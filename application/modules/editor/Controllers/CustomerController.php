@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Customer\CustomerService;
+
 class Editor_CustomerController extends ZfExtended_RestController
 {
     protected $entityClass = 'editor_Models_Customer_Customer';
@@ -82,8 +84,11 @@ class Editor_CustomerController extends ZfExtended_RestController
     public function deleteAction()
     {
         try {
-            parent::deleteAction();
-        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            $this->entityLoad();
+            $this->processClientReferenceVersion();
+
+            CustomerService::create()->delete($this->entity);
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1047' => 'A client cannot be deleted as long as tasks are assigned to this client.',
             ], 'editor.customer');

@@ -50,13 +50,13 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Plugins\SharedConcept\Translation;
+namespace MittagQI\Translate5\Service;
 
 use editor_Models_Languages;
 
-interface CanDetectLanguageInterface
+interface DetectLanguageInterface
 {
-    public function getServiceId(): string;
+    public function getServiceName(): string;
 
-    public function detectLanguage(string $textSample, bool $isInstantTranslate): ?editor_Models_Languages;
+    public function detectLanguage(string $textSample, int ...$customerIds): ?editor_Models_Languages;
 }

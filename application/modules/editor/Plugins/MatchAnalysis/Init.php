@@ -348,7 +348,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         //if the requested operation is from project, queue analysis for each project task
         if ($task->isProject()) {
             $taskmodel = ZfExtended_Factory::get(editor_Models_Task::class);
-            $projects = $taskmodel->loadProjectTasks($task->getProjectId(), true);
+            $projects = $taskmodel->loadProjectTasks((int) $task->getProjectId(), true);
             $taskGuids = array_column($projects, 'taskGuid');
         }
 
@@ -456,9 +456,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
             $connector = $manager->getConnector(
                 $languageResource,
-                $task->getSourceLang(),
-                $task->getRelaisLang(),
-                $task->getConfig()
+                (int) $task->getSourceLang(),
+                (int) $task->getRelaisLang(),
+                $task->getConfig(),
+                (int) $task->getCustomerId(),
             );
             /* @var $connector editor_Services_Connector */
             //collect all connectors which are supporting batch query
@@ -585,12 +586,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
     ) {
         $workerParameters['userGuid'] = ZfExtended_Models_User::SYSTEM_GUID;
         $workerParameters['userName'] = ZfExtended_Models_User::SYSTEM_LOGIN;
-        
+
         if (ZfExtended_Authentication::getInstance()->getUser()) {
             $workerParameters['userGuid'] = ZfExtended_Authentication::getInstance()->getUserGuid();
             $workerParameters['userName'] = ZfExtended_Authentication::getInstance()->getUser()->getUserName();
         }
-        
+
         //enable batch query via config
         $workerParameters['batchQuery'] = (bool) Zend_Registry::get('config')
             ->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
@@ -727,9 +728,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
             $connector = $manager->getConnector(
                 $languageresource,
-                $task->getSourceLang(),
-                $task->getTargetLang(),
-                $task->getConfig()
+                (int) $task->getSourceLang(),
+                (int) $task->getTargetLang(),
+                $task->getConfig(),
+                (int) $task->getCustomerId(),
             );
             /* @var $connector editor_Services_Connector */
             //collect all connectors which are supporting batch query

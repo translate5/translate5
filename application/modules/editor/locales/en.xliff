@@ -9980,6 +9980,54 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server for the queried service is not reachable.</target>
             </trans-unit>
+            <trans-unit id='U3ByYWNow7xiZXJncmVpZmVuZGUgU3luY2hyb25pc2llcnVuZyB2b24gUmVzc291cmNlbg=='>
+                <source>Sprachübergreifende Synchronisierung von Ressourcen</source>
+                <target>Cross Language Resource synchronisation</target>
+            </trans-unit>
+            <trans-unit id='RWluZsO8aHJ1bmc='>
+                <source>Ausgangssprache Ressource</source>
+                <target>Source Language Resource</target>
+            </trans-unit>
+            <trans-unit id='QXVzZ2FuZ3NzcHJhY2hlIFJlc3NvdXJjZQ=='>
+                <source>Zielsprache Ressource</source>
+                <target>Target Language Resourc</target>
+            </trans-unit>
+            <trans-unit id='VmVyYmluZGVuIFNpZQ=='>
+                <source>Verbinden Sie</source>
+                <target>Connect</target>
+            </trans-unit>
+            <trans-unit id='V2FydGVzY2hsYW5nZSBBbGxlIHN5bmNocm9uaXNpZXJlbg=='>
+                <source>Warteschlange Alle synchronisieren</source>
+                <target>Queue Synchronize All</target>
+            </trans-unit>
+            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgU3luY2hyb25pc2llcnVuZyBsw7ZzY2hlbiBtw7ZjaHRlbj8='>
+                <source>Sind Sie sicher, dass Sie die Synchronisierung löschen möchten?</source>
+                <target>Are you sure you want to delete the synchronization?</target>
+            </trans-unit>
+            <trans-unit id='U3luY2hyb25pc2llcnVuZyB2b24gV2FydGVzY2hsYW5nZW4='>
+                <source>Synchronisierung von Warteschlangen</source>
+                <target>Queue Synchronisation</target>
+            </trans-unit>
+            <trans-unit id='RGllIERhdGVuIGbDvHIgZGllIFppZWxzcHJhY2hlbnJlc3NvdXJjZSBrb25udGVuIG5pY2h0IGdlbGFkZW4gd2VyZGVuLg=='>
+                <source>Die Daten für die Zielsprachenressource konnten nicht geladen werden.</source>
+                <target>Failed to load data for Target Language Resource.</target>
+            </trans-unit>
+            <trans-unit id='RGllIFN5bmNocm9uaXNpZXJ1bmcgd3VyZGUgaW4gZGllIFdhcnRlc2NobGFuZ2UgZ2VzdGVsbHQgdW5kIHdpcmQgaW4gS8O8cnplIHZlcmFyYmVpdGV0Lg=='>
+                <source>Die Synchronisierung wurde in die Warteschlange gestellt und wird in Kürze verarbeitet.</source>
+                <target>Synchronization was queued and will be processed soon.</target>
+            </trans-unit>
+            <trans-unit id='U3luY2hyb25pc2llcnVuZyBpbiBXYXJ0ZXNjaGxhbmdlIGZlaGxnZXNjaGxhZ2VuLg=='>
+                <source>Synchronisierung in Warteschlange fehlgeschlagen.</source>
+                <target>Failed to queue Synchronization.</target>
+            </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRpZSBTeW5jaHJvbmlzaWVydW5nLg=='>
+                <source>Bestätigen Sie die Synchronisierung.</source>
+                <target>Confirm Synchronization.</target>
+            </trans-unit>
+            <trans-unit id='VmVyd2FsdGVuIHZvbiBWZXJiaW5kdW5nZW4='>
+                <source>Verwalten von Verbindungen</source>
+                <target>Manage Connections</target>
+            </trans-unit>
             <trans-unit id='UmVnZWxuYW1lIGV4aXN0aWVydCBiZXJlaXRzIGbDvHIgVHlwIHt0eXBlfQ=='>
                 <source>Regelname existiert bereits für Typ {type}</source>
                 <target>Provided Rule name already exists for type {type}</target>

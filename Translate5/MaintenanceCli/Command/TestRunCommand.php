@@ -112,8 +112,8 @@ class TestRunCommand extends Translate5AbstractTestCommand
         $test = trim($this->input->getArgument('test'), '.');
         $testPath = null;
         if (! empty($test)) {
-            $testPath = empty(pathinfo($test, PATHINFO_EXTENSION)) ? $test . '.php' : $test;
-            $testPath = $this->normalizeSingleTestPath($testPath);
+//            $testPath = empty(pathinfo($test, PATHINFO_EXTENSION)) ? $test . '.php' : $test;
+            $testPath = $this->normalizeSingleTestPath($test);
             if (! file_exists($testPath)) {
                 throw new \RuntimeException('The given Test does not exist: ' . $test);
             }

@@ -29,6 +29,8 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
 use MittagQI\Translate5\LanguageResource\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
@@ -124,6 +126,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $resources = [];
+        $synchronizableServiceTypes = $serviceManager->getSynchronizableServiceTypes();
 
         $getResource = function (string $serviceType, string $id) use ($resources, $serviceManager) {
             if (! empty($resources[$id])) {
@@ -165,6 +168,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             $id = $lrData['id'];
             $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
+            $lrData['synchronizableService'] = in_array($lrData['serviceType'], $synchronizableServiceTypes, true);
 
             $lrData['tmNeedsConversion'] = false;
             $lrData['tmConversionInProgress'] = false;
@@ -331,8 +335,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /***
-     * Returns customer assoc active flag fields (useAsDefault,writeAsDefault or pivotAsDefault) for given customer assoc data
-     * and give language resource id
+     * Returns customer assoc active flag fields (useAsDefault,writeAsDefault or pivotAsDefault) for given customer
+     * assoc data and give language resource id
      *
      * @param array $data
      * @param string $index the datafield to get
@@ -404,10 +408,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $eventLoggerGroupped = $eventLogger->getLatesEventsCount([$this->entity->getId()]);
         $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (int) $eventLoggerGroupped[$this->entity->getId()] : 0;
 
-        $connector = $serviceManager->getConnector(
-            $this->entity,
-            config: $this->getSingleCustomerOrDefaultConfig()
-        );
+        $connector = $this->getConnector();
+
         $this->view->rows->status = $connector->getStatus($this->entity->getResource(), $this->entity);
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
 
@@ -420,20 +422,26 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->prepareSpecificData($this->view->rows, false);
     }
 
-    private function getSingleCustomerOrDefaultConfig(): Zend_Config
+    private ?editor_Models_Customer_Customer $currentCustomer = null;
+
+    private function getSingleAssociatedCustomer(): ?editor_Models_Customer_Customer
     {
+        if ($this->currentCustomer !== null) {
+            return $this->currentCustomer;
+        }
+
         $auth = ZfExtended_Authentication::getInstance();
         $customerIds = $auth->getUser()->getCustomersArray();
 
         // We use the customer config if only one customer is set for the user
         if (1 === count($customerIds)) {
-            $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
-            $customer->load($customerIds[0]);
+            $this->currentCustomer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+            $this->currentCustomer->load($customerIds[0]);
 
-            return $customer->getConfig();
+            return $this->currentCustomer;
         }
 
-        return Zend_Registry::get('config');
+        return null;
     }
 
     /**
@@ -727,12 +735,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw new ZfExtended_Models_Entity_NotFoundException('Requested languageResource is not filebased!');
         }
 
-        /* @var $connector editor_Services_Connector */
-        $connector = $serviceManager->getConnector(
-            $this->entity,
-            config: $this->getSingleCustomerOrDefaultConfig()
-        );
-
+        $connector = $this->getConnector();
         $validExportTypes = $connector->getValidExportTypes();
 
         if (empty($validExportTypes[$type])) {
@@ -860,12 +863,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         // especially tests are not respecting the array format ...
         editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
 
-        //check and save customer assoc db entry
-        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-
-        /* @var editor_Models_LanguageResources_CustomerAssoc $customerAssoc */
         try {
-            $customerAssoc->saveAssocRequest((int) $this->entity->getId(), $this->data);
+            CustomerAssocService::create()->updateAssociations(
+                AssociationFormValues::fromArray(
+                    (int) $this->entity->getId(),
+                    $this->data
+                )
+            );
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();
 
@@ -900,7 +904,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         if ($resource->getFilebased()) {
             try {
-                $this->handleInitialFileUpload($manager);
+                $this->handleInitialFileUpload();
             } catch (ZfExtended_ErrorCodeException $e) {
                 $this->entity->delete();
 
@@ -944,8 +948,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 $this->checkOrCleanCustomerAssociation(true, $this->getDataField('customerIds') ?? []);
             }
 
-            $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            $customerAssoc->updateAssocRequest((int) $this->entity->getId(), $this->data);
+            CustomerAssocService::create()->updateAssociations(
+                AssociationFormValues::fromArray(
+                    (int) $this->entity->getId(),
+                    $this->data
+                )
+            );
 
             $this->addAssocData();
         }
@@ -979,8 +987,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     {
         $this->getAction();
 
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
 
@@ -993,7 +1000,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         //upload errors are handled in handleAdditionalFileUpload
-        $this->handleAdditionalFileUpload($serviceManager);
+        $this->handleAdditionalFileUpload();
 
         //when there are errors, we cannot set it to true
         $this->view->success = $this->validateUpload();
@@ -1226,22 +1233,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * Uploads a file into the new languageResource
      */
-    protected function handleInitialFileUpload(editor_Services_Manager $manager)
+    protected function handleInitialFileUpload()
     {
-        $config = $this->getSingleCustomerOrDefaultConfig();
-        $connector = $manager->getConnector(
-            $this->entity,
-            config: $config
-        );
+        $connector = $this->getConnector();
 
-        if (! $connector->ping($this->entity->getResource(), $config)) {
+        if (! $connector->ping($this->entity->getResource(), $this->getConfig())) {
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1282',
                 ['Server für den angefragten Dienst ist nicht erreichbar.']
             );
         }
-
-        /* @var $connector editor_Services_Connector */
 
         $importInfo = $this->handleFileUpload($connector);
 
@@ -1264,13 +1265,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * Uploads an additional file into the already existing languageResource
      */
-    protected function handleAdditionalFileUpload(editor_Services_Manager $manager)
+    protected function handleAdditionalFileUpload()
     {
-        $connector = $manager->getConnector(
-            $this->entity,
-            config: $this->getSingleCustomerOrDefaultConfig()
-        );
-        /* @var $connector editor_Services_Connector */
+        $connector = $this->getConnector();
         $importInfo = $this->handleFileUpload($connector);
 
         if (empty($importInfo)) {
@@ -1526,7 +1523,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $this->entity->load($languageResourceId);
 
-        $connector = $this->getConnector();
+        $connector = $this->getConnectorForTask($this->getCurrentTask());
         $result = $connector->query($segment);
 
         if ($this->entity->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM) {
@@ -1588,7 +1585,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw new ZfExtended_Models_Entity_NoAccessException('search requests are not allowed on this language resource');
         }
 
-        $connector = $this->getConnector();
+        $connector = $this->getConnectorForTask($this->getCurrentTask());
         $result = $connector->search($query, $field, $offset);
         $this->view->languageResourceId = $this->entity->getId();
         $this->view->nextOffset = $result->getNextOffset();
@@ -1607,7 +1604,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $this->entity->load($languageResourceId);
 
-        $connector = $this->getConnector();
+        $connector = $this->getConnectorForTask($this->getCurrentTask());
         $result = $connector->translate($query);
         $result = $result->getResult()[0] ?? [];
         $this->view->translations = $result->metaData['alternativeTranslations'] ?? $result;
@@ -1615,22 +1612,53 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /**
      * returns the connector to be used
-     * @return editor_Services_Connector
+     *
      * @throws editor_Models_ConfigException
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
-    protected function getConnector()
+    private function getConnectorForTask(editor_Models_Task $task): editor_Services_Connector
     {
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-        $task = $this->getCurrentTask();
+        $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
         return $manager->getConnector(
             $this->entity,
             (int) $task->getSourceLang(),
             (int) $task->getTargetLang(),
-            $task->getConfig()
+            $task->getConfig(),
+            (int) $task->getCustomerId()
         );
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
+     */
+    private function getConnector(): editor_Services_Connector
+    {
+        $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
+        $customer = $this->getSingleAssociatedCustomer();
+
+        return $manager->getConnector(
+            $this->entity,
+            config: $this->getConfig(),
+            customerId: $customer ? (int) $customer->getId() : null
+        );
+    }
+
+    private ?Zend_Config $currentConfig = null;
+
+    private function getConfig(): Zend_Config
+    {
+        if (! $this->currentConfig) {
+            $customer = $this->getSingleAssociatedCustomer();
+
+            $this->currentConfig = $customer ? $customer->getConfig() : Zend_Registry::get('config');
+        }
+
+        return $this->currentConfig;
     }
 
     /***

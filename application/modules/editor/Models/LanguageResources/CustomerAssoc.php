@@ -37,90 +37,22 @@ END LICENSE AND COPYRIGHT
  * @method void setCustomerId(int $customerId)
  *
  * @method string getUseAsDefault()
- * @method void setUseAsDefault(int $useAsDefault)
+ * @method void setUseAsDefault(bool $useAsDefault)
  *
  * @method string getWriteAsDefault()
- * @method void setWriteAsDefault(int $writeAsDefault)
+ * @method void setWriteAsDefault(bool $writeAsDefault)
  *
  * @method string getPivotAsDefault()
- * @method void setPivotAsDefault(int $pivotAsDefault)
+ * @method void setPivotAsDefault(bool $pivotAsDefault)
+ *
+ * @method string getLanguageResourceServiceName()
+ * @method void setLanguageResourceServiceName(string $serviceName)
  */
 class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_CustomerAssoc';
 
     protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_CustomerAssoc';
-
-    /***
-     * Save customer assoc from the request parameters for the given language resource.
-     * A language resource that is saved must have at least one customer assigned
-     * (if none is given, we use the defaultcustomer).
-     * @param int $id
-     * @param array $data : request parameters
-     */
-    public function saveAssocRequest(int $id, array $data): void
-    {
-        $customers = $data['customerIds'] ?? [];
-        $useAsDefault = $data['customerUseAsDefaultIds'] ?? [];
-        $writeAsDefault = $data['customerWriteAsDefaultIds'] ?? [];
-        $pivotAsDefault = $data['customerPivotAsDefaultIds'] ?? [];
-
-        // Check if (at least one) customer is set and use the 'defaultcustomer' if not
-        if (empty($customers)) {
-            $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
-            $customer->loadByDefaultCustomer();
-            $customers[] = $customer->getId();
-        }
-
-        // ensure that only useAsDefault customers are used, which are added also as customers
-        $useAsDefault = array_intersect($useAsDefault, $customers);
-
-        // ensure that only writeAsDefault customers are used, which are added also as useAsDefault(read as default)
-        $writeAsDefault = array_intersect($writeAsDefault, $useAsDefault);
-
-        // ensure that only pivotAsDefault customers are used, which are added also as customers
-        $pivotAsDefault = array_intersect($pivotAsDefault, $customers);
-
-        $this->addAssocs($id, $customers, $useAsDefault, $writeAsDefault, $pivotAsDefault);
-    }
-
-    /**
-     * Update customer assoc from the request parameters.
-     *
-     * @param stdClass $data
-     */
-    public function updateAssocRequest(int $id, array $data)
-    {
-        // remove old assocs for the current languageResourceId
-        $this->db->delete([
-            'languageResourceId IN (?)' => $id,
-        ]);
-
-        // save the new data
-        $this->saveAssocRequest($id, $data);
-    }
-
-    /***
-     * Add customer to language resources association into the database.
-     *
-     * @param int $languageResourceId
-     * @param array $customers
-     * @param array $useAsDefault  list of all customers which useAsDefault is 1
-     * @param array $writeAsDefault  list of all customers which writeAsDefault is 1
-     * @param array $pivotAsDefault  list of all customers which pivotAsDefault is 1
-     */
-    public function addAssocs(int $languageResourceId, array $customers, array $useAsDefault = [], array $writeAsDefault = [], array $pivotAsDefault = []): void
-    {
-        foreach ($customers as $id) {
-            $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            $model->setCustomerId($id);
-            $model->setLanguageResourceId($languageResourceId);
-            $model->setUseAsDefault(in_array($id, $useAsDefault));
-            $model->setWriteAsDefault(in_array($id, $writeAsDefault));
-            $model->setPivotAsDefault(in_array($id, $pivotAsDefault));
-            $model->save();
-        }
-    }
 
     /***
      * Get all assocs by $languageResourceId (languageResourceId).
