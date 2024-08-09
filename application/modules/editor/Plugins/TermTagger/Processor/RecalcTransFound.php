@@ -468,22 +468,17 @@ class RecalcTransFound
             'target' => [],
         ];
 
-        // Setup 'used' and 'isSource' flags for each term
+        // Foreach term entry
         foreach ($this->termsByEntry as $termEntryId => $termA) {
             foreach ($termA as $idx => $term) {
-                $this->termsByEntry[$termEntryId][$idx]['used'] = in_array($term['termTbxId'], $tbxIdA);
-                $this->termsByEntry[$termEntryId][$idx]['isSource'] = in_array($term['termTbxId'], $srcIdA);
-            }
-        }
+                // Setup 'used' and 'isSource' flags for each term
+                $this->termsByEntry[$termEntryId][$idx]['used'] = $_used = in_array($term['termTbxId'], $tbxIdA);
+                $this->termsByEntry[$termEntryId][$idx]['isSource'] = $_isSource = in_array($term['termTbxId'], $srcIdA);
 
-        // Foreach termEntry
-        foreach ($this->termsByEntry as $termEntryId => $termA) {
-            // Foreach term inside termEntry
-            foreach ($termA as $term) {
                 // If it's a term used in source or target
-                if ($term['used']) {
+                if ($_used) {
                     // Setup a flag indicating this termEntry has at least one such term
-                    $used[$term['isSource'] ? 'source' : 'target'][$termEntryId] = true;
+                    $used[$_isSource ? 'source' : 'target'][$termEntryId] = true;
                 }
             }
         }
