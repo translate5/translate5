@@ -60,16 +60,15 @@ class Memory extends Base
             $connector = $serviceManager->getConnector($languageResource);
 
             $fullPath = $this->getFolderPath() . DIRECTORY_SEPARATOR . $languageResource->getName();
-            if ($connector->exportsFile()) {
-                $file = $connector->export($connector->getValidExportTypes()['TMX']);
-                ['extension' => $extension] = pathinfo($file);
-                $fullPath .= '.' . $extension;
-                rename($file, $fullPath);
-            } else {
-                $file = $connector->getTm($connector->getValidExportTypes()['TMX']);
-                $fullPath .= '.tmx';
-                file_put_contents($fullPath, $file);
+            $file = $connector->export($connector->getValidExportTypes()['TMX']);
+
+            if (null === $file) {
+                continue;
             }
+
+            ['extension' => $extension] = pathinfo($file);
+            $fullPath .= '.' . $extension;
+            rename($file, $fullPath);
         }
     }
 }

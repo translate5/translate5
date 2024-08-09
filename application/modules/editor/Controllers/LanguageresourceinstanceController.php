@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
@@ -38,6 +39,7 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use MittagQI\ZfExtended\CsrfProtection;
 use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
 use ZfExtended_Sanitizer as Sanitizer;
 
@@ -717,8 +719,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     public function downloadAction()
     {
-        //call GET to load entity internally
-        $this->getAction();
+        $this->entityLoad();
 
         //get type from extension, the part between :ID and extension does not matter
         $type = $this->getParam('type', '.tm');
@@ -741,51 +742,73 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw new ZfExtended_Models_Entity_NotFoundException('Can not download in format ' . $type);
         }
 
-        if ($connector->exportsFile()) {
-            $this->sendStreamedFile($connector->export($validExportTypes[$type]));
+        $filename = $this->getParam('filename');
+        $token = $this->getParam('token');
+        $workerId = $this->getParam('workerId');
+
+        if (null === $token) {
+            throw new ZfExtended_NotFoundException('Token is missing');
+        }
+
+        if (null !== $filename) {
+            $this->trySendFile($token, $filename);
+        }
+
+        $exportService = new ExportService();
+
+        if (null !== $workerId) {
+            $filename = $exportService->getFilenameIfReady($workerId, $token);
+
+            if (null !== $filename) {
+                echo '{"ready":true,"filename":"' . $filename . '"}';
+
+                exit;
+            }
+
+            echo '{"ready":false}';
 
             exit;
         }
 
-        $data = $connector->getTm($validExportTypes[$type]);
+        if (! $exportService->exportStarted($token)) {
+            $workerId = $exportService->queueExportWorker($this->entity, $validExportTypes[$type], $token);
+        }
 
-        Header::sendDownload(
-            rawurlencode($this->entity->getName()) . '.' . strtolower($type),
-            contentType: $validExportTypes[$type]
-        );
+        $this->view->assign('workerId', $workerId);
+        $this->view->assign('token', $token);
+        $this->view->assign('csrfToken', CsrfProtection::getInstance()->getToken());
+        $this->view->assign('languageResourceId', $this->entity->getId());
 
-        echo $data;
+        echo $this->view->render('languageResource/tm-export.phtml');
+
         exit;
     }
 
-    private function sendStreamedFile(string $filePath): void
+    private function trySendFile(string $token, string $filename): void
     {
-        $fp = fopen($filePath, 'rb');
+        $exportService = new ExportService();
 
-        if ($fp === false) {
-            throw new ZfExtended_Models_Entity_NotFoundException('Error occurred during creating file for download');
+        if (! file_exists($exportService->composeExportFilepath($token, $filename))) {
+            throw new ZfExtended_NotFoundException('File no longer exists');
         }
 
-        ['extension' => $extension] = pathinfo($filePath);
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+
         Header::sendDownload(
-            rawurlencode($this->entity->getName()) . '.' . strtolower($extension),
+            rawurlencode($this->entity->getName()) . '.' . $extension,
             contentType: 'application/octet-stream',
             additionalHeaders: [
-                'Content-Length' => filesize($filePath),
                 'Accept-Ranges' => 'bytes',
             ]
         );
 
-        $bufferSize = 8192;
+        $resource = fopen($exportService->composeExportFilepath($token, $filename), 'rb');
+        fpassthru($resource);
+        fclose($resource);
 
-        while (! feof($fp)) {
-            echo fread($fp, $bufferSize);
-            ob_flush();
-            flush();
-        }
+        $exportService->cleanUp($token);
 
-        fclose($fp);
-        unlink($filePath);
+        exit;
     }
 
     public function postAction()

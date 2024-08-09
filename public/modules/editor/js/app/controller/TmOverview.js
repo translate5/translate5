@@ -525,13 +525,15 @@ Ext.define('Editor.controller.TmOverview', {
             url = proxy.getUrl(),
             menu,
             filetypes = Editor.util.LanguageResources.getService(rec.get('serviceName')).getValidFiletypes(),
+            // random string of 10 characters
+            oneTimeFileToken = Math.random().toString(36).substring(2, 12),
             createMenuItems = function () {
                 var items = [];
                 if (filetypes.indexOf('tm') !== -1) {
                     items.push({
                         itemId: 'exportTm',
                         hrefTarget: '_blank',
-                        href: url + '/download.tm',
+                        href: url + '/download.tm?token=' + oneTimeFileToken,
                         text: me.strings.exportTm
                     });
                 }
@@ -539,7 +541,7 @@ Ext.define('Editor.controller.TmOverview', {
                     items.push({
                         itemId: 'exportTmx',
                         hrefTarget: '_blank',
-                        href: url + '/download.tmx',
+                        href: url + '/download.tmx?token=' + oneTimeFileToken,
                         text: me.strings.exportTmx
                     });
                 }
@@ -547,7 +549,7 @@ Ext.define('Editor.controller.TmOverview', {
                     items.push({
                         itemId: 'exportZippedTmx',
                         hrefTarget: '_blank',
-                        href: url + '/download.zip',
+                        href: url + '/download.zip?token=' + oneTimeFileToken,
                         text: me.strings.exportZippedTmx
                     });
                 }
