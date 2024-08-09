@@ -218,6 +218,36 @@ Ext.override(Ext.grid.column.Column, {
     }
 });
 
+/**
+ * Overridden to render tooltip as a value of data-qtip attribute
+ * to fix extjs bug leading to that all words in tooltip are rendered as attribute names
+ */
+Ext.override(Ext.grid.column.Check, {
+    defaultRenderer: function(value, cellValues) {
+        var me = this,
+            cls = me.checkboxCls,
+            tip = me.tooltip;
+        if (me.invert) {
+            value = !value;
+        }
+        if (me.disabled) {
+            cellValues.tdCls += ' ' + me.disabledCls;
+        }
+        if (value) {
+            cls += ' ' + me.checkboxCheckedCls;
+            tip = me.checkedTooltip || tip;
+        }
+        if (me.useAriaElements) {
+            cellValues.tdAttr += ' aria-describedby="' + me.id + '-cell-description' + (!value ? '-not' : '') + '-selected"';
+        }
+        // This will update the header state on the next animation frame
+        // after all rows have been rendered.
+        if (tip) tip = 'data-qtip="' + tip + '"';         // +
+        me.updateHeaderState();
+        return '<span ' + (tip || '') + ' class="' + cls + '" role="' + me.checkboxAriaRole + '"' + (!me.ariaStaticRoles[me.checkboxAriaRole] ? ' tabIndex="0"' : '') + '></span>';
+    }
+});
+
 
 /***
  * Enable the text to be selectable for treepanels

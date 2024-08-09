@@ -142,7 +142,7 @@ class State
     {
         $this->serviceId = $serviceId;
         $this->segmentId = (is_null($row)) ? -1 : $row->segmentId;
-        if (! isset(static::$table)) {
+        if (! isset(static::$table)) { // @phpstan-ignore-line
             static::$table = new Processing();
         }
         $this->row = $row;
@@ -258,6 +258,11 @@ class State
             $states = [];
             $segmentIds = [];
             $column = $this->getColumnName();
+
+            $db = static::$table->getAdapter();
+
+            $db->beginTransaction();
+
             $where = static::$table->select()
                 ->forUpdate(Zend_Db_Select::FU_MODE_SKIP)
                 ->where('`taskGuid` = ?', $taskGuid)
@@ -269,6 +274,7 @@ class State
                 $states[] = new static($this->serviceId, $row);
             }
             if (count($segmentIds) > 1) {
+                // @phpstan-ignore-next-line
                 static::$table->update([
                     $column => self::INPROGRESS,
                 ], [
@@ -279,6 +285,8 @@ class State
                 $row->$column = self::INPROGRESS;
                 $row->save();
             }
+
+            $db->commit();
 
             return $states;
         });

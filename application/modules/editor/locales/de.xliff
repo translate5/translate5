@@ -9806,6 +9806,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server für den angefragten Dienst ist nicht erreichbar.</target>
             </trans-unit>
+            <trans-unit id='UmVnZWxuYW1lIGV4aXN0aWVydCBiZXJlaXRzIGbDvHIgVHlwIHt0eXBlfQ=='>
+                <source>Regelname existiert bereits für Typ {type}</source>
+                <target>Regelname existiert bereits für Typ {type}</target>
+            </trans-unit>
+            <trans-unit id='U2llIHZlcndlbmRlbiBkaWVzZSBSZWdlbCBiZXJlaXRzIGbDvHIgZGllc2UgU3ByYWNoZQ=='>
+                <source>Sie verwenden diese Regel bereits für diese Sprache</source>
+                <target>Sie verwenden diese Regel bereits für diese Sprache</target>
+            </trans-unit>
+            <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
+                <source>Regel mit dieser Priorität existiert bereits</source>
+                <target>Rule with this priority already exists</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

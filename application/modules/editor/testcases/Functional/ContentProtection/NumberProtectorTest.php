@@ -353,6 +353,42 @@ class NumberProtectorTest extends TestCase
             'expected' => 'string <number type="float" name="default generic with dot" source="123456789.12345" iso="123456789.12345" target="123456789.12345"/> string',
         ];
         yield [
+            'string' => 'string 0.123 string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="0.123" iso="0.123" target="0.123"/> string',
+        ];
+        yield [
+            'string' => 'string -0.123 string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="-0.123" iso="-0.123" target="-0.123"/> string',
+        ];
+        yield [
+            'string' => 'string +0.123 string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="+0.123" iso="+0.123" target="+0.123"/> string',
+        ];
+        yield [
+            'string' => 'string 1.0 string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="1.0" iso="1.0" target="1.0"/> string',
+        ];
+        yield [
+            'string' => 'string 0,123 string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="0,123" iso="0.123" target="0.123"/> string',
+        ];
+        yield [
+            'string' => 'string -0,123 string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="-0,123" iso="-0.123" target="-0.123"/> string',
+        ];
+        yield [
+            'string' => 'string -12,123 string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="-12,123" iso="-12.123" target="-12.123"/> string',
+        ];
+        yield [
+            'string' => 'string +12,123 string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="+12,123" iso="+12.123" target="+12.123"/> string',
+        ];
+        yield [
+            'string' => 'string 1,0 string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="1,0" iso="1.0" target="1.0"/> string',
+        ];
+        yield [
             'string' => 'string 123456789,12345 string',
             'expected' => 'string <number type="float" name="default generic with comma" source="123456789,12345" iso="123456789.12345" target="123456789.12345"/> string',
         ];
@@ -360,10 +396,30 @@ class NumberProtectorTest extends TestCase
             'string' => 'string 123456789·12345 string',
             'expected' => 'string <number type="float" name="default generic with middle dot" source="123456789·12345" iso="123456789.12345" target="123456789.12345"/> string',
         ];
+        yield [
+            'string' => 'string 0·123 string',
+            'expected' => 'string <number type="float" name="default generic with middle dot" source="0·123" iso="0.123" target="0.123"/> string',
+        ];
+        yield [
+            'string' => 'string -0·12345 string',
+            'expected' => 'string <number type="float" name="default generic with middle dot" source="-0·12345" iso="-0.12345" target="-0.12345"/> string',
+        ];
+        yield [
+            'string' => 'string +0·12345 string',
+            'expected' => 'string <number type="float" name="default generic with middle dot" source="+0·12345" iso="+0.12345" target="+0.12345"/> string',
+        ];
 
         yield [
             'string' => 'string 1,234,567.89 string',
             'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="1,234,567.89" iso="1234567.89" target="1234567.89"/> string',
+        ];
+        yield [
+            'string' => 'string -1,234,567.89 string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="-1,234,567.89" iso="-1234567.89" target="-1234567.89"/> string',
+        ];
+        yield [
+            'string' => 'string +1,234,567.89 string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="+1,234,567.89" iso="+1234567.89" target="+1234567.89"/> string',
         ];
         yield [
             'string' => 'string 1,234,567·89 string',
@@ -465,11 +521,28 @@ class NumberProtectorTest extends TestCase
             'string' => 'string 123456789 string',
             'expected' => 'string <number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/> string',
         ];
+        yield [
+            'string' => 'string -123456789 string',
+            'expected' => 'string <number type="integer" name="default simple" source="-123456789" iso="-123456789" target="-123456789"/> string',
+        ];
+        yield [
+            'string' => 'string +123456789 string',
+            'expected' => 'string <number type="integer" name="default simple" source="+123456789" iso="+123456789" target="+123456789"/> string',
+        ];
 
         yield [
             'string' => 'string 1,234,567 string',
             'expected' => 'string <number type="integer" name="default generic with comma separator" source="1,234,567" iso="1234567" target="1234567"/> string',
         ];
+        yield [
+            'string' => 'string -1,234,567 string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="-1,234,567" iso="-1234567" target="-1234567"/> string',
+        ];
+        yield [
+            'string' => 'string +1,234,567 string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="+1,234,567" iso="+1234567" target="+1234567"/> string',
+        ];
+
         yield [
             'string' => 'string 12,34,567 string',
             'expected' => 'string <number type="integer" name="default indian with comma thousand" source="12,34,567" iso="1234567" target="1234567"/> string',
@@ -626,6 +699,16 @@ class NumberProtectorTest extends TestCase
             'string' => 'string KEEP TEXT string',
             'expected' => 'string <number type="keep-content" name="default" source="KEEP TEXT" iso="KEEP TEXT" target="KEEP TEXT"/> string',
         ];
+
+        yield [
+            'string' => '#OVERLAY9_TITLE=In diesem Bereich werfen wir einen Blick in die Zukunft.',
+            'expected' => '<number type="keep-content" name="default" source="#OVERLAY9_TITLE=" iso="#OVERLAY9_TITLE=" target="#OVERLAY9_TITLE="/>In diesem Bereich werfen wir einen Blick in die Zukunft.',
+        ];
+
+        yield [
+            'string' => '#OVERLAY123_BODY=In diesem Bereich werfen wir einen Blick in die Zukunft.',
+            'expected' => '<number type="keep-content" name="default" source="#OVERLAY123_BODY=" iso="#OVERLAY123_BODY=" target="#OVERLAY123_BODY="/>In diesem Bereich werfen wir einen Blick in die Zukunft.',
+        ];
     }
 
     public function replaceContentProvider(): iterable
@@ -699,20 +782,26 @@ class NumberProtectorTest extends TestCase
 
     private function getNumberFormatRepository(): ContentProtectionRepository
     {
+        return $this->createConfiguredMock(
+            ContentProtectionRepository::class,
+            [
+                'getAllForSource' => $this->getProtectionDtos(),
+                'hasActiveTextRules' => true,
+            ]
+        );
+    }
+
+    private function getProtectionDtos(): iterable
+    {
         $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
         $contentRecognitionTable = $dbContentRecognition->info($dbContentRecognition::NAME);
-        $select = $dbContentRecognition->select()
-            ->from([
-                'recognition' => $contentRecognitionTable,
-            ], ['recognition.*'])
-            ->where('isDefault = true');
 
         $getAll = function ($select) use ($dbContentRecognition) {
             foreach ($dbContentRecognition->fetchAll($select) as $formatData) {
                 $formatData = $formatData->toArray();
                 $formatData['outputFormat'] = match ($formatData['type']) {
                     DateProtector::getType() => 'Y-m-d',
-                    FloatProtector::getType() => '#.#',
+                    FloatProtector::getType() => '#.#0',
                     IntegerProtector::getType() => '#',
                     default => null
                 };
@@ -720,38 +809,84 @@ class NumberProtectorTest extends TestCase
 
                 yield ContentProtectionDto::fromRow($formatData);
             }
-
-            yield new ContentProtectionDto(
-                'keep-content',
-                'default',
-                '/KEEP TEXT/',
-                0,
-                null,
-                true,
-                null,
-                0
-            );
-
-            yield new ContentProtectionDto(
-                'replace-content',
-                'default',
-                '/REPLACE TEXT/',
-                0,
-                'REPLACE TEXT',
-                true,
-                'OTHER TEXT',
-                0
-            );
         };
 
-        $numberRepository = $this->createConfiguredMock(
-            ContentProtectionRepository::class,
-            [
-                'getAllForSource' => $getAll($select),
-                'hasActiveTextRules' => true,
-            ]
+        $selectIps = $dbContentRecognition->select()
+            ->from([
+                'recognition' => $contentRecognitionTable,
+            ], ['recognition.*'])
+            ->where('isDefault = true')
+            ->where('type = "ip-address"');
+
+        yield from $getAll($selectIps);
+
+        $selectMacs = $dbContentRecognition->select()
+            ->from([
+                'recognition' => $contentRecognitionTable,
+            ], ['recognition.*'])
+            ->where('isDefault = true')
+            ->where('type = "mac-address"');
+
+        yield from $getAll($selectMacs);
+
+        $selectDates = $dbContentRecognition->select()
+            ->from([
+                'recognition' => $contentRecognitionTable,
+            ], ['recognition.*'])
+            ->where('isDefault = true')
+            ->where('type = "date"');
+
+        yield from $getAll($selectDates);
+
+        $selectFloats = $dbContentRecognition->select()
+            ->from([
+                'recognition' => $contentRecognitionTable,
+            ], ['recognition.*'])
+            ->where('isDefault = true')
+            ->where('type = "float"');
+
+        yield from $getAll($selectFloats);
+
+        $selectIntegers = $dbContentRecognition->select()
+            ->from([
+                'recognition' => $contentRecognitionTable,
+            ], ['recognition.*'])
+            ->where('isDefault = true')
+            ->where('type = "integer"');
+
+        yield from $getAll($selectIntegers);
+
+        yield new ContentProtectionDto(
+            'keep-content',
+            'default',
+            '/KEEP TEXT/',
+            0,
+            null,
+            true,
+            null,
+            0
         );
 
-        return $numberRepository;
+        yield new ContentProtectionDto(
+            'replace-content',
+            'default',
+            '/REPLACE TEXT/',
+            0,
+            'REPLACE TEXT',
+            true,
+            'OTHER TEXT',
+            0
+        );
+
+        yield new ContentProtectionDto(
+            'keep-content',
+            'default',
+            '/#OVERLAY\d*_(BODY|TITLE)=/',
+            0,
+            null,
+            true,
+            null,
+            0
+        );
     }
 }
