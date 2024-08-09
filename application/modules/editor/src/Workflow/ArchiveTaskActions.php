@@ -82,11 +82,11 @@ class ArchiveTaskActions
         $daysOffset = (int) $daysOffset; //ensure that it is plain integer
         $select = $taskEntity->db->select();
 
-        if (! empty($workflowSteps)) {
-            $select->where('(`state` = ?', $taskEntity::STATE_END)
-                ->orWhere('`workflowStepName` IN (?))', $workflowSteps);
-        } else {
+        if (empty($workflowSteps)) {
             $select->where('`state` = ?', $taskEntity::STATE_END);
+        } else {
+            $select->where('`state` IN (?)', $taskEntity::NON_EXCLUSIVE_STATES)
+                ->where('`workflowStepName` IN (?)', $workflowSteps);
         }
 
         if (! empty($clientIds)) {

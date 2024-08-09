@@ -194,9 +194,9 @@ class editor_Models_Import_FileParser_XmlParser
                 //  as trying to use the result of a combined regex
                 $attributes = array_merge(
                     //find attributes with " quotes:
-                    $this->parseAttributes('/([^\s]+)="([^"]*)"/', $chunk),
+                    $this->parseAttributes('/([^\s]+)="([^"]*)"/U', $chunk),
                     //find attributes with ' quotes:
-                    $this->parseAttributes("/([^\s]+)='([^']*)'/", $chunk)
+                    $this->parseAttributes("/([^\s]+)='([^']*)'/U", $chunk)
                 );
 
                 $this->handleElementStart($key, $tag, $attributes, $isSingle);

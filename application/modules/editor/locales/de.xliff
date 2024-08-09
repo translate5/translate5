@@ -9028,6 +9028,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</source>
                 <target>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</target>
             </trans-unit>
+            <trans-unit id='KEdnZi4gZmVobGVyaGFmdGVyKSBUcmVubmVyIGF1cyBRdWVsbGUgdW52ZXLDpG5kZXJ0IGluIFppZWwgw7xiZXJub21tZW4='>
+                <source>(Ggf. fehlerhafter) Trenner aus Quelle unverändert in Ziel übernommen</source>
+                <target>(Ggf. fehlerhafter) Trenner aus Quelle unverändert in Ziel übernommen</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgcHLDvGZlbiwgb2IgZXMgc2ljaCB1bSBlaW5lIGVjaHRlIFphaGwgdnMuIGVpbmUgUHJvZHVrdG51bW1lciBvLsOkLiBoYW5kZWx0LiBCZWkgdmVyd2VuZGV0ZW0gVHJlbm5lciBpbiBlaW5lciBQcm9kdWt0bnVtbWVyIG8uw6QuIGluIGRlciBRdWVsbGUgYml0dGUgaWdub3JpZXJlbg=='>
+                <source>Bitte prüfen, ob es sich um eine echte Zahl vs. eine Produktnummer o.ä. handelt. Bei verwendetem Trenner in einer Produktnummer o.ä. in der Quelle bitte ignorieren</source>
+                <target>Bitte prüfen, ob es sich um eine echte Zahl vs. eine Produktnummer o.ä. handelt. Bei verwendetem Trenner in einer Produktnummer o.ä. in der Quelle bitte ignorieren</target>
+            </trans-unit>
             <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='>
                 <source>taskType::termtranslation</source>
                 <target>Terminologieübersetzungsprojekt</target>
@@ -9841,6 +9849,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='VmVyd2FsdGVuIHZvbiBWZXJiaW5kdW5nZW4='>
                 <source>Verwalten von Verbindungen</source>
                 <target>Manage Connections</target>
+            </trans-unit>
+            <trans-unit id='UmVnZWxuYW1lIGV4aXN0aWVydCBiZXJlaXRzIGbDvHIgVHlwIHt0eXBlfQ=='>
+                <source>Regelname existiert bereits für Typ {type}</source>
+                <target>Regelname existiert bereits für Typ {type}</target>
+            </trans-unit>
+            <trans-unit id='U2llIHZlcndlbmRlbiBkaWVzZSBSZWdlbCBiZXJlaXRzIGbDvHIgZGllc2UgU3ByYWNoZQ=='>
+                <source>Sie verwenden diese Regel bereits für diese Sprache</source>
+                <target>Sie verwenden diese Regel bereits für diese Sprache</target>
+            </trans-unit>
+            <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
+                <source>Regel mit dieser Priorität existiert bereits</source>
+                <target>Rule with this priority already exists</target>
             </trans-unit>
         </body>
     </file>

@@ -32,82 +32,40 @@ use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
  */
 class editor_Segment_Numbers_Check
 {
-    /**
-     * @var string
-     */
     public const NUM1 = 'num1';
 
-    /**
-     * @var string
-     */
     public const NUM2 = 'num2';
 
-    /**
-     * @var string
-     */
     public const NUM3 = 'num3';
 
-    /**
-     * @var string
-     */
     public const NUM4 = 'num4';
 
-    /**
-     * @var string
-     */
     public const NUM5 = 'num5';
 
-    /**
-     * @var string
-     */
     public const NUM6 = 'num6';
 
-    /**
-     * @var string
-     */
     public const NUM7 = 'num7';
 
-    /**
-     * @var string
-     */
     public const NUM8 = 'num8';
 
-    /**
-     * @var string
-     */
     public const NUM9 = 'num9';
 
-    /**
-     * @var string
-     */
     public const NUM10 = 'num10';
 
-    /**
-     * @var string
-     */
     public const NUM11 = 'num11';
 
-    /**
-     * @var string
-     */
     public const NUM12 = 'num12';
 
-    /**
-     * @var string
-     */
     public const NUM13 = 'num13';
 
-    /**
-     * @var array
-     */
-    private $states = [];
+    public const NUM14 = 'num14';
+
+    private array $states = [];
 
     /**
      * Languages [id => rfc5646] pairs
-     *
-     * @var array
      */
-    public static $lang = null;
+    public static ?array $lang = null;
 
     /**
      * editor_Segment_Numbers_Check constructor.
