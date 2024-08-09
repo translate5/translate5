@@ -62,22 +62,38 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
             $prevMassage = $e->getPrevious()->getMessage();
 
-            ZfExtended_Models_Entity_Conflict::addCodes([
+            ZfExtended_UnprocessableEntity::addCodes([
                 'E1591' => 'You already created an {mapping} mapping for this {index} combination',
             ], 'editor.content-protection');
 
             if (strpos($prevMassage, $this->entity->getLanguageId() . '-' . $this->entity->getContentRecognitionId())) {
-                throw new ZfExtended_Models_Entity_Conflict('E1591', [
-                    'mapping' => 'Input',
-                    'index' => 'language-rule',
-                ]);
+                throw ZfExtended_UnprocessableEntity::createResponse(
+                    'E1591',
+                    [
+                        'contentRecognitionId' => [
+                            'Sie verwenden diese Regel bereits für diese Sprache',
+                        ],
+                    ],
+                    [
+                        'mapping' => 'Input',
+                        'index' => 'language-rule',
+                    ]
+                );
             }
 
             if (strpos($prevMassage, $this->entity->getLanguageId() . '-' . $this->entity->getPriority())) {
-                throw new ZfExtended_Models_Entity_Conflict('E1591', [
-                    'mapping' => 'Input',
-                    'index' => 'language-priority',
-                ]);
+                throw ZfExtended_UnprocessableEntity::createResponse(
+                    'E1591',
+                    [
+                        'priority' => [
+                            'Regel mit dieser Priorität existiert bereits',
+                        ],
+                    ],
+                    [
+                        'mapping' => 'Input',
+                        'index' => 'language-priority',
+                    ]
+                );
             }
 
             throw $e;
@@ -97,9 +113,10 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
 
     public function indexAction(): void
     {
-        /** @var array{id: int, languageId: int, type: string, name: string, description: string, priority: int}[] */
+        /** @phpstan-ignore-next-line */
         $this->view->rows = $this->entity->loadAllForFrontEnd();
 
+        /** @var array{id: int, languageId: int, type: string, name: string, description: string, priority: int, enabled: bool} $row */
         foreach ($this->view->rows as &$row) {
             $row['ruleEnabled'] = boolval($row['enabled']);
             unset($row['enabled']);
