@@ -52,9 +52,4 @@ class CrossSynchronizationConnection extends ZfExtended_Models_Entity_Abstract
     protected $dbInstanceClass = Db\CrossSynchronizationConnection::class;
 
     protected $validatorInstanceClass = Validator\CrossLanguageResourceSynchronization::class;
-
-    public function hydrate(array|Zend_Db_Table_Row_Abstract $data): void
-    {
-        $this->row = is_array($data) ? $this->db->createRow($data) : $data;
-    }
 }

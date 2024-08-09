@@ -31,14 +31,15 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
     requires: [
         'Editor.view.LanguageResources.TmWindowViewModel',
         'Editor.model.LanguageResources.SyncAssoc',
-        'Editor.store.LanguageResources.SyncAssocStore'
+        'Editor.store.LanguageResources.SyncAssocStore',
+        'Editor.view.LanguageResources.SyncAssocWindowViewController',
     ],
     xtype: 'associationwindow',
     title: Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
     width: 600,
     height: 400,
     modal: true,
-
+    controller: 'languageResourceSyncAssocWindow',
     items: [
         {
             xtype: 'container',
@@ -161,135 +162,6 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
         }
     ],
 
-    controller: {
-        onAssociationGridRender: function(grid) {
-            grid.getStore().load({
-                params: {
-                    languageResource: this.getView().languageResource.get('id')
-                },
-                callback: (records, operation, success) => {
-                    if (! success) {
-                        return;
-                    }
-
-                    if (records.length === 0) {
-                        return;
-                    }
-
-                    this.lookupReference('queueSynchronizeAll').show();
-                }
-            });
-
-            this.updateForm();
-        },
-
-        updateForm: function() {
-            const form = this.lookupReference('associationForm');
-
-            var combo = form.down('combo[name=targetLanguageResourceId]');
-            var store = combo.getStore();
-
-            Ext.Ajax.request({
-                url: Editor.data.restpath + 'languageresourcesync/' + this.getView().languageResource.get('id') + '/available-for-connection',
-                method: 'GET',
-                success: response => {
-                    form.hide();
-                    const data = Ext.decode(response.responseText);
-
-                    if (data.total > 0) {
-                        form.show();
-                        store.loadData(data.rows)
-                    }
-                },
-                failure: function() {
-                    Ext.Msg.alert(
-                        'Error',
-                        Editor.data.l10n.crossLanguageResourceSynchronization.failedToLoadDataForTargetLanguageResource
-                    );
-                }
-            });
-        },
-
-        onDeleteConnection: function(view, rowIndex, colIndex, item, e, record) {
-            const callback = (btn) => btn === 'yes' && record.erase({
-                success: () => {
-                    view.getStore().remove(record);
-                    this.updateForm();
-                }
-            });
-
-            Ext.MessageBox.confirm(
-                Editor.data.l10n.crossLanguageResourceSynchronization.confirm_deletion_title,
-                Editor.data.l10n.crossLanguageResourceSynchronization.confirm_deletion_message,
-                callback
-            );
-        },
-
-        onSynchronizeConnection: function(view, rowIndex, colIndex, item, e, record) {
-            const callback = (btn) => btn === 'yes' && Ext.Ajax.request({
-                url: Editor.data.restpath + 'languageresourcesyncconnection/' + record.get('id') + '/queue-synchronize',
-                method: 'POST',
-                success: response => {
-                    Ext.Msg.alert(
-                        Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
-                        Editor.data.l10n.crossLanguageResourceSynchronization.synchronisationQueued
-                    );
-                },
-                failure: function() {
-                    Ext.Msg.alert('Error', Editor.data.l10n.crossLanguageResourceSynchronization.failedToQueue);
-                }
-            });
-
-            Ext.MessageBox.confirm(
-                Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
-                Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
-                callback
-            );
-        },
-
-        onAddAssociation: function(button) {
-            const form = button.up('form').getForm();
-            if (form.isValid()) {
-                const
-                    association = Ext.create('Editor.model.LanguageResources.SyncAssoc', form.getValues()),
-                    lrId = this.getView().languageResource.get('id')
-                ;
-
-                association.set('sourceLanguageResourceId', lrId);
-                association.save({
-                    success: () => {
-                        const
-                            store = button.up('window').down('grid').getStore(),
-                            url = Editor.model.LanguageResources.SyncAssoc.proxy.url + '?languageResource=' + lrId
-                        store.load({url: url});
-                        this.updateForm();
-                    }
-                });
-            }
-        },
-
-        queueSynchronizeAll: function(button) {
-            const callback = (btn) => btn === 'yes' && Ext.Ajax.request({
-                url: Editor.data.restpath + 'languageresourcesync/' + this.getView().languageResource.get('id') + '/queue-synchronize-all',
-                method: 'POST',
-                success: response => {
-                    Ext.Msg.alert(
-                        Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
-                        Editor.data.l10n.crossLanguageResourceSynchronization.synchronisationQueued
-                    );
-                },
-                failure: function() {
-                    Ext.Msg.alert('Error', Editor.data.l10n.crossLanguageResourceSynchronization.failedToQueue);
-                }
-            });
-
-            Ext.MessageBox.confirm(
-                Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
-                Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
-                callback
-            );
-        }
-    },
     loadRecord: function(record) {
         let associations = this.getViewModel().getStore('associations'),
             url = Editor.model.LanguageResources.SyncAssoc.proxy.url + '?languageResource=' + record.get('id');

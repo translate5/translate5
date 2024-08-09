@@ -98,11 +98,6 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
     private string $absoluteDataPath;
 
-    public function hydrate(array|Zend_Db_Table_Row_Abstract $data): void
-    {
-        $this->row = is_array($data) ? $this->db->createRow($data) : $data;
-    }
-
     /***
      * Init the language resource instance for given editor_Models_LanguageResources_Resource
      * @param editor_Models_LanguageResources_Resource $resource
