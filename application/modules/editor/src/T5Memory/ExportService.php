@@ -138,10 +138,10 @@ class ExportService
             Api\V6\VersionedApi::isVersionSupported($version) => $this->versionedApiFactory
                 ->get(Api\V6\VersionedApi::class)
                 ->downloadTm($languageResource->getResource()->getUrl(), $tmName),
-//  Code stays here for case if we fix TM export security issue in v5
-//            Api\V5\VersionedApi::isVersionSupported($version) => $this->versionedApiFactory
-//                ->get(Api\V5\VersionedApi::class)
-//                ->getTm($languageResource->getResource()->getUrl(), $tmName),
+            //  Code stays here for case if we fix TM export security issue in v5
+            //            Api\V5\VersionedApi::isVersionSupported($version) => $this->versionedApiFactory
+            //                ->get(Api\V5\VersionedApi::class)
+            //                ->getTm($languageResource->getResource()->getUrl(), $tmName),
 
             default => throw new LogicException('Unsupported T5Memory version: ' . $version)
         };
