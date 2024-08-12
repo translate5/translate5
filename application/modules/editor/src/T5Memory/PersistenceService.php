@@ -35,8 +35,9 @@ use Zend_Config;
 
 class PersistenceService
 {
-    public function __construct(private readonly Zend_Config $config)
-    {
+    public function __construct(
+        private readonly Zend_Config $config
+    ) {
     }
 
     public function getWritableMemory(LanguageResource $languageResource): string
