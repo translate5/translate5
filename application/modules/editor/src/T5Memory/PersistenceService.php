@@ -31,9 +31,15 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use Zend_Config;
 
 class PersistenceService
 {
+    public function __construct(
+        private readonly Zend_Config $config
+    ) {
+    }
+
     public function getWritableMemory(LanguageResource $languageResource): string
     {
         foreach ($languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
@@ -45,5 +51,20 @@ class PersistenceService
         throw new \editor_Services_Connector_Exception('E1564', [
             'name' => $languageResource->getName(),
         ]);
+    }
+
+    /**
+     * adds the internal TM prefix to the given TM name
+     */
+    public function addTmPrefix(string $tmName): string
+    {
+        //CRUCIAL: the prefix (if any) must be added on usage, and may not be stored in the specificName
+        // that is relevant for security on a multi hosting environment
+        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
+        if (! empty($prefix) && ! str_starts_with($tmName, $prefix . '-')) {
+            $tmName = $prefix . '-' . $tmName;
+        }
+
+        return $tmName;
     }
 }
