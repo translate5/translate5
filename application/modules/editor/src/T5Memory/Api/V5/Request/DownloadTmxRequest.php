@@ -36,6 +36,8 @@ class DownloadTmxRequest extends Request
 {
     public function __construct(string $baseUrl, string $tmName)
     {
+        $tmName = urlencode($tmName);
+
         parent::__construct(
             'GET',
             rtrim($baseUrl, '/') . "/$tmName/",
