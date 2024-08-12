@@ -100,10 +100,22 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
                 $state = $this->saveServiceState();
             }
 
-            return ((int) $state[$url] > 1);
+            return ((int) $state[$url]) > 1;
         }
 
         return false;
+    }
+
+    /**
+     * Retrieves if one of our pools is load-balanced
+     */
+    public function hasLoadBalancedPool(): bool
+    {
+        return (
+            $this->isPoolLoadBalanced('default') ||
+            $this->isPoolLoadBalanced('gui') ||
+            $this->isPoolLoadBalanced('import')
+        );
     }
 
     /**
@@ -166,9 +178,7 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
         }
         // we only save services to the down list, if the service is not load-balanced
         // Note, that this is regarded as such, if only one of the single pool-urls is load-balanced ...
-        $isLoadBalanced = ($this->isPoolLoadBalanced('default') || $this->isPoolLoadBalanced('gui'));
-        // save the down-list
-        if (! $isLoadBalanced && $saveStateToMemCache) {
+        if (! $this->hasLoadBalancedPool() && $saveStateToMemCache) {
             Services::saveServiceDownList($this->getServiceId(), $downServices);
         }
 
@@ -220,6 +230,15 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
                 if (! $result['success']) {
                     $this->errors[] = 'The configured service-URL "' . $url . '" is not working properly.';
                     $checked = false;
+                }
+            }
+        }
+        // we add the load-balancing state to our output if there are load-balanced pools
+        if ($this->hasLoadBalancedPool()) {
+            // we fetched the state with ::hasLoadBalancedPool
+            foreach (Services::getServiceState($this->getServiceId()) as $url => $numIps) {
+                if (((int) $numIps) > 1) {
+                    $this->checkedInfos[] = 'Url "' . $url . '" is load-balanced!';
                 }
             }
         }
