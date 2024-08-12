@@ -190,12 +190,18 @@ class editor_ConfigController extends ZfExtended_RestController
 
                 break;
             case $this->entity::CONFIG_LEVEL_CUSTOMER:
-                $customerConfig = ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
+                $customerConfig = ZfExtended_Factory::get(editor_Models_Customer_CustomerConfig::class);
                 /* @var $customerConfig editor_Models_Customer_CustomerConfig */
                 $oldValue = $customerConfig->getCurrentValue($customerId, $this->data->name);
-                $customerConfig->updateInsertConfig($customerId, $this->data->name, $value);
-                //this value may not be saved! It is just for setting the return value to the gui.
-                $this->entity->setValue($value);
+
+                if ('' === $value) {
+                    $customerConfig->deleteRecord($customerId, $this->data->name);
+                    $this->entity->loadByName($this->data->name);
+                } else {
+                    $customerConfig->updateInsertConfig($customerId, $this->data->name, $value);
+                    //this value may not be saved! It is just for setting the return value to the gui.
+                    $this->entity->setValue($value);
+                }
 
                 $row['customerId'] = $customerId;
 

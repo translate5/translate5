@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+
 /**
  * Evaluates to a ZfExtended_BadGateway exception!
  */
@@ -60,5 +62,32 @@ class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode
     {
         parent::setDuplication();
         ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312', 'E1370', 'E1485', 'E1486', 'E1512');
+    }
+
+    public static function fromApiRequestError(
+        mixed $error,
+        string $service,
+        ?LanguageResource $languageResource,
+        ?string $tmName = null,
+        ?Throwable $previous = null,
+    ): self {
+        $ecode = 'E1313';
+        $data = [
+            'service' => $service,
+            'languageResource' => $languageResource ?? '',
+            'tmName' => $tmName,
+            'error' => $error,
+        ];
+        if (strpos($error->error ?? '', 'needs to be organized') !== false) {
+            $ecode = 'E1314';
+            $data['tm'] = $languageResource?->getName();
+        }
+
+        if (strpos($error->error ?? '', 'too many open translation memory databases') !== false) {
+            $ecode = 'E1333';
+        }
+
+        /* @phpstan-ignore-next-line */
+        return new self($ecode, $data, $previous);
     }
 }

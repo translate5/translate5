@@ -1,190 +1,200 @@
 {
-	"config" : {
-		"platform" : {
-			"php" : "8.1.23"
-		},
-		"allow-plugins": {
-			"wikimedia/composer-merge-plugin": true,
-			"php-http/discovery": true
-		}
-	},
-	"autoload" : {
-		"psr-4" : {
-			"MittagQI\\ZfExtended\\" : "library/ZfExtended",
-			"MittagQI\\Translate5\\" : "application/modules/editor/src",
-			"MittagQI\\Translate5\\Plugins\\" : "application/modules/editor/Plugins",
-            "Translate5\\MaintenanceCli\\" : "Translate5/MaintenanceCli"
-		}
-	},
-	"repositories" : [{
-			"type" : "package",
-			"package" : {
-				"name" : "gportela85/datetimefield",
-				"license" : "MIT",
-				"version" : "1.9",
-				"description" : "A DateTime Form Field UX for Sencha, ExtJS 5.x and ExtJS 6.x.",
-				"type" : "extjs-ux",
-				"source" : {
-					"url" : "https://github.com/gportela85/DateTimeField.git",
-					"type" : "git",
-					"reference" : "1.9"
-				}
-			}
-		}, {
-			"type" : "package",
-			"package" : {
-				"name" : "translate5/instanttranslate-roboto-font",
-				"license" : "Apache-2.0",
-				"version" : "26",
-				"description" : "package introducing roboto font from google for instanttranslation",
-				"dist" : {
-					"url" : "https://downloads.translate5.net/instanttranslate-font-roboto.zip",
-					"type" : "zip"
-				}
-			}
-		}, {
-			"type" : "package",
-			"package" : {
-				"name" : "translate5/rangy-lib",
-				"license" : "MIT",
-				"version" : "1.3.1-dev",
-				"description" : "A cross-browser JavaScript range and selection library, originating from https://github.com/timdown/rangy",
-				"dist" : {
-					"url" : "https://downloads.translate5.net/rangy.zip",
-					"type" : "zip"
-				}
-			}
-		}, {
-			"type" : "git",
-			"url" : "https://bitbucket.org/mittagqi/restful-zend-framework/"
-		}, {
-			"type" : "git",
-			"url" : "https://github.com/dream-group/horde-text-diff/"
-		}, {
-			"_README" : "If the pull request https://github.com/technosophos/querypath/pull/208 will go into upstream master we will not need the separate version and URL anymore. version was ~3.0",
-			"type" : "git",
-			"url" : "https://github.com/thomaslauria/querypath"
-		}, {
-			"_README" : "If our pull request will go into upstream shardj/zf1-future as project we will not need the separate version and URL anymore.",
-			"type" : "git",
-			"url" : "https://github.com/MittagQI/zf1-php7.3"
-		}, {
-			"type" : "package",
-                        "package" : {
-                                "name" : "jquery/jquery-ui",
-                                "license" : "MIT",
-                                "version" : "1.13.0",
-                                "description" : "A curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library.",
-				"dist": {
-					"url": "https://jqueryui.com/resources/download/jquery-ui-1.13.0.zip",
-			                "type": "zip"
-				},
-                                "source" : {
-                                        "url" : "https://github.com/jquery/jquery-ui.git",
-                                        "type" : "git",
-                                        "reference" : "1.13.0"
-                                }
-                        }
-		}, {
-			"_README" : "A fork of the openai-php/client OpenAI PHP Client to be able to deliver fixes more rapidly",
-			"type" : "git",
-			"url" : "https://github.com/translate5/openai-client/"
-		}
-	],
-	"require" : {
-		"ext-xml": "*",
-		"ext-simplexml": "*",
-		"ext-libxml": "*",
-		"ext-pdo": "*",
-		"ext-dom": "*",
-		"ext-mysqli": "*",
-		"ext-xmlreader": "*",
-		"ext-xmlwriter": "*",
-		"ext-sockets" : "*",
-		"ext-iconv" : "*",
-		"ext-soap" : "*",
-      	"ext-zip": "*",
-      	"ext-fileinfo": "*",
-      	"ext-curl": "*",
-		"ext-posix": "*",
-		"ext-intl": "*",
-		"ext-zlib": "*",
-		"phpunit/phpunit": "^9",
-		"shardj/zf1-future" : "dev-master",
-		"symfony/console" : "^5.0",
-		"wikimedia/composer-merge-plugin" : "~2.0",
-		"comcast/php-legal-licenses" : "~1.1",
-		"gportela85/datetimefield" : "^1.9",
-		"fortawesome/font-awesome" : "^6.2",
-		"phpoffice/phpspreadsheet" : "~1.12",
-		"querypath/querypath" : "dev-master",
-		"google/cloud-translate" : "~1.7",
-		"dream-group/horde-text-diff" : "dev-master",
-		"lesstif/php-jira-rest-client" : "~2.4",
-		"paquettg/php-html-parser": "^3.1",
-		"jquery/jquery-ui": "1.13.0",
-		"translate5/instanttranslate-roboto-font": "26",
-		"translate5/rangy-lib": "1.3.1-dev",
-		"axelbecher/material-design-icons": "^1.0",
-		"wilsonglasser/spout": "^3.0",
-		"setasign/tfpdf": "1.32",
-		"joshtronic/php-loremipsum": "^2.1",
-		"league/flysystem": "^3.0",
-		"league/flysystem-sftp": "^3.0",
-		"symfony/yaml": "^6.0",
-		"symfony/lock": "^6.0",
-		"cesargb/php-log-rotation": "^2.7",
-		"ifsnop/mysqldump-php": "^v2.9",
-		"http-interop/http-factory-guzzle": "^1.2",
-		"microsoft/microsoft-graph": "^2.6.0",
-		"guzzlehttp/guzzle": "^7.8",
-		"psr/http-client": "^1.0",
-		"guzzlehttp/psr7": "^2.6",
-		"phar-io/version": "^3.2"
+  "config": {
+    "platform": {
+      "php": "8.1.23"
     },
-	"extra" : {
-		"merge-plugin" : {
-			"include" : [
-				"application/modules/editor/Plugins/*/composer.local.json",
-				"application/modules/editor/PrivatePlugins/*/composer.local.json",
-				"library/*/composer.local.json"
-			],
-			"recurse" : true
-		},
-		"hooks" : {
-			"pre-commit" : [
-				"echo committing as $(git config user.name)",
-				"bash .git/hooks/pre-commit.sample",
-				"./translate5.sh dev:githook pre-commit"
-			],
-			"commit-msg" : "./translate5.sh dev:githook commit-msg $1"
-		}
-	},
-	"scripts" : {
-		"phpstan" : "vendor/bin/phpstan",
-		"post-install-cmd" : "cghooks add --ignore-lock; cghooks update",
-		"post-update-cmd" : "cghooks update",
-		"pre-install-cmd" : "Translate5\\Installer\\HookIn::postPackageInstall"
-	},
-	"name" : "mittagqi/translate5",
-	"description" : "Open Source Translation System\nCloud translation, review, post-editing and terminology platform",
-	"homepage" : "https://www.translate5.net",
-	"support" : {
-		"email" : "support@translate5.net",
-		"issues" : "https://jira.translate5.net/",
-		"wiki" : "https://confluence.translate5.net/",
-		"forum" : "https://confluence.translate5.net/questions"
-	},
-	"keywords" : [
-		"translation",
-		"review",
-		"post-editing"
-	],
-	"license" : "AGPL-3.0-only",
-	"require-dev" : {
-		"brainmaestro/composer-git-hooks" : "^2.8",
-		"symfony/var-dumper": "^6.0",
-		"phpstan/phpstan": "^1.10",
-		"symplify/easy-coding-standard": "^12.1"
-	}
+    "allow-plugins": {
+      "wikimedia/composer-merge-plugin": true,
+      "php-http/discovery": true
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "MittagQI\\ZfExtended\\": "library/ZfExtended",
+      "MittagQI\\Translate5\\": "application/modules/editor/src",
+      "MittagQI\\Translate5\\Plugins\\": "application/modules/editor/Plugins",
+      "Translate5\\MaintenanceCli\\": "Translate5/MaintenanceCli"
+    }
+  },
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "gportela85/datetimefield",
+        "license": "MIT",
+        "version": "1.9",
+        "description": "A DateTime Form Field UX for Sencha, ExtJS 5.x and ExtJS 6.x.",
+        "type": "extjs-ux",
+        "source": {
+          "url": "https://github.com/gportela85/DateTimeField.git",
+          "type": "git",
+          "reference": "1.9"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "translate5/instanttranslate-roboto-font",
+        "license": "Apache-2.0",
+        "version": "26",
+        "description": "package introducing roboto font from google for instanttranslation",
+        "dist": {
+          "url": "https://downloads.translate5.net/instanttranslate-font-roboto.zip",
+          "type": "zip"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "translate5/rangy-lib",
+        "license": "MIT",
+        "version": "1.3.1-dev",
+        "description": "A cross-browser JavaScript range and selection library, originating from https://github.com/timdown/rangy",
+        "dist": {
+          "url": "https://downloads.translate5.net/rangy.zip",
+          "type": "zip"
+        }
+      }
+    },
+    {
+      "type": "git",
+      "url": "https://bitbucket.org/mittagqi/restful-zend-framework/"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/dream-group/horde-text-diff/"
+    },
+    {
+      "_README": "If the pull request https://github.com/technosophos/querypath/pull/208 will go into upstream master we will not need the separate version and URL anymore. version was ~3.0",
+      "type": "git",
+      "url": "https://github.com/thomaslauria/querypath"
+    },
+    {
+      "_README": "If our pull request will go into upstream shardj/zf1-future as project we will not need the separate version and URL anymore.",
+      "type": "git",
+      "url": "https://github.com/MittagQI/zf1-php7.3"
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery-ui",
+        "license": "MIT",
+        "version": "1.13.0",
+        "description": "A curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library.",
+        "dist": {
+          "url": "https://jqueryui.com/resources/download/jquery-ui-1.13.0.zip",
+          "type": "zip"
+        },
+        "source": {
+          "url": "https://github.com/jquery/jquery-ui.git",
+          "type": "git",
+          "reference": "1.13.0"
+        }
+      }
+    },
+    {
+      "_README": "A fork of the openai-php/client OpenAI PHP Client to be able to deliver fixes more rapidly",
+      "type": "git",
+      "url": "https://github.com/translate5/openai-client/"
+    }
+  ],
+  "require": {
+    "ext-xml": "*",
+    "ext-simplexml": "*",
+    "ext-libxml": "*",
+    "ext-pdo": "*",
+    "ext-dom": "*",
+    "ext-mysqli": "*",
+    "ext-xmlreader": "*",
+    "ext-xmlwriter": "*",
+    "ext-sockets": "*",
+    "ext-iconv": "*",
+    "ext-soap": "*",
+    "ext-zip": "*",
+    "ext-fileinfo": "*",
+    "ext-curl": "*",
+    "ext-posix": "*",
+    "ext-intl": "*",
+    "ext-zlib": "*",
+    "phpunit/phpunit": "^9",
+    "shardj/zf1-future": "dev-master",
+    "symfony/console": "^5.0",
+    "wikimedia/composer-merge-plugin": "~2.0",
+    "comcast/php-legal-licenses": "~1.1",
+    "gportela85/datetimefield": "^1.9",
+    "fortawesome/font-awesome": "^6.2",
+    "phpoffice/phpspreadsheet": "~1.12",
+    "querypath/querypath": "dev-master",
+    "google/cloud-translate": "~1.7",
+    "dream-group/horde-text-diff": "dev-master",
+    "lesstif/php-jira-rest-client": "~2.4",
+    "paquettg/php-html-parser": "^3.1",
+    "jquery/jquery-ui": "1.13.0",
+    "translate5/instanttranslate-roboto-font": "26",
+    "translate5/rangy-lib": "1.3.1-dev",
+    "axelbecher/material-design-icons": "^1.0",
+    "wilsonglasser/spout": "^3.0",
+    "setasign/tfpdf": "1.32",
+    "joshtronic/php-loremipsum": "^2.1",
+    "league/flysystem": "^3.0",
+    "league/flysystem-sftp": "^3.0",
+    "symfony/yaml": "^6.0",
+    "symfony/lock": "^6.0",
+    "cesargb/php-log-rotation": "^2.7",
+    "ifsnop/mysqldump-php": "^v2.9",
+    "http-interop/http-factory-guzzle": "^1.2",
+    "microsoft/microsoft-graph": "^2.6.0",
+    "guzzlehttp/guzzle": "^7.8",
+    "guzzlehttp/psr7": "^2.7",
+    "psr/event-dispatcher": "^1.0",
+    "psr/http-client": "^1.0",
+    "phar-io/version": "^3.2"
+  },
+  "extra": {
+    "merge-plugin": {
+      "include": [
+        "application/modules/editor/Plugins/*/composer.local.json",
+        "application/modules/editor/PrivatePlugins/*/composer.local.json",
+        "library/*/composer.local.json"
+      ],
+      "recurse": true
+    },
+    "hooks": {
+      "pre-commit": [
+        "echo committing as $(git config user.name)",
+        "bash .git/hooks/pre-commit.sample",
+        "./translate5.sh dev:githook pre-commit"
+      ],
+      "commit-msg": "./translate5.sh dev:githook commit-msg $1"
+    }
+  },
+  "scripts": {
+    "phpstan": "vendor/bin/phpstan",
+    "post-install-cmd": "cghooks add --ignore-lock; cghooks update",
+    "post-update-cmd": "cghooks update",
+    "pre-install-cmd": "Translate5\\Installer\\HookIn::postPackageInstall"
+  },
+  "name": "mittagqi/translate5",
+  "description": "Open Source Translation System\nCloud translation, review, post-editing and terminology platform",
+  "homepage": "https://www.translate5.net",
+  "support": {
+    "email": "support@translate5.net",
+    "issues": "https://jira.translate5.net/",
+    "wiki": "https://confluence.translate5.net/",
+    "forum": "https://confluence.translate5.net/questions"
+  },
+  "keywords": [
+    "translation",
+    "review",
+    "post-editing"
+  ],
+  "license": "AGPL-3.0-only",
+  "require-dev": {
+    "brainmaestro/composer-git-hooks": "^2.8",
+    "symfony/var-dumper": "^6.0",
+    "phpstan/phpstan": "^1.10",
+    "symplify/easy-coding-standard": "^12.1"
+  }
 }

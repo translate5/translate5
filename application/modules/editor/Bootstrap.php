@@ -32,6 +32,7 @@ use MittagQI\Translate5\Acl\TaskCustomField;
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventListener;
 use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Service\SystemCheck;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
@@ -61,6 +62,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         //Binding the worker clean up to the after import event, since import
         // is currently the main use case for workers
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
+
+        EventListener::create($eventManager)->attachAll();
 
         $cleanUp = function () {
             // first clean up jobs
@@ -195,7 +198,9 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceresource', 'languageresourcetaskassoc', 'languageresourcetaskpivotassoc',
                 'languageresourceinstance', 'taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality', 'userassocdefault', 'log', 'collectionattributedatatype', 'token',
-                'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',            ],
+                'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
+                'languageresourcesyncconnection',
+            ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -541,8 +546,45 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $this->front->getRouter()->addRoute('lastusedapp', $lastusedapp);
 
         # Language resources rutes start
-        //WARNING: Order of the route definition is important!
+        // WARNING: Order of the route definition is important!
         // the catchall like download route must be defined before the more specific query/search routes!
+
+        $this->front->getRouter()->addRoute(
+            'languageresources_languageresourcesync_availableforconnection',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/languageresourcesync/:id/available-for-connection',
+                [
+                    'module' => 'editor',
+                    'controller' => 'languageresourcesync',
+                    'action' => 'availableforconnection',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'languageresources_languageresourcesync_queue_synchronize_all',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/languageresourcesync/:id/queue-synchronize-all',
+                [
+                    'module' => 'editor',
+                    'controller' => 'languageresourcesync',
+                    'action' => 'queuesynchronizeall',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'languageresources_languageresourcesyncconnection_queue_synchronize',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/languageresourcesyncconnection/:id/queue-synchronize',
+                [
+                    'module' => 'editor',
+                    'controller' => 'languageresourcesyncconnection',
+                    'action' => 'queuesynchronize',
+                ]
+            )
+        );
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/:type',
             [

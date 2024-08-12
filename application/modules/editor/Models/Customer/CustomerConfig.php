@@ -109,6 +109,18 @@ class editor_Models_Customer_CustomerConfig extends ZfExtended_Models_Entity_Abs
         return $row['value'];
     }
 
+    public function deleteRecord(int $customerId, string $name): void
+    {
+        try {
+            $this->db->delete([
+                'customerId = ?' => $customerId,
+                'name = ?' => $name,
+            ]);
+        } catch (Exception) {
+            // ignore
+        }
+    }
+
     /**
      * Get 'liveSearchMinChars' termportal config option
      * It's getting maximum value among values defined in Zf_configuration

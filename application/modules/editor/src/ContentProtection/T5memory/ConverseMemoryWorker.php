@@ -126,9 +126,10 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        $exportFilename = $connector->export($connector->getValidExportTypes()['TMX']);
+        $mime = $connector->getValidExportTypes()['TMX'];
+        $exportFilename = $connector->export($mime);
 
-        if (! file_exists($exportFilename)) {
+        if (null === $exportFilename || ! file_exists($exportFilename)) {
             $this->log->error(
                 'E1587',
                 'Conversion: TM was not exported. TMX file does not exists: {filename}',
@@ -145,7 +146,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
         $fileinfo = [
             'tmp_name' => $exportFilename,
-            'type' => $connector->getValidExportTypes()['TMX'],
+            'type' => $mime,
             'name' => basename($exportFilename),
         ];
 

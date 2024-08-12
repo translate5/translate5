@@ -622,6 +622,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             $customerAssoc = ZfExtended_Factory::get(LanguageResourcesCustomerAssoc::class);
             $customerAssoc->setCustomerId($customerId);
             $customerAssoc->setLanguageResourceId((int) $newLanguageResource->getId());
+            $customerAssoc->setLanguageResourceServiceName($newLanguageResource->getServiceName());
             $customerAssoc->save();
         }
 

@@ -458,7 +458,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 $languageResource,
                 (int) $task->getSourceLang(),
                 (int) $task->getRelaisLang(),
-                $task->getConfig()
+                $task->getConfig(),
+                (int) $task->getCustomerId(),
             );
             /* @var $connector editor_Services_Connector */
             //collect all connectors which are supporting batch query
@@ -729,7 +730,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 $languageresource,
                 (int) $task->getSourceLang(),
                 (int) $task->getTargetLang(),
-                $task->getConfig()
+                $task->getConfig(),
+                (int) $task->getCustomerId(),
             );
             /* @var $connector editor_Services_Connector */
             //collect all connectors which are supporting batch query
