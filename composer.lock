@@ -6850,7 +6850,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/MittagQI/zf1-php7.3",
-                "reference": "077977a8cc26069acf2675c734cc0cfcc3939e7c"
+                "reference": "f42b3690dab4804ab76af288ca4f53ef2234444a"
             },
             "require": {
                 "php": ">=7.1",
@@ -6916,7 +6916,7 @@
                 "framework",
                 "zf1"
             ],
-            "time": "2024-07-19T09:08:31+00:00"
+            "time": "2024-08-12T07:39:27+00:00"
         },
         {
             "name": "stduritemplate/stduritemplate",

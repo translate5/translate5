@@ -48,13 +48,18 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
      */
     public const OVERFLOW_SUB = 0x100000000; // == PHP_UINT32_MAX +1
 
-    public function __construct(string $filename, string $mode = "r", bool $useIncludePath = false, ?object $context = null)
-    {
+    public function __construct(
+        string $filename,
+        string $mode = "r",
+        bool $useIncludePath = false,
+        ?object $context = null
+    ) {
         parent::__construct($filename, $mode, $useIncludePath, $context);
     }
 
     /**
      * Read next UTF-8 value
+     * @throws ZfExtended_UnprocessableEntity
      */
     public function readUTF()
     {
@@ -63,16 +68,14 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
 
             // unpack("A"...) strips whitespace!
             return $utflen > 0 ? unpack("a" . $utflen, $this->fread($utflen))[1] : '';
-        } catch (Exception $e) {
-            throw new ZfExtended_UnprocessableEntity('E1026', [
-                'errors' => [[$e]],
-            ]);
+        } catch (Throwable $e) {
+            throw new ZfExtended_UnprocessableEntity(errorCode: 'E1026', previous: $e);
         }
     }
 
     /** Write the UTF-8 value in bconf
      */
-    public function writeUTF($string, bool $withNullByte = true)
+    public function writeUTF($string, bool $withNullByte = true): void
     {
         $length = strlen($string);
         $this->fwrite(pack("n", $length));
@@ -89,9 +92,11 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
         return pack("n", $length) . $string;
     }
 
-    /** Read the Integer value in bconf
+    /**
+     * Read the Integer value in bconf
      * QUIRK: PHP unpack has no option for signed 32bit Integer, so we have to convert after reading
      * @return int|mixed
+     * @throws ZfExtended_UnprocessableEntity
      */
     public function readInt(): mixed
     {
@@ -99,16 +104,15 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
             $uint32 = unpack("N", $this->fread(4))[1]; // N -> UInt32.BE but we want Int32
 
             return $uint32 <= self::PHP_INT32_MAX ? $uint32 : $uint32 - self::OVERFLOW_SUB;
-        } catch (Exception $e) {
-            throw new ZfExtended_UnprocessableEntity('E1026', [
-                'errors' => [[$e]],
-            ]);
+        } catch (Throwable $e) {
+            throw new ZfExtended_UnprocessableEntity(errorCode: 'E1026', previous: $e);
         }
     }
 
-    /** Write the Integer value in bconf
+    /**
+     * Write the Integer value in bconf
      */
-    public function writeInt($intValue)
+    public function writeInt($intValue): void
     {
         $this->fwrite(pack("N", $intValue));
     }
