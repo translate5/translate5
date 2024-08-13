@@ -36,7 +36,7 @@ use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Task\Current\NoAccessException;
-use MittagQI\Translate5\Task\Import\TaskDefaults;
+use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\CsrfProtection;
@@ -232,9 +232,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $data = $customerAssoc->loadByCustomerIdsUseAsDefault([$postData['customerId']]);
 
-        $defaults = new TaskDefaults();
+        $languageResourcesDefaults = new LanguageResourcesDefaults();
 
-        $iterator = $defaults->findMatchingAssocData($postData['sourceId'], $postData['targetId'], $data);
+        $iterator = $languageResourcesDefaults->findMatchingAssocData($postData['sourceId'], $postData['targetId'], $data);
 
         $has = false;
         foreach ($iterator as $data) {

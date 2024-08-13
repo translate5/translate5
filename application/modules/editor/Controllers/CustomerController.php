@@ -66,7 +66,7 @@ class Editor_CustomerController extends ZfExtended_RestController
     public function postAction()
     {
         try {
-            return parent::postAction();
+            parent::postAction();
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
             $this->handleDuplicate($e);
         }
@@ -75,7 +75,7 @@ class Editor_CustomerController extends ZfExtended_RestController
     public function putAction()
     {
         try {
-            return parent::putAction();
+            parent::putAction();
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
             $this->handleDuplicate($e);
         }
@@ -239,7 +239,8 @@ class Editor_CustomerController extends ZfExtended_RestController
     }
 
     /***
-     * Set the resources log data for the current export request. If the request is from non test user, this will throw an exception.
+     * Set the resources log data for the current export request. If the request is from non test user, this will throw
+     * an exception.
      * @param int $customerId
      */
     protected function setupTextExportResourcesLogData(int $customerId = null)

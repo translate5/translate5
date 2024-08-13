@@ -192,6 +192,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             formPanel = me.getUserAssocForm(),
             emptySel = selection.length === 0,
             record = !emptySel ? selection[0] : null,
+            isAutoFinished = record && record.get('state') === 'auto-finish',
             userEditable = record && record.get('editable'),
             userDeletable = record && record.get('deletable'),
             task = me.getPrefWindow().getCurrentTask();
@@ -202,7 +203,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
 
         formPanel.setVisible(!emptySel);
 
-        formPanel.setDisabled(emptySel || !userEditable);
+        formPanel.setDisabled(emptySel || !userEditable || isAutoFinished);
 
         me.filterStepsCombo(selection[0]);
 

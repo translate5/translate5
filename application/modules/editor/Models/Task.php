@@ -73,6 +73,8 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setWordCount(string|int $wordcount)
  * @method null|string getOrderdate()
  * @method void setOrderdate(?string $datetime)
+ * @method null|string getDeadlineDate()
+ * @method void setDeadlineDate(?string $datetime)
  * @method null|string getEnddate()
  * @method void setEnddate(?string $datetime)
  * @method string getReferenceFiles()
@@ -1468,5 +1470,35 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     public function hasThirdPartyTermTagging(): bool
     {
         return ! ! json_decode($this->getForeignId())?->glossaryClientId;
+    }
+
+    /**
+     *  Check and set the default pivot langauge based on customer specific config.
+     *  If the pivot field is not provided on task post and for the current task customer
+     *  there is configured defaultPivotLanguage, the configured pivot language will be set as task pivot
+     *
+     * @throws Zend_Exception
+     */
+    public function setDefaultPivotLanguage(
+        editor_Models_Task $project,
+        ?editor_Models_Customer_Customer $customer = null,
+    ): void {
+        $config = null === $customer
+            ? Zend_Registry::get('config')
+            : $customer->getConfig();
+
+        if (! empty($config->runtimeOptions->project->defaultPivotLanguage)) {
+            // get default pivot language value from the config
+            $defaultPivot = $config->runtimeOptions->project->defaultPivotLanguage;
+
+            try {
+                $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+                $language->loadByRfc5646($defaultPivot);
+
+                $project->setRelaisLang((int) $language->getId());
+            } catch (Throwable) {
+                // in case of wrong configured variable and the load language fails, do nothing
+            }
+        }
     }
 }

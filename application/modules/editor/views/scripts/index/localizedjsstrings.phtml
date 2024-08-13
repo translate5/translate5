@@ -702,7 +702,16 @@ Ext.define('Editor.controller.Localizer', {
             usageModeCompetitiveInfo: '<?php echo $this->translate->_('Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.');?>',
             usageModeSimultaneousInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten');?>',
             edit100PercentMatchEnabledMessage: '<?php echo $this->translate->_('Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.');?>',
-            edit100PercentMatchDisabledMessage: '<?php echo $this->translate->_('Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.');?>'
+            edit100PercentMatchDisabledMessage: '<?php echo $this->translate->_('Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.');?>',
+            deadlineDateLabel: '<?php echo $this->translate->_('Deadline Datum');?>',
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.task.TaskDeadlineChangeHandler", {
+        override: "Editor.view.admin.task.TaskDeadlineChangeHandler",
+        strings:{
+            deadlineDateMesssageTitle: '<?php echo $this->translate->_('Deadline Datum'); ?>',
+            deadlineDateMesssage: '<?php echo $this->translate->_('Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.'); ?>',
         }
     });
 
@@ -739,7 +748,8 @@ Ext.define('Editor.controller.Localizer', {
             btnSkip: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>',
             importDefaultsButtonText: '<?php echo $this->translate->_('Importieren (Standards nutzen)');?>',
             description: '<?php echo $this->translate->_('Projektbeschreibung');?>',
-            autoRemovedUploadFilesWarningMessage: '<?php echo $this->translate->_('Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.');?>'
+            autoRemovedUploadFilesWarningMessage: '<?php echo $this->translate->_('Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.');?>',
+            deadlineDateLabel: '<?php echo $this->translate->_('Deadline Datum');?>',
         }
     });
 

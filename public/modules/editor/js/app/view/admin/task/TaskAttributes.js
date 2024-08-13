@@ -57,7 +57,8 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         usageModeCompetitiveInfo: "#UT#Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.",
         usageModeSimultaneousInfo: "#UT#Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten",
         edit100PercentMatchEnabledMessage:'#UT#Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.',
-        edit100PercentMatchDisabledMessage:'#UT#Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.'
+        edit100PercentMatchDisabledMessage:'#UT#Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.',
+        deadlineDateLabel:'#UT#Deadline Datum',
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
@@ -164,6 +165,14 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             bind:'{currentTask.taskName}',
             name:'taskName',
             itemId:'taskName'
+        });
+
+        items.push({
+            xtype: 'datefield',
+            name: 'deadlineDate',
+            itemId:'deadlineDate',
+            bind:'{currentTask.deadlineDate}',
+            fieldLabel: me.strings.deadlineDateLabel
         });
 
         items.push({
