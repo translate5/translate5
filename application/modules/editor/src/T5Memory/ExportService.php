@@ -51,7 +51,7 @@ class ExportService
 {
     private const T5N_TAG_FILTER = 'fix-t5n-tag';
 
-    private const CHUNKSIZE = 1;
+    private const CHUNKSIZE = 1000;
 
     public function __construct(
         private readonly ZfExtended_Logger $logger,
