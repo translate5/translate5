@@ -238,7 +238,7 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
             // we fetched the state with ::hasLoadBalancedPool
             foreach (Services::getServiceState($this->getServiceId()) as $url => $numIps) {
                 if (((int) $numIps) > 1) {
-                    $this->checkedInfos[] = 'Url "' . $url . '" is load-balanced!';
+                    $this->checkedInfos[] = 'Url "' . $url . '" is load-balanced with ' . $numIps . ' ips!';
                 }
             }
         }
