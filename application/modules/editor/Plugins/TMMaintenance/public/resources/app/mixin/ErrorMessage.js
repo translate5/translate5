@@ -1,22 +1,52 @@
 Ext.define('TMMaintenance.mixin.ErrorMessage', {
     showServerError: function (error) {
-        let serverError;
+        this.showGeneralError(this.getErrorMessage(error), this.getDialogTitle(error));
+    },
+
+    showGeneralError: function (error, title = null) {
+        const dialog = this.getErrorDialog();
+
+        if (title) {
+            dialog.setTitle(title);
+        }
+
+        dialog.setHtml(error);
+        dialog.show();
+    },
+
+    getErrorDialog: function () {
+        return Ext.ComponentQuery.query('#errorDialog')[0];
+    },
+
+    getErrorMessage: function (error) {
+        let errorMessage;
+        let errorCode = null;
 
         if (error.hasOwnProperty('errorMessage')) {
-            serverError = error.errorMessage;
+            errorMessage = error.errorMessage;
         } else {
-            serverError = error?.response?.responseJson?.errorMessage;
+            errorMessage = error?.response?.responseJson?.errorMessage;
+            errorCode = error?.response?.responseJson?.errorCode;
         }
 
         const l10n = this.getViewModel().data.l10n;
-        const errorText = l10n.error.couldNotProcessRequest +
-            (serverError ? ('<br>' + l10n.error.responseFromServer + serverError) : '');
-        this.showGeneralError(errorText);
+        errorMessage = (errorMessage ? (l10n.error.responseFromServer + errorMessage) : '');
+
+        if (!this.isInfo(errorCode)) {
+            errorMessage = l10n.error.couldNotProcessRequest + '<br>' + errorMessage;
+        }
+
+        return errorMessage;
     },
 
-    showGeneralError: function (error) {
-        const dialog = Ext.ComponentQuery.query('#errorDialog')[0];
-        dialog.setHtml(error);
-        dialog.show();
+    getDialogTitle: function (error) {
+        const l10n = this.getViewModel().data.l10n;
+        let errorCode = error?.response?.responseJson?.errorCode;
+
+        return this.isInfo(errorCode) ? l10n.error.infoTitle : l10n.error.title;
+    },
+
+    isInfo: function (errorCode) {
+        return errorCode === 'E1377';
     }
 });

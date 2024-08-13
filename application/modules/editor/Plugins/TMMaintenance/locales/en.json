@@ -98,6 +98,7 @@
   },
   "error": {
     "title": "An error occurred",
+    "infoTitle": "Info",
     "couldNotProcessRequest": "Error whilst saving or reading data. Please contact our support team!",
     "close": "Close",
     "responseFromServer": "Response from server: ",
