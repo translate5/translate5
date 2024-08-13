@@ -883,7 +883,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         if ($status !== LanguageResourceStatus::AVAILABLE) {
             throw new \editor_Services_Connector_Exception('E1377', [
                 'languageResource' => $this->languageResource,
-                'status' => 'importing',
+                'status' => $status,
             ]);
         }
     }
