@@ -71,6 +71,13 @@ class WorkerListCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'List just a summary of worker counts grouped by state and worker type.'
         );
+
+        $this->addOption(
+            'running',
+            'r',
+            InputOption::VALUE_NONE,
+            'List only the running workers grouped by worker type.'
+        );
     }
 
     /**
@@ -114,7 +121,8 @@ class WorkerListCommand extends Translate5AbstractCommand
             'progress' => 'Progress:',
         ];
 
-        $isSummary = $this->input->getOption('summary');
+        $isRunningSummary = $this->input->getOption('running');
+        $isSummary = $isRunningSummary || $this->input->getOption('summary');
 
         $resultNotListed = [];
         if ($this->input->getOption('all') || $isSummary) {
@@ -134,8 +142,8 @@ class WorkerListCommand extends Translate5AbstractCommand
 
                 continue;
             }
-
-            if ($isSummary && $workerRow['state'] !== $worker::STATE_RUNNING) {
+            $isRunning = $workerRow['state'] === $worker::STATE_RUNNING;
+            if (($isRunningSummary && $isRunning) || ($isSummary && ! $isRunningSummary && ! $isRunning)) {
                 $idx = $workerRow['worker'] . '#' . $workerRow['state'];
                 if (! array_key_exists($idx, $summary)) {
                     $summary[$idx] = 0;
@@ -164,7 +172,9 @@ class WorkerListCommand extends Translate5AbstractCommand
             $table->addRow($row);
         }
 
-        $table->render();
+        if (! $isRunningSummary) {
+            $table->render();
+        }
 
         if (! empty($summary)) {
             $table = $this->io->createTable();
@@ -174,6 +184,11 @@ class WorkerListCommand extends Translate5AbstractCommand
                 $table->addRow([$key[0], $key[1], $value]);
             }
             $table->render();
+        }
+
+        if ($isRunningSummary && empty($summary)) {
+            $this->io->writeln('Currently no running workers!');
+            $this->io->writeln('');
         }
 
         if (! empty($resultNotListed)) {
