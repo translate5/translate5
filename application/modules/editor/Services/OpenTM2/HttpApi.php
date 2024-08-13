@@ -31,6 +31,7 @@ use GuzzleHttp\Exception\RequestException;
 use MittagQI\Translate5\Service\T5Memory;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
+use MittagQI\Translate5\T5Memory\PersistenceService;
 
 /**
  * OpenTM2 HTTP Connection API
@@ -50,10 +51,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     protected $languageResource;
 
-    protected editor_Services_OpenTM2_FixLanguageCodes $fixLanguages;
+    private editor_Services_OpenTM2_FixLanguageCodes $fixLanguages;
+
+    private PersistenceService $persistenceService;
 
     public function __construct()
     {
+        $this->persistenceService = new PersistenceService(Zend_Registry::get('config'));
         $this->fixLanguages = new editor_Services_OpenTM2_FixLanguageCodes();
         $this->fixLanguages->setDisabled(true);
     }
@@ -65,7 +69,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function createEmptyMemory($memory, $sourceLanguage): ?string
     {
         $data = new stdClass();
-        $data->name = $this->addTmPrefix($memory);
+        $data->name = $this->persistenceService->addTmPrefix($memory);
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
 
         $http = $this->getHttp('POST');
@@ -85,7 +89,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function createMemory($memory, $sourceLanguage, $tmData): ?string
     {
         $data = new stdClass();
-        $data->name = $this->addTmPrefix($memory);
+        $data->name = $this->persistenceService->addTmPrefix($memory);
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
         $data->data = base64_encode($tmData);
 
@@ -131,7 +135,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         StripFramingTags $stripFramingTags
     ): ?string {
         $data = new stdClass();
-        $data->name = $this->addTmPrefix($memory);
+        $data->name = $this->persistenceService->addTmPrefix($memory);
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
         $data->framingTags = $stripFramingTags->value;
 
@@ -147,6 +151,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
     public function importMemoryAsFile(string $filePath, string $tmName, StripFramingTags $stripFramingTags): bool
     {
+        $tmName = urlencode($this->persistenceService->addTmPrefix($tmName));
+
         return $this->sendStreamRequest(
             rtrim($this->resource->getUrl(), '/') . '/' . $tmName . '/importtmx',
             $this->getStreamFromFile($filePath),
@@ -238,25 +244,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     }
 
     /**
-     * This method clones memory
-     *
-     * @throws Zend_Exception
-     */
-    public function cloneMemory(string $targetMemory, string $tmName): bool
-    {
-        $data = [];
-        $data['newName'] = $this->addTmPrefix($targetMemory);
-
-        $http = $this->getHttpWithMemory('POST', $tmName, 'clone');
-        $http->setConfig([
-            'timeout' => $this->createTimeout(1200),
-        ]);
-        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
-
-        return $this->processResponse($http->request());
-    }
-
-    /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the given REST URL Parts (ID + verbs)
      * @param string $urlSuffix
      * @return Zend_Http_Client
@@ -284,25 +271,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     protected function getHttpWithMemory(string $method, string $tmName, string $urlSuffix = ''): Zend_Http_Client
     {
-        $url = $this->addTmPrefix(urlencode($tmName)) . '/' . ltrim($urlSuffix, '/');
+        $url = urlencode($this->persistenceService->addTmPrefix($tmName)) . '/' . ltrim($urlSuffix, '/');
 
         return $this->getHttp($method, $url);
-    }
-
-    /**
-     * adds the internal TM prefix to the given TM name
-     * @throws Zend_Exception
-     */
-    protected function addTmPrefix(string $tmName): string
-    {
-        //CRUCIAL: the prefix (if any) must be added on usage, and may not be stored in the specificName
-        // that is relevant for security on a multi hosting environment
-        $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
-        if (! empty($prefix) && ! str_starts_with($tmName, $prefix . '-')) {
-            $tmName = $prefix . '-' . $tmName;
-        }
-
-        return $tmName;
     }
 
     /**

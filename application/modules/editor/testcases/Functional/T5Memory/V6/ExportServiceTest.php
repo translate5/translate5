@@ -12,6 +12,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\V6\VersionedApi as V5VersionedApi;
 use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
 use MittagQI\Translate5\T5Memory\ExportService;
+use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\VersionService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -30,12 +31,15 @@ class ExportServiceTest extends TestCase
 
     private MockObject & V5VersionedApi $versionedApi;
 
+    private MockObject & PersistenceService $persistenceService;
+
     protected function setUp(): void
     {
         $this->loggerMock = $this->createMock(ZfExtended_Logger::class);
         $this->versionService = $this->createMock(VersionService::class);
         $this->versionedApiFactory = $this->createMock(VersionedApiFactory::class);
         $this->versionedApi = $this->createMock(V5VersionedApi::class);
+        $this->persistenceService = $this->createMock(PersistenceService::class);
 
         $this->versionService->method('getT5MemoryVersion')->willReturn('0.6.14');
         $this->versionedApiFactory->method('get')->willReturn($this->versionedApi);
@@ -45,6 +49,7 @@ class ExportServiceTest extends TestCase
             $this->versionService,
             TmConversionService::create(),
             $this->versionedApiFactory,
+            $this->persistenceService,
         );
     }
 

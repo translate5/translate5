@@ -101,7 +101,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         parent::__construct();
 
         $this->conversionService = TmConversionService::create();
-        $this->persistenceService = new PersistenceService();
+        $this->persistenceService = new PersistenceService($this->config);
         $this->httpClient = new Client();
         $this->versionService = new VersionService(new VersionFetchingApi($this->httpClient));
         $this->exportService = new ExportService(
@@ -109,6 +109,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->versionService,
             $this->conversionService,
             new VersionedApiFactory($this->httpClient),
+            $this->persistenceService
         );
     }
 

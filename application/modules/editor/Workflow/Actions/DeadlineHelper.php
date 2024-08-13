@@ -96,7 +96,7 @@ class editor_Workflow_Actions_DeadlineHelper extends editor_Workflow_Actions_Abs
         if (! empty($role)) {
             $s->where('tua.role = ?', $role);
         }
-        $s->where('tua.state != ?', $this->config->workflow::STATE_FINISH)
+        $s->where('tua.state NOT IN (?)', [$this->config->workflow::STATE_FINISH, editor_Workflow_Default::STATE_AUTO_FINISH])
             ->where('t.state = ?', editor_Models_Task::STATE_OPEN)
             ->where('t.workflow = ?', $this->config->workflow->getName())
             ->where($dateSelect, $daysOffset);

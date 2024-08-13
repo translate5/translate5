@@ -41,6 +41,7 @@ class DownloadTmxChunkRequest extends Request
         ?int $limit = null,
         ?string $startFromInternalKey = null
     ) {
+        $tmName = urlencode($tmName);
         $body = [];
 
         if ($limit !== null) {

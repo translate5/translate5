@@ -51,11 +51,14 @@ class ExportService
 {
     private const T5N_TAG_FILTER = 'fix-t5n-tag';
 
+    private const CHUNKSIZE = 1000;
+
     public function __construct(
-        private ZfExtended_Logger $logger,
-        private VersionService $versionService,
-        private TmConversionService $conversionService,
-        private Api\VersionedApiFactory $versionedApiFactory,
+        private readonly ZfExtended_Logger $logger,
+        private readonly VersionService $versionService,
+        private readonly TmConversionService $conversionService,
+        private readonly Api\VersionedApiFactory $versionedApiFactory,
+        private readonly PersistenceService $persistenceService,
     ) {
     }
 
@@ -68,6 +71,7 @@ class ExportService
             new VersionService(new VersionFetchingApi($httpClient)),
             TmConversionService::create(),
             new Api\VersionedApiFactory($httpClient),
+            new PersistenceService(\Zend_Registry::get('config')),
         );
     }
 
@@ -137,11 +141,14 @@ class ExportService
         return match (true) {
             Api\V6\VersionedApi::isVersionSupported($version) => $this->versionedApiFactory
                 ->get(Api\V6\VersionedApi::class)
-                ->downloadTm($languageResource->getResource()->getUrl(), $tmName),
+                ->downloadTm(
+                    $languageResource->getResource()->getUrl(),
+                    $this->persistenceService->addTmPrefix($tmName)
+                ),
             //  Code stays here for case if we fix TM export security issue in v5
-            //            Api\V5\VersionedApi::isVersionSupported($version) => $this->versionedApiFactory
-            //                ->get(Api\V5\VersionedApi::class)
-            //                ->getTm($languageResource->getResource()->getUrl(), $tmName),
+            //  Api\V5\VersionedApi::isVersionSupported($version) => $this->versionedApiFactory
+            //      ->get(Api\V5\VersionedApi::class)
+            //      ->getTm($languageResource->getResource()->getUrl(), $tmName),
 
             default => throw new LogicException('Unsupported T5Memory version: ' . $version)
         };
@@ -173,7 +180,7 @@ class ExportService
         $memories = $this->getMemories($languageResource, $tmName);
 
         if (empty($memories)) {
-            return null;
+            return yield from [];
         }
 
         $writtenElements = 0;
@@ -233,13 +240,18 @@ class ExportService
         int &$writtenElements,
         bool &$atLeastOneFileRead,
     ): iterable {
+        $firstChunk = true;
+
         foreach ($this->exportTmxChunk($languageResource, $tmName) as $stream) {
-            $iterator = $this->iterateTmx($stream, $memoryNumber > 0, $writtenElements);
+            $iterator = $this->iterateTmx($stream, $firstChunk && $memoryNumber === 0, $writtenElements);
 
             if ($iterator?->valid()) {
                 $atLeastOneFileRead = true;
+                $firstChunk = false;
 
-                yield from $iterator;
+                foreach ($iterator as $item) {
+                    yield $item;
+                }
             }
         }
     }
@@ -257,14 +269,21 @@ class ExportService
         if (Api\V6\VersionedApi::isVersionSupported($version)) {
             return yield from $this->versionedApiFactory
                 ->get(Api\V6\VersionedApi::class)
-                ->downloadTmx($languageResource->getResource()->getUrl(), $tmName, 1000);
+                ->downloadTmx(
+                    $languageResource->getResource()->getUrl(),
+                    $this->persistenceService->addTmPrefix($tmName),
+                    self::CHUNKSIZE
+                );
         }
 
         if (Api\V5\VersionedApi::isVersionSupported($version)) {
             return yield from [
                 $this->versionedApiFactory
                     ->get(Api\V5\VersionedApi::class)
-                    ->getTmx($languageResource->getResource()->getUrl(), $tmName),
+                    ->getTmx(
+                        $languageResource->getResource()->getUrl(),
+                        $this->persistenceService->addTmPrefix($tmName)
+                    ),
             ];
         }
 
@@ -274,7 +293,7 @@ class ExportService
     /**
      * @return Generator<string>|null
      */
-    private function iterateTmx(StreamInterface $stream, bool $notFirstMemory, int &$writtenElements): ?Generator
+    private function iterateTmx(StreamInterface $stream, bool $returnHeader, int &$writtenElements): ?Generator
     {
         $reader = new XMLReader();
 
@@ -294,7 +313,7 @@ class ExportService
                 yield $this->conversionService->convertT5MemoryTagToContent(@$reader->readOuterXML()) . PHP_EOL;
             }
 
-            if ($notFirstMemory) {
+            if (! $returnHeader) {
                 continue;
             }
 

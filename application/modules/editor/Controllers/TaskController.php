@@ -564,6 +564,10 @@ class editor_TaskController extends ZfExtended_RestController
         settype($this->data['enableSourceEditing'], 'integer');
         settype($this->data['lockLocked'], 'integer');
 
+        if (array_key_exists('deadlineDate', $this->data) && empty($this->data['deadlineDate'])) {
+            $this->data['deadlineDate'] = null;
+        }
+
         if (array_key_exists('enddate', $this->data)) {
             unset($this->data['enddate']);
         }
@@ -612,7 +616,7 @@ class editor_TaskController extends ZfExtended_RestController
         // check if the relasiLang field is provided. If it is not provided, check and set default value from config.
         if (false === ($this->data['relaisLang'] ?? false)) {
             // check and set the default pivot language is configured
-            $this->defaults->setDefaultPivotForProject($this->entity, $customer);
+            $this->entity->setDefaultPivotLanguage($this->entity, $customer);
         }
 
         // set the usageMode from config if not set

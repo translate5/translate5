@@ -56,6 +56,8 @@ class editor_Workflow_Default
     //the user has finished his work on this task, and cant access it anymore
     public const STATE_FINISH = 'finished';
 
+    public const STATE_AUTO_FINISH = 'auto-finish';
+
     //the user can access the task editable and writeable,
     //setting this state releases the lock if the user had locked the task
     public const STATE_OPEN = 'open';
@@ -96,7 +98,7 @@ class editor_Workflow_Default
      * The values are a subset of the above STATE_CONSTANTs
      * @var array
      */
-    protected $pendingStates = [self::STATE_EDIT, self::STATE_VIEW];
+    protected $pendingStates = [self::STATE_EDIT, self::STATE_VIEW, self::STATE_AUTO_FINISH];
 
     /**
      * lists all roles with read access to tasks
@@ -523,10 +525,8 @@ class editor_Workflow_Default
 
     /**
      * returns the already translated labels as assoc array
-     * @var boolean optional, defaults to true
-     * @return array
      */
-    public function getLabels($translated = true)
+    public function getLabels(bool $translated = true): array
     {
         if (! $translated) {
             return $this->definition->labels;
@@ -709,7 +709,7 @@ class editor_Workflow_Default
             return $state == $userAssumedStateHeHas && $taskUserAssoc->getUsedState() == self::STATE_EDIT;
         }
 
-        return ! ($state == self::STATE_FINISH || $state == self::STATE_WAITING);
+        return ! ($state === self::STATE_FINISH || $state === self::STATE_WAITING || $state === self::STATE_AUTO_FINISH);
     }
 
     /**

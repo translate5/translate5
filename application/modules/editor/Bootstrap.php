@@ -35,6 +35,7 @@ use MittagQI\Translate5\DbConfig\ActionsEventHandler;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventListener;
 use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Service\SystemCheck;
+use MittagQI\Translate5\Task\Deadline\TaskDeadlineEventHandler;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 use MittagQI\Translate5\Workflow\DeleteOpenidUsersAction;
@@ -134,6 +135,9 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             'afterPutAction',
             $eventHandler->addDefaultPMUsersOnPutAction(DeleteOpenidUsersAction::FALLBACK_PM_CONFIG)
         );
+
+        $taskDeadlineDateEventHandler = new TaskDeadlineEventHandler($eventManager);
+        $taskDeadlineDateEventHandler->register();
     }
 
     public static function initModuleSpecific()
