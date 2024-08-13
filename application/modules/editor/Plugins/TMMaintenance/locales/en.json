@@ -72,6 +72,8 @@
     "title": "Segments",
     "totalAmount": "Total found segments: ",
     "calculating": "calculating...",
+    "loadingSegmentPlaceholder": "Loading...",
+    "loadingSegmentNumber": "loading segment #",
     "saving": "Saving. Please wait a while.",
     "columns": {
       "sourceText": "Source text",

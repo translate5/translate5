@@ -91,9 +91,12 @@ Ext.define('TMMaintenance.view.main.MainController', {
 
     loadPageByChunks: function(pageSize, chunkSize, append, abortPrev) {
         let me = this,
-            store = Ext.getCmp('mainlist').getStore(),
+            vm = this.getViewModel(),
+            view = Ext.getCmp('mainlist'),
+            store = view.getStore(),
             values = Ext.ComponentQuery.query('searchform').pop().getValues(),
-            offset = me.getViewModel().get('lastOffset');
+            offset = me.getViewModel().get('lastOffset'),
+            loadingId = 'TM-offset-' + offset;
 
         if (abortPrev || !append) {
             me.loadedQty = 0;
@@ -104,11 +107,41 @@ Ext.define('TMMaintenance.view.main.MainController', {
             store.getProxy().abort();
         }
 
+        // Add dummy loading entry
+        store.loadRawData([{
+            id: loadingId,
+            metaData: {
+                internalKey: null,
+                sourceLang: '',
+                targetLang: '',
+                author: '',
+                timestamp: '',
+                documentName: '',
+                additionalInfo: ''
+            },
+            source: vm.get('l10n.list.loadingSegmentPlaceholder'),
+            target: vm.get('l10n.list.loadingSegmentPlaceholder'),
+        }], true);
+
+        //
+        vm.set('loadingRecordNumber', store.getCount());
+
+        if (me.loadedQty === 0) {
+            view.ensureVisible(store.last());
+        }
+
         store.load({
             params: {...values, offset: offset},
             limit: chunkSize,
             addRecords: append,
             callback: (records, operation, success) => {
+                var loaderRec = store.getById(loadingId);
+
+                // Remove dummy loading entry
+                if (loaderRec) {
+                    store.remove(loaderRec, false, true);
+                }
+
                 if (!success) {
 
                     if (operation.getError().statusText !== 'transaction aborted' || !operation.getProxy().abortByPurpose) {
@@ -132,6 +165,8 @@ Ext.define('TMMaintenance.view.main.MainController', {
                 }
                 if (null !== offset && me.loadedQty < pageSize) {
                     me.loadPageByChunks(pageSize, chunkSize,true);
+                } else {
+                    vm.set('loadingRecordNumber', false);
                 }
             },
         });

@@ -55,8 +55,6 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         this.getView().up('app-main').controller.cancelEditing();
 
         const mainList = Ext.getCmp('mainlist');
-        const strings = this.getStrings();
-        mainList.setTitle(strings.title + ' - ' + strings.totalAmount +' ' + strings.calculating);
 
         const values = this.getView().getValues();
         const store = mainList.store;
@@ -65,6 +63,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
         this.getViewModel().set('selectedTm', values.tm);
         this.getViewModel().set('lastOffset', null);
+        this.getViewModel().set('totalAmount', null);
         this.loadPageByChunks(20,1, false, true);
         this.updateUrl(values);
     },
@@ -123,16 +122,14 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             params: {...this.getView().getValues(), onlyCount: true},
             async: true,
             method: 'POST',
-            success: (xhr) => {
-                const data = JSON.parse(xhr.responseText);
-                const strings = this.getStrings();
-                Ext.getCmp('mainlist').setTitle(strings.title + ' - ' + strings.totalAmount + ' ' + data.totalAmount);
+            success: xhr => {
+                this.getViewModel().set('totalAmount', JSON.parse(xhr.responseText).totalAmount);
             },
-            error: (xhr) => {
+            error: xhr => {
                 console.log('Error reading total amount');
                 console.log(xhr);
             },
-            failure: (xhr) => {
+            failure: xhr => {
                 console.log('Error reading total amount');
                 console.log(xhr);
             }
