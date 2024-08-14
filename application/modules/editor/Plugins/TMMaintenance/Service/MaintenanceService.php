@@ -873,7 +873,15 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
         $result = $this->api->getResult();
 
-        return isset($result->segmentIndex) && $result->segmentIndex > 0;
+        if (! isset($result->segmentIndex)) {
+            // This means memory is not loaded into RAM
+            // So call for a fake segment to force t5memory to load memory into RAM and call for status again
+            $this->api->getEntry($tmName, 1, 1);
+            $this->api->status($tmName);
+            $result = $this->api->getResult();
+        }
+
+        return $result->segmentIndex > 0;
     }
 
     private function assertMemoryAvailable(string $memoryName): void
