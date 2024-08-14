@@ -175,19 +175,36 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             throw new RuntimeException('Could not open file: ' . $filePath);
         }
 
-        // Uncomment when compression is implemented in the API
-        //        stream_filter_append($stream, 'zlib.deflate', STREAM_FILTER_READ, [
-        //            "window" => 30,
-        //        ]);
-
         $bom = fread($stream, 2);
+
+        rewind($stream);
 
         // Check for BOM indicating UTF-16 BE or LE
         if ($bom === "\xFE\xFF" || $bom === "\xFF\xFE") {
-            stream_filter_append($stream, 'convert.iconv.UTF-16/UTF-8');
-        }
+            $tmpFile = $filePath . bin2hex(random_bytes(2));
+            $outputHandle = fopen($tmpFile, 'w');
 
-        rewind($stream);
+            $from = $bom === "\xFE\xFF" ? 'UTF-16' : 'UTF-16LE';
+
+            while (! feof($stream)) {
+                $chunk = fread($stream, 4096); // Read in chunks
+                if ($chunk === false) {
+                    break;
+                }
+
+                // Convert the chunk from UTF-16 to UTF-8
+                $utf8Chunk = mb_convert_encoding($chunk, 'UTF-8', $from);
+                fwrite($outputHandle, $utf8Chunk);
+            }
+
+            fclose($stream);
+            unlink($filePath);
+            fclose($outputHandle);
+
+            rename($tmpFile, $filePath);
+
+            $stream = fopen($filePath, 'r');
+        }
 
         return $stream;
     }
