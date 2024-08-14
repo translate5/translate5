@@ -180,6 +180,15 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         //            "window" => 30,
         //        ]);
 
+        $bom = fread($stream, 2);
+
+        // Check for BOM indicating UTF-16 BE or LE
+        if ($bom === "\xFE\xFF" || $bom === "\xFF\xFE") {
+            stream_filter_append($stream, 'convert.iconv.UTF-16/UTF-8');
+        }
+
+        rewind($stream);
+
         return $stream;
     }
 
