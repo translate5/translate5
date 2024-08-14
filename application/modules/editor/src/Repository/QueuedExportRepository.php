@@ -48,57 +48,82 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\Export\Model\Database;
+use MittagQI\Translate5\Export\Model\QueuedExport;
+use PDO;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 use Zend_Db_Table_Row;
-use ZfExtended_Acl;
 use ZfExtended_Factory;
-use ZfExtended_Models_User;
 
-class UserRepository
+class QueuedExportRepository
 {
-    protected ZfExtended_Acl $acl;
-
-    public function __construct()
-    {
-        $this->acl = ZfExtended_Acl::getInstance();
+    public function __construct(
+        private Zend_Db_Adapter_Abstract $db,
+    ) {
     }
 
-    /**
-     * @return iterable<ZfExtended_Models_User>
-     */
-    public function getPmList(array $roles, ?int $customerInContext = null): iterable
+    public static function create(): self
     {
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        return new self(Zend_Db_Table::getDefaultAdapter());
+    }
 
-        $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
+    public function findByToken(string $token): ?QueuedExport
+    {
+        $model = ZfExtended_Factory::get(QueuedExport::class);
+        $row = $this->db->fetchRow(
+            "SELECT * FROM {$model->db->info(Database::NAME)} WHERE token = ?",
+            $token,
+            PDO::FETCH_ASSOC
+        );
 
-        foreach ($users as $user) {
-            $userModel->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $userModel->db,
-                        'data' => $user,
-                        'stored' => true,
-                        'readOnly' => false,
-                    ]
-                )
-            );
-
-            $roles = $userModel->getRoles();
-
-            if (in_array(Roles::PM, $roles)) {
-                yield clone $userModel;
-
-                continue;
-            }
-
-            if ($customerInContext !== null && in_array($customerInContext, $userModel->getCustomersArray())) {
-                yield clone $userModel;
-            }
+        if (! $row) {
+            return null;
         }
+
+        $model->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $model->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $model;
+    }
+
+    public function findByWorkerId(int $workerId): ?QueuedExport
+    {
+        $model = ZfExtended_Factory::get(QueuedExport::class);
+        $row = $this->db->fetchRow(
+            "SELECT * FROM {$model->db->info(Database::NAME)} WHERE workerId = ?",
+            $workerId,
+            PDO::FETCH_ASSOC
+        );
+
+        if (! $row) {
+            return null;
+        }
+
+        $model->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $model->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $model;
     }
 }

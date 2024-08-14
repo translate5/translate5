@@ -48,57 +48,51 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use MittagQI\ZfExtended\Acl\Roles;
-use Zend_Db_Table_Row;
-use ZfExtended_Acl;
-use ZfExtended_Factory;
-use ZfExtended_Models_User;
+use editor_Models_Quality_Notifications as QualityNotifications;
+use editor_Models_Segment_MaterializedView;
+use editor_Models_Task as Task;
+use MittagQI\Translate5\Segment\Dto\SegmentView;
+use PDO;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 
-class UserRepository
+class SegmentRepository
 {
-    protected ZfExtended_Acl $acl;
+    public function __construct(
+        private Zend_Db_Adapter_Abstract $db,
+    ) {
+    }
 
-    public function __construct()
+    public static function create(): self
     {
-        $this->acl = ZfExtended_Acl::getInstance();
+        return new self(Zend_Db_Table::getDefaultAdapter());
     }
 
     /**
-     * @return iterable<ZfExtended_Models_User>
+     * @return iterable<SegmentView>
      */
-    public function getPmList(array $roles, ?int $customerInContext = null): iterable
+    public function getSegmentsViewData(Task $task): iterable
     {
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $materializedView = new editor_Models_Segment_MaterializedView($task->getTaskGuid());
+        if (! $materializedView->exists()) {
+            $materializedView->create();
+        }
 
-        $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
+        $segmentIds = $this->db->fetchCol("SELECT id FROM {$materializedView->getName()}");
 
-        foreach ($users as $user) {
-            $userModel->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $userModel->db,
-                        'data' => $user,
-                        'stored' => true,
-                        'readOnly' => false,
-                    ]
-                )
-            );
+        $qualityNotifications = new QualityNotifications($task, $segmentIds);
 
-            $roles = $userModel->getRoles();
+        $stmp = $this->db->query("SELECT * FROM {$materializedView->getName()}");
 
-            if (in_array(Roles::PM, $roles)) {
-                yield clone $userModel;
+        while ($row = $stmp->fetch(PDO::FETCH_ASSOC)) {
+            $row['qualities'] = $qualityNotifications->get((int) $row['id']);
 
-                continue;
-            }
-
-            if ($customerInContext !== null && in_array($customerInContext, $userModel->getCustomersArray())) {
-                yield clone $userModel;
-            }
+            yield new SegmentView($row);
         }
     }
 }

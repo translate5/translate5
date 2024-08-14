@@ -48,57 +48,26 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use MittagQI\ZfExtended\Acl\Roles;
-use Zend_Db_Table_Row;
-use ZfExtended_Acl;
 use ZfExtended_Factory;
-use ZfExtended_Models_User;
+use ZfExtended_Models_Worker;
 
-class UserRepository
+class WorkerRepository
 {
-    protected ZfExtended_Acl $acl;
-
-    public function __construct()
+    public function find(int $int): ?ZfExtended_Models_Worker
     {
-        $this->acl = ZfExtended_Acl::getInstance();
-    }
+        $model = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
 
-    /**
-     * @return iterable<ZfExtended_Models_User>
-     */
-    public function getPmList(array $roles, ?int $customerInContext = null): iterable
-    {
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-
-        $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
-
-        foreach ($users as $user) {
-            $userModel->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $userModel->db,
-                        'data' => $user,
-                        'stored' => true,
-                        'readOnly' => false,
-                    ]
-                )
-            );
-
-            $roles = $userModel->getRoles();
-
-            if (in_array(Roles::PM, $roles)) {
-                yield clone $userModel;
-
-                continue;
-            }
-
-            if ($customerInContext !== null && in_array($customerInContext, $userModel->getCustomersArray())) {
-                yield clone $userModel;
-            }
+        try {
+            $model->load($int);
+        } catch (\ZfExtended_Models_Entity_NotFoundException $e) {
+            return null;
         }
+
+        return $model;
     }
 }

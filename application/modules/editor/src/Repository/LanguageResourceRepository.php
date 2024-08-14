@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\Repository;
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Languages as LanguageResourceLanguages;
+use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -93,7 +94,16 @@ class LanguageResourceRepository
         $languageResource = ZfExtended_Factory::get(LanguageResource::class);
 
         foreach ($db->fetchAll($lrsWithSameCustomersSelect)->toArray() as $row) {
-            $languageResource->hydrate($row);
+            $languageResource->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $languageResource->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $languageResource;
         }
@@ -157,7 +167,7 @@ class LanguageResourceRepository
             return null;
         }
 
-        $languageResource->hydrate($row);
+        $languageResource->init($row);
 
         return $languageResource;
     }

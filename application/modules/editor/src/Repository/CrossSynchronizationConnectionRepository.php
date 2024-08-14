@@ -34,6 +34,7 @@ use editor_Models_Customer_Customer as Customer;
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
+use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 
 class CrossSynchronizationConnectionRepository
@@ -179,7 +180,16 @@ class CrossSynchronizationConnectionRepository
         }
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $syncModel->hydrate($row);
+            $syncModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $syncModel->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $syncModel;
         }
@@ -200,7 +210,16 @@ class CrossSynchronizationConnectionRepository
             ->where('sourceLanguageResourceId = ?', $filterLanguageResourceId);
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $syncModel->hydrate($row);
+            $syncModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $syncModel->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $syncModel;
         }
@@ -266,7 +285,16 @@ class CrossSynchronizationConnectionRepository
             ->orWhere('LanguageResourceSync.targetLanguageResourceId = ?', $targetId);
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $syncModel->hydrate($row);
+            $syncModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $syncModel->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $syncModel;
         }

@@ -257,6 +257,42 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
+        $this->front->getRouter()->addRoute(
+            'editor.queuedexport.view',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/queuedexport/:token',
+                [
+                    'module' => 'editor',
+                    'controller' => 'queuedexport',
+                    'action' => 'view',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'editor.queuedexport.status',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/queuedexport/:token/status',
+                [
+                    'module' => 'editor',
+                    'controller' => 'queuedexport',
+                    'action' => 'status',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'editor.queuedexport.download',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/queuedexport/:token/download',
+                [
+                    'module' => 'editor',
+                    'controller' => 'queuedexport',
+                    'action' => 'download',
+                ]
+            )
+        );
+
         //FIXME convert to RestLikeRoute (remove echo json_encode in action then)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/filemap/*',

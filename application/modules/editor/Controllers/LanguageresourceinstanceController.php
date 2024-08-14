@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportService;
+use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
@@ -35,11 +35,11 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use MittagQI\Translate5\T5Memory\ExportMemoryWorker;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
-use MittagQI\ZfExtended\CsrfProtection;
 use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
 use ZfExtended_Sanitizer as Sanitizer;
 
@@ -742,73 +742,22 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw new ZfExtended_Models_Entity_NotFoundException('Can not download in format ' . $type);
         }
 
-        $filename = $this->getParam('filename');
-        $token = $this->getParam('token');
-        $workerId = $this->getParam('workerId');
+        $exportService = QueuedExportService::create();
 
-        if (null === $token) {
-            throw new ZfExtended_NotFoundException('Token is missing');
-        }
-
-        if (null !== $filename) {
-            $this->trySendFile($token, $filename);
-        }
-
-        $exportService = new ExportService();
-
-        if (null !== $workerId) {
-            $filename = $exportService->getFilenameIfReady($workerId, $token);
-
-            if (null !== $filename) {
-                echo '{"ready":true,"filename":"' . $filename . '"}';
-
-                exit;
-            }
-
-            echo '{"ready":false}';
-
-            exit;
-        }
-
-        if (! $exportService->exportStarted($token)) {
-            $workerId = $exportService->queueExportWorker($this->entity, $validExportTypes[$type], $token);
-        }
-
-        $this->view->assign('workerId', $workerId);
-        $this->view->assign('token', $token);
-        $this->view->assign('csrfToken', CsrfProtection::getInstance()->getToken());
-        $this->view->assign('languageResourceId', $this->entity->getId());
-
-        echo $this->view->render('languageResource/tm-export.phtml');
-
-        exit;
-    }
-
-    private function trySendFile(string $token, string $filename): void
-    {
-        $exportService = new ExportService();
-
-        if (! file_exists($exportService->composeExportFilepath($token, $filename))) {
-            throw new ZfExtended_NotFoundException('File no longer exists');
-        }
-
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
-
-        Header::sendDownload(
-            rawurlencode($this->entity->getName()) . '.' . $extension,
-            contentType: 'application/octet-stream',
-            additionalHeaders: [
-                'Accept-Ranges' => 'bytes',
-            ]
+        $token = ZfExtended_Utils::uuid();
+        $workerId = ExportMemoryWorker::queueExportWorker(
+            $this->entity,
+            $validExportTypes[$type],
+            $exportService->composeExportDir($token)
         );
 
-        $resource = fopen($exportService->composeExportFilepath($token, $filename), 'rb');
-        fpassthru($resource);
-        fclose($resource);
+        $exportService->makeQueueRecord($token, $workerId, $this->entity->getName());
 
-        $exportService->cleanUp($token);
+        $title = 'TMX' === $type
+            ? $this->view->translate('Als TMX-Datei herunterladen und lokal speichern')
+            : $this->view->translate('Dateibasiertes TM herunterladen und lokal speichern');
 
-        exit;
+        $this->redirect("/editor/queuedexport/$token?title=$title");
     }
 
     public function postAction()
