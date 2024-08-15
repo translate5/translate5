@@ -48,6 +48,10 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
 
     protected $postBlacklist = ['id'];
 
+    protected array $dataSanitizationMap = [
+        'regex' => ZfExtended_Sanitizer::UNSANITIZED,
+    ];
+
     public function indexAction()
     {
         $data = [];
