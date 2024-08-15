@@ -237,7 +237,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
     {
         /** @var ArchiveTaskActions $taskActions */
         $taskActions = ZfExtended_Factory::get(ArchiveTaskActions::class, [
-            ArchiveConfigDTO::fromObject($this->config->parameters),
+            ArchiveConfigDTO::fromObject($this->config?->parameters ?? new stdClass()),
         ]);
         $params = $this->config->parameters;
         if (empty($params->filesystem) && empty($params->targetPath)) {
