@@ -62,6 +62,7 @@ use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Test\UnitTestAbstract;
 use ZfExtended_Factory;
@@ -106,6 +107,21 @@ class ContentProtectorTest extends UnitTestAbstract
         $crInt1->loadBy(IntegerProtector::getType(), 'default generic with Middle dot separator');
         $crInt1->setEnabled(true);
         $crInt1->save();
+
+        $goba = ZfExtended_Factory::get(ContentRecognition::class);
+        $goba->setName('Goba');
+        $goba->setType(KeepContentProtector::getType());
+        $goba->setEnabled(true);
+        $goba->setKeepAsIs(true);
+        $goba->setRegex('#\<goba\>#');
+        $goba->setMatchId(0);
+        $goba->save();
+
+        $inputMapping = ZfExtended_Factory::get(InputMapping::class);
+        $inputMapping->setLanguageId(5);
+        $inputMapping->setContentRecognitionId($goba->getId());
+        $inputMapping->setPriority(4);
+        $inputMapping->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
@@ -161,6 +177,9 @@ class ContentProtectorTest extends UnitTestAbstract
         $contentRecognition->setEnabled(false);
         $contentRecognition->save();
 
+        $contentRecognition->loadBy(KeepContentProtector::getType(), 'Goba');
+        $contentRecognition->delete();
+
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         foreach ($inputMapping->loadAll() as $item) {
             $inputMapping->load($item['id']);
@@ -184,13 +203,9 @@ class ContentProtectorTest extends UnitTestAbstract
         self::assertEquals($expected, $contentProtector->protect($node, true, 5, 6, $entityHandling));
     }
 
-    /**
-     * @dataProvider casesProvider
-     */
-    public function testUnprotect(string $expected, string $node): void
+    public function testUnprotectSpecificCase(): void
     {
         $contentProtector = ContentProtector::create(new Whitespace());
-        self::assertSame($expected, $contentProtector->unprotect($node, true));
 
         self::assertSame(
             '123.456,789 Übersetzungsbüro [ ] 24translate 15/09/23 and 19/10/24',
@@ -201,8 +216,23 @@ class ContentProtectorTest extends UnitTestAbstract
         );
     }
 
+    /**
+     * @dataProvider casesProvider
+     */
+    public function testUnprotect(string $expected, string $node): void
+    {
+        $contentProtector = ContentProtector::create(new Whitespace());
+        self::assertSame($expected, $contentProtector->unprotect($node, true));
+    }
+
     public function casesProvider(): iterable
     {
+        yield 'tag like entity <goba>' => [
+            'text' => 'string <goba> string',
+            'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;"/> string',
+            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
+        ];
+
         yield 'int without output format' => [
             'text' => 'Übersetzungsbüro 123·456·789 24translate',
             'expected' => 'Übersetzungsbüro 123·456·789 24translate',

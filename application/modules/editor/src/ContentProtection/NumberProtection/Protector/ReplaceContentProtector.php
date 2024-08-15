@@ -87,9 +87,9 @@ class ReplaceContentProtector extends AbstractProtector
             $this->tagFormat(),
             self::getType(),
             htmlspecialchars($protectionDto->name),
-            $number,
+            htmlspecialchars($number, ENT_XML1),
             implode(':', $formats),
-            $protectionDto->outputFormat,
+            htmlspecialchars($protectionDto->outputFormat),
         );
     }
 }
