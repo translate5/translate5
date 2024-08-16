@@ -188,7 +188,7 @@ export default class DataTransformer {
                 continue;
             }
 
-            result += item.data;
+            result += this.#htmlEncode(item.data);
         }
 
         return result;
@@ -229,5 +229,9 @@ export default class DataTransformer {
 
     #getWhitespaceReferenceTagAtIndex(index) {
         return this.#getReferenceTagAtIndex(TagsConversion.TYPE.WHITESPACE, index);
+    }
+
+    #htmlEncode(string) {
+        return string.replace(/[\u00A0-\u9999<>&]/g, i => '&#'+i.charCodeAt(0)+';');
     }
 }

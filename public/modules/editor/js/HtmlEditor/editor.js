@@ -272,7 +272,7 @@ class DataTransformer {
                 continue;
             }
 
-            result += item.data;
+            result += this.#htmlEncode(item.data);
         }
 
         return result;
@@ -313,6 +313,10 @@ class DataTransformer {
 
     #getWhitespaceReferenceTagAtIndex(index) {
         return this.#getReferenceTagAtIndex(_TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__["default"].TYPE.WHITESPACE, index);
+    }
+
+    #htmlEncode(string) {
+        return string.replace(/[\u00A0-\u9999<>&]/g, i => '&#'+i.charCodeAt(0)+';');
     }
 }
 
