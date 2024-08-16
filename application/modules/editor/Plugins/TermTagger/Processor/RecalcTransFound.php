@@ -188,7 +188,8 @@ class RecalcTransFound
               AND `collectionId`   IN (" . join(',', $this->collectionIds) . ")
               AND `languageId`     IN (" . join(',', $fuzzy) . ")
               AND `processStatus` = 'finalized'
-            ORDER BY FIND_IN_SET(`status`, 'preferredTerm,standardizedTerm') DESC, 
+            ORDER BY FIND_IN_SET(`status`, 'preferredTerm,standardizedTerm') DESC,
+                 NOT FIND_IN_SET(`status`, 'deprecatedTerm,supersededTerm') DESC, 
               `status` = 'admittedTerm' ASC  
         ")->fetchAll(PDO::FETCH_GROUP);
 
