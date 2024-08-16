@@ -632,7 +632,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $filter = ZfExtended_Factory::get($this->filterClass, [
             $events,
-            $this->_getParam('filter'),
+            $this->getRequest()->getRawParam('filter'),
         ]);
 
         $filter->setSort($this->_getParam('sort', '[{"property":"id","direction":"DESC"}]'));
