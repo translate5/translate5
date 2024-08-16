@@ -722,6 +722,11 @@ class NumberProtectorTest extends TestCase
     public function trickyCasesProvider(): iterable
     {
         yield [
+            'string' => 'string &lt;goba&gt; string',
+            'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;"/> string',
+            'useForUnprotectTest' => false,
+        ];
+        yield [
             'string' => 'string &Alpha;123456789&quot; string',
             'expected' => 'string &Alpha;123456789&quot; string',
         ];
@@ -882,6 +887,17 @@ class NumberProtectorTest extends TestCase
             'keep-content',
             'default',
             '/#OVERLAY\d*_(BODY|TITLE)=/',
+            0,
+            null,
+            true,
+            null,
+            0
+        );
+
+        yield new ContentProtectionDto(
+            'keep-content',
+            'Goba',
+            '/\<goba\>/',
             0,
             null,
             true,
