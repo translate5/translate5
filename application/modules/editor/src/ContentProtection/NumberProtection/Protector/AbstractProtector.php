@@ -106,9 +106,9 @@ abstract class AbstractProtector implements NumberProtectorInterface
             $this->tagFormat(),
             static::getType(),
             htmlspecialchars($protectionDto->name),
-            $number,
-            $number,
-            $number
+            htmlspecialchars($number),
+            htmlspecialchars($number),
+            htmlspecialchars($number)
         );
     }
 }
