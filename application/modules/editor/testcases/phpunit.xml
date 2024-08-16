@@ -1,7 +1,4 @@
 <phpunit bootstrap="bootstrap.php" cacheResult="true" colors="true">
-    <listeners>
-        <listener class="Testomatio\Reporter\PHPUnit" file="../../../../vendor/testomatio/reporter/src/PHPUnit.php" />
-    </listeners>
   <extensions>
     <!-- <extension class="MittagQI\Translate5\Test\Api\BeforeFirstTest"/> -->
     <extension class="MittagQI\Translate5\Test\Api\AfterLastTest"/>
