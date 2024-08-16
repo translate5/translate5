@@ -119,7 +119,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     readTotalAmount: function () {
         Ext.Ajax.request({
             url: '/editor/plugins_tmmaintenance_api/read-amount/',
-            params: {...this.getView().getValues(), onlyCount: true},
+            params: {data: JSON.stringify({...this.getView().getValues(), onlyCount: true})},
             async: true,
             method: 'POST',
             success: xhr => {

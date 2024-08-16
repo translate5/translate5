@@ -131,7 +131,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
         }
 
         store.load({
-            params: {...values, offset: offset},
+            params: {data: JSON.stringify({...values, offset: offset})},
             limit: chunkSize,
             addRecords: append,
             callback: (records, operation, success) => {
@@ -232,14 +232,6 @@ Ext.define('TMMaintenance.view.main.MainController', {
             },
             this
         );
-    },
-
-    /**
-     * @param {TMMaintenance.view.main.List} grid
-     * @param {Ext.dataview.Location} gridLocation
-     */
-    onEditPress: function (grid, gridLocation) {
-        this.startEdit(gridLocation.record);
     },
 
     onEditSource: function(grid, gridLocation) {
