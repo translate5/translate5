@@ -48,7 +48,7 @@ class UpdateDTO
 
     public static function fromRequest(Request $request): self
     {
-        $data = Json::decode($request->getParam('data'));
+        $data = json_decode($request->getParam('data'), true, flags: JSON_THROW_ON_ERROR);
 
         return new self(
             (int) $data['id'],
