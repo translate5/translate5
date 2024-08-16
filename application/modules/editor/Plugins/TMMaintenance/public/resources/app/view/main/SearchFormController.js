@@ -64,7 +64,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         this.getViewModel().set('selectedTm', values.tm);
         this.getViewModel().set('lastOffset', null);
         this.getViewModel().set('totalAmount', null);
-        this.loadPageByChunks(20,1, false, true);
+        this.loadPageByChunks(20,20, false, true);
         this.updateUrl(values);
     },
 

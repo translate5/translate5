@@ -155,7 +155,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
                 }
 
                 const offset = operation.getProxy().getReader().metaData.offset;
-                me.loadedQty ++;
+                me.loadedQty += records.length;
 
                 me.getViewModel().set('lastOffset', offset);
                 me.getViewModel().set('hasMoreRecords', null !== offset);
@@ -164,7 +164,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
                     me.readTotalAmount();
                 }
                 if (null !== offset && me.loadedQty < pageSize) {
-                    me.loadPageByChunks(pageSize, chunkSize,true);
+                    me.loadPageByChunks(pageSize, 1,true);
                 } else {
                     vm.set('loadingRecordNumber', false);
                 }
