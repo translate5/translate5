@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TMMaintenance\DTO;
 
-use MittagQI\Translate5\Plugins\TMMaintenance\Helper\Json;
 use Zend_Controller_Request_Abstract as Request;
 
 class DeleteDTO

@@ -34,7 +34,6 @@ use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
-use MittagQI\Translate5\Plugins\TMMaintenance\Helper\Json;
 use MittagQI\Translate5\Plugins\TMMaintenance\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Plugins\TMMaintenance\Service\SegmentProcessor;
 
@@ -109,7 +108,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     {
         $this->getSegmentsProcessor()->update(UpdateDTO::fromRequest($this->getRequest()));
         $this->assignView([
-            json_decode($this->getRequest()->getParam('data'), true, flags: JSON_THROW_ON_ERROR)
+            json_decode($this->getRequest()->getParam('data'), true, flags: JSON_THROW_ON_ERROR),
         ]);
     }
 
