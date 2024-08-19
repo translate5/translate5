@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\Segment\Processing;
 use editor_Models_Task;
 use Exception;
 use MittagQI\Translate5\Segment\AbstractProcessor;
+use MittagQI\ZfExtended\Worker\Exception\SetDelayedException;
 
 /**
  * A processing Looper processes segments/processing-states in a loop until all segments are in state "processed" or higher
@@ -38,6 +39,12 @@ use MittagQI\Translate5\Segment\AbstractProcessor;
  */
 final class Looper
 {
+    /**
+     * Defines the waiting-time in seconds we will wait, if our workload is temporarily blocked by other
+     * processing loopers/workers
+     */
+    public const BLOCKED_DELAY = 20;
+
     private State $state;
 
     /**
@@ -151,9 +158,19 @@ final class Looper
     {
         $this->isReprocessing = false;
         $this->toProcess = $this->state->fetchNextStates(State::UNPROCESSED, $this->task->getTaskGuid(), $fromTheTop, $this->batchSize);
+        // may we are in the reprocessing phase
         if (empty($this->toProcess)) {
             $this->toProcess = $this->state->fetchNextStates(State::REPROCESS, $this->task->getTaskGuid(), $fromTheTop, 1);
             $this->isReprocessing = (count($this->toProcess) > 0);
+            // may we are having only blocked segments, then we need to delay!
+            // this may happens, when other processors are blocking our workload ... a rare case though
+            if (empty($this->toProcess) && $this->state->hasBlockedUnprocessed($this->task->getTaskGuid())) {
+                // set our worker to delayed
+                // we do this without increasing the delay-counter as we do know (if everything is properly coded)
+                // that other processing-workers will either "work through" OR set themselves to delayed if the service is down
+                // a blocked workload must not lead to a terminating worker ...
+                throw new SetDelayedException($this->processor->getServiceId(), null, static::BLOCKED_DELAY);
+            }
         }
     }
 }

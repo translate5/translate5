@@ -165,6 +165,8 @@ class State
         if ($this->row !== null) {
             $column = $this->getColumnName();
             $this->row->$column = $newState;
+            // this assumes, multiple segments cannot be processed simultaneously
+            $this->row->processing = ($newState === self::INPROGRESS) ? 1 : 0;
             $this->row->save();
         }
     }
@@ -266,6 +268,7 @@ class State
             $where = static::$table->select()
                 ->forUpdate(Zend_Db_Select::FU_MODE_SKIP)
                 ->where('`taskGuid` = ?', $taskGuid)
+                ->where('`processing` = ?', 0) // CRUCIAL: exclude segments processed by other processors
                 ->where(static::$table->getAdapter()->quoteIdentifier($column) . ' = ?', $state)
                 ->order('segmentId ' . ($fromTheTop ? 'ASC' : 'DESC'))
                 ->limit($limit);
@@ -277,12 +280,14 @@ class State
                 // @phpstan-ignore-next-line
                 static::$table->update([
                     $column => self::INPROGRESS,
+                    'processing' => 1,
                 ], [
                     'segmentId IN (?)' => $segmentIds,
                 ]);
             } elseif (count($segmentIds) === 1) {
                 // first row of foreach loop
                 $row->$column = self::INPROGRESS;
+                $row->processing = 1;
                 $row->save();
             }
 
@@ -290,6 +295,26 @@ class State
 
             return $states;
         });
+    }
+
+    /**
+     * Retrieves, if the table has blocked states (segments to process, that are currently processed by others)
+     */
+    public function hasBlockedUnprocessed(string $taskGuid): bool
+    {
+        $where = static::$table->select()
+            ->where('`taskGuid` = ?', $taskGuid)
+            // blocked by others
+            ->where('`processing` = ?', 1)
+            // not yet processed
+            ->where(
+                static::$table->getAdapter()->quoteIdentifier($this->getColumnName()) . ' < ?',
+                self::INPROGRESS
+            )
+            // no need to get them all ...
+            ->limit(1);
+
+        return static::$table->fetchAll($where)->count() > 0;
     }
 
     /**
