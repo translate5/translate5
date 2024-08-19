@@ -799,10 +799,11 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1594"></a>E1594 | Plug-In IndiEngine | JSON error with code {json_error_code} occurred on attempt to json_encode events: {json_error_msg} | Please contact the support.                                                                    |
 
 #### Content Protection
-| EventCode               | Context            | EventMessage                                                          | Description/Solution                                                                                                                            |
-|:------------------------|:-------------------|:----------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------|
-| <a id="E1591"></a>E1591 | Content Protection | You already created an {mapping} mapping for this {index} combination | User attempted to create Input or Output mapping for already existing Rule-Language pair                                                        |
-| <a id="E1593"></a>E1593 | Content Protection | Trans unit has unexpected structure and was excluded from TMX import  | In process of TMX import occurred trans unit that we were not able to process. Please fix unit and import it separately or ask support for help |
+| EventCode               | Context            | EventMessage                                                                              | Description/Solution                                                                                                                                    |
+|:------------------------|:-------------------|:------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <a id="E1591"></a>E1591 | Content Protection | You already created an {mapping} mapping for this {index} combination                     | User attempted to create Input or Output mapping for already existing Rule-Language pair                                                                |
+| <a id="E1593"></a>E1593 | Content Protection | Trans unit has unexpected structure and was excluded from TMX import                      | In process of TMX import occurred trans unit that we were not able to process. Please fix unit and import it separately or ask support for help         |
+| <a id="E1625"></a>E1625 | Content Protection | Protection Tag doesn't has required meta info. Fuzzy searches may return worse match rate | Task was created with older version of code so Protection tags may not have required meta info. If that impacts current work - clone task for re-import |
 
 
 ## EventCode Design rules / decisions

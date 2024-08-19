@@ -153,7 +153,7 @@ class NumberProtector implements ProtectorInterface
     public static function fullTagRegex(): string
     {
         return sprintf(
-            '/<%s type="(.+)" name="(.+)" source="(.+)" iso="(.+)" target="(.+)"\s?\/>/U',
+            '/<%s type="(.+)" name="(.+)" source="(.+)" iso="(.+)" target="(.+)"\s*(regex="(.+)")?\s?\/>/U',
             self::TAG_NAME
         );
     }

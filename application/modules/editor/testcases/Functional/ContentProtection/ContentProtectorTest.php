@@ -229,7 +229,7 @@ class ContentProtectorTest extends UnitTestAbstract
     {
         yield 'tag like entity <goba>' => [
             'text' => 'string <goba> string',
-            'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;"/> string',
+            'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;" regex="U46xSc9PSoyxUwYA"/> string',
             'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
         ];
 
@@ -247,7 +247,7 @@ class ContentProtectorTest extends UnitTestAbstract
 
         yield 'float in the beginning' => [
             'text' => '123,456.789 Übersetzungsbüro [ ] 24translate 2023-09-15 and 2024-10-19',
-            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
+            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarV0aw2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B"/>',
             'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
         ];
 
@@ -278,25 +278,25 @@ class ContentProtectorTest extends UnitTestAbstract
         $nbsp = ' ';
         $convertedNbsp = '<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span title="&lt;1/&gt;: No-Break Space (NBSP)" class="short">&lt;1/&gt;</span><span data-originalid="char" data-length="1" class="full">⎵</span></div>';
 
-        yield [
+        yield 'Protect [NBSP]' => [
             'segment' => "string [$nbsp] string",
             'converted' => "string [$convertedNbsp] string",
             'finalTagIdent' => 2,
         ];
 
         $number = '2023-10-20';
-        $convertedNumber = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3230222069736f3d22323032332d31302d323022207461726765743d2232302f31302f3233222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-20" data-target="20/10/23" class="full"></span></div>';
+        $convertedNumber = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3230222069736f3d22323032332d31302d323022207461726765743d2232302f31302f3233222072656765783d22505579354459417744467947346b34694a4134307a424b626967306f4d62766a4949586d666c3247586e36346774447a337036453069547435744a4b71756166345a3847566f736d35426f6b593042416c3334316b593535714536755a483442222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-20" data-target="20/10/23" class="full"></span></div>';
 
-        yield [
+        yield 'Protect [NBSP] and date' => [
             'segment' => "string [$nbsp] string $number string",
             'converted' => "string [$convertedNbsp] string $convertedNumber string",
             'finalTagIdent' => 3,
         ];
 
         $numberIdentOne = '2023-10-30';
-        $convertedNumberIdentOne = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3330222069736f3d22323032332d31302d333022207461726765743d2233302f31302f3233222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-30" data-target="30/10/23" class="full"></span></div>';
+        $convertedNumberIdentOne = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3330222069736f3d22323032332d31302d333022207461726765743d2233302f31302f3233222072656765783d22505579354459417744467947346b34694a4134307a424b626967306f4d62766a4949586d666c3247586e36346774447a337036453069547435744a4b71756166345a3847566f736d35426f6b593042416c3334316b593535714536755a483442222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-30" data-target="30/10/23" class="full"></span></div>';
 
-        yield [
+        yield 'Protect 2 dates' => [
             'segment' => "$numberIdentOne string $number",
             'converted' => "$convertedNumberIdentOne string $convertedNumber",
             'finalTagIdent' => 3,

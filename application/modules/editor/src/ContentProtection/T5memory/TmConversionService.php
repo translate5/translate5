@@ -177,7 +177,7 @@ class TmConversionService
 
     public function convertT5MemoryTagToContent(string $string): string
     {
-        return preg_replace(self::fullTagRegex(), '\3', $string);
+        return html_entity_decode(preg_replace(self::fullTagRegex(), '\3', $string));
     }
 
     public function convertContentTagToT5MemoryTag(string $queryString, bool $isSource, &$numberTagMap = []): string
@@ -192,23 +192,33 @@ class TmConversionService
         $currentId = 1;
         foreach ($tags as $tagProps) {
             $tag = array_shift($tagProps);
-            $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target'], $tagProps);
 
-            $contentRecognition = $this->contentProtectionRepository->getContentRecognition(
-                $tagProps['type'],
-                $tagProps['name']
-            );
+            if (count($tagProps) < 7) {
+                $this->logger->warn(
+                    'E1625',
+                    "Protection Tag doesn't has required meta info. Fuzzy searches may return worse match rate"
+                );
+                $tagProps = array_pad($tagProps, 7, '');
+            }
 
-            $encodedRegex = base64_encode(gzdeflate($contentRecognition->getRegex()));
+            unset($tagProps[5]);
+
+            $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target', 'regex'], $tagProps);
+
+            if (empty($tagProps['regex'])) {
+                // for BC reasons, we use the name as regex
+                $tagProps['regex'] = base64_encode($tagProps['name']);
+            }
+
             $t5nTag = sprintf(
                 '<%s id="%s" r="%s" n="%s"/>',
                 self::T5MEMORY_NUMBER_TAG,
                 $currentId,
-                $encodedRegex,
+                $tagProps['regex'],
                 $isSource ? $tagProps['source'] : $tagProps['target']
             );
 
-            $numberTagMap[$encodedRegex][] = $tag;
+            $numberTagMap[$tagProps['regex']][] = $tag;
 
             $queryString = str_replace($tag, $t5nTag, $queryString);
             $currentId++;
