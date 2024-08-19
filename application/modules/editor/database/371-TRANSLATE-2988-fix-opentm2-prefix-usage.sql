@@ -35,5 +35,5 @@ select @prefix:=value from Zf_configuration WHERE name = 'runtimeOptions.Languag
 
 -- remove it from the specific data
 UPDATE LEK_languageresources
-set specificData = replace(specificData, concat('"fileName":"', @prefix, '-'), '"fileName":"')
+SET specificData = replace(specificData, concat('"fileName":"', @prefix COLLATE utf8mb4_unicode_ci, '-'), '"fileName":"')
 WHERE serviceName = 'OpenTM2' and @prefix is not null;
