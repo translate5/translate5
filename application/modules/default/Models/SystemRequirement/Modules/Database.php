@@ -86,11 +86,6 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
 
     protected function checkTableCharsets(Zend_Db_Adapter_Abstract $db)
     {
-        $result = $db->query("SHOW VARIABLES WHERE Variable_name IN ('character_set_connection', 'collation_connection', 'collation_database', 'collation_server');");
-        while ($row = $result->fetchObject()) {
-            print_r($row);
-        }
-
         $result = $db->query("select TABLE_NAME,TABLE_COLLATION from information_schema.TABLES where TABLE_SCHEMA = database() AND TABLE_COLLATION != 'utf8mb4_unicode_ci';");
         while ($row = $result->fetchObject()) {
             $this->result->error[] = 'DB table ' . $row->TABLE_NAME . ' has collation "' . $row->TABLE_COLLATION . '" instead of "utf8mb4_unicode_ci"';
