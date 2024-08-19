@@ -12,7 +12,7 @@ Ext.define('TMMaintenance.view.main.List', {
     ],
 
     bind: {
-        title: '{l10n.list.title}',
+        title: '{listTitle}',
     },
 
     store: {
@@ -33,6 +33,7 @@ Ext.define('TMMaintenance.view.main.List', {
     columns: [
         {
             xtype: 'rownumberer',
+            text: '#',
             width: 40
         },
         {
@@ -95,6 +96,9 @@ Ext.define('TMMaintenance.view.main.List', {
                 text: '{l10n.list.columns.actions}',
             },
             cell: {
+                bind: {
+                    hidden: '{!record.metaData.internalKey}'
+                },
                 userCls: 'editor-tools',
                 tools: {
                     delete: {

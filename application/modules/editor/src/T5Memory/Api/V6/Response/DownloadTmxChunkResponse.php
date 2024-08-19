@@ -52,7 +52,11 @@ class DownloadTmxChunkResponse
         $nextInternalKeyHeader = $response->getHeader('NextInternalKey');
         $nextInternalKey = null;
 
-        if (! empty($nextInternalKeyHeader) && $nextInternalKeyHeader[0] !== $startFromInternalKey) {
+        if (
+            ! empty($nextInternalKeyHeader)
+            && $nextInternalKeyHeader[0] !== $startFromInternalKey
+            && '0:0' !== $nextInternalKeyHeader[0]
+        ) {
             $nextInternalKey = $nextInternalKeyHeader[0];
 
             if (! preg_match('/\d+:\d+/', $nextInternalKey)) {

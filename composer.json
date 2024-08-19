@@ -115,6 +115,8 @@
     "ext-zip": "*",
     "ext-fileinfo": "*",
     "ext-curl": "*",
+    "ext-sysvsem": "*",
+    "ext-sysvshm": "*",
     "ext-posix": "*",
     "ext-intl": "*",
     "ext-zlib": "*",
@@ -140,6 +142,7 @@
     "joshtronic/php-loremipsum": "^2.1",
     "league/flysystem": "^3.0",
     "league/flysystem-sftp": "^3.0",
+    "league/flysystem-ftp": "^3.0",
     "symfony/yaml": "^6.0",
     "symfony/lock": "^6.0",
     "cesargb/php-log-rotation": "^2.7",
@@ -195,6 +198,7 @@
     "brainmaestro/composer-git-hooks": "^2.8",
     "symfony/var-dumper": "^6.0",
     "phpstan/phpstan": "^1.10",
-    "symplify/easy-coding-standard": "^12.1"
+    "symplify/easy-coding-standard": "^12.1",
+    "doctrine/sql-formatter": "^1.4"
   }
 }

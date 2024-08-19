@@ -25,12 +25,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
--- set to level 1, since on single instances this value is not needed, and on hosted instances it should be only changeable via CLI
-UPDATE Zf_configuration
-SET level = 1, description = CONCAT(description, ' By purpose level 1!')
-WHERE name = 'runtimeOptions.LanguageResources.opentm2.tmprefix';
-
--- remove it from the specific data
-UPDATE LEK_languageresources
-set specificData = replace(specificData, concat('"fileName":"', (select value from Zf_configuration WHERE name = 'runtimeOptions.LanguageResources.opentm2.tmprefix'), '-'), '"fileName":"')
-WHERE serviceName = 'OpenTM2' and (select value from Zf_configuration WHERE name = 'runtimeOptions.LanguageResources.opentm2.tmprefix') is not null;
+alter table LEK_workflow_action
+    modify parameters varchar(1024) null comment 'parameters given to the action, stored as JSON here';

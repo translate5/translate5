@@ -144,7 +144,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
             editor_Segment_Numbers_Check::NUM11 => $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall'),
             editor_Segment_Numbers_Check::NUM12 => $translate->_('1000er-Trenner nicht erlaubt'),
             editor_Segment_Numbers_Check::NUM13 => $translate->_('Dubiose Zahl aus Quelle unverändert in Ziel'),
-            editor_Segment_Numbers_Check::NUM14 => $translate->_('(Ggf. fehlerhafter) Trenner aus SRC unverändert in TRG übernommen'),
+            editor_Segment_Numbers_Check::NUM14 => $translate->_('(Ggf. fehlerhafter) Trenner aus Quelle unverändert in Ziel übernommen'),
             default => null,
         };
     }
