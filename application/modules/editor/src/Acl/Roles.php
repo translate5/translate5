@@ -74,6 +74,8 @@ final class Roles extends BaseRoles
 
     public const TM_MAINTENANCE_ALL_CLIENTS = 'TMMaintenance_allClients';
 
+    public const JOB_COORDINATOR = 'jobCoordinator';
+
     public static $frontendOrder = [
         self::EDITOR,
         self::EDITOR_ONLY_OVERRIDE,
@@ -95,6 +97,7 @@ final class Roles extends BaseRoles
         self::PRODUCTION,
         self::TM_MAINTENANCE,
         self::TM_MAINTENANCE_ALL_CLIENTS,
+        self::JOB_COORDINATOR,
     ];
 
     /**
