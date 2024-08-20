@@ -193,7 +193,8 @@ final class Looper
             } elseif ($this->needsDelayWithoutSegments()) {
                 // set our worker to delayed
                 // we do this without increasing the delay-counter as we do know (if everything is properly coded)
-                // that other processing-workers will either "work through" OR set themselves to delayed if the service is down
+                // that other processing-workers will either "work through" OR
+                // set themselves to delayed if the service is down
                 // a blocked workload must not lead to a terminating worker ...
                 throw new SetDelayedException(
                     $this->processor->getServiceId(),
