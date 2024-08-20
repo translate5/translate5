@@ -46,7 +46,7 @@ use ZfExtended_Models_Db_Exceptions_DeadLockHandler;
  * It work's with LEK_segment_processing ad DB-model
  * It saves the state of the processing during the operation and - with the slitary operations as exception - the serialized tags-model
  */
-class State
+final class State
 {
     use ZfExtended_Models_Db_DeadLockHandlerTrait;
 
@@ -142,8 +142,8 @@ class State
     {
         $this->serviceId = $serviceId;
         $this->segmentId = (is_null($row)) ? -1 : $row->segmentId;
-        if (! isset(static::$table)) { // @phpstan-ignore-line
-            static::$table = new Processing();
+        if (! isset(self::$table)) {
+            self::$table = new Processing();
         }
         $this->row = $row;
     }
@@ -166,6 +166,7 @@ class State
             $column = $this->getColumnName();
             $this->row->$column = $newState;
             // this assumes, multiple segments cannot be processed simultaneously
+            // @phpstan-ignore-next-line - why is phpstan not seeing __get(...) ?
             $this->row->processing = ($newState === self::INPROGRESS) ? 1 : 0;
             $this->row->save();
         }
@@ -181,7 +182,7 @@ class State
 
     public function getColumnName(): string
     {
-        return static::createColumnName($this->serviceId);
+        return self::createColumnName($this->serviceId);
     }
 
     public function getSegmentId(): int
@@ -241,7 +242,7 @@ class State
      */
     public function calculateProgress(string $taskGuid): float
     {
-        return static::$table->calculateProgress($taskGuid, $this->serviceId);
+        return self::$table->calculateProgress($taskGuid, $this->serviceId);
     }
 
     /**
@@ -261,33 +262,32 @@ class State
             $segmentIds = [];
             $column = $this->getColumnName();
 
-            $db = static::$table->getAdapter();
+            $db = self::$table->getAdapter();
 
             $db->beginTransaction();
 
-            $where = static::$table->select()
+            $where = self::$table->select()
                 ->forUpdate(Zend_Db_Select::FU_MODE_SKIP)
                 ->where('`taskGuid` = ?', $taskGuid)
                 ->where('`processing` = ?', 0) // CRUCIAL: exclude segments processed by other processors
-                ->where(static::$table->getAdapter()->quoteIdentifier($column) . ' = ?', $state)
+                ->where(self::$table->getAdapter()->quoteIdentifier($column) . ' = ?', $state)
                 ->order('segmentId ' . ($fromTheTop ? 'ASC' : 'DESC'))
                 ->limit($limit);
-            foreach (static::$table->fetchAll($where) as $row) {
+            foreach (self::$table->fetchAll($where) as $row) {
                 $segmentIds[] = $row->segmentId;
                 $states[] = new static($this->serviceId, $row);
             }
             if (count($segmentIds) > 1) {
-                // @phpstan-ignore-next-line
-                static::$table->update([
+                self::$table->update([
                     $column => self::INPROGRESS,
                     'processing' => 1,
                 ], [
                     'segmentId IN (?)' => $segmentIds,
                 ]);
             } elseif (count($segmentIds) === 1) {
-                // first row of foreach loop
-                $row->$column = self::INPROGRESS;
-                $row->processing = 1;
+                // first row of foreach loop - phpstan does not get that existance of row is certain here
+                $row->$column = self::INPROGRESS; // @phpstan-ignore-line
+                $row->processing = 1; // @phpstan-ignore-line - why is phpstan not seeing __get(...) ?
                 $row->save();
             }
 
@@ -302,19 +302,19 @@ class State
      */
     public function hasBlockedUnprocessed(string $taskGuid): bool
     {
-        $where = static::$table->select()
+        $where = self::$table->select()
             ->where('`taskGuid` = ?', $taskGuid)
             // blocked by others
             ->where('`processing` = ?', 1)
             // not yet processed
             ->where(
-                static::$table->getAdapter()->quoteIdentifier($this->getColumnName()) . ' < ?',
+                self::$table->getAdapter()->quoteIdentifier($this->getColumnName()) . ' < ?',
                 self::INPROGRESS
             )
             // no need to get them all ...
             ->limit(1);
 
-        return static::$table->fetchAll($where)->count() > 0;
+        return self::$table->fetchAll($where)->count() > 0;
     }
 
     /**

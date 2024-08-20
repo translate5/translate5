@@ -174,13 +174,14 @@ final class Looper
                 // VERY UGLY special for API-tests
                 // only the last looper for the current processor will continue the loop (but with sleeps)
                 // because we want to avoid being dependent on the cronjobs when running tests
+                // Why in heaven is phpstan saying "Negated boolean expression is always true" for the fetch ???
                 if ($this->workerIndex === 0) {
                     sleep(4);
-                    while (! $this->fetchNextStates($fromTheTop, $taskGuid)) {
+                    while (! $this->fetchNextStates($fromTheTop, $taskGuid)) { // @phpstan-ignore-line
                         sleep(2);
                     }
 
-                    return true;
+                    return true; // @phpstan-ignore-line
                 }
             } elseif ($this->needsDelayWithoutSegments()) {
                 // set our worker to delayed
@@ -227,7 +228,7 @@ final class Looper
     {
         // hint: if there are blocked segments, these are blocked segments for all running loopers
         // we do not need to delay more batches than the task has segments
-        $maxInstances = (int) ceil($this->task->getSegmentCount() / $this->processor->getBatchSize());
+        $maxInstances = (int) ceil((int) $this->task->getSegmentCount() / $this->processor->getBatchSize());
 
         // normally $maxInstances cannot be 0 but we do not know in which contexts the class may be used
         return $this->workerIndex < $maxInstances || $maxInstances === 0;
