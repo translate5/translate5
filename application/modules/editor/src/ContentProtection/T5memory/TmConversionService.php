@@ -177,7 +177,9 @@ class TmConversionService
 
     public function convertT5MemoryTagToContent(string $string): string
     {
-        return html_entity_decode(preg_replace(self::fullTagRegex(), '\3', $string));
+        $protectedContent = html_entity_decode(preg_replace(self::fullTagRegex(), '\3', $string));
+
+        return str_replace(['*≺*', '*≻*'], ['<', '>'], $protectedContent);
     }
 
     public function convertContentTagToT5MemoryTag(string $queryString, bool $isSource, &$numberTagMap = []): string
@@ -210,12 +212,20 @@ class TmConversionService
                 $tagProps['regex'] = base64_encode($tagProps['name']);
             }
 
+            $protectedContent = $isSource ? $tagProps['source'] : $tagProps['target'];
+
+            $protectedContent = html_entity_decode($protectedContent);
+            // replace < and > with special chars to avoid error in t5memory
+            // simple htmlentities or rawurlencode would not work
+            $protectedContent = str_replace(['<', '>'], ['*≺*', '*≻*'], $protectedContent);
+            $protectedContent = htmlentities($protectedContent, ENT_XML1);
+
             $t5nTag = sprintf(
                 '<%s id="%s" r="%s" n="%s"/>',
                 self::T5MEMORY_NUMBER_TAG,
                 $currentId,
                 $tagProps['regex'],
-                $isSource ? $tagProps['source'] : $tagProps['target']
+                $protectedContent
             );
 
             $numberTagMap[$tagProps['regex']][] = $tag;
