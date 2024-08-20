@@ -69,7 +69,8 @@ final class Looper
     public function __construct(
         private ProgressInterface $progressReporter,
         private editor_Models_Task $task,
-        private AbstractProcessor $processor
+        private AbstractProcessor $processor,
+        private int $workerIndex,
     ) {
         $this->loopingPause = $processor->getLoopingPause();
         $this->state = new State($processor->getServiceId());
@@ -84,9 +85,8 @@ final class Looper
      */
     public function run(string $processingMode, bool $fromTheTop = true, bool $doDebug = false): bool
     {
-        $this->fetchNext($fromTheTop);
         // looping through segments
-        while (! empty($this->toProcess)) {
+        while ($this->fetchNext($fromTheTop)) {
             // create segment tags from State
             $segmentsTags = [];
             foreach ($this->toProcess as $state) {
@@ -108,7 +108,6 @@ final class Looper
             if ($this->loopingPause > 0) {
                 usleep($this->loopingPause);
             }
-            $this->fetchNext($fromTheTop);
         }
 
         return true;
@@ -152,25 +151,85 @@ final class Looper
     }
 
     /**
-     * Retrieves the next segments to process
+     * Retrieves the next segments to process and handles blocked unprocessed states
+     * The latter either finishes the workload or throws an set-delayed-exception
+     * Returns if segments could be found
+     *
+     * @throws SetDelayedException
+     * @throws \Zend_Db_Exception
+     * @throws \Zend_Exception
+     * @throws \ZfExtended_Models_Db_Exceptions_DeadLockHandler
      */
-    private function fetchNext(bool $fromTheTop)
+    private function fetchNext(bool $fromTheTop): bool
     {
-        $this->isReprocessing = false;
-        $this->toProcess = $this->state->fetchNextStates(State::UNPROCESSED, $this->task->getTaskGuid(), $fromTheTop, $this->batchSize);
-        // may we are in the reprocessing phase
-        if (empty($this->toProcess)) {
-            $this->toProcess = $this->state->fetchNextStates(State::REPROCESS, $this->task->getTaskGuid(), $fromTheTop, 1);
-            $this->isReprocessing = (count($this->toProcess) > 0);
-            // may we are having only blocked segments, then we need to delay!
-            // this may happens, when other processors are blocking our workload ... a rare case though
-            if (empty($this->toProcess) && $this->state->hasBlockedUnprocessed($this->task->getTaskGuid())) {
+        $taskGuid = $this->task->getTaskGuid();
+        if ($this->fetchNextStates($fromTheTop, $taskGuid)) {
+            return true;
+        }
+        // may we are having only blocked segments, then we need to delay!
+        // this may happens, when other processors are blocking our workload ... a rare case though
+        if ($this->state->hasBlockedUnprocessed($taskGuid)) {
+            // different behaviour for normal doing & API-tests
+            if (defined('APPLICATION_APITEST') && APPLICATION_APITEST) {
+                // VERY UGLY special for API-tests
+                // only the last looper for the current processor will continue the loop (but with sleeps)
+                // because we want to avoid being dependent on the cronjobs when running tests
+                if ($this->workerIndex === 0) {
+                    sleep(4);
+                    while (! $this->fetchNextStates($fromTheTop, $taskGuid)) {
+                        sleep(2);
+                    }
+
+                    return true;
+                }
+            } elseif ($this->needsDelayWithoutSegments()) {
                 // set our worker to delayed
                 // we do this without increasing the delay-counter as we do know (if everything is properly coded)
                 // that other processing-workers will either "work through" OR set themselves to delayed if the service is down
                 // a blocked workload must not lead to a terminating worker ...
-                throw new SetDelayedException($this->processor->getServiceId(), null, static::BLOCKED_DELAY);
+                throw new SetDelayedException(
+                    $this->processor->getServiceId(),
+                    null,
+                    static::BLOCKED_DELAY
+                );
             }
         }
+
+        return false;
+    }
+
+    /**
+     * Fetch the next states to process, either processing or reprocessing mode
+     * Returns, if there was something found
+     *
+     * @throws \Zend_Db_Exception
+     * @throws \Zend_Exception
+     * @throws \ZfExtended_Models_Db_Exceptions_DeadLockHandler
+     */
+    private function fetchNextStates(bool $fromTheTop, string $taskGuid): bool
+    {
+        $this->isReprocessing = false;
+        $this->toProcess = $this->state->fetchNextStates(State::UNPROCESSED, $taskGuid, $fromTheTop, $this->batchSize);
+        // may we are in the reprocessing phase
+        if (empty($this->toProcess)) {
+            $this->toProcess = $this->state->fetchNextStates(State::REPROCESS, $taskGuid, $fromTheTop, 1);
+            $this->isReprocessing = (count($this->toProcess) > 0);
+        }
+
+        return ! empty($this->toProcess);
+    }
+
+    /**
+     * Evaluates, if a worker needs to be delayed when there are remaining segments that currently cannot be processed
+     * This may is limited by ratio of batches & segments overall for tasks with low number of segments
+     */
+    private function needsDelayWithoutSegments(): bool
+    {
+        // hint: if there are blocked segments, these are blocked segments for all running loopers
+        // we do not need to delay more batches than the task has segments
+        $maxInstances = (int) ceil($this->task->getSegmentCount() / $this->processor->getBatchSize());
+
+        // normally $maxInstances cannot be 0 but we do not know in which contexts the class may be used
+        return $this->workerIndex < $maxInstances || $maxInstances === 0;
     }
 }

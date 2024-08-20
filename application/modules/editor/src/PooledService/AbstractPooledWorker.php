@@ -191,37 +191,36 @@ abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
                     $serviceUrls = $this->service->getPooledServiceUrls('default');
                     $this->resourcePool = 'default';
                 }
-                $this->maxParallel = count($serviceUrls);
+                $maxParallel = count($serviceUrls);
                 $isLoadBalanced = $this->service->isPoolLoadBalanced($this->resourcePool);
 
                 // SPECIAL: Pooled service with pools having only one URL
                 // are expected to inbuilt load-balancing / horizontal scaling behind that URL
                 // we set maxParallel to the number of IPs, this will result in an equal amount of different slots
-                if ($this->maxParallel === 1 && $isLoadBalanced) {
-                    $this->maxParallel = $this->service->getNumIpsForUrl($serviceUrls[0]);
+                if ($maxParallel === 1 && $isLoadBalanced) {
+                    $maxParallel = $this->service->getNumIpsForUrl($serviceUrls[0]);
                 }
             } else {
                 $serviceUrl = $this->service->getServiceUrl();
                 if ($serviceUrl === null) {
                     // no service url available: no workers will be queued
-                    $this->maxParallel = 0;
+                    $maxParallel = 0;
                 } elseif ($this->onlyOncePerTask || $this->isSingleThreaded) {
                     // if we are limited to one per task we can just queue a single worker
                     $serviceUrls = [$serviceUrl];
-                    $this->maxParallel = 1;
+                    $maxParallel = 1;
                 } else {
                     // SPECIAL: non-pooled services (= services with only a single URL overall)
                     // are expected to have inbuilt load-balancing / horizontal scaling
                     // we evaluate the number of instances by the IP's that exist behind the configured URL
                     // we set maxParallel to the number of IPs, this will result in an equal amount of different slots
-                    $this->maxParallel = $this->service->getNumIpsForUrl($serviceUrl);
-                    $serviceUrls = ($this->maxParallel < 1) ? [] : [$serviceUrl];
-                    $isLoadBalanced = ($this->maxParallel > 1);
+                    $maxParallel = $this->service->getNumIpsForUrl($serviceUrl);
+                    $serviceUrls = ($maxParallel < 1) ? [] : [$serviceUrl];
+                    $isLoadBalanced = ($maxParallel > 1);
                 }
             }
-            // limit max parallel to the top ... this gives the chance to limit all service workers via DB
-            $config = Zend_Registry::get('config');
-            $this->maxParallel = min($this->maxParallel, $config->runtimeOptions->worker->maxParallelWorkers);
+            // limit max parallel ... this gives the chance to limit all service workers via DB or other objectives
+            $this->maxParallel = $this->limitMaxParallel($maxParallel);
             // generate the data to queue the workers
             $this->slots = [];
             $numUrls = count($serviceUrls);
@@ -248,6 +247,20 @@ abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
                 );
             }
         }
+    }
+
+    /**
+     * Limits the number of max parallel workers
+     * The global max. parallel is taken into account
+     * @throws Zend_Exception
+     */
+    protected function limitMaxParallel(int $calculatedMaxParallel): int
+    {
+        return min(
+            $calculatedMaxParallel,
+            // the global max. parallel
+            (int) Zend_Registry::get('config')->runtimeOptions->worker->maxParallelWorkers,
+        );
     }
 
     /**

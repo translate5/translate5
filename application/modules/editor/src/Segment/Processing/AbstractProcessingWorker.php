@@ -132,7 +132,7 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
         if ($this->processor->prepareWorkload($this->workerIndex)) {
             // loop through the segments to process
             $this->logger = $this->createLogger($this->processingMode);
-            $this->looper = new Looper($this, $this->task, $this->processor);
+            $this->looper = new Looper($this, $this->task, $this->processor, $this->workerIndex);
             $this->doLoop();
         } else {
             if ($this->doDebug) {
