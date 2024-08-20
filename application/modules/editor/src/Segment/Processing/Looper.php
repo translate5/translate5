@@ -159,6 +159,7 @@ final class Looper
      * @throws \Zend_Db_Exception
      * @throws \Zend_Exception
      * @throws \ZfExtended_Models_Db_Exceptions_DeadLockHandler
+     * @phpstan-impure
      */
     private function fetchNext(bool $fromTheTop): bool
     {
@@ -180,7 +181,10 @@ final class Looper
                     sleep(4);
                     $until -= 4;
                     // Why in heaven is phpstan saying "Negated boolean expression is always true" for the fetch ???
-                    while (!$this->fetchNextStates($fromTheTop, $taskGuid)) { // @phpstan-ignore-line
+                    while (
+                        ! $this->fetchNextStates($fromTheTop, $taskGuid) &&
+                        $this->state->hasBlockedUnprocessed($taskGuid)
+                    ) {
                         sleep(2);
                         $until -= 2;
                         if ($until <= 0) {
@@ -188,7 +192,7 @@ final class Looper
                         }
                     }
 
-                    return true; // @phpstan-ignore-line
+                    return true;
                 }
             } elseif ($this->needsDelayWithoutSegments()) {
                 // set our worker to delayed
@@ -214,12 +218,13 @@ final class Looper
      * @throws \Zend_Db_Exception
      * @throws \Zend_Exception
      * @throws \ZfExtended_Models_Db_Exceptions_DeadLockHandler
+     * @phpstan-impure
      */
     private function fetchNextStates(bool $fromTheTop, string $taskGuid): bool
     {
         $this->isReprocessing = false;
         $this->toProcess = $this->state->fetchNextStates(State::UNPROCESSED, $taskGuid, $fromTheTop, $this->batchSize);
-        // may we are in the reprocessing phase
+        // may we are in     *  the reprocessing phase
         if (empty($this->toProcess)) {
             $this->toProcess = $this->state->fetchNextStates(State::REPROCESS, $taskGuid, $fromTheTop, 1);
             $this->isReprocessing = (count($this->toProcess) > 0);
