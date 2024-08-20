@@ -174,11 +174,18 @@ final class Looper
                 // VERY UGLY special for API-tests
                 // only the last looper for the current processor will continue the loop (but with sleeps)
                 // because we want to avoid being dependent on the cronjobs when running tests
-                // Why in heaven is phpstan saying "Negated boolean expression is always true" for the fetch ???
+                // we must respect the max. import time to avoid creating endless processes
+                $until = \MittagQI\Translate5\Test\Api\Helper::RELOAD_TASK_LIMIT;
                 if ($this->workerIndex === 0) {
                     sleep(4);
-                    while (! $this->fetchNextStates($fromTheTop, $taskGuid)) { // @phpstan-ignore-line
+                    $until -= 4;
+                    // Why in heaven is phpstan saying "Negated boolean expression is always true" for the fetch ???
+                    while (!$this->fetchNextStates($fromTheTop, $taskGuid)) { // @phpstan-ignore-line
                         sleep(2);
+                        $until -= 2;
+                        if ($until <= 0) {
+                            return false;
+                        }
                     }
 
                     return true; // @phpstan-ignore-line
