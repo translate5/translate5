@@ -4402,7 +4402,7 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Diese Kundennummer wird bereits verwendet.</source>
                 <target>This client-number is already in use.</target>
             </trans-unit>
-            <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKQ=='>
+            <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKS4='>
                 <source>Der referenzierte Kunde existiert nicht (mehr).</source>
                 <target>The referenced customer does not exist (anymore).</target>
             </trans-unit>
@@ -10047,6 +10047,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
                 <source>Regel mit dieser Priorität existiert bereits</source>
                 <target>Rule with this priority already exists</target>
+            </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gZGVuIEt1bmRlbiAie2lkfSIgaGllciBuaWNodCBhbmdlYmVu'>
+                <source>Sie können den Kunden "{id}" hier nicht angeben</source>
+                <target>You can't provider customer "{id}" here</target>
             </trans-unit>
         </body>
     </file>

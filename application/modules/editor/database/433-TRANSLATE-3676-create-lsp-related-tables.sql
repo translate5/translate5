@@ -37,8 +37,8 @@ CREATE TABLE `LEK_language_service_provider_customer` (
     `lspId` int (11) DEFAULT NULL COMMENT 'Foreign Key to LEK_language_service_provider',
     `customerId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT,
-    CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE RESTRICT
+    CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE CASCADE,
+    CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `LEK_language_service_provider_user` (
@@ -48,7 +48,7 @@ CREATE TABLE `LEK_language_service_provider_user` (
     `userId` int (11) NOT NULL COMMENT 'Foreign Key to Zf_users',
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT,
-    CONSTRAINT FOREIGN KEY (`userId`) REFERENCES `Zf_users` (`id`) ON DELETE RESTRICT ,
+    CONSTRAINT FOREIGN KEY (`userId`) REFERENCES `Zf_users` (`id`) ON DELETE CASCADE,
     UNIQUE (`userId`)
 );
 

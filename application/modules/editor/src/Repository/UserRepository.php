@@ -91,4 +91,9 @@ class UserRepository
             }
         }
     }
+
+    public function delete(ZfExtended_Models_User $user): void
+    {
+        $user->delete();
+    }
 }

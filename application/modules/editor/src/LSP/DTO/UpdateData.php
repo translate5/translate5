@@ -28,22 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP;
+namespace MittagQI\Translate5\LSP\DTO;
 
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use ZfExtended_Models_User;
-
-class JobCoordinator
+class UpdateData
 {
+    /**
+     * @param \editor_Models_Customer_Customer[] $customers
+     */
     public function __construct(
-        public readonly string $guid,
-        public readonly ZfExtended_Models_User $user,
-        public readonly LanguageServiceProvider $lsp,
+        public readonly string $name,
+        public readonly ?string $description,
+        public readonly array $customers,
     ) {
-    }
-
-    public function isCoordinatorOf(LanguageServiceProvider $lsp): bool
-    {
-        return $this->lsp->getId() === $lsp->getId();
     }
 }

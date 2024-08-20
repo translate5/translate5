@@ -28,22 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP;
+namespace MittagQI\Translate5\Exception;
 
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use ZfExtended_Models_User;
+use InvalidArgumentException;
 
-class JobCoordinator
+class InexistentCustomerException extends InvalidArgumentException
 {
-    public function __construct(
-        public readonly string $guid,
-        public readonly ZfExtended_Models_User $user,
-        public readonly LanguageServiceProvider $lsp,
-    ) {
-    }
-
-    public function isCoordinatorOf(LanguageServiceProvider $lsp): bool
+    public function __construct(public readonly int $customerId)
     {
-        return $this->lsp->getId() === $lsp->getId();
+        parent::__construct("Customer with ID [$customerId] does not exist");
     }
 }

@@ -36,16 +36,26 @@ use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
 class JobCoordinatorRepository
 {
+    public function findByUser(ZfExtended_Models_User $user): ?JobCoordinator
+    {
+        try {
+            return $this->getByUser($user);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
+    }
+
     public function getByUser(ZfExtended_Models_User $user): JobCoordinator
     {
         $roles = $user->getRoles();
 
         if (! in_array(Roles::JOB_COORDINATOR, $roles)) {
-            throw new \ZfExtended_Models_Entity_NotFoundException('User is not a job coordinator');
+            throw new ZfExtended_Models_Entity_NotFoundException('User is not a job coordinator');
         }
 
         $lsp = ZfExtended_Factory::get(LanguageServiceProvider::class);
@@ -63,7 +73,7 @@ class JobCoordinatorRepository
         $row = $lspDb->fetchRow($select);
 
         if (! $row) {
-            throw new \ZfExtended_Models_Entity_NotFoundException('No LSP found for job coordinator');
+            throw new ZfExtended_Models_Entity_NotFoundException('No LSP found for job coordinator');
         }
 
         $guid = $row['guid'];

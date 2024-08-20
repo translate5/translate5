@@ -41,6 +41,7 @@ use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
 class LSPRepository
@@ -53,6 +54,33 @@ class LSPRepository
     public static function create(): self
     {
         return new self(Zend_Db_Table::getDefaultAdapter());
+    }
+
+    /**
+     * @param int $id
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function get(int $id): LanguageServiceProvider
+    {
+        $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
+        $model->load($id);
+
+        return $model;
+    }
+
+    public function save(LanguageServiceProvider $lsp): void
+    {
+        $lsp->save();
+    }
+
+    public function delete(LanguageServiceProvider $lsp): void
+    {
+        $lsp->delete();
+    }
+
+    public function saveCustomerAssignment(LanguageServiceProviderCustomer $lspCustomer): void
+    {
+        $lspCustomer->save();
     }
 
     /**
@@ -143,14 +171,27 @@ class LSPRepository
      */
     public function getForJobCoordinator(JobCoordinator $jc): iterable
     {
-        $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
-
         yield $jc->lsp;
 
-        yield from $this->iterateThroughChildren($model);
+        foreach ($this->getSubLspList($jc->lsp) as $lsp) {
+            yield $lsp;
+        }
     }
 
-    private function iterateThroughChildren(LanguageServiceProvider $lsp): iterable
+    public function getForPmRole(): iterable
+    {
+        $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
+        $select = $model->db->select()->where('parentId IS NULL');
+
+        $stmt = $this->db->query($select);
+
+        yield from $this->generateModels($stmt, $model);
+    }
+
+    /**
+     * @return iterable<LanguageServiceProvider>
+     */
+    public function getSubLspList(LanguageServiceProvider $lsp): iterable
     {
         $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
 
@@ -158,6 +199,13 @@ class LSPRepository
 
         $stmt = $this->db->query($select);
 
+        yield from $this->generateModels($stmt, $model);
+    }
+
+    private function generateModels(
+        \PDOStatement|\Zend_Db_Statement_Interface|\Zend_Db_Statement $stmt,
+        \ZfExtended_Models_Entity_Abstract $model,
+    ): \Generator {
         while ($row = $stmt->fetch()) {
             $model->init(
                 new Zend_Db_Table_Row(
@@ -171,8 +219,6 @@ class LSPRepository
             );
 
             yield clone $model;
-
-            yield from $this->iterateThroughChildren($model);
         }
     }
 }
