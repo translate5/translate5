@@ -65,9 +65,20 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                 },
                 {
                     xtype: 'gridcolumn',
-                    dataIndex: 'clients',
+                    dataIndex: 'customers',
+                    sortable: false,
                     bind: {
-                        text: '{l10n.lsp.clients}'
+                        text: '{l10n.lsp.clients}',
+                    },
+                    filter: {
+                        type: 'customer' // [Multitenancy]
+                    },
+                    renderer: function (customers) {
+                        if (customers.length === 0) {
+                            return '';
+                        }
+
+                        return customers.map(customer => customer.name).join(', ');
                     }
                 },
             ],
