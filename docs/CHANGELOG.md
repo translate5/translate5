@@ -33,6 +33,10 @@ translate5 - 7.8.0 : Improved UI error handling and display
 
 
 ### Changed
+**[TRANSLATE-3518](https://jira.translate5.net/browse/TRANSLATE-3518): LanguageResources - Infrastructure for using "translate5 language resources" as training resources for MT** <br>
+Cross Language Resource synchronisation mechanism and abstraction layer introduced into application.
+From now on we have mechanic to connect different Language Resource types (like t5memory, Term Collection, etc) for data synchronisation if it is possible
+
 **[TRANSLATE-4137](https://jira.translate5.net/browse/TRANSLATE-4137): t5memory, Translate5 CLI - Improve t5memory reorganize command** <br>
 Added capability to process language resources in batches to t5memory:reorganize command
 
