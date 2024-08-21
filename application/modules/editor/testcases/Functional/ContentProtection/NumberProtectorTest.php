@@ -110,7 +110,7 @@ class NumberProtectorTest extends TestCase
         $contentRecognition2->delete();
 
         self::assertSame(
-            '<number type="integer" name="test usd" source="12345 USD" iso="12345" target="12345 EUR"/>',
+            '<number type="integer" name="test usd" source="12345 USD" iso="12345" target="12345 EUR" regex="04+LSdFWCA12UdEHAA=="/>',
             $protected
         );
     }
@@ -161,7 +161,7 @@ class NumberProtectorTest extends TestCase
         $contentRecognition2->delete();
 
         self::assertSame(
-            '<number type="integer" name="test usd" source="12345 USD" iso="12345" target="12345 EUR"/>',
+            '<number type="integer" name="test usd" source="12345 USD" iso="12345" target="12345 EUR" regex="04+LSdFWCA12UdEHAA=="/>',
             $protected
         );
     }
@@ -183,7 +183,7 @@ class NumberProtectorTest extends TestCase
         $protector = NumberProtector::create($this->getNumberFormatRepository());
 
         self::assertSame(
-            'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+            'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
             $protector->protect('string 20231020 string 20231020 string', true, 5, 6)
         );
     }
@@ -240,40 +240,40 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 20231020 string',
-            'expected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+            'expected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
         ];
         yield [
             'string' => 'string 5 7 2023 string',
-            'expected' => 'string <number type="date" name="default d m Y" source="5 7 2023" iso="2023-07-05" target="2023-07-05"/> string',
+            'expected' => 'string <number type="date" name="default d m Y" source="5 7 2023" iso="2023-07-05" target="2023-07-05" regex="09eIKa6Jq4nR0NTQMIg21LWMrQGSRrHRBiCmMZAyBItYxmoqwBQYAkWN4KIxKdUmtUDdMXogo1Q0NWs0dGAsEFUTo6mpDwA="/> string',
         ];
         yield [
             'string' => 'string 31 5 2023 string',
-            'expected' => 'string <number type="date" name="default d m Y" source="31 5 2023" iso="2023-05-31" target="2023-05-31"/> string',
+            'expected' => 'string <number type="date" name="default d m Y" source="31 5 2023" iso="2023-05-31" target="2023-05-31" regex="09eIKa6Jq4nR0NTQMIg21LWMrQGSRrHRBiCmMZAyBItYxmoqwBQYAkWN4KIxKdUmtUDdMXogo1Q0NWs0dGAsEFUTo6mpDwA="/> string',
         ];
         yield [
             'string' => 'string 2023 05 07 string',
-            'expected' => 'string <number type="date" name="default Y d m" source="2023 05 07" iso="2023-07-05" target="2023-07-05"/> string',
+            'expected' => 'string <number type="date" name="default Y d m" source="2023 05 07" iso="2023-07-05" target="2023-07-05" regex="09eIKa6Jq4nR0NSISak2qVXQMIg21LWMrQGSRrHRBiCmMZAyBItYxmrCFRgCRY1gopoaGjF6IKNUNDVrNHRgLBBVE6OpqQ8A"/> string',
         ];
         yield [
             'string' => 'string 2023 5 7 string',
-            'expected' => 'string <number type="date" name="default Y d m" source="2023 5 7" iso="2023-07-05" target="2023-07-05"/> string',
+            'expected' => 'string <number type="date" name="default Y d m" source="2023 5 7" iso="2023-07-05" target="2023-07-05" regex="09eIKa6Jq4nR0NSISak2qVXQMIg21LWMrQGSRrHRBiCmMZAyBItYxmrCFRgCRY1gopoaGjF6IKNUNDVrNHRgLBBVE6OpqQ8A"/> string',
         ];
         yield [
             'string' => 'string 2023 5 30 string',
-            'expected' => 'string <number type="date" name="default Y m d" source="2023 5 30" iso="2023-05-30" target="2023-05-30"/> string',
+            'expected' => 'string <number type="date" name="default Y m d" source="2023 5 30" iso="2023-05-30" target="2023-05-30" regex="09eIKa6Jq4nR0NSISak2qVXQMIg21LWMrTGMNtA1iq0BczThokDSKBYoA2QaAylDmAJNDY0YPZBRKpqaNRo6MBaIqonR1NQHAA=="/> string',
         ];
         yield [
             'string' => 'string 2023 12 31 string',
-            'expected' => 'string <number type="date" name="default Y m d" source="2023 12 31" iso="2023-12-31" target="2023-12-31"/> string',
+            'expected' => 'string <number type="date" name="default Y m d" source="2023 12 31" iso="2023-12-31" target="2023-12-31" regex="09eIKa6Jq4nR0NSISak2qVXQMIg21LWMrTGMNtA1iq0BczThokDSKBYoA2QaAylDmAJNDY0YPZBRKpqaNRo6MBaIqonR1NQHAA=="/> string',
         ];
 
         yield [
             'string' => 'string 05/07 2023 string',
-            'expected' => 'string <number type="date" name="default d/m Y" source="05/07 2023" iso="2023-07-05" target="2023-07-05"/> string',
+            'expected' => 'string <number type="date" name="default d/m Y" source="05/07 2023" iso="2023-07-05" target="2023-07-05" regex="09eIKa6Jq4nR0NTQMIg21LWMrQGSRrHRBiCmMZAyBItYxmrG6MNUGAKFjWDCCjEp1Sa1QO0xeiCzVDQ1azR0YCwQVROjqakPAA=="/> string',
         ];
         yield [
             'string' => 'string 31/12 2023 string',
-            'expected' => 'string <number type="date" name="default d/m Y" source="31/12 2023" iso="2023-12-31" target="2023-12-31"/> string',
+            'expected' => 'string <number type="date" name="default d/m Y" source="31/12 2023" iso="2023-12-31" target="2023-12-31" regex="09eIKa6Jq4nR0NTQMIg21LWMrQGSRrHRBiCmMZAyBItYxmrG6MNUGAKFjWDCCjEp1Sa1QO0xeiCzVDQ1azR0YCwQVROjqakPAA=="/> string',
         ];
     }
 
@@ -281,23 +281,23 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 31 11 2023 string',
-            'expected' => 'string <number type="integer" name="default simple" source="31" iso="31" target="31"/> <number type="integer" name="default simple" source="11" iso="11" target="11"/> <number type="integer" name="default simple" source="2023" iso="2023" target="2023"/> string',
+            'expected' => 'string <number type="integer" name="default simple" source="31" iso="31" target="31" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="11" iso="11" target="11" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="2023" iso="2023" target="2023" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
         yield [
             'string' => 'string 20233108 string',
-            'expected' => 'string <number type="integer" name="default simple" source="20233108" iso="20233108" target="20233108"/> string',
+            'expected' => 'string <number type="integer" name="default simple" source="20233108" iso="20233108" target="20233108" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
         yield [
             'string' => 'string 05 07 23 string',
-            'expected' => 'string 05 07 <number type="integer" name="default simple" source="23" iso="23" target="23"/> string',
+            'expected' => 'string 05 07 <number type="integer" name="default simple" source="23" iso="23" target="23" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
         yield [
             'string' => 'string 5 7 23 string',
-            'expected' => 'string <number type="integer" name="default simple" source="5" iso="5" target="5"/> <number type="integer" name="default simple" source="7" iso="7" target="7"/> <number type="integer" name="default simple" source="23" iso="23" target="23"/> string',
+            'expected' => 'string <number type="integer" name="default simple" source="5" iso="5" target="5" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="7" iso="7" target="7" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="23" iso="23" target="23" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
         yield [
             'string' => 'string 2023 32 3 string',
-            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target="2023"/> <number type="integer" name="default simple" source="32" iso="32" target="32"/> <number type="integer" name="default simple" source="3" iso="3" target="3"/> string',
+            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target="2023" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="32" iso="32" target="32" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="3" iso="3" target="3" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
         yield [
             'string' => 'string 05/07/123 string',
@@ -317,11 +317,11 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 2023 12/31 string',
-            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target="2023"/> 12/31 string',
+            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target="2023" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> 12/31 string',
         ];
         yield [
-            'string' => 'This is <tag1><number type="integer" name="default simple" source="123" iso="123" target="123"/><tag2>malicious 546.5</tag2>2035</tag1> text',
-            'expected' => 'This is <tag1><number type="integer" name="default simple" source="123" iso="123" target="123"/><tag2>malicious <number type="float" name="default generic with dot" source="546.5" iso="546.5" target="546.5"/></tag2><number type="integer" name="default simple" source="2035" iso="2035" target="2035"/></tag1> text',
+            'string' => 'This is <tag1><number type="integer" name="default simple" source="123" iso="123" target="123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/><tag2>malicious 546.5</tag2>2035</tag1> text',
+            'expected' => 'This is <tag1><number type="integer" name="default simple" source="123" iso="123" target="123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/><tag2>malicious <number type="float" name="default generic with dot" source="546.5" iso="546.5" target="546.5" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjF6QFpTQyNGD6RURVOzRkMHxgJRNTGamvqlAA=="/></tag2><number type="integer" name="default simple" source="2035" iso="2035" target="2035" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/></tag1> text',
             'useForUnprotectTest' => false,
         ];
         yield [
@@ -346,160 +346,160 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 9.012345 string',
-            'expected' => 'string <number type="float" name="default generic with dot" source="9.012345" iso="9.012345" target="9.012345"/> string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="9.012345" iso="9.012345" target="9.012345" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjF6QFpTQyNGD6RURVOzRkMHxgJRNTGamvqlAA=="/> string',
         ];
         yield [
             'string' => 'string 123456789.12345 string',
-            'expected' => 'string <number type="float" name="default generic with dot" source="123456789.12345" iso="123456789.12345" target="123456789.12345"/> string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="123456789.12345" iso="123456789.12345" target="123456789.12345" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjF6QFpTQyNGD6RURVOzRkMHxgJRNTGamvqlAA=="/> string',
         ];
         yield [
             'string' => 'string 0.123 string',
-            'expected' => 'string <number type="float" name="default generic with dot" source="0.123" iso="0.123" target="0.123"/> string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="0.123" iso="0.123" target="0.123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjF6QFpTQyNGD6RURVOzRkMHxgJRNTGamvqlAA=="/> string',
         ];
         yield [
             'string' => 'string -0.123 string',
-            'expected' => 'string <number type="float" name="default generic with dot" source="-0.123" iso="-0.123" target="-0.123"/> string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="-0.123" iso="-0.123" target="-0.123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjF6QFpTQyNGD6RURVOzRkMHxgJRNTGamvqlAA=="/> string',
         ];
         yield [
             'string' => 'string +0.123 string',
-            'expected' => 'string <number type="float" name="default generic with dot" source="+0.123" iso="+0.123" target="+0.123"/> string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="+0.123" iso="+0.123" target="+0.123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjF6QFpTQyNGD6RURVOzRkMHxgJRNTGamvqlAA=="/> string',
         ];
         yield [
             'string' => 'string 1.0 string',
-            'expected' => 'string <number type="float" name="default generic with dot" source="1.0" iso="1.0" target="1.0"/> string',
+            'expected' => 'string <number type="float" name="default generic with dot" source="1.0" iso="1.0" target="1.0" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjF6QFpTQyNGD6RURVOzRkMHxgJRNTGamvqlAA=="/> string',
         ];
         yield [
             'string' => 'string 0,123 string',
-            'expected' => 'string <number type="float" name="default generic with comma" source="0,123" iso="0.123" target="0.123"/> string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="0,123" iso="0.123" target="0.123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjpASlNDI0YPpFJFU7NGQwfGAlE1MZqa+qUA"/> string',
         ];
         yield [
             'string' => 'string -0,123 string',
-            'expected' => 'string <number type="float" name="default generic with comma" source="-0,123" iso="-0.123" target="-0.123"/> string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="-0,123" iso="-0.123" target="-0.123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjpASlNDI0YPpFJFU7NGQwfGAlE1MZqa+qUA"/> string',
         ];
         yield [
             'string' => 'string -12,123 string',
-            'expected' => 'string <number type="float" name="default generic with comma" source="-12,123" iso="-12.123" target="-12.123"/> string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="-12,123" iso="-12.123" target="-12.123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjpASlNDI0YPpFJFU7NGQwfGAlE1MZqa+qUA"/> string',
         ];
         yield [
             'string' => 'string +12,123 string',
-            'expected' => 'string <number type="float" name="default generic with comma" source="+12,123" iso="+12.123" target="+12.123"/> string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="+12,123" iso="+12.123" target="+12.123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjpASlNDI0YPpFJFU7NGQwfGAlE1MZqa+qUA"/> string',
         ];
         yield [
             'string' => 'string 1,0 string',
-            'expected' => 'string <number type="float" name="default generic with comma" source="1,0" iso="1.0" target="1.0"/> string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="1,0" iso="1.0" target="1.0" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjpASlNDI0YPpFJFU7NGQwfGAlE1MZqa+qUA"/> string',
         ];
         yield [
             'string' => 'string 123456789,12345 string',
-            'expected' => 'string <number type="float" name="default generic with comma" source="123456789,12345" iso="123456789.12345" target="123456789.12345"/> string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="123456789,12345" iso="123456789.12345" target="123456789.12345" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjpASlNDI0YPpFJFU7NGQwfGAlE1MZqa+qUA"/> string',
         ];
         yield [
             'string' => 'string 123456789·12345 string',
-            'expected' => 'string <number type="float" name="default generic with middle dot" source="123456789·12345" iso="123456789.12345" target="123456789.12345"/> string',
+            'expected' => 'string <number type="float" name="default generic with middle dot" source="123456789·12345" iso="123456789.12345" target="123456789.12345" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmoe2A2lNDY0YPZBSFU3NGg0dGAtE1cRoauqXAgA="/> string',
         ];
         yield [
             'string' => 'string 0·123 string',
-            'expected' => 'string <number type="float" name="default generic with middle dot" source="0·123" iso="0.123" target="0.123"/> string',
+            'expected' => 'string <number type="float" name="default generic with middle dot" source="0·123" iso="0.123" target="0.123" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmoe2A2lNDY0YPZBSFU3NGg0dGAtE1cRoauqXAgA="/> string',
         ];
         yield [
             'string' => 'string -0·12345 string',
-            'expected' => 'string <number type="float" name="default generic with middle dot" source="-0·12345" iso="-0.12345" target="-0.12345"/> string',
+            'expected' => 'string <number type="float" name="default generic with middle dot" source="-0·12345" iso="-0.12345" target="-0.12345" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmoe2A2lNDY0YPZBSFU3NGg0dGAtE1cRoauqXAgA="/> string',
         ];
         yield [
             'string' => 'string +0·12345 string',
-            'expected' => 'string <number type="float" name="default generic with middle dot" source="+0·12345" iso="+0.12345" target="+0.12345"/> string',
+            'expected' => 'string <number type="float" name="default generic with middle dot" source="+0·12345" iso="+0.12345" target="+0.12345" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmoe2A2lNDY0YPZBSFU3NGg0dGAtE1cRoauqXAgA="/> string',
         ];
 
         yield [
             'string' => 'string 1,234,567.89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="1,234,567.89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="1,234,567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarV0aw2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/> string',
         ];
         yield [
             'string' => 'string -1,234,567.89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="-1,234,567.89" iso="-1234567.89" target="-1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="-1,234,567.89" iso="-1234567.89" target="-1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarV0aw2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/> string',
         ];
         yield [
             'string' => 'string +1,234,567.89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="+1,234,567.89" iso="+1234567.89" target="+1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="+1,234,567.89" iso="+1234567.89" target="+1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarV0aw2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/> string',
         ];
         yield [
             'string' => 'string 1,234,567·89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal middle dot" source="1,234,567·89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal middle dot" source="1,234,567·89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarV0aw2rNUAcoyBTC0wfWh7TIq2poZGjB5Io4qmZo2GDowFompiNDX1SwE="/> string',
         ];
         yield [
             'string' => 'string 12,34,567.89 string',
-            'expected' => 'string <number type="float" name="default indian" source="12,34,567.89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default indian" source="12,34,567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeISdHRBJHVRrU6mtoghnGtZoxeTIq2poZGjB5IuYqmZo2GDowFompiNDX1SwE="/> string',
         ];
         yield [
             'string' => 'string 123,4567.89 string',
-            'expected' => 'string <number type="float" name="default chinese" source="123,4567.89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default chinese" source="123,4567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeISak21DGp1dGsNqwFcUBMLTAdoxeToq2poRGjB9KjoqlZo6EDY4GomhhNTf1SAA=="/> string',
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default with whitespace thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with whitespace thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMapV0Kw2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/> string',
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default with whitespace thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with whitespace thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMapV0Kw2rNUAcoyBTC0wrROToq2poRGjB9KnoqlZo6EDY4GomhhNTf1SAA=="/> string',
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMaqNqag2MjCwrNWsNqzVAIoZI0S0IFy9mBRtTQ2NGD2QMSqamjUaOjAWiKqJ0dTULwUA"/> string',
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMaqNqag2MjCwrNWsNqzVAIoZI0S0wFydmBRtTQ2NGD2QKSqamjUaOjAWmNIvBQA="/> string',
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMaqNqag2MjByq9WsNqzVAIoZI0S0IFy9mBRtTQ2NGD2QMSqamjUaOjAWiKqJ0dTULwUA"/> string',
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMaqNqag2MjByq9WsNqzVAIoZI0S0wFydmBRtTQ2NGD2QKSqamjUaOjAWiKqJ0dTULwUA"/> string',
         ];
 
         yield [
             'string' => 'string 1˙234˙567.89 string',
-            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal dot" source="1˙234˙567.89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal dot" source="1˙234˙567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMao9PVOz2rBWA8gzBrG1wIwYvZgUbU0NjRg9kFYVTc0aDR0YC0TVxGhq6pcCAA=="/> string',
         ];
         yield [
             'string' => 'string 1˙234˙567,89 string',
-            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal comma" source="1˙234˙567,89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal comma" source="1˙234˙567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMao9PVOz2rBWA8gzBrG1wAydmBRtTQ2NGD2QThVNzRoNHRgLRNXEaGrqlwIA"/> string',
         ];
 
         yield [
             'string' => "string 1'234'567.89 string",
-            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal dot" source="1\'234\'567.89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal dot" source="1\'234\'567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMapV16w2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/> string',
         ];
         yield [
             'string' => "string 1'234'567,89 string",
-            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal comma" source="1\'234\'567,89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal comma" source="1\'234\'567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMapV16w2rNUAcoyBTC0wrROToq2poRGjB9KnoqlZo6EDY4GomhhNTf1SAA=="/> string',
         ];
 
         yield [
             'string' => 'string 1.234.567,89 string',
-            'expected' => 'string <number type="float" name="default with dot thousand decimal comma" source="1.234.567,89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with dot thousand decimal comma" source="1.234.567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMaqN0dOsNqzVAPKMQWwtMEMnJkVbU0MjRg+kU0VTs0ZDB8YCUTUxmpr6pQA="/> string',
         ];
         yield [
             'string' => "string 1.234.567'89 string",
-            'expected' => 'string <number type="float" name="default with &quot;\'&quot; separator" source="1.234.567\'89" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;\'&quot; separator" source="1.234.567\'89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMaqN0dOsNqzVAPKMQWwtMEM9JkVbU0MjRg+kU0VTs0ZDB8YCUTUxmpr6pQA="/> string',
         ];
 
         yield [
             'string' => "string 1.23e12 string",
-            'expected' => 'string <number type="float" name="default exponent" source="1.23e12" iso="1.23e12" target="1.23e12"/> string',
+            'expected' => 'string <number type="float" name="default exponent" source="1.23e12" iso="1.23e12" target="1.23e12" regex="09eIKa6Jq4nR0NSISdHS0KmJ0dOMSdGOTnWN1bUHMjQ1NGL0QGpUNDVrNHRgLBBVE6OpqQ8A"/> string',
         ];
         yield [
             'string' => "string 1.13e-15 string",
-            'expected' => 'string <number type="float" name="default exponent" source="1.13e-15" iso="1.13e-15" target="1.13e-15"/> string',
+            'expected' => 'string <number type="float" name="default exponent" source="1.13e-15" iso="1.13e-15" target="1.13e-15" regex="09eIKa6Jq4nR0NSISdHS0KmJ0dOMSdGOTnWN1bUHMjQ1NGL0QGpUNDVrNHRgLBBVE6OpqQ8A"/> string',
         ];
 
         yield [
             'string' => "string ١٬٢٣٤٬٥٦٧٫٨٩ string",
-            'expected' => 'string <number type="float" name="default arabian" source="١٬٢٣٤٬٥٦٧٫٨٩" iso="1234567.89" target="1234567.89"/> string',
+            'expected' => 'string <number type="float" name="default arabian" source="١٬٢٣٤٬٥٦٧٫٨٩" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NTQiL658Oaim4tvLrm59Oaym8tvrri5MrbaUMe49uYazWrDWo2YlGowWwvCWB2Tog3UFaMHMkJFU7NGQwfGAlE1MZqa+qUA"/> string',
         ];
     }
 
@@ -519,57 +519,57 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 123456789 string',
-            'expected' => 'string <number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/> string',
+            'expected' => 'string <number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
         yield [
             'string' => 'string -123456789 string',
-            'expected' => 'string <number type="integer" name="default simple" source="-123456789" iso="-123456789" target="-123456789"/> string',
+            'expected' => 'string <number type="integer" name="default simple" source="-123456789" iso="-123456789" target="-123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
         yield [
             'string' => 'string +123456789 string',
-            'expected' => 'string <number type="integer" name="default simple" source="+123456789" iso="+123456789" target="+123456789"/> string',
+            'expected' => 'string <number type="integer" name="default simple" source="+123456789" iso="+123456789" target="+123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
 
         yield [
             'string' => 'string 1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with comma separator" source="1,234,567" iso="1234567" target="1234567"/> string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="1,234,567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSI1tWOtY821LWMjUmpNtAxqtXQ0dQAMo1rY4w1tcAMTQ2NGD2QDhVNzRoNHRgLRNXEaGrqlwIA"/> string',
         ];
         yield [
             'string' => 'string -1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with comma separator" source="-1,234,567" iso="-1234567" target="-1234567"/> string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="-1,234,567" iso="-1234567" target="-1234567" regex="09eIKa6Jq4nR0NSI1tWOtY821LWMjUmpNtAxqtXQ0dQAMo1rY4w1tcAMTQ2NGD2QDhVNzRoNHRgLRNXEaGrqlwIA"/> string',
         ];
         yield [
             'string' => 'string +1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with comma separator" source="+1,234,567" iso="+1234567" target="+1234567"/> string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="+1,234,567" iso="+1234567" target="+1234567" regex="09eIKa6Jq4nR0NSI1tWOtY821LWMjUmpNtAxqtXQ0dQAMo1rY4w1tcAMTQ2NGD2QDhVNzRoNHRgLRNXEaGrqlwIA"/> string',
         ];
 
         yield [
             'string' => 'string 12,34,567 string',
-            'expected' => 'string <number type="integer" name="default indian with comma thousand" source="12,34,567" iso="1234567" target="1234567"/> string',
+            'expected' => 'string <number type="integer" name="default indian with comma thousand" source="12,34,567" iso="1234567" target="1234567" regex="NYsxFoAgDMUu4/C/FhF1ceIgFCdv4HOyvbswOCUZEqG3naYgSphqRknhqHq9iySHkBktVtedY5PNCejcp4E0yG8dpmR8Pg=="/> string',
         ];
         yield [
             'string' => 'string 1,1234,4567 string',
-            'expected' => 'string <number type="integer" name="default chinese with comma thousand" source="1,1234,4567" iso="112344567" target="112344567"/> string',
+            'expected' => 'string <number type="integer" name="default chinese with comma thousand" source="1,1234,4567" iso="112344567" target="112344567" regex="09eIKa6Jq4nR0NSI1tWOtY821LWMjUmpNtAxrtXQ0bTXALJNamOMNbU07G1sdTTBXE0NjRg9kEYVTc0aDR0YC0TVxGhq6pcCAA=="/> string',
         ];
 
         yield [
             'string' => 'string 1˙234˙567 string',
-            'expected' => 'string <number type="integer" name="default generic with dot above separator" source="1˙234˙567" iso="1234567" target="1234567"/> string',
+            'expected' => 'string <number type="integer" name="default generic with dot above separator" source="1˙234˙567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSI1tWOtY821LWMjUmpNtAxqtU4PVNTA8g2ro0x1tQCMzQ1NGL0QFpUNDVrNHRgLBBVE6OpqV8KAA=="/> string',
         ];
 
         yield [
             'string' => "string 1'234'567 string",
-            'expected' => 'string <number type="integer" name="default generic with apostrophe separator" source="1\'234\'567" iso="1234567" target="1234567"/> string',
+            'expected' => 'string <number type="integer" name="default generic with apostrophe separator" source="1\'234\'567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSI1tWOtY821LWMjUmpNtAxqtVQ19QAMo1rY4w1tcAMTQ2NGD2QDhVNzRoNHRgLRNXEaGrqlwIA"/> string',
         ];
 
         yield [
             'string' => 'string 1.234.567 string',
-            'expected' => 'string <number type="integer" name="default generic with dot" source="1.234.567" iso="1234567" target="1234567"/> string',
+            'expected' => 'string <number type="integer" name="default generic with dot" source="1.234.567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarViNHT1LTXAPKMa2NMNLXADE0NoDBIl4qmZo2GDowFompiNDX1AQ=="/> string',
         ];
 
         yield [
             'string' => "string ١٬٢٣٤٬٥٦٧ string",
-            'expected' => 'string <number type="integer" name="default arabian with separator" source="١٬٢٣٤٬٥٦٧" iso="1234567" target="1234567"/> string',
+            'expected' => 'string <number type="integer" name="default arabian with separator" source="١٬٢٣٤٬٥٦٧" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSI1tWOtY++ufDmopuLby65ufTmspvLb664uTK22kDHqPbmGnsNrJLGQClNLRxSmhoaMXogK1Q0NWs0dGAsEFUTo6mpXwoA"/> string',
         ];
     }
 
@@ -581,7 +581,7 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 67 89 45 string',
-            'expected' => 'string <number type="integer" name="default simple" source="67" iso="67" target="67"/> <number type="integer" name="default simple" source="89" iso="89" target="89"/> <number type="integer" name="default simple" source="45" iso="45" target="45"/> string',
+            'expected' => 'string <number type="integer" name="default simple" source="67" iso="67" target="67" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="89" iso="89" target="89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="45" iso="45" target="45" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
     }
 
@@ -589,19 +589,19 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 127.0.0.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1"/> string',
+            'expected' => 'string <number type="ip-address" name="default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1" regex="09eIKa6Jq4nR0NTQMDKNNtA1ja3RMALSJrE1hjEpNdGGupaxNZoxKZoaMXoEVGhWG9cCjQGqA5qpoqlZo6EDY4GomhhNTX0A"/> string',
         ];
         yield [
             'string' => 'string 255.255.255.255 string',
-            'expected' => 'string <number type="ip-address" name="default" source="255.255.255.255" iso="255.255.255.255" target="255.255.255.255"/> string',
+            'expected' => 'string <number type="ip-address" name="default" source="255.255.255.255" iso="255.255.255.255" target="255.255.255.255" regex="09eIKa6Jq4nR0NTQMDKNNtA1ja3RMALSJrE1hjEpNdGGupaxNZoxKZoaMXoEVGhWG9cCjQGqA5qpoqlZo6EDY4GomhhNTX0A"/> string',
         ];
         yield [
             'string' => 'string 0.0.0.0 string',
-            'expected' => 'string <number type="ip-address" name="default" source="0.0.0.0" iso="0.0.0.0" target="0.0.0.0"/> string',
+            'expected' => 'string <number type="ip-address" name="default" source="0.0.0.0" iso="0.0.0.0" target="0.0.0.0" regex="09eIKa6Jq4nR0NTQMDKNNtA1ja3RMALSJrE1hjEpNdGGupaxNZoxKZoaMXoEVGhWG9cCjQGqA5qpoqlZo6EDY4GomhhNTX0A"/> string',
         ];
         yield [
             'string' => 'string 1.1.1.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="1.1.1.1" iso="1.1.1.1" target="1.1.1.1"/> string',
+            'expected' => 'string <number type="ip-address" name="default" source="1.1.1.1" iso="1.1.1.1" target="1.1.1.1" regex="09eIKa6Jq4nR0NTQMDKNNtA1ja3RMALSJrE1hjEpNdGGupaxNZoxKZoaMXoEVGhWG9cCjQGqA5qpoqlZo6EDY4GomhhNTX0A"/> string',
         ];
     }
 
@@ -633,23 +633,23 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 01:02:03:04:ab:cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01:02:03:04:ab:cd" iso="01:02:03:04:ab:cd" target="01:02:03:04:ab:cd"/> string',
+            'expected' => 'string <number type="mac-address" name="default" source="01:02:03:04:ab:cd" iso="01:02:03:04:ab:cd" target="01:02:03:04:ab:cd" regex="09eIKa6Jq4nR0NTQsLeKjraqSMlMzyyxio2tNqrViNa1itXUxJSIMdasNqlFEwSaEKMHMk5FU7NGQwfGAlE1MZqa+gA="/> string',
         ];
         yield [
             'string' => 'string 01-02-03-04-ab-cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="01-02-03-04-ab-cd" target="01-02-03-04-ab-cd"/> string',
+            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="01-02-03-04-ab-cd" target="01-02-03-04-ab-cd" regex="09eIKa6Jq4nR0NTQsLeKjraqSMlMzyyxio2tNqrViNa1itXUxJSIMdasNqlFEwSaEKMHMk5FU7NGQwfGAlE1MZqa+gA="/> string',
         ];
         yield [
             'string' => 'string 00:00:00:00:00:00 string',
-            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="00:00:00:00:00:00" target="00:00:00:00:00:00"/> string',
+            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="00:00:00:00:00:00" target="00:00:00:00:00:00" regex="09eIKa6Jq4nR0NTQsLeKjraqSMlMzyyxio2tNqrViNa1itXUxJSIMdasNqlFEwSaEKMHMk5FU7NGQwfGAlE1MZqa+gA="/> string',
         ];
         yield [
             'string' => 'string FF:FF:FF:FF:FF:FF string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF:FF:FF:FF:FF:FF" iso="FF:FF:FF:FF:FF:FF" target="FF:FF:FF:FF:FF:FF"/> string',
+            'expected' => 'string <number type="mac-address" name="default" source="FF:FF:FF:FF:FF:FF" iso="FF:FF:FF:FF:FF:FF" target="FF:FF:FF:FF:FF:FF" regex="09eIKa6Jq4nR0NTQsLeKjraqSMlMzyyxio2tNqrViNa1itXUxJSIMdasNqlFEwSaEKMHMk5FU7NGQwfGAlE1MZqa+gA="/> string',
         ];
         yield [
             'string' => 'string FF-11-FF-33-FF-44 string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF-11-FF-33-FF-44" iso="FF-11-FF-33-FF-44" target="FF-11-FF-33-FF-44"/> string',
+            'expected' => 'string <number type="mac-address" name="default" source="FF-11-FF-33-FF-44" iso="FF-11-FF-33-FF-44" target="FF-11-FF-33-FF-44" regex="09eIKa6Jq4nR0NTQsLeKjraqSMlMzyyxio2tNqrViNa1itXUxJSIMdasNqlFEwSaEKMHMk5FU7NGQwfGAlE1MZqa+gA="/> string',
         ];
     }
 
@@ -697,17 +697,17 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string KEEP TEXT string',
-            'expected' => 'string <number type="keep-content" name="default" source="KEEP TEXT" iso="KEEP TEXT" target="KEEP TEXT"/> string',
+            'expected' => 'string <number type="keep-content" name="default" source="KEEP TEXT" iso="KEEP TEXT" target="KEEP TEXT" regex="0/d2dQ1QCHGNCNEHAA=="/> string',
         ];
 
         yield [
             'string' => '#OVERLAY9_TITLE=In diesem Bereich werfen wir einen Blick in die Zukunft.',
-            'expected' => '<number type="keep-content" name="default" source="#OVERLAY9_TITLE=" iso="#OVERLAY9_TITLE=" target="#OVERLAY9_TITLE="/>In diesem Bereich werfen wir einen Blick in die Zukunft.',
+            'expected' => '<number type="keep-content" name="default" source="#OVERLAY9_TITLE=" iso="#OVERLAY9_TITLE=" target="#OVERLAY9_TITLE=" regex="01f2D3MN8nGMjEnRitdw8neJrAnxDPFx1bTVBwA="/>In diesem Bereich werfen wir einen Blick in die Zukunft.',
         ];
 
         yield [
             'string' => '#OVERLAY123_BODY=In diesem Bereich werfen wir einen Blick in die Zukunft.',
-            'expected' => '<number type="keep-content" name="default" source="#OVERLAY123_BODY=" iso="#OVERLAY123_BODY=" target="#OVERLAY123_BODY="/>In diesem Bereich werfen wir einen Blick in die Zukunft.',
+            'expected' => '<number type="keep-content" name="default" source="#OVERLAY123_BODY=" iso="#OVERLAY123_BODY=" target="#OVERLAY123_BODY=" regex="01f2D3MN8nGMjEnRitdw8neJrAnxDPFx1bTVBwA="/>In diesem Bereich werfen wir einen Blick in die Zukunft.',
         ];
     }
 
@@ -715,7 +715,7 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string REPLACE TEXT string',
-            'expected' => 'string <number type="replace-content" name="default" source="REPLACE TEXT" iso="OTHER TEXT:REPLACE TEXT" target="OTHER TEXT"/> string',
+            'expected' => 'string <number type="replace-content" name="default" source="REPLACE TEXT" iso="OTHER TEXT:REPLACE TEXT" target="OTHER TEXT" regex="0w9yDfBxdHZVCHGNCNEHAA=="/> string',
         ];
     }
 
@@ -723,7 +723,7 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string &lt;goba&gt; string',
-            'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;"/> string',
+            'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;" regex="04+xSc9PSoyx0wcA"/> string',
             'useForUnprotectTest' => false,
         ];
         yield [
@@ -752,31 +752,31 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string <someTag/>123456789<someTag/> string',
-            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/> string',
+            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/><someTag/> string',
         ];
         yield [
             'string' => 'string <someTag>123456789</someTag> string',
-            'expected' => 'string <someTag><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/></someTag> string',
+            'expected' => 'string <someTag><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/></someTag> string',
         ];
         yield [
             'string' => '123456789<someTag/> string',
-            'expected' => '<number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/> string',
+            'expected' => '<number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/><someTag/> string',
         ];
         yield [
             'string' => '<someTag/>123456789<someTag/> string',
-            'expected' => '<someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/> string',
+            'expected' => '<someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/><someTag/> string',
         ];
         yield [
             'string' => 'string <someTag/>123456789',
-            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/>',
+            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/>',
         ];
         yield [
             'string' => 'string <someTag/>123456789<someTag/>',
-            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/>',
+            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/><someTag/>',
         ];
         yield 'date at the beginning and end of text' => [
             'string' => '2023/18/07 some text with date in it 2023/18/07',
-            'expected' => '<number type="date" name="default Y/d/m" source="2023/18/07" iso="2023-07-18" target="2023-07-18"/> some text with date in it <number type="date" name="default Y/d/m" source="2023/18/07" iso="2023-07-18" target="2023-07-18"/>',
+            'expected' => '<number type="date" name="default Y/d/m" source="2023/18/07" iso="2023-07-18" target="2023-07-18" regex="09eIKa6Jq4nR0NSISak2qY3R1zCINtS1jK0Bkkax0QYgpjGQMgSLWMZqIlQYAoWNYMKaGhoxeiDDVDQ1azR0YCwQVROjqakPAA=="/> some text with date in it <number type="date" name="default Y/d/m" source="2023/18/07" iso="2023-07-18" target="2023-07-18" regex="09eIKa6Jq4nR0NSISak2qY3R1zCINtS1jK0Bkkax0QYgpjGQMgSLWMZqIlQYAoWNYMKaGhoxeiDDVDQ1azR0YCwQVROjqakPAA=="/>',
         ];
         yield 'already protected number is safe' => [
             'string' => 'some text with date in it: <number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',

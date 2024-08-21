@@ -29,8 +29,9 @@ declare(strict_types=1);
 
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
-use editor_Models_LanguageResources_LanguageResource;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_OpenTM2_Connector as Connector;
+use editor_Services_OpenTM2_Service;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -52,6 +53,10 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
 
     private const ARGUMENT_UUID = 'uuid';
 
+    private const OPTION_BATCH_SIZE = 'batchSize';
+
+    private const OPTION_START_FROM_ID = 'startFromId';
+
     protected function configure(): void
     {
         $this->setDescription('Reorganizes particular TM');
@@ -66,6 +71,18 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
             InputOption::VALUE_REQUIRED,
             'If no UUID was given this will filter the list of all TMs if provided'
         );
+        $this->addOption(
+            self::OPTION_BATCH_SIZE,
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Number of memories to reorganize at once. Works only if no UUID and tmName was given',
+        );
+        $this->addOption(
+            self::OPTION_START_FROM_ID,
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The DB ID of the language resource to start reorganize from. Works only if no UUID and tmName was given',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -73,51 +90,51 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $uuid = $this->getTmUuid($input);
+        $this->assertInputValid($input);
 
-        if (null === $uuid) {
-            return self::FAILURE;
+        $languageResources = $this->getLanguageResourcesForReorganization($input);
+
+        foreach ($languageResources as $languageResource) {
+            $this->io->text(sprintf(
+                'Reorganizing all memories in language resource "%s" (ID %s, UUID %s)',
+                $languageResource->getName(),
+                $languageResource->getId(),
+                $languageResource->getLangResUuid()
+            ));
+
+            $connector = $this->getConnectorForLanguageResource($languageResource);
+
+            foreach ($languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
+                $tmName = $memory['filename'];
+                $this->reorganizeTm($connector, $tmName);
+            }
         }
 
-        $connector = $this->getConnectorForLanguageResource($uuid);
-
-        if (null === $connector) {
-            return self::FAILURE;
-        }
-
-        $successful = $this->reorganizeTm($connector);
-
-        if (false === $successful) {
-            $this->io->error('Reorganization failed');
-
-            return self::FAILURE;
-        }
-
-        if (null !== $successful) {
-            $this->io->success('Reorganization finished');
-        }
+        $this->io->success('Finished');
 
         return self::SUCCESS;
     }
 
-    private function reorganizeTm(Connector $connector): ?bool
+    private function reorganizeTm(Connector $connector, string $tmName): void
     {
-        if ($connector->isReorganizingAtTheMoment()) {
-            $this->io->warning('Memory is being reorganized at the moment');
+        if ($connector->isReorganizingAtTheMoment($tmName)) {
+            $this->io->warning('Memory "' . $tmName . '" is being reorganized at the moment');
 
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion('Do you really want to proceed? (Y/N)', false);
 
             if (! $helper->ask($this->input, $this->output, $question)) {
-                return null;
+                return;
             }
         }
 
-        if ($connector->isReorganizeFailed()) {
+        if ($connector->isReorganizeFailed($tmName)) {
             $this->io->text('There was already an attempt to reorganize this memory, but it failed.');
         }
 
-        $success = $connector->reorganizeTm();
+        $this->io->text('Reorganizing memory "' . $tmName . '"');
+
+        $connector->reorganizeTm($tmName);
         $result = $connector->getApi()->getResult();
 
         if (property_exists($result, 'invalidSegmentCount')) {
@@ -130,35 +147,69 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
                 $this->io->info($msg);
             }
         }
-
-        return $success;
     }
 
-    private function getLanguageResource(string $uuid): editor_Models_LanguageResources_LanguageResource
+    /**
+     * @return iterable<LanguageResource>
+     */
+    private function getLanguageResourcesForReorganization(InputInterface $input): iterable
     {
-        $langResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
+        $batchSize = $input->getOption(self::OPTION_BATCH_SIZE);
+        $startFromId = $input->getOption(self::OPTION_START_FROM_ID);
+
+        if ($batchSize) {
+            return $this->getLanguageResourcesBatch((int) $batchSize, (int) $startFromId);
+        }
+
+        $uuid = $this->getTmUuid($input);
+
+        if (null !== $uuid) {
+            return $this->getLanguageResourcesByUuid($uuid);
+        }
+
+        return [];
+    }
+
+    private function getLanguageResourcesBatch(int $batchSize, int $startFromId): iterable
+    {
+        $db = ZfExtended_Factory::get(LanguageResource::class)->db;
+        $s = $db->select()
+            ->from([
+                'lr' => 'LEK_languageresources',
+            ], ['lr.langResUuid AS uuid'])
+            ->where('lr.id > ?', $startFromId)
+            ->where('lr.serviceName = ?', editor_Services_OpenTM2_Service::NAME)
+            ->limit($batchSize);
+
+        $data = $db->fetchAll($s);
+
+        foreach ($data as $row) {
+            yield $this->getLanguageResource($row['uuid']);
+        }
+    }
+
+    private function getLanguageResourcesByUuid(string $uuid): iterable
+    {
+        try {
+            return [$this->getLanguageResource($uuid)];
+        } catch (\ZfExtended_Models_Entity_NotFoundException) {
+            $this->io->error('Language resource with UUID "' . $uuid . '" not found.');
+        }
+
+        return [];
+    }
+
+    private function getLanguageResource(string $uuid): LanguageResource
+    {
+        $langResource = ZfExtended_Factory::get(LanguageResource::class);
 
         $langResource->loadByUuid($uuid);
 
         return $langResource;
     }
 
-    private function getConnectorForLanguageResource(string $languageResourceUuid): ?Connector
+    private function getConnectorForLanguageResource(LanguageResource $languageResource): Connector
     {
-        try {
-            $languageResource = $this->getLanguageResource($languageResourceUuid);
-        } catch (\ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->io->error('Language resource with UUID "' . $languageResourceUuid . '" not found.');
-
-            return null;
-        }
-
-        $this->io->text(sprintf(
-            'Reorganizing memory "%s" (UUID %s)',
-            $languageResource->getName(),
-            $languageResourceUuid
-        ));
-
         $connector = new Connector();
         $connector->connectTo(
             $languageResource,
@@ -172,5 +223,19 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
     protected function getInput(): InputInterface
     {
         return $this->input;
+    }
+
+    private function assertInputValid(InputInterface $input): void
+    {
+        $uuid = $input->getArgument(self::ARGUMENT_UUID);
+        $tmName = $input->getOption(self::OPTION_TM_NAME);
+        $batchSize = $input->getOption(self::OPTION_BATCH_SIZE);
+        $startFromId = $input->getOption(self::OPTION_START_FROM_ID);
+
+        if (($uuid || $tmName) && ($batchSize || $startFromId)) {
+            throw new \InvalidArgumentException(
+                'Please either provide `UUID/tmName` or `batchSize/startFromId`'
+            );
+        }
     }
 }
