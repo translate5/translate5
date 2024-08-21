@@ -73,6 +73,8 @@ use ZfExtended_Models_Entity_Abstract;
  * @method void setKeepAsIs(bool $keepAsIs)
  * @method bool getEnabled()
  * @method void setEnabled(bool $enabled)
+ * @method string getMatchId()
+ * @method void setMatchId(int $matchId)
  * @method bool getIsDefault()
  */
 class ContentRecognition extends ZfExtended_Models_Entity_Abstract
@@ -87,7 +89,7 @@ class ContentRecognition extends ZfExtended_Models_Entity_Abstract
         $s->where('type = ?', $type)->where('name = ?', $name);
 
         $this->row = $this->db->fetchRow($s);
-        if (empty($this->row)) {
+        if (null === $this->row) {
             $this->notFound("#by type, name", "$type, $name");
         }
 

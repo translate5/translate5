@@ -382,7 +382,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $useSegmentTimestamp = $options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false;
 
         $timestamp = $useSegmentTimestamp
-            ? $this->api->getDate((int) $segment->getTimestamp())
+            ? $this->api->getDate(strtotime($segment->getTimestamp()))
             : $this->api->getNowDate();
 
         $successful = $this->api->update(

@@ -798,11 +798,19 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1594"></a>E1594 | Plug-In IndiEngine | JSON error with code {json_error_code} occurred on attempt to json_encode events: {json_error_msg} | Please contact the support.                                                                    |
 
 #### Content Protection
-| EventCode               | Context            | EventMessage                                                          | Description/Solution                                                                                                                            |
-|:------------------------|:-------------------|:----------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------|
-| <a id="E1591"></a>E1591 | Content Protection | You already created an {mapping} mapping for this {index} combination | User attempted to create Input or Output mapping for already existing Rule-Language pair                                                        |
-| <a id="E1593"></a>E1593 | Content Protection | Trans unit has unexpected structure and was excluded from TMX import  | In process of TMX import occurred trans unit that we were not able to process. Please fix unit and import it separately or ask support for help |
+| EventCode               | Context            | EventMessage                                                                              | Description/Solution                                                                                                                                    |
+|:------------------------|:-------------------|:------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <a id="E1591"></a>E1591 | Content Protection | You already created an {mapping} mapping for this {index} combination                     | User attempted to create Input or Output mapping for already existing Rule-Language pair                                                                |
+| <a id="E1593"></a>E1593 | Content Protection | Trans unit has unexpected structure and was excluded from TMX import                      | In process of TMX import occurred trans unit that we were not able to process. Please fix unit and import it separately or ask support for help         |
+| <a id="E1625"></a>E1625 | Content Protection | Protection Tag doesn't has required meta info. Fuzzy searches may return worse match rate | Task was created with older version of code so Protection tags may not have required meta info. If that impacts current work - clone task for re-import |
 
+#### Private plug-in for Plunet connection
+| EventCode               | Context         | EventMessage                                        | Description/Solution                                                      |
+|:------------------------|:----------------|:----------------------------------------------------|:--------------------------------------------------------------------------|
+| <a id="E1618"></a>E1618 | Private plug-in | "unspecific" event-logging entries of this plugin   | for detailed information see event-text and additional data               |
+| <a id="E1619"></a>E1619 | Private plug-in | not able to connect to Plunet                       | check connection config to access Plunet                                  |
+| <a id="E1620"></a>E1620 | Private plug-in | not able to identify Plunet project or find CUS-job | see message text for more information                                     |
+| <a id="E1621"></a>E1621 | Private plug-in | can not set state in Plunet CUS-job                 | Check if "customer" and "ressource" is set correct for this job in Plunet |
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number

@@ -34,7 +34,6 @@ use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
-use MittagQI\Translate5\Plugins\TMMaintenance\Helper\Json;
 use MittagQI\Translate5\Plugins\TMMaintenance\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Plugins\TMMaintenance\Service\SegmentProcessor;
 
@@ -108,7 +107,9 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     public function putAction(): void
     {
         $this->getSegmentsProcessor()->update(UpdateDTO::fromRequest($this->getRequest()));
-        $this->assignView([Json::decode($this->getRequest()->getParam('data'))]);
+        $this->assignView([
+            json_decode($this->getRequest()->getParam('data'), true, flags: JSON_THROW_ON_ERROR),
+        ]);
     }
 
     public function deleteAction(): void
@@ -151,7 +152,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         );
 
         try {
-            $data = Json::decode($fileContent);
+            $data = json_decode($fileContent, true, flags: JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
             trigger_error('Error decoding JSON file: ' . $exception->getMessage(), E_USER_WARNING);
         }

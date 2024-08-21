@@ -76,7 +76,9 @@ Ext.define('Ext.translate5.Editor', {
 
     beforeEdit: function () {
         const location = this.getLocation();
-
+        if (!location.record.get('metaData').internalKey) {
+            return false;
+        }
         this.currentEditingRecord = location.record;
         location.record.set('isEditing', true);
 
