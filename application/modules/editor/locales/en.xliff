@@ -10048,6 +10048,14 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Regel mit dieser Priorität existiert bereits</source>
                 <target>Rule with this priority already exists</target>
             </trans-unit>
+            <trans-unit id='TFNQ'>
+                <source>LSP</source>
+                <target>LSP</target>
+            </trans-unit>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVu'>
+                <source>Zugewiesene Kunden</source>
+                <target>Assigned clients</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
