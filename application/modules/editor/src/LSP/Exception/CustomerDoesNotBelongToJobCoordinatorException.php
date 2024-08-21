@@ -28,22 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP;
+namespace MittagQI\Translate5\LSP\Exception;
 
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use ZfExtended_Models_User;
+use InvalidArgumentException;
 
-class JobCoordinator
+class CustomerDoesNotBelongToJobCoordinatorException extends InvalidArgumentException
 {
     public function __construct(
-        public readonly string $guid,
-        public readonly ZfExtended_Models_User $user,
-        public readonly LanguageServiceProvider $lsp,
+        public readonly int $customerId,
+        public readonly string $jobCoordinatorGuid
     ) {
-    }
-
-    public function isCoordinatorOf(LanguageServiceProvider $lsp): bool
-    {
-        return $this->lsp->getId() === $lsp->getId();
+        parent::__construct(
+            "Customer with ID [$customerId] does not belong to the job coordinator [$jobCoordinatorGuid]"
+        );
     }
 }

@@ -27,6 +27,7 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Customer_Customer;
 use editor_Models_Customer_CustomerConfig;
+use MittagQI\Translate5\Exception\InexistentCustomerException;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -70,5 +71,23 @@ class CustomerRepository
     public function getDefaultCustomer(): editor_Models_Customer_Customer
     {
         return ZfExtended_Factory::get(editor_Models_Customer_Customer::class)->loadByDefaultCustomer();
+    }
+
+    /**
+     * @return editor_Models_Customer_Customer[]
+     * @throws InexistentCustomerException
+     */
+    public function getList(int ...$customerIds): array
+    {
+        $customers = [];
+        foreach ($customerIds as $customerId) {
+            try {
+                $customers[] = $this->get($customerId);
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                throw new InexistentCustomerException($customerId);
+            }
+        }
+
+        return $customers;
     }
 }

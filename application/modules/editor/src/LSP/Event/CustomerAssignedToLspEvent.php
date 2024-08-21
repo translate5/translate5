@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,22 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP;
+namespace MittagQI\Translate5\LSP\Event;
 
+use editor_Models_Customer_Customer;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use ZfExtended_Models_User;
 
-class JobCoordinator
+class CustomerAssignedToLspEvent
 {
     public function __construct(
-        public readonly string $guid,
-        public readonly ZfExtended_Models_User $user,
         public readonly LanguageServiceProvider $lsp,
+        public readonly editor_Models_Customer_Customer $customer,
     ) {
-    }
-
-    public function isCoordinatorOf(LanguageServiceProvider $lsp): bool
-    {
-        return $this->lsp->getId() === $lsp->getId();
     }
 }
