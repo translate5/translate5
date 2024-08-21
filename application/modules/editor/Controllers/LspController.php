@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\DTO\UpdateData;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
