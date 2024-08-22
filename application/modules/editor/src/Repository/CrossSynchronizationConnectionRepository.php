@@ -33,26 +33,63 @@ namespace MittagQI\Translate5\Repository;
 use editor_Models_Customer_Customer as Customer;
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
+use editor_Models_Languages;
+use editor_Models_Languages as Language;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnectionCustomer;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 
 class CrossSynchronizationConnectionRepository
 {
+    public function findConnection(int $id): ?CrossSynchronizationConnection
+    {
+        try {
+            return $this->getConnection($id);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
+    }
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getConnection(int $id): CrossSynchronizationConnection
+    {
+        $connection = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
+        $connection->load($id);
+
+        return $connection;
+    }
+
     public function createConnection(
         LanguageResource $source,
         LanguageResource $target,
-        int $customerId,
+        Language $sourceLang,
+        Language $targetLang,
     ): CrossSynchronizationConnection {
         $connection = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
         $connection->setSourceLanguageResourceId((int) $source->getId());
         $connection->setSourceType($source->getResource()->getService());
         $connection->setTargetLanguageResourceId((int) $target->getId());
         $connection->setTargetType($target->getResource()->getService());
-        $connection->setCustomerId($customerId);
+        $connection->setSourceLanguageId((int) $sourceLang->getId());
+        $connection->setTargetLanguageId((int) $targetLang->getId());
 
         $connection->save();
 
         return $connection;
+    }
+
+    public function createCustomerAssoc(int $connectionId, int $customerId): CrossSynchronizationConnectionCustomer
+    {
+        $assoc = ZfExtended_Factory::get(CrossSynchronizationConnectionCustomer::class);
+        $assoc->setConnectionId($connectionId);
+        $assoc->setCustomerId($customerId);
+
+        $assoc->save();
+
+        return $assoc;
     }
 
     public function deleteConnection(CrossSynchronizationConnection $connection): void
@@ -60,11 +97,18 @@ class CrossSynchronizationConnectionRepository
         $connection->delete();
     }
 
+    public function deleteCustomerAssoc(CrossSynchronizationConnectionCustomer $assoc): void
+    {
+        $assoc->delete();
+    }
+
     public function getAllConnectionsRenderData(int $filterLanguageResourceId): array
     {
         $db = ZfExtended_Factory::get(CrossSynchronizationConnection::class)->db;
         $lrTable = ZfExtended_Factory::get(LanguageResource::class)->db->info($db::NAME);
         $customerTable = ZfExtended_Factory::get(Customer::class)->db->info($db::NAME);
+        $languageTable = ZfExtended_Factory::get(editor_Models_Languages::class)->db->info($db::NAME);
+        $assocTable = ZfExtended_Factory::get(CrossSynchronizationConnectionCustomer::class)->db->info($db::NAME);
 
         $select = $db->select()
             ->setIntegrityCheck(false)
@@ -72,13 +116,20 @@ class CrossSynchronizationConnectionRepository
                 [
                     'connections' => $db->info($db::NAME),
                 ],
-                ['sourceLanguageResourceId', 'targetLanguageResourceId']
+                ['id', 'sourceLanguageResourceId', 'targetLanguageResourceId']
+            )
+            ->join(
+                [
+                    'assocs' => $assocTable,
+                ],
+                'assocs.connectionId = connections.id',
+                []
             )
             ->join(
                 [
                     'customers' => $customerTable,
                 ],
-                'connections.customerId = customers.id',
+                'assocs.customerId = customers.id',
                 [
                     'customers.name as customerName',
                 ]
@@ -103,6 +154,24 @@ class CrossSynchronizationConnectionRepository
                     'LanguageResourceTarget.name as targetName',
                 ]
             )
+            ->join(
+                [
+                    'SourceLanguage' => $languageTable,
+                ],
+                'SourceLanguage.id = connections.sourceLanguageId',
+                [
+                    'SourceLanguage.langName as sourceLanguage',
+                ]
+            )
+            ->join(
+                [
+                    'TargetLanguage' => $languageTable,
+                ],
+                'TargetLanguage.id = connections.targetLanguageId',
+                [
+                    'TargetLanguage.langName as targetLanguage',
+                ]
+            )
             ->where('connections.sourceLanguageResourceId = ?', $filterLanguageResourceId)
             ->orWhere('connections.targetLanguageResourceId = ?', $filterLanguageResourceId);
 
@@ -110,11 +179,12 @@ class CrossSynchronizationConnectionRepository
     }
 
     /**
-     * @return iterable<array{sourceId: int, targetId: int}>
+     * @return iterable<CrossSynchronizationConnection>
      */
-    public function getConnectedPairsByAssoc(CustomerAssoc $assoc): iterable
+    public function getConnectionsByLrCustomerAssoc(CustomerAssoc $assoc): iterable
     {
-        $db = ZfExtended_Factory::get(CrossSynchronizationConnection::class)->db;
+        $connection = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
+        $db = $connection->db;
         $customerAssocTable = ZfExtended_Factory::get(CustomerAssoc::class)->db->info($db::NAME);
 
         $select = $db->select()
@@ -124,7 +194,6 @@ class CrossSynchronizationConnectionRepository
                 [
                     'connections' => $db->info($db::NAME),
                 ],
-                ['sourceLanguageResourceId', 'targetLanguageResourceId']
             )
             ->join(
                 [
@@ -150,38 +219,118 @@ class CrossSynchronizationConnectionRepository
         ;
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            yield [
-                'sourceId' => (int) $row['sourceLanguageResourceId'],
-                'targetId' => (int) $row['targetLanguageResourceId'],
-            ];
+            $connection->hydrate($row);
+
+            yield clone $connection;
         }
     }
 
     /**
      * @return iterable<CrossSynchronizationConnection>
      */
-    public function getConnectionsFor(?int $languageResourceId, ?int $customerId = null): iterable
+    public function getConnectionsFor(int $languageResourceId): iterable
     {
         $syncModel = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
         $db = $syncModel->db;
 
         $select = $db->select()
-            ->from([
-                'connections' => $db->info($db::NAME),
-            ]);
-
-        if ($languageResourceId) {
-            $select->where('sourceLanguageResourceId = ? OR targetLanguageResourceId = ?', $languageResourceId);
-        }
-
-        if (null !== $customerId) {
-            $select->where('customerId = ?', $customerId);
-        }
+            ->where('sourceLanguageResourceId = ? OR targetLanguageResourceId = ?', $languageResourceId);
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
             $syncModel->hydrate($row);
 
             yield clone $syncModel;
+        }
+    }
+
+    public function connectionHasAssociatedCustomers(CrossSynchronizationConnection $connection): bool
+    {
+        $assoc = ZfExtended_Factory::get(CrossSynchronizationConnectionCustomer::class);
+
+        $db = $assoc->db;
+
+        $select = $db->select()
+            ->from(
+                [
+                    'assocs' => $db->info($db::NAME),
+                ],
+                [
+                    'count' => 'COUNT(*)',
+                ]
+            )
+            ->where('connectionId = ?', $connection->getId());
+
+        return $db->fetchRow($select)->toArray()['count'] > 0;
+    }
+
+    /**
+     * @return iterable<CrossSynchronizationConnectionCustomer>
+     */
+    public function getCustomerAssociations(CrossSynchronizationConnection $connection): iterable
+    {
+        $assoc = ZfExtended_Factory::get(CrossSynchronizationConnectionCustomer::class);
+
+        $db = $assoc->db;
+
+        $select = $db->select()
+            ->from(
+                [
+                    'assocs' => $db->info($db::NAME),
+                ],
+            )
+            ->where('connectionId = ?', $connection->getId());
+
+        foreach ($db->fetchAll($select)->toArray() as $row) {
+            $assoc->hydrate($row);
+
+            yield clone $assoc;
+        }
+    }
+
+    /**
+     * @return iterable<CrossSynchronizationConnectionCustomer>
+     */
+    public function getCustomerAssocsByCustomerAndLanguageResource(
+        int $customerId,
+        ?int $languageResourceId = null
+    ): iterable {
+        $assoc = ZfExtended_Factory::get(CrossSynchronizationConnectionCustomer::class);
+
+        $db = $assoc->db;
+
+        $select = $db->select()
+            ->setIntegrityCheck(false)
+            ->from([
+                'assocs' => $db->info($db::NAME),
+            ])
+            ->where('customerId = ?', $customerId);
+
+        if ($languageResourceId !== null) {
+            $connectionTable = ZfExtended_Factory::get(CrossSynchronizationConnection::class)->db->info($db::NAME);
+            $lrTable = ZfExtended_Factory::get(LanguageResource::class)->db->info($db::NAME);
+
+            $select
+                ->join(
+                    [
+                        'connections' => $connectionTable,
+                    ],
+                    'connections.id = assocs.connectionId',
+                    []
+                )
+                ->join(
+                    [
+                        'lr' => $lrTable,
+                    ],
+                    'connections.sourceLanguageResourceId = lr.id OR connections.targetLanguageResourceId = lr.id',
+                    []
+                )
+                ->where('lr.ir = ?', $languageResourceId);
+        }
+
+        foreach ($db->fetchAll($select)->toArray() as $row) {
+            $assoc->hydrate($row);
+
+            yield clone $assoc;
         }
     }
 
@@ -280,7 +429,6 @@ class CrossSynchronizationConnectionRepository
         $syncModel = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
         $existingConnectionTargetsSelect = $syncModel->db
             ->select()
-            ->distinct()
             ->from(
                 $syncModel->db->info($syncModel->db::NAME),
                 ['targetLanguageResourceId']
@@ -291,8 +439,6 @@ class CrossSynchronizationConnectionRepository
             'targetLanguageResourceId'
         );
 
-        array_walk($ids, fn ($id) => (int) $id);
-
-        return $ids;
+        return array_map('intval', $ids);
     }
 }

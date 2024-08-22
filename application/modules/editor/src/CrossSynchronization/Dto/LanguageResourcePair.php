@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto;
+namespace MittagQI\Translate5\CrossSynchronization\Dto;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 

@@ -26,16 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\CrossSynchronization\Db;
+declare(strict_types=1);
 
-use Zend_Db_Table_Abstract;
+namespace MittagQI\Translate5\CrossSynchronization\Events;
 
-/**
- * DB Access for Languageresources Assoc
- */
-class CrossSynchronizationConnection extends Zend_Db_Table_Abstract
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnectionCustomer;
+
+final class CustomerAddedEvent
 {
-    protected $_name = 'LEK_cross_language_resource_synchronization_connection';
-
-    public $_primary = 'id';
+    public function __construct(
+        public readonly CrossSynchronizationConnectionCustomer $connectionCustomer,
+    ) {
+    }
 }

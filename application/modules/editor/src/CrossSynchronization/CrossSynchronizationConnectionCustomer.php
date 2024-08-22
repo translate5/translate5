@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,16 +28,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\CrossSynchronization\Db;
+namespace MittagQI\Translate5\CrossSynchronization;
 
-use Zend_Db_Table_Abstract;
+use ZfExtended_Models_Entity_Abstract;
 
 /**
- * DB Access for Languageresources Assoc
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getConnectionId()
+ * @method void setConnectionId(int $id)
+ * @method string getCustomerId()
+ * @method void setCustomerId(int $customerId)
  */
-class CrossSynchronizationConnection extends Zend_Db_Table_Abstract
+class CrossSynchronizationConnectionCustomer extends ZfExtended_Models_Entity_Abstract
 {
-    protected $_name = 'LEK_cross_language_resource_synchronization_connection';
-
-    public $_primary = 'id';
+    protected $dbInstanceClass = Db\CrossSynchronizationConnectionCustomer::class;
 }

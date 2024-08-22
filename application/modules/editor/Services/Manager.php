@@ -33,11 +33,11 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
+use MittagQI\Translate5\CrossSynchronization\SynchronizableIntegrationInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationInterface;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronizableIntegrationInterface;
 use MittagQI\Translate5\Service\DetectLanguageInterface;
 use MittagQI\Translate5\Service\HasLanguageDetector;
 

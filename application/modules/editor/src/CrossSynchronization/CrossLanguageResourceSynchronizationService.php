@@ -28,30 +28,24 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
+namespace MittagQI\Translate5\CrossSynchronization;
 
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Languages as Language;
 use editor_Services_Manager;
 use Generator;
+use MittagQI\Translate5\CrossSynchronization\Dto\AvailableForConnectionOption;
+use MittagQI\Translate5\CrossSynchronization\Events\ConnectionCreatedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\ConnectionDeletedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\CustomerAddedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\CustomerRemovedEvent;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\AvailableForConnectionOption;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\LanguageResourcePair;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionCreatedEvent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionDeletedEvent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
-use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
 class CrossLanguageResourceSynchronizationService
 {
-    /**
-     * @var array<int, LanguageResource>
-     */
-    private array $cachedLanguageResources = [];
-
     /**
      * @var array<string, SynchronisationInterface>
      */
@@ -60,7 +54,6 @@ class CrossLanguageResourceSynchronizationService
     public function __construct(
         private readonly editor_Services_Manager $serviceManager,
         private readonly EventDispatcher $eventDispatcher,
-        private readonly LanguageResourceRepository $languageResourceRepository,
         private readonly CrossSynchronizationConnectionRepository $connectionRepository,
         private readonly ConnectionOptionsRepository $connectionOptionsRepository,
     ) {
@@ -71,28 +64,22 @@ class CrossLanguageResourceSynchronizationService
         return new self(
             new editor_Services_Manager(),
             EventDispatcher::create(),
-            new LanguageResourceRepository(),
             new CrossSynchronizationConnectionRepository(),
             ConnectionOptionsRepository::create(),
         );
     }
 
-    /**
-     * @return iterable<LanguageResourcePair>
-     */
-    public function getConnectedPairsByAssoc(CustomerAssoc $assoc): iterable
+    public function findConnection(int $id): ?CrossSynchronizationConnection
     {
-        foreach ($this->connectionRepository->getConnectedPairsByAssoc($assoc) as $pair) {
-            yield new LanguageResourcePair(
-                $this->getCachedLanguageResource($pair['sourceId']),
-                $this->getCachedLanguageResource($pair['targetId']),
-            );
-        }
+        return $this->connectionRepository->findConnection($id);
     }
 
-    public function pairHasConnection(int $sourceId, int $targetId): bool
+    /**
+     * @return iterable<CrossSynchronizationConnection>
+     */
+    public function getConnectionsByLrCustomerAssoc(CustomerAssoc $assoc): iterable
     {
-        return $this->connectionRepository->hasConnectionsForPair($sourceId, $targetId);
+        return $this->connectionRepository->getConnectionsByLrCustomerAssoc($assoc);
     }
 
     public function createConnection(
@@ -100,14 +87,12 @@ class CrossLanguageResourceSynchronizationService
         LanguageResource $target,
         Language $sourceLang,
         Language $targetLang,
-        int $customerId,
     ): CrossSynchronizationConnection {
         $connection = $this->connectionRepository->createConnection(
             $source,
             $target,
             $sourceLang,
             $targetLang,
-            $customerId
         );
 
         $this->eventDispatcher->dispatch(new ConnectionCreatedEvent($connection));
@@ -115,39 +100,54 @@ class CrossLanguageResourceSynchronizationService
         return $connection;
     }
 
-    public function getConnectionForLrPair(
-        LanguageResource $source,
-        LanguageResource $target
-    ): ?CrossSynchronizationConnection {
-        $connections = $this->connectionRepository->getConnectionsForPair((int) $source->getId(), (int) $target->getId());
+    public function addCustomer(CrossSynchronizationConnection $connection, int $customerId): void
+    {
+        $assoc = $this->connectionRepository->createCustomerAssoc((int) $connection->getId(), $customerId);
 
-        foreach ($connections as $connection) {
-            return $connection;
-        }
-
-        return null;
+        $this->eventDispatcher->dispatch(new CustomerAddedEvent($assoc));
     }
 
-    public function deleteRelatedConnections(?int $languageResourceId = null, ?int $customerId = null): void
+    public function deleteRelatedConnections(int $languageResourceId): void
     {
-        foreach ($this->connectionRepository->getConnectionsFor($languageResourceId, $customerId) as $connection) {
+        foreach ($this->connectionRepository->getConnectionsFor($languageResourceId) as $connection) {
             $this->deleteConnection($connection);
         }
     }
 
-    public function deleteConnections(LanguageResource $source, LanguageResource $target): void
+    public function connectionHasAssociatedCustomers(CrossSynchronizationConnection $connection): bool
     {
-        $connections = $this->connectionRepository
-            ->getConnectionsForPair((int) $source->getId(), (int) $target->getId());
+        return $this->connectionRepository->connectionHasAssociatedCustomers($connection);
+    }
 
-        foreach ($connections as $connection) {
-            $this->deleteConnection($connection);
+    public function removeCustomerFromConnections(int $customerId, ?int $languageResourceId = null): void
+    {
+        $associations = $this->connectionRepository->getCustomerAssocsByCustomerAndLanguageResource(
+            $customerId,
+            $languageResourceId
+        );
+
+        foreach ($associations as $association) {
+            $this->removeCustomer($association);
         }
+    }
+
+    public function removeCustomer(CrossSynchronizationConnectionCustomer $association): void
+    {
+        $clone = clone $association;
+
+        $this->connectionRepository->deleteCustomerAssoc($association);
+
+        $this->eventDispatcher->dispatch(new CustomerRemovedEvent($clone));
     }
 
     public function deleteConnection(CrossSynchronizationConnection $connection): void
     {
         $clone = clone $connection;
+
+        foreach ($this->connectionRepository->getCustomerAssociations($connection) as $association) {
+            $this->removeCustomer($association);
+        }
+
         $this->connectionRepository->deleteConnection($connection);
 
         $this->eventDispatcher->dispatch(new ConnectionDeletedEvent($clone));
@@ -226,21 +226,19 @@ class CrossLanguageResourceSynchronizationService
         Language $sourceLang,
         Language $targetLang,
     ): void {
+        $connection = $this->createConnection($sourceLr, $targetLr, $sourceLang, $targetLang);
+
         foreach ($sourceLr->getCustomers() as $customer) {
             if (! in_array($customer, $targetLr->getCustomers())) {
                 continue;
             }
 
             try {
-                $this->createConnection($sourceLr, $targetLr, $sourceLang, $targetLang, (int) $customer);
+                $this->addCustomer($connection, (int) $customer);
             } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
                 // connection already exists
             }
         }
-
-        $this->eventDispatcher->dispatch(
-            new LanguageResourcesConnectedEvent($sourceLr, $targetLr)
-        );
     }
 
     private function getSyncIntegration(string $serviceType): ?SynchronisationInterface
@@ -272,7 +270,7 @@ class CrossLanguageResourceSynchronizationService
 
     private function syncIntegrationIsSourceForTarget(
         SynchronisationInterface $sourceIntegration,
-        SynchronisationInterface $targetIntegration
+        SynchronisationInterface $targetIntegration,
     ): bool {
         foreach ($sourceIntegration->syncSourceOf() as $syncType) {
             if (in_array($syncType, $targetIntegration->syncTargetFor())) {
@@ -281,14 +279,5 @@ class CrossLanguageResourceSynchronizationService
         }
 
         return false;
-    }
-
-    private function getCachedLanguageResource(int $id): LanguageResource
-    {
-        if (! isset($this->cachedLanguageResources[$id])) {
-            $this->cachedLanguageResources[$id] = $this->languageResourceRepository->get($id);
-        }
-
-        return $this->cachedLanguageResources[$id];
     }
 }

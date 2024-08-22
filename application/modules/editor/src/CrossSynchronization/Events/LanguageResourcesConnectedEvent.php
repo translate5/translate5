@@ -28,10 +28,9 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
+namespace MittagQI\Translate5\CrossSynchronization\Events;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_Languages as Language;
 
 final class LanguageResourcesConnectedEvent
 {

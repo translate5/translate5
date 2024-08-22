@@ -33,9 +33,9 @@ use Zend_Db_Table_Abstract;
 /**
  * DB Access for Languageresources Assoc
  */
-class CrossSynchronizationConnection extends Zend_Db_Table_Abstract
+class CrossSynchronizationConnectionCustomer extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_cross_language_resource_synchronization_connection';
+    protected $_name = 'LEK_cross_language_resource_synchronization_connection_customer';
 
     public $_primary = 'id';
 }

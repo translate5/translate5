@@ -32,15 +32,15 @@ namespace MittagQI\Translate5\Test\Unit\LanguageResource\CrossSynchronization\Ev
 
 use editor_Models_LanguageResources_CustomerAssoc as Association;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\Dto\LanguageResourcePair;
+use MittagQI\Translate5\CrossSynchronization\Events\ConnectionCreatedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\ConnectionDeletedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\EventListener;
+use MittagQI\Translate5\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\LanguageResourcePair;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionCreatedEvent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionDeletedEvent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventListener;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events as CustomerAssocEvents;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
@@ -157,7 +157,7 @@ class EventListenerTest extends TestCase
 
         $pair = new LanguageResourcePair($source, $target);
 
-        $synchronizationService->method('getConnectedPairsByAssoc')->willReturn([$pair, $pair]);
+        $synchronizationService->method('getConnectionsByLrCustomerAssoc')->willReturn([$pair, $pair]);
 
         $synchronizationService->expects($this->exactly(2))->method('createConnection');
 

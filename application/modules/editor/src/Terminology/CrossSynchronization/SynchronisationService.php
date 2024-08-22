@@ -32,10 +32,10 @@ namespace MittagQI\Translate5\Terminology\CrossSynchronization;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use Generator;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\LanguagePair;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationInterface;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationType;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\LanguagePair;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationType;
 use MittagQI\Translate5\Terminology\TermCollectionRepository;
 use MittagQI\Translate5\Tools\CharCleanup;
 
@@ -94,17 +94,17 @@ class SynchronisationService implements SynchronisationInterface
         }
     }
 
-    public function queueConnectionSynchronisation(CrossSynchronizationConnection $connection): void
+    public function queueCustomerSynchronisation(CrossSynchronizationConnection $connection, int $customerId): void
     {
         // as of now we don't have functionality of terms synchronization
     }
 
-    public function queueDefaultSynchronisation(LanguageResource $source, LanguageResource $target): void
+    public function queueDefaultSynchronisation(CrossSynchronizationConnection $connection): void
     {
         // as of now we don't have functionality of terms synchronization
     }
 
-    public function cleanupOnConnectionDeleted(CrossSynchronizationConnection $deletedConnection): void
+    public function cleanupOnConnectionDeleted(LanguageResource $target, int $customerId): void
     {
         // as of now we don't have functionality of terms synchronization
     }

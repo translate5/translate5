@@ -28,9 +28,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
+namespace MittagQI\Translate5\CrossSynchronization;
 
-use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Models_Entity_Abstract;
 
 /**
@@ -44,8 +43,6 @@ use ZfExtended_Models_Entity_Abstract;
  * @method void setTargetLanguageResourceId(int $id)
  * @method string getTargetType()
  * @method void setTargetType(string $type)
- * @method string getCustomerId()
- * @method void setCustomerId(int $customerId)
  * @method string getSourceLanguageId()
  * @method void setSourceLanguageId(int $sourceLanguageId)
  * @method string getTargetLanguageId()

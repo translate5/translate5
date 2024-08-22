@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Validator;
+namespace MittagQI\Translate5\CrossSynchronization\Validator;
 
 use ZfExtended_Models_Validator_Abstract;
 

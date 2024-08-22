@@ -28,9 +28,9 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
+namespace MittagQI\Translate5\CrossSynchronization\Events;
 
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
 
 final class ConnectionDeletedEvent
 {

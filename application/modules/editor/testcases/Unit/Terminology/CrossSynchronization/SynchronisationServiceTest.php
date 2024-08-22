@@ -31,8 +31,8 @@ declare(strict_types=1);
 namespace Terminology\CrossSynchronization;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\LanguagePair;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationType;
+use MittagQI\Translate5\CrossSynchronization\LanguagePair;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationType;
 use MittagQI\Translate5\Terminology\CrossSynchronization\SynchronisationService;
 use MittagQI\Translate5\Terminology\TermCollectionRepository;
 use PHPUnit\Framework\TestCase;

@@ -32,9 +32,9 @@ namespace LanguageResource\CrossSynchronization;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationInterface;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationDirigent;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
@@ -78,7 +78,7 @@ class SynchronizationDirigentTest extends TestCase
 
         $syncIntegration = $this->createMock(SynchronisationInterface::class);
         $syncIntegration->expects($this->once())->method('queueDefaultSynchronisation');
-        $syncIntegration->expects($this->once())->method('queueConnectionSynchronisation');
+        $syncIntegration->expects($this->once())->method('queueCustomerSynchronisation');
 
         $serviceManager->method('getSynchronisationService')->willReturn($syncIntegration);
 
@@ -119,7 +119,7 @@ class SynchronizationDirigentTest extends TestCase
 
         $syncIntegration = $this->createMock(SynchronisationInterface::class);
         $syncIntegration->expects($this->once())->method('queueDefaultSynchronisation');
-        $syncIntegration->expects($this->exactly(2))->method('queueConnectionSynchronisation');
+        $syncIntegration->expects($this->exactly(2))->method('queueCustomerSynchronisation');
 
         $serviceManager->method('getSynchronisationService')->willReturn($syncIntegration);
 
@@ -219,7 +219,7 @@ class SynchronizationDirigentTest extends TestCase
         $languageResourceRepository->method('get')->willReturn($target);
 
         $syncIntegration = $this->createMock(SynchronisationInterface::class);
-        $syncIntegration->expects($this->once())->method('queueConnectionSynchronisation');
+        $syncIntegration->expects($this->once())->method('queueCustomerSynchronisation');
 
         $serviceManager->method('getSynchronisationService')->willReturn($syncIntegration);
 

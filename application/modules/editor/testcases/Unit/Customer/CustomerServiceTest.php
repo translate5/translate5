@@ -31,9 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Customer;
 
 use editor_Models_Customer_Customer as Customer;
+use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\Customer\CustomerService;
 use MittagQI\Translate5\Customer\Events\EventEmitter;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use PHPUnit\Framework\TestCase;
