@@ -162,7 +162,7 @@ class NumberProtector implements ProtectorInterface
         ?ContentProtectionRepository $numberRepository = null,
         ?ZfExtended_Logger $logger = null,
     ): self {
-        $numberRepository = $numberRepository ?: new ContentProtectionRepository();
+        $numberRepository = $numberRepository ?: ContentProtectionRepository::create();
         $logger = $logger ?: Zend_Registry::get('logger')->cloneMe('translate5.content_protection');
 
         return new self(
