@@ -39,7 +39,7 @@ $headers[] = $this->templateApply('bitte denken Sie an die Fertigstellung Ihrer 
 if($this->task->hasDeadlineDate()){
     $headers[] = sprintf(
         $this->translate->_('Dieser Auftrag wird automatisch am %s geschlossen.'),
-        $this->workflowNotifyMail()->dateFormat($this->task->calculateAutoCloseDate(), false)
+        $this->workflowNotifyMail()->dateFormat($this->task->calculateJobDeadlineDate(), false)
     );
 }
 $this->header=implode('',$headers);

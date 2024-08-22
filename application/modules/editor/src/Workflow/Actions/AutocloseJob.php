@@ -36,7 +36,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
                 error_log('AutocloseJob: cannot find task ' . $tua->taskGuid);
             }
         }
-        // set the found tuas - if any - to auto-close
+        // set the found overtimed tuas to auto-close
         if (count($idsToAutoClose) > 0) {
             $tua = ZfExtended_Factory::get(editor_Models_Db_TaskUserAssoc::class);
             $updated = $tua->update([
@@ -74,7 +74,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
                 editor_Workflow_Default::STATE_FINISH,
             ])
             ->where('t.deadlineDate IS NOT NULL')
-            ->where('tua.deadlineDate <= NOW()');
+            ->where('tua.deadlineDate < NOW()');
 
         return $tua->fetchAll($select)->toArray();
     }

@@ -1023,7 +1023,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * Without deadline-date null is returned
      * @throws Exception
      */
-    public function calculateAutoCloseDate(): ?string
+    public function calculateJobDeadlineDate(): ?string
     {
         if ($this->hasDeadlineDate()) {
             $deadlineCalculator = new \MittagQI\Translate5\Task\Deadline\DeadlineDateCalculator();

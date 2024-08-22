@@ -37,8 +37,9 @@ class TaskDeadlineEventHandler
     {
         /* @var $task editor_Models_Task */
         $task = $event->getParam('task');
-
-        if ($task->hasDeadlineDateAutoClose()) {
+        // if a task has a deadline-date we automatically propagate it to the jobs - adjusted
+        // this always happens when user-assoc-defaults are applied
+        if ($task->hasDeadlineDate()) {
             $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
             $tuas = $model->loadByTaskGuidList([$task->getTaskGuid()]);
             $this->updateDeadlines($tuas, $task, $model);
@@ -47,11 +48,14 @@ class TaskDeadlineEventHandler
 
     public function onAfterTaskUserAssocPostAction(Zend_EventManager_Event $event): void
     {
+        // TODO FIXME taskdeadline
+        // We cannot simply overwrite a date sent by a pm here ! -> add flag "useAutoCalculation"
+
         /* @var editor_Models_TaskUserAssoc $tua */
         $tua = $event->getParam('entity');
         $task = editor_ModelInstances::taskByGuid($tua->getTaskGuid());
 
-        if ($task->hasDeadlineDateAutoClose()) {
+        if ($task->hasDeadlineDate()) {
             $tuas = [$tua->toArray()];
             $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
             $this->updateDeadlines($tuas, $task, $model);
@@ -61,6 +65,6 @@ class TaskDeadlineEventHandler
     private function updateDeadlines(array $associations, editor_Models_Task $task, editor_Models_TaskUserAssoc $tuaModel): void
     {
         $tuaUpdater = new TaskUserAssociationUpdater($tuaModel);
-        $tuaUpdater->updateDeadlines($associations, $task->calculateAutoCloseDate());
+        $tuaUpdater->updateDeadlines($associations, $task->calculateJobDeadlineDate());
     }
 }
