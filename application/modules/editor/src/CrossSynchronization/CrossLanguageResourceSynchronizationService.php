@@ -32,9 +32,11 @@ namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
 
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Languages as Language;
 use editor_Services_Manager;
 use Generator;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\AvailableForConnectionOption;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\LanguageResourcePair;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionCreatedEvent;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionDeletedEvent;
@@ -60,6 +62,7 @@ class CrossLanguageResourceSynchronizationService
         private readonly EventDispatcher $eventDispatcher,
         private readonly LanguageResourceRepository $languageResourceRepository,
         private readonly CrossSynchronizationConnectionRepository $connectionRepository,
+        private readonly ConnectionOptionsRepository $connectionOptionsRepository,
     ) {
     }
 
@@ -70,6 +73,7 @@ class CrossLanguageResourceSynchronizationService
             EventDispatcher::create(),
             new LanguageResourceRepository(),
             new CrossSynchronizationConnectionRepository(),
+            ConnectionOptionsRepository::create(),
         );
     }
 
@@ -94,13 +98,34 @@ class CrossLanguageResourceSynchronizationService
     public function createConnection(
         LanguageResource $source,
         LanguageResource $target,
+        Language $sourceLang,
+        Language $targetLang,
         int $customerId,
     ): CrossSynchronizationConnection {
-        $connection = $this->connectionRepository->createConnection($source, $target, $customerId);
+        $connection = $this->connectionRepository->createConnection(
+            $source,
+            $target,
+            $sourceLang,
+            $targetLang,
+            $customerId
+        );
 
         $this->eventDispatcher->dispatch(new ConnectionCreatedEvent($connection));
 
         return $connection;
+    }
+
+    public function getConnectionForLrPair(
+        LanguageResource $source,
+        LanguageResource $target
+    ): ?CrossSynchronizationConnection {
+        $connections = $this->connectionRepository->getConnectionsForPair((int) $source->getId(), (int) $target->getId());
+
+        foreach ($connections as $connection) {
+            return $connection;
+        }
+
+        return null;
     }
 
     public function deleteRelatedConnections(?int $languageResourceId = null, ?int $customerId = null): void
@@ -147,9 +172,9 @@ class CrossLanguageResourceSynchronizationService
     }
 
     /**
-     * @return LanguageResource[]
+     * @return AvailableForConnectionOption[]
      */
-    public function getAvailableForConnectionLanguageResources(LanguageResource $source): array
+    public function getAvailableForConnectionOptions(LanguageResource $source): iterable
     {
         $sourceIntegration = $this->getSyncIntegration($source->getServiceType());
 
@@ -170,8 +195,8 @@ class CrossLanguageResourceSynchronizationService
             $alreadyConnectedResources[(int) $connection->getTargetLanguageResourceId()] = true;
         }
 
-        $result = [];
-        foreach ($this->languageResourceRepository->getRelatedByLanguageCombinationsAndCustomers($source) as $lr) {
+        foreach ($this->connectionOptionsRepository->getPotentialConnectionOptions($source) as $option) {
+            $lr = $option->languageResource;
             $targetIntegration = $this->getSyncIntegration($lr->getServiceType());
 
             if (null === $targetIntegration) {
@@ -191,27 +216,31 @@ class CrossLanguageResourceSynchronizationService
                 continue;
             }
 
-            $result[] = $lr;
+            yield AvailableForConnectionOption::fromPotentialOption($option);
         }
-
-        return $result;
     }
 
-    public function connect(LanguageResource $source, LanguageResource $target): void
-    {
-        foreach ($source->getCustomers() as $customer) {
-            if (! in_array($customer, $target->getCustomers())) {
+    public function connect(
+        LanguageResource $sourceLr,
+        LanguageResource $targetLr,
+        Language $sourceLang,
+        Language $targetLang,
+    ): void {
+        foreach ($sourceLr->getCustomers() as $customer) {
+            if (! in_array($customer, $targetLr->getCustomers())) {
                 continue;
             }
 
             try {
-                $this->createConnection($source, $target, (int) $customer);
+                $this->createConnection($sourceLr, $targetLr, $sourceLang, $targetLang, (int) $customer);
             } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
                 // connection already exists
             }
         }
 
-        $this->eventDispatcher->dispatch(new LanguageResourcesConnectedEvent($source, $target));
+        $this->eventDispatcher->dispatch(
+            new LanguageResourcesConnectedEvent($sourceLr, $targetLr)
+        );
     }
 
     private function getSyncIntegration(string $serviceType): ?SynchronisationInterface
