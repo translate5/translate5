@@ -26,27 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* @var Zend_View $this */
+/* @var ZfExtended_View $this */
 
 $this->render('general.phtml');
 
-$this->subject = sprintf($this->translate->_('Termin-Erinnerung für die Aufgabe "%s"'),$this->task->getTaskName());
+$this->subject = sprintf($this->translate->_('Termin-Erinnerung für die Aufgabe "%s"'), $this->task->getTaskName());
 
 $headers = [];
 $headers[] = $this->header;
 $headers[] = $this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/>', $this->data);
 
-if($this->task->hasDeadlineDate()){
+if(isset($this->taskUserAssoc) && $this->task->hasDeadlineDateAutoClose()){
     $headers[] = sprintf(
         $this->translate->_('Dieser Auftrag wird automatisch am %s geschlossen.'),
-        $this->workflowNotifyMail()->dateFormat($this->task->calculateJobDeadlineDate(), false)
+        $this->taskUserAssoc['deadlineDate']
     );
 }
-$this->header=implode('',$headers);
+$this->header = implode('',$headers);
 
 $taskFragment = $this->translate->_('<br/><br/><b>Projektdetails:</b><br/><br/><b>Projekttitel:</b> {task.taskName}<br/><b>Quellsprache:</b> {sourceLanguageTranslated} <br/><b>Zielsprache:</b> {targetLanguageTranslated} <br/><b>Zu bearbeiten bis:</b> {deadlineDate}<br/><br/>');
 
-$taskFragment=$this->templateApply($taskFragment, $this->taskData);
+$taskFragment = $this->templateApply($taskFragment, $this->taskData);
 
 $template = '{header}
 {taskFragment}
@@ -54,7 +54,7 @@ $template = '{header}
 
 $footerText = $this->templateApply('<br/><br/>Wir unterstützen Sie gerne bei Fragen zur Übersetzung und translate5 – sprechen Sie uns bitte hierzu gerne an.<br/><br/>Mit freundlichen Grüßen<br/><br/>{companyName}<br/><br/>',$this->taskData);
 
-$this->textbody="To be able to see the mail layout, you need to use app which supports html.";
+$this->textbody = "To be able to see the mail layout, you need to use app which supports html.";
 
 echo $this->templateApply($template, [
     'header' => $this->header,

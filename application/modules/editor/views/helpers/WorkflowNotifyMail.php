@@ -26,14 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package portal
- * @version 2.0
- *
- */
 /**
  * Utility functions usable in workflow notification E-Mails.
+ *
+ * @property ZfExtended_View $view
  */
 class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
 {
@@ -49,6 +45,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
     public function renderUserList(array $users, string $receiverUserGuid = null)
     {
         // anonymize users?
+        /* @var editor_Models_Task $task */
         $task = $this->view->task;
 
         $notifyConfig = $task->getConfig()->runtimeOptions->editor->notification;
@@ -56,15 +53,13 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
 
         $receiverLocale = $this->view->receiver->locale ?? null;
 
-        /* @var $task editor_Models_Task */
         $taskGuid = $task->getTaskGuid();
 
         $rolesOfReceiver = is_string($this->view->receiver->roles) ? explode(',', $this->view->receiver->roles) : $this->view->receiver->roles;
         if ($task->anonymizeUsers(true, $rolesOfReceiver)) {
             // = anonymize $users for task without taking the addressed user into account
             // (the receiver of the mail might not be the currently authenticated user)
-            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            $workflowAnonymize = ZfExtended_Factory::get(editor_Workflow_Anonymize::class);
             foreach ($users as &$user) {
                 $user = $workflowAnonymize->anonymizeUserdata($taskGuid, $user['userGuid'], $user, $receiverUserGuid);
             }
@@ -131,9 +126,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
      */
     public function getTaskLanguages(editor_Models_Task $task)
     {
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages */
-
+        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
         $params = [];
 
         try {
