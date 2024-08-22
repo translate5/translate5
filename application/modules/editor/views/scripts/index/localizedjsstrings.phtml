@@ -2442,7 +2442,11 @@ Editor.data.l10n = {
         enabled: '<?= $this->translate->_('Aktiviert') ?>',
         showDefault: '<?= $this->translate->_('Defaults anzeigen') ?>',
         hideDefault: '<?= $this->translate->_('Defaults ausblenden') ?>',
-        showAll: '<?= $this->translate->_('Zeige alles') ?>'
+        showAll: '<?= $this->translate->_('Zeige alles') ?>',
+        sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+        targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+        sourceLanguageResource: '<?= $this->translate->_('Ausgangssprache Ressource') ?>',
+        targetLanguageResource: '<?= $this->translate->_('Zielsprache Ressource') ?>',
     },
     helpButton: {
         tooltip: '<?= $this->translate->_('Tutorial-Videos aufrufen') ?>'
@@ -2450,8 +2454,6 @@ Editor.data.l10n = {
     crossLanguageResourceSynchronization: {
         windowTitle: '<?= $this->translate->_('Verwalten von Verbindungen') ?>',
         tooltip: '<?= $this->translate->_('Sprachübergreifende Synchronisierung von Ressourcen') ?>',
-        sourceLanguageResource: '<?= $this->translate->_('Ausgangssprache Ressource') ?>',
-        targetLanguageResource: '<?= $this->translate->_('Zielsprache Ressource') ?>',
         confirm_deletion_title: '<?= $this->translate->_('Löschung bestätigen') ?>',
         confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Synchronisierung löschen möchten?') ?>',
         connect: '<?= $this->translate->_('Verbinden Sie') ?>',
@@ -2463,6 +2465,7 @@ Editor.data.l10n = {
         synchronisationQueued: '<?= $this->translate->_('Die Synchronisierung wurde in die Warteschlange gestellt und wird in Kürze verarbeitet.') ?>',
         failedToQueue: '<?= $this->translate->_('Synchronisierung in Warteschlange fehlgeschlagen.') ?>',
         confirmSynchonisation: '<?= $this->translate->_('Bestätigen Sie die Synchronisierung.') ?>',
+        emptyTableText: '<?= $this->translate->_('crossLanguageResourceSynchronization.emptyTableText') ?>',
     }
 };
 
