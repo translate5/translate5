@@ -34,7 +34,7 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
     itemId: 'lspEditWindow',
     modal: true,
     layout: 'fit',
-    width: 400,
+    width: 700,
     flex: 1,
 
     bind: {
@@ -47,56 +47,43 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
             items: [
                 {
                     layout: {
-                        type: 'hbox',
+                        type: 'vbox',
                         pack: 'start',
                         align: 'stretch'
                     },
                     xtype: 'container',
+                    padding: 20,
                     items: [
+                        {
+                            xtype: 'hiddenfield',
+                            name: 'id',
+                        },
                         {
                             xtype: 'textfield',
                             name: 'name',
                             bind: {
-                                fieldLabel: 'l10n.lsp.form.name',
+                                fieldLabel: '{l10n.lsp.form.name}',
                             },
                             allowBlank: false,
-                            // maxLength: 255,
-                            // bind:{
-                            //     readOnly: '{record.isDefaultCustomer}'
-                            // },
-                            // minLength: 1
                         },
                         {
                             xtype: 'textfield',
                             name: 'description',
                             bind: {
-                                fieldLabel: 'l10n.lsp.form.description',
+                                fieldLabel: '{l10n.lsp.form.description}',
                             },
                             allowBlank: false,
-                            // bind:{
-                            //     readOnly: '{record.isDefaultCustomer}'
-                            // },
-                            // maxLength: 255
                         },
-                    ]
-                },
-                {
-                    layout: {
-                        type: 'hbox',
-                        pack: 'start',
-                        align: 'stretch'
-                    },
-                    xtype: 'container',
-                    items: [
                         {
                             xtype: 'customers',
-                            name: 'customers',
+                            name: 'customerIds',
+                            dataIndex: 'customers',
                             bind:{
                                 fieldLabel: '{l10n.lsp.form.clients}',
                             },
                         },
                     ]
-                }
+                },
             ]
         }
     ],
@@ -119,7 +106,16 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
                     bind: {
                         text: '{l10n.lsp.form.saveBtn}',
                     },
-                    handler: () => {debugger; Ext.ComponentQuery.query('lspPanel')[0].controller.onSaveClick()},
+                    handler: (button, event) => {
+                        const form = button.up('lspEditWindow').down('form');
+
+                        if (!form.isValid()) {
+                            return;
+                        }
+
+                        const controller = Ext.ComponentQuery.query('lspPanel')[0].controller;
+                        controller.onSaveClick(form.getValues(), form.getRecord());
+                    }
                 },
                 {
                     xtype: 'button',
@@ -134,8 +130,19 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
     ],
 
     loadRecord: function (record) {
-        const form = this.down('form');
+        const customers = [];
+        const customersStore = Ext.getStore('customersStore');
 
+        for (const customerData of record.get('customers')) {
+            const customer = customersStore.getById(customerData.id);
+
+            if (customer) {
+                customers.push(customer);
+            }
+        }
+
+        const form = this.down('form');
         form.loadRecord(record);
+        form.down('customers').setValue(customers);
     },
 });

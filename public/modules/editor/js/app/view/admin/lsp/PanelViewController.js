@@ -50,24 +50,53 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
         this.getView().down('gridpanel').getStore().reload();
     },
 
-    onEditClick: function (table, row, column, button, event, record) {
-        const win = Ext.widget('lspEditWindow', {editMode: true});
+    onCreateClick: function () {
+        const win = this.editWindow = Ext.widget('lspEditWindow', {editMode: true});
+        win.show();
+    },
 
+    onEditClick: function (table, row, column, button, event, record) {
+        const win = this.editWindow = Ext.widget('lspEditWindow', {editMode: true});
         win.show();
         win.loadRecord(record);
-        this.editWindow = win;
     },
 
     onCancelEditClick: function () {
         this.editWindow.close();
     },
 
-    onSaveClick: function () {
-        debugger;
+    onSaveClick: function (values, record) {
+        let url = '/editor/lsp';
+        let method = 'POST';
+
+        if (values.id) {
+            url += '/' + values.id;
+            method = 'PUT';
+        }
+
+        this.editWindow.setLoading(true);
+        const store = this.getView().down('gridpanel').getStore();
+
+        Ext.Ajax.request({
+            url: url,
+            params: {data: JSON.stringify(values)},
+            async: false,
+            method: method,
+            success: (xhr) => {
+                store.reload();
+                this.editWindow.close();
+                Editor.MessageBox.addSuccess('');
+            },
+            error: (xhr) => {
+                debugger;
+            },
+            failure: (xhr) => {
+                debugger;
+            }
+        });
     },
 
     onDeleteClick: function (table, row, column, button, event, record) {
-        debugger;
         const l10n = Editor.data.l10n.lsp;
         const text = Ext.String.format(l10n.confirmDeleteText, record.get('name'));
         const store = this.getView().down('gridpanel').getStore();
@@ -83,7 +112,7 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
                 record.dropped = true;
                 record.save({
                     failure: function () {
-                        store.reject();
+                        store.reload();
                     },
                     success: function () {
                         store.remove(record);

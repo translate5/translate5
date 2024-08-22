@@ -54,25 +54,35 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     xtype: 'gridcolumn',
                     dataIndex: 'id',
                     bind: {
-                        text: '{l10n.lsp.columns.id}'
+                        text: '{l10n.lsp.columns.id}',
                     }
                 },
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'name',
+                    flex: 1,
                     bind: {
-                        text: '{l10n.lsp.columns.name}'
+                        text: '{l10n.lsp.columns.name}',
+                    }
+                },
+                {
+                    xtype: 'gridcolumn',
+                    dataIndex: 'description',
+                    flex: 1,
+                    bind: {
+                        text: '{l10n.lsp.columns.description}',
                     }
                 },
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'customers',
                     sortable: false,
+                    flex: 1,
                     bind: {
                         text: '{l10n.lsp.columns.clients}',
                     },
                     filter: {
-                        type: 'customer' // [Multitenancy]
+                        type: 'customer',
                     },
                     renderer: function (customers) {
                         if (customers.length === 0) {
@@ -80,7 +90,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                         }
 
                         return customers.map(customer => customer.name).join(', ');
-                    }
+                    },
                 },
                 {
                     xtype: 'actioncolumn',
@@ -119,7 +129,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     itemId: 'reloadLspBtn',
                     bind: {
                         text: '{l10n.lsp.reloadBtn}',
-                        tooltip: '{l10n.lsp.reloadBtnTooltip}'
+                        tooltip: '{l10n.lsp.reloadBtnTooltip}',
                     },
                     listeners: {
                         click: 'onRefreshClick',
@@ -131,9 +141,11 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     itemId: 'addLspBtn',
                     bind: {
                         text: '{l10n.lsp.addNewBtn}',
-                        tooltip: '{l10n.lsp.addNewBtnTooltip}'
+                        tooltip: '{l10n.lsp.addNewBtnTooltip}',
                     },
-                    // hidden: !Editor.app.authenticatedUser.isAllowed('editorAddUser'),
+                    listeners: {
+                        click: 'onCreateClick',
+                    },
                 }
             ]
         }
