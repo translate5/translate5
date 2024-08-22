@@ -32,6 +32,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
     requires: [
         'Editor.store.admin.LspStore',
         'Editor.view.admin.lsp.PanelViewController',
+        'Editor.view.admin.lsp.EditWindow',
     ],
 
     bind: {
@@ -53,14 +54,14 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     xtype: 'gridcolumn',
                     dataIndex: 'id',
                     bind: {
-                        text: '{l10n.lsp.id}'
+                        text: '{l10n.lsp.columns.id}'
                     }
                 },
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'name',
                     bind: {
-                        text: '{l10n.lsp.name}'
+                        text: '{l10n.lsp.columns.name}'
                     }
                 },
                 {
@@ -68,7 +69,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     dataIndex: 'customers',
                     sortable: false,
                     bind: {
-                        text: '{l10n.lsp.clients}',
+                        text: '{l10n.lsp.columns.clients}',
                     },
                     filter: {
                         type: 'customer' // [Multitenancy]
@@ -81,6 +82,27 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                         return customers.map(customer => customer.name).join(', ');
                     }
                 },
+                {
+                    xtype: 'actioncolumn',
+                    items: [
+                        {
+                            bind: {
+                                tooltip: '{l10n.lsp.editBtn}',
+                            },
+                            // hidden: 'editLsp',
+                            glyph: 'f044@FontAwesome5FreeSolid',
+                            handler:'onEditClick',
+                        },
+                        {
+                            bind: {
+                                tooltip: '{l10n.lsp.deleteBtn}',
+                            },
+                            // hidden: 'deleteLsp',
+                            glyph: 'f2ed@FontAwesome5FreeSolid',
+                            handler: 'onDeleteClick',
+                        }
+                    ],
+                }
             ],
         },
     ],
@@ -96,7 +118,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     glyph: 'f2f1@FontAwesome5FreeSolid',
                     itemId: 'reloadLspBtn',
                     bind: {
-                        text: '{l10n.lsp.reload}',
+                        text: '{l10n.lsp.reloadBtn}',
                         tooltip: '{l10n.lsp.reloadBtnTooltip}'
                     },
                     listeners: {
@@ -108,7 +130,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     glyph: 'f234@FontAwesome5FreeSolid',
                     itemId: 'addLspBtn',
                     bind: {
-                        text: '{l10n.lsp.addNew}',
+                        text: '{l10n.lsp.addNewBtn}',
                         tooltip: '{l10n.lsp.addNewBtnTooltip}'
                     },
                     // hidden: !Editor.app.authenticatedUser.isAllowed('editorAddUser'),

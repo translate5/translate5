@@ -2466,13 +2466,27 @@ Editor.data.l10n = {
     },
     lsp: {
         title: '<?= $this->translate->_('LSP') ?>',
-        id: '<?= $this->translate->_('id') ?>',
-        name: '<?= $this->translate->_('name') ?>',
-        clients: '<?= $this->translate->_('Zugewiesene Kunden') ?>',
-        reload: '<?= $this->translate->_('Aktualisieren') ?>',
+        columns: {
+            id: '<?= $this->translate->_('id') ?>',
+            name: '<?= $this->translate->_('name') ?>',
+            description: '<?= $this->translate->_('Beschreibung') ?>',
+            clients: '<?= $this->translate->_('Zugewiesene Kunden') ?>',
+        },
+        reloadBtn: '<?= $this->translate->_('Aktualisieren') ?>',
         reloadBtnTooltip: '<?= $this->translate->_('Aktualisieren') ?>',
-        addNew: '<?= $this->translate->_('Aktualisieren') ?>',
+        addNewBtn: '<?= $this->translate->_('Aktualisieren') ?>',
         addNewBtnTooltip: '<?= $this->translate->_('Aktualisieren') ?>',
+        deleteBtn: '<?= $this->translate->_('Löschen') ?>',
+        editBtn: '<?= $this->translate->_('Bearbeiten') ?>',
+        confirmDeleteTitle: '<?= $this->translate->_('Löschen') ?>',
+        confirmDeleteText: '<?= $this->translate->_('Löschen') ?>',
+        form: {
+            name: '<?= $this->translate->_('Name') ?>',
+            description: '<?= $this->translate->_('Beschreibung') ?>',
+            clients: '<?= $this->translate->_('Zugewiesene Kunden') ?>',
+            saveBtn: '<?= $this->translate->_('Speichern') ?>',
+            cancelBtn: '<?= $this->translate->_('Abbrechen') ?>',
+        },
     }
 };
 

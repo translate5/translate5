@@ -32,6 +32,8 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
         'lsp': 'onLspRoute',
     },
 
+    editWindow: null,
+
     onLspRoute: function () {
         Editor.app.openAdministrationSection(this.getView());
     },
@@ -46,5 +48,48 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
 
     onRefreshClick: function () {
         this.getView().down('gridpanel').getStore().reload();
+    },
+
+    onEditClick: function (table, row, column, button, event, record) {
+        const win = Ext.widget('lspEditWindow', {editMode: true});
+
+        win.show();
+        win.loadRecord(record);
+        this.editWindow = win;
+    },
+
+    onCancelEditClick: function () {
+        this.editWindow.close();
+    },
+
+    onSaveClick: function () {
+        debugger;
+    },
+
+    onDeleteClick: function (table, row, column, button, event, record) {
+        debugger;
+        const l10n = Editor.data.l10n.lsp;
+        const text = Ext.String.format(l10n.confirmDeleteText, record.get('name'));
+        const store = this.getView().down('gridpanel').getStore();
+
+        Ext.Msg.confirm(
+            l10n.confirmDeleteTitle,
+            text,
+            (btn) => {
+                if (btn !== 'yes') {
+                    return;
+                }
+
+                record.dropped = true;
+                record.save({
+                    failure: function () {
+                        store.reject();
+                    },
+                    success: function () {
+                        store.remove(record);
+                    }
+                });
+            }
+        );
     },
 });
