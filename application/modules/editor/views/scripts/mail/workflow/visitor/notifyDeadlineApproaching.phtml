@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* @var $this Zend_View */
+/* @var Zend_View $this */
 
 $this->render('general.phtml');
 
@@ -34,16 +34,13 @@ $this->subject = sprintf($this->translate->_('Termin-Erinnerung für die Aufgabe
 
 $headers = [];
 $headers[] = $this->header;
-$headers[]=$this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/>', $this->data);
+$headers[] = $this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/>', $this->data);
 
-if(empty($this->task->getDeadlineDate())){
-    $percent = $this->task->getConfig()->runtimeOptions->import->projectDeadline->jobAutocloseSubtractPercent;
-    if(!empty($percent)) {
-        $headers[] = sprintf(
-            $this->translate->_('Dieser Auftrag wird automatisch geschlossen wenn die Aufgabenfrist "%s" erreicht ist.'),
-            $percent . '%'
-        );
-    }
+if($this->task->hasDeadlineDate()){
+    $headers[] = sprintf(
+        $this->translate->_('Dieser Auftrag wird automatisch am %s geschlossen.'),
+        $this->workflowNotifyMail()->dateFormat($this->task->calculateAutoCloseDate(), false)
+    );
 }
 $this->header=implode('',$headers);
 
@@ -61,7 +58,7 @@ $this->textbody="To be able to see the mail layout, you need to use app which su
 
 echo $this->templateApply($template, [
     'header' => $this->header,
-    'taskFragment'=>$taskFragment,
+    'taskFragment' => $taskFragment,
     'footer' => $footerText,
     'footerTable' => $this->footerTable
 ]);

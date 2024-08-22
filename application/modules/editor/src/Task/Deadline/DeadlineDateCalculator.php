@@ -4,6 +4,7 @@ namespace MittagQI\Translate5\Task\Deadline;
 
 use DateInterval;
 use DateTime;
+use editor_Models_Task;
 
 class DeadlineDateCalculator
 {
@@ -11,19 +12,21 @@ class DeadlineDateCalculator
      * Cut off the deadline date by the given percentage
      * @throws \Exception
      */
-    public function calculateNewDeadlineDate(string $deadlineDate, int $subPercent): string
+    public function calculateNewDeadlineDate(editor_Models_Task $task): string
     {
-        $now = new DateTime();
-        $end = new DateTime($deadlineDate);
+        $start = new DateTime($task->getCreated());
+        $end = new DateTime($task->getDeadlineDate());
+        $percentage = $task->getConfig()->runtimeOptions->import->projectDeadline->jobAutocloseSubtractPercent;
 
-        $interval = $now->diff($end);
+        $interval = $start->diff($end);
         $totalDays = $interval->days;
+        $daysToAdd = ceil($totalDays * ($percentage / 100));
 
-        $daysToAdd = round($totalDays * ($subPercent / 100));
+        if ($daysToAdd <= 0) {
+            return $start->format('Y-m-d H:i:s');
+        }
+        $start->add(new DateInterval("P{$daysToAdd}D"));
 
-        $result = clone $now;
-        $result->add(new DateInterval("P{$daysToAdd}D"));
-
-        return $result->format('Y-m-d H:i:s');
+        return $start->format('Y-m-d H:i:s');
     }
 }

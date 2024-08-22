@@ -2,6 +2,7 @@
 
 namespace MittagQI\Translate5\Task\Deadline;
 
+use editor_ModelInstances;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
 use Editor_TaskuserassocController;
@@ -37,43 +38,29 @@ class TaskDeadlineEventHandler
         /* @var $task editor_Models_Task */
         $task = $event->getParam('task');
 
-        if (empty($task->getDeadlineDate())) {
-            return;
+        if ($task->hasDeadlineDateAutoClose()) {
+            $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+            $tuas = $model->loadByTaskGuidList([$task->getTaskGuid()]);
+            $this->updateDeadlines($tuas, $task, $model);
         }
-
-        $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
-        $tuas = $model->loadByTaskGuidList([$task->getTaskGuid()]);
-
-        $this->updateDeadlines($tuas, $task, $model);
     }
 
     public function onAfterTaskUserAssocPostAction(Zend_EventManager_Event $event): void
     {
-        /* @var $task editor_Models_TaskUserAssoc */
-        $entity = $event->getParam('entity');
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-        $task->loadByTaskGuid($entity->getTaskGuid());
+        /* @var editor_Models_TaskUserAssoc $tua */
+        $tua = $event->getParam('entity');
+        $task = editor_ModelInstances::taskByGuid($tua->getTaskGuid());
 
-        if (empty($task->getDeadlineDate())) {
-            return;
+        if ($task->hasDeadlineDateAutoClose()) {
+            $tuas = [$tua->toArray()];
+            $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+            $this->updateDeadlines($tuas, $task, $model);
         }
-        $tuas = [$entity->toArray()];
-        $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
-        $this->updateDeadlines($tuas, $task, $model);
-    }
-
-    private function getSubtractDays(editor_Models_Task $task): int
-    {
-        return $task->getConfig()->runtimeOptions->import->projectDeadline->jobAutocloseSubtractPercent ?? 0;
     }
 
     private function updateDeadlines(array $associations, editor_Models_Task $task, editor_Models_TaskUserAssoc $tuaModel): void
     {
-        $deadlineCalculator = new DeadlineDateCalculator();
         $tuaUpdater = new TaskUserAssociationUpdater($tuaModel);
-
-        $subtractDays = $this->getSubtractDays($task);
-        $newDeadline = $deadlineCalculator->calculateNewDeadlineDate($task->getDeadlineDate(), $subtractDays);
-        $tuaUpdater->updateDeadlines($associations, $newDeadline);
+        $tuaUpdater->updateDeadlines($associations, $task->calculateAutoCloseDate());
     }
 }

@@ -2,10 +2,13 @@
 
 namespace MittagQI\Translate5\Workflow\Actions;
 
+use DateTime;
+use editor_ModelInstances;
 use editor_Models_Db_TaskUserAssoc;
 use editor_Models_Task;
 use editor_Workflow_Actions_Abstract;
 use editor_Workflow_Default;
+use Throwable;
 use ZfExtended_Factory;
 
 class AutocloseJob extends editor_Workflow_Actions_Abstract
@@ -20,23 +23,36 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
             return;
         }
 
-        $ids = array_column($jobs, 'id');
+        $idsToAutoClose = [];
+        foreach ($jobs as $tua) {
+            try {
+                $task = editor_ModelInstances::taskByGuid($tua->taskGuid);
+                if ($task->hasDeadlineDateAutoClose()) {
+                    $idsToAutoClose[] = $tua->id;
+                }
+            } catch (Throwable $e) {
+                // this can happen when actions in the instance overlap with cronjob triggered actions
+                // no need to "really" log
+                error_log('AutocloseJob: cannot find task ' . $tua->taskGuid);
+            }
+        }
+        // set the found tuas - if any - to auto-close
+        if (count($idsToAutoClose) > 0) {
+            $tua = ZfExtended_Factory::get(editor_Models_Db_TaskUserAssoc::class);
+            $updated = $tua->update([
+                'state' => editor_Workflow_Default::STATE_AUTO_FINISH,
+            ], [
+                'id IN (?)' => $idsToAutoClose,
+            ]);
 
-        $tua = ZfExtended_Factory::get(editor_Models_Db_TaskUserAssoc::class);
-
-        $updated = $tua->update([
-            'state' => editor_Workflow_Default::STATE_AUTO_FINISH,
-        ], [
-            'id IN (?)' => $ids,
-        ]);
-
-        $this->log->info(
-            '',
-            sprintf('Number of updated task user assocs: %d', $updated),
-            [
-                'taskUserAssocs' => $ids,
-            ]
-        );
+            $this->log->info(
+                '',
+                sprintf('Number of updated task user assocs: %d', $updated),
+                [
+                    'taskUserAssocs' => $idsToAutoClose,
+                ]
+            );
+        }
     }
 
     private function findJobs(): array
@@ -58,7 +74,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
                 editor_Workflow_Default::STATE_FINISH,
             ])
             ->where('t.deadlineDate IS NOT NULL')
-            ->where('tua.deadlineDate < NOW()');
+            ->where('tua.deadlineDate <= NOW()');
 
         return $tua->fetchAll($select)->toArray();
     }
@@ -68,9 +84,9 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
      */
     private function itsAboutTime(): bool
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         $now->setTime(21, 0, 0);
 
-        return new \DateTime() > $now;
+        return new DateTime() > $now;
     }
 }
