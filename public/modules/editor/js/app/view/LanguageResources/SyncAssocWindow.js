@@ -63,7 +63,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                     items: [
                         {
                             xtype: 'combo',
-                            fieldLabel: Editor.data.l10n.crossLanguageResourceSynchronization.targetLanguageResource,
+                            fieldLabel: Editor.data.l10n.general.targetLanguageResource,
                             name: 'targetLanguageResourceId',
                             store: {
                                 xtype: 'store',
@@ -73,7 +73,13 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                             queryMode: 'local',
                             displayField: 'name',
                             valueField: 'id',
-                            allowBlank: false
+                            allowBlank: false,
+                            width: 300,
+                            listConfig: {
+                                getInnerTpl: function() {
+                                    return '<div style="white-space: nowrap;">{name}</div>'; // Prevent text wrapping
+                                }
+                            }
                         },
                         {
                             xtype: 'button',
@@ -83,10 +89,6 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                             margin: '5 0',
                         }
                     ]
-                },
-                {
-                    xtype: 'editorAdminTaskUserPrefsForm',
-                    hidden: true
                 },
                 {
                     xtype: 'tbspacer',
@@ -110,15 +112,16 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
             store: {
                 type: 'LanguageResources.SyncAssoc'
             },
+            emptyText: Editor.data.l10n.crossLanguageResourceSynchronization.emptyTableText,
             columns: [
                 {
-                    text: Editor.data.l10n.crossLanguageResourceSynchronization.sourceLanguageResource,
+                    text: Editor.data.l10n.general.sourceLanguageResource,
                     dataIndex: 'sourceLanguageResourceName',
                     flex: 1,
                     renderer: v => Ext.String.htmlEncode(v)
                 },
                 {
-                    text: Editor.data.l10n.crossLanguageResourceSynchronization.targetLanguageResource,
+                    text: Editor.data.l10n.general.targetLanguageResource,
                     dataIndex: 'targetLanguageResourceName',
                     flex: 1,
                     renderer: v => Ext.String.htmlEncode(v)

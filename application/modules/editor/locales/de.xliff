@@ -9818,11 +9818,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Sprachübergreifende Synchronisierung von Ressourcen</source>
                 <target>Sprachübergreifende Synchronisierung von Ressourcen</target>
             </trans-unit>
-            <trans-unit id='RWluZsO8aHJ1bmc='>
+            <trans-unit id='QXVzZ2FuZ3NzcHJhY2hlIFJlc3NvdXJjZQ=='>
                 <source>Ausgangssprache Ressource</source>
                 <target>Ausgangssprache Ressource</target>
             </trans-unit>
-            <trans-unit id='QXVzZ2FuZ3NzcHJhY2hlIFJlc3NvdXJjZQ=='>
+            <trans-unit id='WmllbHNwcmFjaGUgUmVzc291cmNl'>
                 <source>Zielsprache Ressource</source>
                 <target>Zielsprache Ressource</target>
             </trans-unit>
@@ -9873,6 +9873,19 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
                 <source>Regel mit dieser Priorität existiert bereits</source>
                 <target>Rule with this priority already exists</target>
+            </trans-unit>
+            <trans-unit id='Y3Jvc3NMYW5ndWFnZVJlc291cmNlU3luY2hyb25pemF0aW9uLmVtcHR5VGFibGVUZXh0'>
+                <source>crossLanguageResourceSynchronization.emptyTableText</source>
+                <target>
+Diese Sprachressource ist noch mit keiner anderen verbunden.<br/>
+Es werden Verbindungen von der Ausgangssprachressource zur Zielressource hergestellt.<br/>
+Die Sprachressource kann nur mit einer anderen Sprachresource verbunden werden, wenn folgendes erfüllt ist:<br/>
+- Beide Sprachressourcen haben dasselbe Sprachenpaar<br/>
+- Beide Sprachressourcen haben sind dem selben Kunden zugewiesen<br/>
+- Beide Sprachressourcen haben Daten, die synchronisiert werden können, z. B.: Begriffe können in ein Glossar umgewandelt werden<br/>
+- Die Ziel-Sprachresource ist noch nicht mit der anderen Sprachresource verbunden (im Moment unterstützen wir keine mehrfachen Quellen)
+Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
+                </target>
             </trans-unit>
         </body>
     </file>
