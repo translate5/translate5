@@ -16,11 +16,12 @@ class DeadlineDateCalculator
     {
         $start = new DateTime($task->getCreated());
         $end = new DateTime($task->getDeadlineDate());
-        $percentage = $task->getConfig()->runtimeOptions->import->projectDeadline->jobAutocloseSubtractPercent;
+        $percentage = $task->getConfig()->runtimeOptions->import->projectDeadline->jobDeadlineFraction;
 
         $interval = $start->diff($end);
         $totalDays = $interval->days;
         $daysToAdd = ceil($totalDays * ($percentage / 100));
+        $start->setTime(21,0); // concept is 21:00 is deadline always
 
         if ($daysToAdd <= 0) {
             return $start->format('Y-m-d H:i:s');

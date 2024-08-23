@@ -25,9 +25,10 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
-UPDATE `Zf_configuration` SET `value` = 100, `default` = 100, `description` = 'This setting determines the percentage by which the users jobs will be closed before the project-deadline (if one is set). 100% means, the job deadline equals the project-deadline. Do not set to 0, which would immediately finish the job after creation.', `level` = 4, `guiName` = 'Project Deadline: Auto-Close Timing Configuration', `guiGroup` = 'Workflow'
-WHERE `name` = 'runtimeOptions.import.projectDeadline.jobAutocloseSubtractPercent';
+DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.import.projectDeadline.jobAutocloseSubtractPercent';
 
 INSERT INTO Zf_configuration (`name`,`confirmed`,`module`,`category`,`value`,`default`,`defaults`,`type`,`typeClass`,`description`,`level`,`accessRestriction`,`guiName`,`guiGroup`,`comment`)
-VALUES ('runtimeOptions.import.projectDeadline.autoCloseJobs', 1, 'editor', 'import', 0, 0, null, 'boolean', null, 'When set, all jobs for a project with the deadline set will be auto-closed. This takes the configured "jobAutocloseSubtractPercent" into account.', 16, 'none', 'Project Deadline: Auto-Close Jobs', 'Workflow', null);
+VALUES ('runtimeOptions.import.projectDeadline.jobDeadlineFraction', 1, 'editor', 'import', 100, 100, null, 'integer', null, 'This setting determines the percentage by which the users jobs will be closed before the project-deadline (if one is set). 100% means, the job deadline equals the project-deadline. Do not set to 0, which would immediately finish the job after creation.', 4, 'none', 'Project Deadline: Auto-Close Deadline Configuration', 'Workflow', null);
+
+INSERT INTO Zf_configuration (`name`,`confirmed`,`module`,`category`,`value`,`default`,`defaults`,`type`,`typeClass`,`description`,`level`,`accessRestriction`,`guiName`,`guiGroup`,`comment`)
+VALUES ('runtimeOptions.import.projectDeadline.autoCloseJobs', 1, 'editor', 'import', 0, 0, null, 'boolean', null, 'When set, all jobs for a project with the deadline set will be auto-closed. This takes the configured "jobDeadlineFraction" into account.', 16, 'none', 'Project Deadline: Auto-Close Jobs', 'Workflow', null);

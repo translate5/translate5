@@ -14,7 +14,7 @@ use ZfExtended_Factory;
 class TaskDeadlineEventHandler
 {
     public function __construct(
-        private readonly Zend_EventManager_StaticEventManager $eventManager
+        private readonly Zend_EventManager_StaticEventManager $eventManager,
     ) {
     }
 
@@ -48,22 +48,25 @@ class TaskDeadlineEventHandler
 
     public function onAfterTaskUserAssocPostAction(Zend_EventManager_Event $event): void
     {
-        // TODO FIXME taskdeadline
-        // We cannot simply overwrite a date sent by a pm here ! -> add flag "useAutoCalculation"
-
-        /* @var editor_Models_TaskUserAssoc $tua */
-        $tua = $event->getParam('entity');
-        $task = editor_ModelInstances::taskByGuid($tua->getTaskGuid());
-
-        if ($task->hasDeadlineDate()) {
-            $tuas = [$tua->toArray()];
-            $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
-            $this->updateDeadlines($tuas, $task, $model);
+        // We cannot simply overwrite data sent by post - only if explicitly wanted
+        $params = $event->getParam('params');
+        if (array_key_exists('calculateDeadlineDate', $params) && $params['calculateDeadlineDate']) {
+            /* @var editor_Models_TaskUserAssoc $tua */
+            $tua = $event->getParam('entity');
+            $task = editor_ModelInstances::taskByGuid($tua->getTaskGuid());
+            if ($task->hasDeadlineDate()) {
+                $tuas = [$tua->toArray()];
+                $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+                $this->updateDeadlines($tuas, $task, $model);
+            }
         }
     }
 
-    private function updateDeadlines(array $associations, editor_Models_Task $task, editor_Models_TaskUserAssoc $tuaModel): void
-    {
+    private function updateDeadlines(
+        array $associations,
+        editor_Models_Task $task,
+        editor_Models_TaskUserAssoc $tuaModel,
+    ): void {
         $tuaUpdater = new TaskUserAssociationUpdater($tuaModel);
         $tuaUpdater->updateDeadlines($associations, $task->calculateJobDeadlineDate());
     }
