@@ -225,11 +225,13 @@ class LSPService
 
     public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
-        $lspCustomer = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
-        $lspCustomer->setLspId((int)$lsp->getId());
-        $lspCustomer->setCustomerId($customer->getId());
+        $lspCustomer = $this->lspRepository->findCustomerAssignment($lsp, $customer);
 
-        $this->lspRepository->saveCustomerAssignment($lspCustomer);
+        if (!$lspCustomer) {
+            return;
+        }
+
+        $this->lspRepository->deleteCustomerAssignment($lspCustomer);
 
         $this->eventDispatcher->dispatch(new CustomerUnassignedFromLspEvent($lsp, $customer));
     }
@@ -257,7 +259,11 @@ class LSPService
         foreach ($lspCustomers as $customer) {
             if (!in_array($customer->getId(), $newCustomerIdsSet)) {
                 $this->unassignCustomer($lsp, $customer);
+
+                continue;
             }
+
+            $lspCustomersIds[] = $customer->getId();
         }
 
         foreach ($data->customers as $customer) {

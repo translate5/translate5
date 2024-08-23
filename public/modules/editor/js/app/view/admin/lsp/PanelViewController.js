@@ -84,14 +84,20 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
             method: method,
             success: (xhr) => {
                 store.reload();
+                this.editWindow.setLoading(false);
                 this.editWindow.close();
-                Editor.MessageBox.addSuccess('');
+                // TODO translation
+                Editor.MessageBox.addSuccess('Success');
             },
             error: (xhr) => {
-                debugger;
+                this.editWindow.setLoading(false);
+                // TODO translation
+                Editor.MessageBox.getInstance().showDirectError('Error occurred while saving the LSP');
             },
             failure: (xhr) => {
-                debugger;
+                this.editWindow.setLoading(false);
+                // TODO translation
+                Editor.MessageBox.getInstance().showDirectError('Error occurred while saving the LSP');
             }
         });
     },

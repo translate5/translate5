@@ -174,6 +174,10 @@ class editor_LspController extends ZfExtended_RestController
 
     public function getNewCustomers(?JobCoordinator $coordinator): array
     {
+        if (empty($this->data['customerIds'])) {
+            return [];
+        }
+
         try {
             $customers = $this->customerRepository->getList(...$this->data['customerIds']);
 
