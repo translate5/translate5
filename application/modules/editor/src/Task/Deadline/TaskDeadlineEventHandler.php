@@ -39,7 +39,7 @@ class TaskDeadlineEventHandler
         $task = $event->getParam('task');
         // if a task has a deadline-date we automatically propagate it to the jobs - adjusted
         // this always happens when user-assoc-defaults are applied
-        if ($this->isCalculationTriggered($_REQUEST) && $task->hasDeadlineDate()) {
+        if ($this->isCalculationTriggered($_REQUEST) && $task->hasValidDeadlineDate()) {
             $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
             $tuas = $model->loadByTaskGuidList([$task->getTaskGuid()]);
             $this->updateDeadlines($tuas, $task, $model);
@@ -53,7 +53,7 @@ class TaskDeadlineEventHandler
             /* @var editor_Models_TaskUserAssoc $tua */
             $tua = $event->getParam('entity');
             $task = editor_ModelInstances::taskByGuid($tua->getTaskGuid());
-            if ($task->hasDeadlineDate()) {
+            if ($task->hasValidDeadlineDate()) {
                 $tuas = [$tua->toArray()];
                 $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
                 $this->updateDeadlines($tuas, $task, $model);
