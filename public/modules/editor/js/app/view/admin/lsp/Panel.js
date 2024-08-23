@@ -99,17 +99,21 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                             bind: {
                                 tooltip: '{l10n.lsp.editBtn}',
                             },
-                            // hidden: 'editLsp',
                             glyph: 'f044@FontAwesome5FreeSolid',
                             handler:'onEditClick',
+                            getClass: function(v, meta, rec) {
+                                return rec.get('canEdit') ? '' : 'x-hidden';
+                            }
                         },
                         {
                             bind: {
                                 tooltip: '{l10n.lsp.deleteBtn}',
                             },
-                            // hidden: 'deleteLsp',
                             glyph: 'f2ed@FontAwesome5FreeSolid',
                             handler: 'onDeleteClick',
+                            getClass: function(v, meta, rec) {
+                                return rec.get('canDelete') ? '' : 'x-hidden';
+                            }
                         }
                     ],
                 }
@@ -128,7 +132,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     glyph: 'f2f1@FontAwesome5FreeSolid',
                     itemId: 'reloadLspBtn',
                     bind: {
-                        text: '{l10n.lsp.reloadBtn}',
+                        text: '{l10n.general.reload}',
                         tooltip: '{l10n.lsp.reloadBtnTooltip}',
                     },
                     listeners: {
@@ -140,7 +144,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     glyph: 'f234@FontAwesome5FreeSolid',
                     itemId: 'addLspBtn',
                     bind: {
-                        text: '{l10n.lsp.addNewBtn}',
+                        text: '{l10n.general.addNew}',
                         tooltip: '{l10n.lsp.addNewBtnTooltip}',
                     },
                     listeners: {

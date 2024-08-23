@@ -195,6 +195,9 @@ class LspService
         return [
             'id' => (int) $lsp->getId(),
             'name' => $lsp->getName(),
+            // TODO check credentials
+            'canEdit' => true,
+            'canDelete' => true,
             'description' => $lsp->getDescription(),
             'coordinators' => $coordinatorData,
             'users' => $usersData,

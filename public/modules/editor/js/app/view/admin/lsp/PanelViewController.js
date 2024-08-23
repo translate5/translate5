@@ -56,6 +56,10 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
     },
 
     onEditClick: function (table, row, column, button, event, record) {
+        if (!record.get('canEdit')) {
+            return;
+        }
+
         const win = this.editWindow = Ext.widget('lspEditWindow', {editMode: true});
         win.show();
         win.loadRecord(record);
@@ -103,6 +107,10 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
     },
 
     onDeleteClick: function (table, row, column, button, event, record) {
+        if (!record.get('canDelete')) {
+            return;
+        }
+
         const l10n = Editor.data.l10n.lsp;
         const text = Ext.String.format(l10n.confirmDeleteText, record.get('name'));
         const store = this.getView().down('gridpanel').getStore();
