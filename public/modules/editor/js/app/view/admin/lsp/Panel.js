@@ -79,7 +79,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     sortable: false,
                     flex: 1,
                     bind: {
-                        text: '{l10n.lsp.columns.clients}',
+                        text: '{l10n.general.clients}',
                     },
                     filter: {
                         type: 'customer',

@@ -10060,10 +10060,6 @@ E-Mail: service@MittagQI.com</pre>
                 <source>LSP</source>
                 <target>LSP</target>
             </trans-unit>
-            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVu'>
-                <source>Zugewiesene Kunden</source>
-                <target>Assigned clients</target>
-            </trans-unit>
         </body>
     </file>
 </xliff>

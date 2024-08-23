@@ -79,7 +79,7 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
                             name: 'customerIds',
                             dataIndex: 'customers',
                             bind:{
-                                fieldLabel: '{l10n.lsp.form.clients}',
+                                fieldLabel: '{l10n.general.clients}',
                             },
                         },
                     ]

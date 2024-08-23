@@ -57,7 +57,6 @@ class LspRepository
     }
 
     /**
-     * @param int $id
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function get(int $id): LanguageServiceProvider
@@ -90,7 +89,7 @@ class LspRepository
 
         $row = $db->fetchRow($select);
 
-        if (!$row) {
+        if (! $row) {
             return null;
         }
 
@@ -145,8 +144,12 @@ class LspRepository
 
         $select = $userDb->select()
             ->setIntegrityCheck(false)
-            ->from(['user' => $user->db->info($user->db::NAME)])
-            ->join(['lspToUser' => $lspToUserTable], 'user.id = lspToUser.userId', [])
+            ->from([
+                'user' => $user->db->info($user->db::NAME),
+            ])
+            ->join([
+                'lspToUser' => $lspToUserTable,
+            ], 'user.id = lspToUser.userId', [])
             ->where('lspToUser.lspId = ?', $lsp->getId());
 
         $rows = $userDb->fetchAll($select);
@@ -175,8 +178,12 @@ class LspRepository
 
         $select = $customerDb->select()
             ->setIntegrityCheck(false)
-            ->from(['customer' => $customer->db->info($customer->db::NAME)])
-            ->join(['lspToCustomer' => $lspToCustomerTable], 'customer.id = lspToCustomer.customerId', [])
+            ->from([
+                'customer' => $customer->db->info($customer->db::NAME),
+            ])
+            ->join([
+                'lspToCustomer' => $lspToCustomerTable,
+            ], 'customer.id = lspToCustomer.customerId', [])
             ->where('lspToCustomer.lspId = ?', $lsp->getId());
 
         $rows = $customerDb->fetchAll($select);
