@@ -65,9 +65,13 @@ class LspService
 
     public static function create(): self
     {
+        $lspRepository = LspRepository::create();
         return new self(
-            LspRepository::create(),
-            new JobCoordinatorRepository(),
+            $lspRepository,
+            new JobCoordinatorRepository(
+                $lspRepository,
+                new LspUserRepository($lspRepository),
+            ),
             EventDispatcher::create(),
             new UserRepository(),
         );

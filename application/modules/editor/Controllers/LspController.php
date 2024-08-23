@@ -33,6 +33,7 @@ use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorExcep
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\LspService;
+use MittagQI\Translate5\LSP\LspUserRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
@@ -63,7 +64,11 @@ class editor_LspController extends ZfExtended_RestController
         parent::init();
         $this->lspService = LspService::create();
         $this->customerRepository = new CustomerRepository();
-        $this->coordinatorRepository = new JobCoordinatorRepository(LspRepository::create());
+        $lspRepository = LspRepository::create();
+        $this->coordinatorRepository = new JobCoordinatorRepository(
+            $lspRepository,
+            new LspUserRepository($lspRepository),
+        );
     }
 
     public function indexAction()
