@@ -9806,8 +9806,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server für den angefragten Dienst ist nicht erreichbar.</target>
             </trans-unit>
-            <trans-unit id='RGllc2VyIEF1ZnRyYWcgd2lyZCBhdXRvbWF0aXNjaCBhbSAlcyBnZXNjaGxvc3Nlbi4='>
-                <source>Dieser Auftrag wird automatisch am %s geschlossen.</source>
+            <trans-unit id='RGllc2VyIEF1ZnRyYWcgd2lyZCBhdXRvbWF0aXNjaCBiZWltIEVycmVpY2hlbiBkZXIgQXVmZ2FiZW5mcmlzdCBhbSAlcyBnZXNjaGxvc3Nlbi4='>
+                <source>Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.</source>
                 <target>Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.</target>
             </trans-unit>
             <trans-unit id='SGlud2VpczogRWluaWdlIEJlbnV0emVyIGhhYmVuIGluZGl2aWR1ZWxsZSBBdWZnYWJlbmZyaXN0ZW4uIEJpdHRlbiBwcsO8ZmVuIHVuZCBwYXNzZW4gU2llIGRpZXNlIGJlaSBCZWRhcmYgYW4u'>

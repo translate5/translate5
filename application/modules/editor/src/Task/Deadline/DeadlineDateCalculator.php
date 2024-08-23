@@ -21,7 +21,7 @@ class DeadlineDateCalculator
         $interval = $start->diff($end);
         $totalDays = $interval->days;
         $daysToAdd = ceil($totalDays * ($percentage / 100));
-        $start->setTime(21,0); // concept is 21:00 is deadline always
+        $start->setTime(21, 0); // concept is 21:00 is deadline always
 
         if ($daysToAdd <= 0) {
             return $start->format('Y-m-d H:i:s');

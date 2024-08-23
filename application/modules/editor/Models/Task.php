@@ -1011,30 +1011,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * Retrieves if the optional deadline-date is set and auto-close is configured for the task
-     */
-    public function hasDeadlineDateAutoClose(): bool
-    {
-        return $this->hasDeadlineDate() && $this->getConfig()->runtimeOptions->workflow->autoCloseJobs;
-    }
-
-    /**
-     * Calculates a new dedaline-date for the bound jobs based on the configured substraction
-     * Without deadline-date null is returned
-     * @throws Exception
-     */
-    public function calculateJobDeadlineDate(): ?string
-    {
-        if ($this->hasDeadlineDate()) {
-            $deadlineCalculator = new \MittagQI\Translate5\Task\Deadline\DeadlineDateCalculator();
-
-            return $deadlineCalculator->calculateNewDeadlineDate($this);
-        }
-
-        return null;
-    }
-
-    /**
      * Retrieves the file-type-support for a task.
      * Can only be used for saved tasks
      * @throws ZfExtended_Exception

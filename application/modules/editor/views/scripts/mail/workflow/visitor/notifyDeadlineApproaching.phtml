@@ -36,9 +36,12 @@ $headers = [];
 $headers[] = $this->header;
 $headers[] = $this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/>', $this->data);
 
-if(isset($this->taskUserAssoc) && $this->task->hasDeadlineDateAutoClose()){
+if (isset($this->taskUserAssoc) &&
+    $this->task->hasDeadlineDate() &&
+    $this->task->getConfig()->runtimeOptions->workflow->autoCloseJobs
+) {
     $headers[] = sprintf(
-        $this->translate->_('Dieser Auftrag wird automatisch am %s geschlossen.'),
+        $this->translate->_('Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.'),
         $this->taskUserAssoc['deadlineDate']
     );
 }

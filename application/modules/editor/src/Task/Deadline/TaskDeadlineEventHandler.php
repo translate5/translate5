@@ -72,7 +72,8 @@ class TaskDeadlineEventHandler
         editor_Models_Task $task,
         editor_Models_TaskUserAssoc $tuaModel,
     ): void {
+        $deadlineCalculator = new DeadlineDateCalculator();
         $tuaUpdater = new TaskUserAssociationUpdater($tuaModel);
-        $tuaUpdater->updateDeadlines($associations, $task->calculateJobDeadlineDate());
+        $tuaUpdater->updateDeadlines($associations, $deadlineCalculator->calculateNewDeadlineDate($task));
     }
 }
