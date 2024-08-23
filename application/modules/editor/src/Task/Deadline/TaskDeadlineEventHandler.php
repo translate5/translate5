@@ -39,7 +39,7 @@ class TaskDeadlineEventHandler
         $task = $event->getParam('task');
         // if a task has a deadline-date we automatically propagate it to the jobs - adjusted
         // this always happens when user-assoc-defaults are applied
-        if ($task->hasDeadlineDate()) {
+        if ($this->isCalculationTriggered($_REQUEST) && $task->hasDeadlineDate()) {
             $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
             $tuas = $model->loadByTaskGuidList([$task->getTaskGuid()]);
             $this->updateDeadlines($tuas, $task, $model);
@@ -48,9 +48,8 @@ class TaskDeadlineEventHandler
 
     public function onAfterTaskUserAssocPostAction(Zend_EventManager_Event $event): void
     {
-        // We cannot simply overwrite data sent by post - only if explicitly wanted
-        $params = $event->getParam('params');
-        if (array_key_exists('calculateDeadlineDate', $params) && $params['calculateDeadlineDate']) {
+        // We cannot simply overwrite data sent by post - only if explicitly wanted via trigger-param
+        if ($this->isCalculationTriggered($event->getParam('params'))) {
             /* @var editor_Models_TaskUserAssoc $tua */
             $tua = $event->getParam('entity');
             $task = editor_ModelInstances::taskByGuid($tua->getTaskGuid());
@@ -60,6 +59,12 @@ class TaskDeadlineEventHandler
                 $this->updateDeadlines($tuas, $task, $model);
             }
         }
+    }
+
+    private function isCalculationTriggered(array $requestParams): bool
+    {
+        return array_key_exists('calculateDeadlineDate', $requestParams) &&
+            ($requestParams['calculateDeadlineDate'] === '1' || $requestParams['calculateDeadlineDate'] === 'true');
     }
 
     private function updateDeadlines(
