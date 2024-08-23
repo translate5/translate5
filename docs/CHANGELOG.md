@@ -11,6 +11,19 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.8.2] - 2024-08-23
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4132](https://jira.translate5.net/browse/TRANSLATE-4132): Main back-end mechanisms (Worker, Logging, etc.) - Auto-close jobs by task deadline** <br>
+ translate5 - 7.8.0: New date field project deadline date available for task.
+ translate5 - 7.8.2: Auto-close jobs can be turned on and off by config. By default it is off.
+
+
 ## [7.8.1] - 2024-08-22
 
 ### Important Notes:
