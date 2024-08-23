@@ -33,7 +33,6 @@ $SCRIPT_IDENTIFIER = '438-TRANSLATE-4152-reconnect-sync-lang-resources.php';
 
 $db = Zend_Db_Table::getDefaultAdapter();
 
-
 $connection = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
 $lr = ZfExtended_Factory::get(\editor_Models_LanguageResources_LanguageResource::class);
 
@@ -41,7 +40,7 @@ $connections = $connection->loadAll();
 
 foreach ($connections as $row) {
     $connection->load($row['id']);
-    $lr->load($connection->getTargetLanguageResourceId());
+    $lr->load((int) $connection->getTargetLanguageResourceId());
 
     $connection->setSourceLanguageId($lr->getSourceLang());
     $connection->setTargetLanguageId($lr->getTargetLang());

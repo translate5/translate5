@@ -205,8 +205,6 @@ class CrossLanguageResourceSynchronizationServiceTest extends TestCase
         $service->removeCustomerFromConnections(1, 1);
     }
 
-
-
     public function testDeleteRelatedConnections(): void
     {
         $serviceManager = $this->createMock(editor_Services_Manager::class);

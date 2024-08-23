@@ -189,7 +189,7 @@ class EventListenerTest extends TestCase
         $synchronizationService->method('getConnectionsByLrCustomerAssoc')
             ->willReturn([
                 $this->createMock(CrossSynchronizationConnection::class),
-                $this->createMock(CrossSynchronizationConnection::class)
+                $this->createMock(CrossSynchronizationConnection::class),
             ]);
 
         $synchronizationService->expects($this->exactly(2))->method('addCustomer');

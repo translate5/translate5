@@ -115,8 +115,7 @@ class ConnectionOptionsRepository
          * @param Language $langMap
          * @return iterable<Language>
          */
-        $getResultLangList = function (int $langId, array $langList, array $langMap): iterable
-        {
+        $getResultLangList = function (int $langId, array $langList, array $langMap): iterable {
             if (array_key_exists($langId, $langList)) {
                 return yield $langList[$langId];
             }
@@ -170,13 +169,13 @@ class ConnectionOptionsRepository
             $major = $this->languageRepository->findByRfc5646($sourceLang->getMajorRfc5646());
 
             if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646() && null !== $major) {
-                $langIds[] = (int)$major->getId();
+                $langIds[] = (int) $major->getId();
 
-                if (!isset($addedMajorToLangMap[(int)$major->getId()])) {
-                    $addedMajorToLangMap[(int)$major->getId()] = [];
+                if (! isset($addedMajorToLangMap[(int) $major->getId()])) {
+                    $addedMajorToLangMap[(int) $major->getId()] = [];
                 }
 
-                $addedMajorToLangMap[(int)$major->getId()][] = $sourceLang;
+                $addedMajorToLangMap[(int) $major->getId()][] = $sourceLang;
             }
         }
 

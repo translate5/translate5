@@ -197,7 +197,6 @@ class EventListener
                 (int) $event->connectionCustomer->getCustomerId()
             );
 
-
             if ($this->synchronizationService->connectionHasAssociatedCustomers($connection)) {
                 return;
             }

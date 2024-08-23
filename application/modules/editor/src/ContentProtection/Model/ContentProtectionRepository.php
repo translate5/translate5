@@ -63,7 +63,6 @@ use MittagQI\Translate5\Repository\LanguageRepository;
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
 
 class ContentProtectionRepository
 {

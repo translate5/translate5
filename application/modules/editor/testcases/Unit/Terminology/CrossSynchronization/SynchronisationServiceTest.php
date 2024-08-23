@@ -101,7 +101,7 @@ class SynchronisationServiceTest extends TestCase
             iterator_to_array(
                 $service->getSyncData(
                     $languageResource,
-                    new LanguagePair(1, 2, 'en', 'de'),
+                    new LanguagePair(1, 2),
                     SynchronisationType::Glossary,
                 )
             )
