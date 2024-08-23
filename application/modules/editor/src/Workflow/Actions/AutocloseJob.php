@@ -24,16 +24,16 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
         }
 
         $idsToAutoClose = [];
-        foreach ($jobs as $tua) {
+        foreach ($jobs as $tuaData) {
             try {
-                $task = editor_ModelInstances::taskByGuid($tua->taskGuid);
+                $task = editor_ModelInstances::taskByGuid($tuaData['taskGuid']);
                 if ($task->hasDeadlineDate() && $task->getConfig()->runtimeOptions->workflow->autoCloseJobs) {
-                    $idsToAutoClose[] = $tua->id;
+                    $idsToAutoClose[] = $tuaData['id'];
                 }
             } catch (Throwable $e) {
                 // this can happen when actions in the instance overlap with cronjob triggered actions
                 // no need to "really" log
-                error_log('AutocloseJob: cannot find task ' . $tua->taskGuid);
+                error_log('AutocloseJob: cannot find task ' . $tuaData['taskGuid']);
             }
         }
         // set the found overtimed tuas to auto-close
