@@ -65,12 +65,25 @@ class LspService
 
     public static function create(): self
     {
+        $lspRepository = LspRepository::create();
+
         return new self(
-            LspRepository::create(),
-            new JobCoordinatorRepository(),
+            $lspRepository,
+            new JobCoordinatorRepository($lspRepository),
             EventDispatcher::create(),
             new UserRepository(),
         );
+    }
+
+    public function doesUserHaveAccessToLsp(ZfExtended_Models_User $user, LanguageServiceProvider $lsp): bool
+    {
+        $roles = $user->getRoles();
+
+        $coordinator = $this->jobCoordinatorRepository->findByUser($user);
+
+        return array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)
+            || (in_array(Roles::PM, $roles) && $lsp->isDirectLsp())
+            || (null !== $coordinator && $lsp->isSubLspOf($coordinator->lsp));
     }
 
     public function getLsp(int $id): LanguageServiceProvider
