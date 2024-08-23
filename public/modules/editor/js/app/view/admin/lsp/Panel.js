@@ -54,7 +54,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     xtype: 'gridcolumn',
                     dataIndex: 'id',
                     bind: {
-                        text: '{l10n.lsp.columns.id}',
+                        text: '{l10n.general.id}',
                     }
                 },
                 {
@@ -62,16 +62,18 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     dataIndex: 'name',
                     flex: 1,
                     bind: {
-                        text: '{l10n.lsp.columns.name}',
-                    }
+                        text: '{l10n.general.name}',
+                    },
+                    renderer: v => Ext.String.htmlEncode(v),
                 },
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'description',
                     flex: 1,
                     bind: {
-                        text: '{l10n.lsp.columns.description}',
-                    }
+                        text: '{l10n.general.description}',
+                    },
+                    renderer: v => Ext.String.htmlEncode(v),
                 },
                 {
                     xtype: 'gridcolumn',
@@ -89,7 +91,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                             return '';
                         }
 
-                        return customers.map(customer => customer.name).join(', ');
+                        return customers.map(customer => Ext.String.htmlEncode(customer.name)).join(', ');
                     },
                 },
                 {
@@ -97,7 +99,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     items: [
                         {
                             bind: {
-                                tooltip: '{l10n.lsp.editBtn}',
+                                tooltip: '{l10n.general.edit}',
                             },
                             glyph: 'f044@FontAwesome5FreeSolid',
                             handler:'onEditClick',
@@ -107,7 +109,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                         },
                         {
                             bind: {
-                                tooltip: '{l10n.lsp.deleteBtn}',
+                                tooltip: '{l10n.general.delete}',
                             },
                             glyph: 'f2ed@FontAwesome5FreeSolid',
                             handler: 'onDeleteClick',

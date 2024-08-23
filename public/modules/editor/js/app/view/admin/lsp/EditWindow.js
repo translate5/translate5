@@ -62,7 +62,7 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
                             xtype: 'textfield',
                             name: 'name',
                             bind: {
-                                fieldLabel: '{l10n.lsp.form.name}',
+                                fieldLabel: '{l10n.general.name}',
                             },
                             allowBlank: false,
                         },
@@ -70,7 +70,7 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
                             xtype: 'textfield',
                             name: 'description',
                             bind: {
-                                fieldLabel: '{l10n.lsp.form.description}',
+                                fieldLabel: '{l10n.general.description}',
                             },
                             allowBlank: false,
                         },
@@ -104,7 +104,7 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
                     xtype: 'button',
                     glyph: 'f0c7@FontAwesome5FreeSolid',
                     bind: {
-                        text: '{l10n.lsp.form.saveBtn}',
+                        text: '{l10n.general.save}',
                     },
                     handler: (button, event) => {
                         const form = button.up('lspEditWindow').down('form');
@@ -121,7 +121,7 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
                     xtype: 'button',
                     glyph: 'f00d@FontAwesome5FreeSolid',
                     bind: {
-                        text: '{l10n.lsp.form.cancelBtn}',
+                        text: '{l10n.general.cancel}',
                     },
                     handler: () => Ext.ComponentQuery.query('lspPanel')[0].controller.onCancelEditClick(),
                 }

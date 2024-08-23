@@ -69,7 +69,7 @@ class LspService
 
         return new self(
             $lspRepository,
-            new JobCoordinatorRepository($lspRepository),
+            new JobCoordinatorRepository($lspRepository, new LspUserRepository($lspRepository)),
             EventDispatcher::create(),
             new UserRepository(),
         );
