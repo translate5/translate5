@@ -26,33 +26,85 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\LSP\LspUserService;
+use MittagQI\Translate5\Repository\LspRepository;
+
 class Editor_UserController extends ZfExtended_UserController
 {
+    private LspUserService $lspUserService;
+
+    public function init()
+    {
+        parent::init();
+        $this->lspUserService = LspUserService::create();
+    }
+
     public function deleteAction()
     {
-        //parent is calling load again, but nevermind, this should be bearable...
         $this->entityLoad();
+
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $tasks = $task->loadListByPmGuid($this->entity->getUserGuid());
-        if (empty($tasks)) {
-            parent::deleteAction();
+        if (! empty($tasks)) {
+            $taskGuids = array_column($tasks, 'taskGuid');
 
-            return;
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1048' => 'The user can not be deleted, he is PM in one or more tasks.',
+            ]);
+
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1048', [
+                'Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.',
+            ], [
+                'tasks' => join(', ', $taskGuids),
+                'user' => $this->entity->getUserGuid(),
+                'userLogin' => $this->entity->getLogin(),
+                'userEmail' => $this->entity->getEmail(),
+            ]);
         }
-        $taskGuids = array_column($tasks, 'taskGuid');
 
-        ZfExtended_Models_Entity_Conflict::addCodes([
-            'E1048' => 'The user can not be deleted, he is PM in one or more tasks.',
-        ]);
+        // Possible coordinator that we try to delete
+        $coordinator = $this->lspUserService->findCoordinatorBy($this->entity);
 
-        throw ZfExtended_Models_Entity_Conflict::createResponse('E1048', [
-            'Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.',
-        ], [
-            'tasks' => join(', ', $taskGuids),
-            'user' => $this->entity->getUserGuid(),
-            'userLogin' => $this->entity->getLogin(),
-            'userEmail' => $this->entity->getEmail(),
-        ]);
+        if (null !== $coordinator && $this->lspUserService->getCoordinatorsCountFor($coordinator->lsp) === 1) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1626' => 'The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".',
+            ]);
+
+            throw ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1626',
+                [
+                    'Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".',
+                ],
+                [
+                    'lsp' => $coordinator->lsp->getName(),
+                    'lspId' => $coordinator->lsp->getId(),
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            );
+        }
+
+        // current user may be coordinator
+        $currentCoordinator = $this->castCurrentUserToJobCoordinator();
+
+        if (
+            null !== $currentCoordinator
+            && ! $this->lspUserService->isUserAccessibleFor($currentCoordinator, $this->entity)
+        ) {
+            throw new ZfExtended_NoAccessException();
+        }
+
+        parent::deleteAction();
+    }
+
+    private function castCurrentUserToJobCoordinator(): ?JobCoordinator
+    {
+        $user = ZfExtended_Authentication::getInstance()->getUser();
+
+        return $this->lspUserService->findCoordinatorBy($user);
     }
 }

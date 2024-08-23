@@ -10052,6 +10052,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Sie können den Kunden "{id}" hier nicht angeben</source>
                 <target>You can't provider customer "{id}" here</target>
             </trans-unit>
+            <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZXIgaXN0IGRlciBsZXR6dGUgSm9iLUtvb3JkaW5hdG9yIGRlcyBMU1AgIntsc3B9Ii4='>
+                <source>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</source>
+                <target>The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

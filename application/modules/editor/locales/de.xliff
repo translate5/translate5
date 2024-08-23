@@ -9878,6 +9878,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Sie können den Kunden "{id}" hier nicht angeben</source>
                 <target>Sie können den Kunden "{id}" hier nicht angeben</target>
             </trans-unit>
+            <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZXIgaXN0IGRlciBsZXR6dGUgSm9iLUtvb3JkaW5hdG9yIGRlcyBMU1AgIntsc3B9Ii4='>
+                <source>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</source>
+                <target>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

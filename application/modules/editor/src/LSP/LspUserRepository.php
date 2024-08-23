@@ -40,15 +40,14 @@ use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
-class JobCoordinatorRepository
+class LspUserRepository
 {
     public function __construct(
         private readonly LspRepository $lspRepository,
-        private readonly LspUserRepository $lspUserRepository,
     ) {
     }
 
-    public function findByUser(ZfExtended_Models_User $user): ?JobCoordinator
+    public function findByUser(ZfExtended_Models_User $user): ?LspUser
     {
         try {
             return $this->getByUser($user);
@@ -57,14 +56,8 @@ class JobCoordinatorRepository
         }
     }
 
-    public function getByUser(ZfExtended_Models_User $user): JobCoordinator
+    public function getByUser(ZfExtended_Models_User $user): LspUser
     {
-        $roles = $user->getRoles();
-
-        if (! in_array(Roles::JOB_COORDINATOR, $roles)) {
-            throw new ZfExtended_Models_Entity_NotFoundException('User is not a job coordinator');
-        }
-
         $lsp = ZfExtended_Factory::get(LanguageServiceProvider::class);
         $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
             ->db
@@ -89,13 +82,13 @@ class JobCoordinatorRepository
 
         $lsp->init($row);
 
-        return new JobCoordinator($guid, $user, $lsp);
+        return new LspUser($guid, $user, $lsp);
     }
 
     /**
-     * @return iterable<JobCoordinator>
+     * @return iterable<ZfExtended_Models_User>
      */
-    public function getByLSP(LanguageServiceProvider $lsp): iterable
+    public function getUsers(LanguageServiceProvider $lsp): iterable
     {
         $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
@@ -106,9 +99,8 @@ class JobCoordinatorRepository
         $select = $userDb->select()
             ->setIntegrityCheck(false)
             ->from(['user' => $user->db->info($user->db::NAME)])
-            ->join(['lspToUser' => $lspToUserTable], 'user.id = lspToUser.userId', ['lspToUser.guid'])
-            ->where('lspToUser.lspId = ?', $lsp->getId())
-            ->where('user.roles LIKE ?', '%' . Roles::JOB_COORDINATOR . '%');
+            ->join(['lspToUser' => $lspToUserTable], 'user.id = lspToUser.userId', [])
+            ->where('lspToUser.lspId = ?', $lsp->getId());
 
         $rows = $userDb->fetchAll($select);
 
@@ -117,41 +109,9 @@ class JobCoordinatorRepository
         }
 
         foreach ($rows as $row) {
-            $guid = $row['guid'];
-
-            $row->offsetUnset('guid');
-
             $user->init($row);
 
-            yield new JobCoordinator($guid, clone $user, clone $lsp);
+            yield clone $user;
         }
-    }
-
-    /**
-     * @return iterable<JobCoordinator>
-     */
-    public function getSubLspJobCoordinators(JobCoordinator $coordinator): iterable
-    {
-        foreach ($this->lspRepository->getSubLspList($coordinator->lsp) as $subLsp) {
-            yield from $this->getByLSP($subLsp);
-        }
-    }
-
-    public function getCoordinatorsCount(LanguageServiceProvider $lsp): int
-    {
-        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
-            ->db
-            ->info(LanguageServiceProviderUserTable::NAME);
-        $userDb = $user->db;
-
-        $select = $userDb->select()
-            ->setIntegrityCheck(false)
-            ->from(['user' => $user->db->info($user->db::NAME)], ['count' => 'COUNT(*)'])
-            ->join(['lspToUser' => $lspToUserTable], 'user.id = lspToUser.userId', [])
-            ->where('lspToUser.lspId = ?', $lsp->getId())
-            ->where('user.roles LIKE ?', '%' . Roles::JOB_COORDINATOR . '%');
-
-        return (int) $userDb->fetchRow($select)['count'];
     }
 }
