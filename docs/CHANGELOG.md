@@ -11,15 +11,167 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [7.8.1] - 2024-08-22
+
+### Important Notes:
+#### [TRANSLATE-4151](https://jira.translate5.net/browse/TRANSLATE-4151)
+IMPORTANT: Deprecated target languages "en" and "pt" in DeepL language-resources were converted to "en-GB" and "pt-PT". In case other variants are wanted, please create a new resource or contact our support to change it in the database.
+
+#### [TRANSLATE-4109](https://jira.translate5.net/browse/TRANSLATE-4109)
+Update Visual docker containers to get that change
+ 
 
 
+### Changed
+**[TRANSLATE-4109](https://jira.translate5.net/browse/TRANSLATE-4109): VisualReview / VisualTranslation - Add PDF Version check to pdfconverter container** <br>
+IMPROVEMENT Visual: warn, when imported PDF is of X-4 subtype (which frequently create problems when converting)
 
 
+### Bugfixes
+**[TRANSLATE-4158](https://jira.translate5.net/browse/TRANSLATE-4158): LanguageResources - Add explanation text in empty language resource sync window** <br>
+Add explanation text for empty language resource sync window
+
+**[TRANSLATE-4154](https://jira.translate5.net/browse/TRANSLATE-4154): InstantTranslate - Instant translate produces error for user with no assigned customers** <br>
+FIX: instant translate crashes when accessed by user with no assigned customers
+
+**[TRANSLATE-4153](https://jira.translate5.net/browse/TRANSLATE-4153): Editor general - Bookmark filter in editor does not work** <br>
+FIXED: bookmark filter is now working again
+
+**[TRANSLATE-4151](https://jira.translate5.net/browse/TRANSLATE-4151): LanguageResources - Use EN-GB instead of simple EN and PT as target for DeepL resources** <br>
+For DeepL language resources target languages "en" and "pt" changed to "en-GB" and "pt-PT" respectively.
+
+**[TRANSLATE-4118](https://jira.translate5.net/browse/TRANSLATE-4118): TermPortal - Search results scrolling problem in Firefox** <br>
+translate5 - 7.8.0: FIXED: scrollbar not available for search results grid in Firefox
+translate5 - 7.8.1: Fix for UI error in instant-translate
 
 
+## [7.8.0] - 2024-08-20
+
+### Important Notes:
+#### [TRANSLATE-2270](https://jira.translate5.net/browse/TRANSLATE-2270)
+To make plugin work properly it is needed to add an alias in apache config inside the PHP container:
+edit /etc/apache2/sites-enabled/translate5.conf and add the following line
+Alias /editor/plugins/resources/TMMaintenance/ext /var/www/translate5/application/modules/editor/Plugins/TMMaintenance/public/resources/ext
+ 
 
 
+### Added
+**[TRANSLATE-4132](https://jira.translate5.net/browse/TRANSLATE-4132): Main back-end mechanisms (Worker, Logging, etc.) - Auto-close jobs by task deadline** <br>
+New date field project deadline date available for task.
 
+**[TRANSLATE-3898](https://jira.translate5.net/browse/TRANSLATE-3898): LanguageResources - Change tmx import to be able to use html multipart fileupload** <br>
+Change TMX import to be able to use multipart file-upload
+
+**[TRANSLATE-2270](https://jira.translate5.net/browse/TRANSLATE-2270): LanguageResources - Translation Memory Maintenance** <br>
+translate5 - 7.7.0 : New plugin TMMaintenance for managing segments in t5memory
+translate5 - 7.8.0 : Improved UI error handling and display
+
+
+### Changed
+**[TRANSLATE-3518](https://jira.translate5.net/browse/TRANSLATE-3518): LanguageResources - Infrastructure for using "translate5 language resources" as training resources for MT** <br>
+Cross Language Resource synchronisation mechanism and abstraction layer introduced into application.
+From now on we have mechanic to connect different Language Resource types (like t5memory, Term Collection, etc) for data synchronisation if it is possible
+
+**[TRANSLATE-4137](https://jira.translate5.net/browse/TRANSLATE-4137): t5memory, Translate5 CLI - Improve t5memory reorganize command** <br>
+Added capability to process language resources in batches to t5memory:reorganize command
+
+**[TRANSLATE-4135](https://jira.translate5.net/browse/TRANSLATE-4135): TM Maintenance - TMMaintenance: segments loading usability** <br>
+Added 'Loading...'-row to the bottom of the results grid and amended grid title so loading progress is shown
+
+**[TRANSLATE-4123](https://jira.translate5.net/browse/TRANSLATE-4123): ConnectWorldserver - Plugin ConnectWorldserver: add reviewer to entry in task-history** <br>
+Sample:
+assigned person(s):
+- User1 MittagQI [User1@translate5.net] (reviewing: finished)
+- User2 MittagQI [User2@translate5.net] (reviewing: finished)
+
+**[TRANSLATE-4094](https://jira.translate5.net/browse/TRANSLATE-4094): VisualReview / VisualTranslation - Use VTT files for Video Imports** <br>
+Visual: Enable the import of .vtt-files as workfile for a video-based visual
+
+**[TRANSLATE-4062](https://jira.translate5.net/browse/TRANSLATE-4062): Workflows - Add archive config to use import date instead task modified date** <br>
+translate5 - 7.7.0: Extend task archiving functionality to filter for created timestamp also, instead only modified timestamp. Configurable in Workflow configuration.
+translate5 - 7.8.0: add ftps support
+
+**[TRANSLATE-4057](https://jira.translate5.net/browse/TRANSLATE-4057): Auto-QA - Wrong error count in autoQA after collapsing and re-expanding autoQA panel** <br>
+Qualities filter type is now preserved on collapse/expand of filter panel
+
+**[TRANSLATE-4022](https://jira.translate5.net/browse/TRANSLATE-4022): Auto-QA, SNC - SNC: add new error previously unknown to translate5** <br>
+"(Possibly erroneous) separator from SRC found unchanged in TRG" reported by SNC-lib is now added to the list of known by Translate5 and is now counted as AutoQA-quality under Numbers category group
+
+**[TRANSLATE-3936](https://jira.translate5.net/browse/TRANSLATE-3936): Editor general - Ensure that default plug-ins without config produce no errors** <br>
+Ensure that plug-ins enabled by default are not producing errors when no configuration is given
+
+**[TRANSLATE-3883](https://jira.translate5.net/browse/TRANSLATE-3883): Import/Export - Make TMX export run as stream** <br>
+Fix issues with export of large TMs
+
+
+### Bugfixes
+**[TRANSLATE-4150](https://jira.translate5.net/browse/TRANSLATE-4150): Installation & Update - General error: 1270 Illegal mix of collations** <br>
+Fixing an older DB change file not compatible to latest DB system
+
+**[TRANSLATE-4147](https://jira.translate5.net/browse/TRANSLATE-4147): Content Protection - Content protection: Tag alike render, meta-info in tag** <br>
+Fix render of tag like protected entities
+Store meta info into tag itself for state independency.
+
+**[TRANSLATE-4146](https://jira.translate5.net/browse/TRANSLATE-4146): t5memory, TM Maintenance - Special characters are not treated properly in TM Maintenance** <br>
+Fixed special characters processing in search fields and in editor
+
+**[TRANSLATE-4145](https://jira.translate5.net/browse/TRANSLATE-4145): InstantTranslate - Enable aborting InstantTranslate Requests independently from maxRequestDuration** <br>
+Min time a ranslation-request can be aboted to trigger the next one is now independant from maxRequestDuration
+
+**[TRANSLATE-4143](https://jira.translate5.net/browse/TRANSLATE-4143): Auto-QA - AutoQA Filter is not correctly updated when segment-interdependent qualities change** <br>
+Fix AutoQA filter-panel is not updated when certain segment qualities change
+
+**[TRANSLATE-4140](https://jira.translate5.net/browse/TRANSLATE-4140): t5memory, TM Maintenance - Reorganize is triggered when memory not loaded to RAM** <br>
+Fixed triggering reorganization on the memory which is not loaded into RAM yet
+
+**[TRANSLATE-4139](https://jira.translate5.net/browse/TRANSLATE-4139): t5memory - wrong timestamp in matches saved with option "time of segment saving"** <br>
+Fix segment timestamp when reimporting task to TM and "Time of segment saving" is chosen as an option
+
+**[TRANSLATE-4131](https://jira.translate5.net/browse/TRANSLATE-4131): LanguageResources - Language resource data is not updated when edit form is opened** <br>
+Fix bug when language resource becomes not editable
+
+**[TRANSLATE-4127](https://jira.translate5.net/browse/TRANSLATE-4127): Auto-QA - RootCause: this.getView() is null** <br>
+translate - 7.8.0 : added logging for further investigation of a problem with AutoQA filters
+
+**[TRANSLATE-4122](https://jira.translate5.net/browse/TRANSLATE-4122): Import/Export - Import wizard default assignment: source language not selectable** <br>
+Fix for a problem where target language is not selectable in the user assignment panel in the import wizard.
+
+**[TRANSLATE-4120](https://jira.translate5.net/browse/TRANSLATE-4120): Content Protection - improve content protection rules float generic comma and float generic dot** <br>
+Content protection for floats and integers will try to protect + and - sign before number as default behaviour.
+
+**[TRANSLATE-4118](https://jira.translate5.net/browse/TRANSLATE-4118): TermPortal - Search results scrolling problem in Firefox** <br>
+FIXED: scrollbar not available for search results grid in Firefox
+
+**[TRANSLATE-4117](https://jira.translate5.net/browse/TRANSLATE-4117): MatchAnalysis & Pretranslation - Race condition in Segment Processing functionality** <br>
+Fix race condition in segment processing
+
+**[TRANSLATE-4083](https://jira.translate5.net/browse/TRANSLATE-4083): Content Protection - Content Protection: Rule not working** <br>
+Fixed tag attribute parsing in XmlParser.
+
+**[TRANSLATE-4082](https://jira.translate5.net/browse/TRANSLATE-4082): Content Protection - Content Protection: duplicate key error and priority value not taken over** <br>
+Fix issue with Content protection rule creation.
+Change the way validation error delivered to end user.
+
+**[TRANSLATE-4063](https://jira.translate5.net/browse/TRANSLATE-4063): Editor general - UI error in pricing pre-set grid** <br>
+FIXED: error popping due to incorrect tooltip render for checkbox-column in pricing preset grid
+
+**[TRANSLATE-4051](https://jira.translate5.net/browse/TRANSLATE-4051): InstantTranslate - Instant translate help window does not remember close state** <br>
+Fix for a problem where the visibility state of help button in Instant-Translate  is not remembered.
+
+**[TRANSLATE-4050](https://jira.translate5.net/browse/TRANSLATE-4050): TermTagger integration - correct target term not recognized** <br>
+FIXED: several problems and logic gaps with terminology recognition
+
+**[TRANSLATE-4019](https://jira.translate5.net/browse/TRANSLATE-4019): Editor general - Error in UI filters** <br>
+Fix error when using string filters with special characters in grids.
+
+**[TRANSLATE-3946](https://jira.translate5.net/browse/TRANSLATE-3946): Repetition editor - Repetition's first occurrence should keep its initial match rate** <br>
+First occurrence of repetition is now kept untouched, while others are set 102 or higher
+
+**[TRANSLATE-3899](https://jira.translate5.net/browse/TRANSLATE-3899): LanguageResources - Overwritten DeepL API key produces error with related Term Collection** <br>
+ DeepL API key provided on customer lvl now applied as for DeepL Language Resource as to Term Collection related to it
+
+**[TRANSLATE-3602](https://jira.translate5.net/browse/TRANSLATE-3602): Globalese integration - CSRF-protection causes Globalese plug-in to fail** <br>
+Fixed Plugin auth handling
 
 
 ## [7.7.0] - 2024-07-31
