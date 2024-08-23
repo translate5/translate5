@@ -31,13 +31,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP;
 
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
+use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
 use MittagQI\Translate5\Repository\LspRepository;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Models_Entity_NotFoundException as NotFoundException;
 use ZfExtended_Models_User;
 
 class JobCoordinatorRepository
@@ -52,44 +52,20 @@ class JobCoordinatorRepository
     {
         try {
             return $this->getByUser($user);
-        } catch (ZfExtended_Models_Entity_NotFoundException) {
+        } catch (NotFoundException|CantCreateCoordinatorFromUserException) {
             return null;
         }
     }
 
+    /**
+     * @throws NotFoundException
+     * @throws CantCreateCoordinatorFromUserException
+     */
     public function getByUser(ZfExtended_Models_User $user): JobCoordinator
     {
-        $roles = $user->getRoles();
+        $user = $this->lspUserRepository->getByUser($user);
 
-        if (! in_array(Roles::JOB_COORDINATOR, $roles)) {
-            throw new ZfExtended_Models_Entity_NotFoundException('User is not a job coordinator');
-        }
-
-        $lsp = ZfExtended_Factory::get(LanguageServiceProvider::class);
-        $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
-            ->db
-            ->info(LanguageServiceProviderUserTable::NAME);
-        $lspDb = $lsp->db;
-
-        $select = $lspDb->select()
-            ->setIntegrityCheck(false)
-            ->from(['lsp' => $lsp->db->info(LanguageServiceProviderTable::NAME)])
-            ->join(['lspToUser' => $lspToUserTable], 'lsp.id = lspToUser.lspId', ['lspToUser.guid'])
-            ->where('lspToUser.userId = ?', $user->getId());
-
-        $row = $lspDb->fetchRow($select);
-
-        if (! $row) {
-            throw new ZfExtended_Models_Entity_NotFoundException('No LSP found for job coordinator');
-        }
-
-        $guid = $row['guid'];
-
-        $row->offsetUnset('guid');
-
-        $lsp->init($row);
-
-        return new JobCoordinator($guid, $user, $lsp);
+        return JobCoordinator::fromLspUser($user);
     }
 
     /**

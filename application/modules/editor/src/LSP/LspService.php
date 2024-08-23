@@ -69,13 +69,21 @@ class LspService
 
         return new self(
             $lspRepository,
-            new JobCoordinatorRepository(
-                $lspRepository,
-                new LspUserRepository($lspRepository),
-            ),
+            new JobCoordinatorRepository($lspRepository),
             EventDispatcher::create(),
             new UserRepository(),
         );
+    }
+
+    public function doesUserHaveAccessToLsp(ZfExtended_Models_User $user, LanguageServiceProvider $lsp): bool
+    {
+        $roles = $user->getRoles();
+
+        $coordinator = $this->jobCoordinatorRepository->findByUser($user);
+
+        return array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)
+            || (in_array(Roles::PM, $roles) && $lsp->isDirectLsp())
+            || (null !== $coordinator && $lsp->isSubLspOf($coordinator->lsp));
     }
 
     public function getLsp(int $id): LanguageServiceProvider

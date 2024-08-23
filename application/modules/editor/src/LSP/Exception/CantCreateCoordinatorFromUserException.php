@@ -28,28 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP;
+namespace MittagQI\Translate5\LSP\Exception;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use InvalidArgumentException;
 
-class JobCoordinator extends LspUser
+class CantCreateCoordinatorFromUserException extends InvalidArgumentException
 {
-    /**
-     * @throws CantCreateCoordinatorFromUserException
-     */
-    public static function fromLspUser(LspUser $lspUser): self
+    public function __construct(public readonly string $userGuid)
     {
-        if (! in_array(Roles::JOB_COORDINATOR, $lspUser->user->getRoles())) {
-            throw new CantCreateCoordinatorFromUserException($lspUser->user->getUserGuid());
-        }
-
-        return new self($lspUser->guid, $lspUser->user, $lspUser->lsp);
-    }
-
-    public function isCoordinatorOf(LanguageServiceProvider $lsp): bool
-    {
-        return $this->lsp->getId() === $lsp->getId();
+        parent::__construct("The given user $userGuid is not a job coordinator");
     }
 }
