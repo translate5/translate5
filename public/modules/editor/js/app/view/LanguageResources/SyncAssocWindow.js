@@ -36,7 +36,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
     ],
     xtype: 'associationwindow',
     title: Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
-    width: 600,
+    width: 800,
     height: 400,
     modal: true,
     controller: 'languageResourceSyncAssocWindow',
@@ -64,7 +64,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                         {
                             xtype: 'combo',
                             fieldLabel: Editor.data.l10n.general.targetLanguageResource,
-                            name: 'targetLanguageResourceId',
+                            name: 'connectionOption',
                             store: {
                                 xtype: 'store',
                                 fields: ['id', 'name'],
@@ -123,6 +123,18 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                 {
                     text: Editor.data.l10n.general.targetLanguageResource,
                     dataIndex: 'targetLanguageResourceName',
+                    flex: 1,
+                    renderer: v => Ext.String.htmlEncode(v)
+                },
+                {
+                    text: Editor.data.l10n.general.sourceLang,
+                    dataIndex: 'sourceLanguage',
+                    flex: 1,
+                    renderer: v => Ext.String.htmlEncode(v)
+                },
+                {
+                    text: Editor.data.l10n.general.targetLang,
+                    dataIndex: 'targetLanguage',
                     flex: 1,
                     renderer: v => Ext.String.htmlEncode(v)
                 },

@@ -57,7 +57,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
     updateForm: function() {
         const form = this.lookupReference('associationForm');
 
-        var combo = form.down('combo[name=targetLanguageResourceId]');
+        var combo = form.down('combo[name=connectionOption]');
         var store = combo.getStore();
 
         Ext.Ajax.request({

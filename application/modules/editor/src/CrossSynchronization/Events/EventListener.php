@@ -46,7 +46,7 @@ class EventListener
         private readonly Zend_EventManager_SharedEventManager $eventManager,
         private readonly CrossLanguageResourceSynchronizationService $synchronizationService,
         private readonly LanguageResourceRepository $languageResourceRepository,
-        private readonly SynchronisationDirigent $queueSynchronizationService,
+        private readonly SynchronisationDirigent $synchronisationDirigent,
     ) {
     }
 
@@ -70,11 +70,6 @@ class EventListener
         $this->eventManager->attach(
             EventDispatcher::class,
             ConnectionCreatedEvent::class,
-            $this->queueDefaultSynchronization()
-        );
-        $this->eventManager->attach(
-            EventDispatcher::class,
-            LanguageResourcesConnectedEvent::class,
             $this->queueDefaultSynchronization()
         );
         $this->eventManager->attach(
@@ -113,7 +108,7 @@ class EventListener
                 $source = $this->languageResourceRepository->get((int) $event->connection->getSourceLanguageResourceId());
                 $target = $this->languageResourceRepository->get((int) $event->connection->getTargetLanguageResourceId());
 
-                $this->queueSynchronizationService->cleanupDefaultSynchronization($source, $target);
+                $this->synchronisationDirigent->cleanupDefaultSynchronization($source, $target);
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 // no resource - nothing no cleanup
             }
@@ -133,7 +128,7 @@ class EventListener
                 throw new RuntimeException('Connection was deleted in between');
             }
 
-            $this->queueSynchronizationService->queueCustomerSynchronization(
+            $this->synchronisationDirigent->queueCustomerSynchronization(
                 $connection,
                 (int) $event->connectionCustomer->getCustomerId(),
             );
@@ -146,7 +141,7 @@ class EventListener
             /** @var ConnectionCreatedEvent $event */
             $event = $zendEvent->getParam('event');
 
-            $this->queueSynchronizationService->queueDefaultSynchronization($event->connection);
+            $this->synchronisationDirigent->queueDefaultSynchronization($event->connection);
         };
     }
 
@@ -197,7 +192,7 @@ class EventListener
 
             $target = $this->languageResourceRepository->get((int) $connection->getTargetLanguageResourceId());
 
-            $this->queueSynchronizationService->cleanupOnConnectionDeleted(
+            $this->synchronisationDirigent->cleanupOnConnectionDeleted(
                 $target,
                 (int) $event->connectionCustomer->getCustomerId()
             );

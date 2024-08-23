@@ -384,21 +384,6 @@ class CrossSynchronizationConnectionRepository
         }
     }
 
-    public function hasConnectionsForPair(int $sourceId, int $targetId): bool
-    {
-        $syncModel = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
-        $db = $syncModel->db;
-
-        $select = $db->select()
-            ->from([
-                'LanguageResourceSync' => $db->info($db::NAME),
-            ], 'COUNT(*) as count')
-            ->where('LanguageResourceSync.sourceLanguageResourceId = ?', $sourceId)
-            ->orWhere('LanguageResourceSync.targetLanguageResourceId = ?', $targetId);
-
-        return $db->fetchRow($select)->toArray()['count'] > 0;
-    }
-
     /**
      * @return iterable<CrossSynchronizationConnection>
      */

@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\LanguageResource\CrossSynchronization;
+namespace MittagQI\Translate5\Test\Unit\CrossSynchronization;
 
 use editor_Models_LanguageResources_CustomerAssoc as Association;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
@@ -37,15 +37,16 @@ use editor_Services_Manager;
 use MittagQI\Translate5\CrossSynchronization\ConnectionOptionsRepository;
 use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\Dto\AvailableForConnectionOption;
+use MittagQI\Translate5\CrossSynchronization\Dto\PotentialConnectionOption;
 use MittagQI\Translate5\CrossSynchronization\Events\ConnectionCreatedEvent;
 use MittagQI\Translate5\CrossSynchronization\Events\ConnectionDeletedEvent;
-use MittagQI\Translate5\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\CustomerAddedEvent;
 use MittagQI\Translate5\CrossSynchronization\LanguagePair;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationType;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
-use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
 
 class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
@@ -57,22 +58,11 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
         $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
         $connectionOptionsRepository = $this->createMock(ConnectionOptionsRepository::class);
 
-        $lr = $this->createMock(LanguageResource::class);
-
         $connectionRepository
             ->method('getConnectionsByLrCustomerAssoc')
-            ->willReturn(
-                [
-                    [
-                        'sourceId' => 1,
-                        'targetId' => 2,
-                    ],
-                    [
-                        'sourceId' => 3,
-                        'targetId' => 4,
-                    ],
-                ]
-            );
+            ->willReturn([
+                $this->createMock(CrossSynchronizationConnection::class),
+            ]);
 
         $service = new CrossLanguageResourceSynchronizationService(
             $serviceManager,
@@ -83,32 +73,9 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
 
         $assoc = $this->createMock(Association::class);
 
-        foreach ($service->getConnectionsByLrCustomerAssoc($assoc) as $pair) {
-            self::assertInstanceOf(LanguageResource::class, $pair->source);
-            self::assertInstanceOf(LanguageResource::class, $pair->target);
+        foreach ($service->getConnectionsByLrCustomerAssoc($assoc) as $connection) {
+            self::assertInstanceOf(CrossSynchronizationConnection::class, $connection);
         }
-    }
-
-    public function testPairHasConnection(): void
-    {
-        $serviceManager = $this->createMock(editor_Services_Manager::class);
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
-        $connectionOptionsRepository = $this->createMock(ConnectionOptionsRepository::class);
-
-        $connectionRepository
-            ->method('hasConnectionsForPair')
-            ->willReturnOnConsecutiveCalls(true, false);
-
-        $service = new CrossLanguageResourceSynchronizationService(
-            $serviceManager,
-            $eventDispatcher,
-            $connectionRepository,
-            $connectionOptionsRepository,
-        );
-
-        self::assertTrue($service->pairHasConnection(1, 2));
-        self::assertFalse($service->pairHasConnection(1, 2));
     }
 
     public function testCreateConnection(): void
@@ -223,7 +190,7 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
                     static function ($event) use (&$i) {
                         return 0 === $i++
                             ? $event instanceof ConnectionCreatedEvent
-                            : $event instanceof LanguageResourcesConnectedEvent;
+                            : $event instanceof CustomerAddedEvent;
                     }
                 )
             );
@@ -285,9 +252,14 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
                 ]
             );
 
-        $resources = $service->getAvailableForConnectionOptions($source);
+        $options = $service->getAvailableForConnectionOptions($sourceLR);
 
-        self::assertEmpty($resources);
+        $count = 0;
+        foreach ($options as $option) {
+            $count++;
+        }
+
+        self::assertSame(0, $count);
     }
 
     /**
@@ -298,11 +270,23 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
         $serviceManager = $this->createMock(editor_Services_Manager::class);
         $eventDispatcher = $this->createMock(EventDispatcher::class);
         $connectionOptionsRepository = $this->createMock(ConnectionOptionsRepository::class);
-
         $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
 
         $connectionRepository->method('getAllTargetLanguageResourceIds')->willReturn([]);
         $connectionRepository->method('getConnectionsWhereSource')->willReturn([]);
+
+        $targetLR = $this->createMock(LanguageResource::class);
+        $targetLR->method('__call')->willReturnMap([
+            ['getId', [], 1],
+            ['getServiceType', [], 'targetServiceType'],
+        ]);
+
+        $optionMock = new PotentialConnectionOption(
+            $targetLR,
+            $this->createMock(Language::class),
+            $this->createMock(Language::class),
+        );
+        $connectionOptionsRepository->method('getPotentialConnectionOptions')->willReturn([$optionMock]);
 
         $service = new CrossLanguageResourceSynchronizationService(
             $serviceManager,
@@ -310,14 +294,6 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             $connectionRepository,
             $connectionOptionsRepository,
         );
-
-        $targetLR = $this->createMock(LanguageResource::class);
-        $targetLR->method('getSourceLang')->willReturn(1);
-        $targetLR->method('getTargetLang')->willReturn(2);
-        $targetLR->method('__call')->willReturnMap([
-            ['getId', [], 1],
-            ['getServiceType', [], 'targetServiceType'],
-        ]);
 
         $sourceLR = $this->createMock(LanguageResource::class);
         $sourceLR->method('getSourceLang')->willReturn(1);
@@ -340,9 +316,15 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
                 ]
             );
 
-        $resources = $service->getAvailableForConnectionOptions($sourceLR);
+        $options = $service->getAvailableForConnectionOptions($sourceLR);
 
-        self::assertNotEmpty($resources);
+        $count = 0;
+        foreach ($options as $option) {
+            self::assertInstanceOf(AvailableForConnectionOption::class, $option);
+            $count++;
+        }
+
+        self::assertSame(1, $count);
     }
 
     /**
@@ -363,6 +345,12 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             ['getServiceType', [], 'targetSyncServiceType'],
         ]);
 
+        $validOptionMock = new PotentialConnectionOption(
+            $expectedTarget,
+            $this->createMock(Language::class),
+            $this->createMock(Language::class),
+        );
+
         $additionalTarget = $this->createMock(LanguageResource::class);
         $additionalTarget->method('getSourceLang')->willReturn(1);
         $additionalTarget->method('getTargetLang')->willReturn(2);
@@ -371,7 +359,17 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             ['getServiceType', [], 'targetNotSyncServiceType'],
         ]);
 
+        $additionalOptionMock = new PotentialConnectionOption(
+            $additionalTarget,
+            $this->createMock(Language::class),
+            $this->createMock(Language::class),
+        );
+
         $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
+
+        $connectionOptionsRepository
+            ->method('getPotentialConnectionOptions')
+            ->willReturn([$validOptionMock, $additionalOptionMock]);
 
         $connectionRepository->method('getAllTargetLanguageResourceIds')->willReturn([]);
         $connectionRepository->method('getConnectionsWhereSource')->willReturn([]);
@@ -409,10 +407,16 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
                 ]
             );
 
-        $resources = $service->getAvailableForConnectionOptions($source);
+        $options = $service->getAvailableForConnectionOptions($sourceLR);
 
-        self::assertCount(1, $resources);
-        self::assertSame($expectedTarget, $resources[0]);
+        $count = 0;
+        foreach ($options as $option) {
+            self::assertInstanceOf(AvailableForConnectionOption::class, $option);
+            self::assertSame($expectedTarget, $option->languageResource);
+            $count++;
+        }
+
+        self::assertSame(1, $count);
     }
 
     /**
@@ -433,6 +437,12 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             ['getServiceType', [], 'targetSyncServiceType'],
         ]);
 
+        $validOptionMock = new PotentialConnectionOption(
+            $expectedTarget,
+            $this->createMock(Language::class),
+            $this->createMock(Language::class),
+        );
+
         $connectedTarget = $this->createMock(LanguageResource::class);
         $connectedTarget->method('getSourceLang')->willReturn(1);
         $connectedTarget->method('getTargetLang')->willReturn(2);
@@ -441,9 +451,19 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             ['getServiceType', [], 'targetConnectedServiceType'],
         ]);
 
+        $connectedOptionMock = new PotentialConnectionOption(
+            $connectedTarget,
+            $this->createMock(Language::class),
+            $this->createMock(Language::class),
+        );
+
         $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
 
         $connectionRepository->method('getAllTargetLanguageResourceIds')->willReturn([]);
+
+        $connectionOptionsRepository
+            ->method('getPotentialConnectionOptions')
+            ->willReturn([$validOptionMock, $connectedOptionMock]);
 
         $connection = $this->createMock(CrossSynchronizationConnection::class);
         $connection->method('__call')->willReturnMap([
@@ -484,17 +504,23 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
                 ]
             );
 
-        $resources = $service->getAvailableForConnectionOptions($sourceLR);
+        $options = $service->getAvailableForConnectionOptions($sourceLR);
 
-        self::assertCount(1, $resources);
-        self::assertSame($expectedTarget, $resources[0]);
+        $count = 0;
+        foreach ($options as $option) {
+            self::assertInstanceOf(AvailableForConnectionOption::class, $option);
+            self::assertSame($expectedTarget, $option->languageResource);
+            $count++;
+        }
+
+        self::assertSame(1, $count);
     }
 
     /**
      * 2 LRs connected.
      * 1 to current source LR and 1 to some other
      * LR that is not connected to current source has integration that supports only one-to-one connection
-     * return be empty
+     * return must be empty
      */
     public function testGetAvailableForConnectionLanguageResourcesReturns5(): void
     {
@@ -510,6 +536,12 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             ['getServiceType', [], 'targetConnectedToOtherServiceType'],
         ]);
 
+        $connectedToOtherOptionMock = new PotentialConnectionOption(
+            $targetConnectedToOtherSource,
+            $this->createMock(Language::class),
+            $this->createMock(Language::class),
+        );
+
         $connectedTarget = $this->createMock(LanguageResource::class);
         $connectedTarget->method('getSourceLang')->willReturn(1);
         $connectedTarget->method('getTargetLang')->willReturn(2);
@@ -518,7 +550,18 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             ['getServiceType', [], 'targetConnectedServiceType'],
         ]);
 
+        $connectedOptionMock = new PotentialConnectionOption(
+            $connectedTarget,
+            $this->createMock(Language::class),
+            $this->createMock(Language::class),
+        );
+
         $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
+
+        $connectionOptionsRepository
+            ->method('getPotentialConnectionOptions')
+            ->willReturn([$connectedToOtherOptionMock, $connectedOptionMock])
+        ;
 
         $connectionRepository
             ->method('getAllTargetLanguageResourceIds')
@@ -564,9 +607,14 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
                 ]
             );
 
-        $resources = $service->getAvailableForConnectionOptions($sourceLR);
+        $options = $service->getAvailableForConnectionOptions($sourceLR);
 
-        self::assertEmpty($resources);
+        $count = 0;
+        foreach ($options as $option) {
+            $count++;
+        }
+
+        self::assertSame(0, $count);
     }
 
     /**
@@ -589,6 +637,12 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             ['getServiceType', [], 'targetConnectedToOtherServiceType'],
         ]);
 
+        $connectedToOtherOptionMock = new PotentialConnectionOption(
+            $targetConnectedToOtherSource,
+            $this->createMock(Language::class),
+            $this->createMock(Language::class),
+        );
+
         $connectedTarget = $this->createMock(LanguageResource::class);
         $connectedTarget->method('getSourceLang')->willReturn(1);
         $connectedTarget->method('getTargetLang')->willReturn(2);
@@ -597,7 +651,18 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             ['getServiceType', [], 'targetConnectedServiceType'],
         ]);
 
+        $connectedOptionMock = new PotentialConnectionOption(
+            $connectedTarget,
+            $this->createMock(Language::class),
+            $this->createMock(Language::class),
+        );
+
         $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
+
+        $connectionOptionsRepository
+            ->method('getPotentialConnectionOptions')
+            ->willReturn([$connectedToOtherOptionMock, $connectedOptionMock])
+        ;
 
         $connectionRepository
             ->method('getAllTargetLanguageResourceIds')
@@ -644,10 +709,16 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
                 ]
             );
 
-        $resources = $service->getAvailableForConnectionOptions($sourceLR);
+        $options = $service->getAvailableForConnectionOptions($sourceLR);
 
-        self::assertCount(1, $resources);
-        self::assertSame($targetConnectedToOtherSource, $resources[0]);
+        $count = 0;
+        foreach ($options as $option) {
+            self::assertInstanceOf(AvailableForConnectionOption::class, $option);
+            self::assertSame($targetConnectedToOtherSource, $option->languageResource);
+            $count++;
+        }
+
+        self::assertSame(1, $count);
     }
 
     private function createIntegration(

@@ -28,12 +28,12 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace LanguageResource\CrossSynchronization;
+namespace MittagQI\Translate5\Test\Unit\CrossSynchronization;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
 use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\CrossSynchronization\SynchronisationDirigent;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationDCirigent;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
