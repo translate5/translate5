@@ -61,8 +61,8 @@ class CustomerServiceTest extends TestCase
 
         $synchronizationService
             ->expects($this->once())
-            ->method('deleteRelatedConnections')
-            ->with(null, $this->identicalTo($customer->getId()));
+            ->method('removeCustomerFromConnections')
+            ->with($this->identicalTo($customer->getId()), null);
 
         $customerAssocService
             ->expects($this->once())

@@ -356,35 +356,6 @@ class CrossSynchronizationConnectionRepository
     }
 
     /**
-     * @return iterable<array{sourceId: int, targetId: int}>
-     */
-    public function getConnectedPairsWhere(int $languageResourceId): iterable
-    {
-        $syncModel = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
-        $db = $syncModel->db;
-
-        $select = $db->select()
-            ->distinct()
-            ->from(
-                [
-                    'connections' => $db->info($db::NAME),
-                ],
-                [
-                    'sourceLanguageResourceId',
-                    'targetLanguageResourceId',
-                ]
-            )
-            ->where('sourceLanguageResourceId = ? OR targetLanguageResourceId = ?', $languageResourceId);
-
-        foreach ($db->fetchAll($select)->toArray() as $row) {
-            yield [
-                'sourceId' => (int) $row['sourceLanguageResourceId'],
-                'targetId' => (int) $row['targetLanguageResourceId'],
-            ];
-        }
-    }
-
-    /**
      * @return iterable<CrossSynchronizationConnection>
      */
     public function getConnectionsForPair(int $sourceId, int $targetId): iterable

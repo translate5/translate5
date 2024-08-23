@@ -37,11 +37,13 @@ use editor_Services_Manager;
 use MittagQI\Translate5\CrossSynchronization\ConnectionOptionsRepository;
 use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnectionCustomer;
 use MittagQI\Translate5\CrossSynchronization\Dto\AvailableForConnectionOption;
 use MittagQI\Translate5\CrossSynchronization\Dto\PotentialConnectionOption;
 use MittagQI\Translate5\CrossSynchronization\Events\ConnectionCreatedEvent;
 use MittagQI\Translate5\CrossSynchronization\Events\ConnectionDeletedEvent;
 use MittagQI\Translate5\CrossSynchronization\Events\CustomerAddedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\CustomerRemovedEvent;
 use MittagQI\Translate5\CrossSynchronization\LanguagePair;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationType;
@@ -49,7 +51,7 @@ use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
 use PHPUnit\Framework\TestCase;
 
-class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
+class CrossLanguageResourceSynchronizationServiceTest extends TestCase
 {
     public function testGetConnectedPairsByAssoc(): void
     {
@@ -105,7 +107,7 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
             $connectionOptionsRepository,
         );
 
-        self::assertEquals($connection, $service->createConnection($sourceLR, $targetLR, $sourceLang, $targetLang, 1));
+        self::assertEquals($connection, $service->createConnection($sourceLR, $targetLR, $sourceLang, $targetLang));
     }
 
     public function testDeleteConnection(): void
@@ -129,6 +131,108 @@ class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
         );
 
         $service->deleteConnection($connection);
+    }
+
+    public function testAddCustomer(): void
+    {
+        $serviceManager = $this->createMock(editor_Services_Manager::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
+        $eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(CustomerAddedEvent::class));
+
+        $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
+        $connectionOptionsRepository = $this->createMock(ConnectionOptionsRepository::class);
+
+        $connection = $this->createMock(CrossSynchronizationConnection::class);
+
+        $service = new CrossLanguageResourceSynchronizationService(
+            $serviceManager,
+            $eventDispatcher,
+            $connectionRepository,
+            $connectionOptionsRepository,
+        );
+
+        $service->addCustomer($connection, 1);
+    }
+
+    public function testRemoveCustomer(): void
+    {
+        $serviceManager = $this->createMock(editor_Services_Manager::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
+        $eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(CustomerRemovedEvent::class));
+
+        $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
+        $connectionOptionsRepository = $this->createMock(ConnectionOptionsRepository::class);
+
+        $assoc = $this->createMock(CrossSynchronizationConnectionCustomer::class);
+
+        $service = new CrossLanguageResourceSynchronizationService(
+            $serviceManager,
+            $eventDispatcher,
+            $connectionRepository,
+            $connectionOptionsRepository,
+        );
+
+        $service->removeCustomer($assoc);
+    }
+
+    public function testRemoveCustomerFromConnections(): void
+    {
+        $serviceManager = $this->createMock(editor_Services_Manager::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
+        $eventDispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->with(self::isInstanceOf(CustomerRemovedEvent::class));
+
+        $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
+        $connectionRepository->method('getCustomerAssocsByCustomerAndLanguageResource')->willReturn([
+            $this->createMock(CrossSynchronizationConnectionCustomer::class),
+            $this->createMock(CrossSynchronizationConnectionCustomer::class),
+        ]);
+
+        $connectionOptionsRepository = $this->createMock(ConnectionOptionsRepository::class);
+
+        $service = new CrossLanguageResourceSynchronizationService(
+            $serviceManager,
+            $eventDispatcher,
+            $connectionRepository,
+            $connectionOptionsRepository,
+        );
+
+        $service->removeCustomerFromConnections(1, 1);
+    }
+
+
+
+    public function testDeleteRelatedConnections(): void
+    {
+        $serviceManager = $this->createMock(editor_Services_Manager::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
+        $eventDispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->with(self::isInstanceOf(ConnectionDeletedEvent::class));
+
+        $connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
+        $connectionRepository->method('getConnectionsFor')->willReturn([
+            $this->createMock(CrossSynchronizationConnection::class),
+            $this->createMock(CrossSynchronizationConnection::class),
+        ]);
+
+        $connectionOptionsRepository = $this->createMock(ConnectionOptionsRepository::class);
+
+        $assoc = $this->createMock(CrossSynchronizationConnectionCustomer::class);
+
+        $service = new CrossLanguageResourceSynchronizationService(
+            $serviceManager,
+            $eventDispatcher,
+            $connectionRepository,
+            $connectionOptionsRepository,
+        );
+
+        $service->deleteRelatedConnections(1);
     }
 
     public function testGetSyncData(): void
