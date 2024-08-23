@@ -1015,7 +1015,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     public function hasDeadlineDateAutoClose(): bool
     {
-        return $this->hasDeadlineDate() && $this->getConfig()->runtimeOptions->import->projectDeadline->autoCloseJobs;
+        return $this->hasDeadlineDate() && $this->getConfig()->runtimeOptions->workflow->autoCloseJobs;
     }
 
     /**
