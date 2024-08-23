@@ -44,7 +44,7 @@ use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
-class LspRepository
+class LspRepositoryM
 {
     public function __construct(
         private readonly Zend_Db_Adapter_Abstract $db,

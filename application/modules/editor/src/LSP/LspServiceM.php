@@ -36,7 +36,7 @@ use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LSPRepository;
+use MittagQI\Translate5\Repository\LspRepositoryM;
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;
@@ -53,10 +53,10 @@ use ZfExtended_Models_User;
  * @template C of array{id: int, name: string}
  * @template LspRow of array{id: int, name: string, description: string, coordinators: JC[], users: U[], customers: C[]}
  */
-class LSPService
+class LspServiceM
 {
     public function __construct(
-        private readonly LSPRepository $lspRepository,
+        private readonly LspRepositoryM $lspRepository,
         private readonly JobCoordinatorRepository $jobCoordinatorRepository,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly UserRepository $userRepository,
@@ -66,7 +66,7 @@ class LSPService
     public static function create(): self
     {
         return new self(
-            LSPRepository::create(),
+            LspRepositoryM::create(),
             new JobCoordinatorRepository(),
             EventDispatcher::create(),
             new UserRepository(),

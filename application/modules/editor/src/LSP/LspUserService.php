@@ -32,13 +32,13 @@ namespace MittagQI\Translate5\LSP;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\LspRepositoryM;
 use ZfExtended_Models_User;
 
 class LspUserService
 {
     public function __construct(
-        private readonly LspRepository $lspRepository,
+        private readonly LspRepositoryM $lspRepository,
         private readonly JobCoordinatorRepository $jcRepository,
         private readonly LspUserRepository $lspUserRepository,
     ) {
@@ -46,13 +46,13 @@ class LspUserService
 
     public static function create(): self
     {
-        $lspRepository = LspRepository::create();
+        $lspRepository = LspRepositoryM::create();
         $lspUserRepository = new LspUserRepository(
             $lspRepository
         );
 
         return new self(
-            LspRepository::create(),
+            LspRepositoryM::create(),
             new JobCoordinatorRepository(
                 $lspRepository,
                 $lspUserRepository
