@@ -215,7 +215,6 @@ class CrossSynchronizationConnectionRepository
             )
             ->where('sourceCustomers.customerId = ?', $assoc->getCustomerId())
             ->where('targetCustomers.customerId = ?', $assoc->getCustomerId())
-            ->where('connections.customerId != ?', $assoc->getCustomerId())
         ;
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
@@ -324,7 +323,7 @@ class CrossSynchronizationConnectionRepository
                     'connections.sourceLanguageResourceId = lr.id OR connections.targetLanguageResourceId = lr.id',
                     []
                 )
-                ->where('lr.ir = ?', $languageResourceId);
+                ->where('lr.id = ?', $languageResourceId);
         }
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
