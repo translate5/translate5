@@ -116,7 +116,7 @@ class editor_LspController extends ZfExtended_RestController
             $this->lspService->assignCustomer($lsp, $customer);
         }
 
-        $this->view->rows = (object) $this->lspService->buildViewData($lsp);
+        $this->view->rows = (object) $this->lspService->buildViewData($user, $lsp);
     }
 
     public function putAction()

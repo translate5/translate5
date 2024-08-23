@@ -134,11 +134,11 @@ class LspService
         $roles = $user->getRoles();
 
         if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
-            return $this->buildViewListData($this->lspRepository->getAll());
+            return $this->buildViewListData($user, $this->lspRepository->getAll());
         }
 
         if (in_array(Roles::PM, $roles)) {
-            return $this->buildViewListData($this->lspRepository->getForPmRole());
+            return $this->buildViewListData($user, $this->lspRepository->getForPmRole());
         }
 
         if (! in_array(Roles::JOB_COORDINATOR, $roles)) {
@@ -147,6 +147,7 @@ class LspService
 
         try {
             return $this->buildViewListData(
+                $user,
                 $this->lspRepository->getForJobCoordinator(
                     $this->jobCoordinatorRepository->getByUser($user)
                 )
@@ -159,7 +160,7 @@ class LspService
     /**
      * @return LspRow
      */
-    public function buildViewData(LanguageServiceProvider $lsp): array
+    public function buildViewData(ZfExtended_Models_User $viewer, LanguageServiceProvider $lsp): array
     {
         $coordinators = $this->jobCoordinatorRepository->getByLSP($lsp);
         /**
@@ -203,9 +204,8 @@ class LspService
         return [
             'id' => (int) $lsp->getId(),
             'name' => $lsp->getName(),
-            // TODO check credentials
-            'canEdit' => true,
-            'canDelete' => true,
+            'canEdit' => $this->doesUserHaveAccessToLsp($viewer, $lsp),
+            'canDelete' => $this->doesUserHaveAccessToLsp($viewer, $lsp),
             'description' => $lsp->getDescription(),
             'coordinators' => $coordinatorData,
             'users' => $usersData,
@@ -308,12 +308,12 @@ class LspService
      * @param iterable<LanguageServiceProvider> $lsps
      * @return LspRow[]
      */
-    private function buildViewListData(iterable $lsps): array
+    private function buildViewListData(ZfExtended_Models_User $viewer, iterable $lsps): array
     {
         $data = [];
 
         foreach ($lsps as $lsp) {
-            $data[] = $this->buildViewData($lsp);
+            $data[] = $this->buildViewData($viewer, $lsp);
         }
 
         return $data;
