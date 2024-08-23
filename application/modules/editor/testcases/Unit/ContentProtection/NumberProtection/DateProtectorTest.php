@@ -99,14 +99,14 @@ class DateProtectorTest extends TestCase
 
         yield 'date' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA"/>',
             'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
 
         yield 'target lang de-DE' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA"/>',
             'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
@@ -124,7 +124,7 @@ class DateProtectorTest extends TestCase
 
         yield 'date. target format Y*m*d' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="2023*07*18"/>',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="2023*07*18" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA"/>',
             'protectionDto' => $protectionDto2,
             'targetLang' => $targetLangDe,
         ];
@@ -142,7 +142,7 @@ class DateProtectorTest extends TestCase
 
         yield 'date. keep as is' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023/18/07" target="2023/18/07"/>',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023/18/07" target="2023/18/07" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA"/>',
             'protectionDto' => $protectionDtoKeepAsIs,
             'targetLang' => $targetLangDe,
         ];

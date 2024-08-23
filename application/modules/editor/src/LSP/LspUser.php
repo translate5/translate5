@@ -30,12 +30,21 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP;
 
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use ZfExtended_Models_User;
 
-class JobCoordinator extends LspUser
+class LspUser
 {
-    public function isCoordinatorOf(LanguageServiceProvider $lsp): bool
+    public function __construct(
+        public readonly string $guid,
+        public readonly ZfExtended_Models_User $user,
+        public readonly LanguageServiceProvider $lsp,
+    ) {
+    }
+
+    public function isCoordinator(): bool
     {
-        return $this->lsp->getId() === $lsp->getId();
+        return in_array(Roles::JOB_COORDINATOR, $this->user->getRoles());
     }
 }

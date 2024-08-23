@@ -33,11 +33,12 @@ use MittagQI\Translate5\LSP\DTO\UpdateData;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\LSPService;
+use MittagQI\Translate5\LSP\LspService;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\Repository\CustomerRepository;
+use MittagQI\Translate5\Repository\LspRepository;
 
 class editor_LspController extends ZfExtended_RestController
 {
@@ -52,7 +53,7 @@ class editor_LspController extends ZfExtended_RestController
 
     protected bool $decodePutAssociative = true;
 
-    private LSPService $lspService;
+    private LspService $lspService;
 
     private CustomerRepository $customerRepository;
 
@@ -61,9 +62,9 @@ class editor_LspController extends ZfExtended_RestController
     public function init()
     {
         parent::init();
-        $this->lspService = LSPService::create();
+        $this->lspService = LspService::create();
         $this->customerRepository = new CustomerRepository();
-        $this->coordinatorRepository = new JobCoordinatorRepository();
+        $this->coordinatorRepository = new JobCoordinatorRepository(LspRepository::create());
     }
 
     public function indexAction()
@@ -118,20 +119,11 @@ class editor_LspController extends ZfExtended_RestController
     {
         $this->decodePutData();
 
-        $user = ZfExtended_Authentication::getInstance()->getUser();
-
-        $roles = $user->getRoles();
+        $authUser = ZfExtended_Authentication::getInstance()->getUser();
 
         $lsp = $this->lspService->getLsp((int) $this->_getParam('id'));
 
-        $coordinator = $this->coordinatorRepository->findByUser($user);
-
-        $userCanUpdateLsp = array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)
-            || (in_array(Roles::PM, $roles) && $lsp->isDirectLsp())
-            || (null !== $coordinator && $lsp->isSubLspOf($coordinator->lsp))
-        ;
-
-        if (! $userCanUpdateLsp) {
+        if (! $this->lspService->doesUserHaveAccessToLsp($authUser, $lsp)) {
             throw new ZfExtended_NoAccessException();
         }
 
@@ -139,7 +131,9 @@ class editor_LspController extends ZfExtended_RestController
             'E2003' => 'Wrong value',
         ], 'editor.lsp');
 
-        $customers = $this->getNewCustomers($coordinator);
+
+        $authCoordinator = $this->coordinatorRepository->findByUser($authUser);
+        $customers = $this->getNewCustomers($authCoordinator);
 
         try {
             $this->lspService->updateLsp(
@@ -167,7 +161,13 @@ class editor_LspController extends ZfExtended_RestController
 
     public function deleteAction()
     {
+        $authUser = ZfExtended_Authentication::getInstance()->getUser();
+
         $lsp = $this->lspService->getLsp((int) $this->_getParam('id'));
+
+        if (! $this->lspService->doesUserHaveAccessToLsp($authUser, $lsp)) {
+            throw new ZfExtended_NoAccessException();
+        }
 
         $this->lspService->deleteLsp($lsp);
     }

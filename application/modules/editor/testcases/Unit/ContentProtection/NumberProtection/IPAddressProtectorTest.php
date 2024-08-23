@@ -80,7 +80,7 @@ class IPAddressProtectorTest extends TestCase
         );
 
         self::assertSame(
-            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1"/>',
+            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1" regex="AwA="/>',
             (new IPAddressProtector($repo))->protect('127.0.0.1', $sourceFormat, $sourceLang, $targetLang)
         );
     }
