@@ -49,7 +49,7 @@ class TaskDeadlineEventHandler
     public function onAfterTaskUserAssocPostAction(Zend_EventManager_Event $event): void
     {
         // We cannot simply overwrite data sent by post - only if explicitly wanted via trigger-param
-        if ($this->isCalculationTriggered($event->getParam('params'))) {
+        if ($this->isCalculationTriggered($_REQUEST)) {
             /* @var editor_Models_TaskUserAssoc $tua */
             $tua = $event->getParam('entity');
             $task = editor_ModelInstances::taskByGuid($tua->getTaskGuid());
