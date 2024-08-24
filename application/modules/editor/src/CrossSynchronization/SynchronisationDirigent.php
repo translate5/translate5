@@ -69,11 +69,13 @@ class SynchronisationDirigent
             ?->cleanupDefaultSynchronisation($source, $target);
     }
 
-    public function cleanupOnConnectionDeleted(LanguageResource $target, int $customerId): void
+    public function cleanupOnCustomerRemovedFromConnection(CrossSynchronizationConnection $connection, int $customerId): void
     {
+        $target = $this->languageResourceRepository->get((int) $connection->getTargetLanguageResourceId());
+
         $this->serviceManager
             ->getSynchronisationService($target->getServiceType())
-            ?->cleanupOnConnectionDeleted($target, $customerId);
+            ?->cleanupOnCustomerRemovedFromConnection($connection, $customerId);
     }
 
     public function queueDefaultSynchronization(CrossSynchronizationConnection $connection): void

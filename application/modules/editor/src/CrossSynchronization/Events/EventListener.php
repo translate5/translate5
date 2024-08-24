@@ -190,10 +190,8 @@ class EventListener
                 throw new RuntimeException('Connection was deleted before clean up was done');
             }
 
-            $target = $this->languageResourceRepository->get((int) $connection->getTargetLanguageResourceId());
-
-            $this->synchronisationDirigent->cleanupOnConnectionDeleted(
-                $target,
+            $this->synchronisationDirigent->cleanupOnCustomerRemovedFromConnection(
+                $connection,
                 (int) $event->connectionCustomer->getCustomerId()
             );
 

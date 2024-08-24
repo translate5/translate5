@@ -65,7 +65,7 @@ interface SynchronisationInterface
 
     public function queueDefaultSynchronisation(CrossSynchronizationConnection $connection): void;
 
-    public function cleanupOnConnectionDeleted(LanguageResource $target, int $customerId): void;
+    public function cleanupOnCustomerRemovedFromConnection(CrossSynchronizationConnection $connection, int $customerId): void;
 
     public function cleanupDefaultSynchronisation(LanguageResource $source, LanguageResource $target): void;
 }

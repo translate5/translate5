@@ -160,7 +160,7 @@ class EventListenerTest extends TestCase
         $synchronizationService->expects($this->once())->method('deleteConnection');
 
         $synchronizationDirigent = $this->createMock(SynchronisationDirigent::class);
-        $synchronizationDirigent->expects($this->once())->method('cleanupOnConnectionDeleted');
+        $synchronizationDirigent->expects($this->once())->method('cleanupOnCustomerRemovedFromConnection');
 
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
         $languageResourceRepository->method('get')->willReturn(

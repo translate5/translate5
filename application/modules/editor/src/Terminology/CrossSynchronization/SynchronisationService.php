@@ -104,7 +104,7 @@ class SynchronisationService implements SynchronisationInterface
         // as of now we don't have functionality of terms synchronization
     }
 
-    public function cleanupOnConnectionDeleted(LanguageResource $target, int $customerId): void
+    public function cleanupOnCustomerRemovedFromConnection(CrossSynchronizationConnection $connection, int $customerId): void
     {
         // as of now we don't have functionality of terms synchronization
     }

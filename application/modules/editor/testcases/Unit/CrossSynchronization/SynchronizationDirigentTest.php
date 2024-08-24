@@ -134,12 +134,19 @@ class SynchronizationDirigentTest extends TestCase
             ['getServiceType', [], 'sourceServiceType'],
         ]);
 
+        $languageResourceRepository->method('get')->willReturn($target);
+
+        $connection = $this->createMock(CrossSynchronizationConnection::class);
+        $connection->method('__call')->willReturnMap([
+            ['getTargetLanguageResourceId', [], 1],
+        ]);
+
         $syncIntegration = $this->createMock(SynchronisationInterface::class);
-        $syncIntegration->expects(self::once())->method('cleanupOnConnectionDeleted');
+        $syncIntegration->expects(self::once())->method('cleanupOnCustomerRemovedFromConnection');
 
         $serviceManager->method('getSynchronisationService')->willReturn($syncIntegration);
 
-        $dirigent->cleanupOnConnectionDeleted($target, 1);
+        $dirigent->cleanupOnCustomerRemovedFromConnection($connection, 1);
     }
 
     public function testQueueDefaultSynchronization(): void
