@@ -78,10 +78,33 @@ class ExportService
 
         $view->addScriptPath(APPLICATION_PATH . '/modules/' . Zend_Registry::get('module') . '/views/scripts/task/');
 
+        $stylesheets = [];
+        foreach ($this->getAdditionalCss() as $css) {
+            $stylesheets[] = 'https://' . $this->config->runtimeOptions->server->name . "/" . $css;
+        }
+        $view->assign('stylesheets', $stylesheets);
         $view->assign('taskUrl', 'https://' . $this->config->runtimeOptions->server->name . '/editor/taskid/' . $task->getId());
         $view->assign('taskName', $task->getTaskName());
         $view->assign('segmentDataTable', $segmentDataTable);
 
         return $view->render('overview.phtml');
+    }
+
+    private function getAdditionalCss(): array
+    {
+        if (empty($this->config->runtimeOptions->publicAdditions)) {
+            return [];
+        }
+
+        $css = $this->config->runtimeOptions->publicAdditions->css;
+        if (empty($css)) {
+            return [];
+        }
+
+        if (is_string($css)) {
+            return [$css];
+        }
+
+        return $css->toArray();
     }
 }
