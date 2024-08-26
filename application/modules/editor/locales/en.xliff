@@ -9992,13 +9992,13 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Sprachübergreifende Synchronisierung von Ressourcen</source>
                 <target>Cross Language Resource synchronisation</target>
             </trans-unit>
-            <trans-unit id='RWluZsO8aHJ1bmc='>
+            <trans-unit id='QXVzZ2FuZ3NzcHJhY2hlIFJlc3NvdXJjZQ=='>
                 <source>Ausgangssprache Ressource</source>
                 <target>Source Language Resource</target>
             </trans-unit>
-            <trans-unit id='QXVzZ2FuZ3NzcHJhY2hlIFJlc3NvdXJjZQ=='>
+            <trans-unit id='WmllbHNwcmFjaGUgUmVzc291cmNl'>
                 <source>Zielsprache Ressource</source>
-                <target>Target Language Resourc</target>
+                <target>Target Language Resource</target>
             </trans-unit>
             <trans-unit id='VmVyYmluZGVuIFNpZQ=='>
                 <source>Verbinden Sie</source>
@@ -10047,6 +10047,19 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
                 <source>Regel mit dieser Priorität existiert bereits</source>
                 <target>Rule with this priority already exists</target>
+            </trans-unit>
+            <trans-unit id='Y3Jvc3NMYW5ndWFnZVJlc291cmNlU3luY2hyb25pemF0aW9uLmVtcHR5VGFibGVUZXh0'>
+                <source>crossLanguageResourceSynchronization.emptyTableText</source>
+                <target>
+This language resource is not yet connected to any other language resource.<br/>
+Connections are created from source language resource to target one.<br/>
+The language resource can only be connected to another language resource if the following conditions are met:<br/>
+- Both language resources have the same language pair<br/>
+- Both language resources are assigned to the same customer<br/>
+- Both language resources have data that can be synchronized, e.g: terms can be converted into a glossary<br/>
+- The target language resource is not yet linked to the other language resource (at the moment we do not support multiple sources)<br/>
+Synchronization always takes place in one direction: source data -> target
+                </target>
             </trans-unit>
             <trans-unit id='U2llIGvDtm5uZW4gZGVuIEt1bmRlbiAie2lkfSIgaGllciBuaWNodCBhbmdlYmVu'>
                 <source>Sie können den Kunden "{id}" hier nicht angeben</source>
