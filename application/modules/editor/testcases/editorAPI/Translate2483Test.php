@@ -137,6 +137,7 @@ class Translate2483Test extends JsonTestAbstract
         $params['target'] = self::$targetLang;
         $params['text'] = self::$sourceText;
 
+        print_r(self::$createdResources);
         // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
         static::api()->getJson('editor/instanttranslateapi/translate', $params);
         $responseBody = json_decode(static::api()->getLastResponse()->getBody());
