@@ -36,8 +36,9 @@ class AdditionalInfoViewData
 {
     private int $columnCount = 0;
 
-    public function __construct(private array $rows = [])
-    {
+    public function __construct(
+        private array $rows = []
+    ) {
         foreach ($rows as $row) {
             $this->validateRow($row);
         }
