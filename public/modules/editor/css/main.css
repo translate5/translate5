@@ -1314,3 +1314,8 @@ div.internal-tag.number span.full::after {
     background-color: rgb(210, 210, 210);
     color: #b6b6b6;
 }
+
+.x-boundlist-item .x-item-disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
