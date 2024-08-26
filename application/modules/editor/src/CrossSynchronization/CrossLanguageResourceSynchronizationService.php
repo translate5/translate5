@@ -82,6 +82,14 @@ class CrossLanguageResourceSynchronizationService
         return $this->connectionRepository->getConnectionsByLrCustomerAssoc($assoc);
     }
 
+    /**
+     * @return iterable<CustomerAssoc>
+     */
+    public function getLrCustomerAssocsBy(CrossSynchronizationConnection $connection, LanguageResource $lr): iterable
+    {
+        return $this->connectionRepository->getLrCustomerAssocsBy($connection, $lr);
+    }
+
     public function createConnection(
         LanguageResource $source,
         LanguageResource $target,

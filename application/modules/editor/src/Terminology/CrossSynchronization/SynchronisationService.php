@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\Terminology\CrossSynchronization;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use Generator;
 use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\Dto\AdditionalInfoViewData;
 use MittagQI\Translate5\CrossSynchronization\LanguagePair;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationType;
@@ -112,5 +113,12 @@ class SynchronisationService implements SynchronisationInterface
     public function cleanupDefaultSynchronisation(LanguageResource $source, LanguageResource $target): void
     {
         // as of now we don't have functionality of terms synchronization
+    }
+
+    public function getAdditionalInfoViewData(
+        CrossSynchronizationConnection $connection,
+        LanguageResource $languageResource
+    ): AdditionalInfoViewData {
+        return new AdditionalInfoViewData();
     }
 }

@@ -61,31 +61,46 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
     {
         $languageResourceId = $this->getRequest()->getParam('languageResource');
 
-        $repo = new CrossSynchronizationConnectionRepository();
+        $syncRepo = new CrossSynchronizationConnectionRepository();
+        $lrRepo = new LanguageResourceRepository();
+        $connectionRepo = new CrossSynchronizationConnectionRepository();
+        $integrationManager = new editor_Services_Manager();
 
         $rows = [];
 
-        foreach ($repo->getAllConnectionsRenderData($languageResourceId) as $row) {
-            $id = $row['id'];
+        foreach ($syncRepo->getAllConnectionsRenderData((int) $languageResourceId) as $row) {
+            $sourceLr = $lrRepo->get((int) $row['sourceLanguageResourceId']);
+            $targetLr = $lrRepo->get((int) $row['targetLanguageResourceId']);
+            $connection = $connectionRepo->getConnection((int) $row['id']);
 
-            if (! isset($rows[$id])) {
-                $rows[$id] = [
-                    'id' => $id,
-                    'sourceLanguageResourceId' => $row['sourceLanguageResourceId'],
-                    'targetLanguageResourceId' => $row['targetLanguageResourceId'],
-                    'sourceLanguageResourceName' => $row['sourceServiceName'] . ': ' . $row['sourceName'],
-                    'targetLanguageResourceName' => $row['targetServiceName'] . ': ' . $row['targetName'],
-                    'sourceLanguage' => $row['sourceLanguage'],
-                    'targetLanguage' => $row['targetLanguage'],
-                    'customers' => [],
-                ];
-            }
+            $additionalInfo = [];
 
-            $rows[$id]['customers'][] = $row['customerName'];
+            $additionalInfo[$sourceLr->getName()] = $integrationManager
+                ->getSynchronisationService($sourceLr->getServiceType())
+                ?->getAdditionalInfoViewData($connection, $sourceLr)
+                ->getRows()
+            ;
+            $additionalInfo[$targetLr->getName()] = $integrationManager
+                ->getSynchronisationService($targetLr->getServiceType())
+                ?->getAdditionalInfoViewData($connection, $targetLr)
+                ->getRows()
+            ;
+
+            $rows[] = [
+                'id' => $row['id'],
+                'sourceLanguageResourceId' => $sourceLr->getId(),
+                'targetLanguageResourceId' => $targetLr->getId(),
+                'sourceLanguageResourceName' => $sourceLr->getServiceName() . ': ' . $sourceLr->getName(),
+                'targetLanguageResourceName' => $targetLr->getServiceName() . ': ' . $targetLr->getName(),
+                'sourceLanguage' => $row['sourceLanguage'],
+                'targetLanguage' => $row['targetLanguage'],
+                'customers' => explode(';', $row['customerNames']),
+                'additionalInfo' => array_filter($additionalInfo),
+            ];
         }
 
-        /** @phpstan-ignore-next-line  */
-        $this->view->rows = array_values($rows);
+        /** @phpstan-ignore-next-line */
+        $this->view->rows = $rows;
         $this->view->total = count($rows);
     }
 
