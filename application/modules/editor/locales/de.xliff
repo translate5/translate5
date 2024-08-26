@@ -9806,9 +9806,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server für den angefragten Dienst ist nicht erreichbar.</target>
             </trans-unit>
-            <trans-unit id='RGllc2VyIEF1ZnRyYWcgd2lyZCBhdXRvbWF0aXNjaCBnZXNjaGxvc3NlbiB3ZW5uIGRpZSBBdWZnYWJlbmZyaXN0ICIlcyIgZXJyZWljaHQgaXN0Lg=='>
-                <source>Dieser Auftrag wird automatisch geschlossen wenn die Aufgabenfrist "%s" erreicht ist.</source>
-                <target>Dieser Auftrag wird automatisch geschlossen wenn die Aufgabenfrist "%s" erreicht ist.</target>
+            <trans-unit id='RGllc2VyIEF1ZnRyYWcgd2lyZCBhdXRvbWF0aXNjaCBiZWltIEVycmVpY2hlbiBkZXIgQXVmZ2FiZW5mcmlzdCBhbSAlcyBnZXNjaGxvc3Nlbi4='>
+                <source>Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.</source>
+                <target>Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.</target>
             </trans-unit>
             <trans-unit id='SGlud2VpczogRWluaWdlIEJlbnV0emVyIGhhYmVuIGluZGl2aWR1ZWxsZSBBdWZnYWJlbmZyaXN0ZW4uIEJpdHRlbiBwcsO8ZmVuIHVuZCBwYXNzZW4gU2llIGRpZXNlIGJlaSBCZWRhcmYgYW4u'>
                 <source>Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.</source>
@@ -9818,11 +9818,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Sprachübergreifende Synchronisierung von Ressourcen</source>
                 <target>Sprachübergreifende Synchronisierung von Ressourcen</target>
             </trans-unit>
-            <trans-unit id='RWluZsO8aHJ1bmc='>
+            <trans-unit id='QXVzZ2FuZ3NzcHJhY2hlIFJlc3NvdXJjZQ=='>
                 <source>Ausgangssprache Ressource</source>
                 <target>Ausgangssprache Ressource</target>
             </trans-unit>
-            <trans-unit id='QXVzZ2FuZ3NzcHJhY2hlIFJlc3NvdXJjZQ=='>
+            <trans-unit id='WmllbHNwcmFjaGUgUmVzc291cmNl'>
                 <source>Zielsprache Ressource</source>
                 <target>Zielsprache Ressource</target>
             </trans-unit>
@@ -9877,6 +9877,19 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='SFRNTC3DnGJlcnNpY2h0IGhlcnVudGVybGFkZW4='>
                 <source>HTML-Übersicht herunterladen</source>
                 <target>HTML-Übersicht herunterladen</target>
+            </trans-unit>
+            <trans-unit id='Y3Jvc3NMYW5ndWFnZVJlc291cmNlU3luY2hyb25pemF0aW9uLmVtcHR5VGFibGVUZXh0'>
+                <source>crossLanguageResourceSynchronization.emptyTableText</source>
+                <target>
+Diese Sprachressource ist noch mit keiner anderen verbunden.<br/>
+Es werden Verbindungen von der Ausgangssprachressource zur Zielressource hergestellt.<br/>
+Die Sprachressource kann nur mit einer anderen Sprachresource verbunden werden, wenn folgendes erfüllt ist:<br/>
+- Beide Sprachressourcen haben dasselbe Sprachenpaar<br/>
+- Beide Sprachressourcen haben sind dem selben Kunden zugewiesen<br/>
+- Beide Sprachressourcen haben Daten, die synchronisiert werden können, z. B.: Begriffe können in ein Glossar umgewandelt werden<br/>
+- Die Ziel-Sprachresource ist noch nicht mit der anderen Sprachresource verbunden (im Moment unterstützen wir keine mehrfachen Quellen)
+Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
+                </target>
             </trans-unit>
         </body>
     </file>

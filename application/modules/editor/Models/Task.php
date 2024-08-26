@@ -996,6 +996,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
+     * Retrieves if the optional deadline-date is set
+     * and the deadline is valid (= AFTER the creation date)
+     */
+    public function hasValidDeadlineDate(): bool
+    {
+        return ! empty($this->getDeadlineDate())
+            && strtotime($this->getDeadlineDate()) > strtotime($this->getCreated());
+    }
+
+    /**
      * Retrieves the file-type-support for a task.
      * Can only be used for saved tasks
      * @throws ZfExtended_Exception
