@@ -137,7 +137,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                 	states = [],
                 	metaData = task ? task.getWorkflowMetaData() : [];
 	            Ext.Object.each(metaData.states, function(key, state) {
-	                states.push({id: key, text: state});
+	                states.push({id: key, text: state, disabled: key === task.USER_STATE_AUTO_FINISH});
 	            });
                 return states;
             }
