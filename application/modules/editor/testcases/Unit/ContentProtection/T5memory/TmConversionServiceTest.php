@@ -2,7 +2,11 @@
 
 namespace MittagQI\Translate5\Test\Unit\ContentProtection\T5memory;
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
+use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use PHPUnit\Framework\TestCase;
 
 class TmConversionServiceTest extends TestCase
@@ -12,9 +16,19 @@ class TmConversionServiceTest extends TestCase
      */
     public function testConvertT5MemoryTagToContent(string $t5memorySegment, string $expected): void
     {
-        $tmConversionService = TmConversionService::create();
+        $contentProtectionRepository = $this->createMock(ContentProtectionRepository::class);
+        $contentProtector = $this->createMock(ContentProtector::class);
+        $languageRepository = $this->createMock(LanguageRepository::class);
+        $languageRulesHashService = $this->createMock(LanguageRulesHashService::class);
 
-        $actual = $tmConversionService->convertT5MemoryTagToContent($t5memorySegment);
+        $service = new TmConversionService(
+            $contentProtectionRepository,
+            $contentProtector,
+            $languageRepository,
+            $languageRulesHashService
+        );
+
+        $actual = $service->convertT5MemoryTagToContent($t5memorySegment);
 
         self::assertSame($expected, $actual);
     }
@@ -40,12 +54,78 @@ class TmConversionServiceTest extends TestCase
 
         yield 'segment with tag-like content in CP tag' => [
             'This is a segment with CP tag <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="*≺*goba*≻*"/>.',
-            'This is a segment with CP tag <goba>.',
+            'This is a segment with CP tag &lt;goba&gt;.',
         ];
 
         yield 'segment with CP tag html entity' => [
             'This is a segment with CP tag <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="&copy;"/>',
-            'This is a segment with CP tag ©',
+            'This is a segment with CP tag &copy;',
+        ];
+
+        yield 'ampersand in the TU' => [
+            'input' => <<<TU
+<tu tuid="64" creationdate="20240429T101513Z" creationid="ITL POSTEDIT ES">
+      <prop type="tmgr:segId">0</prop>
+      <prop type="t5:InternalKey">978:1</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">MASTER_Mover_GA_2024-04_18_DE_bereinigt.idml</prop>
+      <prop type="tmgr:context">a7e4fc30273e5e1a206dd7018ada3d5c_mrk-0</prop>
+      <tuv xml:lang="de">
+        <seg>Maximale &amp; Geschwindigkeit</seg>
+      </tuv>
+      <tuv xml:lang="es">
+        <seg>Velocidad &amp; máxima</seg>
+      </tuv>
+</tu>
+TU,
+            'expected' => <<<TU
+<tu tuid="64" creationdate="20240429T101513Z" creationid="ITL POSTEDIT ES">
+      <prop type="tmgr:segId">0</prop>
+      <prop type="t5:InternalKey">978:1</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">MASTER_Mover_GA_2024-04_18_DE_bereinigt.idml</prop>
+      <prop type="tmgr:context">a7e4fc30273e5e1a206dd7018ada3d5c_mrk-0</prop>
+      <tuv xml:lang="de">
+        <seg>Maximale &amp; Geschwindigkeit</seg>
+      </tuv>
+      <tuv xml:lang="es">
+        <seg>Velocidad &amp; máxima</seg>
+      </tuv>
+</tu>
+TU,
+        ];
+
+        yield 'ampersand in the TU + content protection tag' => [
+            'input' => <<<TU
+<tu tuid="64" creationdate="20240429T101513Z" creationid="ITL POSTEDIT ES">
+      <prop type="tmgr:segId">0</prop>
+      <prop type="t5:InternalKey">978:1</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">MASTER_Mover_GA_2024-04_18_DE_bereinigt.idml</prop>
+      <prop type="tmgr:context">a7e4fc30273e5e1a206dd7018ada3d5c_mrk-0</prop>
+      <tuv xml:lang="de">
+        <seg>Maximale &amp; Geschwindigkeit <t5:n id="1" r="09eIKa6Jq" n="H&amp;M"/></seg>
+      </tuv>
+      <tuv xml:lang="es">
+        <seg>Velocidad &amp; máxima</seg>
+      </tuv>
+</tu>
+TU,
+            'expected' => <<<TU
+<tu tuid="64" creationdate="20240429T101513Z" creationid="ITL POSTEDIT ES">
+      <prop type="tmgr:segId">0</prop>
+      <prop type="t5:InternalKey">978:1</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">MASTER_Mover_GA_2024-04_18_DE_bereinigt.idml</prop>
+      <prop type="tmgr:context">a7e4fc30273e5e1a206dd7018ada3d5c_mrk-0</prop>
+      <tuv xml:lang="de">
+        <seg>Maximale &amp; Geschwindigkeit H&amp;M</seg>
+      </tuv>
+      <tuv xml:lang="es">
+        <seg>Velocidad &amp; máxima</seg>
+      </tuv>
+</tu>
+TU,
         ];
     }
 

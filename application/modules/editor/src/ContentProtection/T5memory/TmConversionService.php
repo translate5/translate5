@@ -48,6 +48,7 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\T5memory;
@@ -77,10 +78,10 @@ class TmConversionService
     private ZfExtended_Logger $logger;
 
     public function __construct(
-        private ContentProtectionRepository $contentProtectionRepository,
-        private ContentProtector $contentProtector,
-        private LanguageRepository $languageRepository,
-        private LanguageRulesHashService $languageRulesHashService
+        private readonly ContentProtectionRepository $contentProtectionRepository,
+        private readonly ContentProtector $contentProtector,
+        private readonly LanguageRepository $languageRepository,
+        private readonly LanguageRulesHashService $languageRulesHashService
     ) {
         $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
         $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
@@ -177,9 +178,34 @@ class TmConversionService
 
     public function convertT5MemoryTagToContent(string $string): string
     {
-        $protectedContent = html_entity_decode(preg_replace(self::fullTagRegex(), '\3', $string));
+        preg_match_all(self::fullTagRegex(), $string, $tags, PREG_SET_ORDER);
 
-        return str_replace(['*≺*', '*≻*'], ['<', '>'], $protectedContent);
+        if (empty($tags)) {
+            return $string;
+        }
+
+        foreach ($tags as $tagWithProps) {
+            $tag = $tagWithProps[0];
+            $protectedContent = html_entity_decode($tagWithProps[3], ENT_XML1);
+            // return < and > from special chars that was used to avoid error in t5memory
+            $protectedContent = str_replace(['*≺*', '*≻*'], ['<', '>'], $protectedContent);
+            // make sure not escape already escaped HTML entities
+            $protectedContent = $this->protectHtmlEntities($protectedContent);
+
+            $string = str_replace($tag, htmlentities($protectedContent, ENT_XML1), $string);
+        }
+
+        return $this->unprotectHtmlEntities($string);
+    }
+
+    private function protectHtmlEntities(string $text): string
+    {
+        return preg_replace('/&(\w{2,8});/', '**\1**', $text);
+    }
+
+    private function unprotectHtmlEntities(string $text): string
+    {
+        return preg_replace('/\*\*(\w{2,8})\*\*/', '&\1;', $text);
     }
 
     public function convertContentTagToT5MemoryTag(string $queryString, bool $isSource, &$numberTagMap = []): string
