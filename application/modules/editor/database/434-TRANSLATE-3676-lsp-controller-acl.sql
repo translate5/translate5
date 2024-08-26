@@ -19,12 +19,19 @@
 --  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
 --  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
--- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+-- 	            http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 --
 -- END LICENSE AND COPYRIGHT
 
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES
    ('editor', 'pm', 'editor_lsp', 'all'),
    ('editor', 'jobCoordinator', 'editor_lsp', 'all')
+;
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES
+    ('editor', 'pm', 'frontend', 'lspAdministration'),
+    ('editor', 'jobCoordinator', 'frontend', 'lspAdministration')
 ;
 

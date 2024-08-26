@@ -26,14 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
+use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\DTO\UpdateData;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\LspService;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\LSP\LspService;
+use MittagQI\Translate5\LSP\LspUserRepository;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LspRepository;
 
@@ -61,7 +64,11 @@ class editor_LspController extends ZfExtended_RestController
         parent::init();
         $this->lspService = LspService::create();
         $this->customerRepository = new CustomerRepository();
-        $this->coordinatorRepository = new JobCoordinatorRepository(LspRepository::create());
+        $lspRepository = LspRepository::create();
+        $this->coordinatorRepository = new JobCoordinatorRepository(
+            $lspRepository,
+            new LspUserRepository($lspRepository),
+        );
     }
 
     public function indexAction()
@@ -109,7 +116,7 @@ class editor_LspController extends ZfExtended_RestController
             $this->lspService->assignCustomer($lsp, $customer);
         }
 
-        $this->view->rows = (object) $this->lspService->buildViewData($lsp);
+        $this->view->rows = (object) $this->lspService->buildViewData($user, $lsp);
     }
 
     public function putAction()
@@ -127,7 +134,6 @@ class editor_LspController extends ZfExtended_RestController
         ZfExtended_UnprocessableEntity::addCodes([
             'E2003' => 'Wrong value',
         ], 'editor.lsp');
-
 
         $authCoordinator = $this->coordinatorRepository->findByUser($authUser);
         $customers = $this->getNewCustomers($authCoordinator);
@@ -171,6 +177,10 @@ class editor_LspController extends ZfExtended_RestController
 
     public function getNewCustomers(?JobCoordinator $coordinator): array
     {
+        if (empty($this->data['customerIds'])) {
+            return [];
+        }
+
         try {
             $customers = $this->customerRepository->getList(...$this->data['customerIds']);
 
