@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_Customer_Customer;
+use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderCustomerTable;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
@@ -57,7 +57,6 @@ class LspRepository
     }
 
     /**
-     * @param int $id
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function get(int $id): LanguageServiceProvider
@@ -78,9 +77,35 @@ class LspRepository
         $lsp->delete();
     }
 
+    public function findCustomerAssignment(
+        LanguageServiceProvider $lsp,
+        Customer $customer,
+    ): ?LanguageServiceProviderCustomer {
+        $model = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
+        $db = $model->db;
+        $select = $db->select()
+            ->where('lspId = ?', $lsp->getId())
+            ->where('customerId = ?', $customer->getId());
+
+        $row = $db->fetchRow($select);
+
+        if (! $row) {
+            return null;
+        }
+
+        $model->init($row);
+
+        return $model;
+    }
+
     public function saveCustomerAssignment(LanguageServiceProviderCustomer $lspCustomer): void
     {
         $lspCustomer->save();
+    }
+
+    public function deleteCustomerAssignment(LanguageServiceProviderCustomer $lspCustomer): void
+    {
+        $lspCustomer->delete();
     }
 
     /**
@@ -119,8 +144,12 @@ class LspRepository
 
         $select = $userDb->select()
             ->setIntegrityCheck(false)
-            ->from(['user' => $user->db->info($user->db::NAME)])
-            ->join(['lspToUser' => $lspToUserTable], 'user.id = lspToUser.userId', [])
+            ->from([
+                'user' => $user->db->info($user->db::NAME),
+            ])
+            ->join([
+                'lspToUser' => $lspToUserTable,
+            ], 'user.id = lspToUser.userId', [])
             ->where('lspToUser.lspId = ?', $lsp->getId());
 
         $rows = $userDb->fetchAll($select);
@@ -137,11 +166,11 @@ class LspRepository
     }
 
     /**
-     * @return iterable<editor_Models_Customer_Customer>
+     * @return iterable<Customer>
      */
     public function getCustomers(LanguageServiceProvider $lsp): iterable
     {
-        $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+        $customer = ZfExtended_Factory::get(Customer::class);
         $lspToCustomerTable = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class)
             ->db
             ->info(LanguageServiceProviderCustomerTable::NAME);
@@ -149,8 +178,12 @@ class LspRepository
 
         $select = $customerDb->select()
             ->setIntegrityCheck(false)
-            ->from(['customer' => $customer->db->info($customer->db::NAME)])
-            ->join(['lspToCustomer' => $lspToCustomerTable], 'customer.id = lspToCustomer.customerId', [])
+            ->from([
+                'customer' => $customer->db->info($customer->db::NAME),
+            ])
+            ->join([
+                'lspToCustomer' => $lspToCustomerTable,
+            ], 'customer.id = lspToCustomer.customerId', [])
             ->where('lspToCustomer.lspId = ?', $lsp->getId());
 
         $rows = $customerDb->fetchAll($select);

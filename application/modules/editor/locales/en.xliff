@@ -10069,6 +10069,10 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</source>
                 <target>The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".</target>
             </trans-unit>
+            <trans-unit id='TFNQ'>
+                <source>LSP</source>
+                <target>LSP</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

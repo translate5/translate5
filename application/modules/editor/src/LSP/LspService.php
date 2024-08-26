@@ -30,17 +30,17 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP;
 
+use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LSP\DTO\UpdateData;
+use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;
 use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
-use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
+use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use ZfExtended_Factory;
@@ -69,7 +69,7 @@ class LspService
 
         return new self(
             $lspRepository,
-            new JobCoordinatorRepository($lspRepository),
+            new JobCoordinatorRepository($lspRepository, new LspUserRepository($lspRepository)),
             EventDispatcher::create(),
             new UserRepository(),
         );
@@ -100,8 +100,8 @@ class LspService
         $coordinatorCustomers = $coordinator->user->getCustomersArray();
 
         foreach ($customers as $customer) {
-            if (!in_array($customer->getId(), $coordinatorCustomers)) {
-                throw new CustomerDoesNotBelongToJobCoordinatorException((int)$customer->getId(), $coordinator->guid);
+            if (! in_array($customer->getId(), $coordinatorCustomers)) {
+                throw new CustomerDoesNotBelongToJobCoordinatorException((int) $customer->getId(), $coordinator->guid);
             }
         }
     }
@@ -116,12 +116,12 @@ class LspService
         $lspCustomersIds = [];
 
         foreach ($lspCustomers as $customer) {
-            $lspCustomersIds[] = (int)$customer->getId();
+            $lspCustomersIds[] = (int) $customer->getId();
         }
 
         foreach ($customers as $customer) {
-            if (!in_array($customer->getId(), $lspCustomersIds)) {
-                throw new CustomerDoesNotBelongToLspException((int)$customer->getId(), (int)$lsp->getId());
+            if (! in_array($customer->getId(), $lspCustomersIds)) {
+                throw new CustomerDoesNotBelongToLspException((int) $customer->getId(), (int) $lsp->getId());
             }
         }
     }
@@ -134,19 +134,20 @@ class LspService
         $roles = $user->getRoles();
 
         if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
-            return $this->buildViewListData($this->lspRepository->getAll());
+            return $this->buildViewListData($user, $this->lspRepository->getAll());
         }
 
         if (in_array(Roles::PM, $roles)) {
-            return $this->buildViewListData($this->lspRepository->getForPmRole());
+            return $this->buildViewListData($user, $this->lspRepository->getForPmRole());
         }
 
-        if (!in_array(Roles::JOB_COORDINATOR, $roles)) {
+        if (! in_array(Roles::JOB_COORDINATOR, $roles)) {
             return [];
         }
 
         try {
             return $this->buildViewListData(
+                $user,
                 $this->lspRepository->getForJobCoordinator(
                     $this->jobCoordinatorRepository->getByUser($user)
                 )
@@ -159,7 +160,7 @@ class LspService
     /**
      * @return LspRow
      */
-    public function buildViewData(LanguageServiceProvider $lsp): array
+    public function buildViewData(ZfExtended_Models_User $viewer, LanguageServiceProvider $lsp): array
     {
         $coordinators = $this->jobCoordinatorRepository->getByLSP($lsp);
         /**
@@ -182,7 +183,7 @@ class LspService
 
         foreach ($users as $user) {
             $usersData[] = [
-                'id' => (int)$user->getId(),
+                'id' => (int) $user->getId(),
                 'name' => $user->getUsernameLong(),
             ];
         }
@@ -195,14 +196,16 @@ class LspService
 
         foreach ($customers as $customer) {
             $customersData[] = [
-                'id' => (int)$customer->getId(),
+                'id' => (int) $customer->getId(),
                 'name' => $customer->getName(),
             ];
         }
 
         return [
-            'id' => (int)$lsp->getId(),
+            'id' => (int) $lsp->getId(),
             'name' => $lsp->getName(),
+            'canEdit' => $this->doesUserHaveAccessToLsp($viewer, $lsp),
+            'canDelete' => $this->doesUserHaveAccessToLsp($viewer, $lsp),
             'description' => $lsp->getDescription(),
             'coordinators' => $coordinatorData,
             'users' => $usersData,
@@ -217,7 +220,7 @@ class LspService
         $lsp->setDescription($description);
 
         if (null !== $coordinator) {
-            $lsp->setParentId((int)$coordinator->lsp->getId());
+            $lsp->setParentId((int) $coordinator->lsp->getId());
         }
 
         $this->lspRepository->save($lsp);
@@ -228,7 +231,7 @@ class LspService
     public function assignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
         $lspCustomer = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
-        $lspCustomer->setLspId((int)$lsp->getId());
+        $lspCustomer->setLspId((int) $lsp->getId());
         $lspCustomer->setCustomerId($customer->getId());
 
         $this->lspRepository->saveCustomerAssignment($lspCustomer);
@@ -238,11 +241,13 @@ class LspService
 
     public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
-        $lspCustomer = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
-        $lspCustomer->setLspId((int)$lsp->getId());
-        $lspCustomer->setCustomerId($customer->getId());
+        $lspCustomer = $this->lspRepository->findCustomerAssignment($lsp, $customer);
 
-        $this->lspRepository->saveCustomerAssignment($lspCustomer);
+        if (! $lspCustomer) {
+            return;
+        }
+
+        $this->lspRepository->deleteCustomerAssignment($lspCustomer);
 
         $this->eventDispatcher->dispatch(new CustomerUnassignedFromLspEvent($lsp, $customer));
     }
@@ -252,8 +257,8 @@ class LspService
      */
     public function updateLsp(LanguageServiceProvider $lsp, UpdateData $data): void
     {
-        if (!$lsp->isDirectLsp() && !empty($data->customers)) {
-            $parentLsp = $this->getLsp((int)$lsp->getParentId());
+        if (! $lsp->isDirectLsp() && ! empty($data->customers)) {
+            $parentLsp = $this->getLsp((int) $lsp->getParentId());
             $this->validateCustomersAreSubsetForLSP($parentLsp, $data->customers);
         }
 
@@ -262,19 +267,23 @@ class LspService
 
         $this->lspRepository->save($lsp);
 
-        $newCustomerIdsSet = array_map(fn(Customer $customer) => $customer->getId(), $data->customers);
+        $newCustomerIdsSet = array_map(fn (Customer $customer) => $customer->getId(), $data->customers);
 
         $lspCustomers = $this->lspRepository->getCustomers($lsp);
         $lspCustomersIds = [];
 
         foreach ($lspCustomers as $customer) {
-            if (!in_array($customer->getId(), $newCustomerIdsSet)) {
+            if (! in_array($customer->getId(), $newCustomerIdsSet)) {
                 $this->unassignCustomer($lsp, $customer);
+
+                continue;
             }
+
+            $lspCustomersIds[] = $customer->getId();
         }
 
         foreach ($data->customers as $customer) {
-            if (!in_array($customer->getId(), $lspCustomersIds)) {
+            if (! in_array($customer->getId(), $lspCustomersIds)) {
                 $this->assignCustomer($lsp, $customer);
             }
         }
@@ -299,12 +308,12 @@ class LspService
      * @param iterable<LanguageServiceProvider> $lsps
      * @return LspRow[]
      */
-    private function buildViewListData(iterable $lsps): array
+    private function buildViewListData(ZfExtended_Models_User $viewer, iterable $lsps): array
     {
         $data = [];
 
         foreach ($lsps as $lsp) {
-            $data[] = $this->buildViewData($lsp);
+            $data[] = $this->buildViewData($viewer, $lsp);
         }
 
         return $data;
