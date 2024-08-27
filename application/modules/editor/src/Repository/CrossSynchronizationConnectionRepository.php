@@ -213,6 +213,9 @@ class CrossSynchronizationConnectionRepository
         $assoc = ZfExtended_Factory::get(CustomerAssoc::class);
         $db = $assoc->db;
         $connectionTable = ZfExtended_Factory::get(CrossSynchronizationConnection::class)->db->info($db::NAME);
+        $connectionCustomerTable = ZfExtended_Factory::get(CrossSynchronizationConnectionCustomer::class)
+            ->db
+            ->info($db::NAME);
 
         $select = $db->select()
             ->setIntegrityCheck(false)
@@ -227,6 +230,13 @@ class CrossSynchronizationConnectionRepository
                     'connections' => $connectionTable,
                 ],
                 'assocs.languageResourceId = connections.sourceLanguageResourceId OR assocs.languageResourceId = connections.targetLanguageResourceId',
+                []
+            )
+            ->join(
+                [
+                    'connectionCustomers' => $connectionCustomerTable,
+                ],
+                'connectionCustomers.connectionId = connections.id AND assocs.customerId = connectionCustomers.customerId',
                 []
             )
             ->where('connections.id = ?', $connection->getId())
