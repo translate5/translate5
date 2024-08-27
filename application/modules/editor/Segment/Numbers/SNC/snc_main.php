@@ -75,6 +75,7 @@ function numbers_check($source, $target, $sourceLang, $targetLang, editor_Models
         'Untersch. Zeichen/Formatierung für Zahlen-Intervall' => 'num11',
         '1000er-Trenner in' => 'num12',
         'Dubiose Zahl' => 'num13',
+        '(Ggf. fehlerhafter) Trenner in' => 'num14',
     ];
 
     $res = current(current(current($res ?? [[]])));

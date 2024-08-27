@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
+
 /***
  *
  */
@@ -59,8 +61,11 @@ class editor_TermcollectionController extends ZfExtended_RestController
 
         if ($this->validate()) {
             $customerIds = explode(',', $this->data->customerIds);
-            $collection = $this->entity->create($this->data->name, $customerIds);
-            $this->entity->setId($collection->getId());
+            $collection = $this->entity->create($this->data->name);
+
+            CustomerAssocService::create()->associateCustomers((int) $collection->getId(), $customerIds);
+
+            $this->entity->setId((int) $collection->getId());
             $this->view->rows = $this->entity->getDataObject();
         }
     }
@@ -72,6 +77,25 @@ class editor_TermcollectionController extends ZfExtended_RestController
     {
         parent::decodePutData();
         unset($this->data->langResUuid, $this->data->specificId);
+    }
+
+    public function deleteAction()
+    {
+        $this->entityLoad();
+
+        $this->processClientReferenceVersion();
+
+        try {
+            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [$this->entity]);
+            $remover->remove(true);
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint) {
+            //if there are associated tasks we can not delete the language resource
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1158' => 'A Language Resources cannot be deleted as long as tasks are assigned to this Language Resource.',
+            ], 'editor.languageresources');
+
+            throw new ZfExtended_Models_Entity_Conflict('E1158');
+        }
     }
 
     /***
@@ -137,7 +161,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
         $languages = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languages editor_Models_Languages */
         $languages->loadByRfc5646($lang);
-        $langs = $languages->getFuzzyLanguages($languages->getId());
+        $langs = $languages->getFuzzyLanguages((int) $languages->getId());
 
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */

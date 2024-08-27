@@ -44,7 +44,13 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
             '#metaInfoForm': {
                 afterrender: 'metaInfoFormAfterRenderHandler'
             }
-        }
+        },
+        controller: {
+            '#Segments': {
+                beforeSaveCall: 'onSegmentSaved'
+            },
+        },
+
     },
 
     refs: [ {
@@ -135,4 +141,12 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
         }
     },
 
+    /**
+     * Reload term portlet due to detected terms might change on segment change
+     *
+     * @param segment
+     */
+    onSegmentSaved: function(segment) {
+        this.loadTermPanel(segment.getId());
+    }
 });

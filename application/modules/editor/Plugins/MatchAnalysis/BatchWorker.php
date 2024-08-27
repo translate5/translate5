@@ -83,7 +83,13 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
             $targetLang = $task->getRelaisLang();
         }
 
-        $connector = $manager->getConnector($languageResource, $task->getSourceLang(), $targetLang, $task->getConfig());
+        $connector = $manager->getConnector(
+            $languageResource,
+            (int) $task->getSourceLang(),
+            (int) $targetLang,
+            $task->getConfig(),
+            (int) $task->getCustomerId(),
+        );
         /* @var editor_Services_Connector $connector */
 
         // set the worker user for the connector. This is required for the resource usage log

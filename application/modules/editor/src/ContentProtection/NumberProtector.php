@@ -106,7 +106,7 @@ class NumberProtector implements ProtectorInterface
         array $protectors,
         private ContentProtectionRepository $numberRepository,
         private LanguageRepository $languageRepository,
-        private ZfExtended_Logger $logger
+        private ZfExtended_Logger $logger,
     ) {
         foreach ($protectors as $protector) {
             $this->protectors[$protector::getType()] = $protector;
@@ -153,14 +153,14 @@ class NumberProtector implements ProtectorInterface
     public static function fullTagRegex(): string
     {
         return sprintf(
-            '/<%s type="(.+)" name="(.+)" source="(.+)" iso="(.+)" target="(.+)"\s?\/>/U',
+            '/<%s type="(.+)" name="(.+)" source="(.+)" iso="(.+)" target="(.+)"\s*(regex="(.+)")?\s?\/>/U',
             self::TAG_NAME
         );
     }
 
     public static function create(
         ?ContentProtectionRepository $numberRepository = null,
-        ?ZfExtended_Logger $logger = null
+        ?ZfExtended_Logger $logger = null,
     ): self {
         $numberRepository = $numberRepository ?: new ContentProtectionRepository();
         $logger = $logger ?: Zend_Registry::get('logger')->cloneMe('translate5.content_protection');
@@ -235,7 +235,7 @@ class NumberProtector implements ProtectorInterface
         int &$shortTagIdent,
         bool $collectTagNumbers = false,
         array &$shortcutNumberMap = [],
-        array &$xmlChunks = []
+        array &$xmlChunks = [],
     ): string {
         $xml = ZfExtended_Factory::get(XmlParser::class, [[
             'normalizeTags' => false,
@@ -261,7 +261,7 @@ class NumberProtector implements ProtectorInterface
         string $segment,
         int &$shortTagIdent,
         bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = []
+        array &$shortcutNumberMap = [],
     ): array {
         $xmlChunks = [];
         $this->convertToInternalTags($segment, $shortTagIdent, $collectTagNumbers, $shortcutNumberMap, $xmlChunks);
@@ -272,7 +272,7 @@ class NumberProtector implements ProtectorInterface
     public function convertToInternalTagsWithShortcutNumberMap(
         string $segment,
         int &$shortTagIdent,
-        array $shortcutNumberMap
+        array $shortcutNumberMap,
     ): string {
         return $this->convertToInternalTags($segment, $shortTagIdent, shortcutNumberMap: $shortcutNumberMap);
     }
@@ -292,11 +292,11 @@ class NumberProtector implements ProtectorInterface
             throw new \LogicException("Provided langs are not present in DB: $sourceLangId, $targetLangId");
         }
 
-        $this->loadXML("<node>$textNode</node>");
-
-        if (! $this->hasEntityToProtect($this->document->textContent, $sourceLangId)) {
+        if (! $this->hasEntityToProtect($textNode, $sourceLangId)) {
             return $textNode;
         }
+
+        $this->loadXML("<node>$textNode</node>");
 
         $tries = 0;
 
@@ -309,38 +309,10 @@ class NumberProtector implements ProtectorInterface
             // then we'll need to do that in a couple of tries because in current case will get result as:
             // string <number ... source="12" ... /> 145 <number ... source="67" ... /> string
             while ($tries++ < 2) {
-                if (! preg_match_all($protectionDto->regex, $this->document->textContent, $matches)) {
+                if (! $this->hasProcessableMatches($textNode, $protectionDto)) {
                     $tries = 0;
 
                     continue 2;
-                }
-
-                if (! $protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
-                    $this->loadXML(
-                        preg_replace_callback(
-                            $protectionDto->regex,
-                            fn (array $matches) => str_replace(
-                                $matches[$protectionDto->matchId],
-                                sprintf('<skip content="%s"/>', $matches[$protectionDto->matchId]),
-                                $matches[0]
-                            ),
-                            $this->getCurrentTextNode()
-                        )
-                    );
-
-                    if (! isset($this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"])) {
-                        $this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"] = true;
-                        $this->logger->warn(
-                            'E1585',
-                            'Input rule of type "{type}" and name "{name}" does not have appropriate output rule',
-                            [
-                                'type' => $protectionDto->type,
-                                'name' => $protectionDto->name,
-                            ]
-                        );
-                    }
-
-                    continue;
                 }
 
                 $this->processElement($this->document->documentElement, $protectionDto, $sourceLang, $targetLang);
@@ -358,11 +330,56 @@ class NumberProtector implements ProtectorInterface
         return preg_replace('/<skip content="(.+)"\/>/U', '$1', $matches[1]);
     }
 
+    private function hasProcessableMatches(string $textNode, ContentProtectionDto $protectionDto): bool
+    {
+        // In case we got text like: "string &lt;goba&gt;string"
+        // and user expects us to protect <goba> in: "string <goba> string"
+        // entity encoding is part of upper processing logic
+        $decoded = html_entity_decode($textNode, ENT_XML1);
+
+        if (
+            ! preg_match_all($protectionDto->regex, $this->document->textContent, $matches)
+            && ! preg_match_all($protectionDto->regex, $decoded, $matches)
+        ) {
+            return false;
+        }
+
+        if ($protectionDto->keepAsIs || ! empty($protectionDto->outputFormat)) {
+            return true;
+        }
+
+        $this->loadXML(
+            preg_replace_callback(
+                $protectionDto->regex,
+                fn (array $matches) => str_replace(
+                    $matches[$protectionDto->matchId],
+                    sprintf('<skip content="%s"/>', $matches[$protectionDto->matchId]),
+                    $matches[0]
+                ),
+                $this->getCurrentTextNode()
+            )
+        );
+
+        if (! isset($this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"])) {
+            $this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"] = true;
+            $this->logger->warn(
+                'E1585',
+                'Input rule of type "{type}" and name "{name}" does not have appropriate output rule',
+                [
+                    'type' => $protectionDto->type,
+                    'name' => $protectionDto->name,
+                ]
+            );
+        }
+
+        return false;
+    }
+
     public function unprotect(string $content, bool $isSource): string
     {
         return preg_replace_callback(
             sprintf('/<%s.+source="(.+)".+target="(.+)?"\/>/U', self::TAG_NAME),
-            fn (array $match): string => $isSource ? $match[1] : ($match[2] ?? $match[1]),
+            fn (array $match): string => html_entity_decode($isSource ? $match[1] : ($match[2] ?? $match[1])),
             $content
         );
     }
@@ -378,7 +395,7 @@ class NumberProtector implements ProtectorInterface
         array $opener,
         bool $collectTagNumbers,
         int &$shortTagIdent,
-        array &$shortcutNumberMap = []
+        array &$shortcutNumberMap = [],
     ): NumberTag {
         $source = $xml->getAttribute($opener['attributes'], 'source', null);
         $target = $xml->getAttribute($opener['attributes'], 'target', null);
@@ -501,7 +518,7 @@ class NumberProtector implements ProtectorInterface
         DOMNode $element,
         ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang
+        ?editor_Models_Languages $targetLang,
     ): void {
         // we can't remove them in protectNumbers() because it will break `$element->childNodes` iterator,
         // so we remove them after and replace original text node with a couple of generated nodes in protectNumbers()
@@ -530,15 +547,32 @@ class NumberProtector implements ProtectorInterface
         DOMCharacterData $text,
         ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang
+        ?editor_Models_Languages $targetLang,
     ): bool {
-        if (! preg_match_all($langFormat->regex, $text->textContent, $matches)) {
+        // In case we got text like: "string &lt;goba&gt;string"
+        // and user expects us to protect <goba> in: "string <goba> string"
+        // entity encoding is part of upper processing logic
+        $decoded = html_entity_decode($this->unprotectHtmlEntities($text->textContent), ENT_XML1);
+
+        if (preg_match_all($langFormat->regex, $text->textContent, $matches)) {
+            $parts = preg_split($langFormat->regex, $text->textContent);
+        } elseif (preg_match_all($langFormat->regex, $decoded, $matches)) {
+            $parts = [];
+
+            foreach (preg_split($langFormat->regex, $decoded) as $part) {
+                $parts[] = htmlentities($part, ENT_XML1);
+            }
+        } else {
             return false;
         }
 
         $wholeMatches = $matches[0];
+
+        if (! isset($matches[$langFormat->matchId])) {
+            return false;
+        }
+
         $numbers = $matches[$langFormat->matchId];
-        $parts = preg_split($langFormat->regex, $text->textContent);
 
         $matchCount = count($numbers);
 
@@ -567,7 +601,7 @@ class NumberProtector implements ProtectorInterface
         string $wholeMatch,
         ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang
+        ?editor_Models_Languages $targetLang,
     ): iterable {
         if (! isset($this->protectedNumbers[$number])) {
             try {
@@ -600,17 +634,23 @@ class NumberProtector implements ProtectorInterface
     private function loadXML(string $textNode): void
     {
         // protect entities
-        $this->document->loadXML(preg_replace('/&(\w{2,8});/', '**\1**', $textNode));
+        $this->document->loadXML($this->protectHtmlEntities($textNode));
         // loadXML resets encoding so we setting it here at each iteration
         $this->document->encoding = 'utf-8';
     }
 
     private function getCurrentTextNode(): string
     {
-        return preg_replace(
-            '/\*\*(\w{2,8})\*\*/',
-            '&\1;',
-            $this->document->saveXML($this->document->documentElement)
-        );
+        return $this->unprotectHtmlEntities($this->document->saveXML($this->document->documentElement));
+    }
+
+    private function protectHtmlEntities(string $text): string
+    {
+        return preg_replace('/&(\w{2,8});/', '**\1**', $text);
+    }
+
+    private function unprotectHtmlEntities(string $text): string
+    {
+        return preg_replace('/\*\*(\w{2,8})\*\*/', '&\1;', $text);
     }
 }

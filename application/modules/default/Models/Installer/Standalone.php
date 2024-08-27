@@ -67,6 +67,7 @@ class Models_Installer_Standalone
      * applicationState    → deprecated status
      * updateCheck         → deprecated status
      * license-ignore      → ignore licenses, for automation
+     * auto-activate-only-public-plugins → if true, enable only public plugins automatically
      * applicationZipOverride → path to zip file
      * db::host            → db host
      * db::username        → db username
@@ -128,6 +129,7 @@ class Models_Installer_Standalone
         $saInstaller->initApplication(); //obsolete in CLI context
         $saInstaller->postInstallation();
         $saInstaller->updateDb(); //this does also cache cleaning!
+        $saInstaller->autoActivatePlugins();
         $saInstaller->checkDb();
         $saInstaller->done();
     }
@@ -140,6 +142,7 @@ class Models_Installer_Standalone
      */
     public static function developerInstall(array $options = []): void
     {
+        $options['auto-activate-only-public-plugins'] = true;
         //initially we have to load the locales from the environment
         setlocale(LC_ALL, '');
         $saInstaller = new self(getcwd(), $options);
@@ -157,6 +160,7 @@ class Models_Installer_Standalone
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
         $saInstaller->updateDb(); //this does also cache cleaning!
+        $saInstaller->autoActivatePlugins();
         $saInstaller->checkDb();
         $saInstaller->done();
     }
@@ -462,6 +466,27 @@ class Models_Installer_Standalone
             $db = Zend_Db::factory($config->resources->db);
             $db->query("update Zf_configuration set value = ? where name = 'runtimeOptions.server.name'", $this->hostname);
         }
+    }
+
+    /**
+     * Activate plugins that should be active/enabled by default
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    protected function autoActivatePlugins(): void
+    {
+        $allowedPlugins = null;
+        if ($this->options['auto-activate-only-public-plugins'] ?? false) {
+            $allowedPlugins = [ZfExtended_Plugin_Abstract::TYPE_PUBLIC];
+        }
+        /* @var $pluginmanager ZfExtended_Plugin_Manager */
+        $pluginmanager = \Zend_Registry::get('PluginManager');
+        $pluginmanager->bootstrap();
+        $activated = $pluginmanager->activateEnabledByDefault($allowedPlugins);
+        echo join("\n", $activated) . "\n";
     }
 
     /**

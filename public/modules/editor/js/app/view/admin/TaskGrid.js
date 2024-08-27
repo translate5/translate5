@@ -314,7 +314,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             states = [],
             config,
             //we must have here an own ordered list of states to be filtered
-            userStates = ['open', 'waiting', 'finished', 'unconfirmed'],//TODO get me from backend
+            userStates = ['open', 'waiting', 'finished', 'unconfirmed','auto-finish'],//TODO get me from backend
             stateFilterOrder = ['open', 'locked', 'end', 'unconfirmed', 'import', 'error'],
             relaisLanguages = Ext.Array.clone(Editor.data.languages),
             customColumns = Editor.controller.admin.TaskCustomField.getGridColumnsFor('taskGrid'),

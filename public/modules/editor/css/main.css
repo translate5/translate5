@@ -795,6 +795,7 @@ a.x-btn span.task-confirmation {
 .ico-tm-specific {background-image: url(../images/processing.png); background-repeat:no-repeat; background-position:50% 50%;}
 .ico-tm-converseTm {background-image: url(../images/exclamation.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-converseTm-inProgress {background-image: url(../images/book_processing.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-sync {background-image: url(../images/book_refresh.png); background-repeat:no-repeat; background-position:center;}
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */
@@ -1312,4 +1313,9 @@ div.internal-tag.number span.full::after {
 .disabled-row {
     background-color: rgb(210, 210, 210);
     color: #b6b6b6;
+}
+
+.x-boundlist-item .x-item-disabled {
+    color: #ccc;
+    cursor: not-allowed;
 }

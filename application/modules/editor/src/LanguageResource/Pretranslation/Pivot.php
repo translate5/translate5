@@ -127,7 +127,8 @@ class Pivot
                     $languageresource,
                     (int) $this->task->getSourceLang(),
                     (int) $this->task->getRelaisLang(),
-                    $this->task->getConfig()
+                    $this->task->getConfig(),
+                    (int) $this->task->getCustomerId(),
                 );
 
                 // set the analysis running user to the connector

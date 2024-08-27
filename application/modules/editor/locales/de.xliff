@@ -9028,6 +9028,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</source>
                 <target>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</target>
             </trans-unit>
+            <trans-unit id='KEdnZi4gZmVobGVyaGFmdGVyKSBUcmVubmVyIGF1cyBRdWVsbGUgdW52ZXLDpG5kZXJ0IGluIFppZWwgw7xiZXJub21tZW4='>
+                <source>(Ggf. fehlerhafter) Trenner aus Quelle unverändert in Ziel übernommen</source>
+                <target>(Ggf. fehlerhafter) Trenner aus Quelle unverändert in Ziel übernommen</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgcHLDvGZlbiwgb2IgZXMgc2ljaCB1bSBlaW5lIGVjaHRlIFphaGwgdnMuIGVpbmUgUHJvZHVrdG51bW1lciBvLsOkLiBoYW5kZWx0LiBCZWkgdmVyd2VuZGV0ZW0gVHJlbm5lciBpbiBlaW5lciBQcm9kdWt0bnVtbWVyIG8uw6QuIGluIGRlciBRdWVsbGUgYml0dGUgaWdub3JpZXJlbg=='>
+                <source>Bitte prüfen, ob es sich um eine echte Zahl vs. eine Produktnummer o.ä. handelt. Bei verwendetem Trenner in einer Produktnummer o.ä. in der Quelle bitte ignorieren</source>
+                <target>Bitte prüfen, ob es sich um eine echte Zahl vs. eine Produktnummer o.ä. handelt. Bei verwendetem Trenner in einer Produktnummer o.ä. in der Quelle bitte ignorieren</target>
+            </trans-unit>
             <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='>
                 <source>taskType::termtranslation</source>
                 <target>Terminologieübersetzungsprojekt</target>
@@ -9790,9 +9798,69 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
                 <target>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</target>
             </trans-unit>
+            <trans-unit id="YWxsb3dfZG93bmxvYWRfcG9wdXBfYWxlcnQ=">
+                <source>allow_download_popup_alert</source>
+                <target>Bitte erlauben Sie Popups für diese Seite, um die Datei automatisch herunterzuladen.</target>
+            </trans-unit>
             <trans-unit id='U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4='>
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server für den angefragten Dienst ist nicht erreichbar.</target>
+            </trans-unit>
+            <trans-unit id='RGllc2VyIEF1ZnRyYWcgd2lyZCBhdXRvbWF0aXNjaCBiZWltIEVycmVpY2hlbiBkZXIgQXVmZ2FiZW5mcmlzdCBhbSAlcyBnZXNjaGxvc3Nlbi4='>
+                <source>Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.</source>
+                <target>Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.</target>
+            </trans-unit>
+            <trans-unit id='SGlud2VpczogRWluaWdlIEJlbnV0emVyIGhhYmVuIGluZGl2aWR1ZWxsZSBBdWZnYWJlbmZyaXN0ZW4uIEJpdHRlbiBwcsO8ZmVuIHVuZCBwYXNzZW4gU2llIGRpZXNlIGJlaSBCZWRhcmYgYW4u'>
+                <source>Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.</source>
+                <target>Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.</target>
+            </trans-unit>
+            <trans-unit id='U3ByYWNow7xiZXJncmVpZmVuZGUgU3luY2hyb25pc2llcnVuZyB2b24gUmVzc291cmNlbg=='>
+                <source>Sprachübergreifende Synchronisierung von Ressourcen</source>
+                <target>Sprachübergreifende Synchronisierung von Ressourcen</target>
+            </trans-unit>
+            <trans-unit id='QXVzZ2FuZ3NzcHJhY2hlIFJlc3NvdXJjZQ=='>
+                <source>Ausgangssprache Ressource</source>
+                <target>Ausgangssprache Ressource</target>
+            </trans-unit>
+            <trans-unit id='WmllbHNwcmFjaGUgUmVzc291cmNl'>
+                <source>Zielsprache Ressource</source>
+                <target>Zielsprache Ressource</target>
+            </trans-unit>
+            <trans-unit id='VmVyYmluZGVuIFNpZQ=='>
+                <source>Verbinden Sie</source>
+                <target>Verbinden Sie</target>
+            </trans-unit>
+            <trans-unit id='V2FydGVzY2hsYW5nZSBBbGxlIHN5bmNocm9uaXNpZXJlbg=='>
+                <source>Warteschlange Alle synchronisieren</source>
+                <target>Warteschlange Alle synchronisieren</target>
+            </trans-unit>
+            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgU3luY2hyb25pc2llcnVuZyBsw7ZzY2hlbiBtw7ZjaHRlbj8='>
+                <source>Sind Sie sicher, dass Sie die Synchronisierung löschen möchten?</source>
+                <target>Sind Sie sicher, dass Sie die Synchronisierung löschen möchten?</target>
+            </trans-unit>
+            <trans-unit id='U3luY2hyb25pc2llcnVuZyB2b24gV2FydGVzY2hsYW5nZW4='>
+                <source>Synchronisierung von Warteschlangen</source>
+                <target>Synchronisierung von Warteschlangen</target>
+            </trans-unit>
+            <trans-unit id='RGllIERhdGVuIGbDvHIgZGllIFppZWxzcHJhY2hlbnJlc3NvdXJjZSBrb25udGVuIG5pY2h0IGdlbGFkZW4gd2VyZGVuLg=='>
+                 <source>Die Daten für die Zielsprachenressource konnten nicht geladen werden.</source>
+                 <target>Die Daten für die Zielsprachenressource konnten nicht geladen werden.</target>
+            </trans-unit>
+            <trans-unit id='RGllIFN5bmNocm9uaXNpZXJ1bmcgd3VyZGUgaW4gZGllIFdhcnRlc2NobGFuZ2UgZ2VzdGVsbHQgdW5kIHdpcmQgaW4gS8O8cnplIHZlcmFyYmVpdGV0Lg=='>
+                <source>Die Synchronisierung wurde in die Warteschlange gestellt und wird in Kürze verarbeitet.</source>
+                <target>Die Synchronisierung wurde in die Warteschlange gestellt und wird in Kürze verarbeitet.</target>
+            </trans-unit>
+            <trans-unit id='U3luY2hyb25pc2llcnVuZyBpbiBXYXJ0ZXNjaGxhbmdlIGZlaGxnZXNjaGxhZ2VuLg=='>
+                <source>Synchronisierung in Warteschlange fehlgeschlagen.</source>
+                <target>Synchronisierung in Warteschlange fehlgeschlagen.</target>
+            </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRpZSBTeW5jaHJvbmlzaWVydW5nLg=='>
+                <source>Bestätigen Sie die Synchronisierung.</source>
+                <target>Bestätigen Sie die Synchronisierung.</target>
+            </trans-unit>
+            <trans-unit id='VmVyd2FsdGVuIHZvbiBWZXJiaW5kdW5nZW4='>
+                <source>Verwalten von Verbindungen</source>
+                <target>Manage Connections</target>
             </trans-unit>
             <trans-unit id='UmVnZWxuYW1lIGV4aXN0aWVydCBiZXJlaXRzIGbDvHIgVHlwIHt0eXBlfQ=='>
                 <source>Regelname existiert bereits für Typ {type}</source>
@@ -9805,6 +9873,19 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
                 <source>Regel mit dieser Priorität existiert bereits</source>
                 <target>Rule with this priority already exists</target>
+            </trans-unit>
+            <trans-unit id='Y3Jvc3NMYW5ndWFnZVJlc291cmNlU3luY2hyb25pemF0aW9uLmVtcHR5VGFibGVUZXh0'>
+                <source>crossLanguageResourceSynchronization.emptyTableText</source>
+                <target>
+Diese Sprachressource ist noch mit keiner anderen verbunden.<br/>
+Es werden Verbindungen von der Ausgangssprachressource zur Zielressource hergestellt.<br/>
+Die Sprachressource kann nur mit einer anderen Sprachresource verbunden werden, wenn folgendes erfüllt ist:<br/>
+- Beide Sprachressourcen haben dasselbe Sprachenpaar<br/>
+- Beide Sprachressourcen haben sind dem selben Kunden zugewiesen<br/>
+- Beide Sprachressourcen haben Daten, die synchronisiert werden können, z. B.: Begriffe können in ein Glossar umgewandelt werden<br/>
+- Die Ziel-Sprachresource ist noch nicht mit der anderen Sprachresource verbunden (im Moment unterstützen wir keine mehrfachen Quellen)
+Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
+                </target>
             </trans-unit>
         </body>
     </file>

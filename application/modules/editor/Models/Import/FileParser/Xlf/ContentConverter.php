@@ -179,7 +179,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         $this->placeablesXpathes = $config->runtimeOptions->import->xlf->placeablesXpathes->toArray();
         $this->findPlaceables = count($this->placeablesXpathes) > 0;
         // experimental config: strict escaping for the import stream
-        $this->useStrictEscaping = $config->runtimeOptions->segment->useStrictEscaping;
+        $this->useStrictEscaping = (bool) $config->runtimeOptions->segment?->useStrictEscaping;
     }
 
     /**

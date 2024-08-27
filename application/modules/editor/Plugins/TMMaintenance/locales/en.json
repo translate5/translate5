@@ -72,6 +72,8 @@
     "title": "Segments",
     "totalAmount": "Total found segments: ",
     "calculating": "calculating...",
+    "loadingSegmentPlaceholder": "Loading...",
+    "loadingSegmentNumber": "loading segment #",
     "saving": "Saving. Please wait a while.",
     "columns": {
       "sourceText": "Source text",
@@ -98,6 +100,7 @@
   },
   "error": {
     "title": "An error occurred",
+    "infoTitle": "Info",
     "couldNotProcessRequest": "Error whilst saving or reading data. Please contact our support team!",
     "close": "Close",
     "responseFromServer": "Response from server: ",

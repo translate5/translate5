@@ -29,6 +29,8 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Tools;
 
 use League\Flysystem\Filesystem;
+use League\Flysystem\Ftp\FtpAdapter;
+use League\Flysystem\Ftp\FtpConnectionOptions;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\PhpseclibV2\SftpAdapter;
 use League\Flysystem\PhpseclibV2\SftpConnectionProvider;
@@ -41,7 +43,15 @@ class FlysystemFactory
 {
     public const TYPE_LOCAL = 'local';
 
+    /**
+     * SSH File Transfer Protocol
+     */
     public const TYPE_SFTP = 'sftp';
+
+    /**
+     * FTP Secure
+     */
+    public const TYPE_FTPS = 'ftps';
 
     /**
      * Factory method to create one of the available filesystems
@@ -53,6 +63,7 @@ class FlysystemFactory
         return match ($type) {
             self::TYPE_LOCAL => self::createLocal($config),
             self::TYPE_SFTP => self::createSftp($config),
+            self::TYPE_FTPS => self::createFtps($config),
             default => throw new RuntimeException('The given flysystem adapter type ' . $type . ' is not yet supported in the factory. Please implement it.'),
         };
     }
@@ -94,6 +105,34 @@ class FlysystemFactory
             //                    'private' => 7604,
             //                ],
             //            ])
+        ));
+    }
+
+    /**
+     * Creates a filesystem object with the SFTP adapter.
+     * Options to be given in the $options array:
+     *  root (optional, defaults to /) - the root directory to be used on the SFTP server
+     *  host (required)
+     *  username (required)
+     *  password (optional, default: null) set to null if privateKey is used
+     *  port (optional, default: 21)
+     *  ssl (optional, default: true)
+     *  timeout (optional, default: 90)
+     *  utf8 (optional, default: false)
+     *  passive (optional, default: true)
+     *  transferMode (optional, default: FTP_BINARY)
+     *  systemType (optional, default: null, 'windows' or 'unix')
+     *  ignorePassiveAddress (optional, default: null, true or false)
+     *  timestampsOnUnixListingsEnabled (optional, default: false)
+     *  recurseManually (optional, default: true)
+     */
+    public static function createFtps(object $options): Filesystem
+    {
+        $options->ssl = $options->ssl ?? true;
+        $options->root = $options->root ?? '/';
+
+        return new Filesystem(new FtpAdapter(
+            FtpConnectionOptions::fromArray((array) $options)
         ));
     }
 

@@ -72,6 +72,8 @@
     "title": "Segmente",
     "totalAmount": "Gesamtzahl der gefundenen Segmente: ",
     "calculating": "Wird berechnet...",
+    "loadingSegmentPlaceholder": "Laden...",
+    "loadingSegmentNumber": "ladesegment #",
     "saving": "Speichert, bitte warten.",
     "columns": {
       "sourceText": "Quelle",
@@ -98,6 +100,7 @@
   },
   "error": {
     "title": "Es ist ein Fehler aufgetreten!",
+    "infoTitle": "Info",
     "couldNotProcessRequest": "Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!",
     "close": "Schließen",
     "responseFromServer": "Meldung vom Server: ",

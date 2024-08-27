@@ -188,13 +188,13 @@ Ext.define('Editor.model.admin.User', {
               }
               break;
           case 'editorFinishTask':
-              if(!isJobInStepChain || task.isWaiting() || task.isFinished() || task.isEnded() || task.isUnconfirmed()) {
+              if(!isJobInStepChain || task.isWaiting() || task.isFinished() || task.isEnded() || task.isUnconfirmed() || task.isAutoFinish()) {
                   return false;
               }
               break;
           case 'editorUnfinishTask':
               //if user is not associated to the task or task is not finished, it cant be unfinished
-              if(task.get('userRole') == '' || !task.isFinished() || task.isEnded()) {
+              if(task.get('userRole') === '' || !task.isFinished() || task.isEnded()) {
                   return false;
               }
               break;

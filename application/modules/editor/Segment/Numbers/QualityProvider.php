@@ -144,6 +144,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
             editor_Segment_Numbers_Check::NUM11 => $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall'),
             editor_Segment_Numbers_Check::NUM12 => $translate->_('1000er-Trenner nicht erlaubt'),
             editor_Segment_Numbers_Check::NUM13 => $translate->_('Dubiose Zahl aus Quelle unverändert in Ziel'),
+            editor_Segment_Numbers_Check::NUM14 => $translate->_('(Ggf. fehlerhafter) Trenner aus Quelle unverändert in Ziel übernommen'),
             default => null,
         };
     }
@@ -158,6 +159,8 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
         switch ($category) {
             case editor_Segment_Numbers_Check::NUM13:
                 return $translate->_('Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.');
+            case editor_Segment_Numbers_Check::NUM14:
+                return $translate->_('Bitte prüfen, ob es sich um eine echte Zahl vs. eine Produktnummer o.ä. handelt. Bei verwendetem Trenner in einer eine Produktnummer o.ä. handelt in SRC bitte ignorieren.');
         }
 
         return '';
@@ -182,6 +185,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
             editor_Segment_Numbers_Check::NUM11,
             editor_Segment_Numbers_Check::NUM12,
             editor_Segment_Numbers_Check::NUM13,
+            editor_Segment_Numbers_Check::NUM14,
         ];
     }
 }

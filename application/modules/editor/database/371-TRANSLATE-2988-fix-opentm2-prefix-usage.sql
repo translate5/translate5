@@ -27,13 +27,13 @@
 
 -- set to level 1, since on single instances this value is not needed, and on hosted instances it should be only changeable via CLI
 UPDATE Zf_configuration
-    SET level = 1, description = CONCAT(description, ' By purpose level 1!')
-    WHERE name = 'runtimeOptions.LanguageResources.opentm2.tmprefix';
+SET level = 1, description = CONCAT(description, ' By purpose level 1!')
+WHERE name = 'runtimeOptions.LanguageResources.opentm2.tmprefix';
 
 -- get the current prefix
 select @prefix:=value from Zf_configuration WHERE name = 'runtimeOptions.LanguageResources.opentm2.tmprefix';
 
 -- remove it from the specific data
 UPDATE LEK_languageresources
-set specificData = replace(specificData, concat('"fileName":"', @prefix, '-'), '"fileName":"')
+SET specificData = replace(specificData, concat('"fileName":"', @prefix COLLATE utf8mb4_unicode_ci, '-'), '"fileName":"')
 WHERE serviceName = 'OpenTM2' and @prefix is not null;

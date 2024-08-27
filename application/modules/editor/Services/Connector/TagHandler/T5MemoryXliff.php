@@ -64,7 +64,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
             foreach ($matches as $match) {
                 // $numberTags[*r*][*id*] = ['number' => *n*, 'tag' => *wholeTag*];
                 $numberTags[$match[2]][$match[1]] = [
-                    'number' => $match[3],
+                    'number' => html_entity_decode($match[3]),
                     'tag' => $match[0],
                 ];
             }

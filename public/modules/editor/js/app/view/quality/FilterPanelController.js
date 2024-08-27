@@ -42,6 +42,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         controller: {
             '#Segments': {
                 segmentEditSaved: 'onSegmentSaved',
+                beforeSaveCall: 'onSegmentSaved',
                 segmentEditCanceled: 'onSegmentCanceled',
                 segmentLockToggled: 'onSegmentLockToggled'
             }

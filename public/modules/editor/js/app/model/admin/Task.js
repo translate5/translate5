@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -44,8 +43,9 @@ Ext.define('Editor.model.admin.Task', {
     USER_STATE_VIEW: 'view',
     USER_STATE_WAITING: 'waiting',
     USER_STATE_FINISH: 'finished',
+    USER_STATE_AUTO_FINISH: 'auto-finish',
     USER_STATE_UNCONFIRMED: 'unconfirmed',
-    
+
     statics: {
         USAGE_MODE_COMPETITIVE: 'competitive',
         USAGE_MODE_COOPERATIVE: 'cooperative',
@@ -123,18 +123,19 @@ Ext.define('Editor.model.admin.Task', {
             name: 'projectTasks',
             persist: false,
             convert: function (tasks) {
-                if(!tasks){
+                if (!tasks) {
                     return tasks;
                 }
-                for(var i=0;i<tasks.length;i++){
-                    if(!tasks[i].isModel){
+                for (var i = 0; i < tasks.length; i++) {
+                    if (!tasks[i].isModel) {
                         tasks[i] = Editor.model.admin.Task.create(tasks[i]);
                     }
                 }
                 return tasks;
             }
         },
-        {name: 'reimportable', type: 'boolean'}
+        {name: 'reimportable', type: 'boolean'},
+        {name: 'deadlineDate',type:'date',dateFormat: Editor.DATE_ISO_FORMAT,defaultValue: null},
     ],
     hasMany: [{
         model: 'Editor.model.segment.Field',
@@ -188,10 +189,10 @@ Ext.define('Editor.model.admin.Task', {
         return [];
     },
     hasProjectTasks: function () {
-        return this.get('projectTasks') && this.get('projectTasks').length>0;
+        return this.get('projectTasks') && this.get('projectTasks').length > 0;
     },
 
-    isProject: function (){
+    isProject: function () {
         return this.get('taskType') === 'project';
     },
 
@@ -238,6 +239,12 @@ Ext.define('Editor.model.admin.Task', {
         var me = this, finish = me.USER_STATE_FINISH;
         return me.modified && me.modified.userState === finish || me.get('userState') === finish;
     },
+
+    isAutoFinish: function () {
+        var me = this, autoFinish = me.USER_STATE_AUTO_FINISH;
+        return (me.modified && me.modified.userState === autoFinish) || me.get('userState') === autoFinish;
+    },
+
     /**
      * must consider also the old value (temporary set to open / edit)
      * @returns {Boolean}
@@ -347,7 +354,7 @@ Ext.define('Editor.model.admin.Task', {
         if (me.get('userRole') === 'visitor' || me.get('userState') === me.USER_STATE_VIEW) {
             return true;
         }
-        return !me.isEditable() || me.isFinished() || me.isWaiting() || me.isEnded() || isUnconfirmed;
+        return !me.isEditable() || me.isFinished() || me.isWaiting() || me.isEnded() || isUnconfirmed || me.isAutoFinish();
     },
 
     /**
@@ -355,9 +362,9 @@ Ext.define('Editor.model.admin.Task', {
      *
      * @returns {string}
      */
-    getInitUserState: function() {
+    getInitUserState: function () {
         var me = this;
-        if (me.isUnconfirmed() || me.isWaiting() || me.isFinished()) {
+        if (me.isUnconfirmed() || me.isWaiting() || me.isFinished() || me.isAutoFinish()) {
             return me.USER_STATE_VIEW;
         }
         return me.USER_STATE_EDIT;
@@ -468,6 +475,7 @@ Ext.define('Editor.model.admin.Task', {
             stepsWithFilter = meta.stepsWithFilter,
             task = data.task,
             step = task.get('userStep'),
+            // TODO: validate this here. Should i add auto-finished check
             useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded()),
             filteredValues = [];
 

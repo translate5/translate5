@@ -46,7 +46,7 @@ class QualityNumbersCheckTest extends JsonTestAbstract
 
     public function testTask2()
     {
-        $this->performTestForTask('num12,num13 --- en-GB de-DE', 2);
+        $this->performTestForTask('num12..num14 --- en-GB de-DE', 3);
     }
 
     private function performTestForTask(string $taskName, int $expectedSegmentQuantity)
