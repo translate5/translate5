@@ -140,8 +140,19 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                         queryMode: 'local',
                         fieldLabel: me.strings.fieldState,
                         valueField: 'id',
+                        displayField: 'text',
                         bind: {
                             store: '{states}'
+                        },
+                        listConfig: {
+                            getInnerTpl: function() {
+                                // add css class to the selection item if the state is disabled.
+                                // disabled state is for example the auto-finish state
+                                return '<div class="{[values.disabled ? "x-item-disabled" : ""]}">{text}</div>';
+                            }
+                        },
+                        listeners: {
+                            beforeselect: me.onUserStateBeforeSelect
                         }
                     }, {
                         xtype: 'datetimefield',
@@ -227,5 +238,15 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
         }
         user.setVisible(!edit);
         user.setDisabled(edit);
+    },
+
+    onUserStateBeforeSelect: function(combo, record) {
+        // if record is loaded in the form or when we change the user state to the same state, allow selection
+        if(combo.getValue() === null || combo.getValue() === record.get('id'))
+        {
+            return true;
+        }
+        // prevent selection if the record is disabled
+        return !record.get('disabled');
     }
 });
