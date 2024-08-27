@@ -34,8 +34,9 @@ use InvalidArgumentException;
 
 class CantCreateCoordinatorFromUserException extends InvalidArgumentException
 {
-    public function __construct(public readonly string $userGuid)
-    {
+    public function __construct(
+        public readonly string $userGuid
+    ) {
         parent::__construct("The given user $userGuid is not a job coordinator");
     }
 }

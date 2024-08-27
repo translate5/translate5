@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP;
 
-use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
@@ -66,8 +65,12 @@ class LspUserRepository
 
         $select = $lspDb->select()
             ->setIntegrityCheck(false)
-            ->from(['lsp' => $lsp->db->info(LanguageServiceProviderTable::NAME)])
-            ->join(['lspToUser' => $lspToUserTable], 'lsp.id = lspToUser.lspId', ['lspToUser.guid'])
+            ->from([
+                'lsp' => $lsp->db->info(LanguageServiceProviderTable::NAME),
+            ])
+            ->join([
+                'lspToUser' => $lspToUserTable,
+            ], 'lsp.id = lspToUser.lspId', ['lspToUser.guid'])
             ->where('lspToUser.userId = ?', $user->getId());
 
         $row = $lspDb->fetchRow($select);
@@ -98,8 +101,12 @@ class LspUserRepository
 
         $select = $userDb->select()
             ->setIntegrityCheck(false)
-            ->from(['user' => $user->db->info($user->db::NAME)])
-            ->join(['lspToUser' => $lspToUserTable], 'user.id = lspToUser.userId', [])
+            ->from([
+                'user' => $user->db->info($user->db::NAME),
+            ])
+            ->join([
+                'lspToUser' => $lspToUserTable,
+            ], 'user.id = lspToUser.userId', [])
             ->where('lspToUser.lspId = ?', $lsp->getId());
 
         $rows = $userDb->fetchAll($select);

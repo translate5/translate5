@@ -81,8 +81,12 @@ class JobCoordinatorRepository
 
         $select = $userDb->select()
             ->setIntegrityCheck(false)
-            ->from(['user' => $user->db->info($user->db::NAME)])
-            ->join(['lspToUser' => $lspToUserTable], 'user.id = lspToUser.userId', ['lspToUser.guid'])
+            ->from([
+                'user' => $user->db->info($user->db::NAME),
+            ])
+            ->join([
+                'lspToUser' => $lspToUserTable,
+            ], 'user.id = lspToUser.userId', ['lspToUser.guid'])
             ->where('lspToUser.lspId = ?', $lsp->getId())
             ->where('user.roles LIKE ?', '%' . Roles::JOB_COORDINATOR . '%');
 
@@ -123,8 +127,14 @@ class JobCoordinatorRepository
 
         $select = $userDb->select()
             ->setIntegrityCheck(false)
-            ->from(['user' => $user->db->info($user->db::NAME)], ['count' => 'COUNT(*)'])
-            ->join(['lspToUser' => $lspToUserTable], 'user.id = lspToUser.userId', [])
+            ->from([
+                'user' => $user->db->info($user->db::NAME),
+            ], [
+                'count' => 'COUNT(*)',
+            ])
+            ->join([
+                'lspToUser' => $lspToUserTable,
+            ], 'user.id = lspToUser.userId', [])
             ->where('lspToUser.lspId = ?', $lsp->getId())
             ->where('user.roles LIKE ?', '%' . Roles::JOB_COORDINATOR . '%');
 
