@@ -81,7 +81,38 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                             width: 300,
                             listConfig: {
                                 getInnerTpl: function () {
-                                    return '<div style="white-space: nowrap;">{name}</div>'; // Prevent text wrapping
+                                    return '<div style="white-space: nowrap; overflow: visible;">{name}</div>'; // Prevent text wrapping
+                                }
+                            },
+                            listeners: {
+                                afterrender: function(combo) {
+                                    var store = combo.getStore();
+                                    store.on('refresh', function() {
+                                        var longestText = '';
+                                        store.each(function(record) {
+                                            var text = record.get(combo.displayField);
+                                            if (text.length > longestText.length) {
+                                                longestText = text;
+                                            }
+                                        });
+
+                                        // Create a temporary element to calculate the width of the longest text
+                                        var tempEl = Ext.getBody().createChild({
+                                            tag: 'div',
+                                            html: longestText,
+                                            style: {
+                                                'position': 'absolute',
+                                                'visibility': 'hidden',
+                                                'font-family': combo.getEl().getStyle('font-family'),
+                                                'font-size': combo.getEl().getStyle('font-size')
+                                            }
+                                        });
+
+                                        var textWidth = tempEl.getWidth() + 10; // Add some padding
+                                        tempEl.destroy(); // Remove the temporary element
+
+                                        combo.listConfig.minWidth = textWidth > combo.width ? textWidth : combo.width;
+                                    });
                                 }
                             }
                         },

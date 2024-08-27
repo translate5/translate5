@@ -71,6 +71,7 @@ class ConnectionOptionsRepository
 
         $lrsWithSameCustomersSelect = $db->select()
             ->setIntegrityCheck(false)
+            ->distinct()
             ->from(
                 [
                     'LanguageResources' => $db->info($db::NAME),
@@ -96,16 +97,17 @@ class ConnectionOptionsRepository
             ->where('LanguageResourceLanguages.sourceLang IN (?)', $sourceLangIds)
             ->where('LanguageResourceLanguages.targetLang IN (?)', $targetLangIds)
             ->where('CustomerAssoc.customerId IN (?)', $source->getCustomers())
+            ->where('LanguageResources.id != ?', $source->getId())
             ->order('LanguageResources.serviceName');
 
         $stmt = $db->getAdapter()->query($lrsWithSameCustomersSelect);
 
         /**
-         * If for target LR1->sourceLang = EN and source LR2->sourceLang = [EN-GB, EN-US], then LR1 and LR2 are related
-         * LR1 will be returned as an option for connection to LR2
-         * But we have to provide LR1 twice:
-         *  - once with sourceLang = EN-GB of LR2
-         *  - once with sourceLang = EN-US of LR2
+         * If for target LR_T->sourceLang = EN and source LR_S->sourceLang = [EN-GB, EN-US], then LR1 and LR2 are related
+         * LR_T will be returned as an option for connection to LR_S
+         * But we have to provide LR_S twice:
+         *  - once with sourceLang = EN-GB of LR_S
+         *  - once with sourceLang = EN-US of LR_S
          * And user will have to choose in UI which language should be used as source of data for synchronization
          *
          * Same for targetLang
@@ -116,17 +118,18 @@ class ConnectionOptionsRepository
          * @return iterable<Language>
          */
         $getResultLangList = function (int $langId, array $langList, array $langMap): iterable {
+            $list = [];
+
             if (array_key_exists($langId, $langList)) {
-                return [
-                    $langList[$langId]
+                $list = [
+                    $langList[$langId],
                 ];
             }
 
             if (! array_key_exists($langId, $langMap)) {
-                return [];
+                return $list;
             }
 
-            $list = [];
             foreach ($langMap[$langId] as $lang) {
                 $list[] = $lang;
             }
@@ -155,37 +158,44 @@ class ConnectionOptionsRepository
 
             foreach ($resultSourceLangs as $sourceLang) {
                 foreach ($resultTargetLangs as $targetLang) {
-                    yield new PotentialConnectionOption($lr, $sourceLang, $targetLang);
+                    yield new PotentialConnectionOption(clone $lr, $sourceLang, $targetLang);
                 }
             }
         }
     }
 
     /**
-     * @return array{int[], array<int, Language>, array<int, Language[]>}
+     * @return array{int[], array<int, Language>, array<int, array<int, Language>>}
      */
     private function composeLangStructures(int ...$langIds): array
     {
         $langs = [];
         $addedMajorToLangMap = [];
 
+        $resultLangIds = [];
+
         foreach ($langIds as $langId) {
+            if (isset($langs[$langId])) {
+                continue;
+            }
+
             $sourceLang = $this->languageRepository->get($langId);
             $langs[$langId] = $sourceLang;
+            $resultLangIds[$langId] = true;
 
             $major = $this->languageRepository->findByRfc5646($sourceLang->getMajorRfc5646());
 
             if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646() && null !== $major) {
-                $langIds[] = (int) $major->getId();
+                $resultLangIds[(int) $major->getId()] = true;
 
                 if (! isset($addedMajorToLangMap[(int) $major->getId()])) {
                     $addedMajorToLangMap[(int) $major->getId()] = [];
                 }
 
-                $addedMajorToLangMap[(int) $major->getId()][] = $sourceLang;
+                $addedMajorToLangMap[(int) $major->getId()][$sourceLang->getId()] = $sourceLang;
             }
         }
 
-        return [$langIds, $langs, $addedMajorToLangMap];
+        return [array_keys($resultLangIds), $langs, $addedMajorToLangMap];
     }
 }
