@@ -40,7 +40,7 @@ Ext.define('Editor.view.admin.task.LogWindow', {
             config;
         me.task = me.initialConfig.actualTask;
         config = {
-            title: Ext.String.format(me.title, task.getTaskName()),
+            title: Ext.String.format(me.title, me.task.getTaskName()),
             items : [{
                 xtype: 'editorAdminTaskLogGrid'
             }] 

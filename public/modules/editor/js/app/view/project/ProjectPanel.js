@@ -55,7 +55,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
     },
 
     strings:{
-    	projectTasksTitle:'#UT#Aufgaben für das Projekt: {projectSelectionTaskName}'
+    	projectTasksTitle:'#UT#Aufgaben für das Projekt'
     },
     listen:{
         'deactivate':'onProjectPanelDeactivate'
@@ -92,9 +92,9 @@ Ext.define('Editor.view.project.ProjectPanel', {
                     width: '50%',
                     split: true,
                     bind:{
-                        title:me.strings.projectTasksTitle,
-                        disabled:'{!projectSelection}',
-                        store:'{projectTasks}'
+                        title: me.strings.projectTasksTitle + ': {projectSelectionTaskName}',
+                        disabled: '{!projectSelection}',
+                        store: '{projectTasks}'
                     }
                 },{
                     xtype:'adminTaskTaskManagement',
