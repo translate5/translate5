@@ -78,16 +78,7 @@ class TaskRepository
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
 
         foreach ($tasksData as $taskData) {
-            $task->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $db,
-                        'data' => $taskData,
-                        'stored' => true,
-                        'readOnly' => false,
-                    ]
-                )
-            );
+            $task->init($taskData);
 
             yield clone $task;
         }

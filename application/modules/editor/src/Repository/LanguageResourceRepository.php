@@ -120,7 +120,7 @@ class LanguageResourceRepository
             new Zend_Db_Table_Row(
                 [
                     'table' => $db,
-                    'data' => $row,
+                    'data' => $row->toArray(),
                     'stored' => true,
                     'readOnly' => false,
                 ]

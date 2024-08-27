@@ -83,16 +83,7 @@ class CustomerAssocRepository
             return null;
         }
 
-        $customerAssoc->init(
-            new Zend_Db_Table_Row(
-                [
-                    'table' => $customerAssoc->db,
-                    'data' => $row,
-                    'stored' => true,
-                    'readOnly' => false,
-                ]
-            )
-        );
+        $customerAssoc->init($row);
 
         return $customerAssoc;
     }

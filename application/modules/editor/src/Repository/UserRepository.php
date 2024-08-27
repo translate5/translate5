@@ -80,7 +80,7 @@ class UserRepository
             $userModel->init(
                 new Zend_Db_Table_Row(
                     [
-                        'table' => $user->db,
+                        'table' => $userModel->db,
                         'data' => $user,
                         'stored' => true,
                         'readOnly' => false,
