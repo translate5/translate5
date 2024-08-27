@@ -73,7 +73,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                 },
                 items: [{
                     items: [{
-                        xtype: 'tagfield',
+                        xtype: 'Editor.tagfield',
                         name:'userName',
                         itemId:'userName',
                         typeAhead: true,

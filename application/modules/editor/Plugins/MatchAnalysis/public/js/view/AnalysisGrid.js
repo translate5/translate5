@@ -291,7 +291,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                 } else if (!record.get('resourceColor')) {
                     return value;
                 }
-                return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #' + record.get('resourceColor') + ';"></div>' + value;
+                return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #' + record.get('resourceColor') + ';"></div>' + Ext.String.htmlEncode(value);
             },
             dataIndex: 'resourceName',
             minWidth: 200,

@@ -133,11 +133,13 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         
                         task.segmentFields().each(function(field){
                             cnt++;
+                            // double escape to prevent XSS in qtip
+                            const label = Ext.String.htmlEncode(Ext.String.htmlEncode(field.get('label')));
                             if(Ext.Array.indexOf(fields, field.get('name')) >= 0) {
-                                result.push(field.get('label'));
+                                result.push(label);
                                 visible++;
                             } else {
-                                result.push('<strike>'+field.get('label')+'</strike>');
+                                result.push('<s>'+label+'</s>');
                             }
                         });
                         

@@ -94,7 +94,7 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
      * @returns {(function(*, *, *): (string|*))|*}
      */
     getNameRenderer: function() {
-        var ttip = this.openTermPortal;
+        var ttip = Ext.String.htmlEncode(Ext.String.htmlEncode(this.openTermPortal));
 
         return function(v, meta, rec) {
             if (v !== null) {

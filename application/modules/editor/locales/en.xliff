@@ -5494,9 +5494,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Neues Projekt hinzufügen</source>
                 <target>Add new project</target>
             </trans-unit>
-            <trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdDoge3Byb2plY3RTZWxlY3Rpb24udGFza05hbWV9'>
-                <source>Aufgaben für das Projekt: {projectSelection.taskName}</source>
-                <target>Tasks for the project: {projectSelection.taskName}</target>
+            <trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdA=='>
+                <source>Aufgaben für das Projekt</source>
+                <target>Tasks for the project</target>
             </trans-unit>
             <trans-unit id='enVyIEF1ZmdhYmUgc3ByaW5nZW4='>
                 <source>zur Aufgabe springen</source>
@@ -9980,9 +9980,9 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server for the queried service is not reachable.</target>
             </trans-unit>
-            <trans-unit id='RGllc2VyIEF1ZnRyYWcgd2lyZCBhdXRvbWF0aXNjaCBnZXNjaGxvc3NlbiB3ZW5uIGRpZSBBdWZnYWJlbmZyaXN0ICIlcyIgZXJyZWljaHQgaXN0Lg=='>
-                <source>Dieser Auftrag wird automatisch geschlossen wenn die Aufgabenfrist "%s" erreicht ist.</source>
-                <target>This job will be closed automatically when the task deadline "%s" is reached.</target>
+            <trans-unit id='RGllc2VyIEF1ZnRyYWcgd2lyZCBhdXRvbWF0aXNjaCBiZWltIEVycmVpY2hlbiBkZXIgQXVmZ2FiZW5mcmlzdCBhbSAlcyBnZXNjaGxvc3Nlbi4='>
+                <source>Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.</source>
+                <target>This job will be closed automatically on %s when the task deadline is reached.</target>
             </trans-unit>
             <trans-unit id='SGlud2VpczogRWluaWdlIEJlbnV0emVyIGhhYmVuIGluZGl2aWR1ZWxsZSBBdWZnYWJlbmZyaXN0ZW4uIEJpdHRlbiBwcsO8ZmVuIHVuZCBwYXNzZW4gU2llIGRpZXNlIGJlaSBCZWRhcmYgYW4u'>
                 <source>Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.</source>

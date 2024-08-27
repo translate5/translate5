@@ -466,11 +466,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             return;
         }
 
-        $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wm editor_Workflow_Manager */
-
-        $workflow = $wm->get($this->task->getWorkflow());
-
         $step = $this->data->workflowStepName;
         //get the config for the task workflow and the user assoc role workflow step
         $configValue = $this->task->getConfig()->runtimeOptions->workflow->{$this->task->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;

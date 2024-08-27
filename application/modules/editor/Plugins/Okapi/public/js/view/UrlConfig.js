@@ -65,7 +65,7 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfig', {
         renderer: function(value) {
             var res = [];
             Ext.Object.each(value, function(key, item){
-                res.push(key + ' ('+item+')');
+                res.push(key + ' ('+Ext.String.htmlEncode(item)+')');
             });
             return res.join('<br/>');
         }

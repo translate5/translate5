@@ -30,7 +30,6 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
 
-use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Models_Entity_Abstract;
 
 /**

@@ -175,7 +175,8 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
                 return me.strings.type[value] || value;
             },
             qtip = function(meta, msg, desc) {
-                desc = desc ? '<br>'+desc : '';
+                msg = Ext.String.htmlEncode(Ext.String.htmlEncode(msg));
+                desc = desc ? '<br>'+Ext.String.htmlEncode(Ext.String.htmlEncode(desc)) : '';
                 meta.myLabel = msg; //as ref for the list filter renderer
                 
                 if(record && record.get('matchRate')){

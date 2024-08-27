@@ -73,13 +73,13 @@ Ext.define('Editor.model.admin.User', {
   },
   statics: {
       getUserName: function(rec) {
-        return rec.get('firstName')+' '+rec.get('surName');
+        return Ext.String.htmlEncode(rec.get('firstName')+' '+rec.get('surName'));
       },
       getUserGuid: function(rec) {
           return rec.get('userGuid');
       },
       getLongUserName: function(rec) {
-          return rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')';
+          return Ext.String.htmlEncode(rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')');
       },
       getRoles: function(rec) {
           return rec.get('roles').split(',');

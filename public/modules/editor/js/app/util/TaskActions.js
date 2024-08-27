@@ -256,7 +256,7 @@ Ext.define('Editor.util.TaskActions', {
         }
 
         callback = callback || Ext.emptyFn;
-        app.mask(maskingText, task.get('taskName'));
+        app.mask(maskingText, task.getTaskName());
         task.set(data);
         task.save({
             success: function(rec, op) {
@@ -275,7 +275,7 @@ Ext.define('Editor.util.TaskActions', {
 
         initialState = me.getInitialState(task, readonly);
         task.set('userState', initialState);
-        app.mask(me.strings.taskOpening, task.get('taskName'));
+        app.mask(me.strings.taskOpening, task.getTaskName());
         task.save({
             success: function(rec, op) {
                 me.onOpenTask(rec, initialState, op);
