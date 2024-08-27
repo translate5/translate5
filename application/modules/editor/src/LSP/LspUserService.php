@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP;
 
-use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\ZfExtended\Acl\Roles;
 use ZfExtended_Models_User;
 
 class LspUserService
@@ -102,11 +102,11 @@ class LspUserService
             return true;
         }
 
-        if (in_array(Roles::PM, $roles) && $lsp->isDirectLsp());
+        $coordinator = $this->findCoordinatorBy($manager);
 
-        $coordinator = $this->jobCoordinatorRepository->findByUser($user);
-
-        $coordinator = $this->findCoordinatorBy($authUser);
+        if (null === $coordinator) {
+            return true;
+        }
 
         foreach ($this->getAccessibleUsers($coordinator) as $accessibleUser) {
             if ($accessibleUser->getId() === $user->getId()) {

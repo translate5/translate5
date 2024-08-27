@@ -68,6 +68,7 @@ class Editor_UserController extends ZfExtended_UserController
         // Possible coordinator that we try to delete
         $coordinator = $this->lspUserService->findCoordinatorBy($this->entity);
 
+        // Nobody can delete the last coordinator of an LSP
         if (null !== $coordinator && $this->lspUserService->getCoordinatorsCountFor($coordinator->lsp) === 1) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1626' => 'The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".',
@@ -93,7 +94,10 @@ class Editor_UserController extends ZfExtended_UserController
 
         if (
             null !== $currentCoordinator
-            && ! $this->lspUserService->isUserAccessibleFor($currentCoordinator, $this->entity)
+            && ! $this->lspUserService->isUserAccessibleFor(
+                $this->entity,
+                ZfExtended_Authentication::getInstance()->getUser()
+            )
         ) {
             throw new ZfExtended_NoAccessException();
         }
