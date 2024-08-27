@@ -78,12 +78,13 @@ class ExportService
 
         $view->addScriptPath(APPLICATION_PATH . '/modules/' . Zend_Registry::get('module') . '/views/scripts/task/');
 
+        $protocol = $this->config->runtimeOptions->server->protocol;
         $stylesheets = [];
         foreach ($this->getAdditionalCss() as $css) {
-            $stylesheets[] = 'https://' . $this->config->runtimeOptions->server->name . "/" . $css;
+            $stylesheets[] = $protocol . $this->config->runtimeOptions->server->name . "/" . $css;
         }
         $view->assign('stylesheets', $stylesheets);
-        $view->assign('taskUrl', 'https://' . $this->config->runtimeOptions->server->name . '/editor/taskid/' . $task->getId());
+        $view->assign('taskUrl', $protocol . $this->config->runtimeOptions->server->name . '/editor/taskid/' . $task->getId());
         $view->assign('taskName', $task->getTaskName());
         $view->assign('segmentDataTable', $segmentDataTable);
 

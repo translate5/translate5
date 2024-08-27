@@ -31,10 +31,6 @@ use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\CsrfProtection;
 
-/**
- * Wrapper for ZfExtended_WorkerController
- * else RestRoutes, ACL authentication, etc. will not work.
- */
 class editor_QueuedexportController extends ZfExtended_RestController
 {
     protected $entityClass = QueuedExport::class;
