@@ -53,6 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use MittagQI\ZfExtended\Acl\Roles;
+use Zend_Db_Table_Row;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;
@@ -76,7 +77,16 @@ class UserRepository
         $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
 
         foreach ($users as $user) {
-            $userModel->init($user);
+            $userModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $user->db,
+                        'data' => $user,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             $roles = $userModel->getRoles();
 

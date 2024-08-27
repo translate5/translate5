@@ -53,6 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Task;
+use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 
 class TaskRepository
@@ -60,7 +61,7 @@ class TaskRepository
     public function getProjectBy(editor_Models_Task $task): editor_Models_Task
     {
         $project = ZfExtended_Factory::get(editor_Models_Task::class);
-        $project->load($task->getProjectId());
+        $project->load((int) $task->getProjectId());
 
         return $project;
     }
@@ -77,10 +78,18 @@ class TaskRepository
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
 
         foreach ($tasksData as $taskData) {
-            $task = clone $task;
-            $task->init($taskData->toArray());
+            $task->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $taskData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
-            yield $task;
+            yield clone $task;
         }
     }
 }

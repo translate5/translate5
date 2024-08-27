@@ -37,6 +37,7 @@ use editor_Models_Languages;
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
 use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnectionCustomer;
+use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -199,7 +200,16 @@ class CrossSynchronizationConnectionRepository
         ;
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $connection->hydrate($row);
+            $connection->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $connection;
         }
@@ -244,7 +254,16 @@ class CrossSynchronizationConnectionRepository
         ;
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $assoc->hydrate($row);
+            $assoc->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $assoc;
         }
@@ -262,7 +281,16 @@ class CrossSynchronizationConnectionRepository
             ->where('sourceLanguageResourceId = ? OR targetLanguageResourceId = ?', $languageResourceId);
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $syncModel->hydrate($row);
+            $syncModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $syncModel;
         }
@@ -306,7 +334,16 @@ class CrossSynchronizationConnectionRepository
             ->where('connectionId = ?', $connection->getId());
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $assoc->hydrate($row);
+            $assoc->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $assoc;
         }
@@ -353,7 +390,16 @@ class CrossSynchronizationConnectionRepository
         }
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $assoc->hydrate($row);
+            $assoc->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $assoc;
         }
@@ -374,7 +420,16 @@ class CrossSynchronizationConnectionRepository
             ->where('sourceLanguageResourceId = ?', $filterLanguageResourceId);
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $syncModel->hydrate($row);
+            $syncModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $syncModel;
         }
@@ -396,7 +451,16 @@ class CrossSynchronizationConnectionRepository
             ->orWhere('LanguageResourceSync.targetLanguageResourceId = ?', $targetId);
 
         foreach ($db->fetchAll($select)->toArray() as $row) {
-            $syncModel->hydrate($row);
+            $syncModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $syncModel;
         }

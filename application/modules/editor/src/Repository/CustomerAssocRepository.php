@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
+use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -82,7 +83,16 @@ class CustomerAssocRepository
             return null;
         }
 
-        $customerAssoc->hydrate($row);
+        $customerAssoc->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $customerAssoc->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
 
         return $customerAssoc;
     }
@@ -95,7 +105,16 @@ class CustomerAssocRepository
         $customerAssoc = ZfExtended_Factory::get(CustomerAssoc::class);
 
         foreach ($customerAssoc->loadByLanguageResourceId($languageResourceId) as $row) {
-            $customerAssoc->hydrate($row);
+            $customerAssoc->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $customerAssoc->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $customerAssoc;
         }
@@ -111,7 +130,16 @@ class CustomerAssocRepository
         $s->where('customerId = ?', $customerId);
 
         foreach ($customerAssoc->db->fetchAll($s)->toArray() as $row) {
-            $customerAssoc->hydrate($row);
+            $customerAssoc->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $customerAssoc->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $customerAssoc;
         }

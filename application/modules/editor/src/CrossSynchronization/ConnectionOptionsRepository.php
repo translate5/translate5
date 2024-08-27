@@ -36,6 +36,7 @@ use editor_Models_LanguageResources_Languages as LanguageResourceLanguages;
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\CrossSynchronization\Dto\PotentialConnectionOption;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 
 class ConnectionOptionsRepository
@@ -154,7 +155,16 @@ class ConnectionOptionsRepository
 
             unset($row['sourceLangId'], $row['targetLangId']);
 
-            $lr->hydrate($row);
+            $lr->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             foreach ($resultSourceLangs as $sourceLang) {
                 foreach ($resultTargetLangs as $targetLang) {
@@ -192,7 +202,7 @@ class ConnectionOptionsRepository
                     $addedMajorToLangMap[(int) $major->getId()] = [];
                 }
 
-                $addedMajorToLangMap[(int) $major->getId()][$sourceLang->getId()] = $sourceLang;
+                $addedMajorToLangMap[(int) $major->getId()][(int) $sourceLang->getId()] = $sourceLang;
             }
         }
 

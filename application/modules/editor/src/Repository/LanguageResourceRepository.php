@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -115,7 +116,16 @@ class LanguageResourceRepository
             return null;
         }
 
-        $languageResource->hydrate($row);
+        $languageResource->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
 
         return $languageResource;
     }
