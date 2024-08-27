@@ -83,9 +83,9 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
                             if(values.groupField === 'taskGuid'){
                                 // when taskGuid is active as grouping, render the task name as group value
                                 var data = values.rows && values.rows[0];
-                                return data ? data.get('taskName') : ret;
+                                return data ? Ext.String.htmlEncode(data.get('taskName')) : ret;
                             }
-                            return ret;
+                            return Ext.String.htmlEncode(ret);
                         }
                     }
                 ),
@@ -130,7 +130,8 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
                 xtype: 'gridcolumn',
                 text: me.strings.name,
                 renderer: function(value, metaData, record) {
-                    return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'+value;
+                    return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'
+                        + Ext.String.htmlEncode(value);
                 },
                 dataIndex : 'name',
                 sortable : true,

@@ -131,7 +131,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     handleProjectDelete:function(project,event){
     	var me=this;
         Ext.Msg.show({
-            title:Ext.String.format(me.strings.deleteProjectDialogTitle, project.get('taskName')),
+            title:Ext.String.format(me.strings.deleteProjectDialogTitle, project.getTaskName()),
             message: me.strings.deleteProjectDialogMessage,
             buttons: Ext.Msg.YESNO,
             icon: Ext.Msg.QUESTION,
@@ -180,9 +180,10 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
      * Delete project by given projectId
      */
     deleteProject:function(project){
-    	var me=this;
+    	var me= this,
+            projectName = project.getTaskName();
 
-        Editor.app.mask(Ext.String.format(me.getViewModel().get('l10n.projectGrid.taskDestroy'), project.get('taskName')), project.get('taskName'));
+        Editor.app.mask(Ext.String.format(me.getViewModel().get('l10n.projectGrid.taskDestroy'), projectName), projectName);
 
         if( !Ext.getStore('projectTasks')){
             // if the store is not available, log message and stack trace
@@ -211,7 +212,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
 
                 Editor.app.unmask();
 
-            	Editor.MessageBox.addSuccess(Ext.String.format(me.strings.projectRemovedMessage, project.get('taskName')),2);
+            	Editor.MessageBox.addSuccess(Ext.String.format(me.strings.projectRemovedMessage, project.getTaskName()),2);
             },
             failure: function(records, op){
                 Editor.app.unmask();
