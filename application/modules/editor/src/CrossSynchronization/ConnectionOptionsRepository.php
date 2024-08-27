@@ -117,14 +117,21 @@ class ConnectionOptionsRepository
          */
         $getResultLangList = function (int $langId, array $langList, array $langMap): iterable {
             if (array_key_exists($langId, $langList)) {
-                return yield $langList[$langId];
+                return [
+                    $langList[$langId]
+                ];
             }
 
-            if (array_key_exists($langId, $langMap)) {
-                foreach ($langMap[$langId] as $lang) {
-                    yield $lang;
-                }
+            if (! array_key_exists($langId, $langMap)) {
+                return [];
             }
+
+            $list = [];
+            foreach ($langMap[$langId] as $lang) {
+                $list[] = $lang;
+            }
+
+            return $list;
         };
 
         $lr = ZfExtended_Factory::get(LanguageResource::class);
