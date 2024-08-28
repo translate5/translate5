@@ -39,7 +39,7 @@ use ZfExtended_Zendoverwrites_Translate;
 class SegmentDataProvider
 {
     /**
-     * @param iterable<(callable(Task $task, string $segment): string)|SegmentFormatterInterface> $segmentFormatters
+     * @param iterable<(callable(Task $task, string $segment, bool $isSource): string)|SegmentFormatterInterface> $segmentFormatters
      */
     public function __construct(
         private readonly SegmentFieldManagerFactory $segmentFieldManagerFactory,
