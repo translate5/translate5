@@ -53,7 +53,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Task;
-use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 
 class TaskRepository
