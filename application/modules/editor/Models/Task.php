@@ -177,7 +177,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     protected $meta;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $taskDataPath;
 

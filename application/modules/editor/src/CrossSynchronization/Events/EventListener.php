@@ -28,13 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
+namespace MittagQI\Translate5\CrossSynchronization\Events;
 
+use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events as CustomerAssocEvents;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use RuntimeException;
 use Zend_EventManager_Event;
 use Zend_EventManager_SharedEventManager;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -45,7 +46,7 @@ class EventListener
         private readonly Zend_EventManager_SharedEventManager $eventManager,
         private readonly CrossLanguageResourceSynchronizationService $synchronizationService,
         private readonly LanguageResourceRepository $languageResourceRepository,
-        private readonly SynchronisationDirigent $queueSynchronizationService,
+        private readonly SynchronisationDirigent $synchronisationDirigent,
     ) {
     }
 
@@ -69,12 +70,17 @@ class EventListener
         $this->eventManager->attach(
             EventDispatcher::class,
             ConnectionCreatedEvent::class,
-            $this->queueConnectionSynchronization()
+            $this->queueDefaultSynchronization()
         );
         $this->eventManager->attach(
             EventDispatcher::class,
-            LanguageResourcesConnectedEvent::class,
-            $this->queueDefaultSynchronization()
+            CustomerAddedEvent::class,
+            $this->queueCustomerConnectionSynchronization()
+        );
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            CustomerRemovedEvent::class,
+            $this->cleanUpWhenCustomerRemovedFromConnection()
         );
 
         $this->eventManager->attach(
@@ -85,7 +91,7 @@ class EventListener
         $this->eventManager->attach(
             EventDispatcher::class,
             CustomerAssocEvents\AssociationDeletedEvent::class,
-            $this->deleteConnectionWhenCustomerAssocDeleted()
+            $this->removeCustomerFromConnectionWhenCustomerAssocDeleted()
         );
     }
 
@@ -98,45 +104,44 @@ class EventListener
             /** @var ConnectionDeletedEvent $event */
             $event = $zendEvent->getParam('event');
 
-            $this->queueSynchronizationService->cleanupOnConnectionDeleted($event->connection);
-
-            $pairHasConnection = $this->synchronizationService->pairHasConnection(
-                (int) $event->connection->getSourceLanguageResourceId(),
-                (int) $event->connection->getTargetLanguageResourceId(),
-            );
-
-            if ($pairHasConnection) {
-                return;
-            }
-
             try {
                 $source = $this->languageResourceRepository->get((int) $event->connection->getSourceLanguageResourceId());
                 $target = $this->languageResourceRepository->get((int) $event->connection->getTargetLanguageResourceId());
 
-                $this->queueSynchronizationService->cleanupDefaultSynchronization($source, $target);
+                $this->synchronisationDirigent->cleanupDefaultSynchronization($source, $target);
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 // no resource - nothing no cleanup
             }
         };
     }
 
-    private function queueConnectionSynchronization(): callable
+    private function queueCustomerConnectionSynchronization(): callable
     {
         return function (Zend_EventManager_Event $zendEvent) {
-            /** @var ConnectionCreatedEvent $event */
+            /** @var CustomerAddedEvent $event */
             $event = $zendEvent->getParam('event');
+            $connection = $this->synchronizationService->findConnection(
+                (int) $event->connectionCustomer->getConnectionId()
+            );
 
-            $this->queueSynchronizationService->queueConnectionSynchronization($event->connection);
+            if ($connection === null) {
+                throw new RuntimeException('Connection was deleted in between');
+            }
+
+            $this->synchronisationDirigent->queueCustomerSynchronization(
+                $connection,
+                (int) $event->connectionCustomer->getCustomerId(),
+            );
         };
     }
 
     private function queueDefaultSynchronization(): callable
     {
         return function (Zend_EventManager_Event $zendEvent) {
-            /** @var LanguageResourcesConnectedEvent $event */
+            /** @var ConnectionCreatedEvent $event */
             $event = $zendEvent->getParam('event');
 
-            $this->queueSynchronizationService->queueDefaultSynchronization($event->source, $event->target);
+            $this->synchronisationDirigent->queueDefaultSynchronization($event->connection);
         };
     }
 
@@ -146,15 +151,11 @@ class EventListener
             /** @var CustomerAssocEvents\AssociationCreatedEvent $event */
             $event = $zendEvent->getParam('event');
 
-            $langResPairs = $this->synchronizationService->getConnectedPairsByAssoc($event->assoc);
+            $connections = $this->synchronizationService->getConnectionsByLrCustomerAssoc($event->assoc);
 
-            foreach ($langResPairs as $pair) {
+            foreach ($connections as $connection) {
                 try {
-                    $this->synchronizationService->createConnection(
-                        $pair->source,
-                        $pair->target,
-                        (int) $event->assoc->getCustomerId()
-                    );
+                    $this->synchronizationService->addCustomer($connection, (int) $event->assoc->getCustomerId());
                 } catch (\ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
                     // connection already exists
                 }
@@ -162,16 +163,43 @@ class EventListener
         };
     }
 
-    private function deleteConnectionWhenCustomerAssocDeleted(): callable
+    private function removeCustomerFromConnectionWhenCustomerAssocDeleted(): callable
     {
         return function (Zend_EventManager_Event $zendEvent) {
             /** @var CustomerAssocEvents\AssociationDeletedEvent $event */
             $event = $zendEvent->getParam('event');
 
-            $this->synchronizationService->deleteRelatedConnections(
+            $this->synchronizationService->removeCustomerFromConnections(
+                (int) $event->assoc->getCustomerId(),
                 (int) $event->assoc->getLanguageResourceId(),
-                (int) $event->assoc->getCustomerId()
             );
+        };
+    }
+
+    private function cleanUpWhenCustomerRemovedFromConnection(): callable
+    {
+        return function (Zend_EventManager_Event $zendEvent) {
+            /** @var CustomerRemovedEvent $event */
+            $event = $zendEvent->getParam('event');
+
+            $connection = $this->synchronizationService->findConnection(
+                (int) $event->connectionCustomer->getConnectionId()
+            );
+
+            if ($connection === null) {
+                throw new RuntimeException('Connection was deleted before clean up was done');
+            }
+
+            $this->synchronisationDirigent->cleanupOnCustomerRemovedFromConnection(
+                $connection,
+                (int) $event->connectionCustomer->getCustomerId()
+            );
+
+            if ($this->synchronizationService->connectionHasAssociatedCustomers($connection)) {
+                return;
+            }
+
+            $this->synchronizationService->deleteConnection($connection);
         };
     }
 }

@@ -141,7 +141,7 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
 
     public function namecomboAction(): void
     {
-        $this->view->rows = (new ContentProtectionRepository())->getContentRecognitionForInputMappingForm();
+        $this->view->rows = ContentProtectionRepository::create()->getContentRecognitionForInputMappingForm();
         $this->view->total = count($this->view->rows);
     }
 }

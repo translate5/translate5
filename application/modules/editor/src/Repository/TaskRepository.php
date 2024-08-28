@@ -60,7 +60,7 @@ class TaskRepository
     public function getProjectBy(editor_Models_Task $task): editor_Models_Task
     {
         $project = ZfExtended_Factory::get(editor_Models_Task::class);
-        $project->load($task->getProjectId());
+        $project->load((int) $task->getProjectId());
 
         return $project;
     }
@@ -77,10 +77,9 @@ class TaskRepository
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
 
         foreach ($tasksData as $taskData) {
-            $task = clone $task;
-            $task->init($taskData->toArray());
+            $task->init($taskData);
 
-            yield $task;
+            yield clone $task;
         }
     }
 }
