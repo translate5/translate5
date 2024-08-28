@@ -35,6 +35,8 @@ class editor_QueuedexportController extends ZfExtended_RestController
 {
     protected $entityClass = QueuedExport::class;
 
+    protected array $_unprotectedActions = ['view', 'download', 'status'];
+
     private readonly QueuedExportService $exportService;
 
     public function __construct(
