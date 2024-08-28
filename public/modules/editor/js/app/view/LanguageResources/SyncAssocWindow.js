@@ -35,8 +35,10 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
         'Editor.view.LanguageResources.SyncAssocWindowViewController',
     ],
     xtype: 'associationwindow',
-    title: Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
-    width: 600,
+    bind: {
+        title: '{l10n.crossLanguageResourceSynchronization.confirmSynchronisation}',
+    },
+    width: 800,
     height: 400,
     modal: true,
     controller: 'languageResourceSyncAssocWindow',
@@ -63,8 +65,10 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                     items: [
                         {
                             xtype: 'combo',
-                            fieldLabel: Editor.data.l10n.crossLanguageResourceSynchronization.targetLanguageResource,
-                            name: 'targetLanguageResourceId',
+                            bind: {
+                                fieldLabel: '{l10n.general.targetLanguageResource}',
+                            },
+                            name: 'connectionOption',
                             store: {
                                 xtype: 'store',
                                 fields: ['id', 'name'],
@@ -73,7 +77,44 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                             queryMode: 'local',
                             displayField: 'name',
                             valueField: 'id',
-                            allowBlank: false
+                            allowBlank: false,
+                            width: 300,
+                            listConfig: {
+                                getInnerTpl: function () {
+                                    return '<div style="white-space: nowrap; overflow: visible;">{name}</div>'; // Prevent text wrapping
+                                }
+                            },
+                            listeners: {
+                                afterrender: function(combo) {
+                                    var store = combo.getStore();
+                                    store.on('refresh', function() {
+                                        var longestText = '';
+                                        store.each(function(record) {
+                                            var text = record.get(combo.displayField);
+                                            if (text.length > longestText.length) {
+                                                longestText = text;
+                                            }
+                                        });
+
+                                        // Create a temporary element to calculate the width of the longest text
+                                        var tempEl = Ext.getBody().createChild({
+                                            tag: 'div',
+                                            html: longestText,
+                                            style: {
+                                                'position': 'absolute',
+                                                'visibility': 'hidden',
+                                                'font-family': combo.getEl().getStyle('font-family'),
+                                                'font-size': combo.getEl().getStyle('font-size')
+                                            }
+                                        });
+
+                                        var textWidth = tempEl.getWidth() + 10; // Add some padding
+                                        tempEl.destroy(); // Remove the temporary element
+
+                                        combo.listConfig.minWidth = textWidth > combo.width ? textWidth : combo.width;
+                                    });
+                                }
+                            }
                         },
                         {
                             xtype: 'button',
@@ -85,10 +126,6 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                     ]
                 },
                 {
-                    xtype: 'editorAdminTaskUserPrefsForm',
-                    hidden: true
-                },
-                {
                     xtype: 'tbspacer',
                     flex: 1
                 },
@@ -97,7 +134,9 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                     hidden: true,
                     glyph: 'f021@FontAwesome5FreeSolid',
                     reference: 'queueSynchronizeAll',
-                    text: Editor.data.l10n.crossLanguageResourceSynchronization.queueSynchronyzeAll,
+                    bind: {
+                        text: '{l10n.crossLanguageResourceSynchronization.queueSynchronizeAll}',
+                    },
                     handler: 'queueSynchronizeAll',
                     margin: 15,
                 }
@@ -110,21 +149,46 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
             store: {
                 type: 'LanguageResources.SyncAssoc'
             },
+            bind: {
+                emptyText: '{l10n.crossLanguageResourceSynchronization.emptyTableText}'
+            },
             columns: [
                 {
-                    text: Editor.data.l10n.crossLanguageResourceSynchronization.sourceLanguageResource,
+                    bind: {
+                        text: '{l10n.general.sourceLanguageResource}'
+                    },
                     dataIndex: 'sourceLanguageResourceName',
                     flex: 1,
                     renderer: v => Ext.String.htmlEncode(v)
                 },
                 {
-                    text: Editor.data.l10n.crossLanguageResourceSynchronization.targetLanguageResource,
+                    bind: {
+                        text: '{l10n.general.targetLanguageResource}'
+                    },
                     dataIndex: 'targetLanguageResourceName',
                     flex: 1,
                     renderer: v => Ext.String.htmlEncode(v)
                 },
                 {
-                    text: Editor.data.l10n.crossLanguageResourceSynchronization.customers,
+                    bind: {
+                        text: '{l10n.general.sourceLang}'
+                    },
+                    dataIndex: 'sourceLanguage',
+                    flex: 1,
+                    renderer: v => Ext.String.htmlEncode(v)
+                },
+                {
+                    bind: {
+                        text: '{l10n.general.targetLang}'
+                    },
+                    dataIndex: 'targetLanguage',
+                    flex: 1,
+                    renderer: v => Ext.String.htmlEncode(v)
+                },
+                {
+                    bind: {
+                        text: '{l10n.crossLanguageResourceSynchronization.customers}'
+                    },
                     dataIndex: 'customers',
                     flex: 1,
                     renderer: function (v, meta) {
@@ -139,17 +203,33 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                     }
                 },
                 {
+                    xtype: 'gridcolumn',
+                    bind: {
+                        text: '{l10n.general.additionalInfo}'
+                    },
+                    flex: 1,
+                    tdCls: 'specificData',
+                    renderer: (v, meta, r) => {
+                        ! Ext.isEmpty(v) ? meta.tdCls = 'gridColumnInfoIconTooltipCenter' : ''
+                    },
+                    dataIndex: 'additionalInfo'
+                },
+                {
                     xtype: 'actioncolumn',
                     width: 50,
                     items: [
                         {
                             iconCls: 'x-fa fa-trash',
-                            tooltip: Editor.data.l10n.crossLanguageResourceSynchronization.deleteTooltip,
+                            bind: {
+                                tooltip: '{l10n.crossLanguageResourceSynchronization.deleteTooltip}'
+                            },
                             handler: 'onDeleteConnection'
                         },
                         {
                             iconCls: 'x-fa fa-refresh',
-                            tooltip: Editor.data.l10n.crossLanguageResourceSynchronization.queueSynchronizationTooltip,
+                            bind: {
+                                tooltip: '{l10n.crossLanguageResourceSynchronization.queueSynchronizationTooltip}'
+                            },
                             handler: 'onSynchronizeConnection'
                         }
                     ],
@@ -157,12 +237,13 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                 }
             ],
             listeners: {
-                render: 'onAssociationGridRender'
+                render: 'onAssociationGridRender',
+                afterrender: 'onAssociationGridAfterRender'
             }
         }
     ],
 
-    loadRecord: function(record) {
+    loadRecord: function (record) {
         let associations = this.getViewModel().getStore('associations'),
             url = Editor.model.LanguageResources.SyncAssoc.proxy.url + '?languageResource=' + record.get('id');
 

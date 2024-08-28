@@ -177,7 +177,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     protected $meta;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $taskDataPath;
 
@@ -280,7 +280,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::init()
      */
-    public function init(array $data = null, $assumeDatabase = false)
+    public function init(array|Zend_Db_Table_Row_Abstract|null $data = null, $assumeDatabase = false): void
     {
         parent::init($data, $assumeDatabase);
         $this->taskDataPath = null;
@@ -1000,6 +1000,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     public function isExclusiveState(array $additionalNonExclusive = []): bool
     {
         return ! in_array($this->getState(), array_merge(self::NON_EXCLUSIVE_STATES, $additionalNonExclusive));
+    }
+
+    /**
+     * Retrieves if the optional deadline-date is set
+     * and the deadline is valid (= AFTER the creation date)
+     */
+    public function hasValidDeadlineDate(): bool
+    {
+        return ! empty($this->getDeadlineDate())
+            && strtotime($this->getDeadlineDate()) > strtotime($this->getCreated());
     }
 
     /**

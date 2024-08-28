@@ -90,6 +90,7 @@ class ReplaceContentProtector extends AbstractProtector
             htmlspecialchars($number, ENT_XML1),
             implode(':', $formats),
             htmlspecialchars($protectionDto->outputFormat),
+            $this->encodeRegex($protectionDto->regex),
         );
     }
 }

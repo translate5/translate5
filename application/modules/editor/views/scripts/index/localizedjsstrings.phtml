@@ -814,7 +814,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.project.ProjectPanel",
         title:'<?php echo $this->translate->_('Projekte');?>',
         strings:{
-        	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt: {projectSelection.taskName}');?>'
+        	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt');?>'
         }
     });
 
@@ -2319,7 +2319,8 @@ Editor.data.l10n = {
                 domainCode: 'Domain code',
                 engineName: 'Engine name',
                 fileName: 'File name',
-                status: 'Status'
+                status: 'Status',
+                glossaryId: '<?php echo $this->translate->_('default_glossary_id');?>'
             },
             GroupShare: {
                 tmId: '<?php echo $this->translate->_('tmId_GroupShare');?>'
@@ -2336,7 +2337,7 @@ Editor.data.l10n = {
                 term: '<?php echo $this->translate->_('term_TermCollection');?>',
                 termEntry: '<?php echo $this->translate->_('termEntry_TermCollection');?>',
                 attribute: '<?php echo $this->translate->_('attribute_TermCollection');?>'
-            }
+            },
         }
     },
     configuration: {
@@ -2442,7 +2443,12 @@ Editor.data.l10n = {
         enabled: '<?= $this->translate->_('Aktiviert') ?>',
         showDefault: '<?= $this->translate->_('Defaults anzeigen') ?>',
         hideDefault: '<?= $this->translate->_('Defaults ausblenden') ?>',
-        showAll: '<?= $this->translate->_('Zeige alles') ?>'
+        showAll: '<?= $this->translate->_('Zeige alles') ?>',
+        sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+        targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+        sourceLanguageResource: '<?= $this->translate->_('Ausgangssprache Ressource') ?>',
+        targetLanguageResource: '<?= $this->translate->_('Zielsprache Ressource') ?>',
+        additionalInfo: '<?php echo $this->translate->_('Zusätzliche Infos');?>',
     },
     helpButton: {
         tooltip: '<?= $this->translate->_('Tutorial-Videos aufrufen') ?>'
@@ -2450,19 +2456,18 @@ Editor.data.l10n = {
     crossLanguageResourceSynchronization: {
         windowTitle: '<?= $this->translate->_('Verwalten von Verbindungen') ?>',
         tooltip: '<?= $this->translate->_('Sprachübergreifende Synchronisierung von Ressourcen') ?>',
-        sourceLanguageResource: '<?= $this->translate->_('Ausgangssprache Ressource') ?>',
-        targetLanguageResource: '<?= $this->translate->_('Zielsprache Ressource') ?>',
         confirm_deletion_title: '<?= $this->translate->_('Löschung bestätigen') ?>',
         confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Synchronisierung löschen möchten?') ?>',
         connect: '<?= $this->translate->_('Verbinden Sie') ?>',
-        queueSynchronyzeAll: '<?= $this->translate->_('Warteschlange Alle synchronisieren') ?>',
+        queueSynchronizeAll: '<?= $this->translate->_('Warteschlange Alle synchronisieren') ?>',
         customers: '<?= $this->translate->_('Kunden') ?>',
         deleteTooltip: '<?= $this->translate->_('Löschen') ?>',
         queueSynchronizationTooltip: '<?= $this->translate->_('Synchronisierung von Warteschlangen') ?>',
         failedToLoadDataForTargetLanguageResource: '<?= $this->translate->_('Die Daten für die Zielsprachenressource konnten nicht geladen werden.') ?>',
         synchronisationQueued: '<?= $this->translate->_('Die Synchronisierung wurde in die Warteschlange gestellt und wird in Kürze verarbeitet.') ?>',
         failedToQueue: '<?= $this->translate->_('Synchronisierung in Warteschlange fehlgeschlagen.') ?>',
-        confirmSynchonisation: '<?= $this->translate->_('Bestätigen Sie die Synchronisierung.') ?>',
+        confirmSynchronisation: '<?= $this->translate->_('Bestätigen Sie die Synchronisierung.') ?>',
+        emptyTableText: '<?= $this->translate->_('crossLanguageResourceSynchronization.emptyTableText') ?>',
     }
 };
 

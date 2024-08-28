@@ -97,7 +97,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'float' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123.456,78"/>',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123.456,78" regex="049J0og21LWMjUmpNtAxqtXRrDas1QByjIFMLTAdoxeToh2TpF8KAA=="/>',
             'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
@@ -115,7 +115,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'float with custom format' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="12*34*56&78"/>',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="12*34*56&78" regex="049J0og21LWMjUmpNtAxqtXRrDas1QByjIFMLTAdoxeToh2TpF8KAA=="/>',
             'protectionDto' => $protectionDto2,
             'targetLang' => $targetLangDe,
         ];
@@ -133,7 +133,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'float with generic dot' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123456.78"/>',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123456.78" regex="049J0og21LWMjUmpNtAxqtXRrDas1QByjIFMLTAdoxeToh2TpF8KAA=="/>',
             'protectionDto' => $protectionDto3,
             'targetLang' => $targetLangDe,
         ];
@@ -151,7 +151,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'float with generic middle dot' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123456·78"/>',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123456·78" regex="049J0og21LWMjUmpNtAxqtXRrDas1QByjIFMLTAdoxeToh2TpF8KAA=="/>',
             'protectionDto' => $protectionDto4,
             'targetLang' => $targetLangDe,
         ];
@@ -173,7 +173,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'target lang hi_IN' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="1,23,456.78"/>',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="1,23,456.78" regex="049J0og21LWMjUmpNtAxqtXRrDas1QByjIFMLTAdoxeToh2TpF8KAA=="/>',
             'protectionDto' => $protectionDto5,
             'targetLang' => $targetLangHi,
         ];
@@ -191,7 +191,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'target format #.###.####0,###' => [
             'number' => '1,212,312,345.78',
-            'expected' => '<number type="float" name="test-default" source="1,212,312,345.78" iso="1212312345.78" target="12.123.12345,78"/>',
+            'expected' => '<number type="float" name="test-default" source="1,212,312,345.78" iso="1212312345.78" target="12.123.12345,78" regex="049J0og21LWMjUmpNtAxqtXRrDas1QByjIFMLTAdoxeToh2TpF8KAA=="/>',
             'protectionDto' => $protectionDto6,
             'targetLang' => $targetLangDe,
         ];
@@ -209,7 +209,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'date. keep as is' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123,456.78" target="123,456.78"/>',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123,456.78" target="123,456.78" regex="049J0og21LWMjUmpNtAxqtXRrDas1QByjIFMLTAdoxeToh2TpF8KAA=="/>',
             'protectionDto' => $protectionDtoKeepAsIs,
             'targetLang' => $targetLangDe,
         ];

@@ -96,7 +96,8 @@ class IntegerProtector extends FloatProtector
             htmlspecialchars($protectionDto->name),
             $number,
             $sign . $integer,
-            $sign . $this->getTargetInteger($integer, $protectionDto->outputFormat)
+            $sign . $this->getTargetInteger($integer, $protectionDto->outputFormat),
+            $this->encodeRegex($protectionDto->regex),
         );
     }
 

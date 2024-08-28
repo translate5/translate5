@@ -89,7 +89,7 @@ class ContentRecognition extends ZfExtended_Models_Entity_Abstract
         $s->where('type = ?', $type)->where('name = ?', $name);
 
         $this->row = $this->db->fetchRow($s);
-        if (null !== $this->row) {
+        if (null === $this->row) {
             $this->notFound("#by type, name", "$type, $name");
         }
 

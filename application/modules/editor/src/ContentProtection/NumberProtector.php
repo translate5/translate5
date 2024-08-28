@@ -153,7 +153,7 @@ class NumberProtector implements ProtectorInterface
     public static function fullTagRegex(): string
     {
         return sprintf(
-            '/<%s type="(.+)" name="(.+)" source="(.+)" iso="(.+)" target="(.+)"\s?\/>/U',
+            '/<%s type="(.+)" name="(.+)" source="(.+)" iso="(.+)" target="(.+)"\s*(regex="(.+)")?\s?\/>/U',
             self::TAG_NAME
         );
     }
@@ -162,7 +162,7 @@ class NumberProtector implements ProtectorInterface
         ?ContentProtectionRepository $numberRepository = null,
         ?ZfExtended_Logger $logger = null,
     ): self {
-        $numberRepository = $numberRepository ?: new ContentProtectionRepository();
+        $numberRepository = $numberRepository ?: ContentProtectionRepository::create();
         $logger = $logger ?: Zend_Registry::get('logger')->cloneMe('translate5.content_protection');
 
         return new self(

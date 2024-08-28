@@ -79,7 +79,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                         if (Editor.data.debug) {
                             v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
                         }
-                        return Ext.String.htmlEncode(rec.get('surName') + ', ' + rec.get('firstName')) + ' (' + v + ')';
+                        return Ext.String.htmlEncode(rec.get('surName') + ', ' + rec.get('firstName') + ' (' + v + ')');
                     },
                     filter: {
                         type: 'string'

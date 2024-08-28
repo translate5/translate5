@@ -137,8 +137,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 width: 260,
                 dataIndex: 'name',
                 stateId: 'name',
-                renderer: function(value, metadata){
-                    metadata.tdAttr = 'data-qtip="' + value + '"';
+                renderer: function(value, metadata) {
+                    value = Ext.String.htmlEncode(value);
+                    metadata.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(value) + '"';
                     return value;
                 },
                 flex: 1,
@@ -151,10 +152,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 dataIndex: 'customExtensions',
                 stateId: 'customExtensions',
                 renderer: function(value, metadata){
-                    value = value.join(', ');
-                    if(value){
-                        metadata.tdAttr = 'data-qtip="' + value + '"';
+                    value = Ext.String.htmlEncode(value.join(', '));
+
+                    if (value) {
+                        metadata.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(value) + '"';
                     }
+
                     return value;
                 },
                 text: me.text_cols.extensions,
@@ -173,7 +176,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     }
                 },
                 text: me.text_cols.description,
-                flex: 3
+                flex: 3,
+                renderer  : v => Ext.String.htmlEncode(v)
             },{
                 xtype: 'checkcolumn',
                 text: me.text_cols.customerStandard,

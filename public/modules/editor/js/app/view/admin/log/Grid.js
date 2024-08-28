@@ -131,6 +131,7 @@ Ext.define('Editor.view.admin.log.Grid', {
                         tdCls: 'message',
                         renderer: function(v, meta, rec) {
                             var data = rec.get('extra');
+                            v = Ext.String.htmlEncode(v);
                             if(data) {
                                 v += ' <img class="icon-log-more-info" src="'+Ext.BLANK_IMAGE_URL+'" alt="'+me.strings.moreInfo+'">';
                             }
@@ -149,7 +150,8 @@ Ext.define('Editor.view.admin.log.Grid', {
                         text: me.strings.colUsername,
                         filter: {
                             type: 'string'
-                        }
+                        },
+                        renderer: v => Ext.String.htmlEncode(v)
                     },
                     {
                         width: 100,

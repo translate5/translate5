@@ -55,7 +55,9 @@ Ext.define('Editor.view.comments.Navigation', {
         itemSelector: 'div.x-grid-item',
         tpl: [
             `<tpl for=".">
-                <div class="x-grid-item x-grid-cell-inner {[this.iconClass[values.type]]} {[this.getUserColor(values.userGuid)]} " tabindex="-1"> {comment}</div>
+                <div class="x-grid-item x-grid-cell-inner {[this.iconClass[values.type]]} {[this.getUserColor(values.userGuid)]} " tabindex="-1">
+                    {[Ext.String.htmlEncode(values.comment)]}
+                </div>
             </tpl>`,
             {
                 iconClass: {
@@ -83,9 +85,9 @@ Ext.define('Editor.view.comments.Navigation', {
         }
     }],
     tipTpl: new Ext.XTemplate([
-        `<div style="padding:10px;font-size:16px;font-weight:normal;line-height:1.5">{comment}</div>
+        `<div style="padding:10px;font-size:16px;font-weight:normal;line-height:1.5">{[Ext.String.htmlEncode(values.comment)]}</div>
          <hr>
-         <small><i>{userName} {modified}</i></small>
+         <small><i>{[Ext.String.htmlEncode(values.userName)]} {modified}</i></small>
          `
     ]),
 
