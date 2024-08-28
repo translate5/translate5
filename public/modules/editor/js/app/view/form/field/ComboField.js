@@ -26,17 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.segments.GridViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.segmentsGrid',
-    data: {
-        isEditingSegment: false,
-        taskProgress: 0,
-        userProgress: false
+Ext.define('Editor.view.form.field.ComboField', {
+    extend: 'Ext.form.field.ComboBox',
+    xtype: 'Editor.combobox',
+
+    initComponent: function () {
+        var me = this;
+        me.callParent();
+
+        me.tpl = Ext.create('Ext.XTemplate',
+            '<ul class="x-list-plain"><tpl for=".">',
+            '<li role="option" class="x-boundlist-item">' + this.getInnerTpl(this.displayField) + '</li>',
+            '</tpl></ul>'
+        );
     },
-    formulas: {
-        taskDescription: () => Ext.String.htmlEncode(Editor.data.task.get('description')),
-        taskProgressPercent: get => Math.round(get('taskProgress') * 100) + '%',
-        userProgressPercent: get => Math.round(get('userProgress') * 100) + '%'
+
+    getInnerTpl: function(displayField) {
+        console.log('getInnerTpl called');
+        return '{[Ext.String.htmlEncode(values.' + displayField + ')]}';
     }
 });

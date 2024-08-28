@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
-use MittagQI\ZfExtended\Tools\Markup;
 
 /**
  * Loads segment comments.
@@ -94,8 +93,7 @@ class Editor_CommentnavController extends ZfExtended_RestController
         /* @var $commentEntity editor_Models_Comment */
         $comments = $commentEntity->loadByTaskPlain($taskGuid);
         foreach ($comments as &$row) {
-            // TODO FIXME: this should not be neccessary ... may is resolved in TRANSLATE-3960 ?
-            $row['comment'] = Markup::escapeAllQuotes($row['comment']);
+            $row['comment'] = $row['comment'];
             $row['type'] = $commentEntity::FRONTEND_ID;
             // the segment mappings segmentPage column  is a Hex-Value and does not qualify for sorting, therefore we add a parsed decimal property
             $this->getWfAnonymize()?->anonymizeUserdata($taskGuid, $row['userGuid'], $row);

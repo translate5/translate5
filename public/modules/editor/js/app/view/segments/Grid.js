@@ -249,7 +249,7 @@ Ext.define('Editor.view.segments.Grid', {
                 name = rec.get('name'),
                 type = rec.get('type'),
                 editable = rec.get('editable'),
-                label = rec.get('label'),
+                label = Ext.String.htmlEncode(rec.get('label')),
                 width = rec.get('width'),
                 widthFactorHeader = Editor.data.columns.widthFactorHeader,
                 widthOffsetEditable = Editor.data.columns.widthOffsetEditable,
@@ -298,7 +298,7 @@ Ext.define('Editor.view.segments.Grid', {
                     stateId: 'contentColumn_'+name+'_edit',
                     isContentColumn: true,//TODO those properties are missing 
                     isEditableContentColumn: true,//TODO those properties are missing
-                    tooltip: rec.get('label'),
+                    tooltip: Ext.String.htmlEncode(rec.get('label')),
                     text: label,
                     width: width
                 };
@@ -366,7 +366,7 @@ Ext.define('Editor.view.segments.Grid', {
     initConfig: function(instanceConfig) {
             var me = this,
             config = {
-                title: me.title, //see EXT6UPD-9
+                title: Ext.String.htmlEncode(me.title), //see EXT6UPD-9
                 viewConfig: {
                     getRowClass: function(record, rowIndex, rowParams, store){
                         var newClass = ['segment-font-sizable'],

@@ -236,7 +236,7 @@ Ext.define('Editor.controller.Segments', {
     gridAfterRender: function (grid) {
         var me = this,
             task = Editor.data.task,
-            title = Ext.String.ellipsis(task.get('taskName'), 60),
+            title = Ext.String.ellipsis(task.getTaskName(), 60),
             store = grid.store,
             repeated = grid.down('isRepeatedColumn'),
             initialGridFilters = Editor.data.initialGridFilters;

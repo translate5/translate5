@@ -36,10 +36,10 @@ Ext.define('Editor.view.ApplicationInfoPanel', {
     cls: 'head-panel-info-panel',
     itemId: 'applicationInfoPanel',
     tpl: [
-        '<div class="info-line"><span class="user-label">{userLabel}:</span> <span class="user-name">{user.firstName} {user.surName}</span></div>',
-        '<div class="info-line"><span class="login-label">{loginLabel}:</span> <span class="user-login">{user.login}</span></div>',
+        '<div class="info-line"><span class="user-label">{userLabel}:</span> <span class="user-name">{[Ext.String.htmlEncode(values.user.firstName)]} {[Ext.String.htmlEncode(values.user.surName)]}</span></div>',
+        '<div class="info-line"><span class="login-label">{loginLabel}:</span> <span class="user-login">{[Ext.String.htmlEncode(values.user.login)]}</span></div>',
         '<tpl if="task">',
-        '<div class="info-line"><span class="task-label">{taskLabel}:</span> <span class="task-name">{task.taskName}</span>',
+        '<div class="info-line"><span class="task-label">{taskLabel}:</span> <span class="task-name">{[Ext.String.htmlEncode(values.task.taskName)]}</span>',
         '</tpl>',
         '<tpl if="isReadonly">',
         '<span class="task-readonly">{readonlyLabel}</span>',
