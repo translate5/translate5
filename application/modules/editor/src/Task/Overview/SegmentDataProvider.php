@@ -121,7 +121,7 @@ class SegmentDataProvider
                     SegmentDataHeader::FIELD_MATCH_RATE => $segment->getValue('matchRate'),
                     SegmentDataHeader::FIELD_COMMENTS => $segment->getValue('comments'),
 
-                    default => $this->formatSegment($task, $segment->getValue($field->id)),
+                    default => $this->formatSegment($task, $segment->getValue($field->id), str_contains($field->id, 'source')),
                 };
             }
 
@@ -131,14 +131,14 @@ class SegmentDataProvider
         return $segmentDataTable;
     }
 
-    private function formatSegment(Task $task, ?string $segment): string
+    private function formatSegment(Task $task, ?string $segment, bool $isSource): string
     {
         if ($segment === null) {
             return '';
         }
 
         foreach ($this->segmentFormatters as $formatter) {
-            $segment = $formatter($task, $segment);
+            $segment = $formatter($task, $segment, $isSource);
         }
 
         return $segment;

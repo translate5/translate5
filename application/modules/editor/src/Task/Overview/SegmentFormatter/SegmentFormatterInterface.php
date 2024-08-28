@@ -29,5 +29,5 @@ use editor_Models_Task as Task;
 
 interface SegmentFormatterInterface
 {
-    public function __invoke(Task $task, string $segment): string;
+    public function __invoke(Task $task, string $segment, bool $isSource): string;
 }

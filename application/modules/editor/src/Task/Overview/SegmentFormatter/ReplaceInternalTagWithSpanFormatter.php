@@ -26,26 +26,86 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\Overview\SegmentFormatter;
 
+use editor_Models_Segment_InternalTag;
 use editor_Models_Task as Task;
 
 class ReplaceInternalTagWithSpanFormatter implements SegmentFormatterInterface
 {
     public function __construct(
         private readonly string $messageAttr = 'data-message',
-        private readonly string $color = 'rgba(207, 207, 207, 0.667)'
+        private readonly string $color = 'rgba(207, 207, 207, 0.667)',
     ) {
     }
 
-    public function __invoke(Task $task, string $segment): string
+    public function __invoke(Task $task, string $segment, bool $isSource): string
     {
-        //remove full tags
-        $segment = preg_replace('#<span[^>]+class="full"[^>]*>[^<]*</span>#i', '', $segment);
+        $tagCount = preg_match_all(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $segment, $tags);
 
-        //replace short tag div span construct to a simple span
+        if (! $tagCount) {
+            return $segment;
+        }
+
+        foreach ($tags[0] as $tag) {
+            $replacedTag = match (true) {
+                $this->isContentProtectionTag($tag) => $this->getContentProtectionTagReplacement($tag, $isSource),
+                $this->isWhitespaceTag($tag) => $this->getWhitespaceTagReplacement($tag),
+                default => $this->getSimpleTagReplacement($tag),
+            };
+
+            $segment = str_replace($tag, $replacedTag, $segment);
+        }
+
+        return $segment;
+    }
+
+    private function isContentProtectionTag(string $tag): bool
+    {
+        return (bool) preg_match('#\sclass="(open|close|single)\s+([gxA-Fa-f0-9]*)[^"]*number\s#', $tag);
+    }
+
+    private function getContentProtectionTagReplacement(string $tag, bool $isSource): string
+    {
+        preg_match(
+            '#<div[^>]+>\s*<span[^>]+class="short"\s*title="(.+)"[^>]*>[^<]*</span>\s*<span\s*class="full".*data-source="(.+)"\s*data-target="(.+)"\s*([^>]*)>([^<]*)</span>[\s]*</div>#miU',
+            $tag,
+            $matches
+        );
+
+        return sprintf(
+            '<span %s="%s" style="background-color: %s">%s</span>',
+            $this->messageAttr,
+            $matches[1],
+            $this->color,
+            htmlentities($isSource ? $matches[2] : $matches[3])
+        );
+    }
+
+    private function isWhitespaceTag(string $tag): bool
+    {
+        return (bool) preg_match(
+            '#\sclass="(open|close|single)\s+([gxA-Fa-f0-9]*)[^"]*(nbsp|tab|space|newline|char)\s#',
+            $tag
+        );
+    }
+
+    private function getWhitespaceTagReplacement(string $tag): string
+    {
+        return preg_replace(
+            '#<div[^>]+>\s*<span[^>]+class="short"\s*title="(.+)"[^>]*>[^<]*</span>\s*<span\s*class="full"\s*([^>]*)>([^<]*)</span>[\s]*</div>#miU',
+            '<span ' . $this->messageAttr . '="$1" style="background-color: ' . $this->color . '">$3</span>',
+            $tag
+        );
+    }
+
+    private function getSimpleTagReplacement(string $tag): string
+    {
+        //remove full tag
+        $tag = preg_replace('#<span[^>]+class="full"[^>]*>[^<]*</span>#i', '', $tag);
+
         return preg_replace(
             '#<div[^>]+>\s*<span\s*class="short"\s*title="(.+)"([^>]*)>([^<]*)</span>[\s]*</div>#miU',
             '<span ' . $this->messageAttr . '="$1" style="background-color: ' . $this->color . '">$3</span>',
-            $segment
+            $tag
         );
     }
 }

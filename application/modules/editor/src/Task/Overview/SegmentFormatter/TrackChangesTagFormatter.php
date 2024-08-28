@@ -46,7 +46,7 @@ class TrackChangesTagFormatter implements SegmentFormatterInterface
         );
     }
 
-    public function __invoke(Task $task, string $segment): string
+    public function __invoke(Task $task, string $segment, bool $isSource): string
     {
         $tracks = $this->taskUserTrackingRepository->getByTaskGuid($task->getTaskGuid());
         $trackChangeIdToUserName = array_column($tracks, 'userName', 'id');

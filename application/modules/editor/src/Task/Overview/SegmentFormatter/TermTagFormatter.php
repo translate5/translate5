@@ -35,7 +35,7 @@ class TermTagFormatter implements SegmentFormatterInterface
     ) {
     }
 
-    public function __invoke(Task $task, string $segment): string
+    public function __invoke(Task $task, string $segment, bool $isSource): string
     {
         //replace term divs by breaking apart to replace the class
         $parts = preg_split('#(<div[^>]+>)#i', $segment, flags: PREG_SPLIT_DELIM_CAPTURE);
