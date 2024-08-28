@@ -103,9 +103,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      * @param string $workflowStepName string or null, if empty returns no users, since needed as filter
      * @param array $assocFields optional, column names of the assoc table to be added in the result set
      * @param string $state string or null, additional filter for state of the job
-     * @return [array] list with user arrays
      */
-    public function loadUsersOfTaskWithStep(string $taskGuid, $workflowStepName, array $assocFields = [], $state = null)
+    public function loadUsersOfTaskWithStep(string $taskGuid, $workflowStepName, array $assocFields = [], $state = null): array
     {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
@@ -168,14 +167,14 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
 
     /**
      * loads the assocs regardless isPmOverride is set or not
-     * @return array
      */
-    public function loadByTaskGuidList(array $list)
+    public function loadByTaskGuidList(array $list): array
     {
+        if (empty($list)) {
+            return [];
+        }
+
         try {
-            if (empty($list)) {
-                return [];
-            }
             $s = $this->db->select()->where('taskGuid in (?)', $list);
 
             return $this->db->fetchAll($s)->toArray();
@@ -183,7 +182,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
             $this->notFound('NotFound after other Error', $e);
         }
 
-        return null;
+        return [];
     }
 
     /**
@@ -877,15 +876,14 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function onBeforeSave() : void
+    public function onBeforeSave(): void
     {
         // If segmentrange-prop is modified or it's new assoc-record
-        if ($this->isModified('segmentrange') || !$this->getId()) {
-
+        if ($this->isModified('segmentrange') || ! $this->getId()) {
             // Recount values for segmentEditableCount and segmentFinishCount fields
             ZfExtended_Factory
                 ::get(editor_Models_TaskProgress::class)
-                ->recountEditableAndFinished($this);
+                    ->recountEditableAndFinished($this);
         }
     }
 }

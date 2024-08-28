@@ -240,7 +240,11 @@ class ReimportSegments
         $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
         /** @var UpdatableAdapterInterface|editor_Services_Connector $connector */
-        $connector = $manager->getConnector($this->languageResource, null, null, $this->task->getConfig());
+        $connector = $manager->getConnector(
+            $this->languageResource,
+            config: $this->task->getConfig(),
+            customerId: (int) $this->task->getCustomerId(),
+        );
 
         $emptySegmentsAmount = 0;
         $successfulSegmentsAmount = 0;

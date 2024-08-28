@@ -40,10 +40,17 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskattributesviewcontroller',
 
+    requires:[
+        'Editor.view.admin.task.TaskDeadlineChangeHandler'
+    ],
+
     listen: {
         component: {
             'radio[name="usageMode"]': {
                 change: 'onUsageModeChange'
+            },
+            '#deadlineDate': {
+                change: 'onDeadlineDateChange'
             }
         }
     },
@@ -118,7 +125,7 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
     },
     
     /***
-     * Remove loading mask from task attribute panel
+     * Remove loading mask from task attribdeadlineDateLabelute panel
      */
     unmask:function(){
         this.getView().getEl().unmask();
@@ -129,6 +136,11 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
      */
     getCurrentTask:function(){
     	return this.getView().lookupViewModel().get('currentTask');
+    },
+
+    onDeadlineDateChange: function (field, newValue, oldValue) {
+        const deadlineHandler = Ext.create('Editor.view.admin.task.TaskDeadlineChangeHandler');
+        deadlineHandler.handleDeadlineChange(this.getCurrentTask(), newValue);
     }
 
 });

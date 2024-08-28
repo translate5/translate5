@@ -144,20 +144,29 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
         $this->row = $row;
     }
 
-    /***
+    /**
      * Search customers by given search string.
      * The search will provide any match on name field.
-     *
-     * @param string $searchString
-     * @return array|array
      */
-    public function search($searchString, $fields = [])
+    public function search(string $searchString, array $fields = []): array
     {
         $s = $this->db->select();
         if (! empty($fields)) {
             $s->from($this->tableName, $fields);
         }
         $s->where('lower(name) LIKE lower(?)', '%' . $searchString . '%');
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+
+    /**
+     * Search for a customer which name starts with the given string
+     */
+    public function nameStartsWith(string $name): array
+    {
+        $s = $this->db->select()
+            ->where('name LIKE ?', $name . '%')
+            ->order('name ASC');
 
         return $this->db->fetchAll($s)->toArray();
     }

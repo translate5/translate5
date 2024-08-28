@@ -52,6 +52,7 @@ class editor_Workflow_CachableDefinition
         'STATE_WAITING' => 'wartend',
         'STATE_UNCONFIRMED' => 'unbestätigt',
         'STATE_FINISH' => 'abgeschlossen',
+        'STATE_AUTO_FINISH' => 'automatisch abgeschlossen',
         'STATE_OPEN' => 'offen',
         'STATE_EDIT' => 'selbst in Arbeit',
         'STATE_VIEW' => 'selbst geöffnet',

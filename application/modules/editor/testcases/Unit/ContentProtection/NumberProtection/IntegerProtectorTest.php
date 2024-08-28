@@ -96,7 +96,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'integer with comma separator' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123456"/>',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123456" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA=="/>',
             'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
@@ -118,7 +118,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'target lang hi_IN' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="1.23.456"/>',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="1.23.456" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA=="/>',
             'protectionDto' => $protectionDto1,
             'targetLang' => $targetLangHi,
         ];
@@ -136,7 +136,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'target format #,###,####0.###' => [
             'number' => '1,212,312,345',
-            'expected' => '<number type="integer" name="test-default" source="1,212,312,345" iso="1212312345" target="12,123,12345"/>',
+            'expected' => '<number type="integer" name="test-default" source="1,212,312,345" iso="1212312345" target="12,123,12345" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA=="/>',
             'protectionDto' => $protectionDto2,
             'targetLang' => $targetLangDe,
         ];
@@ -154,7 +154,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'keep as is' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123,456" target="123,456"/>',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123,456" target="123,456" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA=="/>',
             'protectionDto' => $protectionDtoKeepAsIs,
             'targetLang' => $targetLangDe,
         ];

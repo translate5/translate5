@@ -34,12 +34,12 @@ END LICENSE AND COPYRIGHT
 
 $currentDomain=$_SERVER['HTTP_HOST'].APPLICATION_RUNDIR.'/';
 
-$user=ZfExtended_Factory::get(ZfExtended_Models_User::class);
+$user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
 
 $customerId = $user->isValidCustomerDomain($this->receiver->userGuid, $currentDomain);
 
 if(!$customerId){
-    $currentDomain=$this->config->runtimeOptions->server->name.APPLICATION_RUNDIR;
+    $currentDomain = $this->config->runtimeOptions->server->name.APPLICATION_RUNDIR;
 }
 $portal = $this->config->runtimeOptions->server->protocol.$currentDomain;
 
@@ -63,30 +63,28 @@ $dateFormater=function($date){
     if(!isset($date) || empty($date)){
         return '-';
     }
-    return $this->workflowNotifyMail()->dateFormat($date,true);
+    return $this->workflowNotifyMail()->dateFormat($date, true);
 };
 
 if(isset($this->taskUserAssoc)){
     //format the assoc deadlineDate to the required format
-    $this->taskUserAssoc['deadlineDate']=$dateFormater($this->taskUserAssoc['deadlineDate']);
+    $this->taskUserAssoc['deadlineDate'] = $dateFormater($this->taskUserAssoc['deadlineDate']);
 }
 
 //format all user assocs deadlineDates to the required format
 if(isset($this->associatedUsers) && !empty($this->associatedUsers)){
-    $this->associatedUsers=array_map(function($item) use($dateFormater){
-        $item['deadlineDate']=$dateFormater($item['deadlineDate'] ?? null);
+    $this->associatedUsers = array_map(function($item) use($dateFormater){
+        $item['deadlineDate'] = $dateFormater($item['deadlineDate'] ?? null);
         return $item;
     }, $this->associatedUsers);
-    
 }
 
 //format all user assocs deadlineDates to the required format
 if(isset($this->previousUsers) && !empty($this->previousUsers)){
     $this->previousUsers=array_map(function($item) use($dateFormater){
-        $item['deadlineDate']=$dateFormater($item['deadlineDate'] ?? null);
+        $item['deadlineDate'] = $dateFormater($item['deadlineDate'] ?? null);
         return $item;
     }, $this->previousUsers);
-        
 }
 
 
@@ -108,10 +106,11 @@ if(!empty($this->project)) {
 
     // If the customer domain is set, use this domain as portal url and link
     if (empty($customer->getDomain())) {
-        $data['portalLink']='<a href="'.$portal.$urlPart.'">'.$portal.$urlPart.'</a>';
+        $data['portalLink'] = '<a href="' . $portal . $urlPart . '">' . $portal . $urlPart . '</a>';
     } else {
         $data['portalUrl'] = $customer->getFullDomain();
-        $data['portalLink']='<a href="'.$customer->getFullDomain().$urlPart.'">'.$customer->getFullDomain().$urlPart.'</a>';
+        $data['portalLink'] = '<a href="' . $customer->getFullDomain() . $urlPart . '">'
+            . $customer->getFullDomain() . $urlPart . '</a>';
     }
 }
 
@@ -119,7 +118,7 @@ if(!empty($this->task)) {
     $taskData = $this->workflowNotifyMail()->getTaskLanguages($this->task);
     $taskData['task'] = $this->task->getDataObject();
 
-    $urlPart = '/editor#task/'.$this->task->getId().'/1/edit';
+    $urlPart = '/editor#task/' . $this->task->getId() . '/1/edit';
 
     $taskData['deadlineDate'] = $this->taskUserAssoc['deadlineDate'] ?? '-';
     $taskData['wordCount'] = $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-';
@@ -128,12 +127,12 @@ if(!empty($this->task)) {
     $customer->load($this->task->getCustomerId());
 
     //if the customer domain is set, use this domain as portal url and link
-    if(empty($customer->getDomain())){
-        $data['portalLink']='<a href="'.$portal.$urlPart.'">'.$portal.$urlPart.'</a>';
-    }
-    else {
-        $data['portalUrl']=$customer->getFullDomain();
-        $data['portalLink']='<a href="'.$customer->getFullDomain().$urlPart.'">'.$customer->getFullDomain().$urlPart.'</a>';
+    if (empty($customer->getDomain())) {
+        $data['portalLink'] = '<a href="' . $portal . $urlPart . '">' . $portal . $urlPart . '</a>';
+    } else {
+        $data['portalUrl'] = $customer->getFullDomain();
+        $data['portalLink'] = '<a href="' . $customer->getFullDomain() . $urlPart . '">'
+            . $customer->getFullDomain() . $urlPart . '</a>';
     }
     
     //we have to pre-apply the relaisLang Fragment to inject the language itself

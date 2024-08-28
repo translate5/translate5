@@ -304,14 +304,6 @@ class ContentProtectionRepository
         return $dbContentRecognition->fetchAll($select)->toArray();
     }
 
-    public function getContentRecognition(string $type, string $name): ContentRecognition
-    {
-        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
-        $contentRecognition->loadBy($type, $name);
-
-        return $contentRecognition;
-    }
-
     public function getRulesHashBy(Languages $sourceLang, Languages $targetLang): ?string
     {
         $inputLines = [];

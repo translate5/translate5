@@ -44,6 +44,7 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.EditTmWindow',
         'Editor.view.LanguageResources.TaskGridWindow',
         'Editor.view.LanguageResources.ImportCollectionWindow',
+        'Editor.view.LanguageResources.SyncAssocWindow',
         'Editor.view.LanguageResources.log.LogWindow',
         'Editor.view.LanguageResources.ProposalExport',
         'Editor.view.LanguageResources.TbxExport',
@@ -483,18 +484,23 @@ Ext.define('Editor.controller.TmOverview', {
                     break;
                 case 'log':
                     me.handleLogTm(view, cell, col, newRecord);
-                    break;
-                case 'converseTm':
-                    me.handleTmConversion(view, cell, col, newRecord);
-                    break;
                 case 'specific':
                     me.handleEditSpecific(view, cell, col, newRecord);
                     break;
                 case 'converseTm':
                     me.handleTmConversion(view, cell, col, newRecord);
                     break;
+                case 'sync':
+                    me.handleLanguageResourceSync(view, cell, col, newRecord);
+                    break;
             }
         });
+    },
+
+    handleLanguageResourceSync: function (view, cell, cellIdx, rec) {
+        Ext.widget('languageResourceSyncAssocWindow', {
+            languageResource: rec
+        }).show();
     },
 
     handleTmConversion: function (view, cell, cellIdx, rec) {
@@ -523,13 +529,15 @@ Ext.define('Editor.controller.TmOverview', {
             url = proxy.getUrl(),
             menu,
             filetypes = Editor.util.LanguageResources.getService(rec.get('serviceName')).getValidFiletypes(),
+            // random string of 10 characters
+            oneTimeFileToken = Math.random().toString(36).substring(2, 12),
             createMenuItems = function () {
                 var items = [];
                 if (filetypes.indexOf('tm') !== -1) {
                     items.push({
                         itemId: 'exportTm',
                         hrefTarget: '_blank',
-                        href: url + '/download.tm',
+                        href: url + '/download.tm?token=' + oneTimeFileToken,
                         text: me.strings.exportTm
                     });
                 }
@@ -537,7 +545,7 @@ Ext.define('Editor.controller.TmOverview', {
                     items.push({
                         itemId: 'exportTmx',
                         hrefTarget: '_blank',
-                        href: url + '/download.tmx',
+                        href: url + '/download.tmx?token=' + oneTimeFileToken,
                         text: me.strings.exportTmx
                     });
                 }
@@ -545,7 +553,7 @@ Ext.define('Editor.controller.TmOverview', {
                     items.push({
                         itemId: 'exportZippedTmx',
                         hrefTarget: '_blank',
-                        href: url + '/download.zip',
+                        href: url + '/download.zip?token=' + oneTimeFileToken,
                         text: me.strings.exportZippedTmx
                     });
                 }

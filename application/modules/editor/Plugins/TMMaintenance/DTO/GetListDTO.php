@@ -60,27 +60,29 @@ class GetListDTO
 
     public static function fromRequest(Request $request): static
     {
+        $data = json_decode($request->getParam('data'), true, JSON_THROW_ON_ERROR);
+
         return new static(
-            (int) $request->getParam('tm'),
+            (int) $data['tm'],
             (int) $request->getParam('limit'),
-            (string) $request->getParam('offset'),
-            (string) $request->getParam('source'),
-            (string) $request->getParam('sourceMode'),
-            (string) $request->getParam('target'),
-            (string) $request->getParam('targetMode'),
-            (string) $request->getParam('sourceLanguage'),
-            (string) $request->getParam('targetLanguage'),
-            (string) $request->getParam('author'),
-            (string) $request->getParam('authorMode'),
-            (string) $request->getParam('creationDateFrom'),
-            (string) $request->getParam('creationDateTo'),
-            (string) $request->getParam('additionalInfo'),
-            (string) $request->getParam('additionalInfoMode'),
-            (string) $request->getParam('document'),
-            (string) $request->getParam('documentMode'),
-            (string) $request->getParam('context'),
-            (string) $request->getParam('contextMode'),
-            (bool) $request->getParam('onlyCount', false),
+            (string) $data['offset'],
+            (string) $data['source'],
+            (string) $data['sourceMode'],
+            (string) $data['target'],
+            (string) $data['targetMode'],
+            (string) $data['sourceLanguage'],
+            (string) $data['targetLanguage'],
+            (string) $data['author'],
+            (string) $data['authorMode'],
+            (string) $data['creationDateFrom'],
+            (string) $data['creationDateTo'],
+            (string) $data['additionalInfo'],
+            (string) $data['additionalInfoMode'],
+            (string) $data['document'],
+            (string) $data['documentMode'],
+            (string) $data['context'],
+            (string) $data['contextMode'],
+            (bool) ($data['onlyCount'] ?? false),
         );
     }
 

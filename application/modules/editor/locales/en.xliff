@@ -7190,6 +7190,14 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</source>
                 <target>If this is not a decimal number but a list with missing spaces between list elements, please insert spaces between list elements in target. In case of wrongly used decimal separator in the source please ignore message.</target>
             </trans-unit>
+            <trans-unit id='KEdnZi4gZmVobGVyaGFmdGVyKSBUcmVubmVyIGF1cyBRdWVsbGUgdW52ZXLDpG5kZXJ0IGluIFppZWwgw7xiZXJub21tZW4='>
+                <source>(Ggf. fehlerhafter) Trenner aus Quelle unverändert in Ziel übernommen</source>
+                <target>(Possibly erroneous) separator from SRC found unchanged in TRG</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgcHLDvGZlbiwgb2IgZXMgc2ljaCB1bSBlaW5lIGVjaHRlIFphaGwgdnMuIGVpbmUgUHJvZHVrdG51bW1lciBvLsOkLiBoYW5kZWx0LiBCZWkgdmVyd2VuZGV0ZW0gVHJlbm5lciBpbiBlaW5lciBQcm9kdWt0bnVtbWVyIG8uw6QuIGluIGRlciBRdWVsbGUgYml0dGUgaWdub3JpZXJlbg=='>
+                <source>Bitte prüfen, ob es sich um eine echte Zahl vs. eine Produktnummer o.ä. handelt. Bei verwendetem Trenner in einer Produktnummer o.ä. in der Quelle bitte ignorieren</source>
+                <target>Please check if this is a real number vs. a product number or similar. In case of a separator in a product number in SRC, please set as ignored</target>
+            </trans-unit>
             <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='>
                 <source>taskType::termtranslation</source>
                 <target>Terminology Translation Project</target>
@@ -9964,9 +9972,69 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
                 <target>Update locale user with data from the SSO provider (roles, gender, locale)</target>
             </trans-unit>
+            <trans-unit id="YWxsb3dfZG93bmxvYWRfcG9wdXBfYWxlcnQ=">
+                <source>allow_download_popup_alert</source>
+                <target>Please allow popups for this site to automatically download the file.</target>
+            </trans-unit>
             <trans-unit id='U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4='>
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server for the queried service is not reachable.</target>
+            </trans-unit>
+            <trans-unit id='RGllc2VyIEF1ZnRyYWcgd2lyZCBhdXRvbWF0aXNjaCBiZWltIEVycmVpY2hlbiBkZXIgQXVmZ2FiZW5mcmlzdCBhbSAlcyBnZXNjaGxvc3Nlbi4='>
+                <source>Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.</source>
+                <target>This job will be closed automatically on %s when the task deadline is reached.</target>
+            </trans-unit>
+            <trans-unit id='SGlud2VpczogRWluaWdlIEJlbnV0emVyIGhhYmVuIGluZGl2aWR1ZWxsZSBBdWZnYWJlbmZyaXN0ZW4uIEJpdHRlbiBwcsO8ZmVuIHVuZCBwYXNzZW4gU2llIGRpZXNlIGJlaSBCZWRhcmYgYW4u'>
+                <source>Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.</source>
+                <target>Note: Some users have individual deadline dates set. Please review and adjust them manually if necessary.</target>
+            </trans-unit>
+            <trans-unit id='U3ByYWNow7xiZXJncmVpZmVuZGUgU3luY2hyb25pc2llcnVuZyB2b24gUmVzc291cmNlbg=='>
+                <source>Sprachübergreifende Synchronisierung von Ressourcen</source>
+                <target>Cross Language Resource synchronisation</target>
+            </trans-unit>
+            <trans-unit id='QXVzZ2FuZ3NzcHJhY2hlIFJlc3NvdXJjZQ=='>
+                <source>Ausgangssprache Ressource</source>
+                <target>Source Language Resource</target>
+            </trans-unit>
+            <trans-unit id='WmllbHNwcmFjaGUgUmVzc291cmNl'>
+                <source>Zielsprache Ressource</source>
+                <target>Target Language Resource</target>
+            </trans-unit>
+            <trans-unit id='VmVyYmluZGVuIFNpZQ=='>
+                <source>Verbinden Sie</source>
+                <target>Connect</target>
+            </trans-unit>
+            <trans-unit id='V2FydGVzY2hsYW5nZSBBbGxlIHN5bmNocm9uaXNpZXJlbg=='>
+                <source>Warteschlange Alle synchronisieren</source>
+                <target>Queue Synchronize All</target>
+            </trans-unit>
+            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgU3luY2hyb25pc2llcnVuZyBsw7ZzY2hlbiBtw7ZjaHRlbj8='>
+                <source>Sind Sie sicher, dass Sie die Synchronisierung löschen möchten?</source>
+                <target>Are you sure you want to delete the synchronization?</target>
+            </trans-unit>
+            <trans-unit id='U3luY2hyb25pc2llcnVuZyB2b24gV2FydGVzY2hsYW5nZW4='>
+                <source>Synchronisierung von Warteschlangen</source>
+                <target>Queue Synchronisation</target>
+            </trans-unit>
+            <trans-unit id='RGllIERhdGVuIGbDvHIgZGllIFppZWxzcHJhY2hlbnJlc3NvdXJjZSBrb25udGVuIG5pY2h0IGdlbGFkZW4gd2VyZGVuLg=='>
+                <source>Die Daten für die Zielsprachenressource konnten nicht geladen werden.</source>
+                <target>Failed to load data for Target Language Resource.</target>
+            </trans-unit>
+            <trans-unit id='RGllIFN5bmNocm9uaXNpZXJ1bmcgd3VyZGUgaW4gZGllIFdhcnRlc2NobGFuZ2UgZ2VzdGVsbHQgdW5kIHdpcmQgaW4gS8O8cnplIHZlcmFyYmVpdGV0Lg=='>
+                <source>Die Synchronisierung wurde in die Warteschlange gestellt und wird in Kürze verarbeitet.</source>
+                <target>Synchronization was queued and will be processed soon.</target>
+            </trans-unit>
+            <trans-unit id='U3luY2hyb25pc2llcnVuZyBpbiBXYXJ0ZXNjaGxhbmdlIGZlaGxnZXNjaGxhZ2VuLg=='>
+                <source>Synchronisierung in Warteschlange fehlgeschlagen.</source>
+                <target>Failed to queue Synchronization.</target>
+            </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRpZSBTeW5jaHJvbmlzaWVydW5nLg=='>
+                <source>Bestätigen Sie die Synchronisierung.</source>
+                <target>Confirm Synchronization.</target>
+            </trans-unit>
+            <trans-unit id='VmVyd2FsdGVuIHZvbiBWZXJiaW5kdW5nZW4='>
+                <source>Verwalten von Verbindungen</source>
+                <target>Manage Connections</target>
             </trans-unit>
             <trans-unit id='UmVnZWxuYW1lIGV4aXN0aWVydCBiZXJlaXRzIGbDvHIgVHlwIHt0eXBlfQ=='>
                 <source>Regelname existiert bereits für Typ {type}</source>
@@ -9979,6 +10047,19 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
                 <source>Regel mit dieser Priorität existiert bereits</source>
                 <target>Rule with this priority already exists</target>
+            </trans-unit>
+            <trans-unit id='Y3Jvc3NMYW5ndWFnZVJlc291cmNlU3luY2hyb25pemF0aW9uLmVtcHR5VGFibGVUZXh0'>
+                <source>crossLanguageResourceSynchronization.emptyTableText</source>
+                <target>
+This language resource is not yet connected to any other language resource.<br/>
+Connections are created from source language resource to target one.<br/>
+The language resource can only be connected to another language resource if the following conditions are met:<br/>
+- Both language resources have the same language pair<br/>
+- Both language resources are assigned to the same customer<br/>
+- Both language resources have data that can be synchronized, e.g: terms can be converted into a glossary<br/>
+- The target language resource is not yet linked to the other language resource (at the moment we do not support multiple sources)<br/>
+Synchronization always takes place in one direction: source data -> target
+                </target>
             </trans-unit>
         </body>
     </file>

@@ -122,7 +122,7 @@ class editor_Services_ServiceResult
 
         $result->target = $target;
         $result->rawTarget = $rawTarget;
-        $result->matchrate = (int) $matchrate;
+        $result->matchrate = (int) ($matchrate ?: $this->defaultMatchrate);
         $result->source = $this->defaultSource;
         $result->languageResourceid = $this->languageResource->getId();
         $result->languageResourceType = $this->languageResource->getResourceType();

@@ -81,7 +81,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnSkip:'#UT#Importieren (weitere überspringen)',
         importDefaultsButtonText:'#UT#Importieren (Standards nutzen)',
         description: '#Projektbeschreibung',
-        autoRemovedUploadFilesWarningMessage:'#UT#Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.'
+        autoRemovedUploadFilesWarningMessage:'#UT#Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.',
+        deadlineDateLabel:'#UT#Deadline Datum',
     },
     modal : true,
     layout: 'anchor',
@@ -184,6 +185,11 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     submitFormat: Editor.DATE_ISO_FORMAT,
                                     value: now,
                                     fieldLabel: me.strings.orderdate
+                                },{
+                                    xtype: 'datefield',
+                                    name: 'deadlineDate',
+                                    submitFormat: Editor.DATE_ISO_FORMAT,
+                                    fieldLabel: me.strings.deadlineDateLabel
                                 },{
                                     xtype: 'checkbox',
                                     inputValue:1,
