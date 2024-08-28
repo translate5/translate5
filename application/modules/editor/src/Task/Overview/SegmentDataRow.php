@@ -27,7 +27,7 @@ namespace MittagQI\Translate5\Task\Overview;
 use SplObjectStorage;
 
 /**
- * @extends SplObjectStorage<SegmentField, string|int|float>
+ * @extends SplObjectStorage<SegmentField, string|int|float|string[]>
  */
 class SegmentDataRow extends SplObjectStorage
 {

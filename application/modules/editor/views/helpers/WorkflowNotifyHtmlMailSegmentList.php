@@ -143,6 +143,14 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
                     continue;
                 }
 
+                if ($field->id === SegmentDataHeader::FIELD_MANUAL_QS) {
+                    $joinedQualities = ! empty($row[$field]) ? implode(',<br />', $row[$field]) : '';
+
+                    $result[] = '<td valign="top" nowrap="nowrap">' . $joinedQualities . '</td>';
+
+                    continue;
+                }
+
                 $result[] = '<td valign="top">' . $row[$field] . '</td>';
             }
 
