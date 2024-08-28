@@ -47,9 +47,7 @@ class LspUserService
     public static function create(): self
     {
         $lspRepository = LspRepository::create();
-        $lspUserRepository = new LspUserRepository(
-            $lspRepository
-        );
+        $lspUserRepository = new LspUserRepository();
 
         return new self(
             LspRepository::create(),

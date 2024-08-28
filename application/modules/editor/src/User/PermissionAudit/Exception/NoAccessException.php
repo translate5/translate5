@@ -30,6 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\PermissionAudit\Exception;
 
-final class NoAccessException extends \Exception implements ValidationExceptionInterface
+final class NoAccessException extends \Exception implements PermissionExceptionInterface
 {
 }

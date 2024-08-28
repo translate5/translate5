@@ -41,9 +41,8 @@ use ZfExtended_Models_User;
 
 class LspUserRepository
 {
-    public function __construct(
-        private readonly LspRepository $lspRepository,
-    ) {
+    public function __construct()
+    {
     }
 
     public function findByUser(ZfExtended_Models_User $user): ?LspUser

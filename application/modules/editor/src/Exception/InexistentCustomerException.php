@@ -34,8 +34,9 @@ use InvalidArgumentException;
 
 class InexistentCustomerException extends InvalidArgumentException
 {
-    public function __construct(public readonly int $customerId)
-    {
+    public function __construct(
+        public readonly int $customerId
+    ) {
         parent::__construct("Customer with ID [$customerId] does not exist");
     }
 }

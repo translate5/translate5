@@ -67,7 +67,7 @@ class editor_LspController extends ZfExtended_RestController
         $lspRepository = LspRepository::create();
         $this->coordinatorRepository = new JobCoordinatorRepository(
             $lspRepository,
-            new LspUserRepository($lspRepository),
+            new LspUserRepository(),
         );
     }
 
