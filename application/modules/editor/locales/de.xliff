@@ -9887,6 +9887,10 @@ Die Sprachressource kann nur mit einer anderen Sprachresource verbunden werden, 
 Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 </target>
             </trans-unit>
+            <trans-unit id='ZGVmYXVsdF9nbG9zc2FyeV9pZA=='>
+                <source>default_glossary_id</source>
+                <target>Standard-Glossar-ID</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

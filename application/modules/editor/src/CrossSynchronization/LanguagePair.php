@@ -23,9 +23,13 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
+namespace MittagQI\Translate5\CrossSynchronization;
 
-enum SynchronisationType: string
+class LanguagePair
 {
-    case Glossary = 'glossary';
+    public function __construct(
+        public readonly int $sourceId,
+        public readonly int $targetId,
+    ) {
+    }
 }
