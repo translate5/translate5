@@ -10,6 +10,54 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [7.8.2] - 2024-08-23
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4132](https://jira.translate5.net/browse/TRANSLATE-4132): Main back-end mechanisms (Worker, Logging, etc.) - Auto-close jobs by task deadline** <br>
+ translate5 - 7.8.0: New date field project deadline date available for task.
+ translate5 - 7.8.2: Auto-close jobs can be turned on and off by config. By default it is off.
+
+
+## [7.8.1] - 2024-08-22
+
+### Important Notes:
+#### [TRANSLATE-4151](https://jira.translate5.net/browse/TRANSLATE-4151)
+IMPORTANT: Deprecated target languages "en" and "pt" in DeepL language-resources were converted to "en-GB" and "pt-PT". In case other variants are wanted, please create a new resource or contact our support to change it in the database.
+
+#### [TRANSLATE-4109](https://jira.translate5.net/browse/TRANSLATE-4109)
+Update Visual docker containers to get that change
+ 
+
+
+### Changed
+**[TRANSLATE-4109](https://jira.translate5.net/browse/TRANSLATE-4109): VisualReview / VisualTranslation - Add PDF Version check to pdfconverter container** <br>
+IMPROVEMENT Visual: warn, when imported PDF is of X-4 subtype (which frequently create problems when converting)
+
+
+### Bugfixes
+**[TRANSLATE-4158](https://jira.translate5.net/browse/TRANSLATE-4158): LanguageResources - Add explanation text in empty language resource sync window** <br>
+Add explanation text for empty language resource sync window
+
+**[TRANSLATE-4154](https://jira.translate5.net/browse/TRANSLATE-4154): InstantTranslate - Instant translate produces error for user with no assigned customers** <br>
+FIX: instant translate crashes when accessed by user with no assigned customers
+
+**[TRANSLATE-4153](https://jira.translate5.net/browse/TRANSLATE-4153): Editor general - Bookmark filter in editor does not work** <br>
+FIXED: bookmark filter is now working again
+
+**[TRANSLATE-4151](https://jira.translate5.net/browse/TRANSLATE-4151): LanguageResources - Use EN-GB instead of simple EN and PT as target for DeepL resources** <br>
+For DeepL language resources target languages "en" and "pt" changed to "en-GB" and "pt-PT" respectively.
+
+**[TRANSLATE-4118](https://jira.translate5.net/browse/TRANSLATE-4118): TermPortal - Search results scrolling problem in Firefox** <br>
+translate5 - 7.8.0: FIXED: scrollbar not available for search results grid in Firefox
+translate5 - 7.8.1: Fix for UI error in instant-translate
+
+
 ## [7.8.0] - 2024-08-20
 
 ### Important Notes:

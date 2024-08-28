@@ -109,7 +109,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
      * @param {Editor.plugins.Okapi.model.BconfModel} record
      */
     deleteBconf: function(view, rowIndex, colIndex, item, e, record){
-        Ext.Msg.confirm(view.grid.strings.confirmDeleteTitle + `: <i>"${record.get('name')}"</i>`, view.grid.strings.confirmDeleteMessage, function(btnId){
+        let name = Ext.String.htmlEncode(record.get('name'));
+        Ext.Msg.confirm(view.grid.strings.confirmDeleteTitle + `: <i>"${name}"</i>`, view.grid.strings.confirmDeleteMessage, function(btnId){
             if(btnId === 'yes'){
                 record.drop(/* cascade */ false);
             }

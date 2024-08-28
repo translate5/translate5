@@ -85,7 +85,7 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract
         $s->where('taskGuid = ?', $taskGuid);
 
         return array_map(function ($item) {
-            $item['message'] = htmlspecialchars($item['message']);
+            $item['message'] = $item['message'];
 
             return $item;
         }, $this->loadFilterdCustom($s));

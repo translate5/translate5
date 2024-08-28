@@ -72,6 +72,7 @@ Ext.define('Editor.view.segments.grid.Header', {
         });
 
         var config = {
+                title: Ext.String.htmlEncode(me.title),
                 padding:'8 8 8 8', // the default padding spreads up the height of the header
                 defaults: {
                     margin:'0 0 0 4'

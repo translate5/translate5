@@ -99,10 +99,12 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 				'{title} <br/>',
 				'<table class="languageresource-meta-data">',
 				'<tpl for="metaData">',
-				'<tr><th>{name}</th><td>{value}</td></tr>',
+				'<tr><th>{[xt.String.htmlEncode(Ext.String.htmlEncode(values.name))]}</th>',
+                '<td>{[Ext.String.htmlEncode(xt.String.htmlEncode(values.value))]}</td>',
+                '</tr>',
 				'</tpl>',
 				'</table>',
-				'<br /> {ctrl} - {idx}: {takeMsg}'
+				'<br /> {ctrl} - {idx}: {[Ext.String.htmlEncode(values.takeMsg)]}'
 			),
         segField = Editor.model.segment.Field,
 	    config = {
@@ -138,13 +140,13 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 					  tooltip = '<div style="' + style + '" class="' + className + '"></div>' + tooltip + '<br/><br/>';
 				  }
 
-				  meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(attrTpl.applyTemplate({
+				  meta.tdAttr = 'data-qtip="'+attrTpl.applyTemplate({
 					  title: tooltip + me.strings.atributeTooltipMsg,
 					  metaData: record.get('metaData'),
 					  ctrl: me.strings.ctrl,
 					  idx: (meta.rowIndex + 1),
 					  takeMsg: me.strings.tooltipMsg
-				  }))+'"';
+				  })+'"';
 				  meta.tdCls  = meta.tdCls  + ' info-icon-shown';
 
 				  return meta.rowIndex + 1 + (
@@ -162,7 +164,8 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          cellWrap: true,
 			  tdCls: 'x-selectable segment-tag-column source '+segField.getDirectionCls('source'),
 	          dataIndex: 'source',
-	          text: me.strings.source
+	          text: me.strings.source,
+              renderer: v => Ext.String.htmlEncode(v)
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 5,
@@ -172,7 +175,8 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          cellWrap: true,
 			  tdCls: 'x-selectable segment-tag-column target '+segField.getDirectionCls('target'),
 	          dataIndex: 'target',
-	          text: me.strings.target
+	          text: me.strings.target,
+              renderer: v => Ext.String.htmlEncode(v)
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 3,
@@ -182,7 +186,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
 				  var str = me.assocStore.findRecord('languageResourceId',record.get('languageResourceid'),0,false,true,true),
-				  name = str.get('name')+' ('+str.get('serviceName')+')';
+				  name = Ext.String.htmlEncode(Ext.String.htmlEncode(str.get('name')))+' ('+str.get('serviceName')+')';
 	              meta.tdAttr += 'data-qtip="' + name + "<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
 				  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              meta.tdAttr += 'bgcolor="' + str.get('color') + '"';

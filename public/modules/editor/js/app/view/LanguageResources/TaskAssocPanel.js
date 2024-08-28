@@ -92,9 +92,9 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                     if(values.groupField === 'taskGuid'){
                                         //when taskGuid is active as grouping, render the task name as group value
                                         var data=values.rows && values.rows[0];
-                                        return data ? data.get('taskName') : ret;
+                                        return data ? Ext.String.htmlEncode(data.get('taskName')) : ret;
                                     }
-                                    return ret;
+                                    return Ext.String.htmlEncode(ret);
                                 }
                             }
                     ),
@@ -153,7 +153,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                     ? '<div style="' + style + '" class="' + className + '" data-qtip="'+ tooltip +'"></div>'
                                     : ''
                             )
-                            + value;
+                            + Ext.String.htmlEncode(value);
                     },
                     dataIndex : 'name',
                     sortable : true,

@@ -162,7 +162,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         items.push({
             xtype: auth.isAllowed('editorEditTaskTaskName') ? 'textfield' : 'displayfield',
             fieldLabel: me.strings.taskName,
-            bind:'{currentTask.taskName}',
+            bind: {
+                value: '{currentTask.taskName}'
+            },
             name:'taskName',
             itemId:'taskName'
         });
