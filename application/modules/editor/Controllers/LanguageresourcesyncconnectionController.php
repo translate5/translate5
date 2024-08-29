@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
+use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\ZfExtended\MismatchException;
 
 /**
  * Controller for the LanguageResources Associations
@@ -50,6 +52,8 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
      */
     protected $postBlacklist = ['id'];
 
+    protected bool $decodePutAssociative = true;
+
     /**
      * @see ZfExtended_RestController::indexAction()
      */
@@ -57,29 +61,46 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
     {
         $languageResourceId = $this->getRequest()->getParam('languageResource');
 
-        $repo = new CrossSynchronizationConnectionRepository();
+        $syncRepo = new CrossSynchronizationConnectionRepository();
+        $lrRepo = new LanguageResourceRepository();
+        $connectionRepo = new CrossSynchronizationConnectionRepository();
+        $integrationManager = new editor_Services_Manager();
 
         $rows = [];
 
-        foreach ($repo->getAllConnectionsRenderData($languageResourceId) as $row) {
-            $id = $row['sourceLanguageResourceId'] . ':' . $row['targetLanguageResourceId'];
+        foreach ($syncRepo->getAllConnectionsRenderData((int) $languageResourceId) as $row) {
+            $sourceLr = $lrRepo->get((int) $row['sourceLanguageResourceId']);
+            $targetLr = $lrRepo->get((int) $row['targetLanguageResourceId']);
+            $connection = $connectionRepo->getConnection((int) $row['id']);
 
-            if (! isset($rows[$id])) {
-                $rows[$id] = [
-                    'id' => $row['sourceLanguageResourceId'] . ':' . $row['targetLanguageResourceId'],
-                    'sourceLanguageResourceId' => $row['sourceLanguageResourceId'],
-                    'targetLanguageResourceId' => $row['targetLanguageResourceId'],
-                    'sourceLanguageResourceName' => $row['sourceServiceName'] . ': ' . $row['sourceName'],
-                    'targetLanguageResourceName' => $row['targetServiceName'] . ': ' . $row['targetName'],
-                    'customers' => [],
-                ];
-            }
+            $additionalInfo = [];
 
-            $rows[$id]['customers'][] = $row['customerName'];
+            $additionalInfo[$sourceLr->getName()] = $integrationManager
+                ->getSynchronisationService($sourceLr->getServiceType())
+                ?->getAdditionalInfoViewData($connection, $sourceLr)
+                ->getRows()
+            ;
+            $additionalInfo[$targetLr->getName()] = $integrationManager
+                ->getSynchronisationService($targetLr->getServiceType())
+                ?->getAdditionalInfoViewData($connection, $targetLr)
+                ->getRows()
+            ;
+
+            $rows[] = [
+                'id' => $row['id'],
+                'sourceLanguageResourceId' => $sourceLr->getId(),
+                'targetLanguageResourceId' => $targetLr->getId(),
+                'sourceLanguageResourceName' => $sourceLr->getServiceName() . ': ' . $sourceLr->getName(),
+                'targetLanguageResourceName' => $targetLr->getServiceName() . ': ' . $targetLr->getName(),
+                'sourceLanguage' => $row['sourceLanguage'],
+                'targetLanguage' => $row['targetLanguage'],
+                'customers' => explode(';', $row['customerNames']),
+                'additionalInfo' => array_filter($additionalInfo),
+            ];
         }
 
-        /** @phpstan-ignore-next-line  */
-        $this->view->rows = array_values($rows);
+        /** @phpstan-ignore-next-line */
+        $this->view->rows = $rows;
         $this->view->total = count($rows);
     }
 
@@ -87,12 +108,28 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
     {
         $this->decodePutData();
 
+        $languageRepo = LanguageRepository::create();
         $lrRepo = new LanguageResourceRepository();
 
-        $source = $lrRepo->get((int) $this->data->sourceLanguageResourceId ?: 0);
-        $target = $lrRepo->get((int) $this->data->targetLanguageResourceId ?: 0);
+        if (empty($this->data['connectionOption'])) {
+            throw new MismatchException('E2000', ['connectionOption']);
+        }
 
-        CrossLanguageResourceSynchronizationService::create()->connect($source, $target);
+        $ids = explode(':', $this->data['connectionOption']);
+
+        if (count($ids) !== 3) {
+            throw new MismatchException('E2003', ['connectionOption']);
+        }
+
+        [$lrId, $sourceLangId, $targetLangId] = array_map('intval', $ids);
+
+        $source = $lrRepo->get((int) ($this->data['sourceLanguageResourceId'] ?? 0));
+        $target = $lrRepo->get($lrId);
+
+        $sourceLang = $languageRepo->get($sourceLangId);
+        $targetLang = $languageRepo->get($targetLangId);
+
+        CrossLanguageResourceSynchronizationService::create()->connect($source, $target, $sourceLang, $targetLang);
 
         $this->view->rows = (object) [
             'id' => $source->getId() . ':' . $target->getId(),
@@ -100,28 +137,30 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
             'targetLanguageResourceId' => $target->getId(),
             'sourceLanguageResourceName' => $source->getServiceName() . ': ' . $source->getName(),
             'targetLanguageResourceName' => $target->getServiceName() . ': ' . $target->getName(),
+            'sourceLanguage' => $sourceLang->getLangName(),
+            'targetLanguage' => $targetLang->getLangName(),
         ];
     }
 
     public function deleteAction(): void
     {
-        $lrRepo = new LanguageResourceRepository();
-        $connectedIds = explode(':', $this->_getParam('id'));
+        $syncService = CrossLanguageResourceSynchronizationService::create();
+        $connection = $syncService->findConnection((int) $this->_getParam('id'));
 
-        try {
-            $source = $lrRepo->get((int) $connectedIds[0]);
-            $target = $lrRepo->get((int) $connectedIds[1]);
-
-            CrossLanguageResourceSynchronizationService::create()->deleteConnections($source, $target);
-        } catch (ZfExtended_Models_Entity_NotFoundException) {
-            //do nothing since it was already deleted, and that is ok since user tried to delete it
+        if (null !== $connection) {
+            $syncService->deleteConnection($connection);
         }
     }
 
     public function queuesynchronizeAction(): void
     {
-        $connectedIds = explode(':', $this->_getParam('id'));
-        SynchronisationDirigent::create()
-            ->queueSynchronizationForPair((int) $connectedIds[0], (int) $connectedIds[1]);
+        $connection = CrossLanguageResourceSynchronizationService::create()
+            ->findConnection((int) $this->_getParam('id'));
+
+        if ($connection === null) {
+            throw new ZfExtended_Models_Entity_NotFoundException();
+        }
+
+        SynchronisationDirigent::create()->queueConnectionSynchronization($connection);
     }
 }

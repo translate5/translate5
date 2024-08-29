@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Acl\Rights;
+use MittagQI\ZfExtended\Tools\Markup;
 
 /**
  * Import the whole task from an earlier exported Excel-file
@@ -191,6 +192,10 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
                 continue;
             }
 
+            // Escape taglike placeholders before tags structure is checked
+            $newSegment = Markup::escapeTaglikePlaceholders($newSegment);
+
+            // Check tags structure
             $this->checkTagStructure($newSegment, $orgSegmentAsExcel, $segment);
 
             // add TrackChanges informations comparing the new segment (from excel) with the t5 segment (converted to excel tagging)

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,16 +28,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-declare(strict_types=1);
+namespace MittagQI\Translate5\CrossSynchronization;
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
+use ZfExtended_Models_Entity_Abstract;
 
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-
-final class ConnectionCreatedEvent
+/**
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getConnectionId()
+ * @method void setConnectionId(int $id)
+ * @method string getCustomerId()
+ * @method void setCustomerId(int $customerId)
+ */
+class CrossSynchronizationConnectionCustomer extends ZfExtended_Models_Entity_Abstract
 {
-    public function __construct(
-        public readonly CrossSynchronizationConnection $connection
-    ) {
-    }
+    protected $dbInstanceClass = Db\CrossSynchronizationConnectionCustomer::class;
 }

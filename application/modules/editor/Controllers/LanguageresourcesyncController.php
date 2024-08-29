@@ -27,8 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
+use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationDirigent;
 
 /**
  * Controller for the LanguageResources Associations
@@ -54,17 +54,28 @@ class editor_LanguageresourcesyncController extends ZfExtended_RestController
 
         $resourceSynchronizationService = CrossLanguageResourceSynchronizationService::create();
 
-        $lrs = $resourceSynchronizationService->getAvailableForConnectionLanguageResources($this->entity);
+        $options = $resourceSynchronizationService->getAvailableForConnectionOptions($this->entity);
 
         $this->view->rows = [];
 
-        foreach ($lrs as $lr) {
+        foreach ($options as $option) {
             $this->view->rows[] = [
-                'id' => $lr->getId(),
-                'name' => $lr->getServiceName() . ': ' . $lr->getName(),
+                'id' => sprintf(
+                    '%s:%s:%s',
+                    $option->languageResource->getId(),
+                    $option->sourceLanguage->getId(),
+                    $option->targetLanguage->getId(),
+                ),
+                'name' => sprintf(
+                    '(%s -> %s) -> %s: %s',
+                    $option->sourceLanguage->getRfc5646(),
+                    $option->targetLanguage->getRfc5646(),
+                    $option->languageResource->getServiceName(),
+                    $option->languageResource->getName(),
+                ),
             ];
         }
-        $this->view->total = count($lrs);
+        $this->view->total = count($this->view->rows);
     }
 
     public function queuesynchronizeallAction(): void

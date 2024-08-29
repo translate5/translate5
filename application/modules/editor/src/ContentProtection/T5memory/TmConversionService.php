@@ -90,7 +90,7 @@ class TmConversionService
 
     public static function create(?Whitespace $whitespace = null)
     {
-        $contentProtectionRepository = new ContentProtectionRepository();
+        $contentProtectionRepository = ContentProtectionRepository::create();
         $languageRepository = new LanguageRepository();
 
         return new self(

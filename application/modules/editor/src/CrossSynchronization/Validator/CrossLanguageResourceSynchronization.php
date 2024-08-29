@@ -1,6 +1,4 @@
 <?php
-
-declare(strict_types=1);
 /*
 START LICENSE AND COPYRIGHT
 
@@ -28,27 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
+namespace MittagQI\Translate5\CrossSynchronization\Validator;
 
-use ZfExtended_Models_Entity_Abstract;
+use ZfExtended_Models_Validator_Abstract;
 
-/**
- * @method string getId()
- * @method void setId(int $id)
- * @method string getSourceLanguageResourceId()
- * @method void setSourceLanguageResourceId(int $id)
- * @method string getSourceType()
- * @method void setSourceType(string $type)
- * @method string getTargetLanguageResourceId()
- * @method void setTargetLanguageResourceId(int $id)
- * @method string getTargetType()
- * @method void setTargetType(string $type)
- * @method string getCustomerId()
- * @method void setCustomerId(int $customerId)
- */
-class CrossSynchronizationConnection extends ZfExtended_Models_Entity_Abstract
+class CrossLanguageResourceSynchronization extends ZfExtended_Models_Validator_Abstract
 {
-    protected $dbInstanceClass = Db\CrossSynchronizationConnection::class;
-
-    protected $validatorInstanceClass = Validator\CrossLanguageResourceSynchronization::class;
+    /**
+     * Validators for Task User Assoc Entity
+     */
+    protected function defineValidators()
+    {
+        $this->addValidator('sourceLanguageResourceId', 'int');
+        $this->addValidator('sourceType', 'string');
+        $this->addValidator('targetLanguageResourceId', 'int');
+        $this->addValidator('targetType', 'string');
+        $this->addValidator('clientId', 'int');
+        $this->addValidator('specificData', 'stringLength', [
+            'min' => 0,
+            'max' => 1024,
+        ]);
+    }
 }
