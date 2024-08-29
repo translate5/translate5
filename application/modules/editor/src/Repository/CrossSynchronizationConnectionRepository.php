@@ -423,7 +423,7 @@ class CrossSynchronizationConnectionRepository
             $syncModel->init(
                 new Zend_Db_Table_Row(
                     [
-                        'table' => $db,
+                        'table' => $syncModel->db,
                         'data' => $row,
                         'stored' => true,
                         'readOnly' => false,

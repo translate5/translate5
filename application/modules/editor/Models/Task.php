@@ -176,10 +176,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     protected $meta;
 
-    /**
-     * @var string|null
-     */
-    protected $taskDataPath;
+    protected ?string $taskDataPath;
 
     /**
      * A Cache for the faulty segments the task holds
@@ -276,10 +273,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         $this->row = $row;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Models_Entity_Abstract::init()
-     */
     public function init(array|Zend_Db_Table_Row_Abstract|null $data = null, $assumeDatabase = false): void
     {
         parent::init($data, $assumeDatabase);
