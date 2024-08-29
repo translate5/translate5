@@ -10077,6 +10077,14 @@ Synchronization always takes place in one direction: source data -> target
                 <source>default_glossary_id</source>
                 <target>Default Glossary id</target>
             </trans-unit>
+            <trans-unit id='Sm9iQ29vcmRpbmF0b3I='>
+                <source>JobCoordinator</source>
+                <target>Job Coordinator</target>
+            </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gZGllIFJvbGxlIHtyb2xlfSBuaWNodCBtaXQgZWluZXIgZGVyIGZvbGdlbmRlbiBSb2xsZW4gZmVzdGxlZ2VuOiB7cm9sZXN9'>
+                <source>Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}</source>
+                <target>You can not set role {role} with one of the following roles: {roles}</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\LSP\LspUserService;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\PermissionAudit\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\PermissionAudit\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\PermissionAudit\Exception\NotAccessibleForLspUserException;
@@ -37,6 +38,8 @@ use MittagQI\Translate5\User\UserService;
 
 class Editor_UserController extends ZfExtended_UserController
 {
+    protected $entityClass = User::class;
+
     private LspUserService $lspUserService;
 
     public function init(): void

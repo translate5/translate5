@@ -9903,6 +9903,14 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>default_glossary_id</source>
                 <target>Standard-Glossar-ID</target>
             </trans-unit>
+            <trans-unit id='Sm9iQ29vcmRpbmF0b3I='>
+                <source>JobCoordinator</source>
+                <target>Job-Koordinator</target>
+            </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gZGllIFJvbGxlIHtyb2xlfSBuaWNodCBtaXQgZWluZXIgZGVyIGZvbGdlbmRlbiBSb2xsZW4gZmVzdGxlZ2VuOiB7cm9sZXN9'>
+                <source>Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}</source>
+                <target>Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
