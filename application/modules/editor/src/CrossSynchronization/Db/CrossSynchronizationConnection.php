@@ -26,17 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-declare(strict_types=1);
+namespace MittagQI\Translate5\CrossSynchronization\Db;
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto;
+use Zend_Db_Table_Abstract;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-
-final class LanguageResourcePair
+/**
+ * DB Access for Languageresources Assoc
+ */
+class CrossSynchronizationConnection extends Zend_Db_Table_Abstract
 {
-    public function __construct(
-        public readonly LanguageResource $source,
-        public readonly LanguageResource $target,
-    ) {
-    }
+    protected $_name = 'LEK_cross_language_resource_synchronization_connection';
+
+    public $_primary = 'id';
 }

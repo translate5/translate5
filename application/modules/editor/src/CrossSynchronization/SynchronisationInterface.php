@@ -28,10 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
+namespace MittagQI\Translate5\CrossSynchronization;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use Generator;
+use MittagQI\Translate5\CrossSynchronization\Dto\AdditionalInfoViewData;
 
 interface SynchronisationInterface
 {
@@ -61,11 +62,16 @@ interface SynchronisationInterface
         ?int $customerId = null,
     ): Generator;
 
-    public function queueConnectionSynchronisation(CrossSynchronizationConnection $connection): void;
+    public function queueCustomerSynchronisation(CrossSynchronizationConnection $connection, int $customerId): void;
 
-    public function queueDefaultSynchronisation(LanguageResource $source, LanguageResource $target): void;
+    public function queueDefaultSynchronisation(CrossSynchronizationConnection $connection): void;
 
-    public function cleanupOnConnectionDeleted(CrossSynchronizationConnection $deletedConnection): void;
+    public function cleanupOnCustomerRemovedFromConnection(CrossSynchronizationConnection $connection, int $customerId): void;
 
     public function cleanupDefaultSynchronisation(LanguageResource $source, LanguageResource $target): void;
+
+    public function getAdditionalInfoViewData(
+        CrossSynchronizationConnection $connection,
+        LanguageResource $languageResource
+    ): AdditionalInfoViewData;
 }

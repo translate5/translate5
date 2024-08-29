@@ -101,7 +101,7 @@ class editor_ContentprotectionoutputmappingController extends ZfExtended_RestCon
 
     public function namecomboAction(): void
     {
-        $this->view->rows = (new ContentProtectionRepository())->getContentRecognitionForOutputMappingForm();
+        $this->view->rows = ContentProtectionRepository::create()->getContentRecognitionForOutputMappingForm();
         $this->view->total = count($this->view->rows);
     }
 

@@ -23,7 +23,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
+namespace MittagQI\Translate5\CrossSynchronization;
 
 interface SynchronizableIntegrationInterface
 {

@@ -505,9 +505,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             rows += this.createSpecificDataRow('fileName', serviceName, specificData.fileName);
         }
 
+        if (specificData.hasOwnProperty('version') && typeof specificData.version === "object" && specificData.version.hasOwnProperty('version')) {
+            rows += this.createSpecificDataRow('version', serviceName, specificData.version.version);
+        }
+
         // then the others
         for (key in specificData) {
-            if (key !== 'fileName' && key !== 'status' && key !== 'memories') {
+            if (key !== 'fileName' && key !== 'status' && key !== 'memories' && key !== 'version') {
                 rows += this.createSpecificDataRow(key, serviceName, specificData[key]);
             }
         }

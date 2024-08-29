@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
+namespace MittagQI\Translate5\CrossSynchronization;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
@@ -37,11 +37,6 @@ use MittagQI\Translate5\Repository\LanguageResourceRepository;
 
 class SynchronisationDirigent
 {
-    /**
-     * @var array<int, LanguageResource>
-     */
-    private array $cachedLanguageResources;
-
     public function __construct(
         private editor_Services_Manager $serviceManager,
         private LanguageResourceRepository $languageResourceRepository,
@@ -58,43 +53,12 @@ class SynchronisationDirigent
         );
     }
 
-    public function queueSynchronizationForPair(int $sourceLanguageResourceId, int $targetLanguageResourceId): void
-    {
-        $target = $this->languageResourceRepository->get($targetLanguageResourceId);
-        $syncService = $this->serviceManager->getSynchronisationService($target->getServiceType());
-
-        if (null === $syncService) {
-            return;
-        }
-
-        $source = $this->languageResourceRepository->get($sourceLanguageResourceId);
-
-        $syncService->queueDefaultSynchronisation($source, $target);
-
-        $connections = $this->connectionRepository
-            ->getConnectionsForPair((int) $source->getId(), (int) $target->getId());
-
-        foreach ($connections as $connection) {
-            $syncService->queueConnectionSynchronisation($connection);
-        }
-    }
-
     public function queueSynchronizationWhere(LanguageResource $languageResource): void
     {
         $connections = $this->connectionRepository->getConnectionsFor((int) $languageResource->getId());
 
         foreach ($connections as $connection) {
             $this->queueConnectionSynchronization($connection);
-        }
-
-        /** @var iterable<array{sourceId: int, targetId: int}> $pairs */
-        $pairs = $this->connectionRepository->getConnectedPairsWhere((int) $languageResource->getId());
-
-        foreach ($pairs as $pair) {
-            $source = $this->getCachedLanguageResource($pair['sourceId']);
-            $target = $this->getCachedLanguageResource($pair['targetId']);
-
-            $this->queueDefaultSynchronization($source, $target);
         }
     }
 
@@ -105,35 +69,50 @@ class SynchronisationDirigent
             ?->cleanupDefaultSynchronisation($source, $target);
     }
 
-    public function cleanupOnConnectionDeleted(CrossSynchronizationConnection $connection): void
+    public function cleanupOnCustomerRemovedFromConnection(CrossSynchronizationConnection $connection, int $customerId): void
     {
         $target = $this->languageResourceRepository->get((int) $connection->getTargetLanguageResourceId());
 
-        $this->serviceManager->getSynchronisationService($target->getServiceType())?->cleanupOnConnectionDeleted($connection);
-    }
-
-    public function queueDefaultSynchronization(LanguageResource $source, LanguageResource $target): void
-    {
         $this->serviceManager
             ->getSynchronisationService($target->getServiceType())
-            ?->queueDefaultSynchronisation($source, $target);
+            ?->cleanupOnCustomerRemovedFromConnection($connection, $customerId);
+    }
+
+    public function queueDefaultSynchronization(CrossSynchronizationConnection $connection): void
+    {
+        $target = $this->languageResourceRepository->get((int) $connection->getTargetLanguageResourceId());
+
+        $this->serviceManager
+            ->getSynchronisationService($target->getServiceType())
+            ?->queueDefaultSynchronisation($connection);
     }
 
     public function queueConnectionSynchronization(CrossSynchronizationConnection $connection): void
     {
         $target = $this->languageResourceRepository->get((int) $connection->getTargetLanguageResourceId());
 
-        $this->serviceManager
-            ->getSynchronisationService($target->getServiceType())
-            ?->queueConnectionSynchronisation($connection);
-    }
+        $syncService = $this->serviceManager->getSynchronisationService($target->getServiceType());
 
-    private function getCachedLanguageResource(int $id): LanguageResource
-    {
-        if (! isset($this->cachedLanguageResources[$id])) {
-            $this->cachedLanguageResources[$id] = $this->languageResourceRepository->get($id);
+        if (null === $syncService) {
+            return;
         }
 
-        return $this->cachedLanguageResources[$id];
+        foreach ($this->connectionRepository->getCustomerAssociations($connection) as $association) {
+            $syncService->queueCustomerSynchronisation($connection, (int) $association->getCustomerId());
+        }
+
+        $syncService->queueDefaultSynchronisation($connection);
+    }
+
+    public function queueCustomerSynchronization(CrossSynchronizationConnection $connection, int $customerId): void
+    {
+        $target = $this->languageResourceRepository->get((int) $connection->getTargetLanguageResourceId());
+        $syncService = $this->serviceManager->getSynchronisationService($target->getServiceType());
+
+        if (null === $syncService) {
+            return;
+        }
+
+        $syncService->queueCustomerSynchronisation($connection, $customerId);
     }
 }
