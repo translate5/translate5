@@ -74,6 +74,13 @@ Ext.define('Editor.view.admin.user.AddWindowViewController', {
                 win.setLoading(false);
                 var errorHandler = Editor.app.getController('ServerException');
                 errorHandler.handleFormFailure(basic, rec, op);
+
+                const response = Ext.decode(op.error.response.responseText);
+                for (const error of response.errorsTranslated) {
+                    if (basic.findField(error.id).hidden) {
+                        Editor.MessageBox.addWarning(error.msg);
+                    }
+                }
             },
             success: function() {
                 var user = rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')',
