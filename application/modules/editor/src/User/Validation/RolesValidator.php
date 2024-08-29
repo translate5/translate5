@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Validation;
 
-use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
 use MittagQI\Translate5\Acl\Roles;
+use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
 use Zend_Validate_Abstract;
 
 class RolesValidator extends Zend_Validate_Abstract
@@ -73,10 +73,10 @@ class RolesValidator extends Zend_Validate_Abstract
                         implode(
                             ', ',
                             array_map(
-                                static fn($conflictRole) => $translator->translate(mb_ucfirst($conflictRole)),
+                                static fn ($conflictRole) => $translator->translate(mb_ucfirst($conflictRole)),
                                 $conflictRoles
                             )
-                        )
+                        ),
                     ],
                     $message
                 );
