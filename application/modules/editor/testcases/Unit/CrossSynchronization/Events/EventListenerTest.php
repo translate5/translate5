@@ -28,19 +28,20 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\LanguageResource\CrossSynchronization\Events;
+namespace MittagQI\Translate5\Test\Unit\CrossSynchronization\Events;
 
 use editor_Models_LanguageResources_CustomerAssoc as Association;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnectionCustomer;
+use MittagQI\Translate5\CrossSynchronization\Events\ConnectionCreatedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\ConnectionDeletedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\CustomerAddedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\CustomerRemovedEvent;
+use MittagQI\Translate5\CrossSynchronization\Events\EventListener;
+use MittagQI\Translate5\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\LanguageResourcePair;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionCreatedEvent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionDeletedEvent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventListener;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events as CustomerAssocEvents;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
@@ -64,7 +65,9 @@ class EventListenerTest extends TestCase
         /** @phpstan-ignore-next-line  */
         self::assertFalse($em->getListeners(EventDispatcher::class, ConnectionCreatedEvent::class)->isEmpty());
         /** @phpstan-ignore-next-line  */
-        self::assertFalse($em->getListeners(EventDispatcher::class, LanguageResourcesConnectedEvent::class)->isEmpty());
+        self::assertFalse($em->getListeners(EventDispatcher::class, CustomerAddedEvent::class)->isEmpty());
+        /** @phpstan-ignore-next-line  */
+        self::assertFalse($em->getListeners(EventDispatcher::class, CustomerRemovedEvent::class)->isEmpty());
         /** @phpstan-ignore-next-line  */
         self::assertFalse($em->getListeners(EventDispatcher::class, CustomerAssocEvents\AssociationCreatedEvent::class)->isEmpty());
         /** @phpstan-ignore-next-line  */
@@ -76,10 +79,8 @@ class EventListenerTest extends TestCase
         $em = new Zend_EventManager_SharedEventManager();
 
         $synchronizationService = $this->createMock(CrossLanguageResourceSynchronizationService::class);
-        $synchronizationService->method('pairHasConnection')->willReturn(false);
 
         $synchronizationDirigent = $this->createMock(SynchronisationDirigent::class);
-        $synchronizationDirigent->expects($this->once())->method('cleanupOnConnectionDeleted');
         $synchronizationDirigent->expects($this->once())->method('cleanupDefaultSynchronization');
 
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
@@ -104,7 +105,7 @@ class EventListenerTest extends TestCase
         $synchronizationService = $this->createMock(CrossLanguageResourceSynchronizationService::class);
 
         $synchronizationDirigent = $this->createMock(SynchronisationDirigent::class);
-        $synchronizationDirigent->expects($this->once())->method('queueConnectionSynchronization');
+        $synchronizationDirigent->expects($this->once())->method('queueDefaultSynchronization');
 
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
@@ -121,14 +122,15 @@ class EventListenerTest extends TestCase
         ]));
     }
 
-    public function testLanguageResourcesConnectedEventHandler(): void
+    public function testCustomerAddedEventHandler(): void
     {
         $em = new Zend_EventManager_SharedEventManager();
 
         $synchronizationService = $this->createMock(CrossLanguageResourceSynchronizationService::class);
+        $synchronizationService->method('findConnection')->willReturn($this->createMock(CrossSynchronizationConnection::class));
 
         $synchronizationDirigent = $this->createMock(SynchronisationDirigent::class);
-        $synchronizationDirigent->expects($this->once())->method('queueDefaultSynchronization');
+        $synchronizationDirigent->expects($this->once())->method('queueCustomerSynchronization');
 
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
@@ -136,13 +138,45 @@ class EventListenerTest extends TestCase
         $el->attachAll();
 
         /** @phpstan-ignore-next-line  */
-        $closure = $em->getListeners(EventDispatcher::class, LanguageResourcesConnectedEvent::class)->top();
+        $closure = $em->getListeners(EventDispatcher::class, CustomerAddedEvent::class)->top();
 
-        $source = $this->createMock(LanguageResource::class);
-        $target = $this->createMock(LanguageResource::class);
+        $assoc = $this->createMock(CrossSynchronizationConnectionCustomer::class);
 
         $closure(new Zend_EventManager_Event(params: [
-            'event' => new LanguageResourcesConnectedEvent($source, $target),
+            'event' => new CustomerAddedEvent($assoc),
+        ]));
+    }
+
+    public function testCustomerRemovedEventHandler(): void
+    {
+        $em = new Zend_EventManager_SharedEventManager();
+
+        $synchronizationService = $this->createMock(CrossLanguageResourceSynchronizationService::class);
+        $synchronizationService->method('findConnection')->willReturn(
+            $this->createMock(CrossSynchronizationConnection::class)
+        );
+        $synchronizationService->method('connectionHasAssociatedCustomers')->willReturn(false);
+
+        $synchronizationService->expects($this->once())->method('deleteConnection');
+
+        $synchronizationDirigent = $this->createMock(SynchronisationDirigent::class);
+        $synchronizationDirigent->expects($this->once())->method('cleanupOnCustomerRemovedFromConnection');
+
+        $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
+        $languageResourceRepository->method('get')->willReturn(
+            $this->createMock(LanguageResource::class)
+        );
+
+        $el = new EventListener($em, $synchronizationService, $languageResourceRepository, $synchronizationDirigent);
+        $el->attachAll();
+
+        /** @phpstan-ignore-next-line  */
+        $closure = $em->getListeners(EventDispatcher::class, CustomerRemovedEvent::class)->top();
+
+        $assoc = $this->createMock(CrossSynchronizationConnectionCustomer::class);
+
+        $closure(new Zend_EventManager_Event(params: [
+            'event' => new CustomerRemovedEvent($assoc),
         ]));
     }
 
@@ -152,14 +186,13 @@ class EventListenerTest extends TestCase
 
         $synchronizationService = $this->createMock(CrossLanguageResourceSynchronizationService::class);
 
-        $source = $this->createMock(LanguageResource::class);
-        $target = $this->createMock(LanguageResource::class);
+        $synchronizationService->method('getConnectionsByLrCustomerAssoc')
+            ->willReturn([
+                $this->createMock(CrossSynchronizationConnection::class),
+                $this->createMock(CrossSynchronizationConnection::class),
+            ]);
 
-        $pair = new LanguageResourcePair($source, $target);
-
-        $synchronizationService->method('getConnectedPairsByAssoc')->willReturn([$pair, $pair]);
-
-        $synchronizationService->expects($this->exactly(2))->method('createConnection');
+        $synchronizationService->expects($this->exactly(2))->method('addCustomer');
 
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
         $synchronizationDirigent = $this->createMock(SynchronisationDirigent::class);
@@ -183,7 +216,7 @@ class EventListenerTest extends TestCase
 
         $synchronizationService = $this->createMock(CrossLanguageResourceSynchronizationService::class);
 
-        $synchronizationService->expects($this->once())->method('deleteRelatedConnections');
+        $synchronizationService->expects($this->once())->method('removeCustomerFromConnections');
 
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
         $synchronizationDirigent = $this->createMock(SynchronisationDirigent::class);

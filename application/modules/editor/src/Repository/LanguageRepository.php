@@ -58,6 +58,11 @@ use ZfExtended_Models_Entity_NotFoundException;
 
 class LanguageRepository
 {
+    public static function create(): self
+    {
+        return new self();
+    }
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */

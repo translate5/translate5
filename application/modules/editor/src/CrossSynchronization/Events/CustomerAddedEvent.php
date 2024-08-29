@@ -28,15 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
+namespace MittagQI\Translate5\CrossSynchronization\Events;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnectionCustomer;
 
-final class LanguageResourcesConnectedEvent
+final class CustomerAddedEvent
 {
     public function __construct(
-        public readonly LanguageResource $source,
-        public readonly LanguageResource $target,
+        public readonly CrossSynchronizationConnectionCustomer $connectionCustomer,
     ) {
     }
 }

@@ -48,12 +48,12 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Task;
-use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -90,16 +90,7 @@ class TaskRepository
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
 
         foreach ($tasksData as $taskData) {
-            $task->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $task->db,
-                        'data' => $taskData,
-                        'stored' => true,
-                        'readOnly' => false,
-                    ]
-                )
-            );
+            $task->init($taskData);
 
             yield clone $task;
         }

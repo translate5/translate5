@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_LanguageResources_Languages as LanguageResourceLanguages;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -55,62 +54,12 @@ class LanguageResourceRepository
         $lr->save();
     }
 
-    /**
-     * @return iterable<LanguageResource>
-     */
-    public function getRelatedByLanguageCombinationsAndCustomers(LanguageResource $source): iterable
-    {
-        $db = $source->db;
-
-        $lrLangTable = ZfExtended_Factory::get(LanguageResourceLanguages::class)->db->info($db::NAME);
-        $lrCustomerTable = ZfExtended_Factory::get(CustomerAssoc::class)->db->info($db::NAME);
-
-        $lrsWithSameCustomersSelect = $db->select()
-            ->setIntegrityCheck(false)
-            ->from(
-                [
-                    'LanguageResources' => $db->info($db::NAME),
-                ],
-            )
-            ->join(
-                [
-                    'LanguageResourceLanguages' => $lrLangTable,
-                ],
-                'LanguageResourceLanguages.languageResourceId = LanguageResources.id',
-                []
-            )
-            ->join(
-                [
-                    'CustomerAssoc' => $lrCustomerTable,
-                ],
-                'CustomerAssoc.languageResourceId = LanguageResources.id',
-                []
-            )
-            ->where('LanguageResourceLanguages.sourceLang IN (?)', (array) $source->getSourceLang())
-            ->where('LanguageResourceLanguages.targetLang IN (?)', (array) $source->getTargetLang())
-            ->where('CustomerAssoc.customerId IN (?)', $source->getCustomers())
-            ->order('LanguageResources.serviceName');
-
-        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
-
-        foreach ($db->fetchAll($lrsWithSameCustomersSelect)->toArray() as $row) {
-            $languageResource->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $languageResource->db,
-                        'data' => $row,
-                        'stored' => true,
-                        'readOnly' => false,
-                    ]
-                )
-            );
-
-            yield clone $languageResource;
-        }
-    }
-
     public function languageResourceWithServiceNameAndCustomerIdExists(string $serviceName, int ...$customerIds): bool
     {
+        if (empty($customerIds)) {
+            return false;
+        }
+
         $languageResource = ZfExtended_Factory::get(LanguageResource::class);
         $db = $languageResource->db;
 
@@ -167,7 +116,16 @@ class LanguageResourceRepository
             return null;
         }
 
-        $languageResource->init($row);
+        $languageResource->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $db,
+                    'data' => $row->toArray(),
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
 
         return $languageResource;
     }

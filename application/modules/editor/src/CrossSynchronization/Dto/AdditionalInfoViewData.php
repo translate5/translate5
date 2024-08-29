@@ -26,25 +26,44 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Validator;
+declare(strict_types=1);
 
-use ZfExtended_Models_Validator_Abstract;
+namespace MittagQI\Translate5\CrossSynchronization\Dto;
 
-class CrossLanguageResourceSynchronization extends ZfExtended_Models_Validator_Abstract
+use InvalidArgumentException;
+
+class AdditionalInfoViewData
 {
-    /**
-     * Validators for Task User Assoc Entity
-     */
-    protected function defineValidators()
+    private int $columnCount = 0;
+
+    public function __construct(
+        private array $rows = []
+    ) {
+        foreach ($rows as $row) {
+            $this->validateRow($row);
+        }
+    }
+
+    public function addRow(array $row): void
     {
-        $this->addValidator('sourceLanguageResourceId', 'int');
-        $this->addValidator('sourceType', 'string');
-        $this->addValidator('targetLanguageResourceId', 'int');
-        $this->addValidator('targetType', 'string');
-        $this->addValidator('clientId', 'int');
-        $this->addValidator('specificData', 'stringLength', [
-            'min' => 0,
-            'max' => 1024,
-        ]);
+        $this->validateRow($row);
+
+        $this->rows[] = $row;
+    }
+
+    private function validateRow(array $row): void
+    {
+        if (0 === $this->columnCount) {
+            $this->columnCount = count($row);
+        }
+
+        if ($this->columnCount !== count($row)) {
+            throw new InvalidArgumentException('All rows must have the same number of columns');
+        }
+    }
+
+    public function getRows(): array
+    {
+        return $this->rows;
     }
 }

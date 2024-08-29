@@ -10065,6 +10065,10 @@ The language resource can only be connected to another language resource if the 
 Synchronization always takes place in one direction: source data -> target
                 </target>
             </trans-unit>
+            <trans-unit id='ZGVmYXVsdF9nbG9zc2FyeV9pZA=='>
+                <source>default_glossary_id</source>
+                <target>Default Glossary id</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
