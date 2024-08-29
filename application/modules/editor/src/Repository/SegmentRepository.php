@@ -53,46 +53,46 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_Task;
-use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
+use editor_Models_Quality_Notifications as QualityNotifications;
+use editor_Models_Segment_MaterializedView;
+use editor_Models_Task as Task;
+use MittagQI\Translate5\Segment\Dto\SegmentView;
+use PDO;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 
-class TaskRepository
+class SegmentRepository
 {
-    /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    public function get(int $id): editor_Models_Task
-    {
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-        $task->load($id);
+    public function __construct(
+        private Zend_Db_Adapter_Abstract $db,
+    ) {
+    }
 
-        return $task;
+    public static function create(): self
+    {
+        return new self(Zend_Db_Table::getDefaultAdapter());
     }
 
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @return iterable<SegmentView>
      */
-    public function getProjectBy(editor_Models_Task $task): editor_Models_Task
+    public function getSegmentsViewData(Task $task): iterable
     {
-        return $this->get((int) $task->getProjectId());
-    }
+        $materializedView = new editor_Models_Segment_MaterializedView($task->getTaskGuid());
+        if (! $materializedView->exists()) {
+            $materializedView->create();
+        }
 
-    /**
-     * @return iterable<editor_Models_Task>
-     */
-    public function getProjectTaskList(int $projectId): iterable
-    {
-        $db = ZfExtended_Factory::get(editor_Models_Task::class)->db;
-        $s = $db->select()->where('projectId = ?', $projectId)->where('id != ?', $projectId);
-        $tasksData = $db->fetchAll($s);
+        $segmentIds = $this->db->fetchCol("SELECT id FROM {$materializedView->getName()}");
 
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
+        $qualityNotifications = new QualityNotifications($task, $segmentIds);
 
-        foreach ($tasksData as $taskData) {
-            $task->init($taskData);
+        $stmp = $this->db->query("SELECT * FROM {$materializedView->getName()}");
 
-            yield clone $task;
+        while ($row = $stmp->fetch(PDO::FETCH_ASSOC)) {
+            $row['qualities'] = $qualityNotifications->get((int) $row['id']);
+
+            yield new SegmentView($row);
         }
     }
 }
