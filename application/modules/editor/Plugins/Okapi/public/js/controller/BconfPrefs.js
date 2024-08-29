@@ -165,7 +165,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             fieldLabel: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.titleLong,
             tpl: Ext.create('Ext.XTemplate',
                 '<ul class="x-list-plain t5leveledList"><tpl for=".">',
-                '<li role="option" class="{[values.cid == 0 ? "x-boundlist-item t5level1" : "x-boundlist-item"]}" title="{description}">{name}</li>',
+                '<li role="option" class="{[values.cid == 0 ? "x-boundlist-item t5level1" : "x-boundlist-item"]}" title="{[Ext.String.htmlEncode(values.description)]}">{[Ext.String.htmlEncode(values.name)]}</li>',
                 '</tpl></ul>'
             )
         });

@@ -116,6 +116,10 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         return (specificData.hasOwnProperty(key)) ? specificData[key] : null;
     },
 
+    getName: function() {
+        return Ext.String.htmlEncode(this.get('name'));
+    },
+
     proxy: {
         type: 'rest', //POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
         url: Editor.data.restpath + 'languageresourceinstance', //same as PHP controller name

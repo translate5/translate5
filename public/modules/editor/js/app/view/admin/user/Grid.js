@@ -100,7 +100,8 @@ Ext.define('Editor.view.admin.user.Grid', {
           filter: {
               type: 'string'
           },
-          text: me.text_cols.login
+          text: me.text_cols.login,
+          renderer: v => Ext.String.htmlEncode(v)
       },{
           xtype: 'gridcolumn',
           width: 100,
@@ -168,7 +169,8 @@ Ext.define('Editor.view.admin.user.Grid', {
           filter: {
               type: 'string'
           },
-          text: me.text_cols.email
+          text: me.text_cols.email,
+          renderer: v => Ext.String.htmlEncode(v)
       },{
           xtype: 'gridcolumn',
           width: 120,

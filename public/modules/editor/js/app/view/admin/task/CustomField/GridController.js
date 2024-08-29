@@ -145,7 +145,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      */
     typeRenderer: function(value, meta, record) {
         if (value === 'combobox') {
-            meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(record.get('comboboxData')) + '"';
+            meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(Ext.String.htmlEncode(record.get('comboboxData'))) + '"';
             meta.tdStyle = 'text-decoration: underline dotted; text-underline-offset: 4px;';
         }
 

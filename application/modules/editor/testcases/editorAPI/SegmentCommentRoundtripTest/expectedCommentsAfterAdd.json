@@ -9,25 +9,25 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection &quot;Kommentar 2&quot;: \nKommentar 2",
+            "comment": "annotates selection \"Kommentar 2\": \nKommentar 2",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection &quot;Kommentar 1&quot;: \nKommentar 1",
+            "comment": "annotates selection \"Kommentar 1\": \nKommentar 1",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "TL",
-            "comment": "(annotates source column)\nannotates selection &quot;keinen Kommentar&quot;: \nSource Kommentar 2",
+            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 2",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "TL",
-            "comment": "(annotates source column)\nannotates selection &quot;keinen Kommentar&quot;: \nSource Kommentar 1",
+            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 1",
             "isEditable": false
         }
     ],
@@ -55,7 +55,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection &quot;HIER&quot;: \nKommentar für HIER in Segment 3 (Severy level: Warning)",
+            "comment": "annotates selection \"HIER\": \nKommentar für HIER in Segment 3 (Severy level: Warning)",
             "isEditable": false
         }
     ],
@@ -69,19 +69,19 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection &quot;2_KOMMENTARE&quot;: \nKommentar bei: &quot;2_KOMMENTARE&quot;",
+            "comment": "annotates selection \"2_KOMMENTARE\": \nKommentar bei: \"2_KOMMENTARE\"",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection &quot;KOMMENTAR_ 2_KOMMENTARE&quot;: \nKommentar bei: KOMMENTAR_2_KOMMENTARE",
+            "comment": "annotates selection \"KOMMENTAR_ 2_KOMMENTARE\": \nKommentar bei: KOMMENTAR_2_KOMMENTARE",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection &quot;HIER&quot;: \nKommentar für Benutzer 1 HIER in Segment 4 (Severy level: Error)",
+            "comment": "annotates selection \"HIER\": \nKommentar für Benutzer 1 HIER in Segment 4 (Severy level: Error)",
             "isEditable": false
         }
     ],
@@ -95,13 +95,13 @@
         {
             "userGuid": "memoq-imported",
             "userName": "JF",
-            "comment": "&quot;Hallo&quot; „Marc“!",
+            "comment": "\"Hallo\" „Marc“!",
             "isEditable": false
         },
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "und &lt;b&gt;nochmal&lt;/b&gt; einer.",
+            "comment": "und <b>nochmal</b> einer.",
             "isEditable": false
         },
         {

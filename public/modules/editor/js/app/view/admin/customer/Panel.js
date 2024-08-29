@@ -172,7 +172,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 text: me.strings.customerName,
                                 filter: {
                                     type: 'string'
-                                }
+                                },
+                                renderer: v => Ext.String.htmlEncode(v)
                             },{
                                 xtype: 'gridcolumn',
                                 dataIndex: 'number',

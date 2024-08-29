@@ -185,8 +185,8 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
             return '';
         }
         var user = store.getAt(idx);
-        if(user){
-            return user.get('surName')+', '+user.get('firstName')+' ('+user.get('login')+')';
+        if (user) {
+            return Ext.String.htmlEncode(user.get('surName')+', '+user.get('firstName')+' ('+user.get('login')+')');
         }
         return '';
     }
