@@ -34,7 +34,7 @@ VALUES
     ('editor', 'jobCoordinator', 'setaclrole', 'editor'),
     ('editor', 'jobCoordinator', 'setaclrole', 'instantTranslate'),
 
-    ('editor', 'jobCoordinator', 'system', 'seeAllUsers'),
+    ('editor', 'jobCoordinator', 'editor_userassocdefault', 'index'),
     ('default', 'jobCoordinator', 'auto_set_role', 'editor'),
     ('editor', 'jobCoordinator', 'editor_customer', 'index'),
     ('editor', 'jobCoordinator', 'editor_taskuserassoc', 'index'),
