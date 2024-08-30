@@ -91,27 +91,4 @@ class LspUserService
             yield $subCoordinator->user;
         }
     }
-
-    public function isUserAccessibleFor(ZfExtended_Models_User $user, ZfExtended_Models_User $manager): bool
-    {
-        $roles = $manager->getRoles();
-
-        if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
-            return true;
-        }
-
-        $coordinator = $this->findCoordinatorBy($manager);
-
-        if (null === $coordinator) {
-            return true;
-        }
-
-        foreach ($this->getAccessibleUsers($coordinator) as $accessibleUser) {
-            if ($accessibleUser->getId() === $user->getId()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

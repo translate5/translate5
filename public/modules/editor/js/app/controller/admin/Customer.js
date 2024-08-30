@@ -55,9 +55,6 @@ Ext.define('Editor.controller.admin.Customer', {
             'headPanel toolbar#top-menu': {
                 afterrender: 'onHeadPanelAfterRender'
             },
-            '#adminUserAddWindow':{
-                afterrender:'onAdminUserAddWindowAfterRender'
-            },
             '#adminUserGrid': {
                 beforerender:'onAdminUserGridBeforeRender',
                 afterrender: 'onGridAfterRender'                            // Multitenancy
@@ -112,19 +109,6 @@ Ext.define('Editor.controller.admin.Customer', {
         }
         // multitenancy: add the drop-down "Switch client"
         this.addCustomerSwitch(toolbar);
-    },
-
-    /**
-     * Admin add window after render handler
-     */
-    onAdminUserAddWindowAfterRender:function(adminWindow){
-        var me = this,
-            loginFieldset = adminWindow.down('#loginDetailsFieldset');
-
-        loginFieldset.add({
-            xtype: 'customers',
-            fieldLabel: me.strings.customerLabelText
-        });
     },
 
     /***

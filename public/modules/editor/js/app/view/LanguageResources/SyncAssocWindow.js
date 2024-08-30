@@ -81,7 +81,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                             width: 300,
                             listConfig: {
                                 getInnerTpl: function () {
-                                    return '<div style="white-space: nowrap; overflow: visible;">{name}</div>'; // Prevent text wrapping
+                                    return '<div style="white-space: nowrap; overflow: visible;">{[Ext.String.htmlEncode(values.name)]}</div>'; // Prevent text wrapping
                                 }
                             },
                             listeners: {

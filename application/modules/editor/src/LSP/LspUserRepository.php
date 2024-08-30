@@ -40,10 +40,6 @@ use ZfExtended_Models_User;
 
 class LspUserRepository
 {
-    public function __construct()
-    {
-    }
-
     public function findByUser(ZfExtended_Models_User $user): ?LspUser
     {
         try {
@@ -84,6 +80,17 @@ class LspUserRepository
         $lsp->init($row);
 
         return new LspUser($guid, $user, $lsp);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getUserIdToLspIdMap(): array
+    {
+        $lspToUser = ZfExtended_Factory::get(LanguageServiceProviderUser::class);
+        $assocs = $lspToUser->loadAll();
+
+        return array_column($assocs, 'lspId', 'userId');
     }
 
     /**

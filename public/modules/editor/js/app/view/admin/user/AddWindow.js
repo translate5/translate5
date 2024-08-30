@@ -248,11 +248,10 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             }
                                         },
                                         {
-                                            xtype: 'combo',
+                                            xtype: 'Editor.combobox',
                                             itemId: 'lsp',
                                             name: 'lsp',
                                             allowBlank: false,
-                                            forceSelection: true,
                                             hidden: true,
                                             store: 'admin.LspStore',
                                             displayField: 'name',
@@ -272,7 +271,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
 
                                                         return;
                                                     }
-                                                    debugger;
+
                                                     const customersStore = Ext.getStore('customersStore');
 
                                                     const customers = [];
@@ -333,6 +332,84 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             },
                                             queryMode: 'local',
                                             fieldLabel: me.strings.parentUserLabel
+                                        },
+                                        {
+                                            xtype: 'Editor.combobox',
+                                            bind: {
+                                                fieldLabel: '{l10n.general.clinets}',
+                                            },
+                                            name: 'connectionOption',
+                                            store: {
+                                                xtype: 'store',
+                                                fields: ['id', 'name'],
+                                                data: [] // Initially empty, will be set dynamically
+                                            },
+                                            queryMode: 'local',
+                                            displayField: 'name',
+                                            valueField: 'id',
+                                            allowBlank: false,
+                                            width: 300,
+                                            listConfig: {
+                                                getInnerTpl: function () {
+                                                    return '<div style="white-space: nowrap; overflow: visible;">{[Ext.String.htmlEncode(values.name)]}</div>'; // Prevent text wrapping
+                                                }
+                                            },
+                                            listeners: {
+                                                render: function(combo) {
+                                                    const store = combo.getStore();
+
+                                                    const lsp = combo.up('form').down('combo[name=lsp]');
+
+                                                    store.on('refresh', function() {
+                                                        var longestText = '';
+                                                        store.each(function(record) {
+                                                            var text = record.get(combo.displayField);
+                                                            if (text.length > longestText.length) {
+                                                                longestText = text;
+                                                            }
+                                                        });
+
+                                                        // Create a temporary element to calculate the width of the longest text
+                                                        var tempEl = Ext.getBody().createChild({
+                                                            tag: 'div',
+                                                            html: longestText,
+                                                            style: {
+                                                                'position': 'absolute',
+                                                                'visibility': 'hidden',
+                                                                'font-family': combo.getEl().getStyle('font-family'),
+                                                                'font-size': combo.getEl().getStyle('font-size')
+                                                            }
+                                                        });
+
+                                                        var textWidth = tempEl.getWidth() + 10; // Add some padding
+                                                        tempEl.destroy(); // Remove the temporary element
+
+                                                        combo.listConfig.minWidth = textWidth > combo.width ? textWidth : combo.width;
+                                                    });
+
+                                                    const form = this.lookupReference('associationForm');
+
+                                                    Ext.Ajax.request({
+                                                        url: Editor.data.restpath + 'languageresourcesync/' + this.getView().languageResource.get('id') + '/available-for-connection',
+                                                        method: 'GET',
+                                                        success: response => {
+                                                            form.hide();
+                                                            const data = Ext.decode(response.responseText);
+
+                                                            if (data.total > 0) {
+                                                                form.show();
+                                                                store.loadData(data.rows)
+                                                            }
+                                                        },
+                                                        failure: function() {
+                                                            Ext.Msg.alert(
+                                                                'Error',
+                                                                Editor.data.l10n.crossLanguageResourceSynchronization.failedToLoadDataForTargetLanguageResource
+                                                            );
+                                                        }
+                                                    });
+                                                }
+                                            }
                                         }
                                     ]
                                     // + item for assigning customers to the user
@@ -527,7 +604,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         form.loadRecord(record);
 
         Ext.Array.forEach(me.query('#rolesGroup checkbox'), function (item) {
-            item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
+            item.setValue(roles.includes(item.initialConfig.value));
         });
 
         if (form.isDisabled() && record.get('openIdIssuer') !== '') {

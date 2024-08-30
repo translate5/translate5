@@ -30,15 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User;
 
-use MittagQI\Translate5\LSP\LspUserService;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\PermissionAudit\Action;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\ClientRestrictedPermissionAuditor;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\LastCoordinatorPermissionAuditor;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\LspUserAccessPermissionAuditor;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\ParentPermissionAuditor;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\PmInTaskPermissionAuditor;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\UserIsEditableAuditor;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use MittagQI\Translate5\User\PermissionAudit\UserActionPermissionAuditor;
 use ZfExtended_Models_User as User;
@@ -46,25 +39,27 @@ use ZfExtended_Models_User as User;
 final class UserService
 {
     public function __construct(
-        private readonly LspUserService $lspUserService,
-        private readonly UserRepository $userRepository
+        private readonly UserRepository $userRepository,
+        private readonly UserActionPermissionAuditor $permissionAuditor,
     ) {
     }
 
+    public static function create(?UserActionPermissionAuditor $permissionAuditor = null): self
+    {
+        $permissionAuditor ??= UserActionPermissionAuditor::create();
+
+        return new self(
+            new UserRepository(),
+            $permissionAuditor,
+        );
+    }
+
+    /**
+     * @throws PermissionAudit\Exception\PermissionExceptionInterface
+     */
     public function delete(User $user, ?User $manager): void
     {
-        $auditors = [
-            new UserIsEditableAuditor(),
-            new PmInTaskPermissionAuditor(),
-            ParentPermissionAuditor::create(),
-            new ClientRestrictedPermissionAuditor(),
-            new LastCoordinatorPermissionAuditor($this->lspUserService),
-            new LspUserAccessPermissionAuditor($this->lspUserService),
-        ];
-
-        $permissionAuditor = new UserActionPermissionAuditor($auditors);
-
-        $permissionAuditor->assertGranted(Action::DELETE, $user, new PermissionAuditContext($manager));
+        $this->permissionAuditor->assertGranted(Action::DELETE, $user, new PermissionAuditContext($manager));
 
         $this->userRepository->delete($user);
     }

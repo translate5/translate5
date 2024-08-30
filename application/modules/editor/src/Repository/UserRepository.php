@@ -54,19 +54,11 @@ namespace MittagQI\Translate5\Repository;
 
 use MittagQI\ZfExtended\Acl\Roles;
 use Zend_Db_Table_Row;
-use ZfExtended_Acl;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;
 
 class UserRepository
 {
-    protected ZfExtended_Acl $acl;
-
-    public function __construct()
-    {
-        $this->acl = ZfExtended_Acl::getInstance();
-    }
-
     /**
      * @return iterable<ZfExtended_Models_User>
      */

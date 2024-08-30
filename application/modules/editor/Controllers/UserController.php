@@ -26,36 +26,95 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\LSP\LspUserService;
-use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\LSP\LspUserRepository;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\PermissionAudit\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\PermissionAudit\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\PermissionAudit\Exception\NotAccessibleForLspUserException;
+use MittagQI\Translate5\User\PermissionAudit\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\User\PermissionAudit\Exception\PmInTaskException;
 use MittagQI\Translate5\User\PermissionAudit\Exception\UserIsNotEditableException;
+use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\PermissionAudit\UserActionPermissionAuditor;
 use MittagQI\Translate5\User\UserService;
 
 class Editor_UserController extends ZfExtended_UserController
 {
     protected $entityClass = User::class;
 
-    private LspUserService $lspUserService;
+    private UserActionPermissionAuditor $permissionAuditor;
 
     public function init(): void
     {
         parent::init();
-        $this->lspUserService = LspUserService::create();
+        $this->permissionAuditor = UserActionPermissionAuditor::create();;
+    }
+
+    public function indexAction()
+    {
+        $rows = $this->entity->loadAll();
+
+        $lspUserRepo = new LspUserRepository();
+        $userIdToLspIdMap = $lspUserRepo->getUserIdToLspIdMap();
+
+        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $authUser = ZfExtended_Authentication::getInstance()->getUser();
+        $editableRoles = $authUser->getSetableRoles();
+
+        foreach ($rows as $key => $row) {
+            $userModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $userModel->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            try {
+                $this->permissionAuditor->assertGranted(
+                    Action::READ,
+                    clone $userModel,
+                    new PermissionAuditContext($authUser)
+                );
+            } catch (PermissionExceptionInterface) {
+                unset($rows[$key]);
+
+                continue;
+            }
+
+            $notEditableUser = (int) $row['id'] !== (int) $authUser->getId()
+                && $row['editable'] === '1'
+                && ! empty($row['roles'])
+                && $row['roles'] !== ','
+                && ! empty(array_diff(explode(',', $row['roles']), $editableRoles))
+            ;
+
+            if ($notEditableUser) {
+                $rows[$key]['editable'] = '0';
+            }
+
+            $rows[$key]['lsp'] = $userIdToLspIdMap[$row['id']] ?? null;
+        }
+
+        $this->view->rows = $rows;
+        $this->view->total = count($rows);
+
+        $this->csvToArray();
     }
 
     public function deleteAction(): void
     {
         $this->entityLoad();
 
-        $userService = new UserService($this->lspUserService, new UserRepository());
-
         try {
-            $userService->delete($this->entity, ZfExtended_Authentication::getInstance()->getUser());
+            UserService::create($this->permissionAuditor)->delete(
+                $this->entity,
+                ZfExtended_Authentication::getInstance()->getUser()
+            );
         } catch (PmInTaskException $e) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1048' => 'The user can not be deleted, he is PM in one or more tasks.',
