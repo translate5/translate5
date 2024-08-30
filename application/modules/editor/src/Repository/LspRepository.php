@@ -184,7 +184,9 @@ class LspRepository
             ->join([
                 'lspToCustomer' => $lspToCustomerTable,
             ], 'customer.id = lspToCustomer.customerId', [])
-            ->where('lspToCustomer.lspId = ?', $lsp->getId());
+            ->where('lspToCustomer.lspId = ?', $lsp->getId())
+            ->group('customer.id')
+        ;
 
         $rows = $customerDb->fetchAll($select);
 
@@ -197,6 +199,37 @@ class LspRepository
 
             yield clone $customer;
         }
+    }
+
+    /**
+     * @return array<int>
+     */
+    public function getCustomerIds(LanguageServiceProvider $lsp): array
+    {
+        $customer = ZfExtended_Factory::get(Customer::class);
+        $lspToCustomerTable = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class)
+            ->db
+            ->info(LanguageServiceProviderCustomerTable::NAME);
+        $customerDb = $customer->db;
+
+        $select = $customerDb->select()
+            ->setIntegrityCheck(false)
+            ->from(
+                [
+                    'customer' => $customer->db->info($customer->db::NAME),
+                ],
+                ['id']
+            )
+            ->join([
+                'lspToCustomer' => $lspToCustomerTable,
+            ], 'customer.id = lspToCustomer.customerId', [])
+            ->where('lspToCustomer.lspId = ?', $lsp->getId())
+            ->group('customer.id')
+        ;
+
+        $rows = $customerDb->fetchAll($select);
+
+        return array_column($rows->toArray(), 'id');
     }
 
     /**

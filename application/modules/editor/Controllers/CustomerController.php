@@ -27,6 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Customer\CustomerService;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\LSP\LspUserRepository;
+use MittagQI\Translate5\Repository\LspRepository;
 
 class Editor_CustomerController extends ZfExtended_RestController
 {
@@ -42,6 +45,9 @@ class Editor_CustomerController extends ZfExtended_RestController
      */
     protected array $_unprotectedActions = ['exportresource'];
 
+    private JobCoordinatorRepository $coordinatorRepository;
+    private LspRepository $lspRepository;
+
     public function init()
     {
         parent::init();
@@ -52,10 +58,31 @@ class Editor_CustomerController extends ZfExtended_RestController
                 'Content-Type' => 'application/zip',
             ],
         ])->addActionContext('exportresource', 'resourceLogExport')->initContext();
+
+        $this->lspRepository = LspRepository::create();
+        $this->coordinatorRepository = new JobCoordinatorRepository(
+            $this->lspRepository,
+            new LspUserRepository(),
+        );
     }
 
     public function indexAction()
     {
+        $currentUser = ZfExtended_Authentication::getInstance()->getUser();
+        $coordinator = $this->coordinatorRepository->findByUser($currentUser);
+
+        if ($coordinator) {
+            $allowedCustomerIds = $this->lspRepository->getCustomerIds($coordinator->lsp);
+
+            $idFilter = new stdClass();
+            $idFilter->type = 'list';
+            $idFilter->field = 'id';
+            $idFilter->table = 'LEK_customer';
+            $idFilter->comparison = 'in';
+            $idFilter->value = $allowedCustomerIds;
+            $this->entity->getFilter()->addFilter($idFilter);
+        }
+
         if ($this->entity->getFilter()->hasSort() === false) {
             // add default alphabetical sort
             $this->entity->getFilter()->addSort('name');
