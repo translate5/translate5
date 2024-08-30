@@ -876,7 +876,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         if (! isset($result->segmentIndex)) {
             // This means memory is not loaded into RAM
             // So call for a fake segment to force t5memory to load memory into RAM and call for status again
-            $this->api->getEntry($tmName, 1, 1);
+            $this->api->getEntry($tmName, 7, 1);
             $this->api->status($tmName);
             $result = $this->api->getResult();
         }
