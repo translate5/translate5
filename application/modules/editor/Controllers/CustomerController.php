@@ -46,6 +46,7 @@ class Editor_CustomerController extends ZfExtended_RestController
     protected array $_unprotectedActions = ['exportresource'];
 
     private JobCoordinatorRepository $coordinatorRepository;
+
     private LspRepository $lspRepository;
 
     public function init()

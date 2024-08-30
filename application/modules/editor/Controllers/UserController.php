@@ -48,7 +48,8 @@ class Editor_UserController extends ZfExtended_UserController
     public function init(): void
     {
         parent::init();
-        $this->permissionAuditor = UserActionPermissionAuditor::create();;
+        $this->permissionAuditor = UserActionPermissionAuditor::create();
+        ;
     }
 
     public function indexAction()
