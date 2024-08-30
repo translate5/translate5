@@ -53,6 +53,7 @@ use SplFileInfo;
 use stdClass;
 use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Debug;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
@@ -151,6 +152,8 @@ final class Tagger extends AbstractProcessor
      */
     private array $segments = [];
 
+    private bool $doDebug;
+
     /**
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
@@ -166,6 +169,7 @@ final class Tagger extends AbstractProcessor
         // various outdated tag-helpers - use TagSequence/FieldTags based code instead
         $this->termTagTrackChangeHelper = ZfExtended_Factory::get(editor_Models_Segment_TermTagTrackChange::class);
         $this->generalTrackChangesHelper = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'TermTaggerReqquests');
     }
 
     public function getBatchSize(): int
@@ -366,8 +370,25 @@ final class Tagger extends AbstractProcessor
         // encode the segments
         $this->encodeSegments();
         $timeout = Configuration::getRequestTimeout($this->isWorkerContext);
+
+        if ($this->doDebug) {
+            error_log(
+                'TermTagger -> send data: ' . json_encode(
+                    $this->serviceData->segments,
+                    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
+                )
+            );
+        }
         // tag with the termtagger-service
         $segmentsData = $this->service->tagTerms($url, $this->serviceData, $this->logger, $timeout);
+        if ($this->doDebug) {
+            error_log(
+                'TermTagger -> received raw data: ' . json_encode(
+                    $segmentsData,
+                    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
+                )
+            );
+        }
 
         // decode the result
         return $this->decodeSegments($segmentsData);
@@ -400,8 +421,7 @@ final class Tagger extends AbstractProcessor
 
     private function encodeSegment(stdClass $segment, string $field): string
     {
-        $trackChangeTag = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        /* @var $trackChangeTag editor_Models_Segment_TrackChangeTag */
+        $trackChangeTag = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
 
         $text = $segment->$field;
         $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';

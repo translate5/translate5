@@ -750,7 +750,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         }
 
         var confirm = me.confirmStrings[action];
-        Ext.Msg.confirm(Ext.String.format(confirm.title, task.get('taskName')), confirm.msg, function (btn) {
+        Ext.Msg.confirm(Ext.String.format(confirm.title, task.getTaskName()), confirm.msg, function (btn) {
             if (btn === 'yes') {
                 me[action](task, ev);
             }
@@ -900,7 +900,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     editorFinishTask: function (task) {
         var me = this;
-        Editor.app.mask(me.strings.taskFinishing, task.get('taskName'));
+        Editor.app.mask(me.strings.taskFinishing, task.getTaskName());
         task.set('userState', task.USER_STATE_FINISH);
         task.save(me.getTaskMaskBindings());
     },
@@ -911,7 +911,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     editorUnfinishTask: function (task) {
         var me = this;
-        Editor.app.mask(me.strings.taskUnFinishing, task.get('taskName'));
+        Editor.app.mask(me.strings.taskUnFinishing, task.getTaskName());
         task.set('userState', task.USER_STATE_OPEN);
         task.save(me.getTaskMaskBindings());
     },
@@ -922,7 +922,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     editorEndTask: function (task) {
         var me = this;
-        Editor.app.mask(me.strings.taskEnding, task.get('taskName'));
+        Editor.app.mask(me.strings.taskEnding, task.getTaskName());
         task.set('state', 'end');
         task.save(me.getTaskMaskBindings());
     },
@@ -933,7 +933,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     editorReopenTask: function (task) {
         var me = this;
-        Editor.app.mask(me.strings.taskReopen, task.get('taskName'));
+        Editor.app.mask(me.strings.taskReopen, task.getTaskName());
         task.set('state', 'open');
         task.save(me.getTaskMaskBindings());
     },
@@ -944,9 +944,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     editorDeleteTask: function(task) {
         var me = this,
             app = Editor.app,
-            store = task.store;
+            store = task.store,
+            taskName = task.getTaskName();
 
-        app.mask(Ext.String.format(me.strings.taskDestroy, task.get('taskName')), task.get('taskName'));
+        app.mask(Ext.String.format(me.strings.taskDestroy, taskName), taskName);
 
         if(task.isProject()){
             Ext.StoreManager.get('projectTasks').removeAll();
@@ -959,7 +960,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             preventDefaultHandler: true,
             success: function () {
                 app.unmask();
-                Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskDeleted, task.get('taskName')),2);
+                Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskDeleted, task.getTaskName()), 2);
                 me.fireEvent('afterTaskDelete', task);
             },
             failure: function (batch, operation) {

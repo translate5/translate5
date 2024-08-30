@@ -38,7 +38,12 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
     ],
     controller: 'tmwindowviewcontroller',
     viewModel: {
-        type: 'tmwindow'
+        type: 'tmwindow',
+        formulas: {
+            languageResourceName: function(get) {
+                return Ext.String.htmlEncode(get('name'));
+            }
+        }
     },
     alias: 'widget.editTmWindow',
     itemId: 'editTmWindow',
@@ -97,7 +102,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
             },
             config = {
                 bind:{
-                    title:me.strings.edit+': {name}'
+                    title:me.strings.edit+': {languageResourceName}'
                 },
                 items : [{
                     xtype: 'form',
@@ -112,7 +117,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         renderer: function(id) {
                             var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
                                 resource = store.getById(id);
-                            return resource ? resource.get('name') : id;
+                            return resource ? Ext.String.htmlEncode(resource.get('name')) : id;
                         },
                         fieldLabel: me.strings.resource
                     },{
@@ -146,7 +151,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         fieldLabel:me.strings.customers,
                         allowBlank: false
                     },{
-                        xtype:'tagfield',
+                        xtype:'Editor.tagfield',
                         name:'customerUseAsDefaultIds',
                         itemId:'useAsDefault',
                         dataIndex:'customerUseAsDefaultIds',
@@ -168,7 +173,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                             'data-qtip': me.strings.useAsDefaultTooltip
                         }
                     },{
-                        xtype:'tagfield',
+                        xtype:'Editor.tagfield',
                         name:'customerWriteAsDefaultIds',
                         itemId:'writeAsDefault',
                         dataIndex:'customerWriteAsDefaultIds',
@@ -187,7 +192,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                             'data-qtip': me.strings.writeAsDefaultTooltip
                         }
                     },{
-                        xtype:'tagfield',
+                        xtype:'Editor.tagfield',
                         name:'customerPivotAsDefaultIds',
                         itemId:'pivotAsDefault',
                         dataIndex:'customerPivotAsDefaultIds',

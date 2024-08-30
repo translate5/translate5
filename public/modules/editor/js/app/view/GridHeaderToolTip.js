@@ -55,7 +55,7 @@ Ext.define('Editor.view.GridHeaderToolTip', {
                     beforeshow: function(tip) {
                         var c = headerCt.down('gridcolumn[id=' + tip.triggerElement.id  +']');
                         if (c && c.tooltip) {
-                            tip.update(c.tooltip);
+                            tip.update(Ext.String.htmlEncode(c.tooltip));
                         } else {
                             tip.clearTimers();
                             return false;

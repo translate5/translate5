@@ -77,7 +77,7 @@ Ext.define('Editor.view.admin.log.SystemGrid', {
                 ptype: 'rowexpander',
                 rowBodyTpl : new Ext.XTemplate(
                     '<tpl if="file">',
-                        '<p><b>File:</b> {file} ({line})</p>',
+                        '<p><b>File:</b> {[Ext.String.htmlEncode(values.file)]} ({line})</p>',
                     '</tpl>',
                     '<p><b>Request:</b> {httpHost} {method} {url}</p>',
                     '<tpl if="trace">',
@@ -140,7 +140,7 @@ Ext.define('Editor.view.admin.log.SystemGrid', {
                     dataIndex: 'message',
                     tdCls: 'message',
                     renderer: function(v) {
-                        return v.replace(/\n/, "<br>\n");
+                        return Ext.String.htmlEncode(v).replace(/\n/, "<br>\n");
                     },
                     text: me.strings.message,
                     variableRowHeight: true,

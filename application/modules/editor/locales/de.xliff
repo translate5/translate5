@@ -7272,9 +7272,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Neues Projekt hinzufügen</source>
                 <target>Neues Projekt hinzufügen</target>
             </trans-unit>
-            <trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdDoge3Byb2plY3RTZWxlY3Rpb24udGFza05hbWV9'>
-                <source>Aufgaben für das Projekt: {projectSelection.taskName}</source>
-                <target>Aufgaben für das Projekt: {projectSelection.taskName}</target>
+            <trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdA=='>
+                <source>Aufgaben für das Projekt</source>
+                <target>Aufgaben für das Projekt</target>
             </trans-unit>
             <trans-unit id='enVyIEF1ZmdhYmUgc3ByaW5nZW4='>
                 <source>zur Aufgabe springen</source>
@@ -9873,6 +9873,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
                 <source>Regel mit dieser Priorität existiert bereits</source>
                 <target>Rule with this priority already exists</target>
+            </trans-unit>
+            <trans-unit id='SFRNTC3DnGJlcnNpY2h0IGhlcnVudGVybGFkZW4='>
+                <source>HTML-Übersicht herunterladen</source>
+                <target>HTML-Übersicht herunterladen</target>
             </trans-unit>
             <trans-unit id='Y3Jvc3NMYW5ndWFnZVJlc291cmNlU3luY2hyb25pemF0aW9uLmVtcHR5VGFibGVUZXh0'>
                 <source>crossLanguageResourceSynchronization.emptyTableText</source>

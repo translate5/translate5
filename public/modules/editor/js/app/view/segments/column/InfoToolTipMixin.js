@@ -39,7 +39,7 @@ Ext.define('Editor.view.segments.column.InfoToolTipMixin', {
     tableTpl: ['<table>',
     '<tpl for=".">',
         '<tpl if="value">',
-          '<tr><th>{name}</th><td>{value}</td></tr>',
+          '<tr><th>{name}</th><td>{[Ext.String.htmlEncode(Ext.String.htmlEncode(values.value))]}</td></tr>',
         '</tpl>',
     '</tpl></table>'],
     initOtherRenderers: function() {
@@ -103,6 +103,6 @@ Ext.define('Editor.view.segments.column.InfoToolTipMixin', {
                 }
             })
         }
-        return Ext.String.htmlEncode(me.tableTpl.apply(data));
+        return me.tableTpl.apply(data);
     }
 });

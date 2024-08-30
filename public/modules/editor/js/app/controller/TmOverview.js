@@ -247,7 +247,7 @@ Ext.define('Editor.controller.TmOverview', {
             url: Editor.data.restpath + 'languageresourceinstance',
             scope: me,
             success: function (form, submit) {
-                var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
+                var msg = Ext.String.format(me.strings.created, Ext.String.htmlEncode(submit.result.rows.name));
                 this.getTmOverviewPanel().getStore().load();
                 window.setLoading(false);
                 window.close();
@@ -349,7 +349,7 @@ Ext.define('Editor.controller.TmOverview', {
                 Editor.app.getController('ServerException').handleException(op.error.response);
             },
             success: function () {
-                var msg = Ext.String.format(me.strings.edited, record.get('name'));
+                var msg = Ext.String.format(me.strings.edited, record.getName());
                 me.getTmOverviewPanel().getStore().load();
                 window.setLoading(false);
                 window.close();
@@ -379,7 +379,7 @@ Ext.define('Editor.controller.TmOverview', {
             success: function (record, operation) {
                 store && store.load();
                 store.remove(rec);
-                Editor.MessageBox.addSuccess(Ext.String.format(msg.deleted, rec.get('name')));
+                Editor.MessageBox.addSuccess(Ext.String.format(msg.deleted, rec.getName()));
                 Editor.MessageBox.addByOperation(operation);
             }
         });
@@ -529,15 +529,14 @@ Ext.define('Editor.controller.TmOverview', {
             url = proxy.getUrl(),
             menu,
             filetypes = Editor.util.LanguageResources.getService(rec.get('serviceName')).getValidFiletypes(),
-            // random string of 10 characters
-            oneTimeFileToken = Math.random().toString(36).substring(2, 12),
+
             createMenuItems = function () {
                 var items = [];
                 if (filetypes.indexOf('tm') !== -1) {
                     items.push({
                         itemId: 'exportTm',
                         hrefTarget: '_blank',
-                        href: url + '/download.tm?token=' + oneTimeFileToken,
+                        href: url + '/download.tm',
                         text: me.strings.exportTm
                     });
                 }
@@ -545,7 +544,7 @@ Ext.define('Editor.controller.TmOverview', {
                     items.push({
                         itemId: 'exportTmx',
                         hrefTarget: '_blank',
-                        href: url + '/download.tmx?token=' + oneTimeFileToken,
+                        href: url + '/download.tmx',
                         text: me.strings.exportTmx
                     });
                 }
@@ -553,7 +552,7 @@ Ext.define('Editor.controller.TmOverview', {
                     items.push({
                         itemId: 'exportZippedTmx',
                         hrefTarget: '_blank',
-                        href: url + '/download.zip?token=' + oneTimeFileToken,
+                        href: url + '/download.zip',
                         text: me.strings.exportZippedTmx
                     });
                 }
@@ -586,7 +585,7 @@ Ext.define('Editor.controller.TmOverview', {
         var me = this,
             msg = me.strings,
             noConn = rec.get('status') === rec.STATUS_NOCONNECTION,
-            info = Ext.String.format(noConn ? msg.deleteConfirmLocalText : msg.deleteConfirmText, rec.get('name')),
+            info = Ext.String.format(noConn ? msg.deleteConfirmLocalText : msg.deleteConfirmText, rec.getName()),
             //force local deletion when no connection to resource
             params = noConn ? {deleteLocally: true} : {};
 
@@ -643,8 +642,9 @@ Ext.define('Editor.controller.TmOverview', {
                 }
                 for (i = 0; i < v.length; i++) {
                     languageResource = v[i];
-                    strservices.push(languageResource.name + ' (' + languageResource.serviceName + ')');
-                    //meta.tdAttr = 'data-qtip="'+languageResource.name+' ('+languageResource.serviceName+')<br/>"';
+                    // Double escape to prevent XSS in qtip
+                    const lrName = Ext.String.htmlEncode(Ext.String.htmlEncode(languageResource.name));
+                    strservices.push(lrName + ' (' + languageResource.serviceName + ')');
                 }
                 meta.tdAttr = 'data-qtip="' + strservices.join('<br />') + '"';
                 return v.length;

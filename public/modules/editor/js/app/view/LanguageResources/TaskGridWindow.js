@@ -102,7 +102,8 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
                                 //cellWrap: true,
                                 //tdCls: 'segment-tag-column source',
                                 dataIndex: 'taskName',
-                                text: me.strings.task
+                                text: me.strings.task,
+                                renderer: v => Ext.String.htmlEncode(v)
                             },
                             {
                                 xtype: 'gridcolumn',
