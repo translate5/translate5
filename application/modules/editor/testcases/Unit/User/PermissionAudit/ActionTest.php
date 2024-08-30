@@ -28,17 +28,35 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit;
+namespace User\PermissionAudit;
 
-enum Action: string
+use MittagQI\Translate5\User\PermissionAudit\Action;
+use PHPUnit\Framework\TestCase;
+
+class ActionTest extends TestCase
 {
-    case CREATE = 'create';
-    case READ = 'read';
-    case UPDATE = 'update';
-    case DELETE = 'delete';
-
-    public function isMutable(): bool
+    public function provideIsMutable(): iterable
     {
-        return in_array($this, [self::UPDATE, self::DELETE], true);
+        yield ['read', false];
+        yield ['create', false];
+        yield ['update', true];
+        yield ['delete', true];
+    }
+
+    /**
+     * @dataProvider provideIsMutable
+     */
+    public function testIsMutable(string $value, bool $expected): void
+    {
+        $action = Action::tryFrom($value);
+        self::assertSame($expected, $action->isMutable());
+    }
+
+    public function testList(): void
+    {
+        self::assertEquals(
+            ['create', 'read', 'update', 'delete'],
+            array_map(static fn (Action $action) => $action->value, Action::cases())
+        );
     }
 }

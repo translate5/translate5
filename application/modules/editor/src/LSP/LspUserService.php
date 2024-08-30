@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\LSP;
 
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\ZfExtended\Acl\Roles;
 use ZfExtended_Models_User;
 
 class LspUserService
