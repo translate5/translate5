@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
 
 use MittagQI\Translate5\LSP\LspUserService;
-use MittagQI\Translate5\User\PermissionAudit\ActionInterface;
+use MittagQI\Translate5\User\PermissionAudit\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use ZfExtended_Models_User as User;
@@ -43,10 +43,15 @@ final class LastCoordinatorPermissionAuditor implements PermissionAuditorInterfa
     ) {
     }
 
+    public function supports(Action $action): bool
+    {
+        return $action === Action::DELETE;
+    }
+
     /**
      * Restrict deletion of the last coordinator in the LSP
      */
-    public function assertGranted(ActionInterface $action, User $user, PermissionAuditContext $context): void
+    public function assertGranted(User $user, PermissionAuditContext $context): void
     {
         // Possible coordinator that we try to delete
         $coordinator = $this->lspUserService->findCoordinatorBy($user);

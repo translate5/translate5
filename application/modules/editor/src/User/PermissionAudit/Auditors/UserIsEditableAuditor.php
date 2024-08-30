@@ -30,17 +30,22 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
 
-use MittagQI\Translate5\User\PermissionAudit\ActionInterface;
+use MittagQI\Translate5\User\PermissionAudit\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\UserIsNotEditableException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use ZfExtended_Models_User as User;
 
 final class UserIsEditableAuditor implements PermissionAuditorInterface
 {
+    public function supports(Action $action): bool
+    {
+        return $action->isMutable();
+    }
+
     /**
      * Restrict access if user is not editable
      */
-    public function assertGranted(ActionInterface $action, User $user, PermissionAuditContext $context): void
+    public function assertGranted(User $user, PermissionAuditContext $context): void
     {
         if (! $user->getEditable()) {
             throw new UserIsNotEditableException();

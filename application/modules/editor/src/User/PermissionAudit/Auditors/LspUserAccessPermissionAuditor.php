@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
 
 use MittagQI\Translate5\LSP\LspUserService;
-use MittagQI\Translate5\User\PermissionAudit\ActionInterface;
+use MittagQI\Translate5\User\PermissionAudit\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\NotAccessibleForLspUserException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use MittagQI\ZfExtended\Acl\Roles;
@@ -44,10 +44,15 @@ final class LspUserAccessPermissionAuditor implements PermissionAuditorInterface
     ) {
     }
 
+    public function supports(Action $action): bool
+    {
+        return in_array($action, [Action::UPDATE, Action::DELETE, Action::READ], true);
+    }
+
     /**
      * Restrict access for job coordinators to LSP users and other job coordinator
      */
-    public function assertGranted(ActionInterface $action, User $user, PermissionAuditContext $context): void
+    public function assertGranted(User $user, PermissionAuditContext $context): void
     {
         $manager = $context->manager;
         $roles = $manager->getRoles();

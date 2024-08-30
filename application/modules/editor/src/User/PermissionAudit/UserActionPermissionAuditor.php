@@ -30,7 +30,14 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\PermissionAudit;
 
+use MittagQI\Translate5\LSP\LspUserService;
+use MittagQI\Translate5\User\PermissionAudit\Auditors\ClientRestrictedPermissionAuditor;
+use MittagQI\Translate5\User\PermissionAudit\Auditors\LastCoordinatorPermissionAuditor;
+use MittagQI\Translate5\User\PermissionAudit\Auditors\LspUserAccessPermissionAuditor;
+use MittagQI\Translate5\User\PermissionAudit\Auditors\ParentPermissionAuditor;
 use MittagQI\Translate5\User\PermissionAudit\Auditors\PermissionAuditorInterface;
+use MittagQI\Translate5\User\PermissionAudit\Auditors\PmInTaskPermissionAuditor;
+use MittagQI\Translate5\User\PermissionAudit\Auditors\UserIsEditableAuditor;
 use ZfExtended_Models_User as User;
 
 final class UserActionPermissionAuditor
@@ -43,10 +50,31 @@ final class UserActionPermissionAuditor
     ) {
     }
 
-    public function assertGranted(ActionInterface $action, User $user, PermissionAuditContext $context): void
+    public static function create(): self
+    {
+        $lspUserService = LspUserService::create();
+
+        return new self([
+            new UserIsEditableAuditor(),
+            new PmInTaskPermissionAuditor(),
+            ParentPermissionAuditor::create(),
+            new ClientRestrictedPermissionAuditor(),
+            new LastCoordinatorPermissionAuditor($lspUserService),
+            new LspUserAccessPermissionAuditor($lspUserService),
+        ]);
+    }
+
+    /**
+     * @throws Exception\PermissionExceptionInterface
+     */
+    public function assertGranted(Action $action, User $user, PermissionAuditContext $context): void
     {
         foreach ($this->auditors as $auditor) {
-            $auditor->assertGranted($action, $user, $context);
+            if (! $auditor->supports($action)) {
+                continue;
+            }
+
+            $auditor->assertGranted($user, $context);
         }
     }
 }

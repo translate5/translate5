@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
 
 use editor_Models_Task;
-use MittagQI\Translate5\User\PermissionAudit\ActionInterface;
+use MittagQI\Translate5\User\PermissionAudit\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\PmInTaskException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use ZfExtended_Factory;
@@ -39,10 +39,15 @@ use ZfExtended_Models_User as User;
 
 final class PmInTaskPermissionAuditor implements PermissionAuditorInterface
 {
+    public function supports(Action $action): bool
+    {
+        return $action === Action::DELETE;
+    }
+
     /**
      * Restrict access if the user is a project manager in at least one task
      */
-    public function assertGranted(ActionInterface $action, User $user, PermissionAuditContext $context): void
+    public function assertGranted(User $user, PermissionAuditContext $context): void
     {
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $tasks = $task->loadListByPmGuid($user->getUserGuid());

@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
 
-use MittagQI\Translate5\User\PermissionAudit\ActionInterface;
+use MittagQI\Translate5\User\PermissionAudit\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\NoAccessException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use MittagQI\ZfExtended\Acl\SystemResource;
@@ -52,12 +52,17 @@ final class ParentPermissionAuditor implements PermissionAuditorInterface
         );
     }
 
+    public function supports(Action $action): bool
+    {
+        return in_array($action, [Action::UPDATE, Action::DELETE, Action::READ], true);
+    }
+
     /**
      * Restrict access if user is not same as the manager or a child of the manager
      */
-    public function assertGranted(ActionInterface $action, User $user, PermissionAuditContext $context): void
+    public function assertGranted(User $user, PermissionAuditContext $context): void
     {
-        //Am I allowed to see all users:
+        // Am I allowed to see all users:
         if ($this->acl->isInAllowedRoles(
             $this->auth->getUserRoles(),
             SystemResource::ID,
@@ -68,7 +73,7 @@ final class ParentPermissionAuditor implements PermissionAuditorInterface
 
         $manager = $context->manager;
 
-        //if the edited user is the current user, also everything is OK
+        // if user is current user, also everything is OK
         if ($manager->getUserGuid() === $user->getUserGuid()) {
             return;
         }
