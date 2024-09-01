@@ -287,11 +287,12 @@ class editor_Models_LanguageResources_Resource
     /**
      * sets the service type
      */
-    public function setService(string $name, string $type, string $defaultColor)
+    public function setService(string $name, string $type, string $defaultColor, string $queryMode)
     {
         $this->service = $name;
         $this->serviceType = $type;
         $this->defaultColor = $defaultColor;
+        $this->queryMode = $queryMode;
     }
 
     /**
