@@ -28,41 +28,13 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\User\ActionFeasibility\Exception;
 
-use MittagQI\Translate5\LSP\LspUserService;
-use MittagQI\Translate5\User\PermissionAudit\Action;
-use MittagQI\Translate5\User\PermissionAudit\Exception\LastCoordinatorException;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
-use ZfExtended_Models_User as User;
-
-final class LastCoordinatorPermissionAuditor implements PermissionAuditorInterface
+final class PmInTaskException extends \Exception implements FeasibilityExceptionInterface
 {
     public function __construct(
-        private readonly LspUserService $lspUserService
+        public array $taskGuids = []
     ) {
-    }
-
-    public function supports(Action $action): bool
-    {
-        return $action === Action::DELETE;
-    }
-
-    /**
-     * Restrict deletion of the last coordinator in the LSP
-     */
-    public function assertGranted(User $user, PermissionAuditContext $context): void
-    {
-        // Possible coordinator that we try to delete
-        $coordinator = $this->lspUserService->findCoordinatorBy($user);
-
-        if (null === $coordinator) {
-            return;
-        }
-
-        // Nobody can delete the last coordinator of an LSP
-        if ($this->lspUserService->getCoordinatorsCountFor($coordinator->lsp) === 1) {
-            throw new LastCoordinatorException($coordinator);
-        }
+        parent::__construct();
     }
 }

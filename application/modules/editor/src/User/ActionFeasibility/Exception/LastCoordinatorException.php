@@ -28,27 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\User\ActionFeasibility\Exception;
 
-use MittagQI\Translate5\User\PermissionAudit\Action;
-use MittagQI\Translate5\User\PermissionAudit\Exception\UserIsNotEditableException;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\LSP\JobCoordinator;
 
-final class UserIsEditableAuditor implements PermissionAuditorInterface
+final class LastCoordinatorException extends \Exception implements FeasibilityExceptionInterface
 {
-    public function supports(Action $action): bool
-    {
-        return $action->isMutable();
-    }
-
-    /**
-     * Restrict access if user is not editable
-     */
-    public function assertGranted(User $user, PermissionAuditContext $context): void
-    {
-        if (! $user->getEditable()) {
-            throw new UserIsNotEditableException();
-        }
+    public function __construct(
+        public readonly JobCoordinator $coordinator
+    ) {
+        parent::__construct();
     }
 }

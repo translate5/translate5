@@ -27,14 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\LSP\LspUserRepository;
+use MittagQI\Translate5\User\Action;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\PermissionAudit\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\ClientRestrictionException;
-use MittagQI\Translate5\User\PermissionAudit\Exception\LastCoordinatorException;
+use MittagQI\Translate5\User\ActionFeasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\PermissionAudit\Exception\NotAccessibleForLspUserException;
 use MittagQI\Translate5\User\PermissionAudit\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\User\PermissionAudit\Exception\PmInTaskException;
-use MittagQI\Translate5\User\PermissionAudit\Exception\UserIsNotEditableException;
+use MittagQI\Translate5\User\ActionFeasibility\Exception\PmInTaskException;
+use MittagQI\Translate5\User\ActionFeasibility\Exception\UserIsNotEditableException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use MittagQI\Translate5\User\PermissionAudit\UserActionPermissionAuditor;
 use MittagQI\Translate5\User\UserService;
@@ -140,10 +140,13 @@ class Editor_UserController extends ZfExtended_UserController
         $this->entityLoad();
 
         try {
-            UserService::create($this->permissionAuditor)->delete(
+            $this->permissionAuditor->assertGranted(
+                Action::DELETE,
                 $this->entity,
-                ZfExtended_Authentication::getInstance()->getUser()
+                new PermissionAuditContext(ZfExtended_Authentication::getInstance()->getUser())
             );
+
+            UserService::create()->delete($this->entity);
         } catch (PmInTaskException $e) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1048' => 'The user can not be deleted, he is PM in one or more tasks.',

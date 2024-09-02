@@ -28,15 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\User\ActionFeasibility\Checkers;
 
 use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\User\PermissionAudit\Action;
-use MittagQI\Translate5\User\PermissionAudit\Exception\PmInTaskException;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\Action;
+use MittagQI\Translate5\User\ActionFeasibility\Exception\PmInTaskException;
 use ZfExtended_Models_User as User;
 
-final class PmInTaskPermissionAuditor implements PermissionAuditorInterface
+final class PmInTaskFeasibilityChecker implements FeasibilityCheckerInterface
 {
     public function __construct(
         private readonly TaskRepository $taskRepository
@@ -56,7 +55,7 @@ final class PmInTaskPermissionAuditor implements PermissionAuditorInterface
     /**
      * Restrict access if the user is a project manager in at least one task
      */
-    public function assertGranted(User $user, PermissionAuditContext $context): void
+    public function assertAllowed(User $user): void
     {
         $tasks = $this->taskRepository->loadListByPmGuid($user->getUserGuid());
 

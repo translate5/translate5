@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
 
-use MittagQI\Translate5\User\PermissionAudit\Action;
+use MittagQI\Translate5\User\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use ZfExtended_Models_User as User;

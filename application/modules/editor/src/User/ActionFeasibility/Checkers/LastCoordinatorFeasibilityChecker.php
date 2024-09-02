@@ -28,17 +28,40 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit;
+namespace MittagQI\Translate5\User\ActionFeasibility\Checkers;
 
-enum Action: string
+use MittagQI\Translate5\LSP\LspUserService;
+use MittagQI\Translate5\User\Action;
+use MittagQI\Translate5\User\ActionFeasibility\Exception\LastCoordinatorException;
+use ZfExtended_Models_User as User;
+
+final class LastCoordinatorFeasibilityChecker implements FeasibilityCheckerInterface
 {
-    case CREATE = 'create';
-    case READ = 'read';
-    case UPDATE = 'update';
-    case DELETE = 'delete';
+    public function __construct(
+        private readonly LspUserService $lspUserService
+    ) {
+    }
 
-    public function isMutable(): bool
+    public function supports(Action $action): bool
     {
-        return in_array($this, [self::UPDATE, self::DELETE], true);
+        return $action === Action::DELETE;
+    }
+
+    /**
+     * Restrict deletion of the last coordinator in the LSP
+     */
+    public function assertAllowed(User $user): void
+    {
+        // Possible coordinator that we try to delete
+        $coordinator = $this->lspUserService->findCoordinatorBy($user);
+
+        if (null === $coordinator) {
+            return;
+        }
+
+        // Nobody can delete the last coordinator of an LSP
+        if ($this->lspUserService->getCoordinatorsCountFor($coordinator->lsp) === 1) {
+            throw new LastCoordinatorException($coordinator);
+        }
     }
 }

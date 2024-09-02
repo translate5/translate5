@@ -28,23 +28,28 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit;
+namespace MittagQI\Translate5\User\ActionFeasibility;
 
 use MittagQI\Translate5\LSP\LspUserService;
 use MittagQI\Translate5\User\Action;
 use MittagQI\Translate5\User\PermissionAudit\Auditors\ClientRestrictedPermissionAuditor;
+use MittagQI\Translate5\User\ActionFeasibility\Checkers\LastCoordinatorFeasibilityChecker;
 use MittagQI\Translate5\User\PermissionAudit\Auditors\LspUserAccessPermissionAuditor;
 use MittagQI\Translate5\User\PermissionAudit\Auditors\ParentPermissionAuditor;
 use MittagQI\Translate5\User\PermissionAudit\Auditors\PermissionAuditorInterface;
+use MittagQI\Translate5\User\ActionFeasibility\Checkers\PmInTaskFeasibilityChecker;
+use MittagQI\Translate5\User\ActionFeasibility\Checkers\UserIsEditableFeasibilityChecker;
+use MittagQI\Translate5\User\PermissionAudit\Exception;
+use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use ZfExtended_Models_User as User;
 
-final class UserActionPermissionAuditor
+final class UserActionFeasibilityChecker
 {
     /**
-     * @param PermissionAuditorInterface[] $auditors
+     * @param PermissionAuditorInterface[] $checkers
      */
     public function __construct(
-        private readonly array $auditors
+        private readonly array $checkers
     ) {
     }
 
@@ -53,8 +58,11 @@ final class UserActionPermissionAuditor
         $lspUserService = LspUserService::create();
 
         return new self([
+            new UserIsEditableFeasibilityChecker(),
+            new PmInTaskFeasibilityChecker(),
             ParentPermissionAuditor::create(),
             new ClientRestrictedPermissionAuditor(),
+            new LastCoordinatorFeasibilityChecker($lspUserService),
             new LspUserAccessPermissionAuditor($lspUserService),
         ]);
     }
@@ -64,7 +72,7 @@ final class UserActionPermissionAuditor
      */
     public function assertGranted(Action $action, User $user, PermissionAuditContext $context): void
     {
-        foreach ($this->auditors as $auditor) {
+        foreach ($this->checkers as $auditor) {
             if (! $auditor->supports($action)) {
                 continue;
             }

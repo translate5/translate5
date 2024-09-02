@@ -31,9 +31,9 @@ declare(strict_types=1);
 namespace User\PermissionAudit\Auditors;
 
 use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\User\PermissionAudit\Action;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\PmInTaskPermissionAuditor;
-use MittagQI\Translate5\User\PermissionAudit\Exception\PmInTaskException;
+use MittagQI\Translate5\User\Action;
+use MittagQI\Translate5\User\ActionFeasibility\Checkers\PmInTaskFeasibilityChecker;
+use MittagQI\Translate5\User\ActionFeasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
@@ -53,7 +53,7 @@ class PmInTaskPermissionAuditorTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $auditor = new PmInTaskPermissionAuditor($this->createMock(TaskRepository::class));
+        $auditor = new PmInTaskFeasibilityChecker($this->createMock(TaskRepository::class));
         $this->assertEquals($expected, $auditor->supports($action));
     }
 
@@ -86,7 +86,7 @@ class PmInTaskPermissionAuditorTest extends TestCase
             $this->expectException(PmInTaskException::class);
         }
 
-        $auditor = new PmInTaskPermissionAuditor($taskRepositoryMock);
-        $auditor->assertGranted($user, $context);
+        $auditor = new PmInTaskFeasibilityChecker($taskRepositoryMock);
+        $auditor->assertAllowed($user, $context);
     }
 }

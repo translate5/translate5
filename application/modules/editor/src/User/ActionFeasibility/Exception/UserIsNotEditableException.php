@@ -28,13 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Exception;
+namespace MittagQI\Translate5\User\ActionFeasibility\Exception;
 
-final class PmInTaskException extends \Exception implements PermissionExceptionInterface
+final class UserIsNotEditableException extends \Exception implements FeasibilityExceptionInterface
 {
-    public function __construct(
-        public array $taskGuids = []
-    ) {
-        parent::__construct();
-    }
 }

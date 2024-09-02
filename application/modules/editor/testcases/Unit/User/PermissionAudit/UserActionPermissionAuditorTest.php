@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace User\PermissionAudit;
 
-use MittagQI\Translate5\User\PermissionAudit\Action;
+use MittagQI\Translate5\User\Action;
 use MittagQI\Translate5\User\PermissionAudit\Auditors\PermissionAuditorInterface;
 use MittagQI\Translate5\User\PermissionAudit\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;

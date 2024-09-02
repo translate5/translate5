@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
 
 use MittagQI\Translate5\LSP\LspUserService;
-use MittagQI\Translate5\User\PermissionAudit\Action;
+use MittagQI\Translate5\User\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\NotAccessibleForLspUserException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use MittagQI\ZfExtended\Acl\Roles;

@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,35 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\PermissionAudit;
+namespace MittagQI\Translate5\User;
 
-use MittagQI\Translate5\User\Action;
-use PHPUnit\Framework\TestCase;
-
-class ActionTest extends TestCase
+enum Action: string
 {
-    public function provideIsMutable(): iterable
-    {
-        yield ['read', false];
-        yield ['create', false];
-        yield ['update', true];
-        yield ['delete', true];
-    }
+    case CREATE = 'create';
+    case READ = 'read';
+    case UPDATE = 'update';
+    case DELETE = 'delete';
 
-    /**
-     * @dataProvider provideIsMutable
-     */
-    public function testIsMutable(string $value, bool $expected): void
+    public function isMutable(): bool
     {
-        $action = Action::tryFrom($value);
-        self::assertSame($expected, $action->isMutable());
-    }
-
-    public function testList(): void
-    {
-        self::assertEquals(
-            ['create', 'read', 'update', 'delete'],
-            array_map(static fn (Action $action) => $action->value, Action::cases())
-        );
+        return in_array($this, [self::UPDATE, self::DELETE], true);
     }
 }

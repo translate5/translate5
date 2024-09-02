@@ -28,8 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Exception;
+namespace MittagQI\Translate5\User\ActionFeasibility\Exception;
 
-final class UserIsNotEditableException extends \Exception implements PermissionExceptionInterface
+interface FeasibilityExceptionInterface extends \Throwable
 {
 }

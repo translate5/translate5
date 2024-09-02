@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace User\PermissionAudit\Auditors;
 
-use MittagQI\Translate5\User\PermissionAudit\Action;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\UserIsEditableAuditor;
-use MittagQI\Translate5\User\PermissionAudit\Exception\UserIsNotEditableException;
+use MittagQI\Translate5\User\Action;
+use MittagQI\Translate5\User\ActionFeasibility\Checkers\UserIsEditableFeasibilityChecker;
+use MittagQI\Translate5\User\ActionFeasibility\Exception\UserIsNotEditableException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use PHPUnit\Framework\TestCase;
 
@@ -51,7 +51,7 @@ class UserIsEditableAuditorTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $auditor = new UserIsEditableAuditor();
+        $auditor = new UserIsEditableFeasibilityChecker();
         $this->assertEquals($expected, $auditor->supports($action));
     }
 
@@ -66,8 +66,8 @@ class UserIsEditableAuditorTest extends TestCase
                 ['getEditable', [], true],
             ]);
 
-        $auditor = new UserIsEditableAuditor();
-        $auditor->assertGranted($user, $context);
+        $auditor = new UserIsEditableFeasibilityChecker();
+        $auditor->assertAllowed($user, $context);
     }
 
     public function testAssertGrantedNotEditableUser(): void
@@ -83,7 +83,7 @@ class UserIsEditableAuditorTest extends TestCase
 
         $this->expectException(UserIsNotEditableException::class);
 
-        $auditor = new UserIsEditableAuditor();
-        $auditor->assertGranted($user, $context);
+        $auditor = new UserIsEditableFeasibilityChecker();
+        $auditor->assertAllowed($user, $context);
     }
 }

@@ -28,15 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Exception;
+namespace MittagQI\Translate5\User\ActionFeasibility\Checkers;
 
-use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\User\Action;
+use MittagQI\Translate5\User\ActionFeasibility\Exception\FeasibilityExceptionInterface;
+use ZfExtended_Models_User as User;
 
-final class LastCoordinatorException extends \Exception implements PermissionExceptionInterface
+interface FeasibilityCheckerInterface
 {
-    public function __construct(
-        public readonly JobCoordinator $coordinator
-    ) {
-        parent::__construct();
-    }
+    /**
+     * @throws FeasibilityExceptionInterface
+     */
+    public function assertAllowed(User $user): void;
+
+    public function supports(Action $action): bool;
 }

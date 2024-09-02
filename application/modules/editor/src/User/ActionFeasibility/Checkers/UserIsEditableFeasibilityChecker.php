@@ -28,45 +28,26 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User;
+namespace MittagQI\Translate5\User\ActionFeasibility\Checkers;
 
-use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionFeasibility\Exception\LastCoordinatorException;
+use MittagQI\Translate5\User\Action;
+use MittagQI\Translate5\User\ActionFeasibility\Exception\UserIsNotEditableException;
 use ZfExtended_Models_User as User;
 
-final class UserService
+final class UserIsEditableFeasibilityChecker implements FeasibilityCheckerInterface
 {
-    public function __construct(
-        private readonly UserRepository $userRepository,
-    ) {
+    public function supports(Action $action): bool
+    {
+        return $action->isMutable();
     }
 
-    public static function create(): self
+    /**
+     * Restrict access if user is not editable
+     */
+    public function assertAllowed(User $user): void
     {
-        return new self(
-            new UserRepository(),
-        );
-    }
-
-    public function delete(User $user): void
-    {
-        // Possible coordinator that we try to delete
-        $coordinator = $this->lspUserService->findCoordinatorBy($user);
-
-        if (null === $coordinator) {
-            return;
+        if (! $user->getEditable()) {
+            throw new UserIsNotEditableException();
         }
-
-        // Nobody can delete the last coordinator of an LSP
-        if ($this->lspUserService->getCoordinatorsCountFor($coordinator->lsp) === 1) {
-            throw new LastCoordinatorException($coordinator);
-        }
-
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
     }
 }
