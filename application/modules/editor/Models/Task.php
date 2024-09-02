@@ -299,18 +299,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * loads all tasks associated to a specific user as PM
-     * @return array
-     */
-    public function loadListByPmGuid(string $pmGuid)
-    {
-        $s = $this->db->select();
-        $s->where('pmGuid = ?', $pmGuid);
-
-        return parent::loadFilterdCustom($s);
-    }
-
-    /**
      * loads all tasks of the given tasktype that are associated to a specific user as PM
      */
     public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype): array

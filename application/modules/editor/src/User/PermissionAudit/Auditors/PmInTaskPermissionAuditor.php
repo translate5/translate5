@@ -30,15 +30,24 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
 
-use editor_Models_Task;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\User\PermissionAudit\Action;
 use MittagQI\Translate5\User\PermissionAudit\Exception\PmInTaskException;
 use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
-use ZfExtended_Factory;
 use ZfExtended_Models_User as User;
 
 final class PmInTaskPermissionAuditor implements PermissionAuditorInterface
 {
+    public function __construct(
+        private readonly TaskRepository $taskRepository
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(new TaskRepository());
+    }
+
     public function supports(Action $action): bool
     {
         return $action === Action::DELETE;
@@ -49,8 +58,7 @@ final class PmInTaskPermissionAuditor implements PermissionAuditorInterface
      */
     public function assertGranted(User $user, PermissionAuditContext $context): void
     {
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-        $tasks = $task->loadListByPmGuid($user->getUserGuid());
+        $tasks = $this->taskRepository->loadListByPmGuid($user->getUserGuid());
 
         if (! empty($tasks)) {
             $taskGuids = array_column($tasks, 'taskGuid');

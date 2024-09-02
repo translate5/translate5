@@ -82,4 +82,17 @@ class TaskRepository
             yield clone $task;
         }
     }
+
+    /**
+     * Return all tasks associated to a specific user as PM
+     *
+     * @return array[]
+     */
+    public function loadListByPmGuid(string $pmGuid): array
+    {
+        $db = ZfExtended_Factory::get(editor_Models_Task::class)->db;
+        $s = $db->select()->where('pmGuid = ?', $pmGuid);
+
+        return $db->fetchAll($s);
+    }
 }
