@@ -55,7 +55,8 @@ Ext.define('Editor.model.admin.User', {
     }},
     {name: 'locale', type: 'string'},
     {name: 'customers', type: 'string'},
-    {name: 'openIdIssuer', type: 'string'}
+    {name: 'openIdIssuer', type: 'string'},
+    {name: 'lsp', type: 'int'}
   ],
   idProperty: 'id',
   proxy : {

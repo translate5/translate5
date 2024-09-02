@@ -49,7 +49,22 @@ class Editor_UserController extends ZfExtended_UserController
     {
         parent::init();
         $this->permissionAuditor = UserActionPermissionAuditor::create();
-        ;
+    }
+
+    public function getAction()
+    {
+        parent::getAction();
+
+        $this->permissionAuditor->assertGranted(
+            Action::READ,
+            $this->entity,
+            new PermissionAuditContext(ZfExtended_Authentication::getInstance()->getUser())
+        );
+
+        $lspUserRepo = new LspUserRepository();
+
+        // @phpstan-ignore-next-line
+        $this->view->rows->lsp = $lspUserRepo->findByUser($this->entity)?->lsp->getId();
     }
 
     public function indexAction()
@@ -105,6 +120,19 @@ class Editor_UserController extends ZfExtended_UserController
         $this->view->total = count($rows);
 
         $this->csvToArray();
+    }
+
+    public function putAction(): void
+    {
+        $this->entityLoad();
+
+        $this->permissionAuditor->assertGranted(
+            Action::UPDATE,
+            $this->entity,
+            new PermissionAuditContext(ZfExtended_Authentication::getInstance()->getUser())
+        );
+
+        parent::putAction();
     }
 
     public function deleteAction(): void

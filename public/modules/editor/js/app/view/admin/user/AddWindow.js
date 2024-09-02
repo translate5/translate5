@@ -252,6 +252,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             itemId: 'lsp',
                                             name: 'lsp',
                                             allowBlank: false,
+                                            forceSelection: true,
                                             hidden: true,
                                             store: 'admin.LspStore',
                                             displayField: 'name',
@@ -265,26 +266,27 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                                      * @type {Editor.model.admin.LspModel}
                                                      */
                                                     const lsp = Ext.getStore('admin.LspStore').getById(newValue);
+                                                    const customerField = fld.up('form').down('combo[name=customers]');
 
                                                     if (null === lsp) {
-                                                        fld.up('form').down('customers').setValue([]);
+                                                        customerField.setValue([]);
 
                                                         return;
                                                     }
 
-                                                    const customersStore = Ext.getStore('customersStore');
+                                                    const customersStore = customerField.getStore();
 
-                                                    const customers = [];
+                                                    Ext.Ajax.request({
+                                                        url: Editor.data.restpath + 'lsp/' + lsp.get('id'),
+                                                        method: 'GET',
+                                                        success: response => {
+                                                            const data = Ext.decode(response.responseText);
+                                                            const customers = data.rows.customers;
 
-                                                    for (const customerData of lsp.get('customers')) {
-                                                        const customer = customersStore.getById(customerData.id);
-
-                                                        if (customer) {
-                                                            customers.push(customer);
+                                                            customersStore.loadData(customers)
+                                                            customerField.setValue(customers.map(c => c.id));
                                                         }
-                                                    }
-
-                                                    fld.up('form').down('customers').setValue(customers);
+                                                    });
                                                 }
                                             }
                                         },
@@ -334,86 +336,60 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             fieldLabel: me.strings.parentUserLabel
                                         },
                                         {
-                                            xtype: 'Editor.combobox',
+                                            xtype: 'customers',
                                             bind: {
-                                                fieldLabel: '{l10n.general.clinets}',
+                                                fieldLabel: '{l10n.general.clients}',
                                             },
-                                            name: 'connectionOption',
+                                            name: 'customers',
                                             store: {
                                                 xtype: 'store',
-                                                fields: ['id', 'name'],
+                                                // fields: ['id', 'name'],
                                                 data: [] // Initially empty, will be set dynamically
                                             },
                                             queryMode: 'local',
                                             displayField: 'name',
                                             valueField: 'id',
                                             allowBlank: false,
-                                            width: 300,
-                                            listConfig: {
-                                                getInnerTpl: function () {
-                                                    return '<div style="white-space: nowrap; overflow: visible;">{[Ext.String.htmlEncode(values.name)]}</div>'; // Prevent text wrapping
-                                                }
-                                            },
+                                            typeAhead: true,
+                                            anyMatch: true,
+                                            forceSelection: true,
+                                            selectOnFocus:true,
                                             listeners: {
-                                                render: function(combo) {
-                                                    const store = combo.getStore();
-
-                                                    const lsp = combo.up('form').down('combo[name=lsp]');
-
-                                                    store.on('refresh', function() {
-                                                        var longestText = '';
-                                                        store.each(function(record) {
-                                                            var text = record.get(combo.displayField);
-                                                            if (text.length > longestText.length) {
-                                                                longestText = text;
-                                                            }
-                                                        });
-
-                                                        // Create a temporary element to calculate the width of the longest text
-                                                        var tempEl = Ext.getBody().createChild({
-                                                            tag: 'div',
-                                                            html: longestText,
-                                                            style: {
-                                                                'position': 'absolute',
-                                                                'visibility': 'hidden',
-                                                                'font-family': combo.getEl().getStyle('font-family'),
-                                                                'font-size': combo.getEl().getStyle('font-size')
-                                                            }
-                                                        });
-
-                                                        var textWidth = tempEl.getWidth() + 10; // Add some padding
-                                                        tempEl.destroy(); // Remove the temporary element
-
-                                                        combo.listConfig.minWidth = textWidth > combo.width ? textWidth : combo.width;
-                                                    });
-
-                                                    const form = this.lookupReference('associationForm');
-
-                                                    Ext.Ajax.request({
-                                                        url: Editor.data.restpath + 'languageresourcesync/' + this.getView().languageResource.get('id') + '/available-for-connection',
-                                                        method: 'GET',
-                                                        success: response => {
-                                                            form.hide();
-                                                            const data = Ext.decode(response.responseText);
-
-                                                            if (data.total > 0) {
-                                                                form.show();
-                                                                store.loadData(data.rows)
-                                                            }
-                                                        },
-                                                        failure: function() {
-                                                            Ext.Msg.alert(
-                                                                'Error',
-                                                                Editor.data.l10n.crossLanguageResourceSynchronization.failedToLoadDataForTargetLanguageResource
-                                                            );
-                                                        }
-                                                    });
-                                                }
+                                                // render: function(combo) {
+                                                //     const store = combo.getStore();
+                                                //     const form = combo.up('form');
+                                                //     const lsp = form.down('combo[name=lsp]').getValue();
+                                                //
+                                                //     const customers = [];
+                                                //     const customersStore = Ext.getStore('customersStore');
+                                                //
+                                                //     for (const customerData of record.get('customers')) {
+                                                //         const customer = customersStore.getById(customerData.id);
+                                                //
+                                                //         if (customer) {
+                                                //             customers.push(customer);
+                                                //         }
+                                                //     }
+                                                //
+                                                //     if (! lsp) {
+                                                //         store.loadData(customersStore.getData());
+                                                //
+                                                //         return;
+                                                //     }
+                                                //
+                                                //     Ext.Ajax.request({
+                                                //         url: Editor.data.restpath + 'lsp/' + lsp,
+                                                //         method: 'GET',
+                                                //         success: response => {
+                                                //             const data = Ext.decode(response.responseText);
+                                                //
+                                                //             store.loadData(data.rows.customers)
+                                                //         }
+                                                //     });
+                                                // }
                                             }
                                         }
                                     ]
-                                    // + item for assigning customers to the user
-                                    // (added dynamically by Editor.controller.admin.Customer)
                                 },
                                 {
                                     xtype: 'fieldset',
@@ -535,16 +511,24 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             form = box.up('form'),
             boxes = box.up('#rolesGroup').query('checkbox[checked=true]');
 
-        Ext.Array.forEach(boxes, function (item) {
-            roles.push(item.initialConfig.value);
+        boxes.forEach(box => {
+            roles.push(box.initialConfig.value);
+            box.setDisabled(false);
         });
 
         if (roles.includes('jobCoordinator')) {
             form.down('#lsp').setHidden(false);
-            roles = roles.filter(role => !role.includes('pm') && !role.includes('admin'));
+            roles = roles.filter(role => ! role.includes('pm') && ! role.includes('admin')) && 'api' !== role;
             boxes
-                .filter(box => box.initialConfig.value.includes('pm') || box.initialConfig.value.includes('admin'))
-                .forEach(box => box.setValue(false))
+                .filter(
+                    box => box.initialConfig.value.includes('pm')
+                        || box.initialConfig.value.includes('admin')
+                        || 'api' === box.initialConfig.value
+                )
+                .forEach(box => {
+                    box.setValue(false);
+                    box.setDisabled(true);
+                })
             ;
         }
 
@@ -563,7 +547,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                     allSubRoles.push(item[0]);
                 }
                 tagfield.setValue(allSubRoles);
-                // form.getRecord().set('clientPmSubRoles', allSubRoles, { silent: true, commit: false });
                 tagfield.isClientPmInited = true;
             }
 
@@ -603,9 +586,58 @@ Ext.define('Editor.view.admin.user.AddWindow', {
 
         form.loadRecord(record);
 
-        Ext.Array.forEach(me.query('#rolesGroup checkbox'), function (item) {
-            item.setValue(roles.includes(item.initialConfig.value));
+        const userIsJobCoordinator = roles.includes('jobCoordinator');
+
+        me.query('#rolesGroup checkbox').forEach(function (box) {
+            let boxInitValue = box.initialConfig.value;
+            box.setValue(roles.includes(boxInitValue));
+
+            if (userIsJobCoordinator) {
+                if (boxInitValue.includes('pm') || boxInitValue.includes('admin') || 'api' === boxInitValue) {
+                    box.setDisabled(true);
+                }
+            }
         });
+
+        const customersField = form.down('customers');
+        const customersFieldStore = customersField.getStore();
+
+        const customers = [];
+        const customersStore = Ext.getStore('customersStore');
+
+        customersFieldStore.loadData(customersStore.getData().items);
+
+        if (!! record.get('lsp')) {
+            let lspStore = Ext.getStore('admin.LspStore');
+
+            const updateRelatedToLspField = () => {
+                const lsp = lspStore.getById(record.get('lsp'));
+
+                const lspField = form.down('#lsp');
+                lspField.setHidden(false);
+                lspField.setValue(lsp);
+                lspField.setDisabled(! userIsJobCoordinator);
+
+                customersFieldStore.loadData(lsp.get('customers'));
+            };
+
+            if (! lspStore.isLoaded()) {
+                lspStore.on('load', updateRelatedToLspField);
+                lspStore.load();
+            } else {
+                updateRelatedToLspField();
+            }
+        }
+
+        for (const customerId of record.getCustomerIds()) {
+            const customer = customersStore.getById(customerId);
+
+            if (customer) {
+                customers.push(customer);
+            }
+        }
+
+        form.down('customers').setValue(customers);
 
         if (form.isDisabled() && record.get('openIdIssuer') !== '') {
             form.add({
