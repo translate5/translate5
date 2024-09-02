@@ -32,22 +32,18 @@ namespace MittagQI\Translate5\User\ActionFeasibility;
 
 use MittagQI\Translate5\LSP\LspUserService;
 use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\ClientRestrictedPermissionAuditor;
+use MittagQI\Translate5\User\ActionFeasibility\Checkers\FeasibilityCheckerInterface;
 use MittagQI\Translate5\User\ActionFeasibility\Checkers\LastCoordinatorFeasibilityChecker;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\LspUserAccessPermissionAuditor;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\ParentPermissionAuditor;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\PermissionAuditorInterface;
 use MittagQI\Translate5\User\ActionFeasibility\Checkers\PmInTaskFeasibilityChecker;
 use MittagQI\Translate5\User\ActionFeasibility\Checkers\UserIsEditableFeasibilityChecker;
-use MittagQI\Translate5\User\PermissionAudit\Exception;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
 use ZfExtended_Models_User as User;
 
 final class UserActionFeasibilityChecker
 {
     /**
-     * @param PermissionAuditorInterface[] $checkers
+     * @param FeasibilityCheckerInterface[] $checkers
      */
+    
     public function __construct(
         private readonly array $checkers
     ) {
@@ -59,25 +55,22 @@ final class UserActionFeasibilityChecker
 
         return new self([
             new UserIsEditableFeasibilityChecker(),
-            new PmInTaskFeasibilityChecker(),
-            ParentPermissionAuditor::create(),
-            new ClientRestrictedPermissionAuditor(),
+            PmInTaskFeasibilityChecker::create(),
             new LastCoordinatorFeasibilityChecker($lspUserService),
-            new LspUserAccessPermissionAuditor($lspUserService),
         ]);
     }
 
     /**
-     * @throws Exception\PermissionExceptionInterface
+     * @throws Exception\FeasibilityExceptionInterface
      */
-    public function assertGranted(Action $action, User $user, PermissionAuditContext $context): void
+    public function assertGranted(Action $action, User $user): void
     {
-        foreach ($this->checkers as $auditor) {
-            if (! $auditor->supports($action)) {
+        foreach ($this->checkers as $checker) {
+            if (! $checker->supports($action)) {
                 continue;
             }
 
-            $auditor->assertGranted($user, $context);
+            $checker->assertAllowed($user);
         }
     }
 }
