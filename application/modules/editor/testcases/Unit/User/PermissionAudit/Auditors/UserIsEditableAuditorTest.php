@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace User\PermissionAudit\Auditors;
 
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\ActionFeasibility\Checkers\UserIsEditableFeasibilityChecker;
-use MittagQI\Translate5\User\ActionFeasibility\Exception\UserIsNotEditableException;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\UserIsEditableFeasibilityChecker;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\UserIsNotEditableException;
+use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
 use PHPUnit\Framework\TestCase;
 
 class UserIsEditableAuditorTest extends TestCase

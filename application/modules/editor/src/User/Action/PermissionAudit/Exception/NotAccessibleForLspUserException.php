@@ -28,19 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\User\Action\PermissionAudit\Exception;
 
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\PermissionAudit\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\LSP\JobCoordinator;
 
-interface PermissionAuditorInterface
+final class NotAccessibleForLspUserException extends \Exception implements PermissionExceptionInterface
 {
-    /**
-     * @throws PermissionExceptionInterface
-     */
-    public function assertGranted(User $user, PermissionAuditContext $context): void;
-
-    public function supports(Action $action): bool;
+    public function __construct(
+        public readonly JobCoordinator $coordinator
+    ) {
+        parent::__construct();
+    }
 }

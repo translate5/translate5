@@ -31,10 +31,10 @@ declare(strict_types=1);
 namespace User\PermissionAudit\Auditors;
 
 use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\ActionFeasibility\Checkers\PmInTaskFeasibilityChecker;
-use MittagQI\Translate5\User\ActionFeasibility\Exception\PmInTaskException;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\PmInTaskFeasibilityChecker;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\PmInTaskException;
+use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 

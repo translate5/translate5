@@ -28,18 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionFeasibility\Checkers;
+namespace MittagQI\Translate5\User\Action\PermissionAudit\Exception;
 
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\ActionFeasibility\Exception\FeasibilityExceptionInterface;
-use ZfExtended_Models_User as User;
-
-interface FeasibilityCheckerInterface
+interface PermissionExceptionInterface extends \Throwable
 {
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function assertAllowed(User $user): void;
-
-    public function supports(Action $action): bool;
 }

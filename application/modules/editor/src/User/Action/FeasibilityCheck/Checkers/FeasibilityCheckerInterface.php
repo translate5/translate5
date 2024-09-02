@@ -28,13 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionFeasibility\Exception;
+namespace MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers;
 
-final class PmInTaskException extends \Exception implements FeasibilityExceptionInterface
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\FeasibilityExceptionInterface;
+use ZfExtended_Models_User as User;
+
+interface FeasibilityCheckerInterface
 {
-    public function __construct(
-        public array $taskGuids = []
-    ) {
-        parent::__construct();
-    }
+    /**
+     * @throws FeasibilityExceptionInterface
+     */
+    public function assertAllowed(User $user): void;
+
+    public function supports(Action $action): bool;
 }

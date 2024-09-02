@@ -28,41 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User;
+namespace MittagQI\Translate5\User\Action\PermissionAudit\Exception;
 
-use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\Action\Action;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\UserActionFeasibilityChecker;
-use ZfExtended_Models_User as User;
-
-final class UserService
+class ClientRestrictionException extends \Exception implements PermissionExceptionInterface
 {
-    public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityChecker $userActionFeasibilityChecker,
-    ) {
-    }
-
-    public static function create(): self
-    {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityChecker::create(),
-        );
-    }
-
-    /**
-     * @throws \MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\FeasibilityExceptionInterface
-     */
-    public function delete(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
-
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
-    }
 }

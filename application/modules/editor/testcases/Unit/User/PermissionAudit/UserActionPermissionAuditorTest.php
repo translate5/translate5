@@ -30,11 +30,11 @@ declare(strict_types=1);
 
 namespace User\PermissionAudit;
 
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\PermissionAudit\Auditors\PermissionAuditorInterface;
-use MittagQI\Translate5\User\PermissionAudit\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
-use MittagQI\Translate5\User\PermissionAudit\UserActionPermissionAuditor;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\PermissionAudit\Auditors\PermissionAuditorInterface;
+use MittagQI\Translate5\User\Action\PermissionAudit\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\Action\PermissionAudit\UserActionPermissionAuditor;
 use PHPUnit\Framework\TestCase;
 
 class UserActionPermissionAuditorTest extends TestCase

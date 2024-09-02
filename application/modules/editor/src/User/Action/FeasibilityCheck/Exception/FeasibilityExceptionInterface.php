@@ -28,8 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Exception;
+namespace MittagQI\Translate5\User\Action\FeasibilityCheck\Exception;
 
-final class NoAccessException extends \Exception implements PermissionExceptionInterface
+interface FeasibilityExceptionInterface extends \Throwable
 {
 }

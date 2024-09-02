@@ -28,11 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\User\Action\PermissionAudit\Auditors;
 
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\PermissionAudit\Exception\NoAccessException;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\PermissionAudit\Exception\NoAccessException;
+use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
 use MittagQI\ZfExtended\Acl\SystemResource;
 use ZfExtended_Models_User as User;
 

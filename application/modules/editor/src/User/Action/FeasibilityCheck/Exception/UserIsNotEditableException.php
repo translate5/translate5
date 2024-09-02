@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionFeasibility\Exception;
+namespace MittagQI\Translate5\User\Action\FeasibilityCheck\Exception;
 
 final class UserIsNotEditableException extends \Exception implements FeasibilityExceptionInterface
 {

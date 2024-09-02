@@ -28,8 +28,41 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionFeasibility\Exception;
+namespace MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers;
 
-interface FeasibilityExceptionInterface extends \Throwable
+use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\PmInTaskException;
+use ZfExtended_Models_User as User;
+
+final class PmInTaskFeasibilityChecker implements FeasibilityCheckerInterface
 {
+    public function __construct(
+        private readonly TaskRepository $taskRepository
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(new TaskRepository());
+    }
+
+    public function supports(Action $action): bool
+    {
+        return $action === Action::DELETE;
+    }
+
+    /**
+     * Restrict access if the user is a project manager in at least one task
+     */
+    public function assertAllowed(User $user): void
+    {
+        $tasks = $this->taskRepository->loadListByPmGuid($user->getUserGuid());
+
+        if (! empty($tasks)) {
+            $taskGuids = array_column($tasks, 'taskGuid');
+
+            throw new PmInTaskException($taskGuids);
+        }
+    }
 }

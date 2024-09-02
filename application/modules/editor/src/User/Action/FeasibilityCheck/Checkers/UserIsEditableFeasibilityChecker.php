@@ -28,8 +28,26 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Exception;
+namespace MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers;
 
-class ClientRestrictionException extends \Exception implements PermissionExceptionInterface
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\UserIsNotEditableException;
+use ZfExtended_Models_User as User;
+
+final class UserIsEditableFeasibilityChecker implements FeasibilityCheckerInterface
 {
+    public function supports(Action $action): bool
+    {
+        return $action->isMutable();
+    }
+
+    /**
+     * Restrict access if user is not editable
+     */
+    public function assertAllowed(User $user): void
+    {
+        if (! $user->getEditable()) {
+            throw new UserIsNotEditableException();
+        }
+    }
 }

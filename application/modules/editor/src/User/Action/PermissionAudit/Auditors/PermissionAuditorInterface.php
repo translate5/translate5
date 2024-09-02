@@ -28,8 +28,19 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Exception;
+namespace MittagQI\Translate5\User\Action\PermissionAudit\Auditors;
 
-interface PermissionExceptionInterface extends \Throwable
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\PermissionAudit\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
+use ZfExtended_Models_User as User;
+
+interface PermissionAuditorInterface
 {
+    /**
+     * @throws PermissionExceptionInterface
+     */
+    public function assertGranted(User $user, PermissionAuditContext $context): void;
+
+    public function supports(Action $action): bool;
 }

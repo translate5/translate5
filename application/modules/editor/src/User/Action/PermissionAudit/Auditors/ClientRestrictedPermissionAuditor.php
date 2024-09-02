@@ -28,14 +28,33 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit;
+namespace MittagQI\Translate5\User\Action\PermissionAudit\Auditors;
 
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\PermissionAudit\Exception\ClientRestrictionException;
+use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
 use ZfExtended_Models_User as User;
 
-final class PermissionAuditContext
+final class ClientRestrictedPermissionAuditor implements PermissionAuditorInterface
 {
-    public function __construct(
-        public readonly User $manager
-    ) {
+    public function supports(Action $action): bool
+    {
+        return in_array($action, [Action::CREATE, Action::UPDATE, Action::DELETE, Action::READ], true);
+    }
+
+    /**
+     * Restrict access by clients
+     */
+    public function assertGranted(User $user, PermissionAuditContext $context): void
+    {
+        if (! $context->manager->isClientRestricted()) {
+            return;
+        }
+
+        $allowedCustomerIs = $context->manager->getRestrictedClientIds();
+
+        if (! empty(array_diff($user->getCustomersArray(), $allowedCustomerIs))) {
+            throw new ClientRestrictionException();
+        }
     }
 }

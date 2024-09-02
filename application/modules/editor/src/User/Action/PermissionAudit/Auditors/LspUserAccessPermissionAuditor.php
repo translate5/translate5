@@ -28,33 +28,51 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\User\Action\PermissionAudit\Auditors;
 
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\PermissionAudit\Exception\ClientRestrictionException;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\LSP\LspUserService;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\PermissionAudit\Exception\NotAccessibleForLspUserException;
+use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
+use MittagQI\ZfExtended\Acl\Roles;
 use ZfExtended_Models_User as User;
 
-final class ClientRestrictedPermissionAuditor implements PermissionAuditorInterface
+final class LspUserAccessPermissionAuditor implements PermissionAuditorInterface
 {
+    public function __construct(
+        private readonly LspUserService $lspUserService
+    ) {
+    }
+
     public function supports(Action $action): bool
     {
-        return in_array($action, [Action::CREATE, Action::UPDATE, Action::DELETE, Action::READ], true);
+        return in_array($action, [Action::UPDATE, Action::DELETE, Action::READ], true);
     }
 
     /**
-     * Restrict access by clients
+     * Restrict access for job coordinators to LSP users and other job coordinator
      */
     public function assertGranted(User $user, PermissionAuditContext $context): void
     {
-        if (! $context->manager->isClientRestricted()) {
+        $manager = $context->manager;
+        $roles = $manager->getRoles();
+
+        if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
             return;
         }
 
-        $allowedCustomerIs = $context->manager->getRestrictedClientIds();
+        $coordinator = $this->lspUserService->findCoordinatorBy($manager);
 
-        if (! empty(array_diff($user->getCustomersArray(), $allowedCustomerIs))) {
-            throw new ClientRestrictionException();
+        if (null === $coordinator) {
+            return;
         }
+
+        foreach ($this->lspUserService->getAccessibleUsers($coordinator) as $accessibleUser) {
+            if ($accessibleUser->getId() === $user->getId()) {
+                return;
+            }
+        }
+
+        throw new NotAccessibleForLspUserException($coordinator);
     }
 }

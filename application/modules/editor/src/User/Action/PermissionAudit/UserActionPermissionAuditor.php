@@ -28,41 +28,48 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionFeasibility\Checkers;
+namespace MittagQI\Translate5\User\Action\PermissionAudit;
 
-use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\ActionFeasibility\Exception\PmInTaskException;
+use MittagQI\Translate5\LSP\LspUserService;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\PermissionAudit\Auditors\ClientRestrictedPermissionAuditor;
+use MittagQI\Translate5\User\Action\PermissionAudit\Auditors\LspUserAccessPermissionAuditor;
+use MittagQI\Translate5\User\Action\PermissionAudit\Auditors\ParentPermissionAuditor;
+use MittagQI\Translate5\User\Action\PermissionAudit\Auditors\PermissionAuditorInterface;
 use ZfExtended_Models_User as User;
 
-final class PmInTaskFeasibilityChecker implements FeasibilityCheckerInterface
+final class UserActionPermissionAuditor
 {
+    /**
+     * @param PermissionAuditorInterface[] $auditors
+     */
     public function __construct(
-        private readonly TaskRepository $taskRepository
+        private readonly array $auditors
     ) {
     }
 
     public static function create(): self
     {
-        return new self(new TaskRepository());
-    }
+        $lspUserService = LspUserService::create();
 
-    public function supports(Action $action): bool
-    {
-        return $action === Action::DELETE;
+        return new self([
+            ParentPermissionAuditor::create(),
+            new ClientRestrictedPermissionAuditor(),
+            new LspUserAccessPermissionAuditor($lspUserService),
+        ]);
     }
 
     /**
-     * Restrict access if the user is a project manager in at least one task
+     * @throws \MittagQI\Translate5\User\Action\PermissionAudit\Exception\PermissionExceptionInterface
      */
-    public function assertAllowed(User $user): void
+    public function assertGranted(Action $action, User $user, PermissionAuditContext $context): void
     {
-        $tasks = $this->taskRepository->loadListByPmGuid($user->getUserGuid());
+        foreach ($this->auditors as $auditor) {
+            if (! $auditor->supports($action)) {
+                continue;
+            }
 
-        if (! empty($tasks)) {
-            $taskGuids = array_column($tasks, 'taskGuid');
-
-            throw new PmInTaskException($taskGuids);
+            $auditor->assertGranted($user, $context);
         }
     }
 }

@@ -28,14 +28,12 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Exception;
+namespace MittagQI\Translate5\User\Action\FeasibilityCheck\Exception;
 
-use MittagQI\Translate5\LSP\JobCoordinator;
-
-final class NotAccessibleForLspUserException extends \Exception implements PermissionExceptionInterface
+final class PmInTaskException extends \Exception implements FeasibilityExceptionInterface
 {
     public function __construct(
-        public readonly JobCoordinator $coordinator
+        public array $taskGuids = []
     ) {
         parent::__construct();
     }

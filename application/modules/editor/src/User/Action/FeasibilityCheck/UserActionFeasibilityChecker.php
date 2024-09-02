@@ -28,51 +28,49 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\User\Action\FeasibilityCheck;
 
 use MittagQI\Translate5\LSP\LspUserService;
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\PermissionAudit\Exception\NotAccessibleForLspUserException;
-use MittagQI\Translate5\User\PermissionAudit\PermissionAuditContext;
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\FeasibilityCheckerInterface;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\LastCoordinatorFeasibilityChecker;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\PmInTaskFeasibilityChecker;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\UserIsEditableFeasibilityChecker;
 use ZfExtended_Models_User as User;
 
-final class LspUserAccessPermissionAuditor implements PermissionAuditorInterface
+final class UserActionFeasibilityChecker
 {
+    /**
+     * @param FeasibilityCheckerInterface[] $checkers
+     */
+
     public function __construct(
-        private readonly LspUserService $lspUserService
+        private readonly array $checkers
     ) {
     }
 
-    public function supports(Action $action): bool
+    public static function create(): self
     {
-        return in_array($action, [Action::UPDATE, Action::DELETE, Action::READ], true);
+        $lspUserService = LspUserService::create();
+
+        return new self([
+            new UserIsEditableFeasibilityChecker(),
+            PmInTaskFeasibilityChecker::create(),
+            new LastCoordinatorFeasibilityChecker($lspUserService),
+        ]);
     }
 
     /**
-     * Restrict access for job coordinators to LSP users and other job coordinator
+     * @throws \MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\FeasibilityExceptionInterface
      */
-    public function assertGranted(User $user, PermissionAuditContext $context): void
+    public function assertAllowed(Action $action, User $user): void
     {
-        $manager = $context->manager;
-        $roles = $manager->getRoles();
-
-        if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
-            return;
-        }
-
-        $coordinator = $this->lspUserService->findCoordinatorBy($manager);
-
-        if (null === $coordinator) {
-            return;
-        }
-
-        foreach ($this->lspUserService->getAccessibleUsers($coordinator) as $accessibleUser) {
-            if ($accessibleUser->getId() === $user->getId()) {
-                return;
+        foreach ($this->checkers as $checker) {
+            if (! $checker->supports($action)) {
+                continue;
             }
-        }
 
-        throw new NotAccessibleForLspUserException($coordinator);
+            $checker->assertAllowed($user);
+        }
     }
 }

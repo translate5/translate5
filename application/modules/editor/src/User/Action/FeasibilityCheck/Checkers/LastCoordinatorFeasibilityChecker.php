@@ -28,11 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionFeasibility\Checkers;
+namespace MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers;
 
 use MittagQI\Translate5\LSP\LspUserService;
-use MittagQI\Translate5\User\Action;
-use MittagQI\Translate5\User\ActionFeasibility\Exception\LastCoordinatorException;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\LastCoordinatorException;
 use ZfExtended_Models_User as User;
 
 final class LastCoordinatorFeasibilityChecker implements FeasibilityCheckerInterface
