@@ -12,6 +12,52 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.9.0] - 2024-08-30
+
+### Important Notes:
+#### [TRANSLATE-4109](https://jira.translate5.net/browse/TRANSLATE-4109)
+Update Visual docker containers to get that change
+ 
+
+
+### Added
+**[TRANSLATE-3938](https://jira.translate5.net/browse/TRANSLATE-3938): Import/Export - Export segments as html** <br>
+Introduce HTML Task export feature
+
+
+### Changed
+**[TRANSLATE-4109](https://jira.translate5.net/browse/TRANSLATE-4109): VisualReview / VisualTranslation - Add PDF Version check to pdfconverter container** <br>
+IMPROVEMENT Visual: warn, when imported PDF is of X-4 subtype (which frequently create problems when converting)
+
+**[TRANSLATE-3960](https://jira.translate5.net/browse/TRANSLATE-3960): Editor general - Test PXSS in all input fields of the application** <br>
+Security: fixed remaining PXSS issues by adding frontend-sanitization
+
+**[TRANSLATE-3518](https://jira.translate5.net/browse/TRANSLATE-3518): LanguageResources - Infrastructure for using "translate5 language resources" as training resources for MT** <br>
+Cross Language Resource synchronisation mechanism and abstraction layer introduced into application.
+From now on we have mechanic to connect different Language Resource types (like t5memory, Term Collection, etc) for data synchronisation if it is possible
+
+
+### Bugfixes
+**[TRANSLATE-4161](https://jira.translate5.net/browse/TRANSLATE-4161): TM Maintenance - Segments batch deletion no longer works** <br>
+Fix segments batch deletion in TM Maintenance
+
+**[TRANSLATE-4159](https://jira.translate5.net/browse/TRANSLATE-4159): t5memory - Html entities are not escaped in TMX export** <br>
+Escape tag like enties for t5memory
+
+**[TRANSLATE-4157](https://jira.translate5.net/browse/TRANSLATE-4157): TermPortal, TM Maintenance - Uncaught TypeError: Ext.scrollbar._size is null** <br>
+FIXED: problem with production builds of TermPortal and TMMaintenance
+
+**[TRANSLATE-4152](https://jira.translate5.net/browse/TRANSLATE-4152): LanguageResources - reenable usage of sub-languages in as source of lang synch with major languages as target of lang synch** <br>
+Changed language resource synchronisation makes it possible to connect source language resource with a sub-language to a target language resource with a major language
+
+**[TRANSLATE-3452](https://jira.translate5.net/browse/TRANSLATE-3452): Auto-QA - Automatic tag correction completes to many tags on Excel re-import** <br>
+Excel Re-import: taglike placeholders are now escaped to prevent errors in the UI
+
+**[TRANSLATE-3079](https://jira.translate5.net/browse/TRANSLATE-3079): Editor general, Security Related - Self-XSS is still possible** <br>
+Security: fixed PXSS issuesin grids in the frontend
+
+
 ## [7.8.2] - 2024-08-23
 
 ### Important Notes:
