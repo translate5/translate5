@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\PermissionAudit;
+namespace User\Action;
 
 use MittagQI\Translate5\User\Action\Action;
 use PHPUnit\Framework\TestCase;

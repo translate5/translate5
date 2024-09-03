@@ -34,21 +34,24 @@ use MittagQI\Translate5\User\Action\Action;
 use MittagQI\Translate5\User\Action\PermissionAudit\Exception\NoAccessException;
 use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
 use MittagQI\ZfExtended\Acl\SystemResource;
+use ZfExtended_Acl;
+use ZfExtended_Authentication;
+use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User as User;
 
 final class ParentPermissionAuditor implements PermissionAuditorInterface
 {
     public function __construct(
-        private readonly \ZfExtended_Acl $acl,
-        private readonly \ZfExtended_Authentication $auth
+        private readonly ZfExtended_Acl $acl,
+        private readonly ZfExtended_AuthenticationInterface $auth
     ) {
     }
 
     public static function create(): self
     {
         return new self(
-            \ZfExtended_Acl::getInstance(),
-            \ZfExtended_Authentication::getInstance()
+            ZfExtended_Acl::getInstance(),
+            ZfExtended_Authentication::getInstance()
         );
     }
 

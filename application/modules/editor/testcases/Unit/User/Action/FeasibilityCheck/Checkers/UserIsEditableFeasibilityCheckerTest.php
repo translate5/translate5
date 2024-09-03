@@ -28,23 +28,21 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\PermissionAudit\Auditors;
+namespace User\Action\FeasibilityCheck\Checkers;
 
-use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\User\Action\Action;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\PmInTaskFeasibilityChecker;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\PmInTaskException;
-use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\UserIsEditableFeasibilityChecker;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\UserIsNotEditableException;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class PmInTaskPermissionAuditorTest extends TestCase
+class UserIsEditableFeasibilityCheckerTest extends TestCase
 {
     public function provideSupports(): iterable
     {
-        yield [Action::DELETE, true];
-        yield [Action::UPDATE, false];
         yield [Action::CREATE, false];
+        yield [Action::UPDATE, true];
+        yield [Action::DELETE, true];
         yield [Action::READ, false];
     }
 
@@ -53,40 +51,33 @@ class PmInTaskPermissionAuditorTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $auditor = new PmInTaskFeasibilityChecker($this->createMock(TaskRepository::class));
+        $auditor = new UserIsEditableFeasibilityChecker();
         $this->assertEquals($expected, $auditor->supports($action));
     }
 
-    public function provideAssertGranted(): iterable
+    public function provideAssertAllowed(): iterable
     {
-        yield [[], false];
-        yield [[['taskGuid' => bin2hex(random_bytes(16))]], true];
+        yield [true, false];
+        yield [false, true];
     }
 
     /**
-     * @dataProvider provideAssertGranted
+     * @dataProvider provideAssertAllowed
      */
-    public function testAssertGranted(array $taskList, bool $expectException): void
+    public function testAssertAllowedEditableUser(bool $isEditable, bool $expectException): void
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
 
-        $user->method('__call')->willReturnMap([
-            ['getUserGuid', [], bin2hex(random_bytes(16))],
-        ]);
-
-        $taskRepositoryMock = $this->createMock(TaskRepository::class);
-        $taskRepositoryMock->expects($this->once())
-            ->method('loadListByPmGuid')
-            ->with($user->getUserGuid())
-            ->willReturn($taskList);
+        $user->expects($this->once())
+            ->method('__call')->willReturnMap([
+                ['getEditable', [], $isEditable],
+            ]);
 
         if ($expectException) {
-            $this->expectException(PmInTaskException::class);
+            $this->expectException(UserIsNotEditableException::class);
         }
 
-        $auditor = new PmInTaskFeasibilityChecker($taskRepositoryMock);
-        $auditor->assertAllowed($user, $context);
+        $auditor = new UserIsEditableFeasibilityChecker();
+        $auditor->assertAllowed($user);
     }
 }

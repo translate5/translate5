@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\PermissionAudit;
+namespace User\Action\PermissionAudit;
 
 use MittagQI\Translate5\User\Action\Action;
 use MittagQI\Translate5\User\Action\PermissionAudit\Auditors\PermissionAuditorInterface;
@@ -46,12 +46,12 @@ class UserActionPermissionAuditorTest extends TestCase
         $context = new PermissionAuditContext($manager);
 
         $permissionAuditorMock1 = $this->createMock(PermissionAuditorInterface::class);
-        $permissionAuditorMock1->expects($this->once())->method('assertGranted')->with($user, $context);
         $permissionAuditorMock1->expects($this->once())->method('supports')->willReturn(true);
+        $permissionAuditorMock1->expects($this->once())->method('assertGranted')->with($user, $context);
 
         $permissionAuditorMock2 = $this->createMock(PermissionAuditorInterface::class);
-        $permissionAuditorMock2->expects($this->never())->method('assertGranted');
         $permissionAuditorMock2->expects($this->once())->method('supports')->willReturn(false);
+        $permissionAuditorMock2->expects($this->never())->method('assertGranted');
 
         $auditor = new UserActionPermissionAuditor([$permissionAuditorMock1, $permissionAuditorMock2]);
         $auditor->assertGranted(Action::DELETE, $user, $context);

@@ -28,28 +28,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP;
+namespace User\Action\FeasibilityCheck;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\User\Action\Action;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\FeasibilityCheckerInterface;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\UserActionFeasibilityChecker;
+use PHPUnit\Framework\TestCase;
+use ZfExtended_Models_User;
 
-class JobCoordinator extends LspUser
+class UserActionFeasibilityCheckerTest extends TestCase
 {
-    /**
-     * @throws CantCreateCoordinatorFromUserException
-     */
-    public static function fromLspUser(LspUser $lspUser): self
+    public function testAssertAllowed(): void
     {
-        if (! in_array(Roles::JOB_COORDINATOR, $lspUser->user->getRoles(), true)) {
-            throw new CantCreateCoordinatorFromUserException($lspUser->user->getUserGuid());
-        }
+        $user = $this->createMock(ZfExtended_Models_User::class);
+        $checker1 = $this->createMock(FeasibilityCheckerInterface::class);
+        $checker1->expects($this->once())->method('supports')->with(Action::READ)->willReturn(true);
+        $checker1->expects($this->once())->method('assertAllowed')->with($user);
+        $checker2 = $this->createMock(FeasibilityCheckerInterface::class);
+        $checker2->expects($this->once())->method('supports')->with(Action::READ)->willReturn(false);
+        $checker2->expects($this->never())->method('assertAllowed');
 
-        return new self($lspUser->guid, $lspUser->user, $lspUser->lsp);
-    }
-
-    public function isCoordinatorOf(LanguageServiceProvider $lsp): bool
-    {
-        return $this->lsp->getId() === $lsp->getId();
+        $checker = new UserActionFeasibilityChecker([$checker1, $checker2]);
+        $checker->assertAllowed(Action::READ, $user);
     }
 }

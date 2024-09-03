@@ -36,6 +36,7 @@ use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\FeasibilityChecker
 use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\LastCoordinatorFeasibilityChecker;
 use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\PmInTaskFeasibilityChecker;
 use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\UserIsEditableFeasibilityChecker;
+use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\FeasibilityExceptionInterface;
 use ZfExtended_Models_User as User;
 
 final class UserActionFeasibilityChecker
@@ -43,7 +44,6 @@ final class UserActionFeasibilityChecker
     /**
      * @param FeasibilityCheckerInterface[] $checkers
      */
-
     public function __construct(
         private readonly array $checkers
     ) {
@@ -61,7 +61,7 @@ final class UserActionFeasibilityChecker
     }
 
     /**
-     * @throws \MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\FeasibilityExceptionInterface
+     * @throws FeasibilityExceptionInterface
      */
     public function assertAllowed(Action $action, User $user): void
     {
