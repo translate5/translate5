@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * OpenID Client Configuration management panel
+ * TODO FIXME: management of the client-pm subroles should be unified with Editor.view.admin.user.AddWindow
+ */
 Ext.define('Editor.view.admin.customer.OpenIdPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.openIdPanel',
@@ -55,8 +59,8 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
 
     initConfig: function (instanceConfig) {
         var me = this,
-            roles=[];
-
+            roles = [];
+        // base rules
         Ext.Object.each(Editor.data.app.roles, function(key, value) {
             //if the role is not settable for the user, do not create check box for it
             if(!value.setable){
@@ -68,7 +72,21 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
                 value: key,
                 handler: me.roleCheckChange
             });
+            // client-pm subroles - they are added without check if setable, they must be available alongside client-pm
+            if(key === 'clientpm'){
+                Ext.Object.each(Editor.data.app.clientPmSubRoles, function(i, item) {
+                    roles.push({
+                        boxLabel: value.label + ': ' + item[1],
+                        name: 'roles_helper',
+                        value: item[0],
+                        disabled: true,
+                        handler: me.roleCheckChange,
+                        cls: 'clientpm-subroles'
+                    });
+                });
+            }
         });
+
         var config = {
                 bodyPadding: 10,
                 scrollable:true,
@@ -347,21 +365,35 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
     },
 
     /**
-     * merge and save the checked roles into the hidden roles field
+     * Merge and save the checked roles into the hidden roles field
      * @param {Ext.form.field.Checkbox} box
-     * @param {Boolean} checked
      */
-    roleCheckChange: function (box, checked) {
+    roleCheckChange: function (box) {
         var roles = [],
             holder = box.up('checkboxgroup'),
-            boxes = holder.query('checkbox[checked=true]'),
-            holderMap = {
-                serverRolesGroup: 'openIdServerRoles',
-                defaultRolesGroup: 'openIdDefaultServerRoles'
-            };
-        Ext.Array.forEach(boxes, function (box) {
-            roles.push(box.initialConfig.value);
-        });
-        box.up('#openIdPanel').down('hidden[name="' + holderMap[holder.getItemId()] + '"]').setValue(roles.join(','));
+            checked = holder.query('checkbox[checked=true]'),
+            targetId = holder.getItemId() === 'serverRolesGroup' ? 'openIdServerRoles' : 'openIdDefaultServerRoles',
+            clientPmChecked = false;
+        for (var cb of checked) {
+            if (cb.initialConfig.value === 'clientpm') {
+                clientPmChecked = true;
+            }
+        }
+        for (cb of checked) {
+            if (clientPmChecked || !String(cb.initialConfig.value).startsWith('clientpm_')) {
+                roles.push(cb.initialConfig.value);
+            }
+        }
+        // set hidden field value
+        box.up('#openIdPanel').down('hidden[name="' + targetId + '"]').setValue(roles.join(','));
+        // if calling checkbox is the clientpm-box, we have to change the disabledness of the subroles
+        if (box.initialConfig.value === 'clientpm') {
+            for (cb of holder.query('checkbox[cls~=clientpm-subroles]')) {
+                if (!clientPmChecked) {
+                    cb.setValue(false);
+                }
+                cb.setDisabled(!clientPmChecked);
+            }
+        }
     }
 });
