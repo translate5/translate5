@@ -13,6 +13,21 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.9.1] - 2024-09-04
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4162](https://jira.translate5.net/browse/TRANSLATE-4162): Editor general - Error in html escape in match grid template** <br>
+Fix for UI error with wrong html escape.
+
+**[TRANSLATE-4160](https://jira.translate5.net/browse/TRANSLATE-4160): Client management, OpenId Connect - Client pm sub roles not available in openid roles configuration** <br>
+FIX: Make clientPM subroles accessible in the OpenID client configuration
+
+
 ## [7.9.0] - 2024-08-30
 
 ### Important Notes:
