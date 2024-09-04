@@ -105,6 +105,7 @@ class Tag extends editor_Segment_Tag
     /**
      * Counts preceiding or trailing img-tags (positive for at the start, negative for at the end)
      * Or 0 if there are not only preceiding or following tags
+     * This is used to detect "clustering" of tags as DeepL it often does
      */
     public static function countImgTagsOnlyStartOrEnd(string $html): int
     {
