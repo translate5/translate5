@@ -124,7 +124,6 @@ class Tag extends editor_Segment_Tag
      */
     public static function countImgTagPositions(string $html): stdClass
     {
-        // detect at the start
         $result = new stdClass();
         $result->all = self::countImgTags($html);
         $result->start = self::countImgTagsByPattern($html, '~^<img[^>]*>~');
