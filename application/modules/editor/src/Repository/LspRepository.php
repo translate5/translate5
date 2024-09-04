@@ -202,7 +202,7 @@ class LspRepository
     }
 
     /**
-     * @return array<int>
+     * @return int[]
      */
     public function getCustomerIds(LanguageServiceProvider $lsp): array
     {
@@ -230,28 +230,6 @@ class LspRepository
         $rows = $customerDb->fetchAll($select);
 
         return array_column($rows->toArray(), 'id');
-    }
-
-    /**
-     * @return iterable<LanguageServiceProvider>
-     */
-    public function getForJobCoordinator(JobCoordinator $jc): iterable
-    {
-        yield $jc->lsp;
-
-        foreach ($this->getSubLspList($jc->lsp) as $lsp) {
-            yield $lsp;
-        }
-    }
-
-    public function getForPmRole(): iterable
-    {
-        $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
-        $select = $model->db->select()->where('parentId IS NULL');
-
-        $stmt = $this->db->query($select);
-
-        yield from $this->generateModels($stmt, $model);
     }
 
     /**

@@ -74,6 +74,11 @@ class LanguageServiceProvider extends ZfExtended_Models_Entity_Abstract
         return $this->getParentId() === $lsp->getId();
     }
 
+    public function same(LanguageServiceProvider $lsp): bool
+    {
+        return $this->getId() === $lsp->getId();
+    }
+
     public function isDirectLsp(): bool
     {
         return empty($this->getParentId());

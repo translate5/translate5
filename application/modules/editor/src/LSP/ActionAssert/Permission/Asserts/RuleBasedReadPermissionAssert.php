@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,17 +28,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert;
+namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
 
-enum Action: string
+use MittagQI\Translate5\LSP\ActionAssert\Action;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+
+final class RuleBasedReadPermissionAssert extends RuleBasedPermissionAssert
 {
-    case CREATE = 'create';
-    case READ = 'read';
-    case UPDATE = 'update';
-    case DELETE = 'delete';
-
-    public function isMutable(): bool
+    public static function create(?JobCoordinatorRepository $jobCoordinatorRepository = null): self
     {
-        return in_array($this, [self::UPDATE, self::DELETE], true);
+        $jobCoordinatorRepository = $jobCoordinatorRepository ?? JobCoordinatorRepository::create();
+
+        return new self($jobCoordinatorRepository);
+    }
+
+    public function supports(Action $action): bool
+    {
+        return Action::READ === $action;
+    }
+
+    protected function coordinatorHasAccessToHisLsp(): bool
+    {
+        return true;
     }
 }

@@ -28,19 +28,19 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
+namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LSP\ActionAssert\Action;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 
 interface PermissionAssertInterface
 {
     /**
      * @throws PermissionExceptionInterface
      */
-    public function assertGranted(User $user, PermissionAssertContext $context): void;
+    public function assertGranted(LanguageServiceProvider $lsp, PermissionAssertContext $context): void;
 
     public function supports(Action $action): bool;
 }
