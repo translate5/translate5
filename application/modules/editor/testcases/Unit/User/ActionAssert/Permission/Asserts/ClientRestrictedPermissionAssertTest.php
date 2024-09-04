@@ -28,16 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\Action\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\User\Action\Action;
-use MittagQI\Translate5\User\Action\PermissionAudit\Auditors\ClientRestrictedPermissionAuditor;
-use MittagQI\Translate5\User\Action\PermissionAudit\Exception\ClientRestrictionException;
-use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
+use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class ClientRestrictedPermissionAuditorTest extends TestCase
+class ClientRestrictedPermissionAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
@@ -52,7 +52,7 @@ class ClientRestrictedPermissionAuditorTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $lspPermissionAuditor = new ClientRestrictedPermissionAuditor();
+        $lspPermissionAuditor = new ClientRestrictedPermissionAssert();
         $this->assertEquals($expected, $lspPermissionAuditor->supports($action));
     }
 
@@ -60,7 +60,7 @@ class ClientRestrictedPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $manager->expects($this->once())
             ->method('isClientRestricted')
@@ -68,7 +68,7 @@ class ClientRestrictedPermissionAuditorTest extends TestCase
         $manager->expects($this->never())
             ->method('getRestrictedClientIds');
 
-        $lspPermissionAuditor = new ClientRestrictedPermissionAuditor();
+        $lspPermissionAuditor = new ClientRestrictedPermissionAssert();
         $lspPermissionAuditor->assertGranted($user, $context);
     }
 
@@ -76,7 +76,7 @@ class ClientRestrictedPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $manager->expects($this->once())
             ->method('isClientRestricted')
@@ -89,7 +89,7 @@ class ClientRestrictedPermissionAuditorTest extends TestCase
             ->method('getCustomersArray')
             ->willReturn([2, 3, 4]);
 
-        $lspPermissionAuditor = new ClientRestrictedPermissionAuditor();
+        $lspPermissionAuditor = new ClientRestrictedPermissionAssert();
         $lspPermissionAuditor->assertGranted($user, $context);
     }
 
@@ -97,7 +97,7 @@ class ClientRestrictedPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $manager->expects($this->once())
             ->method('isClientRestricted')
@@ -110,7 +110,7 @@ class ClientRestrictedPermissionAuditorTest extends TestCase
             ->method('getCustomersArray')
             ->willReturn([1, 3, 4]);
 
-        $lspPermissionAuditor = new ClientRestrictedPermissionAuditor();
+        $lspPermissionAuditor = new ClientRestrictedPermissionAssert();
         $this->expectException(ClientRestrictionException::class);
         $lspPermissionAuditor->assertGranted($user, $context);
     }

@@ -43,10 +43,10 @@ use ZfExtended_Models_User as User;
 final class UserActionPermissionAssert
 {
     /**
-     * @param PermissionAssertInterface[] $auditors
+     * @param PermissionAssertInterface[] $asserts
      */
     public function __construct(
-        private readonly array $auditors
+        private readonly array $asserts
     ) {
     }
 
@@ -67,12 +67,12 @@ final class UserActionPermissionAssert
      */
     public function assertGranted(Action $action, User $user, PermissionAssertContext $context): void
     {
-        foreach ($this->auditors as $auditor) {
-            if (! $auditor->supports($action)) {
+        foreach ($this->asserts as $assert) {
+            if (! $assert->supports($action)) {
                 continue;
             }
 
-            $auditor->assertGranted($user, $context);
+            $assert->assertGranted($user, $context);
         }
     }
 }

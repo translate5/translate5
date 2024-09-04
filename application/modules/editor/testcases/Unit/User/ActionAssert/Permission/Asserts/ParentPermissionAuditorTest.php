@@ -28,12 +28,12 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\Action\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\User\Action\Action;
-use MittagQI\Translate5\User\Action\PermissionAudit\Auditors\ParentPermissionAuditor;
-use MittagQI\Translate5\User\Action\PermissionAudit\Exception\NoAccessException;
-use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ParentPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
 use ZfExtended_AuthenticationInterface;
@@ -54,7 +54,7 @@ class ParentPermissionAuditorTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $auditor = new ParentPermissionAuditor(
+        $auditor = new ParentPermissionAssert(
             $this->createMock(ZfExtended_Acl::class),
             $this->createMock(ZfExtended_AuthenticationInterface::class)
         );
@@ -65,7 +65,7 @@ class ParentPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
         $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
@@ -85,14 +85,14 @@ class ParentPermissionAuditorTest extends TestCase
 
         $user->expects($this->never())->method('hasParent');
 
-        $auditor = new ParentPermissionAuditor($acl, $authentication);
+        $auditor = new ParentPermissionAssert($acl, $authentication);
         $auditor->assertGranted($user, $context);
     }
 
     public function testAssertGrantedSameUser(): void
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($user);
+        $context = new PermissionAssertContext($user);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
         $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
@@ -106,7 +106,7 @@ class ParentPermissionAuditorTest extends TestCase
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
-        $auditor = new ParentPermissionAuditor($acl, $authentication);
+        $auditor = new ParentPermissionAssert($acl, $authentication);
         $auditor->assertGranted($user, $context);
     }
 
@@ -114,7 +114,7 @@ class ParentPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
         $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
@@ -135,7 +135,7 @@ class ParentPermissionAuditorTest extends TestCase
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
-        $auditor = new ParentPermissionAuditor($acl, $authentication);
+        $auditor = new ParentPermissionAssert($acl, $authentication);
         $auditor->assertGranted($user, $context);
     }
 
@@ -143,7 +143,7 @@ class ParentPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
         $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
@@ -164,7 +164,7 @@ class ParentPermissionAuditorTest extends TestCase
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
-        $auditor = new ParentPermissionAuditor($acl, $authentication);
+        $auditor = new ParentPermissionAssert($acl, $authentication);
         $this->expectException(NoAccessException::class);
         $auditor->assertGranted($user, $context);
     }

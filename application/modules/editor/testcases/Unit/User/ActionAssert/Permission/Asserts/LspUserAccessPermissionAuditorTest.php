@@ -28,13 +28,13 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\Action\PermissionAudit\Auditors;
+namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\LspUserService;
-use MittagQI\Translate5\User\Action\Action;
-use MittagQI\Translate5\User\Action\PermissionAudit\Auditors\LspUserAccessPermissionAuditor;
-use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
+use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\ZfExtended\Acl\Roles;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
@@ -54,7 +54,7 @@ class LspUserAccessPermissionAuditorTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $lspPermissionAuditor = new LspUserAccessPermissionAuditor($this->createMock(LspUserService::class));
+        $lspPermissionAuditor = new LspUserAccessPermissionAssert($this->createMock(LspUserService::class));
         $this->assertEquals($expected, $lspPermissionAuditor->supports($action));
     }
 
@@ -71,14 +71,14 @@ class LspUserAccessPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn($roles);
 
         $lspUserService = $this->createMock(LspUserService::class);
         $lspUserService->expects($this->never())->method('findCoordinatorBy');
 
-        $lspPermissionAuditor = new LspUserAccessPermissionAuditor($lspUserService);
+        $lspPermissionAuditor = new LspUserAccessPermissionAssert($lspUserService);
         $lspPermissionAuditor->assertGranted($user, $context);
     }
 
@@ -86,7 +86,7 @@ class LspUserAccessPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn([]);
 
@@ -95,7 +95,7 @@ class LspUserAccessPermissionAuditorTest extends TestCase
             ->method('findCoordinatorBy')
             ->willReturn(null);
 
-        $lspPermissionAuditor = new LspUserAccessPermissionAuditor($lspUserService);
+        $lspPermissionAuditor = new LspUserAccessPermissionAssert($lspUserService);
         $lspPermissionAuditor->assertGranted($user, $context);
     }
 
@@ -103,7 +103,7 @@ class LspUserAccessPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn([]);
 
@@ -118,7 +118,7 @@ class LspUserAccessPermissionAuditorTest extends TestCase
             ->with($this->callback(fn (object $provided) => $provided === $coordinator))
             ->willReturn([$user]);
 
-        $lspPermissionAuditor = new LspUserAccessPermissionAuditor($lspUserService);
+        $lspPermissionAuditor = new LspUserAccessPermissionAssert($lspUserService);
         $lspPermissionAuditor->assertGranted($user, $context);
     }
 
@@ -126,7 +126,7 @@ class LspUserAccessPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn([]);
 
@@ -141,7 +141,7 @@ class LspUserAccessPermissionAuditorTest extends TestCase
             ->with($this->callback(fn (object $provided) => $provided === $coordinator))
             ->willReturn([$manager]);
 
-        $lspPermissionAuditor = new LspUserAccessPermissionAuditor($lspUserService);
+        $lspPermissionAuditor = new LspUserAccessPermissionAssert($lspUserService);
         $lspPermissionAuditor->assertGranted($user, $context);
     }
 }

@@ -42,11 +42,11 @@ use ZfExtended_Models_User as User;
 final class UserActionFeasibilityAssert
 {
     /**
-     * @param FeasibilityAssertInterface[] $checkers
+     * @param FeasibilityAssertInterface[] $asserts
      */
 
     public function __construct(
-        private readonly array $checkers
+        private readonly array $asserts
     ) {
     }
 
@@ -66,12 +66,12 @@ final class UserActionFeasibilityAssert
      */
     public function assertAllowed(Action $action, User $user): void
     {
-        foreach ($this->checkers as $checker) {
-            if (! $checker->supports($action)) {
+        foreach ($this->asserts as $assert) {
+            if (! $assert->supports($action)) {
                 continue;
             }
 
-            $checker->assertAllowed($user);
+            $assert->assertAllowed($user);
         }
     }
 }

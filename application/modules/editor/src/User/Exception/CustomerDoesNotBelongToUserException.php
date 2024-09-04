@@ -28,42 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User;
+namespace MittagQI\Translate5\User\Exception;
 
-use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
-use ZfExtended_Models_User as User;
+use InvalidArgumentException;
 
-final class UserDeleteService
+class CustomerDoesNotBelongToUserException extends InvalidArgumentException
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssert $userActionFeasibilityChecker,
+        public readonly int $customerId,
+        public readonly string $userGuid
     ) {
-    }
-
-    public static function create(): self
-    {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
+        parent::__construct(
+            "Customer with ID [$customerId] does not belong to the user [$userGuid]"
         );
-    }
-
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function delete(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
-
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
     }
 }

@@ -28,27 +28,29 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\Action\FeasibilityCheck;
+namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility;
 
-use MittagQI\Translate5\User\Action\Action;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\FeasibilityCheckerInterface;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\UserActionFeasibilityChecker;
+use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class UserActionFeasibilityCheckerTest extends TestCase
+class UserActionFeasibilityAssertTest extends TestCase
 {
     public function testAssertAllowed(): void
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
-        $checker1 = $this->createMock(FeasibilityCheckerInterface::class);
-        $checker1->expects($this->once())->method('supports')->with(Action::READ)->willReturn(true);
-        $checker1->expects($this->once())->method('assertAllowed')->with($user);
-        $checker2 = $this->createMock(FeasibilityCheckerInterface::class);
-        $checker2->expects($this->once())->method('supports')->with(Action::READ)->willReturn(false);
-        $checker2->expects($this->never())->method('assertAllowed');
 
-        $checker = new UserActionFeasibilityChecker([$checker1, $checker2]);
+        $assert1 = $this->createMock(FeasibilityAssertInterface::class);
+        $assert1->expects($this->once())->method('supports')->with(Action::READ)->willReturn(true);
+        $assert1->expects($this->once())->method('assertAllowed')->with($user);
+
+        $assert2 = $this->createMock(FeasibilityAssertInterface::class);
+        $assert2->expects($this->once())->method('supports')->with(Action::READ)->willReturn(false);
+        $assert2->expects($this->never())->method('assertAllowed');
+
+        $checker = new UserActionFeasibilityAssert([$assert1, $assert2]);
         $checker->assertAllowed(Action::READ, $user);
     }
 }

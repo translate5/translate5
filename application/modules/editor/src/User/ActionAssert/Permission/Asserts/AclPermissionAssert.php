@@ -39,7 +39,7 @@ final class AclPermissionAssert implements PermissionAssertInterface
 {
     public function supports(Action $action): bool
     {
-        return $action->isMutable();
+        return in_array($action, [Action::UPDATE, Action::DELETE], true);
     }
 
     /**

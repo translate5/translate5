@@ -28,15 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility\Asserts;
+namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
 use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\UserIsEditableFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\AclPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class UserIsEditableFeasibilityAssertTest extends TestCase
+class AclPermissionAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
@@ -51,7 +52,7 @@ class UserIsEditableFeasibilityAssertTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $auditor = new UserIsEditableFeasibilityAssert();
+        $auditor = new AclPermissionAssert();
         $this->assertEquals($expected, $auditor->supports($action));
     }
 
@@ -64,20 +65,19 @@ class UserIsEditableFeasibilityAssertTest extends TestCase
     /**
      * @dataProvider provideAssertAllowed
      */
-    public function testAssertAllowedEditableUser(bool $isEditable, bool $expectException): void
+    public function testAssertGrantedEditableUser(bool $isEditable, bool $expectException): void
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $context = new PermissionAssertContext($manager);
 
-        $user->expects($this->once())
-            ->method('__call')->willReturnMap([
-                ['getEditable', [], $isEditable],
-            ]);
+        $user->expects($this->once())->method('isEditableFor')->willReturn($isEditable);
 
         if ($expectException) {
-            $this->expectException(UserIsNotEditableException::class);
+            $this->expectException(NoAccessException::class);
         }
 
-        $auditor = new UserIsEditableFeasibilityAssert();
-        $auditor->assertAllowed($user);
+        $auditor = new AclPermissionAssert();
+        $auditor->assertGranted($user, $context);
     }
 }

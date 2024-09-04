@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\Action\FeasibilityCheck\Checkers;
+namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
@@ -37,7 +37,7 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskExceptio
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class PmInTaskFeasibilityCheckerTest extends TestCase
+class PmInTaskFeasibilityAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {

@@ -40,33 +40,33 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditabl
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleForLspUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAuditContext;
+use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\UserCustomerAssociationUpdateService;
-use MittagQI\Translate5\User\UserService;
+use MittagQI\Translate5\User\UserDeleteService;
 
 class Editor_UserController extends ZfExtended_UserController
 {
     protected $entityClass = User::class;
 
-    private UserActionPermissionAssert $permissionAuditor;
+    private UserActionPermissionAssert $permissionAssert;
 
     public function init(): void
     {
         parent::init();
-        $this->permissionAuditor = UserActionPermissionAssert::create();
+        $this->permissionAssert = UserActionPermissionAssert::create();
     }
 
     public function getAction()
     {
         parent::getAction();
 
-        $this->permissionAuditor->assertGranted(
+        $this->permissionAssert->assertGranted(
             Action::READ,
             $this->entity,
-            new PermissionAuditContext(ZfExtended_Authentication::getInstance()->getUser())
+            new PermissionAssertContext(ZfExtended_Authentication::getInstance()->getUser())
         );
 
         $lspUserRepo = new LspUserRepository();
@@ -99,10 +99,10 @@ class Editor_UserController extends ZfExtended_UserController
             );
 
             try {
-                $this->permissionAuditor->assertGranted(
+                $this->permissionAssert->assertGranted(
                     Action::READ,
                     clone $userModel,
-                    new PermissionAuditContext($authUser)
+                    new PermissionAssertContext($authUser)
                 );
             } catch (PermissionExceptionInterface) {
                 unset($rows[$key]);
@@ -140,28 +140,15 @@ class Editor_UserController extends ZfExtended_UserController
         try {
             $authUser = ZfExtended_Authentication::getInstance()->getUser();
 
-            $this->permissionAuditor->assertGranted(
+            $this->permissionAssert->assertGranted(
                 Action::UPDATE,
                 $this->entity,
-                new PermissionAuditContext($authUser)
+                new PermissionAssertContext($authUser)
             );
 
             $this->decodePutData();
 
-            $sentCustomerIds = array_filter(
-                array_map(
-                    'intval',
-                    explode(',', trim($this->getDataField('customers'), ','))
-                )
-            );
-
-            UserService::create()->update($this->entity);
-
-            UserCustomerAssociationUpdateService::create()->updateAssociatedCustomersFor(
-                $this->entity,
-                $sentCustomerIds,
-                $authUser
-            );
+            $this->updateCustomers($authUser);
         } catch (UserIsNotEditableException) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1628' => 'Tried to manipulate a not editable user.',
@@ -178,47 +165,6 @@ class Editor_UserController extends ZfExtended_UserController
                     'userEmail' => $this->entity->getEmail(),
                 ]
             );
-        } catch (InexistentCustomerException $e) {
-            ZfExtended_UnprocessableEntity::addCodes([
-                'E2002' => 'No object of type "{0}" was found by key "{1}"',
-            ], 'editor.user');
-
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2002',
-                [
-                    'customers' => [
-                        'Der referenzierte Kunde existiert nicht (mehr).',
-                    ],
-                ],
-                [
-                    editor_Models_Customer_Customer::class,
-                    $e->customerId,
-                ]
-            );
-        } catch (CustomerDoesNotBelongToLspException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'customers' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
-                    ],
-                ],
-                [
-                    'id' => $e->customerId,
-                ]
-            );
-        } catch (CustomerDoesNotBelongToUserException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'customers' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
-                    ],
-                ],
-                [
-                    'id' => $e->customerId,
-                ]
-            );
         }
 
         parent::putAction();
@@ -229,13 +175,13 @@ class Editor_UserController extends ZfExtended_UserController
         $this->entityLoad();
 
         try {
-            $this->permissionAuditor->assertGranted(
+            $this->permissionAssert->assertGranted(
                 Action::DELETE,
                 $this->entity,
-                new PermissionAuditContext(ZfExtended_Authentication::getInstance()->getUser())
+                new PermissionAssertContext(ZfExtended_Authentication::getInstance()->getUser())
             );
 
-            UserService::create()->delete($this->entity);
+            UserDeleteService::create()->delete($this->entity);
         } catch (PmInTaskException $e) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1048' => 'The user can not be deleted, he is PM in one or more tasks.',
@@ -310,6 +256,79 @@ class Editor_UserController extends ZfExtended_UserController
             throw new ZfExtended_NoAccessException('Deletion of User is not allowed due to client-restriction');
         } catch (Exception $e) {
             throw new ZfExtended_NoAccessException(previous: $e);
+        }
+    }
+
+    /**
+     * @param ZfExtended_Models_User|null $authUser
+     * @return void
+     * @throws \MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface
+     */
+    private function updateCustomers(?ZfExtended_Models_User $authUser): void
+    {
+        $sentCustomerIds = array_filter(
+            array_map(
+                'intval',
+                explode(',', trim($this->getDataField('customers'), ','))
+            )
+        );
+
+        try {
+            UserCustomerAssociationUpdateService::create()->updateAssociatedCustomersFor(
+                $this->entity,
+                $sentCustomerIds,
+                $authUser
+            );
+        } catch (InexistentCustomerException $e) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E2002' => 'No object of type "{0}" was found by key "{1}"',
+            ], 'editor.user');
+
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2002',
+                [
+                    'customers' => [
+                        'Der referenzierte Kunde existiert nicht (mehr).',
+                    ],
+                ],
+                [
+                    editor_Models_Customer_Customer::class,
+                    $e->customerId,
+                ]
+            );
+        } catch (CustomerDoesNotBelongToUserException $e) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'customers' => [
+                        'Sie können den Kunden "{id}" hier nicht angeben',
+                    ],
+                ],
+                [
+                    'id' => $e->customerId,
+                ]
+            );
+        } catch (CustomerDoesNotBelongToLspException $e) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'customers' => [
+                        'Sie können den Kunden "{id}" hier nicht angeben',
+                    ],
+                ],
+                [
+                    'id' => $e->customerId,
+                ]
+            );
+        }
+
+        // make sure customers not processed by parent class
+        if (is_array($this->data)) {
+            unset($this->data['customers']);
+        }
+
+        if (is_object($this->data)) {
+            unset($this->data->customers);
         }
     }
 }

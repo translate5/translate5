@@ -28,22 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\Action\PermissionAudit;
+namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission;
 
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAuditContext;
+use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use PHPUnit\Framework\TestCase;
 
-class UserActionPermissionAuditorTest extends TestCase
+class UserActionPermissionAssertTest extends TestCase
 {
     public function testAssertGranted(): void
     {
         $user = $this->createMock(\ZfExtended_Models_User::class);
         $manager = $this->createMock(\ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $permissionAuditorMock1 = $this->createMock(PermissionAssertInterface::class);
         $permissionAuditorMock1->expects($this->once())->method('supports')->willReturn(true);
@@ -61,7 +61,7 @@ class UserActionPermissionAuditorTest extends TestCase
     {
         $user = $this->createMock(\ZfExtended_Models_User::class);
         $manager = $this->createMock(\ZfExtended_Models_User::class);
-        $context = new PermissionAuditContext($manager);
+        $context = new PermissionAssertContext($manager);
 
         $permissionAuditorMock = $this->createMock(PermissionAssertInterface::class);
         $permissionAuditorMock->expects($this->once())

@@ -28,18 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\Action\FeasibilityCheck\Checkers;
+namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\LspUserService;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\User\Action\Action;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\Checkers\LastCoordinatorFeasibilityChecker;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\LastCoordinatorException;
+use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class LastCoordinatorFeasibilityCheckerTest extends TestCase
+class LastCoordinatorFeasibilityAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
@@ -54,7 +54,7 @@ class LastCoordinatorFeasibilityCheckerTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $lspPermissionAuditor = new LastCoordinatorFeasibilityChecker($this->createMock(LspUserService::class));
+        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($this->createMock(LspUserService::class));
         $this->assertEquals($expected, $lspPermissionAuditor->supports($action));
     }
 
@@ -68,7 +68,7 @@ class LastCoordinatorFeasibilityCheckerTest extends TestCase
             ->with($this->callback(fn (object $provided) => $provided === $user))
             ->willReturn(null);
 
-        $lspPermissionAuditor = new LastCoordinatorFeasibilityChecker($lspUserService);
+        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($lspUserService);
         $lspPermissionAuditor->assertAllowed($user);
     }
 
@@ -91,7 +91,7 @@ class LastCoordinatorFeasibilityCheckerTest extends TestCase
             ->with($this->callback(fn (object $provided) => $provided === $lsp))
             ->willReturn(1);
 
-        $lspPermissionAuditor = new LastCoordinatorFeasibilityChecker($lspUserService);
+        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($lspUserService);
         $this->expectException(LastCoordinatorException::class);
         $lspPermissionAuditor->assertAllowed($user);
     }
