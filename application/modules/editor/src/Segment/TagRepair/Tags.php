@@ -193,7 +193,7 @@ class Tags extends editor_TagSequence
             $this->invalidate();
             $this->reEvaluate(strip_tags($html));
             $rendered = $this->render();
-            if (self::DO_DEBUG) {
+            if (self::DO_DEBUG) { // @phpstan-ignore-line
                 error_log('RECREATE RepairTags recreation failed, created fallback: [' . $rendered . ']' . "\n");
             }
 
