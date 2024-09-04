@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Validation;
+namespace MittagQI\Translate5\User\Model\Validation;
 
 use Zend_Validate;
 use ZfExtended_Models_Entity_Abstract;

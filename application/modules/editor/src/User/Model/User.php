@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Model;
 
-use MittagQI\Translate5\User\Validation\UserValidator;
+use MittagQI\Translate5\User\Model\Validation\UserValidator;
 
 class User extends \ZfExtended_Models_User
 {

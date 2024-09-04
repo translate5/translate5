@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Validation;
+namespace MittagQI\Translate5\User\Model\Validation;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
