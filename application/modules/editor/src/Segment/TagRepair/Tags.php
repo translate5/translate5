@@ -90,6 +90,12 @@ class Tags extends editor_TagSequence
      */
     private array $pairedTags = [];
 
+    /**
+     * Holds the markup the TagRepair was created with
+     * Not to be confused with ::originalMarkup in editor_TagSequence
+     */
+    private string $originalHtml;
+
     /* general API */
 
     /**
@@ -99,6 +105,7 @@ class Tags extends editor_TagSequence
      */
     public function __construct(string $markup, bool $preserveComments = false)
     {
+        $this->originalHtml = $markup;
         if ($preserveComments) {
             $markup = Tag::replaceComments($markup);
         } else {
@@ -126,8 +133,21 @@ class Tags extends editor_TagSequence
      * Provides the returned html from request and in return get's the fixed and re-applied markup
      * @throws ZfExtended_Exception
      */
-    public function recreateTags(string $html): string
+    public function recreateTags(string $html, bool $detectUntranslated = true): string
     {
+        // when the result is just a minor variation of the requested markup we return the original
+        if ($detectUntranslated && $this->seemsUntranslated($html)) {
+            return $this->originalHtml;
+        }
+        // when the result has all tags clustered on the start or end and this is substantially different
+        // to
+        if ($this->invalidateDueToClusteredTags(Tag::countImgTagsOnlyStartOrEnd($html))) {
+            if (self::DO_DEBUG) {
+                error_log('INVALIDATE sent markup due to detected tag-clustering!');
+            }
+            $html = Tag::stripImgTags($html);
+        }
+
         $this->evaluate();
         $this->invalidate();
         $this->reEvaluate($html);
@@ -180,6 +200,41 @@ class Tags extends editor_TagSequence
             // if this still produces errors we may create tag-errors which will be reported or even lead to an exception
             return $rendered;
         }
+    }
+
+    /**
+     * If the returned Markup is textually identical to the sent stuff
+     * (whitespace differences do not count) we simply return the original...
+     */
+    private function seemsUntranslated(string $returnedHtml): bool
+    {
+        return trim(preg_replace('~\s+~', ' ', strip_tags($this->requestHtml))) ===
+            trim(preg_replace('~\s+~', ' ', strip_tags($returnedHtml)));
+    }
+
+    /**
+     * If we detected that in the returned markup all tags are clustered on the front or back,
+     * we must decide, if we should invalidate this result
+     */
+    private function invalidateDueToClusteredTags(int $clusterSize): bool
+    {
+        // a single tag on beginning or end is no cluster
+        if ($clusterSize > 1 || $clusterSize < -1) {
+            $imgtags = Tag::countImgTagPositions($this->requestHtml);
+            $isClustered = $imgtags->start === $imgtags->all || $imgtags->end === $imgtags->all;
+            // if we do also have clustered tags it must have the same sign, otherwise invalidate
+            if ($isClustered) {
+                return $imgtags->start > 0 && $clusterSize < 0 || $imgtags->end > 0 && $clusterSize > 0;
+            }
+            // if the "distance" of the cluster is more than 1 we also invalidate
+            if ($clusterSize > 0) {
+                return ($clusterSize - $imgtags->start) > 1;
+            }
+
+            return ((-1 * $clusterSize) - $imgtags->end) > 1;
+        }
+
+        return false;
     }
 
     /* re-evaluation API */

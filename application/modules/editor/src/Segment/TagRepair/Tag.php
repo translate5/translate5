@@ -84,6 +84,69 @@ class Tag extends editor_Segment_Tag
     }
 
     /**
+     * Counts the image-tags in the given HTML
+     */
+    public static function stripImgTags(string $html): string
+    {
+        return preg_replace('~<img[^>]*>~', '', $html);
+    }
+
+    /**
+     * Counts the image-tags in the given HTML
+     */
+    public static function countImgTags(string $html): int
+    {
+        $count = 0;
+        $html = preg_replace('~<img[^>]*>~', '', $html, -1, $count);
+
+        return $count;
+    }
+
+    /**
+     * Counts preceiding or trailing img-tags (positive for at the start, negative for at the end)
+     * Or 0 if there are not only preceiding or following tags
+     */
+    public static function countImgTagsOnlyStartOrEnd(string $html): int
+    {
+        $imgtags = self::countImgTagPositions($html);
+        if ($imgtags->start > 0 && $imgtags->all === $imgtags->start) {
+            return $imgtags->start;
+        } elseif ($imgtags->end > 0 && $imgtags->all === $imgtags->end) {
+            return -1 * $imgtags->end;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Counts the position of tags: at the start, end or inbetween
+     * @return stdClass{all: int,start: int, end: int, inbetween: int}
+     */
+    public static function countImgTagPositions(string $html): stdClass
+    {
+        // detect at the start
+        $result = new stdClass();
+        $result->all = self::countImgTags($html);
+        $result->start = self::countImgTagsByPattern($html, '~^<img[^>]*>~');
+        $result->end = self::countImgTagsByPattern($html, '~<img[^>]*>$~');
+        $result->inbetween = $result->all - ($result->start + $result->end);
+
+        return $result;
+    }
+
+    private static function countImgTagsByPattern(string $html, string $pattern): int
+    {
+        $count = 0;
+        $amount = 0;
+        do {
+            $html = preg_replace($pattern, '', $html, 1, $count);
+            $amount += ($count > 0) ? 1 : 0;
+        } while ($count > 0);
+
+        return $amount;
+    }
+
+    /**
      * We need to expand the singular tags to cover the xliff tags
      * @var string[]
      */
