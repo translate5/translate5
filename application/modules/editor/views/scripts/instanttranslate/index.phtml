@@ -52,7 +52,7 @@ $this->translations = array(
     'copy' => $translate->_('Kopieren'),
     'enterText' => $translate->_('Geben Sie Text ein'),
     'serverErrorMsg500' => $translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.'),
-    'noResultsFound' => $translate->_('<b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.'),
+    'noResultsFound' => $translate->_('Keine Ergebnisse gefunden'),
     'translate' => $translate->_('Übersetzen'),
     'orTranslateFile' => $translate->_('oder lassen Sie ein Dokument übersetzen'),
     'orTranslateText' => $translate->_('oder lassen Sie Text übersetzen, den Sie eingeben.'),
@@ -394,7 +394,7 @@ $languageSelector[] = '</form>';
 </div>
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/apps/js/ErrorHandler.js<?= $version ?>"></script>
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/js/shared.js<?php echo $version ?>"></script>
-<script src="<?= APPLICATION_RUNDIR ?>/editor/plugins/resources/InstantTranslate/js/instanttranslate.js<?= $version ?>"></script>
+<script src="<?= APPLICATION_RUNDIR . "/editor/plugins/resources/InstantTranslate/js/instanttranslate.js" ?>?<?= filemtime("../application/modules/editor/PrivatePlugins/InstantTranslate/public/resources/js/instanttranslate.js") ?>"></script>
 <script type="text/javascript">
 
     $(document).ready(function () {
