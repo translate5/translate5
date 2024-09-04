@@ -48,6 +48,19 @@ class JobCoordinatorRepository
     ) {
     }
 
+    public static function create(
+        ?LspRepository $lspRepository = null,
+        ?LspUserRepository $lspUserRepository = null
+    ): self {
+        $lspRepository = $lspRepository ?? LspRepository::create();
+        $lspUserRepository = $lspUserRepository ?? new LspUserRepository();
+
+        return new self(
+            $lspRepository,
+            $lspUserRepository,
+        );
+    }
+
     public function findByUser(ZfExtended_Models_User $user): ?JobCoordinator
     {
         try {

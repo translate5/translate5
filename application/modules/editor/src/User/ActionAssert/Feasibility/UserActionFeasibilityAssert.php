@@ -28,50 +28,50 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
 
-use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\LSP\LspUserService;
 use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\PmInTaskFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\UserIsEditableFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use ZfExtended_Models_User as User;
 
-final class UserService
+final class UserActionFeasibilityAssert
 {
+    /**
+     * @param FeasibilityAssertInterface[] $checkers
+     */
+
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssert $userActionFeasibilityChecker,
+        private readonly array $checkers
     ) {
     }
 
     public static function create(): self
     {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
-        );
+        $lspUserService = LspUserService::create();
+
+        return new self([
+            new UserIsEditableFeasibilityAssert(),
+            PmInTaskFeasibilityAssert::create(),
+            new LastCoordinatorFeasibilityAssert($lspUserService),
+        ]);
     }
 
     /**
      * @throws FeasibilityExceptionInterface
      */
-    public function update(User $user): void
+    public function assertAllowed(Action $action, User $user): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
-    }
+        foreach ($this->checkers as $checker) {
+            if (! $checker->supports($action)) {
+                continue;
+            }
 
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function delete(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
-
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
+            $checker->assertAllowed($user);
+        }
     }
 }

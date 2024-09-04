@@ -26,29 +26,37 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Exception\InexistentCustomerException;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\LSP\LspService;
 use MittagQI\Translate5\LSP\LspUserRepository;
-use MittagQI\Translate5\User\Action\Action;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\LastCoordinatorException;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\PmInTaskException;
-use MittagQI\Translate5\User\Action\FeasibilityCheck\Exception\UserIsNotEditableException;
-use MittagQI\Translate5\User\Action\PermissionAudit\Exception\ClientRestrictionException;
-use MittagQI\Translate5\User\Action\PermissionAudit\Exception\NotAccessibleForLspUserException;
-use MittagQI\Translate5\User\Action\PermissionAudit\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\User\Action\PermissionAudit\PermissionAuditContext;
-use MittagQI\Translate5\User\Action\PermissionAudit\UserActionPermissionAuditor;
+use MittagQI\Translate5\Repository\CustomerRepository;
+use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleForLspUserException;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAuditContext;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\UserCustomerAssociationUpdateService;
 use MittagQI\Translate5\User\UserService;
 
 class Editor_UserController extends ZfExtended_UserController
 {
     protected $entityClass = User::class;
 
-    private UserActionPermissionAuditor $permissionAuditor;
+    private UserActionPermissionAssert $permissionAuditor;
 
     public function init(): void
     {
         parent::init();
-        $this->permissionAuditor = UserActionPermissionAuditor::create();
+        $this->permissionAuditor = UserActionPermissionAssert::create();
     }
 
     public function getAction()
@@ -102,12 +110,11 @@ class Editor_UserController extends ZfExtended_UserController
                 continue;
             }
 
-            $notEditableUser = (int) $row['id'] !== (int) $authUser->getId()
+            $notEditableUser = (int)$row['id'] !== (int)$authUser->getId()
                 && $row['editable'] === '1'
-                && ! empty($row['roles'])
+                && !empty($row['roles'])
                 && $row['roles'] !== ','
-                && ! empty(array_diff(explode(',', $row['roles']), $editableRoles))
-            ;
+                && !empty(array_diff(explode(',', $row['roles']), $editableRoles));
 
             if ($notEditableUser) {
                 $rows[$key]['editable'] = '0';
@@ -126,11 +133,93 @@ class Editor_UserController extends ZfExtended_UserController
     {
         $this->entityLoad();
 
-        $this->permissionAuditor->assertGranted(
-            Action::UPDATE,
-            $this->entity,
-            new PermissionAuditContext(ZfExtended_Authentication::getInstance()->getUser())
-        );
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E2003' => 'Wrong value',
+        ], 'editor.user');
+
+        try {
+            $authUser = ZfExtended_Authentication::getInstance()->getUser();
+
+            $this->permissionAuditor->assertGranted(
+                Action::UPDATE,
+                $this->entity,
+                new PermissionAuditContext($authUser)
+            );
+
+            $this->decodePutData();
+
+            $sentCustomerIds = array_filter(
+                array_map(
+                    'intval',
+                    explode(',', trim($this->getDataField('customers'), ','))
+                )
+            );
+
+            UserService::create()->update($this->entity);
+
+            UserCustomerAssociationUpdateService::create()->updateAssociatedCustomersFor(
+                $this->entity,
+                $sentCustomerIds,
+                $authUser
+            );
+        } catch (UserIsNotEditableException) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1628' => 'Tried to manipulate a not editable user.',
+            ]);
+
+            throw ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1628',
+                [
+                    'Versucht, einen nicht bearbeitbaren Benutzer zu manipulieren.',
+                ],
+                [
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            );
+        } catch (InexistentCustomerException $e) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E2002' => 'No object of type "{0}" was found by key "{1}"',
+            ], 'editor.user');
+
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2002',
+                [
+                    'customers' => [
+                        'Der referenzierte Kunde existiert nicht (mehr).',
+                    ],
+                ],
+                [
+                    editor_Models_Customer_Customer::class,
+                    $e->customerId,
+                ]
+            );
+        } catch (CustomerDoesNotBelongToLspException $e) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'customers' => [
+                        'Sie können den Kunden "{id}" hier nicht angeben',
+                    ],
+                ],
+                [
+                    'id' => $e->customerId,
+                ]
+            );
+        } catch (CustomerDoesNotBelongToUserException $e) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'customers' => [
+                        'Sie können den Kunden "{id}" hier nicht angeben',
+                    ],
+                ],
+                [
+                    'id' => $e->customerId,
+                ]
+            );
+        }
 
         parent::putAction();
     }

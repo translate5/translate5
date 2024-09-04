@@ -140,4 +140,9 @@ final class Roles extends BaseRoles
             self::CLIENTPM_USERS,
         ];
     }
+
+    public static function isClientRestricted(array $userRoles): bool
+    {
+        return in_array(self::JOB_COORDINATOR, $userRoles) || parent::isClientRestricted($userRoles);
+    }
 }

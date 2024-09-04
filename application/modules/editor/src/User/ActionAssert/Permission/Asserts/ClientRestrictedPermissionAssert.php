@@ -28,50 +28,33 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User;
+namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
+use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use ZfExtended_Models_User as User;
 
-final class UserService
+final class ClientRestrictedPermissionAssert implements PermissionAssertInterface
 {
-    public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssert $userActionFeasibilityChecker,
-    ) {
-    }
-
-    public static function create(): self
+    public function supports(Action $action): bool
     {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
-        );
+        return in_array($action, [Action::CREATE, Action::UPDATE, Action::DELETE, Action::READ], true);
     }
 
     /**
-     * @throws FeasibilityExceptionInterface
+     * Restrict access by clients
      */
-    public function update(User $user): void
+    public function assertGranted(User $user, PermissionAssertContext $context): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
-    }
+        if (! $context->manager->isClientRestricted()) {
+            return;
+        }
 
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function delete(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
+        $allowedCustomerIs = $context->manager->getRestrictedClientIds();
 
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
+        if (! empty(array_diff($user->getCustomersArray(), $allowedCustomerIs))) {
+            throw new ClientRestrictionException();
+        }
     }
 }

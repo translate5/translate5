@@ -28,50 +28,41 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
-use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use ZfExtended_Models_User as User;
 
-final class UserService
+final class PmInTaskFeasibilityAssert implements FeasibilityAssertInterface
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssert $userActionFeasibilityChecker,
+        private readonly TaskRepository $taskRepository
     ) {
     }
 
     public static function create(): self
     {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
-        );
+        return new self(new TaskRepository());
+    }
+
+    public function supports(Action $action): bool
+    {
+        return $action === Action::DELETE;
     }
 
     /**
-     * @throws FeasibilityExceptionInterface
+     * Restrict access if the user is a project manager in at least one task
      */
-    public function update(User $user): void
+    public function assertAllowed(User $user): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
-    }
+        $tasks = $this->taskRepository->loadListByPmGuid($user->getUserGuid());
 
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function delete(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
+        if (! empty($tasks)) {
+            $taskGuids = array_column($tasks, 'taskGuid');
 
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
+            throw new PmInTaskException($taskGuids);
+        }
     }
 }

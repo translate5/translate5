@@ -49,11 +49,8 @@ class LspUserService
         $lspUserRepository = new LspUserRepository();
 
         return new self(
-            LspRepository::create(),
-            new JobCoordinatorRepository(
-                $lspRepository,
-                $lspUserRepository
-            ),
+            $lspRepository,
+            JobCoordinatorRepository::create($lspRepository, $lspUserRepository),
             $lspUserRepository,
         );
     }

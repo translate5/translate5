@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Customer\CustomerService;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\LspUserRepository;
 use MittagQI\Translate5\Repository\LspRepository;
 
 class Editor_CustomerController extends ZfExtended_RestController
@@ -61,10 +60,7 @@ class Editor_CustomerController extends ZfExtended_RestController
         ])->addActionContext('exportresource', 'resourceLogExport')->initContext();
 
         $this->lspRepository = LspRepository::create();
-        $this->coordinatorRepository = new JobCoordinatorRepository(
-            $this->lspRepository,
-            new LspUserRepository(),
-        );
+        $this->coordinatorRepository = JobCoordinatorRepository::create($this->lspRepository);
     }
 
     public function indexAction()

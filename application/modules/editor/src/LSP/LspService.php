@@ -42,6 +42,8 @@ use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use MittagQI\Translate5\User\UserCustomerAssociationValidator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -60,6 +62,7 @@ class LspService
         private readonly JobCoordinatorRepository $jobCoordinatorRepository,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly UserRepository $userRepository,
+        private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
     ) {
     }
 
@@ -69,9 +72,10 @@ class LspService
 
         return new self(
             $lspRepository,
-            new JobCoordinatorRepository($lspRepository, new LspUserRepository()),
+            JobCoordinatorRepository::create($lspRepository),
             EventDispatcher::create(),
             new UserRepository(),
+            UserCustomerAssociationValidator::create(),
         );
     }
 
@@ -97,12 +101,10 @@ class LspService
      */
     public function validateCustomersAreSubsetForCoordinator(JobCoordinator $coordinator, iterable $customers): void
     {
-        $coordinatorCustomers = $coordinator->user->getCustomersArray();
-
-        foreach ($customers as $customer) {
-            if (! in_array($customer->getId(), $coordinatorCustomers)) {
-                throw new CustomerDoesNotBelongToJobCoordinatorException((int) $customer->getId(), $coordinator->guid);
-            }
+        try {
+            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($coordinator->user, $customers);
+        } catch (CustomerDoesNotBelongToUserException $e) {
+            throw new CustomerDoesNotBelongToJobCoordinatorException($e->customerId, $coordinator->guid);
         }
     }
 

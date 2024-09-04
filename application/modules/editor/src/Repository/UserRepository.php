@@ -59,6 +59,11 @@ use ZfExtended_Models_User;
 
 class UserRepository
 {
+    public function save(ZfExtended_Models_User $user): void
+    {
+        $user->save();
+    }
+
     /**
      * @return iterable<ZfExtended_Models_User>
      */

@@ -28,50 +28,35 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User;
+namespace User\Action;
 
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
-use ZfExtended_Models_User as User;
+use PHPUnit\Framework\TestCase;
 
-final class UserService
+class ActionTest extends TestCase
 {
-    public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssert $userActionFeasibilityChecker,
-    ) {
+    public function provideIsMutable(): iterable
+    {
+        yield ['read', false];
+        yield ['create', false];
+        yield ['update', true];
+        yield ['delete', true];
     }
 
-    public static function create(): self
+    /**
+     * @dataProvider provideIsMutable
+     */
+    public function testIsMutable(string $value, bool $expected): void
     {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
+        $action = Action::tryFrom($value);
+        self::assertSame($expected, $action->isMutable());
+    }
+
+    public function testList(): void
+    {
+        self::assertEquals(
+            ['create', 'read', 'update', 'delete'],
+            array_map(static fn (Action $action) => $action->value, Action::cases())
         );
-    }
-
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function update(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
-    }
-
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function delete(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
-
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
     }
 }

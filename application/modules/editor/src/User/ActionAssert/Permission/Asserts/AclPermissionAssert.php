@@ -28,50 +28,31 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User;
+namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use ZfExtended_Models_User as User;
 
-final class UserService
+final class AclPermissionAssert implements PermissionAssertInterface
 {
-    public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssert $userActionFeasibilityChecker,
-    ) {
-    }
-
-    public static function create(): self
+    public function supports(Action $action): bool
     {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
-        );
+        return $action->isMutable();
     }
 
     /**
-     * @throws FeasibilityExceptionInterface
+     * Retrieves, if a user can be edited by another user.
+     * This will be evaluated by the "setaclrule" ACLs of the given user:
+     * If the user is allowed to set all our roles, he is allowed to edit
      */
-    public function update(User $user): void
+    public function assertGranted(User $user, PermissionAssertContext $context): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
-    }
+        if ($user->isEditableFor($context->manager)) {
+            return;
+        }
 
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function delete(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
-
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
+        throw new NoAccessException();
     }
 }

@@ -13,7 +13,12 @@
       "MittagQI\\ZfExtended\\": "library/ZfExtended",
       "MittagQI\\Translate5\\": "application/modules/editor/src",
       "MittagQI\\Translate5\\Plugins\\": "application/modules/editor/Plugins",
-      "Translate5\\MaintenanceCli\\": "Translate5/MaintenanceCli"
+      "Translate5\\MaintenanceCli\\": "Translate5/MaintenanceCli",
+      "MittagQI\\Translate5\\Test\\": "application/modules/editor/testcases"
+    },
+    "psr-0": {
+      "editor": "application/modules/",
+      "ZfExtended": "library/"
     }
   },
   "repositories": [

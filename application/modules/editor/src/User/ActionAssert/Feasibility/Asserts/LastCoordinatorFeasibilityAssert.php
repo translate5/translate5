@@ -28,50 +28,40 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
-use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\LSP\LspUserService;
 use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use ZfExtended_Models_User as User;
 
-final class UserService
+final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterface
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssert $userActionFeasibilityChecker,
+        private readonly LspUserService $lspUserService
     ) {
     }
 
-    public static function create(): self
+    public function supports(Action $action): bool
     {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
-        );
+        return $action === Action::DELETE;
     }
 
     /**
-     * @throws FeasibilityExceptionInterface
+     * Restrict deletion of the last coordinator in the LSP
      */
-    public function update(User $user): void
+    public function assertAllowed(User $user): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
-    }
+        // Possible coordinator that we try to delete
+        $coordinator = $this->lspUserService->findCoordinatorBy($user);
 
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function delete(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
+        if (null === $coordinator) {
+            return;
+        }
 
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
+        // Nobody can delete the last coordinator of an LSP
+        if ($this->lspUserService->getCoordinatorsCountFor($coordinator->lsp) === 1) {
+            throw new LastCoordinatorException($coordinator);
+        }
     }
 }

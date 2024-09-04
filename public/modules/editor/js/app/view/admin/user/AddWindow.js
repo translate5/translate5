@@ -251,10 +251,14 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             xtype: 'Editor.combobox',
                                             itemId: 'lsp',
                                             name: 'lsp',
-                                            allowBlank: false,
-                                            forceSelection: true,
+                                            allowBlank: true,
+                                            forceSelection: false,
                                             hidden: true,
-                                            store: 'admin.LspStore',
+                                            store: {
+                                                xtype: 'store',
+                                                data: [] // Initially empty, will be set dynamically
+                                            },
+                                            queryMode: 'local',
                                             displayField: 'name',
                                             valueField: 'id',
                                             bind: {
@@ -265,28 +269,18 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                                     /**
                                                      * @type {Editor.model.admin.LspModel}
                                                      */
-                                                    const lsp = Ext.getStore('admin.LspStore').getById(newValue);
-                                                    const customerField = fld.up('form').down('combo[name=customers]');
+                                                    const lsp = fld.getStore().getById(newValue);
 
                                                     if (null === lsp) {
-                                                        customerField.setValue([]);
+                                                        this.updateCustomerField(
+                                                            fld.up('form'),
+                                                            Ext.getStore('customersStore').getData().items
+                                                        );
 
                                                         return;
                                                     }
 
-                                                    const customersStore = customerField.getStore();
-
-                                                    Ext.Ajax.request({
-                                                        url: Editor.data.restpath + 'lsp/' + lsp.get('id'),
-                                                        method: 'GET',
-                                                        success: response => {
-                                                            const data = Ext.decode(response.responseText);
-                                                            const customers = data.rows.customers;
-
-                                                            customersStore.loadData(customers)
-                                                            customerField.setValue(customers.map(c => c.id));
-                                                        }
-                                                    });
+                                                    this.updateCustomerField(fld.up('form'), lsp.get('customers'));
                                                 }
                                             }
                                         },
@@ -343,7 +337,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             name: 'customers',
                                             store: {
                                                 xtype: 'store',
-                                                // fields: ['id', 'name'],
                                                 data: [] // Initially empty, will be set dynamically
                                             },
                                             queryMode: 'local',
@@ -353,41 +346,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             typeAhead: true,
                                             anyMatch: true,
                                             forceSelection: true,
-                                            selectOnFocus:true,
-                                            listeners: {
-                                                // render: function(combo) {
-                                                //     const store = combo.getStore();
-                                                //     const form = combo.up('form');
-                                                //     const lsp = form.down('combo[name=lsp]').getValue();
-                                                //
-                                                //     const customers = [];
-                                                //     const customersStore = Ext.getStore('customersStore');
-                                                //
-                                                //     for (const customerData of record.get('customers')) {
-                                                //         const customer = customersStore.getById(customerData.id);
-                                                //
-                                                //         if (customer) {
-                                                //             customers.push(customer);
-                                                //         }
-                                                //     }
-                                                //
-                                                //     if (! lsp) {
-                                                //         store.loadData(customersStore.getData());
-                                                //
-                                                //         return;
-                                                //     }
-                                                //
-                                                //     Ext.Ajax.request({
-                                                //         url: Editor.data.restpath + 'lsp/' + lsp,
-                                                //         method: 'GET',
-                                                //         success: response => {
-                                                //             const data = Ext.decode(response.responseText);
-                                                //
-                                                //             store.loadData(data.rows.customers)
-                                                //         }
-                                                //     });
-                                                // }
-                                            }
+                                            selectOnFocus:true
                                         }
                                     ]
                                 },
@@ -517,8 +476,13 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         });
 
         if (roles.includes('jobCoordinator')) {
-            form.down('#lsp').setHidden(false);
-            roles = roles.filter(role => ! role.includes('pm') && ! role.includes('admin')) && 'api' !== role;
+            const lspField = form.down('#lsp');
+            lspField.setHidden(false);
+            lspField.allowBlank = false;
+            lspField.setDisabled(false);
+            lspField.forceSelection = true;
+
+            roles = roles.filter(role => ! role.includes('pm') && ! role.includes('admin') && 'api' !== role);
             boxes
                 .filter(
                     box => box.initialConfig.value.includes('pm')
@@ -533,7 +497,11 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         }
 
         if (! roles.includes('jobCoordinator')) {
-            form.down('#lsp').setHidden(true);
+            const lspField = form.down('#lsp');
+            lspField.setHidden(true);
+            lspField.allowBlank = true;
+            lspField.setDisabled(true);
+            lspField.forceSelection = false;
         }
 
         if (this.isClientPm(roles)) {
@@ -599,45 +567,29 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             }
         });
 
-        const customersField = form.down('customers');
-        const customersFieldStore = customersField.getStore();
-
-        const customers = [];
-        const customersStore = Ext.getStore('customersStore');
-
-        customersFieldStore.loadData(customersStore.getData().items);
+        this.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
 
         if (!! record.get('lsp')) {
-            let lspStore = Ext.getStore('admin.LspStore');
+            const lspField = form.down('#lsp');
+            lspField.setHidden(false);
+            lspField.setDisabled(! userIsJobCoordinator);
 
-            const updateRelatedToLspField = () => {
-                const lsp = lspStore.getById(record.get('lsp'));
+            const lspStore = lspField.getStore();
 
-                const lspField = form.down('#lsp');
-                lspField.setHidden(false);
-                lspField.setValue(lsp);
-                lspField.setDisabled(! userIsJobCoordinator);
+            Ext.Ajax.request({
+                url: Editor.data.restpath + 'lsp',
+                method: 'GET',
+                success: response => {
+                    const data = Ext.decode(response.responseText);
+                    lspStore.loadData(data.rows);
 
-                customersFieldStore.loadData(lsp.get('customers'));
-            };
+                    const lsp = lspStore.getById(record.get('lsp'));
+                    lspField.setValue(lsp);
 
-            if (! lspStore.isLoaded()) {
-                lspStore.on('load', updateRelatedToLspField);
-                lspStore.load();
-            } else {
-                updateRelatedToLspField();
-            }
+                    this.updateCustomerField(form, lsp.get('customers'));
+                }
+            });
         }
-
-        for (const customerId of record.getCustomerIds()) {
-            const customer = customersStore.getById(customerId);
-
-            if (customer) {
-                customers.push(customer);
-            }
-        }
-
-        form.down('customers').setValue(customers);
 
         if (form.isDisabled() && record.get('openIdIssuer') !== '') {
             form.add({
@@ -654,6 +606,29 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 me.down('#clientPmSubRoles').setDisabled(true);
             }
         }
+    },
+
+    /**
+     * @param {Ext.form.Panel} form
+     * @param {{id: int, name: string}[]} storeData
+     */
+    updateCustomerField: function (form, storeData) {
+        const customersField = form.down('customers');
+        const customersFieldStore = customersField.getStore();
+        /** @type {{id: int, name: string}[]} */
+        const customers = [];
+
+        customersFieldStore.loadData(storeData);
+
+        for (const customerId of form.getRecord().getCustomerIds()) {
+            const customer = customersFieldStore.getById(customerId);
+
+            if (customer) {
+                customers.push(customer);
+            }
+        }
+
+        customersField.setValue(customers.map(c => c.id));
     },
 
     /**

@@ -93,6 +93,6 @@ class TaskRepository
         $db = ZfExtended_Factory::get(editor_Models_Task::class)->db;
         $s = $db->select()->where('pmGuid = ?', $pmGuid);
 
-        return $db->fetchAll($s);
+        return $db->fetchAll($s)->toArray();
     }
 }

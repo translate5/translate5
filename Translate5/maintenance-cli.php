@@ -214,6 +214,7 @@ foreach (glob(getcwd() . '/application/modules/editor/Plugins/*/CLI/*Command.php
 }
 
 if (file_exists('.git')) {
+    $commands[] = new \Translate5\MaintenanceCli\Command\TempCommand();
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
