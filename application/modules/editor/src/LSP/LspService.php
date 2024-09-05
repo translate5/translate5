@@ -30,23 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP;
 
-use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;
-use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use ZfExtended_Factory;
 
 class LspService
 {
     public function __construct(
         private readonly LspRepository $lspRepository,
-        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly UserRepository $userRepository,
     ) {
     }
@@ -57,9 +49,7 @@ class LspService
 
         return new self(
             $lspRepository,
-            EventDispatcher::create(),
             new UserRepository(),
-            UserCustomerAssociationValidator::create(),
         );
     }
 
@@ -70,7 +60,7 @@ class LspService
 
     public function createLsp(string $name, ?string $description, ?JobCoordinator $coordinator): LanguageServiceProvider
     {
-        $lsp = ZfExtended_Factory::get(LanguageServiceProvider::class);
+        $lsp = $this->lspRepository->getEmptyModel();
         $lsp->setName($name);
         $lsp->setDescription($description);
 
@@ -83,28 +73,12 @@ class LspService
         return $lsp;
     }
 
-    public function assignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
+    public function updateInfoFields(LanguageServiceProvider $lsp, string $name, ?string $description): void
     {
-        $lspCustomer = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
-        $lspCustomer->setLspId((int) $lsp->getId());
-        $lspCustomer->setCustomerId($customer->getId());
+        $lsp->setName($name);
+        $lsp->setDescription($description);
 
-        $this->lspRepository->saveCustomerAssignment($lspCustomer);
-
-        $this->eventDispatcher->dispatch(new CustomerAssignedToLspEvent($lsp, $customer));
-    }
-
-    public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
-    {
-        $lspCustomer = $this->lspRepository->findCustomerAssignment($lsp, $customer);
-
-        if (! $lspCustomer) {
-            return;
-        }
-
-        $this->lspRepository->deleteCustomerAssignment($lspCustomer);
-
-        $this->eventDispatcher->dispatch(new CustomerUnassignedFromLspEvent($lsp, $customer));
+        $this->lspRepository->save($lsp);
     }
 
     // TODO: delete all relations of lsp: users, customer associations...

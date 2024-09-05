@@ -56,6 +56,11 @@ class LspRepository
         return new self(Zend_Db_Table::getDefaultAdapter());
     }
 
+    public function getEmptyModel(): LanguageServiceProvider
+    {
+        return ZfExtended_Factory::get(LanguageServiceProvider::class);
+    }
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */

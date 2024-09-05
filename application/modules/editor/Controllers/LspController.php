@@ -34,17 +34,13 @@ use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptio
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssertInterface;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\DTO\UpdateData;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\LspService;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Service\UpdateLspService;
+use MittagQI\Translate5\LSP\Service\LspCustomerAssociationUpdateService;
 use MittagQI\Translate5\LSP\ViewDataProvider;
-use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
-use ZfExtended_Models_User as User;
 
 class editor_LspController extends ZfExtended_RestController
 {
@@ -67,13 +63,13 @@ class editor_LspController extends ZfExtended_RestController
 
     private LspActionPermissionAssertInterface $permissionAssert;
 
-    private UpdateLspService $updateLspService;
+    private LspCustomerAssociationUpdateService $updateLspService;
 
     public function init()
     {
         parent::init();
         $this->lspService = LspService::create();
-        $this->updateLspService = UpdateLspService::create();
+        $this->updateLspService = LspCustomerAssociationUpdateService::create();
         $this->coordinatorRepository = JobCoordinatorRepository::create();
         $this->permissionAssert = LspActionPermissionAssert::create($this->coordinatorRepository);
         $this->viewDataProvider = ViewDataProvider::create(
@@ -161,16 +157,10 @@ class editor_LspController extends ZfExtended_RestController
             'E2003' => 'Wrong value',
         ], 'editor.lsp');
 
+        $this->lspService->updateInfoFields($lsp, $this->data['name'], $this->data['description'] ?? null);
+
         $this->runWithExceptionHandlerWrapping(
-            fn () => $this->updateLspService->updateBy(
-                $lsp,
-                new UpdateData(
-                    $this->data['name'],
-                    $this->data['description'] ?? null,
-                    $this->data['customerIds'],
-                ),
-                $authUser,
-            )
+            fn () => $this->updateLspService->updateCustomersBy($lsp, $this->data['customerIds'], $authUser)
         );
 
         $this->view->rows = (object) $this->viewDataProvider->buildViewData($authUser, $lsp);

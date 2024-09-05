@@ -32,12 +32,13 @@ namespace MittagQI\Translate5\Test\Unit\LSP\Service;
 
 use MittagQI\Translate5\LSP\LspService;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Service\UpdateLspService;
+use MittagQI\Translate5\LSP\Service\LspCustomerAssociationUpdateService;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 class UpdateLspServiceTest extends TestCase
 {
@@ -48,45 +49,26 @@ class UpdateLspServiceTest extends TestCase
         $userCustomerAssociationValidator = $this->createMock(UserCustomerAssociationValidator::class);
         $lspCustomerAssociationValidator = $this->createMock(LspCustomerAssociationValidator::class);
         $customerRepository = $this->createMock(CustomerRepository::class);
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $lsp = new class extends LanguageServiceProvider
-        {
-            public string $name = '';
-            public string $description = '';
-
-            public function __construct()
-            {
-            }
-
-            public function setDescription(string $description): void
-            {
-                $this->description = $description;
-            }
-
-            public function setName(string $name): void
-            {
-                $this->name = $name;
-            }
-        };
+        $lsp = $this->createMock(LanguageServiceProvider::class);
 
         $lspRepository->expects(self::once())
             ->method('save')
             ->with(
                 $this->callback(
                     fn (LanguageServiceProvider $lspToSave) => $lsp === $lspToSave
-                        && $lspToSave->name === 'name'
-                        && $lspToSave->description === 'description'
                 )
             );
 
-        $service = new UpdateLspService(
+        $service = new LspCustomerAssociationUpdateService(
             $lspRepository,
-            $lspService,
             $userCustomerAssociationValidator,
             $lspCustomerAssociationValidator,
             $customerRepository,
+            $eventDispatcher,
         );
 
-        $service->updateInfoFields($lsp, 'name', 'description');
+        $service->updateCustomers($lsp, [1, 2, 3]);
     }
 }
