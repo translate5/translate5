@@ -39,7 +39,7 @@ use MittagQI\ZfExtended\Acl\Roles;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class LspUserAccessPermissionAuditorTest extends TestCase
+class LspUserAccessPermissionAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {

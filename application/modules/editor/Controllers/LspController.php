@@ -39,6 +39,7 @@ use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\LspService;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LSP\Service\UpdateLspService;
 use MittagQI\Translate5\LSP\ViewDataProvider;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
@@ -60,24 +61,21 @@ class editor_LspController extends ZfExtended_RestController
 
     private LspService $lspService;
 
-    private CustomerRepository $customerRepository;
-
     private JobCoordinatorRepository $coordinatorRepository;
 
     private ViewDataProvider $viewDataProvider;
 
     private LspActionPermissionAssertInterface $permissionAssert;
 
-    private UserCustomerAssociationValidator $userCustomerAssociationValidator;
+    private UpdateLspService $updateLspService;
 
     public function init()
     {
         parent::init();
         $this->lspService = LspService::create();
-        $this->customerRepository = new CustomerRepository();
+        $this->updateLspService = UpdateLspService::create();
         $this->coordinatorRepository = JobCoordinatorRepository::create();
         $this->permissionAssert = LspActionPermissionAssert::create($this->coordinatorRepository);
-        $this->userCustomerAssociationValidator = UserCustomerAssociationValidator::create();
         $this->viewDataProvider = ViewDataProvider::create(
             $this->coordinatorRepository,
             $this->permissionAssert,
@@ -132,17 +130,15 @@ class editor_LspController extends ZfExtended_RestController
         $user = ZfExtended_Authentication::getInstance()->getUser();
         $coordinator = $this->coordinatorRepository->findByUser($user);
 
-        $customers = $this->getNewCustomers($user);
-
         $lsp = $this->lspService->createLsp(
             $this->data['name'],
             $this->data['description'] ?? null,
             $coordinator,
         );
 
-        foreach ($customers as $customer) {
-            $this->lspService->assignCustomer($lsp, $customer);
-        }
+        $this->runWithExceptionHandlerWrapping(
+            fn () => $this->updateLspService->updateCustomersBy($lsp, $this->data['customerIds'], $user)
+        );
 
         $this->view->rows = (object) $this->viewDataProvider->buildViewData($user, $lsp);
     }
@@ -165,30 +161,17 @@ class editor_LspController extends ZfExtended_RestController
             'E2003' => 'Wrong value',
         ], 'editor.lsp');
 
-        $customers = $this->getNewCustomers($authUser);
-
-        try {
-            $this->lspService->updateLsp(
+        $this->runWithExceptionHandlerWrapping(
+            fn () => $this->updateLspService->updateBy(
                 $lsp,
                 new UpdateData(
                     $this->data['name'],
                     $this->data['description'] ?? null,
-                    $customers,
+                    $this->data['customerIds'],
                 ),
-            );
-        } catch (CustomerDoesNotBelongToLspException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'customerIds' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
-                    ],
-                ],
-                [
-                    'id' => $e->customerId,
-                ]
-            );
-        }
+                $authUser,
+            )
+        );
 
         $this->view->rows = (object) $this->viewDataProvider->buildViewData($authUser, $lsp);
     }
@@ -208,18 +191,10 @@ class editor_LspController extends ZfExtended_RestController
         $this->lspService->deleteLsp($lsp);
     }
 
-    public function getNewCustomers(User $authUser): array
+    private function runWithExceptionHandlerWrapping(callable $update): void
     {
-        if (empty($this->data['customerIds'])) {
-            return [];
-        }
-
         try {
-            $customers = $this->customerRepository->getList(...$this->data['customerIds']);
-
-            if ($authUser->isClientRestricted()) {
-                $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($authUser, $customers);
-            }
+            $update();
         } catch (InexistentCustomerException $e) {
             ZfExtended_UnprocessableEntity::addCodes([
                 'E2002' => 'No object of type "{0}" was found by key "{1}"',
@@ -249,8 +224,18 @@ class editor_LspController extends ZfExtended_RestController
                     'id' => $e->customerId,
                 ]
             );
+        } catch (CustomerDoesNotBelongToLspException $e) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'customerIds' => [
+                        'Sie können den Kunden "{id}" hier nicht angeben',
+                    ],
+                ],
+                [
+                    'id' => $e->customerId,
+                ]
+            );
         }
-
-        return $customers;
     }
 }

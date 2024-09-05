@@ -33,24 +33,23 @@ namespace MittagQI\Translate5\User\Validation;
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\LspUserRepository;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use ZfExtended_Models_User as User;
 
 class UserCustomerAssociationValidator
 {
     public function __construct(
-        private readonly LspRepository $lspRepository,
         private readonly LspUserRepository $lspUserRepository,
+        private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
     ) {
     }
 
     public static function create(): self
     {
         return new self(
-            LspRepository::create(),
             new LspUserRepository(),
+            LspCustomerAssociationValidator::create(),
         );
     }
 
@@ -58,7 +57,7 @@ class UserCustomerAssociationValidator
      * @param iterable<Customer> $customers
      * @throws CustomerDoesNotBelongToUserException
      */
-    public function assertCustomersAreSubsetForUser(User $user, iterable $customers): void
+    public function assertCustomersAreSubsetForUser(iterable $customers, User $user): void
     {
         $userCustomers = $user->getCustomersArray();
 
@@ -71,37 +70,16 @@ class UserCustomerAssociationValidator
 
     /**
      * @param iterable<Customer> $customers
-     * @throws CustomerDoesNotBelongToLspException
-     */
-    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, iterable $customers): void
-    {
-        $lspCustomers = $this->lspRepository->getCustomers($lsp);
-        $lspCustomersIds = [];
-
-        foreach ($lspCustomers as $customer) {
-            $lspCustomersIds[] = (int) $customer->getId();
-        }
-
-        foreach ($customers as $customer) {
-            if (! in_array($customer->getId(), $lspCustomersIds)) {
-                throw new CustomerDoesNotBelongToLspException((int) $customer->getId(), (int) $lsp->getId());
-            }
-        }
-    }
-
-    /**
-     * @param iterable<Customer> $customers
      * @param User $user
-     * @param User $authManager
      * @return void
-     * @throws CustomerDoesNotBelongToUserException
+     * @throws CustomerDoesNotBelongToLspException
      */
     public function assertCustomersMayBeAssociatedWithUser(iterable $customers, User $user): void
     {
         $lspUser = $this->lspUserRepository->findByUser($user);
 
         if (null !== $lspUser) {
-            $this->assertCustomersAreSubsetForLSP($lspUser->lsp, $customers);
+            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($lspUser->lsp, $customers);
         }
     }
 }

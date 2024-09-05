@@ -28,20 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
 
-use MittagQI\Translate5\LSP\ActionAssert\Action;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use ZfExtended_Models_User as User;
 
-final class RuleBasedReadPermissionAssert extends RuleBasedPermissionAssert
+interface UserActionFeasibilityAssertInterface
 {
-    public function supports(Action $action): bool
-    {
-        return Action::READ === $action;
-    }
-
-    protected function coordinatorHasAccessToHisLsp(): bool
-    {
-        return true;
-    }
+    /**
+     * @throws FeasibilityExceptionInterface
+     */
+    public function assertAllowed(Action $action, User $user): void;
 }

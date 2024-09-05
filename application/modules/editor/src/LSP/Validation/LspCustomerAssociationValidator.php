@@ -28,17 +28,45 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\DTO;
+namespace MittagQI\Translate5\LSP\Validation;
 
-class UpdateData
+use editor_Models_Customer_Customer as Customer;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Repository\LspRepository;
+
+class LspCustomerAssociationValidator
 {
-    /**
-     * @param int[] $customers
-     */
     public function __construct(
-        public readonly string $name,
-        public readonly ?string $description,
-        public readonly array $customers,
+        private readonly LspRepository $lspRepository,
     ) {
     }
+
+    public static function create(): self
+    {
+        return new self(
+            LspRepository::create(),
+        );
+    }
+
+    /**
+     * @param iterable<Customer> $customers
+     * @throws CustomerDoesNotBelongToLspException
+     */
+    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, iterable $customers): void
+    {
+        $lspCustomers = $this->lspRepository->getCustomers($lsp);
+        $lspCustomersIds = [];
+
+        foreach ($lspCustomers as $customer) {
+            $lspCustomersIds[] = (int) $customer->getId();
+        }
+
+        foreach ($customers as $customer) {
+            if (! in_array($customer->getId(), $lspCustomersIds)) {
+                throw new CustomerDoesNotBelongToLspException((int) $customer->getId(), (int) $lsp->getId());
+            }
+        }
+    }
+
 }

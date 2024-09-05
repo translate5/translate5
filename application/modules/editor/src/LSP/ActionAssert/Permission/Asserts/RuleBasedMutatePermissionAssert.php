@@ -31,17 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
 
 use MittagQI\Translate5\LSP\ActionAssert\Action;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 
 final class RuleBasedMutatePermissionAssert extends RuleBasedPermissionAssert
 {
-    public static function create(?JobCoordinatorRepository $jobCoordinatorRepository = null): self
-    {
-        $jobCoordinatorRepository = $jobCoordinatorRepository ?? JobCoordinatorRepository::create();
-
-        return new self($jobCoordinatorRepository);
-    }
-
     public function supports(Action $action): bool
     {
         return $action->isMutable();

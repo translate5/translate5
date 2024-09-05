@@ -270,7 +270,7 @@ class Editor_UserController extends ZfExtended_UserController
         );
 
         try {
-            UserCustomerAssociationUpdateService::create()->updateAssociatedCustomersFor(
+            UserCustomerAssociationUpdateService::create()->updateAssociatedCustomersBy(
                 $this->entity,
                 $sentCustomerIds,
                 $authUser

@@ -53,8 +53,8 @@ final class LspActionPermissionAssert implements LspActionPermissionAssertInterf
         $jobCoordinatorRepository = $jobCoordinatorRepository ?? JobCoordinatorRepository::create();
 
         return new self([
-            RuleBasedMutatePermissionAssert::create($jobCoordinatorRepository),
-            RuleBasedReadPermissionAssert::create($jobCoordinatorRepository),
+            new RuleBasedMutatePermissionAssert($jobCoordinatorRepository),
+            new RuleBasedReadPermissionAssert($jobCoordinatorRepository),
         ]);
     }
 

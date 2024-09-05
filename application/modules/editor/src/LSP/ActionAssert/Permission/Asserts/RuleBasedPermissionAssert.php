@@ -52,7 +52,7 @@ abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
         throw new NoAccessException();
     }
 
-    final public function doesPermissionGranted(LanguageServiceProvider $lsp, PermissionAssertContext $context): bool
+    private function doesPermissionGranted(LanguageServiceProvider $lsp, PermissionAssertContext $context): bool
     {
         $roles = $context->manager->getRoles();
 

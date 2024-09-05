@@ -39,7 +39,7 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\UserIsEditableFeas
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use ZfExtended_Models_User as User;
 
-final class UserActionFeasibilityAssert
+final class UserActionFeasibilityAssert implements UserActionFeasibilityAssertInterface
 {
     /**
      * @param FeasibilityAssertInterface[] $asserts

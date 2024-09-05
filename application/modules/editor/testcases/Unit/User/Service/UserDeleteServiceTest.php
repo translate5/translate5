@@ -28,43 +28,52 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Service;
+namespace MittagQI\Translate5\Test\Unit\User\Service;
 
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\User\Service\UserDeleteService;
+use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User as User;
 
-final class UserDeleteService
+class UserDeleteServiceTest extends TestCase
 {
-    public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
-    ) {
-    }
-
-    public static function create(): self
+    public function deleteDataProvider(): array
     {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
-        );
+        return [
+            'action allowed' => [true],
+            'action not allowed' => [false],
+        ];
     }
 
     /**
-     * @throws FeasibilityExceptionInterface
+     * @dataProvider deleteDataProvider
      */
-    public function delete(User $user): void
+    public function testDelete(bool $actionAllowed): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
+        $userRepository = $this->createMock(UserRepository::class);
+        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
+        $user = $this->createMock(User::class);
 
-        $this->userRepository->delete($user);
-    }
+        if ($actionAllowed) {
+            $feasibilityChecker
+                ->expects($this->once())
+                ->method('assertAllowed')
+                ->with(Action::DELETE, $user);
+            $userRepository->expects(self::once())->method('delete')->with($user);
+        } else {
+            $exception = $this->createMock(FeasibilityExceptionInterface::class);
+            $feasibilityChecker
+                ->expects(self::once())
+                ->method('assertAllowed')
+                ->with(Action::DELETE, $user)
+                ->willThrowException($exception);
+            $this->expectException(FeasibilityExceptionInterface::class);
+        }
 
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
+        $service = new UserDeleteService($userRepository, $feasibilityChecker);
+        $service->delete($user);
     }
 }

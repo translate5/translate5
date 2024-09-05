@@ -39,7 +39,7 @@ use ZfExtended_Acl;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User;
 
-class ParentPermissionAuditorTest extends TestCase
+class ParentPermissionAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {

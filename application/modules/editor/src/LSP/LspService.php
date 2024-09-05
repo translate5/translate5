@@ -32,10 +32,8 @@ namespace MittagQI\Translate5\LSP;
 
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\LSP\DTO\UpdateData;
 use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;
 use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
 use MittagQI\Translate5\Repository\LspRepository;
@@ -50,7 +48,6 @@ class LspService
         private readonly LspRepository $lspRepository,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly UserRepository $userRepository,
-        private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
     ) {
     }
 
@@ -110,43 +107,7 @@ class LspService
         $this->eventDispatcher->dispatch(new CustomerUnassignedFromLspEvent($lsp, $customer));
     }
 
-    /**
-     * @throws CustomerDoesNotBelongToLspException
-     */
-    public function updateLsp(LanguageServiceProvider $lsp, UpdateData $data): void
-    {
-        if (! $lsp->isDirectLsp() && ! empty($data->customers)) {
-            $parentLsp = $this->getLsp((int) $lsp->getParentId());
-            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForLSP($parentLsp, $data->customers);
-        }
-
-        $lsp->setName($data->name);
-        $lsp->setDescription($data->description);
-
-        $this->lspRepository->save($lsp);
-
-        $newCustomerIdsSet = array_map(fn (Customer $customer) => $customer->getId(), $data->customers);
-
-        $lspCustomers = $this->lspRepository->getCustomers($lsp);
-        $lspCustomersIds = [];
-
-        foreach ($lspCustomers as $customer) {
-            if (! in_array($customer->getId(), $newCustomerIdsSet)) {
-                $this->unassignCustomer($lsp, $customer);
-
-                continue;
-            }
-
-            $lspCustomersIds[] = $customer->getId();
-        }
-
-        foreach ($data->customers as $customer) {
-            if (! in_array($customer->getId(), $lspCustomersIds)) {
-                $this->assignCustomer($lsp, $customer);
-            }
-        }
-    }
-
+    // TODO: delete all relations of lsp: users, customer associations...
     public function deleteLsp(LanguageServiceProvider $lsp): void
     {
         $lspUsers = $this->lspRepository->getUsers($lsp);

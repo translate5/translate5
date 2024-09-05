@@ -30,11 +30,13 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Service;
 
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use ZfExtended_Models_User as User;
@@ -44,7 +46,8 @@ final class UserCustomerAssociationUpdateService
     public function __construct(
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
         private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssert $feasibilityAssert,
+        private readonly UserActionFeasibilityAssertInterface $feasibilityAssert,
+        private readonly CustomerRepository $customerRepository,
     ) {
     }
 
@@ -54,33 +57,51 @@ final class UserCustomerAssociationUpdateService
             UserCustomerAssociationValidator::create(),
             new UserRepository(),
             UserActionFeasibilityAssert::create(),
+            new CustomerRepository(),
         );
     }
 
     /**
      * @param int[] $associatedCustomerIds
      * @throws FeasibilityExceptionInterface
-     * @throws CustomerDoesNotBelongToUserException
+     * @throws CustomerDoesNotBelongToLspException
      */
-    public function updateAssociatedCustomersFor(
+    public function updateAssociatedCustomers(User $user, array $associatedCustomerIds): void
+    {
+        $this->feasibilityAssert->assertAllowed(Action::UPDATE, $user);
+
+        $customers = $this->customerRepository->getList(...$associatedCustomerIds);
+
+        $this->userCustomerAssociationValidator->assertCustomersMayBeAssociatedWithUser($customers, $user);
+
+        $user->assignCustomers($associatedCustomerIds);
+
+        $this->userRepository->save($user);
+    }
+
+    /**
+     * @param int[] $associatedCustomerIds
+     * @throws FeasibilityExceptionInterface
+     * @throws CustomerDoesNotBelongToUserException
+     * @throws CustomerDoesNotBelongToLspException
+     */
+    public function updateAssociatedCustomersBy(
         User $user,
         array $associatedCustomerIds,
-        ?User $authManager = null
+        User $authManager = null
     ): void {
         $this->feasibilityAssert->assertAllowed(Action::UPDATE, $user);
 
-        $customerRepository = new CustomerRepository();
-
-        $managerCustomers = $authManager?->getCustomersArray() ?: [];
+        $managerCustomers = $authManager->getCustomersArray();
         $currentUserCustomers = $user->getCustomersArray();
 
-        $customers = $customerRepository->getList(...$associatedCustomerIds);
-
-        if ($authManager?->isClientRestricted()) {
-            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($authManager, $customers);
-        }
+        $customers = $this->customerRepository->getList(...$associatedCustomerIds);
 
         $this->userCustomerAssociationValidator->assertCustomersMayBeAssociatedWithUser($customers, $user);
+
+        if ($authManager->isClientRestricted()) {
+            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($customers, $authManager);
+        }
 
         // Process deleted customers
         foreach ($currentUserCustomers as $customer) {
