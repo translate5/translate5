@@ -14,6 +14,29 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.9.2] - 2024-09-05
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4168](https://jira.translate5.net/browse/TRANSLATE-4168): t5memory - Enable stripping framing tags by default** <br>
+Config value runtimeOptions.LanguageResources.t5memory.stripFramingTagsEnabled is now 1 by default
+
+**[TRANSLATE-4167](https://jira.translate5.net/browse/TRANSLATE-4167): t5memory, TM Maintenance - TMMaintenance search fails for big memories** <br>
+Fix TM Maintenance search for big memories
+
+**[TRANSLATE-4164](https://jira.translate5.net/browse/TRANSLATE-4164): LanguageResources - DeepL: Improve tag-repair to handle new tag-problems in DeepL** <br>
+FIX: DeepL at times "clusters" all sent internal tags in the front of the segment. In these cases the automatic tag-repair now also kicks in
+
+
+### Bugfixes
+**[TRANSLATE-4169](https://jira.translate5.net/browse/TRANSLATE-4169): t5memory - Match results in Editor rendered in escaped format** <br>
+Remove segment escaping in FE
+
+
 ## [7.9.1] - 2024-09-04
 
 ### Important Notes:
