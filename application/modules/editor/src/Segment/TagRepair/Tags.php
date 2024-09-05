@@ -139,8 +139,8 @@ class Tags extends editor_TagSequence
         if ($detectUntranslated && $this->seemsUntranslated($html)) {
             return $this->originalHtml;
         }
-        // when the result has all tags clustered on the start or end and this is substantially different
-        // to
+        // when the result has all tags clustered on the start or end and this clusteringis substantially different
+        // then in the source
         if ($this->invalidateDueToClusteredTags(Tag::countImgTagsOnlyStartOrEnd($html))) {
             if (self::DO_DEBUG) {
                 error_log('INVALIDATE sent markup due to detected tag-clustering!');
