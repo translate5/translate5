@@ -34,6 +34,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
 use Exception;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
+use MittagQI\Translate5\Repository\QueuedExportRepository;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
 
@@ -47,13 +48,25 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
 
     private LanguageResource $languageResource;
 
-    private ExportService $exportService;
-
     public function __construct()
     {
         parent::__construct();
         $this->log = \Zend_Registry::get('logger')->cloneMe('editor.languageResource.tm.export');
-        $this->exportService = ExportService::create();
+    }
+
+    public static function queueExportWorker(LanguageResource $languageResource, string $mime, string $exportFolder): int
+    {
+        $worker = ZfExtended_Factory::get(self::class);
+
+        if ($worker->init(parameters: [
+            'languageResourceId' => $languageResource->getId(),
+            'mime' => $mime,
+            'exportFolder' => $exportFolder,
+        ])) {
+            return $worker->queue();
+        }
+
+        throw new \MittagQI\Translate5\Export\Exception('E1608');
     }
 
     protected function validateParameters(array $parameters): bool
@@ -105,11 +118,19 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
             return true;
         }
 
+        $queueModel = QueuedExportRepository::create()->findByWorkerId((int) $this->workerModel->getId());
+
+        if (null === $queueModel) {
+            throw new Exception('Export failed: No queue model found');
+        }
+
+        $exportService = ExportService::create();
+
         mkdir($this->exportFolder, 0777, true);
 
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
-        $file = $this->exportService->export(
+        $file = $exportService->export(
             $this->languageResource,
             ExportTmFileExtension::fromMimeType($this->mime, $memories > 1),
         );
@@ -120,13 +141,20 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
 
         $extension = pathinfo($file, PATHINFO_EXTENSION);
 
-        $exportFilename = $this->exportFolder . "/{$this->getModel()->getHash()}.$extension";
+        $filename = "{$this->getModel()->getHash()}.$extension";
 
-        rename($file, $exportFilename);
+        $filePath = "{$this->exportFolder}/{$filename}";
 
-        if (! file_exists($exportFilename)) {
+        rename($file, $filePath);
+
+        if (! file_exists($filePath)) {
             throw new Exception('Export failed: Moving file to export dir failed');
         }
+
+        $queueModel->setResultFileName("{$queueModel->getResultFileName()}.$extension");
+        $queueModel->setLocalFileName($filename);
+
+        $queueModel->save();
 
         return true;
     }

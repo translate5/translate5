@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -54,11 +53,77 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
         this.updateForm();
     },
 
+    onAssociationGridAfterRender: function () {
+        this.tooltip = this.createToolTip();
+        this.tooltip.on({
+            beforeshow: {
+                scope: this,
+                fn: this.createAdditionalInfoTooltip
+            }
+        });
+    },
+
+    /**
+     * @returns {Ext.tip.ToolTip}
+     */
+    createToolTip: function () {
+        return Ext.create('Ext.tip.ToolTip', {
+            target: this.getView().down('grid').el,
+            delegate: 'td.specificData',
+            dismissDelay: 0,
+            showDelay: 200,
+            maxWidth: 1000,
+            renderTo: Ext.getBody()
+        });
+    },
+
+    /**
+     * @param {Ext.tip.ToolTip} tip
+     * @returns {boolean}
+     */
+    createAdditionalInfoTooltip: function (tip) {
+        const grid = this.getView().down('grid'),
+            td = Ext.fly(tip.triggerElement),
+            row = td.up('tr'),
+            view = grid.getView(),
+            record = view.getRecord(row.dom);
+
+        if (!record) {
+            return false;
+        }
+
+        const additionalInfo = record.get('additionalInfo');
+
+        if (Ext.isEmpty(additionalInfo)) {
+            return false;
+        }
+
+        let tipBody = '';
+
+        for (let lrName in additionalInfo) {
+            tipBody += lrName + '</br>';
+
+            const rows = additionalInfo[lrName].map(row =>
+                '<tr>' +
+                row.map(value =>
+                    '<td style="border: 1px solid #ccc; padding: 5px;">' + Ext.String.htmlEncode(value) + '</td>'
+                ).join('') +
+                '</tr>'
+            );
+
+            tipBody += '<table style="border-collapse: collapse; width: 100%; margin-top: 5px">' + rows.join('') + '</table>';
+            tipBody += '</br>';
+        }
+
+        tip.update(tipBody);
+        return true;
+    },
+
     updateForm: function() {
         const form = this.lookupReference('associationForm');
 
-        var combo = form.down('combo[name=targetLanguageResourceId]');
-        var store = combo.getStore();
+        const combo = form.down('combo[name=connectionOption]');
+        const store = combo.getStore();
 
         Ext.Ajax.request({
             url: Editor.data.restpath + 'languageresourcesync/' + this.getView().languageResource.get('id') + '/available-for-connection',
@@ -113,7 +178,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
 
         Ext.MessageBox.confirm(
             Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
-            Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
+            Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchronisation,
             callback
         );
     },
@@ -156,7 +221,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
 
         Ext.MessageBox.confirm(
             Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
-            Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
+            Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchronisation,
             callback
         );
     }

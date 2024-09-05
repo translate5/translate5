@@ -50,7 +50,7 @@ final class Looper
     /**
      * @var State[]
      */
-    private array $toProcess;
+    private array $toProcess = [];
 
     private int $batchSize;
 

@@ -31,9 +31,9 @@ END LICENSE AND COPYRIGHT
  * So the function can be used from all places inside the application.
  */
 
+use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer as CustomerAssocCleanup;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task as TaskAssocCleanup;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 
 class editor_Models_LanguageResources_Remover

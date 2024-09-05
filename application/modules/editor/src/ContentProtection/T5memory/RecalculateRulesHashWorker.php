@@ -76,7 +76,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
     public function __construct()
     {
         parent::__construct();
-        $this->protectionRepository = new ContentProtectionRepository();
+        $this->protectionRepository = ContentProtectionRepository::create();
         $this->languageRepository = new LanguageRepository();
         $this->languageRulesHashService = new LanguageRulesHashService(
             $this->protectionRepository,

@@ -176,7 +176,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                         fieldLabel: me.strings.customers,
                         allowBlank: false
                     }, {
-                        xtype: 'tagfield',
+                        xtype: 'Editor.tagfield',
                         name: 'customerUseAsDefaultIds[]',
                         itemId: 'useAsDefault',
                         dataIndex: 'customerUseAsDefaultIds',
@@ -198,7 +198,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                             'data-qtip': me.strings.useAsDefaultTooltip
                         }
                     }, {
-                        xtype: 'tagfield',
+                        xtype: 'Editor.tagfield',
                         name: 'customerWriteAsDefaultIds[]',
                         itemId: 'writeAsDefault',
                         dataIndex: 'customerWriteAsDefaultIds',
@@ -217,7 +217,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                             'data-qtip': me.strings.writeAsDefaultTooltip
                         }
                     },{
-                        xtype: 'tagfield',
+                        xtype: 'Editor.tagfield',
                         name: 'customerPivotAsDefaultIds[]',
                         itemId: 'pivotAsDefault',
                         dataIndex: 'customerPivotAsDefaultIds',
@@ -295,7 +295,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                             }
                         },
                         {
-                            xtype: 'tagfield',
+                            xtype: 'Editor.tagfield',
                             name: 'categories',
                             id: 'categories',
                             store: Ext.create('Editor.store.Categories').load(),

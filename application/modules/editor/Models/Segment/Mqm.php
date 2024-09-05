@@ -49,7 +49,7 @@ class editor_Models_Segment_Mqm
      *     string $sevName the untranslated sev string,
      *     string $comment the user comment
      *
-     * @param Closure $replacer does the final rendering of the qm tag, Parameters see above
+     * @param Closure(string $part, array $cls, string $issueId, string $issueName, string $sev, string $sevName, string $comment): string $replacer does the final rendering of the qm tag, Parameters see above
      */
     public function replace(editor_Models_Task $task, string $segment, Closure $replacer)
     {

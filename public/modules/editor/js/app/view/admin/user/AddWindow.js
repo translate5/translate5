@@ -232,7 +232,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                     'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
                                 }
                             },{
-                                xtype: 'tagfield',
+                                xtype: 'Editor.tagfield',
                                 itemId: 'clientPmSubRoles',
                                 fieldLabel: me.strings.clientPmSubRoles,
                                 queryMode: 'local',

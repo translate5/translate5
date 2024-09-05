@@ -91,7 +91,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
         Ext.Ajax.request({
             url: '/editor/plugins_tmmaintenance_api/delete-batch/',
-            params: this.getView().getValues(),
+            params: {data: JSON.stringify(this.getView().getValues())},
             async: false,
             method: 'POST',
             success: function (xhr) {

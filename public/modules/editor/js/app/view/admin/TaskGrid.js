@@ -222,9 +222,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
      * @returns {String}
      */
     customerRenderer: function (val, md, record) {
-        var customer = record.get('customerName');
+        var customer = Ext.String.htmlEncode(record.get('customerName'));
         if (customer) {
-            md.tdAttr = 'data-qtip="' + customer + ' (id: ' + val + ')"';
+            md.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(customer) + ' (id: ' + val + ')"';
             return customer;
         }
         return this.strings.notFound;
@@ -259,7 +259,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             '<tpl for="users">',
             '<tr>',
             '<td class="">{#}</td>',
-            '<td class="">{userName}</td>',
+            '<td class="">{[Ext.String.htmlEncode(values.userName)]}</td>',
             '<td class="">{[this.getRole(parent, values)]}</td>',
             '<td class="">{[this.getState(parent, values)]}</td>',
             '<td class="">{[Ext.util.Format.date(values.assignmentDate,Editor.DATE_TIME_LOCALIZED_FORMAT)]}</td>',
@@ -319,13 +319,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
             relaisLanguages = Ext.Array.clone(Editor.data.languages),
             customColumns = Editor.controller.admin.TaskCustomField.getGridColumnsFor('taskGrid'),
             addQtip = function (meta, text) {
-                meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text) + '"';
+                meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(Ext.String.htmlEncode(text)) + '"';
             },
             multiUserTpl = new Ext.XTemplate(
                 me.strings.lockedMultiUser,
                 '<br>',
                 '<tpl for=".">',
-                '{userName} ({login})<br>',
+                '{[Ext.String.htmlEncode(Ext.String.htmlEncode(values.userName))]} ({[Ext.String.htmlEncode(Ext.String.htmlEncode(values.login))]})<br>',
                 '</tpl>'
             );
         multiUserTpl.compile();
@@ -670,11 +670,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             type: 'string'
                         },
                         renderer: function (v, meta, rec) {
-                            var tooltip = Ext.String.htmlEncode(v),
+                            var tooltip,
                                 ret = Ext.String.htmlEncode(v);
                             if (Editor.data.frontend.tasklist.pmMailTo) {
                                 tooltip = rec.get('pmMail');
-                                ret = '<a alt="' + tooltip + '" href="mailto:' + tooltip + '" target="_blank">' + v + '</a>';
+                                ret = '<a alt="' + tooltip + '" href="mailto:' + tooltip + '" target="_blank">'
+                                    + Ext.String.htmlEncode(v)
+                                    + '</a>';
                                 meta.tdAttr = 'data-qtip="' + tooltip + '"';
                             }
                             return ret;

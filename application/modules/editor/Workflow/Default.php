@@ -98,7 +98,7 @@ class editor_Workflow_Default
      * The values are a subset of the above STATE_CONSTANTs
      * @var array
      */
-    protected $pendingStates = [self::STATE_EDIT, self::STATE_VIEW, self::STATE_AUTO_FINISH];
+    protected $pendingStates = [self::STATE_EDIT, self::STATE_VIEW];
 
     /**
      * lists all roles with read access to tasks

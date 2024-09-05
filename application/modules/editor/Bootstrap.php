@@ -31,8 +31,8 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\TaskCustomField;
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
+use MittagQI\Translate5\CrossSynchronization\Events\EventListener;
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventListener;
 use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Service\SystemCheck;
 use MittagQI\Translate5\Task\Deadline\TaskDeadlineEventHandler;
@@ -256,6 +256,42 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'packagestatus',
             ]
         ));
+
+        $this->front->getRouter()->addRoute(
+            'editor.queuedexport.view',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/queuedexport/:token',
+                [
+                    'module' => 'editor',
+                    'controller' => 'queuedexport',
+                    'action' => 'view',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'editor.queuedexport.status',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/queuedexport/:token/status',
+                [
+                    'module' => 'editor',
+                    'controller' => 'queuedexport',
+                    'action' => 'status',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'editor.queuedexport.download',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/queuedexport/:token/download',
+                [
+                    'module' => 'editor',
+                    'controller' => 'queuedexport',
+                    'action' => 'download',
+                ]
+            )
+        );
 
         //FIXME convert to RestLikeRoute (remove echo json_encode in action then)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
