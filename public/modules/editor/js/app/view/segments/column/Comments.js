@@ -60,9 +60,9 @@ Ext.define('Editor.view.segments.column.Comments', {
             if(split.length > 1) {
                 text = split.length == 2 ? self.text_morecomment : self.text_morecomments;
                 more = Ext.String.format(text, (split.length - 1));
-                return Ext.String.htmlEncode(split[0]) + '<span class="ellipsis"> ... '+more+'</span></div>'; //add stripped end tag and ...
+                return split[0] + '<span class="ellipsis"> ... '+more+'</span></div>'; //add stripped end tag and ...
             }
-            return Ext.String.htmlEncode(split[0]);
+            return split[0];
         }
     },
     renderer: function(val, meta, record) {
@@ -70,7 +70,7 @@ Ext.define('Editor.view.segments.column.Comments', {
         if(!val || val.length == 0) {
             return '<img class="add" src="'+Ext.BLANK_IMAGE_URL+'"'+tip+'>';
         }
-        var value = Ext.String.htmlEncode(Ext.String.htmlEncode(val));
+        var value = Ext.String.htmlEncode(val);
         meta.tdAttr = 'data-qtip="'+value+'"';
         return '<img class="edit" src="'+Ext.BLANK_IMAGE_URL+'"'+tip+'>' + Editor.view.segments.column.Comments.getFirstComment(val);
     },

@@ -1,3 +1,9 @@
+Ext.override(Ext.data.Connection, {
+    timeout: 300000
+});
+Ext.Ajax.timeout = 300000;
+Ext.override(Ext.data.proxy.Ajax, {timeout: 300000});
+
 /*
  * This file launches the application by asking Ext JS to create
  * and launch() the Application class.

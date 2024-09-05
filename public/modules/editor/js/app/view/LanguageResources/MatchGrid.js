@@ -164,8 +164,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          cellWrap: true,
 			  tdCls: 'x-selectable segment-tag-column source '+segField.getDirectionCls('source'),
 	          dataIndex: 'source',
-	          text: me.strings.source,
-              renderer: v => Ext.String.htmlEncode(v)
+	          text: me.strings.source
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 5,
@@ -175,8 +174,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          cellWrap: true,
 			  tdCls: 'x-selectable segment-tag-column target '+segField.getDirectionCls('target'),
 	          dataIndex: 'target',
-	          text: me.strings.target,
-              renderer: v => Ext.String.htmlEncode(v)
+	          text: me.strings.target
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 3,
