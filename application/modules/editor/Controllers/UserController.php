@@ -27,12 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Exception\InexistentCustomerException;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\LspService;
 use MittagQI\Translate5\LSP\LspUserRepository;
-use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
@@ -44,8 +40,8 @@ use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\UserCustomerAssociationUpdateService;
-use MittagQI\Translate5\User\UserDeleteService;
+use MittagQI\Translate5\User\Service\UserCustomerAssociationUpdateService;
+use MittagQI\Translate5\User\Service\UserDeleteService;
 
 class Editor_UserController extends ZfExtended_UserController
 {
