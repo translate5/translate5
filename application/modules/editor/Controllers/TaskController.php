@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Import\ImportService;
@@ -36,6 +37,7 @@ use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\TaskService;
+use MittagQI\Translate5\Task\Worker\Export\Html;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
@@ -231,6 +233,11 @@ class editor_TaskController extends ZfExtended_RestController
             ->addContext('package', [
                 'headers' => [
                     'Content-Type' => 'application/zip',
+                ],
+            ])->addActionContext('export', 'package')
+            ->addContext('html', [
+                'headers' => [
+                    'Content-Type' => 'text/xml',
                 ],
             ])->addActionContext('export', 'package')
             ->initContext();
@@ -1763,6 +1770,25 @@ class editor_TaskController extends ZfExtended_RestController
                     echo $this->view->render('task/packageexporterror.phtml');
                 }
                 exit;
+
+            case 'html':
+                $this->entity->checkStateAllowsActions();
+
+                $exportService = QueuedExportService::create();
+                $token = ZfExtended_Utils::uuid();
+                $workerId = Html::queueExportWorker(
+                    $this->entity,
+                    $exportService->composeExportDir($token)
+                );
+
+                $exportService->makeQueueRecord($token, $workerId, "{$this->entity->getTaskName()}.html");
+
+                $title = $this->view->translate('HTML-Übersicht herunterladen');
+
+                $this->redirect("/editor/queuedexport/$token?title=$title");
+
+                break;
+
             case 'filetranslation':
             case 'transfer':
             default:
@@ -1775,6 +1801,14 @@ class editor_TaskController extends ZfExtended_RestController
                 $exportFolder = $worker->initExport($this->entity, $diff);
 
                 break;
+        }
+
+        if (! isset($worker) || ! isset($finalExportWorker)) {
+            throw new LogicException('Worker not set');
+        }
+
+        if (! isset($exportFolder)) {
+            throw new LogicException('Export folder not set');
         }
 
         $workerId = $worker->queue();

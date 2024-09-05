@@ -152,7 +152,13 @@ Ext.define('Editor.view.admin.ExportMenu', {
                 href: me.makePath('task/export/id/{0}?format=xliff2'),
                 text: me.messages.export2Def,
                 handler: alertHandler
-            },{
+            }, {
+                itemId: 'exportItemHtml',
+                hrefTarget: '_blank',
+                href: me.makePath('task/export/id/{0}?format=html'),
+                text: 'HTML',
+                handler: alertHandler
+            }, {
                 itemId: 'exportExcelHistory',
                 hrefTarget: '_blank',
                 href: me.makePath('task/export/id/{0}?format=excelhistory'),

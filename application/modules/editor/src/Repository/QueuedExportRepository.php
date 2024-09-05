@@ -53,59 +53,77 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_Task;
+use MittagQI\Translate5\Export\Model\Database;
+use MittagQI\Translate5\Export\Model\QueuedExport;
+use PDO;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
+use Zend_Db_Table_Row;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
 
-class TaskRepository
+class QueuedExportRepository
 {
-    /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    public function get(int $id): editor_Models_Task
-    {
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-        $task->load($id);
-
-        return $task;
+    public function __construct(
+        private Zend_Db_Adapter_Abstract $db,
+    ) {
     }
 
-    /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    public function getProjectBy(editor_Models_Task $task): editor_Models_Task
+    public static function create(): self
     {
-        return $this->get((int) $task->getProjectId());
+        return new self(Zend_Db_Table::getDefaultAdapter());
     }
 
-    /**
-     * @return iterable<editor_Models_Task>
-     */
-    public function getProjectTaskList(int $projectId): iterable
+    public function findByToken(string $token): ?QueuedExport
     {
-        $db = ZfExtended_Factory::get(editor_Models_Task::class)->db;
-        $s = $db->select()->where('projectId = ?', $projectId)->where('id != ?', $projectId);
-        $tasksData = $db->fetchAll($s);
+        $model = ZfExtended_Factory::get(QueuedExport::class);
+        $row = $this->db->fetchRow(
+            "SELECT * FROM {$model->db->info(Database::NAME)} WHERE token = ?",
+            $token,
+            PDO::FETCH_ASSOC
+        );
 
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-
-        foreach ($tasksData as $taskData) {
-            $task->init($taskData);
-
-            yield clone $task;
+        if (! $row) {
+            return null;
         }
+
+        $model->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $model->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $model;
     }
 
-    /**
-     * Return all tasks associated to a specific user as PM
-     *
-     * @return array[]
-     */
-    public function loadListByPmGuid(string $pmGuid): array
+    public function findByWorkerId(int $workerId): ?QueuedExport
     {
-        $db = ZfExtended_Factory::get(editor_Models_Task::class)->db;
-        $s = $db->select()->where('pmGuid = ?', $pmGuid);
+        $model = ZfExtended_Factory::get(QueuedExport::class);
+        $row = $this->db->fetchRow(
+            "SELECT * FROM {$model->db->info(Database::NAME)} WHERE workerId = ?",
+            $workerId,
+            PDO::FETCH_ASSOC
+        );
 
-        return $db->fetchAll($s)->toArray();
+        if (! $row) {
+            return null;
+        }
+
+        $model->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $model->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $model;
     }
 }

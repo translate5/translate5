@@ -28,25 +28,24 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory;
+namespace MittagQI\Translate5\Task\Worker\Export;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Services_Manager;
+use editor_Models_Task as Task;
 use Exception;
-use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\Repository\QueuedExportRepository;
+use MittagQI\Translate5\Task\Export\ExportService;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
 
-class ExportMemoryWorker extends ZfExtended_Worker_Abstract
+/**
+ * Contains the Import Worker (the scheduling parts)
+ * The import process itself is encapsulated in editor_Models_Import_Worker_Import
+ */
+class Html extends ZfExtended_Worker_Abstract
 {
-    private int $languageResourceId;
-
-    private string $mime;
+    private int $taskId;
 
     private string $exportFolder;
-
-    private LanguageResource $languageResource;
 
     public function __construct()
     {
@@ -54,13 +53,12 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
         $this->log = \Zend_Registry::get('logger')->cloneMe('editor.languageResource.tm.export');
     }
 
-    public static function queueExportWorker(LanguageResource $languageResource, string $mime, string $exportFolder): int
+    public static function queueExportWorker(Task $task, string $exportFolder): int
     {
         $worker = ZfExtended_Factory::get(self::class);
 
         if ($worker->init(parameters: [
-            'languageResourceId' => $languageResource->getId(),
-            'mime' => $mime,
+            'taskId' => $task->getId(),
             'exportFolder' => $exportFolder,
         ])) {
             return $worker->queue();
@@ -77,29 +75,11 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
 
         $this->exportFolder = $parameters['exportFolder'];
 
-        if (! array_key_exists('mime', $parameters)) {
+        if (! array_key_exists('taskId', $parameters)) {
             return false;
         }
 
-        $this->mime = $parameters['mime'];
-
-        if (! array_key_exists('languageResourceId', $parameters)) {
-            return false;
-        }
-
-        $this->languageResourceId = (int) $parameters['languageResourceId'];
-
-        $this->languageResource = ZfExtended_Factory::get(LanguageResource::class);
-
-        try {
-            $this->languageResource->load($this->languageResourceId);
-        } catch (\ZfExtended_Models_Entity_NotFoundException) {
-            return false;
-        }
-
-        if (editor_Services_Manager::SERVICE_OPENTM2 !== $this->languageResource->getServiceType()) {
-            return false;
-        }
+        $this->taskId = (int) $parameters['taskId'];
 
         return true;
     }
@@ -128,30 +108,18 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
 
         mkdir($this->exportFolder, 0777, true);
 
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+        $html = $exportService->asHtml($this->taskId);
 
-        $file = $exportService->export(
-            $this->languageResource,
-            ExportTmFileExtension::fromMimeType($this->mime, $memories > 1),
-        );
-
-        if (null === $file || ! file_exists($file)) {
-            throw new Exception('Export failed: Nothing was exported');
-        }
-
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
-
-        $filename = "{$this->getModel()->getHash()}.$extension";
+        $filename = "{$this->getModel()->getHash()}.html";
 
         $filePath = "{$this->exportFolder}/{$filename}";
 
-        rename($file, $filePath);
+        file_put_contents($filePath, $html);
 
         if (! file_exists($filePath)) {
-            throw new Exception('Export failed: Moving file to export dir failed');
+            throw new Exception('Export failed: Saving file to export dir failed');
         }
 
-        $queueModel->setResultFileName("{$queueModel->getResultFileName()}.$extension");
         $queueModel->setLocalFileName($filename);
 
         $queueModel->save();

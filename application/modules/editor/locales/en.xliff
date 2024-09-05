@@ -10048,6 +10048,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Regel mit dieser Priorität existiert bereits</source>
                 <target>Rule with this priority already exists</target>
             </trans-unit>
+            <trans-unit id='SFRNTC3DnGJlcnNpY2h0IGhlcnVudGVybGFkZW4='>
+                <source>HTML-Übersicht herunterladen</source>
+                <target>Download HTML overview</target>
+            </trans-unit>
             <trans-unit id='Y3Jvc3NMYW5ndWFnZVJlc291cmNlU3luY2hyb25pemF0aW9uLmVtcHR5VGFibGVUZXh0'>
                 <source>crossLanguageResourceSynchronization.emptyTableText</source>
                 <target>

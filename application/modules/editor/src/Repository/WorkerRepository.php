@@ -53,59 +53,21 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_Task;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Models_Worker;
 
-class TaskRepository
+class WorkerRepository
 {
-    /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    public function get(int $id): editor_Models_Task
+    public function find(int $int): ?ZfExtended_Models_Worker
     {
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-        $task->load($id);
+        $model = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
 
-        return $task;
-    }
-
-    /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    public function getProjectBy(editor_Models_Task $task): editor_Models_Task
-    {
-        return $this->get((int) $task->getProjectId());
-    }
-
-    /**
-     * @return iterable<editor_Models_Task>
-     */
-    public function getProjectTaskList(int $projectId): iterable
-    {
-        $db = ZfExtended_Factory::get(editor_Models_Task::class)->db;
-        $s = $db->select()->where('projectId = ?', $projectId)->where('id != ?', $projectId);
-        $tasksData = $db->fetchAll($s);
-
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-
-        foreach ($tasksData as $taskData) {
-            $task->init($taskData);
-
-            yield clone $task;
+        try {
+            $model->load($int);
+        } catch (\ZfExtended_Models_Entity_NotFoundException $e) {
+            return null;
         }
-    }
 
-    /**
-     * Return all tasks associated to a specific user as PM
-     *
-     * @return array[]
-     */
-    public function loadListByPmGuid(string $pmGuid): array
-    {
-        $db = ZfExtended_Factory::get(editor_Models_Task::class)->db;
-        $s = $db->select()->where('pmGuid = ?', $pmGuid);
-
-        return $db->fetchAll($s)->toArray();
+        return $model;
     }
 }
