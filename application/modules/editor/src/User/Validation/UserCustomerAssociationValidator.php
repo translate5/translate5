@@ -32,8 +32,8 @@ namespace MittagQI\Translate5\User\Validation;
 
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\LspUserRepository;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use ZfExtended_Models_User as User;
 

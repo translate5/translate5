@@ -30,12 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\LspUserService;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\ZfExtended\Acl\Roles;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
@@ -54,8 +57,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $lspPermissionAuditor = new LspUserAccessPermissionAssert($this->createMock(LspUserService::class));
-        $this->assertEquals($expected, $lspPermissionAuditor->supports($action));
+        $assert = new LspUserAccessPermissionAssert($this->createMock(LspUserService::class));
+        $this->assertEquals($expected, $assert->supports($action));
     }
 
     public function provideAssertGrantedAdmin(): iterable
@@ -78,70 +81,287 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $lspUserService = $this->createMock(LspUserService::class);
         $lspUserService->expects($this->never())->method('findCoordinatorBy');
 
-        $lspPermissionAuditor = new LspUserAccessPermissionAssert($lspUserService);
-        $lspPermissionAuditor->assertGranted($user, $context);
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+        $assert->assertGranted($user, $context);
     }
 
-    public function testAssertGrantedNoCoordinator(): void
+    public function testAssertGrantedNoAccessForNotManagerRole(): void
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
         $context = new PermissionAssertContext($manager);
 
-        $manager->method('getRoles')->willReturn([]);
+        $manager->method('getRoles')->willReturn(['some-role']);
+
+        $lspUser = $this->createMock(LspUser::class);
 
         $lspUserService = $this->createMock(LspUserService::class);
-        $lspUserService->expects($this->once())
-            ->method('findCoordinatorBy')
-            ->willReturn(null);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
 
-        $lspPermissionAuditor = new LspUserAccessPermissionAssert($lspUserService);
-        $lspPermissionAuditor->assertGranted($user, $context);
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $this->expectException(NotAccessibleLspUserException::class);
+        $assert->assertGranted($user, $context);
     }
 
-    public function testAssertGrantedAccessibleUser(): void
+    public function testAssertGrantedWhenNotLspUser(): void
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
         $context = new PermissionAssertContext($manager);
 
-        $manager->method('getRoles')->willReturn([]);
+        $manager->method('getRoles')->willReturn(['some-role']);
+
+        $lspUserService = $this->createMock(LspUserService::class);
+        $lspUserService->expects(self::once())->method('findLspUserBy')->willReturn(null);
+
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $assert->assertGranted($user, $context);
+    }
+
+    public function testAssertGrantedNoAccessForPmToNotDirectLspUser(): void
+    {
+        $user = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $manager->method('getRoles')->willReturn([Roles::PM]);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isDirectLsp')->willReturn(false);
+        $lspUser = new LspUser('guid', $user, $lsp);
+
+        $lspUserService = $this->createMock(LspUserService::class);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
+
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $this->expectException(NotAccessibleLspUserException::class);
+        $assert->assertGranted($user, $context);
+    }
+
+    public function testAssertGrantedNoAccessForPmToNotDirectCoordinator(): void
+    {
+        $user = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+
+        $manager->method('getRoles')->willReturn([Roles::PM]);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isDirectLsp')->willReturn(false);
+        $lspUser = new LspUser('guid', $user, $lsp);
+
+        $lspUserService = $this->createMock(LspUserService::class);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
+
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $this->expectException(NotAccessibleLspUserException::class);
+        $assert->assertGranted($user, $context);
+    }
+
+    public function testAssertGrantedNoAccessForPmToDirectLspUser(): void
+    {
+        $user = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $user->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+        $user->method('getRoles')->willReturn([]);
+
+        $manager->method('getRoles')->willReturn([Roles::PM]);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isDirectLsp')->willReturn(true);
+        $lspUser = new LspUser('guid', $user, $lsp);
+
+        $lspUserService = $this->createMock(LspUserService::class);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
+
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $this->expectException(NotAccessibleLspUserException::class);
+        $assert->assertGranted($user, $context);
+    }
+
+    public function testAssertGrantedForPmToDirectCoordinator(): void
+    {
+        $user = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $user->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+
+        $manager->method('getRoles')->willReturn([Roles::PM]);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isDirectLsp')->willReturn(true);
+        $lspUser = new LspUser('guid', $user, $lsp);
+
+        $lspUserService = $this->createMock(LspUserService::class);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
+
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $assert->assertGranted($user, $context);
+        self::assertTrue(true);
+    }
+
+    public function testAssertGrantedNoAccessForCoordinatorToNotSameLspUser(): void
+    {
+        $user = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $user->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+        $user->method('getRoles')->willReturn([]);
+
+        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
 
         $coordinator = $this->createMock(JobCoordinator::class);
+        $coordinator->method('isCoordinatorOf')->willReturn(false);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lspUser = new LspUser('guid', $user, $lsp);
 
         $lspUserService = $this->createMock(LspUserService::class);
-        $lspUserService->method('findCoordinatorBy')
-            ->with($this->callback(fn (object $provided) => $provided === $manager))
-            ->willReturn($coordinator);
-        $lspUserService->expects($this->once())
-            ->method('getAccessibleUsers')
-            ->with($this->callback(fn (object $provided) => $provided === $coordinator))
-            ->willReturn([$user]);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
+        $lspUserService->method('findCoordinatorBy')->willReturn($coordinator);
 
-        $lspPermissionAuditor = new LspUserAccessPermissionAssert($lspUserService);
-        $lspPermissionAuditor->assertGranted($user, $context);
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $this->expectException(NotAccessibleLspUserException::class);
+        $assert->assertGranted($user, $context);
     }
 
-    public function testAssertGrantedNoAccess(): void
+    public function testAssertGrantedForCoordinatorToSameLspUser(): void
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
         $manager = $this->createMock(ZfExtended_Models_User::class);
         $context = new PermissionAssertContext($manager);
 
-        $manager->method('getRoles')->willReturn([]);
+        $user->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+        $user->method('getRoles')->willReturn([]);
+
+        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
 
         $coordinator = $this->createMock(JobCoordinator::class);
+        $coordinator->method('isCoordinatorOf')->willReturn(true);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lspUser = new LspUser('guid', $user, $lsp);
 
         $lspUserService = $this->createMock(LspUserService::class);
-        $lspUserService->method('findCoordinatorBy')
-            ->with($this->callback(fn (object $provided) => $provided === $manager))
-            ->willReturn($coordinator);
-        $lspUserService->expects($this->once())
-            ->method('getAccessibleUsers')
-            ->with($this->callback(fn (object $provided) => $provided === $coordinator))
-            ->willReturn([$manager]);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
+        $lspUserService->method('findCoordinatorBy')->willReturn($coordinator);
 
-        $lspPermissionAuditor = new LspUserAccessPermissionAssert($lspUserService);
-        $lspPermissionAuditor->assertGranted($user, $context);
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $assert->assertGranted($user, $context);
+
+        self::assertTrue(true);
+    }
+
+    public function testAssertGrantedForCoordinatorToSameLspCoordinator(): void
+    {
+        $user = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $user->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+
+        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+
+        $coordinator = $this->createMock(JobCoordinator::class);
+        $coordinator->method('isCoordinatorOf')->willReturn(true);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lspUser = new LspUser('guid', $user, $lsp);
+
+        $lspUserService = $this->createMock(LspUserService::class);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
+        $lspUserService->method('findCoordinatorBy')->willReturn($coordinator);
+
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $assert->assertGranted($user, $context);
+
+        self::assertTrue(true);
+    }
+
+    public function testAssertGrantedForCoordinatorToDirectCoordinator(): void
+    {
+        $user = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $user->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+
+        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+
+        $coordinatorLsp = $this->createMock(LanguageServiceProvider::class);
+        $coordinator = new JobCoordinator('coordinator-guid', $user, $coordinatorLsp);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isSubLspOf')->willReturn(true);
+        $lspUser = new LspUser('user-guid', $user, $lsp);
+
+        $lspUserService = $this->createMock(LspUserService::class);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
+        $lspUserService->method('findCoordinatorBy')->willReturn($coordinator);
+
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $assert->assertGranted($user, $context);
+        self::assertTrue(true);
+    }
+
+    public function testAssertGrantedNoAccessForCoordinatorToNotDirectCoordinator(): void
+    {
+        $user = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $user->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+
+        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+
+        $coordinatorLsp = $this->createMock(LanguageServiceProvider::class);
+        $coordinator = new JobCoordinator('coordinator-guid', $user, $coordinatorLsp);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isSubLspOf')->willReturn(false);
+        $lspUser = new LspUser('user-guid', $user, $lsp);
+
+        $lspUserService = $this->createMock(LspUserService::class);
+        $lspUserService->method('findLspUserBy')->willReturn($lspUser);
+        $lspUserService->method('findCoordinatorBy')->willReturn($coordinator);
+
+        $assert = new LspUserAccessPermissionAssert($lspUserService);
+
+        $this->expectException(NotAccessibleLspUserException::class);
+        $assert->assertGranted($user, $context);
     }
 }

@@ -36,7 +36,10 @@ use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssertInterface;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use ZfExtended_Models_User;
 
 /**
@@ -48,7 +51,8 @@ use ZfExtended_Models_User;
 class ViewDataProvider
 {
     public function __construct(
-        private readonly LspRepository $lspRepository,
+        private readonly LspRepositoryInterface $lspRepository,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly JobCoordinatorRepository $jobCoordinatorRepository,
         private readonly LspActionPermissionAssertInterface $permissionAssert,
     ) {
@@ -64,6 +68,7 @@ class ViewDataProvider
 
         return new self(
             $lspRepository,
+            new LspUserRepository(),
             $jobCoordinatorRepository,
             $lspActionPermissionAssert,
         );
@@ -107,7 +112,7 @@ class ViewDataProvider
             ];
         }
 
-        $users = $this->lspRepository->getUsers($lsp);
+        $users = $this->lspUserRepository->getUsers($lsp);
         /**
          * @var array<array{id: int, name: string}> $usersData
          */

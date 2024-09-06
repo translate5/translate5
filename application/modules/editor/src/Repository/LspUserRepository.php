@@ -28,17 +28,19 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP;
+namespace MittagQI\Translate5\Repository;
 
+use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
-class LspUserRepository
+class LspUserRepository implements LspUserRepositoryInterface
 {
     public function findByUser(ZfExtended_Models_User $user): ?LspUser
     {

@@ -28,15 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Permission\Exception;
+namespace MittagQI\Translate5\Repository\Contract;
 
-use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\LspUser;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use ZfExtended_Models_User;
 
-final class NotAccessibleForLspUserException extends \Exception implements PermissionExceptionInterface
+interface LspUserRepositoryInterface
 {
-    public function __construct(
-        public readonly JobCoordinator $coordinator
-    ) {
-        parent::__construct();
-    }
+    public function findByUser(ZfExtended_Models_User $user): ?LspUser;
+    public function getByUser(ZfExtended_Models_User $user): LspUser;
+    /**
+     * @return array<int, int>
+     */
+    public function getUserIdToLspIdMap(): array;
+    /**
+     * @return iterable<ZfExtended_Models_User>
+     */
+    public function getUsers(LanguageServiceProvider $lsp): iterable;
 }

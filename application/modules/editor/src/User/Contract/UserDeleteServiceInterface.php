@@ -28,44 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Service;
+namespace MittagQI\Translate5\User\Contract;
 
-use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
-use MittagQI\Translate5\User\Contract\UserDeleteServiceInterface;
 use ZfExtended_Models_User as User;
 
-final class UserDeleteService implements UserDeleteServiceInterface
+interface UserDeleteServiceInterface
 {
-    public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
-    ) {
-    }
-
-    public static function create(): self
-    {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
-        );
-    }
-
     /**
      * @throws FeasibilityExceptionInterface
      */
-    public function delete(User $user): void
-    {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
+    public function delete(User $user): void;
 
-        $this->userRepository->delete($user);
-    }
-
-    public function forceDelete(User $user): void
-    {
-        $this->userRepository->delete($user);
-    }
+    public function forceDelete(User $user): void;
 }

@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,30 +26,26 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-declare(strict_types=1);
+/**
+ * Bootstrapping the API tests
+ */
 
-namespace MittagQI\Translate5\LSP;
+$APPLICATION_ROOT = realpath(__DIR__ . '/../../../..');
+require_once $APPLICATION_ROOT . '/vendor/autoload.php';
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+define('APPLICATION_ROOT', $APPLICATION_ROOT);
+define('APPLICATION_ENV', 'test');
+defined('APPLICATION_ROOT') || define('APPLICATION_ROOT', $APPLICATION_ROOT);
+defined('APPLICATION_PATH') || define('APPLICATION_PATH', $APPLICATION_ROOT . '/application');
+defined('APPLICATION_ENV') || define('APPLICATION_ENV', 'test');
 
-class JobCoordinator extends LspUser
-{
-    /**
-     * @throws CantCreateCoordinatorFromUserException
-     */
-    public static function fromLspUser(LspUser $lspUser): self
-    {
-        if (! in_array(Roles::JOB_COORDINATOR, $lspUser->user->getRoles(), true)) {
-            throw new CantCreateCoordinatorFromUserException($lspUser->user->getUserGuid());
-        }
+$translate5 = new \Translate5\MaintenanceCli\WebAppBridge\Application();
+$translate5->init('test');
+// define a general marker for unit tests
+// be aware, that this marker affects the TESTING installation and the tests running in it, not the via API tested installation.
+// thus this flag can only be evaluated for "classic" UNIT-tests
+define('APPLICATION_UNITTEST', true);
 
-        return new self($lspUser->guid, $lspUser->user, $lspUser->lsp);
-    }
-
-    public function isCoordinatorOf(LanguageServiceProvider $lsp): bool
-    {
-        return $this->lsp->same($lsp);
-    }
+if (empty(ini_get('error_log'))) {
+    ini_set('error_log', APPLICATION_ROOT . '/data/php-tests.log');
 }

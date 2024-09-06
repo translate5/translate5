@@ -41,7 +41,7 @@ use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use ZfExtended_Models_User as User;
 
-final class UserCustomerAssociationUpdateService
+class UserCustomerAssociationUpdateService
 {
     public function __construct(
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,

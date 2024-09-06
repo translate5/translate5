@@ -32,12 +32,12 @@ namespace MittagQI\Translate5\LSP;
 
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use ZfExtended_Models_User;
 
 class LspUserService
 {
     public function __construct(
-        private readonly LspRepository $lspRepository,
         private readonly JobCoordinatorRepository $jcRepository,
         private readonly LspUserRepository $lspUserRepository,
     ) {
@@ -49,7 +49,6 @@ class LspUserService
         $lspUserRepository = new LspUserRepository();
 
         return new self(
-            $lspRepository,
             JobCoordinatorRepository::create($lspRepository, $lspUserRepository),
             $lspUserRepository,
         );
@@ -68,23 +67,5 @@ class LspUserService
     public function getCoordinatorsCountFor(LanguageServiceProvider $lsp): int
     {
         return $this->jcRepository->getCoordinatorsCount($lsp);
-    }
-
-    /**
-     * @return iterable<ZfExtended_Models_User>
-     */
-    public function getAccessibleUsers(JobCoordinator $coordinator): iterable
-    {
-        $lspUsers = $this->lspRepository->getUsers($coordinator->lsp);
-
-        foreach ($lspUsers as $lspUser) {
-            yield $lspUser;
-        }
-
-        $subCoordinators = $this->jcRepository->getSubLspJobCoordinators($coordinator);
-
-        foreach ($subCoordinators as $subCoordinator) {
-            yield $subCoordinator->user;
-        }
     }
 }

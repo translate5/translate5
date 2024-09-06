@@ -30,11 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP;
 
+use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\LspService;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\Contract\UserDeleteServiceInterface;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
@@ -59,36 +63,28 @@ class LspServiceTest extends TestCase
     public function testCreateLsp(?JobCoordinator $coordinator): void
     {
         $lspRepository = $this->createMock(LspRepository::class);
-        $userRepository = $this->createMock(UserRepository::class);
+        $userDeleteService = $this->createMock(UserDeleteServiceInterface::class);
+        $lspUserRepository = $this->createMock(LspUserRepository::class);
 
         $mock = new class extends LanguageServiceProvider
         {
-            private array $data = [];
-
             public function __construct()
             {
             }
 
-            public function __call($name, array $arguments)
-            {
-                $param = strtolower(str_replace('get', '', $name));
-
-                return $this->data[$param];
-            }
-
             public function setDescription(string $description): void
             {
-                $this->data['description'] = $description;
+                TestCase::assertSame('description', $description);
             }
 
             public function setName(string $name): void
             {
-                $this->data['name'] = $name;
+                TestCase::assertSame('name', $name);
             }
 
             public function setParentId(int $parentId): void
             {
-                $this->data['parentid'] = $parentId;
+                TestCase::assertSame(1, $parentId);
             }
         };
 
@@ -97,24 +93,20 @@ class LspServiceTest extends TestCase
 
         $service = new LspService(
             $lspRepository,
-            $userRepository,
+            $userDeleteService,
+            $lspUserRepository,
         );
 
         $lsp = $service->createLsp('name', 'description', $coordinator);
 
         self::assertInstanceOf(LanguageServiceProvider::class, $lsp);
-        self::assertEquals('name', $lsp->getName());
-        self::assertEquals('description', $lsp->getDescription());
-
-        if (null !== $coordinator) {
-            self::assertEquals(1, $lsp->getParentId());
-        }
     }
 
     public function testUpdateInfoFields(): void
     {
         $lspRepository = $this->createMock(LspRepository::class);
-        $userRepository = $this->createMock(UserRepository::class);
+        $userDeleteService = $this->createMock(UserDeleteServiceInterface::class);
+        $lspUserRepository = $this->createMock(LspUserRepository::class);
 
         $lsp = new class extends LanguageServiceProvider
         {
@@ -148,7 +140,8 @@ class LspServiceTest extends TestCase
 
         $service = new LspService(
             $lspRepository,
-            $userRepository,
+            $userDeleteService,
+            $lspUserRepository,
         );
 
         $service->updateInfoFields($lsp, 'name', 'description');
@@ -157,7 +150,8 @@ class LspServiceTest extends TestCase
     public function testGetLsp(): void
     {
         $lspRepository = $this->createMock(LspRepository::class);
-        $userRepository = $this->createMock(UserRepository::class);
+        $userDeleteService = $this->createMock(UserDeleteServiceInterface::class);
+        $lspUserRepository = $this->createMock(LspUserRepository::class);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
@@ -165,9 +159,119 @@ class LspServiceTest extends TestCase
 
         $service = new LspService(
             $lspRepository,
-            $userRepository,
+            $userDeleteService,
+            $lspUserRepository,
         );
 
         self::assertSame($lsp, $service->getLsp(1));
+    }
+
+    public function testDeleteLsp(): void
+    {
+        $lspUserRepository = $this->createMock(LspUserRepository::class);
+
+        $user1 = $this->createMock(ZfExtended_Models_User::class);
+        $user2 = $this->createMock(ZfExtended_Models_User::class);
+
+        $lspUserRepository->method('getUsers')->willReturnOnConsecutiveCalls([$user1], [$user2]);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $subLsp = $this->createMock(LanguageServiceProvider::class);
+
+        $userDeleteService = new class implements UserDeleteServiceInterface
+        {
+            public array $deletedUsers = [];
+
+            public function delete(ZfExtended_Models_User $user): void
+            {
+            }
+
+            public function forceDelete(ZfExtended_Models_User $user): void
+            {
+                $this->deletedUsers[] = $user;
+            }
+        };
+
+        $lspRepository = new class ($subLsp) implements LspRepositoryInterface
+        {
+            public array $deletedLsps = [];
+
+            private bool $firstCall = true;
+
+            public function __construct(private LanguageServiceProvider $subLsp)
+            {
+            }
+
+            /** @phpstan-ignore-next-line */
+            public function get(int $id): LanguageServiceProvider
+            {
+            }
+
+            /** @phpstan-ignore-next-line */
+            public function getEmptyModel(): LanguageServiceProvider
+            {
+            }
+
+            public function save(LanguageServiceProvider $lsp): void
+            {
+            }
+
+            public function delete(LanguageServiceProvider $lsp): void
+            {
+                $this->deletedLsps[] = $lsp;
+            }
+
+            /** @phpstan-ignore-next-line */
+            public function findCustomerAssignment(
+                LanguageServiceProvider $lsp,
+                Customer $customer,
+            ): ?LanguageServiceProviderCustomer {
+            }
+
+            public function saveCustomerAssignment(LanguageServiceProviderCustomer $lspCustomer): void
+            {
+            }
+
+            public function deleteCustomerAssignment(LanguageServiceProviderCustomer $lspCustomer): void
+            {
+            }
+
+            /** @phpstan-ignore-next-line */
+            public function getAll(): iterable
+            {
+            }
+
+            /** @phpstan-ignore-next-line */
+            public function getCustomers(LanguageServiceProvider $lsp): iterable
+            {
+            }
+
+            /** @phpstan-ignore-next-line */
+            public function getCustomerIds(LanguageServiceProvider $lsp): array
+            {
+            }
+
+            public function getSubLspList(LanguageServiceProvider $lsp): iterable
+            {
+                if ($this->firstCall) {
+                    $this->firstCall = false;
+
+                    return [$this->subLsp];
+                }
+
+                return [];
+            }
+        };
+
+        $service = new LspService(
+            $lspRepository,
+            $userDeleteService,
+            $lspUserRepository,
+        );
+
+        $service->deleteLsp($lsp);
+
+        self::assertSame([$user1, $user2], $userDeleteService->deletedUsers);
+        self::assertSame([$subLsp, $lsp], $lspRepository->deletedLsps);
     }
 }

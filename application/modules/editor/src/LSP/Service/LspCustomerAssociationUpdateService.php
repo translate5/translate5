@@ -117,7 +117,7 @@ class LspCustomerAssociationUpdateService
 
     private function assignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
-        $lspCustomer = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
+        $lspCustomer = $this->lspRepository->getEmptyLspCustomerModel();
         $lspCustomer->setLspId((int) $lsp->getId());
         $lspCustomer->setCustomerId($customer->getId());
 

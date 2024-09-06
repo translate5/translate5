@@ -31,20 +31,17 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderCustomerTable;
-use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
-use ZfExtended_Models_User;
 
-class LspRepository
+class LspRepository implements LspRepositoryInterface
 {
     public function __construct(
         private readonly Zend_Db_Adapter_Abstract $db,
@@ -59,6 +56,11 @@ class LspRepository
     public function getEmptyModel(): LanguageServiceProvider
     {
         return ZfExtended_Factory::get(LanguageServiceProvider::class);
+    }
+
+    public function getEmptyLspCustomerModel(): LanguageServiceProviderCustomer
+    {
+        return ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
     }
 
     /**
@@ -133,40 +135,6 @@ class LspRepository
             );
 
             yield clone $model;
-        }
-    }
-
-    /**
-     * @return iterable<ZfExtended_Models_User>
-     */
-    public function getUsers(LanguageServiceProvider $lsp): iterable
-    {
-        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
-            ->db
-            ->info(LanguageServiceProviderUserTable::NAME);
-        $userDb = $user->db;
-
-        $select = $userDb->select()
-            ->setIntegrityCheck(false)
-            ->from([
-                'user' => $user->db->info($user->db::NAME),
-            ])
-            ->join([
-                'lspToUser' => $lspToUserTable,
-            ], 'user.id = lspToUser.userId', [])
-            ->where('lspToUser.lspId = ?', $lsp->getId());
-
-        $rows = $userDb->fetchAll($select);
-
-        if (! $rows->valid()) {
-            return yield from [];
-        }
-
-        foreach ($rows as $row) {
-            $user->init($row);
-
-            yield clone $user;
         }
     }
 

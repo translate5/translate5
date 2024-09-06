@@ -28,13 +28,13 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\LspUserRepository;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleForLspUserException;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
@@ -213,7 +213,7 @@ class Editor_UserController extends ZfExtended_UserController
                     'userEmail' => $this->entity->getEmail(),
                 ]
             );
-        } catch (NotAccessibleForLspUserException $e) {
+        } catch (NotAccessibleLspUserException $e) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1627' => 'Job coordinator can not delete this user.',
             ]);

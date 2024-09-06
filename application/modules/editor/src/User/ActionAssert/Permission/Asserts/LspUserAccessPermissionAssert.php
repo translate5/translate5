@@ -30,9 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
+use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\LspUserService;
 use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleForLspUserException;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\ZfExtended\Acl\Roles;
 use ZfExtended_Models_User as User;
@@ -40,7 +43,7 @@ use ZfExtended_Models_User as User;
 final class LspUserAccessPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
-        private readonly LspUserService $lspUserService
+        private readonly LspUserService $lspUserService,
     ) {
     }
 
@@ -50,7 +53,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
     }
 
     /**
-     * Restrict access for job coordinators to LSP users and other job coordinator
+     * Restrict access to LSP users
      */
     public function assertGranted(User $user, PermissionAssertContext $context): void
     {
@@ -61,18 +64,55 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        $coordinator = $this->lspUserService->findCoordinatorBy($manager);
+        $lspUser = $this->lspUserService->findLspUserBy($user);
 
-        if (null === $coordinator) {
+        if (null === $lspUser) {
             return;
         }
 
-        foreach ($this->lspUserService->getAccessibleUsers($coordinator) as $accessibleUser) {
-            if ($accessibleUser->getId() === $user->getId()) {
+        if (in_array(Roles::PM, $roles)) {
+            if ($this->isGrantedForPm($lspUser)) {
                 return;
             }
+
+            throw new NotAccessibleLspUserException();
         }
 
-        throw new NotAccessibleForLspUserException($coordinator);
+        $managerCoordinator = $this->lspUserService->findCoordinatorBy($manager);
+
+        if (null === $managerCoordinator) {
+            throw new NotAccessibleLspUserException();
+        }
+
+        if ($managerCoordinator->isCoordinatorOf($lspUser->lsp)) {
+            return;
+        }
+
+        try {
+            $subjectCoordinator = JobCoordinator::fromLspUser($lspUser);
+        } catch (CantCreateCoordinatorFromUserException) {
+            throw new NotAccessibleLspUserException();
+        }
+
+        if ($subjectCoordinator->lsp->isSubLspOf($managerCoordinator->lsp)) {
+            return;
+        }
+
+        throw new NotAccessibleLspUserException();
+    }
+
+    private function isGrantedForPm(LspUser $lspUser): bool
+    {
+        if (! $lspUser->lsp->isDirectLsp()) {
+            return false;
+        }
+
+        try {
+            JobCoordinator::fromLspUser($lspUser);
+
+            return true;
+        } catch (CantCreateCoordinatorFromUserException) {
+            return false;
+        }
     }
 }

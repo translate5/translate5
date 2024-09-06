@@ -36,6 +36,7 @@ use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
 use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException as NotFoundException;
 use ZfExtended_Models_User;

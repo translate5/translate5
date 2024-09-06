@@ -31,15 +31,19 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP;
 
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\Translate5\Repository\UserRepository;
-use ZfExtended_Factory;
+use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\Contract\UserDeleteServiceInterface;
+use MittagQI\Translate5\User\Service\UserDeleteService;
 
 class LspService
 {
     public function __construct(
-        private readonly LspRepository $lspRepository,
-        private readonly UserRepository $userRepository,
+        private readonly LspRepositoryInterface $lspRepository,
+        private readonly UserDeleteServiceInterface $userDeleteService,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
     ) {
     }
 
@@ -49,7 +53,8 @@ class LspService
 
         return new self(
             $lspRepository,
-            new UserRepository(),
+            UserDeleteService::create(),
+            new LspUserRepository(),
         );
     }
 
@@ -81,13 +86,12 @@ class LspService
         $this->lspRepository->save($lsp);
     }
 
-    // TODO: delete all relations of lsp: users, customer associations...
     public function deleteLsp(LanguageServiceProvider $lsp): void
     {
-        $lspUsers = $this->lspRepository->getUsers($lsp);
+        $usersOfLsp = $this->lspUserRepository->getUsers($lsp);
 
-        foreach ($lspUsers as $user) {
-            $this->userRepository->delete($user);
+        foreach ($usersOfLsp as $user) {
+            $this->userDeleteService->forceDelete($user);
         }
 
         foreach ($this->lspRepository->getSubLspList($lsp) as $subLsp) {
