@@ -70,8 +70,6 @@ class UserCustomerAssociationValidator
 
     /**
      * @param iterable<Customer> $customers
-     * @param User $user
-     * @return void
      * @throws CustomerDoesNotBelongToLspException
      */
     public function assertCustomersMayBeAssociatedWithUser(iterable $customers, User $user): void

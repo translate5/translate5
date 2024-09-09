@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\ActionAssert\Action;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
 interface PermissionAssertInterface
 {

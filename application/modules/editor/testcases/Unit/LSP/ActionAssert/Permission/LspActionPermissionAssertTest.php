@@ -33,8 +33,8 @@ namespace MittagQI\Translate5\Test\Unit\LSP\ActionAssert\Permission;
 use MittagQI\Translate5\LSP\ActionAssert\Action;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use PHPUnit\Framework\TestCase;
 

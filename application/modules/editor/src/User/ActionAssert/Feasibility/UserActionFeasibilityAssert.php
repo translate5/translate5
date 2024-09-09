@@ -44,7 +44,6 @@ final class UserActionFeasibilityAssert implements UserActionFeasibilityAssertIn
     /**
      * @param FeasibilityAssertInterface[] $asserts
      */
-
     public function __construct(
         private readonly array $asserts
     ) {

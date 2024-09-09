@@ -276,8 +276,6 @@ class Editor_UserController extends ZfExtended_UserController
     }
 
     /**
-     * @param ZfExtended_Models_User|null $authUser
-     * @return void
      * @throws FeasibilityExceptionInterface
      */
     private function updateCustomers(?ZfExtended_Models_User $authUser): void

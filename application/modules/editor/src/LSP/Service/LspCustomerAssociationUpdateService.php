@@ -37,14 +37,12 @@ use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;
 use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use ZfExtended_Factory;
 use ZfExtended_Models_User as User;
 
 class LspCustomerAssociationUpdateService

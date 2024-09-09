@@ -30,12 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\ActionAssert\Action;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RuleBasedMutatePermissionAssert;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\ZfExtended\Acl\Roles;
 use PHPUnit\Framework\TestCase;

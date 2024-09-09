@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\ActionAssert\Permission;
 
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RuleBasedMutatePermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Action;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RuleBasedMutatePermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RuleBasedReadPermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;

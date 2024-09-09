@@ -66,8 +66,7 @@ class LspServiceTest extends TestCase
         $userDeleteService = $this->createMock(UserDeleteServiceInterface::class);
         $lspUserRepository = $this->createMock(LspUserRepository::class);
 
-        $mock = new class extends LanguageServiceProvider
-        {
+        $mock = new class() extends LanguageServiceProvider {
             public function __construct()
             {
             }
@@ -108,9 +107,9 @@ class LspServiceTest extends TestCase
         $userDeleteService = $this->createMock(UserDeleteServiceInterface::class);
         $lspUserRepository = $this->createMock(LspUserRepository::class);
 
-        $lsp = new class extends LanguageServiceProvider
-        {
+        $lsp = new class() extends LanguageServiceProvider {
             public string $name = '';
+
             public string $description = '';
 
             public function __construct()
@@ -178,8 +177,7 @@ class LspServiceTest extends TestCase
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $subLsp = $this->createMock(LanguageServiceProvider::class);
 
-        $userDeleteService = new class implements UserDeleteServiceInterface
-        {
+        $userDeleteService = new class() implements UserDeleteServiceInterface {
             public array $deletedUsers = [];
 
             public function delete(ZfExtended_Models_User $user): void
@@ -192,22 +190,26 @@ class LspServiceTest extends TestCase
             }
         };
 
-        $lspRepository = new class ($subLsp) implements LspRepositoryInterface
-        {
+        $lspRepository = new class($subLsp) implements LspRepositoryInterface {
             public array $deletedLsps = [];
 
             private bool $firstCall = true;
 
-            public function __construct(private LanguageServiceProvider $subLsp)
-            {
+            public function __construct(
+                private LanguageServiceProvider $subLsp
+            ) {
             }
 
-            /** @phpstan-ignore-next-line */
+            /**
+             * @phpstan-ignore-next-line
+             */
             public function get(int $id): LanguageServiceProvider
             {
             }
 
-            /** @phpstan-ignore-next-line */
+            /**
+             * @phpstan-ignore-next-line
+             */
             public function getEmptyModel(): LanguageServiceProvider
             {
             }
@@ -221,7 +223,9 @@ class LspServiceTest extends TestCase
                 $this->deletedLsps[] = $lsp;
             }
 
-            /** @phpstan-ignore-next-line */
+            /**
+             * @phpstan-ignore-next-line
+             */
             public function findCustomerAssignment(
                 LanguageServiceProvider $lsp,
                 Customer $customer,
@@ -236,17 +240,23 @@ class LspServiceTest extends TestCase
             {
             }
 
-            /** @phpstan-ignore-next-line */
+            /**
+             * @phpstan-ignore-next-line
+             */
             public function getAll(): iterable
             {
             }
 
-            /** @phpstan-ignore-next-line */
+            /**
+             * @phpstan-ignore-next-line
+             */
             public function getCustomers(LanguageServiceProvider $lsp): iterable
             {
             }
 
-            /** @phpstan-ignore-next-line */
+            /**
+             * @phpstan-ignore-next-line
+             */
             public function getCustomerIds(LanguageServiceProvider $lsp): array
             {
             }

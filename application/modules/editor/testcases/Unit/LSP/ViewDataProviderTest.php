@@ -124,7 +124,7 @@ class ViewDataProviderTest extends TestCase
         $lspRepository->method('getAll')->willReturn([$lsp]);
         $lspRepository->method('getCustomers')->willReturn([$customer1, $customer2]);
 
-        $permissionAssert = new class implements LspActionPermissionAssertInterface {
+        $permissionAssert = new class() implements LspActionPermissionAssertInterface {
             public function assertGranted(
                 Action $action,
                 LanguageServiceProvider $lsp,
@@ -134,7 +134,7 @@ class ViewDataProviderTest extends TestCase
                     return;
                 }
 
-                throw new class extends Exception implements PermissionExceptionInterface {
+                throw new class() extends Exception implements PermissionExceptionInterface {
                 };
             }
         };

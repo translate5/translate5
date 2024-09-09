@@ -207,7 +207,6 @@ class LspCustomerAssociationUpdateServiceTest extends TestCase
             ['getId', [], 2],
         ]);
 
-
         $lspRepository->method('getCustomers')->willReturn([$customer1, $customer2]);
         $lspRepository->expects(self::never())->method('saveCustomerAssignment');
         $lspRepository->method('findCustomerAssignment')->willReturn(null);
@@ -253,8 +252,7 @@ class LspCustomerAssociationUpdateServiceTest extends TestCase
             ['getId', [], 2],
         ]);
 
-        $lspCustomer = new class extends LanguageServiceProviderCustomer
-        {
+        $lspCustomer = new class() extends LanguageServiceProviderCustomer {
             public function __construct()
             {
             }

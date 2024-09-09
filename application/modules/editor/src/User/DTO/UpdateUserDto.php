@@ -32,5 +32,4 @@ namespace MittagQI\Translate5\User\DTO;
 
 class UpdateUserDto
 {
-
 }
