@@ -31,8 +31,11 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Validation;
 
 use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
+use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
+use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
 use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
-use Zend_Validate_Abstract;
+use ZfExtended_Acl;
 
 class RolesValidator
 {
@@ -40,7 +43,10 @@ class RolesValidator
         'roles' => 'Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}',
     ];
 
-    private array $conflictRoles = [
+    /**
+     * @var array<string, string[]>
+     */
+    private array $conflictMap = [
         Roles::JOB_COORDINATOR => [
             BaseRoles::ADMIN,
             BaseRoles::SYSTEMADMIN,
@@ -54,43 +60,49 @@ class RolesValidator
     ) {
     }
 
-    public function assertRolesDontConflict(array $roles): bool
+    /**
+     * @param array $roles
+     * @return void
+     * @throws RolesetHasConflictingRolesException
+     * @throws RoleConflictWithRoleThatPopulatedToRolesetException
+     * @throws \Zend_Acl_Exception
+     */
+    public function assertRolesDontConflict(array $roles): void
     {
-        $valid = true;
-        $this->_setValue($value);
-
-        if ('' === $value) {
-            return true;
+        if (empty($roles)) {
+            return;
         }
 
-        $roles = explode(',', $value);
+        $potentialConflictRoles = array_intersect($roles, array_keys($this->conflictMap));
 
-        foreach ($this->conflictRoles as $role => $conflictRoles) {
-            if (in_array($role, $roles) && ! empty(array_intersect($roles, $conflictRoles))) {
-                $valid = false;
-                $translator = $this->getTranslator();
+        // straightforward check if any of the roles is in the conflict map
+        foreach ($potentialConflictRoles as $potentialConflictRole) {
+            $conflictingRoles = array_intersect($this->conflictMap[$potentialConflictRole], $roles);
 
-                $message = $translator->translate($this->_messageTemplates['roles']);
-                $message = str_replace(
-                    ['{role}', '{roles}'],
-                    [
-                        $translator->translate(mb_ucfirst($role)),
-                        implode(
-                            ', ',
-                            array_map(
-                                static fn ($conflictRole) => $translator->translate(mb_ucfirst($conflictRole)),
-                                $conflictRoles
-                            )
-                        ),
-                    ],
-                    $message
-                );
-
-                $this->_errors[] = 'roles';
-                $this->_messages['roles'] = $message;
+            if (! empty($conflictingRoles)) {
+                throw new RolesetHasConflictingRolesException($potentialConflictRole, $conflictingRoles);
             }
         }
 
-        return $valid;
+        // check for populated roles. Some roles are populated with setaclrole
+        foreach ($roles as $role) {
+            if (in_array($role, $potentialConflictRoles, true)) {
+                continue;
+            }
+
+            $populatedRoles = $this->acl->getRightsToRolesAndResource([$role], AutoSetRoleResource::ID);
+
+            foreach ($potentialConflictRoles as $potentialConflictRole) {
+                $conflictingRoles = array_intersect($this->conflictMap[$potentialConflictRole], $populatedRoles);
+
+                if (!empty($conflictingRoles)) {
+                    throw new RoleConflictWithRoleThatPopulatedToRolesetException(
+                        $role,
+                        $potentialConflictRole,
+                        $conflictingRoles
+                    );
+                }
+            }
+        }
     }
 }

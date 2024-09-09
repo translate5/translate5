@@ -88,7 +88,7 @@ class UserCustomerAssociationUpdateService
     public function updateAssociatedCustomersBy(
         User $user,
         array $associatedCustomerIds,
-        User $authManager = null
+        User $authManager
     ): void {
         $this->feasibilityAssert->assertAllowed(Action::UPDATE, $user);
 

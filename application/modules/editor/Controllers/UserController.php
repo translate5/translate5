@@ -40,8 +40,12 @@ use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExcepti
 use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
+use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
+use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Service\UserCustomerAssociationUpdateService;
 use MittagQI\Translate5\User\Service\UserDeleteService;
+use MittagQI\Translate5\User\Service\UserRolesUpdateService;
 
 class Editor_UserController extends ZfExtended_UserController
 {
@@ -53,6 +57,16 @@ class Editor_UserController extends ZfExtended_UserController
     {
         parent::init();
         $this->permissionAssert = UserActionPermissionAssert::create();
+
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E2002' => 'No object of type "{0}" was found by key "{1}"',
+            'E2003' => 'Wrong value',
+            'E1048' => 'The user can not be deleted, he is PM in one or more tasks.',
+            'E1626' => 'The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".',
+            'E1627' => 'Attempts to manipulate not accessible user.',
+            'E1628' => 'Tried to manipulate a not editable user.',
+            'E1630' => 'You can not set role {role} with one of the following roles: {roles}',
+        ], 'editor.user');
     }
 
     public function getAction()
@@ -129,10 +143,6 @@ class Editor_UserController extends ZfExtended_UserController
     {
         $this->entityLoad();
 
-        ZfExtended_UnprocessableEntity::addCodes([
-            'E2003' => 'Wrong value',
-        ], 'editor.user');
-
         try {
             $authUser = ZfExtended_Authentication::getInstance()->getUser();
 
@@ -145,15 +155,12 @@ class Editor_UserController extends ZfExtended_UserController
             $this->decodePutData();
 
             $this->updateCustomers($authUser);
+            $this->updateRoles($authUser);
         } catch (FeasibilityExceptionInterface) {
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1628' => 'Tried to manipulate a not editable user.',
-            ]);
-
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1628',
                 [
-                    'Versucht, einen nicht bearbeitbaren Benutzer zu manipulieren.',
+                    'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
                 ],
                 [
                     'user' => $this->entity->getUserGuid(),
@@ -162,14 +169,10 @@ class Editor_UserController extends ZfExtended_UserController
                 ]
             );
         } catch (NotAccessibleLspUserException $e) {
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1627' => 'Job coordinator can not delete this user.',
-            ]);
-
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1627',
                 [
-                    'Der Jobkoordinator kann diesen Benutzer nicht löschen.',
+                    'Versuch, einen nicht erreichbaren Benutzer zu manipulieren.',
                 ],
                 [
                     'coordinator' => $e->lspUser->guid,
@@ -198,10 +201,6 @@ class Editor_UserController extends ZfExtended_UserController
 
             UserDeleteService::create()->delete($this->entity);
         } catch (PmInTaskException $e) {
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1048' => 'The user can not be deleted, he is PM in one or more tasks.',
-            ]);
-
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1048',
                 [
@@ -215,10 +214,6 @@ class Editor_UserController extends ZfExtended_UserController
                 ]
             );
         } catch (LastCoordinatorException $e) {
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1626' => 'The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".',
-            ]);
-
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1626',
                 [
@@ -233,17 +228,13 @@ class Editor_UserController extends ZfExtended_UserController
                 ]
             );
         } catch (NotAccessibleLspUserException $e) {
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1627' => 'Job coordinator can not delete this user.',
-            ]);
-
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1627',
                 [
-                    'Der Jobkoordinator kann diesen Benutzer nicht löschen.',
+                    'Versuch, einen nicht erreichbaren Benutzer zu manipulieren.',
                 ],
                 [
-                    'coordinator' => $e->lspUser->guid,
+                    'lspUser' => $e->lspUser->guid,
                     'lsp' => $e->lspUser->lsp->getName(),
                     'lspId' => $e->lspUser->lsp->getId(),
                     'user' => $this->entity->getUserGuid(),
@@ -252,14 +243,10 @@ class Editor_UserController extends ZfExtended_UserController
                 ]
             );
         } catch (UserIsNotEditableException) {
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1628' => 'Tried to manipulate a not editable user.',
-            ]);
-
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1628',
                 [
-                    'Versucht, einen nicht bearbeitbaren Benutzer zu manipulieren.',
+                    'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
                 ],
                 [
                     'user' => $this->entity->getUserGuid(),
@@ -277,7 +264,7 @@ class Editor_UserController extends ZfExtended_UserController
     /**
      * @throws FeasibilityExceptionInterface
      */
-    private function updateCustomers(?ZfExtended_Models_User $authUser): void
+    private function updateCustomers(ZfExtended_Models_User $authUser): void
     {
         $sentCustomerIds = array_filter(
             array_map(
@@ -293,10 +280,6 @@ class Editor_UserController extends ZfExtended_UserController
                 $authUser
             );
         } catch (InexistentCustomerException $e) {
-            ZfExtended_UnprocessableEntity::addCodes([
-                'E2002' => 'No object of type "{0}" was found by key "{1}"',
-            ], 'editor.user');
-
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E2002',
                 [
@@ -309,19 +292,7 @@ class Editor_UserController extends ZfExtended_UserController
                     $e->customerId,
                 ]
             );
-        } catch (CustomerDoesNotBelongToUserException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'customers' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
-                    ],
-                ],
-                [
-                    'id' => $e->customerId,
-                ]
-            );
-        } catch (CustomerDoesNotBelongToLspException $e) {
+        } catch (CustomerDoesNotBelongToUserException|CustomerDoesNotBelongToLspException $e) {
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E2003',
                 [
@@ -336,12 +307,55 @@ class Editor_UserController extends ZfExtended_UserController
         }
 
         // make sure customers not processed by parent class
-        if (is_array($this->data)) {
-            unset($this->data['customers']);
+        unset($this->data->customers);
+    }
+
+    /**
+     * @throws FeasibilityExceptionInterface
+     */
+    private function updateRoles(ZfExtended_Models_User $authUser): void
+    {
+        if (empty($this->data->roles)) {
+            return;
         }
 
-        if (is_object($this->data)) {
-            unset($this->data->customers);
+        $roles = explode(',', trim($this->data->roles, ','));
+
+        try {
+            UserRolesUpdateService::create()->updateRolesBy($this->entity, $roles, $authUser);
+        } catch (RolesetHasConflictingRolesException $e) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E1630',
+                [
+                    'roles' => [
+                        'Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}',
+                    ],
+                ],
+                [
+                    'role' => $e->role,
+                    'roles' => join(', ', $e->conflictsWith),
+                ]
+            );
+        } catch (RoleConflictWithRoleThatPopulatedToRolesetException $e) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E1630',
+                [
+                    'roles' => [
+                        'Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}',
+                    ],
+                ],
+                [
+                    'role' => $e->role,
+                    'roles' => join(', ', array_merge([$e->conflictsWith], $e->becauseOf)),
+                    'conflictsWith' => $e->conflictsWith,
+                    'becauseOf' => $e->becauseOf,
+                ]
+            );
+        } catch (Zend_Acl_Exception|UserIsNotAuthorisedToAssignRoleException $e) {
+            throw new ZfExtended_NoAccessException(previous: $e);
         }
+
+        // make sure roles not processed by parent class
+        unset($this->data->roles);
     }
 }

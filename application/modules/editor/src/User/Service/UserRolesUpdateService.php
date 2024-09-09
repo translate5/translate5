@@ -30,13 +30,17 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Service;
 
-use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
-use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
+use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
+use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
+use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
+use MittagQI\Translate5\User\Validation\RolesValidator;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource;
+use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Models_User as User;
 
@@ -44,25 +48,34 @@ final class UserRolesUpdateService
 {
     public function __construct(
         private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
+        private readonly RolesValidator $rolesValidator,
         private readonly ZfExtended_Acl $acl,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
     public static function create(): self
     {
+        $acl = ZfExtended_Acl::getInstance();
+
         return new self(
             UserActionFeasibilityAssert::create(),
-            ZfExtended_Acl::getInstance(),
+            new RolesValidator($acl),
+            $acl,
+            new UserRepository(),
         );
     }
 
     /**
      * @param string[] $roles
      * @throws FeasibilityExceptionInterface
+     * @throws RolesetHasConflictingRolesException
+     * @throws RoleConflictWithRoleThatPopulatedToRolesetException
+     * @throws UserIsNotAuthorisedToAssignRoleException
+     * @throws Zend_Acl_Exception
      */
     public function updateRolesBy(User $user, array $roles, User $authUser): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
 
         if (empty($roles)) {
             return;
@@ -79,11 +92,10 @@ final class UserRolesUpdateService
 
         foreach ($roles as $role) {
             if (! $this->hasAclPermissionToSetRole($authUser, $role)) {
-                throw new \ZfExtended_NoAccessException("Authenticated User is not allowed to modify role " . $role);
+                throw new UserIsNotAuthorisedToAssignRoleException($role);
             }
         }
 
-        // merge the requested roles and the old roles and apply the autoset roles to them
         $roles = array_merge(array_merge($roles, $oldRoles));
 
         $this->updateRoles($user, $roles);
@@ -92,54 +104,30 @@ final class UserRolesUpdateService
     /**
      * @param User $user
      * @param string[] $roles
+     * @throws FeasibilityExceptionInterface
+     * @throws RolesetHasConflictingRolesException
+     * @throws RoleConflictWithRoleThatPopulatedToRolesetException
+     * @throws Zend_Acl_Exception
      */
     public function updateRoles(User $user, array $roles): void
     {
-        $hasCoordinatorRole = in_array(Roles::JOB_COORDINATOR, $roles, true);
+        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
 
-        foreach ($roles as $role) {
-            $populatedRoles = $this->acl->getRightsToRolesAndResource([$role], AutoSetRoleResource::ID);
+        $this->rolesValidator->assertRolesDontConflict($roles);
 
-            if (! $this->acl->isRole($role)) {
-                throw new \ZfExtended_BadRequestException("Role " . $role . " does not exist");
-            }
-        }
-
-        $roles = $this->acl->mergeAutoSetRoles($roles, $oldRoles);
+        $roles = $this->acl->mergeAutoSetRoles($roles, []);
 
         $user->setRoles($roles);
-        $user->save();
+
+        $this->userRepository->save($user);
     }
 
-    /**
-     * @param string[] $roles
-     */
-    private function assertRolesDontConflict(array $roles): void
+    private function hasAclPermissionToSetRole(User $authUser, string $role): bool
     {
-        $hasCoordinatorRole = in_array(Roles::JOB_COORDINATOR, $roles, true);
-
-        if (! $hasCoordinatorRole) {
-            return;
+        try {
+            return $this->acl->isInAllowedRoles($authUser->getRoles(), SetAclRoleResource::ID, $role);
+        } catch (Zend_Acl_Exception) {
+            return false;
         }
-
-        $restrictedForJcRoles = [Roles::ADMIN, Roles::PM, Roles::SYSTEMADMIN, Roles::CLIENTPM];
-        $conflictingRoles = array_intersect($roles, $restrictedForJcRoles);
-
-        if (! empty($conflictingRoles)) {
-            throw new \ZfExtended_BadRequestException("Job Coordinator role can not be combined with " . implode(", ", $conflictingRoles));
-        }
-
-        foreach ($roles as $role) {
-            $populatedRoles = $this->acl->getRightsToRolesAndResource([$role], AutoSetRoleResource::ID);
-
-            if (array_intersect($restrictedForJcRoles, $populatedRoles)) {
-                throw new \ZfExtended_BadRequestException("Role " . $role . " does not exist");
-            }
-        }
-    }
-
-    private function hasAclPermissionToSetRole(User $authUser, string $role)
-    {
-        return $this->acl->isInAllowedRoles($authUser->getRoles(), SetAclRoleResource::ID, $role);
     }
 }

@@ -9915,6 +9915,14 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}</source>
                 <target>Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}</target>
             </trans-unit>
+            <trans-unit id='VmVyc3VjaCwgZWluZW4gbmljaHQgZXJyZWljaGJhcmVuIEJlbnV0emVyIHp1IG1hbmlwdWxpZXJlbi4='>
+                <source>Versuch, einen nicht erreichbaren Benutzer zu manipulieren.</source>
+                <target>Versuch, einen nicht erreichbaren Benutzer zu manipulieren.</target>
+            </trans-unit>
+            <trans-unit id='VmVyc3VjaHQsIGVpbmVuIEJlbnV0emVyIHp1IG1hbmlwdWxpZXJlbiwgZGVyIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuIGthbm4u'>
+                <source>Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.</source>
+                <target>Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

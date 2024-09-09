@@ -10089,6 +10089,14 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}</source>
                 <target>You can not set role {role} with one of the following roles: {roles}</target>
             </trans-unit>
+            <trans-unit id='VmVyc3VjaCwgZWluZW4gbmljaHQgZXJyZWljaGJhcmVuIEJlbnV0emVyIHp1IG1hbmlwdWxpZXJlbi4='>
+                <source>Versuch, einen nicht erreichbaren Benutzer zu manipulieren.</source>
+                <target>Attempt to manipulate not accessible user.</target>
+            </trans-unit>
+            <trans-unit id='VmVyc3VjaHQsIGVpbmVuIEJlbnV0emVyIHp1IG1hbmlwdWxpZXJlbiwgZGVyIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuIGthbm4u'>
+                <source>Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.</source>
+                <target>Attempts to manipulate a user who cannot be edited.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
