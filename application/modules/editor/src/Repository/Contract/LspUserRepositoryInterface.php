@@ -37,11 +37,14 @@ use ZfExtended_Models_User;
 interface LspUserRepositoryInterface
 {
     public function findByUser(ZfExtended_Models_User $user): ?LspUser;
+
     public function getByUser(ZfExtended_Models_User $user): LspUser;
+
     /**
      * @return array<int, int>
      */
     public function getUserIdToLspIdMap(): array;
+
     /**
      * @return iterable<ZfExtended_Models_User>
      */

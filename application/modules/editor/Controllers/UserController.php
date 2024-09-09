@@ -40,13 +40,12 @@ use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExcepti
 use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Service\UserCustomerAssociationUpdateService;
 use MittagQI\Translate5\User\Service\UserDeleteService;
 
 class Editor_UserController extends ZfExtended_UserController
 {
-    protected $entityClass = User::class;
+    protected $entityClass = ZfExtended_Models_User::class;
 
     private UserActionPermissionAssert $permissionAssert;
 

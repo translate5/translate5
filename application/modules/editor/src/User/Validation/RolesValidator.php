@@ -28,15 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Model\Validation;
+namespace MittagQI\Translate5\User\Validation;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
 use Zend_Validate_Abstract;
 
-class RolesValidator extends Zend_Validate_Abstract
+class RolesValidator
 {
-    protected $_messageTemplates = [
+    private array $_messageTemplates = [
         'roles' => 'Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}',
     ];
 
@@ -49,7 +49,12 @@ class RolesValidator extends Zend_Validate_Abstract
         ],
     ];
 
-    public function isValid($value): bool
+    public function __construct(
+        private readonly ZfExtended_Acl $acl,
+    ) {
+    }
+
+    public function assertRolesDontConflict(array $roles): bool
     {
         $valid = true;
         $this->_setValue($value);

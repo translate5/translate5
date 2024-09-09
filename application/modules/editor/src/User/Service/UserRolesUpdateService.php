@@ -30,10 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Service;
 
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource;
 use ZfExtended_Acl;
 use ZfExtended_Models_User as User;
@@ -58,7 +60,7 @@ final class UserRolesUpdateService
      * @param string[] $roles
      * @throws FeasibilityExceptionInterface
      */
-    public function updateRolesBy(User $user, array $roles, User $actor): void
+    public function updateRolesBy(User $user, array $roles, User $authUser): void
     {
         $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
 
@@ -70,26 +72,70 @@ final class UserRolesUpdateService
 
         //if there are old roles, remove the roles for which the user isAllowed for setaclrole
         foreach ($oldRoles as $i => $old) {
-            if ($this->hasAclPermissionToSetRole($actor, $old)) {
+            if ($this->hasAclPermissionToSetRole($authUser, $old)) {
                 unset($oldRoles[$i]);
             }
         }
 
-        //check if the user is allowed for the requested roles
         foreach ($roles as $role) {
-            if (! $this->hasAclPermissionToSetRole($actor, $role)) {
+            if (! $this->hasAclPermissionToSetRole($authUser, $role)) {
                 throw new \ZfExtended_NoAccessException("Authenticated User is not allowed to modify role " . $role);
             }
         }
 
         // merge the requested roles and the old roles and apply the autoset roles to them
-        $roles = $this->acl->mergeAutoSetRoles($roles, $oldRoles);
+        $roles = array_merge(array_merge($roles, $oldRoles));
 
         $this->updateRoles($user, $roles);
     }
 
+    /**
+     * @param User $user
+     * @param string[] $roles
+     */
     public function updateRoles(User $user, array $roles): void
     {
+        $hasCoordinatorRole = in_array(Roles::JOB_COORDINATOR, $roles, true);
+
+        foreach ($roles as $role) {
+            $populatedRoles = $this->acl->getRightsToRolesAndResource([$role], AutoSetRoleResource::ID);
+
+            if (! $this->acl->isRole($role)) {
+                throw new \ZfExtended_BadRequestException("Role " . $role . " does not exist");
+            }
+        }
+
+        $roles = $this->acl->mergeAutoSetRoles($roles, $oldRoles);
+
+        $user->setRoles($roles);
+        $user->save();
+    }
+
+    /**
+     * @param string[] $roles
+     */
+    private function assertRolesDontConflict(array $roles): void
+    {
+        $hasCoordinatorRole = in_array(Roles::JOB_COORDINATOR, $roles, true);
+
+        if (! $hasCoordinatorRole) {
+            return;
+        }
+
+        $restrictedForJcRoles = [Roles::ADMIN, Roles::PM, Roles::SYSTEMADMIN, Roles::CLIENTPM];
+        $conflictingRoles = array_intersect($roles, $restrictedForJcRoles);
+
+        if (! empty($conflictingRoles)) {
+            throw new \ZfExtended_BadRequestException("Job Coordinator role can not be combined with " . implode(", ", $conflictingRoles));
+        }
+
+        foreach ($roles as $role) {
+            $populatedRoles = $this->acl->getRightsToRolesAndResource([$role], AutoSetRoleResource::ID);
+
+            if (array_intersect($restrictedForJcRoles, $populatedRoles)) {
+                throw new \ZfExtended_BadRequestException("Role " . $role . " does not exist");
+            }
+        }
     }
 
     private function hasAclPermissionToSetRole(User $authUser, string $role)
