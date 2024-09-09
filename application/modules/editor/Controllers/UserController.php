@@ -30,6 +30,7 @@ use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
@@ -106,11 +107,11 @@ class Editor_UserController extends ZfExtended_UserController
                 continue;
             }
 
-            $notEditableUser = (int)$row['id'] !== (int)$authUser->getId()
+            $notEditableUser = (int) $row['id'] !== (int) $authUser->getId()
                 && $row['editable'] === '1'
-                && !empty($row['roles'])
+                && ! empty($row['roles'])
                 && $row['roles'] !== ','
-                && !empty(array_diff(explode(',', $row['roles']), $editableRoles));
+                && ! empty(array_diff(explode(',', $row['roles']), $editableRoles));
 
             if ($notEditableUser) {
                 $rows[$key]['editable'] = '0';
@@ -145,7 +146,7 @@ class Editor_UserController extends ZfExtended_UserController
             $this->decodePutData();
 
             $this->updateCustomers($authUser);
-        } catch (UserIsNotEditableException) {
+        } catch (FeasibilityExceptionInterface) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1628' => 'Tried to manipulate a not editable user.',
             ]);
@@ -156,6 +157,25 @@ class Editor_UserController extends ZfExtended_UserController
                     'Versucht, einen nicht bearbeitbaren Benutzer zu manipulieren.',
                 ],
                 [
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            );
+        } catch (NotAccessibleLspUserException $e) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1627' => 'Job coordinator can not delete this user.',
+            ]);
+
+            throw ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1627',
+                [
+                    'Der Jobkoordinator kann diesen Benutzer nicht löschen.',
+                ],
+                [
+                    'coordinator' => $e->lspUser->guid,
+                    'lsp' => $e->lspUser->lsp->getName(),
+                    'lspId' => $e->lspUser->lsp->getId(),
                     'user' => $this->entity->getUserGuid(),
                     'userLogin' => $this->entity->getLogin(),
                     'userEmail' => $this->entity->getEmail(),
@@ -224,9 +244,9 @@ class Editor_UserController extends ZfExtended_UserController
                     'Der Jobkoordinator kann diesen Benutzer nicht löschen.',
                 ],
                 [
-                    'coordinator' => $e->coordinator->guid,
-                    'lsp' => $e->coordinator->lsp->getName(),
-                    'lspId' => $e->coordinator->lsp->getId(),
+                    'coordinator' => $e->lspUser->guid,
+                    'lsp' => $e->lspUser->lsp->getName(),
+                    'lspId' => $e->lspUser->lsp->getId(),
                     'user' => $this->entity->getUserGuid(),
                     'userLogin' => $this->entity->getLogin(),
                     'userEmail' => $this->entity->getEmail(),
@@ -258,7 +278,7 @@ class Editor_UserController extends ZfExtended_UserController
     /**
      * @param ZfExtended_Models_User|null $authUser
      * @return void
-     * @throws \MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface
+     * @throws FeasibilityExceptionInterface
      */
     private function updateCustomers(?ZfExtended_Models_User $authUser): void
     {

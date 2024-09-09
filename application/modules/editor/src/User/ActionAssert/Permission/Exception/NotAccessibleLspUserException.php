@@ -30,6 +30,13 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Exception;
 
+use MittagQI\Translate5\LSP\LspUser;
+
 final class NotAccessibleLspUserException extends \Exception implements PermissionExceptionInterface
 {
+    public function __construct(
+        public readonly LspUser $lspUser
+    ) {
+        parent::__construct();
+    }
 }

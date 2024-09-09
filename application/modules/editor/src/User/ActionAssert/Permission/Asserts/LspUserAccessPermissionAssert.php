@@ -75,13 +75,13 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
                 return;
             }
 
-            throw new NotAccessibleLspUserException();
+            throw new NotAccessibleLspUserException($lspUser);
         }
 
         $managerCoordinator = $this->lspUserService->findCoordinatorBy($manager);
 
         if (null === $managerCoordinator) {
-            throw new NotAccessibleLspUserException();
+            throw new NotAccessibleLspUserException($lspUser);
         }
 
         if ($managerCoordinator->isCoordinatorOf($lspUser->lsp)) {
@@ -91,14 +91,14 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
         try {
             $subjectCoordinator = JobCoordinator::fromLspUser($lspUser);
         } catch (CantCreateCoordinatorFromUserException) {
-            throw new NotAccessibleLspUserException();
+            throw new NotAccessibleLspUserException($lspUser);
         }
 
         if ($subjectCoordinator->lsp->isSubLspOf($managerCoordinator->lsp)) {
             return;
         }
 
-        throw new NotAccessibleLspUserException();
+        throw new NotAccessibleLspUserException($lspUser);
     }
 
     private function isGrantedForPm(LspUser $lspUser): bool
