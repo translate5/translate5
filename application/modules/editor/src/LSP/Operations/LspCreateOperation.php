@@ -28,40 +28,42 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Service;
+namespace MittagQI\Translate5\LSP\Operations;
 
-use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\DTO\CreateUserDto;
-use ZfExtended_Models_User as User;
-use ZfExtended_Utils;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\LspRepository;
 
-final class UserCreateService
+class LspCreateOperation
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
+        private readonly LspRepositoryInterface $lspRepository,
     ) {
     }
 
     public static function create(): self
     {
         return new self(
-            new UserRepository(),
+            LspRepository::create(),
         );
     }
 
-    public function createUser(CreateUserDto $dto): User
-    {
-        $user = $this->userRepository->getEmptyModel();
-        $user->setUserGuid(ZfExtended_Utils::guid(true));
-        $user->setLogin($dto->login);
-        $user->setEmail($dto->email);
-        $user->setFirstName($dto->firstName);
-        $user->setSurName($dto->surName);
-        $user->setGender($dto->gender);
-        $user->setCustomers(',,');
+    public function createLsp(
+        string $name,
+        ?string $description,
+        ?JobCoordinator $authCoordinator
+    ): LanguageServiceProvider {
+        $lsp = $this->lspRepository->getEmptyModel();
+        $lsp->setName($name);
+        $lsp->setDescription($description);
 
-        $this->userRepository->save($user);
+        if (null !== $authCoordinator) {
+            $lsp->setParentId((int) $authCoordinator->lsp->getId());
+        }
 
-        return $user;
+        $this->lspRepository->save($lsp);
+
+        return $lsp;
     }
 }

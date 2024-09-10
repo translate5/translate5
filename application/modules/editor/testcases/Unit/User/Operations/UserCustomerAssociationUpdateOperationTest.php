@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\User\Service;
+namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use InvalidArgumentException;
 use MittagQI\Translate5\Repository\CustomerRepository;
@@ -36,12 +36,12 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
-use MittagQI\Translate5\User\Service\UserCustomerAssociationUpdateService;
+use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User as User;
 
-class UserCustomerAssociationUpdateServiceTest extends TestCase
+class UserCustomerAssociationUpdateOperationTest extends TestCase
 {
     public function testThrowsFeasibilityExceptionWhenActionNotAllowed(): void
     {
@@ -59,7 +59,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->with(Action::UPDATE, $user)
             ->willThrowException($exception);
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,
@@ -93,7 +93,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->with(Action::UPDATE, $user)
             ->willThrowException($exception);
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,
@@ -130,7 +130,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->method('assertCustomersAreSubsetForUser')
             ->willThrowException($exception);
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,
@@ -167,7 +167,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->method('assertCustomersMayBeAssociatedWithUser')
             ->willThrowException($exception);
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,
@@ -204,7 +204,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->method('assertCustomersMayBeAssociatedWithUser')
             ->willThrowException($exception);
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,
@@ -239,7 +239,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->expects(self::once())
             ->method('assertCustomersMayBeAssociatedWithUser');
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,
@@ -281,7 +281,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->expects(self::once())
             ->method('assertCustomersMayBeAssociatedWithUser');
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,
@@ -323,7 +323,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->expects(self::once())
             ->method('assertCustomersMayBeAssociatedWithUser');
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,
@@ -370,7 +370,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->expects(self::once())
             ->method('assertCustomersAreSubsetForUser');
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,
@@ -417,7 +417,7 @@ class UserCustomerAssociationUpdateServiceTest extends TestCase
             ->expects(self::once())
             ->method('assertCustomersAreSubsetForUser');
 
-        $updateService = new UserCustomerAssociationUpdateService(
+        $updateService = new UserCustomerAssociationUpdateOperation(
             $associationValidator,
             $userRepository,
             $feasibilityChecker,

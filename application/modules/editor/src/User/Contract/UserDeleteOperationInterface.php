@@ -28,42 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Service;
+namespace MittagQI\Translate5\User\Contract;
 
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use ZfExtended_Models_User as User;
 
-class LspCreateService
+interface UserDeleteOperationInterface
 {
-    public function __construct(
-        private readonly LspRepositoryInterface $lspRepository,
-    ) {
-    }
+    /**
+     * @throws FeasibilityExceptionInterface
+     */
+    public function delete(User $user): void;
 
-    public static function create(): self
-    {
-        return new self(
-            LspRepository::create(),
-        );
-    }
-
-    public function createLsp(
-        string $name,
-        ?string $description,
-        ?JobCoordinator $authCoordinator
-    ): LanguageServiceProvider {
-        $lsp = $this->lspRepository->getEmptyModel();
-        $lsp->setName($name);
-        $lsp->setDescription($description);
-
-        if (null !== $authCoordinator) {
-            $lsp->setParentId((int) $authCoordinator->lsp->getId());
-        }
-
-        $this->lspRepository->save($lsp);
-
-        return $lsp;
-    }
+    public function forceDelete(User $user): void;
 }

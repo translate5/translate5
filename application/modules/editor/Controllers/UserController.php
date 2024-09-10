@@ -49,10 +49,10 @@ use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
-use MittagQI\Translate5\User\Service\UserCreateService;
-use MittagQI\Translate5\User\Service\UserCustomerAssociationUpdateService;
-use MittagQI\Translate5\User\Service\UserDeleteService;
-use MittagQI\Translate5\User\Service\UserRolesUpdateService;
+use MittagQI\Translate5\User\Operations\UserCreateOperation;
+use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
+use MittagQI\Translate5\User\Operations\UserDeleteOperation;
+use MittagQI\Translate5\User\Operations\UserRolesUpdateOperation;
 
 class Editor_UserController extends ZfExtended_UserController
 {
@@ -240,7 +240,7 @@ class Editor_UserController extends ZfExtended_UserController
                 )
             );
 
-            UserDeleteService::create()->delete($this->entity);
+            UserDeleteOperation::create()->delete($this->entity);
         } catch (PmInTaskException $e) {
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1048',
@@ -307,7 +307,7 @@ class Editor_UserController extends ZfExtended_UserController
         try {
             $this->decodePutData();
 
-            $this->entity = UserCreateService::create()->createUser(
+            $this->entity = UserCreateOperation::create()->createUser(
                 CreateUserDto::fromArray((array) $this->data)
             );
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
@@ -355,7 +355,7 @@ class Editor_UserController extends ZfExtended_UserController
         );
 
         try {
-            UserCustomerAssociationUpdateService::create()->updateAssociatedCustomersBy(
+            UserCustomerAssociationUpdateOperation::create()->updateAssociatedCustomersBy(
                 $this->entity,
                 $sentCustomerIds,
                 $authUser
@@ -403,7 +403,7 @@ class Editor_UserController extends ZfExtended_UserController
         $roles = explode(',', trim($this->data->roles, ','));
 
         try {
-            UserRolesUpdateService::create()->updateRolesBy($this->entity, $roles, $authUser);
+            UserRolesUpdateOperation::create()->updateRolesBy($this->entity, $roles, $authUser);
         } catch (RolesetHasConflictingRolesException $e) {
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1630',

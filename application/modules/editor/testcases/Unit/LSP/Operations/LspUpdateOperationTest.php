@@ -31,11 +31,11 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\LSP\Service;
 
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Service\LspUpdateService;
+use MittagQI\Translate5\LSP\Operations\LspUpdateOperation;
 use MittagQI\Translate5\Repository\LspRepository;
 use PHPUnit\Framework\TestCase;
 
-class LspUpdateServiceTest extends TestCase
+class LspUpdateOperationTest extends TestCase
 {
     public function testUpdateInfoFields(): void
     {
@@ -71,7 +71,7 @@ class LspUpdateServiceTest extends TestCase
                 )
             );
 
-        $service = new LspUpdateService(
+        $service = new LspUpdateOperation(
             $lspRepository,
         );
 

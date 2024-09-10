@@ -33,14 +33,14 @@ namespace MittagQI\Translate5\Test\Unit\LSP\Service;
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
-use MittagQI\Translate5\LSP\Service\LspDeleteService;
+use MittagQI\Translate5\LSP\Operations\LspDeleteOperation;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
-use MittagQI\Translate5\User\Contract\UserDeleteServiceInterface;
+use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class LspDeleteServiceTest extends TestCase
+class LspDeleteOperationTest extends TestCase
 {
     public function testDeleteLsp(): void
     {
@@ -54,7 +54,7 @@ class LspDeleteServiceTest extends TestCase
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $subLsp = $this->createMock(LanguageServiceProvider::class);
 
-        $userDeleteService = new class() implements UserDeleteServiceInterface {
+        $userDeleteService = new class() implements UserDeleteOperationInterface {
             public array $deletedUsers = [];
 
             public function delete(ZfExtended_Models_User $user): void
@@ -150,7 +150,7 @@ class LspDeleteServiceTest extends TestCase
             }
         };
 
-        $service = new LspDeleteService(
+        $service = new LspDeleteOperation(
             $lspRepository,
             $userDeleteService,
             $lspUserRepository,

@@ -28,17 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Service;
+namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
-use MittagQI\Translate5\User\Contract\UserDeleteServiceInterface;
+use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use ZfExtended_Models_User as User;
 
-final class UserDeleteService implements UserDeleteServiceInterface
+final class UserDeleteOperation implements UserDeleteOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,

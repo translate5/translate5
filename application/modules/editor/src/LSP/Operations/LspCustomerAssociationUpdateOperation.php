@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Service;
+namespace MittagQI\Translate5\LSP\Operations;
 
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
@@ -45,7 +45,7 @@ use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use ZfExtended_Models_User as User;
 
-class LspCustomerAssociationUpdateService
+class LspCustomerAssociationUpdateOperation
 {
     public function __construct(
         private readonly LspRepository $lspRepository,

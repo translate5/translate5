@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Service;
+namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\Repository\CustomerRepository;
@@ -41,7 +41,7 @@ use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use ZfExtended_Models_User as User;
 
-class UserCustomerAssociationUpdateService
+class UserCustomerAssociationUpdateOperation
 {
     public function __construct(
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,

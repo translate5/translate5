@@ -28,16 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Service;
+namespace MittagQI\Translate5\LSP\Operations;
 
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
+use MittagQI\Translate5\User\Operations\UserDeleteOperation;
 
-class LspUpdateService
+class LspDeleteOperation
 {
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
+        private readonly UserDeleteOperationInterface $userDeleteService,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
     ) {
     }
 
@@ -47,14 +53,23 @@ class LspUpdateService
 
         return new self(
             $lspRepository,
+            UserDeleteOperation::create(),
+            new LspUserRepository(),
         );
     }
 
-    public function updateInfoFields(LanguageServiceProvider $lsp, string $name, ?string $description): void
+    public function deleteLsp(LanguageServiceProvider $lsp): void
     {
-        $lsp->setName($name);
-        $lsp->setDescription($description);
+        $usersOfLsp = $this->lspUserRepository->getUsers($lsp);
 
-        $this->lspRepository->save($lsp);
+        foreach ($usersOfLsp as $user) {
+            $this->userDeleteService->forceDelete($user);
+        }
+
+        foreach ($this->lspRepository->getSubLspList($lsp) as $subLsp) {
+            $this->deleteLsp($subLsp);
+        }
+
+        $this->lspRepository->delete($lsp);
     }
 }

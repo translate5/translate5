@@ -36,7 +36,7 @@ use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
-use MittagQI\Translate5\LSP\Service\LspCustomerAssociationUpdateService;
+use MittagQI\Translate5\LSP\Operations\LspCustomerAssociationUpdateOperation;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LspRepository;
@@ -46,7 +46,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use ZfExtended_Models_User as User;
 
-class LspCustomerAssociationUpdateServiceTest extends TestCase
+class LspCustomerAssociationUpdateOperationTest extends TestCase
 {
     public function testUpdateCustomersThrowsExceptionIfCustomerNotInParentLsp(): void
     {
@@ -68,7 +68,7 @@ class LspCustomerAssociationUpdateServiceTest extends TestCase
             ->method('assertCustomersAreSubsetForLSP')
             ->willThrowException(new CustomerDoesNotBelongToLspException(1, 1));
 
-        $service = new LspCustomerAssociationUpdateService(
+        $service = new LspCustomerAssociationUpdateOperation(
             $lspRepository,
             $userCustomerAssociationValidator,
             $lspCustomerAssociationValidator,
@@ -114,7 +114,7 @@ class LspCustomerAssociationUpdateServiceTest extends TestCase
 
         $eventDispatcher->expects(self::never())->method('dispatch');
 
-        $service = new LspCustomerAssociationUpdateService(
+        $service = new LspCustomerAssociationUpdateOperation(
             $lspRepository,
             $userCustomerAssociationValidator,
             $lspCustomerAssociationValidator,
@@ -172,7 +172,7 @@ class LspCustomerAssociationUpdateServiceTest extends TestCase
             ->with(self::isInstanceOf(CustomerUnassignedFromLspEvent::class))
         ;
 
-        $service = new LspCustomerAssociationUpdateService(
+        $service = new LspCustomerAssociationUpdateOperation(
             $lspRepository,
             $userCustomerAssociationValidator,
             $lspCustomerAssociationValidator,
@@ -217,7 +217,7 @@ class LspCustomerAssociationUpdateServiceTest extends TestCase
 
         $eventDispatcher->expects(self::never())->method('dispatch');
 
-        $service = new LspCustomerAssociationUpdateService(
+        $service = new LspCustomerAssociationUpdateOperation(
             $lspRepository,
             $userCustomerAssociationValidator,
             $lspCustomerAssociationValidator,
@@ -285,7 +285,7 @@ class LspCustomerAssociationUpdateServiceTest extends TestCase
             ->with(self::isInstanceOf(CustomerAssignedToLspEvent::class))
         ;
 
-        $service = new LspCustomerAssociationUpdateService(
+        $service = new LspCustomerAssociationUpdateOperation(
             $lspRepository,
             $userCustomerAssociationValidator,
             $lspCustomerAssociationValidator,
@@ -321,7 +321,7 @@ class LspCustomerAssociationUpdateServiceTest extends TestCase
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
-        $service = new LspCustomerAssociationUpdateService(
+        $service = new LspCustomerAssociationUpdateOperation(
             $lspRepository,
             $userCustomerAssociationValidator,
             $lspCustomerAssociationValidator,

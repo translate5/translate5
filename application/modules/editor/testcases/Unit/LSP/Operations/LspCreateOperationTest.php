@@ -32,12 +32,12 @@ namespace MittagQI\Translate5\Test\Unit\LSP\Service;
 
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Service\LspCreateService;
+use MittagQI\Translate5\LSP\Operations\LspCreateOperation;
 use MittagQI\Translate5\Repository\LspRepository;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class LspCreateServiceTest extends TestCase
+class LspCreateOperationTest extends TestCase
 {
     public function coordinatorProvider(): array
     {
@@ -83,7 +83,7 @@ class LspCreateServiceTest extends TestCase
         $lspRepository->method('getEmptyModel')->willReturn($mock);
         $lspRepository->expects(self::once())->method('save');
 
-        $service = new LspCreateService(
+        $service = new LspCreateOperation(
             $lspRepository,
         );
 

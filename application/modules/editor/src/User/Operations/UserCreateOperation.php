@@ -28,17 +28,40 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Contract;
+namespace MittagQI\Translate5\User\Operations;
 
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\DTO\CreateUserDto;
 use ZfExtended_Models_User as User;
+use ZfExtended_Utils;
 
-interface UserDeleteServiceInterface
+final class UserCreateOperation
 {
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function delete(User $user): void;
+    public function __construct(
+        private readonly UserRepository $userRepository,
+    ) {
+    }
 
-    public function forceDelete(User $user): void;
+    public static function create(): self
+    {
+        return new self(
+            new UserRepository(),
+        );
+    }
+
+    public function createUser(CreateUserDto $dto): User
+    {
+        $user = $this->userRepository->getEmptyModel();
+        $user->setUserGuid(ZfExtended_Utils::guid(true));
+        $user->setLogin($dto->login);
+        $user->setEmail($dto->email);
+        $user->setFirstName($dto->firstName);
+        $user->setSurName($dto->surName);
+        $user->setGender($dto->gender);
+        $user->setCustomers(',,');
+
+        $this->userRepository->save($user);
+
+        return $user;
+    }
 }

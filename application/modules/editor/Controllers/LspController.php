@@ -37,10 +37,10 @@ use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Service\LspCreateService;
-use MittagQI\Translate5\LSP\Service\LspCustomerAssociationUpdateService;
-use MittagQI\Translate5\LSP\Service\LspDeleteService;
-use MittagQI\Translate5\LSP\Service\LspUpdateService;
+use MittagQI\Translate5\LSP\Operations\LspCreateOperation;
+use MittagQI\Translate5\LSP\Operations\LspCustomerAssociationUpdateOperation;
+use MittagQI\Translate5\LSP\Operations\LspDeleteOperation;
+use MittagQI\Translate5\LSP\Operations\LspUpdateOperation;
 use MittagQI\Translate5\LSP\ViewDataProvider;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
@@ -64,12 +64,12 @@ class editor_LspController extends ZfExtended_RestController
 
     private LspActionPermissionAssertInterface $permissionAssert;
 
-    private LspCustomerAssociationUpdateService $lspCustomerAssocUpdateService;
+    private LspCustomerAssociationUpdateOperation $lspCustomerAssocUpdateService;
 
     public function init()
     {
         parent::init();
-        $this->lspCustomerAssocUpdateService = LspCustomerAssociationUpdateService::create();
+        $this->lspCustomerAssocUpdateService = LspCustomerAssociationUpdateOperation::create();
         $this->coordinatorRepository = JobCoordinatorRepository::create();
         $this->permissionAssert = LspActionPermissionAssert::create($this->coordinatorRepository);
         $this->viewDataProvider = ViewDataProvider::create(
@@ -126,7 +126,7 @@ class editor_LspController extends ZfExtended_RestController
         $user = ZfExtended_Authentication::getInstance()->getUser();
         $coordinator = $this->coordinatorRepository->findByUser($user);
 
-        $lsp = LspCreateService::create()->createLsp(
+        $lsp = LspCreateOperation::create()->createLsp(
             $this->data['name'],
             $this->data['description'] ?? null,
             $coordinator,
@@ -158,7 +158,7 @@ class editor_LspController extends ZfExtended_RestController
             'E2003' => 'Wrong value',
         ], 'editor.lsp');
 
-        LspUpdateService::create($lspRepository)->updateInfoFields(
+        LspUpdateOperation::create($lspRepository)->updateInfoFields(
             $lsp,
             $this->data['name'],
                 $this->data['description'] ?? null
@@ -184,7 +184,7 @@ class editor_LspController extends ZfExtended_RestController
             throw new ZfExtended_NoAccessException();
         }
 
-        LspDeleteService::create($lspRepository)->deleteLsp($lsp);
+        LspDeleteOperation::create($lspRepository)->deleteLsp($lsp);
     }
 
     private function runWithExceptionHandlerWrapping(callable $update): void

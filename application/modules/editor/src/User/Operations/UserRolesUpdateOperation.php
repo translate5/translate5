@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Service;
+namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
@@ -44,7 +44,7 @@ use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Models_User as User;
 
-final class UserRolesUpdateService
+final class UserRolesUpdateOperation
 {
     public function __construct(
         private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,

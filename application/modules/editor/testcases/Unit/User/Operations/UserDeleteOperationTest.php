@@ -28,17 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\User\Service;
+namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
-use MittagQI\Translate5\User\Service\UserDeleteService;
+use MittagQI\Translate5\User\Operations\UserDeleteOperation;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User as User;
 
-class UserDeleteServiceTest extends TestCase
+class UserDeleteOperationTest extends TestCase
 {
     public function deleteDataProvider(): array
     {
@@ -73,7 +73,7 @@ class UserDeleteServiceTest extends TestCase
             $this->expectException(FeasibilityExceptionInterface::class);
         }
 
-        $service = new UserDeleteService($userRepository, $feasibilityChecker);
+        $service = new UserDeleteOperation($userRepository, $feasibilityChecker);
         $service->delete($user);
     }
 }
