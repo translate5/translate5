@@ -28,143 +28,20 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\LSP;
+namespace MittagQI\Translate5\Test\Unit\LSP\Service;
 
 use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\LspService;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
+use MittagQI\Translate5\LSP\Service\LspDeleteService;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Contract\UserDeleteServiceInterface;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User;
 
-class LspServiceTest extends TestCase
+class LspDeleteServiceTest extends TestCase
 {
-    public function coordinatorProvider(): array
-    {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $lsp = $this->createMock(LanguageServiceProvider::class);
-        $lsp->method('__call')->willReturn(1);
-        $coordinator = new JobCoordinator('guid', $user, $lsp);
-
-        return [
-            [null],
-            [$coordinator],
-        ];
-    }
-
-    /**
-     * @dataProvider coordinatorProvider
-     */
-    public function testCreateLsp(?JobCoordinator $coordinator): void
-    {
-        $lspRepository = $this->createMock(LspRepository::class);
-        $userDeleteService = $this->createMock(UserDeleteServiceInterface::class);
-        $lspUserRepository = $this->createMock(LspUserRepository::class);
-
-        $mock = new class() extends LanguageServiceProvider {
-            public function __construct()
-            {
-            }
-
-            public function setDescription(string $description): void
-            {
-                TestCase::assertSame('description', $description);
-            }
-
-            public function setName(string $name): void
-            {
-                TestCase::assertSame('name', $name);
-            }
-
-            public function setParentId(int $parentId): void
-            {
-                TestCase::assertSame(1, $parentId);
-            }
-        };
-
-        $lspRepository->method('getEmptyModel')->willReturn($mock);
-        $lspRepository->expects(self::once())->method('save');
-
-        $service = new LspService(
-            $lspRepository,
-            $userDeleteService,
-            $lspUserRepository,
-        );
-
-        $lsp = $service->createLsp('name', 'description', $coordinator);
-
-        self::assertInstanceOf(LanguageServiceProvider::class, $lsp);
-    }
-
-    public function testUpdateInfoFields(): void
-    {
-        $lspRepository = $this->createMock(LspRepository::class);
-        $userDeleteService = $this->createMock(UserDeleteServiceInterface::class);
-        $lspUserRepository = $this->createMock(LspUserRepository::class);
-
-        $lsp = new class() extends LanguageServiceProvider {
-            public string $name = '';
-
-            public string $description = '';
-
-            public function __construct()
-            {
-            }
-
-            public function setDescription(string $description): void
-            {
-                $this->description = $description;
-            }
-
-            public function setName(string $name): void
-            {
-                $this->name = $name;
-            }
-        };
-
-        $lspRepository->expects(self::once())
-            ->method('save')
-            ->with(
-                $this->callback(
-                    fn (LanguageServiceProvider $lspToSave) => $lsp === $lspToSave
-                        && $lspToSave->name === 'name'
-                        && $lspToSave->description === 'description'
-                )
-            );
-
-        $service = new LspService(
-            $lspRepository,
-            $userDeleteService,
-            $lspUserRepository,
-        );
-
-        $service->updateInfoFields($lsp, 'name', 'description');
-    }
-
-    public function testGetLsp(): void
-    {
-        $lspRepository = $this->createMock(LspRepository::class);
-        $userDeleteService = $this->createMock(UserDeleteServiceInterface::class);
-        $lspUserRepository = $this->createMock(LspUserRepository::class);
-
-        $lsp = $this->createMock(LanguageServiceProvider::class);
-
-        $lspRepository->method('get')->willReturn($lsp);
-
-        $service = new LspService(
-            $lspRepository,
-            $userDeleteService,
-            $lspUserRepository,
-        );
-
-        self::assertSame($lsp, $service->getLsp(1));
-    }
-
     public function testDeleteLsp(): void
     {
         $lspUserRepository = $this->createMock(LspUserRepository::class);
@@ -273,7 +150,7 @@ class LspServiceTest extends TestCase
             }
         };
 
-        $service = new LspService(
+        $service = new LspDeleteService(
             $lspRepository,
             $userDeleteService,
             $lspUserRepository,

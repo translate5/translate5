@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP;
+namespace MittagQI\Translate5\LSP\Service;
 
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
@@ -38,7 +38,7 @@ use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Contract\UserDeleteServiceInterface;
 use MittagQI\Translate5\User\Service\UserDeleteService;
 
-class LspService
+class LspDeleteService
 {
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
@@ -47,43 +47,15 @@ class LspService
     ) {
     }
 
-    public static function create(): self
+    public static function create(?LspRepository $lspRepository = null): self
     {
-        $lspRepository = LspRepository::create();
+        $lspRepository = $lspRepository ?? LspRepository::create();
 
         return new self(
             $lspRepository,
             UserDeleteService::create(),
             new LspUserRepository(),
         );
-    }
-
-    public function getLsp(int $id): LanguageServiceProvider
-    {
-        return $this->lspRepository->get($id);
-    }
-
-    public function createLsp(string $name, ?string $description, ?JobCoordinator $coordinator): LanguageServiceProvider
-    {
-        $lsp = $this->lspRepository->getEmptyModel();
-        $lsp->setName($name);
-        $lsp->setDescription($description);
-
-        if (null !== $coordinator) {
-            $lsp->setParentId((int) $coordinator->lsp->getId());
-        }
-
-        $this->lspRepository->save($lsp);
-
-        return $lsp;
-    }
-
-    public function updateInfoFields(LanguageServiceProvider $lsp, string $name, ?string $description): void
-    {
-        $lsp->setName($name);
-        $lsp->setDescription($description);
-
-        $this->lspRepository->save($lsp);
     }
 
     public function deleteLsp(LanguageServiceProvider $lsp): void

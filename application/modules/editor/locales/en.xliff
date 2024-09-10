@@ -10097,6 +10097,14 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.</source>
                 <target>Attempts to manipulate a user who cannot be edited.</target>
             </trans-unit>
+            <trans-unit id='RWluIFdlY2hzZWwgZGVzIFNwcmFjaGRpZW5zdGxlaXN0ZXJzIGlzdCBuaWNodCB6dWzDpHNzaWcu'>
+                <source>Ein Wechsel des Sprachdienstleisters ist nicht zulässig.</source>
+                <target>A change of Language Service Provider is not permitted.</target>
+            </trans-unit>
+            <trans-unit id='U3ByYWNoZGllbnN0bGVpc3RlciBpc3QgZWluIFBmbGljaHRmZWxkIGbDvHIgZGllIFJvbGxlIGRlcyBKb2Jrb29yZGluYXRvcnMu'>
+                <source>Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.</source>
+                <target>Language Service Provider is a mandatory field for the Job Coordinator role.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

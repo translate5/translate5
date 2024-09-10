@@ -26,8 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
@@ -39,10 +44,12 @@ use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspU
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\DTO\CreateUserDto;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
+use MittagQI\Translate5\User\Service\UserCreateService;
 use MittagQI\Translate5\User\Service\UserCustomerAssociationUpdateService;
 use MittagQI\Translate5\User\Service\UserDeleteService;
 use MittagQI\Translate5\User\Service\UserRolesUpdateService;
@@ -154,6 +161,17 @@ class Editor_UserController extends ZfExtended_UserController
 
             $this->decodePutData();
 
+            if (! empty($this->data->lsp)) {
+                throw ZfExtended_UnprocessableEntity::createResponse(
+                    'E2003',
+                    [
+                        'lsp' => [
+                            'Ein Wechsel des Sprachdienstleisters ist nicht zulässig.',
+                        ],
+                    ],
+                );
+            }
+
             $this->updateCustomers($authUser);
             $this->updateRoles($authUser);
         } catch (FeasibilityExceptionInterface) {
@@ -185,7 +203,28 @@ class Editor_UserController extends ZfExtended_UserController
             );
         }
 
-        parent::putAction();
+        // old controller code. will be refactored one the time comes, hopefully
+        try {
+            $this->processClientReferenceVersion();
+            $this->setDataInEntity();
+            if ($this->validate()) {
+                $this->encryptPassword();
+                $this->entity->save();
+                $this->view->rows = $this->entity->getDataObject();
+            }
+
+            $this->handlePasswdMail();
+            $this->credentialCleanup();
+
+            if ($this->wasValid) {
+                $this->csvToArray();
+                $this->resetInvalidCounter();
+            }
+
+            $this->checkAndUpdateSession();
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+            $this->handleLoginDuplicates($e);
+        }
     }
 
     public function deleteAction(): void
@@ -196,7 +235,9 @@ class Editor_UserController extends ZfExtended_UserController
             $this->permissionAssert->assertGranted(
                 Action::DELETE,
                 $this->entity,
-                new PermissionAssertContext(ZfExtended_Authentication::getInstance()->getUser())
+                new PermissionAssertContext(
+                    ZfExtended_Authentication::getInstance()->getUser()
+                )
             );
 
             UserDeleteService::create()->delete($this->entity);
@@ -261,6 +302,46 @@ class Editor_UserController extends ZfExtended_UserController
         }
     }
 
+    public function postAction()
+    {
+        try {
+            $this->decodePutData();
+
+            $this->entity = UserCreateService::create()->createUser(
+                CreateUserDto::fromArray((array) $this->data)
+            );
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+            $this->handleLoginDuplicates($e);
+        }
+
+        $authUser = ZfExtended_Authentication::getInstance()->getUser();
+
+        $this->updateCustomers($authUser);
+        $this->updateRoles($authUser);
+        $this->assignLsp($authUser);
+
+        // make sure fields not processed by setDataInEntity
+        unset($this->data->firstName);
+        unset($this->data->surName);
+        unset($this->data->login);
+        unset($this->data->email);
+        unset($this->data->gender);
+
+        $this->setDataInEntity($this->postBlacklist);
+
+        if ($this->validate()) {
+            $this->encryptPassword();
+            $this->entity->save();
+            $this->view->rows = $this->entity->getDataObject();
+        }
+
+        $this->handlePasswdMail();
+        $this->credentialCleanup();
+        if ($this->wasValid) {
+            $this->csvToArray();
+        }
+    }
+
     /**
      * @throws FeasibilityExceptionInterface
      */
@@ -306,7 +387,7 @@ class Editor_UserController extends ZfExtended_UserController
             );
         }
 
-        // make sure customers not processed by parent class
+        // make sure customers not processed by setDataInEntity
         unset($this->data->customers);
     }
 
@@ -355,7 +436,61 @@ class Editor_UserController extends ZfExtended_UserController
             throw new ZfExtended_NoAccessException(previous: $e);
         }
 
-        // make sure roles not processed by parent class
+        // make sure roles not processed by setDataInEntity
         unset($this->data->roles);
+    }
+
+    private function assignLsp(ZfExtended_Models_User $authUser): void
+    {
+        $jobCoordinatorRepo = JobCoordinatorRepository::create();
+        $authCoordinator = $jobCoordinatorRepo->findByUser($authUser);
+        $userIsCoordinator = in_array(Roles::JOB_COORDINATOR, $this->entity->getRoles());
+
+        if (! $userIsCoordinator && ! $authCoordinator && empty($this->data->lsp)) {
+            return;
+        }
+
+        // for lsp users lsp is set automatically from the coordinator
+        if (! $userIsCoordinator && ! empty($this->data->lsp)) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'lsp' => [
+                        'Ein Wechsel des Sprachdienstleisters ist nicht zulässig.',
+                    ],
+                ],
+            );
+        }
+
+        // for coordinators lsp is mandatory
+        if ($userIsCoordinator && empty($this->data->lsp)) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'lsp' => [
+                        'Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.',
+                    ],
+                ],
+            );
+        }
+
+        $lsp = (int) $this->fetchLspForAssignment($authCoordinator);
+
+
+    }
+
+    private function fetchLspForAssignment(?JobCoordinator $authCoordinator): LanguageServiceProvider
+    {
+        $lspRepository = LspRepository::create();
+
+        if (! empty($this->data->lsp)) {
+            return $lspRepository->get((int) $this->data->lsp);
+        }
+
+        if ($authCoordinator) {
+            return $authCoordinator->lsp;
+        }
+
+        throw new \LogicException('Unexpected logic branch. Either lsp or coordinator must be set at this point.');
     }
 }

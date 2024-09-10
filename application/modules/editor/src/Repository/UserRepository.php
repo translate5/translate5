@@ -59,6 +59,11 @@ use ZfExtended_Models_User;
 
 class UserRepository
 {
+    public function getEmptyModel(): ZfExtended_Models_User
+    {
+        return ZfExtended_Factory::get(ZfExtended_Models_User::class);
+    }
+
     public function save(ZfExtended_Models_User $user): void
     {
         $user->save();
