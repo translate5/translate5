@@ -46,6 +46,9 @@ final class UserCreateOperation
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(

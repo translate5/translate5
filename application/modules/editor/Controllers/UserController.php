@@ -58,6 +58,7 @@ use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Operations\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
+use MittagQI\Translate5\User\Operations\UserInitParentIdsOperation;
 use MittagQI\Translate5\User\Operations\UserInitRolesOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateDataOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateParentIdsOperation;
@@ -376,7 +377,7 @@ class Editor_UserController extends ZfExtended_UserController
                 ),
             );
             $this->initRoles($authUser);
-            UserUpdateParentIdsOperation::create()->setParentIdsOnUserCreationBy(
+            UserInitParentIdsOperation::create()->initParentIdsBy(
                 $this->entity,
                 $this->data->parentIds ?? null,
                 $authUser,

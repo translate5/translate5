@@ -48,6 +48,9 @@ class LspRepository implements LspRepositoryInterface
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(Zend_Db_Table::getDefaultAdapter());

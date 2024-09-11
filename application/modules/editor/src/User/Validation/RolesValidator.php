@@ -40,10 +40,6 @@ use ZfExtended_Acl;
 
 class RolesValidator
 {
-    private array $_messageTemplates = [
-        'roles' => 'Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}',
-    ];
-
     /**
      * @var array<string, string[]>
      */

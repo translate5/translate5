@@ -32,12 +32,13 @@ namespace MittagQI\Translate5\Repository;
 use MittagQI\ZfExtended\Acl\Roles;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
 class UserRepository
 {
     /**
-     * @throws \ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function get(int $id): ZfExtended_Models_User
     {
@@ -48,7 +49,7 @@ class UserRepository
     }
 
     /**
-     * @throws \ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function getByGuid(string $guid): ZfExtended_Models_User
     {
@@ -56,6 +57,18 @@ class UserRepository
         $user->loadByGuid($guid);
 
         return $user;
+    }
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function resolveUser(string $identifier): ZfExtended_Models_User
+    {
+        if (is_numeric($identifier)) {
+            return $this->get((int) $identifier);
+        }
+
+        return $this->getByGuid($identifier);
     }
 
     public function getEmptyModel(): ZfExtended_Models_User

@@ -42,6 +42,9 @@ final class PmInTaskFeasibilityAssert implements FeasibilityAssertInterface
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(new TaskRepository());

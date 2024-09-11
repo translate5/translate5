@@ -42,6 +42,9 @@ class LspCustomerAssociationValidator
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(

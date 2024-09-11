@@ -50,6 +50,9 @@ final class UserActionPermissionAssert
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         $lspUserService = LspUserService::create();

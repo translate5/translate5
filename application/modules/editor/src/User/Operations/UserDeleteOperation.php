@@ -46,6 +46,9 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(

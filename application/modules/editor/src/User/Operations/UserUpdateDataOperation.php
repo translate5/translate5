@@ -50,6 +50,9 @@ final class UserUpdateDataOperation
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(
@@ -90,7 +93,7 @@ final class UserUpdateDataOperation
         }
 
         if (null !== $dto->locale) {
-            $user->setLogin($dto->locale);
+            $user->setLocale($dto->locale);
         }
 
         $user->validate();

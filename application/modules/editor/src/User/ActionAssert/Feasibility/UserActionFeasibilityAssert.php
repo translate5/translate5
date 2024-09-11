@@ -49,6 +49,9 @@ final class UserActionFeasibilityAssert implements UserActionFeasibilityAssertIn
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         $lspUserService = LspUserService::create();

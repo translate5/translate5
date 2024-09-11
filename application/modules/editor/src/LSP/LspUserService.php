@@ -43,6 +43,9 @@ class LspUserService
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         $lspRepository = LspRepository::create();

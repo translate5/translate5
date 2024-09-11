@@ -31,15 +31,11 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
-use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use Zend_Exception;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User as User;
+use ZfExtended_ValidateException;
 
 final class UserUpdatePasswordOperation
 {
@@ -49,6 +45,9 @@ final class UserUpdatePasswordOperation
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(
@@ -59,6 +58,7 @@ final class UserUpdatePasswordOperation
 
     /**
      * @throws Zend_Exception
+     * @throws ZfExtended_ValidateException
      */
     public function updatePassword(User $user, ?string $password): void
     {

@@ -54,6 +54,9 @@ class CustomerAssocService
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(

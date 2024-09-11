@@ -60,6 +60,9 @@ final class UserUpdateRolesOperation
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         $acl = ZfExtended_Acl::getInstance();
