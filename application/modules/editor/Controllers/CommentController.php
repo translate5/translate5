@@ -40,8 +40,6 @@ class Editor_CommentController extends ZfExtended_RestController
      */
     protected $entity;
 
-    protected array $_unprotectedActions = ['post', 'put'];
-
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException

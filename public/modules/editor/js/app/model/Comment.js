@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -37,28 +36,48 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Model
  */
 Ext.define('Editor.model.Comment', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'segmentId', type: 'int'},
-    {name: 'userName', type: 'string'},
-    {name: 'comment', type: 'string'},
-    {name: 'isEditable', type: 'boolean'},
-    {name: 'modified', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
-    {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'comment',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
-    },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'id', type: 'int'},
+        {name: 'segmentId', type: 'int'},
+        {name: 'userName', type: 'string'},
+        {name: 'comment', type: 'string'},
+        {name: 'isEditable', type: 'boolean'},
+        {name: 'modified', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+        {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
+    ],
+    idProperty: 'id',
+    proxy: {
+        type: 'rest',
+        url: Editor.data.restpath + 'comment',
+        reader: {
+            rootProperty: 'rows',
+            type: 'json',
+            transform: {
+                fn: function(data) {
+                    if (typeof data.rows[Symbol.iterator] === 'function') {
+                        for (const record of data.rows) {
+                            record.comment = Ext.String.htmlDecode(record.comment);
+                        }
+                    } else {
+                        data.rows.comment = Ext.String.htmlDecode(data.rows.comment);
+                    }
+
+                    return data;
+                }
+            }
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false,
+            transform: {
+                fn: function (data, request) {
+                    data.comment = Ext.String.htmlEncode(data.comment);
+
+                    return data;
+                }
+            }
+        }
     }
-  }
 });
