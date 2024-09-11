@@ -43,7 +43,9 @@ use ZfExtended_ValidateException;
 class UserInitParentIdsOperationTest extends TestCase
 {
     private ZfExtended_Acl|MockObject $acl;
+
     private UserRepository|MockObject $userRepository;
+
     private UserInitParentIdsOperation $operation;
 
     protected function setUp(): void

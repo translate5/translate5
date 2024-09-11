@@ -41,7 +41,9 @@ use ZfExtended_ValidateException;
 class UserUpdatePasswordOperationTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
+
     private ZfExtended_AuthenticationInterface|MockObject $authentication;
+
     private UserUpdatePasswordOperation $operation;
 
     protected function setUp(): void

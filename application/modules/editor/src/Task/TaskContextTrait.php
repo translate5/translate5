@@ -164,7 +164,6 @@ trait TaskContextTrait
     /**
      * Recalculate task progress and assign results into view
      *
-     * @param editor_Models_Task|null $task
      * @throws Current\Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws \ReflectionException
@@ -172,8 +171,8 @@ trait TaskContextTrait
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function appendTaskProgress(?editor_Models_Task $task = null) : void {
-
+    public function appendTaskProgress(?editor_Models_Task $task = null): void
+    {
         // Get taskProgress model instance
         $progressM = ZfExtended_Factory::get(\editor_Models_TaskProgress::class);
 

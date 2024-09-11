@@ -49,11 +49,15 @@ use ZfExtended_Models_User as User;
 class UserUpdateRolesOperationTest extends TestCase
 {
     private UserActionFeasibilityAssertInterface|MockObject $userActionFeasibilityChecker;
+
     private RolesValidator|MockObject $rolesValidator;
+
     private ZfExtended_Acl|MockObject $acl;
+
     private UserRepository|MockObject $userRepository;
 
     private LspUserRepositoryInterface|MockObject $lspUserRepository;
+
     private UserUpdateRolesOperation $operation;
 
     protected function setUp(): void

@@ -43,8 +43,11 @@ use ZfExtended_Models_User as User;
 class UserInitRolesOperationTest extends TestCase
 {
     private RolesValidator|MockObject $rolesValidator;
+
     private ZfExtended_Acl|MockObject $acl;
+
     private UserRepository|MockObject $userRepository;
+
     private UserInitRolesOperation $operation;
 
     protected function setUp(): void

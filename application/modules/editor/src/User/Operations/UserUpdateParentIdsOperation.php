@@ -84,7 +84,6 @@ final class UserUpdateParentIdsOperation
     }
 
     /**
-     * @param User $user
      * @param int[] $parentIds
      * @throws FeasibilityExceptionInterface
      * @throws Zend_Acl_Exception

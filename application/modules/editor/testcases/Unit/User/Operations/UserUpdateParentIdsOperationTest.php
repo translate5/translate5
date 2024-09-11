@@ -45,8 +45,11 @@ use ZfExtended_ValidateException;
 class UserUpdateParentIdsOperationTest extends TestCase
 {
     private UserActionFeasibilityAssertInterface|MockObject $userActionFeasibilityChecker;
+
     private ZfExtended_Acl|MockObject $acl;
+
     private UserRepository|MockObject $userRepository;
+
     private UserUpdateParentIdsOperation $operation;
 
     protected function setUp(): void

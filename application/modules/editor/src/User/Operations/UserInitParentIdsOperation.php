@@ -76,7 +76,6 @@ final class UserInitParentIdsOperation
     }
 
     /**
-     * @param User $user
      * @param int[] $parentIds
      * @throws Zend_Acl_Exception
      * @throws ZfExtended_ValidateException

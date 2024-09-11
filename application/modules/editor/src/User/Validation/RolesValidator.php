@@ -58,8 +58,6 @@ class RolesValidator
     }
 
     /**
-     * @param array $roles
-     * @return void
      * @throws ConflictingRolesExceptionInterface
      * @throws \Zend_Acl_Exception
      */
@@ -91,7 +89,7 @@ class RolesValidator
             foreach ($potentialConflictRoles as $potentialConflictRole) {
                 $conflictingRoles = array_intersect($this->conflictMap[$potentialConflictRole], $populatedRoles);
 
-                if (!empty($conflictingRoles)) {
+                if (! empty($conflictingRoles)) {
                     throw new RoleConflictWithRoleThatPopulatedToRolesetException(
                         $role,
                         $potentialConflictRole,

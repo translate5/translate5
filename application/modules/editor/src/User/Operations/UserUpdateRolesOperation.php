@@ -111,7 +111,6 @@ final class UserUpdateRolesOperation
     }
 
     /**
-     * @param User $user
      * @param string[] $roles
      * @throws FeasibilityExceptionInterface
      * @throws RolesetHasConflictingRolesException

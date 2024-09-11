@@ -47,7 +47,9 @@ use ZfExtended_ValidateException;
 class UserUpdateDataOperationTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
+
     private UserActionFeasibilityAssertInterface|MockObject $userActionFeasibilityChecker;
+
     private UserUpdateDataOperation $operation;
 
     protected function setUp(): void
@@ -242,7 +244,9 @@ class UserUpdateDataOperationTest extends TestCase
         $this->userRepository
             ->method('save')
             ->willThrowException(
-                new ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey('E0000', ['field' => 'login'])
+                new ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey('E0000', [
+                    'field' => 'login',
+                ])
             );
 
         $this->operation->update($user, $dto);
@@ -260,7 +264,9 @@ class UserUpdateDataOperationTest extends TestCase
         $this->userRepository
             ->method('save')
             ->willThrowException(
-                new ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey('E0000', ['field' => 'userGuid'])
+                new ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey('E0000', [
+                    'field' => 'userGuid',
+                ])
             );
 
         $this->operation->update($user, $dto);

@@ -83,7 +83,7 @@ final class UserInitRolesOperation
         }
 
         foreach ($roles as $role) {
-            if (!$this->hasAclPermissionToSetRole($authUser, $role)) {
+            if (! $this->hasAclPermissionToSetRole($authUser, $role)) {
                 throw new UserIsNotAuthorisedToAssignRoleException($role);
             }
         }
@@ -92,7 +92,6 @@ final class UserInitRolesOperation
     }
 
     /**
-     * @param User $user
      * @param string[] $roles
      * @throws ConflictingRolesExceptionInterface
      * @throws Zend_Acl_Exception

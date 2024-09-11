@@ -91,8 +91,6 @@ final class UserCreateOperation
             throw $e;
         }
 
-
-
         return $user;
     }
 }
