@@ -59,6 +59,28 @@ use ZfExtended_Models_User;
 
 class UserRepository
 {
+    /**
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     */
+    public function get(int $id): ZfExtended_Models_User
+    {
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $user->load($id);
+
+        return $user;
+    }
+
+    /**
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getByGuid(string $guid): ZfExtended_Models_User
+    {
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $user->loadByGuid($guid);
+
+        return $user;
+    }
+
     public function getEmptyModel(): ZfExtended_Models_User
     {
         return ZfExtended_Factory::get(ZfExtended_Models_User::class);

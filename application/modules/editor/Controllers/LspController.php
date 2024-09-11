@@ -64,12 +64,12 @@ class editor_LspController extends ZfExtended_RestController
 
     private LspActionPermissionAssertInterface $permissionAssert;
 
-    private LspCustomerAssociationUpdateOperation $lspCustomerAssocUpdateService;
+    private LspCustomerAssociationUpdateOperation $lspCustomerAssociationUpdateOperation;
 
     public function init()
     {
         parent::init();
-        $this->lspCustomerAssocUpdateService = LspCustomerAssociationUpdateOperation::create();
+        $this->lspCustomerAssociationUpdateOperation = LspCustomerAssociationUpdateOperation::create();
         $this->coordinatorRepository = JobCoordinatorRepository::create();
         $this->permissionAssert = LspActionPermissionAssert::create($this->coordinatorRepository);
         $this->viewDataProvider = ViewDataProvider::create(
@@ -133,7 +133,7 @@ class editor_LspController extends ZfExtended_RestController
         );
 
         $this->runWithExceptionHandlerWrapping(
-            fn () => $this->lspCustomerAssocUpdateService->updateCustomersBy($lsp, $this->data['customerIds'], $user)
+            fn () => $this->lspCustomerAssociationUpdateOperation->updateCustomersBy($lsp, $this->data['customerIds'], $user)
         );
 
         $this->view->rows = (object) $this->viewDataProvider->buildViewData($user, $lsp);
@@ -165,7 +165,11 @@ class editor_LspController extends ZfExtended_RestController
         );
 
         $this->runWithExceptionHandlerWrapping(
-            fn () => $this->lspCustomerAssocUpdateService->updateCustomersBy($lsp, $this->data['customerIds'], $authUser)
+            fn () => $this->lspCustomerAssociationUpdateOperation->updateCustomersBy(
+                $lsp,
+                $this->data['customerIds'],
+                $authUser
+            )
         );
 
         $this->view->rows = (object) $this->viewDataProvider->buildViewData($authUser, $lsp);

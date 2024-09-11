@@ -34,6 +34,7 @@ use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
@@ -49,10 +50,13 @@ use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
+use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Operations\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
-use MittagQI\Translate5\User\Operations\UserRolesUpdateOperation;
+use MittagQI\Translate5\User\Operations\UserUpdateParentIdsOperation;
+use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
+use MittagQI\Translate5\User\Operations\UserUpdateRolesOperation;
 
 class Editor_UserController extends ZfExtended_UserController
 {
@@ -62,34 +66,66 @@ class Editor_UserController extends ZfExtended_UserController
 
     public function init(): void
     {
+        $this->_filterTypeMap = [
+            'customers' => [
+                'list' => 'listCommaSeparated',
+                'string' => new ZfExtended_Models_Filter_JoinHard(
+                    'editor_Models_Db_Customer',
+                    'name',
+                    'id',
+                    'customers',
+                    'listCommaSeparated'
+                ),
+            ],
+        ];
+
         parent::init();
         $this->permissionAssert = UserActionPermissionAssert::create();
 
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1420' => 'Old password is required',
+            'E1421' => 'Old password does not match',
+            'E2003' => 'Wrong value',
+            'E1630' => 'You can not set role {role} with one of the following roles: {roles}',
+        ]);
+
         ZfExtended_Models_Entity_Conflict::addCodes([
             'E2002' => 'No object of type "{0}" was found by key "{1}"',
-            'E2003' => 'Wrong value',
             'E1048' => 'The user can not be deleted, he is PM in one or more tasks.',
             'E1626' => 'The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".',
             'E1627' => 'Attempts to manipulate not accessible user.',
             'E1628' => 'Tried to manipulate a not editable user.',
-            'E1630' => 'You can not set role {role} with one of the following roles: {roles}',
         ], 'editor.user');
     }
 
     public function getAction()
     {
-        parent::getAction();
+        $userRepo = new UserRepository();
+
+        $user = $userRepo->get($this->getParam('id'));
+
+        if ($user->getLogin() == ZfExtended_Models_User::SYSTEM_LOGIN) {
+            $e = new ZfExtended_Models_Entity_NotFoundException();
+            $e->setMessage("System Benutzer wurde versucht zu erreichen", true);
+
+            throw $e;
+        }
+
+        $this->view->rows = $user->getDataObject();
 
         $this->permissionAssert->assertGranted(
             Action::READ,
-            $this->entity,
+            $user,
             new PermissionAssertContext(ZfExtended_Authentication::getInstance()->getUser())
         );
 
         $lspUserRepo = new LspUserRepository();
 
         // @phpstan-ignore-next-line
-        $this->view->rows->lsp = $lspUserRepo->findByUser($this->entity)?->lsp->getId();
+        $this->view->rows->lsp = $lspUserRepo->findByUser($user)?->lsp->getId();
+
+        $this->csvToArray();
+        $this->credentialCleanup();
     }
 
     public function indexAction()
@@ -174,6 +210,14 @@ class Editor_UserController extends ZfExtended_UserController
 
             $this->updateCustomers($authUser);
             $this->updateRoles($authUser);
+
+            if (! empty($this->data->parentIds)) {
+                UserUpdateParentIdsOperation::create()->updateParentIdsBy(
+                    $this->entity,
+                    $this->data->parentIds,
+                    $authUser,
+                );
+            }
         } catch (FeasibilityExceptionInterface) {
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1628',
@@ -308,7 +352,10 @@ class Editor_UserController extends ZfExtended_UserController
             $this->decodePutData();
 
             $this->entity = UserCreateOperation::create()->createUser(
-                CreateUserDto::fromArray((array) $this->data)
+                CreateUserDto::fromRequestData(
+                    ZfExtended_Utils::guid(true),
+                    (array) $this->data
+                ),
             );
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
             $this->handleLoginDuplicates($e);
@@ -319,6 +366,11 @@ class Editor_UserController extends ZfExtended_UserController
         $this->updateCustomers($authUser);
         $this->updateRoles($authUser);
         $this->assignLsp($authUser);
+        UserUpdateParentIdsOperation::create()->setParentIdsOnUserCreationBy(
+            $this->entity,
+            $this->data->parentIds ?? null,
+            $authUser,
+        );
 
         // make sure fields not processed by setDataInEntity
         unset($this->data->firstName);
@@ -326,6 +378,7 @@ class Editor_UserController extends ZfExtended_UserController
         unset($this->data->login);
         unset($this->data->email);
         unset($this->data->gender);
+        unset($this->data->parentIds);
 
         $this->setDataInEntity($this->postBlacklist);
 
@@ -340,6 +393,72 @@ class Editor_UserController extends ZfExtended_UserController
         if ($this->wasValid) {
             $this->csvToArray();
         }
+    }
+
+    /**
+     * encapsulate a separate REST sub request for authenticated users only.
+     * A authenticated user is allowed to get and change (PUT) himself, nothing more, nothing less.
+     * @throws ZfExtended_BadMethodCallException
+     */
+    public function authenticatedAction()
+    {
+        if ($this->_request->getActionName() !== 'put') {
+            throw new ZfExtended_BadMethodCallException();
+        }
+
+        $oldpwd = trim($this->getParam('oldpasswd'));
+
+        if (empty($oldpwd)) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1420', [
+                'oldpasswd' => 'Old password is required',
+            ]);
+        }
+
+        $auth = ZfExtended_Authentication::getInstance();
+
+        if (! $auth->authenticate($auth->getLogin(), $oldpwd)) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1421', [
+                'oldpasswd' => 'Old password does not match',
+            ]);
+        }
+
+        $this->decodePutData();
+
+        if (! isset($this->data->passwd)) {
+            return;
+        }
+
+        $updateUserPassOperation = UserUpdatePasswordOperation::create();
+
+        if (! empty($this->data->passwd)) {
+            $updateUserPassOperation->updatePassword($auth->getUser(), $this->data->passwd);
+
+            return;
+        }
+
+        $updateUserPassOperation->updatePassword($auth->getUser(), null);
+
+        ResetPasswordEmail::create()->sendTo($auth->getUser());
+    }
+
+    /**
+     * Loads a list of all users with role 'pm'. If 'pmRoles' is set,
+     * all users with roles listed in 'pmRoles' will be loaded
+     */
+    public function pmAction()
+    {
+        //check if the user is allowed to see all users
+        if ($this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
+            $parentId = -1;
+        } else {
+            $parentId = ZfExtended_Authentication::getInstance()->getUserId();
+        }
+        $pmRoles = explode(',', $this->getParam('pmRoles', ''));
+        $pmRoles[] = 'pm';
+        $pmRoles = array_unique(array_filter($pmRoles));
+        $this->view->rows = $this->entity->loadAllByRole($pmRoles, $parentId);
+        $this->view->total = $this->entity->getTotalByRole($pmRoles, $parentId);
+        $this->csvToArray();
     }
 
     /**
@@ -361,7 +480,7 @@ class Editor_UserController extends ZfExtended_UserController
                 $authUser
             );
         } catch (InexistentCustomerException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
+            throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E2002',
                 [
                     'customers' => [
@@ -403,7 +522,7 @@ class Editor_UserController extends ZfExtended_UserController
         $roles = explode(',', trim($this->data->roles, ','));
 
         try {
-            UserRolesUpdateOperation::create()->updateRolesBy($this->entity, $roles, $authUser);
+            UserUpdateRolesOperation::create()->updateRolesBy($this->entity, $roles, $authUser);
         } catch (RolesetHasConflictingRolesException $e) {
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1630',
@@ -492,5 +611,62 @@ class Editor_UserController extends ZfExtended_UserController
         }
 
         throw new \LogicException('Unexpected logic branch. Either lsp or coordinator must be set at this point.');
+    }
+
+    /**
+     * converts the source and target comma separated language ids to array.
+     * Frontend/api use array, in the database we save comma separated values.
+     */
+    private function csvToArray(): void
+    {
+        $callback = function ($row) {
+            if ($row !== null && $row !== "") {
+                $row = trim($row, ', ');
+                $row = explode(',', $row);
+            }
+
+            return $row;
+        };
+
+        //if the row is an array, loop over its elements, and explode the source/target language
+        if (is_array($this->view->rows)) {
+            foreach ($this->view->rows as &$singleRow) {
+                $singleRow['parentIds'] = $callback($singleRow['parentIds']);
+            }
+
+            return;
+        }
+
+        $this->view->rows->parentIds = $callback($this->view->rows->parentIds);
+    }
+
+    /**
+     * remove password hashes and openid subject from output
+     */
+    protected function credentialCleanup(): void
+    {
+        if (is_object($this->view->rows)) {
+            if (property_exists($this->view->rows, 'passwd')) {
+                unset($this->view->rows->passwd);
+            }
+            if (property_exists($this->view->rows, 'openIdSubject')) {
+                unset($this->view->rows->openIdSubject);
+            }
+            if (property_exists($this->view->rows, 'openIdIssuer')) {
+                unset($this->view->rows->openIdIssuer);
+            }
+        }
+
+        if (is_array($this->view->rows)) {
+            if (isset($this->view->rows['passwd'])) {
+                unset($this->view->rows['passwd']);
+            }
+            if (isset($this->view->rows['openIdSubject'])) {
+                unset($this->view->rows['openIdSubject']);
+            }
+            if (isset($this->view->rows['openIdIssuer'])) {
+                unset($this->view->rows['openIdIssuer']);
+            }
+        }
     }
 }

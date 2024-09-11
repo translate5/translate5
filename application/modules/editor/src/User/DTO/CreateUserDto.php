@@ -32,23 +32,47 @@ namespace MittagQI\Translate5\User\DTO;
 
 class CreateUserDto
 {
+    /**
+     * @param string[] $roles
+     * @param int[] $customers
+     */
     public function __construct(
+        public readonly string $guid,
         public readonly string $login,
         public readonly string $email,
         public readonly string $firstName,
         public readonly string $surName,
         public readonly string $gender,
+        public readonly array $roles = [],
+        public readonly array $customers = [],
+        public readonly ?string $password = null,
+        public readonly ?string $parentId = null,
+        public readonly ?string $locale = null,
     ) {
     }
 
-    public static function fromArray(array $data): self
+    public static function fromRequestData(string $guid, array $data): self
     {
+        $roles = explode(',', trim($data['roles'], ','));
+        $customers = array_filter(
+            array_map(
+                'intval',
+                explode(',', trim($data['customers'], ','))
+            )
+        );
+
         return new self(
+            $guid,
             $data['login'],
             $data['email'],
             $data['firstName'],
             $data['surName'],
             $data['gender'],
+            $roles,
+            $customers,
+            isset($data['passwd']) ? trim($data['passwd']) : null,
+            $data['parentIds'] ?? null,
+            $data['locale'] ?? null,
         );
     }
 }

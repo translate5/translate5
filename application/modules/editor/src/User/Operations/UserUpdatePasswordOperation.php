@@ -28,48 +28,43 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Operations;
+namespace MittagQI\Translate5\User\Operations;
 
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
-use MittagQI\Translate5\User\Operations\UserDeleteOperation;
+use ZfExtended_Authentication;
+use ZfExtended_AuthenticationInterface;
+use ZfExtended_Models_User as User;
 
-class LspDeleteOperation
+final class UserUpdatePasswordOperation
 {
     public function __construct(
-        private readonly LspRepositoryInterface $lspRepository,
-        private readonly UserDeleteOperationInterface $userDeleteOperation,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly UserRepository $userRepository,
+        private readonly ZfExtended_AuthenticationInterface $authentication,
     ) {
     }
 
-    public static function create(?LspRepository $lspRepository = null): self
+    public static function create(): self
     {
-        $lspRepository = $lspRepository ?? LspRepository::create();
-
         return new self(
-            $lspRepository,
-            UserDeleteOperation::create(),
-            new LspUserRepository(),
+            new UserRepository(),
+            ZfExtended_Authentication::getInstance(),
         );
     }
 
-    public function deleteLsp(LanguageServiceProvider $lsp): void
+    /**
+     * @throws \Zend_Exception
+     */
+    public function updatePassword(User $user, ?string $password): void
     {
-        $usersOfLsp = $this->lspUserRepository->getUsers($lsp);
+        $password = empty($password) ? null : $this->authentication->createSecurePassword($password);
 
-        foreach ($usersOfLsp as $user) {
-            $this->userDeleteOperation->forceDelete($user);
-        }
+        $user->setPasswd($password);
 
-        foreach ($this->lspRepository->getSubLspList($lsp) as $subLsp) {
-            $this->deleteLsp($subLsp);
-        }
-
-        $this->lspRepository->delete($lsp);
+        $this->userRepository->save($user);
     }
 }

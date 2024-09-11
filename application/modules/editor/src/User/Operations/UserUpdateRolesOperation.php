@@ -44,7 +44,7 @@ use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Models_User as User;
 
-final class UserRolesUpdateOperation
+final class UserUpdateRolesOperation
 {
     public function __construct(
         private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
