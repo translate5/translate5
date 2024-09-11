@@ -99,8 +99,8 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 				'{title} <br/>',
 				'<table class="languageresource-meta-data">',
 				'<tpl for="metaData">',
-				'<tr><th>{[xt.String.htmlEncode(Ext.String.htmlEncode(values.name))]}</th>',
-                '<td>{[Ext.String.htmlEncode(xt.String.htmlEncode(values.value))]}</td>',
+                '<tr><th>{[Ext.String.htmlEncode(values.name)]}</th>',
+                '<td>{[Ext.String.htmlEncode(values.value)]}</td>',
                 '</tr>',
 				'</tpl>',
 				'</table>',
@@ -140,13 +140,13 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 					  tooltip = '<div style="' + style + '" class="' + className + '"></div>' + tooltip + '<br/><br/>';
 				  }
 
-				  meta.tdAttr = 'data-qtip="'+attrTpl.applyTemplate({
+				  meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(attrTpl.applyTemplate({
 					  title: tooltip + me.strings.atributeTooltipMsg,
 					  metaData: record.get('metaData'),
 					  ctrl: me.strings.ctrl,
 					  idx: (meta.rowIndex + 1),
 					  takeMsg: me.strings.tooltipMsg
-				  })+'"';
+				  }))+'"';
 				  meta.tdCls  = meta.tdCls  + ' info-icon-shown';
 
 				  return meta.rowIndex + 1 + (
@@ -164,8 +164,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          cellWrap: true,
 			  tdCls: 'x-selectable segment-tag-column source '+segField.getDirectionCls('source'),
 	          dataIndex: 'source',
-	          text: me.strings.source,
-              renderer: v => Ext.String.htmlEncode(v)
+	          text: me.strings.source
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 5,
@@ -175,8 +174,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          cellWrap: true,
 			  tdCls: 'x-selectable segment-tag-column target '+segField.getDirectionCls('target'),
 	          dataIndex: 'target',
-	          text: me.strings.target,
-              renderer: v => Ext.String.htmlEncode(v)
+	          text: me.strings.target
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 3,

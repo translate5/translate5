@@ -447,6 +447,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     {
         $data = $this->getSearchData($searchDTO, $searchPosition, $numResults);
         $http = $this->getHttpWithMemory('POST', $tmName, '/search');
+        $http->setConfig([
+            'timeout' => $this->createTimeout(300),
+        ]);
         $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
