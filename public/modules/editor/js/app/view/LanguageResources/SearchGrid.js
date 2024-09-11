@@ -118,7 +118,6 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
                     text: me.strings.source,
                     name: 'source',
                     renderer: function (value) {
-                        value = Ext.String.htmlEncode(value);
                         if (me.controller.lastActiveField.id !== 'sourceSearch') {
                             return value;
                         }
@@ -137,7 +136,6 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
                     text: me.strings.target,
                     name: 'target',
                     renderer: function (value) {
-                        value = Ext.String.htmlEncode(value);
                         if (me.controller.lastActiveField.id !== 'targetSearch') {
                             return value;
                         }
