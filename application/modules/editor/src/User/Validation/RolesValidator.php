@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Validation;
 
 use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
@@ -63,8 +64,7 @@ class RolesValidator
     /**
      * @param array $roles
      * @return void
-     * @throws RolesetHasConflictingRolesException
-     * @throws RoleConflictWithRoleThatPopulatedToRolesetException
+     * @throws ConflictingRolesExceptionInterface
      * @throws \Zend_Acl_Exception
      */
     public function assertRolesDontConflict(array $roles): void

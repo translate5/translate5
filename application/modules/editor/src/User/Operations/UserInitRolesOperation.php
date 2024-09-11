@@ -30,17 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
-use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Validation\RolesValidator;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource;
@@ -49,14 +42,16 @@ use ZfExtended_Acl;
 use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
-final class UserUpdateRolesOperation
+/**
+ * Ment to be used to initialize roles for a user.
+ * So only on User creation or in special cases where the roles need to be reinitialized.
+ */
+final class UserInitRolesOperation
 {
     public function __construct(
-        private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
         private readonly RolesValidator $rolesValidator,
         private readonly ZfExtended_Acl $acl,
         private readonly UserRepository $userRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
     ) {
     }
 
@@ -65,68 +60,43 @@ final class UserUpdateRolesOperation
         $acl = ZfExtended_Acl::getInstance();
 
         return new self(
-            UserActionFeasibilityAssert::create(),
             new RolesValidator($acl),
             $acl,
             new UserRepository(),
-            new LspUserRepository(),
         );
     }
 
     /**
      * @param string[] $roles
-     * @throws FeasibilityExceptionInterface
      * @throws RolesetHasConflictingRolesException
      * @throws RoleConflictWithRoleThatPopulatedToRolesetException
      * @throws UserIsNotAuthorisedToAssignRoleException
      * @throws Zend_Acl_Exception
      */
-    public function updateRolesBy(User $user, array $roles, User $authUser): void
+    public function initUserRolesBy(User $user, array $roles, User $authUser): void
     {
         if (empty($roles)) {
             return;
         }
 
-        $oldRoles = $user->getRoles();
-
-        // leave roles for wich the user is not allowed to setaclrole (not allowed to unset them as well)
-        foreach ($oldRoles as $i => $old) {
-            if ($this->hasAclPermissionToSetRole($authUser, $old)) {
-                unset($oldRoles[$i]);
-            }
-        }
-
         foreach ($roles as $role) {
-            if (! $this->hasAclPermissionToSetRole($authUser, $role)) {
+            if (!$this->hasAclPermissionToSetRole($authUser, $role)) {
                 throw new UserIsNotAuthorisedToAssignRoleException($role);
             }
         }
 
-        $roles = array_unique(array_merge($roles, $oldRoles));
-
-        $this->updateRoles($user, $roles);
+        $this->initRoles($user, $roles);
     }
 
     /**
      * @param User $user
      * @param string[] $roles
-     * @throws FeasibilityExceptionInterface
-     * @throws RolesetHasConflictingRolesException
-     * @throws RoleConflictWithRoleThatPopulatedToRolesetException
-     * @throws UnableToAssignJobCoordinatorRoleToExistingUserException
+     * @throws ConflictingRolesExceptionInterface
      * @throws Zend_Acl_Exception
      * @throws ZfExtended_ValidateException
      */
-    public function updateRoles(User $user, array $roles): void
+    public function initRoles(User $user, array $roles): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
-
-        $lspUser = $this->lspUserRepository->findByUser($user);
-
-        if (in_array(Roles::JOB_COORDINATOR, $roles, true) && null === $lspUser) {
-            throw new UnableToAssignJobCoordinatorRoleToExistingUserException();
-        }
-
         $this->rolesValidator->assertRolesDontConflict($roles);
 
         $roles = $this->acl->mergeAutoSetRoles($roles, []);

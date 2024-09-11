@@ -52,11 +52,13 @@ use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
+use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Operations\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
+use MittagQI\Translate5\User\Operations\UserInitRolesOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateDataOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateParentIdsOperation;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
@@ -94,6 +96,7 @@ class Editor_UserController extends ZfExtended_UserController
             'E1630' => 'You can not set role {role} with one of the following roles: {roles}',
             'E1094' => 'User can not be saved: the chosen login does already exist.',
             'E1095' => 'User can not be saved: the chosen userGuid does already exist.',
+            'E1631' => 'Role "Job Coordinator" can be set only on User creation process or to LSP User',
         ]);
 
         ZfExtended_Models_Entity_Conflict::addCodes([
@@ -215,7 +218,10 @@ class Editor_UserController extends ZfExtended_UserController
                 );
             }
 
-            UserUpdateDataOperation::create()->update($this->entity, UpdateUserDto::fromRequestData((array) $this->data));
+            UserUpdateDataOperation::create()->update(
+                $this->entity,
+                UpdateUserDto::fromRequestData((array) $this->data),
+            );
             $this->updateCustomers($authUser);
             $this->updateRoles($authUser);
             $this->updatePassword($authUser);
@@ -274,26 +280,11 @@ class Editor_UserController extends ZfExtended_UserController
             $this->handleValidateException($e);
         }
 
-        // old controller code. will be refactored one the time comes, hopefully
-        try {
-            $this->processClientReferenceVersion();
-            $this->setDataInEntity();
-            if ($this->validate()) {
-                $this->entity->save();
-                $this->view->rows = $this->entity->getDataObject();
-            }
+        $this->view->rows = $this->entity->getDataObject();
 
-            $this->credentialCleanup();
-
-            if ($this->wasValid) {
-                $this->csvToArray();
-                $this->resetInvalidCounter();
-            }
-
-            $this->checkAndUpdateSession();
-        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-            $this->handleLoginDuplicates($e);
-        }
+        $this->credentialCleanup();
+        $this->csvToArray();
+        $this->checkAndUpdateSession();
     }
 
     public function deleteAction(): void
@@ -384,7 +375,7 @@ class Editor_UserController extends ZfExtended_UserController
                     (array) $this->data
                 ),
             );
-            $this->updateRoles($authUser);
+            $this->initRoles($authUser);
             UserUpdateParentIdsOperation::create()->setParentIdsOnUserCreationBy(
                 $this->entity,
                 $this->data->parentIds ?? null,
@@ -542,6 +533,24 @@ class Editor_UserController extends ZfExtended_UserController
     /**
      * @throws FeasibilityExceptionInterface
      */
+    private function initRoles(ZfExtended_Models_User $authUser): void
+    {
+        if (empty($this->data->roles)) {
+            return;
+        }
+
+        $roles = explode(',', trim($this->data->roles, ','));
+
+        try {
+            UserInitRolesOperation::create()->initUserRolesBy($this->entity, $roles, $authUser);
+        } catch (Exception $e) {
+            throw $this->transformRolesException($e);
+        }
+    }
+
+    /**
+     * @throws FeasibilityExceptionInterface
+     */
     private function updateRoles(ZfExtended_Models_User $authUser): void
     {
         if (empty($this->data->roles)) {
@@ -552,8 +561,18 @@ class Editor_UserController extends ZfExtended_UserController
 
         try {
             UserUpdateRolesOperation::create()->updateRolesBy($this->entity, $roles, $authUser);
-        } catch (RolesetHasConflictingRolesException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
+        } catch (Exception $e) {
+            throw $this->transformRolesException($e);
+        }
+
+        // make sure roles not processed by setDataInEntity
+        unset($this->data->roles);
+    }
+
+    private function transformRolesException(Exception $e): ZfExtended_ErrorCodeException|Exception
+    {
+        return match ($e::class) {
+            RolesetHasConflictingRolesException::class => ZfExtended_UnprocessableEntity::createResponse(
                 'E1630',
                 [
                     'roles' => [
@@ -564,9 +583,8 @@ class Editor_UserController extends ZfExtended_UserController
                     'role' => $e->role,
                     'roles' => join(', ', $e->conflictsWith),
                 ]
-            );
-        } catch (RoleConflictWithRoleThatPopulatedToRolesetException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
+            ),
+            RoleConflictWithRoleThatPopulatedToRolesetException::class => ZfExtended_UnprocessableEntity::createResponse(
                 'E1630',
                 [
                     'roles' => [
@@ -579,13 +597,19 @@ class Editor_UserController extends ZfExtended_UserController
                     'conflictsWith' => $e->conflictsWith,
                     'becauseOf' => $e->becauseOf,
                 ]
-            );
-        } catch (Zend_Acl_Exception|UserIsNotAuthorisedToAssignRoleException $e) {
-            throw new ZfExtended_NoAccessException(previous: $e);
-        }
-
-        // make sure roles not processed by setDataInEntity
-        unset($this->data->roles);
+            ),
+            Zend_Acl_Exception::class => new ZfExtended_NoAccessException(previous: $e),
+            UserIsNotAuthorisedToAssignRoleException::class => new ZfExtended_NoAccessException(previous: $e),
+            UnableToAssignJobCoordinatorRoleToExistingUserException::class => throw ZfExtended_UnprocessableEntity::createResponse(
+                'E1631',
+                [
+                    'roles' => [
+                        'Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung oder für LSP-Benutzer definiert werden.',
+                    ],
+                ],
+            ),
+            default => $e,
+        };
     }
 
     private function assignLsp(ZfExtended_Models_User $authUser): void

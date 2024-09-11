@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\LSP\Service;
+namespace MittagQI\Translate5\Test\Unit\LSP\Operations;
 
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Operations\LspUpdateOperation;

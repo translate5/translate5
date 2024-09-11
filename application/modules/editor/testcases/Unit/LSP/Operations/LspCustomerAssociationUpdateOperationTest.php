@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\LSP\Service;
+namespace MittagQI\Translate5\Test\Unit\LSP\Operations;
 
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;

@@ -30,17 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Exception;
 
-use InvalidArgumentException;
-
-class RolesetHasConflictingRolesException extends InvalidArgumentException implements ConflictingRolesExceptionInterface
+interface ConflictingRolesExceptionInterface extends \Throwable
 {
-    /**
-     * @param string[] $conflictsWith
-     */
-    public function __construct(
-        public readonly string $role,
-        public readonly array $conflictsWith
-    ) {
-        parent::__construct();
-    }
 }

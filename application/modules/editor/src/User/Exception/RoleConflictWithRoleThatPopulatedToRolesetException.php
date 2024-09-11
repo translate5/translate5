@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class RoleConflictWithRoleThatPopulatedToRolesetException extends InvalidArgumentException
+class RoleConflictWithRoleThatPopulatedToRolesetException extends InvalidArgumentException implements ConflictingRolesExceptionInterface
 {
     public function __construct(
         public readonly string $role,

@@ -34,7 +34,6 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_User as User;
 use ZfExtended_Utils;
@@ -88,6 +87,8 @@ final class UserCreateOperation
 
             throw $e;
         }
+
+
 
         return $user;
     }

@@ -9931,6 +9931,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.</source>
                 <target>Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.</target>
             </trans-unit>
+            <trans-unit id='RGllIFJvbGxlICJKb2ItS29vcmRpbmF0b3IiIGthbm4gbnVyIGJlaSBkZXIgQmVudXR6ZXJlcnN0ZWxsdW5nIG9kZXIgZsO8ciBMU1AtQmVudXR6ZXIgZGVmaW5pZXJ0IHdlcmRlbi4='>
+                <source>Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung oder für LSP-Benutzer definiert werden.</source>
+                <target>Role "Job Coordinator" can be set only on User creation process or to LSP User.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
