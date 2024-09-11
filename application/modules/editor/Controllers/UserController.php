@@ -670,7 +670,7 @@ class Editor_UserController extends ZfExtended_UserController
      * converts the source and target comma separated language ids to array.
      * Frontend/api use array, in the database we save comma separated values.
      */
-    private function csvToArray(): void
+    protected function csvToArray(): void
     {
         $callback = function ($row) {
             if ($row !== null && $row !== "") {
