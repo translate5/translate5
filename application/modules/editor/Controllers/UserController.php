@@ -46,7 +46,10 @@ use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExcepti
 use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
+use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
@@ -54,9 +57,11 @@ use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Operations\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
+use MittagQI\Translate5\User\Operations\UserUpdateDataOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateParentIdsOperation;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateRolesOperation;
+use MittagQI\ZfExtended\Acl\SystemResource;
 
 class Editor_UserController extends ZfExtended_UserController
 {
@@ -87,6 +92,8 @@ class Editor_UserController extends ZfExtended_UserController
             'E1421' => 'Old password does not match',
             'E2003' => 'Wrong value',
             'E1630' => 'You can not set role {role} with one of the following roles: {roles}',
+            'E1094' => 'User can not be saved: the chosen login does already exist.',
+            'E1095' => 'User can not be saved: the chosen userGuid does already exist.',
         ]);
 
         ZfExtended_Models_Entity_Conflict::addCodes([
@@ -208,8 +215,12 @@ class Editor_UserController extends ZfExtended_UserController
                 );
             }
 
+            UserUpdateDataOperation::create()->update($this->entity, UpdateUserDto::fromRequestData((array) $this->data));
             $this->updateCustomers($authUser);
             $this->updateRoles($authUser);
+            $this->updatePassword($authUser);
+
+            unset($this->data->passwd);
 
             if (! empty($this->data->parentIds)) {
                 UserUpdateParentIdsOperation::create()->updateParentIdsBy(
@@ -217,6 +228,8 @@ class Editor_UserController extends ZfExtended_UserController
                     $this->data->parentIds,
                     $authUser,
                 );
+
+                unset($this->data->parentIds);
             }
         } catch (FeasibilityExceptionInterface) {
             throw ZfExtended_Models_Entity_Conflict::createResponse(
@@ -245,6 +258,20 @@ class Editor_UserController extends ZfExtended_UserController
                     'userEmail' => $this->entity->getEmail(),
                 ]
             );
+        } catch (LoginAlreadyInUseException) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1094', [
+                'login' => [
+                    'duplicateLogin' => 'Dieser Anmeldename wird bereits verwendet.',
+                ],
+            ]);
+        } catch (GuidAlreadyInUseException) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1095', [
+                'login' => [
+                    'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
+                ],
+            ]);
+        } catch (ZfExtended_ValidateException $e) {
+            $this->handleValidateException($e);
         }
 
         // old controller code. will be refactored one the time comes, hopefully
@@ -252,12 +279,10 @@ class Editor_UserController extends ZfExtended_UserController
             $this->processClientReferenceVersion();
             $this->setDataInEntity();
             if ($this->validate()) {
-                $this->encryptPassword();
                 $this->entity->save();
                 $this->view->rows = $this->entity->getDataObject();
             }
 
-            $this->handlePasswdMail();
             $this->credentialCleanup();
 
             if ($this->wasValid) {
@@ -348,6 +373,8 @@ class Editor_UserController extends ZfExtended_UserController
 
     public function postAction()
     {
+        $authUser = ZfExtended_Authentication::getInstance()->getUser();
+
         try {
             $this->decodePutData();
 
@@ -357,20 +384,33 @@ class Editor_UserController extends ZfExtended_UserController
                     (array) $this->data
                 ),
             );
+            $this->updateRoles($authUser);
+            UserUpdateParentIdsOperation::create()->setParentIdsOnUserCreationBy(
+                $this->entity,
+                $this->data->parentIds ?? null,
+                $authUser,
+            );
+            $this->updatePassword($authUser);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
             $this->handleLoginDuplicates($e);
+        } catch (LoginAlreadyInUseException) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1094', [
+                'login' => [
+                    'duplicateLogin' => 'Dieser Anmeldename wird bereits verwendet.',
+                ],
+            ]);
+        } catch (GuidAlreadyInUseException) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1095', [
+                'login' => [
+                    'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
+                ],
+            ]);
+        } catch (ZfExtended_ValidateException $e) {
+            $this->handleValidateException($e);
         }
 
-        $authUser = ZfExtended_Authentication::getInstance()->getUser();
-
         $this->updateCustomers($authUser);
-        $this->updateRoles($authUser);
         $this->assignLsp($authUser);
-        UserUpdateParentIdsOperation::create()->setParentIdsOnUserCreationBy(
-            $this->entity,
-            $this->data->parentIds ?? null,
-            $authUser,
-        );
 
         // make sure fields not processed by setDataInEntity
         unset($this->data->firstName);
@@ -379,16 +419,15 @@ class Editor_UserController extends ZfExtended_UserController
         unset($this->data->email);
         unset($this->data->gender);
         unset($this->data->parentIds);
+        unset($this->data->passwd);
 
         $this->setDataInEntity($this->postBlacklist);
 
         if ($this->validate()) {
-            $this->encryptPassword();
             $this->entity->save();
             $this->view->rows = $this->entity->getDataObject();
         }
 
-        $this->handlePasswdMail();
         $this->credentialCleanup();
         if ($this->wasValid) {
             $this->csvToArray();
@@ -424,21 +463,11 @@ class Editor_UserController extends ZfExtended_UserController
 
         $this->decodePutData();
 
-        if (! isset($this->data->passwd)) {
-            return;
+        try {
+            $this->updatePassword($auth->getUser());
+        } catch (ZfExtended_ValidateException $e) {
+            $this->handleValidateException($e);
         }
-
-        $updateUserPassOperation = UserUpdatePasswordOperation::create();
-
-        if (! empty($this->data->passwd)) {
-            $updateUserPassOperation->updatePassword($auth->getUser(), $this->data->passwd);
-
-            return;
-        }
-
-        $updateUserPassOperation->updatePassword($auth->getUser(), null);
-
-        ResetPasswordEmail::create()->sendTo($auth->getUser());
     }
 
     /**
@@ -447,12 +476,12 @@ class Editor_UserController extends ZfExtended_UserController
      */
     public function pmAction()
     {
+        $parentId = ZfExtended_Authentication::getInstance()->getUserId();
         //check if the user is allowed to see all users
         if ($this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
             $parentId = -1;
-        } else {
-            $parentId = ZfExtended_Authentication::getInstance()->getUserId();
         }
+
         $pmRoles = explode(',', $this->getParam('pmRoles', ''));
         $pmRoles[] = 'pm';
         $pmRoles = array_unique(array_filter($pmRoles));
@@ -668,5 +697,27 @@ class Editor_UserController extends ZfExtended_UserController
                 unset($this->view->rows['openIdIssuer']);
             }
         }
+    }
+
+    /**
+     * @throws Zend_Exception
+     */
+    public function updatePassword(ZfExtended_Models_User $authUser): void
+    {
+        if (! isset($this->data->passwd)) {
+            return;
+        }
+
+        $updateUserPasswordOperation = UserUpdatePasswordOperation::create();
+
+        if (! empty($this->data->passwd)) {
+            $updateUserPasswordOperation->updatePassword($authUser, $this->data->passwd);
+
+            return;
+        }
+
+        $updateUserPasswordOperation->updatePassword($authUser, null);
+
+        ResetPasswordEmail::create()->sendTo($authUser);
     }
 }

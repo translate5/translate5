@@ -41,6 +41,7 @@ use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User as User;
+use ZfExtended_ValidateException;
 
 final class UserUpdateParentIdsOperation
 {
@@ -138,6 +139,7 @@ final class UserUpdateParentIdsOperation
      * @param int[] $parentIds
      * @throws FeasibilityExceptionInterface
      * @throws Zend_Acl_Exception
+     * @throws ZfExtended_ValidateException
      */
     private function updateParentIds(User $user, array $parentIds): void
     {
@@ -147,6 +149,8 @@ final class UserUpdateParentIdsOperation
         if (! empty($parentIds)) {
             $user->setParentIds(',' . implode(',', $parentIds) . ',');
         }
+
+        $user->validate();
 
         $this->userRepository->save($user);
     }

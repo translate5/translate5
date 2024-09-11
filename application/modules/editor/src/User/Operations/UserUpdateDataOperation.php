@@ -31,19 +31,22 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\DTO\CreateUserDto;
+use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_User as User;
-use ZfExtended_Utils;
 use ZfExtended_ValidateException;
 
-final class UserCreateOperation
+final class UserUpdateDataOperation
 {
     public function __construct(
         private readonly UserRepository $userRepository,
+        private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
     ) {
     }
 
@@ -51,25 +54,44 @@ final class UserCreateOperation
     {
         return new self(
             new UserRepository(),
+            UserActionFeasibilityAssert::create(),
         );
     }
 
     /**
+     * @throws FeasibilityExceptionInterface
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_ValidateException
      * @throws LoginAlreadyInUseException
      * @throws GuidAlreadyInUseException
      */
-    public function createUser(CreateUserDto $dto): User
+    public function update(User $user, UpdateUserDto $dto): void
     {
-        $user = $this->userRepository->getEmptyModel();
-        $user->setUserGuid(ZfExtended_Utils::guid(true));
-        $user->setLogin($dto->login);
-        $user->setEmail($dto->email);
-        $user->setFirstName($dto->firstName);
-        $user->setSurName($dto->surName);
-        $user->setGender($dto->gender);
-        $user->setCustomers(',,');
+        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
+
+        if (null !== $dto->email) {
+            $user->setEmail($dto->email);
+        }
+
+        if (null !== $dto->login) {
+            $user->setLogin($dto->login);
+        }
+
+        if (null !== $dto->firstName) {
+            $user->setFirstName($dto->firstName);
+        }
+
+        if (null !== $dto->surName) {
+            $user->setSurName($dto->surName);
+        }
+
+        if (null !== $dto->gender) {
+            $user->setGender($dto->gender);
+        }
+
+        if (null !== $dto->locale) {
+            $user->setLogin($dto->locale);
+        }
 
         $user->validate();
 
@@ -88,7 +110,5 @@ final class UserCreateOperation
 
             throw $e;
         }
-
-        return $user;
     }
 }

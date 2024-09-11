@@ -28,46 +28,29 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Operations;
+namespace MittagQI\Translate5\User\DTO;
 
-use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
-use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
-use Zend_Exception;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User as User;
-
-final class UserUpdatePasswordOperation
+class UpdateUserDto
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly ZfExtended_AuthenticationInterface $authentication,
+        public readonly ?string $login,
+        public readonly ?string $email,
+        public readonly ?string $firstName,
+        public readonly ?string $surName,
+        public readonly ?string $gender,
+        public readonly ?string $locale,
     ) {
     }
 
-    public static function create(): self
+    public static function fromRequestData(array $data): self
     {
         return new self(
-            new UserRepository(),
-            ZfExtended_Authentication::getInstance(),
+            $data['login'] ?? null,
+            $data['email'] ?? null,
+            $data['firstName'] ?? null,
+            $data['surName'] ?? null,
+            $data['gender'] ?? null,
+            $data['locale'] ?? null,
         );
-    }
-
-    /**
-     * @throws Zend_Exception
-     */
-    public function updatePassword(User $user, ?string $password): void
-    {
-        $password = empty($password) ? null : $this->authentication->createSecurePassword($password);
-
-        $user->setPasswd($password);
-
-        $user->validate();
-
-        $this->userRepository->save($user);
     }
 }

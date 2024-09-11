@@ -86,6 +86,11 @@ class UserRepository
         return ZfExtended_Factory::get(ZfExtended_Models_User::class);
     }
 
+    /**
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
     public function save(ZfExtended_Models_User $user): void
     {
         $user->save();

@@ -43,6 +43,7 @@ use MittagQI\ZfExtended\Acl\SetAclRoleResource;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Models_User as User;
+use ZfExtended_ValidateException;
 
 final class UserUpdateRolesOperation
 {
@@ -108,6 +109,7 @@ final class UserUpdateRolesOperation
      * @throws RolesetHasConflictingRolesException
      * @throws RoleConflictWithRoleThatPopulatedToRolesetException
      * @throws Zend_Acl_Exception
+     * @throws ZfExtended_ValidateException
      */
     public function updateRoles(User $user, array $roles): void
     {
@@ -118,6 +120,8 @@ final class UserUpdateRolesOperation
         $roles = $this->acl->mergeAutoSetRoles($roles, []);
 
         $user->setRoles($roles);
+
+        $user->validate();
 
         $this->userRepository->save($user);
     }
