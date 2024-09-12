@@ -141,6 +141,14 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
             }
         }
 
+        customersStore.clearFilter();
+        const parentLsp = Ext.getStore('admin.LspStore').getById(record.get('parentId'));
+
+        if (parentLsp) {
+            const allowedCustomerIds = parentLsp.get('customers').map((customer) => customer.id);
+            customersStore.filterBy((record) => allowedCustomerIds.includes(record.get('id')));
+        }
+
         const form = this.down('form');
         form.loadRecord(record);
         form.down('customers').setValue(customers);
