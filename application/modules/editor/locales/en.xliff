@@ -10109,6 +10109,18 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung oder für LSP-Benutzer definiert werden.</source>
                 <target>Role "Job Coordinator" can be set only on User creation process or to LSP User.</target>
             </trans-unit>
+            <trans-unit id='V29sbGVuIFNpZSBkZW4gTFNQIHdpcmtsaWNoIGzDtnNjaGVuICJ7MH0iPyBEaWVzZSBBa3Rpb24ga2FubiBuaWNodCByw7xja2fDpG5naWcgZ2VtYWNodCB3ZXJkZW4uIEJpdHRlIGJlYWNodGVuIFNpZSwgZGFzcyBtaXQgZGVtIEzDtnNjaGVuIGRlcyBMU1AgYXVjaCBzZWluZSBKb2ItS29vcmRpbmF0b3JlbiB1bmQgQmVudXR6ZXIgbWl0IGRlbiBpaG5lbiB6dWdld2llc2VuZW4gSm9icyBnZWzDtnNjaHQgd2VyZGVuLg=='>
+                <source>Wollen Sie den LSP wirklich löschen "{0}"? Diese Aktion kann nicht rückgängig gemacht werden. Bitte beachten Sie, dass mit dem Löschen des LSP auch seine Job-Koordinatoren und Benutzer mit den ihnen zugewiesenen Jobs gelöscht werden.</source>
+                <target>Do you really want to delete LSP "{0}"? This action can not be undone. Please note that deleting LSP will delete its job coordinators and users with their assigned jobs.</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgZ2ViZW4gU2llIGRlbiBMU1AtTmFtZW4gaW4gZGFzIFRleHRmZWxkIHVudGVuIGVpbiwgdW0gZm9ydHp1ZmFocmVuLg=='>
+                <source>Bitte geben Sie den LSP-Namen in das Textfeld unten ein, um fortzufahren.</source>
+                <target>Please type the LSP name in the text field below to proceed.</target>
+            </trans-unit>
+            <trans-unit id='RmFsc2NoZXIgTmFtZQ=='>
+                <source>Falscher Name</source>
+                <target>Wrong name</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -111,15 +111,27 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
             return;
         }
 
+        this._showDeletePrompt(record, null);
+    },
+
+    _showDeletePrompt: function (record, value) {
         const l10n = Editor.data.l10n.lsp;
-        const text = Ext.String.format(l10n.confirmDeleteText, record.get('name'));
+        const text = Ext.String.format(l10n.confirmDeleteText, record.get('name')) + "<br><br>" + l10n.enterLspName;
         const store = this.getView().down('gridpanel').getStore();
 
-        Ext.Msg.confirm(
+        Ext.Msg.prompt(
             l10n.confirmDeleteTitle,
             text,
-            (btn) => {
-                if (btn !== 'yes') {
+            (btn, value) => {
+                if (btn === 'cancel') {
+                    return;
+                }
+
+                if (record.get('name') !== value) {
+                    Editor.MessageBox.addWarning(l10n.confirmDeleteWrongName);
+
+                    this._showDeletePrompt(record, value);
+
                     return;
                 }
 
@@ -132,7 +144,10 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
                         store.remove(record);
                     }
                 });
-            }
+            },
+            this,
+            false,
+            value,
         );
-    },
+    }
 });
