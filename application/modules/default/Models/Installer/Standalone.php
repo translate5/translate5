@@ -478,6 +478,9 @@ class Models_Installer_Standalone
      */
     protected function autoActivatePlugins(): void
     {
+        if (! $this->isInstallation) {
+            return;
+        }
         $allowedPlugins = null;
         if ($this->options['auto-activate-only-public-plugins'] ?? false) {
             $allowedPlugins = [ZfExtended_Plugin_Abstract::TYPE_PUBLIC];
