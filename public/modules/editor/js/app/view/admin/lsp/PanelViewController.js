@@ -129,19 +129,25 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
 
                 if (record.get('name') !== value) {
                     Editor.MessageBox.addWarning(l10n.confirmDeleteWrongName);
-
                     this._showDeletePrompt(record, value);
 
                     return;
                 }
 
-                record.dropped = true;
-                record.save({
-                    failure: function () {
+                Ext.Ajax.request({
+                    url: '/editor/lsp/' + record.get('id'),
+                    method: 'DELETE',
+                    params: {data: JSON.stringify({
+                        id: record.get('id'),
+                        name: value,
+                    })},
+                    success: () => {
+                        Editor.MessageBox.addSuccess(Editor.data.l10n.general.entryHasBeenDeleted);
                         store.reload();
                     },
-                    success: function () {
-                        store.remove(record);
+                    failure: (response) => {
+                        Editor.app.getController('ServerException').handleException(response);
+                        store.reload();
                     }
                 });
             },

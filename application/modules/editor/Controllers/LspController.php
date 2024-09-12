@@ -182,6 +182,11 @@ class editor_LspController extends ZfExtended_RestController
         $lspRepository = LspRepository::create();
         $lsp = LspRepository::create()->get((int) $this->_getParam('id'));
 
+        $name = $this->getRequest()->getData(true)['name'] ?? null;
+        if (!$name || $name !== $lsp->getName()) {
+            throw new ZfExtended_NoAccessException($this->getTranslator()->_('Falscher Name'));
+        }
+
         try {
             $this->permissionAssert->assertGranted(Action::DELETE, $lsp, new PermissionAssertContext($authUser));
         } catch (PermissionExceptionInterface) {
@@ -237,5 +242,10 @@ class editor_LspController extends ZfExtended_RestController
                 ]
             );
         }
+    }
+
+    private function getTranslator(): ZfExtended_Zendoverwrites_Translate
+    {
+        return ZfExtended_Zendoverwrites_Translate::getInstance();
     }
 }

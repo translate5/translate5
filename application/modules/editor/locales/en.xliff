@@ -10109,9 +10109,9 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung oder für LSP-Benutzer definiert werden.</source>
                 <target>Role "Job Coordinator" can be set only on User creation process or to LSP User.</target>
             </trans-unit>
-            <trans-unit id='V29sbGVuIFNpZSBkZW4gTFNQIHdpcmtsaWNoIGzDtnNjaGVuICJ7MH0iPyBEaWVzZSBBa3Rpb24ga2FubiBuaWNodCByw7xja2fDpG5naWcgZ2VtYWNodCB3ZXJkZW4uIEJpdHRlIGJlYWNodGVuIFNpZSwgZGFzcyBtaXQgZGVtIEzDtnNjaGVuIGRlcyBMU1AgYXVjaCBzZWluZSBKb2ItS29vcmRpbmF0b3JlbiB1bmQgQmVudXR6ZXIgbWl0IGRlbiBpaG5lbiB6dWdld2llc2VuZW4gSm9icyBnZWzDtnNjaHQgd2VyZGVuLg=='>
-                <source>Wollen Sie den LSP wirklich löschen "{0}"? Diese Aktion kann nicht rückgängig gemacht werden. Bitte beachten Sie, dass mit dem Löschen des LSP auch seine Job-Koordinatoren und Benutzer mit den ihnen zugewiesenen Jobs gelöscht werden.</source>
-                <target>Do you really want to delete LSP "{0}"? This action can not be undone. Please note that deleting LSP will delete its job coordinators and users with their assigned jobs.</target>
+            <trans-unit id='V29sbGVuIFNpZSBkZW4gTFNQIHdpcmtsaWNoIGzDtnNjaGVuPyBEaWVzZSBBa3Rpb24ga2FubiBuaWNodCByw7xja2fDpG5naWcgZ2VtYWNodCB3ZXJkZW4uIEJpdHRlIGJlYWNodGVuIFNpZSwgZGFzcyBtaXQgZGVtIEzDtnNjaGVuIGRlcyBMU1AgYXVjaCBhbGxlIHVudGVyZ2VvcmRuZXRlbiBMU1BzIG1pdCBhbGxlbiB6dWdlaMO2cmlnZW4gSm9iLUtvb3JkaW5hdG9yZW4gdW5kIEJlbnV0emVybiBtaXQgZGVuIGlobmVuIHp1Z2V3aWVzZW5lbiBKb2JzIGdlbMO2c2NodCB3ZXJkZW4u'>
+                <source>Wollen Sie den LSP wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden. Bitte beachten Sie, dass mit dem Löschen des LSP auch alle untergeordneten LSPs mit allen zugehörigen Job-Koordinatoren und Benutzern mit den ihnen zugewiesenen Jobs gelöscht werden.</source>
+                <target>Do you really want to delete LSP "{0}"? This action can not be undone.<br /> Please note that deleting LSP will delete all sub LSPs with all theirs job coordinators and users with their assigned jobs.</target>
             </trans-unit>
             <trans-unit id='Qml0dGUgZ2ViZW4gU2llIGRlbiBMU1AtTmFtZW4gaW4gZGFzIFRleHRmZWxkIHVudGVuIGVpbiwgdW0gZm9ydHp1ZmFocmVuLg=='>
                 <source>Bitte geben Sie den LSP-Namen in das Textfeld unten ein, um fortzufahren.</source>
@@ -10120,6 +10120,10 @@ Synchronization always takes place in one direction: source data -> target
             <trans-unit id='RmFsc2NoZXIgTmFtZQ=='>
                 <source>Falscher Name</source>
                 <target>Wrong name</target>
+            </trans-unit>
+            <trans-unit id='RmFsc2NoZXIgTmFtZQ=='>
+                <source>Der {0} wurde erfolgreich gelöscht.</source>
+                <target>Der {0} wurde erfolgreich gelöscht.</target>
             </trans-unit>
         </body>
     </file>
