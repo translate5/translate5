@@ -78,6 +78,10 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
                             xtype: 'customers',
                             name: 'customerIds',
                             dataIndex: 'customers',
+                            store: {
+                                xtype: 'store',
+                                data: [] // Initially empty, will be set dynamically
+                            },
                             bind:{
                                 fieldLabel: '{l10n.general.clients}',
                             },
@@ -130,27 +134,29 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
     ],
 
     loadRecord: function (record) {
-        const customers = [];
+        const form = this.down('form');
         const customersStore = Ext.getStore('customersStore');
+
+        form.loadRecord(record);
+
+        const parentLsp = Ext.getStore('admin.LspStore').getById(record.get('parentId'));
+        let allowedCustomers = customersStore.getData().items;
+
+        if (parentLsp) {
+            allowedCustomers = parentLsp.get('customers').map((customer) => customersStore.getById(customer.id));
+        }
+
+        const customersSet = [];
 
         for (const customerData of record.get('customers')) {
             const customer = customersStore.getById(customerData.id);
 
             if (customer) {
-                customers.push(customer);
+                customersSet.push(customer);
             }
         }
 
-        customersStore.clearFilter();
-        const parentLsp = Ext.getStore('admin.LspStore').getById(record.get('parentId'));
-
-        if (parentLsp) {
-            const allowedCustomerIds = parentLsp.get('customers').map((customer) => customer.id);
-            customersStore.filterBy((record) => allowedCustomerIds.includes(record.get('id')));
-        }
-
-        const form = this.down('form');
-        form.loadRecord(record);
-        form.down('customers').setValue(customers);
+        form.down('customers').getStore().setData(allowedCustomers);
+        form.down('customers').setValue(customersSet);
     },
 });
