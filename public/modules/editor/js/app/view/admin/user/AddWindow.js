@@ -479,7 +479,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             const lspField = form.down('#lsp');
             lspField.setHidden(false);
             lspField.allowBlank = false;
-            lspField.setDisabled(false);
+            lspField.setDisabled(! form.getRecord().phantom);
             lspField.forceSelection = true;
 
             roles = roles.filter(role => ! role.includes('pm') && ! role.includes('admin') && 'api' !== role);
@@ -569,27 +569,25 @@ Ext.define('Editor.view.admin.user.AddWindow', {
 
         this.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
 
-        if (!! record.get('lsp')) {
-            const lspField = form.down('#lsp');
-            lspField.setHidden(false);
-            lspField.setDisabled(! userIsJobCoordinator);
+        const lspField = form.down('#lsp');
+        const lspStore = lspField.getStore();
 
-            const lspStore = lspField.getStore();
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'lsp',
+            method: 'GET',
+            success: response => {
+                const data = Ext.decode(response.responseText);
+                lspStore.loadData(data.rows);
 
-            Ext.Ajax.request({
-                url: Editor.data.restpath + 'lsp',
-                method: 'GET',
-                success: response => {
-                    const data = Ext.decode(response.responseText);
-                    lspStore.loadData(data.rows);
+                const lsp = lspStore.getById(record.get('lsp'));
+                lspField.setValue(lsp);
+                lspField.setHidden(! lsp);
 
-                    const lsp = lspStore.getById(record.get('lsp'));
-                    lspField.setValue(lsp);
-
+                if (!! lsp) {
                     this.updateCustomerField(form, lsp.get('customers'));
                 }
-            });
-        }
+            }
+        });
 
         if (form.isDisabled() && record.get('openIdIssuer') !== '') {
             form.add({
