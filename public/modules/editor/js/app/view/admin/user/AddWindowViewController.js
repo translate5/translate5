@@ -76,9 +76,23 @@ Ext.define('Editor.view.admin.user.AddWindowViewController', {
                 errorHandler.handleFormFailure(basic, rec, op);
 
                 const response = Ext.decode(op.error.response.responseText);
-                for (const error of response.errorsTranslated) {
-                    if (basic.findField(error.id).hidden) {
-                        Editor.MessageBox.addWarning(error.msg);
+                if (typeof response.errorsTranslated[Symbol.iterator] === 'function') {
+                    for (const error of response.errorsTranslated) {
+                        if (basic.findField(error.id).hidden) {
+                            Editor.MessageBox.addWarning(error.msg);
+                        }
+                    }
+
+                    return;
+                }
+
+                for (const [key, errors] of Object.entries(response.errorsTranslated)) {
+                    if (!basic.findField(key).hidden) {
+                        continue;
+                    }
+
+                    for (const error of errors) {
+                        Editor.MessageBox.addWarning(error);
                     }
                 }
             },

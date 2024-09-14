@@ -1707,7 +1707,9 @@ Ext.define('Translate5.override.data.request.Ajax', {
         // Call parent
         var response = this.callParent(arguments);
 
-        if (~[401, 403].indexOf(response.status)) location = '/login' + location.hash;
+        if (401 === response.status) {
+            location = '/login' + location.hash;
+        };
 
         // Parse response and show msgbox if need
         this.parseResponse(response, this.options);

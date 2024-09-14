@@ -9943,6 +9943,22 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.</source>
                 <target>Language Service Provider is set automaticaly for non Job Coordinator role users.</target>
             </trans-unit>
+            <trans-unit id='V29sbGVuIFNpZSBkZW4gTFNQIHdpcmtsaWNoIGzDtnNjaGVuPyBEaWVzZSBBa3Rpb24ga2FubiBuaWNodCByw7xja2fDpG5naWcgZ2VtYWNodCB3ZXJkZW4uIEJpdHRlIGJlYWNodGVuIFNpZSwgZGFzcyBtaXQgZGVtIEzDtnNjaGVuIGRlcyBMU1AgYXVjaCBhbGxlIHVudGVyZ2VvcmRuZXRlbiBMU1BzIG1pdCBhbGxlbiB6dWdlaMO2cmlnZW4gSm9iLUtvb3JkaW5hdG9yZW4gdW5kIEJlbnV0emVybiBtaXQgZGVuIGlobmVuIHp1Z2V3aWVzZW5lbiBKb2JzIGdlbMO2c2NodCB3ZXJkZW4u'>
+                <source>Wollen Sie den LSP wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden. Bitte beachten Sie, dass mit dem Löschen des LSP auch alle untergeordneten LSPs mit allen zugehörigen Job-Koordinatoren und Benutzern mit den ihnen zugewiesenen Jobs gelöscht werden.</source>
+                <target>Wollen Sie den LSP wirklich löschen "{0}"? Diese Aktion kann nicht rückgängig gemacht werden. Bitte beachten Sie, dass mit dem Löschen des LSP auch seine Job-Koordinatoren und Benutzer mit den ihnen zugewiesenen Jobs gelöscht werden.</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgZ2ViZW4gU2llIGRlbiBMU1AtTmFtZW4gaW4gZGFzIFRleHRmZWxkIHVudGVuIGVpbiwgdW0gZm9ydHp1ZmFocmVuLg=='>
+                <source>Bitte geben Sie den LSP-Namen in das Textfeld unten ein, um fortzufahren.</source>
+                <target>Bitte geben Sie den LSP-Namen in das Textfeld unten ein, um fortzufahren.</target>
+            </trans-unit>
+            <trans-unit id='RmFsc2NoZXIgTmFtZQ=='>
+                <source>Falscher Name</source>
+                <target>Falscher Name</target>
+            </trans-unit>
+            <trans-unit id='RGVyIHswfSB3dXJkZSBlcmZvbGdyZWljaCBnZWzDtnNjaHQu'>
+                <source>Der {0} wurde erfolgreich gelöscht.</source>
+                <target>Der {0} wurde erfolgreich gelöscht.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

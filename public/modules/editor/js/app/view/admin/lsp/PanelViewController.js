@@ -111,28 +111,49 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
             return;
         }
 
+        this._showDeletePrompt(record, null);
+    },
+
+    _showDeletePrompt: function (record, value) {
         const l10n = Editor.data.l10n.lsp;
-        const text = Ext.String.format(l10n.confirmDeleteText, record.get('name'));
+        const text = Ext.String.format(l10n.confirmDeleteText, record.get('name')) + "<br><br>" + l10n.enterLspName;
         const store = this.getView().down('gridpanel').getStore();
 
-        Ext.Msg.confirm(
+        Ext.Msg.prompt(
             l10n.confirmDeleteTitle,
             text,
-            (btn) => {
-                if (btn !== 'yes') {
+            (btn, value) => {
+                if (btn === 'cancel') {
                     return;
                 }
 
-                record.dropped = true;
-                record.save({
-                    failure: function () {
+                if (record.get('name') !== value) {
+                    Editor.MessageBox.addWarning(l10n.confirmDeleteWrongName);
+                    this._showDeletePrompt(record, value);
+
+                    return;
+                }
+
+                Ext.Ajax.request({
+                    url: '/editor/lsp/' + record.get('id'),
+                    method: 'DELETE',
+                    params: {data: JSON.stringify({
+                        id: record.get('id'),
+                        name: value,
+                    })},
+                    success: () => {
+                        Editor.MessageBox.addSuccess(Editor.data.l10n.general.entryHasBeenDeleted);
                         store.reload();
                     },
-                    success: function () {
-                        store.remove(record);
+                    failure: (response) => {
+                        Editor.app.getController('ServerException').handleException(response);
+                        store.reload();
                     }
                 });
-            }
+            },
+            this,
+            false,
+            value,
         );
-    },
+    }
 });

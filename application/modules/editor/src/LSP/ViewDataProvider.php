@@ -140,6 +140,7 @@ class ViewDataProvider
 
         return [
             'id' => (int) $lsp->getId(),
+            'parentId' => $lsp->getParentId() ? (int) $lsp->getParentId() : null,
             'name' => $lsp->getName(),
             'canEdit' => $this->userCanEditLsp($viewer, $lsp),
             'canDelete' => $this->userCanDeleteLsp($viewer, $lsp),
