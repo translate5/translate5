@@ -28,16 +28,21 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Validation;
+namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
 
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\LspUserRepository;
+use ZfExtended_AuthenticationInterface;
+use ZfExtended_Models_User as User;
 
-class LspCustomerAssociationValidator
+class LspUserCreateOperation
 {
     public function __construct(
-        private readonly LspRepository $lspRepository,
+        private readonly \MittagQI\Translate5\LSP\Operations\LspUserCreateOperation $operation,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly ZfExtended_AuthenticationInterface $authentication,
     ) {
     }
 
@@ -47,22 +52,18 @@ class LspCustomerAssociationValidator
     public static function create(): self
     {
         return new self(
-            LspRepository::create(),
+            new \MittagQI\Translate5\LSP\Operations\LspUserCreateOperation(),
+            new LspUserRepository(),
+            ZfExtended_Authentication::getInstance(),
         );
     }
 
-    /**
-     * @param int[] $customerIds
-     * @throws CustomerDoesNotBelongToLspException
-     */
-    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, iterable $customerIds): void
+    public function createLspUser(LanguageServiceProvider $lsp, User $user): LspUser
     {
-        $lspCustomersIds = $this->lspRepository->getCustomerIds($lsp);
+        $lsp = new LspUser($user->getUserGuid(), $user, $lsp);
 
-        foreach ($customerIds as $customerId) {
-            if (! in_array($customerId, $lspCustomersIds, true)) {
-                throw new CustomerDoesNotBelongToLspException($customerId, (int) $lsp->getId());
-            }
-        }
+        $this->operation->save($user->getUserGuid(), $user, $lsp);
+
+        return $lsp;
     }
 }

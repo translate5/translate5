@@ -41,4 +41,9 @@ class LspUser
         public readonly LanguageServiceProvider $lsp,
     ) {
     }
+
+    public static function from(ZfExtended_Models_User $user, LanguageServiceProvider $lsp): self
+    {
+        return new self($user->getUserGuid(), $user, $lsp);
+    }
 }

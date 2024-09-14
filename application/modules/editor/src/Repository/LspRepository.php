@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Customer_Customer as Customer;
+use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderCustomerTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
@@ -67,14 +68,18 @@ class LspRepository implements LspRepositoryInterface
     }
 
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws LspNotFoundException
      */
     public function get(int $id): LanguageServiceProvider
     {
-        $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
-        $model->load($id);
+        try {
+            $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
+            $model->load($id);
 
-        return $model;
+            return $model;
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            throw new LspNotFoundException(previous: $e);
+        }
     }
 
     public function save(LanguageServiceProvider $lsp): void

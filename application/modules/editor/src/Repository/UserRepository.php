@@ -29,6 +29,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\Roles;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
@@ -71,19 +74,35 @@ class UserRepository
         return $this->getByGuid($identifier);
     }
 
-    public function getEmptyModel(): ZfExtended_Models_User
+    public function getEmptyModel(): User
     {
-        return ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        return ZfExtended_Factory::get(User::class);
     }
 
     /**
+     * @throws GuidAlreadyInUseException
+     * @throws LoginAlreadyInUseException
      * @throws \Zend_Db_Statement_Exception
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     public function save(ZfExtended_Models_User $user): void
     {
-        $user->save();
+        try {
+            $user->save();
+        } catch (\ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+            $field = $e->getExtra('field') ?? '';
+
+            if ($field === 'login') {
+                throw new LoginAlreadyInUseException();
+            }
+
+            if ($field === 'userGuid') {
+                throw new GuidAlreadyInUseException();
+            }
+
+            throw $e;
+        }
     }
 
     /**

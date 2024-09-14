@@ -58,6 +58,8 @@ use ZfExtended_Models_Entity_Abstract;
 
 /**
  * @method int getId()
+ * @method string getGuid()
+ * @method void setGuid(string $guid)
  * @method string getLspId()
  * @method void setLspId(int $lspId)
  * @method string getUserId()

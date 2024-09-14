@@ -31,16 +31,16 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository\Contract;
 
 use editor_Models_Customer_Customer as Customer;
+use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
-use ZfExtended_Models_Entity_NotFoundException;
 
 interface LspRepositoryInterface
 {
     public function getEmptyModel(): LanguageServiceProvider;
 
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws LspNotFoundException
      */
     public function get(int $id): LanguageServiceProvider;
 

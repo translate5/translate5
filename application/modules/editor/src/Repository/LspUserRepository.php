@@ -42,6 +42,16 @@ use ZfExtended_Models_User;
 
 class LspUserRepository implements LspUserRepositoryInterface
 {
+    public function save(LspUser $lspUser): void
+    {
+        $assoc = ZfExtended_Factory::get(LanguageServiceProviderUser::class);
+        $assoc->setGuid($lspUser->guid);
+        $assoc->setLspId((int) $lspUser->lsp->getId());
+        $assoc->setUserId((int) $lspUser->user->getId());
+
+        $assoc->save();
+    }
+
     public function findByUser(ZfExtended_Models_User $user): ?LspUser
     {
         try {

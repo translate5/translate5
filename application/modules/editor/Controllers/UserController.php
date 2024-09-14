@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
@@ -50,25 +51,30 @@ use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
+use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
-use MittagQI\Translate5\User\Operations\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
-use MittagQI\Translate5\User\Operations\UserInitParentIdsOperation;
-use MittagQI\Translate5\User\Operations\UserInitRolesOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateDataOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateParentIdsOperation;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateRolesOperation;
+use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
 use MittagQI\ZfExtended\Acl\SystemResource;
 
-class Editor_UserController extends ZfExtended_UserController
+class Editor_UserController extends ZfExtended_RestController
 {
     protected $entityClass = ZfExtended_Models_User::class;
+
+    /**
+     * @var ZfExtended_Models_User
+     */
+    protected $entity;
 
     private UserActionPermissionAssert $permissionAssert;
 
@@ -227,58 +233,17 @@ class Editor_UserController extends ZfExtended_UserController
             $this->updateRoles($authUser);
             $this->updatePassword($authUser);
 
-            unset($this->data->passwd);
-
             if (! empty($this->data->parentIds)) {
                 UserUpdateParentIdsOperation::create()->updateParentIdsBy(
                     $this->entity,
                     $this->data->parentIds,
                     $authUser,
                 );
-
-                unset($this->data->parentIds);
             }
-        } catch (FeasibilityExceptionInterface) {
-            throw ZfExtended_Models_Entity_Conflict::createResponse(
-                'E1628',
-                [
-                    'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
-                ],
-                [
-                    'user' => $this->entity->getUserGuid(),
-                    'userLogin' => $this->entity->getLogin(),
-                    'userEmail' => $this->entity->getEmail(),
-                ]
-            );
-        } catch (NotAccessibleLspUserException $e) {
-            throw ZfExtended_Models_Entity_Conflict::createResponse(
-                'E1627',
-                [
-                    'Versuch, einen nicht erreichbaren Benutzer zu manipulieren.',
-                ],
-                [
-                    'coordinator' => $e->lspUser->guid,
-                    'lsp' => $e->lspUser->lsp->getName(),
-                    'lspId' => $e->lspUser->lsp->getId(),
-                    'user' => $this->entity->getUserGuid(),
-                    'userLogin' => $this->entity->getLogin(),
-                    'userEmail' => $this->entity->getEmail(),
-                ]
-            );
-        } catch (LoginAlreadyInUseException) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1094', [
-                'login' => [
-                    'duplicateLogin' => 'Dieser Anmeldename wird bereits verwendet.',
-                ],
-            ]);
-        } catch (GuidAlreadyInUseException) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1095', [
-                'login' => [
-                    'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
-                ],
-            ]);
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
+        } catch (Exception $e) {
+            throw $this->transformException($e);
         }
 
         $this->view->rows = $this->entity->getDataObject();
@@ -365,65 +330,36 @@ class Editor_UserController extends ZfExtended_UserController
 
     public function postAction()
     {
-        $authUser = ZfExtended_Authentication::getInstance()->getUser();
+        $this->decodePutData();
+
+        if (! in_array(Roles::JOB_COORDINATOR, $this->data->roles) && ! empty($this->data->lsp)) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'lsp' => [
+                        'Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.',
+                    ],
+                ],
+            );
+        }
 
         try {
-            $this->decodePutData();
-
-            $this->entity = UserCreateOperation::create()->createUser(
+            $user = UserCreateOperation::create()->createUser(
                 CreateUserDto::fromRequestData(
                     ZfExtended_Utils::guid(true),
                     (array) $this->data
                 ),
             );
-            $this->initRoles($authUser);
-            UserInitParentIdsOperation::create()->initParentIdsBy(
-                $this->entity,
-                $this->data->parentIds ?? null,
-                $authUser,
-            );
-            $this->updatePassword($authUser);
-        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-            $this->handleLoginDuplicates($e);
-        } catch (LoginAlreadyInUseException) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1094', [
-                'login' => [
-                    'duplicateLogin' => 'Dieser Anmeldename wird bereits verwendet.',
-                ],
-            ]);
-        } catch (GuidAlreadyInUseException) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1095', [
-                'login' => [
-                    'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
-                ],
-            ]);
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
+        } catch (Exception $e) {
+            throw $this->transformException($e);
         }
 
-        $this->updateCustomers($authUser);
-        $this->assignLsp($authUser);
-
-        // make sure fields not processed by setDataInEntity
-        unset($this->data->firstName);
-        unset($this->data->surName);
-        unset($this->data->login);
-        unset($this->data->email);
-        unset($this->data->gender);
-        unset($this->data->parentIds);
-        unset($this->data->passwd);
-
-        $this->setDataInEntity($this->postBlacklist);
-
-        if ($this->validate()) {
-            $this->entity->save();
-            $this->view->rows = $this->entity->getDataObject();
-        }
+        $this->view->rows = $user->getDataObject();
 
         $this->credentialCleanup();
-        if ($this->wasValid) {
-            $this->csvToArray();
-        }
+        $this->csvToArray();
     }
 
     /**
@@ -494,59 +430,11 @@ class Editor_UserController extends ZfExtended_UserController
             )
         );
 
-        try {
-            UserCustomerAssociationUpdateOperation::create()->updateAssociatedCustomersBy(
-                $this->entity,
-                $sentCustomerIds,
-                $authUser
-            );
-        } catch (InexistentCustomerException $e) {
-            throw ZfExtended_Models_Entity_Conflict::createResponse(
-                'E2002',
-                [
-                    'customers' => [
-                        'Der referenzierte Kunde existiert nicht (mehr).',
-                    ],
-                ],
-                [
-                    editor_Models_Customer_Customer::class,
-                    $e->customerId,
-                ]
-            );
-        } catch (CustomerDoesNotBelongToUserException|CustomerDoesNotBelongToLspException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'customers' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
-                    ],
-                ],
-                [
-                    'id' => $e->customerId,
-                ]
-            );
-        }
-
-        // make sure customers not processed by setDataInEntity
-        unset($this->data->customers);
-    }
-
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    private function initRoles(ZfExtended_Models_User $authUser): void
-    {
-        if (empty($this->data->roles)) {
-            return;
-        }
-
-        $roles = explode(',', trim($this->data->roles, ','));
-
-        try {
-            UserInitRolesOperation::create()->initUserRolesBy($this->entity, $roles, $authUser);
-        } catch (Exception $e) {
-            throw $this->transformRolesException($e);
-        }
+        UserCustomerAssociationUpdateOperation::create()->updateAssociatedCustomersBy(
+            $this->entity,
+            $sentCustomerIds,
+            $authUser
+        );
     }
 
     /**
@@ -560,17 +448,10 @@ class Editor_UserController extends ZfExtended_UserController
 
         $roles = explode(',', trim($this->data->roles, ','));
 
-        try {
-            UserUpdateRolesOperation::create()->updateRolesBy($this->entity, $roles, $authUser);
-        } catch (Exception $e) {
-            throw $this->transformRolesException($e);
-        }
-
-        // make sure roles not processed by setDataInEntity
-        unset($this->data->roles);
+        UserUpdateRolesOperation::create()->updateRolesBy($this->entity, $roles, $authUser);
     }
 
-    private function transformRolesException(Exception $e): ZfExtended_ErrorCodeException|Exception
+    private function transformException(Exception $e): ZfExtended_ErrorCodeException|Exception
     {
         return match ($e::class) {
             RolesetHasConflictingRolesException::class => ZfExtended_UnprocessableEntity::createResponse(
@@ -599,7 +480,7 @@ class Editor_UserController extends ZfExtended_UserController
                     'becauseOf' => $e->becauseOf,
                 ]
             ),
-            Zend_Acl_Exception::class => new ZfExtended_NoAccessException(previous: $e),
+            Zend_Acl_Exception::class,
             UserIsNotAuthorisedToAssignRoleException::class => new ZfExtended_NoAccessException(previous: $e),
             UnableToAssignJobCoordinatorRoleToExistingUserException::class => throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1631',
@@ -608,6 +489,103 @@ class Editor_UserController extends ZfExtended_UserController
                         'Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung oder für LSP-Benutzer definiert werden.',
                     ],
                 ],
+            ),
+            InexistentCustomerException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+                'E2002',
+                [
+                    'customers' => [
+                        'Der referenzierte Kunde existiert nicht (mehr).',
+                    ],
+                ],
+                [
+                    editor_Models_Customer_Customer::class,
+                    $e->customerId,
+                ]
+            ),
+            CustomerDoesNotBelongToUserException::class => ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'customers' => [
+                        'Sie können den Kunden "{id}" hier nicht angeben',
+                    ],
+                ],
+                [
+                    'id' => $e->customerId,
+                ]
+            ),
+            CustomerDoesNotBelongToLspException::class => ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'customers' => [
+                        'Sie können den Kunden "{id}" hier nicht angeben',
+                    ],
+                ],
+                [
+                    'id' => $e->customerId,
+                ]
+            ),
+            LoginAlreadyInUseException::class => ZfExtended_UnprocessableEntity::createResponse('E1094', [
+            'login' => [
+                'duplicateLogin' => 'Dieser Anmeldename wird bereits verwendet.',
+            ],
+        ]),
+            GuidAlreadyInUseException::class => ZfExtended_UnprocessableEntity::createResponse('E1095', [
+        'login' => [
+            'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
+        ],
+    ]),
+            LspMustBeProvidedInJobCoordinatorCreationProcessException::class => ZfExtended_UnprocessableEntity::createResponse(
+        'E2003',
+        [
+            'lsp' => [
+                'Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.',
+            ],
+        ],
+    ),
+            ProvidedParentIdCannotBeEvaluatedToUserException::class => ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'parentIds' => [
+                        'Gegebener parentIds-Wert kann für keinen Benutzer ausgewertet werden!',
+                    ],
+                ],
+            ),
+            FeasibilityExceptionInterface::class => ZfExtended_Models_Entity_Conflict::createResponse(
+            'E1628',
+            [
+                'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
+            ],
+            [
+                'user' => $this->entity->getUserGuid(),
+                'userLogin' => $this->entity->getLogin(),
+                'userEmail' => $this->entity->getEmail(),
+            ]
+        ),
+            NotAccessibleLspUserException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+            'E1627',
+            [
+                'Versuch, einen nicht erreichbaren Benutzer zu manipulieren.',
+            ],
+            [
+                'coordinator' => $e->lspUser->guid,
+                'lsp' => $e->lspUser->lsp->getName(),
+                'lspId' => $e->lspUser->lsp->getId(),
+                'user' => $this->entity->getUserGuid(),
+                'userLogin' => $this->entity->getLogin(),
+                'userEmail' => $this->entity->getEmail(),
+            ]
+        ),
+            LspNotFoundException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+                'E2002',
+                [
+                    'lsp' => [
+                        'Der referenzierte LSP existiert nicht (mehr).',
+                    ],
+                ],
+                [
+                    LanguageServiceProvider::class,
+                    $e->getId(),
+                ]
             ),
             default => $e,
         };
@@ -637,14 +615,7 @@ class Editor_UserController extends ZfExtended_UserController
 
         // for coordinators lsp is mandatory
         if ($userIsCoordinator && empty($this->data->lsp)) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'lsp' => [
-                        'Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.',
-                    ],
-                ],
-            );
+
         }
 
         $lsp = (int) $this->fetchLspForAssignment($authCoordinator);
@@ -744,5 +715,20 @@ class Editor_UserController extends ZfExtended_UserController
         $updateUserPasswordOperation->updatePassword($authUser, null);
 
         ResetPasswordEmail::create()->sendTo($authUser);
+    }
+
+    /**
+     * Check and update user session if the current modified user is the one in the session
+     */
+    protected function checkAndUpdateSession()
+    {
+        $userSession = new Zend_Session_Namespace('user');
+        //ignore the check if session user or the data user is not set
+        if (! isset($userSession->data->id) || ! isset($this->data->id)) {
+            return;
+        }
+        if ($userSession->data->id == $this->data->id) {
+            ZfExtended_Authentication::getInstance()->authenticateBySessionData($userSession->data);
+        }
     }
 }

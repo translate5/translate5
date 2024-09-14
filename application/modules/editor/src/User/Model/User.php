@@ -28,41 +28,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Validation;
+namespace MittagQI\Translate5\User\Model;
 
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\User\DTO\CreateUserDto;
 
-class LspCustomerAssociationValidator
+class User extends \ZfExtended_Models_User
 {
-    public function __construct(
-        private readonly LspRepository $lspRepository,
-    ) {
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
+    public function isCoordinator(): bool
     {
-        return new self(
-            LspRepository::create(),
-        );
+        return in_array(Roles::JOB_COORDINATOR, $this->getRoles(), true);
     }
 
-    /**
-     * @param int[] $customerIds
-     * @throws CustomerDoesNotBelongToLspException
-     */
-    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, iterable $customerIds): void
+    public function setInitialFields(CreateUserDto $dto): void
     {
-        $lspCustomersIds = $this->lspRepository->getCustomerIds($lsp);
-
-        foreach ($customerIds as $customerId) {
-            if (! in_array($customerId, $lspCustomersIds, true)) {
-                throw new CustomerDoesNotBelongToLspException($customerId, (int) $lsp->getId());
-            }
-        }
+        $this->setUserGuid($dto->guid);
+        $this->setLogin($dto->login);
+        $this->setEmail($dto->email);
+        $this->setFirstName($dto->firstName);
+        $this->setSurName($dto->surName);
+        $this->setGender($dto->gender);
+        $this->setLocale($dto->locale);
     }
+
 }

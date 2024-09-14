@@ -39,7 +39,6 @@ use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserEx
 use MittagQI\ZfExtended\Acl\SystemResource;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
-use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
@@ -49,6 +48,7 @@ final class UserUpdateParentIdsOperation
         private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
         private readonly ZfExtended_Acl $acl,
         private readonly UserRepository $userRepository,
+        private readonly UserSetParentIdsOperation $setParentIds,
     ) {
     }
 
@@ -63,6 +63,7 @@ final class UserUpdateParentIdsOperation
             UserActionFeasibilityAssert::create(),
             $acl,
             new UserRepository(),
+            UserSetParentIdsOperation::create(),
         );
     }
 
@@ -73,63 +74,38 @@ final class UserUpdateParentIdsOperation
      */
     public function updateParentIdsBy(User $user, string $parentId, User $authUser): void
     {
-        $parentUser = $this->resolveParentUser($parentId, $authUser);
+        $parentId = $this->resolveParentUserId($parentId, $authUser);
 
         //FIXME currently its not possible for seeAllUsers users to remove the parentIds flag by set it to null/""
-        if (! $parentUser) {
+        if (! $parentId) {
             return;
         }
 
-        $this->updateParentIds($user, $this->getParentIds($parentUser));
+        $this->updateParentIds($user, $parentId);
     }
 
     /**
-     * @param int[] $parentIds
      * @throws FeasibilityExceptionInterface
+     * @throws ProvidedParentIdCannotBeEvaluatedToUserException
      * @throws Zend_Acl_Exception
      * @throws ZfExtended_ValidateException
      */
-    public function updateParentIds(User $user, array $parentIds): void
+    public function updateParentIds(User $user, ?string $parentId): void
     {
         $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
 
-        $user->setParentIds(',' . implode(',', $parentIds) . ',');
-
-        $user->validate();
+        $this->setParentIds->setParentIds($user, $parentId);
 
         $this->userRepository->save($user);
     }
 
-    private function resolveParentUser(?string $parentId, User $authUser): ?User
+    private function resolveParentUserId(?string $parentId, User $authUser): ?string
     {
         if (! $this->canSeeAllUsers($authUser) || empty($parentId)) {
             return null;
         }
 
-        try {
-            return $this->userRepository->resolveUser($parentId);
-        } catch (ZfExtended_Models_Entity_NotFoundException) {
-            throw new ProvidedParentIdCannotBeEvaluatedToUserException($parentId);
-        }
-    }
-
-    /**
-     * @return int[]
-     */
-    private function getParentIds(User $parentUser): array
-    {
-        $parentIds = [];
-
-        if (! empty($parentUser->getParentIds())) {
-            $parentIds = array_map(
-                'intval',
-                explode(',', trim($parentUser->getParentIds(), ' ,'))
-            );
-        }
-
-        $parentIds[] = (int) $parentUser->getId();
-
-        return $parentIds;
+        return $parentId;
     }
 
     private function canSeeAllUsers(User $authUser): bool

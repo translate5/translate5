@@ -28,30 +28,29 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Operations;
+namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
-use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
+use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
-use MittagQI\Translate5\User\Validation\RolesValidator;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
+use ZfExtended_Authentication;
+use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User as User;
-use ZfExtended_ValidateException;
 
 /**
  * Ment to be used to initialize roles for a user.
  * So only on User creation or in special cases where the roles need to be reinitialized.
  */
-final class UserInitRolesOperation
+final class UserSetRolesOperation implements UserSetRolesOperationInterface
 {
     public function __construct(
-        private readonly RolesValidator $rolesValidator,
+        private readonly \MittagQI\Translate5\User\Operations\UserSetRolesOperation $operation,
+        private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly ZfExtended_Acl $acl,
-        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -60,12 +59,10 @@ final class UserInitRolesOperation
      */
     public static function create(): self
     {
-        $acl = ZfExtended_Acl::getInstance();
-
         return new self(
-            new RolesValidator($acl),
-            $acl,
-            new UserRepository(),
+            \MittagQI\Translate5\User\Operations\UserSetRolesOperation::create(),
+            ZfExtended_Authentication::getInstance(),
+            ZfExtended_Acl::getInstance(),
         );
     }
 
@@ -76,38 +73,15 @@ final class UserInitRolesOperation
      * @throws UserIsNotAuthorisedToAssignRoleException
      * @throws Zend_Acl_Exception
      */
-    public function initUserRolesBy(User $user, array $roles, User $authUser): void
+    public function setRoles(User $user, array $roles): void
     {
-        if (empty($roles)) {
-            return;
-        }
-
         foreach ($roles as $role) {
-            if (! $this->hasAclPermissionToSetRole($authUser, $role)) {
+            if (! $this->hasAclPermissionToSetRole($this->authentication->getUser(), $role)) {
                 throw new UserIsNotAuthorisedToAssignRoleException($role);
             }
         }
 
-        $this->initRoles($user, $roles);
-    }
-
-    /**
-     * @param string[] $roles
-     * @throws ConflictingRolesExceptionInterface
-     * @throws Zend_Acl_Exception
-     * @throws ZfExtended_ValidateException
-     */
-    public function initRoles(User $user, array $roles): void
-    {
-        $this->rolesValidator->assertRolesDontConflict($roles);
-
-        $roles = $this->acl->mergeAutoSetRoles($roles, []);
-
-        $user->setRoles($roles);
-
-        $user->validate();
-
-        $this->userRepository->save($user);
+        $this->operation->setRoles($user, $roles);
     }
 
     private function hasAclPermissionToSetRole(User $authUser, string $role): bool

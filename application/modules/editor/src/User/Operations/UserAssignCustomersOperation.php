@@ -28,16 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Validation;
+namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
+use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
+use ZfExtended_Models_User as User;
 
-class LspCustomerAssociationValidator
+/**
+ * Should not be used directly, use:
+ * @see UserCustomerAssociationUpdateOperation
+ * @see UserCreateOperation
+ */
+final class UserAssignCustomersOperation implements UserAssignCustomersOperationInterface
 {
     public function __construct(
-        private readonly LspRepository $lspRepository,
+        private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
     ) {
     }
 
@@ -47,22 +53,20 @@ class LspCustomerAssociationValidator
     public static function create(): self
     {
         return new self(
-            LspRepository::create(),
+            UserCustomerAssociationValidator::create(),
         );
     }
 
     /**
-     * @param int[] $customerIds
+     * @param int[] $associatedCustomerIds
      * @throws CustomerDoesNotBelongToLspException
      */
-    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, iterable $customerIds): void
+    public function assignCustomers(User $user, array $associatedCustomerIds): void
     {
-        $lspCustomersIds = $this->lspRepository->getCustomerIds($lsp);
+        // TODO: add LSP customers check
 
-        foreach ($customerIds as $customerId) {
-            if (! in_array($customerId, $lspCustomersIds, true)) {
-                throw new CustomerDoesNotBelongToLspException($customerId, (int) $lsp->getId());
-            }
-        }
+        $this->userCustomerAssociationValidator->assertCustomersMayBeAssociatedWithUser($associatedCustomerIds, $user);
+
+        $user->assignCustomers($associatedCustomerIds);
     }
 }

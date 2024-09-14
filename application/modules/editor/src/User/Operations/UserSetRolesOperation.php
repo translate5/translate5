@@ -28,16 +28,25 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Validation;
+namespace MittagQI\Translate5\User\Operations;
 
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
+use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
+use MittagQI\Translate5\User\Validation\RolesValidator;
+use Zend_Acl_Exception;
+use ZfExtended_Acl;
+use ZfExtended_Models_User as User;
+use ZfExtended_ValidateException;
 
-class LspCustomerAssociationValidator
+/**
+ * Ment to be used to initialize roles for a user.
+ * So only on User creation or in special cases where the roles need to be reinitialized.
+ */
+final class UserSetRolesOperation implements UserSetRolesOperationInterface
 {
     public function __construct(
-        private readonly LspRepository $lspRepository,
+        private readonly RolesValidator $rolesValidator,
+        private readonly ZfExtended_Acl $acl,
     ) {
     }
 
@@ -46,23 +55,28 @@ class LspCustomerAssociationValidator
      */
     public static function create(): self
     {
+        $acl = ZfExtended_Acl::getInstance();
+
         return new self(
-            LspRepository::create(),
+            new RolesValidator($acl),
+            $acl,
         );
     }
 
     /**
-     * @param int[] $customerIds
-     * @throws CustomerDoesNotBelongToLspException
+     * @param string[] $roles
+     * @throws ConflictingRolesExceptionInterface
+     * @throws Zend_Acl_Exception
+     * @throws ZfExtended_ValidateException
      */
-    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, iterable $customerIds): void
+    public function setRoles(User $user, array $roles): void
     {
-        $lspCustomersIds = $this->lspRepository->getCustomerIds($lsp);
+        $this->rolesValidator->assertRolesDontConflict($roles);
 
-        foreach ($customerIds as $customerId) {
-            if (! in_array($customerId, $lspCustomersIds, true)) {
-                throw new CustomerDoesNotBelongToLspException($customerId, (int) $lsp->getId());
-            }
-        }
+        $roles = $this->acl->mergeAutoSetRoles($roles, []);
+
+        $user->setRoles($roles);
+
+        $user->validate();
     }
 }

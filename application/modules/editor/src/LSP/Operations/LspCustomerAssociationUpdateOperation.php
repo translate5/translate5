@@ -78,39 +78,36 @@ class LspCustomerAssociationUpdateOperation
      */
     public function updateCustomersBy(LanguageServiceProvider $lsp, array $customerIds, User $authUser): void
     {
-        $customers = $this->customerRepository->getList(...$customerIds);
-
         if ($authUser->isClientRestricted()) {
-            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($customers, $authUser);
+            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($customerIds, $authUser);
         }
 
-        $this->updateCustomers($lsp, ...$customers);
+        $this->updateCustomers($lsp, ...$customerIds);
     }
 
-    public function updateCustomers(LanguageServiceProvider $lsp, Customer ...$customers): void
+    public function updateCustomers(LanguageServiceProvider $lsp, int ...$customerIds): void
     {
-        if (! $lsp->isDirectLsp() && ! empty($customers)) {
+        if (! $lsp->isDirectLsp() && ! empty($customerIds)) {
             $parentLsp = $this->lspRepository->get((int) $lsp->getParentId());
-            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($parentLsp, $customers);
+            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($parentLsp, $customerIds);
         }
 
-        $newCustomerIdsSet = array_map(fn (Customer $customer) => $customer->getId(), $customers);
+        $lspCustomerIds = $this->lspRepository->getCustomerIds($lsp);
 
-        $lspCustomers = $this->lspRepository->getCustomers($lsp);
-        $lspCustomersIds = [];
+        foreach ($lspCustomerIds as $i => $lspCustomerId) {
+            if (! in_array($lspCustomerId, $customerIds, true)) {
+                $customer = $this->customerRepository->get($lspCustomerId);
 
-        foreach ($lspCustomers as $customer) {
-            if (! in_array($customer->getId(), $newCustomerIdsSet)) {
                 $this->unassignCustomer($lsp, $customer);
 
-                continue;
+                unset($lspCustomerIds[$i]);
             }
-
-            $lspCustomersIds[] = $customer->getId();
         }
 
-        foreach ($customers as $customer) {
-            if (! in_array($customer->getId(), $lspCustomersIds)) {
+        foreach ($customerIds as $customerId) {
+            if (! in_array($customerId, $lspCustomerIds, true)) {
+                $customer = $this->customerRepository->get($customerId);
+
                 $this->assignCustomer($lsp, $customer);
             }
         }

@@ -9935,6 +9935,14 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung oder für LSP-Benutzer definiert werden.</source>
                 <target>Role "Job Coordinator" can be set only on User creation process or to LSP User.</target>
             </trans-unit>
+            <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgTFNQIGV4aXN0aWVydCBuaWNodCAobWVociku'>
+                <source>Der referenzierte LSP existiert nicht (mehr).</source>
+                <target>Der referenzierte LSP existiert nicht (mehr).</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBCZW51dHplciwgZGllIG5pY2h0IGRpZSBSb2xsZSBkZXMgSm9ia29vcmRpbmF0b3JzIGhhYmVuLCB3aXJkIGRlciBTcHJhY2hkaWVuc3RsZWlzdGVyIGF1dG9tYXRpc2NoIGVpbmdlc3RlbGx0Lg=='>
+                <source>Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.</source>
+                <target>Language Service Provider is set automaticaly for non Job Coordinator role users.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

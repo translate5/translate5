@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
@@ -47,7 +46,7 @@ class UserCustomerAssociationUpdateOperation
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
         private readonly UserRepository $userRepository,
         private readonly UserActionFeasibilityAssertInterface $feasibilityAssert,
-        private readonly CustomerRepository $customerRepository,
+        private readonly UserAssignCustomersOperation $assignCustomers,
     ) {
     }
 
@@ -60,7 +59,7 @@ class UserCustomerAssociationUpdateOperation
             UserCustomerAssociationValidator::create(),
             new UserRepository(),
             UserActionFeasibilityAssert::create(),
-            new CustomerRepository(),
+            UserAssignCustomersOperation::create(),
         );
     }
 
@@ -73,11 +72,7 @@ class UserCustomerAssociationUpdateOperation
     {
         $this->feasibilityAssert->assertAllowed(Action::UPDATE, $user);
 
-        $customers = $this->customerRepository->getList(...$associatedCustomerIds);
-
-        $this->userCustomerAssociationValidator->assertCustomersMayBeAssociatedWithUser($customers, $user);
-
-        $user->assignCustomers($associatedCustomerIds);
+        $this->assignCustomers->assignCustomers($user, $associatedCustomerIds);
 
         $this->userRepository->save($user);
     }
@@ -91,19 +86,15 @@ class UserCustomerAssociationUpdateOperation
     public function updateAssociatedCustomersBy(
         User $user,
         array $associatedCustomerIds,
-        User $authManager
+        User $authManager,
     ): void {
         $this->feasibilityAssert->assertAllowed(Action::UPDATE, $user);
 
         $managerCustomers = $authManager->getCustomersArray();
         $currentUserCustomers = $user->getCustomersArray();
 
-        $customers = $this->customerRepository->getList(...$associatedCustomerIds);
-
-        $this->userCustomerAssociationValidator->assertCustomersMayBeAssociatedWithUser($customers, $user);
-
         if ($authManager->isClientRestricted()) {
-            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($customers, $authManager);
+            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($associatedCustomerIds, $authManager);
         }
 
         // Process deleted customers
@@ -124,7 +115,7 @@ class UserCustomerAssociationUpdateOperation
             $associatedCustomerIds[] = $customer;
         }
 
-        $user->assignCustomers($associatedCustomerIds);
+        $this->assignCustomers->assignCustomers($user, $associatedCustomerIds);
 
         $this->userRepository->save($user);
     }

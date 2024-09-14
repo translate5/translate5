@@ -31,17 +31,22 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
-use Zend_Exception;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
+use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
+use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
+use Zend_Acl_Exception;
+use ZfExtended_Acl;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
-final class UserUpdatePasswordOperation
+/**
+ * Ment to be used to initialize parentIds for a user.
+ * So only on User creation or in special cases where the parentIds need to be reinitialized.
+ */
+final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly UserSetPasswordOperation $setPassword,
     ) {
     }
 
@@ -52,18 +57,51 @@ final class UserUpdatePasswordOperation
     {
         return new self(
             new UserRepository(),
-            UserSetPasswordOperation::create(),
         );
     }
 
     /**
-     * @throws Zend_Exception
+     * @throws ProvidedParentIdCannotBeEvaluatedToUserException
+     * @throws Zend_Acl_Exception
      * @throws ZfExtended_ValidateException
      */
-    public function updatePassword(User $user, ?string $password): void
+    public function setParentIds(User $user, ?string $parentId): void
     {
-        $this->setPassword->setPassword($user, $password);
+        if (null === $parentId) {
+            $user->setParentIds(',,');
 
-        $this->userRepository->save($user);
+            return;
+        }
+
+        try {
+            $parentUser = $this->userRepository->resolveUser($parentId);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new ProvidedParentIdCannotBeEvaluatedToUserException($parentId);
+        }
+
+        $parentIds = $this->getParentIds($parentUser);
+
+        $user->setParentIds(',' . implode(',', $parentIds) . ',');
+
+        $user->validate();
+    }
+
+    /**
+     * @return int[]
+     */
+    private function getParentIds(User $parentUser): array
+    {
+        $parentIds = [];
+
+        if (! empty($parentUser->getParentIds())) {
+            $parentIds = array_map(
+                'intval',
+                explode(',', trim($parentUser->getParentIds(), ' ,'))
+            );
+        }
+
+        $parentIds[] = (int) $parentUser->getId();
+
+        return $parentIds;
     }
 }

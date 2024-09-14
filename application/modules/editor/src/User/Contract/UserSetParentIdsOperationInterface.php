@@ -28,41 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Validation;
+namespace MittagQI\Translate5\User\Contract;
 
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
+use ZfExtended_Models_User as User;
 
-class LspCustomerAssociationValidator
+interface UserSetParentIdsOperationInterface
 {
-    public function __construct(
-        private readonly LspRepository $lspRepository,
-    ) {
-    }
-
     /**
-     * @codeCoverageIgnore
+     * @throws ProvidedParentIdCannotBeEvaluatedToUserException
+     * @throws Zend_Acl_Exception
      */
-    public static function create(): self
-    {
-        return new self(
-            LspRepository::create(),
-        );
-    }
-
-    /**
-     * @param int[] $customerIds
-     * @throws CustomerDoesNotBelongToLspException
-     */
-    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, iterable $customerIds): void
-    {
-        $lspCustomersIds = $this->lspRepository->getCustomerIds($lsp);
-
-        foreach ($customerIds as $customerId) {
-            if (! in_array($customerId, $lspCustomersIds, true)) {
-                throw new CustomerDoesNotBelongToLspException($customerId, (int) $lsp->getId());
-            }
-        }
-    }
+    public function setParentIds(User $user, ?string $parentId): void;
 }

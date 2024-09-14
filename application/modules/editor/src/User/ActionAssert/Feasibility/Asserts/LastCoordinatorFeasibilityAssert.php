@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
-use MittagQI\Translate5\LSP\LspUserService;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use ZfExtended_Models_User as User;
@@ -38,7 +38,7 @@ use ZfExtended_Models_User as User;
 final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterface
 {
     public function __construct(
-        private readonly LspUserService $lspUserService
+        private readonly JobCoordinatorRepository $jcRepository,
     ) {
     }
 
@@ -53,14 +53,14 @@ final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterfa
     public function assertAllowed(User $user): void
     {
         // Possible coordinator that we try to delete
-        $coordinator = $this->lspUserService->findCoordinatorBy($user);
+        $coordinator = $this->jcRepository->findByUser($user);
 
         if (null === $coordinator) {
             return;
         }
 
         // Nobody can delete the last coordinator of an LSP
-        if ($this->lspUserService->getCoordinatorsCountFor($coordinator->lsp) === 1) {
+        if ($this->jcRepository->getCoordinatorsCount($coordinator->lsp) === 1) {
             throw new LastCoordinatorException($coordinator);
         }
     }

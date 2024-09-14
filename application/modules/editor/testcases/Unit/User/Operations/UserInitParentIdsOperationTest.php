@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
-use MittagQI\Translate5\User\Operations\UserInitParentIdsOperation;
+use MittagQI\Translate5\User\Operations\UserSetParentIdsOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
@@ -46,14 +46,14 @@ class UserInitParentIdsOperationTest extends TestCase
 
     private UserRepository|MockObject $userRepository;
 
-    private UserInitParentIdsOperation $operation;
+    private UserSetParentIdsOperation $operation;
 
     protected function setUp(): void
     {
         $this->acl = $this->createMock(ZfExtended_Acl::class);
         $this->userRepository = $this->createMock(UserRepository::class);
 
-        $this->operation = new UserInitParentIdsOperation(
+        $this->operation = new UserSetParentIdsOperation(
             $this->acl,
             $this->userRepository
         );
@@ -75,7 +75,7 @@ class UserInitParentIdsOperationTest extends TestCase
 
         $user->expects(self::once())->method('__call')->with('setParentIds', [',2,3,4,']);
 
-        $this->operation->initParentIdsBy($user, '1', $authUser);
+        $this->operation->setParentIdsBy($user, '1', $authUser);
     }
 
     public function testAuthUserParentIdsUsedIfEmptyParentIdsPassed(): void
@@ -94,7 +94,7 @@ class UserInitParentIdsOperationTest extends TestCase
 
         $user->expects(self::once())->method('__call')->with('setParentIds', [',2,3,4,']);
 
-        $this->operation->initParentIdsBy($user, '', $authUser);
+        $this->operation->setParentIdsBy($user, '', $authUser);
     }
 
     public function testEmptyListSetOnEmptyArrayPassed(): void
@@ -106,7 +106,7 @@ class UserInitParentIdsOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('save');
 
-        $this->operation->initParentIds($user, []);
+        $this->operation->setParentIds($user, []);
     }
 
     public function testListSetOnArrayOfParentIdsPassed(): void
@@ -118,7 +118,7 @@ class UserInitParentIdsOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('save');
 
-        $this->operation->initParentIds($user, [1, 2]);
+        $this->operation->setParentIds($user, [1, 2]);
     }
 
     public function testUpdateParentIdsThrowsValidationException(): void
@@ -129,7 +129,7 @@ class UserInitParentIdsOperationTest extends TestCase
 
         $user->expects(self::once())->method('validate')->willThrowException($this->createMock(ZfExtended_ValidateException::class));
 
-        $this->operation->initParentIds($user, [1, 2]);
+        $this->operation->setParentIds($user, [1, 2]);
     }
 
     public function testOnlyParentUserIdSetCauseItHasNoParentIdsItself(): void
@@ -153,7 +153,7 @@ class UserInitParentIdsOperationTest extends TestCase
             ->method('__call')
             ->with('setParentIds', [',' . $parentUser->getId() . ',']);
 
-        $this->operation->initParentIdsBy($user, $parentUser->getId(), $authUser);
+        $this->operation->setParentIdsBy($user, $parentUser->getId(), $authUser);
     }
 
     public function testParentUserParentIdsAreSetWithItsOwnId(): void
@@ -177,7 +177,7 @@ class UserInitParentIdsOperationTest extends TestCase
             ->method('__call')
             ->with('setParentIds', [',1,2,' . $parentUser->getId() . ',']);
 
-        $this->operation->initParentIdsBy($user, $parentUser->getId(), $authUser);
+        $this->operation->setParentIdsBy($user, $parentUser->getId(), $authUser);
     }
 
     public function testExceptionIsThrownIfParentUserNotFoundByIdentifier(): void
@@ -199,6 +199,6 @@ class UserInitParentIdsOperationTest extends TestCase
 
         $user->expects(self::never())->method('__call')->with('setParentIds');
 
-        $this->operation->initParentIdsBy($user, 'oops', $authUser);
+        $this->operation->setParentIdsBy($user, 'oops', $authUser);
     }
 }

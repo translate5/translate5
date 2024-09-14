@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
-use MittagQI\Translate5\User\Operations\UserInitRolesOperation;
+use MittagQI\Translate5\User\Operations\UserSetRolesOperation;
 use MittagQI\Translate5\User\Validation\RolesValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -48,7 +48,7 @@ class UserInitRolesOperationTest extends TestCase
 
     private UserRepository|MockObject $userRepository;
 
-    private UserInitRolesOperation $operation;
+    private UserSetRolesOperation $operation;
 
     protected function setUp(): void
     {
@@ -56,7 +56,7 @@ class UserInitRolesOperationTest extends TestCase
         $this->acl = $this->createMock(ZfExtended_Acl::class);
         $this->userRepository = $this->createMock(UserRepository::class);
 
-        $this->operation = new UserInitRolesOperation(
+        $this->operation = new UserSetRolesOperation(
             $this->rolesValidator,
             $this->acl,
             $this->userRepository
@@ -68,7 +68,7 @@ class UserInitRolesOperationTest extends TestCase
         $user = $this->createMock(User::class);
         $authUser = $this->createMock(User::class);
 
-        $this->operation->initUserRolesBy($user, [], $authUser);
+        $this->operation->setRolesBy($user, [], $authUser);
 
         $user->expects($this->never())->method('setRoles');
 
@@ -88,7 +88,7 @@ class UserInitRolesOperationTest extends TestCase
 
         $this->userRepository->expects($this->never())->method('save');
 
-        $this->operation->initUserRolesBy($user, ['role1'], $authUser);
+        $this->operation->setRolesBy($user, ['role1'], $authUser);
     }
 
     public function testInitRoles(): void
@@ -112,7 +112,7 @@ class UserInitRolesOperationTest extends TestCase
 
         $this->userRepository->expects($this->once())->method('save')->with($user);
 
-        $this->operation->initRoles($user, $roles);
+        $this->operation->setRoles($user, $roles);
     }
 
     public function testNothingDoneIfRolesHaveConflict(): void
@@ -129,6 +129,6 @@ class UserInitRolesOperationTest extends TestCase
 
         $this->userRepository->expects($this->never())->method('save');
 
-        $this->operation->initRoles($user, ['role1']);
+        $this->operation->setRoles($user, ['role1']);
     }
 }

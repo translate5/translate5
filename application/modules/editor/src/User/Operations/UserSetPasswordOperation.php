@@ -28,18 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP;
+namespace MittagQI\Translate5\User\Operations;
 
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
-use ZfExtended_Models_User;
+use Zend_Exception;
+use ZfExtended_Authentication;
+use ZfExtended_AuthenticationInterface;
+use ZfExtended_Models_User as User;
+use ZfExtended_ValidateException;
 
-class LspUserService
+class UserSetPasswordOperation
 {
     public function __construct(
-        private readonly JobCoordinatorRepository $jcRepository,
-        private readonly LspUserRepository $lspUserRepository,
+        private readonly ZfExtended_AuthenticationInterface $authentication,
     ) {
     }
 
@@ -48,27 +48,25 @@ class LspUserService
      */
     public static function create(): self
     {
-        $lspRepository = LspRepository::create();
-        $lspUserRepository = new LspUserRepository();
-
         return new self(
-            JobCoordinatorRepository::create($lspRepository, $lspUserRepository),
-            $lspUserRepository,
+            ZfExtended_Authentication::getInstance(),
         );
     }
 
-    public function findLspUserBy(ZfExtended_Models_User $user): ?LspUser
+    /**
+     * @throws Zend_Exception
+     * @throws ZfExtended_ValidateException
+     */
+    public function setPassword(User $user, ?string $password): void
     {
-        return $this->lspUserRepository->findByUser($user);
-    }
+        if ('' === trim($password)) {
+            throw new \InvalidArgumentException('Password cannot be empty string');
+        }
 
-    public function findCoordinatorBy(ZfExtended_Models_User $user): ?JobCoordinator
-    {
-        return $this->jcRepository->findByUser($user);
-    }
+        $password = null === $password ? null : $this->authentication->createSecurePassword($password);
 
-    public function getCoordinatorsCountFor(LanguageServiceProvider $lsp): int
-    {
-        return $this->jcRepository->getCoordinatorsCount($lsp);
+        $user->setPasswd($password);
+
+        $user->validate();
     }
 }

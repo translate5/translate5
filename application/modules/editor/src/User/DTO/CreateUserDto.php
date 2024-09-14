@@ -30,6 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\DTO;
 
+use ZfExtended_Models_User;
+
 class CreateUserDto
 {
     /**
@@ -45,6 +47,7 @@ class CreateUserDto
         public readonly string $gender,
         public readonly array $roles = [],
         public readonly array $customers = [],
+        public readonly ?int $lsp = null,
         public readonly ?string $password = null,
         public readonly ?string $parentId = null,
         public readonly ?string $locale = null,
@@ -53,11 +56,11 @@ class CreateUserDto
 
     public static function fromRequestData(string $guid, array $data): self
     {
-        $roles = explode(',', trim($data['roles'], ','));
+        $roles = explode(',', trim($data['roles'] ?? '', ','));
         $customers = array_filter(
             array_map(
                 'intval',
-                explode(',', trim($data['customers'], ','))
+                explode(',', trim($data['customers'] ?? '', ','))
             )
         );
 
@@ -67,9 +70,10 @@ class CreateUserDto
             $data['email'],
             $data['firstName'],
             $data['surName'],
-            $data['gender'],
+            $data['gender'] ?? ZfExtended_Models_User::GENDER_NONE,
             $roles,
             $customers,
+            isset($data['lsp']) ? (int) $data['lsp'] : null,
             isset($data['passwd']) ? trim($data['passwd']) : null,
             $data['parentIds'] ?? null,
             $data['locale'] ?? null,

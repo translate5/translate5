@@ -42,7 +42,6 @@ use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolese
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
-use MittagQI\Translate5\User\Validation\RolesValidator;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
@@ -53,10 +52,10 @@ final class UserUpdateRolesOperation
 {
     public function __construct(
         private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
-        private readonly RolesValidator $rolesValidator,
         private readonly ZfExtended_Acl $acl,
         private readonly UserRepository $userRepository,
         private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly UserSetRolesOperation $setRoles,
     ) {
     }
 
@@ -69,10 +68,10 @@ final class UserUpdateRolesOperation
 
         return new self(
             UserActionFeasibilityAssert::create(),
-            new RolesValidator($acl),
             $acl,
             new UserRepository(),
             new LspUserRepository(),
+            UserSetRolesOperation::create(),
         );
     }
 
@@ -129,13 +128,7 @@ final class UserUpdateRolesOperation
             throw new UnableToAssignJobCoordinatorRoleToExistingUserException();
         }
 
-        $this->rolesValidator->assertRolesDontConflict($roles);
-
-        $roles = $this->acl->mergeAutoSetRoles($roles, []);
-
-        $user->setRoles($roles);
-
-        $user->validate();
+        $this->setRoles->setRoles($user, $roles);
 
         $this->userRepository->save($user);
     }

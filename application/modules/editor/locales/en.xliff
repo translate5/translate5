@@ -10109,6 +10109,18 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung oder für LSP-Benutzer definiert werden.</source>
                 <target>Role "Job Coordinator" can be set only on User creation process or to LSP User.</target>
             </trans-unit>
+            <trans-unit id='R2VnZWJlbmVyIHBhcmVudElkcy1XZXJ0IGthbm4gZsO8ciBrZWluZW4gQmVudXR6ZXIgYXVzZ2V3ZXJ0ZXQgd2VyZGVuIQ=='>
+                <source>Gegebener parentIds-Wert kann für keinen Benutzer ausgewertet werden!</source>
+                <target>Given parentIds value can not be evaluated to any user!</target>
+            </trans-unit>
+            <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgTFNQIGV4aXN0aWVydCBuaWNodCAobWVociku'>
+                <source>Der referenzierte LSP existiert nicht (mehr).</source>
+                <target>The referenced LSP does not exist (anymore).</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBCZW51dHplciwgZGllIG5pY2h0IGRpZSBSb2xsZSBkZXMgSm9ia29vcmRpbmF0b3JzIGhhYmVuLCB3aXJkIGRlciBTcHJhY2hkaWVuc3RsZWlzdGVyIGF1dG9tYXRpc2NoIGVpbmdlc3RlbGx0Lg=='>
+                <source>Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.</source>
+                <target>Language Service Provider is set automaticaly for non Job Coordinator role users.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -28,27 +28,28 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Operations;
+namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
 use MittagQI\ZfExtended\Acl\SystemResource;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
-use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Authentication;
+use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User as User;
-use ZfExtended_ValidateException;
 
 /**
  * Ment to be used to initialize parentIds for a user.
  * So only on User creation or in special cases where the parentIds need to be reinitialized.
  */
-final class UserInitParentIdsOperation
+final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterface
 {
     public function __construct(
         private readonly ZfExtended_Acl $acl,
-        private readonly UserRepository $userRepository,
+        private readonly \MittagQI\Translate5\User\Operations\UserSetParentIdsOperation $operation,
+        private readonly ZfExtended_AuthenticationInterface $authentication,
     ) {
     }
 
@@ -59,7 +60,8 @@ final class UserInitParentIdsOperation
     {
         return new self(
             ZfExtended_Acl::getInstance(),
-            new UserRepository(),
+            \MittagQI\Translate5\User\Operations\UserSetParentIdsOperation::create(),
+            ZfExtended_Authentication::getInstance(),
         );
     }
 
@@ -68,57 +70,24 @@ final class UserInitParentIdsOperation
      * @throws ProvidedParentIdCannotBeEvaluatedToUserException
      * @throws Zend_Acl_Exception
      */
-    public function initParentIdsBy(User $user, ?string $parentId, User $authUser): void
+    public function setParentIds(User $user, ?string $parentId): void
     {
-        $parentUser = $this->resolveParentUser($parentId, $authUser);
-
-        $this->initParentIds($user, $this->getParentIds($parentUser));
+        $this->operation->setParentIds(
+            $user,
+            $this->resolveParentUserId(
+                $parentId,
+                $this->authentication->getUser()
+            )
+        );
     }
 
-    /**
-     * @param int[] $parentIds
-     * @throws Zend_Acl_Exception
-     * @throws ZfExtended_ValidateException
-     */
-    public function initParentIds(User $user, array $parentIds): void
-    {
-        $user->setParentIds(',' . implode(',', $parentIds) . ',');
-
-        $user->validate();
-
-        $this->userRepository->save($user);
-    }
-
-    private function resolveParentUser(?string $parentId, User $authUser): User
+    private function resolveParentUserId(?string $parentId, User $authUser): string
     {
         if (! $this->canSeeAllUsers($authUser) || empty($parentId)) {
-            return $authUser;
+            return (string) $authUser->getId();
         }
 
-        try {
-            return $this->userRepository->resolveUser($parentId);
-        } catch (ZfExtended_Models_Entity_NotFoundException) {
-            throw new ProvidedParentIdCannotBeEvaluatedToUserException($parentId);
-        }
-    }
-
-    /**
-     * @return int[]
-     */
-    private function getParentIds(User $parentUser): array
-    {
-        $parentIds = [];
-
-        if (! empty($parentUser->getParentIds())) {
-            $parentIds = array_map(
-                'intval',
-                explode(',', trim($parentUser->getParentIds(), ' ,'))
-            );
-        }
-
-        $parentIds[] = (int) $parentUser->getId();
-
-        return $parentIds;
+        return $parentId;
     }
 
     private function canSeeAllUsers(User $authUser): bool

@@ -28,20 +28,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Validation;
+namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
-use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
+use ZfExtended_Authentication;
+use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User as User;
 
-class UserCustomerAssociationValidator
+/**
+ * Should not be used directly, use:
+ * @see UserCustomerAssociationUpdateOperation
+ * @see UserCreateOperation
+ */
+final class UserAssignCustomersOperation implements UserAssignCustomersOperationInterface
 {
     public function __construct(
-        private readonly LspUserRepository $lspUserRepository,
-        private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
+        private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
+        private readonly \MittagQI\Translate5\User\Operations\UserAssignCustomersOperation $operation,
+        private readonly ZfExtended_AuthenticationInterface $authentication,
     ) {
     }
 
@@ -51,36 +58,26 @@ class UserCustomerAssociationValidator
     public static function create(): self
     {
         return new self(
-            new LspUserRepository(),
-            LspCustomerAssociationValidator::create(),
+            UserCustomerAssociationValidator::create(),
+            \MittagQI\Translate5\User\Operations\UserAssignCustomersOperation::create(),
+            ZfExtended_Authentication::getInstance(),
         );
     }
 
     /**
-     * @param iterable<int> $customerIds
+     * @param int[] $associatedCustomerIds
      * @throws CustomerDoesNotBelongToUserException
-     */
-    public function assertCustomersAreSubsetForUser(iterable $customerIds, User $user): void
-    {
-        $userCustomers = $user->getCustomersArray();
-
-        foreach ($customerIds as $customerId) {
-            if (! in_array((int) $customerId, $userCustomers, true)) {
-                throw new CustomerDoesNotBelongToUserException((int) $customerId, $user->getUserGuid());
-            }
-        }
-    }
-
-    /**
-     * @param iterable<int> $customerIds
      * @throws CustomerDoesNotBelongToLspException
      */
-    public function assertCustomersMayBeAssociatedWithUser(iterable $customerIds, User $user): void
+    public function assignCustomers(User $user, array $associatedCustomerIds): void
     {
-        $lspUser = $this->lspUserRepository->findByUser($user);
-
-        if (null !== $lspUser) {
-            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($lspUser->lsp, $customerIds);
+        if ($this->authentication->getUser()->isClientRestricted()) {
+            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser(
+                $associatedCustomerIds,
+                $this->authentication->getUser()
+            );
         }
+
+        $this->operation->assignCustomers($user, $associatedCustomerIds);
     }
 }

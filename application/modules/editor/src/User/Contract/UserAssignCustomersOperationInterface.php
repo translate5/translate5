@@ -28,41 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Validation;
+namespace MittagQI\Translate5\User\Contract;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use ZfExtended_Models_User as User;
 
-class LspCustomerAssociationValidator
+interface UserAssignCustomersOperationInterface
 {
-    public function __construct(
-        private readonly LspRepository $lspRepository,
-    ) {
-    }
-
     /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self(
-            LspRepository::create(),
-        );
-    }
-
-    /**
-     * @param int[] $customerIds
+     * @param int[] $associatedCustomerIds
+     * @throws CustomerDoesNotBelongToUserException
      * @throws CustomerDoesNotBelongToLspException
      */
-    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, iterable $customerIds): void
-    {
-        $lspCustomersIds = $this->lspRepository->getCustomerIds($lsp);
-
-        foreach ($customerIds as $customerId) {
-            if (! in_array($customerId, $lspCustomersIds, true)) {
-                throw new CustomerDoesNotBelongToLspException($customerId, (int) $lsp->getId());
-            }
-        }
-    }
+    public function assignCustomers(User $user, array $associatedCustomerIds): void;
 }

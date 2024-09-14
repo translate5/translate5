@@ -32,8 +32,9 @@ namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
 use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\LSP\LspUserService;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
@@ -43,7 +44,8 @@ use ZfExtended_Models_User as User;
 final class LspUserAccessPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
-        private readonly LspUserService $lspUserService,
+        private readonly LspUserRepository $lspUserRepository,
+        private readonly JobCoordinatorRepository $coordinatorRepository,
     ) {
     }
 
@@ -64,7 +66,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        $lspUser = $this->lspUserService->findLspUserBy($user);
+        $lspUser = $this->lspUserRepository->findByUser($user);
 
         if (null === $lspUser) {
             return;
@@ -78,7 +80,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             throw new NotAccessibleLspUserException($lspUser);
         }
 
-        $managerCoordinator = $this->lspUserService->findCoordinatorBy($manager);
+        $managerCoordinator = $this->coordinatorRepository->findByUser($manager);
 
         if (null === $managerCoordinator) {
             throw new NotAccessibleLspUserException($lspUser);
