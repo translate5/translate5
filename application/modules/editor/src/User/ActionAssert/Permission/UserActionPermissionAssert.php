@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission;
 
-use MittagQI\Translate5\LSP\LspUserService;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\AclPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedPermissionAssert;
@@ -55,12 +54,10 @@ final class UserActionPermissionAssert
      */
     public static function create(): self
     {
-        $lspUserService = LspUserService::create();
-
         return new self([
             ParentPermissionAssert::create(),
             new ClientRestrictedPermissionAssert(),
-            new LspUserAccessPermissionAssert($lspUserService),
+            LspUserAccessPermissionAssert::create(),
             new AclPermissionAssert(),
         ]);
     }

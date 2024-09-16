@@ -31,238 +31,162 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use InvalidArgumentException;
-use MittagQI\Translate5\Repository\CustomerRepository;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_User as User;
 
 class UserCustomerAssociationUpdateOperationTest extends TestCase
 {
+    private UserCustomerAssociationValidator|MockObject $associationValidator;
+
+    private UserRepository|MockObject $userRepository;
+
+    private UserActionFeasibilityAssertInterface|MockObject $feasibilityChecker;
+
+    private UserAssignCustomersOperationInterface|MockObject $assignCustomers;
+    
+    private UserCustomerAssociationUpdateOperation $operation;
+    
+    public function setUp(): void
+    {
+        $this->associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
+        $this->feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
+        $this->assignCustomers = $this->createMock(UserAssignCustomersOperationInterface::class);
+
+        $this->operation = new UserCustomerAssociationUpdateOperation(
+            $this->associationValidator,
+            $this->userRepository,
+            $this->feasibilityChecker,
+            $this->assignCustomers,
+        );
+    }
+
     public function testThrowsFeasibilityExceptionWhenActionNotAllowed(): void
     {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
         $user = $this->createMock(User::class);
 
         $exception = $this->createMock(FeasibilityExceptionInterface::class);
-        $feasibilityChecker
+        $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user)
             ->willThrowException($exception);
 
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
-
         $this->expectException(FeasibilityExceptionInterface::class);
 
-        $userRepository->expects(self::never())->method('save');
+        $this->userRepository->expects(self::never())->method('save');
 
-        $updateService->updateAssociatedCustomers($user, []);
+        $this->operation->updateAssociatedCustomers($user, []);
 
-        $userRepository->expects(self::never())->method('save');
+        $this->userRepository->expects(self::never())->method('save');
 
-        $updateService->updateAssociatedCustomersBy($user, [], $this->createMock(User::class));
+        $this->operation->updateAssociatedCustomersBy($user, [], $this->createMock(User::class));
     }
 
     public function testThrowsFeasibilityExceptionWhenActionNotAllowedInAuthUserScenario(): void
     {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
         $user = $this->createMock(User::class);
 
         $exception = $this->createMock(FeasibilityExceptionInterface::class);
-        $feasibilityChecker
+        $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user)
             ->willThrowException($exception);
 
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
-
         $this->expectException(FeasibilityExceptionInterface::class);
 
-        $userRepository->expects(self::never())->method('save');
+        $this->userRepository->expects(self::never())->method('save');
 
-        $updateService->updateAssociatedCustomersBy($user, [], $this->createMock(User::class));
+        $this->operation->updateAssociatedCustomersBy($user, [], $this->createMock(User::class));
     }
 
     public function testThrowsExceptionWhenAuthUserTriesAddCustomersThatHeHasNotAccessTo(): void
     {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
         $user = $this->createMock(User::class);
 
         $authUser = $this->createMock(User::class);
         $authUser->method('isClientRestricted')->willReturn(true);
 
         $exception = $this->createMock(InvalidArgumentException::class);
-        $feasibilityChecker
+        $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $associationValidator
+        $this->associationValidator
             ->expects(self::once())
             ->method('assertCustomersAreSubsetForUser')
             ->willThrowException($exception);
 
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
-
         $this->expectException(InvalidArgumentException::class);
 
-        $userRepository->expects(self::never())->method('save');
+        $this->userRepository->expects(self::never())->method('save');
 
-        $updateService->updateAssociatedCustomersBy($user, [], $authUser);
+        $this->operation->updateAssociatedCustomersBy($user, [], $authUser);
     }
 
-    public function testThrowsExceptionWhenOneOfProvidedCustomersCannotBeAssociatedWithUser(): void
+    public function testThrowsExceptionWhenCustomerDoesNotBelongToLsp(): void
     {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
         $user = $this->createMock(User::class);
 
         $authUser = $this->createMock(User::class);
         $authUser->method('isClientRestricted')->willReturn(true);
 
-        $exception = $this->createMock(InvalidArgumentException::class);
-        $feasibilityChecker
+        $exception = $this->createMock(CustomerDoesNotBelongToLspException::class);
+        $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $associationValidator
+        $this->assignCustomers
             ->expects(self::once())
-            ->method('assertCustomersMayBeAssociatedWithUser')
+            ->method('assignCustomers')
             ->willThrowException($exception);
 
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
+        $this->expectException(CustomerDoesNotBelongToLspException::class);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->userRepository->expects(self::never())->method('save');
 
-        $userRepository->expects(self::never())->method('save');
-
-        $updateService->updateAssociatedCustomers($user, []);
-    }
-
-    public function testThrowsExceptionWhenOneOfProvidedCustomersCannotBeAssociatedWithUserInAuthUserScenario(): void
-    {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
-        $user = $this->createMock(User::class);
-
-        $authUser = $this->createMock(User::class);
-        $authUser->method('isClientRestricted')->willReturn(true);
-
-        $exception = $this->createMock(InvalidArgumentException::class);
-        $feasibilityChecker
-            ->expects(self::once())
-            ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
-
-        $associationValidator
-            ->expects(self::once())
-            ->method('assertCustomersMayBeAssociatedWithUser')
-            ->willThrowException($exception);
-
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-
-        $userRepository->expects(self::never())->method('save');
-
-        $updateService->updateAssociatedCustomersBy($user, [], $authUser);
+        $this->operation->updateAssociatedCustomers($user, []);
     }
 
     public function testCustomerAssociatedWithUser(): void
     {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
         $customerIds = [1, 2, 3];
 
         $user = $this->createMock(User::class);
-        $user->expects(self::once())->method('assignCustomers')->with($customerIds);
 
-        $feasibilityChecker
+        $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $associationValidator
+        $this->assignCustomers
             ->expects(self::once())
-            ->method('assertCustomersMayBeAssociatedWithUser');
+            ->method('assignCustomers');
 
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
-
-        $userRepository
+        $this->userRepository
             ->expects(self::once())
             ->method('save')
             ->with(
                 $this->callback(fn (User $userToSave) => $userToSave === $user)
             );
 
-        $updateService->updateAssociatedCustomers($user, $customerIds);
+        $this->operation->updateAssociatedCustomers($user, $customerIds);
     }
 
     public function testAssociateSameCustomersWithUserInAuthUserScenario(): void
     {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
         $customerIds = [1, 2, 3];
 
         $user = $this->createMock(User::class);
@@ -272,39 +196,27 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
         $authUser = $this->createMock(User::class);
         $authUser->method('isClientRestricted')->willReturn(true);
 
-        $feasibilityChecker
+        $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $associationValidator
+        $this->associationValidator
             ->expects(self::once())
             ->method('assertCustomersMayBeAssociatedWithUser');
 
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
-
-        $userRepository
+        $this->userRepository
             ->expects(self::once())
             ->method('save')
             ->with(
                 $this->callback(fn (User $userToSave) => $userToSave === $user)
             );
 
-        $updateService->updateAssociatedCustomersBy($user, $customerIds, $authUser);
+        $this->operation->updateAssociatedCustomersBy($user, $customerIds, $authUser);
     }
 
     public function testCustomerUnassociatedFromUserInAuthUserScenarioAuthUserNotClientRestricted(): void
     {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
         $customerIds = [1, 2];
 
         $user = $this->createMock(User::class);
@@ -314,39 +226,27 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
         $authUser = $this->createMock(User::class);
         $authUser->method('isClientRestricted')->willReturn(false);
 
-        $feasibilityChecker
+        $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $associationValidator
+        $this->associationValidator
             ->expects(self::once())
             ->method('assertCustomersMayBeAssociatedWithUser');
 
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
-
-        $userRepository
+        $this->userRepository
             ->expects(self::once())
             ->method('save')
             ->with(
                 $this->callback(fn (User $userToSave) => $userToSave === $user)
             );
 
-        $updateService->updateAssociatedCustomersBy($user, $customerIds, $authUser);
+        $this->operation->updateAssociatedCustomersBy($user, $customerIds, $authUser);
     }
 
     public function testCustomerUnassociatedFromUserInAuthUserScenarioAuthUserIsClientRestrictedAndHasAccessToDeletedCustomer(): void
     {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
         $customerIds = [1, 2];
 
         $user = $this->createMock(User::class);
@@ -357,43 +257,31 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
         $authUser->method('isClientRestricted')->willReturn(true);
         $authUser->expects(self::once())->method('getCustomersArray')->willReturn([1, 2, 3]);
 
-        $feasibilityChecker
+        $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $associationValidator
+        $this->associationValidator
             ->expects(self::once())
             ->method('assertCustomersMayBeAssociatedWithUser');
 
-        $associationValidator
+        $this->associationValidator
             ->expects(self::once())
             ->method('assertCustomersAreSubsetForUser');
 
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
-
-        $userRepository
+        $this->userRepository
             ->expects(self::once())
             ->method('save')
             ->with(
                 $this->callback(fn (User $userToSave) => $userToSave === $user)
             );
 
-        $updateService->updateAssociatedCustomersBy($user, $customerIds, $authUser);
+        $this->operation->updateAssociatedCustomersBy($user, $customerIds, $authUser);
     }
 
     public function testCustomerNotUnassociatedFromUserInAuthUserScenarioAuthUserIsClientRestrictedAndDoesNotHaveAccessToDeletedCustomer(): void
     {
-        $associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $customerRepository = $this->createMock(CustomerRepository::class);
-
         $userCustomers = [1, 2, 3];
 
         $user = $this->createMock(User::class);
@@ -404,33 +292,26 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
         $authUser->method('isClientRestricted')->willReturn(true);
         $authUser->expects(self::once())->method('getCustomersArray')->willReturn([1]);
 
-        $feasibilityChecker
+        $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $associationValidator
+        $this->associationValidator
             ->expects(self::once())
             ->method('assertCustomersMayBeAssociatedWithUser');
 
-        $associationValidator
+        $this->associationValidator
             ->expects(self::once())
             ->method('assertCustomersAreSubsetForUser');
 
-        $updateService = new UserCustomerAssociationUpdateOperation(
-            $associationValidator,
-            $userRepository,
-            $feasibilityChecker,
-            $customerRepository
-        );
-
-        $userRepository
+        $this->userRepository
             ->expects(self::once())
             ->method('save')
             ->with(
                 $this->callback(fn (User $userToSave) => $userToSave === $user)
             );
 
-        $updateService->updateAssociatedCustomersBy($user, [1, 2], $authUser);
+        $this->operation->updateAssociatedCustomersBy($user, [1, 2], $authUser);
     }
 }

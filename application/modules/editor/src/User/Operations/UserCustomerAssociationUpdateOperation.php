@@ -36,6 +36,7 @@ use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use ZfExtended_Models_User as User;
@@ -46,7 +47,7 @@ class UserCustomerAssociationUpdateOperation
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
         private readonly UserRepository $userRepository,
         private readonly UserActionFeasibilityAssertInterface $feasibilityAssert,
-        private readonly UserAssignCustomersOperation $assignCustomers,
+        private readonly UserAssignCustomersOperationInterface $assignCustomers,
     ) {
     }
 

@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\LspUserService;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
@@ -54,7 +54,7 @@ class LastCoordinatorFeasibilityAssertTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($this->createMock(LspUserService::class));
+        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($this->createMock(JobCoordinatorRepository::class));
         $this->assertEquals($expected, $lspPermissionAuditor->supports($action));
     }
 
@@ -62,13 +62,13 @@ class LastCoordinatorFeasibilityAssertTest extends TestCase
     {
         $user = $this->createMock(ZfExtended_Models_User::class);
 
-        $lspUserService = $this->createMock(LspUserService::class);
-        $lspUserService->expects($this->once())
-            ->method('findCoordinatorBy')
+        $coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
+        $coordinatorRepository->expects($this->once())
+            ->method('findByUser')
             ->with($this->callback(fn (object $provided) => $provided === $user))
             ->willReturn(null);
 
-        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($lspUserService);
+        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($coordinatorRepository);
         $lspPermissionAuditor->assertAllowed($user);
     }
 
@@ -81,17 +81,17 @@ class LastCoordinatorFeasibilityAssertTest extends TestCase
             ->setConstructorArgs(['lsp', $user, $lsp])
             ->getMock();
 
-        $lspUserService = $this->createMock(LspUserService::class);
-        $lspUserService->expects($this->once())
-            ->method('findCoordinatorBy')
+        $coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
+        $coordinatorRepository->expects($this->once())
+            ->method('findByUser')
             ->with($this->callback(fn (object $provided) => $provided === $user))
             ->willReturn($coordinator);
-        $lspUserService->expects($this->once())
-            ->method('getCoordinatorsCountFor')
+        $coordinatorRepository->expects($this->once())
+            ->method('getCoordinatorsCount')
             ->with($this->callback(fn (object $provided) => $provided === $lsp))
             ->willReturn(1);
 
-        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($lspUserService);
+        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($coordinatorRepository);
         $this->expectException(LastCoordinatorException::class);
         $lspPermissionAuditor->assertAllowed($user);
     }

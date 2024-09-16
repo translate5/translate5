@@ -34,6 +34,7 @@ use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\LspUser;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
@@ -44,9 +45,20 @@ use ZfExtended_Models_User as User;
 final class LspUserAccessPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
-        private readonly LspUserRepository $lspUserRepository,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
     ) {
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self(
+            new LspUserRepository(),
+            JobCoordinatorRepository::create(),
+        );
     }
 
     public function supports(Action $action): bool
