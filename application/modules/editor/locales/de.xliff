@@ -9959,6 +9959,14 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Der {0} wurde erfolgreich gelöscht.</source>
                 <target>Der {0} wurde erfolgreich gelöscht.</target>
             </trans-unit>
+            <trans-unit id='RGVyIMO8YmVyZ2VvcmRuZXRlIEJlbnV0emVyIGRlcyBKb2ItS29vcmRpbmF0b3JzIGthbm4gbnVyIGRlciBQTSwgQWRtaW4gdW5kIEpvYi1Lb29yZGluYXRvciBkZXMgZWlnZW5lbiBvZGVyIMO8YmVyZ2VvcmRuZXRlbiBMU1Agc2Vpbg=='>
+                <source>Der übergeordnete Benutzer des Job-Koordinators kann nur der PM, Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein</source>
+                <target>Der übergeordnete Benutzer des Job-Koordinators kann nur der PM, Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein</target>
+            </trans-unit>
+            <trans-unit id='RGVyIMO8YmVyZ2VvcmRuZXRlIEJlbnV0emVyIGVpbmVzIExTUC1CZW51dHplcnMga2FubiBudXIgZGVyIEpvYmtvb3JkaW5hdG9yIGRlcyBlaWdlbmVuIFNwcmFjaGRpZW5zdGxlaXN0ZXJzIChMU1ApIHNlaW4u'>
+                <source>Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.</source>
+                <target>Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

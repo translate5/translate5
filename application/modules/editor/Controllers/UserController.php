@@ -50,6 +50,8 @@ use MittagQI\Translate5\User\DTO\CreateUserDto;
 use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForJobCoordinatorException;
+use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForLspUserException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
@@ -584,58 +586,27 @@ class Editor_UserController extends ZfExtended_RestController
                 ],
                 [
                     LanguageServiceProvider::class,
-                    $e->getId(),
+                    $e->lspId,
                 ]
+            ),
+            InvalidParentUserProvidedForJobCoordinatorException::class => ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'parentIds' => [
+                        'Der übergeordnete Benutzer des Job-Koordinators kann nur der PM, Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein',
+                    ],
+                ],
+            ),
+            InvalidParentUserProvidedForLspUserException::class => ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'parentIds' => [
+                        'Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.',
+                    ],
+                ],
             ),
             default => $e,
         };
-    }
-
-    private function assignLsp(ZfExtended_Models_User $authUser): void
-    {
-        $jobCoordinatorRepo = JobCoordinatorRepository::create();
-        $authCoordinator = $jobCoordinatorRepo->findByUser($authUser);
-        $userIsCoordinator = in_array(Roles::JOB_COORDINATOR, $this->entity->getRoles());
-
-        if (! $userIsCoordinator && ! $authCoordinator && empty($this->data->lsp)) {
-            return;
-        }
-
-        // for lsp users lsp is set automatically from the coordinator
-        if (! $userIsCoordinator && ! empty($this->data->lsp)) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'lsp' => [
-                        'Ein Wechsel des Sprachdienstleisters ist nicht zulässig.',
-                    ],
-                ],
-            );
-        }
-
-        // for coordinators lsp is mandatory
-        if ($userIsCoordinator && empty($this->data->lsp)) {
-
-        }
-
-        $lsp = (int) $this->fetchLspForAssignment($authCoordinator);
-
-
-    }
-
-    private function fetchLspForAssignment(?JobCoordinator $authCoordinator): LanguageServiceProvider
-    {
-        $lspRepository = LspRepository::create();
-
-        if (! empty($this->data->lsp)) {
-            return $lspRepository->get((int) $this->data->lsp);
-        }
-
-        if ($authCoordinator) {
-            return $authCoordinator->lsp;
-        }
-
-        throw new \LogicException('Unexpected logic branch. Either lsp or coordinator must be set at this point.');
     }
 
     /**

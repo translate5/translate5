@@ -78,7 +78,7 @@ class LspRepository implements LspRepositoryInterface
 
             return $model;
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            throw new LspNotFoundException(previous: $e);
+            throw new LspNotFoundException($id);
         }
     }
 

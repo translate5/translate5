@@ -43,9 +43,9 @@ class UserRepository
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function get(int $id): ZfExtended_Models_User
+    public function get(int $id): User
     {
-        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $user = ZfExtended_Factory::get(User::class);
         $user->load($id);
 
         return $user;
@@ -54,9 +54,9 @@ class UserRepository
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getByGuid(string $guid): ZfExtended_Models_User
+    public function getByGuid(string $guid): User
     {
-        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $user = ZfExtended_Factory::get(User::class);
         $user->loadByGuid($guid);
 
         return $user;
@@ -65,7 +65,7 @@ class UserRepository
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function resolveUser(string $identifier): ZfExtended_Models_User
+    public function resolveUser(string $identifier): User
     {
         if (is_numeric($identifier)) {
             return $this->get((int) $identifier);

@@ -63,8 +63,6 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
      */
     public function assignCustomers(User $user, array $associatedCustomerIds): void
     {
-        // TODO: add LSP customers check
-
         $this->userCustomerAssociationValidator->assertCustomersMayBeAssociatedWithUser($associatedCustomerIds, $user);
 
         $user->assignCustomers($associatedCustomerIds);

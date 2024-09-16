@@ -10137,6 +10137,14 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Der {0} wurde erfolgreich gelöscht.</source>
                 <target>The {0} has been successfully deleted.</target>
             </trans-unit>
+            <trans-unit id='RGVyIMO8YmVyZ2VvcmRuZXRlIEJlbnV0emVyIGRlcyBKb2ItS29vcmRpbmF0b3JzIGthbm4gbnVyIGRlciBQTSwgQWRtaW4gdW5kIEpvYi1Lb29yZGluYXRvciBkZXMgZWlnZW5lbiBvZGVyIMO8YmVyZ2VvcmRuZXRlbiBMU1Agc2Vpbg=='>
+                <source>Der übergeordnete Benutzer des Job-Koordinators kann nur der PM, Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein</source>
+                <target>The parent user of the Job Coordinator can only be the PM, Admin and Job Coordinator of the own or parent LSP</target>
+            </trans-unit>
+            <trans-unit id='RGVyIMO8YmVyZ2VvcmRuZXRlIEJlbnV0emVyIGVpbmVzIExTUC1CZW51dHplcnMga2FubiBudXIgZGVyIEpvYmtvb3JkaW5hdG9yIGRlcyBlaWdlbmVuIFNwcmFjaGRpZW5zdGxlaXN0ZXJzIChMU1ApIHNlaW4u'>
+                <source>Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.</source>
+                <target>The parent user of LSP user can only be the Job coordinator of the own LSP</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

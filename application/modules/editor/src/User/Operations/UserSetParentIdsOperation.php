@@ -30,13 +30,19 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations;
 
+use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
+use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForJobCoordinatorException;
+use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForLspUserException;
 use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
+use MittagQI\Translate5\User\Model\User;
 use Zend_Acl_Exception;
-use ZfExtended_Acl;
 use ZfExtended_Models_Entity_NotFoundException;
-use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
 /**
@@ -45,8 +51,15 @@ use ZfExtended_ValidateException;
  */
 final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterface
 {
+    /**
+     * @var array<string, JobCoordinator>
+     */
+    private array $jobCoordinators = [];
+
     public function __construct(
         private readonly UserRepository $userRepository,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly JobCoordinatorRepository $coordinatorRepository,
     ) {
     }
 
@@ -57,6 +70,8 @@ final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterf
     {
         return new self(
             new UserRepository(),
+            new LspUserRepository(),
+            JobCoordinatorRepository::create(),
         );
     }
 
@@ -79,6 +94,8 @@ final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterf
             throw new ProvidedParentIdCannotBeEvaluatedToUserException($parentId);
         }
 
+        $this->assertUserCanBeSetAsParentTo($parentUser, $user);
+
         $parentIds = $this->getParentIds($parentUser);
 
         $user->setParentIds(',' . implode(',', $parentIds) . ',');
@@ -86,11 +103,69 @@ final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterf
         $user->validate();
     }
 
+    private function assertUserCanBeSetAsParentTo(User $parentUser, User $childUser): void
+    {
+        $childLspUser = $this->lspUserRepository->findByUser($childUser);
+
+        if (null === $childLspUser) {
+            return;
+        }
+
+        try {
+            JobCoordinator::fromLspUser($childLspUser);
+
+            $childUserIsCoordinator =  true;
+        } catch (CantCreateCoordinatorFromUserException) {
+            $childUserIsCoordinator =  false;
+        }
+
+        $parentCoordinator = $this->fetchCoordinator($parentUser);
+
+        if ($childUserIsCoordinator) {
+            if (($parentUser->isPm() || $parentUser->isAdmin()) && $childLspUser->lsp->isDirectLsp()) {
+                return;
+            }
+
+            if (null === $parentCoordinator) {
+                throw new InvalidParentUserProvidedForJobCoordinatorException();
+            }
+
+            if ($parentCoordinator->isCoordinatorOf($childLspUser->lsp)) {
+                return;
+            }
+
+            if ($childLspUser->lsp->isSubLspOf($parentCoordinator->lsp)) {
+                return;
+            }
+
+            throw new InvalidParentUserProvidedForJobCoordinatorException();
+        }
+
+        if (null === $parentCoordinator || ! $parentCoordinator->isCoordinatorOf($childLspUser->lsp)) {
+            throw new InvalidParentUserProvidedForLspUserException();
+        }
+    }
+
+    private function fetchCoordinator(User $user): ?JobCoordinator
+    {
+        if (! isset($this->jobCoordinators[$user->getUserGuid()])) {
+            $this->jobCoordinators[$user->getUserGuid()] = $this->coordinatorRepository->findByUser($user);
+        }
+
+        return $this->jobCoordinators[$user->getUserGuid()];
+    }
+
     /**
      * @return int[]
      */
     private function getParentIds(User $parentUser): array
     {
+        $parentCoordinator = $this->fetchCoordinator($parentUser);
+
+        if (null !== $parentCoordinator) {
+            return [(int) $parentUser->getId()];
+        }
+
         $parentIds = [];
 
         if (! empty($parentUser->getParentIds())) {

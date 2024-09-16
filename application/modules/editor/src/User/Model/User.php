@@ -40,6 +40,17 @@ class User extends \ZfExtended_Models_User
         return in_array(Roles::JOB_COORDINATOR, $this->getRoles(), true);
     }
 
+    public function isPm(): bool
+    {
+        return in_array(Roles::PM, $this->getRoles(), true);
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array(Roles::ADMIN, $this->getRoles(), true)
+            || in_array(Roles::SYSTEMADMIN, $this->getRoles(), true);
+    }
+
     public function setInitialFields(CreateUserDto $dto): void
     {
         $this->setUserGuid($dto->guid);
@@ -50,5 +61,4 @@ class User extends \ZfExtended_Models_User
         $this->setGender($dto->gender);
         $this->setLocale($dto->locale);
     }
-
 }

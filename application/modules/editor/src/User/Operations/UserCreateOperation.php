@@ -32,7 +32,9 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\LSP\Operations\LspUserCreateOperation;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
@@ -42,6 +44,7 @@ use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use Throwable;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_User as User;
@@ -58,6 +61,7 @@ final class UserCreateOperation
         private readonly ResetPasswordEmail $resetPasswordEmail,
         private readonly LspUserCreateOperation $lspUserCreate,
         private readonly LspRepositoryInterface $lspRepository,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
     ) {
     }
 
@@ -75,6 +79,7 @@ final class UserCreateOperation
             ResetPasswordEmail::create(),
             LspUserCreateOperation::create(),
             LspRepository::create(),
+            new LspUserRepository(),
         );
     }
 
@@ -92,6 +97,7 @@ final class UserCreateOperation
             ResetPasswordEmail::create(),
             LspUserCreateOperation::create(),
             LspRepository::create(),
+            new LspUserRepository(),
         );
     }
 
@@ -111,12 +117,7 @@ final class UserCreateOperation
             $this->setPassword->setPassword($user, $dto->password);
         }
 
-        if (null !== $dto->parentId) {
-            $this->setParentIds->setParentIds($user, $dto->parentId);
-        }
-
         $this->setRoles->setRoles($user, $dto->roles);
-        $this->assignCustomers->assignCustomers($user, $dto->customers);
 
         $user->validate();
 
@@ -132,8 +133,26 @@ final class UserCreateOperation
 
         $this->userRepository->save($user);
 
-        if (null !== $lsp) {
-            $this->lspUserCreate->createLspUser($lsp, $user);
+        try {
+            $lspUser = null;
+
+            if (null !== $lsp) {
+                $lspUser = $this->lspUserCreate->createLspUser($lsp, $user);
+            }
+
+            if (null !== $dto->parentId) {
+                $this->setParentIds->setParentIds($user, $dto->parentId);
+            }
+
+            $this->assignCustomers->assignCustomers($user, $dto->customers);
+        } catch (Throwable $e) {
+            if ($lspUser) {
+                $this->lspUserRepository->delete($lspUser);
+            }
+
+            $this->userRepository->delete($user);
+
+            throw $e;
         }
 
         if (empty($dto->password)) {

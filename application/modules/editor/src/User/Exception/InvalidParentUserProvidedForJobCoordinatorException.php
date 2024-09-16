@@ -28,16 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Contract;
+namespace MittagQI\Translate5\User\Exception;
 
-use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
-use MittagQI\Translate5\User\Model\User;
+use InvalidArgumentException;
 
-interface UserSetParentIdsOperationInterface
+class InvalidParentUserProvidedForJobCoordinatorException extends InvalidArgumentException
 {
-    /**
-     * @throws ProvidedParentIdCannotBeEvaluatedToUserException
-     * @throws Zend_Acl_Exception
-     */
-    public function setParentIds(User $user, ?string $parentId): void;
 }
