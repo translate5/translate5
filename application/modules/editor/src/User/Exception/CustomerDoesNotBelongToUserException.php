@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class CustomerDoesNotBelongToUserException extends InvalidArgumentException
+class CustomerDoesNotBelongToUserException extends InvalidArgumentException implements UserExceptionInterface
 {
     public function __construct(
         public readonly int $customerId,

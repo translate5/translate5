@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class UserIsNotAuthorisedToAssignRoleException extends InvalidArgumentException
+class UserIsNotAuthorisedToAssignRoleException extends InvalidArgumentException implements UserExceptionInterface
 {
     public function __construct(
         public readonly string $role,

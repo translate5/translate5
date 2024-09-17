@@ -48,7 +48,7 @@ final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterf
 {
     public function __construct(
         private readonly ZfExtended_Acl $acl,
-        private readonly \MittagQI\Translate5\User\Operations\UserSetParentIdsOperation $operation,
+        private readonly UserSetParentIdsOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
     ) {
     }
@@ -83,7 +83,7 @@ final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterf
 
     private function resolveParentUserId(?string $parentId, User $authUser): string
     {
-        if (! $this->canSeeAllUsers($authUser) || empty($parentId)) {
+        if (empty($parentId) || ! $this->canSeeAllUsers($authUser)) {
             return (string) $authUser->getId();
         }
 

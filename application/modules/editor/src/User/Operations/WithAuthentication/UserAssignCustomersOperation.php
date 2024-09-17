@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
@@ -46,9 +47,10 @@ use ZfExtended_Models_User as User;
 final class UserAssignCustomersOperation implements UserAssignCustomersOperationInterface
 {
     public function __construct(
+        private readonly UserAssignCustomersOperationInterface $operation,
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
-        private readonly \MittagQI\Translate5\User\Operations\UserAssignCustomersOperation $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -58,9 +60,10 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
     public static function create(): self
     {
         return new self(
-            UserCustomerAssociationValidator::create(),
             \MittagQI\Translate5\User\Operations\UserAssignCustomersOperation::create(),
+            UserCustomerAssociationValidator::create(),
             ZfExtended_Authentication::getInstance(),
+            new UserRepository(),
         );
     }
 
@@ -71,11 +74,10 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
      */
     public function assignCustomers(User $user, array $associatedCustomerIds): void
     {
-        if ($this->authentication->getUser()->isClientRestricted()) {
-            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser(
-                $associatedCustomerIds,
-                $this->authentication->getUser()
-            );
+        $authUser = $this->userRepository->get($this->authentication->getUserId());
+
+        if ($authUser->isClientRestricted()) {
+            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($associatedCustomerIds, $authUser);
         }
 
         $this->operation->assignCustomers($user, $associatedCustomerIds);

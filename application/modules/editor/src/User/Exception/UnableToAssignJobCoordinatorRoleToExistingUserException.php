@@ -32,6 +32,6 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class UnableToAssignJobCoordinatorRoleToExistingUserException extends InvalidArgumentException
+class UnableToAssignJobCoordinatorRoleToExistingUserException extends InvalidArgumentException implements UserExceptionInterface
 {
 }

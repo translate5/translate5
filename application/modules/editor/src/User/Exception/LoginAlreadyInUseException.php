@@ -32,6 +32,6 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class LoginAlreadyInUseException extends InvalidArgumentException
+class LoginAlreadyInUseException extends InvalidArgumentException implements UserExceptionInterface
 {
 }

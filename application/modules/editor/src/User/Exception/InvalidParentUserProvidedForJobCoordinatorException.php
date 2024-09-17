@@ -32,6 +32,6 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class InvalidParentUserProvidedForJobCoordinatorException extends InvalidArgumentException
+class InvalidParentUserProvidedForJobCoordinatorException extends InvalidArgumentException implements UserExceptionInterface
 {
 }

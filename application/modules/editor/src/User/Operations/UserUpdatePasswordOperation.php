@@ -32,8 +32,6 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
 use Zend_Exception;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 

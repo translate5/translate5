@@ -37,20 +37,18 @@ use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
+use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
-use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
+use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use MittagQI\Translate5\User\Model\User;
 use Throwable;
-use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
-use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
-use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
-final class UserCreateOperation
+final class UserCreateOperation implements UserCreateOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -58,8 +56,8 @@ final class UserCreateOperation
         private readonly UserSetRolesOperationInterface $setRoles,
         private readonly UserSetPasswordOperation $setPassword,
         private readonly UserAssignCustomersOperationInterface $assignCustomers,
-        private readonly ResetPasswordEmail $resetPasswordEmail,
         private readonly LspUserCreateOperation $lspUserCreate,
+        private readonly ResetPasswordEmail $resetPasswordEmail,
         private readonly LspRepositoryInterface $lspRepository,
         private readonly LspUserRepositoryInterface $lspUserRepository,
     ) {
@@ -76,8 +74,8 @@ final class UserCreateOperation
             UserSetRolesOperation::create(),
             UserSetPasswordOperation::create(),
             UserAssignCustomersOperation::create(),
-            ResetPasswordEmail::create(),
             LspUserCreateOperation::create(),
+            ResetPasswordEmail::create(),
             LspRepository::create(),
             new LspUserRepository(),
         );
@@ -94,18 +92,15 @@ final class UserCreateOperation
             WithAuthentication\UserSetRolesOperation::create(),
             UserSetPasswordOperation::create(),
             WithAuthentication\UserAssignCustomersOperation::create(),
-            ResetPasswordEmail::create(),
             LspUserCreateOperation::create(),
+            ResetPasswordEmail::create(),
             LspRepository::create(),
             new LspUserRepository(),
         );
     }
 
     /**
-     * @throws GuidAlreadyInUseException
-     * @throws LoginAlreadyInUseException
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws UserExceptionInterface
      * @throws ZfExtended_ValidateException
      */
     public function createUser(CreateUserDto $dto): User

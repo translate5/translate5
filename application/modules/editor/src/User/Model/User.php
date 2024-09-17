@@ -61,4 +61,9 @@ class User extends \ZfExtended_Models_User
         $this->setGender($dto->gender);
         $this->setLocale($dto->locale);
     }
+
+    public function isClientRestricted(): bool
+    {
+        return Roles::isClientRestricted($this->getRoles());
+    }
 }

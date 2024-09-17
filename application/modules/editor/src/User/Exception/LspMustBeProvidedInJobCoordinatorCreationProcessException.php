@@ -32,6 +32,6 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class LspMustBeProvidedInJobCoordinatorCreationProcessException extends InvalidArgumentException
+class LspMustBeProvidedInJobCoordinatorCreationProcessException extends InvalidArgumentException implements UserExceptionInterface
 {
 }

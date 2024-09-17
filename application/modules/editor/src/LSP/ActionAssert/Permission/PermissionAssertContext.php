@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\ActionAssert\Permission;
 
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 final class PermissionAssertContext
 {

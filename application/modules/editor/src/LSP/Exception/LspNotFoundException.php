@@ -34,8 +34,9 @@ use ZfExtended_Models_Entity_NotFoundException;
 
 class LspNotFoundException extends ZfExtended_Models_Entity_NotFoundException
 {
-    public function __construct(public readonly int $lspId)
-    {
+    public function __construct(
+        public readonly int $lspId
+    ) {
         parent::__construct('LSP with ID ' . $lspId . ' not found');
     }
 }

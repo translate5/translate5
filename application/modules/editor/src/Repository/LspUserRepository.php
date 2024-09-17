@@ -54,7 +54,9 @@ class LspUserRepository implements LspUserRepositoryInterface
 
     public function delete(LspUser $lspUser): void
     {
-        ZfExtended_Factory::get(LanguageServiceProviderUser::class)->db->delete(['guid = ?' => $lspUser->guid]);
+        ZfExtended_Factory::get(LanguageServiceProviderUser::class)->db->delete([
+            'guid = ?' => $lspUser->guid,
+        ]);
     }
 
     public function findByUser(ZfExtended_Models_User $user): ?LspUser

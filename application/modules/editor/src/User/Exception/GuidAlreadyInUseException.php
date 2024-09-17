@@ -32,6 +32,6 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class GuidAlreadyInUseException extends InvalidArgumentException
+class GuidAlreadyInUseException extends InvalidArgumentException implements UserExceptionInterface
 {
 }

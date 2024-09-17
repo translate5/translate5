@@ -39,25 +39,25 @@ use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
 use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
-use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\UserExceptionInterface;
+use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
-use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
-use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
-final class UserCreateOperation
+final class UserCreateOperation implements UserCreateOperationInterface
 {
     public function __construct(
-        private readonly \MittagQI\Translate5\User\Operations\UserCreateOperation $operation,
+        private readonly UserCreateOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly LspRepositoryInterface $lspRepository,
         private readonly LspActionPermissionAssertInterface $lspPermissionAssert,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -72,14 +72,12 @@ final class UserCreateOperation
             JobCoordinatorRepository::create(),
             LspRepository::create(),
             LspActionPermissionAssert::create(),
+            new UserRepository(),
         );
     }
 
     /**
-     * @throws GuidAlreadyInUseException
-     * @throws LoginAlreadyInUseException
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws UserExceptionInterface
      * @throws ZfExtended_ValidateException
      */
     public function createUser(CreateUserDto $dto): User
@@ -90,11 +88,13 @@ final class UserCreateOperation
 
         $lsp = $this->fetchLspForAssignment($dto->lsp);
 
+        $authUser = $this->userRepository->get($this->authentication->getUserId());
+
         if (null !== $lsp) {
             $this->lspPermissionAssert->assertGranted(
                 Action::READ,
                 $lsp,
-                new PermissionAssertContext($this->authentication->getUser())
+                new PermissionAssertContext($authUser)
             );
         }
 

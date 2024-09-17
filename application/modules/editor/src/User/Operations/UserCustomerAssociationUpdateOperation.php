@@ -38,8 +38,9 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAsser
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
-use ZfExtended_Models_User as User;
+use ZfExtended_Models_User as ZfUser;
 
 class UserCustomerAssociationUpdateOperation
 {
@@ -69,7 +70,7 @@ class UserCustomerAssociationUpdateOperation
      * @throws FeasibilityExceptionInterface
      * @throws CustomerDoesNotBelongToLspException
      */
-    public function updateAssociatedCustomers(User $user, array $associatedCustomerIds): void
+    public function updateAssociatedCustomers(ZfUser $user, array $associatedCustomerIds): void
     {
         $this->feasibilityAssert->assertAllowed(Action::UPDATE, $user);
 
@@ -85,7 +86,7 @@ class UserCustomerAssociationUpdateOperation
      * @throws CustomerDoesNotBelongToLspException
      */
     public function updateAssociatedCustomersBy(
-        User $user,
+        ZfUser $user,
         array $associatedCustomerIds,
         User $authManager,
     ): void {

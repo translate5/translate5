@@ -41,9 +41,9 @@ use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use ZfExtended_Models_User as User;
 
 class LspCustomerAssociationUpdateOperation
 {

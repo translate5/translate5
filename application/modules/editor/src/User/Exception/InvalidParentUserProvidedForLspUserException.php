@@ -32,6 +32,6 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class InvalidParentUserProvidedForLspUserException extends InvalidArgumentException
+class InvalidParentUserProvidedForLspUserException extends InvalidArgumentException implements UserExceptionInterface
 {
 }

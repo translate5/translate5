@@ -30,9 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
-use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Operations\UserSetRolesOperation;
 use MittagQI\Translate5\User\Validation\RolesValidator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -40,13 +38,11 @@ use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
 use ZfExtended_Models_User as User;
 
-class UserInitRolesOperationTest extends TestCase
+class UserSetRolesOperationTest extends TestCase
 {
     private RolesValidator|MockObject $rolesValidator;
 
     private ZfExtended_Acl|MockObject $acl;
-
-    private UserRepository|MockObject $userRepository;
 
     private UserSetRolesOperation $operation;
 
@@ -54,41 +50,35 @@ class UserInitRolesOperationTest extends TestCase
     {
         $this->rolesValidator = $this->createMock(RolesValidator::class);
         $this->acl = $this->createMock(ZfExtended_Acl::class);
-        $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->operation = new UserSetRolesOperation(
             $this->rolesValidator,
             $this->acl,
-            $this->userRepository
         );
     }
 
-    public function testInitUserRolesByWithEmptyRoles(): void
+    public function testSetRolesWithEmptyRoles(): void
     {
+        $this->rolesValidator->expects(self::once())->method('assertRolesDontConflict');
+        $this->acl->method('mergeAutoSetRoles')->willReturn([]);
+
         $user = $this->createMock(User::class);
-        $authUser = $this->createMock(User::class);
+        $user->expects(self::once())->method('setRoles')->with([]);
+        $user->expects(self::once())->method('validate');
 
-        $this->operation->setRolesBy($user, [], $authUser);
-
-        $user->expects($this->never())->method('setRoles');
-
-        $this->userRepository->expects($this->never())->method('save');
+        $this->operation->setRoles($user, []);
     }
 
-    public function testInitUserRolesByThrowsExceptionWhenUserIsNotAuthorized(): void
+    public function testSetDefaultRolesWithNoRolesPassed(): void
     {
-        $this->expectException(UserIsNotAuthorisedToAssignRoleException::class);
+        $this->rolesValidator->expects(self::once())->method('assertRolesDontConflict');
+        $this->acl->method('mergeAutoSetRoles')->willReturn(['defaultRole']);
 
         $user = $this->createMock(User::class);
-        $authUser = $this->createMock(User::class);
+        $user->expects(self::once())->method('setRoles')->with(['defaultRole']);
+        $user->expects(self::once())->method('validate');
 
-        $this->acl->method('isInAllowedRoles')->willReturn(false);
-
-        $user->expects($this->never())->method('setRoles');
-
-        $this->userRepository->expects($this->never())->method('save');
-
-        $this->operation->setRolesBy($user, ['role1'], $authUser);
+        $this->operation->setRoles($user, []);
     }
 
     public function testInitRoles(): void
@@ -110,8 +100,6 @@ class UserInitRolesOperationTest extends TestCase
         $user->expects($this->once())->method('setRoles')->with($roles);
         $user->expects($this->once())->method('validate');
 
-        $this->userRepository->expects($this->once())->method('save')->with($user);
-
         $this->operation->setRoles($user, $roles);
     }
 
@@ -126,8 +114,6 @@ class UserInitRolesOperationTest extends TestCase
         $this->rolesValidator->method('assertRolesDontConflict')->willThrowException($exception);
 
         $user->expects($this->never())->method('setRoles');
-
-        $this->userRepository->expects($this->never())->method('save');
 
         $this->operation->setRoles($user, ['role1']);
     }

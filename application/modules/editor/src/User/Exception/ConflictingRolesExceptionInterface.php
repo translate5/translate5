@@ -30,6 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Exception;
 
-interface ConflictingRolesExceptionInterface extends \Throwable
+interface ConflictingRolesExceptionInterface extends UserExceptionInterface
 {
 }

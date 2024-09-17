@@ -28,45 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Operations;
+namespace MittagQI\Translate5\User\Contract;
 
-use Zend_Exception;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User as User;
-use ZfExtended_ValidateException;
-
-class UserSetPasswordOperation
+use MittagQI\Translate5\User\DTO\CreateUserDto;
+use MittagQI\Translate5\User\Exception\UserExceptionInterface;
+use MittagQI\Translate5\User\Model\User;
+interface UserCreateOperationInterface
 {
-    public function __construct(
-        private readonly ZfExtended_AuthenticationInterface $authentication,
-    ) {
-    }
-
     /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self(
-            ZfExtended_Authentication::getInstance(),
-        );
-    }
-
-    /**
-     * @throws Zend_Exception
+     * @throws UserExceptionInterface
      * @throws ZfExtended_ValidateException
      */
-    public function setPassword(User $user, ?string $password): void
-    {
-        if (null !== $password && '' === trim($password)) {
-            throw new \InvalidArgumentException('Password cannot be empty string');
-        }
-
-        $password = null === $password ? null : $this->authentication->createSecurePassword($password);
-
-        $user->setPasswd($password);
-
-        $user->validate();
-    }
+    public function createUser(CreateUserDto $dto): User;
 }

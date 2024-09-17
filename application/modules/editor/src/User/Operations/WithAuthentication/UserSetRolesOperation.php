@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
@@ -48,9 +49,10 @@ use ZfExtended_Models_User as User;
 final class UserSetRolesOperation implements UserSetRolesOperationInterface
 {
     public function __construct(
-        private readonly \MittagQI\Translate5\User\Operations\UserSetRolesOperation $operation,
+        private readonly UserSetRolesOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly ZfExtended_Acl $acl,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -63,6 +65,7 @@ final class UserSetRolesOperation implements UserSetRolesOperationInterface
             \MittagQI\Translate5\User\Operations\UserSetRolesOperation::create(),
             ZfExtended_Authentication::getInstance(),
             ZfExtended_Acl::getInstance(),
+            new UserRepository(),
         );
     }
 
@@ -75,8 +78,18 @@ final class UserSetRolesOperation implements UserSetRolesOperationInterface
      */
     public function setRoles(User $user, array $roles): void
     {
+        $authUser = $this->userRepository->get($this->authentication->getUserId());
+
         foreach ($roles as $role) {
-            if (! $this->hasAclPermissionToSetRole($this->authentication->getUser(), $role)) {
+            if (! $this->hasAclPermissionToSetRole($authUser, $role)) {
+                throw new UserIsNotAuthorisedToAssignRoleException($role);
+            }
+
+            if ($authUser->isAdmin()) {
+                continue;
+            }
+
+            if (! in_array($role, $authUser->getRoles(), true)) {
                 throw new UserIsNotAuthorisedToAssignRoleException($role);
             }
         }

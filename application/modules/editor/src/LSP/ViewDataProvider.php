@@ -40,7 +40,7 @@ use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
-use ZfExtended_Models_User;
+use MittagQI\Translate5\User\Model\User;
 
 /**
  * @template JC of array{guid: string, name: string}
@@ -77,7 +77,7 @@ class ViewDataProvider
     /**
      * @return LspRow[]
      */
-    public function getViewListFor(ZfExtended_Models_User $viewer): array
+    public function getViewListFor(User $viewer): array
     {
         $data = [];
 
@@ -97,7 +97,7 @@ class ViewDataProvider
     /**
      * @return LspRow
      */
-    public function buildViewData(ZfExtended_Models_User $viewer, LanguageServiceProvider $lsp): array
+    public function buildViewData(User $viewer, LanguageServiceProvider $lsp): array
     {
         $coordinators = $this->jobCoordinatorRepository->getByLSP($lsp);
         /**
@@ -151,7 +151,7 @@ class ViewDataProvider
         ];
     }
 
-    private function userCanEditLsp(ZfExtended_Models_User $viewer, LanguageServiceProvider $lsp): bool
+    private function userCanEditLsp(User $viewer, LanguageServiceProvider $lsp): bool
     {
         try {
             $this->permissionAssert->assertGranted(Action::UPDATE, $lsp, new PermissionAssertContext($viewer));
@@ -162,7 +162,7 @@ class ViewDataProvider
         }
     }
 
-    private function userCanDeleteLsp(ZfExtended_Models_User $viewer, LanguageServiceProvider $lsp): bool
+    private function userCanDeleteLsp(User $viewer, LanguageServiceProvider $lsp): bool
     {
         try {
             $this->permissionAssert->assertGranted(Action::DELETE, $lsp, new PermissionAssertContext($viewer));

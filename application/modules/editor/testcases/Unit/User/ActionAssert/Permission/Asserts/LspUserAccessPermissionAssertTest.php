@@ -47,6 +47,7 @@ use ZfExtended_Models_User;
 class LspUserAccessPermissionAssertTest extends TestCase
 {
     private LspUserRepositoryInterface|MockObject $lspUserRepository;
+
     private JobCoordinatorRepository|MockObject $coordinatorRepository;
 
     private LspUserAccessPermissionAssert $assert;

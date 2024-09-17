@@ -38,10 +38,10 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExcep
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User as User;
 
 class UserCustomerAssociationUpdateOperationTest extends TestCase
 {
@@ -52,9 +52,9 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
     private UserActionFeasibilityAssertInterface|MockObject $feasibilityChecker;
 
     private UserAssignCustomersOperationInterface|MockObject $assignCustomers;
-    
+
     private UserCustomerAssociationUpdateOperation $operation;
-    
+
     public function setUp(): void
     {
         $this->associationValidator = $this->createMock(UserCustomerAssociationValidator::class);
@@ -191,19 +191,18 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
 
         $user = $this->createMock(User::class);
         $user->expects(self::once())->method('getCustomersArray')->willReturn($customerIds);
-        $user->expects(self::once())->method('assignCustomers')->with($customerIds);
 
         $authUser = $this->createMock(User::class);
         $authUser->method('isClientRestricted')->willReturn(true);
+
+        $this->associationValidator->expects(self::once())->method('assertCustomersAreSubsetForUser');
 
         $this->feasibilityChecker
             ->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $this->associationValidator
-            ->expects(self::once())
-            ->method('assertCustomersMayBeAssociatedWithUser');
+        $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $customerIds);
 
         $this->userRepository
             ->expects(self::once())
@@ -221,7 +220,6 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
 
         $user = $this->createMock(User::class);
         $user->expects(self::once())->method('getCustomersArray')->willReturn([1, 2, 3]);
-        $user->expects(self::once())->method('assignCustomers')->with($customerIds);
 
         $authUser = $this->createMock(User::class);
         $authUser->method('isClientRestricted')->willReturn(false);
@@ -231,9 +229,7 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $this->associationValidator
-            ->expects(self::once())
-            ->method('assertCustomersMayBeAssociatedWithUser');
+        $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $customerIds);
 
         $this->userRepository
             ->expects(self::once())
@@ -251,7 +247,6 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
 
         $user = $this->createMock(User::class);
         $user->expects(self::once())->method('getCustomersArray')->willReturn([1, 2, 3]);
-        $user->expects(self::once())->method('assignCustomers')->with($customerIds);
 
         $authUser = $this->createMock(User::class);
         $authUser->method('isClientRestricted')->willReturn(true);
@@ -264,11 +259,9 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
 
         $this->associationValidator
             ->expects(self::once())
-            ->method('assertCustomersMayBeAssociatedWithUser');
-
-        $this->associationValidator
-            ->expects(self::once())
             ->method('assertCustomersAreSubsetForUser');
+
+        $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $customerIds);
 
         $this->userRepository
             ->expects(self::once())
@@ -286,7 +279,6 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
 
         $user = $this->createMock(User::class);
         $user->expects(self::once())->method('getCustomersArray')->willReturn($userCustomers);
-        $user->expects(self::once())->method('assignCustomers')->with($userCustomers);
 
         $authUser = $this->createMock(User::class);
         $authUser->method('isClientRestricted')->willReturn(true);
@@ -299,11 +291,9 @@ class UserCustomerAssociationUpdateOperationTest extends TestCase
 
         $this->associationValidator
             ->expects(self::once())
-            ->method('assertCustomersMayBeAssociatedWithUser');
-
-        $this->associationValidator
-            ->expects(self::once())
             ->method('assertCustomersAreSubsetForUser');
+
+        $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $userCustomers);
 
         $this->userRepository
             ->expects(self::once())

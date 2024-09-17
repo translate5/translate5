@@ -43,6 +43,7 @@ use MittagQI\Translate5\LSP\Operations\LspDeleteOperation;
 use MittagQI\Translate5\LSP\Operations\LspUpdateOperation;
 use MittagQI\Translate5\LSP\ViewDataProvider;
 use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 
 class editor_LspController extends ZfExtended_RestController
@@ -80,7 +81,8 @@ class editor_LspController extends ZfExtended_RestController
 
     public function getAction(): void
     {
-        $authUser = ZfExtended_Authentication::getInstance()->getUser();
+        $userRepository = new UserRepository();
+        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
 
         $lsp = LspRepository::create()->get((int) $this->_getParam('id'));
 
@@ -95,9 +97,10 @@ class editor_LspController extends ZfExtended_RestController
 
     public function indexAction(): void
     {
-        $user = ZfExtended_Authentication::getInstance()->getUser();
+        $userRepository = new UserRepository();
+        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
 
-        $this->view->rows = $this->viewDataProvider->getViewListFor($user); // @phpstan-ignore-line
+        $this->view->rows = $this->viewDataProvider->getViewListFor($authUser); // @phpstan-ignore-line
         $this->view->total = count($this->view->rows);
     }
 
@@ -123,8 +126,10 @@ class editor_LspController extends ZfExtended_RestController
             );
         }
 
-        $user = ZfExtended_Authentication::getInstance()->getUser();
-        $coordinator = $this->coordinatorRepository->findByUser($user);
+        $userRepository = new UserRepository();
+        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+
+        $coordinator = $this->coordinatorRepository->findByUser($authUser);
 
         $lsp = LspCreateOperation::create()->createLsp(
             $this->data['name'],
@@ -133,17 +138,22 @@ class editor_LspController extends ZfExtended_RestController
         );
 
         $this->runWithExceptionHandlerWrapping(
-            fn () => $this->lspCustomerAssociationUpdateOperation->updateCustomersBy($lsp, $this->data['customerIds'], $user)
+            fn () => $this->lspCustomerAssociationUpdateOperation->updateCustomersBy(
+                $lsp,
+                $this->data['customerIds'],
+                $authUser
+            )
         );
 
-        $this->view->rows = (object) $this->viewDataProvider->buildViewData($user, $lsp);
+        $this->view->rows = (object) $this->viewDataProvider->buildViewData($authUser, $lsp);
     }
 
     public function putAction(): void
     {
         $this->decodePutData();
 
-        $authUser = ZfExtended_Authentication::getInstance()->getUser();
+        $userRepository = new UserRepository();
+        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
 
         $lspRepository = LspRepository::create();
         $lsp = $lspRepository->get((int) $this->_getParam('id'));
@@ -177,7 +187,8 @@ class editor_LspController extends ZfExtended_RestController
 
     public function deleteAction(): void
     {
-        $authUser = ZfExtended_Authentication::getInstance()->getUser();
+        $userRepository = new UserRepository();
+        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
 
         $lspRepository = LspRepository::create();
         $lsp = LspRepository::create()->get((int) $this->_getParam('id'));
