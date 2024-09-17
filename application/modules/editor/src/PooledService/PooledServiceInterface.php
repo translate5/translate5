@@ -34,14 +34,16 @@ namespace MittagQI\Translate5\PooledService;
 interface PooledServiceInterface
 {
     /**
-     * Retrieves one of our Pools
-     * The URLs will be filtered for services that are marked as DOWN via the global services mem-cache
+     * Retrieves the URLs of one of our Pools
+     * If the pool is not load-balanced, The URLs will be filtered for services that are marked as DOWN
+     * via the global services mem-cache
      */
     public function getPooledServiceUrls(string $pool): array;
 
     /**
      * Retrieves a random url out of one of our Pools
-     * The URLs will be filtered for services that are marked as DOWN via the global services mem-cache
+     * If the pool is not load-balanced, The URL will be filtered for services that are marked as DOWN
+     * via the global services mem-cache
      */
     public function getPooledServiceUrl(string $pool): ?string;
 
@@ -49,7 +51,7 @@ interface PooledServiceInterface
      * Special API for pooled services with a single URL for one pool:
      * This also is expected to represent a load-balancing and for a single URL maybe multiple workers are queued
      */
-    public function hasLoadBalancingBehindSingularPool(string $pool): bool;
+    public function isPoolLoadBalanced(string $pool): bool;
 
     /**
      * To enable a transition from pooled services (providing a t5-based load-balancing) to docker services which include load-balancing,

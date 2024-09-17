@@ -38,8 +38,8 @@ use editor_Plugins_TermTagger_Exception_TimeOut;
 use Exception;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\Remover;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\Tagger;
+use MittagQI\Translate5\Segment\Processing\AbstractProcessingWorker;
 use MittagQI\Translate5\Segment\Processing\State;
-use MittagQI\Translate5\Segment\Processing\Worker as ProcessingWorker;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Exception;
@@ -52,7 +52,7 @@ use ZfExtended_Logger;
  * @property Service $service;
  * @property Tagger|Remover $processor;
  */
-class Worker extends ProcessingWorker
+class Worker extends AbstractProcessingWorker
 {
     /**
      * @throws ZfExtended_Exception
@@ -111,7 +111,7 @@ class Worker extends ProcessingWorker
             if ($isReprocessing) {
                 $this->setUnprocessedStates($problematicStates, State::UNPROCESSABLE);
                 // log if it did not work in the second attempt
-                $this->logException($loopedProcessingException);
+                $this->logTaskException($loopedProcessingException);
             } else {
                 $this->setUnprocessedStates($problematicStates, State::REPROCESS);
             }
@@ -122,10 +122,8 @@ class Worker extends ProcessingWorker
         // a Down Exception will be created if all services are down to create an import error.
         // If other URLs are still up, we simply end the worker without further notice
         if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Down) {
-            // we log only, if the last service is down ...
-            if ($this->setServiceUrlDown()) {
-                $this->logException($loopedProcessingException);
-            }
+            // when a TermTagger is down, the behaviour depends on if we are a load-balanced service or not
+            $this->onServiceDown($loopedProcessingException);
 
             // this will terminate the processing
             return 0;
@@ -135,14 +133,14 @@ class Worker extends ProcessingWorker
         if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Open) {
             $this->task->setTerminologie(false);
             $this->task->save();
-            $this->logException($loopedProcessingException);
+            $this->logTaskException($loopedProcessingException);
 
             // this will terminate the processing
             return 0;
         }
         // all other Termtagger exceptions will be logged according their severity
         if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Abstract) {
-            $this->logException($loopedProcessingException);
+            $this->logTaskException($loopedProcessingException);
 
             // unknown exceptions will terminate the processing
             return 0;
@@ -163,13 +161,13 @@ class Worker extends ProcessingWorker
     /**
      * Logs an task-error out of the exception
      */
-    private function logException(editor_Plugins_TermTagger_Exception_Abstract $exception)
+    protected function logTaskException(Exception $exception): void
     {
-        $exception->addExtraData([
-            'task' => $this->task,
-        ]);
         $this->logger->exception($exception, [
             'domain' => Configuration::getLoggerDomain($this->processingMode),
+            'extra' => [
+                'task' => $this->task,
+            ],
         ]);
     }
 }

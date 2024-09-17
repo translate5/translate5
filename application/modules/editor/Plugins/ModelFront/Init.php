@@ -221,16 +221,16 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract
 
             return;
         }
-        $parent = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $parent = new ZfExtended_Models_Worker();
         $result = $parent->loadByState(
             ZfExtended_Models_Worker::STATE_PREPARE,
             editor_Plugins_MatchAnalysis_Worker::class,
             $taskGuid
         );
 
-        $parentWorkerId = null;
+        $parentWorkerId = 0;
         if (! empty($result)) {
-            $parentWorkerId = $result[0]['id'];
+            $parentWorkerId = (int) $result[0]['id'];
         }
 
         $worker->queue($parentWorkerId);

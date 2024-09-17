@@ -34,21 +34,11 @@ use MittagQI\Translate5\Task\Import\ImportService;
  */
 class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
 {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         return true;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @throws ReflectionException
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     * @see ZfExtended_Worker_Abstract::work()
-     */
     public function work(): bool
     {
         $importService = new ImportService();

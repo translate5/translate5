@@ -207,7 +207,7 @@ class StatusCommand extends Translate5AbstractCommand
      */
     protected function writeWorkerSummary(): void
     {
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
 
         $workerSummary = $worker->getSummary();
         $workerSumText = [

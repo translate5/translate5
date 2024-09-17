@@ -40,7 +40,7 @@ abstract class PauseWorker extends editor_Models_Task_AbstractWorker
 {
     public const PROCESSOR = 'processor';
 
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         return isset($parameters[self::PROCESSOR])
             && class_exists($parameters[self::PROCESSOR])

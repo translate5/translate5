@@ -45,9 +45,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_TaskUsageLog extends ZfExtended_Models_Entity_Abstract
 {
-    protected $dbInstanceClass = "editor_Models_Db_TaskUsageLog";
+    protected $dbInstanceClass = editor_Models_Db_TaskUsageLog::class;
 
-    protected $validatorInstanceClass = "editor_Models_Validator_TaskUsageLog";
+    protected $validatorInstanceClass = editor_Models_Validator_TaskUsageLog::class;
 
     /***
      * Load task usage by taskType and customer.
