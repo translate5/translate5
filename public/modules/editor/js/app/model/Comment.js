@@ -53,31 +53,11 @@ Ext.define('Editor.model.Comment', {
         reader: {
             rootProperty: 'rows',
             type: 'json',
-            transform: {
-                fn: function(data) {
-                    if (typeof data.rows[Symbol.iterator] === 'function') {
-                        for (const record of data.rows) {
-                            record.comment = Ext.String.htmlDecode(record.comment);
-                        }
-                    } else {
-                        data.rows.comment = Ext.String.htmlDecode(data.rows.comment);
-                    }
-
-                    return data;
-                }
-            }
         },
         writer: {
             encode: true,
             rootProperty: 'data',
             writeAllFields: false,
-            transform: {
-                fn: function (data, request) {
-                    data.comment = Ext.String.htmlEncode(data.comment);
-
-                    return data;
-                }
-            }
         }
     }
 });
