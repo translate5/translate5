@@ -52,7 +52,7 @@ $this->translations = array(
     'copy' => $translate->_('Kopieren'),
     'enterText' => $translate->_('Geben Sie Text ein'),
     'serverErrorMsg500' => $translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.'),
-    'noResultsFound' => $translate->_('<b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.'),
+    'noResultsFound' => $translate->_('Keine Ergebnisse gefunden'),
     'translate' => $translate->_('Übersetzen'),
     'orTranslateFile' => $translate->_('oder lassen Sie ein Dokument übersetzen'),
     'orTranslateText' => $translate->_('oder lassen Sie Text übersetzen, den Sie eingeben.'),
@@ -86,7 +86,9 @@ $this->translations = array(
     ],
     'languagesAreSame' => $translate->_('<b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.'),
     'helpWindowTitle' => $translate->_('Einführung'),
-    'helpWindowCheckboxlabel' => $translate->_('Dieses Fenster nicht mehr automatisch anzeigen.')
+    'helpWindowCheckboxlabel' => $translate->_('Dieses Fenster nicht mehr automatisch anzeigen.'),
+    'loadingResourcesList' => $translate->_('Liste der Ressourcen laden...'),
+    'loadingResultsForResourceIndex' => $translate->_('Überprüfe Ergebnisse für Ressource #{index} von {total}...'),
 );
 // Shortcut
 $rop = Zend_Registry::get('config')->runtimeOptions;
@@ -324,7 +326,8 @@ $languageSelector[] = '</form>';
         </form>
         <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all box marginTop"></div>
         <div class="loadingSpinnerIndicator marginTop">
-            <img src="<?= $this->publicModulePath ?>/images/loading-spinner.gif" alt="spinner"/>
+            <img src="<?= $this->publicModulePath ?>/images/loading-spinner.gif" alt="spinner" style="vertical-align: middle; margin-right: 10px;"/>
+            <span id="loading-status"></span>
         </div>
 
         <div id="translations" class="show-if-source-is-text"><!-- inject text-translations here  --></div>
