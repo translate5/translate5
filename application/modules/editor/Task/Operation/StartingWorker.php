@@ -38,7 +38,7 @@ class editor_Task_Operation_StartingWorker extends editor_Models_Task_AbstractWo
      */
     private $operationType;
 
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (array_key_exists('operationType', $parameters)) {
             $this->operationType = $parameters['operationType'];
@@ -49,7 +49,7 @@ class editor_Task_Operation_StartingWorker extends editor_Models_Task_AbstractWo
         return false;
     }
 
-    protected function work()
+    protected function work(): bool
     {
         $this->task->setState($this->operationType);
         $this->task->save();

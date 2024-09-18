@@ -238,7 +238,8 @@ final class editor_Segment_Quality_Manager
         // add starting worker
         $workerParams = [
             'processingMode' => $processingMode,
-        ]; // mandatory for any quality processing
+        ];
+        // mandatory for any quality processing
         $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationWorker::class);
         if ($worker->init($task->getTaskGuid(), $workerParams)) {
             $qualityParentId = $worker->queue($workerParentId, $workerState, false);

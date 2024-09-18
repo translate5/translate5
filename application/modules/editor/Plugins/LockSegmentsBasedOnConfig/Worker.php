@@ -28,16 +28,12 @@ END LICENSE AND COPYRIGHT
 
 class editor_Plugins_LockSegmentsBasedOnConfig_Worker extends editor_Models_Task_AbstractWorker
 {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         return empty($parameters);
     }
 
-    public function work()
+    public function work(): bool
     {
         $config = Zend_Registry::get('config');
         $metaToLock = $config->runtimeOptions->plugins->LockSegmentsBasedOnConfig->metaToLock;

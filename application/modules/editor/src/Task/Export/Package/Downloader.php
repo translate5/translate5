@@ -36,6 +36,7 @@ use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Models_Worker;
 
 class Downloader
 {
@@ -72,7 +73,7 @@ class Downloader
      */
     public function isAvailable(int $workerId): bool
     {
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        $worker = new ZfExtended_Models_Worker();
         $worker->load($workerId);
 
         if ($worker->isDefunct()) {
@@ -127,7 +128,7 @@ class Downloader
     {
         $restPath = APPLICATION_RUNDIR . '/' . Zend_Registry::get('module') . '/';
 
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        $worker = new ZfExtended_Models_Worker();
         $worker->load($workerId);
 
         $link = base64_encode('workerId=' . $worker->getId());

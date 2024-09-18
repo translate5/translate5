@@ -155,7 +155,7 @@ class ProjectWorkersService
                 continue;
             }
 
-            $workerModel = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+            $workerModel = new ZfExtended_Models_Worker();
 
             try {
                 $workerModel->loadFirstOf(

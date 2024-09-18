@@ -34,15 +34,10 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract
 {
     /**
      * Defines the behaviour class to be used for this worker
-     * @var string
      */
-    protected $behaviourClass = 'editor_Models_Import_Worker_FinalStepBehaviour';
+    protected string $behaviourClass = editor_Models_Import_Worker_FinalStepBehaviour::class;
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['config']) || ! $parameters['config'] instanceof editor_Models_Import_Configuration) {
             throw new ZfExtended_Exception('missing or wrong parameter config, must be if instance editor_Models_Import_Configuration');
@@ -51,11 +46,7 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract
         return true;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */

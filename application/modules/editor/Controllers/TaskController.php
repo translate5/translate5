@@ -37,7 +37,7 @@ use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\TaskService;
-use MittagQI\Translate5\Task\Worker\Export\Html;
+use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
@@ -1776,7 +1776,7 @@ class editor_TaskController extends ZfExtended_RestController
 
                 $exportService = QueuedExportService::create();
                 $token = ZfExtended_Utils::uuid();
-                $workerId = Html::queueExportWorker(
+                $workerId = HtmlWorker::queueExportWorker(
                     $this->entity,
                     $exportService->composeExportDir($token)
                 );
@@ -2242,7 +2242,7 @@ class editor_TaskController extends ZfExtended_RestController
             unset($this->data->entityVersion);
         }
 
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
 
         try {
             $worker->loadFirstOf(editor_Models_Import_Worker::class, $this->entity->getTaskGuid());

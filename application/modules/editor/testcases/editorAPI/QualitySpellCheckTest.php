@@ -48,7 +48,7 @@ class QualitySpellCheckTest extends JsonTestAbstract
         // this way at least the maintainer of the test can easily see, that the error originates from a different languagetool-version
         $service = editor_Plugins_SpellCheck_Init::createService('languagetool');
         $service->check();
-        $checkResult = $service->createServiceMsg('', ',', false, true);
+        $checkResult = $service->createServiceMsg('', ',', false, true, false);
         $matches = [];
         preg_match('~Versions?:([^,]+)~', $checkResult, $matches);
         $checkResult = (count($matches) > 0) ? 'Version: ' . trim($matches[1]) : 'UNKNOWN VERSION';

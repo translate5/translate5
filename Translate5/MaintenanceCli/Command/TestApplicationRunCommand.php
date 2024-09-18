@@ -34,7 +34,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 
 class TestApplicationRunCommand extends Translate5AbstractTestCommand
@@ -132,7 +131,7 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
         if ($this->initTestEnvironment('application', false)) {
             // special option: clean workers to avoid test-quirks
             if ($this->input->getOption('worker-cleanup')) {
-                $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+                $worker = new ZfExtended_Models_Worker();
                 // remove done & defunct workers and garbage-cleaner
                 $worker->db->delete([
                     'state in (?)' => [$worker::STATE_DONE, $worker::STATE_DEFUNCT],

@@ -29,29 +29,32 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\PooledService;
 
 use editor_Models_Task_AbstractWorker;
+use Exception;
+use MittagQI\ZfExtended\Worker\Exception\SetDelayedException;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Debug;
+use ZfExtended_ErrorCodeException;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
 
 /**
  * Extends the import worker to work with pooled services tailored for processing segments
- * The Worker will be instantiated as many times as the service has max parallel configured or a single service-url has IPs or as many url's are configured for the pool
- * Then each of these workers will process the segments in a loop until no unprocessed segments are available anymore
- * The worker normally operates with pooled services or services, that are setup as such (see MittagQI\Translate5\PooledService\AbstractPooledService::isPooled)
- * Then the amount of workers to queue is evaluated on the fly by getting the IP-Adresses the configured host has
- * the URL of the service is not the slot anymore but a seperate worker-param "serviceUrl"
+ * The Worker will be instantiated as many times as the service has max parallel configured or a single service-url has
+ * IPs or as many url's are configured for the pool Then each of these workers will process the segments in a loop
+ * until no unprocessed segments are available anymore The worker normally operates with pooled services or services,
+ * that are setup as such (see MittagQI\Translate5\PooledService\AbstractPooledService::isPooled) Then the amount of
+ * workers to queue is evaluated on the fly by getting the IP-Adresses the configured host has the URL of the service
+ * is not the slot anymore but a seperate worker-param "serviceUrl"
  */
-abstract class Worker extends editor_Models_Task_AbstractWorker
+abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
 {
     protected string $resourcePool = 'import';
 
     /**
      * Pooled (or "Pseudo-Pooled" = multiple IPs) Service Workers can run in Parallel!
-     * @var bool
      */
-    protected $onlyOncePerTask = false;
+    protected bool $onlyOncePerTask = false;
 
     /**
      * Temporary flag for queueing phase to prevent queueing multiple workers
@@ -66,13 +69,13 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
 
     protected int $workerIndex = 0;
 
+    protected int $workerCount = 1;
+
     protected string $serviceUrl;
 
     protected array $calculatedSlot;
 
     protected PooledServiceInterface $service;
-
-    protected bool $doDebug = false;
 
     public function __construct()
     {
@@ -81,14 +84,20 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
         // pooled services need to have their pool respected
         $this->isPooled = $this->service->isPooled();
         // debugging generally is tailored to what workers are working when
-        $this->doDebug = ZfExtended_Debug::hasLevel('core', 'ServiceWorkers');
+        $this->doDebug = $this->doDebug || ZfExtended_Debug::hasLevel('core', 'ServiceWorkers');
     }
 
     /**
-     * Must be implemented to create the service
+     * Must be implemented in inheriting classes to create the service
      * This function is also used in a static context and must not use internal dependencis
      */
     abstract protected function createService(): PooledServiceInterface;
+
+    /**
+     * Must be implemented in inheriting classes
+     * It logs an exception which must be enriched by task-information
+     */
+    abstract protected function logTaskException(Exception $exception): void;
 
     /**
      * Must be implemented to create the no services available exception
@@ -132,24 +141,41 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     }
 
     /**
-     * marks the used service-URL as "down" via the memcache
-     * @return bool: If all services are down
-     * @throws ZfExtended_Exception
+     * certain aspects of our behaviour depend on having a load-balanced cloud-service
+     * this will be set via the slot-name (quite ugly...)
      */
-    protected function setServiceUrlDown(): bool
+    protected function isServiceLoadBalanced(): bool
     {
-        // if the slot / max parallel workers was evaluated by counting IPs of a loadbalanced service
-        // we must not mark is as "down" or assume, it's the "last available" ...
-        if (str_contains($this->workerModel->getSlot(), '_lb_')) {
-            return false;
-        }
-
-        return $this->service->setServiceUrlDown($this->serviceUrl);
+        return str_contains($this->workerModel->getSlot(), '_lb_');
     }
 
     /**
-     * @throws ZfExtended_Exception
+     * Triggers the worker to be set to delayed (load-balanced service)
+     * or marks the used service-URL as "down" via the memcache
+     * @throws SetDelayedException
+     */
+    protected function onServiceDown(ZfExtended_ErrorCodeException $exception): void
+    {
+        // if the slot / max parallel workers was evaluated by counting IPs of a loadbalanced service
+        // we must not mark is as "down" or assume, it's the "last available" but set the worker to delayed
+        // by throwing a marker-exception
+        if ($this->isServiceLoadBalanced()) {
+            throw new SetDelayedException(
+                $this->service->getServiceId(),
+                get_class($this)
+            );
+        }
+
+        // when we have "traditional" services we set the service down.
+        // If all services are down, we set the task to erroneus
+        if ($this->service->setServiceUrlDown($this->serviceUrl)) {
+            $this->logTaskException($exception);
+        }
+    }
+
+    /**
      * @throws Zend_Exception
+     * @throws \Exception
      */
     protected function initSlots()
     {
@@ -165,37 +191,36 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
                     $serviceUrls = $this->service->getPooledServiceUrls('default');
                     $this->resourcePool = 'default';
                 }
-                $this->maxParallel = count($serviceUrls);
+                $maxParallel = count($serviceUrls);
+                $isLoadBalanced = $this->service->isPoolLoadBalanced($this->resourcePool);
 
                 // SPECIAL: Pooled service with pools having only one URL
                 // are expected to inbuilt load-balancing / horizontal scaling behind that URL
                 // we set maxParallel to the number of IPs, this will result in an equal amount of different slots
-                if ($this->maxParallel === 1 && $this->service->hasLoadBalancingBehindSingularPool($this->resourcePool)) {
-                    $this->maxParallel = $this->service->getNumIpsForUrl($serviceUrls[0]);
-                    $isLoadBalanced = ($this->maxParallel > 1);
+                if ($maxParallel === 1 && $isLoadBalanced) {
+                    $maxParallel = $this->service->getNumIpsForUrl($serviceUrls[0]);
                 }
             } else {
                 $serviceUrl = $this->service->getServiceUrl();
                 if ($serviceUrl === null) {
                     // no service url available: no workers will be queued
-                    $this->maxParallel = 0;
+                    $maxParallel = 0;
                 } elseif ($this->onlyOncePerTask || $this->isSingleThreaded) {
                     // if we are limited to one per task we can just queue a single worker
                     $serviceUrls = [$serviceUrl];
-                    $this->maxParallel = 1;
+                    $maxParallel = 1;
                 } else {
                     // SPECIAL: non-pooled services (= services with only a single URL overall)
                     // are expected to have inbuilt load-balancing / horizontal scaling
                     // we evaluate the number of instances by the IP's that exist behind the configured URL
                     // we set maxParallel to the number of IPs, this will result in an equal amount of different slots
-                    $this->maxParallel = $this->service->getNumIpsForUrl($serviceUrl);
-                    $serviceUrls = ($this->maxParallel < 1) ? [] : [$serviceUrl];
-                    $isLoadBalanced = ($this->maxParallel > 1);
+                    $maxParallel = $this->service->getNumIpsForUrl($serviceUrl);
+                    $serviceUrls = ($maxParallel < 1) ? [] : [$serviceUrl];
+                    $isLoadBalanced = ($maxParallel > 1);
                 }
             }
-            // limit max parallel to the top ... this gives the chance to limit all service workers via DB
-            $config = Zend_Registry::get('config');
-            $this->maxParallel = min($this->maxParallel, $config->runtimeOptions->worker->maxParallelWorkers);
+            // limit max parallel ... this gives the chance to limit all service workers via DB or other objectives
+            $this->maxParallel = $this->limitMaxParallel($maxParallel);
             // generate the data to queue the workers
             $this->slots = [];
             $numUrls = count($serviceUrls);
@@ -204,16 +229,38 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
             if ($this->maxParallel > 0) {
                 for ($i = 0; $i < $this->maxParallel; $i++) {
                     $this->slots[] = [
-                        'resource' => $serviceId . ucfirst($this->resourcePool), // the resource-name for the worker model
-                        'slot' => $slotName . ($isLoadBalanced ? '' : $i),       // the slot that represents a "virtualized" url and not the real URL anymore as with other workers
-                        'url' => ($i < $numUrls) ? $serviceUrls[$i] : (($numUrls > 1) ? $serviceUrls[random_int(0, $numUrls - 1)] : $serviceUrls[0]), // the actual URL (saved in the worker-params)
+                        // the resource-name for the worker model
+                        'resource' => $serviceId . ucfirst($this->resourcePool),
+                        // the slot that represents a "virtualized" url and not the real URL anymore as with other workers
+                        // TODO DELAYED WORKERS: was it really neccessary, that the slot is identical in case of load-balanced workers ?
+                        'slot' => $slotName . ($isLoadBalanced ? '' : $i),
+                        // the actual URL (saved in the worker-params)
+                        'url' => ($i < $numUrls) ? $serviceUrls[$i] :
+                            (($numUrls > 1) ? $serviceUrls[random_int(0, $numUrls - 1)] : $serviceUrls[0]),
                     ];
                 }
             }
             if ($this->doDebug) {
-                error_log('PooledService Worker::initSlots(): number of Workers: ' . $this->maxParallel . ' / slots: ' . print_r($this->slots, true));
+                error_log(
+                    'AbstractPooledWorker::initSlots(): number of Workers: '
+                    . $this->maxParallel . ' / slots: ' . print_r($this->slots, true)
+                );
             }
         }
+    }
+
+    /**
+     * Limits the number of max parallel workers
+     * The global max. parallel is taken into account
+     * @throws Zend_Exception
+     */
+    protected function limitMaxParallel(int $calculatedMaxParallel): int
+    {
+        return min(
+            $calculatedMaxParallel,
+            // the global max. parallel
+            (int) Zend_Registry::get('config')->runtimeOptions->worker->maxParallelWorkers,
+        );
     }
 
     /**
@@ -227,15 +274,19 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
 
     /**
      * HINT: this function will not check the serviceUrl Param as it is set programmatically in the queue-method
-     * @param array $parameters
      */
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
-        if ($this->isPooled && array_key_exists('resourcePool', $parameters) && $this->service->isValidPool($parameters['resourcePool'])) {
+        if ($this->isPooled && array_key_exists('resourcePool', $parameters) && $this->service->isValidPool(
+            $parameters['resourcePool']
+        )) {
             $this->resourcePool = $parameters['resourcePool'];
         }
         if (array_key_exists('workerIndex', $parameters)) {
             $this->workerIndex = (int) $parameters['workerIndex'];
+        }
+        if (array_key_exists('workerCount', $parameters)) {
+            $this->workerCount = (int) $parameters['workerCount'];
         }
         // we cannot check this param as it is not present in the initial init but will be added programmatically
         if (array_key_exists('serviceUrl', $parameters)) {
@@ -243,6 +294,23 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
         }
 
         return true;
+    }
+
+    public function onInit(array $parameters): bool
+    {
+        if (parent::onInit($parameters)) {
+            // if there is more than one worker working on the same workload
+            // our behaviour must reflect this
+            if ($this->workerCount > 1) {
+                $this->behaviour->setConfig([
+                    'isMultiInstance' => true,
+                ]);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -256,13 +324,16 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     /**
      * Queueing a pooled service worker usually queues several workers at once
      * UGLY: The param $startNext has a ambigous meaning here: more like "startAsManyAsThereAreFreeResources"
-     * This is defined by the
-     * @param int $parentId
-     * @param null $state
-     * @param bool $startNext
+     *
+     * @throws Zend_Exception
      * @throws ZfExtended_Exception
+     * @throws \ReflectionException
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws \ZfExtended_Models_Entity_NotFoundException
      */
-    public function queue($parentId = 0, $state = null, $startNext = true): int
+    public function queue(int $parentId = 0, string $state = null, bool $startNext = true): int
     {
         if ($startNext) {
             $this->checkIsInitCalled();
@@ -273,6 +344,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
 
             $params = $this->workerModel->getParameters();
             $params['workerIndex'] = 0;
+            $params['workerCount'] = count($this->slots);
             $myselfQueued = false;
 
             foreach ($this->slots as $slot) {
@@ -294,7 +366,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
                     $myselfQueued = true;
 
                     if ($this->doDebug) {
-                        error_log('Queued PooledService Worker: ' . get_class($this) . ', primary');
+                        error_log('Queued AbstractPooledWorker: ' . get_class($this) . ', primary');
                     }
                 }
                 $params['workerIndex']++;
@@ -306,7 +378,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
         }
 
         if ($this->doDebug) {
-            error_log('Queued PooledService Worker: ' . get_class($this) . ', secondary');
+            error_log('Queued AbstractPooledWorker: ' . get_class($this) . ', secondary');
         }
 
         return parent::queue($parentId, $state, false);

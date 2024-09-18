@@ -39,11 +39,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $this->log = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         $neededEntries = ['internalFuzzy', 'pretranslateMatchrate', 'pretranslateTmAndTerm', 'pretranslateMt', 'isTaskImport', 'pretranslate'];
         $foundEntries = array_keys($parameters);
@@ -53,10 +49,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         return empty($keyDiff);
     }
 
-    /**
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         try {
             return $this->doWork();

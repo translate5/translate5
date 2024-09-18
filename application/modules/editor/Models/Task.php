@@ -1122,7 +1122,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         // first check if disabled by state
         $this->checkStateAllowsActions();
 
-        $model = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $model = new ZfExtended_Models_Worker();
         // check if there are running exports
         if ($model->isExportRunning($this->getTaskGuid(), $exportClass)) {
             ZfExtended_Models_Entity_Conflict::addCodes([
