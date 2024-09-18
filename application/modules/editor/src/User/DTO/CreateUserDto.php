@@ -30,6 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\DTO;
 
+use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
 use ZfExtended_Models_User;
 
 class CreateUserDto
@@ -56,11 +58,16 @@ class CreateUserDto
 
     public static function fromRequestData(string $guid, array $data): self
     {
-        $roles = explode(',', trim($data['roles'] ?? '', ','));
+        $roles = explode(',', trim($data['roles'] ?? '', ' ,'));
+
+        if (! in_array(Roles::JOB_COORDINATOR, $roles) && isset($data['lsp'])) {
+            throw new AttemptToSetLspForNonJobCoordinatorException();
+        }
+
         $customers = array_filter(
             array_map(
                 'intval',
-                explode(',', trim($data['customers'] ?? '', ','))
+                explode(',', trim($data['customers'] ?? '', ' ,'))
             )
         );
 

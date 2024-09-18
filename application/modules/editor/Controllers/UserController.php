@@ -30,10 +30,7 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
@@ -59,13 +56,9 @@ use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolese
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
-use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
-use MittagQI\Translate5\User\Operations\UserCustomerAssociationUpdateOperation;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
-use MittagQI\Translate5\User\Operations\UserUpdateDataOperation;
-use MittagQI\Translate5\User\Operations\UserUpdateParentIdsOperation;
+use MittagQI\Translate5\User\Operations\UserUpdateOperation;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
-use MittagQI\Translate5\User\Operations\UserUpdateRolesOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
 use MittagQI\ZfExtended\Acl\SystemResource;
 
@@ -203,52 +196,42 @@ class Editor_UserController extends ZfExtended_RestController
 
     public function putAction(): void
     {
-        $this->entityLoad();
+        $this->decodePutData();
+
+        if (! empty($this->getDataField('lsp'))) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'lsp' => [
+                        'Ein Wechsel des Sprachdienstleisters ist nicht zulässig.',
+                    ],
+                ],
+            );
+        }
+
+        $userRepository = new UserRepository();
+        $user = $userRepository->get($this->getParam('id'));
 
         try {
             $authUser = ZfExtended_Authentication::getInstance()->getUser();
 
             $this->permissionAssert->assertGranted(
                 Action::UPDATE,
-                $this->entity,
+                $user,
                 new PermissionAssertContext($authUser)
             );
 
-            $this->decodePutData();
-
-            if (! empty($this->data->lsp)) {
-                throw ZfExtended_UnprocessableEntity::createResponse(
-                    'E2003',
-                    [
-                        'lsp' => [
-                            'Ein Wechsel des Sprachdienstleisters ist nicht zulässig.',
-                        ],
-                    ],
-                );
-            }
-
-            UserUpdateDataOperation::create()->update(
-                $this->entity,
+            UserUpdateOperation::createWithAuthentication()->updateUser(
+                $user,
                 UpdateUserDto::fromRequestData((array) $this->data),
             );
-            $this->updateCustomers($authUser);
-            $this->updateRoles($authUser);
-            $this->updatePassword($authUser);
-
-            if (! empty($this->data->parentIds)) {
-                UserUpdateParentIdsOperation::create()->updateParentIdsBy(
-                    $this->entity,
-                    $this->data->parentIds,
-                    $authUser,
-                );
-            }
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
         } catch (Exception $e) {
             throw $this->transformException($e);
         }
 
-        $this->view->rows = $this->entity->getDataObject();
+        $this->view->rows = $user->getDataObject();
 
         $this->credentialCleanup();
         $this->csvToArray();
@@ -394,7 +377,11 @@ class Editor_UserController extends ZfExtended_RestController
         $this->decodePutData();
 
         try {
-            $this->updatePassword($auth->getUser());
+            if (! property_exists($this->data->passwd, 'passwd')) {
+                return;
+            }
+
+            UserUpdatePasswordOperation::create()->updatePassword($authUser, $this->data->passwd);
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
         }
@@ -418,39 +405,6 @@ class Editor_UserController extends ZfExtended_RestController
         $this->view->rows = $this->entity->loadAllByRole($pmRoles, $parentId);
         $this->view->total = $this->entity->getTotalByRole($pmRoles, $parentId);
         $this->csvToArray();
-    }
-
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    private function updateCustomers(ZfExtended_Models_User $authUser): void
-    {
-        $sentCustomerIds = array_filter(
-            array_map(
-                'intval',
-                explode(',', trim($this->getDataField('customers'), ','))
-            )
-        );
-
-        UserCustomerAssociationUpdateOperation::create()->updateAssociatedCustomersBy(
-            $this->entity,
-            $sentCustomerIds,
-            $authUser
-        );
-    }
-
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    private function updateRoles(ZfExtended_Models_User $authUser): void
-    {
-        if (empty($this->data->roles)) {
-            return;
-        }
-
-        $roles = explode(',', trim($this->data->roles, ','));
-
-        UserUpdateRolesOperation::create()->updateRolesBy($this->entity, $roles, $authUser);
     }
 
     private function transformException(Exception $e): ZfExtended_ErrorCodeException|Exception
@@ -664,28 +618,6 @@ class Editor_UserController extends ZfExtended_RestController
                 unset($this->view->rows['openIdIssuer']);
             }
         }
-    }
-
-    /**
-     * @throws Zend_Exception
-     */
-    public function updatePassword(ZfExtended_Models_User $authUser): void
-    {
-        if (! isset($this->data->passwd)) {
-            return;
-        }
-
-        $updateUserPasswordOperation = UserUpdatePasswordOperation::create();
-
-        if (! empty($this->data->passwd)) {
-            $updateUserPasswordOperation->updatePassword($authUser, $this->data->passwd);
-
-            return;
-        }
-
-        $updateUserPasswordOperation->updatePassword($authUser, null);
-
-        ResetPasswordEmail::create()->sendTo($authUser);
     }
 
     /**

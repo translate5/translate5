@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\Validation;
 
-use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
@@ -65,11 +64,6 @@ class UserCustomerAssociationValidatorTest extends TestCase
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
-        $customer = $this->createMock(Customer::class);
-        $customer->method('__call')->willReturnMap([
-            ['getId', [], $customerId],
-        ]);
-
         if (! $isSubset) {
             $this->expectException(CustomerDoesNotBelongToUserException::class);
         }
@@ -78,7 +72,7 @@ class UserCustomerAssociationValidatorTest extends TestCase
             $lspUserRepository,
             $lspCustomerAssociationValidator,
         );
-        $validator->assertCustomersAreSubsetForUser([$customer], $user);
+        $validator->assertCustomersAreSubsetForUser([$customerId], $user);
         $this->assertTrue(true);
     }
 
@@ -131,13 +125,11 @@ class UserCustomerAssociationValidatorTest extends TestCase
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
-        $customer = $this->createMock(Customer::class);
-
         $validator = new UserCustomerAssociationValidator(
             $lspUserRepository,
             $lspCustomerAssociationValidator,
         );
-        $validator->assertCustomersMayBeAssociatedWithUser([$customer], $user);
+        $validator->assertCustomersMayBeAssociatedWithUser([12], $user);
         $this->assertTrue(true);
     }
 
@@ -184,15 +176,13 @@ class UserCustomerAssociationValidatorTest extends TestCase
             ->method('assertCustomersAreSubsetForLSP')
             ->willThrowException(new CustomerDoesNotBelongToUserException(1, $user->getUserGuid()));
 
-        $customer = $this->createMock(Customer::class);
-
         $this->expectException(CustomerDoesNotBelongToUserException::class);
 
         $validator = new UserCustomerAssociationValidator(
             $lspUserRepository,
             $lspCustomerAssociationValidator,
         );
-        $validator->assertCustomersMayBeAssociatedWithUser([$customer], $user);
+        $validator->assertCustomersMayBeAssociatedWithUser([12], $user);
     }
 
     public function testAssertSuccess(): void
@@ -217,12 +207,10 @@ class UserCustomerAssociationValidatorTest extends TestCase
             ->expects(self::once())
             ->method('assertCustomersAreSubsetForLSP');
 
-        $customer = $this->createMock(Customer::class);
-
         $validator = new UserCustomerAssociationValidator(
             $lspUserRepository,
             $lspCustomerAssociationValidator,
         );
-        $validator->assertCustomersMayBeAssociatedWithUser([$customer], $user);
+        $validator->assertCustomersMayBeAssociatedWithUser([12], $user);
     }
 }

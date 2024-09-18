@@ -28,48 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Operations;
+namespace MittagQI\Translate5\User\Contract;
 
-use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\DTO\PasswordDto;
-use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
-use Zend_Exception;
-use ZfExtended_Models_User as User;
-use ZfExtended_ValidateException;
+use MittagQI\Translate5\User\DTO\UpdateUserDto;
+use MittagQI\Translate5\User\Exception\UserExceptionInterface;
+use MittagQI\Translate5\User\Model\User;
 
-final class UserUpdatePasswordOperation
+interface UserUpdateOperationInterface
 {
-    public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserSetPasswordOperation $setPassword,
-        private readonly ResetPasswordEmail $resetPasswordEmail,
-    ) {
-    }
-
     /**
-     * @codeCoverageIgnore
+     * @throws UserExceptionInterface
+     * @throws \ZfExtended_ValidateException
      */
-    public static function create(): self
-    {
-        return new self(
-            new UserRepository(),
-            UserSetPasswordOperation::create(),
-            ResetPasswordEmail::create(),
-        );
-    }
-
-    /**
-     * @throws Zend_Exception
-     * @throws ZfExtended_ValidateException
-     */
-    public function updatePassword(User $user, ?string $password): void
-    {
-        $this->setPassword->setPassword($user, $password);
-
-        $this->userRepository->save($user);
-
-        if (null === $password) {
-            $this->resetPasswordEmail->sendTo($user);
-        }
-    }
+    public function updateUser(User $user, UpdateUserDto $dto): void;
 }

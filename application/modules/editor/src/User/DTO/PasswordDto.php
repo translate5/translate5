@@ -28,17 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Contract;
+namespace MittagQI\Translate5\User\DTO;
 
-use MittagQI\Translate5\User\DTO\CreateUserDto;
-use MittagQI\Translate5\User\Exception\UserExceptionInterface;
-use MittagQI\Translate5\User\Model\User;
-
-interface UserCreateOperationInterface
+class PasswordDto
 {
-    /**
-     * @throws UserExceptionInterface
-     * @throws \ZfExtended_ValidateException
-     */
-    public function createUser(CreateUserDto $dto): User;
+    public function __construct(public readonly ?string $password)
+    {
+    }
 }

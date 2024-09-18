@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
-use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\ActionAssert\Action;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssertInterface;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
@@ -42,7 +42,8 @@ use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
-use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
+use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Authentication;
@@ -77,15 +78,14 @@ final class UserCreateOperation implements UserCreateOperationInterface
     }
 
     /**
+     * @throws PermissionExceptionInterface
+     * @throws GuidAlreadyInUseException
+     * @throws LoginAlreadyInUseException
      * @throws UserExceptionInterface
      * @throws ZfExtended_ValidateException
      */
     public function createUser(CreateUserDto $dto): User
     {
-        if (! in_array(Roles::JOB_COORDINATOR, $dto->roles) && null !== $dto->lsp) {
-            throw new AttemptToSetLspForNonJobCoordinatorException();
-        }
-
         $lsp = $this->fetchLspForAssignment($dto->lsp);
 
         $authUser = $this->userRepository->get($this->authentication->getUserId());

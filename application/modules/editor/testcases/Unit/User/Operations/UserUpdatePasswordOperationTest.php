@@ -31,75 +31,67 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User as User;
-use ZfExtended_ValidateException;
 
 class UserUpdatePasswordOperationTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
 
-    private ZfExtended_AuthenticationInterface|MockObject $authentication;
+    private UserSetPasswordOperation|MockObject $setPassword;
+
+    private ResetPasswordEmail|MockObject $resetPasswordEmail;
 
     private UserUpdatePasswordOperation $operation;
 
     protected function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
+        $this->setPassword = $this->createMock(UserSetPasswordOperation::class);
+        $this->resetPasswordEmail = $this->createMock(ResetPasswordEmail::class);
 
         $this->operation = new UserUpdatePasswordOperation(
             $this->userRepository,
-            $this->authentication
+            $this->setPassword,
+            $this->resetPasswordEmail
         );
     }
 
-    public function passwordProvider(): iterable
-    {
-        yield 'null' => [null, null];
-        yield 'empty string' => ['', null];
-        yield 'password' => ['password', 'secure_password'];
-    }
-
-    /**
-     * @dataProvider passwordProvider
-     */
-    public function testUpdatePassword(?string $password, ?string $expectedSet): void
+    public function testUpdatePassword(): void
     {
         $user = $this->createMock(User::class);
 
-        if (! empty($password)) {
-            $this->authentication
-                ->expects(self::once())
-                ->method('createSecurePassword')
-                ->with($password)
-                ->willReturn($expectedSet)
-            ;
-        } else {
-            $this->authentication->expects(self::never())->method('createSecurePassword');
-        }
-
-        $user->expects(self::once())->method('__call')->with('setPasswd', [$expectedSet]);
-        $user->expects(self::once())->method('validate');
-
+        $this->setPassword->expects(self::once())->method('setPassword')->with($user, 'password');
         $this->userRepository->expects(self::once())->method('save')->with($user);
-
-        $this->operation->updatePassword($user, $password);
-    }
-
-    public function testUpdateThrowsValidateException(): void
-    {
-        $this->expectException(ZfExtended_ValidateException::class);
-
-        $user = $this->createMock(User::class);
-
-        $user->expects(self::once())->method('validate')->willThrowException(new ZfExtended_ValidateException());
-
-        $this->userRepository->expects(self::never())->method('save');
+        $this->resetPasswordEmail->expects(self::never())->method('sendTo');
 
         $this->operation->updatePassword($user, 'password');
+    }
+
+    public function testResetPassword(): void
+    {
+        $user = $this->createMock(User::class);
+
+        $this->setPassword->expects(self::once())->method('setPassword')->with($user, null);
+        $this->userRepository->expects(self::once())->method('save')->with($user);
+        $this->resetPasswordEmail->expects(self::once())->method('sendTo');
+
+        $this->operation->updatePassword($user, null);
+    }
+
+    public function testEmailNotSentOnPasswordSetException(): void
+    {
+        $this->expectException(\Exception::class);
+        $user = $this->createMock(User::class);
+
+        $this->setPassword->expects(self::once())->method('setPassword')->willThrowException(new \Exception());
+        $this->userRepository->expects(self::never())->method('save')->with($user);
+        $this->resetPasswordEmail->expects(self::never())->method('sendTo');
+
+        $this->operation->updatePassword($user, null);
     }
 }

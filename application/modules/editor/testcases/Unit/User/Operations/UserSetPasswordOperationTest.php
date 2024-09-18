@@ -30,54 +30,107 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User as User;
+use ZfExtended_ValidateException;
 
 class UserSetPasswordOperationTest extends TestCase
 {
-    public function passwordProvider(): array
-    {
-        return [
-            'empty string' => [''],
-            'null' => [null],
-            'string' => ['password'],
-        ];
-    }
-
-    /**
-     * @dataProvider passwordProvider
-     */
-    public function testDelete(?string $password): void
+    public function testSetNull(): void
     {
         $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $user = $this->createMock(User::class);
 
-        if ('' === $password) {
-            $this->expectException(\InvalidArgumentException::class);
+        $user->expects(self::once())->method('__call')->with('setPasswd', [null]);
 
-            $user->expects(self::never())->method('__call')->with('setPasswd');
-        } else {
-            $encodedPassword = 'secure_password';
+        $service = new UserSetPasswordOperation($authentication);
+        $service->setPassword($user, null);
+    }
 
-            if (null !== $password) {
-                $authentication
-                    ->expects(self::once())
-                    ->method('createSecurePassword')
-                    ->with($password)
-                    ->willReturn($encodedPassword);
-            }
+    public function testThrowsExceptionOnEmptyString(): void
+    {
+        $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
+        $user = $this->createMock(User::class);
 
-            $expectedPassword = null === $password ? null : $encodedPassword;
+        $this->expectException(\InvalidArgumentException::class);
 
-            $user->expects(self::once())->method('__call')->with('setPasswd', [$expectedPassword]);
-            $user->expects(self::once())->method('validate');
-        }
+        $user->expects(self::never())->method('__call')->with('setPasswd');
+
+        $service = new UserSetPasswordOperation($authentication);
+        $service->setPassword($user, '');
+    }
+
+    public function testThrowsValidationException(): void
+    {
+        $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
+        $user = $this->createMock(User::class);
+
+        $this->expectException(ZfExtended_ValidateException::class);
+
+        $password = 'qwerty';
+
+        $user->expects(self::once())->method('__call')->with('setPasswd', [$password]);
+        $user->expects(self::once())
+            ->method('validate')
+            ->willThrowException($this->createMock(ZfExtended_ValidateException::class));
 
         $service = new UserSetPasswordOperation($authentication);
         $service->setPassword($user, $password);
+    }
+
+    public function testSetPassword(): void
+    {
+        $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
+        $user = new class extends User
+        {
+            private int $count = 0;
+
+            private int $countValidate = 0;
+
+            public function setPasswd(?string $password): void
+            {
+                $this->count++;
+
+                if ($this->count === 1) {
+                    TestCase::assertEquals('qwerty', $password);
+                } elseif ($this->count === 2) {
+                    TestCase::assertEquals('secure_password', $password);
+                } else {
+                    TestCase::fail('Unexpected call');
+                }
+            }
+
+            public function validate(): void
+            {
+                $this->countValidate++;
+            }
+
+            public function count(): int
+            {
+                return $this->count;
+            }
+
+            public function countValidate(): int
+            {
+                return $this->countValidate;
+            }
+        };
+
+        $password = 'qwerty';
+        $encodedPassword = 'secure_password';
+
+        $authentication
+            ->expects(self::once())
+            ->method('createSecurePassword')
+            ->with($password)
+            ->willReturn($encodedPassword);
+
+        $service = new UserSetPasswordOperation($authentication);
+        $service->setPassword($user, $password);
+
+        self::assertEquals(2, $user->count());
+        self::assertEquals(1, $user->countValidate());
     }
 }

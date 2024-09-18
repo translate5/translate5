@@ -63,10 +63,14 @@ class UserSetPasswordOperation
             throw new \InvalidArgumentException('Password cannot be empty string');
         }
 
+        if (null !== $password) {
+            $user->setPasswd($password);
+
+            $user->validate();
+        }
+
         $password = null === $password ? null : $this->authentication->createSecurePassword($password);
 
         $user->setPasswd($password);
-
-        $user->validate();
     }
 }

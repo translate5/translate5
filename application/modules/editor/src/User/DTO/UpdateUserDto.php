@@ -32,24 +32,48 @@ namespace MittagQI\Translate5\User\DTO;
 
 class UpdateUserDto
 {
+    /**
+     * @param string[] $roles
+     * @param int[] $customers
+     */
     public function __construct(
         public readonly ?string $login,
         public readonly ?string $email,
         public readonly ?string $firstName,
         public readonly ?string $surName,
         public readonly ?string $gender,
-        public readonly ?string $locale,
+        public readonly ?array $roles = null,
+        public readonly ?array $customers = null,
+        public readonly ?PasswordDto $password = null,
+        public readonly ?string $parentId = null,
+        public readonly ?string $locale = null,
     ) {
     }
 
     public static function fromRequestData(array $data): self
     {
+        $roles = isset($data['roles']) ? explode(',', trim($data['roles'], ',')) : null;
+        $customers = isset($data['roles'])
+            ? array_filter(
+                array_map(
+                    'intval',
+                    explode(',', trim($data['customers'], ','))
+                )
+            )
+            : null;
+
         return new self(
             $data['login'] ?? null,
             $data['email'] ?? null,
             $data['firstName'] ?? null,
             $data['surName'] ?? null,
             $data['gender'] ?? null,
+            $roles,
+            $customers,
+            array_key_exists('passwd', $data)
+                ? new PasswordDto(null !== $data['passwd'] ? trim($data['passwd']) : null)
+                : null,
+            $data['parentIds'] ?? null,
             $data['locale'] ?? null,
         );
     }

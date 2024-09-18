@@ -41,6 +41,8 @@ use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
+use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
@@ -100,6 +102,8 @@ final class UserCreateOperation implements UserCreateOperationInterface
     }
 
     /**
+     * @throws GuidAlreadyInUseException
+     * @throws LoginAlreadyInUseException
      * @throws UserExceptionInterface
      * @throws ZfExtended_ValidateException
      */

@@ -34,32 +34,59 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
+use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
+use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
+use MittagQI\Translate5\User\DTO\PasswordDto;
 use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use MittagQI\Translate5\User\Operations\UserUpdateDataOperation;
+use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
+use MittagQI\Translate5\User\Operations\UserUpdateOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
-use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
-class UserUpdateDataOperationTest extends TestCase
+class UserUpdateOperationTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
 
     private UserActionFeasibilityAssertInterface|MockObject $userActionFeasibilityChecker;
 
-    private UserUpdateDataOperation $operation;
+    private UserSetParentIdsOperationInterface|MockObject $setParentIds;
+
+    private UserSetRolesOperationInterface|MockObject $setRoles;
+
+    private UserSetPasswordOperation|MockObject $setPassword;
+
+    private UserAssignCustomersOperationInterface|MockObject $assignCustomers;
+
+
+    private ResetPasswordEmail|MockObject $resetPasswordEmail;
+
+    private UserUpdateOperation $operation;
 
     protected function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->userActionFeasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
+        $this->setParentIds = $this->createMock(UserSetParentIdsOperationInterface::class);
+        $this->setRoles = $this->createMock(UserSetRolesOperationInterface::class);
+        $this->setPassword = $this->createMock(UserSetPasswordOperation::class);
+        $this->assignCustomers = $this->createMock(UserAssignCustomersOperationInterface::class);
+        $this->resetPasswordEmail = $this->createMock(ResetPasswordEmail::class);
 
-        $this->operation = new UserUpdateDataOperation(
+        $this->operation = new UserUpdateOperation(
             $this->userRepository,
-            $this->userActionFeasibilityChecker
+            $this->userActionFeasibilityChecker,
+            $this->setParentIds,
+            $this->setRoles,
+            $this->setPassword,
+            $this->assignCustomers,
+            $this->resetPasswordEmail,
         );
     }
 
@@ -68,7 +95,6 @@ class UserUpdateDataOperationTest extends TestCase
         $user = $this->createMock(User::class);
         $dto = new UpdateUserDto(
             'new_login',
-            null,
             null,
             null,
             null,
@@ -84,7 +110,7 @@ class UserUpdateDataOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('save')->with($user);
 
-        $this->operation->update($user, $dto);
+        $this->operation->updateUser($user, $dto);
     }
 
     public function testUpdateEmail(): void
@@ -108,7 +134,7 @@ class UserUpdateDataOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('save')->with($user);
 
-        $this->operation->update($user, $dto);
+        $this->operation->updateUser($user, $dto);
     }
 
     public function testUpdateFirstName(): void
@@ -132,7 +158,7 @@ class UserUpdateDataOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('save')->with($user);
 
-        $this->operation->update($user, $dto);
+        $this->operation->updateUser($user, $dto);
     }
 
     public function testUpdateSurName(): void
@@ -156,7 +182,7 @@ class UserUpdateDataOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('save')->with($user);
 
-        $this->operation->update($user, $dto);
+        $this->operation->updateUser($user, $dto);
     }
 
     public function testUpdateGender(): void
@@ -180,7 +206,7 @@ class UserUpdateDataOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('save')->with($user);
 
-        $this->operation->update($user, $dto);
+        $this->operation->updateUser($user, $dto);
     }
 
     public function testUpdateLocale(): void
@@ -192,7 +218,7 @@ class UserUpdateDataOperationTest extends TestCase
             null,
             null,
             null,
-            'en',
+            locale: 'en',
         );
 
         $this->userActionFeasibilityChecker->expects(self::once())
@@ -204,7 +230,132 @@ class UserUpdateDataOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('save')->with($user);
 
-        $this->operation->update($user, $dto);
+        $this->operation->updateUser($user, $dto);
+    }
+
+    public function testUpdatePassword(): void
+    {
+        $user = $this->createMock(User::class);
+        $dto = new UpdateUserDto(
+            null,
+            null,
+            null,
+            null,
+            null,
+            password: new PasswordDto('password'),
+        );
+
+        $this->userActionFeasibilityChecker->expects(self::once())
+            ->method('assertAllowed')
+            ->with(Action::UPDATE, $user);
+
+        $this->setPassword->expects(self::once())->method('setPassword')->with($user, $dto->password->password);
+        $user->expects(self::once())->method('validate');
+
+        $this->userRepository->expects(self::once())->method('save')->with($user);
+
+        $this->operation->updateUser($user, $dto);
+    }
+
+    public function testSendsResetMail(): void
+    {
+        $user = $this->createMock(User::class);
+        $dto = new UpdateUserDto(
+            null,
+            null,
+            null,
+            null,
+            null,
+            password: null,
+        );
+
+        $this->userActionFeasibilityChecker->expects(self::once())
+            ->method('assertAllowed')
+            ->with(Action::UPDATE, $user);
+
+        $this->setPassword->expects(self::never())->method('setPassword');
+        $user->expects(self::once())->method('validate');
+
+        $this->resetPasswordEmail->expects(self::once())->method('sendTo')->with($user);
+
+        $this->userRepository->expects(self::once())->method('save')->with($user);
+
+        $this->operation->updateUser($user, $dto);
+    }
+
+    public function testUpdateRoles(): void
+    {
+        $user = $this->createMock(User::class);
+        $dto = new UpdateUserDto(
+            null,
+            null,
+            null,
+            null,
+            null,
+            roles: ['role1', 'role2'],
+        );
+
+        $this->userActionFeasibilityChecker->expects(self::once())
+            ->method('assertAllowed')
+            ->with(Action::UPDATE, $user);
+
+        $this->setRoles->expects(self::once())->method('setRoles')->with($user, $dto->roles);
+
+        $user->expects(self::once())->method('validate');
+
+        $this->userRepository->expects(self::once())->method('save')->with($user);
+
+        $this->operation->updateUser($user, $dto);
+    }
+
+    public function testUpdateParentIds(): void
+    {
+        $user = $this->createMock(User::class);
+        $dto = new UpdateUserDto(
+            null,
+            null,
+            null,
+            null,
+            null,
+            parentId: 'parent-guid',
+        );
+
+        $this->userActionFeasibilityChecker->expects(self::once())
+            ->method('assertAllowed')
+            ->with(Action::UPDATE, $user);
+
+        $this->setParentIds->expects(self::once())->method('setParentIds')->with($user, $dto->parentId);
+
+        $user->expects(self::once())->method('validate');
+
+        $this->userRepository->expects(self::once())->method('save')->with($user);
+
+        $this->operation->updateUser($user, $dto);
+    }
+
+    public function testUpdateCustomers(): void
+    {
+        $user = $this->createMock(User::class);
+        $dto = new UpdateUserDto(
+            null,
+            null,
+            null,
+            null,
+            null,
+            customers: [11, 12],
+        );
+
+        $this->userActionFeasibilityChecker->expects(self::once())
+            ->method('assertAllowed')
+            ->with(Action::UPDATE, $user);
+
+        $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $dto->customers);
+
+        $user->expects(self::once())->method('validate');
+
+        $this->userRepository->expects(self::once())->method('save')->with($user);
+
+        $this->operation->updateUser($user, $dto);
     }
 
     public function testUpdateEmpty(): void
@@ -229,47 +380,7 @@ class UserUpdateDataOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('save')->with($user);
 
-        $this->operation->update($user, $dto);
-    }
-
-    public function testUpdateThrowsLoginAlreadyInUseException(): void
-    {
-        $this->expectException(LoginAlreadyInUseException::class);
-
-        $user = $this->createMock(User::class);
-        $dto = new UpdateUserDto(null, 'duplicate_login', null, null, null, null);
-
-        $this->userActionFeasibilityChecker->expects(self::once())->method('assertAllowed');
-
-        $this->userRepository
-            ->method('save')
-            ->willThrowException(
-                new ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey('E0000', [
-                    'field' => 'login',
-                ])
-            );
-
-        $this->operation->update($user, $dto);
-    }
-
-    public function testUpdateThrowsGuidAlreadyInUseException(): void
-    {
-        $this->expectException(GuidAlreadyInUseException::class);
-
-        $user = $this->createMock(User::class);
-        $dto = new UpdateUserDto(null, null, null, null, null, null);
-
-        $this->userActionFeasibilityChecker->expects(self::once())->method('assertAllowed');
-
-        $this->userRepository
-            ->method('save')
-            ->willThrowException(
-                new ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey('E0000', [
-                    'field' => 'userGuid',
-                ])
-            );
-
-        $this->operation->update($user, $dto);
+        $this->operation->updateUser($user, $dto);
     }
 
     public function testUpdateThrowsFeasibilityException(): void
@@ -282,7 +393,7 @@ class UserUpdateDataOperationTest extends TestCase
         $this->userActionFeasibilityChecker->method('assertAllowed')
             ->willThrowException($this->createMock(FeasibilityExceptionInterface::class));
 
-        $this->operation->update($user, $dto);
+        $this->operation->updateUser($user, $dto);
     }
 
     public function testUpdateThrowsValidateException(): void
@@ -301,9 +412,8 @@ class UserUpdateDataOperationTest extends TestCase
             null,
             null,
             null,
-            'en',
         );
 
-        $this->operation->update($user, $dto);
+        $this->operation->updateUser($user, $dto);
     }
 }

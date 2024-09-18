@@ -35,18 +35,28 @@ use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
+use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
+use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
+use MittagQI\Translate5\User\Contract\UserUpdateOperationInterface;
 use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Exception\UserExceptionInterface;
+use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use MittagQI\Translate5\User\Model\User;
 use ZfExtended_ValidateException;
 
-final class UserUpdateDataOperation
+final class UserUpdateOperation implements UserUpdateOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
+        private readonly UserSetParentIdsOperationInterface $setParentIds,
+        private readonly UserSetRolesOperationInterface $setRoles,
+        private readonly UserSetPasswordOperation $setPassword,
+        private readonly UserAssignCustomersOperationInterface $assignCustomers,
+        private readonly ResetPasswordEmail $resetPasswordEmail,
     ) {
     }
 
@@ -58,17 +68,38 @@ final class UserUpdateDataOperation
         return new self(
             new UserRepository(),
             UserActionFeasibilityAssert::create(),
+            UserSetParentIdsOperation::create(),
+            UserSetRolesOperation::create(),
+            UserSetPasswordOperation::create(),
+            UserAssignCustomersOperation::create(),
+            ResetPasswordEmail::create(),
+        );
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function createWithAuthentication(): self
+    {
+        return new self(
+            new UserRepository(),
+            UserActionFeasibilityAssert::create(),
+            WithAuthentication\UserSetParentIdsOperation::create(),
+            WithAuthentication\UserSetRolesOperation::create(),
+            UserSetPasswordOperation::create(),
+            WithAuthentication\UserAssignCustomersOperation::create(),
+            ResetPasswordEmail::create(),
         );
     }
 
     /**
      * @throws FeasibilityExceptionInterface
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     * @throws ZfExtended_ValidateException
-     * @throws LoginAlreadyInUseException
      * @throws GuidAlreadyInUseException
+     * @throws LoginAlreadyInUseException
+     * @throws UserExceptionInterface
+     * @throws ZfExtended_ValidateException
      */
-    public function update(User $user, UpdateUserDto $dto): void
+    public function updateUser(User $user, UpdateUserDto $dto): void
     {
         $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
 
@@ -96,22 +127,28 @@ final class UserUpdateDataOperation
             $user->setLocale($dto->locale);
         }
 
+        if (null !== $dto->password) {
+            $this->setPassword->setPassword($user, $dto->password->password);
+        }
+
+        if (null !== $dto->roles) {
+            $this->setRoles->setRoles($user, $dto->roles);
+        }
+
+        if (null !== $dto->parentId) {
+            $this->setParentIds->setParentIds($user, $dto->parentId);
+        }
+
+        if (null !== $dto->customers) {
+            $this->assignCustomers->assignCustomers($user, $dto->customers);
+        }
+
         $user->validate();
 
-        try {
-            $this->userRepository->save($user);
-        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-            $field = $e->getExtra('field') ?? '';
+        $this->userRepository->save($user);
 
-            if ($field === 'login') {
-                throw new LoginAlreadyInUseException();
-            }
-
-            if ($field === 'userGuid') {
-                throw new GuidAlreadyInUseException();
-            }
-
-            throw $e;
+        if (null === $dto->password) {
+            $this->resetPasswordEmail->sendTo($user);
         }
     }
 }
