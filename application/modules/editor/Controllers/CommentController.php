@@ -33,12 +33,16 @@ class Editor_CommentController extends ZfExtended_RestController
 {
     use TaskContextTrait;
 
-    protected $entityClass = 'editor_Models_Comment';
+    protected $entityClass = editor_Models_Comment::class;
 
     /**
      * @var editor_Models_Comment
      */
     protected $entity;
+
+    protected array $dataSanitizationMap = [
+        'comment' => ZfExtended_Sanitizer::UNSANITIZED,
+    ];
 
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
