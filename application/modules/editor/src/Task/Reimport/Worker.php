@@ -32,21 +32,18 @@ use editor_Models_Loaders_Taskuserassoc as JobLoader;
 use editor_Models_Task as Task;
 use editor_Models_Task_AbstractWorker;
 use editor_Models_TaskUserAssoc;
-use JsonException;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use ReflectionException;
+use Throwable;
 use Zend_Acl_Exception;
-use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_Conflict;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
-use ZfExtended_Worker_Abstract;
 
 /**
  * Contains the Task Reimport Worker
@@ -63,11 +60,7 @@ class Worker extends editor_Models_Task_AbstractWorker
      */
     public const FILEFILTER_CONTEXT_NEW = 'REIMPORT_CHECK_NEW';
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         $neededEntries = ['files', 'userGuid', 'segmentTimestamp', 'dataProviderClass'];
         $foundEntries = array_keys($parameters);
@@ -77,26 +70,12 @@ class Worker extends editor_Models_Task_AbstractWorker
         return empty($keyDiff);
     }
 
-    /**
-     * (non-PHPdoc)
-     * @return true
-     * @throws Exception
-     * @throws JsonException
-     * @throws Zend_Acl_Exception
-     * @throws ZfExtended_Models_Entity_Conflict
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws Zend_Exception
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $params = $this->workerModel->getParameters();
 
-        /** @var ZfExtended_Models_User $user */
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         $user->loadByGuid($params['userGuid']);
-
-        $logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
 
         //contains the TUA which is used to alter the segments
         $tua = $this->prepareTaskUserAssociation($this->task, $user);
@@ -117,7 +96,7 @@ class Worker extends editor_Models_Task_AbstractWorker
                 $reimportFile->setFileDto($file);
                 $reimportFile->import($fileId, $file->reimportFile, $params['segmentTimestamp']);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Zend_Registry::get('logger')->exception($e);
         } finally {
             //if it was a PM override, delete it again

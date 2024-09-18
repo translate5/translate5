@@ -40,7 +40,7 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Task_Abstract
 
     private LanguageResource $languageResource;
 
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['languageResourceId'])) {
             return false;

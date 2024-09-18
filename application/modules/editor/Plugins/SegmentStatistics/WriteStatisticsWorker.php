@@ -28,11 +28,7 @@ END LICENSE AND COPYRIGHT
 
 class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plugins_SegmentStatistics_Worker
 {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $this->setType();
         $config = Zend_Registry::get('config');

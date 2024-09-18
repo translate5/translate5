@@ -75,16 +75,9 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension) . Connector::OUTPUT_FILE_EXTENSION;
     }
 
-    /**
-     * @var ZfExtended_Logger
-     */
-    protected $logger;
+    protected ZfExtended_Logger $logger;
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['type'])
                 || ! ($parameters['type'] == self::TYPE_IMPORT || $parameters['type'] == self::TYPE_EXPORT)) {
@@ -94,23 +87,23 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         return true;
     }
 
-    public function init($taskGuid = null, $parameters = [])
+    public function onInit(array $parameters): bool
     {
-        $result = parent::init($taskGuid, $parameters);
-        if ($result && $parameters['type'] === self::TYPE_EXPORT) {
-            //on export we just use normal maintenance check, not the extended one for imports
-            $this->behaviour->setConfig([
-                'isMaintenanceScheduled' => true,
-            ]);
+        if (parent::onInit($parameters)) {
+            if ($parameters['type'] === self::TYPE_EXPORT) {
+                // on export we just use normal maintenance check, not the extended one for imports
+                $this->behaviour->setConfig([
+                    'isMaintenanceScheduled' => true,
+                ]);
+            }
+
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
-    /**
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $this->logger = Zend_Registry::get('logger')->cloneMe('plugin.okapi');
         $params = $this->workerModel->getParameters();
@@ -124,7 +117,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
     /**
      * Uploads one file to Okapi to convert it to an XLIFF file importable by translate5
      */
-    protected function doImport()
+    protected function doImport(): bool
     {
         $params = $this->workerModel->getParameters();
 

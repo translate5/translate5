@@ -54,9 +54,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_UserAssocDefault extends ZfExtended_Models_Entity_Abstract
 {
-    protected $dbInstanceClass = "editor_Models_Db_UserAssocDefault";
+    protected $dbInstanceClass = editor_Models_Db_UserAssocDefault::class;
 
-    protected $validatorInstanceClass = "editor_Models_Validator_UserAssocDefault";
+    protected $validatorInstanceClass = editor_Models_Validator_UserAssocDefault::class;
 
     /***
      * Load all default assocs for given task. The rows are filtered for workflow,customerId, sourceLang and targetLang

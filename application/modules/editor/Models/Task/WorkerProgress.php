@@ -60,8 +60,7 @@ class editor_Models_Task_WorkerProgress
      */
     public function calculateProgress(string $taskGuid, int $context = null): array
     {
-        /** @var ZfExtended_Models_Worker $worker */
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        $worker = new ZfExtended_Models_Worker();
 
         //if the context is not provided, try to calculate one base on the workers state
         if ($context == null) {

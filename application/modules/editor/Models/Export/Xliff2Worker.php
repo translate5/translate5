@@ -31,11 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Export_Xliff2Worker extends ZfExtended_Worker_Abstract
 {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (isset($parameters['exportToFolder']) && (! is_dir($parameters['exportToFolder']) || ! is_writable($parameters['exportToFolder']))) {
             $this->log->error('E1398', 'Export folder not found or not write able: {folder}', [
@@ -80,11 +76,7 @@ class editor_Models_Export_Xliff2Worker extends ZfExtended_Worker_Abstract
         }
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         //also containing an instance of the initial dataprovider.
         // The Dataprovider can itself hook on to several import events

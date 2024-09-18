@@ -34,11 +34,7 @@ use MittagQI\Translate5\Task\Import\ImportEventTrigger;
  */
 class editor_Models_Import_Worker extends editor_Models_Task_AbstractWorker
 {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['config']) || ! $parameters['config'] instanceof editor_Models_Import_Configuration) {
             throw new ZfExtended_Exception(
