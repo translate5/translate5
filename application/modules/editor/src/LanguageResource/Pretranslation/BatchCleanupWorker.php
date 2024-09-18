@@ -13,11 +13,7 @@ use ZfExtended_Factory;
  */
 class BatchCleanupWorker extends editor_Models_Task_AbstractWorker
 {
-    /***
-     * @param $parameters
-     * @return bool
-     */
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         $neededEntries = ['taskGuid'];
         $foundEntries = array_keys($parameters);
@@ -27,7 +23,7 @@ class BatchCleanupWorker extends editor_Models_Task_AbstractWorker
         return empty($keyDiff);
     }
 
-    protected function work()
+    protected function work(): bool
     {
         $resources = [];
 

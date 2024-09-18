@@ -42,7 +42,7 @@ class UpdateLanguageResourcesWorker extends ZfExtended_Worker_Abstract
 {
     private editor_Models_Segment $segment;
 
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['segmentId'])) {
             return false;

@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract
 {
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         return true;
     }
@@ -61,11 +61,7 @@ class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract
         return ZfExtended_Factory::get($className);
     }
 
-    /**
-     * @see ZfExtended_Worker_Abstract::work()
-     * @return bool
-     */
-    public function work()
+    public function work(): bool
     {
         // Get params
         $parameters = $this->workerModel->getParameters();

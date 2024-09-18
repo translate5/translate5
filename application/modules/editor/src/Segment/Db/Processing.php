@@ -30,6 +30,7 @@ namespace MittagQI\Translate5\Segment\Db;
 
 use editor_Models_Db_Segments;
 use MittagQI\Translate5\Segment\Processing\State;
+use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Exception;
 use ZfExtended_Factory;
@@ -41,6 +42,8 @@ use ZfExtended_Factory;
  */
 final class Processing extends Zend_Db_Table_Abstract
 {
+    private const INSERT_BATCH = 1000;
+
     protected $_name = 'LEK_segment_processing';
 
     public $_primary = 'segmentId';
@@ -133,25 +136,43 @@ final class Processing extends Zend_Db_Table_Abstract
     /**
      * Will generate empty entries for the given task to at least store the states in
      */
-    public function prepareOperation(string $taskGuid)
+    public function prepareOperation(string $taskGuid): void
     {
         $db = $this->getAdapter();
         // this clears the table for the operation. HINT: when we have multiple operations at once for the same task (what must not happen!), this will clear other running operations
         $db->query('DELETE FROM ' . $db->quoteIdentifier($this->_name) . ' WHERE taskGuid = ?', $taskGuid);
-        $rowvals = [];
         // get segment ids
         $segmentsTable = ZfExtended_Factory::get(editor_Models_Db_Segments::class);
         $segmentIds = $segmentsTable->getAllIdsForTask($taskGuid, false);
-
         // in case the task has no segments, do not try to insert rows
         if (empty($segmentIds)) {
             return;
         }
-
-        foreach ($segmentIds as $id) {
-            $rowvals[] = '(' . $id . ', \'' . $taskGuid . '\')';
+        // insert in batches to avoid overruns
+        $idPairs = [];
+        $numSegments = count($segmentIds);
+        for ($i = 0; $i < $numSegments; $i++) {
+            $idPairs[] = '(' . $segmentIds[$i] . ', \'' . $taskGuid . '\')';
+            if ($i > 0 && ($i % self::INSERT_BATCH) === 0) {
+                $this->insertPreparedSegments($db, $idPairs);
+                $idPairs = [];
+            }
         }
-        $db->query('INSERT INTO ' . $db->quoteIdentifier($this->_name) . ' (`segmentId`, `taskGuid`) VALUES ' . implode(',', $rowvals));
+        if (count($idPairs) > 0) {
+            $this->insertPreparedSegments($db, $idPairs);
+        }
+    }
+
+    /**
+     * Helper, adds the given id-pairs as rows
+     */
+    private function insertPreparedSegments(Zend_Db_Adapter_Abstract $db, array $idPairs): void
+    {
+        $db->query(
+            'INSERT INTO ' . $db->quoteIdentifier($this->_name)
+            . ' (`segmentId`, `taskGuid`) VALUES '
+            . implode(',', $idPairs)
+        );
     }
 
     /**

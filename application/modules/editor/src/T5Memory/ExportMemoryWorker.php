@@ -69,7 +69,7 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
         throw new \MittagQI\Translate5\Export\Exception('E1608');
     }
 
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (! array_key_exists('exportFolder', $parameters)) {
             return false;
@@ -104,7 +104,7 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
         return true;
     }
 
-    protected function handleWorkerException(\Throwable $workException)
+    protected function handleWorkerException(\Throwable $workException): void
     {
         $this->workerException = $workException;
 

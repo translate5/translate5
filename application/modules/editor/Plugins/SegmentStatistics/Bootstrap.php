@@ -123,6 +123,6 @@ class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstr
         $worker->init($task->getTaskGuid(), [
             'type' => $type,
         ]);
-        $worker->queue($parentId);
+        $worker->queue((int) $parentId);
     }
 }

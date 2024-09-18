@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Export_Exported_Worker
 {
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         // Get logger
         $logger = Zend_Registry::get('logger')->cloneMe('editor.export');

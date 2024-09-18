@@ -41,18 +41,8 @@ use ZfExtended_Worker_Abstract;
  * Contains the Import Worker (the scheduling parts)
  * The import process itself is encapsulated in editor_Models_Import_Worker_Import
  */
-class Html extends ZfExtended_Worker_Abstract
+class HtmlWorker extends ZfExtended_Worker_Abstract
 {
-    private int $taskId;
-
-    private string $exportFolder;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->log = \Zend_Registry::get('logger')->cloneMe('editor.languageResource.tm.export');
-    }
-
     public static function queueExportWorker(Task $task, string $exportFolder): int
     {
         $worker = ZfExtended_Factory::get(self::class);
@@ -67,7 +57,17 @@ class Html extends ZfExtended_Worker_Abstract
         throw new \MittagQI\Translate5\Export\Exception('E1608');
     }
 
-    protected function validateParameters($parameters = [])
+    private int $taskId;
+
+    private string $exportFolder;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->log = \Zend_Registry::get('logger')->cloneMe('editor.languageResource.tm.export');
+    }
+
+    protected function validateParameters(array $parameters): bool
     {
         if (! array_key_exists('exportFolder', $parameters)) {
             return false;
@@ -84,7 +84,7 @@ class Html extends ZfExtended_Worker_Abstract
         return true;
     }
 
-    protected function handleWorkerException(\Throwable $workException)
+    protected function handleWorkerException(\Throwable $workException): void
     {
         $this->workerException = $workException;
 

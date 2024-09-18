@@ -77,6 +77,7 @@ abstract class AbstractProcessor
     /**
      * Processes a single segment (either for a retag in the worker or when editing segments via the frontend)
      * HINT: do not process stuff for the whole task, this API is called for single-segment actions!
+     * IMPORTANT: after processing, editor_Segment_Tags::save() MUST be callsed when $saveTags is given !!
      */
     abstract public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true);
 

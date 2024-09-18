@@ -72,11 +72,7 @@ class Worker extends editor_Models_Export_Worker
         return $this->initFolderExport($task, $diff, $root);
     }
 
-    /***
-     * @param $parameters
-     * @return bool
-     */
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         if (! parent::validateParameters($parameters)) {
             return false;
@@ -101,10 +97,6 @@ class Worker extends editor_Models_Export_Worker
         return $exportFolder;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
     public function work(): bool
     {
         //also containing an instance of the initial dataprovider.
