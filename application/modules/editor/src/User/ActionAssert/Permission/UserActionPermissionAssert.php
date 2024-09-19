@@ -30,25 +30,18 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\AclPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ParentPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\PermissionAssertInterface;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use ZfExtended_Models_User as User;
 
-final class UserActionPermissionAssert
+/**
+ * @extends ActionPermissionAssert<User>
+ */
+final class UserActionPermissionAssert extends ActionPermissionAssert
 {
-    /**
-     * @param PermissionAssertInterface[] $asserts
-     */
-    public function __construct(
-        private readonly array $asserts
-    ) {
-    }
-
     /**
      * @codeCoverageIgnore
      */
@@ -60,19 +53,5 @@ final class UserActionPermissionAssert
             LspUserAccessPermissionAssert::create(),
             new AclPermissionAssert(),
         ]);
-    }
-
-    /**
-     * @throws PermissionExceptionInterface
-     */
-    public function assertGranted(Action $action, User $user, PermissionAssertContext $context): void
-    {
-        foreach ($this->asserts as $assert) {
-            if (! $assert->supports($action)) {
-                continue;
-            }
-
-            $assert->assertGranted($user, $context);
-        }
     }
 }

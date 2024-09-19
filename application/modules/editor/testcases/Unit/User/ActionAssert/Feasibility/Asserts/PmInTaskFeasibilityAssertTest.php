@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\PmInTaskFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use PHPUnit\Framework\TestCase;

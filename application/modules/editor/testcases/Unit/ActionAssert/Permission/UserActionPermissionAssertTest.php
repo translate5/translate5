@@ -28,21 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission;
+namespace MittagQI\Translate5\Test\Unit\ActionAssert\Permission;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\PermissionAssertInterface;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 
 class UserActionPermissionAssertTest extends TestCase
 {
     public function testAssertGranted(): void
     {
-        $user = $this->createMock(\ZfExtended_Models_User::class);
-        $manager = $this->createMock(\ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $permissionAuditorMock1 = $this->createMock(PermissionAssertInterface::class);
@@ -53,14 +54,14 @@ class UserActionPermissionAssertTest extends TestCase
         $permissionAuditorMock2->expects($this->once())->method('supports')->willReturn(false);
         $permissionAuditorMock2->expects($this->never())->method('assertGranted');
 
-        $auditor = new UserActionPermissionAssert([$permissionAuditorMock1, $permissionAuditorMock2]);
+        $auditor = new ActionPermissionAssert([$permissionAuditorMock1, $permissionAuditorMock2]);
         $auditor->assertGranted(Action::DELETE, $user, $context);
     }
 
     public function testAssertGrantedException(): void
     {
-        $user = $this->createMock(\ZfExtended_Models_User::class);
-        $manager = $this->createMock(\ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $permissionAuditorMock = $this->createMock(PermissionAssertInterface::class);
@@ -70,7 +71,7 @@ class UserActionPermissionAssertTest extends TestCase
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
         $permissionAuditorMock->expects($this->once())->method('supports')->willReturn(true);
 
-        $auditor = new UserActionPermissionAssert([$permissionAuditorMock]);
+        $auditor = new ActionPermissionAssert([$permissionAuditorMock]);
 
         $this->expectException(PermissionExceptionInterface::class);
         $auditor->assertGranted(Action::DELETE, $user, $context);

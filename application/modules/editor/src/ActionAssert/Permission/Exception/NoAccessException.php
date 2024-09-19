@@ -28,35 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace User\Action;
+namespace MittagQI\Translate5\ActionAssert\Permission\Exception;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
-use PHPUnit\Framework\TestCase;
-
-class ActionTest extends TestCase
+final class NoAccessException extends \Exception implements PermissionExceptionInterface
 {
-    public function provideIsMutable(): iterable
-    {
-        yield ['read', false];
-        yield ['create', false];
-        yield ['update', true];
-        yield ['delete', true];
-    }
-
-    /**
-     * @dataProvider provideIsMutable
-     */
-    public function testIsMutable(string $value, bool $expected): void
-    {
-        $action = Action::tryFrom($value);
-        self::assertSame($expected, $action->isMutable());
-    }
-
-    public function testList(): void
-    {
-        self::assertEquals(
-            ['create', 'read', 'update', 'delete'],
-            array_map(static fn (Action $action) => $action->value, Action::cases())
-        );
-    }
 }

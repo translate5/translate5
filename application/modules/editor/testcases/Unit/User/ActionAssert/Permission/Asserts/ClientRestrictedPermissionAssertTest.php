@@ -30,12 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class ClientRestrictedPermissionAssertTest extends TestCase
 {
@@ -58,8 +58,8 @@ class ClientRestrictedPermissionAssertTest extends TestCase
 
     public function testAssertGrantedNotClientRestricted(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->expects($this->once())
@@ -74,8 +74,8 @@ class ClientRestrictedPermissionAssertTest extends TestCase
 
     public function testAssertGranted(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->expects($this->once())
@@ -95,8 +95,8 @@ class ClientRestrictedPermissionAssertTest extends TestCase
 
     public function testAssertGrantedNoAccess(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->expects($this->once())

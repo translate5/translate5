@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
 use ZfExtended_Models_User as User;
 

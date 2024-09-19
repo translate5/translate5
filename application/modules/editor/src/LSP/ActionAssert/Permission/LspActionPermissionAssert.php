@@ -30,24 +30,17 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\ActionAssert\Permission;
 
-use MittagQI\Translate5\LSP\ActionAssert\Action;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RuleBasedMutatePermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RuleBasedReadPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
-final class LspActionPermissionAssert implements LspActionPermissionAssertInterface
+/**
+ * @extends ActionPermissionAssert<LanguageServiceProvider>
+ */
+final class LspActionPermissionAssert extends ActionPermissionAssert
 {
-    /**
-     * @param PermissionAssertInterface[] $asserts
-     */
-    public function __construct(
-        private readonly array $asserts
-    ) {
-    }
-
     public static function create(?JobCoordinatorRepository $jobCoordinatorRepository = null): self
     {
         $jobCoordinatorRepository = $jobCoordinatorRepository ?? JobCoordinatorRepository::create();
@@ -56,19 +49,5 @@ final class LspActionPermissionAssert implements LspActionPermissionAssertInterf
             new RuleBasedMutatePermissionAssert($jobCoordinatorRepository),
             new RuleBasedReadPermissionAssert($jobCoordinatorRepository),
         ]);
-    }
-
-    /**
-     * @throws PermissionExceptionInterface
-     */
-    public function assertGranted(Action $action, LanguageServiceProvider $lsp, PermissionAssertContext $context): void
-    {
-        foreach ($this->asserts as $assert) {
-            if (! $assert->supports($action)) {
-                continue;
-            }
-
-            $assert->assertGranted($lsp, $context);
-        }
     }
 }

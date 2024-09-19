@@ -32,10 +32,10 @@ namespace MittagQI\Translate5\Test\Unit\LSP;
 
 use editor_Models_Customer_Customer;
 use Exception;
-use MittagQI\Translate5\LSP\ActionAssert\Action;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssertInterface;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
@@ -44,8 +44,8 @@ use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class ViewDataProviderTest extends TestCase
 {
@@ -54,7 +54,7 @@ class ViewDataProviderTest extends TestCase
         $lspRepository = $this->createMock(LspRepository::class);
         $lspUserRepository = $this->createMock(LspUserRepository::class);
         $jobCoordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
-        $permissionAssert = $this->createMock(LspActionPermissionAssertInterface::class);
+        $permissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
@@ -68,7 +68,7 @@ class ViewDataProviderTest extends TestCase
             )
         ;
 
-        $viewer = $this->createMock(ZfExtended_Models_User::class);
+        $viewer = $this->createMock(User::class);
 
         $viewDataProvider = new ViewDataProvider(
             $lspRepository,
@@ -93,14 +93,14 @@ class ViewDataProviderTest extends TestCase
             ['getDescription', [], 'lsp description'],
         ]);
 
-        $user1 = $this->createMock(ZfExtended_Models_User::class);
+        $user1 = $this->createMock(User::class);
         $user1->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid-1'],
             ['getUsernameLong', [], 'user-1'],
         ]);
         $coordinator1 = new JobCoordinator($user1->getUserGuid(), $user1, $lsp);
 
-        $user2 = $this->createMock(ZfExtended_Models_User::class);
+        $user2 = $this->createMock(User::class);
         $user2->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid-2'],
             ['getUsernameLong', [], 'user-2'],
@@ -124,10 +124,10 @@ class ViewDataProviderTest extends TestCase
         $lspRepository->method('getAll')->willReturn([$lsp]);
         $lspRepository->method('getCustomers')->willReturn([$customer1, $customer2]);
 
-        $permissionAssert = new class() implements LspActionPermissionAssertInterface {
+        $permissionAssert = new class() implements ActionPermissionAssertInterface {
             public function assertGranted(
                 Action $action,
-                LanguageServiceProvider $lsp,
+                object $object,
                 PermissionAssertContext $context
             ): void {
                 if (Action::UPDATE === $action) {
@@ -139,7 +139,7 @@ class ViewDataProviderTest extends TestCase
             }
         };
 
-        $viewer = $this->createMock(ZfExtended_Models_User::class);
+        $viewer = $this->createMock(User::class);
 
         $viewDataProvider = new ViewDataProvider(
             $lspRepository,
@@ -180,6 +180,7 @@ class ViewDataProviderTest extends TestCase
                     'name' => $customer2->getName(),
                 ],
             ],
+            'parentId' => null,
         ];
 
         self::assertEquals($expected, $viewDataProvider->buildViewData($viewer, $lsp));

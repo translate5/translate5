@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use ZfExtended_Models_User as User;
 
@@ -40,6 +40,13 @@ final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterfa
     public function __construct(
         private readonly JobCoordinatorRepository $jcRepository,
     ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            JobCoordinatorRepository::create()
+        );
     }
 
     public function supports(Action $action): bool

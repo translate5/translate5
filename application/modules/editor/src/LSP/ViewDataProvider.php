@@ -30,11 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP;
 
-use MittagQI\Translate5\LSP\ActionAssert\Action;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssertInterface;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
@@ -54,13 +54,13 @@ class ViewDataProvider
         private readonly LspRepositoryInterface $lspRepository,
         private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly JobCoordinatorRepository $jobCoordinatorRepository,
-        private readonly LspActionPermissionAssertInterface $permissionAssert,
+        private readonly ActionPermissionAssertInterface $permissionAssert,
     ) {
     }
 
     public static function create(
         ?JobCoordinatorRepository $jobCoordinatorRepository = null,
-        ?LspActionPermissionAssertInterface $lspActionPermissionAssert = null,
+        ?ActionPermissionAssertInterface $lspActionPermissionAssert = null,
     ): self {
         $lspRepository = LspRepository::create();
         $jobCoordinatorRepository = $jobCoordinatorRepository ?? JobCoordinatorRepository::create($lspRepository);

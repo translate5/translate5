@@ -30,11 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use ZfExtended_Models_User as User;
 
+/**
+ * @implements PermissionAssertInterface<User>
+ */
 final class AclPermissionAssert implements PermissionAssertInterface
 {
     public function supports(Action $action): bool
@@ -46,10 +50,12 @@ final class AclPermissionAssert implements PermissionAssertInterface
      * Retrieves, if a user can be edited by another user.
      * This will be evaluated by the "setaclrule" ACLs of the given user:
      * If the user is allowed to set all our roles, he is allowed to edit
+     *
+     * {@inheritDoc}
      */
-    public function assertGranted(User $user, PermissionAssertContext $context): void
+    public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        if ($user->isEditableFor($context->manager)) {
+        if ($object->isEditableFor($context->manager)) {
             return;
         }
 

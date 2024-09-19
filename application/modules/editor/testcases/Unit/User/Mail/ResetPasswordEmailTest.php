@@ -28,8 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Exception;
+namespace MittagQI\Translate5\Test\Unit\User\Mail;
 
-interface PermissionExceptionInterface extends \Throwable
+use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use PHPUnit\Framework\TestCase;
+
+class ResetPasswordEmailTest extends TestCase
 {
+    public function testSendTo(): void
+    {
+        $user = $this->createMock(\ZfExtended_Models_User::class);
+
+        $mailer = $this->createMock(\ZfExtended_TemplateBasedMail::class);
+        $mailer->expects(self::once())->method('sendToUser')->with($user);
+
+        $resetPasswordEmail = new ResetPasswordEmail($mailer);
+
+        $resetPasswordEmail->sendTo($user);
+    }
 }

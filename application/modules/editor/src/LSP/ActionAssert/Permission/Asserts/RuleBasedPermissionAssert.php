@@ -31,11 +31,15 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
 
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
+/**
+ * @implements PermissionAssertInterface<LanguageServiceProvider>
+ */
 abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
@@ -43,9 +47,12 @@ abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
     ) {
     }
 
-    final public function assertGranted(LanguageServiceProvider $lsp, PermissionAssertContext $context): void
+    /**
+     * {@inheritDoc}
+     */
+    final public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        if ($this->doesPermissionGranted($lsp, $context)) {
+        if ($this->doesPermissionGranted($object, $context)) {
             return;
         }
 

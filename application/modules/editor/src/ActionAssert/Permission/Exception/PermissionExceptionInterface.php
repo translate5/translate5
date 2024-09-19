@@ -28,8 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Exception;
+namespace MittagQI\Translate5\ActionAssert\Permission\Exception;
 
-final class NoAccessException extends \Exception implements PermissionExceptionInterface
+use Throwable;
+
+interface PermissionExceptionInterface extends Throwable
 {
 }

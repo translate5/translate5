@@ -30,8 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
 
-use MittagQI\Translate5\LSP\LspUserService;
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\PmInTaskFeasibilityAssert;
@@ -54,12 +53,10 @@ final class UserActionFeasibilityAssert implements UserActionFeasibilityAssertIn
      */
     public static function create(): self
     {
-        $lspUserService = LspUserService::create();
-
         return new self([
             new UserIsEditableFeasibilityAssert(),
             PmInTaskFeasibilityAssert::create(),
-            new LastCoordinatorFeasibilityAssert($lspUserService),
+            LastCoordinatorFeasibilityAssert::create(),
         ]);
     }
 

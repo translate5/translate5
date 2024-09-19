@@ -28,8 +28,19 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Permission\Exception;
+namespace MittagQI\Translate5\ActionAssert\Permission;
 
-interface PermissionExceptionInterface extends \Throwable
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+
+/**
+ * @template T of object
+ */
+interface ActionPermissionAssertInterface
 {
+    /**
+     * @param T $object
+     * @throws PermissionExceptionInterface
+     */
+    public function assertGranted(Action $action, object $object, PermissionAssertContext $context): void;
 }

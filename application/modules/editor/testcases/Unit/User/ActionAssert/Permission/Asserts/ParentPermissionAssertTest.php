@@ -30,14 +30,14 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ParentPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User;
 
 class ParentPermissionAssertTest extends TestCase
 {
@@ -63,8 +63,8 @@ class ParentPermissionAssertTest extends TestCase
 
     public function testAssertGrantedCanSeeAllUsers(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
@@ -91,7 +91,7 @@ class ParentPermissionAssertTest extends TestCase
 
     public function testAssertGrantedSameUser(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
         $context = new PermissionAssertContext($user);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
@@ -112,8 +112,8 @@ class ParentPermissionAssertTest extends TestCase
 
     public function testAssertGrantedParentUser(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
@@ -141,8 +141,8 @@ class ParentPermissionAssertTest extends TestCase
 
     public function testAssertGrantedNoAccess(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);

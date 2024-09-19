@@ -28,11 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\Exception\InexistentCustomerException;
-use MittagQI\Translate5\LSP\ActionAssert\Action;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssertInterface;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
@@ -63,7 +63,7 @@ class editor_LspController extends ZfExtended_RestController
 
     private ViewDataProvider $viewDataProvider;
 
-    private LspActionPermissionAssertInterface $permissionAssert;
+    private ActionPermissionAssertInterface $permissionAssert;
 
     private LspCustomerAssociationUpdateOperation $lspCustomerAssociationUpdateOperation;
 

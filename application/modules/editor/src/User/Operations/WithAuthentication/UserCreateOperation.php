@@ -30,11 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
-use MittagQI\Translate5\LSP\ActionAssert\Action;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssertInterface;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
@@ -57,7 +57,7 @@ final class UserCreateOperation implements UserCreateOperationInterface
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly LspRepositoryInterface $lspRepository,
-        private readonly LspActionPermissionAssertInterface $lspPermissionAssert,
+        private readonly ActionPermissionAssertInterface $lspPermissionAssert,
         private readonly UserRepository $userRepository,
     ) {
     }
@@ -86,9 +86,9 @@ final class UserCreateOperation implements UserCreateOperationInterface
      */
     public function createUser(CreateUserDto $dto): User
     {
-        $lsp = $this->fetchLspForAssignment($dto->lsp);
-
         $authUser = $this->userRepository->get($this->authentication->getUserId());
+
+        $lsp = $this->fetchLspForAssignment($dto->lsp, $authUser);
 
         if (null !== $lsp) {
             $this->lspPermissionAssert->assertGranted(
@@ -118,13 +118,13 @@ final class UserCreateOperation implements UserCreateOperationInterface
         return $this->operation->createUser($dto);
     }
 
-    private function fetchLspForAssignment(?int $lspId): ?LanguageServiceProvider
+    private function fetchLspForAssignment(?int $lspId, User $authUser): ?LanguageServiceProvider
     {
         if (null !== $lspId) {
             return $this->lspRepository->get($lspId);
         }
 
-        $coordinator = $this->coordinatorRepository->findByUser($this->authentication->getUser());
+        $coordinator = $this->coordinatorRepository->findByUser($authUser);
 
         if ($coordinator) {
             return $coordinator->lsp;

@@ -31,16 +31,15 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Operations\WithAuthentication;
 
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssertInterface;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
-use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -57,7 +56,7 @@ class UserCreateOperationTest extends TestCase
 
     private LspRepositoryInterface|MockObject $lspRepository;
 
-    private LspActionPermissionAssertInterface|MockObject $lspPermissionAssert;
+    private ActionPermissionAssertInterface|MockObject $lspPermissionAssert;
 
     private UserRepository|MockObject $userRepository;
 
@@ -69,7 +68,7 @@ class UserCreateOperationTest extends TestCase
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
         $this->lspRepository = $this->createMock(LspRepositoryInterface::class);
-        $this->lspPermissionAssert = $this->createMock(LspActionPermissionAssertInterface::class);
+        $this->lspPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->operation = new UserCreateOperation(
@@ -112,24 +111,123 @@ class UserCreateOperationTest extends TestCase
             1,
         );
 
+        $this->generalOperation->expects(self::never())->method('createUser');
+
         $this->operation->createUser($dto);
     }
 
-    public function testAssignCustomers(): void
+    public function testWithProvidedLsp(): void
     {
         $this->authentication->method('getUserId')->willReturn(1);
 
+        $this->lspPermissionAssert->expects(self::once())->method('assertGranted');
+
         $authUser = $this->createMock(User::class);
-        $authUser->method('isClientRestricted')->willReturn(false);
+        $authUser->method('isClientRestricted')->willReturn(true);
 
         $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
 
+        $this->lspRepository->method('get')->willReturn($this->createMock(LanguageServiceProvider::class));
+
+        $dto = new CreateUserDto(
+            'guid',
+            'login',
+            'email@translate5.com',
+            'firstname',
+            'surname',
+            'm',
+            ['role1', Roles::JOB_COORDINATOR],
+            [1, 2, 3],
+            1,
+        );
+
         $user = $this->createMock(User::class);
 
-        $associatedCustomerIds = [1, 2, 3];
+        $this->generalOperation->expects(self::once())->method('createUser')->willReturn($user);
 
-        $this->generalOperation->method('assignCustomers')->with($user, $associatedCustomerIds);
+        $createdUser = $this->operation->createUser($dto);
 
-        $this->operation->assignCustomers($user, $associatedCustomerIds);
+        self::assertSame($user, $createdUser);
+    }
+
+    public function testCoordinatorLspWillBeUsedWhenLspNotProvided(): void
+    {
+        $this->authentication->method('getUserId')->willReturn(1);
+
+        $this->lspPermissionAssert->expects(self::once())->method('assertGranted');
+
+        $authUser = $this->createMock(User::class);
+        $authUser->method('isClientRestricted')->willReturn(true);
+
+        $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('__call')->willReturnMap([
+            ['getId', [], 12],
+        ]);
+
+        $coordinator = new JobCoordinator('auth-user-guid', $authUser, $lsp);
+
+        $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
+
+        $dto = new CreateUserDto(
+            'guid',
+            'login',
+            'email@translate5.com',
+            'firstname',
+            'surname',
+            'm',
+            ['role1', Roles::JOB_COORDINATOR],
+            [1, 2, 3],
+        );
+
+        $user = $this->createMock(User::class);
+
+        $this->generalOperation
+            ->expects(self::once())
+            ->method('createUser')
+            ->with(self::callback(fn (CreateUserDto $dto) => (int) $lsp->getId() === $dto->lsp))
+            ->willReturn($user);
+
+        $createdUser = $this->operation->createUser($dto);
+
+        self::assertSame($user, $createdUser);
+    }
+
+    public function testNoLsp(): void
+    {
+        $this->authentication->method('getUserId')->willReturn(1);
+
+        $this->lspPermissionAssert->expects(self::never())->method('assertGranted');
+
+        $authUser = $this->createMock(User::class);
+        $authUser->method('isClientRestricted')->willReturn(true);
+
+        $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
+
+        $this->coordinatorRepository->method('findByUser')->willReturn(null);
+
+        $dto = new CreateUserDto(
+            'guid',
+            'login',
+            'email@translate5.com',
+            'firstname',
+            'surname',
+            'm',
+            ['role1', Roles::JOB_COORDINATOR],
+            [1, 2, 3],
+        );
+
+        $user = $this->createMock(User::class);
+
+        $this->generalOperation
+            ->expects(self::once())
+            ->method('createUser')
+            ->with(self::callback(fn (CreateUserDto $dto) => null === $dto->lsp))
+            ->willReturn($user);
+
+        $createdUser = $this->operation->createUser($dto);
+
+        self::assertSame($user, $createdUser);
     }
 }

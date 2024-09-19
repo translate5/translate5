@@ -30,18 +30,22 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\ZfExtended\Acl\Roles;
 use ZfExtended_Models_User as User;
 
+/**
+ * @implements PermissionAssertInterface<User>
+ */
 final class LspUserAccessPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
@@ -68,8 +72,10 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
 
     /**
      * Restrict access to LSP users
+     *
+     * {@inheritDoc}
      */
-    public function assertGranted(User $user, PermissionAssertContext $context): void
+    public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         $manager = $context->manager;
         $roles = $manager->getRoles();
@@ -78,7 +84,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        $lspUser = $this->lspUserRepository->findByUser($user);
+        $lspUser = $this->lspUserRepository->findByUser($object);
 
         if (null === $lspUser) {
             return;

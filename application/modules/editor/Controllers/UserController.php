@@ -33,15 +33,15 @@ use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
 use MittagQI\Translate5\User\DTO\UpdateUserDto;
@@ -72,6 +72,8 @@ class Editor_UserController extends ZfExtended_RestController
     protected $entity;
 
     private UserActionPermissionAssert $permissionAssert;
+    
+    private UserRepository $userRepository;
 
     public function init(): void
     {
@@ -90,6 +92,7 @@ class Editor_UserController extends ZfExtended_RestController
 
         parent::init();
         $this->permissionAssert = UserActionPermissionAssert::create();
+        $this->userRepository = new UserRepository();
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E1420' => 'Old password is required',
@@ -112,9 +115,7 @@ class Editor_UserController extends ZfExtended_RestController
 
     public function getAction()
     {
-        $userRepo = new UserRepository();
-
-        $user = $userRepo->get($this->getParam('id'));
+        $user = $this->userRepository->get($this->getParam('id'));
 
         if ($user->getLogin() == ZfExtended_Models_User::SYSTEM_LOGIN) {
             $e = new ZfExtended_Models_Entity_NotFoundException();
@@ -124,11 +125,13 @@ class Editor_UserController extends ZfExtended_RestController
         }
 
         $this->view->rows = $user->getDataObject();
+        
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
 
         $this->permissionAssert->assertGranted(
             Action::READ,
             $user,
-            new PermissionAssertContext(ZfExtended_Authentication::getInstance()->getUser())
+            new PermissionAssertContext($authUser)
         );
 
         $lspUserRepo = new LspUserRepository();
@@ -148,7 +151,7 @@ class Editor_UserController extends ZfExtended_RestController
         $userIdToLspIdMap = $lspUserRepo->getUserIdToLspIdMap();
 
         $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $authUser = ZfExtended_Authentication::getInstance()->getUser();
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
         $editableRoles = $authUser->getSetableRoles();
 
         foreach ($rows as $key => $row) {
@@ -209,11 +212,10 @@ class Editor_UserController extends ZfExtended_RestController
             );
         }
 
-        $userRepository = new UserRepository();
-        $user = $userRepository->get($this->getParam('id'));
+        $user = $this->userRepository->get($this->getParam('id'));
 
         try {
-            $authUser = ZfExtended_Authentication::getInstance()->getUser();
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
 
             $this->permissionAssert->assertGranted(
                 Action::UPDATE,
@@ -242,13 +244,13 @@ class Editor_UserController extends ZfExtended_RestController
     {
         $this->entityLoad();
 
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+
         try {
             $this->permissionAssert->assertGranted(
                 Action::DELETE,
                 $this->entity,
-                new PermissionAssertContext(
-                    ZfExtended_Authentication::getInstance()->getUser()
-                )
+                new PermissionAssertContext($authUser)
             );
 
             UserDeleteOperation::create()->delete($this->entity);
@@ -381,7 +383,7 @@ class Editor_UserController extends ZfExtended_RestController
                 return;
             }
 
-            UserUpdatePasswordOperation::create()->updatePassword($authUser, $this->data->passwd);
+            UserUpdatePasswordOperation::create()->updatePassword($auth->getUser(), $this->data->passwd);
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
         }

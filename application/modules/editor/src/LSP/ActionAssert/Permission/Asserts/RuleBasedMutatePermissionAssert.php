@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\LSP\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
 
 final class RuleBasedMutatePermissionAssert extends RuleBasedPermissionAssert
 {

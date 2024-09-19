@@ -28,16 +28,42 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert\Permission;
+namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
 
-use MittagQI\Translate5\LSP\ActionAssert\Action;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\LspUserRepository;
+use ZfExtended_AuthenticationInterface;
+use ZfExtended_Models_User as User;
 
-interface LspActionPermissionAssertInterface
+class LspCreateOperation
 {
+    public function __construct(
+        private readonly \MittagQI\Translate5\LSP\Operations\LspCreateOperation $operation,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly ZfExtended_AuthenticationInterface $authentication,
+    ) {
+    }
+
     /**
-     * @throws PermissionExceptionInterface
+     * @codeCoverageIgnore
      */
-    public function assertGranted(Action $action, LanguageServiceProvider $lsp, PermissionAssertContext $context): void;
+    public static function create(): self
+    {
+        return new self(
+            new \MittagQI\Translate5\LSP\Operations\LspUserCreateOperation(),
+            new LspUserRepository(),
+            ZfExtended_Authentication::getInstance(),
+        );
+    }
+
+    public function createLspUser(LanguageServiceProvider $lsp, User $user): LspUser
+    {
+        $lsp = new LspUser($user->getUserGuid(), $user, $lsp);
+
+        $this->operation->save($user->getUserGuid(), $user, $lsp);
+
+        return $lsp;
+    }
 }

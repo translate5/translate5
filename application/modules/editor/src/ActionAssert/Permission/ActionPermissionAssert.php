@@ -28,14 +28,36 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert\Permission;
+namespace MittagQI\Translate5\ActionAssert\Permission;
 
-use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 
-final class PermissionAssertContext
+/**
+ * @template T of object
+ * @implements ActionPermissionAssertInterface<T>
+ */
+class ActionPermissionAssert implements ActionPermissionAssertInterface
 {
+    /**
+     * @param PermissionAssertInterface[] $asserts
+     */
     public function __construct(
-        public readonly User $manager
+        private readonly array $asserts
     ) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function assertGranted(Action $action, object $object, PermissionAssertContext $context): void
+    {
+        foreach ($this->asserts as $assert) {
+            if (! $assert->supports($action)) {
+                continue;
+            }
+
+            $assert->assertGranted($object, $context);
+        }
     }
 }

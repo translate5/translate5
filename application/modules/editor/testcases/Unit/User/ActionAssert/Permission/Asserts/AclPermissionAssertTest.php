@@ -30,12 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\AclPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class AclPermissionAssertTest extends TestCase
 {
@@ -67,8 +67,8 @@ class AclPermissionAssertTest extends TestCase
      */
     public function testAssertGrantedEditableUser(bool $isEditable, bool $expectException): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $user->expects($this->once())->method('isEditableFor')->willReturn($isEditable);

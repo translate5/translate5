@@ -30,19 +30,19 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\User\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
 use PHPUnit\Framework\MockObject\MockObject;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class LspUserAccessPermissionAssertTest extends TestCase
 {
@@ -90,8 +90,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
      */
     public function testAssertGrantedAdmin(array $roles): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn($roles);
@@ -103,8 +103,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedNoAccessForNotManagerRole(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn(['some-role']);
@@ -119,8 +119,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedWhenNotLspUser(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn(['some-role']);
@@ -132,8 +132,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedNoAccessForPmToNotDirectLspUser(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn([Roles::PM]);
@@ -150,8 +150,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedNoAccessForPmToNotDirectCoordinator(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
@@ -170,8 +170,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedNoAccessForPmToDirectLspUser(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $user->method('__call')->willReturnMap([
@@ -193,8 +193,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedForPmToDirectCoordinator(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $user->method('__call')->willReturnMap([
@@ -216,8 +216,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedNoAccessForCoordinatorToNotSameLspUser(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $user->method('__call')->willReturnMap([
@@ -242,8 +242,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedForCoordinatorToSameLspUser(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $user->method('__call')->willReturnMap([
@@ -269,8 +269,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedForCoordinatorToSameLspCoordinator(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $user->method('__call')->willReturnMap([
@@ -296,8 +296,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedForCoordinatorToDirectCoordinator(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $user->method('__call')->willReturnMap([
@@ -323,8 +323,8 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function testAssertGrantedNoAccessForCoordinatorToNotDirectCoordinator(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $user->method('__call')->willReturnMap([

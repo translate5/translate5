@@ -30,11 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use ZfExtended_Models_User as User;
 
+/**
+ * @implements PermissionAssertInterface<User>
+ */
 final class ClientRestrictedPermissionAssert implements PermissionAssertInterface
 {
     public function supports(Action $action): bool
@@ -44,8 +48,10 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
 
     /**
      * Restrict access by clients
+     *
+     * {@inheritDoc}
      */
-    public function assertGranted(User $user, PermissionAssertContext $context): void
+    public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         if (! $context->manager->isClientRestricted()) {
             return;
@@ -53,7 +59,7 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
 
         $allowedCustomerIs = $context->manager->getRestrictedClientIds();
 
-        if (! empty(array_diff($user->getCustomersArray(), $allowedCustomerIs))) {
+        if (! empty(array_diff($object->getCustomersArray(), $allowedCustomerIs))) {
             throw new ClientRestrictionException();
         }
     }

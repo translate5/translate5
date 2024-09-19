@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,17 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert;
+namespace MittagQI\Translate5\ActionAssert\Permission\Asserts;
 
-enum Action: string
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+
+/**
+ * @template T of object
+ */
+interface PermissionAssertInterface
 {
-    case CREATE = 'create';
-    case READ = 'read';
-    case UPDATE = 'update';
-    case DELETE = 'delete';
+    /**
+     * @param T $object
+     * @throws PermissionExceptionInterface
+     */
+    public function assertGranted(object $object, PermissionAssertContext $context): void;
 
-    public function isMutable(): bool
-    {
-        return in_array($this, [self::UPDATE, self::DELETE], true);
-    }
+    public function supports(Action $action): bool;
 }

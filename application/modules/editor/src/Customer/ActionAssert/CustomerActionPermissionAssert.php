@@ -28,42 +28,26 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
+namespace MittagQI\Translate5\User\ActionAssert\Permission;
 
-use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
-use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\AclPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ParentPermissionAssert;
 
-class LspUserCreateOperation
+final class UserActionPermissionAssert extends ActionPermissionAssert
 {
-    public function __construct(
-        private readonly \MittagQI\Translate5\LSP\Operations\LspUserCreateOperation $operation,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
-        private readonly ZfExtended_AuthenticationInterface $authentication,
-    ) {
-    }
-
     /**
      * @codeCoverageIgnore
      */
     public static function create(): self
     {
-        return new self(
-            new \MittagQI\Translate5\LSP\Operations\LspUserCreateOperation(),
-            new LspUserRepository(),
-            ZfExtended_Authentication::getInstance(),
-        );
-    }
-
-    public function createLspUser(LanguageServiceProvider $lsp, User $user): LspUser
-    {
-        $lsp = new LspUser($user->getUserGuid(), $user, $lsp);
-
-        $this->operation->save($user->getUserGuid(), $user, $lsp);
-
-        return $lsp;
+        return new self([
+            ParentPermissionAssert::create(),
+            new ClientRestrictedPermissionAssert(),
+            LspUserAccessPermissionAssert::create(),
+            new AclPermissionAssert(),
+        ]);
     }
 }

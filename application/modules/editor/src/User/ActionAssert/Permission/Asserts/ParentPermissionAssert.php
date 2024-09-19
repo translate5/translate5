@@ -30,15 +30,19 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\User\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\User\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\ZfExtended\Acl\SystemResource;
 use ZfExtended_Acl;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User as User;
 
+/**
+ * @implements PermissionAssertInterface<User>
+ */
 final class ParentPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
@@ -65,8 +69,10 @@ final class ParentPermissionAssert implements PermissionAssertInterface
 
     /**
      * Restrict access if user is not same as the manager or a child of the manager
+     *
+     * {@inheritDoc}
      */
-    public function assertGranted(User $user, PermissionAssertContext $context): void
+    public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         // Am I allowed to see all users:
         if ($this->acl->isInAllowedRoles(
@@ -80,11 +86,11 @@ final class ParentPermissionAssert implements PermissionAssertInterface
         $manager = $context->manager;
 
         // if user is current user, also everything is OK
-        if ($manager->getUserGuid() === $user->getUserGuid()) {
+        if ($manager->getUserGuid() === $object->getUserGuid()) {
             return;
         }
 
-        if ($user->hasParent($manager->getId())) {
+        if ($object->hasParent($manager->getId())) {
             return;
         }
 
