@@ -32,7 +32,6 @@ use MittagQI\Translate5\Test\ApiTestAbstract;
 use stdClass;
 use Throwable;
 use Zend_Registry;
-use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 use ZfExtended_Plugin_Manager;
 
@@ -93,7 +92,7 @@ final class DbHelper
     ): stdClass {
         $result = new stdClass();
         $result->cleanupNeccessary = false;
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
         $summary = $worker->getSummary();
         $numFaulty =
             $summary[ZfExtended_Models_Worker::STATE_SCHEDULED]
@@ -119,13 +118,13 @@ final class DbHelper
      */
     public static function removeWorkers()
     {
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
         $worker->db->delete('1 = 1');
     }
 
     public static function getLastWorkerId(): int
     {
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
         $s = $worker->db->select()->from($worker->db, ['id'])->order('id DESC')->limit(1);
         $row = $worker->db->fetchRow($s);
 
@@ -134,7 +133,7 @@ final class DbHelper
 
     public static function getLastWorkers(int $sinceId, string $workerClass, array $taskGuids = []): array
     {
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
         $s = $worker->db->select()
             ->where('id > ?', $sinceId)
             ->where('worker = ?', $workerClass);

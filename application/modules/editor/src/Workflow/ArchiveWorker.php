@@ -66,7 +66,7 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function work()
+    public function work(): bool
     {
         $parameters = $this->workerModel->getParameters();
         if (! $this->validateParameters($parameters)) {
@@ -156,11 +156,7 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
         file_put_contents($filename, $xliffConverter->export($this->task));
     }
 
-    /**
-     * @param array $parameters
-     * @return bool
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['exportToFolder'])
             || (! is_dir($parameters['exportToFolder'])

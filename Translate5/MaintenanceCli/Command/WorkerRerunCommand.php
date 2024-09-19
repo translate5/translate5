@@ -100,7 +100,7 @@ class WorkerRerunCommand extends Translate5AbstractCommand
         }
 
         try {
-            $workerModel = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+            $workerModel = new ZfExtended_Models_Worker();
             $workerModel->load($input->getArgument('id'));
             $cmdline = '/proc/' . $workerModel->getPid() . '/cmdline';
 

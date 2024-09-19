@@ -39,9 +39,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
 {
-    protected $dbInstanceClass = "editor_Models_Db_TaskConfig";
+    protected $dbInstanceClass = editor_Models_Db_TaskConfig::class;
 
-    protected $validatorInstanceClass = "editor_Models_Validator_TaskConfig";
+    protected $validatorInstanceClass = editor_Models_Validator_TaskConfig::class;
 
     /***
      * Internal cache task config cache

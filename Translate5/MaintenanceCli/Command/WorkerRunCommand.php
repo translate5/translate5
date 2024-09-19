@@ -34,7 +34,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Zend_Exception;
-use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_Installer_Maintenance;
 use ZfExtended_Models_MaintenanceException;
@@ -112,7 +111,7 @@ class WorkerRunCommand extends Translate5AbstractCommand
         }
 
         try {
-            $workerModel = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+            $workerModel = new ZfExtended_Models_Worker();
             $workerModel->load($input->getArgument('id'));
 
             $this->changeProcessTitle($workerModel);

@@ -61,7 +61,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $this->languageResource->save();
     }
 
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (! array_key_exists('languageResourceId', $parameters)) {
             return false;
@@ -86,7 +86,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         return true;
     }
 
-    protected function handleWorkerException(\Throwable $workException)
+    protected function handleWorkerException(\Throwable $workException): void
     {
         $this->workerException = $workException;
 

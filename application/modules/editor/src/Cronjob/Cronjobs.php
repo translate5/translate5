@@ -38,6 +38,7 @@ use ReflectionException;
 use Zend_Application_Bootstrap_Exception as Zend_Application_Bootstrap_ExceptionAlias;
 use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Debug;
 use ZfExtended_Factory;
 use ZfExtended_Models_Log;
 use ZfExtended_Resource_GarbageCollector;
@@ -72,7 +73,7 @@ class Cronjobs
         self::$running = true;
         /* @var $gc ZfExtended_Resource_GarbageCollector */
         $gc = $this->bootstrap->getPluginResource(ZfExtended_Resource_GarbageCollector::class);
-        $gc->cleanUp($gc::ORIGIN_CRON);
+        $gc->cleanUp();
         $this->doCronWorkflow('doCronPeriodical');
         $this->eventTrigger->triggerPeriodical();
         $this->logCall(CronEventTrigger::PERIODICAL);
@@ -107,6 +108,9 @@ class Cronjobs
      */
     private function logCall(string $type): void
     {
+        if (ZfExtended_Debug::hasLevel('core', 'Cronjobs')) {
+            error_log('Cron Job called: ' . $type);
+        }
         Zend_Registry::get('logger')->cloneMe('core.cron')->info(
             'E1615',
             'Cron Jobs called: {type}',
@@ -124,6 +128,7 @@ class Cronjobs
         // Rotate php log
         Rotation::rotate('php.log');
         Rotation::rotate('worker.log');
+        Rotation::rotate('instanttranslate.log');
     }
 
     /**

@@ -56,30 +56,19 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
     protected array $importConfigurationConfig;
 
     /**
-     * Retrieves one of our Pools
-     * The URLs will be filtered for services that are marked as DOWN via the global services mem-cache
      * @throws ZfExtended_Exception
      */
     public function getPooledServiceUrls(string $pool): array
     {
-        switch ($pool) {
-            case 'default':
-                return $this->filterDownedServiceUrls($this->getDefaultServiceUrls());
-
-            case 'gui':
-                return $this->filterDownedServiceUrls($this->getGuiServiceUrls());
-
-            case 'import':
-                return $this->filterDownedServiceUrls($this->getImportServiceUrls());
-
-            default:
-                throw new ZfExtended_Exception('PooledService::getPooledServiceUrls: pool must be: default | gui | import');
+        // in case we have a load-balanced pool we must not use the down-list
+        if (! $this->isPoolLoadBalanced($pool)) {
+            return $this->filterDownedServiceUrls($this->getPoolUrls($pool));
         }
+
+        return $this->getPoolUrls($pool);
     }
 
     /**
-     * Retrieves a random url out of one of our Pools
-     * The URLs will be filtered for services that are marked as DOWN via the global services mem-cache
      * @throws ZfExtended_Exception
      */
     public function getPooledServiceUrl(string $pool): ?string
@@ -95,12 +84,60 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
     }
 
     /**
-     * Special API for pooled services with a single URL for one pool:
-     * This also is expected to represent a load-balancing and for a single URL maybe multiple workers are queued
+     * Special API for pooled services with a single URL for one pool
+     * It retrieves, if behind the given single URL multiple servers are hidden
+     * This information is cached for the time defined in Services::STATE_LIFETIME
+     * for not having to evaluate that with every request
      */
-    public function hasLoadBalancingBehindSingularPool(string $pool): bool
+    public function isPoolLoadBalanced(string $pool): bool
     {
-        return true;
+        $urls = $this->getPoolUrls($pool);
+        if (count($urls) === 1) {
+            $url = $urls[0];
+            $state = Services::getServiceState($this->getServiceId());
+            if (! array_key_exists($url, $state)) {
+                // when there is no cached key we evaluate & cache it
+                $state = $this->saveServiceState();
+            }
+
+            return ((int) $state[$url]) > 1;
+        }
+
+        return false;
+    }
+
+    /**
+     * Retrieves if one of our pools is load-balanced
+     */
+    public function hasLoadBalancedPool(): bool
+    {
+        return (
+            $this->isPoolLoadBalanced('default') ||
+            $this->isPoolLoadBalanced('gui') ||
+            $this->isPoolLoadBalanced('import')
+        );
+    }
+
+    /**
+     * Saves our load-balancing state to the services-memcache
+     */
+    private function saveServiceState(): array
+    {
+        $state = [];
+        $pools = [
+            $this->getGuiServiceUrls(),
+            $this->getImportServiceUrls(),
+            $this->getDefaultServiceUrls(),
+        ];
+        foreach ($pools as $urls) {
+            // only single url pools can be load-balanced
+            if (count($urls) === 1 && ! array_key_exists($urls[0], $state)) {
+                $state[$urls[0]] = $this->getNumIpsForUrl($urls[0]);
+            }
+        }
+        Services::saveServiceState($this->getServiceId(), $state);
+
+        return $state;
     }
 
     /**
@@ -139,8 +176,9 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
                 $downServices[] = $url;
             }
         }
-        // save the down-list
-        if ($saveStateToMemCache) {
+        // we only save services to the down list, if the service is not load-balanced
+        // Note, that this is regarded as such, if only one of the single pool-urls is load-balanced ...
+        if (! $this->hasLoadBalancedPool() && $saveStateToMemCache) {
             Services::saveServiceDownList($this->getServiceId(), $downServices);
         }
 
@@ -192,6 +230,15 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
                 if (! $result['success']) {
                     $this->errors[] = 'The configured service-URL "' . $url . '" is not working properly.';
                     $checked = false;
+                }
+            }
+        }
+        // we add the load-balancing state to our output if there are load-balanced pools
+        if ($this->hasLoadBalancedPool()) {
+            // we fetched the state with ::hasLoadBalancedPool
+            foreach (Services::getServiceState($this->getServiceId()) as $url => $numIps) {
+                if (((int) $numIps) > 1) {
+                    $this->checkedInfos[] = 'Url "' . $url . '" is load-balanced with ' . $numIps . ' ips!';
                 }
             }
         }
@@ -314,6 +361,8 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
         $this->updateConfigurationConfig($this->configurationConfig['name'], $this->configurationConfig['type'], $pooledUrls['default'], $doSave, $io);
         $this->updateConfigurationConfig($this->guiConfigurationConfig['name'], $this->guiConfigurationConfig['type'], $pooledUrls['gui'], $doSave, $io);
         $this->updateConfigurationConfig($this->importConfigurationConfig['name'], $this->importConfigurationConfig['type'], $pooledUrls['import'], $doSave, $io);
+        // invalidate any cached state's
+        Services::invalidateServiceState($this->getServiceId());
     }
 
     /**
@@ -344,6 +393,19 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
     }
 
     /**
+     * @throws ZfExtended_Exception
+     */
+    private function getPoolUrls(string $pool): array
+    {
+        return match ($pool) {
+            'default' => $this->getDefaultServiceUrls(),
+            'gui' => $this->getGuiServiceUrls(),
+            'import' => $this->getImportServiceUrls(),
+            default => throw new ZfExtended_Exception('PooledService: pool must be: default | gui | import')
+        };
+    }
+
+    /**
      * Will exclude service-urls, that have been marked as "down" via the global services mem-cache
      */
     private function filterDownedServiceUrls(array $serviceUrls): array
@@ -358,7 +420,7 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
         array &$urlPool,
         string $type,
         string $potentialHost,
-        string $port,
+        int $port,
         string $path
     ): bool {
         if ($this->isDnsSet($potentialHost, $port)) {

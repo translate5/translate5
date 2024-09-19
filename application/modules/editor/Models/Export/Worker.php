@@ -41,7 +41,7 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract
     /**
      * Disable the update progress trigger on export
      */
-    protected function onProgressUpdated(float $progress)
+    protected function onProgressUpdated(float $progress): void
     {
         //do nothing on export
         //DANGER: currently we inherit from ZfExtended_Worker_Abstract, all fine then.
@@ -49,11 +49,7 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract
         // then updateProgress trigger event must not be called on export, therefore this empty stub is created!
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (! isset($parameters['diff']) || ! is_bool($parameters['diff'])) {
             return false;
@@ -90,11 +86,7 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract
         return $exportFolder;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         //also containing an instance of the initial dataprovider.
         // The Dataprovider can itself hook on to several import events
@@ -122,13 +114,13 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract
         $export = ZfExtended_Factory::get($exportClass);
         /* @var $export editor_Models_Export */
         $export->setTaskToExport($task, $parameters['diff']);
-        $export->export($parameters[self::PARAM_EXPORT_FOLDER], $this->workerModel->getId());
+        $export->export($parameters[self::PARAM_EXPORT_FOLDER], (int) $this->workerModel->getId());
 
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', [$exportClass]);
         $eventManager->trigger('afterExport', $this, [
             'task' => $task,
-            'parentWorkerId' => $this->workerModel->getId(),
+            'parentWorkerId' => (int) $this->workerModel->getId(),
         ]);
 
         return true;

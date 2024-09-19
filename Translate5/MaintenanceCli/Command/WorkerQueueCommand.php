@@ -96,7 +96,7 @@ class WorkerQueueCommand extends Translate5AbstractCommand
 
         $this->writeTitle('trigger worker queue');
 
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
 
         $workerQueue = ZfExtended_Factory::get(Queue::class);
 
