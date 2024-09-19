@@ -9895,6 +9895,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>default_glossary_id</source>
                 <target>Standard-Glossar-ID</target>
             </trans-unit>
+            <trans-unit id='YXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='>
+                <source>automatisch abgeschlossen</source>
+                <target>automatisch abgeschlossen</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

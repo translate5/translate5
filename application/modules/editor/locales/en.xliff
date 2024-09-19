@@ -10069,6 +10069,10 @@ Synchronization always takes place in one direction: source data -> target
                 <source>default_glossary_id</source>
                 <target>Default Glossary id</target>
             </trans-unit>
+            <trans-unit id='YXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='>
+                <source>automatisch abgeschlossen</source>
+                <target>auto-close</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
