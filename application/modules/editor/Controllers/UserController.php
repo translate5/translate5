@@ -56,6 +56,7 @@ use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolese
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
@@ -150,7 +151,7 @@ class Editor_UserController extends ZfExtended_RestController
         $lspUserRepo = new LspUserRepository();
         $userIdToLspIdMap = $lspUserRepo->getUserIdToLspIdMap();
 
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $userModel = ZfExtended_Factory::get(User::class);
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
         $editableRoles = $authUser->getSetableRoles();
 
@@ -321,13 +322,13 @@ class Editor_UserController extends ZfExtended_RestController
                     (array) $this->data
                 ),
             );
+
+            $this->view->rows = $user->getDataObject();
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
         } catch (Exception $e) {
             throw $this->transformException($e);
         }
-
-        $this->view->rows = $user->getDataObject();
 
         $this->credentialCleanup();
         $this->csvToArray();

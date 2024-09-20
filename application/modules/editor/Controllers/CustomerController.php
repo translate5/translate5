@@ -26,14 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\CustomerService;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 
 class Editor_CustomerController extends ZfExtended_RestController
 {
-    protected $entityClass = 'editor_Models_Customer_Customer';
+    protected $entityClass = editor_Models_Customer_Customer::class;
 
     /**
      * @var editor_Models_Customer_Customer
@@ -45,9 +47,7 @@ class Editor_CustomerController extends ZfExtended_RestController
      */
     protected array $_unprotectedActions = ['exportresource'];
 
-    private JobCoordinatorRepository $coordinatorRepository;
-
-    private LspRepository $lspRepository;
+    private CustomerActionPermissionAssert $permissionAssert;
 
     public function init()
     {
@@ -60,8 +60,7 @@ class Editor_CustomerController extends ZfExtended_RestController
             ],
         ])->addActionContext('exportresource', 'resourceLogExport')->initContext();
 
-        $this->lspRepository = LspRepository::create();
-        $this->coordinatorRepository = JobCoordinatorRepository::create($this->lspRepository);
+        $this->permissionAssert = CustomerActionPermissionAssert::create();
     }
 
     public function indexAction()
@@ -69,25 +68,33 @@ class Editor_CustomerController extends ZfExtended_RestController
         $userRepository = new UserRepository();
         $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
 
-        $coordinator = $this->coordinatorRepository->findByUser($authUser);
+        $customerModel = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+        $rows = $this->entity->loadAll();
+        $context = new PermissionAssertContext($authUser);
 
-        if ($coordinator) {
-            $allowedCustomerIds = $this->lspRepository->getCustomerIds($coordinator->lsp);
+        foreach ($rows as $key => $row) {
+            $customerModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $customerModel->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => true,
+                    ]
+                )
+            );
 
-            $idFilter = new stdClass();
-            $idFilter->type = 'list';
-            $idFilter->field = 'id';
-            $idFilter->table = 'LEK_customer';
-            $idFilter->comparison = 'in';
-            $idFilter->value = $allowedCustomerIds;
-            $this->entity->getFilter()->addFilter($idFilter);
+            try {
+                $this->permissionAssert->assertGranted(Action::READ, $customerModel, $context);
+            } catch (PermissionExceptionInterface) {
+                unset($rows[$key]);
+
+                continue;
+            }
         }
 
-        if ($this->entity->getFilter()->hasSort() === false) {
-            // add default alphabetical sort
-            $this->entity->getFilter()->addSort('name');
-        }
-        parent::indexAction();
+        $this->view->rows = $rows;
+        $this->view->total = count($rows);
     }
 
     public function postAction()
