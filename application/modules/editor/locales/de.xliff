@@ -9967,6 +9967,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.</source>
                 <target>Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.</target>
             </trans-unit>
+            <trans-unit id='S3VuZGUgbmljaHQgYW5nZWdlYmVu'>
+                <source>Kunde nicht angegeben</source>
+                <target>Kunde nicht angegeben</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

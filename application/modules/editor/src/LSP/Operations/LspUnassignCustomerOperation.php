@@ -28,22 +28,21 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
+namespace MittagQI\Translate5\LSP\Operations;
 
-use MittagQI\Translate5\LSP\Contract\LspCreateOperationInterface;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use editor_Models_Customer_Customer as Customer;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\LSP\Contract\LspUnassignCustomerOperationInterface;
+use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\UserRepository;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
+use MittagQI\Translate5\Repository\LspRepository;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
-final class LspCreateOperation implements LspCreateOperationInterface
+final class LspUnassignCustomerOperation implements LspUnassignCustomerOperationInterface
 {
     public function __construct(
-        private readonly LspCreateOperationInterface $operation,
-        private readonly JobCoordinatorRepository $coordinatorRepository,
-        private readonly ZfExtended_AuthenticationInterface $authentication,
-        private readonly UserRepository $userRepository,
+        private readonly LspRepository $lspRepository,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -53,24 +52,21 @@ final class LspCreateOperation implements LspCreateOperationInterface
     public static function create(): self
     {
         return new self(
-            \MittagQI\Translate5\LSP\Operations\LspCreateOperation::create(),
-            JobCoordinatorRepository::create(),
-            ZfExtended_Authentication::getInstance(),
-            new UserRepository(),
+            LspRepository::create(),
+            EventDispatcher::create(),
         );
     }
 
-    public function createLsp(
-        string $name,
-        ?string $description,
-        ?int $parentLspId = null,
-    ): LanguageServiceProvider {
-        $authUser = $this->userRepository->get($this->authentication->getUserId());
+    public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
+    {
+        $lspCustomer = $this->lspRepository->findCustomerAssignment($lsp, $customer);
 
-        $coordinator = $this->coordinatorRepository->findByUser($authUser);
+        if (! $lspCustomer) {
+            return;
+        }
 
-        $parentLspId = null === $coordinator ? null : (int) $coordinator->lsp->getId();
+        $this->lspRepository->deleteCustomerAssignment($lspCustomer);
 
-        return $this->operation->createLsp($name, $description, $parentLspId);
+        $this->eventDispatcher->dispatch(new CustomerUnassignedFromLspEvent($lsp, $customer));
     }
 }

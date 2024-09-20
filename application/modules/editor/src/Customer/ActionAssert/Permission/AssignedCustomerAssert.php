@@ -28,28 +28,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
+namespace MittagQI\Translate5\Customer\ActionAssert\Permission;
 
+use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
 
 /**
- * @implements PermissionAssertInterface<User>
+ * @implements PermissionAssertInterface<Customer>
  */
-final class ClientRestrictedPermissionAssert implements PermissionAssertInterface
+final class AssignedCustomerAssert implements PermissionAssertInterface
 {
     public function supports(Action $action): bool
     {
-        return in_array($action, [Action::CREATE, Action::UPDATE, Action::DELETE, Action::READ], true);
+        return in_array($action, [Action::UPDATE, Action::DELETE, Action::READ], true);
     }
 
     /**
-     * Restrict access by clients
-     *
      * {@inheritDoc}
+     * @throws NoAccessToCustomerException
      */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
@@ -59,8 +58,8 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
 
         $allowedCustomerIs = $context->manager->getRestrictedClientIds();
 
-        if (! empty(array_diff($object->getCustomersArray(), $allowedCustomerIs))) {
-            throw new ClientRestrictionException();
+        if (! in_array((int) $object->getId(), $allowedCustomerIs, true)) {
+            throw new NoAccessToCustomerException((int) $object->getId());
         }
     }
 }

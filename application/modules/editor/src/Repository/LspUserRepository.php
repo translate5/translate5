@@ -36,6 +36,7 @@ use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
@@ -113,11 +114,11 @@ class LspUserRepository implements LspUserRepositoryInterface
     }
 
     /**
-     * @return iterable<ZfExtended_Models_User>
+     * @return iterable<User>
      */
     public function getUsers(LanguageServiceProvider $lsp): iterable
     {
-        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $user = ZfExtended_Factory::get(User::class);
         $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
             ->db
             ->info(LanguageServiceProviderUserTable::NAME);

@@ -56,10 +56,10 @@ use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolese
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
-use MittagQI\Translate5\User\Operations\UserDeleteOperation;
-use MittagQI\Translate5\User\Operations\UserUpdateOperation;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
+use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
+use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
 use MittagQI\ZfExtended\Acl\SystemResource;
 
 class Editor_UserController extends ZfExtended_RestController
@@ -102,7 +102,7 @@ class Editor_UserController extends ZfExtended_RestController
             'E1094' => 'User can not be saved: the chosen login does already exist.',
             'E1095' => 'User can not be saved: the chosen userGuid does already exist.',
             'E1631' => 'Role "Job Coordinator" can be set only on User creation process or to LSP User',
-        ]);
+        ], 'editor.user');
 
         ZfExtended_Models_Entity_Conflict::addCodes([
             'E2002' => 'No object of type "{0}" was found by key "{1}"',
@@ -215,15 +215,7 @@ class Editor_UserController extends ZfExtended_RestController
         $user = $this->userRepository->get($this->getParam('id'));
 
         try {
-            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
-
-            $this->permissionAssert->assertGranted(
-                Action::UPDATE,
-                $user,
-                new PermissionAssertContext($authUser)
-            );
-
-            UserUpdateOperation::createWithAuthentication()->updateUser(
+            UserUpdateOperation::class::create()->updateUser(
                 $user,
                 UpdateUserDto::fromRequestData((array) $this->data),
             );
@@ -242,18 +234,10 @@ class Editor_UserController extends ZfExtended_RestController
 
     public function deleteAction(): void
     {
-        $this->entityLoad();
-
-        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+        $user = $this->userRepository->get($this->getParam('id'));
 
         try {
-            $this->permissionAssert->assertGranted(
-                Action::DELETE,
-                $this->entity,
-                new PermissionAssertContext($authUser)
-            );
-
-            UserDeleteOperation::create()->delete($this->entity);
+            UserDeleteOperation::create()->delete($user);
         } catch (PmInTaskException $e) {
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1048',
@@ -356,11 +340,7 @@ class Editor_UserController extends ZfExtended_RestController
      */
     public function authenticatedAction()
     {
-        if ($this->_request->getActionName() !== 'put') {
-            throw new ZfExtended_BadMethodCallException();
-        }
-
-        $oldpwd = trim($this->getParam('oldpasswd'));
+       $oldpwd = trim($this->getParam('oldpasswd'));
 
         if (empty($oldpwd)) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1420', [

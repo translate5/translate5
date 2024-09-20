@@ -30,11 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations;
 
+use MittagQI\Translate5\LSP\Contract\LspUpdateOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 
-class LspUpdateOperation
+final class LspUpdateOperation implements LspUpdateOperationInterface
 {
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
@@ -50,7 +51,7 @@ class LspUpdateOperation
         );
     }
 
-    public function updateInfoFields(LanguageServiceProvider $lsp, string $name, ?string $description): void
+    public function updateLsp(LanguageServiceProvider $lsp, string $name, ?string $description): void
     {
         $lsp->setName($name);
         $lsp->setDescription($description);

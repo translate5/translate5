@@ -54,23 +54,20 @@ class ViewDataProvider
         private readonly LspRepositoryInterface $lspRepository,
         private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly JobCoordinatorRepository $jobCoordinatorRepository,
-        private readonly ActionPermissionAssertInterface $permissionAssert,
+        private readonly ActionPermissionAssertInterface $lspPermissionAssert,
     ) {
     }
 
-    public static function create(
-        ?JobCoordinatorRepository $jobCoordinatorRepository = null,
-        ?ActionPermissionAssertInterface $lspActionPermissionAssert = null,
-    ): self {
+    public static function create(): self
+    {
         $lspRepository = LspRepository::create();
-        $jobCoordinatorRepository = $jobCoordinatorRepository ?? JobCoordinatorRepository::create($lspRepository);
-        $lspActionPermissionAssert = $lspActionPermissionAssert ?? LspActionPermissionAssert::create($jobCoordinatorRepository);
+        $jobCoordinatorRepository = JobCoordinatorRepository::create($lspRepository);
 
         return new self(
             $lspRepository,
             new LspUserRepository(),
             $jobCoordinatorRepository,
-            $lspActionPermissionAssert,
+            LspActionPermissionAssert::create($jobCoordinatorRepository),
         );
     }
 
@@ -83,8 +80,6 @@ class ViewDataProvider
 
         foreach ($this->lspRepository->getAll() as $lsp) {
             try {
-                $this->permissionAssert->assertGranted(Action::READ, $lsp, new PermissionAssertContext($viewer));
-
                 $data[] = $this->buildViewData($viewer, $lsp);
             } catch (PermissionExceptionInterface) {
                 continue;
@@ -96,9 +91,12 @@ class ViewDataProvider
 
     /**
      * @return LspRow
+     * @throws PermissionExceptionInterface
      */
     public function buildViewData(User $viewer, LanguageServiceProvider $lsp): array
     {
+        $this->lspPermissionAssert->assertGranted(Action::READ, $lsp, new PermissionAssertContext($viewer));
+
         $coordinators = $this->jobCoordinatorRepository->getByLSP($lsp);
         /**
          * @var array<array{guid: string, name: string}> $coordinatorData
@@ -154,7 +152,7 @@ class ViewDataProvider
     private function userCanEditLsp(User $viewer, LanguageServiceProvider $lsp): bool
     {
         try {
-            $this->permissionAssert->assertGranted(Action::UPDATE, $lsp, new PermissionAssertContext($viewer));
+            $this->lspPermissionAssert->assertGranted(Action::UPDATE, $lsp, new PermissionAssertContext($viewer));
 
             return true;
         } catch (PermissionExceptionInterface) {
@@ -165,7 +163,7 @@ class ViewDataProvider
     private function userCanDeleteLsp(User $viewer, LanguageServiceProvider $lsp): bool
     {
         try {
-            $this->permissionAssert->assertGranted(Action::DELETE, $lsp, new PermissionAssertContext($viewer));
+            $this->lspPermissionAssert->assertGranted(Action::DELETE, $lsp, new PermissionAssertContext($viewer));
 
             return true;
         } catch (PermissionExceptionInterface) {

@@ -28,47 +28,73 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Operations;
+namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use MittagQI\Translate5\User\Model\User;
+use ZfExtended_Authentication;
+use ZfExtended_AuthenticationInterface;
 
-final class UserDeleteOperation implements UserDeleteOperationInterface
+class UserDeleteOperation implements UserDeleteOperationInterface
 {
     public function __construct(
+        private readonly ActionPermissionAssert $permissionAssert,
+        private readonly UserDeleteOperationInterface $operation,
+        private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
     ) {
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public static function create(): self
     {
         return new self(
+            UserActionPermissionAssert::create(),
+            \MittagQI\Translate5\User\Operations\UserDeleteOperation::create(),
+            ZfExtended_Authentication::getInstance(),
             new UserRepository(),
-            UserActionFeasibilityAssert::create(),
         );
     }
 
     /**
      * @throws FeasibilityExceptionInterface
+     * @throws PermissionExceptionInterface
      */
     public function delete(User $user): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
+        $this->assertDeleteAllowed($user);
 
-        $this->userRepository->delete($user);
+        $this->operation->delete($user);
     }
 
+    /**
+     * @throws FeasibilityExceptionInterface
+     * @throws PermissionExceptionInterface
+     */
     public function forceDelete(User $user): void
     {
-        $this->userRepository->delete($user);
+        $this->assertDeleteAllowed($user);
+
+        $this->operation->forceDelete($user);
+    }
+
+    /**
+     * @throws PermissionExceptionInterface
+     */
+    private function assertDeleteAllowed(User $user): void
+    {
+        $authUser = $this->userRepository->get($this->authentication->getUserId());
+
+        $this->permissionAssert->assertGranted(
+            Action::DELETE,
+            $user,
+            new PermissionAssertContext($authUser)
+        );
     }
 }

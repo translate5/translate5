@@ -28,23 +28,12 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Contract;
+namespace MittagQI\Translate5\LSP\Contract;
 
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\DTO\UpdateUserDto;
-use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\UserExceptionInterface;
-use MittagQI\Translate5\User\Model\User;
+use editor_Models_Customer_Customer as Customer;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
-interface UserUpdateOperationInterface
+interface LspUnassignCustomerOperationInterface
 {
-    /**
-     * @throws FeasibilityExceptionInterface
-     * @throws GuidAlreadyInUseException
-     * @throws LoginAlreadyInUseException
-     * @throws UserExceptionInterface
-     * @throws \ZfExtended_ValidateException
-     */
-    public function updateUser(User $user, UpdateUserDto $dto): void;
+    public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void;
 }

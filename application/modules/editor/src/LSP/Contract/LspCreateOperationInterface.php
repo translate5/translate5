@@ -51,36 +51,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Model;
+namespace MittagQI\Translate5\LSP\Contract;
 
-use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
-use ZfExtended_Models_Entity_Abstract;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
-/**
- * @method string getId()
- * @method string getName()
- * @method void setName(string $name)
- * @method string getDescription()
- * @method void setDescription(string|null $description)
- * @method null|string getParentId()
- * @method void setParentId(int|null $parentId)
- */
-class LanguageServiceProvider extends ZfExtended_Models_Entity_Abstract
+interface LspCreateOperationInterface
 {
-    protected $dbInstanceClass = LanguageServiceProviderTable::class;
-
-    public function isSubLspOf(LanguageServiceProvider $lsp): bool
-    {
-        return $this->getParentId() === $lsp->getId();
-    }
-
-    public function same(LanguageServiceProvider $lsp): bool
-    {
-        return $this->getId() === $lsp->getId();
-    }
-
-    public function isDirectLsp(): bool
-    {
-        return empty($this->getParentId());
-    }
+    public function createLsp(
+        string $name,
+        ?string $description,
+        ?int $parentLspId = null,
+    ): LanguageServiceProvider;
 }

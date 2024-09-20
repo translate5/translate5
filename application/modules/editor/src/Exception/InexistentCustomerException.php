@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Exception;
 
-use InvalidArgumentException;
+use ZfExtended_Models_Entity_NotFoundException;
 
-class InexistentCustomerException extends InvalidArgumentException
+class InexistentCustomerException extends ZfExtended_Models_Entity_NotFoundException
 {
     public function __construct(
         public readonly int $customerId

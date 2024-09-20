@@ -30,18 +30,21 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
 
-use MittagQI\Translate5\LSP\Contract\LspCreateOperationInterface;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
+use MittagQI\Translate5\LSP\Contract\LspDeleteOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\UserRepository;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 
-final class LspCreateOperation implements LspCreateOperationInterface
+final class LspDeleteOperation implements LspDeleteOperationInterface
 {
     public function __construct(
-        private readonly LspCreateOperationInterface $operation,
-        private readonly JobCoordinatorRepository $coordinatorRepository,
+        private readonly LspDeleteOperationInterface $operation,
+        private readonly ActionPermissionAssertInterface $permissionAssert,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
     ) {
@@ -53,24 +56,19 @@ final class LspCreateOperation implements LspCreateOperationInterface
     public static function create(): self
     {
         return new self(
-            \MittagQI\Translate5\LSP\Operations\LspCreateOperation::create(),
-            JobCoordinatorRepository::create(),
+            \MittagQI\Translate5\LSP\Operations\LspDeleteOperation::create(),
+            LspActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
         );
     }
 
-    public function createLsp(
-        string $name,
-        ?string $description,
-        ?int $parentLspId = null,
-    ): LanguageServiceProvider {
+    public function deleteLsp(LanguageServiceProvider $lsp): void
+    {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $coordinator = $this->coordinatorRepository->findByUser($authUser);
+        $this->permissionAssert->assertGranted(Action::DELETE, $lsp, new PermissionAssertContext($authUser));
 
-        $parentLspId = null === $coordinator ? null : (int) $coordinator->lsp->getId();
-
-        return $this->operation->createLsp($name, $description, $parentLspId);
+        $this->operation->deleteLsp($lsp);
     }
 }

@@ -52,10 +52,9 @@ class LspCustomerAssociationValidator
     }
 
     /**
-     * @param int[] $customerIds
      * @throws CustomerDoesNotBelongToLspException
      */
-    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, iterable $customerIds): void
+    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, int ...$customerIds): void
     {
         $lspCustomersIds = $this->lspRepository->getCustomerIds($lsp);
 

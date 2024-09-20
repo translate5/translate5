@@ -28,35 +28,35 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Operations\WithAuthentication;
+namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
 
+use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\Repository\CustomerRepository;
+use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
+use MittagQI\Translate5\LSP\Contract\LspAssignCustomerOperationInterface;
+use MittagQI\Translate5\LSP\Exception\NoAccessToLspException;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User as User;
 
-/**
- * Should not be used directly, use:
- * @see UserCustomerAssociationUpdateOperation
- * @see UserCreateOperation
- */
-final class UserAssignCustomersOperation implements UserAssignCustomersOperationInterface
+class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
 {
+    /**
+     * @param ActionPermissionAssertInterface<LanguageServiceProvider> $lspActionPermissionAssert
+     * @param ActionPermissionAssertInterface<Customer> $customerActionPermissionAssert
+     */
     public function __construct(
-        private readonly UserAssignCustomersOperationInterface $operation,
+        private readonly LspAssignCustomerOperationInterface $generalOperation,
+        private readonly ActionPermissionAssertInterface $lspActionPermissionAssert,
+        private readonly ActionPermissionAssertInterface $customerActionPermissionAssert,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
-        private readonly CustomerRepository $customerRepository,
-        private readonly ActionPermissionAssertInterface $customerPermissionAssert,
     ) {
     }
 
@@ -66,37 +66,36 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
     public static function create(): self
     {
         return new self(
-            \MittagQI\Translate5\User\Operations\UserAssignCustomersOperation::create(),
+            \MittagQI\Translate5\LSP\Operations\LspAssignCustomerOperation::create(),
+            LspActionPermissionAssert::create(),
+            CustomerActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
-            new CustomerRepository(),
-            CustomerActionPermissionAssert::create(),
         );
     }
 
     /**
-     * @param int[] $associatedCustomerIds
-     * @throws CustomerDoesNotBelongToUserException
-     * @throws CustomerDoesNotBelongToLspException
+     * @throws NoAccessToLspException
+     * @throws NoAccessToCustomerException
+     * @throws PermissionExceptionInterface
+     * @throws \ZfExtended_Models_Entity_NotFoundException
      */
-    public function assignCustomers(User $user, array $associatedCustomerIds): void
+    public function assignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $customers = $this->customerRepository->getList(...$associatedCustomerIds);
+        $this->lspActionPermissionAssert->assertGranted(
+            Action::UPDATE,
+            $lsp,
+            new PermissionAssertContext($authUser)
+        );
 
-        foreach ($customers as $customer) {
-            try {
-                $this->customerPermissionAssert->assertGranted(
-                    Action::READ,
-                    $customer,
-                    new PermissionAssertContext($authUser)
-                );
-            } catch (PermissionExceptionInterface) {
-                throw new CustomerDoesNotBelongToUserException((int) $customer->getId(), $user->getUserGuid());
-            }
-        }
+        $this->customerActionPermissionAssert->assertGranted(
+            Action::READ,
+            $customer,
+            new PermissionAssertContext($authUser)
+        );
 
-        $this->operation->assignCustomers($user, $associatedCustomerIds);
+        $this->generalOperation->assignCustomer($lsp, $customer);
     }
 }

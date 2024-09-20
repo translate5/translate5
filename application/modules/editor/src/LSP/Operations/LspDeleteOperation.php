@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations;
 
+use MittagQI\Translate5\LSP\Contract\LspDeleteOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
@@ -38,7 +39,7 @@ use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
 
-class LspDeleteOperation
+final class LspDeleteOperation implements LspDeleteOperationInterface
 {
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
@@ -47,9 +48,9 @@ class LspDeleteOperation
     ) {
     }
 
-    public static function create(?LspRepository $lspRepository = null): self
+    public static function create(): self
     {
-        $lspRepository = $lspRepository ?? LspRepository::create();
+        $lspRepository = LspRepository::create();
 
         return new self(
             $lspRepository,

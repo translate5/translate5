@@ -28,15 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Permission;
+namespace MittagQI\Translate5\Customer\ActionAssert;
 
+use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\AclPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ParentPermissionAssert;
+use MittagQI\Translate5\Customer\ActionAssert\Permission\AssignedCustomerAssert;
 
-final class UserActionPermissionAssert extends ActionPermissionAssert
+/**
+ * @extends ActionPermissionAssert<Customer>
+ */
+final class CustomerActionPermissionAssert extends ActionPermissionAssert
 {
     /**
      * @codeCoverageIgnore
@@ -44,10 +45,7 @@ final class UserActionPermissionAssert extends ActionPermissionAssert
     public static function create(): self
     {
         return new self([
-            ParentPermissionAssert::create(),
-            new ClientRestrictedPermissionAssert(),
-            LspUserAccessPermissionAssert::create(),
-            new AclPermissionAssert(),
+            new AssignedCustomerAssert(),
         ]);
     }
 }

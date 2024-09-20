@@ -75,6 +75,6 @@ class LspUpdateOperationTest extends TestCase
             $lspRepository,
         );
 
-        $service->updateInfoFields($lsp, 'name', 'description');
+        $service->updateLsp($lsp, 'name', 'description');
     }
 }

@@ -230,6 +230,24 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
+        $this->front->getRouter()->addRoute('editorLspCustomer', new ZfExtended_Controller_RestLikeRoute(
+            'editor/lsp/:lspId/customer',
+            [
+                'module' => 'editor',
+                'controller' => 'lspcustomer',
+                'action' => 'assign',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorLspCustomer', new ZfExtended_Controller_RestLikeRoute(
+            'editor/lsp/:lspId/customer/:customerId',
+            [
+                'module' => 'editor',
+                'controller' => 'lspcustomer',
+                'action' => 'unassign',
+            ]
+        ));
+
         $this->front->getRouter()->addRoute('editorFiletreeRootRoute', new ZfExtended_Controller_RestLikeRoute(
             'editor/filetree/root',
             [

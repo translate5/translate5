@@ -63,7 +63,8 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
      */
     public function assignCustomers(User $user, array $associatedCustomerIds): void
     {
-        $this->userCustomerAssociationValidator->assertCustomersMayBeAssociatedWithUser($associatedCustomerIds, $user);
+        $this->userCustomerAssociationValidator
+            ->assertCustomersMayBeAssociatedWithUser($user, ...$associatedCustomerIds);
 
         $user->assignCustomers($associatedCustomerIds);
     }

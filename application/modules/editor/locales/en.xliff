@@ -10145,6 +10145,10 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.</source>
                 <target>The parent user of LSP user can only be the Job coordinator of the own LSP</target>
             </trans-unit>
+            <trans-unit id='S3VuZGUgbmljaHQgYW5nZWdlYmVu'>
+                <source>Kunde nicht angegeben</source>
+                <target>Customer not provided</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

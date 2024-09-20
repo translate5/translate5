@@ -28,23 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Contract;
+namespace MittagQI\Translate5\LSP\Exception;
 
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\DTO\UpdateUserDto;
-use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\UserExceptionInterface;
-use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 
-interface UserUpdateOperationInterface
+class NoAccessToLspException extends NoAccessException
 {
-    /**
-     * @throws FeasibilityExceptionInterface
-     * @throws GuidAlreadyInUseException
-     * @throws LoginAlreadyInUseException
-     * @throws UserExceptionInterface
-     * @throws \ZfExtended_ValidateException
-     */
-    public function updateUser(User $user, UpdateUserDto $dto): void;
+    public function __construct(
+        public readonly int $lspId
+    ) {
+        parent::__construct('No access to LSP with ID ' . $lspId);
+    }
 }

@@ -28,30 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
+namespace MittagQI\Translate5\LSP\Operations;
 
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\Exception\InexistentCustomerException;
+use MittagQI\Translate5\LSP\Contract\LspAssignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;
-use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
-use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
-class LspCustomerAssociationUpdateOperation
+final class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
 {
     public function __construct(
-        private readonly \MittagQI\Translate5\LSP\Operations\LspCustomerAssociationUpdateOperation $genericOperation,
-        private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
+        private readonly LspRepository $lspRepository,
         private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
-        private readonly CustomerRepository $customerRepository,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
@@ -63,25 +55,24 @@ class LspCustomerAssociationUpdateOperation
     {
         return new self(
             LspRepository::create(),
-            UserCustomerAssociationValidator::create(),
             LspCustomerAssociationValidator::create(),
-            new CustomerRepository(),
             EventDispatcher::create(),
         );
     }
 
-    /**
-     * @param int[] $customerIds
-     * @throws InexistentCustomerException
-     * @throws CustomerDoesNotBelongToUserException
-     * @throws CustomerDoesNotBelongToLspException
-     */
-    public function updateCustomers(LanguageServiceProvider $lsp, array $customerIds, User $authUser): void
+    public function assignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
-        if ($authUser->isClientRestricted()) {
-            $this->userCustomerAssociationValidator->assertCustomersAreSubsetForUser($customerIds, $authUser);
+        if (! $lsp->isDirectLsp()) {
+            $parentLsp = $this->lspRepository->get((int) $lsp->getParentId());
+            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($parentLsp, (int) $customer->getId());
         }
 
-        $this->genericOperation->updateCustomers($lsp, ...$customerIds);
+        $lspCustomer = $this->lspRepository->getEmptyLspCustomerModel();
+        $lspCustomer->setLspId((int) $lsp->getId());
+        $lspCustomer->setCustomerId($customer->getId());
+
+        $this->lspRepository->saveCustomerAssignment($lspCustomer);
+
+        $this->eventDispatcher->dispatch(new CustomerAssignedToLspEvent($lsp, $customer));
     }
 }

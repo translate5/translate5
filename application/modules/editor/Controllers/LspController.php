@@ -30,17 +30,13 @@ declare(strict_types=1);
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\Exception\InexistentCustomerException;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Operations\LspCreateOperation;
-use MittagQI\Translate5\LSP\Operations\LspCustomerAssociationUpdateOperation;
-use MittagQI\Translate5\LSP\Operations\LspDeleteOperation;
-use MittagQI\Translate5\LSP\Operations\LspUpdateOperation;
+use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspCreateOperation;
+use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspDeleteOperation;
+use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspUpdateOperation;
 use MittagQI\Translate5\LSP\ViewDataProvider;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -59,24 +55,12 @@ class editor_LspController extends ZfExtended_RestController
 
     protected bool $decodePutAssociative = true;
 
-    private JobCoordinatorRepository $coordinatorRepository;
-
     private ViewDataProvider $viewDataProvider;
-
-    private ActionPermissionAssertInterface $permissionAssert;
-
-    private LspCustomerAssociationUpdateOperation $lspCustomerAssociationUpdateOperation;
 
     public function init()
     {
         parent::init();
-        $this->lspCustomerAssociationUpdateOperation = LspCustomerAssociationUpdateOperation::create();
-        $this->coordinatorRepository = JobCoordinatorRepository::create();
-        $this->permissionAssert = LspActionPermissionAssert::create($this->coordinatorRepository);
-        $this->viewDataProvider = ViewDataProvider::create(
-            $this->coordinatorRepository,
-            $this->permissionAssert,
-        );
+        $this->viewDataProvider = ViewDataProvider::create();
     }
 
     public function getAction(): void
@@ -87,12 +71,10 @@ class editor_LspController extends ZfExtended_RestController
         $lsp = LspRepository::create()->get((int) $this->_getParam('id'));
 
         try {
-            $this->permissionAssert->assertGranted(Action::READ, $lsp, new PermissionAssertContext($authUser));
+            $this->view->rows = (object) $this->viewDataProvider->buildViewData($authUser, $lsp);
         } catch (PermissionExceptionInterface) {
             throw new ZfExtended_NoAccessException();
         }
-
-        $this->view->rows = (object) $this->viewDataProvider->buildViewData($authUser, $lsp);
     }
 
     public function indexAction(): void
@@ -129,20 +111,9 @@ class editor_LspController extends ZfExtended_RestController
         $userRepository = new UserRepository();
         $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
 
-        $coordinator = $this->coordinatorRepository->findByUser($authUser);
-
         $lsp = LspCreateOperation::create()->createLsp(
             $this->data['name'],
             $this->data['description'] ?? null,
-            $coordinator,
-        );
-
-        $this->runWithExceptionHandlerWrapping(
-            fn () => $this->lspCustomerAssociationUpdateOperation->updateCustomersBy(
-                $lsp,
-                $this->data['customerIds'],
-                $authUser
-            )
         );
 
         $this->view->rows = (object) $this->viewDataProvider->buildViewData($authUser, $lsp);
@@ -152,46 +123,33 @@ class editor_LspController extends ZfExtended_RestController
     {
         $this->decodePutData();
 
-        $userRepository = new UserRepository();
-        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
-
         $lspRepository = LspRepository::create();
         $lsp = $lspRepository->get((int) $this->_getParam('id'));
-
-        try {
-            $this->permissionAssert->assertGranted(Action::UPDATE, $lsp, new PermissionAssertContext($authUser));
-        } catch (PermissionExceptionInterface) {
-            throw new ZfExtended_NoAccessException();
-        }
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E2003' => 'Wrong value',
         ], 'editor.lsp');
 
-        LspUpdateOperation::create($lspRepository)->updateInfoFields(
-            $lsp,
-            $this->data['name'],
-                $this->data['description'] ?? null
-        );
-
-        $this->runWithExceptionHandlerWrapping(
-            fn () => $this->lspCustomerAssociationUpdateOperation->updateCustomersBy(
+        try {
+            LspUpdateOperation::create()->updateLsp(
                 $lsp,
-                $this->data['customerIds'],
-                $authUser
-            )
-        );
+                $this->data['name'],
+                    $this->data['description'] ?? null
+            );
+        } catch (PermissionExceptionInterface) {
+            throw new ZfExtended_NoAccessException();
+        }
+
+        $userRepository = new UserRepository();
+        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
 
         $this->view->rows = (object) $this->viewDataProvider->buildViewData($authUser, $lsp);
     }
 
     public function deleteAction(): void
     {
-        $userRepository = new UserRepository();
-        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
-
         $lspRepository = LspRepository::create();
-        $lsp = LspRepository::create()->get((int) $this->_getParam('id'));
+        $lsp = $lspRepository->get((int) $this->_getParam('id'));
 
         $name = $this->getRequest()->getData(true)['name'] ?? null;
         if (!$name || $name !== $lsp->getName()) {
@@ -199,12 +157,10 @@ class editor_LspController extends ZfExtended_RestController
         }
 
         try {
-            $this->permissionAssert->assertGranted(Action::DELETE, $lsp, new PermissionAssertContext($authUser));
+            LspDeleteOperation::create()->deleteLsp($lsp);
         } catch (PermissionExceptionInterface) {
             throw new ZfExtended_NoAccessException();
         }
-
-        LspDeleteOperation::create($lspRepository)->deleteLsp($lsp);
     }
 
     private function runWithExceptionHandlerWrapping(callable $update): void

@@ -35,3 +35,9 @@ VALUES
     ('editor', 'jobCoordinator', 'frontend', 'lspAdministration')
 ;
 
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES
+    ('editor', 'pm', 'editor_lspcustomer', 'all'),
+    ('editor', 'jobCoordinator', 'editor_lspcustomer', 'all')
+;
+

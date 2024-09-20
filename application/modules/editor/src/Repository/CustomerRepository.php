@@ -34,12 +34,17 @@ use ZfExtended_Models_Entity_NotFoundException;
 class CustomerRepository
 {
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws InexistentCustomerException
      */
     public function get(int $id): editor_Models_Customer_Customer
     {
         $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
-        $customer->load($id);
+
+        try {
+            $customer->load($id);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new InexistentCustomerException($id);
+        }
 
         return $customer;
     }
@@ -81,11 +86,7 @@ class CustomerRepository
     {
         $customers = [];
         foreach ($customerIds as $customerId) {
-            try {
-                $customers[] = $this->get($customerId);
-            } catch (ZfExtended_Models_Entity_NotFoundException) {
-                throw new InexistentCustomerException($customerId);
-            }
+            $customers[] = $this->get($customerId);
         }
 
         return $customers;

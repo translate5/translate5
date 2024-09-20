@@ -32,8 +32,8 @@ namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\Exception\NoAccessToLspException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
@@ -49,6 +49,7 @@ abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
 
     /**
      * {@inheritDoc}
+     * @throws NoAccessToLspException
      */
     final public function assertGranted(object $object, PermissionAssertContext $context): void
     {
@@ -56,7 +57,7 @@ abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        throw new NoAccessException();
+        throw new NoAccessToLspException((int) $object->getId());
     }
 
     private function doesPermissionGranted(LanguageServiceProvider $lsp, PermissionAssertContext $context): bool

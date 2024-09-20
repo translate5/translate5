@@ -71,15 +71,14 @@ class UserCustomerAssociationValidator
     }
 
     /**
-     * @param iterable<int> $customerIds
      * @throws CustomerDoesNotBelongToLspException
      */
-    public function assertCustomersMayBeAssociatedWithUser(iterable $customerIds, User $user): void
+    public function assertCustomersMayBeAssociatedWithUser(User $user, int ...$customerIds): void
     {
         $lspUser = $this->lspUserRepository->findByUser($user);
 
         if (null !== $lspUser) {
-            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($lspUser->lsp, $customerIds);
+            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($lspUser->lsp, ...$customerIds);
         }
     }
 }

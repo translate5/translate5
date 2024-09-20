@@ -31,72 +31,60 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\Contract\UserUpdateOperationInterface;
+use MittagQI\Translate5\User\DTO\UpdateUserDto;
+use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\UserExceptionInterface;
+use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User as User;
+use ZfExtended_ValidateException;
 
-/**
- * Should not be used directly, use:
- * @see UserCustomerAssociationUpdateOperation
- * @see UserCreateOperation
- */
-final class UserAssignCustomersOperation implements UserAssignCustomersOperationInterface
+class UserUpdateOperation implements UserUpdateOperationInterface
 {
     public function __construct(
-        private readonly UserAssignCustomersOperationInterface $operation,
+        private readonly ActionPermissionAssert $permissionAssert,
+        private readonly UserUpdateOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
-        private readonly CustomerRepository $customerRepository,
-        private readonly ActionPermissionAssertInterface $customerPermissionAssert,
     ) {
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public static function create(): self
     {
         return new self(
-            \MittagQI\Translate5\User\Operations\UserAssignCustomersOperation::create(),
+            UserActionPermissionAssert::create(),
+            \MittagQI\Translate5\User\Operations\UserUpdateOperation::createWithAuthentication(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
-            new CustomerRepository(),
-            CustomerActionPermissionAssert::create(),
         );
     }
 
     /**
-     * @param int[] $associatedCustomerIds
-     * @throws CustomerDoesNotBelongToUserException
-     * @throws CustomerDoesNotBelongToLspException
+     * @throws FeasibilityExceptionInterface
+     * @throws GuidAlreadyInUseException
+     * @throws LoginAlreadyInUseException
+     * @throws PermissionExceptionInterface
+     * @throws UserExceptionInterface
+     * @throws ZfExtended_ValidateException
      */
-    public function assignCustomers(User $user, array $associatedCustomerIds): void
+    public function updateUser(User $user, UpdateUserDto $dto): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $customers = $this->customerRepository->getList(...$associatedCustomerIds);
+        $this->permissionAssert->assertGranted(
+            Action::UPDATE,
+            $user,
+            new PermissionAssertContext($authUser)
+        );
 
-        foreach ($customers as $customer) {
-            try {
-                $this->customerPermissionAssert->assertGranted(
-                    Action::READ,
-                    $customer,
-                    new PermissionAssertContext($authUser)
-                );
-            } catch (PermissionExceptionInterface) {
-                throw new CustomerDoesNotBelongToUserException((int) $customer->getId(), $user->getUserGuid());
-            }
-        }
-
-        $this->operation->assignCustomers($user, $associatedCustomerIds);
+        $this->operation->updateUser($user, $dto);
     }
 }

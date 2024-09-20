@@ -30,12 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations;
 
-use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\Contract\LspCreateOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 
-class LspCreateOperation
+final class LspCreateOperation implements LspCreateOperationInterface
 {
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
@@ -55,15 +55,12 @@ class LspCreateOperation
     public function createLsp(
         string $name,
         ?string $description,
-        ?JobCoordinator $authCoordinator
+        ?int $parentLspId = null,
     ): LanguageServiceProvider {
         $lsp = $this->lspRepository->getEmptyModel();
         $lsp->setName($name);
         $lsp->setDescription($description);
-
-        if (null !== $authCoordinator) {
-            $lsp->setParentId((int) $authCoordinator->lsp->getId());
-        }
+        $lsp->setParentId($parentLspId);
 
         $this->lspRepository->save($lsp);
 

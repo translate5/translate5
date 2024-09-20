@@ -30,6 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Exception;
 
-interface FeasibilityExceptionInterface extends \Throwable
+use Throwable;
+
+interface FeasibilityExceptionInterface extends Throwable
 {
 }
