@@ -1975,3 +1975,10 @@ Ext.override(Ext.ProgressBar, {
         this.el.dom.setAttribute('data-qtip', tooltip);
     }
 });
+
+/**
+ * Overridden to make page number field longer
+ */
+Ext.override(Ext.toolbar.Paging, {
+    inputItemWidth: 50
+});
