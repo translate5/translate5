@@ -34,7 +34,7 @@ use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 class LspUserCreateOperation
 {
@@ -55,10 +55,10 @@ class LspUserCreateOperation
 
     public function createLspUser(LanguageServiceProvider $lsp, User $user): LspUser
     {
-        $lsp = new LspUser($user->getUserGuid(), $user, $lsp);
+        $lspUser = new LspUser($user->getUserGuid(), $user, $lsp);
 
-        $this->lspUserRepository->save($lsp);
+        $this->lspUserRepository->save($lspUser);
 
-        return $lsp;
+        return $lspUser;
     }
 }

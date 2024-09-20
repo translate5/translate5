@@ -35,8 +35,8 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User as User;
 
 class UserDeleteOperationTest extends TestCase
 {

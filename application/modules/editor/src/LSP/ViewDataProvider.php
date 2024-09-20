@@ -34,12 +34,14 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Model\User;
 
 /**
@@ -55,9 +57,14 @@ class ViewDataProvider
         private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly JobCoordinatorRepository $jobCoordinatorRepository,
         private readonly ActionPermissionAssertInterface $lspPermissionAssert,
+        private readonly ActionPermissionAssertInterface $customerActionPermissionAssert,
+        private readonly ActionPermissionAssertInterface $userActionPermissionAssert,
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         $lspRepository = LspRepository::create();
@@ -68,6 +75,8 @@ class ViewDataProvider
             new LspUserRepository(),
             $jobCoordinatorRepository,
             LspActionPermissionAssert::create($jobCoordinatorRepository),
+            CustomerActionPermissionAssert::create(),
+            UserActionPermissionAssert::create(),
         );
     }
 
@@ -117,10 +126,20 @@ class ViewDataProvider
         $usersData = [];
 
         foreach ($users as $user) {
-            $usersData[] = [
-                'id' => (int) $user->getId(),
-                'name' => $user->getUsernameLong(),
-            ];
+            try {
+                $this->userActionPermissionAssert->assertGranted(
+                    Action::READ,
+                    $user,
+                    new PermissionAssertContext($viewer)
+                );
+
+                $usersData[] = [
+                    'id' => (int) $user->getId(),
+                    'name' => $user->getUsernameLong(),
+                ];
+            } catch (PermissionExceptionInterface) {
+                continue;
+            }
         }
 
         $customers = $this->lspRepository->getCustomers($lsp);
@@ -130,10 +149,20 @@ class ViewDataProvider
         $customersData = [];
 
         foreach ($customers as $customer) {
-            $customersData[] = [
-                'id' => (int) $customer->getId(),
-                'name' => $customer->getName(),
-            ];
+            try {
+                $this->customerActionPermissionAssert->assertGranted(
+                    Action::READ,
+                    $customer,
+                    new PermissionAssertContext($viewer)
+                );
+
+                $customersData[] = [
+                    'id' => (int)$customer->getId(),
+                    'name' => $customer->getName(),
+                ];
+            } catch (PermissionExceptionInterface) {
+                continue;
+            }
         }
 
         return [

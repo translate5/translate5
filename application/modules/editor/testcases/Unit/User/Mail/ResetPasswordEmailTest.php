@@ -31,13 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Mail;
 
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 
 class ResetPasswordEmailTest extends TestCase
 {
     public function testSendTo(): void
     {
-        $user = $this->createMock(\ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
 
         $mailer = $this->createMock(\ZfExtended_TemplateBasedMail::class);
         $mailer->expects(self::once())->method('sendToUser')->with($user);

@@ -39,7 +39,6 @@ use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
-use ZfExtended_Models_User;
 
 class LspUserRepository implements LspUserRepositoryInterface
 {
@@ -60,7 +59,7 @@ class LspUserRepository implements LspUserRepositoryInterface
         ]);
     }
 
-    public function findByUser(ZfExtended_Models_User $user): ?LspUser
+    public function findByUser(User $user): ?LspUser
     {
         try {
             return $this->getByUser($user);
@@ -69,7 +68,7 @@ class LspUserRepository implements LspUserRepositoryInterface
         }
     }
 
-    public function getByUser(ZfExtended_Models_User $user): LspUser
+    public function getByUser(User $user): LspUser
     {
         $lsp = ZfExtended_Factory::get(LanguageServiceProvider::class);
         $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)

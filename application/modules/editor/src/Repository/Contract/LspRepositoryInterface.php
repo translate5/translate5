@@ -39,6 +39,8 @@ interface LspRepositoryInterface
 {
     public function getEmptyModel(): LanguageServiceProvider;
 
+    public function getEmptyLspCustomerModel(): LanguageServiceProviderCustomer;
+
     /**
      * @throws LspNotFoundException
      */

@@ -30,12 +30,13 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP\ActionAssert\Permission;
 
-use MittagQI\Translate5\LSP\ActionAssert\Action;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\PermissionAssertInterface;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 
 class LspActionPermissionAssertTest extends TestCase
@@ -43,7 +44,7 @@ class LspActionPermissionAssertTest extends TestCase
     public function testAssertGranted(): void
     {
         $lsp = $this->createMock(LanguageServiceProvider::class);
-        $manager = $this->createMock(\ZfExtended_Models_User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $permissionAuditorMock1 = $this->createMock(PermissionAssertInterface::class);
@@ -61,7 +62,7 @@ class LspActionPermissionAssertTest extends TestCase
     public function testAssertGrantedException(): void
     {
         $lsp = $this->createMock(LanguageServiceProvider::class);
-        $manager = $this->createMock(\ZfExtended_Models_User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $permissionAuditorMock = $this->createMock(PermissionAssertInterface::class);

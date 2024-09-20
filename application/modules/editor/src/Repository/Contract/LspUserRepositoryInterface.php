@@ -41,9 +41,9 @@ interface LspUserRepositoryInterface
 
     public function delete(LspUser $lspUser): void;
 
-    public function findByUser(ZfExtended_Models_User $user): ?LspUser;
+    public function findByUser(User $user): ?LspUser;
 
-    public function getByUser(ZfExtended_Models_User $user): LspUser;
+    public function getByUser(User $user): LspUser;
 
     /**
      * @return array<int, int>

@@ -163,54 +163,6 @@ class editor_LspController extends ZfExtended_RestController
         }
     }
 
-    private function runWithExceptionHandlerWrapping(callable $update): void
-    {
-        try {
-            $update();
-        } catch (InexistentCustomerException $e) {
-            ZfExtended_UnprocessableEntity::addCodes([
-                'E2002' => 'No object of type "{0}" was found by key "{1}"',
-            ], 'editor.lsp');
-
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2002',
-                [
-                    'customerIds' => [
-                        'Der referenzierte Kunde existiert nicht (mehr).',
-                    ],
-                ],
-                [
-                    editor_Models_Customer_Customer::class,
-                    $e->customerId,
-                ]
-            );
-        } catch (CustomerDoesNotBelongToUserException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'customerIds' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
-                    ],
-                ],
-                [
-                    'id' => $e->customerId,
-                ]
-            );
-        } catch (CustomerDoesNotBelongToLspException $e) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'customerIds' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
-                    ],
-                ],
-                [
-                    'id' => $e->customerId,
-                ]
-            );
-        }
-    }
-
     private function getTranslator(): ZfExtended_Zendoverwrites_Translate
     {
         return ZfExtended_Zendoverwrites_Translate::getInstance();

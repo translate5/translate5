@@ -31,9 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
 class UserSetPasswordOperationTest extends TestCase

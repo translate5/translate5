@@ -33,9 +33,9 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\User\Operations\UserAssignCustomersOperation;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User as User;
 
 class UserAssignCustomerOperationTest extends TestCase
 {

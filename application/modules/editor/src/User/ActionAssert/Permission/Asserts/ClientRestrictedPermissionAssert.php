@@ -34,7 +34,7 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 /**
  * @implements PermissionAssertInterface<User>
@@ -43,7 +43,7 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
 {
     public function supports(Action $action): bool
     {
-        return in_array($action, [Action::CREATE, Action::UPDATE, Action::DELETE, Action::READ], true);
+        return Action::DELETE === $action;
     }
 
     /**
@@ -57,8 +57,9 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
             return;
         }
 
-        $allowedCustomerIs = $context->manager->getRestrictedClientIds();
+        $allowedCustomerIs = $context->manager->getCustomersArray();
 
+        // don't allow to delete a user that have customers that don't belong to auth user
         if (! empty(array_diff($object->getCustomersArray(), $allowedCustomerIs))) {
             throw new ClientRestrictionException();
         }

@@ -30,38 +30,32 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP\Operations;
 
-use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Operations\LspCreateOperation;
 use MittagQI\Translate5\Repository\LspRepository;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class LspCreateOperationTest extends TestCase
 {
-    public function coordinatorProvider(): array
+    public function parentIdProvider(): array
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
-        $lsp = $this->createMock(LanguageServiceProvider::class);
-        $lsp->method('__call')->willReturn(1);
-        $coordinator = new JobCoordinator('guid', $user, $lsp);
-
         return [
             [null],
-            [$coordinator],
+            [1],
         ];
     }
 
     /**
-     * @dataProvider coordinatorProvider
+     * @dataProvider parentIdProvider
      */
-    public function testCreateLsp(?JobCoordinator $coordinator): void
+    public function testCreateLsp(?int $parentId): void
     {
         $lspRepository = $this->createMock(LspRepository::class);
 
-        $mock = new class() extends LanguageServiceProvider {
-            public function __construct()
-            {
+        $mock = new class($parentId) extends LanguageServiceProvider {
+            public function __construct(
+                private ?int $parentId
+            ) {
             }
 
             public function setDescription(string $description): void
@@ -74,9 +68,9 @@ class LspCreateOperationTest extends TestCase
                 TestCase::assertSame('name', $name);
             }
 
-            public function setParentId(int $parentId): void
+            public function setParentId(?int $parentId): void
             {
-                TestCase::assertSame(1, $parentId);
+                TestCase::assertSame($this->parentId, $parentId);
             }
         };
 
@@ -87,7 +81,7 @@ class LspCreateOperationTest extends TestCase
             $lspRepository,
         );
 
-        $lsp = $service->createLsp('name', 'description', $coordinator);
+        $lsp = $service->createLsp('name', 'description', $parentId);
 
         self::assertInstanceOf(LanguageServiceProvider::class, $lsp);
     }

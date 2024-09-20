@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations;
 
+use MittagQI\Translate5\User\Model\User;
 use Zend_Exception;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
 class UserSetPasswordOperation

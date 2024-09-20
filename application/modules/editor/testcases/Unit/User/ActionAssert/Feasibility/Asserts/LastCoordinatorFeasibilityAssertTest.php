@@ -36,8 +36,8 @@ use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class LastCoordinatorFeasibilityAssertTest extends TestCase
 {
@@ -60,7 +60,7 @@ class LastCoordinatorFeasibilityAssertTest extends TestCase
 
     public function testAssertAllowedNotCoordinator(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
 
         $coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
         $coordinatorRepository->expects($this->once())
@@ -74,7 +74,7 @@ class LastCoordinatorFeasibilityAssertTest extends TestCase
 
     public function testAssertAllowedLastCoordinator(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
         $coordinator = $this->getMockBuilder(JobCoordinator::class)

@@ -30,9 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\Operations\WithAuthentication;
 
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
-use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserSetRolesOperation;
@@ -43,6 +45,8 @@ use ZfExtended_AuthenticationInterface;
 
 class UserSetRolesOperationTest extends TestCase
 {
+    private ActionPermissionAssertInterface|MockObject $userPermissionAssert;
+
     private UserSetRolesOperationInterface|MockObject $generalOperation;
 
     private ZfExtended_AuthenticationInterface|MockObject $authentication;
@@ -55,17 +59,33 @@ class UserSetRolesOperationTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->userPermissionAssert = $this->createMock(ActionPermissionAssert::class);
         $this->generalOperation = $this->createMock(UserSetRolesOperationInterface::class);
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->acl = $this->createMock(ZfExtended_Acl::class);
         $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->operation = new UserSetRolesOperation(
+            $this->userPermissionAssert,
             $this->generalOperation,
             $this->authentication,
             $this->acl,
             $this->userRepository,
         );
+    }
+
+    public function testThrowsPermissionException(): void
+    {
+        $this->expectException(PermissionExceptionInterface::class);
+
+        $this->userPermissionAssert
+            ->expects(self::once())
+            ->method('assertGranted')
+            ->willThrowException($this->createMock(PermissionExceptionInterface::class));
+
+        $user = $this->createMock(User::class);
+
+        $this->operation->setRoles($user, ['role1']);
     }
 
     public function testThrowsExceptionOnAclUnAllowedRole(): void
@@ -91,6 +111,8 @@ class UserSetRolesOperationTest extends TestCase
     {
         $this->expectException(UserIsNotAuthorisedToAssignRoleException::class);
 
+        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
+
         $this->authentication->expects(self::once())->method('getUserId')->willReturn(1);
 
         $authUser = $this->createMock(User::class);
@@ -109,6 +131,8 @@ class UserSetRolesOperationTest extends TestCase
     public function testThrowsExceptionOnRoleThatNotBelongToAuthUser(): void
     {
         $this->expectException(UserIsNotAuthorisedToAssignRoleException::class);
+
+        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
 
         $this->authentication->expects(self::once())->method('getUserId')->willReturn(1);
 
@@ -129,6 +153,8 @@ class UserSetRolesOperationTest extends TestCase
 
     public function testAllowSetNotBelongingToAuthUserRoleIfAuthUserIsAdmin(): void
     {
+        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
+
         $this->authentication->expects(self::once())->method('getUserId')->willReturn(1);
 
         $authUser = $this->createMock(User::class);
@@ -148,6 +174,8 @@ class UserSetRolesOperationTest extends TestCase
 
     public function testAllowSetBelongingToAuthUserRole(): void
     {
+        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
+
         $this->authentication->expects(self::once())->method('getUserId')->willReturn(1);
 
         $authUser = $this->createMock(User::class);

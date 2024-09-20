@@ -28,47 +28,38 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
+namespace MittagQI\Translate5\Test\Unit\LSP\Operations;
 
-use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LSP\Operations\LspUserCreateOperation;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\User\Model\User;
+use PHPUnit\Framework\TestCase;
 
-final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterface
+class LspUserCreateOperationTest extends TestCase
 {
-    public function __construct(
-        private readonly JobCoordinatorRepository $jcRepository,
-    ) {
-    }
-
-    public static function create(): self
+    public function testCreateLspUser(): void
     {
-        return new self(
-            JobCoordinatorRepository::create()
+        $lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+
+        $user = $this->createMock(User::class);
+        $user->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+
+        $lspUserRepository->expects(self::once())->method('save');
+
+        $service = new LspUserCreateOperation(
+            $lspUserRepository,
         );
-    }
 
-    public function supports(Action $action): bool
-    {
-        return $action === Action::DELETE;
-    }
+        $lspUser = $service->createLspUser($lsp, $user);
 
-    /**
-     * Restrict deletion of the last coordinator in the LSP
-     */
-    public function assertAllowed(User $user): void
-    {
-        // Possible coordinator that we try to delete
-        $coordinator = $this->jcRepository->findByUser($user);
-
-        if (null === $coordinator) {
-            return;
-        }
-
-        // Nobody can delete the last coordinator of an LSP
-        if ($this->jcRepository->getCoordinatorsCount($coordinator->lsp) === 1) {
-            throw new LastCoordinatorException($coordinator);
-        }
+        self::assertInstanceOf(LanguageServiceProvider::class, $lsp);
+        self::assertSame($user->getUserGuid(), $lspUser->guid);
+        self::assertSame($lsp, $lspUser->lsp);
+        self::assertSame($user, $lspUser->user);
     }
 }

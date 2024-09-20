@@ -35,13 +35,14 @@ use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LSP\Contract\LspUnassignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 final class LspUnassignCustomerOperation implements LspUnassignCustomerOperationInterface
 {
     public function __construct(
-        private readonly LspRepository $lspRepository,
+        private readonly LspRepositoryInterface $lspRepository,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }

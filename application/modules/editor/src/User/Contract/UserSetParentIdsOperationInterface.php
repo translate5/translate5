@@ -31,7 +31,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Contract;
 
 use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
-use ZfExtended_Models_User;
+use MittagQI\Translate5\User\Model\User;
+use Zend_Acl_Exception;
 
 interface UserSetParentIdsOperationInterface
 {
@@ -39,5 +40,5 @@ interface UserSetParentIdsOperationInterface
      * @throws ProvidedParentIdCannotBeEvaluatedToUserException
      * @throws Zend_Acl_Exception
      */
-    public function setParentIds(ZfExtended_Models_User $user, ?string $parentId): void;
+    public function setParentIds(User $user, ?string $parentId): void;
 }

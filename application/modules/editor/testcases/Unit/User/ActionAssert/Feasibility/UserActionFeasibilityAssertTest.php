@@ -33,14 +33,14 @@ namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class UserActionFeasibilityAssertTest extends TestCase
 {
     public function testAssertAllowed(): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
 
         $assert1 = $this->createMock(FeasibilityAssertInterface::class);
         $assert1->expects($this->once())->method('supports')->with(Action::READ)->willReturn(true);

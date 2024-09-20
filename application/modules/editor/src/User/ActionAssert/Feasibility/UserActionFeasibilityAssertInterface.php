@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 interface UserActionFeasibilityAssertInterface
 {

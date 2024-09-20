@@ -203,7 +203,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceinstance', 'taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality', 'userassocdefault', 'log', 'collectionattributedatatype', 'token',
                 'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
-                'languageresourcesyncconnection', 'lsp',
+                'languageresourcesyncconnection','lsp',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -230,22 +230,14 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
-        $this->front->getRouter()->addRoute('editorLspCustomer', new ZfExtended_Controller_RestLikeRoute(
+        $this->front->getRouter()->addRoute('editorLspCustomer', new ZfExtended_Controller_CustomPathRestRoute(
+            $this->front,
             'editor/lsp/:lspId/customer',
             [
                 'module' => 'editor',
                 'controller' => 'lspcustomer',
-                'action' => 'assign',
-            ]
-        ));
-
-        $this->front->getRouter()->addRoute('editorLspCustomer', new ZfExtended_Controller_RestLikeRoute(
-            'editor/lsp/:lspId/customer/:customerId',
-            [
-                'module' => 'editor',
-                'controller' => 'lspcustomer',
-                'action' => 'unassign',
-            ]
+                'action' => '',
+            ],
         ));
 
         $this->front->getRouter()->addRoute('editorFiletreeRootRoute', new ZfExtended_Controller_RestLikeRoute(

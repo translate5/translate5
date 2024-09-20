@@ -42,7 +42,6 @@ use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Validation\ParentUserValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class ParentUserValidatorTest extends TestCase
 {
@@ -66,7 +65,7 @@ class ParentUserValidatorTest extends TestCase
     public function testNothingHappensIfChildUserIsNotLspUser(): void
     {
         $parentUser = $this->createMock(User::class);
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
 
         $this->lspUserRepository->method('findByUser')->willReturn(null);
 
@@ -81,7 +80,7 @@ class ParentUserValidatorTest extends TestCase
 
         $parentUser = $this->createMock(User::class);
 
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
@@ -108,7 +107,7 @@ class ParentUserValidatorTest extends TestCase
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isCoordinatorOf')->willReturn(false);
 
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
@@ -147,7 +146,7 @@ class ParentUserValidatorTest extends TestCase
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isCoordinatorOf')->willReturn(false);
 
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
@@ -177,7 +176,7 @@ class ParentUserValidatorTest extends TestCase
         $parentUser->method('isPm')->willReturn(false);
         $parentUser->method('isAdmin')->willReturn(false);
 
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
@@ -208,7 +207,7 @@ class ParentUserValidatorTest extends TestCase
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isCoordinatorOf')->willReturn(true);
 
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
@@ -241,7 +240,7 @@ class ParentUserValidatorTest extends TestCase
 
         $coordinator = new JobCoordinator(bin2hex(random_bytes(16)), $parentUser, $parentLsp);
 
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
@@ -277,7 +276,7 @@ class ParentUserValidatorTest extends TestCase
 
         $coordinator = new JobCoordinator(bin2hex(random_bytes(16)), $parentUser, $parentLsp);
 
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);

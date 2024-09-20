@@ -10,7 +10,6 @@ use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForLspUserException;
 use MittagQI\Translate5\User\Model\User;
-use ZfExtended_Models_User;
 
 class ParentUserValidator
 {
@@ -35,7 +34,7 @@ class ParentUserValidator
      * @throws InvalidParentUserProvidedForJobCoordinatorException
      * @throws InvalidParentUserProvidedForLspUserException
      */
-    public function assertUserCanBeSetAsParentTo(User $parentUser, ZfExtended_Models_User $childUser): void
+    public function assertUserCanBeSetAsParentTo(User $parentUser, User $childUser): void
     {
         $childLspUser = $this->lspUserRepository->findByUser($childUser);
 

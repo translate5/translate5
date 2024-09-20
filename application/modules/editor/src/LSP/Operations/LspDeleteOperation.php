@@ -48,6 +48,9 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         $lspRepository = LspRepository::create();

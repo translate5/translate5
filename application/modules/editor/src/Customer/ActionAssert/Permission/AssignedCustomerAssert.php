@@ -56,7 +56,7 @@ final class AssignedCustomerAssert implements PermissionAssertInterface
             return;
         }
 
-        $allowedCustomerIs = $context->manager->getRestrictedClientIds();
+        $allowedCustomerIs = $context->manager->getCustomersArray();
 
         if (! in_array((int) $object->getId(), $allowedCustomerIs, true)) {
             throw new NoAccessToCustomerException((int) $object->getId());

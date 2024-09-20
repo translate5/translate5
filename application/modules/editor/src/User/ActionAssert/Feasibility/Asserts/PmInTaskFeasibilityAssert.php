@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 final class PmInTaskFeasibilityAssert implements FeasibilityAssertInterface
 {

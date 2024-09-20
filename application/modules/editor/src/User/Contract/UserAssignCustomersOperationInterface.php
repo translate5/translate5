@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\User\Contract;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 interface UserAssignCustomersOperationInterface
 {

@@ -36,64 +36,11 @@ use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User as User;
 
 class UserCustomerAssociationValidatorTest extends TestCase
 {
-    public function customerIdsProvider(): array
-    {
-        return [
-            [1, true],
-            [2, true],
-            [3, false],
-        ];
-    }
-
-    /**
-     * @dataProvider customerIdsProvider
-     */
-    public function testAssertCustomersAreSubsetForUser(int $customerId, bool $isSubset): void
-    {
-        $lspUserRepository = $this->createMock(LspUserRepository::class);
-        $lspCustomerAssociationValidator = $this->createMock(LspCustomerAssociationValidator::class);
-
-        $user = $this->createMock(User::class);
-        $user->method('getCustomersArray')->willReturn([1, 2]);
-        $user->method('__call')->willReturnMap([
-            ['getUserGuid', [], bin2hex(random_bytes(16))],
-        ]);
-
-        if (! $isSubset) {
-            $this->expectException(CustomerDoesNotBelongToUserException::class);
-        }
-
-        $validator = new UserCustomerAssociationValidator(
-            $lspUserRepository,
-            $lspCustomerAssociationValidator,
-        );
-        $validator->assertCustomersAreSubsetForUser([$customerId], $user);
-        $this->assertTrue(true);
-    }
-
-    public function testAssertCustomersAreSubsetForUserWithEmptyCustomers(): void
-    {
-        $lspUserRepository = $this->createMock(LspUserRepository::class);
-        $lspCustomerAssociationValidator = $this->createMock(LspCustomerAssociationValidator::class);
-
-        $user = $this->createMock(User::class);
-        $user->method('getCustomersArray')->willReturn([1, 2]);
-        $user->method('__call')->willReturnMap([
-            ['getUserGuid', [], bin2hex(random_bytes(16))],
-        ]);
-
-        $validator = new UserCustomerAssociationValidator(
-            $lspUserRepository,
-            $lspCustomerAssociationValidator,
-        );
-        $validator->assertCustomersAreSubsetForUser([], $user);
-        $this->assertTrue(true);
-    }
 
     public function testAssertCustomersMayBeAssociatedWithUserWithEmptyCustomers(): void
     {
@@ -109,7 +56,7 @@ class UserCustomerAssociationValidatorTest extends TestCase
             $lspUserRepository,
             $lspCustomerAssociationValidator,
         );
-        $validator->assertCustomersMayBeAssociatedWithUser([], $user);
+        $validator->assertCustomersMayBeAssociatedWithUser($user, ...[]);
         $this->assertTrue(true);
     }
 
@@ -129,7 +76,7 @@ class UserCustomerAssociationValidatorTest extends TestCase
             $lspUserRepository,
             $lspCustomerAssociationValidator,
         );
-        $validator->assertCustomersMayBeAssociatedWithUser([12], $user);
+        $validator->assertCustomersMayBeAssociatedWithUser($user, 12);
         $this->assertTrue(true);
     }
 
@@ -149,7 +96,7 @@ class UserCustomerAssociationValidatorTest extends TestCase
             $lspUserRepository,
             $lspCustomerAssociationValidator,
         );
-        $validator->assertCustomersMayBeAssociatedWithUser([], $user);
+        $validator->assertCustomersMayBeAssociatedWithUser($user, ...[]);
         $this->assertTrue(true);
     }
 
@@ -182,7 +129,7 @@ class UserCustomerAssociationValidatorTest extends TestCase
             $lspUserRepository,
             $lspCustomerAssociationValidator,
         );
-        $validator->assertCustomersMayBeAssociatedWithUser([12], $user);
+        $validator->assertCustomersMayBeAssociatedWithUser($user, 12);
     }
 
     public function testAssertSuccess(): void
@@ -211,6 +158,6 @@ class UserCustomerAssociationValidatorTest extends TestCase
             $lspUserRepository,
             $lspCustomerAssociationValidator,
         );
-        $validator->assertCustomersMayBeAssociatedWithUser([12], $user);
+        $validator->assertCustomersMayBeAssociatedWithUser($user, 12);
     }
 }

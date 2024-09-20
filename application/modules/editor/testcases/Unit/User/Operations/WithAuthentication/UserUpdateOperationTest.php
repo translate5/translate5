@@ -32,52 +32,45 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations\WithAuthentication;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use MittagQI\Translate5\User\Operations\WithAuthentication\UserAssignCustomersOperation;
+use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
+use MittagQI\Translate5\User\Contract\UserUpdateOperationInterface;
+use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
+use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
 
-class UserAssignCustomerOperationTest extends TestCase
+class UserUpdateOperationTest extends TestCase
 {
     private ActionPermissionAssertInterface|MockObject $userPermissionAssert;
 
-    private UserAssignCustomersOperationInterface|MockObject $generalOperation;
+    private UserUpdateOperationInterface|MockObject $generalOperation;
 
     private ZfExtended_AuthenticationInterface|MockObject $authentication;
 
     private UserRepository|MockObject $userRepository;
 
-    private CustomerRepository|MockObject $customerRepository;
-
-    private ActionPermissionAssertInterface|MockObject $customerPermissionAssert;
-
-    private UserAssignCustomersOperation $operation;
+    private UserUpdateOperation $operation;
 
     public function setUp(): void
     {
         $this->userPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
-        $this->generalOperation = $this->createMock(UserAssignCustomersOperationInterface::class);
+        $this->generalOperation = $this->createMock(UserUpdateOperationInterface::class);
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->customerRepository = $this->createMock(CustomerRepository::class);
-        $this->customerPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
 
-        $this->operation = new UserAssignCustomersOperation(
+        $this->operation = new UserUpdateOperation(
             $this->userPermissionAssert,
             $this->generalOperation,
             $this->authentication,
             $this->userRepository,
-            $this->customerRepository,
-            $this->customerPermissionAssert,
         );
     }
 
-    public function testThrowsPermissionException(): void
+    public function testThrowsPermissionExceptionOnDelete(): void
     {
         $this->expectException(PermissionExceptionInterface::class);
 
@@ -88,61 +81,39 @@ class UserAssignCustomerOperationTest extends TestCase
 
         $user = $this->createMock(User::class);
 
-        $this->operation->assignCustomers($user, [1]);
+        $dto = new UpdateUserDto(
+            'new_login',
+            null,
+            null,
+            null,
+            null,
+        );
+
+        $this->operation->updateUser($user, $dto);
     }
 
-    public function testThrowsExceptionOnNotAllowedCustomer(): void
-    {
-        $this->expectException(CustomerDoesNotBelongToUserException::class);
-
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
-
-        $this->authentication->method('getUserId')->willReturn(1);
-
-        $authUser = $this->createMock(User::class);
-        $authUser->method('isClientRestricted')->willReturn(true);
-
-        $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
-
-        $customer = $this->createMock(\editor_Models_Customer_Customer::class);
-        $customer->method('__call')->willReturnMap([
-            ['getId', [], '2'],
-        ]);
-
-        $this->customerRepository
-            ->method('getList')
-            ->willReturn([$customer]);
-
-        $this->customerPermissionAssert
-            ->expects(self::once())
-            ->method('assertGranted')
-            ->willThrowException($this->createMock(PermissionExceptionInterface::class));
-
-        $user = $this->createMock(User::class);
-        $user->method('__call')->willReturnMap([
-            ['getUserGuid', [], 'user-guid'],
-        ]);
-
-        $this->operation->assignCustomers($user, [1]);
-    }
-
-    public function testAssignCustomers(): void
+    public function testUpdateUser(): void
     {
         $this->authentication->method('getUserId')->willReturn(1);
 
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
-
         $authUser = $this->createMock(User::class);
-        $authUser->method('isClientRestricted')->willReturn(false);
 
         $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
 
+        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
+
         $user = $this->createMock(User::class);
 
-        $associatedCustomerIds = [1, 2, 3];
+        $dto = new UpdateUserDto(
+            'new_login',
+            null,
+            null,
+            null,
+            null,
+        );
 
-        $this->generalOperation->method('assignCustomers')->with($user, $associatedCustomerIds);
+        $this->generalOperation->method('updateUser')->with($user, $dto);
 
-        $this->operation->assignCustomers($user, $associatedCustomerIds);
+        $this->operation->updateUser($user, $dto);
     }
 }

@@ -34,9 +34,9 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User as User;
 
 class UserUpdatePasswordOperationTest extends TestCase
 {

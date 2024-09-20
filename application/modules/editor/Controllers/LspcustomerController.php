@@ -87,7 +87,7 @@ class editor_LspcustomerController extends ZfExtended_RestController
         throw new ZfExtended_NotFoundException('Action not found');
     }
 
-    public function assignAction(): void
+    public function postAction(): void
     {
         $lsp = $this->lspRepository->get((int) $this->getRequest()->getParam('lspId'));
 
@@ -155,10 +155,10 @@ class editor_LspcustomerController extends ZfExtended_RestController
         $this->view->rows = [];
     }
 
-    public function unassignAction(): void
+    public function deleteAction(): void
     {
         $lsp = $this->lspRepository->get((int) $this->getRequest()->getParam('lspId'));
-        $customer = $this->customerRepository->get((int) $this->getRequest()->getParam('customerId'));
+        $customer = $this->customerRepository->get((int) $this->getRequest()->getParam('id'));
 
         try {
             $this->lspUnassignCustomerOperation->unassignCustomer($lsp, $customer);

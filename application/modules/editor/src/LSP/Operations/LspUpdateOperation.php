@@ -42,6 +42,9 @@ final class LspUpdateOperation implements LspUpdateOperationInterface
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(?LspRepository $lspRepository = null): self
     {
         $lspRepository = $lspRepository ?? LspRepository::create();

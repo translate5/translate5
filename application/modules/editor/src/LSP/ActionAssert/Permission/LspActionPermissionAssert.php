@@ -41,6 +41,9 @@ use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
  */
 final class LspActionPermissionAssert extends ActionPermissionAssert
 {
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(?JobCoordinatorRepository $jobCoordinatorRepository = null): self
     {
         $jobCoordinatorRepository = $jobCoordinatorRepository ?? JobCoordinatorRepository::create();

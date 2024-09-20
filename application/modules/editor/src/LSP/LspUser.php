@@ -31,19 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP;
 
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use ZfExtended_Models_User;
+use MittagQI\Translate5\User\Model\User;
 
 class LspUser
 {
     public function __construct(
         public readonly string $guid,
-        public readonly ZfExtended_Models_User $user,
+        public readonly User $user,
         public readonly LanguageServiceProvider $lsp,
     ) {
-    }
-
-    public static function from(ZfExtended_Models_User $user, LanguageServiceProvider $lsp): self
-    {
-        return new self($user->getUserGuid(), $user, $lsp);
     }
 }

@@ -33,8 +33,7 @@ namespace MittagQI\Translate5\User\Validation;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\LspUserRepository;
-use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 class UserCustomerAssociationValidator
 {
@@ -53,21 +52,6 @@ class UserCustomerAssociationValidator
             new LspUserRepository(),
             LspCustomerAssociationValidator::create(),
         );
-    }
-
-    /**
-     * @param iterable<int> $customerIds
-     * @throws CustomerDoesNotBelongToUserException
-     */
-    public function assertCustomersAreSubsetForUser(iterable $customerIds, User $user): void
-    {
-        $userCustomers = $user->getCustomersArray();
-
-        foreach ($customerIds as $customerId) {
-            if (! in_array((int) $customerId, $userCustomers, true)) {
-                throw new CustomerDoesNotBelongToUserException((int) $customerId, $user->getUserGuid());
-            }
-        }
     }
 
     /**

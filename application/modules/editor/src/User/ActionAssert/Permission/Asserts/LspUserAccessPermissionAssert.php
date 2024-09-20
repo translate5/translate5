@@ -40,8 +40,8 @@ use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\Roles;
-use ZfExtended_Models_User as User;
 
 /**
  * @implements PermissionAssertInterface<User>

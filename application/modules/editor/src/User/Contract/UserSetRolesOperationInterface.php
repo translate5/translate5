@@ -33,8 +33,8 @@ namespace MittagQI\Translate5\User\Contract;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
+use MittagQI\Translate5\User\Model\User;
 use Zend_Acl_Exception;
-use ZfExtended_Models_User as User;
 
 interface UserSetRolesOperationInterface
 {

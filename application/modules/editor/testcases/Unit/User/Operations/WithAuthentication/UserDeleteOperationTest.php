@@ -32,52 +32,42 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations\WithAuthentication;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use MittagQI\Translate5\User\Operations\WithAuthentication\UserAssignCustomersOperation;
+use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
 
-class UserAssignCustomerOperationTest extends TestCase
+class UserDeleteOperationTest extends TestCase
 {
     private ActionPermissionAssertInterface|MockObject $userPermissionAssert;
 
-    private UserAssignCustomersOperationInterface|MockObject $generalOperation;
+    private UserDeleteOperationInterface|MockObject $generalOperation;
 
     private ZfExtended_AuthenticationInterface|MockObject $authentication;
 
     private UserRepository|MockObject $userRepository;
 
-    private CustomerRepository|MockObject $customerRepository;
-
-    private ActionPermissionAssertInterface|MockObject $customerPermissionAssert;
-
-    private UserAssignCustomersOperation $operation;
+    private UserDeleteOperation $operation;
 
     public function setUp(): void
     {
         $this->userPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
-        $this->generalOperation = $this->createMock(UserAssignCustomersOperationInterface::class);
+        $this->generalOperation = $this->createMock(UserDeleteOperationInterface::class);
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->customerRepository = $this->createMock(CustomerRepository::class);
-        $this->customerPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
 
-        $this->operation = new UserAssignCustomersOperation(
+        $this->operation = new UserDeleteOperation(
             $this->userPermissionAssert,
             $this->generalOperation,
             $this->authentication,
             $this->userRepository,
-            $this->customerRepository,
-            $this->customerPermissionAssert,
         );
     }
 
-    public function testThrowsPermissionException(): void
+    public function testThrowsPermissionExceptionOnDelete(): void
     {
         $this->expectException(PermissionExceptionInterface::class);
 
@@ -88,61 +78,54 @@ class UserAssignCustomerOperationTest extends TestCase
 
         $user = $this->createMock(User::class);
 
-        $this->operation->assignCustomers($user, [1]);
+        $this->operation->delete($user);
     }
 
-    public function testThrowsExceptionOnNotAllowedCustomer(): void
+    public function testThrowsPermissionExceptionOnForceDelete(): void
     {
-        $this->expectException(CustomerDoesNotBelongToUserException::class);
+        $this->expectException(PermissionExceptionInterface::class);
 
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
-
-        $this->authentication->method('getUserId')->willReturn(1);
-
-        $authUser = $this->createMock(User::class);
-        $authUser->method('isClientRestricted')->willReturn(true);
-
-        $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
-
-        $customer = $this->createMock(\editor_Models_Customer_Customer::class);
-        $customer->method('__call')->willReturnMap([
-            ['getId', [], '2'],
-        ]);
-
-        $this->customerRepository
-            ->method('getList')
-            ->willReturn([$customer]);
-
-        $this->customerPermissionAssert
+        $this->userPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
 
         $user = $this->createMock(User::class);
-        $user->method('__call')->willReturnMap([
-            ['getUserGuid', [], 'user-guid'],
-        ]);
 
-        $this->operation->assignCustomers($user, [1]);
+        $this->operation->delete($user);
     }
 
-    public function testAssignCustomers(): void
+    public function testDelete(): void
     {
         $this->authentication->method('getUserId')->willReturn(1);
 
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
-
         $authUser = $this->createMock(User::class);
-        $authUser->method('isClientRestricted')->willReturn(false);
 
         $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
 
+        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
+
         $user = $this->createMock(User::class);
 
-        $associatedCustomerIds = [1, 2, 3];
+        $this->generalOperation->method('delete')->with($user);
 
-        $this->generalOperation->method('assignCustomers')->with($user, $associatedCustomerIds);
+        $this->operation->delete($user);
+    }
 
-        $this->operation->assignCustomers($user, $associatedCustomerIds);
+    public function testForceDelete(): void
+    {
+        $this->authentication->method('getUserId')->willReturn(1);
+
+        $authUser = $this->createMock(User::class);
+
+        $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
+
+        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
+
+        $user = $this->createMock(User::class);
+
+        $this->generalOperation->method('forceDelete')->with($user);
+
+        $this->operation->forceDelete($user);
     }
 }

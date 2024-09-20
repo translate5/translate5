@@ -36,7 +36,7 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFea
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\PmInTaskFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\UserIsEditableFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 final class UserActionFeasibilityAssert implements UserActionFeasibilityAssertInterface
 {

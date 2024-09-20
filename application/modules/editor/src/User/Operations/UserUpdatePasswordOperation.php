@@ -31,10 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\DTO\PasswordDto;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use MittagQI\Translate5\User\Model\User;
 use Zend_Exception;
-use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
 final class UserUpdatePasswordOperation

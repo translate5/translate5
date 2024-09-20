@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Customer\CustomerService;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 
 class Editor_CustomerController extends ZfExtended_RestController
 {
@@ -65,8 +66,10 @@ class Editor_CustomerController extends ZfExtended_RestController
 
     public function indexAction()
     {
-        $currentUser = ZfExtended_Authentication::getInstance()->getUser();
-        $coordinator = $this->coordinatorRepository->findByUser($currentUser);
+        $userRepository = new UserRepository();
+        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+
+        $coordinator = $this->coordinatorRepository->findByUser($authUser);
 
         if ($coordinator) {
             $allowedCustomerIds = $this->lspRepository->getCustomerIds($coordinator->lsp);

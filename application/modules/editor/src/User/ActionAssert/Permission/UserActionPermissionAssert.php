@@ -35,7 +35,7 @@ use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\AclPermissionAssert
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ParentPermissionAssert;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 /**
  * @extends ActionPermissionAssert<User>

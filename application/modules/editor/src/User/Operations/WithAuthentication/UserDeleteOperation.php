@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -45,7 +45,7 @@ use ZfExtended_AuthenticationInterface;
 class UserDeleteOperation implements UserDeleteOperationInterface
 {
     public function __construct(
-        private readonly ActionPermissionAssert $permissionAssert,
+        private readonly ActionPermissionAssertInterface $userPermissionAssert,
         private readonly UserDeleteOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
@@ -91,7 +91,7 @@ class UserDeleteOperation implements UserDeleteOperationInterface
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->permissionAssert->assertGranted(
+        $this->userPermissionAssert->assertGranted(
             Action::DELETE,
             $user,
             new PermissionAssertContext($authUser)

@@ -28,22 +28,23 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
+namespace Customer\ActionAssert\Permission;
 
+use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
+use MittagQI\Translate5\Customer\ActionAssert\Permission\AssignedCustomerAssert;
+use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 
-class ClientRestrictedPermissionAssertTest extends TestCase
+class AssignedCustomerAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
         yield [Action::DELETE, true];
-        yield [Action::UPDATE, false];
-        yield [Action::READ, false];
+        yield [Action::UPDATE, true];
+        yield [Action::READ, true];
         yield [Action::CREATE, false];
     }
 
@@ -52,13 +53,13 @@ class ClientRestrictedPermissionAssertTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $lspPermissionAuditor = new ClientRestrictedPermissionAssert();
+        $lspPermissionAuditor = new AssignedCustomerAssert();
         $this->assertEquals($expected, $lspPermissionAuditor->supports($action));
     }
 
     public function testAssertGrantedNotClientRestricted(): void
     {
-        $user = $this->createMock(User::class);
+        $customer = $this->createMock(Customer::class);
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
@@ -68,13 +69,17 @@ class ClientRestrictedPermissionAssertTest extends TestCase
         $manager->expects($this->never())
             ->method('getCustomersArray');
 
-        $lspPermissionAuditor = new ClientRestrictedPermissionAssert();
-        $lspPermissionAuditor->assertGranted($user, $context);
+        $lspPermissionAuditor = new AssignedCustomerAssert();
+        $lspPermissionAuditor->assertGranted($customer, $context);
     }
 
     public function testAssertGranted(): void
     {
-        $user = $this->createMock(User::class);
+        $customer = $this->createMock(Customer::class);
+        $customer->method('__call')->willReturnMap([
+            ['getId', [], 3],
+        ]);
+
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
@@ -85,19 +90,19 @@ class ClientRestrictedPermissionAssertTest extends TestCase
             ->method('getCustomersArray')
             ->willReturn([2, 3, 4]);
 
-        $user->expects($this->once())
-            ->method('getCustomersArray')
-            ->willReturn([2, 3, 4]);
-
-        $lspPermissionAuditor = new ClientRestrictedPermissionAssert();
-        $lspPermissionAuditor->assertGranted($user, $context);
+        $lspPermissionAuditor = new AssignedCustomerAssert();
+        $lspPermissionAuditor->assertGranted($customer, $context);
     }
 
     public function testAccessNotGranted(): void
     {
-        $this->expectException(ClientRestrictionException::class);
+        $this->expectException(NoAccessToCustomerException::class);
 
-        $user = $this->createMock(User::class);
+        $customer = $this->createMock(Customer::class);
+        $customer->method('__call')->willReturnMap([
+            ['getId', [], 5],
+        ]);
+
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
@@ -108,12 +113,8 @@ class ClientRestrictedPermissionAssertTest extends TestCase
             ->method('getCustomersArray')
             ->willReturn([2, 3, 4]);
 
-        $user->expects($this->once())
-            ->method('getCustomersArray')
-            ->willReturn([1, 3, 4]);
+        $lspPermissionAuditor = new AssignedCustomerAssert();
 
-        $lspPermissionAuditor = new ClientRestrictedPermissionAssert();
-
-        $lspPermissionAuditor->assertGranted($user, $context);
+        $lspPermissionAuditor->assertGranted($customer, $context);
     }
 }

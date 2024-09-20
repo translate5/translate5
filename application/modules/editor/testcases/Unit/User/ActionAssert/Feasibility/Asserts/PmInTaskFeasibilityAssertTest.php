@@ -34,8 +34,8 @@ use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\PmInTaskFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class PmInTaskFeasibilityAssertTest extends TestCase
 {
@@ -69,7 +69,7 @@ class PmInTaskFeasibilityAssertTest extends TestCase
      */
     public function testAssertAllowed(array $taskList, bool $expectException): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
 
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],

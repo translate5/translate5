@@ -35,10 +35,10 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\ZfExtended\Acl\SystemResource;
+use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Acl;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User as User;
 
 /**
  * @implements PermissionAssertInterface<User>

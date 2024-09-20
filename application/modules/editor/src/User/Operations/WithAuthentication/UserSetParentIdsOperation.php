@@ -30,15 +30,20 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\SystemResource;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_Models_User as User;
 
 /**
  * Ment to be used to initialize parentIds for a user.
@@ -47,9 +52,11 @@ use ZfExtended_Models_User as User;
 final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterface
 {
     public function __construct(
+        private readonly ActionPermissionAssertInterface $userPermissionAssert,
         private readonly ZfExtended_Acl $acl,
         private readonly UserSetParentIdsOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -59,9 +66,11 @@ final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterf
     public static function create(): self
     {
         return new self(
+            UserActionPermissionAssert::create(),
             ZfExtended_Acl::getInstance(),
             \MittagQI\Translate5\User\Operations\UserSetParentIdsOperation::create(),
             ZfExtended_Authentication::getInstance(),
+            new UserRepository(),
         );
     }
 
@@ -72,11 +81,19 @@ final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterf
      */
     public function setParentIds(User $user, ?string $parentId): void
     {
+        $authUser = $this->userRepository->get($this->authentication->getUserId());
+
+        $this->userPermissionAssert->assertGranted(
+            Action::DELETE,
+            $user,
+            new PermissionAssertContext($authUser)
+        );
+
         $this->operation->setParentIds(
             $user,
             $this->resolveParentUserId(
                 $parentId,
-                $this->authentication->getUser()
+                $authUser
             )
         );
     }

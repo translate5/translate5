@@ -34,7 +34,7 @@ use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterfac
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use ZfExtended_Models_User as User;
+use MittagQI\Translate5\User\Model\User;
 
 /**
  * @implements PermissionAssertInterface<User>

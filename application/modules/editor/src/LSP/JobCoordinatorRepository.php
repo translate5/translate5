@@ -37,6 +37,7 @@ use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException as NotFoundException;
 use ZfExtended_Models_User;
@@ -75,11 +76,11 @@ class JobCoordinatorRepository
      * @throws NotFoundException
      * @throws CantCreateCoordinatorFromUserException
      */
-    public function getByUser(ZfExtended_Models_User $user): JobCoordinator
+    public function getByUser(User $user): JobCoordinator
     {
-        $user = $this->lspUserRepository->getByUser($user);
+        $lspUser = $this->lspUserRepository->getByUser($user);
 
-        return JobCoordinator::fromLspUser($user);
+        return JobCoordinator::fromLspUser($lspUser);
     }
 
     /**
@@ -87,7 +88,7 @@ class JobCoordinatorRepository
      */
     public function getByLSP(LanguageServiceProvider $lsp): iterable
     {
-        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $user = ZfExtended_Factory::get(User::class);
         $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
             ->db
             ->info(LanguageServiceProviderUserTable::NAME);

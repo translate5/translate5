@@ -148,6 +148,10 @@ class LspDeleteOperationTest extends TestCase
 
                 return [];
             }
+
+            public function getEmptyLspCustomerModel(): LanguageServiceProviderCustomer
+            {
+            }
         };
 
         $service = new LspDeleteOperation(

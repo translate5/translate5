@@ -75,7 +75,7 @@ final class UserSetParentIdsOperation implements UserSetParentIdsOperationInterf
      * @throws Zend_Acl_Exception
      * @throws ZfExtended_ValidateException
      */
-    public function setParentIds(ZfExtended_Models_User $user, ?string $parentId): void
+    public function setParentIds(User $user, ?string $parentId): void
     {
         if (empty($parentId)) {
             $user->setParentIds(',,');

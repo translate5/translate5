@@ -33,8 +33,8 @@ namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility\Asserts;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\UserIsEditableFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class UserIsEditableFeasibilityAssertTest extends TestCase
 {
@@ -66,7 +66,7 @@ class UserIsEditableFeasibilityAssertTest extends TestCase
      */
     public function testAssertAllowedEditableUser(bool $isEditable, bool $expectException): void
     {
-        $user = $this->createMock(ZfExtended_Models_User::class);
+        $user = $this->createMock(User::class);
 
         $user->expects($this->once())
             ->method('__call')->willReturnMap([

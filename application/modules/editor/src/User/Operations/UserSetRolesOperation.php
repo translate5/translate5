@@ -33,9 +33,9 @@ namespace MittagQI\Translate5\User\Operations;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\User\Validation\RolesValidator;
+use MittagQI\Translate5\User\Model\User;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
-use ZfExtended_Models_User as User;
 use ZfExtended_ValidateException;
 
 /**

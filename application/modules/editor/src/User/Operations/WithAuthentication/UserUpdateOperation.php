@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -50,7 +50,7 @@ use ZfExtended_ValidateException;
 class UserUpdateOperation implements UserUpdateOperationInterface
 {
     public function __construct(
-        private readonly ActionPermissionAssert $permissionAssert,
+        private readonly ActionPermissionAssertInterface $permissionAssert,
         private readonly UserUpdateOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,

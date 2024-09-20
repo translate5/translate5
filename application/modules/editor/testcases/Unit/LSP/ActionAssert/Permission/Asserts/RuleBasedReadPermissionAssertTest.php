@@ -30,16 +30,16 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\LSP\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RuleBasedReadPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\Roles;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_User;
 
 class RuleBasedReadPermissionAssertTest extends TestCase
 {
@@ -74,7 +74,7 @@ class RuleBasedReadPermissionAssertTest extends TestCase
     public function testAssertGrantedAdmin(array $roles): void
     {
         $lsp = $this->createMock(LanguageServiceProvider::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->expects(self::once())->method('getRoles')->willReturn($roles);
@@ -102,7 +102,7 @@ class RuleBasedReadPermissionAssertTest extends TestCase
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->expects(self::once())->method('isDirectLsp')->willReturn($isDirectLsp);
 
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn([Roles::PM]);
@@ -120,7 +120,7 @@ class RuleBasedReadPermissionAssertTest extends TestCase
     public function testAssertNotGrantedIfNotAdminOrPmAndNotCoordinator(): void
     {
         $lsp = $this->createMock(LanguageServiceProvider::class);
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn(['some-role']);
@@ -141,14 +141,14 @@ class RuleBasedReadPermissionAssertTest extends TestCase
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->expects(self::once())->method('same')->willReturn(true);
 
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn(['some-role']);
 
         $coordinator = new JobCoordinator(
             'guid',
-            $this->createMock(ZfExtended_Models_User::class),
+            $this->createMock(User::class),
             $lsp
         );
 
@@ -166,7 +166,7 @@ class RuleBasedReadPermissionAssertTest extends TestCase
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->expects(self::once())->method('isSubLspOf')->willReturn(true);
 
-        $manager = $this->createMock(ZfExtended_Models_User::class);
+        $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
         $manager->method('getRoles')->willReturn(['some-role']);
@@ -175,7 +175,7 @@ class RuleBasedReadPermissionAssertTest extends TestCase
         $coordinatorLsp->expects(self::once())->method('same')->willReturn(false);
         $coordinator = new JobCoordinator(
             'guid',
-            $this->createMock(ZfExtended_Models_User::class),
+            $this->createMock(User::class),
             $coordinatorLsp
         );
 
