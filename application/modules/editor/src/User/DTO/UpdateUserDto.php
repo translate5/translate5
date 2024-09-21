@@ -73,7 +73,7 @@ class UpdateUserDto
             array_key_exists('passwd', $data)
                 ? new PasswordDto(null !== $data['passwd'] ? trim($data['passwd']) : null)
                 : null,
-            $data['parentIds'] ?? null,
+            isset($data['parentIds']) ? (string) $data['parentIds'] : null,
             $data['locale'] ?? null,
         );
     }

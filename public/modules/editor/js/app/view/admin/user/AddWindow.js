@@ -105,7 +105,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         }
 
         Ext.Object.each(Editor.data.app.roles, function (key, value) {
-            //if the role is not setable for the user, do not create an check box for it
+            //if the role is not setable for the user, do not create a checkbox for it
             if (!value.setable) {
                 return;
             }
@@ -114,9 +114,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 boxLabel: value.label,
                 name: 'roles_helper',
                 value: key,
-                handler: function (box, checked) {
-                    me.roleCheckChange(box, checked);
-                }
             });
         });
         Ext.Object.each(Editor.data.l10n.translations, function (id, value) {
@@ -245,6 +242,9 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             autoEl: {
                                                 tag: 'div',
                                                 'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
+                                            },
+                                            listeners: {
+                                                change: (box, newValue) => this.roleCheckChange(box, newValue),
                                             }
                                         },
                                         {
@@ -265,24 +265,8 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                                 fieldLabel: '{l10n.lsp.title}',
                                             },
                                             listeners: {
-                                                change: (fld, newValue) => {
-                                                    /**
-                                                     * @type {Editor.model.admin.LspModel}
-                                                     */
-                                                    const lsp = fld.getStore().getById(newValue);
-
-                                                    if (null === lsp) {
-                                                        this.updateCustomerField(
-                                                            fld.up('form'),
-                                                            Ext.getStore('customersStore').getData().items
-                                                        );
-
-                                                        return;
-                                                    }
-
-                                                    this.updateCustomerField(fld.up('form'), lsp.get('customers'));
-                                                }
-                                            }
+                                                change: (box, newValue) => this.onLspChange(box, newValue),
+                                            },
                                         },
                                         {
                                             xtype: 'Editor.tagfield',
@@ -320,11 +304,10 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             displayField: 'longUserName',
                                             valueField: 'id',
                                             store: {
-                                                type: 'store',
+                                                xtype: 'store',
                                                 model: 'Editor.model.admin.User',
-                                                autoLoad: true,
-                                                remoteFilter: false,
-                                                pageSize: 0
+                                                pageSize: 0,
+                                                data: [],
                                             },
                                             queryMode: 'local',
                                             fieldLabel: me.strings.parentUserLabel
@@ -361,6 +344,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                     setDisablePasswords: function (disable) {
                                         Ext.Array.forEach(this.query('textfield'), function (field) {
                                             field.setDisabled(disable);
+
                                             if (disable) {
                                                 field.reset();
                                             }
@@ -395,6 +379,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             disabled: true,
                                             validator: function (value) {
                                                 var pwd = this.previousSibling('[name=passwd]');
+
                                                 return (value === pwd.getValue()) ? true : me.strings.passwordMisMatch;
                                             },
                                             fieldLabel: me.strings.password_check
@@ -460,15 +445,37 @@ Ext.define('Editor.view.admin.user.AddWindow', {
 
         return me.callParent([config]);
     },
+
+    onLspChange: function (fld, newValue) {
+        /**
+         * @type {Editor.model.admin.LspModel}
+         */
+        const lsp = fld.getStore().getById(newValue);
+        const form = fld.up('form');
+
+        if (null === lsp) {
+            this.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
+
+            return;
+        }
+
+        this.updateCustomerField(form, lsp.get('customers'));
+        this.updateParentUsersField(form);
+    },
+
     /**
      * merge and save the checked roles into the hidden roles field
      * @param {Ext.form.field.Checkbox} box
-     * @param {Boolean} checked
+     * @param {Object} newValue
      */
-    roleCheckChange: function (box, checked) {
-        var roles = [],
+    roleCheckChange: function (box, newValue) {
+        if (Object.entries(newValue).length === 0) {
+            return;
+        }
+
+        let roles = [],
             form = box.up('form'),
-            boxes = box.up('#rolesGroup').query('checkbox[checked=true]');
+            boxes = box.query('checkbox[checked=true]');
 
         boxes.forEach(box => {
             roles.push(box.initialConfig.value);
@@ -502,18 +509,22 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             lspField.allowBlank = true;
             lspField.setDisabled(true);
             lspField.forceSelection = false;
+            lspField.setValue(null);
         }
 
         if (this.isClientPm(roles)) {
             // if the client-pm role is checked, we show the client-pm sub-roles and add their value
             var tagfield = form.down('#clientPmSubRoles');
+
             // if a new user is set the first time to be a clientPm we add all sub-roles for convenience
             if (!tagfield.isClientPmInited && !Number.isInteger(form.getRecord().get('id'))) {
-                var item, allSubRoles = [];
+                var item,
+                    allSubRoles = [];
 
                 for (item of Editor.data.app.clientPmSubRoles) {
                     allSubRoles.push(item[0]);
                 }
+
                 tagfield.setValue(allSubRoles);
                 tagfield.isClientPmInited = true;
             }
@@ -525,6 +536,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         }
 
         form.down('hidden[name="roles"]').setValue(roles.join(','));
+        this.updateParentUsersField(form);
     },
     /**
      * merge and save the checked roles AND the client-pm sub-roles into the hidden roles field
@@ -535,9 +547,11 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         var roles = [],
             form = tagfield.up('form'),
             boxes = form.down('#rolesGroup').query('checkbox[checked=true]');
+
         Ext.Array.forEach(boxes, function (item) {
             roles.push(item.initialConfig.value);
         });
+
         roles = roles.concat(newValue);
         form.down('hidden[name="roles"]').setValue(roles.join(','));
     },
@@ -549,6 +563,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         var me = this,
             form = me.down('form'),
             roles = record.getMainRoles();
+
         // we set the subroles just for the lifetime of the form as "real" data-values
         record.set('clientPmSubRoles', record.getClientPmSubRoles(), {silent: true, commit: false});
 
@@ -576,14 +591,14 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             url: Editor.data.restpath + 'lsp',
             method: 'GET',
             success: response => {
-                const data = Ext.decode(response.responseText);
+                const data = response.responseJson;
                 lspStore.loadData(data.rows);
 
                 const lsp = lspStore.getById(record.get('lsp'));
                 lspField.setValue(lsp);
                 lspField.setHidden(! lsp);
 
-                if (!! lsp) {
+                if (lsp) {
                     this.updateCustomerField(form, lsp.get('customers'));
                 }
             }
@@ -596,9 +611,11 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 dock: 'bottom'
             });
         }
+
         // set the subroles-tagfield visible if the user is a clientPm
         if (me.isClientPm(roles)) {
             me.down('#clientPmSubRoles').setHidden(false);
+
             // when the current user is "only" client-pm, he must not be able to change his own subroles
             if (me.isClientPm(Editor.data.app.user.roles.split(','))) {
                 me.down('#clientPmSubRoles').setDisabled(true);
@@ -636,5 +653,33 @@ Ext.define('Editor.view.admin.user.AddWindow', {
      */
     isClientPm: function (roles) {
         return !roles.includes('pm') && roles.includes('clientpm');
-    }
+    },
+
+    updateParentUsersField: function (form) {
+        const parentIdsStore = form.down('#parentIds').getStore();
+        const record = form.getRecord();
+
+        let params = {
+            roles: form.down('hidden[name="roles"]').getValue(),
+            lspId: form.down('#lsp').getValue(),
+        };
+
+        if (!record.phantom) {
+            params = {
+                id: record.get('id')
+            };
+        }
+
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'user/parents',
+            method: 'GET',
+            params: params,
+            success: (response) => {
+                const data = response.responseJson;
+                parentIdsStore.loadData(data.rows);
+                const parentUser = parentIdsStore.getById(record.get('parentIds'));
+                form.down('#parentIds').setValue(parentUser);
+            },
+        });
+    },
 });

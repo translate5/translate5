@@ -36,6 +36,7 @@ use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedException;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForLspUserException;
 use MittagQI\Translate5\User\Model\User;
@@ -62,10 +63,33 @@ class ParentUserValidatorTest extends TestCase
         );
     }
 
+    public function testUserCanNotBeParentForHimself(): void
+    {
+        $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+
+        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+
+        $this->expectException(InvalidParentUserProvidedException::class);
+
+        $this->validator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
+    }
+
     public function testNothingHappensIfChildUserIsNotLspUser(): void
     {
         $parentUser = $this->createMock(User::class);
-        $childUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser->method('__call')->willReturnMap([
+            ['getId', [], 2],
+        ]);
 
         $this->lspUserRepository->method('findByUser')->willReturn(null);
 
@@ -79,17 +103,21 @@ class ParentUserValidatorTest extends TestCase
         $this->expectException(InvalidParentUserProvidedForLspUserException::class);
 
         $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
 
         $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
+            ['getId', [], 2],
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
-        $lspUser = new LspUser('guid', $childUser, $lsp);
-
-        $this->createMock(LspUser::class);
+        $lspUser = $this->getMockBuilder(LspUser::class)
+            ->setConstructorArgs(['guid', $childUser, $lsp])
+            ->getMock();
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
@@ -98,31 +126,69 @@ class ParentUserValidatorTest extends TestCase
         $this->validator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
     }
 
+    public function testThrowsExceptionOnAttemptToSetNotCoordinatorAsParentForLspUserOnCreate(): void
+    {
+        $this->expectException(InvalidParentUserProvidedForLspUserException::class);
+
+        $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+
+        $this->coordinatorRepository->method('findByUser')->willReturn(null);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+
+        $this->validator->assertIsSuitableParentForLspUser($parentUser, false, $lsp);
+    }
+
     public function testThrowsExceptionOnAttemptToSetCoordinatorOfDifferentLspAsParentForLspUser(): void
     {
         $this->expectException(InvalidParentUserProvidedForLspUserException::class);
 
         $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
 
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isCoordinatorOf')->willReturn(false);
 
         $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
+            ['getId', [], 2],
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
-        $lspUser = new LspUser($childUser->getUserGuid(), $childUser, $lsp);
-
-        $this->createMock(LspUser::class);
+        $lspUser = $this->getMockBuilder(LspUser::class)
+            ->setConstructorArgs([$childUser->getUserGuid(), $childUser, $lsp])
+            ->getMock();
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
         $this->validator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
+    }
+
+    public function testThrowsExceptionOnAttemptToSetCoordinatorOfDifferentLspAsParentForLspUserOnCreate(): void
+    {
+        $this->expectException(InvalidParentUserProvidedForLspUserException::class);
+
+        $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+
+        $coordinator = $this->createMock(JobCoordinator::class);
+        $coordinator->method('isCoordinatorOf')->willReturn(false);
+
+        $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+
+        $this->validator->assertIsSuitableParentForLspUser($parentUser, false, $lsp);
     }
 
     public function parentRoleProvider(): array
@@ -141,13 +207,17 @@ class ParentUserValidatorTest extends TestCase
     {
         $parentUser = $this->createMock(User::class);
         $parentUser->method('isPm')->willReturn($parentRole === Roles::PM);
-        $parentUser->method('isAdmin')->willReturn(in_array($parentRole, [Roles::ADMIN, Roles::SYSTEMADMIN]));
+        $parentUser->method('isAdmin')->willReturn(in_array($parentRole, [Roles::ADMIN, Roles::SYSTEMADMIN], true));
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
 
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isCoordinatorOf')->willReturn(false);
 
         $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
+            ['getId', [], 2],
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
         $childUser->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
@@ -155,15 +225,40 @@ class ParentUserValidatorTest extends TestCase
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->method('isDirectLsp')->willReturn(true);
 
-        $lspUser = new LspUser($childUser->getUserGuid(), $childUser, $lsp);
-
-        $this->createMock(LspUser::class);
+        $lspUser = $this->getMockBuilder(LspUser::class)
+            ->setConstructorArgs([$childUser->getUserGuid(), $childUser, $lsp])
+            ->getMock();
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
         $this->validator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
+
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @dataProvider parentRoleProvider
+     */
+    public function testAllowedToSetParentOfRoleToDirectCoordinatorOnCreate(string $parentRole): void
+    {
+        $parentUser = $this->createMock(User::class);
+        $parentUser->method('isPm')->willReturn($parentRole === Roles::PM);
+        $parentUser->method('isAdmin')->willReturn(in_array($parentRole, [Roles::ADMIN, Roles::SYSTEMADMIN], true));
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+
+        $coordinator = $this->createMock(JobCoordinator::class);
+        $coordinator->method('isCoordinatorOf')->willReturn(false);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isDirectLsp')->willReturn(true);
+
+        $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
+
+        $this->validator->assertIsSuitableParentForLspUser($parentUser, true, $lsp);
 
         $this->assertTrue(true);
     }
@@ -173,11 +268,15 @@ class ParentUserValidatorTest extends TestCase
         $this->expectException(InvalidParentUserProvidedForJobCoordinatorException::class);
 
         $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
         $parentUser->method('isPm')->willReturn(false);
         $parentUser->method('isAdmin')->willReturn(false);
 
         $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
+            ['getId', [], 2],
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
         $childUser->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
@@ -185,12 +284,11 @@ class ParentUserValidatorTest extends TestCase
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->method('isDirectLsp')->willReturn(true);
 
-        $lspUser = new LspUser($childUser->getUserGuid(), $childUser, $lsp);
-
-        $this->createMock(LspUser::class);
+        $lspUser = $this->getMockBuilder(LspUser::class)
+            ->setConstructorArgs([$childUser->getUserGuid(), $childUser, $lsp])
+            ->getMock();
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
-
         $this->coordinatorRepository->method('findByUser')->willReturn(null);
 
         $this->validator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
@@ -198,9 +296,33 @@ class ParentUserValidatorTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function testThrowsExceptionOnAttemptToSetParentOfNotAllowedRoleToCoordinatorOnCreate(): void
+    {
+        $this->expectException(InvalidParentUserProvidedForJobCoordinatorException::class);
+
+        $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+        $parentUser->method('isPm')->willReturn(false);
+        $parentUser->method('isAdmin')->willReturn(false);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isDirectLsp')->willReturn(true);
+
+        $this->coordinatorRepository->method('findByUser')->willReturn(null);
+
+        $this->validator->assertIsSuitableParentForLspUser($parentUser, true, $lsp);
+
+        $this->assertTrue(true);
+    }
+
     public function testAllowedToSetCoordinatorOfSameLspToCoordinator(): void
     {
         $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
         $parentUser->method('isPm')->willReturn(false);
         $parentUser->method('isAdmin')->willReturn(false);
 
@@ -209,6 +331,7 @@ class ParentUserValidatorTest extends TestCase
 
         $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
+            ['getId', [], 2],
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
         $childUser->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
@@ -216,12 +339,11 @@ class ParentUserValidatorTest extends TestCase
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->method('isDirectLsp')->willReturn(true);
 
-        $lspUser = new LspUser($childUser->getUserGuid(), $childUser, $lsp);
-
-        $this->createMock(LspUser::class);
+        $lspUser = $this->getMockBuilder(LspUser::class)
+            ->setConstructorArgs([$childUser->getUserGuid(), $childUser, $lsp])
+            ->getMock();
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
-
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
         $this->validator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
@@ -229,19 +351,47 @@ class ParentUserValidatorTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function testAllowedToSetCoordinatorOfSameLspToCoordinatorOnCreate(): void
+    {
+        $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+        $parentUser->method('isPm')->willReturn(false);
+        $parentUser->method('isAdmin')->willReturn(false);
+
+        $coordinator = $this->createMock(JobCoordinator::class);
+        $coordinator->method('isCoordinatorOf')->willReturn(true);
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isDirectLsp')->willReturn(true);
+
+        $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
+
+        $this->validator->assertIsSuitableParentForLspUser($parentUser, true, $lsp);
+
+        $this->assertTrue(true);
+    }
+
     public function testAllowedToSetCoordinatorOfParentLspToCoordinator(): void
     {
         $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
         $parentUser->method('isPm')->willReturn(false);
         $parentUser->method('isAdmin')->willReturn(false);
 
         $parentLsp = $this->createMock(LanguageServiceProvider::class);
         $parentLsp->method('same')->willReturn(false);
 
-        $coordinator = new JobCoordinator(bin2hex(random_bytes(16)), $parentUser, $parentLsp);
+        $coordinator = $this->getMockBuilder(JobCoordinator::class)
+            ->setConstructorArgs([bin2hex(random_bytes(16)), $parentUser, $parentLsp])
+            ->getMock();
 
         $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
+            ['getId', [], 2],
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
         $childUser->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
@@ -250,15 +400,41 @@ class ParentUserValidatorTest extends TestCase
         $lsp->method('isDirectLsp')->willReturn(false);
         $lsp->method('isSubLspOf')->willReturn(true);
 
-        $lspUser = new LspUser($childUser->getUserGuid(), $childUser, $lsp);
-
-        $this->createMock(LspUser::class);
+        $lspUser = $this->getMockBuilder(LspUser::class)
+            ->setConstructorArgs([$childUser->getUserGuid(), $childUser, $lsp])
+            ->getMock();
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
-
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
         $this->validator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
+
+        $this->assertTrue(true);
+    }
+
+    public function testAllowedToSetCoordinatorOfParentLspToCoordinatorOnCreate(): void
+    {
+        $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+        $parentUser->method('isPm')->willReturn(false);
+        $parentUser->method('isAdmin')->willReturn(false);
+
+        $parentLsp = $this->createMock(LanguageServiceProvider::class);
+        $parentLsp->method('same')->willReturn(false);
+
+        $coordinator = $this->getMockBuilder(JobCoordinator::class)
+            ->setConstructorArgs([bin2hex(random_bytes(16)), $parentUser, $parentLsp])
+            ->getMock();
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isDirectLsp')->willReturn(false);
+        $lsp->method('isSubLspOf')->willReturn(true);
+
+        $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
+
+        $this->validator->assertIsSuitableParentForLspUser($parentUser, true, $lsp);
 
         $this->assertTrue(true);
     }
@@ -268,16 +444,22 @@ class ParentUserValidatorTest extends TestCase
         $this->expectException(InvalidParentUserProvidedForJobCoordinatorException::class);
 
         $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
         $parentUser->method('isPm')->willReturn(false);
         $parentUser->method('isAdmin')->willReturn(false);
 
         $parentLsp = $this->createMock(LanguageServiceProvider::class);
         $parentLsp->method('same')->willReturn(false);
 
-        $coordinator = new JobCoordinator(bin2hex(random_bytes(16)), $parentUser, $parentLsp);
+        $coordinator = $this->getMockBuilder(JobCoordinator::class)
+            ->setConstructorArgs([bin2hex(random_bytes(16)), $parentUser, $parentLsp])
+            ->getMock();
 
         $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
+            ['getId', [], 2],
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
         $childUser->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
@@ -286,13 +468,60 @@ class ParentUserValidatorTest extends TestCase
         $lsp->method('isDirectLsp')->willReturn(false);
         $lsp->method('isSubLspOf')->willReturn(false);
 
-        $lspUser = new LspUser($childUser->getUserGuid(), $childUser, $lsp);
-
-        $this->createMock(LspUser::class);
+        $lspUser = $this->getMockBuilder(LspUser::class)
+            ->setConstructorArgs([$childUser->getUserGuid(), $childUser, $lsp])
+            ->getMock();
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
+        $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
+
+        $this->validator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
+    }
+
+    public function testThrowsExceptionOnSetNotRelatedCoordinatorToCoordinatorOnCreate(): void
+    {
+        $this->expectException(InvalidParentUserProvidedForJobCoordinatorException::class);
+
+        $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+        $parentUser->method('isPm')->willReturn(false);
+        $parentUser->method('isAdmin')->willReturn(false);
+
+        $parentLsp = $this->createMock(LanguageServiceProvider::class);
+        $parentLsp->method('same')->willReturn(false);
+
+        $coordinator = $this->getMockBuilder(JobCoordinator::class)
+            ->setConstructorArgs([bin2hex(random_bytes(16)), $parentUser, $parentLsp])
+            ->getMock();
+
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->method('isDirectLsp')->willReturn(false);
+        $lsp->method('isSubLspOf')->willReturn(false);
 
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
+
+        $this->validator->assertIsSuitableParentForLspUser($parentUser, true, $lsp);
+    }
+
+    public function testThrowsExceptionWhenParentIsLspAndChildIsNot(): void
+    {
+        $this->expectException(InvalidParentUserProvidedException::class);
+
+        $parentUser = $this->createMock(User::class);
+        $parentUser->method('__call')->willReturnMap([
+            ['getId', [], 1],
+        ]);
+
+        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser->method('__call')->willReturnMap([
+            ['getId', [], 2],
+        ]);
+
+        $lspUser = $this->createMock(LspUser::class);
+
+        $this->lspUserRepository->method('findByUser')->willReturnOnConsecutiveCalls($lspUser, null);
 
         $this->validator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
     }

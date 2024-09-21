@@ -26,7 +26,6 @@
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
 VALUES
     ('editor', 'pm', 'setaclrole', 'jobCoordinator'),
-    ('editor', 'clientpm', 'setaclrole', 'jobCoordinator'),
     ('editor', 'admin', 'setaclrole', 'jobCoordinator'),
     ('editor', 'systemadmin', 'setaclrole', 'jobCoordinator'),
 

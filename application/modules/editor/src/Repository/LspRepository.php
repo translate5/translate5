@@ -82,6 +82,15 @@ class LspRepository implements LspRepositoryInterface
         }
     }
 
+    public function find(int $id): ?LanguageServiceProvider
+    {
+        try {
+            return $this->get($id);
+        } catch (LspNotFoundException) {
+            return null;
+        }
+    }
+
     public function save(LanguageServiceProvider $lsp): void
     {
         $lsp->save();

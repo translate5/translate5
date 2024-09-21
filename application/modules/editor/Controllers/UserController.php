@@ -34,6 +34,7 @@ use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
@@ -56,13 +57,16 @@ use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserEx
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
+use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
+use MittagQI\Translate5\User\Validation\ParentUserValidator;
 use MittagQI\ZfExtended\Acl\SystemResource;
+use ZfExtended_UnprocessableEntity as UnprocessableEntity;
 
 class Editor_UserController extends ZfExtended_RestController
 {
@@ -115,7 +119,7 @@ class Editor_UserController extends ZfExtended_RestController
         ], 'editor.user');
     }
 
-    public function getAction()
+    public function getAction(): void
     {
         $user = $this->userRepository->get($this->getParam('id'));
 
@@ -145,16 +149,16 @@ class Editor_UserController extends ZfExtended_RestController
         $this->credentialCleanup();
     }
 
-    public function indexAction()
+    public function indexAction(): void
     {
         $rows = $this->entity->loadAll();
-
         $lspUserRepo = new LspUserRepository();
         $userIdToLspIdMap = $lspUserRepo->getUserIdToLspIdMap();
 
         $userModel = ZfExtended_Factory::get(User::class);
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
         $editableRoles = $authUser->getSetableRoles();
+        $context = new PermissionAssertContext($authUser);
 
         foreach ($rows as $key => $row) {
             $userModel->init(
@@ -169,15 +173,8 @@ class Editor_UserController extends ZfExtended_RestController
             );
 
             try {
-                $this->permissionAssert->assertGranted(
-                    Action::READ,
-                    clone $userModel,
-                    new PermissionAssertContext($authUser)
-                );
-            } catch (PermissionExceptionInterface $e) {
-                if ($row['id'] == 52) {
-                    error_log($e::class);
-                }
+                $this->permissionAssert->assertGranted(Action::READ, $userModel, $context);
+            } catch (PermissionExceptionInterface) {
                 unset($rows[$key]);
 
                 continue;
@@ -220,7 +217,7 @@ class Editor_UserController extends ZfExtended_RestController
         $user = $this->userRepository->get($this->getParam('id'));
 
         try {
-            UserUpdateOperation::class::create()->updateUser(
+            UserUpdateOperation::create()->updateUser(
                 $user,
                 UpdateUserDto::fromRequestData((array) $this->data),
             );
@@ -250,7 +247,7 @@ class Editor_UserController extends ZfExtended_RestController
                     'Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.',
                 ],
                 [
-                    'tasks' => join(', ', $e->taskGuids),
+                    'tasks' => implode(', ', $e->taskGuids),
                     'user' => $this->entity->getUserGuid(),
                     'userLogin' => $this->entity->getLogin(),
                     'userEmail' => $this->entity->getEmail(),
@@ -304,7 +301,7 @@ class Editor_UserController extends ZfExtended_RestController
         }
     }
 
-    public function postAction()
+    public function postAction(): void
     {
         $this->decodePutData();
 
@@ -332,7 +329,7 @@ class Editor_UserController extends ZfExtended_RestController
      * A authenticated user is allowed to get and change (PUT) himself, nothing more, nothing less.
      * @throws ZfExtended_BadMethodCallException
      */
-    public function authenticatedAction()
+    public function authenticatedAction(): void
     {
         $oldpwd = trim($this->getParam('oldpasswd'));
 
@@ -367,7 +364,7 @@ class Editor_UserController extends ZfExtended_RestController
      * Loads a list of all users with role 'pm'. If 'pmRoles' is set,
      * all users with roles listed in 'pmRoles' will be loaded
      */
-    public function pmAction()
+    public function pmAction(): void
     {
         $parentId = ZfExtended_Authentication::getInstance()->getUserId();
         //check if the user is allowed to see all users
@@ -383,10 +380,27 @@ class Editor_UserController extends ZfExtended_RestController
         $this->csvToArray();
     }
 
+    public function allowedparentusersAction(): void
+    {
+        $rows = $this->entity->loadAll();
+
+        if ($this->_getParam('id')) {
+            $rows = $this->filterParentUsersForExistingUser($rows);
+        } else {
+            $rows = $this->filterParentUsersForCreate($rows);
+        }
+
+        $this->view->rows = array_values($rows);
+        $this->view->total = count($rows);
+    }
+
+    /**
+     * @throws Zend_Exception
+     */
     private function transformException(Exception $e): ZfExtended_ErrorCodeException|Exception
     {
         return match ($e::class) {
-            RolesetHasConflictingRolesException::class => ZfExtended_UnprocessableEntity::createResponse(
+            RolesetHasConflictingRolesException::class => UnprocessableEntity::createResponse(
                 'E1630',
                 [
                     'roles' => [
@@ -395,10 +409,10 @@ class Editor_UserController extends ZfExtended_RestController
                 ],
                 [
                     'role' => $e->role,
-                    'roles' => join(', ', $e->conflictsWith),
+                    'roles' => implode(', ', $e->conflictsWith),
                 ]
             ),
-            RoleConflictWithRoleThatPopulatedToRolesetException::class => ZfExtended_UnprocessableEntity::createResponse(
+            RoleConflictWithRoleThatPopulatedToRolesetException::class => UnprocessableEntity::createResponse(
                 'E1630',
                 [
                     'roles' => [
@@ -407,18 +421,19 @@ class Editor_UserController extends ZfExtended_RestController
                 ],
                 [
                     'role' => $e->role,
-                    'roles' => join(', ', array_merge([$e->conflictsWith], $e->becauseOf)),
+                    'roles' => implode(', ', array_merge([$e->conflictsWith], $e->becauseOf)),
                     'conflictsWith' => $e->conflictsWith,
                     'becauseOf' => $e->becauseOf,
                 ]
             ),
             Zend_Acl_Exception::class,
             UserIsNotAuthorisedToAssignRoleException::class => new ZfExtended_NoAccessException(previous: $e),
-            UnableToAssignJobCoordinatorRoleToExistingUserException::class => ZfExtended_UnprocessableEntity::createResponse(
+            UnableToAssignJobCoordinatorRoleToExistingUserException::class => UnprocessableEntity::createResponse(
                 'E1631',
                 [
                     'roles' => [
-                        'Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung oder für LSP-Benutzer definiert werden.',
+                        'Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung '
+                        . 'oder für LSP-Benutzer definiert werden.',
                     ],
                 ],
             ),
@@ -434,7 +449,7 @@ class Editor_UserController extends ZfExtended_RestController
                     $e->customerId,
                 ]
             ),
-            CustomerDoesNotBelongToUserException::class => ZfExtended_UnprocessableEntity::createResponse(
+            CustomerDoesNotBelongToUserException::class => UnprocessableEntity::createResponse(
                 'E2003',
                 [
                     'customers' => [
@@ -445,7 +460,7 @@ class Editor_UserController extends ZfExtended_RestController
                     'id' => $e->customerId,
                 ]
             ),
-            CustomerDoesNotBelongToLspException::class => ZfExtended_UnprocessableEntity::createResponse(
+            CustomerDoesNotBelongToLspException::class => UnprocessableEntity::createResponse(
                 'E2003',
                 [
                     'customers' => [
@@ -456,25 +471,25 @@ class Editor_UserController extends ZfExtended_RestController
                     'id' => $e->customerId,
                 ]
             ),
-            LoginAlreadyInUseException::class => ZfExtended_UnprocessableEntity::createResponse('E1094', [
+            LoginAlreadyInUseException::class => UnprocessableEntity::createResponse('E1094', [
                 'login' => [
                     'duplicateLogin' => 'Dieser Anmeldename wird bereits verwendet.',
                 ],
             ]),
-            GuidAlreadyInUseException::class => ZfExtended_UnprocessableEntity::createResponse('E1095', [
+            GuidAlreadyInUseException::class => UnprocessableEntity::createResponse('E1095', [
                 'login' => [
                     'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
                 ],
             ]),
-            LspMustBeProvidedInJobCoordinatorCreationProcessException::class => ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
+            LspMustBeProvidedInJobCoordinatorCreationProcessException::class => UnprocessableEntity::createResponse(
+        'E2003',
                 [
                     'lsp' => [
                         'Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.',
                     ],
                 ],
             ),
-            ProvidedParentIdCannotBeEvaluatedToUserException::class => ZfExtended_UnprocessableEntity::createResponse(
+            ProvidedParentIdCannotBeEvaluatedToUserException::class => UnprocessableEntity::createResponse(
                 'E2003',
                 [
                     'parentIds' => [
@@ -519,19 +534,21 @@ class Editor_UserController extends ZfExtended_RestController
                     $e->lspId,
                 ]
             ),
-            InvalidParentUserProvidedForJobCoordinatorException::class => ZfExtended_UnprocessableEntity::createResponse(
+            InvalidParentUserProvidedForJobCoordinatorException::class => UnprocessableEntity::createResponse(
                 'E2003',
                 [
                     'parentIds' => [
-                        'Der übergeordnete Benutzer des Job-Koordinators kann nur der PM, Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein',
+                        'Der übergeordnete Benutzer des Job-Koordinators kann nur der PM, '
+                        .'Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein',
                     ],
                 ],
             ),
-            InvalidParentUserProvidedForLspUserException::class => ZfExtended_UnprocessableEntity::createResponse(
+            InvalidParentUserProvidedForLspUserException::class => UnprocessableEntity::createResponse(
                 'E2003',
                 [
                     'parentIds' => [
-                        'Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.',
+                        'Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator '
+                        .'des eigenen Sprachdienstleisters (LSP) sein.',
                     ],
                 ],
             ),
@@ -551,7 +568,7 @@ class Editor_UserController extends ZfExtended_RestController
      * converts the source and target comma separated language ids to array.
      * Frontend/api use array, in the database we save comma separated values.
      */
-    protected function csvToArray(): void
+    private function csvToArray(): void
     {
         $callback = function ($row) {
             if ($row !== null && $row !== "") {
@@ -577,7 +594,7 @@ class Editor_UserController extends ZfExtended_RestController
     /**
      * remove password hashes and openid subject from output
      */
-    protected function credentialCleanup(): void
+    private function credentialCleanup(): void
     {
         if (is_object($this->view->rows)) {
             if (property_exists($this->view->rows, 'passwd')) {
@@ -607,7 +624,7 @@ class Editor_UserController extends ZfExtended_RestController
     /**
      * Check and update user session if the current modified user is the one in the session
      */
-    protected function checkAndUpdateSession()
+    private function checkAndUpdateSession()
     {
         $userSession = new Zend_Session_Namespace('user');
         //ignore the check if session user or the data user is not set
@@ -617,5 +634,94 @@ class Editor_UserController extends ZfExtended_RestController
         if ($userSession->data->id == $this->data->id) {
             ZfExtended_Authentication::getInstance()->authenticateBySessionData($userSession->data);
         }
+    }
+
+    private function filterParentUsersForCreate(array $rows): array
+    {
+        $roles = explode(',', $this->_getParam('roles'));
+        $roles = array_filter(array_map('trim', $roles));
+        $childIsJobCoordinator = in_array(Roles::JOB_COORDINATOR, $roles, true);
+        $childLsp = LspRepository::create()->find((int) $this->_getParam('lspId'));
+        $lspUserRepo = new LspUserRepository();
+        $userIdToLspIdMap = $lspUserRepo->getUserIdToLspIdMap();
+
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+        $context = new PermissionAssertContext($authUser);
+        $parentUser = ZfExtended_Factory::get(User::class);
+        $parentUserValidator = ParentUserValidator::create();
+
+        foreach ($rows as $key => $row) {
+            $parentUser->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $parentUser->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            try {
+                $this->permissionAssert->assertGranted(Action::READ, $parentUser, $context);
+            } catch (PermissionExceptionInterface) {
+                unset($rows[$key]);
+
+                continue;
+            }
+
+            $parentIsLspUser = isset($userIdToLspIdMap[$row['id']]);
+
+            if (! $childLsp && ! $childIsJobCoordinator && ! $parentIsLspUser) {
+                continue;
+            }
+
+            if ($childLsp) {
+                try {
+                    $parentUserValidator->assertIsSuitableParentForLspUser(
+                        $parentUser,
+                        $childIsJobCoordinator,
+                        $childLsp
+                    );
+                    continue;
+                } catch (UserExceptionInterface) {
+                }
+            }
+
+            unset($rows[$key]);
+        }
+
+        return $rows;
+    }
+
+    private function filterParentUsersForExistingUser(array $rows): array
+    {
+        $childUser = $this->userRepository->get($this->getParam('id'));
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+        $context = new PermissionAssertContext($authUser);
+        $parentUser = ZfExtended_Factory::get(User::class);
+        $parentUserValidator = ParentUserValidator::create();
+
+        foreach ($rows as $key => $row) {
+            $parentUser->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $parentUser->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            try {
+                $this->permissionAssert->assertGranted(Action::READ, $parentUser, $context);
+                $parentUserValidator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
+            } catch (PermissionExceptionInterface|UserExceptionInterface) {
+                unset($rows[$key]);
+            }
+        }
+
+        return $rows;
     }
 }
