@@ -70,7 +70,7 @@ class ParentUserValidatorTest extends TestCase
             ['getId', [], 1],
         ]);
 
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getId', [], 1],
         ]);
@@ -86,7 +86,7 @@ class ParentUserValidatorTest extends TestCase
         $parentUser->method('__call')->willReturnMap([
             ['getId', [], 1],
         ]);
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getId', [], 2],
         ]);
@@ -514,7 +514,7 @@ class ParentUserValidatorTest extends TestCase
             ['getId', [], 1],
         ]);
 
-        $childUser = $this->createMock(ZfExtended_Models_User::class);
+        $childUser = $this->createMock(User::class);
         $childUser->method('__call')->willReturnMap([
             ['getId', [], 2],
         ]);
