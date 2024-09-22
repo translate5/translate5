@@ -53,7 +53,7 @@ class UpdateUserDto
     public static function fromRequestData(array $data): self
     {
         $roles = isset($data['roles']) ? explode(',', trim($data['roles'], ',')) : null;
-        $customers = isset($data['roles'])
+        $customers = isset($data['customers'])
             ? array_filter(
                 array_map(
                     'intval',

@@ -42,7 +42,6 @@ use MittagQI\Translate5\User\Validation\ParentUserValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Models_Entity_NotFoundException;
-use ZfExtended_ValidateException;
 
 class UserSetParentIdsOperationTest extends TestCase
 {

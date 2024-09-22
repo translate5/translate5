@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
@@ -39,15 +39,12 @@ use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\DTO\PasswordDto;
 use MittagQI\Translate5\User\DTO\UpdateUserDto;
-use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_ValidateException;
 
 class UserUpdateOperationTest extends TestCase
@@ -63,7 +60,6 @@ class UserUpdateOperationTest extends TestCase
     private UserSetPasswordOperation|MockObject $setPassword;
 
     private UserAssignCustomersOperationInterface|MockObject $assignCustomers;
-
 
     private ResetPasswordEmail|MockObject $resetPasswordEmail;
 

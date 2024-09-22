@@ -38,7 +38,6 @@ use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Model\User;
@@ -48,11 +47,11 @@ use ZfExtended_AuthenticationInterface;
 /**
  * Should not be used directly, use:
  * @see UserCreateOperation
+ * @see UserUpdateOperation
  */
 final class UserAssignCustomersOperation implements UserAssignCustomersOperationInterface
 {
     public function __construct(
-        private readonly ActionPermissionAssertInterface $userPermissionAssert,
         private readonly UserAssignCustomersOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
@@ -67,7 +66,6 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
     public static function create(): self
     {
         return new self(
-            UserActionPermissionAssert::create(),
             \MittagQI\Translate5\User\Operations\UserAssignCustomersOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
@@ -84,12 +82,6 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
     public function assignCustomers(User $user, array $associatedCustomerIds): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
-
-        $this->userPermissionAssert->assertGranted(
-            Action::DELETE,
-            $user,
-            new PermissionAssertContext($authUser)
-        );
 
         $customers = $this->customerRepository->getList(...$associatedCustomerIds);
 

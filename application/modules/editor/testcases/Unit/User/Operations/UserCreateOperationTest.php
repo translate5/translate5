@@ -43,9 +43,9 @@ use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
-use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -154,7 +154,7 @@ class UserCreateOperationTest extends TestCase
 
         $this->lspRepository->method('get')->willReturn($lsp);
 
-        $this->userRepository->expects(self::once())->method('save')->with($user);
+        $this->userRepository->expects(self::exactly(2))->method('save')->with($user);
 
         $this->lspUserCreate
             ->expects(self::once())
@@ -201,7 +201,7 @@ class UserCreateOperationTest extends TestCase
 
         $this->lspRepository->method('get')->willReturn($lsp);
 
-        $this->userRepository->expects(self::once())->method('save')->with($user);
+        $this->userRepository->expects(self::exactly(2))->method('save')->with($user);
 
         $this->lspUserCreate
             ->expects(self::once())
@@ -246,7 +246,7 @@ class UserCreateOperationTest extends TestCase
 
         $this->lspRepository->expects(self::never())->method('get');
 
-        $this->userRepository->expects(self::once())->method('save')->with($user);
+        $this->userRepository->expects(self::exactly(2))->method('save')->with($user);
 
         $this->lspUserCreate->expects(self::never())->method('createLspUser');
 
@@ -287,11 +287,11 @@ class UserCreateOperationTest extends TestCase
 
         $this->lspRepository->expects(self::never())->method('get');
 
-        $this->userRepository->expects(self::once())->method('save')->with($user);
+        $this->userRepository->expects(self::exactly(2))->method('save')->with($user);
 
         $this->lspUserCreate->expects(self::never())->method('createLspUser');
 
-        $this->setParentIds->expects(self::never())->method('setParentIds');
+        $this->setParentIds->expects(self::once())->method('setParentIds');
 
         $this->assignCustomers->expects(self::once())->method('assignCustomers');
 

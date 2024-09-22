@@ -157,7 +157,7 @@ class ViewDataProvider
                 );
 
                 $customersData[] = [
-                    'id' => (int)$customer->getId(),
+                    'id' => (int) $customer->getId(),
                     'name' => $customer->getName(),
                 ];
             } catch (PermissionExceptionInterface) {

@@ -210,7 +210,9 @@ class LspRepository implements LspRepositoryInterface
 
         $rows = $customerDb->fetchAll($select);
 
-        return array_column($rows->toArray(), 'id');
+        $rows->rewind();
+
+        return array_map('intval', array_column($rows->toArray(), 'id'));
     }
 
     /**

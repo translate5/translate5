@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility\Asserts;
 
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\Model\User;

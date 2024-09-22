@@ -32,9 +32,9 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
-use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

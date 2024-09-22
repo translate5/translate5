@@ -31,10 +31,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\ActionAssert\Permission;
 
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 

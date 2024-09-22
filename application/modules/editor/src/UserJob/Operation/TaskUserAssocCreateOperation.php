@@ -28,17 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Permission\Exception;
+namespace MittagQI\Translate5\UserJob\Operation;
 
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\LSP\LspUser;
-
-final class NotAccessibleLspUserException extends NoAccessException implements PermissionExceptionInterface
+class TaskUserAssocCreateOperation
 {
-    public function __construct(
-        public readonly LspUser $lspUser
-    ) {
-        parent::__construct();
-    }
 }

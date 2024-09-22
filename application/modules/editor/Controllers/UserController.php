@@ -27,24 +27,25 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\DTO\CreateUserDto;
 use MittagQI\Translate5\User\DTO\UpdateUserDto;
+use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForJobCoordinatorException;
@@ -73,7 +74,7 @@ class Editor_UserController extends ZfExtended_RestController
     protected $entity;
 
     private UserActionPermissionAssert $permissionAssert;
-    
+
     private UserRepository $userRepository;
 
     public function init(): void
@@ -126,7 +127,7 @@ class Editor_UserController extends ZfExtended_RestController
         }
 
         $this->view->rows = $user->getDataObject();
-        
+
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
 
         $this->permissionAssert->assertGranted(
@@ -173,7 +174,10 @@ class Editor_UserController extends ZfExtended_RestController
                     clone $userModel,
                     new PermissionAssertContext($authUser)
                 );
-            } catch (PermissionExceptionInterface) {
+            } catch (PermissionExceptionInterface $e) {
+                if ($row['id'] == 52) {
+                    error_log($e::class);
+                }
                 unset($rows[$key]);
 
                 continue;
@@ -192,7 +196,7 @@ class Editor_UserController extends ZfExtended_RestController
             $rows[$key]['lsp'] = $userIdToLspIdMap[$row['id']] ?? null;
         }
 
-        $this->view->rows = $rows;
+        $this->view->rows = array_values($rows);
         $this->view->total = count($rows);
 
         $this->csvToArray();
@@ -304,17 +308,6 @@ class Editor_UserController extends ZfExtended_RestController
     {
         $this->decodePutData();
 
-        if (! in_array(Roles::JOB_COORDINATOR, $this->data->roles) && ! empty($this->data->lsp)) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'lsp' => [
-                        'Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.',
-                    ],
-                ],
-            );
-        }
-
         try {
             $user = UserCreateOperation::create()->createUser(
                 CreateUserDto::fromRequestData(
@@ -341,7 +334,7 @@ class Editor_UserController extends ZfExtended_RestController
      */
     public function authenticatedAction()
     {
-       $oldpwd = trim($this->getParam('oldpasswd'));
+        $oldpwd = trim($this->getParam('oldpasswd'));
 
         if (empty($oldpwd)) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1420', [
@@ -421,7 +414,7 @@ class Editor_UserController extends ZfExtended_RestController
             ),
             Zend_Acl_Exception::class,
             UserIsNotAuthorisedToAssignRoleException::class => new ZfExtended_NoAccessException(previous: $e),
-            UnableToAssignJobCoordinatorRoleToExistingUserException::class => throw ZfExtended_UnprocessableEntity::createResponse(
+            UnableToAssignJobCoordinatorRoleToExistingUserException::class => ZfExtended_UnprocessableEntity::createResponse(
                 'E1631',
                 [
                     'roles' => [
@@ -464,23 +457,23 @@ class Editor_UserController extends ZfExtended_RestController
                 ]
             ),
             LoginAlreadyInUseException::class => ZfExtended_UnprocessableEntity::createResponse('E1094', [
-            'login' => [
-                'duplicateLogin' => 'Dieser Anmeldename wird bereits verwendet.',
-            ],
-        ]),
+                'login' => [
+                    'duplicateLogin' => 'Dieser Anmeldename wird bereits verwendet.',
+                ],
+            ]),
             GuidAlreadyInUseException::class => ZfExtended_UnprocessableEntity::createResponse('E1095', [
-        'login' => [
-            'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
-        ],
-    ]),
+                'login' => [
+                    'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
+                ],
+            ]),
             LspMustBeProvidedInJobCoordinatorCreationProcessException::class => ZfExtended_UnprocessableEntity::createResponse(
-        'E2003',
-        [
-            'lsp' => [
-                'Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.',
-            ],
-        ],
-    ),
+                'E2003',
+                [
+                    'lsp' => [
+                        'Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.',
+                    ],
+                ],
+            ),
             ProvidedParentIdCannotBeEvaluatedToUserException::class => ZfExtended_UnprocessableEntity::createResponse(
                 'E2003',
                 [
@@ -490,30 +483,30 @@ class Editor_UserController extends ZfExtended_RestController
                 ],
             ),
             FeasibilityExceptionInterface::class => ZfExtended_Models_Entity_Conflict::createResponse(
-            'E1628',
-            [
-                'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
-            ],
-            [
-                'user' => $this->entity->getUserGuid(),
-                'userLogin' => $this->entity->getLogin(),
-                'userEmail' => $this->entity->getEmail(),
-            ]
-        ),
+                'E1628',
+                [
+                    'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
+                ],
+                [
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            ),
             NotAccessibleLspUserException::class => ZfExtended_Models_Entity_Conflict::createResponse(
-            'E1627',
-            [
-                'Versuch, einen nicht erreichbaren Benutzer zu manipulieren.',
-            ],
-            [
-                'coordinator' => $e->lspUser->guid,
-                'lsp' => $e->lspUser->lsp->getName(),
-                'lspId' => $e->lspUser->lsp->getId(),
-                'user' => $this->entity->getUserGuid(),
-                'userLogin' => $this->entity->getLogin(),
-                'userEmail' => $this->entity->getEmail(),
-            ]
-        ),
+                'E1627',
+                [
+                    'Versuch, einen nicht erreichbaren Benutzer zu manipulieren.',
+                ],
+                [
+                    'coordinator' => $e->lspUser->guid,
+                    'lsp' => $e->lspUser->lsp->getName(),
+                    'lspId' => $e->lspUser->lsp->getId(),
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            ),
             LspNotFoundException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E2002',
                 [
@@ -539,6 +532,14 @@ class Editor_UserController extends ZfExtended_RestController
                 [
                     'parentIds' => [
                         'Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.',
+                    ],
+                ],
+            ),
+            AttemptToSetLspForNonJobCoordinatorException::class => ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'lsp' => [
+                        'Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.',
                     ],
                 ],
             ),

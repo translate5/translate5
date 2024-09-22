@@ -33,17 +33,38 @@ namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
+use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
 use MittagQI\Translate5\User\Model\User;
 
 /**
  * @implements PermissionAssertInterface<User>
  */
-final class ClientRestrictedPermissionAssert implements PermissionAssertInterface
+final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
 {
+    public function __construct(
+        private readonly JobCoordinatorRepository $coordinatorRepository,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
+    ) {
+    }
+
+    public static function create(): self
+    {
+        $lsUserRepository = new LspUserRepository();
+
+        return new self(
+            JobCoordinatorRepository::create(lspUserRepository: $lsUserRepository),
+            $lsUserRepository,
+        );
+    }
+
     public function supports(Action $action): bool
     {
-        return Action::DELETE === $action;
+        return true;
     }
 
     /**
@@ -53,15 +74,34 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
      */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        if (! $context->manager->isClientRestricted()) {
+        if ($object->getId() === $context->manager->getId()) {
             return;
         }
 
-        $allowedCustomerIs = $context->manager->getCustomersArray();
+        $coordinator = $this->coordinatorRepository->findByUser($context->manager);
 
-        // don't allow to delete a user that have customers that don't belong to auth user
-        if (! empty(array_diff($object->getCustomersArray(), $allowedCustomerIs))) {
-            throw new ClientRestrictionException();
+        if (null === $coordinator) {
+            return;
+        }
+
+        $lspUser = $this->lspUserRepository->findByUser($object);
+
+        if (null === $lspUser) {
+            throw new NoAccessToUserException($object);
+        }
+
+        if ($coordinator->isCoordinatorOf($lspUser->lsp)) {
+            return;
+        }
+
+        if (! $lspUser->lsp->isSubLspOf($coordinator->lsp)) {
+            throw new NoAccessToUserException($object);
+        }
+
+        try {
+            JobCoordinator::fromLspUser($lspUser);
+        } catch (CantCreateCoordinatorFromUserException) {
+            throw new NoAccessToUserException($object);
         }
     }
 }

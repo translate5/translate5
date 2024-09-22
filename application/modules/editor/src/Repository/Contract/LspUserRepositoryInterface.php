@@ -33,7 +33,6 @@ namespace MittagQI\Translate5\Repository\Contract;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\User\Model\User;
-use ZfExtended_Models_User;
 
 interface LspUserRepositoryInterface
 {

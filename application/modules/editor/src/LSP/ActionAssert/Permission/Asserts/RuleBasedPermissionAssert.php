@@ -48,7 +48,6 @@ abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
     }
 
     /**
-     * {@inheritDoc}
      * @throws NoAccessToLspException
      */
     final public function assertGranted(object $object, PermissionAssertContext $context): void

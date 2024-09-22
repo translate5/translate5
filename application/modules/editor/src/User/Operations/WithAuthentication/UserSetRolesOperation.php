@@ -30,11 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
-use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
@@ -49,11 +45,12 @@ use ZfExtended_AuthenticationInterface;
 /**
  * Ment to be used to initialize roles for a user.
  * So only on User creation or in special cases where the roles need to be reinitialized.
+ * @see UserCreateOperation
+ * @see UserUpdateOperation
  */
 final class UserSetRolesOperation implements UserSetRolesOperationInterface
 {
     public function __construct(
-        private readonly ActionPermissionAssertInterface $userPermissionAssert,
         private readonly UserSetRolesOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly ZfExtended_Acl $acl,
@@ -67,7 +64,6 @@ final class UserSetRolesOperation implements UserSetRolesOperationInterface
     public static function create(): self
     {
         return new self(
-            UserActionPermissionAssert::create(),
             \MittagQI\Translate5\User\Operations\UserSetRolesOperation::create(),
             ZfExtended_Authentication::getInstance(),
             ZfExtended_Acl::getInstance(),
@@ -85,12 +81,6 @@ final class UserSetRolesOperation implements UserSetRolesOperationInterface
     public function setRoles(User $user, array $roles): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
-
-        $this->userPermissionAssert->assertGranted(
-            Action::DELETE,
-            $user,
-            new PermissionAssertContext($authUser)
-        );
 
         foreach ($roles as $role) {
             if (! $this->hasAclPermissionToSetRole($authUser, $role)) {

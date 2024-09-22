@@ -43,6 +43,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 class LspUnassignCustomerOperationTest extends TestCase
 {
     private LspRepositoryInterface|MockObject $lspRepository;
+
     private EventDispatcherInterface|MockObject $eventDispatcher;
 
     private LspUnassignCustomerOperation $operation;

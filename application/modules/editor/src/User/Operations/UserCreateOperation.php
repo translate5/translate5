@@ -139,11 +139,11 @@ final class UserCreateOperation implements UserCreateOperationInterface
                 $lspUser = $this->lspUserCreate->createLspUser($lsp, $user);
             }
 
-            if (null !== $dto->parentId) {
-                $this->setParentIds->setParentIds($user, $dto->parentId);
-            }
+            $this->setParentIds->setParentIds($user, $dto->parentId);
 
             $this->assignCustomers->assignCustomers($user, $dto->customers);
+
+            $this->userRepository->save($user);
         } catch (Throwable $e) {
             if ($lspUser) {
                 $this->lspUserRepository->delete($lspUser);

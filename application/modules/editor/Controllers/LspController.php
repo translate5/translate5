@@ -28,11 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
-use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspCreateOperation;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspDeleteOperation;
@@ -40,7 +36,6 @@ use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspUpdateOperation;
 use MittagQI\Translate5\LSP\ViewDataProvider;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 
 class editor_LspController extends ZfExtended_RestController
 {
@@ -134,7 +129,7 @@ class editor_LspController extends ZfExtended_RestController
             LspUpdateOperation::create()->updateLsp(
                 $lsp,
                 $this->data['name'],
-                    $this->data['description'] ?? null
+                $this->data['description'] ?? null
             );
         } catch (PermissionExceptionInterface) {
             throw new ZfExtended_NoAccessException();
@@ -152,7 +147,7 @@ class editor_LspController extends ZfExtended_RestController
         $lsp = $lspRepository->get((int) $this->_getParam('id'));
 
         $name = $this->getRequest()->getData(true)['name'] ?? null;
-        if (!$name || $name !== $lsp->getName()) {
+        if (! $name || $name !== $lsp->getName()) {
             throw new ZfExtended_NoAccessException($this->getTranslator()->_('Falscher Name'));
         }
 

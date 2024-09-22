@@ -35,13 +35,12 @@ use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use PHPUnit\Framework\TestCase;
 
 class UserCustomerAssociationValidatorTest extends TestCase
 {
-
     public function testAssertCustomersMayBeAssociatedWithUserWithEmptyCustomers(): void
     {
         $lspUserRepository = $this->createMock(LspUserRepository::class);

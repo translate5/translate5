@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
-use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_ValidateException;
@@ -83,8 +83,7 @@ class UserSetPasswordOperationTest extends TestCase
     public function testSetPassword(): void
     {
         $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
-        $user = new class extends User
-        {
+        $user = new class() extends User {
             private int $count = 0;
 
             private int $countValidate = 0;

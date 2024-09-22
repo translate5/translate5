@@ -27,7 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\TaskService;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\ZfExtended\Acl\SystemResource;
 
 /**
@@ -60,22 +65,41 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
      */
     protected $task;
 
+    private UserActionPermissionAssert $permissionAssert;
+
+    private UserRepository $userRepository;
+
     public function init()
     {
         parent::init();
         $this->task = ZfExtended_Factory::get('editor_Models_Task');
         $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->task]);
+        $this->permissionAssert = UserActionPermissionAssert::create();
+        $this->userRepository = new UserRepository();
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::indexAction()
-     */
-    public function indexAction()
+    public function indexAction(): void
     {
         $rows = $this->entity->loadAllWithUserInfo();
-        $this->view->rows = $rows;
-        $this->view->total = $this->entity->getTotalCount();
+
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+        $context = new PermissionAssertContext($authUser);
+
+        foreach ($rows as $key => $row) {
+            $user = $this->userRepository->getByGuid($row['userGuid']);
+
+            try {
+                $this->permissionAssert->assertGranted(Action::READ, $user, $context);
+            } catch (PermissionExceptionInterface) {
+                unset($rows[$key]);
+
+                continue;
+            }
+        }
+
+        $this->view->rows = array_values($rows);
+        $this->view->total = count($rows);
+
         $this->applyEditableAndDeletable();
     }
 

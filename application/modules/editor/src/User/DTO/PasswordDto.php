@@ -32,7 +32,8 @@ namespace MittagQI\Translate5\User\DTO;
 
 class PasswordDto
 {
-    public function __construct(public readonly ?string $password)
-    {
+    public function __construct(
+        public readonly ?string $password
+    ) {
     }
 }

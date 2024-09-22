@@ -45,7 +45,9 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 class LspAssignCustomerOperationTest extends TestCase
 {
     private LspRepositoryInterface|MockObject $lspRepository;
+
     private LspCustomerAssociationValidator|MockObject $lspCustomerAssociationValidator;
+
     private EventDispatcherInterface|MockObject $eventDispatcher;
 
     private LspAssignCustomerOperation $operation;

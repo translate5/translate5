@@ -31,9 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\UserSetRolesOperation;
 use MittagQI\Translate5\User\Validation\RolesValidator;
-use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;

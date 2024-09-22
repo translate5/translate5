@@ -47,9 +47,6 @@ class ActionPermissionAssert implements ActionPermissionAssertInterface
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(Action $action, object $object, PermissionAssertContext $context): void
     {
         foreach ($this->asserts as $assert) {

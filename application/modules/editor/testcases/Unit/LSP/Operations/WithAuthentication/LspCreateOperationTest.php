@@ -30,9 +30,7 @@ declare(strict_types=1);
 
 namespace LSP\Operations\WithAuthentication;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\LSP\Contract\LspCreateOperationInterface;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;

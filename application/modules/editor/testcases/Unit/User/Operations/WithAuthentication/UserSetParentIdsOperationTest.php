@@ -30,13 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\Operations\WithAuthentication;
 
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
-use MittagQI\Translate5\User\Operations\WithAuthentication\UserSetParentIdsOperation;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\WithAuthentication\UserSetParentIdsOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
@@ -44,8 +41,6 @@ use ZfExtended_AuthenticationInterface;
 
 class UserSetParentIdsOperationTest extends TestCase
 {
-    private ActionPermissionAssertInterface|MockObject $userPermissionAssert;
-
     private ZfExtended_Acl|MockObject $acl;
 
     private UserSetParentIdsOperationInterface|MockObject $generalOperation;
@@ -58,33 +53,17 @@ class UserSetParentIdsOperationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userPermissionAssert = $this->createMock(ActionPermissionAssert::class);
         $this->acl = $this->createMock(ZfExtended_Acl::class);
         $this->generalOperation = $this->createMock(UserSetParentIdsOperationInterface::class);
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->operation = new UserSetParentIdsOperation(
-            $this->userPermissionAssert,
             $this->acl,
             $this->generalOperation,
             $this->authentication,
             $this->userRepository,
         );
-    }
-
-    public function testThrowsPermissionException(): void
-    {
-        $this->expectException(PermissionExceptionInterface::class);
-
-        $this->userPermissionAssert
-            ->expects(self::once())
-            ->method('assertGranted')
-            ->willThrowException($this->createMock(PermissionExceptionInterface::class));
-
-        $user = $this->createMock(\MittagQI\Translate5\User\Model\User::class);
-
-        $this->operation->setParentIds($user, 'guid');
     }
 
     public function emptyParentIdProvider(): array
@@ -100,8 +79,6 @@ class UserSetParentIdsOperationTest extends TestCase
      */
     public function testSetAuthUserOnEmptyParent(?string $parentId): void
     {
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
-
         $user = $this->createMock(User::class);
 
         $authUser = $this->createMock(User::class);
@@ -120,8 +97,6 @@ class UserSetParentIdsOperationTest extends TestCase
 
     public function testSetAuthUserWhenAuthUserNotAllowedToSeeAllUsers(): void
     {
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
-
         $user = $this->createMock(User::class);
 
         $authUser = $this->createMock(User::class);
@@ -142,8 +117,6 @@ class UserSetParentIdsOperationTest extends TestCase
 
     public function testSetAuthUserOnAclException(): void
     {
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
-
         $user = $this->createMock(User::class);
 
         $authUser = $this->createMock(User::class);
@@ -164,8 +137,6 @@ class UserSetParentIdsOperationTest extends TestCase
 
     public function testSetParentId(): void
     {
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
-
         $user = $this->createMock(User::class);
 
         $authUser = $this->createMock(User::class);

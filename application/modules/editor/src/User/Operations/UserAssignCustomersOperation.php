@@ -32,8 +32,8 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 
 final class UserAssignCustomersOperation implements UserAssignCustomersOperationInterface
 {

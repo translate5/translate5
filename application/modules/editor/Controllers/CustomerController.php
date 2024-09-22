@@ -93,7 +93,7 @@ class Editor_CustomerController extends ZfExtended_RestController
             }
         }
 
-        $this->view->rows = $rows;
+        $this->view->rows = array_values($rows);
         $this->view->total = count($rows);
     }
 

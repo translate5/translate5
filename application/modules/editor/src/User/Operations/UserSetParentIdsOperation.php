@@ -40,7 +40,6 @@ use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Validation\ParentUserValidator;
 use Zend_Acl_Exception;
 use ZfExtended_Models_Entity_NotFoundException;
-use ZfExtended_Models_User;
 use ZfExtended_ValidateException;
 
 /**

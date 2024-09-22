@@ -47,7 +47,6 @@ final class AssignedCustomerAssert implements PermissionAssertInterface
     }
 
     /**
-     * {@inheritDoc}
      * @throws NoAccessToCustomerException
      */
     public function assertGranted(object $object, PermissionAssertContext $context): void

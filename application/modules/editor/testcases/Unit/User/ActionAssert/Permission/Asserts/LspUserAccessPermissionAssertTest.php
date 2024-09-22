@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\LspUser;
@@ -40,8 +40,8 @@ use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
-use PHPUnit\Framework\MockObject\MockObject;
 use MittagQI\Translate5\User\Model\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class LspUserAccessPermissionAssertTest extends TestCase
@@ -222,9 +222,14 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
+            ['getId', [], '12'],
         ]);
         $user->method('getRoles')->willReturn([]);
 
+        $manager->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'manager-guid'],
+            ['getId', [], '14'],
+        ]);
         $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
 
         $coordinator = $this->createMock(JobCoordinator::class);
@@ -237,6 +242,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
         $this->expectException(NotAccessibleLspUserException::class);
+
         $this->assert->assertGranted($user, $context);
     }
 
@@ -329,9 +335,14 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
+            ['getId', [], '12'],
         ]);
         $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
 
+        $manager->method('__call')->willReturnMap([
+            ['getUserGuid', [], 'manager-guid'],
+            ['getId', [], '14'],
+        ]);
         $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
 
         $coordinatorLsp = $this->createMock(LanguageServiceProvider::class);

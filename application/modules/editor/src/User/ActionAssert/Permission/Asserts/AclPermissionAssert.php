@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\Model\User;

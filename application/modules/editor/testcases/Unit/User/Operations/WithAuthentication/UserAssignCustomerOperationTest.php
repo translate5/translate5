@@ -36,16 +36,14 @@ use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use MittagQI\Translate5\User\Operations\WithAuthentication\UserAssignCustomersOperation;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\WithAuthentication\UserAssignCustomersOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
 
 class UserAssignCustomerOperationTest extends TestCase
 {
-    private ActionPermissionAssertInterface|MockObject $userPermissionAssert;
-
     private UserAssignCustomersOperationInterface|MockObject $generalOperation;
 
     private ZfExtended_AuthenticationInterface|MockObject $authentication;
@@ -60,7 +58,6 @@ class UserAssignCustomerOperationTest extends TestCase
 
     public function setUp(): void
     {
-        $this->userPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
         $this->generalOperation = $this->createMock(UserAssignCustomersOperationInterface::class);
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
@@ -68,7 +65,6 @@ class UserAssignCustomerOperationTest extends TestCase
         $this->customerPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
 
         $this->operation = new UserAssignCustomersOperation(
-            $this->userPermissionAssert,
             $this->generalOperation,
             $this->authentication,
             $this->userRepository,
@@ -77,25 +73,9 @@ class UserAssignCustomerOperationTest extends TestCase
         );
     }
 
-    public function testThrowsPermissionException(): void
-    {
-        $this->expectException(PermissionExceptionInterface::class);
-
-        $this->userPermissionAssert
-            ->expects(self::once())
-            ->method('assertGranted')
-            ->willThrowException($this->createMock(PermissionExceptionInterface::class));
-
-        $user = $this->createMock(User::class);
-
-        $this->operation->assignCustomers($user, [1]);
-    }
-
     public function testThrowsExceptionOnNotAllowedCustomer(): void
     {
         $this->expectException(CustomerDoesNotBelongToUserException::class);
-
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
 
         $this->authentication->method('getUserId')->willReturn(1);
 
@@ -129,8 +109,6 @@ class UserAssignCustomerOperationTest extends TestCase
     public function testAssignCustomers(): void
     {
         $this->authentication->method('getUserId')->willReturn(1);
-
-        $this->userPermissionAssert->expects(self::once())->method('assertGranted');
 
         $authUser = $this->createMock(User::class);
         $authUser->method('isClientRestricted')->willReturn(false);
