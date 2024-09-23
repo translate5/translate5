@@ -39,6 +39,7 @@ use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\DTO\ParentIdDto;
 use MittagQI\Translate5\User\Operations\DTO\PasswordDto;
 use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
@@ -313,14 +314,14 @@ class UserUpdateOperationTest extends TestCase
             null,
             null,
             null,
-            parentId: 'parent-guid',
+            parentId: new ParentIdDto('parent-guid'),
         );
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::UPDATE, $user);
 
-        $this->setParentIds->expects(self::once())->method('setParentIds')->with($user, $dto->parentId);
+        $this->setParentIds->expects(self::once())->method('setParentIds')->with($user, $dto->parentId->identifier);
 
         $user->expects(self::once())->method('validate');
 

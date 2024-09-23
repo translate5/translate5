@@ -76,7 +76,6 @@ class UpdateUserDtoFactory
     }
 
     /**
-     * @param Request $request
      * @throws AttemptToSetLspForNonJobCoordinatorException
      * @throws CustomerDoesNotBelongToUserException
      * @throws PermissionExceptionInterface

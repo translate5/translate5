@@ -62,11 +62,7 @@ use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedException;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForLspUserException;
-use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\ZfExtended\Acl\SetAclRoleResource;
-use Zend_Acl_Exception;
-use ZfExtended_Acl;
 
 class ParentUserValidator
 {
@@ -149,7 +145,7 @@ class ParentUserValidator
             throw new InvalidParentUserProvidedForJobCoordinatorException();
         }
 
-        if (null === $parentCoordinator || !$parentCoordinator->isCoordinatorOf($childUserLsp)) {
+        if (null === $parentCoordinator || ! $parentCoordinator->isCoordinatorOf($childUserLsp)) {
             throw new InvalidParentUserProvidedForLspUserException();
         }
     }

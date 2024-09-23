@@ -30,10 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations\DTO;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
-use ZfExtended_Models_User;
-
 class CreateUserDto
 {
     /**
