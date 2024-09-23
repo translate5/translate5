@@ -161,5 +161,11 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.GridControlle
         this.setEditableCellHint(view, record, metaData);
 
         return Ext.String.htmlEncode(value);
+    },
+
+    descrCellRenderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
+        this.setEditableCellHint(view, record, metaData);
+        return Ext.String.htmlEncode(value).replace(/&lt;br\s*\/?&gt;/ig, '<br>');
     }
+
 });
