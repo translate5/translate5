@@ -43,8 +43,6 @@ VALUES
     ('editor', 'jobCoordinator', 'editor_task', 'editor_taskuserassoc'),
     ('editor', 'jobCoordinator', 'editor_task', 'userlist'),
     ('editor', 'jobCoordinator', 'editor_task', 'position'),
-    ('editor', 'jobCoordinator', 'editor_user', 'editor_taskuserassoc'),
-    ('editor', 'jobCoordinator', 'frontend', 'customerAdministration'),
     ('editor', 'jobCoordinator', 'frontend', 'editAllTasks'),
     ('editor', 'jobCoordinator', 'frontend', 'editorAddUser'),
     ('editor', 'jobCoordinator', 'frontend', 'editorChangeUserAssocTask'),
@@ -53,6 +51,12 @@ VALUES
     ('editor', 'jobCoordinator', 'frontend', 'editorEditUser'),
     ('editor', 'jobCoordinator', 'frontend', 'editorMenuProject'),
     ('editor', 'jobCoordinator', 'frontend', 'editorProjectTask'),
-    ('editor', 'jobCoordinator', 'frontend', 'loadAllTasks')
+    ('editor', 'jobCoordinator', 'frontend', 'loadAllTasks'),
+    ('editor', 'jobCoordinator', 'frontend', 'userAdministration'),
+    ('editor', 'jobCoordinator', 'editor_user', 'index'),
+    ('editor', 'jobCoordinator', 'editor_user', 'post'),
+    ('editor', 'jobCoordinator', 'editor_user', 'put'),
+    ('editor', 'jobCoordinator', 'editor_user', 'delete'),
+    ('editor', 'jobCoordinator', 'editor_user', 'get')
 ;
 

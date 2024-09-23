@@ -52,3 +52,5 @@ CREATE TABLE `LEK_language_service_provider_user` (
     UNIQUE (`userId`)
 );
 
+ALTER TABLE `LEK_taskUserAssoc` ADD `type` TINYINT DEFAULT 1 NOT NULL;
+

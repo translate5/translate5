@@ -84,14 +84,11 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
         $customers = $this->customerRepository->getList(...$associatedCustomerIds);
+        $context = new PermissionAssertContext($authUser);
 
         foreach ($customers as $customer) {
             try {
-                $this->customerPermissionAssert->assertGranted(
-                    Action::READ,
-                    $customer,
-                    new PermissionAssertContext($authUser)
-                );
+                $this->customerPermissionAssert->assertGranted(Action::READ, $customer, $context);
             } catch (PermissionExceptionInterface) {
                 throw new CustomerDoesNotBelongToUserException((int) $customer->getId(), $user->getUserGuid());
             }
