@@ -28,12 +28,12 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\DTO;
+namespace MittagQI\Translate5\User\Operations\DTO;
 
-class PasswordDto
+class ParentIdDto
 {
     public function __construct(
-        public readonly ?string $password
+        public readonly ?string $identifier,
     ) {
     }
 }

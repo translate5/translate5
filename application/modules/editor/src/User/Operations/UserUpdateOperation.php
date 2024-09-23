@@ -39,12 +39,12 @@ use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Contract\UserUpdateOperationInterface;
-use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
 use ZfExtended_ValidateException;
 
 final class UserUpdateOperation implements UserUpdateOperationInterface
@@ -72,22 +72,6 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
             UserSetRolesOperation::create(),
             UserSetPasswordOperation::create(),
             UserAssignCustomersOperation::create(),
-            ResetPasswordEmail::create(),
-        );
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function createWithAuthentication(): self
-    {
-        return new self(
-            new UserRepository(),
-            UserActionFeasibilityAssert::create(),
-            WithAuthentication\UserSetParentIdsOperation::create(),
-            WithAuthentication\UserSetRolesOperation::create(),
-            UserSetPasswordOperation::create(),
-            WithAuthentication\UserAssignCustomersOperation::create(),
             ResetPasswordEmail::create(),
         );
     }
@@ -136,7 +120,7 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
         }
 
         if (null !== $dto->parentId) {
-            $this->setParentIds->setParentIds($user, $dto->parentId);
+            $this->setParentIds->setParentIds($user, $dto->parentId->identifier);
         }
 
         if (null !== $dto->customers) {

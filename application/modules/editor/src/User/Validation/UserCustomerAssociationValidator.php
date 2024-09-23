@@ -30,9 +30,16 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Validation;
 
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
+use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Model\User;
 
 class UserCustomerAssociationValidator
@@ -40,6 +47,8 @@ class UserCustomerAssociationValidator
     public function __construct(
         private readonly LspUserRepository $lspUserRepository,
         private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
+        private readonly CustomerRepository $customerRepository,
+        private readonly ActionPermissionAssertInterface $customerPermissionAssert,
     ) {
     }
 
@@ -51,6 +60,8 @@ class UserCustomerAssociationValidator
         return new self(
             new LspUserRepository(),
             LspCustomerAssociationValidator::create(),
+            new CustomerRepository(),
+            CustomerActionPermissionAssert::create(),
         );
     }
 
@@ -63,6 +74,26 @@ class UserCustomerAssociationValidator
 
         if (null !== $lspUser) {
             $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($lspUser->lsp, ...$customerIds);
+        }
+    }
+
+    /**
+     * @param int[] $customerIds
+     */
+    public function assertUserCatAssignCustomers(User $authUser, array $customerIds): void
+    {
+        $context = new PermissionAssertContext($authUser);
+        $customers = $this->customerRepository->getList(...$customerIds);
+
+        foreach ($customers as $customer) {
+            try {
+                $this->customerPermissionAssert->assertGranted(Action::READ, $customer, $context);
+            } catch (PermissionExceptionInterface) {
+                throw new CustomerDoesNotBelongToUserException(
+                    (int) $customer->getId(),
+                    $context->manager->getUserGuid()
+                );
+            }
         }
     }
 }

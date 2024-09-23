@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\DTO;
+namespace MittagQI\Translate5\User\Operations\DTO;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
@@ -54,36 +54,5 @@ class CreateUserDto
         public readonly ?string $parentId = null,
         public readonly ?string $locale = null,
     ) {
-    }
-
-    public static function fromRequestData(string $guid, array $data): self
-    {
-        $roles = explode(',', trim($data['roles'] ?? '', ' ,'));
-
-        if (! in_array(Roles::JOB_COORDINATOR, $roles) && isset($data['lsp'])) {
-            throw new AttemptToSetLspForNonJobCoordinatorException();
-        }
-
-        $customers = array_filter(
-            array_map(
-                'intval',
-                explode(',', trim($data['customers'] ?? '', ' ,'))
-            )
-        );
-
-        return new self(
-            $guid,
-            $data['login'],
-            $data['email'],
-            $data['firstName'],
-            $data['surName'],
-            $data['gender'] ?? ZfExtended_Models_User::GENDER_NONE,
-            $roles,
-            $customers,
-            isset($data['lsp']) ? (int) $data['lsp'] : null,
-            isset($data['passwd']) ? trim($data['passwd']) : null,
-            $data['parentIds'] ?? null,
-            $data['locale'] ?? null,
-        );
     }
 }

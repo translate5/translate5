@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Contract;
 
-use MittagQI\Translate5\User\DTO\CreateUserDto;
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
 
 interface UserCreateOperationInterface
 {

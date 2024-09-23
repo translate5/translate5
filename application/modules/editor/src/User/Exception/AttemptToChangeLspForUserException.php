@@ -28,42 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Model;
+namespace MittagQI\Translate5\User\Exception;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
+use InvalidArgumentException;
 
-class User extends \ZfExtended_Models_User
+class AttemptToChangeLspForUserException extends InvalidArgumentException implements UserExceptionInterface
 {
-    public function isCoordinator(): bool
+    public function __construct(private int $userId)
     {
-        return in_array(Roles::JOB_COORDINATOR, $this->getRoles(), true);
-    }
-
-    public function isPm(): bool
-    {
-        return in_array(Roles::PM, $this->getRoles(), true);
-    }
-
-    public function isAdmin(): bool
-    {
-        return in_array(Roles::ADMIN, $this->getRoles(), true)
-            || in_array(Roles::SYSTEMADMIN, $this->getRoles(), true);
-    }
-
-    public function setInitialFields(CreateUserDto $dto): void
-    {
-        $this->setUserGuid($dto->guid);
-        $this->setLogin($dto->login);
-        $this->setEmail($dto->email);
-        $this->setFirstName($dto->firstName);
-        $this->setSurName($dto->surName);
-        $this->setGender($dto->gender);
-        $this->setLocale($dto->locale);
-    }
-
-    public function isClientRestricted(): bool
-    {
-        return Roles::isClientRestricted($this->getRoles());
+        parent::__construct("The LSP of the user with the ID $userId cannot be changed.");
     }
 }

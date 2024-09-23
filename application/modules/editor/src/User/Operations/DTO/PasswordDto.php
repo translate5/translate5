@@ -28,42 +28,12 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Model;
+namespace MittagQI\Translate5\User\Operations\DTO;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
-
-class User extends \ZfExtended_Models_User
+class PasswordDto
 {
-    public function isCoordinator(): bool
-    {
-        return in_array(Roles::JOB_COORDINATOR, $this->getRoles(), true);
-    }
-
-    public function isPm(): bool
-    {
-        return in_array(Roles::PM, $this->getRoles(), true);
-    }
-
-    public function isAdmin(): bool
-    {
-        return in_array(Roles::ADMIN, $this->getRoles(), true)
-            || in_array(Roles::SYSTEMADMIN, $this->getRoles(), true);
-    }
-
-    public function setInitialFields(CreateUserDto $dto): void
-    {
-        $this->setUserGuid($dto->guid);
-        $this->setLogin($dto->login);
-        $this->setEmail($dto->email);
-        $this->setFirstName($dto->firstName);
-        $this->setSurName($dto->surName);
-        $this->setGender($dto->gender);
-        $this->setLocale($dto->locale);
-    }
-
-    public function isClientRestricted(): bool
-    {
-        return Roles::isClientRestricted($this->getRoles());
+    public function __construct(
+        public readonly ?string $password
+    ) {
     }
 }

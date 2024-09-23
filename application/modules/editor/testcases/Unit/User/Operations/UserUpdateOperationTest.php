@@ -37,10 +37,10 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAsser
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
-use MittagQI\Translate5\User\DTO\PasswordDto;
-use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\DTO\PasswordDto;
+use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
 use MittagQI\Translate5\User\Operations\UserUpdateOperation;
 use PHPUnit\Framework\MockObject\MockObject;

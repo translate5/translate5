@@ -34,8 +34,12 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
+use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
 use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
+use MittagQI\ZfExtended\Acl\SetAclRoleResource;
+use Zend_Acl_Exception;
 use ZfExtended_Acl;
 
 class RolesValidator
@@ -57,9 +61,16 @@ class RolesValidator
     ) {
     }
 
+    public static function create(): self
+    {
+        return new self(
+            ZfExtended_Acl::getInstance(),
+        );
+    }
+
     /**
      * @throws ConflictingRolesExceptionInterface
-     * @throws \Zend_Acl_Exception
+     * @throws Zend_Acl_Exception
      */
     public function assertRolesDontConflict(array $roles): void
     {
@@ -97,6 +108,32 @@ class RolesValidator
                     );
                 }
             }
+        }
+    }
+
+    public function assertUserCanSetRoles(User $user, array $roles): void
+    {
+        foreach ($roles as $role) {
+            if (! $this->hasAclPermissionToSetRole($user, $role)) {
+                throw new UserIsNotAuthorisedToAssignRoleException($role);
+            }
+
+            if ($user->isAdmin()) {
+                continue;
+            }
+
+            if (! in_array($role, $user->getRoles(), true)) {
+                throw new UserIsNotAuthorisedToAssignRoleException($role);
+            }
+        }
+    }
+
+    private function hasAclPermissionToSetRole(User $authUser, string $role): bool
+    {
+        try {
+            return $this->acl->isInAllowedRoles($authUser->getRoles(), SetAclRoleResource::ID, $role);
+        } catch (Zend_Acl_Exception) {
+            return false;
         }
     }
 }

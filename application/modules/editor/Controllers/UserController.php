@@ -44,8 +44,6 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditabl
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
-use MittagQI\Translate5\User\DTO\CreateUserDto;
-use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
@@ -60,8 +58,12 @@ use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistin
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
+use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
+use MittagQI\Translate5\User\Operations\Factory\CreateUserDtoFactory;
+use MittagQI\Translate5\User\Operations\Factory\UpdateUserDtoFactory;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
-use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
+use MittagQI\Translate5\User\Operations\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
 use MittagQI\Translate5\User\Validation\ParentUserValidator;
@@ -201,25 +203,13 @@ class Editor_UserController extends ZfExtended_RestController
 
     public function putAction(): void
     {
-        $this->decodePutData();
-
-        if (! empty($this->getDataField('lsp'))) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'lsp' => [
-                        'Ein Wechsel des Sprachdienstleisters ist nicht zulässig.',
-                    ],
-                ],
-            );
-        }
-
         $user = $this->userRepository->get($this->getParam('id'));
 
         try {
+            $dto = UpdateUserDtoFactory::create()->fromRequest($this->getRequest());
             UserUpdateOperation::create()->updateUser(
                 $user,
-                UpdateUserDto::fromRequestData((array) $this->data),
+                $dto,
             );
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
@@ -303,20 +293,14 @@ class Editor_UserController extends ZfExtended_RestController
 
     public function postAction(): void
     {
-        $this->decodePutData();
-
         try {
-            $user = UserCreateOperation::create()->createUser(
-                CreateUserDto::fromRequestData(
-                    ZfExtended_Utils::guid(true),
-                    (array) $this->data
-                ),
-            );
+            $dto = CreateUserDtoFactory::create()->fromRequest($this->getRequest());
+            $user = UserCreateOperation::create()->createUser($dto);
 
             $this->view->rows = $user->getDataObject();
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             throw $this->transformException($e);
         }
 
@@ -354,7 +338,9 @@ class Editor_UserController extends ZfExtended_RestController
                 return;
             }
 
-            UserUpdatePasswordOperation::create()->updatePassword($auth->getUser(), $this->data->passwd);
+            $user = $this->userRepository->get($auth->getUserId());
+
+            UserUpdatePasswordOperation::create()->updatePassword($user, $this->data->passwd);
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
         }
@@ -397,7 +383,7 @@ class Editor_UserController extends ZfExtended_RestController
     /**
      * @throws Zend_Exception
      */
-    private function transformException(Exception $e): ZfExtended_ErrorCodeException|Exception
+    private function transformException(Throwable $e): ZfExtended_ErrorCodeException|Throwable
     {
         return match ($e::class) {
             RolesetHasConflictingRolesException::class => UnprocessableEntity::createResponse(

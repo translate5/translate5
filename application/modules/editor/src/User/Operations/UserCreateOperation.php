@@ -40,13 +40,13 @@ use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
-use MittagQI\Translate5\User\DTO\CreateUserDto;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
 use Throwable;
 use ZfExtended_ValidateException;
 
@@ -76,24 +76,6 @@ final class UserCreateOperation implements UserCreateOperationInterface
             UserSetRolesOperation::create(),
             UserSetPasswordOperation::create(),
             UserAssignCustomersOperation::create(),
-            LspUserCreateOperation::create(),
-            ResetPasswordEmail::create(),
-            LspRepository::create(),
-            new LspUserRepository(),
-        );
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function createWithAuthentication(): self
-    {
-        return new self(
-            new UserRepository(),
-            WithAuthentication\UserSetParentIdsOperation::create(),
-            WithAuthentication\UserSetRolesOperation::create(),
-            UserSetPasswordOperation::create(),
-            WithAuthentication\UserAssignCustomersOperation::create(),
             LspUserCreateOperation::create(),
             ResetPasswordEmail::create(),
             LspRepository::create(),

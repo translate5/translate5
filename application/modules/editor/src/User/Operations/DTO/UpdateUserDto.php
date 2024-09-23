@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\DTO;
+namespace MittagQI\Translate5\User\Operations\DTO;
 
 class UpdateUserDto
 {
@@ -45,36 +45,8 @@ class UpdateUserDto
         public readonly ?array $roles = null,
         public readonly ?array $customers = null,
         public readonly ?PasswordDto $password = null,
-        public readonly ?string $parentId = null,
+        public readonly ?ParentIdDto $parentId = null,
         public readonly ?string $locale = null,
     ) {
-    }
-
-    public static function fromRequestData(array $data): self
-    {
-        $roles = isset($data['roles']) ? explode(',', trim($data['roles'], ',')) : null;
-        $customers = isset($data['customers'])
-            ? array_filter(
-                array_map(
-                    'intval',
-                    explode(',', trim($data['customers'], ','))
-                )
-            )
-            : null;
-
-        return new self(
-            $data['login'] ?? null,
-            $data['email'] ?? null,
-            $data['firstName'] ?? null,
-            $data['surName'] ?? null,
-            $data['gender'] ?? null,
-            $roles,
-            $customers,
-            array_key_exists('passwd', $data)
-                ? new PasswordDto(null !== $data['passwd'] ? trim($data['passwd']) : null)
-                : null,
-            isset($data['parentIds']) ? (string) $data['parentIds'] : null,
-            $data['locale'] ?? null,
-        );
     }
 }

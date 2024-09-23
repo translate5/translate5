@@ -62,7 +62,11 @@ use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedException;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForLspUserException;
+use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\ZfExtended\Acl\SetAclRoleResource;
+use Zend_Acl_Exception;
+use ZfExtended_Acl;
 
 class ParentUserValidator
 {
@@ -121,7 +125,7 @@ class ParentUserValidator
     public function assertIsSuitableParentForLspUser(
         User $parentUser,
         bool $childUserIsCoordinator,
-        LanguageServiceProvider $childUserLsp
+        LanguageServiceProvider $childUserLsp,
     ): void {
         $parentCoordinator = $this->coordinatorRepository->findByUser($parentUser);
 

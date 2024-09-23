@@ -38,11 +38,11 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Contract\UserUpdateOperationInterface;
-use MittagQI\Translate5\User\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_ValidateException;
@@ -61,7 +61,7 @@ class UserUpdateOperation implements UserUpdateOperationInterface
     {
         return new self(
             UserActionPermissionAssert::create(),
-            \MittagQI\Translate5\User\Operations\UserUpdateOperation::createWithAuthentication(),
+            \MittagQI\Translate5\User\Operations\UserUpdateOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
         );
