@@ -229,7 +229,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
      */
     public function getBconfId(): int
     {
-        return $this->bconf->getId();
+        return (int) $this->bconf->getId();
     }
 
     /**
@@ -512,7 +512,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
         $existingFilters = [];
         $existingNames = [];
         $allFilters = [];
-        foreach ($bconfFilter->getRowsByBconfId($this->bconf->getId()) as $filterData) {
+        foreach ($bconfFilter->getRowsByBconfId((int) $this->bconf->getId()) as $filterData) {
             $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($filterData['okapiType'], $filterData['okapiId']);
             $existingFilters[$identifier] = $filterData['id'];
             $existingNames[] = $filterData['name'];
