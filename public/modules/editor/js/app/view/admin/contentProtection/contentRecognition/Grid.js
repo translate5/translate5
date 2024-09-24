@@ -178,7 +178,7 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.Grid', {
                         }
                     }
                 },
-                renderer: 'descrCellRenderer',
+                renderer: 'htmlEncRendererAllowBr',
                 flex: 2,
                 bind: {
                     text: '{l10n.general.description}'
