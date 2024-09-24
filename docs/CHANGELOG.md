@@ -15,6 +15,44 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.10.0] - 2024-09-19
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4173](https://jira.translate5.net/browse/TRANSLATE-4173): InstantTranslate - InstantTranslate: Move automatically triggered "manual translate" button on resource level** <br>
+manual translation button is now shown for each resource, if it's slow
+
+**[TRANSLATE-4149](https://jira.translate5.net/browse/TRANSLATE-4149): SpellCheck (LanguageTool integration), TermTagger integration - Segment processing may processes segments simultaneously** <br>
+FIX: Auto-QA processing may had bugs processing segments simultaneously and overwriting results
+
+**[TRANSLATE-4039](https://jira.translate5.net/browse/TRANSLATE-4039): InstantTranslate - Request assigned languageResources in InstantTranslate in the Frontend** <br>
+IMPROVEMENT: InstantTranslate requests the attached Resources individually from the Frontend to bring request-times down
+
+
+### Bugfixes
+**[TRANSLATE-4192](https://jira.translate5.net/browse/TRANSLATE-4192): Workflows - job status "autoclose" preselected when assigning users** <br>
+Fix default pre-selected job state.
+
+**[TRANSLATE-4180](https://jira.translate5.net/browse/TRANSLATE-4180): Installation & Update - Prevent default plugin activation for updates** <br>
+Since 7.8.0 default plugins were activated by default. This was also done on updates, so by purposes deactivated default plugins were reactivated automatically. This is fixed, so that default plug-ins are only activated on installations.
+
+**[TRANSLATE-4179](https://jira.translate5.net/browse/TRANSLATE-4179): Editor general - Fix html escaping in concordance search** <br>
+Remove unneeded html escaping in concordance search grid result
+
+**[TRANSLATE-4178](https://jira.translate5.net/browse/TRANSLATE-4178): Editor general - comments to a segment starting with < will be empty** <br>
+Fix saving segment comments containing special characters
+
+**[TRANSLATE-4174](https://jira.translate5.net/browse/TRANSLATE-4174): Editor general - Language resource name wrongly escaped in Match rate grid** <br>
+Fix Language resource name escaping in Match rate grid
+
+**[TRANSLATE-4056](https://jira.translate5.net/browse/TRANSLATE-4056): TermTagger integration - Delayed Workers: Improve Termtagging & Spellchecking to not stop when Containers are busy** <br>
+Enhancement: When a single Segment have a TermTagger error in the Import, a warning is reported to the task-events instead of an exception rendering the task erroneous
+
+
 ## [7.9.2] - 2024-09-05
 
 ### Important Notes:

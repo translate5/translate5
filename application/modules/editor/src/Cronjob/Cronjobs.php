@@ -128,6 +128,7 @@ class Cronjobs
         // Rotate php log
         Rotation::rotate('php.log');
         Rotation::rotate('worker.log');
+        Rotation::rotate('instanttranslate.log');
     }
 
     /**

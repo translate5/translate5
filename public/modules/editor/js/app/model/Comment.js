@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -37,28 +36,28 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Model
  */
 Ext.define('Editor.model.Comment', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'segmentId', type: 'int'},
-    {name: 'userName', type: 'string'},
-    {name: 'comment', type: 'string'},
-    {name: 'isEditable', type: 'boolean'},
-    {name: 'modified', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
-    {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'comment',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
-    },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'id', type: 'int'},
+        {name: 'segmentId', type: 'int'},
+        {name: 'userName', type: 'string'},
+        {name: 'comment', type: 'string'},
+        {name: 'isEditable', type: 'boolean'},
+        {name: 'modified', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+        {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
+    ],
+    idProperty: 'id',
+    proxy: {
+        type: 'rest',
+        url: Editor.data.restpath + 'comment',
+        reader: {
+            rootProperty: 'rows',
+            type: 'json',
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false,
+        }
     }
-  }
 });

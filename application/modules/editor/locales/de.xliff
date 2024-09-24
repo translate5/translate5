@@ -7450,15 +7450,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</source>
                 <target>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</target>
             </trans-unit>
-            <trans-unit id='PGI+S2VpbmUgRXJnZWJuaXNzZSBnZWZ1bmRlbjwvYj48YnIvPkbDvHIgSWhyZSBTdWNoZSBnaWJ0IGVzIGtlaW5lIEVpbnRyw6RnZSBpbiBkZXIgVGVybWlub2xvZ2llIHVuZCBkZW0gVHJhbnNsYXRpb24gTWVtb3J5IHVuZCBmw7xyIGRpZSBnZXfDpGhsdGUgU3ByYWNoa29tYmluYXRpb24gc3RlaHQga2VpbmUgbWFzY2hpbmVsbGUgw5xiZXJzZXR6dW5nIHp1ciBWZXJmw7xndW5nLg=='>
-                <source>
-                    <b>Keine Ergebnisse gefunden</b>
-                    <br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.
-                </source>
-                <target>
-                    <b>Keine Ergebnisse gefunden</b>
-                    <br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.
-                </target>
+            <trans-unit id='S2VpbmUgRXJnZWJuaXNzZSBnZWZ1bmRlbg=='>
+                <source>Keine Ergebnisse gefunden</source>
+                <target>Keine Ergebnisse gefunden</target>
             </trans-unit>
             <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='>
                 <source>Aufgabe verlassen</source>
@@ -9907,6 +9901,7 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>default_glossary_id</source>
                 <target>Standard-Glossar-ID</target>
             </trans-unit>
+<<<<<<< HEAD
             <trans-unit id='Sm9iQ29vcmRpbmF0b3I='>
                 <source>JobCoordinator</source>
                 <target>Job-Koordinator</target>
@@ -9970,6 +9965,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
             <trans-unit id='S3VuZGUgbmljaHQgYW5nZWdlYmVu'>
                 <source>Kunde nicht angegeben</source>
                 <target>Kunde nicht angegeben</target>
+            </trans-unit>
+            <trans-unit id='YXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='>
+                <source>automatisch abgeschlossen</source>
+                <target>automatisch abgeschlossen</target>
             </trans-unit>
         </body>
     </file>

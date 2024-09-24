@@ -43,6 +43,11 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
     protected $resourceClass = 'editor_Services_TermCollection_Resource';
 
     /**
+     * @inheritdoc
+     */
+    public $queryMode = 'batch';
+
+    /**
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
     public function isConfigured(): bool
