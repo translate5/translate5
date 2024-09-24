@@ -96,7 +96,7 @@ final class ParentPermissionAssert implements PermissionAssertInterface
 
         $lspUser = $this->lspUserRepository->findByUser($object);
 
-        if (null === $lspUser) {
+        if (null !== $lspUser) {
             return;
         }
 

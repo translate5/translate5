@@ -43,7 +43,7 @@ class CreateUserJobAssignmentOperation
     public static function create(): self
     {
         return new self(
-            $userJobRepository,
+            new UserJobRepository(),
         );
     }
 

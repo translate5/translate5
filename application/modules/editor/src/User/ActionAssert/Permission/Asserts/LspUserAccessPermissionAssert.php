@@ -78,11 +78,12 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         $manager = $context->manager;
-
+        dump('TYT');
         if ($manager->getId() === $object->getId()) {
+            dump('TYT');
             return;
         }
-
+        dump('TYT');
         $roles = $manager->getRoles();
 
         if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
@@ -90,7 +91,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
         }
 
         $lspUser = $this->lspUserRepository->findByUser($object);
-
+        dump('TYT');
         if (null === $lspUser) {
             return;
         }
@@ -104,7 +105,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
         }
 
         $managerCoordinator = $this->coordinatorRepository->findByUser($manager);
-
+dump('TYT');
         if (null === $managerCoordinator) {
             throw new NotAccessibleLspUserException($lspUser);
         }
