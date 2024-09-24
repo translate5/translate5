@@ -33,13 +33,10 @@ namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
-use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\Model\User;
 
 /**
@@ -53,6 +50,9 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         $lsUserRepository = new LspUserRepository();

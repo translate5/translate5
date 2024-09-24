@@ -33,7 +33,6 @@ namespace MittagQI\Translate5\LSP;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 
 class JobCoordinator extends LspUser
 {
