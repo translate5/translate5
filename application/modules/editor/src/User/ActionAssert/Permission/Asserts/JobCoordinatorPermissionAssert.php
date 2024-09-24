@@ -39,6 +39,7 @@ use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\Model\User;
 
 /**
@@ -68,8 +69,6 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
     }
 
     /**
-     * Restrict access by clients
-     *
      * {@inheritDoc}
      */
     public function assertGranted(object $object, PermissionAssertContext $context): void
@@ -90,17 +89,7 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
             throw new NoAccessToUserException($object);
         }
 
-        if ($coordinator->isCoordinatorOf($lspUser->lsp)) {
-            return;
-        }
-
-        if (! $lspUser->lsp->isSubLspOf($coordinator->lsp)) {
-            throw new NoAccessToUserException($object);
-        }
-
-        try {
-            JobCoordinator::fromLspUser($lspUser);
-        } catch (CantCreateCoordinatorFromUserException) {
+        if (! $coordinator->isSupervisorOf($lspUser)) {
             throw new NoAccessToUserException($object);
         }
     }

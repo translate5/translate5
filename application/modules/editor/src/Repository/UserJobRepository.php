@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,15 +28,32 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Exception;
+namespace MittagQI\Translate5\Repository;
 
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+use editor_Models_TaskUserAssoc;
+use ZfExtended_Factory;
 
-class NoAccessToLspException extends NoAccessException
+class UserJobRepository
 {
-    public function __construct(
-        public readonly int $lspId
-    ) {
-        parent::__construct('No access to LSP with ID ' . $lspId);
+    public function getEmptyModel(): editor_Models_TaskUserAssoc
+    {
+        return ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAssignedUserGuidsByTask(string $taskGuid): array
+    {
+        $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+
+        $tuas =$tua->loadByTaskGuidList([$taskGuid]);
+
+        return array_column($tuas, 'userGuid');
+    }
+
+    public function save(editor_Models_TaskUserAssoc $job): void
+    {
+        $job->save();
     }
 }

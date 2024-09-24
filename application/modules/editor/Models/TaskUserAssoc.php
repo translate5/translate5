@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\UserJob\TypeEnum;
 use MittagQI\ZfExtended\Logger\CustomFileLogger;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
@@ -85,6 +86,16 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
     protected $dbInstanceClass = 'editor_Models_Db_TaskUserAssoc';
 
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserAssoc';
+
+    public function setType(TypeEnum $type): void
+    {
+        $this->set('type', $type->value);
+    }
+
+    public function getType(): TypeEnum
+    {
+        return TypeEnum::from((int) $this->get('type'));
+    }
 
     /***
      * @param string $taskGuid

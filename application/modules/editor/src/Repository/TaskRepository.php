@@ -31,18 +31,38 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Task;
+use MittagQI\Translate5\Exception\InexistentTaskException;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class TaskRepository
 {
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws InexistentTaskException
      */
     public function get(int $id): editor_Models_Task
     {
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-        $task->load($id);
+        try {
+            $task = ZfExtended_Factory::get(editor_Models_Task::class);
+            $task->load($id);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new InexistentTaskException((string) $id);
+        }
+
+        return $task;
+    }
+
+    /**
+     * @throws InexistentTaskException
+     */
+    public function getByGuid(string $guid): editor_Models_Task
+    {
+        try {
+            $task = ZfExtended_Factory::get(editor_Models_Task::class);
+            $task->loadByTaskGuid($guid);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new InexistentTaskException($guid);
+        }
 
         return $task;
     }

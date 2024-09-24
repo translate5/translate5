@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\LSP;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 
 class JobCoordinator extends LspUser
 {
@@ -51,5 +52,20 @@ class JobCoordinator extends LspUser
     public function isCoordinatorOf(LanguageServiceProvider $lsp): bool
     {
         return $this->lsp->same($lsp);
+    }
+
+    public function isSupervisorOf(LspUser $lspUser): bool
+    {
+        if ($this->isCoordinatorOf($lspUser->lsp)) {
+            return true;
+        }
+
+        try {
+            $subjectCoordinator = self::fromLspUser($lspUser);
+        } catch (CantCreateCoordinatorFromUserException) {
+            return false;
+        }
+
+        return $subjectCoordinator->lsp->isSubLspOf($this->lsp);
     }
 }

@@ -28,82 +28,70 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
+namespace MittagQI\Translate5\Task\ActionAssert\Permission\Assert;
 
+use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
-use MittagQI\Translate5\User\Model\User;
-use MittagQI\ZfExtended\Acl\SystemResource;
-use ZfExtended_Acl;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
+use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
 
 /**
- * @implements PermissionAssertInterface<User>
+ * @implements PermissionAssertInterface<Task>
  */
-final class ParentPermissionAssert implements PermissionAssertInterface
+final class ReadJobCoordinatorPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
-        private readonly ZfExtended_Acl $acl,
-        private readonly ZfExtended_AuthenticationInterface $auth,
+        private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly UserJobRepository $userJobRepository,
     ) {
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public static function create(): self
     {
+        $lsUserRepository = new LspUserRepository();
+
         return new self(
-            ZfExtended_Acl::getInstance(),
-            ZfExtended_Authentication::getInstance(),
-            new LspUserRepository(),
+            JobCoordinatorRepository::create(lspUserRepository: $lsUserRepository),
+            $lsUserRepository,
+            new UserJobRepository(),
         );
     }
 
     public function supports(Action $action): bool
     {
-        return in_array($action, [Action::UPDATE, Action::DELETE, Action::READ], true);
+        return Action::READ === $action;
     }
 
     /**
-     * Restrict access if user is not same as the manager or a child of the manager
-     *
      * {@inheritDoc}
      */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        $manager = $context->manager;
+        $coordinator = $this->coordinatorRepository->findByUser($context->manager);
 
-        // if user is current user, also everything is OK
-        if ($manager->getUserGuid() === $object->getUserGuid()) {
+        if (null === $coordinator) {
             return;
         }
 
-        // Am I allowed to see all users:
-        if ($this->acl->isInAllowedRoles(
-            $this->auth->getUserRoles(),
-            SystemResource::ID,
-            SystemResource::SEE_ALL_USERS
-        )) {
-            return;
+        $coordinators = $this->coordinatorRepository->getByLSP($coordinator->lsp);
+        $coordinatorGuids = array_map(
+            fn (JobCoordinator $coordinator) => $coordinator->user->getUserGuid(),
+            $coordinators
+        );
+
+        $assignedUsers = $this->userJobRepository->getAssignedUserGuidsByTask($object->getTaskGuid());
+
+        if (empty(array_intersect($coordinatorGuids, $assignedUsers))) {
+            throw new NoAccessToTaskException($object);
         }
-
-        $lspUser = $this->lspUserRepository->findByUser($object);
-
-        if (null === $lspUser) {
-            return;
-        }
-
-        if ($object->hasParent($manager->getId())) {
-            return;
-        }
-
-        throw new NoAccessException();
     }
 }

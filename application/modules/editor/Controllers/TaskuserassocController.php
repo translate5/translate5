@@ -33,11 +33,14 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\TaskService;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\UserJob\Operation\CreateUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\Operation\Factory\NewUserJobDtoFactory;
 use MittagQI\ZfExtended\Acl\SystemResource;
 
 /**
  * Controller for the User Task Associations
- * Since PMs see all Task and Users, the indexAction has not to be constrained to show a subset of associations for security reasons
+ * Since PMs see all Task and Users, the indexAction has not to be constrained to show a subset of associations for
+ * security reasons
  */
 class Editor_TaskuserassocController extends ZfExtended_RestController
 {
@@ -81,7 +84,30 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     public function indexAction(): void
     {
         $rows = $this->entity->loadAllWithUserInfo();
+        $rows = $this->filterTuas($rows);
 
+        $this->view->rows = $rows;
+        $this->view->total = count($rows);
+
+        $this->applyEditableAndDeletable();
+    }
+
+    public function projectAction()
+    {
+        $projectId = $this->getParam('projectId');
+        $workflow = $this->getParam('workflow');
+        if (empty($projectId) || empty($workflow)) {
+            return;
+        }
+
+        $rows = $this->entity->loadProjectWithUserInfo($projectId, $workflow);
+        $rows = $this->filterTuas($rows);
+
+        $this->view->rows = $rows;
+    }
+
+    private function filterTuas(array $rows): array
+    {
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
         $context = new PermissionAssertContext($authUser);
 
@@ -97,20 +123,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             }
         }
 
-        $this->view->rows = array_values($rows);
-        $this->view->total = count($rows);
-
-        $this->applyEditableAndDeletable();
-    }
-
-    public function projectAction()
-    {
-        $projectId = $this->getParam('projectId');
-        $workflow = $this->getParam('workflow');
-        if (empty($projectId) || empty($workflow)) {
-            return;
-        }
-        $this->view->rows = $this->entity->loadProjectWithUserInfo($projectId, $workflow);
+        return array_values($rows);
     }
 
     public function postDispatch()
@@ -147,28 +160,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->setDefaultAssignmentDate();
         $this->setDefaultDeadlineDate();
 
-        $this->setLegacyDeadlineDate();
-
         $valid = parent::validate();
         //add the login hash AFTER validating, since we don't need any validation for it
         $this->entity->createstaticAuthHash();
 
         return $valid;
-    }
-
-    /**
-     * @deprecated TODO: 11.02.2020 remove this function after all customers adopt there api calls, remove also the task meta targetDeliveryDate!
-     */
-    protected function setLegacyDeadlineDate()
-    {
-        $meta = $this->task->meta();
-        if (! $meta->hasField('targetDeliveryDate')) {
-            return;
-        }
-        $tdd = $meta->getTargetDeliveryDate();
-        if (! empty($tdd) && empty($this->data->deadlineDate)) {
-            $this->entity->setDeadlineDate($tdd);
-        }
     }
 
     /**
@@ -340,16 +336,24 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
      */
     public function postAction()
     {
-        parent::postAction();
-        //if the validation was successful, log the request and apply additional data
-        if ($this->wasValid) {
-            $this->log->request();
-            $this->addUserInfoToResult();
-            $this->log->info('E1012', 'job created', [
-                'tua' => $this->entity->getSanitizedEntityForLog(),
+        try {
+            $dto = NewUserJobDtoFactory::create()->fromRequest($this->getRequest());
+            CreateUserJobAssignmentOperation::create()->assignJob($dto);
+        } catch (Throwable $e) {
+            $this->log->error('E1012', 'job creation failed', [
+                'error' => $e->getMessage(),
             ]);
-            $this->applyEditableAndDeletable();
+
+            throw $e;
         }
+
+        //if the validation was successful, log the request and apply additional data
+        $this->log->request();
+        $this->addUserInfoToResult();
+        $this->log->info('E1012', 'job created', [
+            'tua' => $this->entity->getSanitizedEntityForLog(),
+        ]);
+        $this->applyEditableAndDeletable();
     }
 
     public function deleteAction()
@@ -461,7 +465,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     /***
      * Set the assignmentDate with the curent time stamp.
-     * In different mysql versions the current_timestamp depends on mysql system variable (explicit_defaults_for_timestamp)
+     * In different mysql versions the current_timestamp depends on mysql system variable
+     * (explicit_defaults_for_timestamp)
      * https://dev.mysql.com/doc/refman/5.6/en/server-system-variables.html#sysvar_explicit_defaults_for_timestamp
      */
     protected function setDefaultAssignmentDate()

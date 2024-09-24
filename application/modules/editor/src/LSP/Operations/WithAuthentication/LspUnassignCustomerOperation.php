@@ -37,9 +37,9 @@ use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInt
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessToLspException;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Contract\LspUnassignCustomerOperationInterface;
-use MittagQI\Translate5\LSP\Exception\NoAccessToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\UserRepository;
 use ZfExtended_Authentication;

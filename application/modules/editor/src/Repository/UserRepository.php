@@ -29,6 +29,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use MittagQI\Translate5\Exception\InexistentUserException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Model\User;
@@ -41,29 +42,37 @@ use ZfExtended_Models_User;
 class UserRepository
 {
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws InexistentUserException
      */
     public function get(int $id): User
     {
-        $user = ZfExtended_Factory::get(User::class);
-        $user->load($id);
+        try {
+            $user = ZfExtended_Factory::get(User::class);
+            $user->load($id);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new InexistentUserException((string) $id);
+        }
 
         return $user;
     }
 
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws InexistentUserException
      */
     public function getByGuid(string $guid): User
     {
-        $user = ZfExtended_Factory::get(User::class);
-        $user->loadByGuid($guid);
+        try {
+            $user = ZfExtended_Factory::get(User::class);
+            $user->loadByGuid($guid);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new InexistentUserException($guid);
+        }
 
         return $user;
     }
 
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws InexistentUserException
      */
     public function resolveUser(string $identifier): User
     {

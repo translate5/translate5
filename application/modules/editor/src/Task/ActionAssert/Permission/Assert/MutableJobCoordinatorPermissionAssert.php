@@ -28,61 +28,48 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
+namespace MittagQI\Translate5\Task\ActionAssert\Permission\Assert;
 
-use MittagQI\Translate5\Acl\Roles;
+use editor_Models_Task as Task;
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessToLspException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
 
 /**
- * @implements PermissionAssertInterface<LanguageServiceProvider>
+ * @implements PermissionAssertInterface<Task>
  */
-abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
+final class MutableJobCoordinatorPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
-        private readonly JobCoordinatorRepository $jobCoordinatorRepository,
+        private readonly JobCoordinatorRepository $coordinatorRepository,
     ) {
     }
 
-    /**
-     * @throws NoAccessToLspException
-     */
-    final public function assertGranted(object $object, PermissionAssertContext $context): void
+    public static function create(): self
     {
-        if ($this->doesPermissionGranted($object, $context)) {
+        return new self(
+            JobCoordinatorRepository::create(),
+        );
+    }
+
+    public function supports(Action $action): bool
+    {
+        return $action->isMutable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function assertGranted(object $object, PermissionAssertContext $context): void
+    {
+        $coordinator = $this->coordinatorRepository->findByUser($context->manager);
+
+        if (null === $coordinator) {
             return;
         }
 
-        throw new NoAccessToLspException((int) $object->getId());
+        throw new NoAccessToTaskException($object);
     }
-
-    private function doesPermissionGranted(LanguageServiceProvider $lsp, PermissionAssertContext $context): bool
-    {
-        $roles = $context->manager->getRoles();
-
-        if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
-            return true;
-        }
-
-        if (in_array(Roles::PM, $roles)) {
-            return $lsp->isDirectLsp();
-        }
-
-        $coordinator = $this->jobCoordinatorRepository->findByUser($context->manager);
-
-        if (null === $coordinator) {
-            return false;
-        }
-
-        if ($coordinator->lsp->same($lsp)) {
-            return $this->coordinatorHasAccessToHisLsp();
-        }
-
-        return $lsp->isSubLspOf($coordinator->lsp);
-    }
-
-    abstract protected function coordinatorHasAccessToHisLsp(): bool;
 }

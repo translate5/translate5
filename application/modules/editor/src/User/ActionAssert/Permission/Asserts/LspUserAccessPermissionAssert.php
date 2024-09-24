@@ -78,6 +78,11 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         $manager = $context->manager;
+
+        if ($manager->getId() === $object->getId()) {
+            return;
+        }
+
         $roles = $manager->getRoles();
 
         if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
@@ -104,25 +109,9 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             throw new NotAccessibleLspUserException($lspUser);
         }
 
-        if ($manager->getId() === $object->getId()) {
-            return;
-        }
-
-        if ($managerCoordinator->isCoordinatorOf($lspUser->lsp)) {
-            return;
-        }
-
-        try {
-            $subjectCoordinator = JobCoordinator::fromLspUser($lspUser);
-        } catch (CantCreateCoordinatorFromUserException) {
+        if (! $managerCoordinator->isSupervisorOf($lspUser)) {
             throw new NotAccessibleLspUserException($lspUser);
         }
-
-        if ($subjectCoordinator->lsp->isSubLspOf($managerCoordinator->lsp)) {
-            return;
-        }
-
-        throw new NotAccessibleLspUserException($lspUser);
     }
 
     private function isGrantedForPm(LspUser $lspUser): bool

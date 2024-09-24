@@ -28,8 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\Operation;
+namespace MittagQI\Translate5\UserJob\Exception;
 
-class TaskUserAssocCreateOperation
+use InvalidArgumentException;
+
+class UserGuidNotProvidedException extends InvalidArgumentException
 {
 }
