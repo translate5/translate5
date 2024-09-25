@@ -31,6 +31,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_TaskUserAssoc;
+use MittagQI\Translate5\UserJob\TypeEnum;
+use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 
 class UserJobRepository
@@ -41,15 +43,30 @@ class UserJobRepository
     }
 
     /**
-     * @return string[]
+     * @return iterable<editor_Models_TaskUserAssoc>
      */
-    public function getAssignedUserGuidsByTask(string $taskGuid): array
+    public function getLspJobsByTask(string $taskGuid): iterable
     {
         $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
 
-        $tuas =$tua->loadByTaskGuidList([$taskGuid]);
+        $jobs = $tua->loadByTaskGuidList([$taskGuid]);
 
-        return array_column($tuas, 'userGuid');
+        foreach ($jobs as $job) {
+            if (TypeEnum::Coordinator === TypeEnum::from((int) $job['type'])) {
+                $tua->init(
+                    new Zend_Db_Table_Row(
+                        [
+                            'table' => $tua->db,
+                            'data' => $job,
+                            'stored' => true,
+                            'readOnly' => false,
+                        ]
+                    )
+                );
+
+                yield clone $tua;
+            }
+        }
     }
 
     public function save(editor_Models_TaskUserAssoc $job): void

@@ -34,14 +34,11 @@ use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
 
 /**
  * @implements PermissionAssertInterface<Task>
@@ -50,7 +47,6 @@ final class ReadJobCoordinatorPermissionAssert implements PermissionAssertInterf
 {
     public function __construct(
         private readonly JobCoordinatorRepository $coordinatorRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly UserJobRepository $userJobRepository,
     ) {
     }
@@ -61,7 +57,6 @@ final class ReadJobCoordinatorPermissionAssert implements PermissionAssertInterf
 
         return new self(
             JobCoordinatorRepository::create(lspUserRepository: $lsUserRepository),
-            $lsUserRepository,
             new UserJobRepository(),
         );
     }
@@ -88,10 +83,14 @@ final class ReadJobCoordinatorPermissionAssert implements PermissionAssertInterf
             $coordinators
         );
 
-        $assignedUsers = $this->userJobRepository->getAssignedUserGuidsByTask($object->getTaskGuid());
+        $lspJobs = $this->userJobRepository->getLspJobsByTask($object->getTaskGuid());
 
-        if (empty(array_intersect($coordinatorGuids, $assignedUsers))) {
-            throw new NoAccessToTaskException($object);
+        foreach ($lspJobs as $lspJob) {
+            if (in_array($lspJob->getUserGuid(), $coordinatorGuids, true)) {
+                return;
+            }
         }
+
+        throw new NoAccessToTaskException($object);
     }
 }
