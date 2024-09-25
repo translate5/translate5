@@ -33,6 +33,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
         'Editor.store.admin.LspStore',
         'Editor.view.admin.lsp.PanelViewController',
         'Editor.view.admin.lsp.EditWindow',
+        'Editor.view.admin.lsp.EditCustomersWindow',
     ],
 
     bind: {
@@ -55,7 +56,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     dataIndex: 'id',
                     bind: {
                         text: '{l10n.general.id}',
-                    }
+                    },
                 },
                 {
                     xtype: 'gridcolumn',
@@ -64,7 +65,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     bind: {
                         text: '{l10n.general.name}',
                     },
-                    renderer: v => Ext.String.htmlEncode(v),
+                    renderer: (v) => Ext.String.htmlEncode(v),
                 },
                 {
                     xtype: 'gridcolumn',
@@ -73,7 +74,7 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     bind: {
                         text: '{l10n.general.description}',
                     },
-                    renderer: v => Ext.String.htmlEncode(v),
+                    renderer: (v) => Ext.String.htmlEncode(v),
                 },
                 {
                     xtype: 'gridcolumn',
@@ -102,10 +103,10 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                                 tooltip: '{l10n.general.edit}',
                             },
                             glyph: 'f044@FontAwesome5FreeSolid',
-                            handler:'onEditClick',
-                            getClass: function(v, meta, rec) {
+                            handler: 'onEditClick',
+                            getClass: function (v, meta, rec) {
                                 return rec.get('canEdit') ? '' : 'x-hidden';
-                            }
+                            },
                         },
                         {
                             bind: {
@@ -113,13 +114,30 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                             },
                             glyph: 'f2ed@FontAwesome5FreeSolid',
                             handler: 'onDeleteClick',
-                            getClass: function(v, meta, rec) {
+                            getClass: function (v, meta, rec) {
                                 return rec.get('canDelete') ? '' : 'x-hidden';
-                            }
-                        }
+                            },
+                            margin: '0 0 0 10px',
+                        },
+                        {
+                            bind: {
+                                tooltip: '{l10n.lsp.editCustomers}',
+                            },
+                            glyph: 'xf1ad@FontAwesome5FreeSolid',
+                            handler: 'onEditCustomersClick',
+                            getClass: function (v, meta, rec) {
+                                return rec.get('canEdit') ? '' : 'x-hidden';
+                            },
+                            margin: '0 0 0 10px',
+                        },
                     ],
-                }
+                },
             ],
+            listeners: {
+                itemdblclick: function (table, record, row, column, event, button) {
+                    this.up().getController().onEditClick(table, row, column, button, event, record);
+                },
+            },
         },
     ],
 
@@ -152,8 +170,8 @@ Ext.define('Editor.view.admin.lsp.Panel', {
                     listeners: {
                         click: 'onCreateClick',
                     },
-                }
-            ]
-        }
-    ]
+                },
+            ],
+        },
+    ],
 });

@@ -29,7 +29,7 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.lspPanelView',
     routes: {
-        'lsp': 'onLspRoute',
+        lsp: 'onLspRoute',
     },
 
     editWindow: null,
@@ -51,7 +51,7 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
     },
 
     onCreateClick: function () {
-        const win = this.editWindow = Ext.widget('lspEditWindow', {editMode: true});
+        const win = (this.editWindow = Ext.widget('lspEditWindow', { editMode: true }));
         win.show();
     },
 
@@ -60,7 +60,7 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
             return;
         }
 
-        const win = this.editWindow = Ext.widget('lspEditWindow', {editMode: true});
+        const win = (this.editWindow = Ext.widget('lspEditWindow', { editMode: true }));
         win.show();
         win.loadRecord(record);
     },
@@ -83,7 +83,7 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
 
         Ext.Ajax.request({
             url: url,
-            params: {data: JSON.stringify(values)},
+            params: { data: JSON.stringify(values) },
             async: false,
             method: method,
             success: (xhr) => {
@@ -102,7 +102,7 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
                 this.editWindow.setLoading(false);
                 // TODO translation
                 Editor.MessageBox.getInstance().showDirectError('Error occurred while saving the LSP');
-            }
+            },
         });
     },
 
@@ -114,9 +114,70 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
         this._showDeletePrompt(record, null);
     },
 
+    onEditCustomersClick: function (table, row, column, button, event, record) {
+        if (!record.get('canEdit')) {
+            return;
+        }
+
+        const win = (this.editWindow = Ext.widget('lspEditCustomerWindow', { editMode: true }));
+        win.show();
+        win.loadRecord(record);
+    },
+
+    unassignCustomer: function (lsp, customer) {
+        const l10n = Editor.data.l10n.lsp;
+
+        Ext.Msg.confirm(
+            l10n.unassignCustomer,
+            Ext.String.format(l10n.confirmUnassignCustomer, customer.get('name'), lsp.get('name')),
+            (btn) => {
+                if (btn === 'no') {
+                    return;
+                }
+
+                Ext.Ajax.request({
+                    url: '/editor/lsp/' + lsp.get('id') + '/customer/' + customer.get('id'),
+                    method: 'DELETE',
+                    success: () => {
+                        lsp.load({
+                            callback: (record) => {
+                                Ext.ComponentQuery.query('lspEditCustomerWindow')[0].loadRecord(record);
+                            },
+                        });
+                    },
+                    failure: (response) => {
+                        Editor.app.getController('ServerException').handleException(response);
+                    },
+                });
+            },
+        );
+    },
+
+    assignCustomer: function (lsp, customer) {
+        Ext.Ajax.request({
+            url: '/editor/lsp/' + lsp.get('id') + '/customer/',
+            method: 'POST',
+            params: {
+                data: JSON.stringify({
+                    customer: customer.get('id'),
+                }),
+            },
+            success: () => {
+                lsp.load({
+                    callback: (record) => {
+                        Ext.ComponentQuery.query('lspEditCustomerWindow')[0].loadRecord(record);
+                    },
+                });
+            },
+            failure: (response) => {
+                Editor.app.getController('ServerException').handleException(response);
+            },
+        });
+    },
+
     _showDeletePrompt: function (record, value) {
         const l10n = Editor.data.l10n.lsp;
-        const text = Ext.String.format(l10n.confirmDeleteText, record.get('name')) + "<br><br>" + l10n.enterLspName;
+        const text = Ext.String.format(l10n.confirmDeleteText, record.get('name')) + '<br><br>' + l10n.enterLspName;
         const store = this.getView().down('gridpanel').getStore();
 
         Ext.Msg.prompt(
@@ -137,10 +198,12 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
                 Ext.Ajax.request({
                     url: '/editor/lsp/' + record.get('id'),
                     method: 'DELETE',
-                    params: {data: JSON.stringify({
-                        id: record.get('id'),
-                        name: value,
-                    })},
+                    params: {
+                        data: JSON.stringify({
+                            id: record.get('id'),
+                            name: value,
+                        }),
+                    },
                     success: () => {
                         Editor.MessageBox.addSuccess(Editor.data.l10n.general.entryHasBeenDeleted);
                         store.reload();
@@ -148,12 +211,12 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
                     failure: (response) => {
                         Editor.app.getController('ServerException').handleException(response);
                         store.reload();
-                    }
+                    },
                 });
             },
             this,
             false,
             value,
         );
-    }
+    },
 });

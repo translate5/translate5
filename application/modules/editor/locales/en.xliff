@@ -10147,6 +10147,26 @@ Synchronization always takes place in one direction: source data -> target
                 <source>automatisch abgeschlossen</source>
                 <target>auto-close</target>
             </trans-unit>
+            <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='>
+                <source>Kunden bearbeiten</source>
+                <target>Edit clients</target>
+            </trans-unit>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVu'>
+                <source>Zugewiesene Kunden</source>
+                <target>Assigned clients</target>
+            </trans-unit>
+            <trans-unit id='S3VuZGUgenV3ZWlzZW4='>
+                <source>Kunde zuweisen</source>
+                <target>Assign client</target>
+            </trans-unit>
+            <trans-unit id='WnV3ZWlzdW5nIGRlcyBLdW5kZW4gYXVmaGViZW4='>
+                <source>Zuweisung des Kunden aufheben</source>
+                <target>Unassign client</target>
+            </trans-unit>
+            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIHZvbiBLdW5kZSB7MH0genUgTFNQIHsxfSBhdWZoZWJlbiB3b2xsZW4/'>
+                <source>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen?</source>
+                <target>Are you sure you want to unassign customer {0} from LSP {1}</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -9969,6 +9969,26 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>automatisch abgeschlossen</source>
                 <target>automatisch abgeschlossen</target>
             </trans-unit>
+            <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='>
+                <source>Kunden bearbeiten</source>
+                <target>Kunden bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVu'>
+                <source>Zugewiesene Kunden</source>
+                <target>Zugewiesene Kunden</target>
+            </trans-unit>
+            <trans-unit id='S3VuZGUgenV3ZWlzZW4='>
+                <source>Kunde zuweisen</source>
+                <target>Kunde zuweisen</target>
+            </trans-unit>
+            <trans-unit id='WnV3ZWlzdW5nIGRlcyBLdW5kZW4gYXVmaGViZW4='>
+                <source>Zuweisung des Kunden aufheben</source>
+                <target>Zuweisung des Kunden aufheben</target>
+            </trans-unit>
+            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIHZvbiBLdW5kZSB7MH0genUgTFNQIHsxfSBhdWZoZWJlbiB3b2xsZW4/'>
+                <source>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen?</source>
+                <target>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen?</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

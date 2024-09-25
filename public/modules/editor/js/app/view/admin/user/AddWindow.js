@@ -325,10 +325,8 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             queryMode: 'local',
                                             displayField: 'name',
                                             valueField: 'id',
-                                            allowBlank: false,
                                             typeAhead: true,
                                             anyMatch: true,
-                                            forceSelection: true,
                                             selectOnFocus:true
                                         }
                                     ]
