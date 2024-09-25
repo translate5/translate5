@@ -160,12 +160,7 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.GridControlle
     editableCellRenderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
         this.setEditableCellHint(view, record, metaData);
 
-        return Ext.String.htmlEncode(value);
-    },
-
-    makeBrGreatAgain: function(value, metaData, record, rowIndex, colIndex, store, view) {
-        return this.editableCellRenderer(value, metaData, record, rowIndex, colIndex, store, view)
-            .replace(/&lt;br\s*\/?&gt;/ig, '<br>');
+        return Ext.String.htmlEncode(value).replace(/&lt;br\s*\/?&gt;/ig, '<br>');
     }
 
 });
