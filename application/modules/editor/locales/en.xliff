@@ -10075,7 +10075,6 @@ Synchronization always takes place in one direction: source data -> target
                 <source>default_glossary_id</source>
                 <target>Default Glossary id</target>
             </trans-unit>
-<<<<<<< HEAD
             <trans-unit id='Sm9iQ29vcmRpbmF0b3I='>
                 <source>JobCoordinator</source>
                 <target>Job Coordinator</target>

@@ -9901,7 +9901,6 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>default_glossary_id</source>
                 <target>Standard-Glossar-ID</target>
             </trans-unit>
-<<<<<<< HEAD
             <trans-unit id='Sm9iQ29vcmRpbmF0b3I='>
                 <source>JobCoordinator</source>
                 <target>Job-Koordinator</target>
