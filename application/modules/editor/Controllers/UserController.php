@@ -58,12 +58,10 @@ use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistin
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
-use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Operations\Factory\CreateUserDtoFactory;
 use MittagQI\Translate5\User\Operations\Factory\UpdateUserDtoFactory;
-use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use MittagQI\Translate5\User\Operations\UserCreateOperation;
+use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
 use MittagQI\Translate5\User\Validation\ParentUserValidator;
@@ -468,7 +466,7 @@ class Editor_UserController extends ZfExtended_RestController
                 ],
             ]),
             LspMustBeProvidedInJobCoordinatorCreationProcessException::class => UnprocessableEntity::createResponse(
-        'E2003',
+                'E2003',
                 [
                     'lsp' => [
                         'Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.',
@@ -525,7 +523,7 @@ class Editor_UserController extends ZfExtended_RestController
                 [
                     'parentIds' => [
                         'Der übergeordnete Benutzer des Job-Koordinators kann nur der PM, '
-                        .'Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein',
+                        . 'Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein',
                     ],
                 ],
             ),
@@ -534,7 +532,7 @@ class Editor_UserController extends ZfExtended_RestController
                 [
                     'parentIds' => [
                         'Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator '
-                        .'des eigenen Sprachdienstleisters (LSP) sein.',
+                        . 'des eigenen Sprachdienstleisters (LSP) sein.',
                     ],
                 ],
             ),
@@ -669,6 +667,7 @@ class Editor_UserController extends ZfExtended_RestController
                         $childIsJobCoordinator,
                         $childLsp
                     );
+
                     continue;
                 } catch (UserExceptionInterface) {
                 }

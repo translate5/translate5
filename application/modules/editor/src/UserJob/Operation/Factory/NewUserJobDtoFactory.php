@@ -94,7 +94,7 @@ class NewUserJobDtoFactory
         $state = $data['state'] ?? $workflow::STATE_WAITING;
 
         try {
-            $type = isset($data['type']) ? TypeEnum::from((int)$data['type']) : TypeEnum::Editor;
+            $type = isset($data['type']) ? TypeEnum::from((int) $data['type']) : TypeEnum::Editor;
         } catch (UnexpectedValueException) {
             throw new InvalidTypeProvidedException();
         }

@@ -66,9 +66,6 @@ final class ReadJobCoordinatorPermissionAssert implements PermissionAssertInterf
         return Action::READ === $action;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         $coordinator = $this->coordinatorRepository->findByUser($context->manager);

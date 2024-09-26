@@ -39,7 +39,6 @@ use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
