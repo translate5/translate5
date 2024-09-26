@@ -63,7 +63,7 @@ class JobCoordinatorRepository
         );
     }
 
-    public function findByUser(ZfExtended_Models_User $user): ?JobCoordinator
+    public function findByUser(User $user): ?JobCoordinator
     {
         try {
             return $this->getByUser($user);

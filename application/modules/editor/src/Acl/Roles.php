@@ -123,7 +123,7 @@ final class Roles
      */
     public static function getFrontendRoles(): array
     {
-        $allRoles = ZfExtended_Acl::getInstance()?->getAllRoles() ?? [];
+        $allRoles = ZfExtended_Acl::getInstance()->getAllRoles() ?: [];
         $frontendRoles = [];
 
         foreach (self::FRONTEND_ROLES as $role) {
@@ -180,7 +180,7 @@ final class Roles
         ];
     }
 
-    private static function getNotClientRestrictedRoles(): array
+    public static function getNotClientRestrictedRoles(): array
     {
         return array_diff(self::FRONTEND_ROLES, self::getClientRestrictedRoles());
     }

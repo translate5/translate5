@@ -73,4 +73,14 @@ class UserJobRepository
     {
         $job->save();
     }
+
+    /**
+     * @deprecated proxy to \editor_Models_TaskUserAssoc::loadAllWithUserInfo(), dangerous as it apply hidden filters
+     */
+    public function loadAllWithUserInfo(): array
+    {
+        $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+
+        return $tua->loadAllWithUserInfo();
+    }
 }

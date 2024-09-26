@@ -28,26 +28,30 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\ActionAssert\Permission;
+namespace MittagQI\Translate5\UserJob;
 
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\MutableJobCoordinatorPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\ReadJobCoordinatorPermissionAssert;
+use MittagQI\Translate5\Repository\UserJobRepository;
 
-/**
- * @extends ActionPermissionAssert<Task>
- */
-final class TaskActionPermissionAssert extends ActionPermissionAssert
+class ViewDataProvider
 {
+    public function __construct(
+        private readonly UserJobRepository $userJobRepository,
+    ) {
+    }
+
     /**
-     * @codeCoverageIgnore
+     * @deprecated Created for BC reasons, use ViewDataProvider::getListFor() instead
      */
-    public static function create(): self
+    public function getAll(): array
     {
-        return new self([
-            ReadJobCoordinatorPermissionAssert::create(),
-            MutableJobCoordinatorPermissionAssert::create(),
-        ]);
+        $jobs = $this->userJobRepository->loadAllWithUserInfo();
+
+        return $jobs;
+    }
+
+    public function getListFor(Task $task): array
+    {
+
     }
 }

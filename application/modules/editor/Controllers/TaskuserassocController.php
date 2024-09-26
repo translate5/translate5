@@ -30,7 +30,9 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
 use MittagQI\Translate5\Task\TaskService;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\UserJob\Operation\CreateUserJobAssignmentOperation;
@@ -68,17 +70,23 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
      */
     protected $task;
 
-    private UserActionPermissionAssert $permissionAssert;
+    private UserActionPermissionAssert $userPermissionAssert;
+
+    private TaskActionPermissionAssert $taskPermissionAssert;
 
     private UserRepository $userRepository;
+
+    private TaskRepository $taskRepository;
 
     public function init()
     {
         parent::init();
         $this->task = ZfExtended_Factory::get('editor_Models_Task');
         $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->task]);
-        $this->permissionAssert = UserActionPermissionAssert::create();
+        $this->userPermissionAssert = UserActionPermissionAssert::create();
+        $this->taskPermissionAssert = TaskActionPermissionAssert::create();
         $this->userRepository = new UserRepository();
+        $this->taskRepository = new TaskRepository();
     }
 
     public function indexAction(): void
@@ -111,15 +119,36 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
         $context = new PermissionAssertContext($authUser);
 
+        $taskGuids = [];
+        $userGuids = [];
+
         foreach ($rows as $key => $row) {
-            $user = $this->userRepository->getByGuid($row['userGuid']);
+            if (! isset($userGuids[$row['userGuid']])) {
+                $user = $this->userRepository->getByGuid($row['userGuid']);
 
-            try {
-                $this->permissionAssert->assertGranted(Action::READ, $user, $context);
-            } catch (PermissionExceptionInterface) {
+                try {
+                    $this->userPermissionAssert->assertGranted(Action::READ, $user, $context);
+
+                    $userGuids[$row['userGuid']] = true;
+                } catch (PermissionExceptionInterface) {
+                    $userGuids[$row['userGuid']] = false;
+                }
+            }
+
+            if (! isset($taskGuids[$row['taskGuid']])) {
+                $task = $this->taskRepository->getByGuid($row['taskGuid']);
+
+                try {
+                    $this->taskPermissionAssert->assertGranted(Action::READ, $task, $context);
+
+                    $taskGuids[$row['taskGuid']] = true;
+                } catch (PermissionExceptionInterface) {
+                    $taskGuids[$row['taskGuid']] = false;
+                }
+            }
+
+            if (! $userGuids[$row['userGuid']] || ! $taskGuids[$row['taskGuid']]) {
                 unset($rows[$key]);
-
-                continue;
             }
         }
 
