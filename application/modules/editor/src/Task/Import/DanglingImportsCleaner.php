@@ -100,7 +100,7 @@ class DanglingImportsCleaner
             try {
                 $worker->loadFirstOf($finalStepWorker, $task->getTaskGuid());
                 $worker->defuncRemainingOfGroup([$finalStepWorker], true, true);
-                $worker->wakeupScheduled();
+                $worker->wakeupScheduledAndDelayed();
 
                 WorkerTriggerFactory::create()->triggerWorker(
                     (string) $worker->getId(),
