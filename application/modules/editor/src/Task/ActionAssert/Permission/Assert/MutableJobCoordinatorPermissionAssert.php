@@ -59,9 +59,6 @@ final class MutableJobCoordinatorPermissionAssert implements PermissionAssertInt
         return $action->isMutable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         $coordinator = $this->coordinatorRepository->findByUser($context->manager);

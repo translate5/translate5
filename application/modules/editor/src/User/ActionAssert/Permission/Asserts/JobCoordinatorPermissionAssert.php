@@ -68,9 +68,6 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         if ($object->getId() === $context->manager->getId()) {
