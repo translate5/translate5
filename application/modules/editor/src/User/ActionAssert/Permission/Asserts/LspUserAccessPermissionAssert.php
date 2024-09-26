@@ -41,7 +41,7 @@ use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\Acl\Roles;
 
 /**
  * @implements PermissionAssertInterface<User>
@@ -95,7 +95,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        if (in_array(Roles::PM, $roles)) {
+        if (in_array(Roles::PM, $roles, true)) {
             if ($this->isGrantedForPm($lspUser)) {
                 return;
             }

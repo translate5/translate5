@@ -67,7 +67,7 @@ abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
             return true;
         }
 
-        if (in_array(Roles::PM, $roles)) {
+        if (in_array(Roles::PM, $roles, true)) {
             return $lsp->isDirectLsp();
         }
 

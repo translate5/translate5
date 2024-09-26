@@ -38,7 +38,7 @@ use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\Acl\Roles;
 use PHPUnit\Framework\TestCase;
 
 class RuleBasedMutatePermissionAssertTest extends TestCase

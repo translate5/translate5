@@ -101,7 +101,7 @@ class UpdateUserDtoFactory
 
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->userCustomerAssociationValidator->assertUserCatAssignCustomers($authUser, $customerIds);
+        $this->userCustomerAssociationValidator->assertUserCanAssignCustomers($authUser, $customerIds);
 
         $this->rolesValidator->assertUserCanSetRoles($authUser, $roles);
 

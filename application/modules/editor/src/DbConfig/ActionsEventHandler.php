@@ -56,7 +56,7 @@ use editor_Models_Customer_Customer;
 use editor_Models_Task;
 use editor_Segment_Quality_Manager;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\Acl\Roles;
 use Zend_Config;
 use Zend_Controller_Request_Abstract;
 use Zend_EventManager_Event;

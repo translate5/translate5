@@ -80,7 +80,7 @@ class UserCustomerAssociationValidator
     /**
      * @param int[] $customerIds
      */
-    public function assertUserCatAssignCustomers(User $authUser, array $customerIds): void
+    public function assertUserCanAssignCustomers(User $authUser, array $customerIds): void
     {
         $context = new PermissionAssertContext($authUser);
         $customers = $this->customerRepository->getList(...$customerIds);

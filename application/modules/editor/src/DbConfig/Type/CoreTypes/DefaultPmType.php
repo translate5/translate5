@@ -54,7 +54,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\DbConfig\Type\CoreTypes;
 
 use editor_Models_Config;
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\Acl\Roles;
 use ZfExtended_DbConfig_Type_CoreTypes;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;

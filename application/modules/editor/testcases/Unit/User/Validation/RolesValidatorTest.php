@@ -33,7 +33,6 @@ namespace MittagQI\Translate5\Test\Unit\User\Validation;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\User\Validation\RolesValidator;
-use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
@@ -60,10 +59,10 @@ class RolesValidatorTest extends TestCase
 
     public function conflictingRolesProvider(): iterable
     {
-        yield [[Roles::JOB_COORDINATOR, BaseRoles::ADMIN]];
-        yield [[Roles::JOB_COORDINATOR, BaseRoles::SYSTEMADMIN]];
-        yield [[Roles::JOB_COORDINATOR, BaseRoles::PM]];
-        yield [[Roles::JOB_COORDINATOR, BaseRoles::CLIENTPM]];
+        yield [[Roles::JOB_COORDINATOR, Roles::ADMIN]];
+        yield [[Roles::JOB_COORDINATOR, Roles::SYSTEMADMIN]];
+        yield [[Roles::JOB_COORDINATOR, Roles::PM]];
+        yield [[Roles::JOB_COORDINATOR, Roles::CLIENTPM]];
     }
 
     /**
@@ -92,7 +91,7 @@ class RolesValidatorTest extends TestCase
         $this->acl
             ->method('getRightsToRolesAndResource')
             ->with([$roleToBePopulated])
-            ->willReturn([Roles::JOB_COORDINATOR, BaseRoles::ADMIN]);
+            ->willReturn([Roles::JOB_COORDINATOR, Roles::ADMIN]);
 
         $this->validator->assertRolesDontConflict([Roles::JOB_COORDINATOR, $roleToBePopulated]);
     }

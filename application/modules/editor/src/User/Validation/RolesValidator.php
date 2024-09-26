@@ -37,7 +37,6 @@ use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
-use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
@@ -49,10 +48,10 @@ class RolesValidator
      */
     private array $conflictMap = [
         Roles::JOB_COORDINATOR => [
-            BaseRoles::ADMIN,
-            BaseRoles::SYSTEMADMIN,
-            BaseRoles::PM,
-            BaseRoles::CLIENTPM,
+            Roles::ADMIN,
+            Roles::SYSTEMADMIN,
+            Roles::PM,
+            Roles::CLIENTPM,
         ],
     ];
 

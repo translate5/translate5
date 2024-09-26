@@ -562,7 +562,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.roles', $roles);
 
         $clientPmSubRoles = [];
-        foreach (Roles::getClientPmSubroles() as $role) {
+        foreach (Roles::getClientPmSubRoles() as $role) {
             $clientPmSubRoles[] = [
                 $role,
                 $this->translate->_($role),

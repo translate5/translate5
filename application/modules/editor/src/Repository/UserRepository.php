@@ -33,7 +33,7 @@ use MittagQI\Translate5\Exception\InexistentUserException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\Acl\Roles;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -137,7 +137,7 @@ class UserRepository
 
             $roles = $userModel->getRoles();
 
-            if (in_array(Roles::PM, $roles)) {
+            if (in_array(Roles::PM, $roles, true)) {
                 yield clone $userModel;
 
                 continue;
