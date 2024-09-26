@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP\ActionAssert\Permission\Asserts;
 
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
@@ -38,7 +39,6 @@ use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\Acl\Roles;
 use PHPUnit\Framework\TestCase;
 
 class RuleBasedReadPermissionAssertTest extends TestCase
