@@ -48,6 +48,7 @@ class Editor_TmmaintenanceController extends ZfExtended_Controllers_Action
         );
         $this->view->assign([
             'csrfToken' => CsrfProtection::getInstance()->getToken(),
+            'userLogin' => ZfExtended_Authentication::getInstance()->getLogin(),
         ]);
 
         echo $this->view->render('index.php');
