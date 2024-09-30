@@ -58,21 +58,19 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
         },
         userAssoc:{
             model:'Editor.model.admin.TaskUserAssoc',
-            remoteFilter: true,
+            remoteFilter: false,
             pageSize: false,
-            setFilters:function(filters){
-                //the binding is also triggered when the value is empty. Ignore the filtering with empty value
-                if(filters && !filters.value){
-                    this.loadData([],false);
-                    return;
+            autoLoad: true,
+            listeners: {
+                beforeload: function (store, operation) {
+                    // const taskId = this.currentTask.get('id'); // Get the bound taskGuid
+                    // if (taskId) {
+                    //     // Update the proxy URL dynamically
+                    //     store.getProxy().setUrl(Editor.data.restpath + 'task/' + taskId + '/job');
+                    // }
                 }
-                this.superclass.superclass.setFilters.apply(this, [filters]);
             },
-            filters:{
-                property: 'taskGuid',
-                operator:"eq",
-                value:'{projectTaskSelection.taskGuid}'
-            }
+            currentTask: '{currentTask}',
         }
     },
     formulas: {

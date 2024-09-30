@@ -45,7 +45,7 @@ use ZfExtended_AuthenticationInterface;
 /**
  * @implements PermissionAssertInterface<User>
  */
-final class ParentPermissionAssert implements PermissionAssertInterface
+final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly ZfExtended_Acl $acl,
@@ -97,10 +97,6 @@ final class ParentPermissionAssert implements PermissionAssertInterface
         $lspUser = $this->lspUserRepository->findByUser($object);
 
         if (null !== $lspUser) {
-            return;
-        }
-
-        if ($object->hasParent($manager->getId())) {
             return;
         }
 

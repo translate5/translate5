@@ -36,16 +36,11 @@ use MittagQI\Translate5\User\Exception\AttemptToChangeLspForUserException;
 use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
-use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\Operations\DTO\ParentIdDto;
 use MittagQI\Translate5\User\Operations\DTO\PasswordDto;
 use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Validation\RolesValidator;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
-use MittagQI\ZfExtended\Acl\SystemResource;
 use REST_Controller_Request_Http as Request;
-use Zend_Acl_Exception;
-use ZfExtended_Acl;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User;
@@ -55,7 +50,6 @@ class UpdateUserDtoFactory
     public function __construct(
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
-        private readonly ZfExtended_Acl $acl,
         private readonly RolesValidator $rolesValidator,
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
     ) {
@@ -69,7 +63,6 @@ class UpdateUserDtoFactory
         return new self(
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
-            ZfExtended_Acl::getInstance(),
             RolesValidator::create(),
             UserCustomerAssociationValidator::create(),
         );
@@ -105,10 +98,6 @@ class UpdateUserDtoFactory
 
         $this->rolesValidator->assertUserCanSetRoles($authUser, $roles);
 
-        $parentId = $this->resolveParentUserId($data['parentIds'] ?? null, $authUser);
-
-        $parentIdDto = $parentId ? new ParentIdDto($parentId) : null;
-
         return new UpdateUserDto(
             $data['login'],
             $data['email'],
@@ -120,30 +109,7 @@ class UpdateUserDtoFactory
             array_key_exists('passwd', $data)
                 ? new PasswordDto(null !== $data['passwd'] ? trim($data['passwd']) : null)
                 : null,
-            $parentIdDto,
             $data['locale'] ?? null,
         );
-    }
-
-    private function resolveParentUserId(?string $parentId, User $authUser): ?string
-    {
-        if ($this->canSeeAllUsers($authUser)) {
-            return $parentId;
-        }
-
-        return null;
-    }
-
-    private function canSeeAllUsers(User $authUser): bool
-    {
-        try {
-            return $this->acl->isInAllowedRoles(
-                $authUser->getRoles(),
-                SystemResource::ID,
-                SystemResource::SEE_ALL_USERS
-            );
-        } catch (Zend_Acl_Exception) {
-            return false;
-        }
     }
 }

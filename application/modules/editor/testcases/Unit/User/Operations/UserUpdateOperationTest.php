@@ -35,11 +35,9 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\Operations\DTO\ParentIdDto;
 use MittagQI\Translate5\User\Operations\DTO\PasswordDto;
 use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
 use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
@@ -53,8 +51,6 @@ class UserUpdateOperationTest extends TestCase
     private UserRepository|MockObject $userRepository;
 
     private UserActionFeasibilityAssertInterface|MockObject $userActionFeasibilityChecker;
-
-    private UserSetParentIdsOperationInterface|MockObject $setParentIds;
 
     private UserSetRolesOperationInterface|MockObject $setRoles;
 
@@ -70,7 +66,6 @@ class UserUpdateOperationTest extends TestCase
     {
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->userActionFeasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
-        $this->setParentIds = $this->createMock(UserSetParentIdsOperationInterface::class);
         $this->setRoles = $this->createMock(UserSetRolesOperationInterface::class);
         $this->setPassword = $this->createMock(UserSetPasswordOperation::class);
         $this->assignCustomers = $this->createMock(UserAssignCustomersOperationInterface::class);
@@ -79,7 +74,6 @@ class UserUpdateOperationTest extends TestCase
         $this->operation = new UserUpdateOperation(
             $this->userRepository,
             $this->userActionFeasibilityChecker,
-            $this->setParentIds,
             $this->setRoles,
             $this->setPassword,
             $this->assignCustomers,
@@ -297,31 +291,6 @@ class UserUpdateOperationTest extends TestCase
             ->with(Action::UPDATE, $user);
 
         $this->setRoles->expects(self::once())->method('setRoles')->with($user, $dto->roles);
-
-        $user->expects(self::once())->method('validate');
-
-        $this->userRepository->expects(self::once())->method('save')->with($user);
-
-        $this->operation->updateUser($user, $dto);
-    }
-
-    public function testUpdateParentIds(): void
-    {
-        $user = $this->createMock(User::class);
-        $dto = new UpdateUserDto(
-            null,
-            null,
-            null,
-            null,
-            null,
-            parentId: new ParentIdDto('parent-guid'),
-        );
-
-        $this->userActionFeasibilityChecker->expects(self::once())
-            ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
-
-        $this->setParentIds->expects(self::once())->method('setParentIds')->with($user, $dto->parentId->identifier);
 
         $user->expects(self::once())->method('validate');
 

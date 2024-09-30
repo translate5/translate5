@@ -35,7 +35,7 @@ use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\AclPermissionAssert
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\JobCoordinatorPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ParentPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\SeeAllUsersPermissionAssert;
 use MittagQI\Translate5\User\Model\User;
 
 /**
@@ -49,7 +49,7 @@ final class UserActionPermissionAssert extends ActionPermissionAssert
     public static function create(): self
     {
         return new self([
-            ParentPermissionAssert::create(),
+            SeeAllUsersPermissionAssert::create(),
             new ClientRestrictedPermissionAssert(),
             LspUserAccessPermissionAssert::create(),
             new AclPermissionAssert(),

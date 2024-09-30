@@ -31,10 +31,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\ActionAssert\Permission;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 
@@ -54,7 +54,7 @@ class UserActionPermissionAssertTest extends TestCase
         $permissionAuditorMock2->expects($this->once())->method('supports')->willReturn(false);
         $permissionAuditorMock2->expects($this->never())->method('assertGranted');
 
-        $auditor = new ActionPermissionAssert([$permissionAuditorMock1, $permissionAuditorMock2]);
+        $auditor = new UserActionPermissionAssert([$permissionAuditorMock1, $permissionAuditorMock2]);
         $auditor->assertGranted(Action::DELETE, $user, $context);
     }
 
@@ -71,7 +71,7 @@ class UserActionPermissionAssertTest extends TestCase
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
         $permissionAuditorMock->expects($this->once())->method('supports')->willReturn(true);
 
-        $auditor = new ActionPermissionAssert([$permissionAuditorMock]);
+        $auditor = new UserActionPermissionAssert([$permissionAuditorMock]);
 
         $this->expectException(PermissionExceptionInterface::class);
         $auditor->assertGranted(Action::DELETE, $user, $context);

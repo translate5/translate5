@@ -38,7 +38,6 @@ use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
@@ -52,8 +51,6 @@ use PHPUnit\Framework\TestCase;
 class UserCreateOperationTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
-
-    private UserSetParentIdsOperationInterface|MockObject $setParentIds;
 
     private UserSetRolesOperationInterface|MockObject $setRoles;
 
@@ -74,7 +71,6 @@ class UserCreateOperationTest extends TestCase
     public function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->setParentIds = $this->createMock(UserSetParentIdsOperationInterface::class);
         $this->setRoles = $this->createMock(UserSetRolesOperationInterface::class);
         $this->setPassword = $this->createMock(UserSetPasswordOperation::class);
         $this->assignCustomers = $this->createMock(UserAssignCustomersOperationInterface::class);
@@ -85,7 +81,6 @@ class UserCreateOperationTest extends TestCase
 
         $this->operation = new UserCreateOperation(
             $this->userRepository,
-            $this->setParentIds,
             $this->setRoles,
             $this->setPassword,
             $this->assignCustomers,
@@ -137,7 +132,6 @@ class UserCreateOperationTest extends TestCase
             [1, 2, 3],
             1,
             'password',
-            'parent-guid',
             'en',
         );
 
@@ -162,8 +156,6 @@ class UserCreateOperationTest extends TestCase
             ->with($lsp, $user)
             ->willReturn($this->createMock(LspUser::class));
 
-        $this->setParentIds->expects(self::once())->method('setParentIds')->with($user, $dto->parentId);
-
         $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $dto->customers);
 
         $this->resetPasswordEmail->expects(self::never())->method('sendTo');
@@ -184,7 +176,6 @@ class UserCreateOperationTest extends TestCase
             [1, 2, 3],
             1,
             'password',
-            'parent-guid',
             'en',
         );
 
@@ -192,6 +183,8 @@ class UserCreateOperationTest extends TestCase
         $user->expects(self::once())->method('setInitialFields');
         $user->method('isCoordinator')->willReturn(false);
         $user->expects(self::once())->method('validate');
+
+        $this->setPassword->expects(self::once())->method('setPassword')->with($user, $dto->password);
 
         $this->userRepository->method('getEmptyModel')->willReturn($user);
 
@@ -208,8 +201,6 @@ class UserCreateOperationTest extends TestCase
             ->method('createLspUser')
             ->with($lsp, $user)
             ->willReturn($this->createMock(LspUser::class));
-
-        $this->setParentIds->expects(self::once())->method('setParentIds')->with($user, $dto->parentId);
 
         $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $dto->customers);
 
@@ -231,7 +222,6 @@ class UserCreateOperationTest extends TestCase
             [1, 2, 3],
             null,
             'password',
-            'parent-guid',
             'en',
         );
 
@@ -239,6 +229,8 @@ class UserCreateOperationTest extends TestCase
         $user->expects(self::once())->method('setInitialFields');
         $user->method('isCoordinator')->willReturn(false);
         $user->expects(self::once())->method('validate');
+
+        $this->setPassword->expects(self::once())->method('setPassword')->with($user, $dto->password);
 
         $this->userRepository->method('getEmptyModel')->willReturn($user);
 
@@ -249,8 +241,6 @@ class UserCreateOperationTest extends TestCase
         $this->userRepository->expects(self::exactly(2))->method('save')->with($user);
 
         $this->lspUserCreate->expects(self::never())->method('createLspUser');
-
-        $this->setParentIds->expects(self::once())->method('setParentIds')->with($user, $dto->parentId);
 
         $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $dto->customers);
 
@@ -273,13 +263,14 @@ class UserCreateOperationTest extends TestCase
             null,
             null,
             null,
-            null,
         );
 
         $user = $this->createMock(User::class);
         $user->expects(self::once())->method('setInitialFields');
         $user->method('isCoordinator')->willReturn(false);
         $user->expects(self::once())->method('validate');
+
+        $this->setPassword->expects(self::never())->method('setPassword');
 
         $this->userRepository->method('getEmptyModel')->willReturn($user);
 
@@ -290,8 +281,6 @@ class UserCreateOperationTest extends TestCase
         $this->userRepository->expects(self::exactly(2))->method('save')->with($user);
 
         $this->lspUserCreate->expects(self::never())->method('createLspUser');
-
-        $this->setParentIds->expects(self::once())->method('setParentIds');
 
         $this->assignCustomers->expects(self::once())->method('assignCustomers');
 
@@ -313,7 +302,6 @@ class UserCreateOperationTest extends TestCase
             [1, 2, 3],
             1,
             'password',
-            'parent-guid',
             'en',
         );
 
@@ -321,6 +309,8 @@ class UserCreateOperationTest extends TestCase
         $user->expects(self::once())->method('setInitialFields');
         $user->method('isCoordinator')->willReturn(false);
         $user->expects(self::once())->method('validate');
+
+        $this->setPassword->expects(self::once())->method('setPassword')->with($user, $dto->password);
 
         $this->userRepository->method('getEmptyModel')->willReturn($user);
 
@@ -342,8 +332,6 @@ class UserCreateOperationTest extends TestCase
             ->willReturn($lspUser);
 
         $this->lspUserRepository->expects(self::once())->method('delete')->with($lspUser);
-
-        $this->setParentIds->expects(self::once())->method('setParentIds')->with($user, $dto->parentId);
 
         $this->assignCustomers
             ->expects(self::once())

@@ -45,7 +45,6 @@ class UpdateUserDto
         public readonly ?array $roles = null,
         public readonly ?array $customers = null,
         public readonly ?PasswordDto $password = null,
-        public readonly ?ParentIdDto $parentId = null,
         public readonly ?string $locale = null,
     ) {
     }

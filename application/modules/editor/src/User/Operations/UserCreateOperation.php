@@ -38,7 +38,6 @@ use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
-use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
@@ -54,7 +53,6 @@ final class UserCreateOperation implements UserCreateOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly UserSetParentIdsOperationInterface $setParentIds,
         private readonly UserSetRolesOperationInterface $setRoles,
         private readonly UserSetPasswordOperation $setPassword,
         private readonly UserAssignCustomersOperationInterface $assignCustomers,
@@ -72,7 +70,6 @@ final class UserCreateOperation implements UserCreateOperationInterface
     {
         return new self(
             new UserRepository(),
-            UserSetParentIdsOperation::create(),
             UserSetRolesOperation::create(),
             UserSetPasswordOperation::create(),
             UserAssignCustomersOperation::create(),
@@ -120,8 +117,6 @@ final class UserCreateOperation implements UserCreateOperationInterface
             if (null !== $lsp) {
                 $lspUser = $this->lspUserCreate->createLspUser($lsp, $user);
             }
-
-            $this->setParentIds->setParentIds($user, $dto->parentId);
 
             $this->assignCustomers->assignCustomers($user, $dto->customers);
 

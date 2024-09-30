@@ -26,7 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
@@ -34,13 +33,11 @@ use MittagQI\Translate5\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
@@ -55,7 +52,6 @@ use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserEx
 use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
-use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\Factory\CreateUserDtoFactory;
@@ -64,7 +60,6 @@ use MittagQI\Translate5\User\Operations\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
-use MittagQI\Translate5\User\Validation\ParentUserValidator;
 use MittagQI\ZfExtended\Acl\SystemResource;
 use ZfExtended_UnprocessableEntity as UnprocessableEntity;
 
@@ -232,64 +227,8 @@ class Editor_UserController extends ZfExtended_RestController
 
         try {
             UserDeleteOperation::create()->delete($user);
-        } catch (PmInTaskException $e) {
-            throw ZfExtended_Models_Entity_Conflict::createResponse(
-                'E1048',
-                [
-                    'Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.',
-                ],
-                [
-                    'tasks' => implode(', ', $e->taskGuids),
-                    'user' => $this->entity->getUserGuid(),
-                    'userLogin' => $this->entity->getLogin(),
-                    'userEmail' => $this->entity->getEmail(),
-                ]
-            );
-        } catch (LastCoordinatorException $e) {
-            throw ZfExtended_Models_Entity_Conflict::createResponse(
-                'E1626',
-                [
-                    'Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".',
-                ],
-                [
-                    'lsp' => $e->coordinator->lsp->getName(),
-                    'lspId' => $e->coordinator->lsp->getId(),
-                    'user' => $this->entity->getUserGuid(),
-                    'userLogin' => $this->entity->getLogin(),
-                    'userEmail' => $this->entity->getEmail(),
-                ]
-            );
-        } catch (NotAccessibleLspUserException $e) {
-            throw ZfExtended_Models_Entity_Conflict::createResponse(
-                'E1627',
-                [
-                    'Versuch, einen nicht erreichbaren Benutzer zu manipulieren.',
-                ],
-                [
-                    'lspUser' => $e->lspUser->guid,
-                    'lsp' => $e->lspUser->lsp->getName(),
-                    'lspId' => $e->lspUser->lsp->getId(),
-                    'user' => $this->entity->getUserGuid(),
-                    'userLogin' => $this->entity->getLogin(),
-                    'userEmail' => $this->entity->getEmail(),
-                ]
-            );
-        } catch (UserIsNotEditableException) {
-            throw ZfExtended_Models_Entity_Conflict::createResponse(
-                'E1628',
-                [
-                    'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
-                ],
-                [
-                    'user' => $this->entity->getUserGuid(),
-                    'userLogin' => $this->entity->getLogin(),
-                    'userEmail' => $this->entity->getEmail(),
-                ]
-            );
-        } catch (ClientRestrictionException) {
-            throw new ZfExtended_NoAccessException('Deletion of User is not allowed due to client-restriction');
-        } catch (Exception $e) {
-            throw new ZfExtended_NoAccessException(previous: $e);
+        } catch (Throwable $e) {
+            throw $this->transformException($e);
         }
     }
 
@@ -366,20 +305,6 @@ class Editor_UserController extends ZfExtended_RestController
         $this->view->rows = $this->entity->loadAllByRole($pmRoles, $parentId);
         $this->view->total = $this->entity->getTotalByRole($pmRoles, $parentId);
         $this->csvToArray();
-    }
-
-    public function allowedparentusersAction(): void
-    {
-        $rows = $this->entity->loadAll();
-
-        if ($this->_getParam('id')) {
-            $rows = $this->filterParentUsersForExistingUser($rows);
-        } else {
-            $rows = $this->filterParentUsersForCreate($rows);
-        }
-
-        $this->view->rows = array_values($rows);
-        $this->view->total = count($rows);
     }
 
     /**
@@ -548,6 +473,34 @@ class Editor_UserController extends ZfExtended_RestController
                     ],
                 ],
             ),
+            PmInTaskException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1048',
+                [
+                    'Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.',
+                ],
+                [
+                    'tasks' => implode(', ', $e->taskGuids),
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            ),
+            LastCoordinatorException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1626',
+                [
+                    'Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".',
+                ],
+                [
+                    'lsp' => $e->coordinator->lsp->getName(),
+                    'lspId' => $e->coordinator->lsp->getId(),
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            ),
+            ClientRestrictionException::class => new ZfExtended_NoAccessException(
+                'Deletion of User is not allowed due to client-restriction'
+            ),
             default => $e,
         };
     }
@@ -622,95 +575,5 @@ class Editor_UserController extends ZfExtended_RestController
         if ($userSession->data->id == $this->data->id) {
             ZfExtended_Authentication::getInstance()->authenticateBySessionData($userSession->data);
         }
-    }
-
-    private function filterParentUsersForCreate(array $rows): array
-    {
-        $roles = explode(',', $this->_getParam('roles'));
-        $roles = array_filter(array_map('trim', $roles));
-        $childIsJobCoordinator = in_array(Roles::JOB_COORDINATOR, $roles, true);
-        $childLsp = LspRepository::create()->find((int) $this->_getParam('lspId'));
-        $lspUserRepo = new LspUserRepository();
-        $userIdToLspIdMap = $lspUserRepo->getUserIdToLspIdMap();
-
-        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
-        $context = new PermissionAssertContext($authUser);
-        $parentUser = ZfExtended_Factory::get(User::class);
-        $parentUserValidator = ParentUserValidator::create();
-
-        foreach ($rows as $key => $row) {
-            $parentUser->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $parentUser->db,
-                        'data' => $row,
-                        'stored' => true,
-                        'readOnly' => false,
-                    ]
-                )
-            );
-
-            try {
-                $this->permissionAssert->assertGranted(Action::READ, $parentUser, $context);
-            } catch (PermissionExceptionInterface) {
-                unset($rows[$key]);
-
-                continue;
-            }
-
-            $parentIsLspUser = isset($userIdToLspIdMap[$row['id']]);
-
-            if (! $childLsp && ! $childIsJobCoordinator && ! $parentIsLspUser) {
-                continue;
-            }
-
-            if ($childLsp) {
-                try {
-                    $parentUserValidator->assertIsSuitableParentForLspUser(
-                        $parentUser,
-                        $childIsJobCoordinator,
-                        $childLsp
-                    );
-
-                    continue;
-                } catch (UserExceptionInterface) {
-                }
-            }
-
-            unset($rows[$key]);
-        }
-
-        return $rows;
-    }
-
-    private function filterParentUsersForExistingUser(array $rows): array
-    {
-        $childUser = $this->userRepository->get($this->getParam('id'));
-        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
-        $context = new PermissionAssertContext($authUser);
-        $parentUser = ZfExtended_Factory::get(User::class);
-        $parentUserValidator = ParentUserValidator::create();
-
-        foreach ($rows as $key => $row) {
-            $parentUser->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $parentUser->db,
-                        'data' => $row,
-                        'stored' => true,
-                        'readOnly' => false,
-                    ]
-                )
-            );
-
-            try {
-                $this->permissionAssert->assertGranted(Action::READ, $parentUser, $context);
-                $parentUserValidator->assertUserCanBeSetAsParentTo($parentUser, $childUser);
-            } catch (PermissionExceptionInterface|UserExceptionInterface) {
-                unset($rows[$key]);
-            }
-        }
-
-        return $rows;
     }
 }

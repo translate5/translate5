@@ -47,7 +47,6 @@ class CreateUserDto
         public readonly array $customers = [],
         public readonly ?int $lsp = null,
         public readonly ?string $password = null,
-        public readonly ?string $parentId = null,
         public readonly ?string $locale = null,
     ) {
     }

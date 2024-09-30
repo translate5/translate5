@@ -332,8 +332,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 'newState' => $this->data->state,
             ]);
         }
-
-        $this->applyEditableAndDeletable();
     }
 
     /**
@@ -359,7 +357,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->log->info('E1012', 'job created', [
             'tua' => $this->entity->getSanitizedEntityForLog(),
         ]);
-        $this->applyEditableAndDeletable();
     }
 
     public function deleteAction()
@@ -369,7 +366,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->log->request();
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActiveByTask($this->task);
         /* @var $workflow editor_Workflow_Default */
-        $this->checkAuthenticatedIsParentOfEntity();
         $this->processClientReferenceVersion();
         $entity = clone $this->entity;
         $this->entity->setId(0);
@@ -378,41 +374,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->log->info('E1012', 'job deleted', [
             'tua' => $this->entity->getSanitizedEntityForLog(),
         ]);
-    }
-
-    /**
-     * checks user based access on POST/PUT
-     * {@inheritDoc}
-     * @see ZfExtended_RestController::additionalValidations()
-     */
-    protected function additionalValidations()
-    {
-        $this->checkAuthenticatedIsParentOfEntity();
-    }
-
-    /***
-     * Check if the current logged in user is allowed to POST/PUT/DELETE the given TaskUser Assoc entry
-     */
-    protected function checkAuthenticatedIsParentOfEntity()
-    {
-        //if I am allowed to see any user:
-        if ($this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
-            return;
-        }
-
-        //The authenticated user is allowed to see/edit himself
-        if ($this->entity->getUserGuid() === ZfExtended_Authentication::getInstance()->getUserGuid()) {
-            return;
-        }
-
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->loadByGuid($this->entity->getUserGuid());
-
-        //if the authenticated user is no parent, then he is not allowed to proceed
-        if (! $user->hasParent(ZfExtended_Authentication::getInstance()->getUserId())) {
-            throw new ZfExtended_NoAccessException();
-        }
     }
 
     /**
@@ -429,44 +390,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->view->rows->login = $user->getLogin();
         $this->view->rows->firstName = $user->getFirstName();
         $this->view->rows->surName = $user->getSurName();
-        $this->view->rows->parentIds = $user->getParentIds();
         $this->view->rows->longUserName = $user->getUsernameLong();
-    }
-
-    /***
-     * Add editable/deletable variable calculated for each user in the response rows.
-     */
-    protected function applyEditableAndDeletable()
-    {
-        $authentication = ZfExtended_Authentication::getInstance();
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $seeAllUsersAllowed = $this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS);
-
-        if (is_array($this->view->rows)) {
-            foreach ($this->view->rows as &$row) {
-                if ($seeAllUsersAllowed || $row['login'] === $authentication->getLogin()) {
-                    $row['editable'] = true;
-                    $row['deletable'] = true;
-
-                    continue;
-                }
-                //check if the current loged user is a parent for the user in the row
-                $hasParent = $userModel->hasParent($authentication->getUserId(), $row['parentIds']);
-                $row['editable'] = $hasParent;
-                $row['deletable'] = $hasParent;
-            }
-        } elseif (is_object($this->view->rows)) {
-            if ($seeAllUsersAllowed || $this->view->rows->login === $authentication->getLogin()) {
-                $this->view->rows->editable = true;
-                $this->view->rows->deletable = true;
-
-                return;
-            }
-            //check if the current loged user is a parent for the user in the row
-            $hasParent = $userModel->hasParent($authentication->getUserId(), $this->view->rows->parentIds);
-            $this->view->rows->editable = $hasParent;
-            $this->view->rows->deletable = $hasParent;
-        }
     }
 
     /***

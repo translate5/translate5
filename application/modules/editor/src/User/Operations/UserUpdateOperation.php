@@ -36,7 +36,6 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExcep
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Contract\UserSetParentIdsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Contract\UserUpdateOperationInterface;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
@@ -52,7 +51,6 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
-        private readonly UserSetParentIdsOperationInterface $setParentIds,
         private readonly UserSetRolesOperationInterface $setRoles,
         private readonly UserSetPasswordOperation $setPassword,
         private readonly UserAssignCustomersOperationInterface $assignCustomers,
@@ -68,7 +66,6 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
         return new self(
             new UserRepository(),
             UserActionFeasibilityAssert::create(),
-            UserSetParentIdsOperation::create(),
             UserSetRolesOperation::create(),
             UserSetPasswordOperation::create(),
             UserAssignCustomersOperation::create(),
@@ -117,10 +114,6 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
 
         if (null !== $dto->roles) {
             $this->setRoles->setRoles($user, $dto->roles);
-        }
-
-        if (null !== $dto->parentId) {
-            $this->setParentIds->setParentIds($user, $dto->parentId->identifier);
         }
 
         if (null !== $dto->customers) {

@@ -48,10 +48,7 @@ use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
 use MittagQI\Translate5\User\Validation\RolesValidator;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
-use MittagQI\ZfExtended\Acl\SystemResource;
 use REST_Controller_Request_Http as Request;
-use Zend_Acl_Exception;
-use ZfExtended_Acl;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Models_User;
@@ -65,7 +62,6 @@ class CreateUserDtoFactory
         private readonly LspRepositoryInterface $lspRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly ActionPermissionAssertInterface $lspPermissionAssert,
-        private readonly ZfExtended_Acl $acl,
         private readonly RolesValidator $rolesValidator,
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
     ) {
@@ -82,7 +78,6 @@ class CreateUserDtoFactory
             LspRepository::create(),
             JobCoordinatorRepository::create(),
             LspActionPermissionAssert::create(),
-            ZfExtended_Acl::getInstance(),
             RolesValidator::create(),
             UserCustomerAssociationValidator::create(),
         );
@@ -118,8 +113,6 @@ class CreateUserDtoFactory
 
         $this->rolesValidator->assertUserCanSetRoles($authUser, $roles);
 
-        $parentId = $this->resolveParentUserId($data['parentIds'] ?? null, $authUser);
-
         $lsp = $this->fetchLspForAssignment($data['lsp'] ?? null, $authUser);
 
         $lspId = null === $lsp ? null : (int) $lsp->getId();
@@ -137,31 +130,8 @@ class CreateUserDtoFactory
             $customerIds,
             $lspId,
             isset($data['passwd']) ? trim($data['passwd']) : null,
-            $parentId,
             $data['locale'] ?? null,
         );
-    }
-
-    private function resolveParentUserId(?string $parentId, User $authUser): string
-    {
-        if (empty($parentId) || ! $this->canSeeAllUsers($authUser)) {
-            return (string) $authUser->getId();
-        }
-
-        return $parentId;
-    }
-
-    private function canSeeAllUsers(User $authUser): bool
-    {
-        try {
-            return $this->acl->isInAllowedRoles(
-                $authUser->getRoles(),
-                SystemResource::ID,
-                SystemResource::SEE_ALL_USERS
-            );
-        } catch (Zend_Acl_Exception) {
-            return false;
-        }
     }
 
     private function fetchLspForAssignment(?int $lspId, User $authUser): ?LanguageServiceProvider

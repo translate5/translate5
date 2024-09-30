@@ -46,13 +46,6 @@ Ext.define('Editor.model.admin.User', {
     {name: 'roles', type: 'string'},
     {name: 'passwd', type: 'string'},
     {name: 'editable', type: 'boolean', persist: false},
-    {name: 'parentIds', type: 'int', convert: function(v,rec) {
-        if(Ext.isArray(v)) {
-            //return last element of the array or null
-            return (v && v.length) ? v[v.length - 1] : null;
-        }
-        return v;
-    }},
     {name: 'locale', type: 'string'},
     {name: 'customers', type: 'string'},
     {name: 'openIdIssuer', type: 'string'},

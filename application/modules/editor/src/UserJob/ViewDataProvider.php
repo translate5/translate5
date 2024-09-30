@@ -41,7 +41,6 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
-use MittagQI\ZfExtended\Acl\SystemResource;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
 
@@ -68,10 +67,7 @@ use ZfExtended_Factory;
  * login: string,
  * firstName: string,
  * surName: string,
- * parentIds: string|null,
- * longUserName: string,
- * editable: bool,
- * deletable: bool
+ * longUserName: string
  * }
  */
 class ViewDataProvider
@@ -146,19 +142,6 @@ class ViewDataProvider
         return $tua;
     }
 
-    private function isMutableJob(User $user, User $viewer): bool
-    {
-        if ($this->acl->isInAllowedRoles(
-            $viewer->getRoles(),
-            SystemResource::ID,
-            SystemResource::SEE_ALL_USERS
-        )) {
-            return true;
-        }
-
-        return $user->hasParent($viewer->getId());
-    }
-
     /**
      * @return Job
      */
@@ -186,10 +169,7 @@ class ViewDataProvider
             'login' => $assignedUser->getLogin(),
             'firstName' => $assignedUser->getFirstName(),
             'surName' => $assignedUser->getSurName(),
-            'parentIds' => $assignedUser->getParentIds(),
             'longUserName' => $assignedUser->getUsernameLong(),
-            'editable' => $this->isMutableJob($assignedUser, $viewer),
-            'deletable' => $this->isMutableJob($assignedUser, $viewer),
         ];
 
         if ($this->acl->isInAllowedRoles($viewer->getRoles(), Rights::ID, Rights::READ_AUTH_HASH)) {

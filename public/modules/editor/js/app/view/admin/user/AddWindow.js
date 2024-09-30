@@ -293,26 +293,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             fieldLabel: me.strings.localeLabel
                                         },
                                         {
-                                            xtype: 'combo',
-                                            itemId: 'parentIds',
-                                            name: 'parentIds',
-                                            width: 110,
-                                            allowBlank: true,
-                                            typeAhead: true,
-                                            anyMatch: true,
-                                            forceSelection: true,
-                                            displayField: 'longUserName',
-                                            valueField: 'id',
-                                            store: {
-                                                xtype: 'store',
-                                                model: 'Editor.model.admin.User',
-                                                pageSize: 0,
-                                                data: [],
-                                            },
-                                            queryMode: 'local',
-                                            fieldLabel: me.strings.parentUserLabel
-                                        },
-                                        {
                                             xtype: 'customers',
                                             bind: {
                                                 fieldLabel: '{l10n.general.clients}',
@@ -458,7 +438,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         }
 
         this.updateCustomerField(form, lsp.get('customers'));
-        this.updateParentUsersField(form);
     },
 
     /**
@@ -534,7 +513,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         }
 
         form.down('hidden[name="roles"]').setValue(roles.join(','));
-        this.updateParentUsersField(form);
     },
     /**
      * merge and save the checked roles AND the client-pm sub-roles into the hidden roles field
@@ -651,33 +629,5 @@ Ext.define('Editor.view.admin.user.AddWindow', {
      */
     isClientPm: function (roles) {
         return !roles.includes('pm') && roles.includes('clientpm');
-    },
-
-    updateParentUsersField: function (form) {
-        const parentIdsStore = form.down('#parentIds').getStore();
-        const record = form.getRecord();
-
-        let params = {
-            roles: form.down('hidden[name="roles"]').getValue(),
-            lspId: form.down('#lsp').getValue(),
-        };
-
-        if (!record.phantom) {
-            params = {
-                id: record.get('id')
-            };
-        }
-
-        Ext.Ajax.request({
-            url: Editor.data.restpath + 'user/parents',
-            method: 'GET',
-            params: params,
-            success: (response) => {
-                const data = response.responseJson;
-                parentIdsStore.loadData(data.rows);
-                const parentUser = parentIdsStore.getById(record.get('parentIds'));
-                form.down('#parentIds').setValue(parentUser);
-            },
-        });
     },
 });
