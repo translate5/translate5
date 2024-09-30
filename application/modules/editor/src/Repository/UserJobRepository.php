@@ -30,24 +30,25 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_TaskUserAssoc;
+use editor_Models_Task as Task;
+use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\UserJob\TypeEnum;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 
 class UserJobRepository
 {
-    public function getEmptyModel(): editor_Models_TaskUserAssoc
+    public function getEmptyModel(): UserJob
     {
-        return ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+        return ZfExtended_Factory::get(UserJob::class);
     }
 
     /**
-     * @return iterable<editor_Models_TaskUserAssoc>
+     * @return iterable<UserJob>
      */
     public function getLspJobsByTask(string $taskGuid): iterable
     {
-        $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+        $tua = ZfExtended_Factory::get(UserJob::class);
 
         $jobs = $tua->loadByTaskGuidList([$taskGuid]);
 
@@ -69,18 +70,37 @@ class UserJobRepository
         }
     }
 
-    public function save(editor_Models_TaskUserAssoc $job): void
+    public function save(UserJob $job): void
     {
         $job->save();
     }
 
     /**
-     * @deprecated proxy to \editor_Models_TaskUserAssoc::loadAllWithUserInfo(), dangerous as it apply hidden filters
+     * @return iterable<UserJob>
      */
-    public function loadAllWithUserInfo(): array
+    public function getTaskJobs(Task $task, bool $excludePmOverride = false): iterable
     {
-        $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+        $tua = ZfExtended_Factory::get(UserJob::class);
 
-        return $tua->loadAllWithUserInfo();
+        $jobs = $tua->loadByTaskGuidList([$task->getTaskGuid()]);
+
+        foreach ($jobs as $job) {
+            $tua->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $tua->db,
+                        'data' => $job,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            if ($excludePmOverride && $tua->getIsPmOverride()) {
+                continue;
+            }
+
+            yield clone $tua;
+        }
     }
 }

@@ -35,7 +35,7 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToUserJobException;
 
 /**
  * @implements PermissionAssertInterface<Task>
@@ -67,6 +67,6 @@ final class MutableJobCoordinatorPermissionAssert implements PermissionAssertInt
             return;
         }
 
-        throw new NoAccessToTaskException($object);
+        throw new NoAccessToUserJobException($object);
     }
 }

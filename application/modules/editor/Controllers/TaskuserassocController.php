@@ -37,6 +37,7 @@ use MittagQI\Translate5\Task\TaskService;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\UserJob\Operation\CreateUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\Operation\Factory\NewUserJobDtoFactory;
+use MittagQI\Translate5\UserJob\ViewDataProvider;
 use MittagQI\ZfExtended\Acl\SystemResource;
 
 /**
@@ -78,6 +79,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     private TaskRepository $taskRepository;
 
+    private ViewDataProvider $viewDataProvider;
+
     public function init()
     {
         parent::init();
@@ -87,17 +90,32 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->taskPermissionAssert = TaskActionPermissionAssert::create();
         $this->userRepository = new UserRepository();
         $this->taskRepository = new TaskRepository();
+
+        $this->viewDataProvider = ViewDataProvider::create();
     }
 
     public function indexAction(): void
     {
-        $rows = $this->entity->loadAllWithUserInfo();
-        $rows = $this->filterTuas($rows);
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
 
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (! $this->getRequest()->getParam('taskId')) {
+            $rows = $this->viewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
+
+            // @phpstan-ignore-next-line
+            $this->view->rows = $rows;
+            $this->view->total = count($rows);
+
+            return;
+        }
+
+        $task = $this->taskRepository->get((int) $this->getRequest()->getParam('taskId'));
+
+        $rows = $this->viewDataProvider->getListFor($task, $authUser);
+
+        // @phpstan-ignore-next-line
         $this->view->rows = $rows;
         $this->view->total = count($rows);
-
-        $this->applyEditableAndDeletable();
     }
 
     public function projectAction()
@@ -112,47 +130,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $rows = $this->filterTuas($rows);
 
         $this->view->rows = $rows;
-    }
-
-    private function filterTuas(array $rows): array
-    {
-        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
-        $context = new PermissionAssertContext($authUser);
-
-        $taskGuids = [];
-        $userGuids = [];
-
-        foreach ($rows as $key => $row) {
-            if (! isset($userGuids[$row['userGuid']])) {
-                $user = $this->userRepository->getByGuid($row['userGuid']);
-
-                try {
-                    $this->userPermissionAssert->assertGranted(Action::READ, $user, $context);
-
-                    $userGuids[$row['userGuid']] = true;
-                } catch (PermissionExceptionInterface) {
-                    $userGuids[$row['userGuid']] = false;
-                }
-            }
-
-            if (! isset($taskGuids[$row['taskGuid']])) {
-                $task = $this->taskRepository->getByGuid($row['taskGuid']);
-
-                try {
-                    $this->taskPermissionAssert->assertGranted(Action::READ, $task, $context);
-
-                    $taskGuids[$row['taskGuid']] = true;
-                } catch (PermissionExceptionInterface) {
-                    $taskGuids[$row['taskGuid']] = false;
-                }
-            }
-
-            if (! $userGuids[$row['userGuid']] || ! $taskGuids[$row['taskGuid']]) {
-                unset($rows[$key]);
-            }
-        }
-
-        return array_values($rows);
     }
 
     public function postDispatch()

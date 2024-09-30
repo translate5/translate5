@@ -28,46 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\Operation;
+namespace MittagQI\Translate5\UserJob\ActionAssert\Permission\Exception;
 
-use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 
-class CreateUserJobAssignmentOperation
+final class NoAccessToUserJobException extends NoAccessException implements PermissionExceptionInterface
 {
     public function __construct(
-        private readonly UserJobRepository $userJobRepository,
+        public readonly UserJob $job
     ) {
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self(
-            new UserJobRepository(),
-        );
-    }
-
-    public function assignJob(NewUserJobDto $dto): void
-    {
-        $job = $this->userJobRepository->getEmptyModel();
-        $job->setTaskGuid($dto->taskGuid);
-        $job->setUserGuid($dto->userGuid);
-        $job->setState($dto->state);
-        $job->setRole($dto->role);
-        $job->setWorkflow($dto->workflow);
-        $job->setWorkflowStepName($dto->workflowStepName);
-        $job->setType($dto->type);
-        $job->setSegmentrange($dto->segmentRange);
-        $job->setAssignmentDate($dto->assignmentDate);
-        $job->setDeadlineDate($dto->deadlineDate);
-
-        $job->validate();
-
-        $job->createstaticAuthHash();
-
-        $this->userJobRepository->save($job);
+        parent::__construct();
     }
 }

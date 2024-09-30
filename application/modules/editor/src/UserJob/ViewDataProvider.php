@@ -31,27 +31,171 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\UserJob;
 
 use editor_Models_Task as Task;
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
+use MittagQI\ZfExtended\Acl\SystemResource;
+use ZfExtended_Acl;
+use ZfExtended_Factory;
 
+/**
+ * @template Job of array{
+ * id: string,
+ * taskGuid: string,
+ * userGuid: string,
+ * state: string,
+ * role: string,
+ * workflowStepName: string,
+ * workflow: string,
+ * segmentrange: string|null,
+ * segmentEditableCount: int,
+ * segmentFinishCount: int,
+ * usedState: string|null,
+ * deadlineDate: string,
+ * assignmentDate: string,
+ * finishedDate: string|null,
+ * trackchangesShow: bool,
+ * trackchangesShowAll: bool,
+ * trackchangesAcceptReject: bool,
+ * type: string,
+ * login: string,
+ * firstName: string,
+ * surName: string,
+ * parentIds: string|null,
+ * longUserName: string,
+ * editable: bool,
+ * deletable: bool
+ * }
+ */
 class ViewDataProvider
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
+        private readonly ActionPermissionAssertInterface $userJobPermissionAssert,
+        private readonly UserRepository $userRepository,
+        private readonly ZfExtended_Acl $acl,
     ) {
     }
 
     /**
-     * @deprecated Created for BC reasons, use ViewDataProvider::getListFor() instead
+     * @codeCoverageIgnore
      */
-    public function getAll(): array
+    public static function create(): self
     {
-        $jobs = $this->userJobRepository->loadAllWithUserInfo();
-
-        return $jobs;
+        return new self(
+            new UserJobRepository(),
+            UserJobActionPermissionAssert::create(),
+            new UserRepository(),
+            ZfExtended_Acl::getInstance(),
+        );
     }
 
-    public function getListFor(Task $task): array
+    /**
+     * @return Job[]
+     */
+    public function buildViewForList(iterable $jobs, User $viewer): array
     {
+        $users = [];
+        $result = [];
+        $context = new PermissionAssertContext($viewer);
 
+        foreach ($jobs as $job) {
+            $job = $this->getJob($job);
+
+            try {
+                $this->userJobPermissionAssert->assertGranted(Action::READ, $job, $context);
+            } catch (PermissionExceptionInterface) {
+                continue;
+            }
+
+            if (! isset($users[$job->getUserGuid()])) {
+                $users[$job->getUserGuid()] = $this->userRepository->getByGuid($job->getUserGuid());
+            }
+
+            $assignedUser = $users[$job->getUserGuid()];
+
+            $result[] = $this->buildJobView($job, $assignedUser, $viewer);
+        }
+
+        return $result;
+    }
+
+    public function getListFor(Task $task, User $viewer): array
+    {
+        $jobs = $this->userJobRepository->getTaskJobs($task, true);
+
+        return $this->buildViewForList($jobs, $viewer);
+    }
+
+    private function getJob(array|UserJob $job): UserJob
+    {
+        if ($job instanceof UserJob) {
+            return $job;
+        }
+
+        $tua = ZfExtended_Factory::get(UserJob::class);
+        $tua->init($job);
+
+        return $tua;
+    }
+
+    private function isMutableJob(User $user, User $viewer): bool
+    {
+        if ($this->acl->isInAllowedRoles(
+            $viewer->getRoles(),
+            SystemResource::ID,
+            SystemResource::SEE_ALL_USERS
+        )) {
+            return true;
+        }
+
+        return $user->hasParent($viewer->getId());
+    }
+
+    /**
+     * @return Job
+     */
+    public function buildJobView(UserJob $job, User $assignedUser, User $viewer): array
+    {
+        $row = [
+            'id' => $job->getId(),
+            'taskGuid' => $job->getTaskGuid(),
+            'userGuid' => $job->getUserGuid(),
+            'state' => $job->getState(),
+            'role' => $job->getRole(),
+            'workflowStepName' => $job->getWorkflowStepName(),
+            'workflow' => $job->getWorkflow(),
+            'segmentrange' => $job->getSegmentrange(),
+            'segmentEditableCount' => (int)$job->getSegmentEditableCount(),
+            'segmentFinishCount' => (int)$job->getSegmentFinishCount(),
+            'usedState' => $job->getUsedState(),
+            'deadlineDate' => $job->getDeadlineDate(),
+            'assignmentDate' => $job->getAssignmentDate(),
+            'finishedDate' => $job->getFinishedDate(),
+            'trackchangesShow' => (bool)$job->getTrackchangesShow(),
+            'trackchangesShowAll' => (bool)$job->getTrackchangesShowAll(),
+            'trackchangesAcceptReject' => (bool)$job->getTrackchangesAcceptReject(),
+            'type' => $job->getType()->name,
+            'login' => $assignedUser->getLogin(),
+            'firstName' => $assignedUser->getFirstName(),
+            'surName' => $assignedUser->getSurName(),
+            'parentIds' => $assignedUser->getParentIds(),
+            'longUserName' => $assignedUser->getUsernameLong(),
+            'editable' => $this->isMutableJob($assignedUser, $viewer),
+            'deletable' => $this->isMutableJob($assignedUser, $viewer),
+        ];
+
+        if ($this->acl->isInAllowedRoles($viewer->getRoles(), Rights::ID, Rights::READ_AUTH_HASH)) {
+            $row['staticAuthHash'] = $job->getStaticAuthHash();
+        }
+
+        return $row;
     }
 }

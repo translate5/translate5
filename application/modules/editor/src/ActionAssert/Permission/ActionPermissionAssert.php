@@ -37,7 +37,7 @@ use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterfac
  * @template T of object
  * @implements ActionPermissionAssertInterface<T>
  */
-class ActionPermissionAssert implements ActionPermissionAssertInterface
+abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
 {
     /**
      * @param PermissionAssertInterface[] $asserts

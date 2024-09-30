@@ -134,11 +134,15 @@ class Editor_UserController extends ZfExtended_RestController
 
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
 
-        $this->permissionAssert->assertGranted(
-            Action::READ,
-            $user,
-            new PermissionAssertContext($authUser)
-        );
+        try {
+            $this->permissionAssert->assertGranted(
+                Action::READ,
+                $user,
+                new PermissionAssertContext($authUser)
+            );
+        } catch (Throwable $e) {
+            throw $this->transformException($e);
+        }
 
         $lspUserRepo = new LspUserRepository();
 
