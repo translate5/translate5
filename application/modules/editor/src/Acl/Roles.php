@@ -28,14 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Acl;
 
-use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
-use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
-use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
-use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
-use MittagQI\ZfExtended\Acl\SetAclRoleResource;
-use Zend_Acl_Exception;
 use ZfExtended_Acl;
-use MittagQI\Translate5\User\Model\User;
 
 /**
  * Holds additional roles for translate5
@@ -84,7 +77,7 @@ final class Roles
 
     public const TERMREVIEWER = 'termReviewer';
 
-    // region sub-roles for the client-pm */
+    // region sub-roles for the client-pm
     public const CLIENTPM_PROJECTS = 'clientpm_projects';
 
     public const CLIENTPM_LANGRESOURCES = 'clientpm_langresources';
@@ -100,7 +93,7 @@ final class Roles
 
     public const JOB_COORDINATOR = 'jobCoordinator';
 
-    public const FRONTEND_ROLES = [
+    private const FRONTEND_ROLES = [
         self::EDITOR,
         self::EDITOR_ONLY_OVERRIDE,
         self::CLIENTPM,
@@ -136,14 +129,14 @@ final class Roles
         ],
     ];
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function __construct(
         private readonly ZfExtended_Acl $acl,
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(

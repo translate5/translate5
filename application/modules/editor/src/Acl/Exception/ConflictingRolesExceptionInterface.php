@@ -28,10 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Exception;
+namespace MittagQI\Translate5\Acl\Exception;
 
-use InvalidArgumentException;
+use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 
-class InvalidParentUserProvidedForJobCoordinatorException extends InvalidArgumentException implements UserExceptionInterface
+interface ConflictingRolesExceptionInterface extends UserExceptionInterface
 {
 }

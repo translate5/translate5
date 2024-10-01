@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Exception\ClientRestrictedAndNotRolesProvidedTogetherException;
+use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
+use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
@@ -44,13 +47,8 @@ use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForJobCoordinatorException;
-use MittagQI\Translate5\User\Exception\InvalidParentUserProvidedForLspUserException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
-use MittagQI\Translate5\User\Exception\ProvidedParentIdCannotBeEvaluatedToUserException;
-use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
-use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
@@ -325,6 +323,18 @@ class Editor_UserController extends ZfExtended_RestController
                     'roles' => implode(', ', $e->conflictsWith),
                 ]
             ),
+            ClientRestrictedAndNotRolesProvidedTogetherException::class => UnprocessableEntity::createResponse(
+                'E1630',
+                [
+                    'roles' => [
+                        'Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}',
+                    ],
+                ],
+                [
+                    'role' => '"client restricted"',
+                    'roles' => '"not client restricted"',
+                ]
+            ),
             RoleConflictWithRoleThatPopulatedToRolesetException::class => UnprocessableEntity::createResponse(
                 'E1630',
                 [
@@ -339,7 +349,6 @@ class Editor_UserController extends ZfExtended_RestController
                     'becauseOf' => $e->becauseOf,
                 ]
             ),
-            Zend_Acl_Exception::class,
             UserIsNotAuthorisedToAssignRoleException::class => new ZfExtended_NoAccessException(previous: $e),
             UnableToAssignJobCoordinatorRoleToExistingUserException::class => UnprocessableEntity::createResponse(
                 'E1631',
@@ -402,14 +411,6 @@ class Editor_UserController extends ZfExtended_RestController
                     ],
                 ],
             ),
-            ProvidedParentIdCannotBeEvaluatedToUserException::class => UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'parentIds' => [
-                        'Gegebener parentIds-Wert kann für keinen Benutzer ausgewertet werden!',
-                    ],
-                ],
-            ),
             FeasibilityExceptionInterface::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1628',
                 [
@@ -446,24 +447,6 @@ class Editor_UserController extends ZfExtended_RestController
                     LanguageServiceProvider::class,
                     $e->lspId,
                 ]
-            ),
-            InvalidParentUserProvidedForJobCoordinatorException::class => UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'parentIds' => [
-                        'Der übergeordnete Benutzer des Job-Koordinators kann nur der PM, '
-                        . 'Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein',
-                    ],
-                ],
-            ),
-            InvalidParentUserProvidedForLspUserException::class => UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'parentIds' => [
-                        'Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator '
-                        . 'des eigenen Sprachdienstleisters (LSP) sein.',
-                    ],
-                ],
             ),
             AttemptToSetLspForNonJobCoordinatorException::class => ZfExtended_UnprocessableEntity::createResponse(
                 'E2003',

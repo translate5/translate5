@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations;
 
+use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
-use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\User\Model\User;
 use Zend_Acl_Exception;
 use ZfExtended_ValidateException;

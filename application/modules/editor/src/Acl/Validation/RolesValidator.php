@@ -30,10 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Acl\Validation;
 
+use MittagQI\Translate5\Acl\Exception\ClientRestrictedAndNotRolesProvidedTogetherException;
+use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
+use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
+use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
-use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
-use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
@@ -46,6 +47,7 @@ class RolesValidator
 
     public function __construct(
         private readonly ZfExtended_Acl $acl,
+        private readonly Roles $roles,
     ) {
     }
 
@@ -56,6 +58,7 @@ class RolesValidator
     {
         return new self(
             ZfExtended_Acl::getInstance(),
+            Roles::create(),
         );
     }
 
@@ -116,6 +119,15 @@ class RolesValidator
                     );
                 }
             }
+        }
+
+        $roles = $this->roles->expandListWithAutoRoles($roles, []);
+
+        $hasPrivilegedRoles = ! empty(array_intersect($roles, Roles::getAdminRoles()))
+            || ! empty(array_intersect($roles, Roles::getManagerRoles()));
+
+        if ($hasPrivilegedRoles && ! empty(array_intersect($roles, Roles::getClientRestrictedRoles()))) {
+            throw new ClientRestrictedAndNotRolesProvidedTogetherException();
         }
     }
 

@@ -28,18 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Exception;
+namespace MittagQI\Translate5\Acl\Exception;
 
 use InvalidArgumentException;
 
-class RolesetHasConflictingRolesException extends InvalidArgumentException implements ConflictingRolesExceptionInterface
+class RoleConflictWithRoleThatPopulatedToRolesetException extends InvalidArgumentException implements ConflictingRolesExceptionInterface
 {
-    /**
-     * @param string[] $conflictsWith
-     */
     public function __construct(
         public readonly string $role,
-        public readonly array $conflictsWith
+        public readonly string $conflictsWith,
+        public readonly array $becauseOf
     ) {
         parent::__construct();
     }
