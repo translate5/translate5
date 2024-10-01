@@ -46,7 +46,7 @@ use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
-use MittagQI\Translate5\User\Validation\RolesValidator;
+use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use REST_Controller_Request_Http as Request;
 use ZfExtended_Authentication;

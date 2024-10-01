@@ -91,7 +91,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
     },
     initConfig: function (instanceConfig) {
         var me = this,
-            roles = [],
             config = {},
             defaults = {
                 labelWidth: 160,
@@ -104,18 +103,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             bottomInfo.push(me.strings.bottomPwInfo);
         }
 
-        Ext.Object.each(Editor.data.app.roles, function (key, value) {
-            //if the role is not setable for the user, do not create a checkbox for it
-            if (!value.setable) {
-                return;
-            }
-
-            roles.push({
-                boxLabel: value.label,
-                name: 'roles_helper',
-                value: key,
-            });
-        });
         Ext.Object.each(Editor.data.l10n.translations, function (id, value) {
             translations.push([id, value]);
         });
@@ -232,20 +219,21 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             name: 'roles'
                                         },
                                         {
-                                            xtype: 'checkboxgroup',
+                                            xtype: 'fieldset',
                                             itemId: 'rolesGroup',
-                                            cls: 'x-check-group-alt',
-                                            fieldLabel: me.strings.rolesLabel + ' &#8505;',
-                                            labelAlign: 'top',
-                                            items: roles,
-                                            columns: 2,
+                                            margin: 5,
+                                            title: me.strings.rolesLabel + ' &#8505;',
                                             autoEl: {
                                                 tag: 'div',
                                                 'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
                                             },
-                                            listeners: {
-                                                change: (box, newValue) => this.roleCheckChange(box, newValue),
-                                            }
+                                            items: [
+                                                this.createRoleFieldSet('General roles', 'general', Editor.data.app.groupedRoles.general),
+                                                this.createRoleFieldSet('Admin roles', 'admins', Editor.data.app.groupedRoles.admins),
+                                                this.createRoleFieldSet('Not client restricted roles', 'managers', Editor.data.app.groupedRoles.managers),
+                                                this.createRoleFieldSet('Client restricted roles', 'clientRestricted', Editor.data.app.groupedRoles.clientRestricted),
+                                                this.createRoleFieldSet(me.strings.clientPmSubRoles, 'clientPmSubRoles', Editor.data.app.groupedRoles.clientPmSubRoles, true),
+                                            ],
                                         },
                                         {
                                             xtype: 'Editor.combobox',
@@ -267,18 +255,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             listeners: {
                                                 change: (box, newValue) => this.onLspChange(box, newValue),
                                             },
-                                        },
-                                        {
-                                            xtype: 'Editor.tagfield',
-                                            itemId: 'clientPmSubRoles',
-                                            fieldLabel: me.strings.clientPmSubRoles,
-                                            queryMode: 'local',
-                                            dataIndex: 'clientPmSubRoles',
-                                            store: Editor.data.app.clientPmSubRoles,
-                                            hidden: true,
-                                            listeners: {
-                                                change: me.clientPmSubRoleChange
-                                            }
                                         },
                                         {
                                             xtype: 'combo',
@@ -307,7 +283,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             valueField: 'id',
                                             typeAhead: true,
                                             anyMatch: true,
-                                            selectOnFocus:true
+                                            selectOnFocus: true
                                         }
                                     ]
                                 },
@@ -424,6 +400,130 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         return me.callParent([config]);
     },
 
+    createRoleFieldSet: function (title, groupType, roles, hidden = false) {
+        const userWindow = this;
+        let items = [];
+
+        roles.forEach(function (node) {
+            items.push({
+                boxLabel: node.label,
+                name: 'roles_helper',
+                inputValue: node.role,
+                listeners: {
+                    change: userWindow.onRoleCheckChange,
+                    scope: userWindow
+                }
+            });
+        })
+
+        return {
+            xtype: 'fieldset',
+            title: title,
+            checkboxToggle: false,
+            hidden: hidden || ! items || items.length === 0,
+            items: [
+                {
+                    xtype: 'checkboxgroup',
+                    columns: 2,
+                    items: items
+                }
+            ],
+            reference: groupType + 'FieldSet'
+        };
+    },
+
+    getSelectedRoles: function (form) {
+        let selectedRoles = form.getValues().roles_helper || [];
+
+        if (selectedRoles && ! Array.isArray(selectedRoles)) {
+            selectedRoles = [selectedRoles];
+        }
+
+        return selectedRoles;
+    },
+
+    onRoleCheckChange: function (checkbox, checked) {
+        var form = checkbox.up('form'),
+            adminGroup = this.lookupReference('adminsFieldSet'),
+            managersGroup = this.lookupReference('managersFieldSet'),
+            clientRestrictedGroup = this.lookupReference('clientRestrictedFieldSet'),
+            clientPmSubRolesGroup = this.lookupReference('clientPmSubRolesFieldSet'),
+            selectedRoles = this.getSelectedRoles(form);
+
+        if (this.hasRoleFromGroup(selectedRoles, ['admins', 'managers'])) {
+            clientRestrictedGroup.setHidden(true);
+            clientRestrictedGroup.down('checkboxgroup').reset();
+            clientPmSubRolesGroup.setHidden(true);
+            clientPmSubRolesGroup.down('checkboxgroup').reset();
+        } else {
+            clientRestrictedGroup.setHidden(false);
+        }
+
+        if (this.hasRoleFromGroup(selectedRoles, ['clientRestricted'])) {
+            adminGroup.setHidden(true);
+            adminGroup.down('checkboxgroup').reset();
+            managersGroup.setHidden(true);
+            managersGroup.down('checkboxgroup').reset();
+
+            this.toggleRequirementOfCustomersField(form, true);
+        } else {
+            adminGroup.setHidden(false);
+            managersGroup.setHidden(false);
+
+            this.toggleRequirementOfCustomersField(form, false);
+        }
+
+        if (selectedRoles.includes('clientpm')) {
+            clientPmSubRolesGroup.setHidden(false);
+        } else {
+            clientPmSubRolesGroup.setHidden(true);
+            clientPmSubRolesGroup.down('checkboxgroup').reset();
+        }
+
+        form.down('hidden[name="roles"]').setValue(selectedRoles.join(','));
+
+        this.toggleLspField(form, selectedRoles);
+    },
+
+    toggleRequirementOfCustomersField: function (form, required) {
+        const customersField = form.down('customers');
+
+        customersField.allowBlank = ! required;
+        customersField.forceSelection = required;
+    },
+
+    toggleLspField: function (form, roles) {
+        const lspField = form.down('#lsp');
+
+        if (roles.includes('jobCoordinator')) {
+            lspField.setHidden(false);
+            lspField.allowBlank = false;
+            lspField.setDisabled(! form.getRecord().phantom);
+            lspField.forceSelection = true;
+
+            return;
+        }
+
+        lspField.setHidden(true);
+        lspField.allowBlank = true;
+        lspField.setDisabled(true);
+        lspField.forceSelection = false;
+        lspField.setValue(null);
+    },
+
+    // Helper to check if any role from a group is selected
+    hasRoleFromGroup: function (selectedRoles, groups) {
+        return groups.some(function (group) {
+            return selectedRoles.some(function (role) {
+                if (! Editor.data.app.groupedRoles.hasOwnProperty(group)) {
+                    return false;
+                }
+
+                return Editor.data.app.groupedRoles[group].some(node => node.role === role);
+            });
+        });
+    },
+
     onLspChange: function (fld, newValue) {
         /**
          * @type {Editor.model.admin.LspModel}
@@ -441,97 +541,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
     },
 
     /**
-     * merge and save the checked roles into the hidden roles field
-     * @param {Ext.form.field.Checkbox} box
-     * @param {Object} newValue
-     */
-    roleCheckChange: function (box, newValue) {
-        if (Object.entries(newValue).length === 0) {
-            return;
-        }
-
-        let roles = [],
-            form = box.up('form'),
-            boxes = box.query('checkbox[checked=true]');
-
-        boxes.forEach(box => {
-            roles.push(box.initialConfig.value);
-            box.setDisabled(false);
-        });
-
-        if (roles.includes('jobCoordinator')) {
-            const lspField = form.down('#lsp');
-            lspField.setHidden(false);
-            lspField.allowBlank = false;
-            lspField.setDisabled(! form.getRecord().phantom);
-            lspField.forceSelection = true;
-
-            roles = roles.filter(role => ! role.includes('pm') && ! role.includes('admin') && 'api' !== role);
-            boxes
-                .filter(
-                    box => box.initialConfig.value.includes('pm')
-                        || box.initialConfig.value.includes('admin')
-                        || 'api' === box.initialConfig.value
-                )
-                .forEach(box => {
-                    box.setValue(false);
-                    box.setDisabled(true);
-                })
-            ;
-        }
-
-        if (! roles.includes('jobCoordinator')) {
-            const lspField = form.down('#lsp');
-            lspField.setHidden(true);
-            lspField.allowBlank = true;
-            lspField.setDisabled(true);
-            lspField.forceSelection = false;
-            lspField.setValue(null);
-        }
-
-        if (this.isClientPm(roles)) {
-            // if the client-pm role is checked, we show the client-pm sub-roles and add their value
-            var tagfield = form.down('#clientPmSubRoles');
-
-            // if a new user is set the first time to be a clientPm we add all sub-roles for convenience
-            if (!tagfield.isClientPmInited && !Number.isInteger(form.getRecord().get('id'))) {
-                var item,
-                    allSubRoles = [];
-
-                for (item of Editor.data.app.clientPmSubRoles) {
-                    allSubRoles.push(item[0]);
-                }
-
-                tagfield.setValue(allSubRoles);
-                tagfield.isClientPmInited = true;
-            }
-
-            roles = roles.concat(tagfield.getValue());
-            tagfield.setHidden(false);
-        } else {
-            form.down('#clientPmSubRoles').setHidden(true);
-        }
-
-        form.down('hidden[name="roles"]').setValue(roles.join(','));
-    },
-    /**
-     * merge and save the checked roles AND the client-pm sub-roles into the hidden roles field
-     * @param {Ext.form.field.Tag} tagfield
-     * @param {Array} newValue
-     */
-    clientPmSubRoleChange: function (tagfield, newValue) {
-        var roles = [],
-            form = tagfield.up('form'),
-            boxes = form.down('#rolesGroup').query('checkbox[checked=true]');
-
-        Ext.Array.forEach(boxes, function (item) {
-            roles.push(item.initialConfig.value);
-        });
-
-        roles = roles.concat(newValue);
-        form.down('hidden[name="roles"]').setValue(roles.join(','));
-    },
-    /**
      * loads the record into the form, does set the role checkboxes according to the roles value
      * @param record
      */
@@ -540,22 +549,11 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             form = me.down('form'),
             roles = record.getMainRoles();
 
-        // we set the subroles just for the lifetime of the form as "real" data-values
-        record.set('clientPmSubRoles', record.getClientPmSubRoles(), {silent: true, commit: false});
-
         form.loadRecord(record);
-
-        const userIsJobCoordinator = roles.includes('jobCoordinator');
 
         me.query('#rolesGroup checkbox').forEach(function (box) {
             let boxInitValue = box.initialConfig.value;
             box.setValue(roles.includes(boxInitValue));
-
-            if (userIsJobCoordinator) {
-                if (boxInitValue.includes('pm') || boxInitValue.includes('admin') || 'api' === boxInitValue) {
-                    box.setDisabled(true);
-                }
-            }
         });
 
         this.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
@@ -586,16 +584,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 html: '<p>' + me.strings.bottomOpenIdNoEditInfo + '</p><p style="margin-top:5px;margin-left:5px;"></p>',
                 dock: 'bottom'
             });
-        }
-
-        // set the subroles-tagfield visible if the user is a clientPm
-        if (me.isClientPm(roles)) {
-            me.down('#clientPmSubRoles').setHidden(false);
-
-            // when the current user is "only" client-pm, he must not be able to change his own subroles
-            if (me.isClientPm(Editor.data.app.user.roles.split(','))) {
-                me.down('#clientPmSubRoles').setDisabled(true);
-            }
         }
     },
 

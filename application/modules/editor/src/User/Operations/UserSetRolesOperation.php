@@ -30,12 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations;
 
+use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\Validation\RolesValidator;
 use Zend_Acl_Exception;
-use ZfExtended_Acl;
 use ZfExtended_ValidateException;
 
 /**
@@ -46,7 +46,7 @@ final class UserSetRolesOperation implements UserSetRolesOperationInterface
 {
     public function __construct(
         private readonly RolesValidator $rolesValidator,
-        private readonly ZfExtended_Acl $acl,
+        private readonly Roles $roles,
     ) {
     }
 
@@ -55,11 +55,9 @@ final class UserSetRolesOperation implements UserSetRolesOperationInterface
      */
     public static function create(): self
     {
-        $acl = ZfExtended_Acl::getInstance();
-
         return new self(
-            new RolesValidator($acl),
-            $acl,
+            RolesValidator::create(),
+            Roles::create(),
         );
     }
 
@@ -73,7 +71,7 @@ final class UserSetRolesOperation implements UserSetRolesOperationInterface
     {
         $this->rolesValidator->assertRolesDontConflict($roles);
 
-        $roles = $this->acl->mergeAutoSetRoles($roles, []);
+        $roles = $this->roles->expandListWithAutoRoles($roles, []);
 
         $user->setRoles($roles);
 

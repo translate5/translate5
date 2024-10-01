@@ -28,7 +28,14 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Acl;
 
+use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
+use MittagQI\Translate5\User\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
+use MittagQI\Translate5\User\Exception\RolesetHasConflictingRolesException;
+use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
+use MittagQI\ZfExtended\Acl\SetAclRoleResource;
+use Zend_Acl_Exception;
 use ZfExtended_Acl;
+use MittagQI\Translate5\User\Model\User;
 
 /**
  * Holds additional roles for translate5
@@ -118,34 +125,56 @@ final class Roles
     ];
 
     /**
-     * Retrieves the roles a user can be assigned to in the frontend
+     * @var array<string, string[]>
+     */
+    public const CONFLICTING_ROLES = [
+        Roles::JOB_COORDINATOR => [
+            Roles::ADMIN,
+            Roles::SYSTEMADMIN,
+            Roles::PM,
+            Roles::CLIENTPM,
+        ],
+    ];
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function __construct(
+        private readonly ZfExtended_Acl $acl,
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            ZfExtended_Acl::getInstance(),
+        );
+    }
+
+    /***
+     * @param string[] $newUserRoles
+     * @param string[] $oldUserRoles
      * @return string[]
      */
-    public static function getFrontendRoles(): array
+    public function expandListWithAutoRoles(array $newUserRoles, array $oldUserRoles): array
     {
-        $allRoles = ZfExtended_Acl::getInstance()->getAllRoles() ?: [];
-        $frontendRoles = [];
+        return $this->acl->mergeAutoSetRoles($newUserRoles, $oldUserRoles);
+    }
 
-        foreach (self::FRONTEND_ROLES as $role) {
-            if (in_array($role, $allRoles, true)) {
-                $frontendRoles[] = $role;
-            }
-        }
+    public static function getGeneralRoles(): array
+    {
+        return [
+            Roles::EDITOR,
+        ];
+    }
 
-        // may someone adds new roles and forgets to put them in the order here
-        // Important: clientpm-roles must not be added also not the internal roles "no-rights" and "basic"
-        foreach ($allRoles as $role) {
-            if (
-                ! in_array($role, self::getClientPmSubRoles(), true)
-                && $role !== self::BASIC
-                && $role !== self::NORIGHTS
-                && ! in_array($role, $frontendRoles, true)
-            ) {
-                $frontendRoles[] = $role;
-            }
-        }
-
-        return $frontendRoles;
+    public static function getAdminRoles(): array
+    {
+        return [
+            Roles::ADMIN,
+            Roles::SYSTEMADMIN,
+            Roles::API,
+        ];
     }
 
     /**
@@ -163,7 +192,7 @@ final class Roles
         ];
     }
 
-    private static function getClientRestrictedRoles(): array
+    public static function getClientRestrictedRoles(): array
     {
         return [
             self::INSTANTTRANSLATE,
@@ -180,34 +209,18 @@ final class Roles
         ];
     }
 
-    public static function getNotClientRestrictedRoles(): array
+    public static function getManagerRoles(): array
     {
-        return array_diff(self::FRONTEND_ROLES, self::getClientRestrictedRoles());
+        return array_diff(
+            self::FRONTEND_ROLES,
+            self::getClientRestrictedRoles(),
+            self::getAdminRoles(),
+            self::getGeneralRoles()
+        );
     }
 
     public static function isClientRestricted(array $userRoles): bool
     {
         return array_intersect(self::getClientRestrictedRoles(), $userRoles) !== [];
-    }
-
-    /**
-     * Removes dependant/subroles if the clientpm role is not set
-     * or removes the client-pm-role if 'pm' is set
-     */
-    public static function filterRoles(array $userRoles): array
-    {
-        if (! in_array(self::CLIENTPM, $userRoles, true)) {
-            $newRoles = [];
-
-            foreach ($userRoles as $role) {
-                if (! str_starts_with($role, self::CLIENTPM)) {
-                    $newRoles[] = $role;
-                }
-            }
-
-            return $newRoles;
-        }
-
-        return $userRoles;
     }
 }

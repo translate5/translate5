@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Validation;
+namespace MittagQI\Translate5\Acl\Validation;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
@@ -43,71 +43,20 @@ use ZfExtended_Acl;
 
 class RolesValidator
 {
-    /**
-     * @var array<string, string[]>
-     */
-    private array $conflictMap = [
-        Roles::JOB_COORDINATOR => [
-            Roles::ADMIN,
-            Roles::SYSTEMADMIN,
-            Roles::PM,
-            Roles::CLIENTPM,
-        ],
-    ];
 
     public function __construct(
         private readonly ZfExtended_Acl $acl,
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(
             ZfExtended_Acl::getInstance(),
         );
-    }
-
-    /**
-     * @throws ConflictingRolesExceptionInterface
-     * @throws Zend_Acl_Exception
-     */
-    public function assertRolesDontConflict(array $roles): void
-    {
-        if (empty($roles)) {
-            return;
-        }
-
-        $potentialConflictRoles = array_intersect($roles, array_keys($this->conflictMap));
-
-        // straightforward check if any of the roles is in the conflict map
-        foreach ($potentialConflictRoles as $potentialConflictRole) {
-            $conflictingRoles = array_intersect($this->conflictMap[$potentialConflictRole], $roles);
-
-            if (! empty($conflictingRoles)) {
-                throw new RolesetHasConflictingRolesException($potentialConflictRole, $conflictingRoles);
-            }
-        }
-
-        // check for populated roles. Some roles are populated with setaclrole
-        foreach ($roles as $role) {
-            if (in_array($role, $potentialConflictRoles, true)) {
-                continue;
-            }
-
-            $populatedRoles = $this->acl->getRightsToRolesAndResource([$role], AutoSetRoleResource::ID);
-
-            foreach ($potentialConflictRoles as $potentialConflictRole) {
-                $conflictingRoles = array_intersect($this->conflictMap[$potentialConflictRole], $populatedRoles);
-
-                if (! empty($conflictingRoles)) {
-                    throw new RoleConflictWithRoleThatPopulatedToRolesetException(
-                        $role,
-                        $potentialConflictRole,
-                        $conflictingRoles
-                    );
-                }
-            }
-        }
     }
 
     public function assertUserCanSetRoles(User $user, array $roles): void
@@ -127,10 +76,53 @@ class RolesValidator
         }
     }
 
-    private function hasAclPermissionToSetRole(User $authUser, string $role): bool
+    /**
+     * @throws ConflictingRolesExceptionInterface
+     * @throws Zend_Acl_Exception
+     */
+    public function assertRolesDontConflict(array $roles): void
+    {
+        if (empty($roles)) {
+            return;
+        }
+
+        $potentialConflictRoles = array_intersect($roles, array_keys(Roles::CONFLICTING_ROLES));
+
+        // straightforward check if any of the roles is in the conflict map
+        foreach ($potentialConflictRoles as $potentialConflictRole) {
+            $conflictingRoles = array_intersect(Roles::CONFLICTING_ROLES[$potentialConflictRole], $roles);
+
+            if (! empty($conflictingRoles)) {
+                throw new RolesetHasConflictingRolesException($potentialConflictRole, $conflictingRoles);
+            }
+        }
+
+        // check for populated roles. Some roles are populated with setaclrole
+        foreach ($roles as $role) {
+            if (in_array($role, $potentialConflictRoles, true)) {
+                continue;
+            }
+
+            $populatedRoles = $this->acl->getRightsToRolesAndResource([$role], AutoSetRoleResource::ID);
+
+            foreach ($potentialConflictRoles as $potentialConflictRole) {
+                $conflictingRoles = array_intersect(Roles::CONFLICTING_ROLES[$potentialConflictRole], $populatedRoles);
+
+                if (! empty($conflictingRoles)) {
+                    throw new RoleConflictWithRoleThatPopulatedToRolesetException(
+                        $role,
+                        $potentialConflictRole,
+                        $conflictingRoles
+                    );
+                }
+            }
+        }
+    }
+
+    public function hasAclPermissionToSetRole(User $viewer, string $role): bool
     {
         try {
-            return $this->acl->isInAllowedRoles($authUser->getRoles(), SetAclRoleResource::ID, $role);
+            return $this->acl->isInAllowedRoles($viewer->getRoles(), SetAclRoleResource::ID, $role);
         } catch (Zend_Acl_Exception) {
             return false;
         }

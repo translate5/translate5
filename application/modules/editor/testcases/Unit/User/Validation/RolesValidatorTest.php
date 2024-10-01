@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Test\Unit\User\Validation;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\User\Exception\ConflictingRolesExceptionInterface;
-use MittagQI\Translate5\User\Validation\RolesValidator;
+use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
