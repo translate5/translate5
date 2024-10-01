@@ -408,7 +408,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             items.push({
                 boxLabel: node.label,
                 name: 'roles_helper',
-                inputValue: node.role,
+                value: node.role,
                 listeners: {
                     change: userWindow.onRoleCheckChange,
                     scope: userWindow
@@ -443,14 +443,24 @@ Ext.define('Editor.view.admin.user.AddWindow', {
     },
 
     onRoleCheckChange: function (checkbox, checked) {
-        var form = checkbox.up('form'),
-            adminGroup = this.lookupReference('adminsFieldSet'),
-            managersGroup = this.lookupReference('managersFieldSet'),
-            clientRestrictedGroup = this.lookupReference('clientRestrictedFieldSet'),
-            clientPmSubRolesGroup = this.lookupReference('clientPmSubRolesFieldSet'),
+        const form = checkbox.up('form'),
             selectedRoles = this.getSelectedRoles(form);
 
-        if (this.hasRoleFromGroup(selectedRoles, ['admins', 'managers'])) {
+        this.toggleRoleGroupsVisibility(form, selectedRoles);
+
+        form.down('hidden[name="roles"]').setValue(selectedRoles.join(','));
+
+        this.toggleLspField(form, selectedRoles);
+    },
+
+    toggleRoleGroupsVisibility: function (form, roles) {
+        const adminGroup = this.lookupReference('adminsFieldSet'),
+            managersGroup = this.lookupReference('managersFieldSet'),
+            clientRestrictedGroup = this.lookupReference('clientRestrictedFieldSet'),
+            clientPmSubRolesGroup = this.lookupReference('clientPmSubRolesFieldSet')
+        ;
+
+        if (this.hasRoleFromGroup(roles, ['admins', 'managers'])) {
             clientRestrictedGroup.setHidden(true);
             clientRestrictedGroup.down('checkboxgroup').reset();
             clientPmSubRolesGroup.setHidden(true);
@@ -459,7 +469,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             clientRestrictedGroup.setHidden(false);
         }
 
-        if (this.hasRoleFromGroup(selectedRoles, ['clientRestricted'])) {
+        if (this.hasRoleFromGroup(roles, ['clientRestricted'])) {
             adminGroup.setHidden(true);
             adminGroup.down('checkboxgroup').reset();
             managersGroup.setHidden(true);
@@ -473,16 +483,12 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             this.toggleRequirementOfCustomersField(form, false);
         }
 
-        if (selectedRoles.includes('clientpm')) {
+        if (roles.includes('clientpm')) {
             clientPmSubRolesGroup.setHidden(false);
         } else {
             clientPmSubRolesGroup.setHidden(true);
             clientPmSubRolesGroup.down('checkboxgroup').reset();
         }
-
-        form.down('hidden[name="roles"]').setValue(selectedRoles.join(','));
-
-        this.toggleLspField(form, selectedRoles);
     },
 
     toggleRequirementOfCustomersField: function (form, required) {
@@ -511,7 +517,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         lspField.setValue(null);
     },
 
-    // Helper to check if any role from a group is selected
     hasRoleFromGroup: function (selectedRoles, groups) {
         return groups.some(function (group) {
             return selectedRoles.some(function (role) {
@@ -555,6 +560,8 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             let boxInitValue = box.initialConfig.value;
             box.setValue(roles.includes(boxInitValue));
         });
+
+        this.toggleRoleGroupsVisibility(form, roles);
 
         this.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
 
@@ -608,14 +615,5 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         }
 
         customersField.setValue(customers.map(c => c.id));
-    },
-
-    /**
-     * Checks wether the users roles represent a clientPm
-     * @param {Array} roles
-     * @returns {boolean}
-     */
-    isClientPm: function (roles) {
-        return !roles.includes('pm') && roles.includes('clientpm');
     },
 });
