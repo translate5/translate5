@@ -1517,6 +1517,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->logger->exception($e);
         }
 
+        // At current point LR is in Import status to prevent race conditions
+        // Here we resetting state to fetch the actual status from t5memory
+        $this->languageResource->setStatus(LanguageResourceStatus::NOTCHECKED);
+
         $this->waitForImportFinish($tmName);
         $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
 
