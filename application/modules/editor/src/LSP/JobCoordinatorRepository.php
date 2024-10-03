@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\LSP;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\Exception\LspUserNotFoundException;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
@@ -55,7 +56,7 @@ class JobCoordinatorRepository
         ?LspUserRepository $lspUserRepository = null
     ): self {
         $lspRepository = $lspRepository ?? LspRepository::create();
-        $lspUserRepository = $lspUserRepository ?? new LspUserRepository();
+        $lspUserRepository = $lspUserRepository ?? LspUserRepository::create();
 
         return new self(
             $lspRepository,
@@ -75,10 +76,23 @@ class JobCoordinatorRepository
     /**
      * @throws NotFoundException
      * @throws CantCreateCoordinatorFromUserException
+     * @throws LspUserNotFoundException
      */
     public function getByUser(User $user): JobCoordinator
     {
         $lspUser = $this->lspUserRepository->getByUser($user);
+
+        return JobCoordinator::fromLspUser($lspUser);
+    }
+
+    /**
+     * @throws NotFoundException
+     * @throws CantCreateCoordinatorFromUserException
+     * @throws LspUserNotFoundException
+     */
+    public function getByUserId(int $userId): JobCoordinator
+    {
+        $lspUser = $this->lspUserRepository->getByUserId($userId);
 
         return JobCoordinator::fromLspUser($lspUser);
     }

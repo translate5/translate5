@@ -40,6 +40,7 @@ use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\NotifiableCoordinatorDeletionAttemptException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
@@ -137,7 +138,7 @@ class Editor_UserController extends ZfExtended_RestController
             throw $this->transformException($e);
         }
 
-        $lspUserRepo = new LspUserRepository();
+        $lspUserRepo = LspUserRepository::create();
 
         // @phpstan-ignore-next-line
         $this->view->rows->lsp = $lspUserRepo->findByUser($user)?->lsp->getId();
@@ -149,7 +150,7 @@ class Editor_UserController extends ZfExtended_RestController
     public function indexAction(): void
     {
         $rows = $this->entity->loadAll();
-        $lspUserRepo = new LspUserRepository();
+        $lspUserRepo = LspUserRepository::create();
         $userIdToLspIdMap = $lspUserRepo->getUserIdToLspIdMap();
 
         $userModel = ZfExtended_Factory::get(User::class);
@@ -202,10 +203,7 @@ class Editor_UserController extends ZfExtended_RestController
 
         try {
             $dto = UpdateUserDtoFactory::create()->fromRequest($this->getRequest());
-            UserUpdateOperation::create()->updateUser(
-                $user,
-                $dto,
-            );
+            UserUpdateOperation::create()->updateUser($user, $dto);
         } catch (ZfExtended_ValidateException $e) {
             $this->handleValidateException($e);
         } catch (Exception $e) {
@@ -411,17 +409,6 @@ class Editor_UserController extends ZfExtended_RestController
                     ],
                 ],
             ),
-            FeasibilityExceptionInterface::class => ZfExtended_Models_Entity_Conflict::createResponse(
-                'E1628',
-                [
-                    'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
-                ],
-                [
-                    'user' => $this->entity->getUserGuid(),
-                    'userLogin' => $this->entity->getLogin(),
-                    'userEmail' => $this->entity->getEmail(),
-                ]
-            ),
             NotAccessibleLspUserException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1627',
                 [
@@ -456,6 +443,17 @@ class Editor_UserController extends ZfExtended_RestController
                     ],
                 ],
             ),
+            ClientRestrictionException::class => new ZfExtended_NoAccessException(
+                'Deletion of User is not allowed due to client-restriction'
+            ),
+            FeasibilityExceptionInterface::class => $this->transformFeasibilityException($e),
+            default => $e,
+        };
+    }
+
+    private function transformFeasibilityException(FeasibilityExceptionInterface $e): ZfExtended_ErrorCodeException
+    {
+        return match ($e::class) {
             PmInTaskException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1048',
                 [
@@ -481,10 +479,30 @@ class Editor_UserController extends ZfExtended_RestController
                     'userEmail' => $this->entity->getEmail(),
                 ]
             ),
-            ClientRestrictionException::class => new ZfExtended_NoAccessException(
-                'Deletion of User is not allowed due to client-restriction'
+            NotifiableCoordinatorDeletionAttemptException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1626',
+                [
+                    'user.validation.error.delete_notifiable_coordinator',
+                ],
+                [
+                    'lsp' => $e->coordinator->lsp->getName(),
+                    'lspId' => $e->coordinator->lsp->getId(),
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
             ),
-            default => $e,
+            default => ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1628',
+                [
+                    'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
+                ],
+                [
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            )
         };
     }
 

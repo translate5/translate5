@@ -55,11 +55,12 @@ namespace MittagQI\Translate5\LSP\Contract;
 
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LSP\Operations\DTO\UpdateLspDto;
 
 interface LspUpdateOperationInterface
 {
     /**
      * @throws PermissionExceptionInterface
      */
-    public function updateLsp(LanguageServiceProvider $lsp, string $name, ?string $description): void;
+    public function updateLsp(LanguageServiceProvider $lsp, UpdateLspDto $dto): void;
 }

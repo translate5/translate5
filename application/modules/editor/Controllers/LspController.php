@@ -29,7 +29,10 @@ END LICENSE AND COPYRIGHT
 declare(strict_types=1);
 
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\Exception\InexistentUserException;
+use MittagQI\Translate5\LSP\Exception\CoordinatorNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LSP\Operations\Fabric\UpdateLspDtoFactory;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspCreateOperation;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspDeleteOperation;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspUpdateOperation;
@@ -56,6 +59,11 @@ class editor_LspController extends ZfExtended_RestController
     {
         parent::init();
         $this->viewDataProvider = ViewDataProvider::create();
+
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E2000' => 'Param "{0}" - is not given',
+            'E2003' => 'Wrong value',
+        ], 'editor.lsp');
     }
 
     public function getAction(): void
@@ -86,10 +94,6 @@ class editor_LspController extends ZfExtended_RestController
         $this->decodePutData();
 
         if (empty($this->data['name'])) {
-            ZfExtended_UnprocessableEntity::addCodes([
-                'E2000' => 'Param "{0}" - is not given',
-            ], 'editor.lsp');
-
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E2000',
                 [
@@ -116,23 +120,27 @@ class editor_LspController extends ZfExtended_RestController
 
     public function putAction(): void
     {
-        $this->decodePutData();
-
         $lspRepository = LspRepository::create();
         $lsp = $lspRepository->get((int) $this->_getParam('id'));
 
-        ZfExtended_UnprocessableEntity::addCodes([
-            'E2003' => 'Wrong value',
-        ], 'editor.lsp');
-
         try {
-            LspUpdateOperation::create()->updateLsp(
-                $lsp,
-                $this->data['name'],
-                $this->data['description'] ?? null
-            );
-        } catch (PermissionExceptionInterface) {
+            $dto = UpdateLspDtoFactory::create()->fromRequest($this->getRequest());
+
+            LspUpdateOperation::create()->updateLsp($lsp, $dto);
+        } catch (PermissionExceptionInterface|InexistentUserException) {
             throw new ZfExtended_NoAccessException();
+        } catch (CoordinatorNotFoundException) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'notifiableCoordinatorId' => [
+                        'Ungültiger Job Koordinator',
+                    ],
+                ],
+                [
+                    'notifiableCoordinatorId',
+                ]
+            );
         }
 
         $userRepository = new UserRepository();

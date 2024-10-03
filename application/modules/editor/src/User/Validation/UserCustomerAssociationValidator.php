@@ -58,7 +58,7 @@ class UserCustomerAssociationValidator
     public static function create(): self
     {
         return new self(
-            new LspUserRepository(),
+            LspUserRepository::create(),
             LspCustomerAssociationValidator::create(),
             new CustomerRepository(),
             CustomerActionPermissionAssert::create(),

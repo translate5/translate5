@@ -62,7 +62,7 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
         return new self(
             ZfExtended_Acl::getInstance(),
             ZfExtended_Authentication::getInstance(),
-            new LspUserRepository(),
+            LspUserRepository::create(),
         );
     }
 

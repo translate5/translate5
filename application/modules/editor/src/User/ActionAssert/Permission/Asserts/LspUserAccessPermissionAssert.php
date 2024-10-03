@@ -60,7 +60,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
     public static function create(): self
     {
         return new self(
-            new LspUserRepository(),
+            LspUserRepository::create(),
             JobCoordinatorRepository::create(),
         );
     }

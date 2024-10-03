@@ -28,8 +28,10 @@ CREATE TABLE `LEK_language_service_provider` (
     `parentId` int (11) DEFAULT NULL COMMENT 'Foreign Key to LEK_language_service_provider',
     `name` varchar(255) NOT NULL,
     `description` varchar(255) DEFAULT NULL,
+    `notifiableCoordinatorId` int (11) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`parentId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT
+    CONSTRAINT FOREIGN KEY (`parentId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT,
+    CONSTRAINT FOREIGN KEY (`notifiableCoordinatorId`) REFERENCES `Zf_users` (`id`) ON DELETE RESTRICT
 );
 
 CREATE TABLE `LEK_language_service_provider_customer` (

@@ -28,37 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Operations;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Exception;
 
-use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
-use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\LSP\JobCoordinator;
 
-class LspUserCreateOperation
+final class NotifiableCoordinatorDeletionAttemptException extends \Exception implements FeasibilityExceptionInterface
 {
     public function __construct(
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        public readonly JobCoordinator $coordinator
     ) {
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self(
-            LspUserRepository::create(),
-        );
-    }
-
-    public function createLspUser(LanguageServiceProvider $lsp, User $user): LspUser
-    {
-        $lspUser = new LspUser($user->getUserGuid(), $user, $lsp);
-
-        $this->lspUserRepository->save($lspUser);
-
-        return $lspUser;
+        parent::__construct();
     }
 }

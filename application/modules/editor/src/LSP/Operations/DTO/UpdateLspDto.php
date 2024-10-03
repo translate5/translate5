@@ -28,37 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Operations;
+namespace MittagQI\Translate5\LSP\Operations\DTO;
 
-use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
-use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\LSP\JobCoordinator;
 
-class LspUserCreateOperation
+class UpdateLspDto
 {
     public function __construct(
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        public readonly ?string $name,
+        public readonly ?string $description,
+        public readonly ?JobCoordinator $notifiableCoordinator,
     ) {
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self(
-            LspUserRepository::create(),
-        );
-    }
-
-    public function createLspUser(LanguageServiceProvider $lsp, User $user): LspUser
-    {
-        $lspUser = new LspUser($user->getUserGuid(), $user, $lsp);
-
-        $this->lspUserRepository->save($lspUser);
-
-        return $lspUser;
     }
 }

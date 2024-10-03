@@ -58,7 +58,7 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
         return new self(
             $lspRepository,
             UserDeleteOperation::create(),
-            new LspUserRepository(),
+            LspUserRepository::create(),
         );
     }
 

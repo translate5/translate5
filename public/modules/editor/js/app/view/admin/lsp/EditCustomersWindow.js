@@ -117,7 +117,7 @@ Ext.define('Editor.view.admin.lsp.EditCustomersWindow', {
                                     name: 'id',
                                 },
                                 {
-                                    xtype: 'combo',
+                                    xtype: 'Editor.combobox',
                                     name: 'customer',
                                     itemId: 'customer',
                                     dataIndex: 'customers',

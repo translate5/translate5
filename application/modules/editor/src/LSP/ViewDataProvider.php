@@ -48,7 +48,18 @@ use MittagQI\Translate5\User\Model\User;
  * @template JC of array{guid: string, name: string}
  * @template U of array{id: int, name: string}
  * @template C of array{id: int, name: string}
- * @template LspRow of array{id: int, name: string, description: string, coordinators: JC[], users: U[], customers: C[]}
+ * @template LspRow of array{
+ *     id: int,
+ *     parentId: int|null,
+ *     name: string,
+ *     description: string,
+ *     canDelete: bool,
+ *     canEdit: bool,
+ *     notifiableCoordinator: string,
+ *     coordinators: JC[],
+ *     users: U[],
+ *     customers: C[]
+ * }
  */
 class ViewDataProvider
 {
@@ -72,7 +83,7 @@ class ViewDataProvider
 
         return new self(
             $lspRepository,
-            new LspUserRepository(),
+            LspUserRepository::create(),
             $jobCoordinatorRepository,
             LspActionPermissionAssert::create($jobCoordinatorRepository),
             CustomerActionPermissionAssert::create(),
@@ -165,6 +176,14 @@ class ViewDataProvider
             }
         }
 
+        $notifiableCoordinator = null;
+
+        if (null !== $lsp->getNotifiableCoordinatorId()) {
+            $notifiableCoordinator = $this->jobCoordinatorRepository->getByUserId(
+                (int) $lsp->getNotifiableCoordinatorId()
+            );
+        }
+
         return [
             'id' => (int) $lsp->getId(),
             'parentId' => $lsp->getParentId() ? (int) $lsp->getParentId() : null,
@@ -175,6 +194,7 @@ class ViewDataProvider
             'coordinators' => $coordinatorData,
             'users' => $usersData,
             'customers' => $customersData,
+            'notifiableCoordinator' => $notifiableCoordinator?->guid,
         ];
     }
 

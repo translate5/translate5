@@ -9893,6 +9893,18 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</source>
                 <target>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</target>
             </trans-unit>
+            <trans-unit id='dXNlci52YWxpZGF0aW9uLmVycm9yLmRlbGV0ZV9ub3RpZmlhYmxlX2Nvb3JkaW5hdG9y'>
+                <source>user.validation.error.delete_notifiable_coordinator</source>
+                <target>Der Benutzer kann nicht gelöscht werden, da er derzeit als Jobkoordinator konfiguriert ist, der benachrichtigt wird, wenn dem LSP "{lsp}" ein neuer Job zugewiesen wird.</target>
+            </trans-unit>
+            <trans-unit id='bHNwLmZvcm0ubm90aWZpYWJsZV9jb29yZGluYXRvcg=='>
+                <source>lsp.form.notifiable_coordinator</source>
+                <target>Benachrichtigbarer Jobkoordinator</target>
+            </trans-unit>
+            <trans-unit id='bHNwLmZvcm0ubm90aWZpYWJsZV9jb29yZGluYXRvci50b29sdGlw'>
+                <source>lsp.form.notifiable_coordinator.tooltip</source>
+                <target>Jobkoordinator konfiguriert ist, der benachrichtigt wird, wenn dem LSP ein neuer Job zugewiesen wird.</target>
+            </trans-unit>
             <trans-unit id='TFNQ'>
                 <source>LSP</source>
                 <target>LSP</target>
@@ -9988,6 +10000,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
             <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIHZvbiBLdW5kZSB7MH0genUgTFNQIHsxfSBhdWZoZWJlbiB3b2xsZW4/'>
                 <source>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen?</source>
                 <target>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen?</target>
+            </trans-unit>
+            <trans-unit id='VW5nw7xsdGlnZXIgSm9iIEtvb3JkaW5hdG9y'>
+                <source>Ungültiger Job Koordinator</source>
+                <target>Ungültiger Job Koordinator</target>
             </trans-unit>
         </body>
     </file>

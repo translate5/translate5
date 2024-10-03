@@ -28,26 +28,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
+namespace MittagQI\Translate5\LSP\Operations\Fabric;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
-use MittagQI\Translate5\LSP\Contract\LspUpdateOperationInterface;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LSP\Exception\CoordinatorNotFoundException;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Operations\DTO\UpdateLspDto;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use REST_Controller_Request_Http as Request;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 
-final class LspUpdateOperation implements LspUpdateOperationInterface
+class UpdateLspDtoFactory
 {
     public function __construct(
-        private readonly LspUpdateOperationInterface $operation,
-        private readonly ActionPermissionAssertInterface $permissionAssert,
+        private readonly ActionPermissionAssertInterface $userPermissionAssert,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly JobCoordinatorRepository $coordinatorRepository,
     ) {
     }
 
@@ -57,19 +58,47 @@ final class LspUpdateOperation implements LspUpdateOperationInterface
     public static function create(): self
     {
         return new self(
-            \MittagQI\Translate5\LSP\Operations\LspUpdateOperation::create(),
-            LspActionPermissionAssert::create(),
+            UserActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            JobCoordinatorRepository::create(),
         );
     }
 
-    public function updateLsp(LanguageServiceProvider $lsp, UpdateLspDto $dto): void
+    /**
+     * @throws CoordinatorNotFoundException
+     * @throws \MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface
+     * @throws \MittagQI\Translate5\Exception\InexistentUserException
+     */
+    public function fromRequest(Request $request): UpdateLspDto
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->permissionAssert->assertGranted(Action::UPDATE, $lsp, new PermissionAssertContext($authUser));
+        $data = $request->getParam('data');
+        $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
 
-        $this->operation->updateLsp($lsp, $dto);
+        $coordinator = null;
+
+        if (isset($data['notifiableCoordinator'])) {
+            try {
+                $notifiableUser = $this->userRepository->getByGuid($data['notifiableCoordinator']);
+
+                $this->userPermissionAssert->assertGranted(
+                    Action::READ,
+                    $notifiableUser,
+                    new PermissionAssertContext($authUser)
+                );
+
+                $coordinator = $this->coordinatorRepository->getByUser($notifiableUser);
+            } catch (\Exception) {
+                throw new CoordinatorNotFoundException($data['notifiableCoordinator']);
+            }
+        }
+
+        return new UpdateLspDto(
+            $data['name'] ?? null,
+            $data['description'] ?? null,
+                $coordinator,
+        );
     }
 }

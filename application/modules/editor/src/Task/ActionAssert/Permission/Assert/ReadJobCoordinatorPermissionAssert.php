@@ -52,7 +52,7 @@ final class ReadJobCoordinatorPermissionAssert implements PermissionAssertInterf
 
     public static function create(): self
     {
-        $lsUserRepository = new LspUserRepository();
+        $lsUserRepository = LspUserRepository::create();
 
         return new self(
             JobCoordinatorRepository::create(lspUserRepository: $lsUserRepository),

@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository\Contract;
 
+use MittagQI\Translate5\LSP\Exception\LspUserNotFoundException;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\User\Model\User;
@@ -42,7 +43,15 @@ interface LspUserRepositoryInterface
 
     public function findByUser(User $user): ?LspUser;
 
+    /**
+     * @throws LspUserNotFoundException
+     */
     public function getByUser(User $user): LspUser;
+
+    /**
+     * @throws LspUserNotFoundException
+     */
+    public function getByUserId(int $userId): LspUser;
 
     /**
      * @return array<int, int>

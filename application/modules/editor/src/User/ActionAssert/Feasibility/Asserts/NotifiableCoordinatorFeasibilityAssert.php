@@ -28,66 +28,46 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\NotifiableCoordinatorDeletionAttemptException;
 use MittagQI\Translate5\User\Model\User;
 
-/**
- * @implements PermissionAssertInterface<User>
- */
-final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
+final class NotifiableCoordinatorFeasibilityAssert implements FeasibilityAssertInterface
 {
     public function __construct(
-        private readonly JobCoordinatorRepository $coordinatorRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly JobCoordinatorRepository $jcRepository,
     ) {
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public static function create(): self
     {
-        $lsUserRepository = LspUserRepository::create();
-
         return new self(
-            JobCoordinatorRepository::create(lspUserRepository: $lsUserRepository),
-            $lsUserRepository,
+            JobCoordinatorRepository::create()
         );
     }
 
     public function supports(Action $action): bool
     {
-        return true;
+        return $action === Action::DELETE;
     }
 
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    /**
+     * Restrict deletion of the last coordinator in the LSP
+     */
+    public function assertAllowed(User $user): void
     {
-        if ($object->getId() === $context->manager->getId()) {
-            return;
-        }
-
-        $coordinator = $this->coordinatorRepository->findByUser($context->manager);
+        // Possible coordinator that we try to delete
+        $coordinator = $this->jcRepository->findByUser($user);
 
         if (null === $coordinator) {
             return;
         }
 
-        $lspUser = $this->lspUserRepository->findByUser($object);
-
-        if (null === $lspUser) {
-            throw new NoAccessToUserException($object);
-        }
-
-        if (! $coordinator->isSupervisorOf($lspUser)) {
-            throw new NoAccessToUserException($object);
+        if ((int) $coordinator->user->getId() === (int) $coordinator->lsp->getNotifiableCoordinatorId()) {
+            throw new NotifiableCoordinatorDeletionAttemptException($coordinator);
         }
     }
 }

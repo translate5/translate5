@@ -76,7 +76,7 @@ final class UserCreateOperation implements UserCreateOperationInterface
             LspUserCreateOperation::create(),
             ResetPasswordEmail::create(),
             LspRepository::create(),
-            new LspUserRepository(),
+            LspUserRepository::create(),
         );
     }
 

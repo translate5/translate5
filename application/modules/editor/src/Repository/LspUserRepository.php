@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use MittagQI\Translate5\LSP\Exception\LspUserNotFoundException;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
@@ -42,6 +43,18 @@ use ZfExtended_Models_Entity_NotFoundException;
 
 class LspUserRepository implements LspUserRepositoryInterface
 {
+    public function __construct(
+        private readonly UserRepository $userRepository,
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            new UserRepository(),
+        );
+    }
+
     public function save(LspUser $lspUser): void
     {
         $assoc = ZfExtended_Factory::get(LanguageServiceProviderUser::class);
@@ -68,6 +81,9 @@ class LspUserRepository implements LspUserRepositoryInterface
         }
     }
 
+    /**
+     * @throws LspUserNotFoundException
+     */
     public function getByUser(User $user): LspUser
     {
         $lsp = ZfExtended_Factory::get(LanguageServiceProvider::class);
@@ -89,7 +105,7 @@ class LspUserRepository implements LspUserRepositoryInterface
         $row = $lspDb->fetchRow($select);
 
         if (! $row) {
-            throw new ZfExtended_Models_Entity_NotFoundException('No LSP found for job coordinator');
+            throw new LspUserNotFoundException((int) $user->getId());
         }
 
         $guid = $row['guid'];
@@ -99,6 +115,20 @@ class LspUserRepository implements LspUserRepositoryInterface
         $lsp->init($row);
 
         return new LspUser($guid, $user, $lsp);
+    }
+
+    /**
+     * @throws LspUserNotFoundException
+     */
+    public function getByUserId(int $userId): LspUser
+    {
+        try {
+            $user = $this->userRepository->get($userId);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new LspUserNotFoundException($userId);
+        }
+
+        return $this->getByUser($user);
     }
 
     /**

@@ -28,37 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Operations;
+namespace MittagQI\Translate5\LSP\Exception;
 
-use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
-use MittagQI\Translate5\User\Model\User;
+use ZfExtended_Models_Entity_NotFoundException;
 
-class LspUserCreateOperation
+class CoordinatorNotFoundException extends ZfExtended_Models_Entity_NotFoundException
 {
     public function __construct(
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        public readonly string $userGuid
     ) {
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self(
-            LspUserRepository::create(),
-        );
-    }
-
-    public function createLspUser(LanguageServiceProvider $lsp, User $user): LspUser
-    {
-        $lspUser = new LspUser($user->getUserGuid(), $user, $lsp);
-
-        $this->lspUserRepository->save($lspUser);
-
-        return $lspUser;
+        parent::__construct('Coordinator with User GUID ' . $userGuid . ' not found');
     }
 }
