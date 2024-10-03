@@ -31,8 +31,9 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\TaskCustomField;
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
-use MittagQI\Translate5\CrossSynchronization\Events\EventListener;
+use MittagQI\Translate5\CrossSynchronization\Events\EventListener as CrossSyncEventListener;
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
+use MittagQI\Translate5\LSP\Event\EventListener as LspEventListener;
 use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Service\SystemCheck;
 use MittagQI\Translate5\Task\Deadline\TaskDeadlineEventHandler;
@@ -64,7 +65,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         // is currently the main use case for workers
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
 
-        EventListener::create($eventManager)->attachAll();
+        CrossSyncEventListener::create($eventManager)->attachAll();
+        LspEventListener::create($eventManager)->attachAll();
 
         $cleanUp = function () {
             // first clean up jobs

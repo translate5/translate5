@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,16 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Operations\DTO;
+namespace MittagQI\Translate5\LSP\Event;
 
-use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\LspUser;
 
-class UpdateLspDto
+class LspUserCreatedEvent
 {
     public function __construct(
-        public readonly ?string $name = null,
-        public readonly ?string $description = null,
-        public readonly ?JobCoordinator $notifiableCoordinator = null,
+        public readonly LspUser $lspUser,
     ) {
     }
 }
