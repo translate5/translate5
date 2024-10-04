@@ -17,6 +17,13 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.11.1] - 2024-10-04
+
+### Important Notes:
+ 
+
+
 ## [7.11.0] - 2024-10-04
 
 ### Important Notes:
