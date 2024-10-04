@@ -1844,6 +1844,21 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         return $termStatusMap[$termStatus] == 'permitted';
     }
 
+    /**
+     * Check if given $termStatus is considered as a match
+     *
+     * @return boolean
+     */
+    public static function isMatch(string $termStatus): bool
+    {
+        $termStatusMap = self::getTermStatusMap();
+        if (! array_key_exists($termStatus, $termStatusMap)) {
+            return false;
+        }
+
+        return ! in_array($termStatusMap[$termStatus], ['supersededTerm', 'deprecatedTerm']);
+    }
+
     public function loadByMid(string $termId, array $collectionIds): ?Zend_Db_Table_Row_Abstract
     {
         $s = $this->db->select(false);
