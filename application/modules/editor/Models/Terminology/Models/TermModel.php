@@ -1856,7 +1856,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             return false;
         }
 
-        return !in_array($termStatusMap[$termStatus], ['supersededTerm', 'deprecatedTerm']);
+        return ! in_array($termStatusMap[$termStatus], ['supersededTerm', 'deprecatedTerm']);
     }
 
     public function loadByMid(string $termId, array $collectionIds): ?Zend_Db_Table_Row_Abstract
