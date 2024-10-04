@@ -43,7 +43,7 @@ final class Looper
      * Defines the waiting-time in seconds we will wait, if our workload is temporarily blocked by other
      * processing loopers/workers
      */
-    public const BLOCKED_DELAY = 20;
+    public const BLOCKED_DELAY = 5;
 
     private State $state;
 

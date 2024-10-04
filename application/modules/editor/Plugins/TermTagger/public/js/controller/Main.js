@@ -59,6 +59,9 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
     }, {
         ref: 'segmentMeta',
         selector: '#metapanel segmentsMetapanel'
+    }, {
+        ref: 'segmentGrid',
+        selector: '#segmentgrid'
     }],
 
     /***
@@ -147,6 +150,14 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
      * @param segment
      */
     onSegmentSaved: function(segment) {
+        var selectedSegmentId = this.getSegmentGrid().getSelection().pop()?.getId();
+
+        // If selection was changed after save-request started - do nothing
+        if (selectedSegmentId && selectedSegmentId !== segment.getId()) {
+            return;
+        }
+
+        // Reload termportlet
         this.loadTermPanel(segment.getId());
     }
 });

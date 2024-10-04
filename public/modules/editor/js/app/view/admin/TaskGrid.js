@@ -319,7 +319,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             relaisLanguages = Ext.Array.clone(Editor.data.languages),
             customColumns = Editor.controller.admin.TaskCustomField.getGridColumnsFor('taskGrid'),
             addQtip = function (meta, text) {
-                meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(Ext.String.htmlEncode(text)) + '"';
+                meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(Ext.String.htmlEncode(text).replace(/&lt;br\s*\/?&gt;/ig, '<br>')) + '"';
             },
             multiUserTpl = new Ext.XTemplate(
                 me.strings.lockedMultiUser,
