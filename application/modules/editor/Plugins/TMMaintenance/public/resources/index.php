@@ -25,6 +25,7 @@
                     shortTagPath: '/modules/editor/images/imageTags/',
                 }
             },
+            userLogin: '<?php echo isset($this) ? $this->userLogin : ''; ?>',
         };
         window.csrfToken = '<?php echo isset($this) ? $this->csrfToken : ''; ?>';
     </script>
