@@ -175,7 +175,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      * @param button
      */
     onFalsePositiveSpread: function(button) {
-        var vm = this.getViewModel(), record = button.getWidgetRecord(), other;
+        var vm = this.getViewModel(), record = button.getWidgetRecord(), rightStore, quality;
 
         // Change the value in the checkbox-column
         record.set('falsePositive', record.get('falsePositive') ? 0 : 1);
@@ -193,8 +193,8 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 // Commit changes
                 record.commit();
 
-                // Prepare component query selector for other instance of falsePositive-panel
-                other = 'falsePositives[floating=' + (!button.up('fieldset')?.floating).toString() + ']';
+                // Prepare component query selector for rightPanel's instance of falsePositive-panel
+                rightStore = Ext.ComponentQuery.query('falsePositives[floating=false] grid').pop().getStore();
 
                 // Show tast message
                 Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.spreaded'));
@@ -203,7 +203,16 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 if (json = Ext.JSON.decode(xhr.responseText, true)) {
 
                     // Update data-t5qfp="true/false" attribute for the similar qualities tags/nodes
-                    json.ids.forEach((id) => Editor.view.quality.FalsePositivesController.applyFalsePositiveStyle(id, record.get('falsePositive')));
+                    json.ids.forEach(id => {
+
+                        // Apply style
+                        Editor.view.quality.FalsePositivesController.applyFalsePositiveStyle(id, record.get('falsePositive'));
+
+                        // Apply checkboxes' values if need
+                        quality = rightStore.getById(id);
+                        quality?.set('falsePositive', record.get('falsePositive'));
+                        quality?.commit();
+                    });
                 }
 
                 // Hide floating panel if click came from there

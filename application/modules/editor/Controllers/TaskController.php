@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Import\ImportService;
@@ -36,6 +37,7 @@ use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\TaskService;
+use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
@@ -231,6 +233,11 @@ class editor_TaskController extends ZfExtended_RestController
             ->addContext('package', [
                 'headers' => [
                     'Content-Type' => 'application/zip',
+                ],
+            ])->addActionContext('export', 'package')
+            ->addContext('html', [
+                'headers' => [
+                    'Content-Type' => 'text/xml',
                 ],
             ])->addActionContext('export', 'package')
             ->initContext();
@@ -564,6 +571,10 @@ class editor_TaskController extends ZfExtended_RestController
         settype($this->data['enableSourceEditing'], 'integer');
         settype($this->data['lockLocked'], 'integer');
 
+        if (array_key_exists('deadlineDate', $this->data) && empty($this->data['deadlineDate'])) {
+            $this->data['deadlineDate'] = null;
+        }
+
         if (array_key_exists('enddate', $this->data)) {
             unset($this->data['enddate']);
         }
@@ -612,7 +623,7 @@ class editor_TaskController extends ZfExtended_RestController
         // check if the relasiLang field is provided. If it is not provided, check and set default value from config.
         if (false === ($this->data['relaisLang'] ?? false)) {
             // check and set the default pivot language is configured
-            $this->defaults->setDefaultPivotForProject($this->entity, $customer);
+            $this->entity->setDefaultPivotLanguage($this->entity, $customer);
         }
 
         // set the usageMode from config if not set
@@ -985,7 +996,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         $filter = ZfExtended_Factory::get($this->filterClass, [
             $events,
-            $this->_getParam('filter'),
+            $this->getRequest()->getRawParam('filter'),
         ]);
 
         $filter->setSort($this->_getParam('sort', '[{"property":"id","direction":"DESC"}]'));
@@ -1759,6 +1770,25 @@ class editor_TaskController extends ZfExtended_RestController
                     echo $this->view->render('task/packageexporterror.phtml');
                 }
                 exit;
+
+            case 'html':
+                $this->entity->checkStateAllowsActions();
+
+                $exportService = QueuedExportService::create();
+                $token = ZfExtended_Utils::uuid();
+                $workerId = HtmlWorker::queueExportWorker(
+                    $this->entity,
+                    $exportService->composeExportDir($token)
+                );
+
+                $exportService->makeQueueRecord($token, $workerId, "{$this->entity->getTaskName()}.html");
+
+                $title = $this->view->translate('HTML-Übersicht herunterladen');
+
+                $this->redirect("/editor/queuedexport/$token?title=$title");
+
+                break;
+
             case 'filetranslation':
             case 'transfer':
             default:
@@ -1771,6 +1801,14 @@ class editor_TaskController extends ZfExtended_RestController
                 $exportFolder = $worker->initExport($this->entity, $diff);
 
                 break;
+        }
+
+        if (! isset($worker) || ! isset($finalExportWorker)) {
+            throw new LogicException('Worker not set');
+        }
+
+        if (! isset($exportFolder)) {
+            throw new LogicException('Export folder not set');
         }
 
         $workerId = $worker->queue();
@@ -2204,7 +2242,7 @@ class editor_TaskController extends ZfExtended_RestController
             unset($this->data->entityVersion);
         }
 
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
 
         try {
             $worker->loadFirstOf(editor_Models_Import_Worker::class, $this->entity->getTaskGuid());

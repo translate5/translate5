@@ -31,6 +31,7 @@ namespace Translate5\MaintenanceCli\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZfExtended_Models_Worker;
 
 class WorkerCleanCommand extends Translate5AbstractCommand
 {
@@ -74,8 +75,7 @@ class WorkerCleanCommand extends Translate5AbstractCommand
 
         $this->writeTitle('worker clean up');
 
-        $worker = \ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker \ZfExtended_Models_Worker */
+        $worker = new ZfExtended_Models_Worker();
 
         $all = (bool) $this->input->getOption('all');
         $running = (bool) $this->input->getOption('running');

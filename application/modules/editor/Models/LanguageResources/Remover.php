@@ -31,8 +31,10 @@ END LICENSE AND COPYRIGHT
  * So the function can be used from all places inside the application.
  */
 
+use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer as CustomerAssocCleanup;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task as TaskAssocCleanup;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 
 class editor_Models_LanguageResources_Remover
 {
@@ -41,23 +43,28 @@ class editor_Models_LanguageResources_Remover
      */
     protected $entity;
 
+    private CrossLanguageResourceSynchronizationService $crossLanguageResourceSynchronizationService;
+
+    private CustomerAssocService $customerAssocService;
+
     /**
      * Sets the languageresource to be removed from system
      */
     public function __construct(editor_Models_LanguageResources_LanguageResource $languageResource)
     {
         $this->entity = $languageResource;
+        $this->crossLanguageResourceSynchronizationService = CrossLanguageResourceSynchronizationService::create();
+        $this->customerAssocService = CustomerAssocService::create();
     }
 
     /**
      * Removes a languageResource completely
-     * @param false $forced
-     * @param false $deleteInResource
+     *
      * @throws Zend_Db_Table_Exception
      * @throws ZfExtended_ErrorCodeException
      * @throws ZfExtended_Exception
      */
-    public function remove($forced = false, $deleteInResource = false)
+    public function remove(bool $forced = false, bool $deleteInResource = false)
     {
         // if the current entity is term collection, init the entity as term collection
         if ($this->entity->isTc()) {
@@ -76,6 +83,10 @@ class editor_Models_LanguageResources_Remover
             // TODO CHECK: A languageResourcesRemover should remove the resource with all existing assocs and a check must take the existing assocs into account, correct ??
             $customersLeft = ($forced) ? [] : $this->entity->getCustomers();
             $this->checkOrCleanAssociations($forced, $customersLeft);
+
+            $this->crossLanguageResourceSynchronizationService->deleteRelatedConnections((int) $this->entity->getId());
+            $this->customerAssocService->separateByLanguageResource((int) $this->entity->getId());
+
             //delete the entity in the DB
             $this->entity->delete();
             // prevent nonsens

@@ -28,23 +28,32 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
+use GuzzleHttp\Client;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
+use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
+use MittagQI\Translate5\T5Memory\ExportService;
+use MittagQI\Translate5\T5Memory\PersistenceService;
+use MittagQI\Translate5\T5Memory\VersionService;
 
 /**
  * T5memory / OpenTM2 Connector
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface
+class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface, ExportAdapterInterface
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
+
+    private const VERSION_0_6 = '0.6';
 
     /**
      * Connector
@@ -70,12 +79,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      */
     protected $internalTagSupport = true;
 
-    /**
-     * Holds the parent API in case of an fuzzy connector
-     */
-    private ?editor_Services_OpenTM2_HttpApi $parentApi = null;
-
     private TmConversionService $conversionService;
+
+    private VersionService $versionService;
+
+    private PersistenceService $persistenceService;
+
+    private ExportService $exportService;
+
+    private Client $httpClient;
 
     public function __construct()
     {
@@ -86,9 +98,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
 
-        $this->conversionService = TmConversionService::create();
-
         parent::__construct();
+
+        $this->conversionService = TmConversionService::create();
+        $this->persistenceService = new PersistenceService($this->config);
+        $this->httpClient = new Client();
+        $this->versionService = new VersionService(new VersionFetchingApi($this->httpClient));
+        $this->exportService = new ExportService(
+            $this->logger,
+            $this->versionService,
+            $this->conversionService,
+            new VersionedApiFactory($this->httpClient),
+            $this->persistenceService
+        );
     }
 
     public function connectTo(
@@ -101,8 +123,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         // TODO T5MEMORY: remove when OpenTM2 is out of production
         // t5 memory is not needing the OpenTM2 specific Xliff TagHandler, the default XLIFF TagHandler is sufficient
-        if (! $this->api->isOpenTM2()
-            && $this->tagHandler instanceof editor_Services_Connector_TagHandler_OpenTM2Xliff) {
+        if ($this->tagHandler instanceof editor_Services_Connector_TagHandler_OpenTM2Xliff) {
             $this->tagHandler = ZfExtended_Factory::get(
                 editor_Services_Connector_TagHandler_T5MemoryXliff::class,
                 [[
@@ -168,7 +189,17 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         //initial upload is a TM file
-        $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
+        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_6, $this->languageResource)) {
+            $tmName = $this->api->createMemoryWithFile(
+                $name,
+                $sourceLang,
+                $fileinfo['tmp_name'],
+                $this->getStripFramingTagsValue($params['stripFramingTags'] ?? null)
+            );
+        } else {
+            $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
+        }
+
         if ($tmName) {
             $this->addMemoryToLanguageResource($this->languageResource, $tmName);
 
@@ -288,8 +319,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             }
 
             $result = $result && $this->importTmxIntoMemory(
-                file_get_contents($importFilename),
-                $params['tmName'] ?? $this->getWritableMemory(),
+                $importFilename,
+                $params['tmName'] ?? $this->persistenceService->getWritableMemory($this->languageResource),
                 $this->getStripFramingTagsValue($params)
             );
 
@@ -310,28 +341,26 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     public function getValidExportTypes(): array
     {
-        return [
-            'TM' => 'application/zip',
-            'TMX' => 'application/xml',
-        ];
+        return ExportTmFileExtension::getValidExportTypes();
     }
 
-    public function getTm($mime, string $tmName = '')
+    public function getTm($mime)
     {
-        if (empty($tmName)) {
-            $tmName = $this->getWritableMemory();
+        $file = $this->exportService->export(
+            $this->languageResource,
+            ExportTmFileExtension::fromMimeType($mime)
+        );
+
+        if (null === $file) {
+            return '';
         }
 
-        if ($this->api->get($mime, $tmName)) {
-            return $this->api->getResult();
-        }
-
-        $this->throwBadGateway();
+        return file_get_contents($file);
     }
 
     public function update(editor_Models_Segment $segment, array $options = []): void
     {
-        $tmName = $this->getWritableMemory();
+        $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
 
         if ($this->isReorganizingAtTheMoment($tmName)) {
             if ($options[UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR] ?? false) {
@@ -353,7 +382,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $useSegmentTimestamp = $options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false;
 
         $timestamp = $useSegmentTimestamp
-            ? $this->api->getDate((int) $segment->getTimestamp())
+            ? $this->api->getDate(strtotime($segment->getTimestamp()))
             : $this->api->getNowDate();
 
         $successful = $this->api->update(
@@ -448,7 +477,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     public function updateTranslation(string $source, string $target, string $tmName = '')
     {
         if (empty($tmName)) {
-            $tmName = $this->getWritableMemory();
+            $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
         }
         $this->api->updateText($source, $target, $tmName);
     }
@@ -743,7 +772,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return LanguageResourceStatus::IMPORT;
         }
 
-        $name = $tmName ?: $this->getWritableMemory();
+        $name = $tmName ?: $this->persistenceService->getWritableMemory($this->languageResource);
 
         if (empty($name)) {
             $this->lastStatusInfo = 'The internal stored filename is invalid';
@@ -752,7 +781,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         // TODO remove after fully migrated to t5memory v0.5.x
-        if ($this->getT5MemoryVersion() === self::VERSION_0_4 && $this->isReorganizingAtTheMoment($name)) {
+        if (
+            ! $this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)
+            && $this->isReorganizingAtTheMoment($name)
+        ) {
             // Status import to prevent any other queries to TM to be performed
             return LanguageResourceStatus::IMPORT;
         }
@@ -936,11 +968,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      */
     public function initForFuzzyAnalysis($analysisId)
     {
-        $mime = 'TM';
+        $ext = 'TM';
         $validExportTypes = $this->getValidExportTypes();
 
-        if (empty($validExportTypes[$mime])) {
-            throw new ZfExtended_NotFoundException('Can not download in format ' . $mime);
+        if (empty($validExportTypes[$ext])) {
+            throw new ZfExtended_NotFoundException('Can not download in format ' . $ext);
         }
 
         $fuzzyLanguageResource = clone $this->languageResource;
@@ -965,7 +997,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         //INFO: The resources logging requires resource with valid id.
         //$fuzzyLanguageResource->setId(null);
 
-        $connector = ZfExtended_Factory::get(self::class);
+        $connector = new self();
         $connector->connectTo(
             $fuzzyLanguageResource,
             $this->languageResource->getSourceLang(),
@@ -976,8 +1008,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         // copy the worker user guid
         $connector->setWorkerUserGuid($this->getWorkerUserGuid());
         $connector->isInternalFuzzy = true;
-        // needed by the fuzzy connector to reorganize the parent TM if neccessary
-        $connector->parentApi = $this->api;
+        // tell version service to not update LR data
+        $connector->versionService->setInternalFuzzy(true);
 
         return $connector;
     }
@@ -1124,16 +1156,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private const REORGANIZE_WAIT_TIME_SECONDS = 60;
 
-    private const VERSION_0_4 = '0.4';
-
     private const VERSION_0_5 = '0.5';
 
     private function needsReorganizing(stdClass $error, string $tmName): bool
     {
-        if ($this->api->isOpentm2()) {
-            return false;
-        }
-
         $errorCodes = explode(
             ',',
             $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
@@ -1166,7 +1192,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     public function reorganizeTm(?string $tmName = null): bool
     {
         if (null === $tmName) {
-            $tmName = $this->getWritableMemory();
+            $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
         }
 
         if (! $this->isInternalFuzzy()) {
@@ -1179,11 +1205,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->languageResource->save();
         }
 
-        $version = $this->getT5MemoryVersion();
-
         $reorganized = $this->api->reorganizeTm($tmName);
 
-        if ($version !== self::VERSION_0_4) {
+        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
             $reorganized = $this->waitReorganizeFinished($tmName);
         }
 
@@ -1202,7 +1226,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     {
         $this->resetReorganizingIfNeeded();
 
-        if ($this->getT5MemoryVersion() !== self::VERSION_0_4) {
+        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
             $status = $this->getStatus($this->resource, tmName: $tmName);
 
             return $status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
@@ -1213,7 +1237,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     public function isReorganizeFailed(?string $tmName = null): bool
     {
-        if ($this->getT5MemoryVersion() !== self::VERSION_0_4) {
+        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
             return $this->getStatus(
                 $this->resource,
                 tmName: $tmName
@@ -1309,48 +1333,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $languageResource->refresh();
         $languageResource->removeSpecificData(self::REORGANIZE_ATTEMPTS);
         $languageResource->save();
-    }
-
-    private function getT5MemoryVersion(): string
-    {
-        $defaultVersion = self::VERSION_0_4;
-
-        if (! $this->languageResource || $this->api->isOpentm2()) {
-            return $defaultVersion;
-        }
-
-        $version = $this->languageResource->getSpecificData('version', true);
-
-        if (isset($version['version'], $version['lastSynced'])
-            && null !== $version
-            && (new DateTime($version['lastSynced']))->modify('+30 minutes') > new DateTime()
-        ) {
-            return $version['version'];
-        }
-
-        $success = $this->api->resources();
-
-        if (! $success) {
-            return $defaultVersion;
-        }
-
-        $resources = $this->api->getResult();
-
-        $version = str_starts_with($resources->Version ?? '', self::VERSION_0_4) ? self::VERSION_0_4 : self::VERSION_0_5;
-
-        if (! $this->isInternalFuzzy()) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $this->languageResource->refresh();
-            $this->languageResource->addSpecificData('version', [
-                'version' => $version,
-                'lastSynced' => date(DateTimeInterface::RFC3339),
-            ]);
-            $this->languageResource->save();
-        }
-
-        return $version;
     }
 
     /**
@@ -1487,19 +1469,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $resultList;
     }
 
-    private function getWritableMemory(): string
-    {
-        foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
-            if (! $memory['readonly']) {
-                return $memory['filename'];
-            }
-        }
-
-        throw new editor_Services_Connector_Exception('E1564', [
-            'name' => $this->languageResource->getName(),
-        ]);
-    }
-
     private function isMemoryOverflown(?object $error): bool
     {
         if (null === $error) {
@@ -1517,14 +1486,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     }
 
     private function importTmxIntoMemory(
-        string $fileContent,
+        string $importFilename,
         string $tmName,
         StripFramingTags $stripFramingTags,
     ): bool {
         $successful = false;
 
         try {
-            $successful = $this->api->importMemory($fileContent, $tmName, $stripFramingTags);
+            if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_6, $this->languageResource)) {
+                $successful = $this->api->importMemoryAsFile($importFilename, $tmName, $stripFramingTags);
+            } else {
+                $successful = $this->api->importMemory(file_get_contents($importFilename), $tmName, $stripFramingTags);
+            }
 
             if (! $successful) {
                 $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
@@ -1544,6 +1517,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->logger->exception($e);
         }
 
+        // At current point LR is in Import status to prevent race conditions
+        // Here we resetting state to fetch the actual status from t5memory
+        $this->languageResource->setStatus(LanguageResourceStatus::NOTCHECKED);
+
         $this->waitForImportFinish($tmName);
         $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
 
@@ -1557,34 +1534,30 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->addMemoryToLanguageResource($this->languageResource, $newName);
 
             // Filter TMX data from already imported segments
-            $fileContent = $this->cutOffTmx(
-                $fileContent,
-                $this->getOverflowSegmentNumber($error->error)
-            );
+            $this->cutOffTmx($importFilename, $this->getOverflowSegmentNumber($error->error));
 
             // Import further
-            return $this->importTmxIntoMemory($fileContent, $newName, $stripFramingTags);
+            return $this->importTmxIntoMemory($importFilename, $newName, $stripFramingTags);
         }
 
         return $successful;
     }
 
-    private function cutOffTmx(string $tmxData, int $segmentToStartFrom): string
+    private function cutOffTmx(string $importFilename, int $segmentToStartFrom): void
     {
         $doc = new DOMDocument();
-        $doc->loadXML($tmxData);
+        $doc->load($importFilename);
 
         if (! $doc->hasChildNodes()) {
             $error = libxml_get_last_error();
 
-            // TODO vice-versa?
-            if (str_contains($error->message, 'labelled UTF-16 but has UTF-8') !== false) {
-                $tmxData = preg_replace('/encoding="UTF-16"/', 'encoding="UTF-8"', $tmxData, 1);
-                $doc->loadXML($tmxData);
+            if (false !== $error) {
+                throw new RuntimeException(
+                    'Error while loading TMX file: ' . $error->message,
+                    $error->code
+                );
             }
         }
-
-        unset($tmxData);
 
         // Create an XPath to query the document
         $xpath = new DOMXPath($doc);
@@ -1596,10 +1569,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         for ($i = 0; $i < $segmentToStartFrom; $i++) {
             $tuNodes->item($i)->parentNode->removeChild($tuNodes->item($i));
         }
-        unset($tuNodes);
 
-        // Save the modified TMX data to a new variable
-        return $doc->saveXML();
+        $doc->save($importFilename);
     }
 
     private function getOverflowSegmentNumber(string $error): int
@@ -1661,163 +1632,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return preg_replace($pattern, '_next-' . ($currentMax + 1), $memories[0]['filename']);
     }
 
-    // region export TM
-    // TODO change to interface method
-    public function exportsFile(): bool
+    public function export(string $mime): ?string
     {
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
-        return count($memories) >= 1;
-    }
-
-    // TODO Move to a separate class(es) during refactoring
-    public function export(string $mime): string
-    {
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-
-        if ($mime === $this->getValidExportTypes()['TMX']) {
-            return $this->exportAllAsOneTmx($memories, $mime);
-        }
-
-        return $this->exportAllAsArchive($memories, $mime);
-    }
-
-    private function exportAllAsOneTmx(array $memories, string $mime): string
-    {
-        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
-        @mkdir($exportDir, recursive: true);
-        $resultFilename = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '.tmx';
-        $writer = new XMLWriter();
-        $writer->openURI($resultFilename);
-        $writer->startDocument('1.0', 'UTF-8');
-        $writer->setIndent(true);
-
-        stream_filter_register('fix-t5n-tag', T5NTagSchemaFixFilter::class);
-
-        $writtenElements = 0;
-
-        foreach ($memories as $memoryNumber => $memory) {
-            $filename = $exportDir . $memory['filename'] . '_' . uniqid() . '.tmx';
-
-            try {
-                file_put_contents(
-                    $filename,
-                    $this->getTm($mime, $memory['filename'])
-                );
-            } catch (editor_Services_Connector_Exception $e) {
-                $this->logger->exception($e);
-
-                continue;
-            }
-
-            $stream = "php://filter/read=fix-t5n-tag/resource=$filename";
-            $reader = new XMLReader();
-            $reader->open($stream);
-
-            while ($reader->read()) {
-                if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
-                    $writtenElements++;
-                    $writer->writeRaw($this->conversionService->convertT5MemoryTagToContent($reader->readOuterXML()));
-                    $writtenElements++;
-                }
-
-                // Further code is only applicable for the first file
-                if ($memoryNumber > 0) {
-                    continue;
-                }
-
-                if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
-                    $writer->writeRaw($reader->readOuterXML());
-                }
-
-                if (! in_array($reader->name, ['tmx', 'body'])) {
-                    continue;
-                }
-
-                if ($reader->nodeType == XMLReader::ELEMENT) {
-                    $writer->startElement($reader->name);
-
-                    if ($reader->hasAttributes) {
-                        while ($reader->moveToNextAttribute()) {
-                            $writer->writeAttribute($reader->name, $reader->value);
-                        }
-                    }
-
-                    if ($reader->isEmptyElement) {
-                        $writer->endElement();
-                    }
-                }
-            }
-
-            $reader->close();
-
-            unlink($filename);
-
-            if ($memoryNumber < count($memories) - 1) {
-                $writer->writeComment('Next file');
-            }
-        }
-
-        $writer->flush();
-
-        if (0 !== $writtenElements) {
-            // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
-            // so add body and tmx closing tags manually
-            file_put_contents($resultFilename, PHP_EOL . '</body>', FILE_APPEND);
-        }
-
-        file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
-
-        return $resultFilename;
-    }
-
-    private function exportAllAsArchive(array $memories, string $mime): string
-    {
-        header('HTTP/1.0 403 Forbidden');
-        echo "<pre>The TM binary export is currently blocked for technical reasons.\n";
-        echo 'Der TM-Binary-Export ist augenblicklich aus technischen Gründen gesperrt.</pre>';
-        exit;
-
-        // @phpstan-ignore-next-line
-        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
-        $tmpDir = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '/';
-        @mkdir($tmpDir, recursive: true);
-
-        foreach ($memories as $index => $memory) {
-            file_put_contents($tmpDir . ($index + 1) . '.tm', $this->getTm($mime, $memory['filename']));
-        }
-
-        $zipFileName = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '.zip';
-        $zip = new ZipArchive();
-        $zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($tmpDir),
-            RecursiveIteratorIterator::LEAVES_ONLY
+        return $this->exportService->export(
+            $this->languageResource,
+            ExportTmFileExtension::fromMimeType($mime, count($memories) > 1)
         );
-
-        foreach ($files as $file) {
-            if (! $file->isDir()) {
-                $filePath = $file->getRealPath();
-                $relativePath = basename($filePath);
-
-                $zip->addFile($filePath, $relativePath);
-            }
-        }
-
-        $zip->close();
-
-        foreach ($files as $file) {
-            if (! $file->isDir() && is_file($file->getRealPath())) {
-                unlink($file->getRealPath());
-            }
-        }
-        rmdir($tmpDir);
-
-        return $zipFileName;
     }
-    // endregion export TM
 
     private function checkUpdateResponse(array $request, object $response): void
     {

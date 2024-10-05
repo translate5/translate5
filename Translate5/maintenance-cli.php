@@ -75,6 +75,7 @@ use Translate5\MaintenanceCli\Command\{
     OkapiUpdateCommand,
     PatchApplyCommand,
     PatchScriptCommand,
+    PhpLogCommand,
     PluginDisableCommand,
     PluginEnableCommand,
     PluginListCommand,
@@ -97,6 +98,7 @@ use Translate5\MaintenanceCli\Command\{
     T5Memory\T5memoryTmListCommand,
     TaskArchiveCommand,
     TaskCleanCommand,
+    TaskFromInstantTranslateCommand,
     TaskImportCommand,
     TaskInfoCommand,
     TaskSkeletonfileCommand,
@@ -118,6 +120,7 @@ use Translate5\MaintenanceCli\Command\{
     VisualImplantReflownWysiwyg,
     WorkerCleanCommand,
     WorkerListCommand,
+    WorkerLogCommand,
     WorkerQueueCommand,
     WorkerRerunCommand,
     WorkerRunCommand,
@@ -157,6 +160,7 @@ $commands = [
     new OkapiCleanBconfsCommand(),
     new PatchApplyCommand(),
     new PatchScriptCommand(),
+    new PhpLogCommand(),
     new PluginDisableCommand(),
     new PluginEnableCommand(),
     new PluginListCommand(),
@@ -173,6 +177,7 @@ $commands = [
     new SystemVersionCommand(),
     new TaskArchiveCommand(),
     new TaskCleanCommand(),
+    new TaskFromInstantTranslateCommand(),
     new TaskInfoCommand(),
     new TaskImportCommand(),
     new TaskSkeletonfileCommand(),
@@ -191,6 +196,7 @@ $commands = [
     new VisualImplantReflownWysiwyg(),
     new WorkerCleanCommand(),
     new WorkerListCommand(),
+    new WorkerLogCommand(),
     new WorkerQueueCommand(),
     new WorkerRerunCommand(),
     new WorkerRunCommand(),
@@ -202,7 +208,7 @@ $commands = [
 
 // integrate Plugin-specific CLI commands
 foreach (glob(getcwd() . '/application/modules/editor/Plugins/*/CLI/*Command.php') as $pluginCommandFile) {
-    $pluginCommandFileSplitt = explode(DIRECTORY_SEPARATOR, $pluginCommandFile);
+    $pluginCommandFileSplitt = explode('/', preg_replace('~(^[A-Z]:)?\\\\~', '/', $pluginCommandFile));
 
     $pluginName = $pluginCommandFileSplitt[(array_key_last($pluginCommandFileSplitt) - 2)];
     $commandName = pathinfo($pluginCommandFile, PATHINFO_FILENAME);

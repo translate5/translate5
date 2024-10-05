@@ -151,7 +151,7 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
                     renderer: function(val, meta, record) {
                         var str = me.assocStore.findRecord('languageResourceId',record.get('languageResourceid'),0,false,true,true);
                         meta.tdStyle="background-color:#"+str.get('color')+" !important;";
-                        return str.get('name')+' ('+str.get('serviceName')+')';
+                        return Ext.String.htmlEncode(str.get('name'))+' ('+str.get('serviceName')+')';
                     },
                     text: me.strings.tmresource
                 }],

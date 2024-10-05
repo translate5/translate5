@@ -198,7 +198,7 @@ class NumberProtectorTest extends TestCase
         );
 
         self::assertSame(
-            '1. Here we have <number type="ip-address" name="test-cheat" source="some text" iso="some text" target="some text"/> case',
+            '1. Here we have <number type="ip-address" name="test-cheat" source="some text" iso="some text" target="some text" regex="0y/Oz01VKEmtKNEHAA=="/> case',
             $protector->protect('1. Here we have some text case', true, 5, 6)
         );
     }

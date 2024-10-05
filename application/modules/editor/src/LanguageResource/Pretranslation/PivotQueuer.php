@@ -172,8 +172,7 @@ class PivotQueuer
      */
     private function fetchImportWorkerId(string $taskGuid): ?int
     {
-        $parent = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $parent ZfExtended_Models_Worker */
+        $parent = new ZfExtended_Models_Worker();
         $result = $parent->loadByState(
             ZfExtended_Models_Worker::STATE_PREPARE,
             'editor_Models_Import_Worker',

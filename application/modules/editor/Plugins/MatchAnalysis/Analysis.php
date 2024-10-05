@@ -743,7 +743,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $languageResource,
             $this->task->getSourceLang(),
             $this->task->getTargetLang(),
-            $this->task->getConfig()
+            $this->task->getConfig(),
+            (int) $this->task->getCustomerId()
         );
 
         // set the analysis running user to the connector

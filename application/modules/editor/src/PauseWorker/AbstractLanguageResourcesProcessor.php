@@ -68,7 +68,8 @@ abstract class AbstractLanguageResourcesProcessor
                     $languageResource,
                     (int) $task->getSourceLang(),
                     (int) $task->getTargetLang(),
-                    $task->getConfig()
+                    $task->getConfig(),
+                    (int) $task->getCustomerId(),
                 );
 
                 if (LanguageResourceStatus::IMPORT === $connector->getStatus($resource, $languageResource)) {

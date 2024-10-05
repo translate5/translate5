@@ -32,6 +32,16 @@ END LICENSE AND COPYRIGHT
  * @version 2.0
  *
  */
+
+use MittagQI\Translate5\Segment\Dto\SegmentView;
+use MittagQI\Translate5\Task\Overview\SegmentDataHeader;
+use MittagQI\Translate5\Task\Overview\SegmentDataProvider;
+use MittagQI\Translate5\Task\Overview\SegmentDataProviderFactory;
+use MittagQI\Translate5\Task\Overview\SegmentFormatter\MqmTagFormatter;
+use MittagQI\Translate5\Task\Overview\SegmentFormatter\ReplaceInternalTagWithSpanFormatter;
+use MittagQI\Translate5\Task\Overview\SegmentFormatter\TermTagFormatter;
+use MittagQI\Translate5\Task\Overview\SegmentFormatter\TrackChangesTagFormatter;
+
 /**
  * Formats a Segment List as a HTML table to be send as an E-Mail.
  */
@@ -41,21 +51,22 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
 
     /**
      * segment list
-     * @var array
      */
-    protected $segments;
+    protected array $segments;
 
-    /**
-     * This vars are initialized lazy
-     * @var editor_Models_Segment_Utility
-     */
-    protected $segmentUtility;
+    private string $segmentHash;
 
-    /**
-     * This vars are initialized lazy
-     * @var editor_Models_Segment_Mqm
-     */
-    protected $mqmConverter;
+    private SegmentDataProvider $segmentProvider;
+
+    public function __construct()
+    {
+        $this->segmentProvider = SegmentDataProviderFactory::create()->getProvider([
+            new ReplaceInternalTagWithSpanFormatter('title', '#39ffa3'),
+            new TermTagFormatter('title'),
+            MqmTagFormatter::create('title', '#ff8215'),
+            TrackChangesTagFormatter::create(),
+        ]);
+    }
 
     /**
      * replace the comment HTML Tags with <br>
@@ -70,84 +81,6 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
     }
 
     /**
-     * replace Segment HTML with E-Mail usable HTML
-     * @param string $content
-     * @return string
-     */
-    protected function prepareSegment($content)
-    {
-        //remove full tags
-        $content = preg_replace('#<span[^>]+class="full"[^>]*>[^<]*</span>#i', '', $content);
-        //replace short tag div span construct to a simple span
-        $content = preg_replace('#<div[^>]+>[\s]*<span([^>]+)class="short"([^>]*)>([^<]*)</span>[\s]*</div>#mi', '<span $1 $2 style="background-color:#39ffa3;">$3</span>', $content);
-        //replace term divs by breaking apart to replace the class
-        $parts = preg_split('#(<div[^>]+>)#i', $content, flags: PREG_SPLIT_DELIM_CAPTURE);
-        foreach ($parts as $idx => $part) {
-            if (! ($idx % 2)) {
-                continue;
-            }
-            $parts[$idx] = $this->modifyTermTag($part);
-        }
-        $content = str_ireplace('</div>', '</span>', join('', $parts));
-
-        return $this->modifyMqmTags($content);
-    }
-
-    /**
-     * replaces the current term tag with a span tag, containing styles instead css classes
-     * In this method the current used term styles are adapted (see main.css)
-     *
-     * @param string $termTag
-     * @return string
-     */
-    protected function modifyTermTag($termTag)
-    {
-        $cls = explode(' ', preg_replace('#<div[^>]+class="([^"]*)"[^>]*>#i', '$1', $termTag));
-        $title = preg_replace('#<div[^>]+title="([^"]*)"[^>]*>#i', '$1', $termTag);
-        $result = '<span title="%1$s" style="%2$s">';
-
-        //adapted css logic:
-        if (in_array('notRecommended', $cls) || in_array('supersededTerm', $cls) || in_array('deprecatedTerm', $cls)) {
-            return sprintf($result, $title, 'border-bottom:none;background-color:#fa51ff;');
-        }
-        if (in_array('transNotFound', $cls)) {
-            return sprintf($result, $title, 'border-bottom-color:#ff0000;');
-        }
-        if (in_array('transNotDefined', $cls)) {
-            return sprintf($result, $title, 'border-bottom-color:#8F4C36;');
-        }
-        if (in_array('term', $cls)) {
-            return sprintf($result, $title, 'background:transparent;border-bottom:1px solid #0000ff;');
-        }
-
-        return '<span>';
-    }
-
-    /**
-     * modifies the QM Subsegment Tags as needed
-     * @param string $content
-     * @return string
-     */
-    protected function modifyMqmTags($content)
-    {
-        $translate = $this->view->translate;
-        $resultRenderer = function ($tag, $cls, $issueId, $issueName, $sev, $sevName, $comment) use ($translate) {
-            $title = empty($sevName) ? '' : htmlspecialchars($translate->_($sevName)) . ': ';
-            $title .= htmlspecialchars(empty($issueName) ? '' : $translate->_($issueName));
-            $title .= empty($comment) ? '' : ' / ' . $comment;
-
-            $span = '<span style="background-color:#ff8215;" title="%1$s"> %2$s </span>';
-            if (in_array('open', $cls)) {
-                return sprintf($span, $title, '[' . $issueId);
-            }
-
-            return sprintf($span, $title, $issueId . ']');
-        };
-
-        return $this->mqmConverter->replace($this->view->task, $content, $resultRenderer);
-    }
-
-    /**
      * render the HTML Segment Table
      * @return string
      */
@@ -159,83 +92,71 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             return '';
         }
 
-        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        /* @var $states editor_Models_Segment_AutoStates */
-        $stateMap = $states->getLabelMap();
-
-        $this->mqmConverter = ZfExtended_Factory::get('editor_Models_Segment_Mqm');
-        $this->segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
-
-        $t = $this->view->translate;
+        $t = $this->view->translate; // @phpstan-ignore-line
         if (empty($this->segments)) {
             return '<b>' . $t->_('Es wurden keine Segmente verändert!') . '</b>';
         }
 
-        $task = $this->view->task;
         /* @var $task editor_Models_Task */
+        $task = $this->view->task; // @phpstan-ignore-line
 
-        $showImportTargetColumn = $task->getConfig()->runtimeOptions->editor->notification->showImportTargetColumn;
-
-        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
-
-        $fields = $sfm->getFieldList();
-        $fieldsToShow = [];
-        foreach ($fields as $field) {
-            if ($field->type == editor_Models_SegmentField::TYPE_RELAIS) {
-                continue;
+        $segments = (function () {
+            foreach ($this->segments as $segment) {
+                yield new SegmentView($segment);
             }
-            //show the original source
-            if ($field->type === editor_Models_SegmentField::TYPE_SOURCE) {
-                $fieldsToShow[$field->name] = $t->_($field->label);
-            }
+        })();
 
-            // show the target on import if configured
-            if ($field->type === editor_Models_SegmentField::TYPE_TARGET && $showImportTargetColumn) {
-                $fieldsToShow[$field->name] = $t->_($field->label);
-            }
-
-            //if field is editable (source or target), show the edited data
-            if ($field->editable) {
-                $fieldsToShow[$sfm->getEditIndex($field->name)] = sprintf($t->_('%s - bearbeitet'), $t->_($field->label));
-            }
-        }
+        $segmentDataTable = $this->segmentProvider->getSegmentDataTable($task, $segments);
 
         $result = [];
         $result[] = '<br/>';
         $header = $t->_('Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />');
-        $header = str_replace('{previousRole}', $t->_($this->view->triggeringStep), $header);
+        $header = str_replace('{previousRole}', $t->_($this->view->triggeringStep), $header); // @phpstan-ignore-line
 
         $result[] = $header;
 
-        $result[] = '<br /><br /><table cellpadding="4">';
-        $th = '<th align="left" valign="top">';
+        $result[] = '<br /><br />';
+        $result[] = '<table cellpadding="4">';
         $result[] = '<tr>';
-        $result[] = $th . $t->_('Nr.') . '</th>';
-        foreach ($fieldsToShow as $field) {
-            $result[] = $th . $field . '</th>';
+
+        $th = '<th align="left" valign="top">';
+
+        foreach ($segmentDataTable->header->getFields() as $field) {
+            $result[] = $th . $field->label . '</th>';
         }
-        $result[] = $th . $t->_('Status') . '</th>';
-        $result[] = $th . $t->_('Manuelle QS (ganzes Segment)') . '</th>';
-        $result[] = $th . $t->_('Bearbeitungsstatus') . '</th>';
-        $result[] = $th . $t->_('Matchrate') . '</th>';
-        $result[] = $th . $t->_('Kommentare') . '</th>';
+
         $result[] = '</tr>';
 
-        foreach ($this->segments as $segment) {
-            $state = $stateMap[$segment['autoStateId']] ?? '- not found -'; //else tree should not be so untranslated
+        foreach ($segmentDataTable->getRows() as $row) {
             $result[] = "\n" . '<tr>';
-            $result[] = '<td valign="top">' . $segment['segmentNrInTask'] . '</td>';
-            foreach ($fieldsToShow as $fieldName => $field) {
-                $result[] = '<td valign="top">' . $this->prepareSegment($segment[$fieldName]) . '</td>';
+
+            foreach ($segmentDataTable->header->getFields() as $field) {
+                if (in_array($field->id, [SegmentDataHeader::FIELD_STATUS, SegmentDataHeader::FIELD_EDIT_STATUS])) {
+                    $result[] = '<td valign="top" nowrap="nowrap">' . $row[$field] . '</td>';
+
+                    continue;
+                }
+
+                if ($field->id === SegmentDataHeader::FIELD_COMMENTS) {
+                    $result[] = '<td valign="top" nowrap="nowrap">' . $this->prepareComments($row[$field] ?? '') . '</td>';
+
+                    continue;
+                }
+
+                if ($field->id === SegmentDataHeader::FIELD_MANUAL_QS) {
+                    $joinedQualities = ! empty($row[$field]) ? implode(',<br />', $row[$field]) : '';
+
+                    $result[] = '<td valign="top" nowrap="nowrap">' . $joinedQualities . '</td>';
+
+                    continue;
+                }
+
+                $result[] = '<td valign="top">' . $row[$field] . '</td>';
             }
-            $result[] = '<td valign="top" nowrap="nowrap">' . $t->_($this->segmentUtility->convertStateId($segment['stateId'])) . '</td>';
-            $joinedQualities = (array_key_exists('qualities', $segment)) ? join(',<br />', $segment['qualities']) : '';
-            $result[] = '<td valign="top" nowrap="nowrap">' . $joinedQualities . '</td>';
-            $result[] = '<td valign="top">' . $t->_($state) . '</td>';
-            $result[] = '<td valign="top">' . $segment['matchRate'] . '%</td>';
-            $result[] = '<td valign="top">' . $this->prepareComments($segment['comments'] ?? '') . '</td>';
+
             $result[] = '</tr>';
         }
+
         $result[] = '</table>';
         $result[] = '<br/>';
 
@@ -256,15 +177,17 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
 
     /**
      * Helper Initiator
-     * @param string $segmentHash optional hash to identify the segments to cash them internally
+     * @param string|null $segmentHash optional hash to identify the segments to cash them internally
      */
-    public function workflowNotifyHtmlMailSegmentList(array $segments, $segmentHash = null)
+    public function workflowNotifyHtmlMailSegmentList(array $segments, string $segmentHash = null)
     {
         if (empty($segmentHash)) {
+            /** @phpstan-ignore-next-line */
             $this->segmentHash = md5(print_r($segments, 1) . $this->view->translate->getTargetLang());
         } else {
             $this->segmentHash = $segmentHash;
         }
+
         $this->segments = $segments;
 
         return $this;

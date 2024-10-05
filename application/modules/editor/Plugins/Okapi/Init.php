@@ -797,7 +797,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         }
 
         try {
-            $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+            $worker = new ZfExtended_Models_Worker();
             $worker->loadFirstOf(editor_Plugins_Okapi_Worker::class, $task->getTaskGuid());
 
             //proceed with the archive only, if a okapi worker was found for the current task

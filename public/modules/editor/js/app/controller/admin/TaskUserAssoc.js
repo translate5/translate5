@@ -346,10 +346,11 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         if (!rec.phantom || isChanged) {
             return;
         }
-        //on new job entries only non finished states are allowed.
+        //on new job entries only non-finished states are allowed.
         // Everything else would make no sense and bypass workflow
         stateCombo.store.addFilter(function (item) {
-            return item.get('id') !== Editor.model.admin.Task.prototype.USER_STATE_FINISH;
+            return item.get('id') !== Editor.model.admin.Task.prototype.USER_STATE_FINISH &&
+                   item.get('id') !== Editor.model.admin.Task.prototype.USER_STATE_AUTO_FINISH;
         });
         if (initialStates && initialStates[step]) {
             newState = initialStates[step];

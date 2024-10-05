@@ -32,27 +32,18 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_AbstractWorker
 {
-    protected ZfExtended_Logger $log;
-
     public function __construct()
     {
         parent::__construct();
         $this->log = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         return ! empty($parameters['languageResourceId']);
     }
 
-    /**
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $params = $this->workerModel->getParameters();
 
@@ -83,7 +74,13 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
             $targetLang = $task->getRelaisLang();
         }
 
-        $connector = $manager->getConnector($languageResource, $task->getSourceLang(), $targetLang, $task->getConfig());
+        $connector = $manager->getConnector(
+            $languageResource,
+            (int) $task->getSourceLang(),
+            (int) $targetLang,
+            $task->getConfig(),
+            (int) $task->getCustomerId(),
+        );
         /* @var editor_Services_Connector $connector */
 
         // set the worker user for the connector. This is required for the resource usage log

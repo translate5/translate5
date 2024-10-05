@@ -130,7 +130,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
         $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [$this->entity, $task->getConfig()]);
         /* @var $repetitionUpdater editor_Models_Segment_RepetitionUpdater */
 
-        $alikeQualities = new editor_Segment_Alike_Qualities($this->entity->getId());
+        $alikeQualities = new editor_Segment_Alike_Qualities((int) $this->entity->getId());
 
         // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
         // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is saved,
@@ -143,7 +143,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
         // Detect first repetition, which can be edited segment itself
         $repeatedIncludingEdited = array_merge($ids, [$editedSegmentId]);
         sort($repeatedIncludingEdited, SORT_NUMERIC);
-        $firstAmongRepeated = $repeatedIncludingEdited[0];
+        $firstAmongRepeated = (int) $repeatedIncludingEdited[0];
 
         foreach ($ids as $id) {
             $id = (int) $id;
@@ -200,7 +200,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
                     continue;
                 }
 
-                if (! is_null($this->entity->getStateId())) {
+                if ($this->entity->getStateId() !== null) {
                     $entity->setStateId($this->entity->getStateId());
                 }
                 $entity->setUserName($this->entity->getUserName());

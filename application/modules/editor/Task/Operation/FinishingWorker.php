@@ -44,7 +44,7 @@ class editor_Task_Operation_FinishingWorker extends editor_Models_Task_AbstractW
      */
     private $taskInitialState;
 
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
         if (array_key_exists('operationType', $parameters) && array_key_exists('taskInitialState', $parameters)) {
@@ -57,7 +57,7 @@ class editor_Task_Operation_FinishingWorker extends editor_Models_Task_AbstractW
         return false;
     }
 
-    protected function work()
+    protected function work(): bool
     {
         $events = ZfExtended_Factory::get('ZfExtended_EventManager', [get_class($this)]);
         /* @var $events ZfExtended_EventManager */

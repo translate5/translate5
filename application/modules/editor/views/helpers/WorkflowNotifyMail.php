@@ -26,14 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package portal
- * @version 2.0
- *
- */
 /**
  * Utility functions usable in workflow notification E-Mails.
+ *
+ * @property ZfExtended_View $view
  */
 class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
 {
@@ -49,22 +45,25 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
     public function renderUserList(array $users, string $receiverUserGuid = null)
     {
         // anonymize users?
+        /** @var editor_Models_Task $task */
         $task = $this->view->task;
 
         $notifyConfig = $task->getConfig()->runtimeOptions->editor->notification;
         $columns = $notifyConfig->userListColumns->toArray();
 
-        $receiverLocale = $this->view->receiver->locale ?? null;
+        /** @var string|null $receiverLocale */
+        // @phpstan-ignore-next-line
+        $receiverLocale = $this->view->receiver?->locale ?? null;
 
-        /* @var $task editor_Models_Task */
         $taskGuid = $task->getTaskGuid();
 
+        /** @var string[] $receiverLocale */
+        // @phpstan-ignore-next-line
         $rolesOfReceiver = is_string($this->view->receiver->roles) ? explode(',', $this->view->receiver->roles) : $this->view->receiver->roles;
         if ($task->anonymizeUsers(true, $rolesOfReceiver)) {
             // = anonymize $users for task without taking the addressed user into account
             // (the receiver of the mail might not be the currently authenticated user)
-            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            $workflowAnonymize = ZfExtended_Factory::get(editor_Workflow_Anonymize::class);
             foreach ($users as &$user) {
                 $user = $workflowAnonymize->anonymizeUserdata($taskGuid, $user['userGuid'], $user, $receiverUserGuid);
             }
@@ -75,6 +74,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
         $firstUser = reset($users);
         $hasState = ! empty($firstUser) && array_key_exists('state', $firstUser);
         $hasRole = ! empty($firstUser) && array_key_exists('role', $firstUser);
+        /** @var ZfExtended_Zendoverwrites_Translate $t */
         $t = $this->view->translate;
         $result = ['<table cellpadding="4">'];
         $th = '<th align="left">';
@@ -105,7 +105,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
 
         //fields to be translated for the receiver
         $translateFieldValues = ['state', 'role'];
-        $t = $this->view->translate;
+
         foreach ($users as $user) {
             $result[] = "\n" . '<tr>';
             foreach ($columns as $col) {
@@ -131,21 +131,22 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
      */
     public function getTaskLanguages(editor_Models_Task $task)
     {
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages */
-
+        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
         $params = [];
 
+        /** @var ZfExtended_Zendoverwrites_Translate $t */
+        $t = $this->view->translate;
+
         try {
-            $lang->load($task->getSourceLang());
-            $params['sourceLanguageTranslated'] = $this->view->translate->_($lang->getLangName());
+            $lang->load((int) $task->getSourceLang());
+            $params['sourceLanguageTranslated'] = $t->_($lang->getLangName());
         } catch (Exception $e) {
             $params['sourceLanguageTranslated'] = 'unknown';
         }
 
         try {
-            $lang->load($task->getTargetLang());
-            $params['targetLanguageTranslated'] = $this->view->translate->_($lang->getLangName());
+            $lang->load((int) $task->getTargetLang());
+            $params['targetLanguageTranslated'] = $t->_($lang->getLangName());
         } catch (Exception $e) {
             $params['targetLanguageTranslated'] = 'unknown';
         }
@@ -153,12 +154,12 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
         $relais = $task->getRelaisLang();
         if (! empty($relais)) {
             try {
-                $lang->load($task->getRelaisLang());
-                $params['relaisLanguageTranslated'] = $this->view->translate->_($lang->getLangName());
+                $lang->load((int) $task->getRelaisLang());
+                $params['relaisLanguageTranslated'] = $t->_($lang->getLangName());
             } catch (Exception $e) {
                 $params['relaisLanguageTranslated'] = 'unknown';
             }
-            $params['relaisLanguageFragment'] = $this->view->translate->_('<b>Relaissprache:</b> {relaisLanguageTranslated}<br />');
+            $params['relaisLanguageFragment'] = $t->_('<b>Relaissprache:</b> {relaisLanguageTranslated}<br />');
         } else {
             $params['relaisLanguageFragment'] = '';
         }
@@ -174,7 +175,9 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
      */
     public function dateFormat($date, $isDateTime = false)
     {
+        // @phpstan-ignore-next-line
         if (empty($this->view->receiver->locale)) {
+            // @phpstan-ignore-next-line
             $locale = $this->view->config->runtimeOptions->translation->fallbackLocale;
         } else {
             $locale = $this->view->receiver->locale;

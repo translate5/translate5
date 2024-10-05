@@ -35,7 +35,6 @@ trait editor_Controllers_Traits_ControllerTrait
     /**
      * Alias for editor_Utils::jcheck(), except that if $data arg is not given - request params will be used by default
      *
-     * @param array $ruleA
      * @param array|null|ZfExtended_Models_Entity_Abstract $data
      * @return array
      * @throws MismatchException
@@ -51,13 +50,11 @@ trait editor_Controllers_Traits_ControllerTrait
     /**
      * Show confirmation prompt
      *
-     * @param string|array $msg
      * @param string $buttons OKCANCEL, YESNO, YESNOCANCEL
      * @param string|null $cancelMsg Msg, that will be shown in case if 'Cancel'
      *                    button was pressed or confirmation window was closed
-     * @return string
      */
-    public function confirm(string|array $msg, $buttons = 'OKCANCEL', $cancelMsg = null) : string
+    public function confirm(string|array $msg, $buttons = 'OKCANCEL', $cancelMsg = null): string
     {
         // Get answer index
         $answerIdx = editor_Utils::rif(editor_Utils::$answer, count(editor_Utils::$answer) + 1);
@@ -82,7 +79,6 @@ trait editor_Controllers_Traits_ControllerTrait
     /**
      * Alias for editor_Utils::jflush()
      *
-     * @param bool|array $success
      * @param string $msg
      * @return mixed
      */

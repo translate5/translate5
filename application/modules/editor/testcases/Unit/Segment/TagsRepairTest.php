@@ -414,17 +414,86 @@ class TagsRepairTest extends MockedTaskTestAbstract
         $this->createInternalTagsRepairTest($markup, '', '', $translatedMarkup);
     }
 
+    public function testStartingEndingTagCount()
+    {
+        $this->assertEquals(2, Tag::countImgTagsOnlyStartOrEnd('<img src="test"/><img src="test"/>Lorem ipsum sit amet'));
+        $this->assertEquals(-3, Tag::countImgTagsOnlyStartOrEnd('Lorem ipsum sit amet <img src="test"/><img src="test"/><img src="test"/>'));
+        $this->assertEquals(-1, Tag::countImgTagsOnlyStartOrEnd('Lorem ipsum sit amet <img src="test"/>'));
+        $this->assertEquals(0, Tag::countImgTagsOnlyStartOrEnd('<img src="test"/><img src="test"/>Lorem ipsum sit amet<img src="test"/>'));
+        $this->assertEquals(0, Tag::countImgTagsOnlyStartOrEnd('<img src="test"/><img src="test"/>Lorem ipsum <img src="test"/> sit amet'));
+        $this->assertEquals(0, Tag::countImgTagsOnlyStartOrEnd(' <img src="test"/>Lorem ipsum sit amet'));
+    }
+
+    public function testDetectUntranslated1()
+    {
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt<7/> werden <2>muss<9/></2>';
+        $translated = '<9/>Ein kurzer Satz, der übersetzt<7/></1> werden muss<8/></2><2>';
+        $this->createHtmlTagsRepairTest($markup, $markup, $translated, true, true);
+    }
+
+    public function testDetectUntranslated2()
+    {
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt<7/> werden <2>muss<9/></2>';
+        $translated = '  Ein  kurzer Satz,   der' . "\t" . 'übersetzt <7/>' . "\n" . '</1> werden  muss<8/> </2> <2> ';
+        $this->createHtmlTagsRepairTest($markup, $markup, $translated, true, true);
+    }
+
+    public function testRepairClusteredTags1()
+    {
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt<7/> werden <2>muss<9/></2>';
+        $expected = '<1><8/>A short sentence,</1> that has to<7/> be <2>translated<9/></2>';
+        $translated = '<1></1><2></2><7/><8/><9/>A short sentence, that has to be translated';
+        $this->createHtmlTagsRepairTest($markup, $expected, $translated, true, true);
+    }
+
+    public function testRepairClusteredTags2()
+    {
+        $markup = '<8/>Ein <1>kurzer Satz,</1> der übersetzt werden muss';
+        $expected = '<8/>A <1>short sentence,</1> that has to be translated';
+        $translated = '<1></1><8/>A short sentence, that has to be translated';
+        $this->createHtmlTagsRepairTest($markup, $expected, $translated, true, true);
+    }
+
+    public function testRepairClusteredTags3()
+    {
+        // this should actually not detect as the cluster-size is to small ...
+        $markup = '<1>Ein kurzer Satz</1>, der übersetzt werden muss';
+        $expected = '<1></1>A short sentence, that has to be translated';
+        $this->createHtmlTagsRepairTest($markup, $expected, $expected, true, true);
+    }
+
+    public function testRepairClusteredTags4()
+    {
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt<7/> werden <2>muss<9/></2>';
+        $expected = '<1><8/>A short sentence,</1> that has to<7/> be <2>translated<9/></2>';
+        $translated = 'A short sentence, that has to be translated<1></1><2></2><7/><8/><9/>';
+        $this->createHtmlTagsRepairTest($markup, $expected, $translated, true, true);
+    }
+
+    public function testRepairClusteredTags5()
+    {
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt<7/> werden <2>muss<9/></2>';
+        $expected = '<1><8/>A short sentence, that has to be translated</1><7/><2><9/></2>';
+        $translated = '<1>A short sentence, that has to be translated</1><2></2><7/><8/><9/>';
+        $this->createHtmlTagsRepairTest($markup, $expected, $translated, true, true);
+    }
+
     /**
      * @throws ZfExtended_Exception
      */
-    protected function createHtmlTagsRepairTest(string $originalMarkup, string $expectedMarkup, string $translatedMarkup, bool $preserveComments = false)
-    {
+    protected function createHtmlTagsRepairTest(
+        string $originalMarkup,
+        string $expectedMarkup,
+        string $translatedMarkup,
+        bool $preserveComments = false,
+        bool $detectUntranslated = false,
+    ) {
         $markup = $this->replaceHtmlTags($originalMarkup);
         $tags = new Tags($markup, $preserveComments);
         $expected = (empty($expectedMarkup)) ? $tags->render() : $this->replaceHtmlTags($expectedMarkup);
         $request = $tags->getRequestHtml();
         $translated = $this->replaceRequestTags($translatedMarkup, $originalMarkup, $request);
-        $actual = $tags->recreateTags($translated);
+        $actual = $tags->recreateTags($translated, $detectUntranslated);
 
         // debugging @phpstan-ignore-next-line
         if (self::DO_DEBUG) {
@@ -440,27 +509,43 @@ class TagsRepairTest extends MockedTaskTestAbstract
     /**
      * @throws ZfExtended_Exception
      */
-    protected function createInternalTagsRepairTest(string $originalMarkup, string $expectedMarkup = '', string $expectedStripped = '', string $translatedMarkup = '')
-    {
+    protected function createInternalTagsRepairTest(
+        string $originalMarkup,
+        string $expectedMarkup = '',
+        string $expectedStripped = '',
+        string $translatedMarkup = '',
+    ) {
         $originalMarkupReplaced = $this->replaceInternalTags($originalMarkup);
         $expectedMarkup = ($expectedMarkup == '') ? '' : $this->replaceInternalTags($expectedMarkup);
         $expectedStripped = ($expectedStripped == '') ? '' : $this->replaceInternalTags($expectedStripped);
 
-        $this->createRealInternalTagsRepairTest($originalMarkupReplaced, $expectedMarkup, $expectedStripped, $translatedMarkup, $originalMarkup);
+        $this->createRealInternalTagsRepairTest(
+            $originalMarkupReplaced,
+            $expectedMarkup,
+            $expectedStripped,
+            $translatedMarkup,
+            $originalMarkup
+        );
     }
 
     /**
      * @throws ZfExtended_Exception
      */
-    protected function createRealInternalTagsRepairTest(string $originalMarkup, string $expectedMarkup = '', string $expectedStripped = '', string $translatedMarkup = '', string $unreplacedOriginal = '')
-    {
+    protected function createRealInternalTagsRepairTest(
+        string $originalMarkup,
+        string $expectedMarkup = '',
+        string $expectedStripped = '',
+        string $translatedMarkup = '',
+        string $unreplacedOriginal = '',
+    ) {
         $tags = new Tags($originalMarkup, true);
         $expected = (empty($expectedMarkup)) ? $tags->render() : $expectedMarkup;
         $request = $tags->getRequestHtml();
         if (! empty($translatedMarkup)) {
             $request = $this->replaceRequestTags($translatedMarkup, $unreplacedOriginal, $request);
         }
-        $actual = $tags->recreateTags($request);
+        // we will not detect untranslated requests because most of our tests use untranslated markup
+        $actual = $tags->recreateTags($request, false);
         // debugging @phpstan-ignore-next-line
         if (self::DO_DEBUG) {
             error_log('===================' . "\n");
@@ -473,7 +558,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
         // test stripped request
         if ($expectedStripped != 'NO') {
             $strippedRequest = Markup::strip($request);
-            $actual = $tags->recreateTags($strippedRequest);
+            $actual = $tags->recreateTags($strippedRequest, false);
             // debugging @phpstan-ignore-next-line
             if (self::DO_DEBUG) {
                 error_log('===================' . "\n");

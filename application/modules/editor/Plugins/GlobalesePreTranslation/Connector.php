@@ -183,7 +183,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector
 
         //if the user is unauthorized
         if ($response->getStatus() == 401) {
-            throw new ZfExtended_NotAuthenticatedException($response->getBody(), 401);
+            throw new ZfExtended_NoAccessException($response->getBody());
         }
 
         if ($responseAsXlif) {

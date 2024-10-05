@@ -77,6 +77,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
         ]);
         $this->addValidator('wordCount', 'int');
         $this->addValidator('orderdate', 'date', ['Y-m-d H:i:s'], true);
+        $this->addValidator('deadlineDate', 'date', ['Y-m-d H:i:s'], true);
         $this->addValidator('referenceFiles', 'int');
         $this->addValidator('terminologie', 'int');
         $this->addValidator('edit100PercentMatch', 'int');

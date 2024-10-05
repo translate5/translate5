@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.customer.Combo', {
-    extend: 'Ext.form.field.ComboBox',
+    extend: 'Editor.view.form.field.ComboField',
     requires: [
         'Editor.store.admin.Customers'
     ],

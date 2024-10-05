@@ -73,6 +73,8 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setWordCount(string|int $wordcount)
  * @method null|string getOrderdate()
  * @method void setOrderdate(?string $datetime)
+ * @method null|string getDeadlineDate()
+ * @method void setDeadlineDate(?string $datetime)
  * @method null|string getEnddate()
  * @method void setEnddate(?string $datetime)
  * @method string getReferenceFiles()
@@ -151,6 +153,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     public const LOG_DIR = 'log';
 
+    public const NON_EXCLUSIVE_STATES = [self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED];
+
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
      */
@@ -172,10 +176,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     protected $meta;
 
-    /**
-     * @var string
-     */
-    protected $taskDataPath;
+    protected ?string $taskDataPath;
 
     /**
      * A Cache for the faulty segments the task holds
@@ -272,11 +273,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         $this->row = $row;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Models_Entity_Abstract::init()
-     */
-    public function init(array $data = null, $assumeDatabase = false)
+    public function init(array|Zend_Db_Table_Row_Abstract|null $data = null, $assumeDatabase = false): void
     {
         parent::init($data, $assumeDatabase);
         $this->taskDataPath = null;
@@ -991,14 +988,21 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns true if current task is in an exclusive state (like import)
-     * @param array $additionalNonExclusive additional states to be handled non exclusive
-     * @return boolean
+     * @param array $additionalNonExclusive additional states to be handled non-exclusive
      */
-    public function isExclusiveState(array $additionalNonExclusive = [])
+    public function isExclusiveState(array $additionalNonExclusive = []): bool
     {
-        $nonExclusiveStates = [self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED];
+        return ! in_array($this->getState(), array_merge(self::NON_EXCLUSIVE_STATES, $additionalNonExclusive));
+    }
 
-        return ! in_array($this->getState(), array_merge($nonExclusiveStates, $additionalNonExclusive));
+    /**
+     * Retrieves if the optional deadline-date is set
+     * and the deadline is valid (= AFTER the creation date)
+     */
+    public function hasValidDeadlineDate(): bool
+    {
+        return ! empty($this->getDeadlineDate())
+            && strtotime($this->getDeadlineDate()) > strtotime($this->getCreated());
     }
 
     /**
@@ -1118,7 +1122,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         // first check if disabled by state
         $this->checkStateAllowsActions();
 
-        $model = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $model = new ZfExtended_Models_Worker();
         // check if there are running exports
         if ($model->isExportRunning($this->getTaskGuid(), $exportClass)) {
             ZfExtended_Models_Entity_Conflict::addCodes([
@@ -1469,5 +1473,35 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     public function hasThirdPartyTermTagging(): bool
     {
         return ! ! json_decode($this->getForeignId())?->glossaryClientId;
+    }
+
+    /**
+     *  Check and set the default pivot langauge based on customer specific config.
+     *  If the pivot field is not provided on task post and for the current task customer
+     *  there is configured defaultPivotLanguage, the configured pivot language will be set as task pivot
+     *
+     * @throws Zend_Exception
+     */
+    public function setDefaultPivotLanguage(
+        editor_Models_Task $project,
+        ?editor_Models_Customer_Customer $customer = null,
+    ): void {
+        $config = null === $customer
+            ? Zend_Registry::get('config')
+            : $customer->getConfig();
+
+        if (! empty($config->runtimeOptions->project->defaultPivotLanguage)) {
+            // get default pivot language value from the config
+            $defaultPivot = $config->runtimeOptions->project->defaultPivotLanguage;
+
+            try {
+                $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+                $language->loadByRfc5646($defaultPivot);
+
+                $project->setRelaisLang((int) $language->getId());
+            } catch (Throwable) {
+                // in case of wrong configured variable and the load language fails, do nothing
+            }
+        }
     }
 }

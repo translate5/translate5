@@ -44,6 +44,7 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.EditTmWindow',
         'Editor.view.LanguageResources.TaskGridWindow',
         'Editor.view.LanguageResources.ImportCollectionWindow',
+        'Editor.view.LanguageResources.SyncAssocWindow',
         'Editor.view.LanguageResources.log.LogWindow',
         'Editor.view.LanguageResources.ProposalExport',
         'Editor.view.LanguageResources.TbxExport',
@@ -246,7 +247,7 @@ Ext.define('Editor.controller.TmOverview', {
             url: Editor.data.restpath + 'languageresourceinstance',
             scope: me,
             success: function (form, submit) {
-                var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
+                var msg = Ext.String.format(me.strings.created, Ext.String.htmlEncode(submit.result.rows.name));
                 this.getTmOverviewPanel().getStore().load();
                 window.setLoading(false);
                 window.close();
@@ -348,7 +349,7 @@ Ext.define('Editor.controller.TmOverview', {
                 Editor.app.getController('ServerException').handleException(op.error.response);
             },
             success: function () {
-                var msg = Ext.String.format(me.strings.edited, record.get('name'));
+                var msg = Ext.String.format(me.strings.edited, record.getName());
                 me.getTmOverviewPanel().getStore().load();
                 window.setLoading(false);
                 window.close();
@@ -378,7 +379,7 @@ Ext.define('Editor.controller.TmOverview', {
             success: function (record, operation) {
                 store && store.load();
                 store.remove(rec);
-                Editor.MessageBox.addSuccess(Ext.String.format(msg.deleted, rec.get('name')));
+                Editor.MessageBox.addSuccess(Ext.String.format(msg.deleted, rec.getName()));
                 Editor.MessageBox.addByOperation(operation);
             }
         });
@@ -417,10 +418,14 @@ Ext.define('Editor.controller.TmOverview', {
         win.load();
     },
     handleEditTm: function (view, cell, cellIdx, rec) {
-        var win = Ext.widget('editTmWindow');
-        win.getViewModel().getStore('customers').load(function () {
-            win.loadRecord(rec);
-            win.show();
+        const win = Ext.widget('editTmWindow');
+        rec.load({
+            callback: () => {
+                win.getViewModel().getStore('customers').load(function () {
+                    win.loadRecord(rec);
+                    win.show();
+                });
+            }
         });
     },
     handleShowTasks: function (view, cell, cellIdx, rec) {
@@ -479,18 +484,23 @@ Ext.define('Editor.controller.TmOverview', {
                     break;
                 case 'log':
                     me.handleLogTm(view, cell, col, newRecord);
-                    break;
-                case 'converseTm':
-                    me.handleTmConversion(view, cell, col, newRecord);
-                    break;
                 case 'specific':
                     me.handleEditSpecific(view, cell, col, newRecord);
                     break;
                 case 'converseTm':
                     me.handleTmConversion(view, cell, col, newRecord);
                     break;
+                case 'sync':
+                    me.handleLanguageResourceSync(view, cell, col, newRecord);
+                    break;
             }
         });
+    },
+
+    handleLanguageResourceSync: function (view, cell, cellIdx, rec) {
+        Ext.widget('languageResourceSyncAssocWindow', {
+            languageResource: rec
+        }).show();
     },
 
     handleTmConversion: function (view, cell, cellIdx, rec) {
@@ -519,6 +529,7 @@ Ext.define('Editor.controller.TmOverview', {
             url = proxy.getUrl(),
             menu,
             filetypes = Editor.util.LanguageResources.getService(rec.get('serviceName')).getValidFiletypes(),
+
             createMenuItems = function () {
                 var items = [];
                 if (filetypes.indexOf('tm') !== -1) {
@@ -574,7 +585,7 @@ Ext.define('Editor.controller.TmOverview', {
         var me = this,
             msg = me.strings,
             noConn = rec.get('status') === rec.STATUS_NOCONNECTION,
-            info = Ext.String.format(noConn ? msg.deleteConfirmLocalText : msg.deleteConfirmText, rec.get('name')),
+            info = Ext.String.format(noConn ? msg.deleteConfirmLocalText : msg.deleteConfirmText, rec.getName()),
             //force local deletion when no connection to resource
             params = noConn ? {deleteLocally: true} : {};
 
@@ -631,8 +642,9 @@ Ext.define('Editor.controller.TmOverview', {
                 }
                 for (i = 0; i < v.length; i++) {
                     languageResource = v[i];
-                    strservices.push(languageResource.name + ' (' + languageResource.serviceName + ')');
-                    //meta.tdAttr = 'data-qtip="'+languageResource.name+' ('+languageResource.serviceName+')<br/>"';
+                    // Double escape to prevent XSS in qtip
+                    const lrName = Ext.String.htmlEncode(Ext.String.htmlEncode(languageResource.name));
+                    strservices.push(lrName + ' (' + languageResource.serviceName + ')');
                 }
                 meta.tdAttr = 'data-qtip="' + strservices.join('<br />') + '"';
                 return v.length;

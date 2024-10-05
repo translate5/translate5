@@ -702,7 +702,16 @@ Ext.define('Editor.controller.Localizer', {
             usageModeCompetitiveInfo: '<?php echo $this->translate->_('Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.');?>',
             usageModeSimultaneousInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten');?>',
             edit100PercentMatchEnabledMessage: '<?php echo $this->translate->_('Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.');?>',
-            edit100PercentMatchDisabledMessage: '<?php echo $this->translate->_('Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.');?>'
+            edit100PercentMatchDisabledMessage: '<?php echo $this->translate->_('Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.');?>',
+            deadlineDateLabel: '<?php echo $this->translate->_('Deadline Datum');?>',
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.task.TaskDeadlineChangeHandler", {
+        override: "Editor.view.admin.task.TaskDeadlineChangeHandler",
+        strings:{
+            deadlineDateMesssageTitle: '<?php echo $this->translate->_('Deadline Datum'); ?>',
+            deadlineDateMesssage: '<?php echo $this->translate->_('Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.'); ?>',
         }
     });
 
@@ -739,7 +748,8 @@ Ext.define('Editor.controller.Localizer', {
             btnSkip: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>',
             importDefaultsButtonText: '<?php echo $this->translate->_('Importieren (Standards nutzen)');?>',
             description: '<?php echo $this->translate->_('Projektbeschreibung');?>',
-            autoRemovedUploadFilesWarningMessage: '<?php echo $this->translate->_('Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.');?>'
+            autoRemovedUploadFilesWarningMessage: '<?php echo $this->translate->_('Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.');?>',
+            deadlineDateLabel: '<?php echo $this->translate->_('Deadline Datum');?>',
         }
     });
 
@@ -804,7 +814,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.project.ProjectPanel",
         title:'<?php echo $this->translate->_('Projekte');?>',
         strings:{
-        	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt: {projectSelection.taskName}');?>'
+        	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt');?>'
         }
     });
 
@@ -2309,7 +2319,8 @@ Editor.data.l10n = {
                 domainCode: 'Domain code',
                 engineName: 'Engine name',
                 fileName: 'File name',
-                status: 'Status'
+                status: 'Status',
+                glossaryId: '<?php echo $this->translate->_('default_glossary_id');?>'
             },
             GroupShare: {
                 tmId: '<?php echo $this->translate->_('tmId_GroupShare');?>'
@@ -2326,7 +2337,7 @@ Editor.data.l10n = {
                 term: '<?php echo $this->translate->_('term_TermCollection');?>',
                 termEntry: '<?php echo $this->translate->_('termEntry_TermCollection');?>',
                 attribute: '<?php echo $this->translate->_('attribute_TermCollection');?>'
-            }
+            },
         }
     },
     configuration: {
@@ -2432,10 +2443,31 @@ Editor.data.l10n = {
         enabled: '<?= $this->translate->_('Aktiviert') ?>',
         showDefault: '<?= $this->translate->_('Defaults anzeigen') ?>',
         hideDefault: '<?= $this->translate->_('Defaults ausblenden') ?>',
-        showAll: '<?= $this->translate->_('Zeige alles') ?>'
+        showAll: '<?= $this->translate->_('Zeige alles') ?>',
+        sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+        targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+        sourceLanguageResource: '<?= $this->translate->_('Ausgangssprache Ressource') ?>',
+        targetLanguageResource: '<?= $this->translate->_('Zielsprache Ressource') ?>',
+        additionalInfo: '<?php echo $this->translate->_('Zusätzliche Infos');?>',
     },
     helpButton: {
         tooltip: '<?= $this->translate->_('Tutorial-Videos aufrufen') ?>'
+    },
+    crossLanguageResourceSynchronization: {
+        windowTitle: '<?= $this->translate->_('Verwalten von Verbindungen') ?>',
+        tooltip: '<?= $this->translate->_('Sprachübergreifende Synchronisierung von Ressourcen') ?>',
+        confirm_deletion_title: '<?= $this->translate->_('Löschung bestätigen') ?>',
+        confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Synchronisierung löschen möchten?') ?>',
+        connect: '<?= $this->translate->_('Verbinden Sie') ?>',
+        queueSynchronizeAll: '<?= $this->translate->_('Warteschlange Alle synchronisieren') ?>',
+        customers: '<?= $this->translate->_('Kunden') ?>',
+        deleteTooltip: '<?= $this->translate->_('Löschen') ?>',
+        queueSynchronizationTooltip: '<?= $this->translate->_('Synchronisierung von Warteschlangen') ?>',
+        failedToLoadDataForTargetLanguageResource: '<?= $this->translate->_('Die Daten für die Zielsprachenressource konnten nicht geladen werden.') ?>',
+        synchronisationQueued: '<?= $this->translate->_('Die Synchronisierung wurde in die Warteschlange gestellt und wird in Kürze verarbeitet.') ?>',
+        failedToQueue: '<?= $this->translate->_('Synchronisierung in Warteschlange fehlgeschlagen.') ?>',
+        confirmSynchronisation: '<?= $this->translate->_('Bestätigen Sie die Synchronisierung.') ?>',
+        emptyTableText: '<?= $this->translate->_('crossLanguageResourceSynchronization.emptyTableText') ?>',
     }
 };
 

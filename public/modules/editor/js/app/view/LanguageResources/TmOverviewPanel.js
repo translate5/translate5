@@ -145,8 +145,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     renderer: function(v, meta, rec){
                         var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
                             resource = store.getById(rec.get('resourceId'));
-                        if(resource) {
-                            meta.tdAttr = 'data-qtip="'+resource.get('name')+'"';
+                        if (resource) {
+                            const resourceName = Ext.String.htmlEncode(Ext.String.htmlEncode(resource.get('name')));
+                            meta.tdAttr = 'data-qtip="' + resourceName + '"';
                         }
                         return v;
                     },
@@ -174,6 +175,12 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         hidden: true,
                         isDisabled: (view, rowIndex, colIndex, item, record) =>
                             item.hidden = !record.get('tmNeedsConversion')
+                    },{
+                        tooltip: Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
+                        iconCls: 'ico-tm-sync',
+                        hidden: true,
+                        isDisabled: (view, rowIndex, colIndex, item, record) =>
+                            item.hidden = ! record.get('synchronizableService')
                     },{
                         tooltip: me.strings.edit,
                         action: 'edit',
@@ -383,10 +390,11 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         }
                         else {
                             for(i = 0;i<v.length;i++){
-                                tasks.push(v[i]);
+                                const taskName = Ext.String.htmlEncode(Ext.String.htmlEncode(v[i]))
+                                tasks.push(taskName);
                             }
                         }
-                        meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(tasks.join('<br />•••••••••••<br />'))+'"';
+                        meta.tdAttr = 'data-qtip="'+tasks.join('<br />•••••••••••<br />')+'"';
                         return v.length;
                     }
                 }],
@@ -497,9 +505,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             rows += this.createSpecificDataRow('fileName', serviceName, specificData.fileName);
         }
 
+        if (specificData.hasOwnProperty('version') && typeof specificData.version === "object" && specificData.version.hasOwnProperty('version')) {
+            rows += this.createSpecificDataRow('version', serviceName, specificData.version.version);
+        }
+
         // then the others
         for (key in specificData) {
-            if (key !== 'fileName' && key !== 'status' && key !== 'memories') {
+            if (key !== 'fileName' && key !== 'status' && key !== 'memories' && key !== 'version') {
                 rows += this.createSpecificDataRow(key, serviceName, specificData[key]);
             }
         }
@@ -566,7 +578,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if(!value || value.length<1){
             return '';
         }
-        meta.tdAttr = 'data-qtip="'+this.getCustomersNames(value,true).join('</br>')+'"';
+        meta.tdAttr = 'data-qtip="'+this.getCustomersNames(value,true, true).join('</br>')+'"';
         return value.length;
     },
 
@@ -584,7 +596,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
      * Get customer names by customer id.
      * When addCustomerNumber is true, the customer number will be concatenate to the result in format [customerNumber] customerName
      */
-    getCustomersNames:function(customerIds, addCustomerNumber){
+    getCustomersNames:function(customerIds, addCustomerNumber, forQtip = false){
         if(!customerIds || customerIds.length<1){
             return '';
         }
@@ -594,15 +606,23 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         
         Ext.Array.each(customerIds, function(id) {
             var rec = customerStore.getById(id);
-            if(!rec) {
+            if (! rec) {
                 return;
             }
-            if(addCustomerNumber){
-                names.push('['+rec.get('number')+'] '+rec.get('name'));
-            }else{
-                names.push(rec.get('name'));
+
+            let name = Ext.String.htmlEncode(rec.get('name'));
+
+            if (forQtip) {
+                name = Ext.String.htmlEncode(name);
+            }
+
+            if (addCustomerNumber) {
+                names.push('['+rec.get('number')+'] ' + name);
+            } else {
+                names.push(name);
             }
         });
+
         return names;
     },
 

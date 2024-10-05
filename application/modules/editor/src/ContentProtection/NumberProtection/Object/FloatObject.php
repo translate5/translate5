@@ -57,8 +57,9 @@ use NumberFormatter;
 class FloatObject
 {
     public function __construct(
-        private float $number,
-        private int $fractionDigits
+        private readonly float $number,
+        private readonly int $fractionDigits,
+        private readonly string $sign = ''
     ) {
     }
 
@@ -68,6 +69,12 @@ class FloatObject
         $symbols = array_filter(preg_split('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $float));
         $decimalSeparator = end($symbols);
 
+        if (false === $decimalSeparator) {
+            $decimalSeparator = '.';
+        }
+
+        $firstChar = mb_substr($float, 0, 1);
+        $sign = in_array($firstChar, ['-', '+']) ? $firstChar : '';
         $decimalPart = explode($decimalSeparator, $float)[1];
         // if format at the end has currency for example
         if (! preg_match('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $decimalPart)) {
@@ -79,7 +86,7 @@ class FloatObject
         $number = preg_replace("/[^\d$regSymbol]/u", '', $float);
         $number = str_replace($decimalSeparator, '.', $number);
 
-        return new self($formater->parse($number), mb_strlen(explode('.', $number)[1]));
+        return new self($formater->parse($number), mb_strlen(explode('.', $number)[1]), $sign);
     }
 
     public function format(string $format, ?string $locale = null): string
@@ -88,9 +95,11 @@ class FloatObject
         if (! empty($format)) {
             $this->setFormat($format, $formater);
         }
+
+        $formater->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $this->fractionDigits);
         $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $this->fractionDigits);
 
-        return $formater->format($this->number);
+        return $this->sign . $formater->format($this->number);
     }
 
     private function setFormat(string $format, NumberFormatter $formater): void

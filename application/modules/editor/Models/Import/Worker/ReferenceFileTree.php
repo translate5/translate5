@@ -31,16 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_Worker_ReferenceFileTree extends editor_Models_Task_AbstractWorker
 {
-    /**
-     * @var ZfExtended_EventManager
-     */
-    protected $events;
-
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['config']) || ! $parameters['config'] instanceof editor_Models_Import_Configuration) {
             throw new ZfExtended_Exception('missing or wrong parameter config, must be if instance editor_Models_Import_Configuration');
@@ -49,11 +40,7 @@ class editor_Models_Import_Worker_ReferenceFileTree extends editor_Models_Task_A
         return true;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $task = $this->task;
         if ($task->getState() != $task::STATE_IMPORT) {

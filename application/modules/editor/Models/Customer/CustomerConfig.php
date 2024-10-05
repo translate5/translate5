@@ -39,9 +39,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_Customer_CustomerConfig extends ZfExtended_Models_Entity_Abstract
 {
-    protected $dbInstanceClass = "editor_Models_Db_CustomerConfig";
+    protected $dbInstanceClass = editor_Models_Db_CustomerConfig::class;
 
-    protected $validatorInstanceClass = "editor_Models_Validator_CustomerConfig";
+    protected $validatorInstanceClass = editor_Models_Validator_CustomerConfig::class;
 
     /***
      * Get the customer specific config for given customer id.
@@ -107,6 +107,18 @@ class editor_Models_Customer_CustomerConfig extends ZfExtended_Models_Entity_Abs
         }
 
         return $row['value'];
+    }
+
+    public function deleteRecord(int $customerId, string $name): void
+    {
+        try {
+            $this->db->delete([
+                'customerId = ?' => $customerId,
+                'name = ?' => $name,
+            ]);
+        } catch (Exception) {
+            // ignore
+        }
     }
 
     /**

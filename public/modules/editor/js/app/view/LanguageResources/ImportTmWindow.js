@@ -149,7 +149,7 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
      */
     loadRecord: function (record) {
         const me = this;
-        me.setTitle(me.strings.title + ': ' + record.get('name'));
+        me.setTitle(me.strings.title + ': ' + Ext.String.htmlEncode(record.get('name')));
         me.languageResourceRecord = record;
         this.getViewModel().set('resourceId', record.get('resourceId'));
         this.getController().updateStrippingFramingTagsSupport(true);

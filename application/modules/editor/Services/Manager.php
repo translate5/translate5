@@ -33,14 +33,19 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
+use MittagQI\Translate5\CrossSynchronization\SynchronizableIntegrationInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\Service\DetectLanguageInterface;
+use MittagQI\Translate5\Service\HasLanguageDetector;
 
 /**
  * LanguageResource Service Manager
  * TODO all services classes should be located somewhere under language resources
- * Not needed to be instanced as singleton since registered connectors were stored internally in a static member variable
+ * Not needed to be instanced as singleton since registered connectors were stored internally in a static member
+ * variable
  */
 class editor_Services_Manager
 {
@@ -102,6 +107,65 @@ class editor_Services_Manager
     public function getAll()
     {
         return self::$registeredServices;
+    }
+
+    /**
+     * @throws ZfExtended_Exception
+     */
+    public function getService(string $serviceType): editor_Services_ServiceAbstract
+    {
+        $this->checkService($serviceType);
+
+        return ZfExtended_Factory::get($this->getServiceClassName($serviceType));
+    }
+
+    public function getSynchronisationService(string $serviceType): ?SynchronisationInterface
+    {
+        try {
+            $service = $this->getService($serviceType);
+        } catch (editor_Services_Exceptions_NoService) {
+            return null;
+        }
+
+        if (! $service instanceof SynchronizableIntegrationInterface) {
+            return null;
+        }
+
+        return $service->getSynchronisationService();
+    }
+
+    public function getLanguageDetectionService(string $serviceType): ?DetectLanguageInterface
+    {
+        try {
+            $service = $this->getService($serviceType);
+        } catch (editor_Services_Exceptions_NoService) {
+            return null;
+        }
+
+        if (! $service instanceof HasLanguageDetector) {
+            return null;
+        }
+
+        return $service->getDetector();
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSynchronizableServiceTypes(): array
+    {
+        $synchronizableServiceTypes = [];
+        foreach ($this->getAll() as $serviceType) {
+            $service = $this->getService($serviceType);
+
+            if (! $service instanceof SynchronizableIntegrationInterface) {
+                continue;
+            }
+
+            $synchronizableServiceTypes[] = $serviceType;
+        }
+
+        return $synchronizableServiceTypes;
     }
 
     public function getAllUiNames(): array
@@ -261,8 +325,13 @@ class editor_Services_Manager
      * @return editor_Services_Connector
      * @throws ZfExtended_Exception
      */
-    public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource, int $sourceLang = null, int $targetLang = null, Zend_Config $config = null)
-    {
+    public function getConnector(
+        editor_Models_LanguageResources_LanguageResource $languageResource,
+        int $sourceLang = null,
+        int $targetLang = null,
+        Zend_Config $config = null,
+        ?int $customerId = null,
+    ) {
         $serviceType = $languageResource->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get('editor_Services_Connector');
@@ -270,6 +339,10 @@ class editor_Services_Manager
         $connector->connectTo($languageResource, $sourceLang, $targetLang);
         if (isset($config)) {
             $connector->setConfig($config);
+        }
+
+        if (isset($customerId)) {
+            $connector->setCustomerId($customerId);
         }
 
         return $connector;
@@ -361,7 +434,7 @@ class editor_Services_Manager
             function (
                 Exception $e,
                 editor_Models_LanguageResources_LanguageResource $languageResource,
-                ZfExtended_Logger_Event $event
+                ZfExtended_Logger_Event $event,
             ): void {
                 self::reportTMUpdateError(null, $event->message, $event->eventCode);
             }
@@ -393,7 +466,11 @@ class editor_Services_Manager
             $languageResource->init($one);
 
             try {
-                $connector = $this->getConnector($languageResource, null, null, $task->getConfig());
+                $connector = $this->getConnector(
+                    $languageResource,
+                    config: $task->getConfig(),
+                    customerId: (int) $task->getCustomerId(),
+                );
                 $todo($connector, $languageResource, $one);
             } catch (editor_Services_Exceptions_NoService | editor_Services_Connector_Exception | ZfExtended_BadGateway $e) {
                 $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service');

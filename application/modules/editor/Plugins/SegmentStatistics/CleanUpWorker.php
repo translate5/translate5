@@ -32,11 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_SegmentStatistics_CleanUpWorker extends editor_Plugins_SegmentStatistics_Worker
 {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
         /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */

@@ -26,7 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Services_TermCollection_Service extends editor_Services_ServiceAbstract
+use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
+use MittagQI\Translate5\CrossSynchronization\SynchronizableIntegrationInterface;
+use MittagQI\Translate5\Terminology\CrossSynchronization\SynchronisationService;
+
+class editor_Services_TermCollection_Service extends editor_Services_ServiceAbstract implements SynchronizableIntegrationInterface
 {
     public const DEFAULT_COLOR = '19737d';
 
@@ -37,6 +41,11 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
     protected static $helpPage = "https://confluence.translate5.net/display/TAD/Term+Collection";
 
     protected $resourceClass = 'editor_Services_TermCollection_Resource';
+
+    /**
+     * @inheritdoc
+     */
+    public $queryMode = 'batch';
 
     /**
      * @see editor_Services_ServiceAbstract::isConfigured()
@@ -61,5 +70,10 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
     public function getName()
     {
         return 'TermCollection';
+    }
+
+    public function getSynchronisationService(): SynchronisationInterface
+    {
+        return SynchronisationService::create();
     }
 }

@@ -117,7 +117,7 @@ final class ExtensionMapping extends ExtensionMappingParser
                         'identifier' => $identifier,
                     ]
                 );
-                // DEBUG
+
                 if ($doDebug) {
                     error_log('ExtensionMapping processUnpackedFilter: okapi default identifier '
                         . $identifier . ' is invalid');
@@ -130,7 +130,7 @@ final class ExtensionMapping extends ExtensionMappingParser
                 // when we import a embedded okapi default filter we map it to a non-embedded okapi default filter
                 if (Filters::instance()->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)) {
                     $replacementMap[$identifier] = $idata->id;
-                    // DEBUG
+
                     if ($doDebug) {
                         error_log('ExtensionMapping processUnpackedFilter: replace ' . $identifier
                             . ' with ' . $idata->id);
@@ -139,7 +139,6 @@ final class ExtensionMapping extends ExtensionMappingParser
             } else {
                 // "real" custom filters, check if they have a supported type
                 if (OkapiFilterInventory::isValidType($idata->type)) {
-                    // DEBUG
                     if ($doDebug) {
                         error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '
                             . $identifier . ' will be embedded');
@@ -167,7 +166,7 @@ final class ExtensionMapping extends ExtensionMappingParser
                             'identifier' => $identifier,
                         ]
                     );
-                    // DEBUG
+
                     if ($doDebug) {
                         error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '
                             . $identifier . ' is invalid');
@@ -233,7 +232,6 @@ final class ExtensionMapping extends ExtensionMappingParser
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiExtensionMapping');
 
         if (is_array($unpackedLines) && is_array($replacementMap)) {
-            // DEBUG
             if ($this->doDebug) {
                 error_log('ExtensionMapping construct by content:' . "\n" . print_r($unpackedLines, 1)
                     . "\n" . ' replacementMap:' . "\n" . print_r($replacementMap, 1));
@@ -241,7 +239,6 @@ final class ExtensionMapping extends ExtensionMappingParser
             // importing an unpacked bconf
             $this->unpackContent($unpackedLines, $replacementMap);
         } else {
-            // DEBUG
             if ($this->doDebug) {
                 error_log('ExtensionMapping construct by path: ' . $this->path);
             }
@@ -309,7 +306,7 @@ final class ExtensionMapping extends ExtensionMappingParser
                 $jsonData[$identifier] = $extensions;
             }
         }
-        // DEBUG
+
         if ($this->doDebug) {
             error_log('ExtensionMapping toJSON: ' . "\n" . print_r($jsonData, 1));
         }
@@ -361,7 +358,6 @@ final class ExtensionMapping extends ExtensionMappingParser
      */
     public function removeExtensions(array $extensions): bool
     {
-        // DEBUG
         if ($this->doDebug) {
             error_log('ExtensionMapping removeExtensions: [ ' . implode(', ', $extensions) . ' ]');
         }
@@ -379,7 +375,7 @@ final class ExtensionMapping extends ExtensionMappingParser
             $this->map = $newMap;
             $this->flush();
             $this->updateBconfContent();
-            // DEBUG
+
             if ($this->doDebug) {
                 error_log('ExtensionMapping removeExtensions: [ ' . implode(', ', $extensions)
                     . ' ] have been removed' . "\n" . print_r($this->map, 1));
@@ -399,7 +395,7 @@ final class ExtensionMapping extends ExtensionMappingParser
     {
         // this api is agnostic to passed embedded okapi default filters
         $defaultIdentifier = Filters::createOkapiDefaultIdentifier($identifier);
-        // DEBUG
+
         if ($this->doDebug) {
             error_log('ExtensionMapping removeFilter: ' . $identifier
                 . ($defaultIdentifier ? ' || ' . $defaultIdentifier : ''));
@@ -421,7 +417,7 @@ final class ExtensionMapping extends ExtensionMappingParser
             }
             $this->flush();
             $this->updateBconfContent();
-            // DEBUG
+
             if ($this->doDebug) {
                 error_log('ExtensionMapping removeFilter: ' . $identifier . ' has been removed' . "\n"
                     . print_r($this->map, true));
@@ -440,14 +436,16 @@ final class ExtensionMapping extends ExtensionMappingParser
     public function complementTranslate5Extensions(): bool
     {
         $translate5Mapping = T5FilterInventory::instance()->getExtensionMappingEntries();
-        // DEBUG
+
         if ($this->doDebug) {
             error_log('ExtensionMapping syncTranslate5Extensions: ' . print_r($translate5Mapping, true));
         }
 
         $changed = false;
         foreach ($translate5Mapping as $extension => $identifier) {
-            if (! array_key_exists($extension, $this->map) || $this->map[$extension] != $identifier) {
+            if (! empty($extension) &&
+                (! array_key_exists($extension, $this->map) || $this->map[$extension] != $identifier)
+            ) {
                 $this->map[$extension] = $identifier;
                 $changed = true;
             }
@@ -455,7 +453,7 @@ final class ExtensionMapping extends ExtensionMappingParser
         if ($changed) {
             $this->flush();
             $this->updateBconfContent();
-            // DEBUG
+
             if ($this->doDebug) {
                 error_log('ExtensionMapping syncTranslate5Extensions: mapping has been changed: ' . "\n"
                     . print_r($this->map, true));
@@ -472,7 +470,6 @@ final class ExtensionMapping extends ExtensionMappingParser
      */
     public function addFilter(string $identifier, array $extensions): bool
     {
-        // DEBUG
         if ($this->doDebug) {
             error_log('ExtensionMapping addFilter: ' . $identifier . ', extensions: [ '
                 . implode(', ', $extensions) . ' ]');
@@ -489,9 +486,11 @@ final class ExtensionMapping extends ExtensionMappingParser
      */
     public function changeFilter(string $identifier, array $extensions): bool
     {
+        // important: make sure, the filter does not contain empty extensions
+        $extensions = array_values(array_filter($extensions));
         // this api is agnostic to passed embedded okapi default filters
         $defaultIdentifier = Filters::createOkapiDefaultIdentifier($identifier);
-        // DEBUG
+
         if ($this->doDebug) {
             error_log('ExtensionMapping changeFilter: ' . $identifier
                 . ($defaultIdentifier ? ' || ' . $defaultIdentifier : '')
@@ -506,7 +505,9 @@ final class ExtensionMapping extends ExtensionMappingParser
             if ($filter === $identifier || ($defaultIdentifier !== null && $filter === $defaultIdentifier)) {
                 $extBefore[] = $extension;
                 if (count($extToAdd) > 0) {
-                    $newMap[array_shift($extToAdd)] = $filter;
+                    // add extension for filter & remove from list to add
+                    $newExt = array_shift($extToAdd);
+                    $newMap[$newExt] = $filter;
                 } else {
                     $changed = true;
                 }
@@ -534,7 +535,7 @@ final class ExtensionMapping extends ExtensionMappingParser
             $this->map = $newMap;
             $this->flush();
             $this->updateBconfContent();
-            // DEBUG
+
             if ($this->doDebug) {
                 error_log('ExtensionMapping changeFilter: ' . $identifier . ' with extensions [ '
                     . implode(', ', $extensions) . ' ] has been changed: '
@@ -557,7 +558,6 @@ final class ExtensionMapping extends ExtensionMappingParser
      */
     public function rescanFilters(): void
     {
-        // DEBUG
         if ($this->doDebug) {
             error_log('ExtensionMapping rescanFilters');
         }
@@ -580,7 +580,7 @@ final class ExtensionMapping extends ExtensionMappingParser
             if (Filters::instance()->isEmbeddedDefaultFilter($idata->type, $idata->id)) {
                 // translate5 and okapi filters must not be in the custom filter dir
                 @unlink($filterFile);
-                // DEBUG
+
                 if ($this->doDebug) {
                     error_log('ExtensionMapping rescanFilters: deleted embedded default filter ' . $identifier);
                 }
@@ -589,7 +589,7 @@ final class ExtensionMapping extends ExtensionMappingParser
                 if (! array_key_exists($identifier, $existingFilters)) {
                     $fprm = new Fprm($filterFile);
                     $this->flushFilterToDatabase($identifier, $fprm->getHash(), $existingNames);
-                    // DEBUG
+
                     if ($this->doDebug) {
                         error_log('ExtensionMapping rescanFilters: added custom filter to DB ' . $identifier);
                     }
@@ -602,7 +602,7 @@ final class ExtensionMapping extends ExtensionMappingParser
             if (! in_array($identifier, $allFilters)) {
                 $bconfFilter->load($id);
                 $bconfFilter->delete();
-                // DEBUG
+
                 if ($this->doDebug) {
                     error_log('ExtensionMapping rescanFilters: deleted non-existing filter '
                         . $identifier . ' from database');
@@ -613,7 +613,7 @@ final class ExtensionMapping extends ExtensionMappingParser
         $content = $this->bconf->getContent();
         $content->setFilters($allFilters);
         $content->flush();
-        // DEBUG
+
         if ($this->doDebug) {
             error_log('ExtensionMapping rescanFilters: The bconf "' . $this->bconf->getName() . '" has '
                 . count($allFilters) . ' custom filters: [ ' . implode(', ', $allFilters) . ' ]');
@@ -663,7 +663,7 @@ final class ExtensionMapping extends ExtensionMappingParser
             $hash
         );
         $usedNames[] = $name;
-        // DEBUG
+
         if ($this->doDebug) {
             error_log('ExtensionMapping flushFilterToDatabase: added ' . $identifier . ', "'
                 . $name . '" to database');
@@ -777,7 +777,10 @@ final class ExtensionMapping extends ExtensionMappingParser
         foreach ($lines as $line) {
             $parts = explode("\t", trim($line));
             if (count($parts) === 2) {
-                $this->map[ltrim(trim($parts[0]), '.')] = trim($parts[1]);
+                $extension = ltrim(trim($parts[0]), '.');
+                if (! empty($extension)) {
+                    $this->map[$extension] = trim($parts[1]);
+                }
             }
         }
     }
@@ -802,7 +805,6 @@ final class ExtensionMapping extends ExtensionMappingParser
      */
     private function preparePacking(array $addedCustomIdentifiers)
     {
-        // DEBUG
         if ($this->doDebug) {
             error_log('ExtensionMapping preparePacking: addedCustomIdentifiers: [ '
                 . implode(', ', $addedCustomIdentifiers) . ' ]');
@@ -823,7 +825,7 @@ final class ExtensionMapping extends ExtensionMappingParser
                         ]);
                     } elseif ($path === false) {
                         $this->mapToPack[] = ['.' . $extension, $identifier];
-                        // DEBUG
+
                         if ($this->doDebug) {
                             error_log('ExtensionMapping preparePacking: add non embedded default filter '
                                 . $identifier . ' for ' . $extension);
@@ -832,7 +834,7 @@ final class ExtensionMapping extends ExtensionMappingParser
                         $identifier = Filters::createIdentifierFromPath($path);
                         $this->fprmsToPack[$identifier] = $path;
                         $this->mapToPack[] = ['.' . $extension, $identifier];
-                        // DEBUG
+
                         if ($this->doDebug) {
                             error_log('ExtensionMapping preparePacking: add embedded default filter '
                                 . $identifier . ' for ' . $extension);
@@ -843,7 +845,7 @@ final class ExtensionMapping extends ExtensionMappingParser
                         // either the identifier is a custom filter and therefore must be part
                         // of the already added custom filters
                         $this->mapToPack[] = ['.' . $extension, $identifier];
-                        // DEBUG
+
                         if ($this->doDebug) {
                             error_log('ExtensionMapping preparePacking: add custom filter '
                                 . $identifier . ' for ' . $extension);
@@ -862,7 +864,7 @@ final class ExtensionMapping extends ExtensionMappingParser
                             $identifier = Filters::createIdentifierFromPath($path);
                             $this->fprmsToPack[$identifier] = $path;
                             $this->mapToPack[] = ['.' . $extension, $identifier];
-                            // DEBUG
+
                             if ($this->doDebug) {
                                 error_log('ExtensionMapping preparePacking: add embedded translate5 filter '
                                     . $identifier . ' for ' . $extension);

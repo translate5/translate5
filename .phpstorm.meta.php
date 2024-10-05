@@ -13,6 +13,7 @@ namespace PHPSTORM_META {
         map([
             'logger' => \ZfExtended_Logger::class,
             'config' => \Zend_Config::class,
+            'cache' => \Zend_Cache_Core::class,
         ])
     );
 }

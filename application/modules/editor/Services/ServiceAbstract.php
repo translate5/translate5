@@ -56,6 +56,13 @@ abstract class editor_Services_ServiceAbstract
     protected $resources = [];
 
     /**
+     * Can be 'sequential' or 'batch'
+     *
+     * @var string
+     */
+    protected $queryMode = 'sequential';
+
+    /**
      * translate5 lists all services that translate5 can handle, no matter if they are
      * already configured or not.
      * - If an unconfigured service is chosen, the user gets the info that more action is needed.
@@ -86,6 +93,16 @@ abstract class editor_Services_ServiceAbstract
      */
     abstract public function getName();
 
+    /**
+     * Returns the mode of how this service should be queried
+     * Possible values: 'batch' and 'sequential'
+     *
+     * @return string
+     */
+    public function getQueryMode() {
+        return $this->queryMode;
+    }
+
     public function getUiName(): string
     {
         return $this->getName();
@@ -107,7 +124,7 @@ abstract class editor_Services_ServiceAbstract
     {
         $res = ZfExtended_Factory::get($this->resourceClass, $constructorArgs);
         /* @var $res editor_Models_LanguageResources_Resource */
-        $res->setService($this->getName(), $this->getServiceNamespace(), static::DEFAULT_COLOR);
+        $res->setService($this->getName(), $this->getServiceNamespace(), static::DEFAULT_COLOR, $this->getQueryMode());
         $this->resources[] = $res;
     }
 

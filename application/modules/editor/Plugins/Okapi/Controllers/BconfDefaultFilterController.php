@@ -74,6 +74,8 @@ class editor_Plugins_Okapi_BconfDefaultFilterController extends ZfExtended_RestC
     {
         $identifier = $this->getParam('identifier');
         $extensions = explode(',', $this->getParam('extensions', ''));
+        $extensions = array_values(array_filter($extensions));
+        
         $bconf = new BconfEntity();
         $bconf->load($this->getParam('bconfId'));
         $extensionMapping = $bconf->getExtensionMapping();

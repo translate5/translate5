@@ -52,14 +52,19 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
 
     public function groupsAction()
     {
-        if ($this->getParam('data') && $this->getParam('data') != "") {
-            $data = json_decode($this->getParam('data'));
+        $data = null;
+        $params = $this->getAllParams();
+
+        if (isset($params['data']) && $params['data'] != "") {
+            $data = json_decode($params['data']);
         }
+
         if (! $data) {
-            $this->view->rows = "[]";
+            $this->view->rows = [];
 
             return;
         }
+
         $connector = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
         $connector->setAuth($data->username, $data->apiKey);
 
@@ -71,11 +76,15 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
 
     public function enginesAction()
     {
-        if ($this->getParam('data') && $this->getParam('data') != "") {
-            $data = json_decode($this->getParam('data'));
+        $data = null;
+        $params = $this->getAllParams();
+
+        if (isset($params['data']) && $params['data'] != "") {
+            $data = json_decode($params['data']);
         }
+
         if (! $data) {
-            $this->view->rows = "[]";
+            $this->view->rows = [];
 
             return;
         }
@@ -89,11 +98,13 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
             throw new ZfExtended_UnprocessableEntity('E1025');
         }
 
+        $targetLang = is_array($data->targetLang) ? $data->targetLang[0] : $data->targetLang;
+
         $connector = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
         $connector->setAuth($data->username, $data->apiKey);
 
         /* @var $connector editor_Plugins_GlobalesePreTranslation_Connector */
-        $engines = $connector->getEngines($data->sourceLang, $data->targetLang);
+        $engines = $connector->getEngines($data->sourceLang, $targetLang);
 
         $this->view->rows = $engines;
     }
@@ -143,18 +154,18 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
 
         // init worker and queue it
         if (! $worker->init($task->getTaskGuid(), $params)) {
+            /** @phpstan-ignore-next-line  */
             $this->log->logError('GlobalesePreTranslation-Error on worker init()', __CLASS__ . ' -> ' . __FUNCTION__ . '; Worker could not be initialized');
 
-            return false;
+            return;
         }
 
         //find the parent worker
-        $parent = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $parent ZfExtended_Models_Worker */
+        $parent = new ZfExtended_Models_Worker();
         $result = $parent->loadByState(ZfExtended_Models_Worker::STATE_PREPARE, 'editor_Models_Import_Worker', $task->getTaskGuid());
-        $parentWorkerId = null;
+        $parentWorkerId = 0;
         if (! empty($result)) {
-            $parentWorkerId = $result[0]['id'];
+            $parentWorkerId = (int) $result[0]['id'];
         }
         $worker->queue($parentWorkerId);
     }

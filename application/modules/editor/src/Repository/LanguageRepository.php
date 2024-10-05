@@ -53,17 +53,45 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Languages;
+use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 
 class LanguageRepository
 {
-    public function find(int $langId): ?editor_Models_Languages
+    public static function create(): self
     {
-        $lang = \ZfExtended_Factory::get(editor_Models_Languages::class);
+        return new self();
+    }
 
-        if (null === $lang->load($langId)) {
-            return null;
-        }
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function get(int $langId): editor_Models_Languages
+    {
+        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $lang->load($langId);
 
         return $lang;
+    }
+
+    public function find(int $langId): ?editor_Models_Languages
+    {
+        try {
+            return $this->get($langId);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
+    }
+
+    public function findByRfc5646(string $rfc): ?editor_Models_Languages
+    {
+        try {
+            $language = \ZfExtended_Factory::get(editor_Models_Languages::class);
+            $language->loadByRfc5646($rfc);
+
+            return $language;
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
     }
 }

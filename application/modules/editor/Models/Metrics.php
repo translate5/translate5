@@ -99,8 +99,7 @@ class editor_Models_Metrics
 
     protected function worker()
     {
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
+        $worker = new ZfExtended_Models_Worker();
         $summary = $worker->getSummary(['state', 'worker']);
         $this->addMeta('worker_total', 'Current amount of workers', self::TYPE_GAUGE);
         foreach ($summary as $count) {

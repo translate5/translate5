@@ -44,7 +44,13 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
             '#metaInfoForm': {
                 afterrender: 'metaInfoFormAfterRenderHandler'
             }
-        }
+        },
+        controller: {
+            '#Segments': {
+                beforeSaveCall: 'onSegmentSaved'
+            },
+        },
+
     },
 
     refs: [ {
@@ -53,6 +59,9 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
     }, {
         ref: 'segmentMeta',
         selector: '#metapanel segmentsMetapanel'
+    }, {
+        ref: 'segmentGrid',
+        selector: '#segmentgrid'
     }],
 
     /***
@@ -135,4 +144,20 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
         }
     },
 
+    /**
+     * Reload term portlet due to detected terms might change on segment change
+     *
+     * @param segment
+     */
+    onSegmentSaved: function(segment) {
+        var selectedSegmentId = this.getSegmentGrid().getSelection().pop()?.getId();
+
+        // If selection was changed after save-request started - do nothing
+        if (selectedSegmentId && selectedSegmentId !== segment.getId()) {
+            return;
+        }
+
+        // Reload termportlet
+        this.loadTermPanel(segment.getId());
+    }
 });

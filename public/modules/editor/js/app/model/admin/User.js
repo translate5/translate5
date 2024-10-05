@@ -73,13 +73,13 @@ Ext.define('Editor.model.admin.User', {
   },
   statics: {
       getUserName: function(rec) {
-        return rec.get('firstName')+' '+rec.get('surName');
+        return Ext.String.htmlEncode(rec.get('firstName')+' '+rec.get('surName'));
       },
       getUserGuid: function(rec) {
           return rec.get('userGuid');
       },
       getLongUserName: function(rec) {
-          return rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')';
+          return Ext.String.htmlEncode(rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')');
       },
       getRoles: function(rec) {
           return rec.get('roles').split(',');
@@ -188,13 +188,13 @@ Ext.define('Editor.model.admin.User', {
               }
               break;
           case 'editorFinishTask':
-              if(!isJobInStepChain || task.isWaiting() || task.isFinished() || task.isEnded() || task.isUnconfirmed()) {
+              if(!isJobInStepChain || task.isWaiting() || task.isFinished() || task.isEnded() || task.isUnconfirmed() || task.isAutoFinish()) {
                   return false;
               }
               break;
           case 'editorUnfinishTask':
               //if user is not associated to the task or task is not finished, it cant be unfinished
-              if(task.get('userRole') == '' || !task.isFinished() || task.isEnded()) {
+              if(task.get('userRole') === '' || !task.isFinished() || task.isEnded()) {
                   return false;
               }
               break;

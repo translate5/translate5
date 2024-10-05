@@ -54,8 +54,12 @@ class RandomAccessFile extends SplFileObject
      */
     public const OVERFLOW_SUB = 0x100000000; // == PHP_UINT32_MAX +1
 
-    public function __construct(string $filename, string $mode = 'r', bool $useIncludePath = false, ?object $context = null)
-    {
+    public function __construct(
+        string $filename,
+        string $mode = 'r',
+        bool $useIncludePath = false,
+        ?object $context = null
+    ) {
         parent::__construct($filename, $mode, $useIncludePath, $context);
     }
 
@@ -71,9 +75,7 @@ class RandomAccessFile extends SplFileObject
             // unpack("A"...) strips whitespace!
             return ($utflen > 0) ? unpack('a' . $utflen, $this->fread($utflen))[1] : '';
         } catch (Throwable $e) {
-            throw new ZfExtended_UnprocessableEntity('E1026', [
-                'errors' => [[$e]],
-            ]);
+            throw new ZfExtended_UnprocessableEntity(errorCode: 'E1026', previous: $e);
         }
     }
 
@@ -99,6 +101,7 @@ class RandomAccessFile extends SplFileObject
     /**
      * Read the Integer value in bconf
      * QUIRK: PHP unpack has no option for signed 32bit Integer, so we have to convert after reading
+     * @return int|mixed
      * @throws ZfExtended_UnprocessableEntity
      */
     public function readInt(): mixed
@@ -108,13 +111,12 @@ class RandomAccessFile extends SplFileObject
 
             return $uint32 <= self::PHP_INT32_MAX ? $uint32 : $uint32 - self::OVERFLOW_SUB;
         } catch (Throwable $e) {
-            throw new ZfExtended_UnprocessableEntity('E1026', [
-                'errors' => [[$e]],
-            ]);
+            throw new ZfExtended_UnprocessableEntity(errorCode: 'E1026', previous: $e);
         }
     }
 
-    /** Write the Integer value in bconf
+    /**
+     * Write the Integer value in bconf
      */
     public function writeInt($intValue): void
     {

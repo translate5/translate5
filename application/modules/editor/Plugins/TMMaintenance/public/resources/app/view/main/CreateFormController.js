@@ -11,7 +11,11 @@ Ext.define('TMMaintenance.view.main.CreateFormController', {
 
         let record = new TMMaintenance.model.Segment();
 
-        record.set(form.getValues());
+        const values = form.getValues();
+        values.source = Ext.htmlEncode(values.source);
+        values.target = Ext.htmlEncode(values.target);
+
+        record.set(values);
         record.set({tm: this.getViewModel().get('selectedTm')});
         record.save({
             success: () => {

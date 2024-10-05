@@ -94,7 +94,8 @@ class FloatProtector extends AbstractProtector
             htmlspecialchars($protectionDto->name),
             $number,
             $float->format('#.#', $targetLang->getRfc5646()),
-            $float->format($protectionDto->outputFormat, $targetLang->getRfc5646())
+            $float->format($protectionDto->outputFormat, $targetLang->getRfc5646()),
+            $this->encodeRegex($protectionDto->regex),
         );
     }
 }

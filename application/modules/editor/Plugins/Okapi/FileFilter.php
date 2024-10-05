@@ -76,7 +76,7 @@ class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter
         if (! $worker->init($task->getTaskGuid(), $params)) {
             return $filePath;
         }
-        $worker->queue($this->config->parentWorkerId);
+        $worker->queue($this->config->parentWorkerId ?? 0);
 
         return $filePath;
     }

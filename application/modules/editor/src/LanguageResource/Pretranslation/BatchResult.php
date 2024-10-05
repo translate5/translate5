@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource\Pretranslation;
 
-use editor_Models_Segment;
 use editor_Services_ServiceResult;
 use ZfExtended_Models_Entity_Abstract;
 
@@ -50,9 +49,6 @@ class BatchResult extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Load the latest service result cache for segment, langauge resource and taskGuid
-     * @param string $segmentId
-     * @param int $languageResource
-     * @return editor_Services_ServiceResult
      */
     public function getResults(string $segmentId, int $languageResource): editor_Services_ServiceResult
     {
@@ -84,16 +80,12 @@ class BatchResult extends ZfExtended_Models_Entity_Abstract
             'taskGuid' => $taskGuid,
             'result' => $result,
         ]);
-
     }
 
     /**
      * Delete all cached records for given language resources
-     * @param array $languageResources
-     * @param string $taskGuid
-     * @return int
      */
-    public function deleteForLanguageresource(array $languageResources,string $taskGuid): int
+    public function deleteForLanguageresource(array $languageResources, string $taskGuid): int
     {
         if (empty($languageResources)) {
             return 0;
@@ -107,7 +99,6 @@ class BatchResult extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Remove cache records older than one day
-     * @return int
      */
     public function deleteOlderRecords(): int
     {

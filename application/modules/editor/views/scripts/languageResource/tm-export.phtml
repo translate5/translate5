@@ -1,0 +1,155 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+$translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+?>
+<style>
+    body {
+        background-color: #f2f2f2;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .logo {
+        max-width: 150px;
+        height: auto;
+    }
+
+    h1 {
+        font-size: 32px;
+        font-weight: bold;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 18px;
+        margin-top: 0;
+        margin-bottom: 40px;
+    }
+
+    .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100px;
+        background-image: url('/modules/editor/images/loading_ico.gif');
+        background-size: 25px;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<div class="container">
+    <div class="header">
+        <img class="logo" src="/images/translate5.png" alt="Company Logo">
+        <h1><?= $translate->_('Dateibasiertes TM herunterladen und lokal speichern'); ?></h1>
+    </div>
+    <p class="export-running-message"><?= $translate->_('Der Export wird ausgeführt. Bitte warten ...'); ?></p>
+    <div class="loading"></div>
+    <div class="result hidden">
+        <p><?= $translate->_('Die Datei kann heruntergeladen werden!'); ?></p>
+        <a href="#" class="btn download hidden"><?= $translate->_('Herunterladen'); ?></a>
+    </div>
+    <div class="error hidden"></div>
+</div>
+
+<script>
+    const workerId = '<?= $this->workerId; ?>';
+    const apiUrl = document.location.href + '&workerId=' + workerId;
+
+    function checkFileAvailability() {
+        fetch(apiUrl, {
+            headers: {
+                'Csrftoken': '<?= $this->csrfToken; ?>'
+            }
+        })
+            .then(response => response.ok ? response.json() : Promise.reject(response))
+            .then(data => {
+                if (! data.ready) {
+                    setTimeout(checkFileAvailability, 3000);
+
+                    return;
+                }
+
+                const downloadLink = apiUrl + '&filename=' + data.filename;
+
+                const newWindow = window.open(downloadLink);
+
+                if (newWindow) {
+                    window.close();
+                } else {
+                    // If the popup was blocked, show an alert to the user
+                    alert("<?= $translate->_('allow_download_popup_alert'); ?>");
+
+                    document.querySelector('.loading').classList.add('hidden');
+                    document.querySelector('.export-running-message').classList.add('hidden');
+                    document.querySelector('.result').classList.remove('hidden');
+
+                    const anchor = document.querySelector('.download');
+                    anchor.href = downloadLink;
+                    anchor.classList.remove('hidden');
+                    anchor.target = '_blank';
+                    anchor.addEventListener('click', () => window.close());
+                }
+            })
+            .catch(error => {
+                document.querySelector('.loading').classList.add('hidden');
+                document.querySelector('.export-running-message').classList.add('hidden');
+                document.querySelector('.error').textContent = '<?= $translate->_('Es ist ein Fehler aufgetreten!').' '; ?>';
+                document.querySelector('.error').textContent += '<?= $translate->_('Weitere Informationen finden Sie im Ergebnisprotokoll.'); ?>';
+                document.querySelector('.error').classList.remove('hidden');
+            });
+    }
+
+    checkFileAvailability();
+</script>

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Customer\CustomerService;
+
 class Editor_CustomerController extends ZfExtended_RestController
 {
     protected $entityClass = 'editor_Models_Customer_Customer';
@@ -64,7 +66,7 @@ class Editor_CustomerController extends ZfExtended_RestController
     public function postAction()
     {
         try {
-            return parent::postAction();
+            parent::postAction();
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
             $this->handleDuplicate($e);
         }
@@ -73,7 +75,7 @@ class Editor_CustomerController extends ZfExtended_RestController
     public function putAction()
     {
         try {
-            return parent::putAction();
+            parent::putAction();
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
             $this->handleDuplicate($e);
         }
@@ -82,8 +84,11 @@ class Editor_CustomerController extends ZfExtended_RestController
     public function deleteAction()
     {
         try {
-            parent::deleteAction();
-        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            $this->entityLoad();
+            $this->processClientReferenceVersion();
+
+            CustomerService::create()->delete($this->entity);
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1047' => 'A client cannot be deleted as long as tasks are assigned to this client.',
             ], 'editor.customer');
@@ -234,7 +239,8 @@ class Editor_CustomerController extends ZfExtended_RestController
     }
 
     /***
-     * Set the resources log data for the current export request. If the request is from non test user, this will throw an exception.
+     * Set the resources log data for the current export request. If the request is from non test user, this will throw
+     * an exception.
      * @param int $customerId
      */
     protected function setupTextExportResourcesLogData(int $customerId = null)
