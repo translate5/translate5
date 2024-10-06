@@ -18,6 +18,18 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.11.2] - 2024-10-06
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4220](https://jira.translate5.net/browse/TRANSLATE-4220): InstantTranslate - Instant translate: segmentation search does not clean the results list correctly** <br>
+Fix for not correctly cleaned instant translate results blocks.
+
+
 ## [7.11.1] - 2024-10-04
 
 ### Important Notes:
