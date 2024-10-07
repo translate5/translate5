@@ -33,8 +33,9 @@ namespace MittagQI\Translate5\User\ActionAssert\Permission\Exception;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\LSP\LspUser;
+use MittagQI\Translate5\User\Exception\LspUserExceptionInterface;
 
-final class NotAccessibleLspUserException extends NoAccessException implements PermissionExceptionInterface
+final class NotAccessibleLspUserException extends NoAccessException implements PermissionExceptionInterface, LspUserExceptionInterface
 {
     public function __construct(
         public readonly LspUser $lspUser

@@ -30,8 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Exception;
 
-use InvalidArgumentException;
-
-class UnableToAssignJobCoordinatorRoleToExistingUserException extends InvalidArgumentException implements LspUserExceptionInterface
+interface LspUserExceptionInterface extends UserExceptionInterface
 {
 }

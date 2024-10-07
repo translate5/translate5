@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class AttemptToChangeLspForUserException extends InvalidArgumentException implements UserExceptionInterface
+class AttemptToChangeLspForUserException extends InvalidArgumentException implements LspUserExceptionInterface
 {
     public function __construct(
         private int $userId

@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,14 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\Event;
+namespace MittagQI\Translate5\User\Exception;
 
-use MittagQI\Translate5\LSP\LspUser;
+use InvalidArgumentException;
 
-class LspUserCreatedEvent
+class CustomerNotProvidedOnClientRestrictedUserCreationException extends InvalidArgumentException implements UserExceptionInterface
 {
-    public function __construct(
-        public readonly LspUser $lspUser,
-    ) {
-    }
 }

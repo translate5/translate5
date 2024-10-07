@@ -47,9 +47,11 @@ use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspU
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use MittagQI\Translate5\User\Exception\CustomerNotProvidedOnClientRestrictedUserCreationException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
+use MittagQI\Translate5\User\Exception\LspUserExceptionInterface;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
@@ -143,7 +145,6 @@ class Editor_UserController extends ZfExtended_RestController
         // @phpstan-ignore-next-line
         $this->view->rows->lsp = $lspUserRepo->findByUser($user)?->lsp->getId();
 
-        $this->csvToArray();
         $this->credentialCleanup();
     }
 
@@ -193,8 +194,6 @@ class Editor_UserController extends ZfExtended_RestController
 
         $this->view->rows = array_values($rows);
         $this->view->total = count($rows);
-
-        $this->csvToArray();
     }
 
     public function putAction(): void
@@ -213,7 +212,6 @@ class Editor_UserController extends ZfExtended_RestController
         $this->view->rows = $user->getDataObject();
 
         $this->credentialCleanup();
-        $this->csvToArray();
         $this->checkAndUpdateSession();
     }
 
@@ -242,7 +240,6 @@ class Editor_UserController extends ZfExtended_RestController
         }
 
         $this->credentialCleanup();
-        $this->csvToArray();
     }
 
     /**
@@ -300,7 +297,6 @@ class Editor_UserController extends ZfExtended_RestController
         $pmRoles = array_unique(array_filter($pmRoles));
         $this->view->rows = $this->entity->loadAllByRole($pmRoles, $parentId);
         $this->view->total = $this->entity->getTotalByRole($pmRoles, $parentId);
-        $this->csvToArray();
     }
 
     /**
@@ -308,6 +304,14 @@ class Editor_UserController extends ZfExtended_RestController
      */
     private function transformException(Throwable $e): ZfExtended_ErrorCodeException|Throwable
     {
+        if ($e instanceof FeasibilityExceptionInterface) {
+            return $this->transformFeasibilityException($e);
+        }
+
+        if ($e instanceof LspUserExceptionInterface) {
+            return $this->transformLspUserException($e);
+        }
+
         return match ($e::class) {
             RolesetHasConflictingRolesException::class => UnprocessableEntity::createResponse(
                 'E1630',
@@ -348,15 +352,6 @@ class Editor_UserController extends ZfExtended_RestController
                 ]
             ),
             UserIsNotAuthorisedToAssignRoleException::class => new ZfExtended_NoAccessException(previous: $e),
-            UnableToAssignJobCoordinatorRoleToExistingUserException::class => UnprocessableEntity::createResponse(
-                'E1631',
-                [
-                    'roles' => [
-                        'Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung '
-                        . 'oder für LSP-Benutzer definiert werden.',
-                    ],
-                ],
-            ),
             InexistentCustomerException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E2002',
                 [
@@ -401,6 +396,45 @@ class Editor_UserController extends ZfExtended_RestController
                     'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
                 ],
             ]),
+            LspNotFoundException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+                'E2002',
+                [
+                    'lsp' => [
+                        'Der referenzierte LSP existiert nicht (mehr).',
+                    ],
+                ],
+                [
+                    LanguageServiceProvider::class,
+                    $e->lspId,
+                ]
+            ),
+            ClientRestrictionException::class => new ZfExtended_NoAccessException(
+                'Deletion of User is not allowed due to client-restriction'
+            ),
+            CustomerNotProvidedOnClientRestrictedUserCreationException::class => UnprocessableEntity::createResponse(
+                'E2003',
+                [
+                    'customers' => [
+                        'Kunde nicht angegeben',
+                    ],
+                ],
+            ),
+            default => $e,
+        };
+    }
+
+    private function transformLspUserException(LspUserExceptionInterface $e): ZfExtended_ErrorCodeException|UnprocessableEntity
+    {
+        return match ($e::class) {
+            UnableToAssignJobCoordinatorRoleToExistingUserException::class => UnprocessableEntity::createResponse(
+                'E1631',
+                [
+                    'roles' => [
+                        'Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung '
+                        . 'oder für LSP-Benutzer definiert werden.',
+                    ],
+                ],
+            ),
             LspMustBeProvidedInJobCoordinatorCreationProcessException::class => UnprocessableEntity::createResponse(
                 'E2003',
                 [
@@ -423,18 +457,6 @@ class Editor_UserController extends ZfExtended_RestController
                     'userEmail' => $this->entity->getEmail(),
                 ]
             ),
-            LspNotFoundException::class => ZfExtended_Models_Entity_Conflict::createResponse(
-                'E2002',
-                [
-                    'lsp' => [
-                        'Der referenzierte LSP existiert nicht (mehr).',
-                    ],
-                ],
-                [
-                    LanguageServiceProvider::class,
-                    $e->lspId,
-                ]
-            ),
             AttemptToSetLspForNonJobCoordinatorException::class => ZfExtended_UnprocessableEntity::createResponse(
                 'E2003',
                 [
@@ -443,10 +465,6 @@ class Editor_UserController extends ZfExtended_RestController
                     ],
                 ],
             ),
-            ClientRestrictionException::class => new ZfExtended_NoAccessException(
-                'Deletion of User is not allowed due to client-restriction'
-            ),
-            FeasibilityExceptionInterface::class => $this->transformFeasibilityException($e),
             default => $e,
         };
     }
@@ -504,33 +522,6 @@ class Editor_UserController extends ZfExtended_RestController
                 ]
             )
         };
-    }
-
-    /**
-     * converts the source and target comma separated language ids to array.
-     * Frontend/api use array, in the database we save comma separated values.
-     */
-    private function csvToArray(): void
-    {
-        $callback = function ($row) {
-            if ($row !== null && $row !== "") {
-                $row = trim($row, ', ');
-                $row = explode(',', $row);
-            }
-
-            return $row;
-        };
-
-        //if the row is an array, loop over its elements, and explode the source/target language
-        if (is_array($this->view->rows)) {
-            foreach ($this->view->rows as &$singleRow) {
-                $singleRow['parentIds'] = $callback($singleRow['parentIds']);
-            }
-
-            return;
-        }
-
-        $this->view->rows->parentIds = $callback($this->view->rows->parentIds);
     }
 
     /**

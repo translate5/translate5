@@ -433,13 +433,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
     },
 
     getSelectedRoles: function (form) {
-        let selectedRoles = form.getValues().roles_helper || [];
-
-        if (selectedRoles && ! Array.isArray(selectedRoles)) {
-            selectedRoles = [selectedRoles];
-        }
-
-        return selectedRoles;
+        return form.down('#rolesGroup').query('checkbox[checked=true]').map(box => box.initialConfig.value);
     },
 
     onRoleCheckChange: function (checkbox, checked) {

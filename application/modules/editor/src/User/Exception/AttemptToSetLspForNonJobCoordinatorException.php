@@ -32,6 +32,6 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class AttemptToSetLspForNonJobCoordinatorException extends InvalidArgumentException implements UserExceptionInterface
+class AttemptToSetLspForNonJobCoordinatorException extends InvalidArgumentException implements LspUserExceptionInterface
 {
 }

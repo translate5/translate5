@@ -39,6 +39,7 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
+use MittagQI\Translate5\User\Exception\CustomerNotProvidedOnClientRestrictedUserCreationException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
@@ -98,6 +99,10 @@ final class UserCreateOperation implements UserCreateOperationInterface
         $this->setRoles->setRoles($user, $dto->roles);
 
         $user->validate();
+
+        if ($user->isClientRestricted() && empty($dto->customers)) {
+            throw new CustomerNotProvidedOnClientRestrictedUserCreationException();
+        }
 
         if ($user->isCoordinator() && null === $dto->lsp) {
             throw new LspMustBeProvidedInJobCoordinatorCreationProcessException();
