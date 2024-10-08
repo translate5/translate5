@@ -64,8 +64,6 @@ use ZfExtended_Models_Entity_Abstract;
  * @method void setDescription(string|null $description)
  * @method null|string getParentId()
  * @method void setParentId(int|null $parentId)
- * @method null|string getNotifiableCoordinatorId()
- * @method void setNotifiableCoordinatorId(int $notifiableCoordinatorId)
  */
 class LanguageServiceProvider extends ZfExtended_Models_Entity_Abstract
 {

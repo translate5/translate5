@@ -31,20 +31,15 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP\Operations;
 
 use MittagQI\Translate5\LSP\Contract\LspUpdateOperationInterface;
-use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Operations\DTO\UpdateLspDto;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\Translate5\Repository\UserRepository;
 
 final class LspUpdateOperation implements LspUpdateOperationInterface
 {
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
-        private readonly UserRepository $userRepository,
-        private readonly JobCoordinatorRepository $jobCoordinatorRepository,
     ) {
     }
 
@@ -57,8 +52,6 @@ final class LspUpdateOperation implements LspUpdateOperationInterface
 
         return new self(
             $lspRepository,
-            new UserRepository(),
-            JobCoordinatorRepository::create(),
         );
     }
 
@@ -70,14 +63,6 @@ final class LspUpdateOperation implements LspUpdateOperationInterface
 
         if (null !== $dto->description) {
             $lsp->setDescription($dto->description);
-        }
-
-        if (null !== $dto->notifiableCoordinator) {
-            if (! $dto->notifiableCoordinator->isCoordinatorOf($lsp)) {
-                throw new CoordinatorDontBelongToLspException();
-            }
-
-            $lsp->setNotifiableCoordinatorId((int) $dto->notifiableCoordinator->user->getId());
         }
 
         $this->lspRepository->save($lsp);

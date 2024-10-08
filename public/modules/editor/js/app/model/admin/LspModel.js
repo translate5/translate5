@@ -31,7 +31,6 @@ Ext.define('Editor.model.admin.LspModel', {
         {name: 'id', type: 'int'},
         {name: 'name', type: 'string'},
         {name: 'description', type: 'string'},
-        {name: 'notifiableCoordinator', type: 'string'},
     ],
     idProperty: 'id',
     proxy: {

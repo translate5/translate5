@@ -74,31 +74,6 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
                             },
                             allowBlank: false,
                         },
-                        {
-                            xtype: 'Editor.combobox',
-                            name: 'notifiableCoordinator',
-                            itemId: 'notifiableCoordinator',
-                            dataIndex: 'notifiableCoordinator',
-                            store: {
-                                xtype: 'store',
-                                data: [] // Initially empty, will be set dynamically
-                            },
-                            queryMode: 'local',
-                            displayField: 'name',
-                            valueField: 'guid',
-                            allowBlank: true,
-                            typeAhead: true,
-                            anyMatch: true,
-                            forceSelection: true,
-                            labelClsExtra: 'lableInfoIcon',
-                            autoEl: {
-                                tag: 'div',
-                                'data-qtip': Editor.data.l10n.lsp.notifiableCoordinatorTooltip,
-                            },
-                            bind:{
-                                fieldLabel: '{l10n.lsp.notifiableCoordinator}',
-                            },
-                        },
                     ]
                 },
             ]
@@ -148,7 +123,6 @@ Ext.define('Editor.view.admin.lsp.EditWindow', {
 
     loadRecord: function (record) {
         const form = this.down('form');
-        form.down('#notifiableCoordinator').getStore().setData(record.get('coordinators') || []);
 
         form.loadRecord(record);
     },

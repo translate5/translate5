@@ -129,18 +129,6 @@ class editor_LspController extends ZfExtended_RestController
             LspUpdateOperation::create()->updateLsp($lsp, $dto);
         } catch (PermissionExceptionInterface|InexistentUserException) {
             throw new ZfExtended_NoAccessException();
-        } catch (CoordinatorNotFoundException) {
-            throw ZfExtended_UnprocessableEntity::createResponse(
-                'E2003',
-                [
-                    'notifiableCoordinatorId' => [
-                        'Ungültiger Job Koordinator',
-                    ],
-                ],
-                [
-                    'notifiableCoordinatorId',
-                ]
-            );
         }
 
         $userRepository = new UserRepository();

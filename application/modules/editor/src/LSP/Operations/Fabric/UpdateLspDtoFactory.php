@@ -30,39 +30,18 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations\Fabric;
 
-use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Exception\CoordinatorNotFoundException;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Operations\DTO\UpdateLspDto;
-use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use REST_Controller_Request_Http as Request;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
 
 class UpdateLspDtoFactory
 {
-    public function __construct(
-        private readonly ActionPermissionAssertInterface $userPermissionAssert,
-        private readonly ZfExtended_AuthenticationInterface $authentication,
-        private readonly UserRepository $userRepository,
-        private readonly JobCoordinatorRepository $coordinatorRepository,
-    ) {
-    }
-
     /**
      * @codeCoverageIgnore
      */
     public static function create(): self
     {
-        return new self(
-            UserActionPermissionAssert::create(),
-            ZfExtended_Authentication::getInstance(),
-            new UserRepository(),
-            JobCoordinatorRepository::create(),
-        );
+        return new self();
     }
 
     /**
@@ -72,33 +51,12 @@ class UpdateLspDtoFactory
      */
     public function fromRequest(Request $request): UpdateLspDto
     {
-        $authUser = $this->userRepository->get($this->authentication->getUserId());
-
         $data = $request->getParam('data');
         $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
-
-        $coordinator = null;
-
-        if (isset($data['notifiableCoordinator'])) {
-            try {
-                $notifiableUser = $this->userRepository->getByGuid($data['notifiableCoordinator']);
-
-                $this->userPermissionAssert->assertGranted(
-                    Action::READ,
-                    $notifiableUser,
-                    new PermissionAssertContext($authUser)
-                );
-
-                $coordinator = $this->coordinatorRepository->getByUser($notifiableUser);
-            } catch (\Exception) {
-                throw new CoordinatorNotFoundException($data['notifiableCoordinator']);
-            }
-        }
 
         return new UpdateLspDto(
             $data['name'] ?? null,
             $data['description'] ?? null,
-                $coordinator,
         );
     }
 }

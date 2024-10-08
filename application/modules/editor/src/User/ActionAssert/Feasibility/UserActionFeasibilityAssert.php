@@ -33,7 +33,6 @@ namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\NotifiableCoordinatorFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\PmInTaskFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\UserIsEditableFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
@@ -58,7 +57,6 @@ final class UserActionFeasibilityAssert implements UserActionFeasibilityAssertIn
             new UserIsEditableFeasibilityAssert(),
             PmInTaskFeasibilityAssert::create(),
             LastCoordinatorFeasibilityAssert::create(),
-            NotifiableCoordinatorFeasibilityAssert::create(),
         ]);
     }
 

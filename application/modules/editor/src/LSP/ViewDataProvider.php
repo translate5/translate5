@@ -55,7 +55,6 @@ use MittagQI\Translate5\User\Model\User;
  *     description: string,
  *     canDelete: bool,
  *     canEdit: bool,
- *     notifiableCoordinator: string,
  *     coordinators: JC[],
  *     users: U[],
  *     customers: C[]
@@ -176,14 +175,6 @@ class ViewDataProvider
             }
         }
 
-        $notifiableCoordinator = null;
-
-        if (null !== $lsp->getNotifiableCoordinatorId()) {
-            $notifiableCoordinator = $this->jobCoordinatorRepository->getByUserId(
-                (int) $lsp->getNotifiableCoordinatorId()
-            );
-        }
-
         return [
             'id' => (int) $lsp->getId(),
             'parentId' => $lsp->getParentId() ? (int) $lsp->getParentId() : null,
@@ -194,7 +185,6 @@ class ViewDataProvider
             'coordinators' => $coordinatorData,
             'users' => $usersData,
             'customers' => $customersData,
-            'notifiableCoordinator' => $notifiableCoordinator?->guid,
         ];
     }
 

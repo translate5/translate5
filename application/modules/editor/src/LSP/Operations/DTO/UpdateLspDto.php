@@ -30,14 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations\DTO;
 
-use MittagQI\Translate5\LSP\JobCoordinator;
-
 class UpdateLspDto
 {
     public function __construct(
         public readonly ?string $name = null,
         public readonly ?string $description = null,
-        public readonly ?JobCoordinator $notifiableCoordinator = null,
     ) {
     }
 }
