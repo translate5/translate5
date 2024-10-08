@@ -27,3 +27,5 @@
 -- */
 
 -- userGroup calculation: basic: 1; editor: 2; pm: 4; admin: 8
+            
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2024-10-06', 'TRANSLATE-4220', 'bugfix', 'InstantTranslate - Instant translate: segmentation search does not clean the results list correctly', 'Fix for not correctly cleaned instant translate results blocks.', '15');
