@@ -39,12 +39,12 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
-use MittagQI\Translate5\UserJob\Contract\UserJobUpdateOperationInterface;
+use MittagQI\Translate5\UserJob\Contract\UpdateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Operation\DTO\UpdateUserJobDto;
 use Zend_Registry;
 use ZfExtended_Logger;
 
-class UpdateUserJobAssignmentOperation implements UserJobUpdateOperationInterface
+class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperationInterface
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,

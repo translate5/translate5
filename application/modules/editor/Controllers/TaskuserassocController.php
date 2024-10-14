@@ -37,7 +37,8 @@ use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\UserJob\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\UserJob\Operation\Factory\NewUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
-use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobAssignmentAssignmentOperation;
+use MittagQI\Translate5\UserJob\Operation\WithAuthentication\DeleteUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\UpdateUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\ViewDataProvider;
 use ZfExtended_UnprocessableEntity as UnprocessableEntity;
@@ -65,7 +66,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     /**
      *  @var editor_Logger_Workflow
      */
-    protected $log = false;
+    protected $log;
 
     /**
      * contains if available the task to the current tua
@@ -84,8 +85,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     public function init()
     {
         parent::init();
-        $this->task = ZfExtended_Factory::get('editor_Models_Task');
-        $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->task]);
+        $this->task = ZfExtended_Factory::get(editor_Models_Task::class);
+        $this->log = ZfExtended_Factory::get(editor_Logger_Workflow::class, [$this->task]);
         $this->userRepository = new UserRepository();
         $this->taskRepository = new TaskRepository();
         $this->userJobRepository = UserJobRepository::create();
@@ -112,7 +113,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if (! $this->getRequest()->getParam('taskId')) {
             Zend_Registry::get('logger')->warn(
                 'E1232',
-                'Job list: this route deprecated, use /editor/task/{taskId}/job instead'
+                'Job list: this route deprecated, use /editor/task/:taskId/job instead'
             );
 
             $rows = $this->viewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
@@ -135,6 +136,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     public function projectAction()
     {
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
+            Zend_Registry::get('logger')->warn(
+                'E1232',
+                'Job list: this route deprecated, use editor/project/:projectId/jobs instead'
+            );
+        }
+
         $projectId = $this->getParam('projectId');
         $workflow = $this->getParam('workflow');
 
@@ -154,11 +163,24 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     public function putAction()
     {
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
+            Zend_Registry::get('logger')->warn(
+                'E1232',
+                'Job list: this route deprecated, use /editor/task/job instead'
+            );
+        }
+
         $this->log->request();
 
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
             $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
+            $task = $this->taskRepository->getByGuid($job->getTaskGuid());
+
+            if ((int) $task->getId() !== (int) $this->getRequest()->getParam('taskId')) {
+                throw new ZfExtended_NotFoundException('Job not found');
+            }
 
             $this->processClientReferenceVersion($job);
 
@@ -174,10 +196,18 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     public function postAction()
     {
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
+            Zend_Registry::get('logger')->warn(
+                'E1232',
+                'Job list: this route deprecated, use /editor/task/:taskId/job instead'
+            );
+        }
+
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
             $dto = NewUserJobDtoFactory::create()->fromRequest($this->getRequest());
-            $job = CreateUserJobAssignmentOperation::create()->assignJob($dto);
+            $job = CreateUserJobAssignmentAssignmentOperation::create()->assignJob($dto);
 
             $this->view->rows = (object) $this->viewDataProvider->buildJobView($job, $authUser);
         } catch (Throwable $e) {
@@ -187,15 +217,23 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     public function deleteAction()
     {
-        $this->entityLoad();
-        $this->task->loadByTaskGuid($this->entity->getTaskGuid());
         $this->log->request();
 
-        $this->processClientReferenceVersion();
-        $entity = clone $this->entity;
-        $this->entity->setId(0);
-        //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing
-        $entity->delete();
+        try {
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
+            $task = $this->taskRepository->getByGuid($job->getTaskGuid());
+
+            if ((int) $task->getId() !== (int) $this->getRequest()->getParam('taskId')) {
+                throw new ZfExtended_NotFoundException('Job not found');
+            }
+
+            $this->processClientReferenceVersion($job);
+
+            DeleteUserJobAssignmentOperation::create()->delete($job);
+        } catch (Throwable $e) {
+            throw $this->transformException($e);
+        }
+
         $this->log->info('E1012', 'job deleted', [
             'tua' => $this->entity->getSanitizedEntityForLog(),
         ]);

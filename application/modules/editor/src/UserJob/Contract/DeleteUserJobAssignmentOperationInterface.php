@@ -31,9 +31,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\UserJob\Contract;
 
 use editor_Models_TaskUserAssoc as UserJob;
-use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 
-interface CreateUserJobOperationInterface
+interface DeleteUserJobAssignmentOperationInterface
 {
-    public function assignJob(NewUserJobDto $dto): UserJob;
+    public function delete(UserJob $job): void;
 }

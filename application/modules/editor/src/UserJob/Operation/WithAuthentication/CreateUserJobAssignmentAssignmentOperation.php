@@ -34,20 +34,26 @@ use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Exception\InexistentUserException;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
-use MittagQI\Translate5\UserJob\Contract\UpdateUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DTO\UpdateUserJobDto;
+use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_NotAuthenticatedException;
 
-class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperationInterface
+class CreateUserJobAssignmentAssignmentOperation implements CreateUserJobAssignmentOperationInterface
 {
     public function __construct(
-        private readonly ActionPermissionAssertInterface $permissionAssert,
-        private readonly UpdateUserJobAssignmentOperationInterface $operation,
+        private readonly CreateUserJobAssignmentOperationInterface $operation,
+        private readonly ActionPermissionAssertInterface $userPermissionAssert,
+        private readonly ActionPermissionAssertInterface $taskPermissionAssert,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly TaskRepository $taskRepository,
     ) {
     }
 
@@ -57,22 +63,30 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
     public static function create(): self
     {
         return new self(
-            UserJobActionPermissionAssert::create(),
-            \MittagQI\Translate5\UserJob\Operation\UpdateUserJobAssignmentOperation::create(),
+            \MittagQI\Translate5\UserJob\Operation\CreateUserJobAssignmentAssignmentOperation::create(),
+            UserActionPermissionAssert::create(),
+            TaskActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            new TaskRepository(),
         );
     }
-    public function update(UserJob $job, UpdateUserJobDto $dto): void
+    public function assignJob(NewUserJobDto $dto): UserJob
     {
-        $authUser = $this->userRepository->get($this->authentication->getUserId());
+        try {
+            $authUser = $this->userRepository->get($this->authentication->getUserId());
+        } catch (InexistentUserException) {
+            throw new ZfExtended_NotAuthenticatedException();
+        }
 
-        $this->permissionAssert->assertGranted(
-            Action::UPDATE,
-            $job,
-            new PermissionAssertContext($authUser),
-        );
+        $context = new PermissionAssertContext($authUser);
+        $task = $this->taskRepository->getByGuid($dto->taskGuid);
+        $user = $this->userRepository->getByGuid($dto->userGuid);
 
-        $this->operation->update($job, $dto);
+        $this->taskPermissionAssert->assertGranted(Action::READ, $task, $context);
+        $this->userPermissionAssert->assertGranted(Action::READ, $user, $context);
+
+
+        return $this->operation->assignJob($dto);
     }
 }

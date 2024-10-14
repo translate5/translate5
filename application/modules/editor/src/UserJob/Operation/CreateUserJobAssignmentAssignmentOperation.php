@@ -32,10 +32,10 @@ namespace MittagQI\Translate5\UserJob\Operation;
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Contract\CreateUserJobOperationInterface;
+use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 
-class CreateUserJobAssignmentOperation implements CreateUserJobOperationInterface
+class CreateUserJobAssignmentAssignmentOperation implements CreateUserJobAssignmentOperationInterface
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,

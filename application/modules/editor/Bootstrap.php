@@ -405,8 +405,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
+        /** @deprecated  */
         $this->front->getRouter()->addRoute('editorTaskUserAssocProject', new ZfExtended_Controller_RestLikeRoute(
             'editor/taskuserassoc/project',
+            [
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => 'project',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorProjectUserJobs', new ZfExtended_Controller_RestLikeRoute(
+            'editor/project/:projectId/jobs/:workflow',
             [
                 'module' => 'editor',
                 'controller' => 'taskuserassoc',

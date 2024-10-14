@@ -159,12 +159,7 @@ class UserJobRepository
             )
             ->where('tua.isPmOverride = 0')
             ->where('t.projectId = ?', $projectId)
-            ->where('t.taskType not in(?)', $this->taskType->getProjectTypes(true))
-            ->order([
-                'surName',
-                'firstName',
-                'login'
-            ]);
+            ->where('t.taskType not in(?)', $this->taskType->getProjectTypes(true));
 
         if (null !== $workflow) {
             $s->where('tua.workflow = ?', $workflow);

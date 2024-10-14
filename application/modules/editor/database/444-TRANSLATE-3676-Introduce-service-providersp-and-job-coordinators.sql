@@ -25,5 +25,22 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
-VALUES ('editor', 'basic', 'editor_user', 'allowedparentusersAction');
+DELETE FROM Zf_acl_rules
+WHERE `resource` = 'auto_set_role'
+  AND `role` = 'admin'
+  AND `right` IN ('TMMaintenance', 'termPM');
+
+DELETE FROM Zf_acl_rules
+WHERE `resource` = 'auto_set_role'
+  AND `role` = 'systemadmin'
+  AND `right` IN ('TMMaintenance', 'termPM');
+
+DELETE FROM Zf_acl_rules
+WHERE `resource` = 'auto_set_role'
+  AND `role` = 'termPM_allClients'
+  AND `right` = 'termPM';
+
+DELETE FROM Zf_acl_rules
+WHERE `resource` = 'auto_set_role'
+  AND `role` = 'termPM_allClients'
+  AND `right` = 'termPM';
