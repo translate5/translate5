@@ -42,7 +42,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewModel', {
         workflow: Ext.create('Editor.store.admin.Workflow'),
         userAssocImport:{
             model:'Editor.model.admin.TaskUserAssoc',
-            remoteFilter: true,
+            remoteFilter: false,
             pageSize: false,
             autoLoad:false,
             groupField: 'targetLang',

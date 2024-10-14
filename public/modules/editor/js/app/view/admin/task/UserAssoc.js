@@ -89,7 +89,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                     bind: {
                         html: '{editInfoHtml}'
                     }
-                }, {
+                },
+                    {
                     xtype: 'form',
                     title: me.strings.formTitleAdd,
                     hidden: true,

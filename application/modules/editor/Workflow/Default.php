@@ -29,8 +29,8 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 
 /**
- * Default Workflow Class, contains the workflow definition and workflow state, all handlers/actions etc are in the handler instance
- * Default roles are:
+ * Default Workflow Class, contains the workflow definition and workflow state, all handlers/actions etc are in the
+ * handler instance Default roles are:
  * - translator
  * - reviewer
  * - translatorCheck
@@ -193,6 +193,22 @@ class editor_Workflow_Default
 
         $this->hookin = ZfExtended_Factory::get('editor_Workflow_Default_Hooks', [$this]);
         $this->segmentHandler = ZfExtended_Factory::get('editor_Workflow_Default_SegmentHandler', [$this]);
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getAllStates(): array
+    {
+        return [
+            self::STATE_UNCONFIRMED,
+            self::STATE_WAITING,
+            self::STATE_FINISH,
+            self::STATE_OPEN,
+            self::STATE_EDIT,
+            self::STATE_VIEW,
+            self::STATE_AUTO_FINISH,
+        ];
     }
 
     /**
@@ -635,7 +651,8 @@ class editor_Workflow_Default
     /**
      * checks if the given TaskUserAssoc Instance allows reading of the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise
+     *     TaskUserAssoc field usedState
      * @return boolean
      */
     public function isReadable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false)
@@ -646,7 +663,8 @@ class editor_Workflow_Default
     /**
      * checks if the given TaskUserAssoc Instance allows writing to the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise
+     *     TaskUserAssoc field usedState
      * @return boolean
      */
     public function isWriteable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false)
@@ -688,8 +706,9 @@ class editor_Workflow_Default
     /**
      * returns true if a normal user can change the state of this assoc, false otherwise.
      * false means that the user has finished this task already or the user is still waiting.
-     * $userAssumedStateHeHas: should be the same as $taskUserAssoc->state, but comes in via API and represents the state which the client has.
-     *  This may differ from the state in the TUA out of DB. Basicly this means the user should refresh his data.
+     * $userAssumedStateHeHas: should be the same as $taskUserAssoc->state, but comes in via API and represents the
+     * state which the client has. This may differ from the state in the TUA out of DB. Basicly this means the user
+     * should refresh his data.
      *
      * - does not look for the state of a task, only for state of taskUserAssoc
      *
@@ -727,7 +746,8 @@ class editor_Workflow_Default
     }
 
     /**
-     * return <0 if stepTwo is before stepOne in the stepChain, >0 if stepTwo is after stepOne and 0 if the steps are equal.
+     * return <0 if stepTwo is before stepOne in the stepChain, >0 if stepTwo is after stepOne and 0 if the steps are
+     * equal.
      * @return integer
      */
     public function compareSteps(string $stepOne, string $stepTwo): int

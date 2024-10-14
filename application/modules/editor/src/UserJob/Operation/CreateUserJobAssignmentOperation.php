@@ -30,10 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\UserJob\Operation;
 
+use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\UserJob\Contract\CreateUserJobOperationInterface;
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 
-class CreateUserJobAssignmentOperation
+class CreateUserJobAssignmentOperation implements CreateUserJobOperationInterface
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
@@ -46,28 +48,33 @@ class CreateUserJobAssignmentOperation
     public static function create(): self
     {
         return new self(
-            new UserJobRepository(),
+            UserJobRepository::create(),
         );
     }
 
-    public function assignJob(NewUserJobDto $dto): void
+    public function assignJob(NewUserJobDto $dto): UserJob
     {
         $job = $this->userJobRepository->getEmptyModel();
         $job->setTaskGuid($dto->taskGuid);
         $job->setUserGuid($dto->userGuid);
         $job->setState($dto->state);
-        $job->setRole($dto->role);
-        $job->setWorkflow($dto->workflow);
-        $job->setWorkflowStepName($dto->workflowStepName);
+        $job->setRole($dto->workflow->role);
+        $job->setWorkflow($dto->workflow->workflow);
+        $job->setWorkflowStepName($dto->workflow->workflowStepName);
         $job->setType($dto->type);
         $job->setSegmentrange($dto->segmentRange);
         $job->setAssignmentDate($dto->assignmentDate);
         $job->setDeadlineDate($dto->deadlineDate);
+        $job->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
+        $job->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
+        $job->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
 
         $job->validate();
 
         $job->createstaticAuthHash();
 
         $this->userJobRepository->save($job);
+
+        return $job;
     }
 }

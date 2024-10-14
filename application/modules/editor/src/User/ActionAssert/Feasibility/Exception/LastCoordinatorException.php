@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Exception;
 
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\LSP\JobCoordinator;
 
 final class LastCoordinatorException extends \Exception implements FeasibilityExceptionInterface

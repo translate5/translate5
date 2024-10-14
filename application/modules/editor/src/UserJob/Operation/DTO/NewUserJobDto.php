@@ -30,6 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\UserJob\Operation\DTO;
 
+use DateTime;
+use editor_Workflow_Default as Workflow;
+use Exception;
+use MittagQI\Translate5\UserJob\Exception\InvalidAssignmentDateStringProvidedException;
+use MittagQI\Translate5\UserJob\Exception\InvalidDeadlineDateStringProvidedException;
+use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
 use MittagQI\Translate5\UserJob\TypeEnum;
 
 class NewUserJobDto
@@ -38,13 +44,27 @@ class NewUserJobDto
         public readonly string $taskGuid,
         public readonly string $userGuid,
         public readonly string $state,
-        public readonly string $role,
-        public readonly string $workflow,
-        public readonly string $workflowStepName,
+        public readonly WorkflowDto $workflow,
         public readonly TypeEnum $type,
         public readonly ?string $segmentRange,
         public readonly string $assignmentDate,
         public readonly ?string $deadlineDate,
+        public readonly TrackChangesRightsDto $trackChangesRights,
     ) {
+        if (! in_array($state, Workflow::getAllStates())) {
+            throw new InvalidStateProvidedException();
+        }
+
+        try {
+            new DateTime($deadlineDate);
+        } catch (Exception) {
+            throw new InvalidDeadlineDateStringProvidedException();
+        }
+
+        try {
+            new DateTime($assignmentDate);
+        } catch (Exception) {
+            throw new InvalidAssignmentDateStringProvidedException();
+        }
     }
 }

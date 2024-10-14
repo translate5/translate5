@@ -37,6 +37,7 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Model\User;
@@ -49,6 +50,8 @@ use ZfExtended_Factory;
  * id: string,
  * taskGuid: string,
  * userGuid: string,
+ * sourceLang: int,
+ * targetLang: int,
  * state: string,
  * role: string,
  * workflowStepName: string,
@@ -76,6 +79,7 @@ class ViewDataProvider
         private readonly UserJobRepository $userJobRepository,
         private readonly ActionPermissionAssertInterface $userJobPermissionAssert,
         private readonly UserRepository $userRepository,
+        private readonly TaskRepository $taskRepository,
         private readonly ZfExtended_Acl $acl,
     ) {
     }
@@ -86,9 +90,10 @@ class ViewDataProvider
     public static function create(): self
     {
         return new self(
-            new UserJobRepository(),
+            UserJobRepository::create(),
             UserJobActionPermissionAssert::create(),
             new UserRepository(),
+            new TaskRepository(),
             ZfExtended_Acl::getInstance(),
         );
     }
@@ -99,6 +104,7 @@ class ViewDataProvider
     public function buildViewForList(iterable $jobs, User $viewer): array
     {
         $users = [];
+        $tasks = [];
         $result = [];
         $context = new PermissionAssertContext($viewer);
 
@@ -115,9 +121,16 @@ class ViewDataProvider
                 $users[$job->getUserGuid()] = $this->userRepository->getByGuid($job->getUserGuid());
             }
 
-            $assignedUser = $users[$job->getUserGuid()];
+            if (! isset($tasks[$job->getTaskGuid()])) {
+                $tasks[$job->getTaskGuid()] = $this->taskRepository->getByGuid($job->getTaskGuid());
+            }
 
-            $result[] = $this->buildJobView($job, $assignedUser, $viewer);
+            $result[] = $this->buildJobViewWithAssignedUserAndTask(
+                $job,
+                $users[$job->getUserGuid()],
+                $tasks[$job->getTaskGuid()],
+                $viewer
+            );
         }
 
         return $result;
@@ -145,26 +158,45 @@ class ViewDataProvider
     /**
      * @return Job
      */
-    public function buildJobView(UserJob $job, User $assignedUser, User $viewer): array
+    public function buildJobView(UserJob $job, User $viewer): array
     {
+        return $this->buildJobViewWithAssignedUserAndTask(
+            $job,
+            $this->userRepository->getByGuid($job->getUserGuid()),
+            $this->taskRepository->getByGuid($job->getTaskGuid()),
+            $viewer
+        );
+    }
+
+    /**
+     * @return Job
+     */
+    private function buildJobViewWithAssignedUserAndTask(
+        UserJob $job,
+        User $assignedUser,
+        Task $task,
+        User $viewer,
+    ): array {
         $row = [
             'id' => $job->getId(),
             'taskGuid' => $job->getTaskGuid(),
             'userGuid' => $job->getUserGuid(),
+            'sourceLang' => (int) $task->getSourceLang(),
+            'targetLang' => (int) $task->getTargetLang(),
             'state' => $job->getState(),
             'role' => $job->getRole(),
             'workflowStepName' => $job->getWorkflowStepName(),
             'workflow' => $job->getWorkflow(),
             'segmentrange' => $job->getSegmentrange(),
-            'segmentEditableCount' => (int)$job->getSegmentEditableCount(),
-            'segmentFinishCount' => (int)$job->getSegmentFinishCount(),
+            'segmentEditableCount' => (int) $job->getSegmentEditableCount(),
+            'segmentFinishCount' => (int) $job->getSegmentFinishCount(),
             'usedState' => $job->getUsedState(),
             'deadlineDate' => $job->getDeadlineDate(),
             'assignmentDate' => $job->getAssignmentDate(),
             'finishedDate' => $job->getFinishedDate(),
-            'trackchangesShow' => (bool)$job->getTrackchangesShow(),
-            'trackchangesShowAll' => (bool)$job->getTrackchangesShowAll(),
-            'trackchangesAcceptReject' => (bool)$job->getTrackchangesAcceptReject(),
+            'trackchangesShow' => (bool) $job->getTrackchangesShow(),
+            'trackchangesShowAll' => (bool) $job->getTrackchangesShowAll(),
+            'trackchangesAcceptReject' => (bool) $job->getTrackchangesAcceptReject(),
             'type' => $job->getType()->name,
             'login' => $assignedUser->getLogin(),
             'firstName' => $assignedUser->getFirstName(),

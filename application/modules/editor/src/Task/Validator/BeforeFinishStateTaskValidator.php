@@ -28,10 +28,43 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Exception;
+namespace MittagQI\Translate5\Task\Validator;
 
-use Throwable;
+use editor_Models_Task as Task;
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 
-interface FeasibilityExceptionInterface extends Throwable
+class BeforeFinishStateTaskValidator
 {
+    public function __construct(
+        private readonly QualityService $qualityService,
+    ) {
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self(new QualityService());
+    }
+
+    /**
+     * @throws TaskHasCriticalQualityErrorsException
+     */
+    public function validateForTaskFinish(string $state, UserJob $job, Task $task): void
+    {
+        if ('beforeFinish' !== $state) {
+            return;
+        }
+
+        $errorCategories = $this->qualityService->getErroredCriticalCategories($job->getTaskGuid(), $job);
+
+        if (empty($errorCategories)) {
+            return;
+        }
+
+        throw new TaskHasCriticalQualityErrorsException($task, $errorCategories);
+    }
 }

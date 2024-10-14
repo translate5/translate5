@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Import\ImportService;
 use MittagQI\Translate5\Task\Import\ProjectWorkersService;
@@ -37,6 +38,7 @@ use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\TaskService;
+use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
@@ -117,6 +119,9 @@ class editor_TaskController extends ZfExtended_RestController
 
     private QualityService $qualityService;
 
+
+    private BeforeFinishStateTaskValidator $beforeFinishStateTaskValidator;
+
     public function init(): void
     {
         $this->_filterTypeMap = [
@@ -189,6 +194,8 @@ class editor_TaskController extends ZfExtended_RestController
         ]]);
 
         $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->entity]);
+
+        $this->beforeFinishStateTaskValidator = BeforeFinishStateTaskValidator::create();
 
         //add context of valid export formats:
         // currently: xliff2, importArchive, excel
@@ -1504,20 +1511,7 @@ class editor_TaskController extends ZfExtended_RestController
             $userTaskAssoc->setState($this->data->userState);
         }
 
-        if ($disableWorkflowEvents) {
-            $userTaskAssoc->save();
-        } else {
-            $this->workflow->hookin()->doWithUserAssoc(
-                $oldUserTaskAssoc,
-                $userTaskAssoc,
-                function (?string $state) use ($userTaskAssoc) {
-                    if ($state) {
-                        TaskService::validateForTaskFinish($state, $userTaskAssoc, $this->entity);
-                    }
-                    $userTaskAssoc->save();
-                }
-            );
-        }
+        $this->saveUserJob($userTaskAssoc, $oldUserTaskAssoc, $disableWorkflowEvents);
 
         if ($oldUserTaskAssoc->getState() != $this->data->userState) {
             $this->log->info('E1011', 'job status changed from {oldState} to {newState}', [
@@ -1525,6 +1519,44 @@ class editor_TaskController extends ZfExtended_RestController
                 'oldState' => $oldUserTaskAssoc->getState(),
                 'newState' => $this->data->userState,
             ]);
+        }
+    }
+
+    private function saveUserJob(
+        editor_Models_TaskUserAssoc $job,
+        editor_Models_TaskUserAssoc $oldJob,
+        bool $disableWorkflowEvents
+    ): void {
+        if ($disableWorkflowEvents) {
+            $job->save();
+
+            return;
+        }
+
+        try {
+            $this->workflow->hookin()->doWithUserAssoc(
+                $oldJob,
+                $job,
+                function (?string $state) use ($job) {
+                    if ($state) {
+                        $this->beforeFinishStateTaskValidator->validateForTaskFinish(
+                            $state,
+                            $job,
+                            $this->entity
+                        );
+                    }
+                    $job->save();
+                }
+            );
+        } catch (TaskHasCriticalQualityErrorsException $e) {
+            throw ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1542',
+                [QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS],
+                [
+                    'task' => $e->task,
+                    'categories' => implode('</br>', $e->categories),
+                ]
+            );
         }
     }
 
@@ -2117,7 +2149,8 @@ class editor_TaskController extends ZfExtended_RestController
     /**
      * Warn the api users that the targetDeliveryDate field is not anymore available for the api.
      * The task deadlines are defined for each task-user-assoc job separately,
-     *  for task creation we store the given date in the task meta table and use that in the jobs, so we do not break the API
+     *  for task creation we store the given date in the task meta table and use that in the jobs, so we do not break
+     * the API
      * @deprecated TODO: 11.02.2020 remove this function after all customers adopt there api calls
      * @see Editor_TaskuserassocController::setLegacyDeadlineDate
      */
@@ -2282,7 +2315,7 @@ class editor_TaskController extends ZfExtended_RestController
      */
     protected function handleConfigurationException(
         editor_Models_Import_ConfigurationException $e,
-        editor_Models_Task $task
+        editor_Models_Task $task,
     ): void {
         $codeToFieldAndMessage = [
             'E1032' => ['sourceLang', 'Die übergebene Quellsprache "{language}" ist ungültig!'],

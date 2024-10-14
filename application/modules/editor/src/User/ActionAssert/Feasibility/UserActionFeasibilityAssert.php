@@ -30,24 +30,17 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
 
-use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
+use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\PmInTaskFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\UserIsEditableFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\Model\User;
 
-final class UserActionFeasibilityAssert implements UserActionFeasibilityAssertInterface
+/**
+ * @extends ActionFeasibilityAssert<User>
+ */
+final class UserActionFeasibilityAssert extends ActionFeasibilityAssert
 {
-    /**
-     * @param FeasibilityAssertInterface[] $asserts
-     */
-    public function __construct(
-        private readonly array $asserts
-    ) {
-    }
-
     /**
      * @codeCoverageIgnore
      */
@@ -58,19 +51,5 @@ final class UserActionFeasibilityAssert implements UserActionFeasibilityAssertIn
             PmInTaskFeasibilityAssert::create(),
             LastCoordinatorFeasibilityAssert::create(),
         ]);
-    }
-
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function assertAllowed(Action $action, User $user): void
-    {
-        foreach ($this->asserts as $assert) {
-            if (! $assert->supports($action)) {
-                continue;
-            }
-
-            $assert->assertAllowed($user);
-        }
     }
 }

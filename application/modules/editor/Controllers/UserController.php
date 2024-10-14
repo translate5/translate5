@@ -38,7 +38,7 @@ use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
@@ -299,7 +299,7 @@ class Editor_UserController extends ZfExtended_RestController
     }
 
     /**
-     * @throws Zend_Exception
+     * @throws Throwable
      */
     private function transformException(Throwable $e): ZfExtended_ErrorCodeException|Throwable
     {

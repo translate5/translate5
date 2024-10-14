@@ -28,16 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
+namespace MittagQI\Translate5\UserJob\Exception;
 
-use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\Model\User;
+use InvalidArgumentException;
 
-interface UserActionFeasibilityAssertInterface
+class TaskIdentificatorNotProvidedException extends InvalidArgumentException
 {
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function assertAllowed(Action $action, User $user): void;
 }

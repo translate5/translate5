@@ -10005,6 +10005,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Ungültiger Job Koordinator</source>
                 <target>Ungültiger Job Koordinator</target>
             </trans-unit>
+            <trans-unit id='VW5nw7xsdGlnZXIgV2VydCBiZXJlaXRnZXN0ZWxsdA=='>
+                <source>Ungültiger Wert bereitgestellt</source>
+                <target>Ungültiger Wert bereitgestellt</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

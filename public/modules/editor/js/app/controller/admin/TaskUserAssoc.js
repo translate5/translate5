@@ -93,6 +93,21 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
         Editor.app.on('adminViewportClosed', me.clearStores, me);
 
+        Ext.on({
+            projectTaskSelectionChange: function (task) {
+                if (! task) {
+                    return;
+                }
+
+                let jobStore = this.getUserAssocGrid().getStore();
+
+                this.setJobStoreProxyPath(jobStore, task);
+
+                jobStore.load();
+            },
+            scope: me,
+        })
+
         me.control({
             '#adminTaskUserAssocGrid': {
                 confirmDelete: me.handleDeleteConfirmClick,
@@ -126,18 +141,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     isAllowed: function (right) {
         return Editor.app.authenticatedUser.isAllowed(right);
     },
-    /**
-     * @param {Ext.button.Button} btn
-     */
+
     handleCancel: function () {
         var form = this.getUserAssocForm();
         form.getForm().reset();
         form.hide();
         this.getEditInfo().show();
     },
-    /**
-     * @param {Ext.button.Button} btn
-     */
+
     handleAddUser: function () {
         var me = this,
             assoc = me.getAdminTaskUserAssocsStore(),
@@ -190,19 +201,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     handleAssocSelection: function (grid, selection) {
         var me = this,
             formPanel = me.getUserAssocForm(),
-            emptySel = selection.length === 0,
-            record = !emptySel ? selection[0] : null,
-            userEditable = record && record.get('editable'),
-            userDeletable = record && record.get('deletable'),
-            task = me.getPrefWindow().getCurrentTask();
+            emptySel = selection.length === 0;
 
-        me.getAssocDelBtn().setDisabled(emptySel || !userDeletable);
+        me.getAssocDelBtn().setDisabled(emptySel);
 
         me.getEditInfo().setVisible(emptySel);
 
         formPanel.setVisible(!emptySel);
-
-        formPanel.setDisabled(emptySel || !userEditable);
+        formPanel.setDisabled(emptySel);
 
         me.filterStepsCombo(selection[0]);
 
@@ -306,6 +312,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                 task && task.load();
             }
         });
+    },
+
+    setJobStoreProxyPath: function (store, task) {
+        store.getProxy().setUrl(Editor.data.restpath + 'task/' + task.get('id') + '/job');
     },
 
     onUserSpecialPropertiesBtnClick: function () {

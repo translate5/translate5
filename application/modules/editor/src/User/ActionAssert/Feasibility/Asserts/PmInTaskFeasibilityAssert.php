@@ -31,10 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\Model\User;
 
+/**
+ * @implements FeasibilityAssertInterface<User>
+ */
 final class PmInTaskFeasibilityAssert implements FeasibilityAssertInterface
 {
     public function __construct(
@@ -58,9 +62,9 @@ final class PmInTaskFeasibilityAssert implements FeasibilityAssertInterface
     /**
      * Restrict access if the user is a project manager in at least one task
      */
-    public function assertAllowed(User $user): void
+    public function assertAllowed(object $object): void
     {
-        $tasks = $this->taskRepository->loadListByPmGuid($user->getUserGuid());
+        $tasks = $this->taskRepository->loadListByPmGuid($object->getUserGuid());
 
         if (! empty($tasks)) {
             $taskGuids = array_column($tasks, 'taskGuid');

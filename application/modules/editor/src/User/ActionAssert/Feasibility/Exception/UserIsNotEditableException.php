@@ -30,6 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Exception;
 
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+
 final class UserIsNotEditableException extends \Exception implements FeasibilityExceptionInterface
 {
 }

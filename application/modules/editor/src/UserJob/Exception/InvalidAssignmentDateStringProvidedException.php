@@ -32,6 +32,6 @@ namespace MittagQI\Translate5\UserJob\Exception;
 
 use InvalidArgumentException;
 
-class TaskGuidNotProvidedException extends InvalidArgumentException
+class InvalidAssignmentDateStringProvidedException extends InvalidArgumentException
 {
 }

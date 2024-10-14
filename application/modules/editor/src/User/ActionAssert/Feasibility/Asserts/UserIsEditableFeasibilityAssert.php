@@ -31,9 +31,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserIsNotEditableException;
 use MittagQI\Translate5\User\Model\User;
 
+/**
+ * @implements FeasibilityAssertInterface<User>
+ */
 final class UserIsEditableFeasibilityAssert implements FeasibilityAssertInterface
 {
     public function supports(Action $action): bool
@@ -44,9 +48,9 @@ final class UserIsEditableFeasibilityAssert implements FeasibilityAssertInterfac
     /**
      * Restrict access if user is not editable
      */
-    public function assertAllowed(User $user): void
+    public function assertAllowed(object $object): void
     {
-        if (! $user->getEditable()) {
+        if (! $object->getEditable()) {
             throw new UserIsNotEditableException();
         }
     }

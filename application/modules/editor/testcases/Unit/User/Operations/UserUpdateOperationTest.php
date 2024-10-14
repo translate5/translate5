@@ -32,8 +32,8 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
@@ -50,7 +50,7 @@ class UserUpdateOperationTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
 
-    private UserActionFeasibilityAssertInterface|MockObject $userActionFeasibilityChecker;
+    private ActionFeasibilityAssertInterface|MockObject $userActionFeasibilityChecker;
 
     private UserSetRolesOperationInterface|MockObject $setRoles;
 
@@ -65,7 +65,7 @@ class UserUpdateOperationTest extends TestCase
     protected function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->userActionFeasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
+        $this->userActionFeasibilityChecker = $this->createMock(ActionFeasibilityAssertInterface::class);
         $this->setRoles = $this->createMock(UserSetRolesOperationInterface::class);
         $this->setPassword = $this->createMock(UserSetPasswordOperation::class);
         $this->assignCustomers = $this->createMock(UserAssignCustomersOperationInterface::class);

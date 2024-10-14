@@ -31,10 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\Model\User;
 
+/**
+ * @implements FeasibilityAssertInterface<User>
+ */
 final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterface
 {
     public function __construct(
@@ -57,10 +61,10 @@ final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterfa
     /**
      * Restrict deletion of the last coordinator in the LSP
      */
-    public function assertAllowed(User $user): void
+    public function assertAllowed(object $object): void
     {
         // Possible coordinator that we try to delete
-        $coordinator = $this->jcRepository->findByUser($user);
+        $coordinator = $this->jcRepository->findByUser($object);
 
         if (null === $coordinator) {
             return;

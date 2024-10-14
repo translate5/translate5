@@ -52,8 +52,6 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
         {name: 'workflow', type: 'string', critical: true},
         {name: 'workflowStepName', type: 'string', critical: true},
         {name: 'segmentrange', type: 'string'},
-        {name: 'deletable', type: 'boolean'},
-        {name: 'editable', type: 'boolean'},
         {name: 'assignmentDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
         {name: 'finishedDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
         {name: 'deadlineDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
@@ -82,8 +80,7 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
 
     idProperty: 'id',
     proxy: {
-        type: 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
-        url: Editor.data.restpath + 'taskuserassoc', //same as PHP controller name
+        type: 'rest',
         reader: {
             rootProperty: 'rows',
             type: 'json'

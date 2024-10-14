@@ -60,17 +60,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
             model: 'Editor.model.admin.TaskUserAssoc',
             remoteFilter: false,
             pageSize: false,
-            autoLoad: true,
-            listeners: {
-                beforeload: function (store, operation) {
-                    // const taskId = this.currentTask.get('id'); // Get the bound taskGuid
-                    // if (taskId) {
-                    //     // Update the proxy URL dynamically
-                    //     store.getProxy().setUrl(Editor.data.restpath + 'task/' + taskId + '/job');
-                    // }
-                }
-            },
-            currentTask: '{currentTask}',
+            autoLoad: false,
         }
     },
     formulas: {
@@ -168,5 +158,5 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
             },
             bind:{bindTo:'{currentTask}',deep:true}
         }
-    }
+    },
 });

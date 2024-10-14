@@ -32,8 +32,8 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
 use PHPUnit\Framework\TestCase;
@@ -54,7 +54,7 @@ class UserDeleteOperationTest extends TestCase
     public function testDelete(bool $actionAllowed): void
     {
         $userRepository = $this->createMock(UserRepository::class);
-        $feasibilityChecker = $this->createMock(UserActionFeasibilityAssertInterface::class);
+        $feasibilityChecker = $this->createMock(ActionFeasibilityAssertInterface::class);
         $user = $this->createMock(User::class);
 
         if ($actionAllowed) {

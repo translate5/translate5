@@ -28,18 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
+namespace MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception;
 
-use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 
-interface FeasibilityAssertInterface
+class UserHasAlreadyOpenedTheTaskForEditingException extends \Exception implements FeasibilityExceptionInterface
 {
-    /**
-     * @throws FeasibilityExceptionInterface
-     */
-    public function assertAllowed(User $user): void;
-
-    public function supports(Action $action): bool;
 }

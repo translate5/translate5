@@ -32,9 +32,9 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssertInterface;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Contract\UserUpdateOperationInterface;
@@ -50,7 +50,7 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly UserActionFeasibilityAssertInterface $userActionFeasibilityChecker,
+        private readonly ActionFeasibilityAssertInterface $userActionFeasibilityChecker,
         private readonly UserSetRolesOperationInterface $setRoles,
         private readonly UserSetPasswordOperation $setPassword,
         private readonly UserAssignCustomersOperationInterface $assignCustomers,
