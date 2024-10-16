@@ -228,6 +228,11 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
         $this->_exportFile = $xmlparser->parse($this->skeletonFile, $preserveWhitespaceDefault);
 
+        // check if the namespaces are set before processing the file. Some functional tests are not able to handle that
+        if (! empty($this->namespace)) {
+            $this->_exportFile = $this->namespace->postProcessFile($this->_exportFile);
+        }
+
         if ($this->options['sourcetoemptytarget']) {
             //UGLY: typecast to string here
             $this->_exportChunksWithSourceFallback = $xmlparser->join(array_replace($xmlparser->getAllChunks(), $this->_exportChunksWithSourceFallback));
@@ -318,9 +323,8 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * dedicated to write the match-Rate to the right position in the target format
      * @param array $file that contains file as array as splitted by parse function
      * @param int $i position of current segment in the file array
-     * @return string
      */
-    protected function writeMatchRate(array $file, int $i)
+    protected function writeMatchRate(array $file, int $i): array
     {
         // FIXME This code is disabled, because:
         //  - the mid is not unique (due multiple files in the XLF) this code is buggy
