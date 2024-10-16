@@ -264,7 +264,7 @@ final class State
 
             $db = self::$table->getAdapter();
 
-            $db->beginTransaction();
+            $db->beginTransaction(); //needed to encapsulate select forUpdate and update
 
             $where = self::$table->select()
                 ->forUpdate(Zend_Db_Select::FU_MODE_SKIP)
@@ -273,25 +273,32 @@ final class State
                 ->where(self::$table->getAdapter()->quoteIdentifier($column) . ' = ?', $state)
                 ->order('segmentId ' . ($fromTheTop ? 'ASC' : 'DESC'))
                 ->limit($limit);
-            foreach (self::$table->fetchAll($where) as $row) {
-                $segmentIds[] = $row->segmentId;
-                $states[] = new static($this->serviceId, $row);
-            }
-            if (count($segmentIds) > 1) {
-                self::$table->update([
-                    $column => self::INPROGRESS,
-                    'processing' => 1,
-                ], [
-                    'segmentId IN (?)' => $segmentIds,
-                ]);
-            } elseif (count($segmentIds) === 1) {
-                // first row of foreach loop - phpstan does not get that existance of row is certain here
-                $row->$column = self::INPROGRESS; // @phpstan-ignore-line
-                $row->processing = 1; // @phpstan-ignore-line - why is phpstan not seeing __get(...) ?
-                $row->save();
-            }
 
-            $db->commit();
+            try {
+                foreach (self::$table->fetchAll($where) as $row) {
+                    $segmentIds[] = $row->segmentId;
+                    $states[] = new static($this->serviceId, $row);
+                }
+                if (count($segmentIds) > 1) {
+                    self::$table->update([
+                        $column => self::INPROGRESS,
+                        'processing' => 1,
+                    ], [
+                        'segmentId IN (?)' => $segmentIds,
+                    ]);
+                } elseif (count($segmentIds) === 1) {
+                    // first row of foreach loop - phpstan does not get that existance of row is certain here
+                    $row->$column = self::INPROGRESS; // @phpstan-ignore-line
+                    $row->processing = 1; // @phpstan-ignore-line - why is phpstan not seeing __get(...) ?
+                    $row->save();
+                }
+
+                $db->commit();
+            } catch (Zend_Db_Exception $e) {
+                $db->rollBack();
+
+                throw $e;
+            }
 
             return $states;
         });
