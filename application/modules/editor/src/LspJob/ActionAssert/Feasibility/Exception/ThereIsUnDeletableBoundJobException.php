@@ -28,15 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Exception;
+namespace MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Exception;
 
-use ZfExtended_Models_Entity_NotFoundException;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 
-class InexistentUserException extends ZfExtended_Models_Entity_NotFoundException
+class ThereIsUnDeletableBoundJobException extends \Exception implements FeasibilityExceptionInterface
 {
-    public function __construct(
-        public readonly string $identifier
-    ) {
-        parent::__construct("User with ID [$identifier] does not exist");
-    }
 }

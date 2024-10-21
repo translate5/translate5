@@ -80,7 +80,7 @@ class LspAssignCustomerOperationTest extends TestCase
         $this->lspPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::UPDATE)
+            ->with(Action::Update)
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
@@ -99,7 +99,7 @@ class LspAssignCustomerOperationTest extends TestCase
         $this->customerPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::READ)
+            ->with(Action::Read)
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
@@ -116,12 +116,12 @@ class LspAssignCustomerOperationTest extends TestCase
         $this->lspPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::UPDATE);
+            ->with(Action::Update);
 
         $this->customerPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::READ);
+            ->with(Action::Read);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 

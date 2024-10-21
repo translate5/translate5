@@ -33,10 +33,10 @@ namespace MittagQI\Translate5\UserJob\Operation\Factory;
 use editor_Models_Task as Task;
 use editor_Workflow_Default as Workflow;
 use editor_Workflow_Manager;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\Exception;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\UserJob\Exception\WorkflowStepNotProvidedException;
@@ -45,9 +45,8 @@ use MittagQI\Translate5\UserJob\Validation\SegmentRangeValidator;
 use REST_Controller_Request_Http as Request;
 use Zend_Registry;
 use ZfExtended_Logger;
-use ZfExtended_NotAuthenticatedException;
 
-class UpdateUserJobDtoFactory extends UserJobDtoFactory
+class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
 {
     public function __construct(
         private readonly TaskRepository $taskRepository,
@@ -76,12 +75,10 @@ class UpdateUserJobDtoFactory extends UserJobDtoFactory
     /**
      * @param Request $request
      *
-     * @throws Exception\InexistentTaskException
-     * @throws Exception\InexistentUserException
+     * @throws InexistentTaskException
+     * @throws InexistentUserException
      * @throws InvalidStateProvidedException
      * @throws InvalidTypeProvidedException
-     * @throws ZfExtended_NotAuthenticatedException
-     * @throws PermissionExceptionInterface
      */
     public function fromRequest(Request $request): UpdateUserJobDto
     {
@@ -113,9 +110,9 @@ class UpdateUserJobDtoFactory extends UserJobDtoFactory
             $workflowDto,
             $segmentRanges,
             $deadlineDate,
-            $data['trackchangesShow'] ?? false,
-            $data['trackchangesShowAll'] ?? false,
-            $data['trackchangesAcceptReject'] ?? false,
+            isset($data['trackchangesShow']) ? (bool) $data['trackchangesShow'] : null,
+            isset($data['trackchangesShowAll']) ? (bool) $data['trackchangesShowAll'] : null,
+                isset($data['trackchangesAcceptReject']) ? (bool) $data['trackchangesAcceptReject'] : null,
         );
     }
 

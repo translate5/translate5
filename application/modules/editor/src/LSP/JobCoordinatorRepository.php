@@ -74,7 +74,6 @@ class JobCoordinatorRepository
     }
 
     /**
-     * @throws NotFoundException
      * @throws CantCreateCoordinatorFromUserException
      * @throws LspUserNotFoundException
      */
@@ -86,15 +85,23 @@ class JobCoordinatorRepository
     }
 
     /**
-     * @throws NotFoundException
      * @throws CantCreateCoordinatorFromUserException
      * @throws LspUserNotFoundException
      */
-    public function getByUserId(int $userId): JobCoordinator
+    public function getByUserGuid(string $userGuid): JobCoordinator
     {
-        $lspUser = $this->lspUserRepository->getByUserId($userId);
+        $lspUser = $this->lspUserRepository->getByUserGuid($userGuid);
 
         return JobCoordinator::fromLspUser($lspUser);
+    }
+
+    public function findByUserGuid(string $userGuid): ?JobCoordinator
+    {
+        try {
+            return $this->getByUserGuid($userGuid);
+        } catch (LspUserNotFoundException|CantCreateCoordinatorFromUserException) {
+            return null;
+        }
     }
 
     /**

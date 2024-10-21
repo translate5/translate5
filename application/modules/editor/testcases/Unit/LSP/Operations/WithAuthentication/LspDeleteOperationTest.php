@@ -76,7 +76,7 @@ class LspDeleteOperationTest extends TestCase
         $this->lspPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::DELETE)
+            ->with(Action::Delete)
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
@@ -94,7 +94,7 @@ class LspDeleteOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
 
-        $this->lspPermissionAssert->expects(self::once())->method('assertGranted')->with(Action::DELETE);
+        $this->lspPermissionAssert->expects(self::once())->method('assertGranted')->with(Action::Delete);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 

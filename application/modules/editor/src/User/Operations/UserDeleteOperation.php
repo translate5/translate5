@@ -62,7 +62,7 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
      */
     public function delete(User $user): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::DELETE, $user);
+        $this->userActionFeasibilityChecker->assertAllowed(Action::Delete, $user);
 
         // TODO delete user jobs
         $this->userRepository->delete($user);

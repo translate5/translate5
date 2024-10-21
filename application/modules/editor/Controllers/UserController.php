@@ -30,15 +30,15 @@ use MittagQI\Translate5\Acl\Exception\ClientRestrictedAndNotRolesProvidedTogethe
 use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Exception\InexistentCustomerException;
+use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
@@ -131,7 +131,7 @@ class Editor_UserController extends ZfExtended_RestController
 
         try {
             $this->permissionAssert->assertGranted(
-                Action::READ,
+                Action::Read,
                 $user,
                 new PermissionAssertContext($authUser)
             );
@@ -171,7 +171,7 @@ class Editor_UserController extends ZfExtended_RestController
             );
 
             try {
-                $this->permissionAssert->assertGranted(Action::READ, $userModel, $context);
+                $this->permissionAssert->assertGranted(Action::Read, $userModel, $context);
             } catch (PermissionExceptionInterface) {
                 unset($rows[$key]);
 
@@ -217,9 +217,13 @@ class Editor_UserController extends ZfExtended_RestController
     public function deleteAction(): void
     {
         $user = $this->userRepository->get($this->getParam('id'));
+        $operation = UserDeleteOperation::create();
 
         try {
-            UserDeleteOperation::create()->delete($user);
+            $this->getRequest()->getParam('force', false)
+                ? $operation->forceDelete($user)
+                : $operation->delete($user)
+            ;
         } catch (Throwable $e) {
             throw $this->transformException($e);
         }

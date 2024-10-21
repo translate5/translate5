@@ -43,7 +43,7 @@ final class AssignedCustomerAssert implements PermissionAssertInterface
 {
     public function supports(Action $action): bool
     {
-        return in_array($action, [Action::UPDATE, Action::DELETE, Action::READ], true);
+        return in_array($action, [Action::Update, Action::Delete, Action::Read], true);
     }
 
     /**
@@ -51,11 +51,11 @@ final class AssignedCustomerAssert implements PermissionAssertInterface
      */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        if (! $context->manager->isClientRestricted()) {
+        if (! $context->authUser->isClientRestricted()) {
             return;
         }
 
-        $allowedCustomerIs = $context->manager->getCustomersArray();
+        $allowedCustomerIs = $context->authUser->getCustomersArray();
 
         if (! in_array((int) $object->getId(), $allowedCustomerIs, true)) {
             throw new NoAccessToCustomerException((int) $object->getId());

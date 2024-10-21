@@ -65,10 +65,10 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function provideSupports(): iterable
     {
-        yield [Action::DELETE, true];
-        yield [Action::UPDATE, true];
-        yield [Action::READ, true];
-        yield [Action::CREATE, false];
+        yield [Action::Delete, true];
+        yield [Action::Update, true];
+        yield [Action::Read, true];
+        yield [Action::Create, false];
     }
 
     /**

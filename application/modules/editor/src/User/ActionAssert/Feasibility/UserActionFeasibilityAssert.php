@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
 
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\JobRestrictionAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\PmInTaskFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\UserIsEditableFeasibilityAssert;
@@ -50,6 +51,7 @@ final class UserActionFeasibilityAssert extends ActionFeasibilityAssert
             new UserIsEditableFeasibilityAssert(),
             PmInTaskFeasibilityAssert::create(),
             LastCoordinatorFeasibilityAssert::create(),
+            JobRestrictionAssert::create(),
         ]);
     }
 }

@@ -61,7 +61,7 @@ abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
 
     private function doesPermissionGranted(LanguageServiceProvider $lsp, PermissionAssertContext $context): bool
     {
-        $roles = $context->manager->getRoles();
+        $roles = $context->authUser->getRoles();
 
         if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
             return true;
@@ -71,7 +71,7 @@ abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
             return $lsp->isDirectLsp();
         }
 
-        $coordinator = $this->jobCoordinatorRepository->findByUser($context->manager);
+        $coordinator = $this->jobCoordinatorRepository->findByUser($context->authUser);
 
         if (null === $coordinator) {
             return false;

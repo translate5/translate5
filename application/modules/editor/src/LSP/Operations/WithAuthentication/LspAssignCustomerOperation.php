@@ -85,13 +85,13 @@ class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
         $this->lspActionPermissionAssert->assertGranted(
-            Action::UPDATE,
+            Action::Update,
             $lsp,
             new PermissionAssertContext($authUser)
         );
 
         $this->customerActionPermissionAssert->assertGranted(
-            Action::READ,
+            Action::Read,
             $customer,
             new PermissionAssertContext($authUser)
         );

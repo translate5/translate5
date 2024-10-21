@@ -28,17 +28,25 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\Operation;
+namespace MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Asserts;
 
-use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
+use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
+use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
+use MittagQI\Translate5\UserJob\TypeEnum;
 
-class CreateUserJobAssignmentAssignmentOperation implements CreateUserJobAssignmentOperationInterface
+/**
+ * @implements FeasibilityAssertInterface<LspJobAssociation>
+ */
+class HasUnDeletableUserJobAssert implements FeasibilityAssertInterface
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
+        private readonly UserJobActionFeasibilityAssert $userJobActionFeasibilityAssert,
     ) {
     }
 
@@ -49,32 +57,30 @@ class CreateUserJobAssignmentAssignmentOperation implements CreateUserJobAssignm
     {
         return new self(
             UserJobRepository::create(),
+            UserJobActionFeasibilityAssert::create(),
         );
     }
 
-    public function assignJob(NewUserJobDto $dto): UserJob
+    public function supports(Action $action): bool
     {
-        $job = $this->userJobRepository->getEmptyModel();
-        $job->setTaskGuid($dto->taskGuid);
-        $job->setUserGuid($dto->userGuid);
-        $job->setState($dto->state);
-        $job->setRole($dto->workflow->role);
-        $job->setWorkflow($dto->workflow->workflow);
-        $job->setWorkflowStepName($dto->workflow->workflowStepName);
-        $job->setType($dto->type);
-        $job->setSegmentrange($dto->segmentRange);
-        $job->setAssignmentDate($dto->assignmentDate);
-        $job->setDeadlineDate($dto->deadlineDate);
-        $job->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
-        $job->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
-        $job->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
+        return $action === Action::Delete;
+    }
 
-        $job->validate();
+    /**
+     * {@inheritDoc}
+     */
+    public function assertAllowed(object $object): void
+    {
+        try {
+            foreach ($this->userJobRepository->getUserJobsByLspJob($object) as $job) {
+                if (TypeEnum::LSP === $job->type) {
+                    continue;
+                }
 
-        $job->createstaticAuthHash();
-
-        $this->userJobRepository->save($job);
-
-        return $job;
+                $this->userJobActionFeasibilityAssert->assertAllowed(Action::Delete, $job);
+            }
+        } catch (FeasibilityExceptionInterface) {
+            throw new ThereIsUnDeletableBoundJobException();
+        }
     }
 }

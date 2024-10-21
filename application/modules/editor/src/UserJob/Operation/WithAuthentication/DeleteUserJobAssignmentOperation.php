@@ -37,8 +37,6 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Contract\UpdateUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DTO\UpdateUserJobDto;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 
@@ -59,7 +57,7 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
     {
         return new self(
             UserJobActionPermissionAssert::create(),
-            \MittagQI\Translate5\UserJob\Operation\UpdateUserJobAssignmentOperation::create(),
+            \MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
         );
@@ -69,7 +67,7 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
         $this->permissionAssert->assertGranted(
-            Action::DELETE,
+            Action::Delete,
             $job,
             new PermissionAssertContext($authUser),
         );

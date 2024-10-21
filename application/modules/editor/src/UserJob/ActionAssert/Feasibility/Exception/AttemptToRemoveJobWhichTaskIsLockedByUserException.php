@@ -28,45 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\ActionAssert\Permission\Assert;
+namespace MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception;
 
-use editor_Models_Task as Task;
-use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToUserJobException;
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 
-/**
- * @implements PermissionAssertInterface<Task>
- */
-final class MutableJobCoordinatorPermissionAssert implements PermissionAssertInterface
+final class AttemptToRemoveJobWhichTaskIsLockedByUserException extends \Exception implements FeasibilityExceptionInterface
 {
     public function __construct(
-        private readonly JobCoordinatorRepository $coordinatorRepository,
+        public readonly UserJob $job,
     ) {
-    }
-
-    public static function create(): self
-    {
-        return new self(
-            JobCoordinatorRepository::create(),
-        );
-    }
-
-    public function supports(Action $action): bool
-    {
-        return $action->isMutable();
-    }
-
-    public function assertGranted(object $object, PermissionAssertContext $context): void
-    {
-        $coordinator = $this->coordinatorRepository->findByUser($context->manager);
-
-        if (null === $coordinator) {
-            return;
-        }
-
-        throw new NoAccessToUserJobException($object);
+        parent::__construct();
     }
 }

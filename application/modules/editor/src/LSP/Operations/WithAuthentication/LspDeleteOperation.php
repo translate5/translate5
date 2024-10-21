@@ -67,7 +67,7 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->permissionAssert->assertGranted(Action::DELETE, $lsp, new PermissionAssertContext($authUser));
+        $this->permissionAssert->assertGranted(Action::Delete, $lsp, new PermissionAssertContext($authUser));
 
         $this->operation->deleteLsp($lsp);
     }

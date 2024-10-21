@@ -46,20 +46,24 @@ final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterfa
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(
-            JobCoordinatorRepository::create()
+            JobCoordinatorRepository::create(),
         );
     }
 
     public function supports(Action $action): bool
     {
-        return $action === Action::DELETE;
+        return $action === Action::Delete;
     }
 
     /**
      * Restrict deletion of the last coordinator in the LSP
+     * {@inheritDoc}
      */
     public function assertAllowed(object $object): void
     {

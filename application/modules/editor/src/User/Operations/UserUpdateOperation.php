@@ -82,7 +82,7 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
      */
     public function updateUser(User $user, UpdateUserDto $dto): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::UPDATE, $user);
+        $this->userActionFeasibilityChecker->assertAllowed(Action::Update, $user);
 
         if (null !== $dto->email) {
             $user->setEmail($dto->email);

@@ -41,10 +41,10 @@ class PmInTaskFeasibilityAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
-        yield [Action::DELETE, true];
-        yield [Action::UPDATE, false];
-        yield [Action::CREATE, false];
-        yield [Action::READ, false];
+        yield [Action::Delete, true];
+        yield [Action::Update, false];
+        yield [Action::Create, false];
+        yield [Action::Read, false];
     }
 
     /**

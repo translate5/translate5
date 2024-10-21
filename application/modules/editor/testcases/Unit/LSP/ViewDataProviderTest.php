@@ -215,7 +215,7 @@ class ViewDataProviderTest extends TestCase
                 object $object,
                 PermissionAssertContext $context,
             ): void {
-                if ($action === Action::READ) {
+                if ($action === Action::Read) {
                     return;
                 }
 

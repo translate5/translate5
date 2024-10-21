@@ -112,7 +112,7 @@ class ViewDataProvider
             $job = $this->getJob($job);
 
             try {
-                $this->userJobPermissionAssert->assertGranted(Action::READ, $job, $context);
+                $this->userJobPermissionAssert->assertGranted(Action::Read, $job, $context);
             } catch (PermissionExceptionInterface) {
                 continue;
             }

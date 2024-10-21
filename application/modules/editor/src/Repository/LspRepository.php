@@ -238,6 +238,17 @@ class LspRepository implements LspRepositoryInterface
         yield from $this->generateModels($stmt, $model);
     }
 
+    /**
+     * @return int[]
+     */
+    public function getSubLspIds(LanguageServiceProvider $lsp): array
+    {
+        $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
+        $select = $model->db->select()->from($model->db, ['id'])->where('parentId = ?', $lsp->getId());
+
+        return $this->db->fetchCol($select);
+    }
+
     private function generateModels(
         \PDOStatement|\Zend_Db_Statement_Interface|\Zend_Db_Statement $stmt,
         \ZfExtended_Models_Entity_Abstract $model,

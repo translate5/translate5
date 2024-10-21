@@ -59,6 +59,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method string getTrackchangesShow()
  * @method string getTrackchangesShowAll()
  * @method string getTrackchangesAcceptReject()
+ * @method string|null getLspJobId()
  *
  * @method void setId(int $id)
  * @method void setTaskGuid(string $taskGuid)
@@ -80,6 +81,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setTrackchangesShow(int $isAllowed)
  * @method void setTrackchangesShowAll(int $isAllowed)
  * @method void setTrackchangesAcceptReject(int $isAllowed)
+ * @method void setLspJobId(int|null $id)
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
 {
@@ -95,6 +97,16 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
     public function getType(): TypeEnum
     {
         return TypeEnum::from((int) $this->get('type'));
+    }
+
+    public function isLspJob(): bool
+    {
+        return TypeEnum::LSP === $this->getType();
+    }
+
+    public function isLspUserJob(): bool
+    {
+        return TypeEnum::LSP !== $this->getType() && ! empty($this->getLspJobId());
     }
 
     /***
@@ -478,19 +490,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         return $otherTuas;
     }
 
-    /**
-     * deletes all assoc entries for this userGuid, and updates the users counter in the Task Entity
-     * @param string $userGuid
-     */
-    public function deleteByUserguid($userGuid)
-    {
-        $list = $this->loadByUserGuid($userGuid);
-        foreach ($list as $assoc) {
-            $this->init($assoc);
-            $this->delete();
-        }
-    }
-
     /***
      * Delete all user association for given taskGuid
      * @return void
@@ -517,7 +516,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      * set all associations of the given taskGuid (or for all tasks if null) to unused where the session is expired
      * sets also the state to open where allowed
      * @param string $taskGuid optional, if omitted cleanup all taskUserAssocs
-     * @param string $forced optional, default false. if true cleanup also taskUserAssocs with validSessionsIds, only usable with given taskGuid!
+     * @param string $forced optional, default false. if true cleanup also taskUserAssocs with validSessionsIds, only
+     *     usable with given taskGuid!
      */
     public function cleanupLocked($taskGuid = null, $forced = false)
     {

@@ -85,7 +85,7 @@ class Editor_CustomerController extends ZfExtended_RestController
             );
 
             try {
-                $this->permissionAssert->assertGranted(Action::READ, $customerModel, $context);
+                $this->permissionAssert->assertGranted(Action::Read, $customerModel, $context);
             } catch (PermissionExceptionInterface) {
                 unset($rows[$key]);
 

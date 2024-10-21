@@ -73,7 +73,7 @@ class JobIsAlreadyInEditingModeAssert implements FeasibilityAssertInterface
 
     public function supports(Action $action): bool
     {
-        return $action === Action::UPDATE;
+        return $action === Action::Update;
     }
 
     /**

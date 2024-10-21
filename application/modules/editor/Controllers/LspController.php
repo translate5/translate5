@@ -29,8 +29,6 @@ END LICENSE AND COPYRIGHT
 declare(strict_types=1);
 
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\Exception\InexistentUserException;
-use MittagQI\Translate5\LSP\Exception\CoordinatorNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Operations\Fabric\UpdateLspDtoFactory;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspCreateOperation;
@@ -39,6 +37,7 @@ use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspUpdateOperation;
 use MittagQI\Translate5\LSP\ViewDataProvider;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 
 class editor_LspController extends ZfExtended_RestController
 {

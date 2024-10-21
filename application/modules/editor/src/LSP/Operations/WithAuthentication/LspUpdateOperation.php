@@ -68,7 +68,7 @@ final class LspUpdateOperation implements LspUpdateOperationInterface
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->permissionAssert->assertGranted(Action::UPDATE, $lsp, new PermissionAssertContext($authUser));
+        $this->permissionAssert->assertGranted(Action::Update, $lsp, new PermissionAssertContext($authUser));
 
         $this->operation->updateLsp($lsp, $dto);
     }

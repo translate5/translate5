@@ -45,10 +45,10 @@ class RuleBasedReadPermissionAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
-        yield [Action::DELETE, false];
-        yield [Action::UPDATE, false];
-        yield [Action::READ, true];
-        yield [Action::CREATE, false];
+        yield [Action::Delete, false];
+        yield [Action::Update, false];
+        yield [Action::Read, true];
+        yield [Action::Create, false];
     }
 
     /**

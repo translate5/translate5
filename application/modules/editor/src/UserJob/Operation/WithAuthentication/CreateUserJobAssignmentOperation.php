@@ -34,18 +34,22 @@ use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Exception\InexistentUserException;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_NotAuthenticatedException;
+use ZfExtended_NotFoundException;
 
-class CreateUserJobAssignmentAssignmentOperation implements CreateUserJobAssignmentOperationInterface
+class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperationInterface
 {
     public function __construct(
         private readonly CreateUserJobAssignmentOperationInterface $operation,
@@ -54,6 +58,8 @@ class CreateUserJobAssignmentAssignmentOperation implements CreateUserJobAssignm
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
         private readonly TaskRepository $taskRepository,
+        private readonly LspJobRepository $lspJobRepository,
+        private readonly JobCoordinatorRepository $coordinatorRepository,
     ) {
     }
 
@@ -63,29 +69,47 @@ class CreateUserJobAssignmentAssignmentOperation implements CreateUserJobAssignm
     public static function create(): self
     {
         return new self(
-            \MittagQI\Translate5\UserJob\Operation\CreateUserJobAssignmentAssignmentOperation::create(),
+            \MittagQI\Translate5\UserJob\Operation\CreateUserJobAssignmentOperation::create(),
             UserActionPermissionAssert::create(),
             TaskActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
             new TaskRepository(),
+            LspJobRepository::create(),
+            JobCoordinatorRepository::create(),
         );
     }
+
     public function assignJob(NewUserJobDto $dto): UserJob
     {
         try {
             $authUser = $this->userRepository->get($this->authentication->getUserId());
         } catch (InexistentUserException) {
-            throw new ZfExtended_NotAuthenticatedException();
+            throw new ZfExtended_NotFoundException();
         }
 
         $context = new PermissionAssertContext($authUser);
         $task = $this->taskRepository->getByGuid($dto->taskGuid);
         $user = $this->userRepository->getByGuid($dto->userGuid);
 
-        $this->taskPermissionAssert->assertGranted(Action::READ, $task, $context);
-        $this->userPermissionAssert->assertGranted(Action::READ, $user, $context);
+        $this->taskPermissionAssert->assertGranted(Action::Read, $task, $context);
+        $this->userPermissionAssert->assertGranted(Action::Read, $user, $context);
 
+        $coordinator = $this->coordinatorRepository->findByUserGuid($this->authentication->getUserGuid());
+
+        if ($coordinator !== null) {
+            // check if the LSP Job exists. Coordinator can only assign sub jobs of LSP Job
+            try {
+                $this->lspJobRepository->getByTaskGuidAndWorkflow(
+                    (int) $coordinator->lsp->getId(),
+                    $dto->taskGuid,
+                    $dto->workflow->workflow,
+                    $dto->workflow->workflowStepName,
+                );
+            } catch (NotFoundLspJobException) {
+                throw new ZfExtended_NotAuthenticatedException();
+            }
+        }
 
         return $this->operation->assignJob($dto);
     }

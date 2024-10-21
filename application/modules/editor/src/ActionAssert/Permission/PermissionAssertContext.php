@@ -35,7 +35,7 @@ use MittagQI\Translate5\User\Model\User;
 final class PermissionAssertContext
 {
     public function __construct(
-        public readonly User $manager
+        public readonly User $authUser
     ) {
     }
 }

@@ -80,7 +80,7 @@ class UserUpdateOperation implements UserUpdateOperationInterface
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
         $this->permissionAssert->assertGranted(
-            Action::UPDATE,
+            Action::Update,
             $user,
             new PermissionAssertContext($authUser)
         );

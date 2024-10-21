@@ -34,9 +34,13 @@ use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\UserJob\Contract\UpdateUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowStepProvidedException;
 use MittagQI\Translate5\UserJob\Operation\DTO\UpdateUserJobDto;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
@@ -48,6 +52,8 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         private readonly UpdateUserJobAssignmentOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly JobCoordinatorRepository $coordinatorRepository,
+        private readonly LspJobRepository $lspJobRepository,
     ) {
     }
 
@@ -61,17 +67,38 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
             \MittagQI\Translate5\UserJob\Operation\UpdateUserJobAssignmentOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            JobCoordinatorRepository::create(),
+            LspJobRepository::create(),
         );
     }
+
+    /**
+     * {@inheritDoc}
+     */
     public function update(UserJob $job, UpdateUserJobDto $dto): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
         $this->permissionAssert->assertGranted(
-            Action::UPDATE,
+            Action::Update,
             $job,
             new PermissionAssertContext($authUser),
         );
+
+        $coordinator = $this->coordinatorRepository->findByUserGuid($this->authentication->getUserGuid());
+
+        if ($coordinator !== null) {
+            try {
+                $this->lspJobRepository->getByTaskGuidAndWorkflow(
+                    (int)$coordinator->lsp->getId(),
+                    $job->getTaskGuid(),
+                    $dto->workflow->workflow,
+                    $dto->workflow->workflowStepName,
+                );
+            } catch (NotFoundLspJobException) {
+                throw new InvalidWorkflowStepProvidedException();
+            }
+        }
 
         $this->operation->update($job, $dto);
     }

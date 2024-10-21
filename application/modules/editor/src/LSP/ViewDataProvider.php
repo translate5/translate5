@@ -114,7 +114,7 @@ class ViewDataProvider
      */
     public function buildViewData(User $viewer, LanguageServiceProvider $lsp): array
     {
-        $this->lspPermissionAssert->assertGranted(Action::READ, $lsp, new PermissionAssertContext($viewer));
+        $this->lspPermissionAssert->assertGranted(Action::Read, $lsp, new PermissionAssertContext($viewer));
 
         $coordinators = $this->jobCoordinatorRepository->getByLSP($lsp);
         /**
@@ -138,7 +138,7 @@ class ViewDataProvider
         foreach ($users as $user) {
             try {
                 $this->userActionPermissionAssert->assertGranted(
-                    Action::READ,
+                    Action::Read,
                     $user,
                     new PermissionAssertContext($viewer)
                 );
@@ -161,7 +161,7 @@ class ViewDataProvider
         foreach ($customers as $customer) {
             try {
                 $this->customerActionPermissionAssert->assertGranted(
-                    Action::READ,
+                    Action::Read,
                     $customer,
                     new PermissionAssertContext($viewer)
                 );
@@ -191,7 +191,7 @@ class ViewDataProvider
     private function userCanEditLsp(User $viewer, LanguageServiceProvider $lsp): bool
     {
         try {
-            $this->lspPermissionAssert->assertGranted(Action::UPDATE, $lsp, new PermissionAssertContext($viewer));
+            $this->lspPermissionAssert->assertGranted(Action::Update, $lsp, new PermissionAssertContext($viewer));
 
             return true;
         } catch (PermissionExceptionInterface) {
@@ -202,7 +202,7 @@ class ViewDataProvider
     private function userCanDeleteLsp(User $viewer, LanguageServiceProvider $lsp): bool
     {
         try {
-            $this->lspPermissionAssert->assertGranted(Action::DELETE, $lsp, new PermissionAssertContext($viewer));
+            $this->lspPermissionAssert->assertGranted(Action::Delete, $lsp, new PermissionAssertContext($viewer));
 
             return true;
         } catch (PermissionExceptionInterface) {

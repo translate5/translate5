@@ -35,8 +35,8 @@ use ZfExtended_Models_Entity_NotFoundException;
 class LspUserNotFoundException extends ZfExtended_Models_Entity_NotFoundException
 {
     public function __construct(
-        public readonly int $userId
+        public readonly int|string $userIdentifier
     ) {
-        parent::__construct('LSP User with User ID ' . $userId . ' not found');
+        parent::__construct('LSP User with User identifier ' . $userIdentifier . ' not found');
     }
 }

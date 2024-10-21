@@ -41,6 +41,6 @@ class TaskHasCriticalQualityErrorsException extends \Exception
         public readonly Task $task,
         public readonly array $categories,
     ) {
-        parent::__construct('The task has critical quality errors', 0, null);
+        parent::__construct();
     }
 }

@@ -40,10 +40,10 @@ class UserIsEditableFeasibilityAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
-        yield [Action::CREATE, false];
-        yield [Action::UPDATE, true];
-        yield [Action::DELETE, true];
-        yield [Action::READ, false];
+        yield [Action::Create, false];
+        yield [Action::Update, true];
+        yield [Action::Delete, true];
+        yield [Action::Read, false];
     }
 
     /**

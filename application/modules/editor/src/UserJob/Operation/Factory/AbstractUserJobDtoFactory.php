@@ -37,7 +37,6 @@ use editor_Workflow_Manager;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\UserJob\Exception\WorkflowStepNotProvidedException;
-use MittagQI\Translate5\UserJob\Operation\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\UserJob\Operation\DTO\WorkflowDto;
 use MittagQI\Translate5\UserJob\Validation\SegmentRangeValidator;
 use REST_Controller_Request_Http as Request;
@@ -46,7 +45,7 @@ use ZfExtended_Logger;
 /**
  * @template Dto
  */
-abstract class UserJobDtoFactory
+abstract class AbstractUserJobDtoFactory
 {
     public function __construct(
         private readonly ZfExtended_Logger $logger,
@@ -76,34 +75,13 @@ abstract class UserJobDtoFactory
      */
     private function getWorkflowStepNameAndRole(array $data, Workflow $workflow): array
     {
-        $role = $data['role'] ?? null;
         $workflowStepName = $data['workflowStepName'] ?? null;
 
-        if (null === $workflowStepName && null === $role) {
+        if (null === $workflowStepName) {
             throw new WorkflowStepNotProvidedException();
         }
 
-        if (null !== $workflowStepName) {
-            return [$workflowStepName, $workflow->getRoleOfStep($workflowStepName)];
-        }
-
-        if ($role === 'lector') {
-            $role = Workflow::ROLE_REVIEWER;
-
-            $this->logger->warn('E1232', 'Job creation: role "lector" is deprecated, use "reviewer" instead!');
-        }
-
-        //we have to get the step from the role (the first found step to the role)
-        $steps = $workflow->getSteps2Roles();
-        $roles = array_flip(array_reverse($steps));
-        $workflowStepName = $roles[$data['role']] ?? null;
-
-        $this->logger->warn(
-            'E1232',
-            'Job creation: using role as parameter on job creation is deprecated, use workflowStepName instead'
-        );
-
-        return [$workflowStepName, $role];
+        return [$workflowStepName, $workflow->getRoleOfStep($workflowStepName)];
     }
 
     /**

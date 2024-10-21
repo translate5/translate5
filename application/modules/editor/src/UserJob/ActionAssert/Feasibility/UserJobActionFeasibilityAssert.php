@@ -33,6 +33,8 @@ namespace MittagQI\Translate5\UserJob\ActionAssert\Feasibility;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Asserts\JobIsAlreadyInEditingModeAssert;
+use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Asserts\JobIsBeingUsedAssert;
+use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Asserts\TaskOfJobIsLockedByUserAssert;
 
 /**
  * @extends ActionFeasibilityAssert<UserJob>
@@ -46,6 +48,8 @@ final class UserJobActionFeasibilityAssert extends ActionFeasibilityAssert
     {
         return new self([
             JobIsAlreadyInEditingModeAssert::create(),
+            JobIsBeingUsedAssert::create(),
+            TaskOfJobIsLockedByUserAssert::create(),
         ]);
     }
 }

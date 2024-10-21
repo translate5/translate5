@@ -47,7 +47,7 @@ class UpdateLspDtoFactory
     /**
      * @throws CoordinatorNotFoundException
      * @throws \MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface
-     * @throws \MittagQI\Translate5\Exception\InexistentUserException
+     * @throws \MittagQI\Translate5\User\Exception\InexistentUserException
      */
     public function fromRequest(Request $request): UpdateLspDto
     {

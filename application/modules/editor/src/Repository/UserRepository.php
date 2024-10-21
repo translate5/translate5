@@ -30,8 +30,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\Exception\InexistentUserException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Model\User;
 use Zend_Db_Table_Row;

@@ -34,8 +34,9 @@ use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc as UserJob;
 use editor_Models_TaskUserAssoc_Segmentrange;
 use editor_Task_Type;
+use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\UserJob\TypeEnum;
-use Zend_Db;
+use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
@@ -77,30 +78,101 @@ class UserJobRepository
         return $job;
     }
 
+    public function delete(UserJob $job): void
+    {
+        $job->delete();
+    }
+
+    public function userHasJobsInTask(string $userGuid, string $taskGuid): bool
+    {
+        $job = ZfExtended_Factory::get(UserJob::class);
+        $select = $this->db
+            ->select()
+            ->from($job->db->info($job->db::NAME), 'COUNT(*)')
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('userGuid = ?', $userGuid);
+
+        return (int) $this->db->fetchOne($select) > 0;
+    }
+
     /**
      * @return iterable<UserJob>
      */
-    public function getLspJobsByTask(string $taskGuid): iterable
+    public function getUserJobsByLspJob(LspJobAssociation $lspJob): iterable
+    {
+        $job = ZfExtended_Factory::get(UserJob::class);
+        $select = $this->db
+            ->select()
+            ->from($job->db->info($job->db::NAME))
+            ->where('lspJobId = ?', $lspJob->getId());
+
+        foreach ($this->db->fetchAll($select) as $jobData) {
+            $job->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            if ($job->isLspJob()) {
+                continue;
+            }
+
+            yield clone $job;
+        }
+    }
+
+    /**
+     * Returns bound UserJob with type LSP of LspJob
+     */
+    public function getDataJobByLspJob(LspJobAssociation $lspJob): UserJob
+    {
+        $job = ZfExtended_Factory::get(UserJob::class);
+        $select = $this->db
+            ->select()
+            ->from($job->db->info($job->db::NAME))
+            ->where('type = ?', TypeEnum::LSP->value)
+            ->where('lspJobId = ?', $lspJob->getId());
+
+        $job->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $job->db,
+                    'data' => $this->db->fetchRow($select, [], PDO::FETCH_ASSOC),
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $job;
+    }
+
+    /**
+     * @return iterable<UserJob>
+     */
+    public function getJobsByUserGuid(string $userGuid): iterable
     {
         $tua = ZfExtended_Factory::get(UserJob::class);
-
-        $jobs = $tua->loadByTaskGuidList([$taskGuid]);
+        $jobs = $tua->loadByUserGuid($userGuid);
 
         foreach ($jobs as $job) {
-            if (TypeEnum::Coordinator === TypeEnum::from((int) $job['type'])) {
-                $tua->init(
-                    new Zend_Db_Table_Row(
-                        [
-                            'table' => $tua->db,
-                            'data' => $job,
-                            'stored' => true,
-                            'readOnly' => false,
-                        ]
-                    )
-                );
+            $tua->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $tua->db,
+                        'data' => $job,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
-                yield clone $tua;
-            }
+            yield clone $tua;
         }
     }
 
@@ -159,13 +231,13 @@ class UserJobRepository
             )
             ->where('tua.isPmOverride = 0')
             ->where('t.projectId = ?', $projectId)
-            ->where('t.taskType not in(?)', $this->taskType->getProjectTypes(true));
+            ->where('t.taskType not in (?)', $this->taskType->getProjectTypes(true));
 
         if (null !== $workflow) {
             $s->where('tua.workflow = ?', $workflow);
         }
 
-        $jobs = $this->db->fetchAll($s, [], Zend_Db::FETCH_ASSOC);
+        $jobs = $this->db->fetchAll($s, [], PDO::FETCH_ASSOC);
 
         foreach ($jobs as $jobData) {
             $job->init(
@@ -203,7 +275,7 @@ class UserJobRepository
             ->where('userGuid != ?', $exceptUserGuid)
             ->where('segmentrange IS NOT NULL');
 
-        $tuaRows = $this->db->fetchAll($s, [], Zend_Db::FETCH_ASSOC);
+        $tuaRows = $this->db->fetchAll($s, [], PDO::FETCH_ASSOC);
 
         return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
     }

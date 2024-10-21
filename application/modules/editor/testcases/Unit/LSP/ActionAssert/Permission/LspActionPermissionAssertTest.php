@@ -56,7 +56,7 @@ class LspActionPermissionAssertTest extends TestCase
         $permissionAuditorMock2->expects($this->never())->method('assertGranted');
 
         $auditor = new LspActionPermissionAssert([$permissionAuditorMock1, $permissionAuditorMock2]);
-        $auditor->assertGranted(Action::DELETE, $lsp, $context);
+        $auditor->assertGranted(Action::Delete, $lsp, $context);
     }
 
     public function testAssertGrantedException(): void
@@ -75,6 +75,6 @@ class LspActionPermissionAssertTest extends TestCase
         $auditor = new LspActionPermissionAssert([$permissionAuditorMock]);
 
         $this->expectException(PermissionExceptionInterface::class);
-        $auditor->assertGranted(Action::DELETE, $lsp, $context);
+        $auditor->assertGranted(Action::Delete, $lsp, $context);
     }
 }

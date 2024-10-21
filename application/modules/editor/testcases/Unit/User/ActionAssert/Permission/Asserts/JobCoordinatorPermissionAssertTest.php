@@ -64,10 +64,10 @@ class JobCoordinatorPermissionAssertTest extends TestCase
 
     public function provideSupports(): iterable
     {
-        yield [Action::DELETE, true];
-        yield [Action::UPDATE, true];
-        yield [Action::READ, true];
-        yield [Action::CREATE, true];
+        yield [Action::Delete, true];
+        yield [Action::Update, true];
+        yield [Action::Read, true];
+        yield [Action::Create, true];
     }
 
     /**

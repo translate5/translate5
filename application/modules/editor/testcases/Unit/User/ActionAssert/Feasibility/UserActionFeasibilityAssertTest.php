@@ -43,14 +43,14 @@ class UserActionFeasibilityAssertTest extends TestCase
         $user = $this->createMock(User::class);
 
         $assert1 = $this->createMock(FeasibilityAssertInterface::class);
-        $assert1->expects($this->once())->method('supports')->with(Action::READ)->willReturn(true);
+        $assert1->expects($this->once())->method('supports')->with(Action::Read)->willReturn(true);
         $assert1->expects($this->once())->method('assertAllowed')->with($user);
 
         $assert2 = $this->createMock(FeasibilityAssertInterface::class);
-        $assert2->expects($this->once())->method('supports')->with(Action::READ)->willReturn(false);
+        $assert2->expects($this->once())->method('supports')->with(Action::Read)->willReturn(false);
         $assert2->expects($this->never())->method('assertAllowed');
 
         $checker = new UserActionFeasibilityAssert([$assert1, $assert2]);
-        $checker->assertAllowed(Action::READ, $user);
+        $checker->assertAllowed(Action::Read, $user);
     }
 }

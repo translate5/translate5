@@ -140,7 +140,7 @@ class CreateUserDtoFactory
             $lsp = $this->lspRepository->get($lspId);
 
             $this->lspPermissionAssert->assertGranted(
-                Action::READ,
+                Action::Read,
                 $lsp,
                 new PermissionAssertContext($authUser)
             );

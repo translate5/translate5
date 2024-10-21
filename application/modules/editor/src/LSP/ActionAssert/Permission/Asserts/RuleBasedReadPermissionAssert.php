@@ -36,7 +36,7 @@ final class RuleBasedReadPermissionAssert extends RuleBasedPermissionAssert
 {
     public function supports(Action $action): bool
     {
-        return Action::READ === $action;
+        return Action::Read === $action;
     }
 
     protected function coordinatorHasAccessToHisLsp(): bool

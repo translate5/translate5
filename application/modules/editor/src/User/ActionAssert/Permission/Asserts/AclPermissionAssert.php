@@ -43,7 +43,7 @@ final class AclPermissionAssert implements PermissionAssertInterface
 {
     public function supports(Action $action): bool
     {
-        return in_array($action, [Action::UPDATE, Action::DELETE], true);
+        return in_array($action, [Action::Update, Action::Delete], true);
     }
 
     /**
@@ -55,7 +55,7 @@ final class AclPermissionAssert implements PermissionAssertInterface
      */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        if ($object->isEditableFor($context->manager)) {
+        if ($object->isEditableFor($context->authUser)) {
             return;
         }
 

@@ -67,7 +67,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
 
     public function supports(Action $action): bool
     {
-        return in_array($action, [Action::UPDATE, Action::DELETE, Action::READ], true);
+        return in_array($action, [Action::Update, Action::Delete, Action::Read], true);
     }
 
     /**
@@ -77,7 +77,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
      */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        $manager = $context->manager;
+        $manager = $context->authUser;
 
         if ($manager->getId() === $object->getId()) {
             return;

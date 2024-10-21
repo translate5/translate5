@@ -28,15 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Exception;
+namespace MittagQI\Translate5\LspJob\Exception;
 
 use ZfExtended_Models_Entity_NotFoundException;
 
-class InexistentCustomerException extends ZfExtended_Models_Entity_NotFoundException
+class InexistentLspJobException extends ZfExtended_Models_Entity_NotFoundException
 {
     public function __construct(
-        public readonly int $customerId
+        public readonly string $identifier
     ) {
-        parent::__construct("Customer with ID [$customerId] does not exist");
+        parent::__construct("LSP Job with ID [$identifier] does not exist");
     }
 }

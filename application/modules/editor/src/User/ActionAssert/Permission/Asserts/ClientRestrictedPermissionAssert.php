@@ -43,7 +43,7 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
 {
     public function supports(Action $action): bool
     {
-        return Action::DELETE === $action;
+        return Action::Delete === $action;
     }
 
     /**
@@ -53,11 +53,11 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
      */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        if (! $context->manager->isClientRestricted()) {
+        if (! $context->authUser->isClientRestricted()) {
             return;
         }
 
-        $allowedCustomerIs = $context->manager->getCustomersArray();
+        $allowedCustomerIs = $context->authUser->getCustomersArray();
 
         // don't allow to delete a user that have customers that don't belong to auth user
         if (! empty(array_diff($object->getCustomersArray(), $allowedCustomerIs))) {

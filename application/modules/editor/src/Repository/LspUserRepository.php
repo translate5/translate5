@@ -120,6 +120,29 @@ class LspUserRepository implements LspUserRepositoryInterface
     /**
      * @throws LspUserNotFoundException
      */
+    public function getByUserGuid(string $userGuid): LspUser
+    {
+        try {
+            $user = $this->userRepository->getByGuid($userGuid);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new LspUserNotFoundException($userGuid);
+        }
+
+        return $this->getByUser($user);
+    }
+
+    public function findByUserGuid(string $userGuid): ?LspUser
+    {
+        try {
+            return $this->getByUserGuid($userGuid);
+        } catch (LspUserNotFoundException) {
+            return null;
+        }
+    }
+
+    /**
+     * @throws LspUserNotFoundException
+     */
     public function getByUserId(int $userId): LspUser
     {
         try {

@@ -94,7 +94,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $user->expects(self::once())->method('__call')->with('setLogin', [$dto->login]);
         $user->expects(self::once())->method('validate');
@@ -118,7 +118,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $user->expects(self::once())->method('__call')->with('setEmail', [$dto->email]);
         $user->expects(self::once())->method('validate');
@@ -142,7 +142,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $user->expects(self::once())->method('__call')->with('setFirstName', [$dto->firstName]);
         $user->expects(self::once())->method('validate');
@@ -166,7 +166,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $user->expects(self::once())->method('__call')->with('setSurName', [$dto->surName]);
         $user->expects(self::once())->method('validate');
@@ -190,7 +190,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $user->expects(self::once())->method('__call')->with('setGender', [$dto->gender]);
         $user->expects(self::once())->method('validate');
@@ -214,7 +214,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $user->expects(self::once())->method('__call')->with('setLocale', [$dto->locale]);
         $user->expects(self::once())->method('validate');
@@ -238,7 +238,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $this->setPassword->expects(self::once())->method('setPassword')->with($user, $dto->password->password);
         $user->expects(self::once())->method('validate');
@@ -262,7 +262,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $this->setPassword->expects(self::never())->method('setPassword');
         $user->expects(self::once())->method('validate');
@@ -288,7 +288,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $this->setRoles->expects(self::once())->method('setRoles')->with($user, $dto->roles);
 
@@ -313,7 +313,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $dto->customers);
 
@@ -338,7 +338,7 @@ class UserUpdateOperationTest extends TestCase
 
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
-            ->with(Action::UPDATE, $user);
+            ->with(Action::Update, $user);
 
         $user->expects(self::never())->method('__call')->with($this->callback(static function (string $method): bool {
             return ! str_contains($method, 'set');

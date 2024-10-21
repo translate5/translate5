@@ -47,6 +47,8 @@ final class UserIsEditableFeasibilityAssert implements FeasibilityAssertInterfac
 
     /**
      * Restrict access if user is not editable
+     *
+     * {@inheritDoc}
      */
     public function assertAllowed(object $object): void
     {

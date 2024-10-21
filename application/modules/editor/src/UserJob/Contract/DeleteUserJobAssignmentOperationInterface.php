@@ -35,4 +35,6 @@ use editor_Models_TaskUserAssoc as UserJob;
 interface DeleteUserJobAssignmentOperationInterface
 {
     public function delete(UserJob $job): void;
+
+    public function forceDelete(UserJob $job): void;
 }

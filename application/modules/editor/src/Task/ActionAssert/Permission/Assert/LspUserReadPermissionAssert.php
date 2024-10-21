@@ -34,60 +34,60 @@ use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToUserJobException;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
 
 /**
  * @implements PermissionAssertInterface<Task>
  */
-final class ReadJobCoordinatorPermissionAssert implements PermissionAssertInterface
+final class LspUserReadPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
-        private readonly JobCoordinatorRepository $coordinatorRepository,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly UserJobRepository $userJobRepository,
+        private readonly LspJobRepository $lspJobRepository,
     ) {
     }
 
     public static function create(): self
     {
-        $lsUserRepository = LspUserRepository::create();
-
         return new self(
-            JobCoordinatorRepository::create(lspUserRepository: $lsUserRepository),
+            LspUserRepository::create(),
             UserJobRepository::create(),
+            LspJobRepository::create(),
         );
     }
 
     public function supports(Action $action): bool
     {
-        return Action::READ === $action;
+        return Action::Read === $action;
     }
 
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        $coordinator = $this->coordinatorRepository->findByUser($context->manager);
+        $lspUser = $this->lspUserRepository->findByUser($context->authUser);
 
-        if (null === $coordinator) {
+        if (null === $lspUser) {
             return;
         }
 
-        $coordinators = $this->coordinatorRepository->getByLSP($coordinator->lsp);
-        $coordinatorGuids = [];
-
-        foreach ($coordinators as $coordinator) {
-            $coordinatorGuids[] = $coordinator->user->getUserGuid();
+        if ($this->userJobRepository->userHasJobsInTask($context->authUser->getUserGuid(), $object->getTaskGuid())) {
+            return;
         }
 
-        $lspJobs = $this->userJobRepository->getLspJobsByTask($object->getTaskGuid());
-
-        foreach ($lspJobs as $lspJob) {
-            if (in_array($lspJob->getUserGuid(), $coordinatorGuids, true)) {
-                return;
-            }
+        try {
+            JobCoordinator::fromLspUser($lspUser);
+        } catch (CantCreateCoordinatorFromUserException) {
+            throw new NoAccessToTaskException($object);
         }
 
-        throw new NoAccessToUserJobException($object);
+        if (! $this->lspJobRepository->lspHasJobInTask((int) $lspUser->lsp->getId(), $object->getTaskGuid())) {
+            throw new NoAccessToTaskException($object);
+        }
     }
 }

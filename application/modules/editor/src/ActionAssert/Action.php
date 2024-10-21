@@ -32,13 +32,13 @@ namespace MittagQI\Translate5\ActionAssert;
 
 enum Action: string
 {
-    case CREATE = 'create';
-    case READ = 'read';
-    case UPDATE = 'update';
-    case DELETE = 'delete';
+    case Create = 'create';
+    case Read = 'read';
+    case Update = 'update';
+    case Delete = 'delete';
 
     public function isMutable(): bool
     {
-        return in_array($this, [self::UPDATE, self::DELETE], true);
+        return in_array($this, [self::Update, self::Delete], true);
     }
 }

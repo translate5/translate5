@@ -56,11 +56,13 @@ final class PmInTaskFeasibilityAssert implements FeasibilityAssertInterface
 
     public function supports(Action $action): bool
     {
-        return $action === Action::DELETE;
+        return $action === Action::Delete;
     }
 
     /**
      * Restrict access if the user is a project manager in at least one task
+     *
+     * {@inheritDoc}
      */
     public function assertAllowed(object $object): void
     {

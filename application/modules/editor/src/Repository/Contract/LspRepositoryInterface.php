@@ -78,4 +78,9 @@ interface LspRepositoryInterface
      * @return iterable<LanguageServiceProvider>
      */
     public function getSubLspList(LanguageServiceProvider $lsp): iterable;
+
+    /**
+     * @return int[]
+     */
+    public function getSubLspIds(LanguageServiceProvider $lsp): array;
 }

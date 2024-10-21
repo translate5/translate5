@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Task;
-use MittagQI\Translate5\Exception\InexistentTaskException;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 

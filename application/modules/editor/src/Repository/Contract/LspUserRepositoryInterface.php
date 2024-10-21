@@ -54,6 +54,13 @@ interface LspUserRepositoryInterface
     public function getByUserId(int $userId): LspUser;
 
     /**
+     * @throws LspUserNotFoundException
+     */
+    public function getByUserGuid(string $userGuid): LspUser;
+
+    public function findByUserGuid(string $userGuid): ?LspUser;
+
+    /**
      * @return array<int, int>
      */
     public function getUserIdToLspIdMap(): array;

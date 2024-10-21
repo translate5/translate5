@@ -76,7 +76,7 @@ class LspUpdateOperationTest extends TestCase
         $this->lspPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::UPDATE)
+            ->with(Action::Update)
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
@@ -92,7 +92,7 @@ class LspUpdateOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
 
-        $this->lspPermissionAssert->expects(self::once())->method('assertGranted')->with(Action::UPDATE);
+        $this->lspPermissionAssert->expects(self::once())->method('assertGranted')->with(Action::Update);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 

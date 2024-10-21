@@ -55,7 +55,7 @@ class UserActionPermissionAssertTest extends TestCase
         $permissionAuditorMock2->expects($this->never())->method('assertGranted');
 
         $auditor = new UserActionPermissionAssert([$permissionAuditorMock1, $permissionAuditorMock2]);
-        $auditor->assertGranted(Action::DELETE, $user, $context);
+        $auditor->assertGranted(Action::Delete, $user, $context);
     }
 
     public function testAssertGrantedException(): void
@@ -74,6 +74,6 @@ class UserActionPermissionAssertTest extends TestCase
         $auditor = new UserActionPermissionAssert([$permissionAuditorMock]);
 
         $this->expectException(PermissionExceptionInterface::class);
-        $auditor->assertGranted(Action::DELETE, $user, $context);
+        $auditor->assertGranted(Action::Delete, $user, $context);
     }
 }

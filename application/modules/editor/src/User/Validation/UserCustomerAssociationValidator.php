@@ -87,11 +87,11 @@ class UserCustomerAssociationValidator
 
         foreach ($customers as $customer) {
             try {
-                $this->customerPermissionAssert->assertGranted(Action::READ, $customer, $context);
+                $this->customerPermissionAssert->assertGranted(Action::Read, $customer, $context);
             } catch (PermissionExceptionInterface) {
                 throw new CustomerDoesNotBelongToUserException(
                     (int) $customer->getId(),
-                    $context->manager->getUserGuid()
+                    $context->authUser->getUserGuid()
                 );
             }
         }

@@ -34,11 +34,10 @@ use editor_Models_Task as Task;
 use editor_Utils;
 use editor_Workflow_Default as Workflow;
 use editor_Workflow_Manager;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\Exception;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\UserJob\Exception\TaskIdentificatorNotProvidedException;
@@ -52,13 +51,11 @@ use REST_Controller_Request_Http as Request;
 use UnexpectedValueException;
 use Zend_Registry;
 use ZfExtended_Logger;
-use ZfExtended_NotAuthenticatedException;
 
-class NewUserJobDtoFactory extends UserJobDtoFactory
+class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly TaskRepository $taskRepository,
         ZfExtended_Logger $logger,
         editor_Workflow_Manager $workflowManager,
@@ -74,7 +71,6 @@ class NewUserJobDtoFactory extends UserJobDtoFactory
     {
         return new self(
             new UserRepository(),
-            JobCoordinatorRepository::create(),
             new TaskRepository(),
             Zend_Registry::get('logger')->cloneMe('userJob.create'),
             new editor_Workflow_Manager(),
@@ -83,15 +79,11 @@ class NewUserJobDtoFactory extends UserJobDtoFactory
     }
 
     /**
-     * @param Request $request
-     *
-     * @throws Exception\InexistentTaskException
-     * @throws Exception\InexistentUserException
+     * @throws InexistentTaskException
+     * @throws InexistentUserException
      * @throws InvalidStateProvidedException
      * @throws InvalidTypeProvidedException
-     * @throws PermissionExceptionInterface
      * @throws WorkflowStepNotProvidedException
-     * @throws ZfExtended_NotAuthenticatedException
      */
     public function fromRequest(Request $request): NewUserJobDto
     {
@@ -120,12 +112,6 @@ class NewUserJobDtoFactory extends UserJobDtoFactory
         try {
             $type = isset($data['type']) ? TypeEnum::from((int) $data['type']) : TypeEnum::Editor;
         } catch (UnexpectedValueException) {
-            throw new InvalidTypeProvidedException();
-        }
-
-        $coordinator = $this->coordinatorRepository->findByUser($user);
-
-        if (null === $coordinator && TypeEnum::Coordinator === $type) {
             throw new InvalidTypeProvidedException();
         }
 

@@ -28,15 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Exception;
+namespace MittagQI\Translate5\LspJob\Exception;
 
-use ZfExtended_Models_Entity_NotFoundException;
-
-class InexistentTaskException extends ZfExtended_Models_Entity_NotFoundException
+class LspJobAlreadyExistsException extends \Exception
 {
-    public function __construct(
-        public readonly string $identifier
-    ) {
-        parent::__construct("Task with ID [$identifier] does not exist");
-    }
 }

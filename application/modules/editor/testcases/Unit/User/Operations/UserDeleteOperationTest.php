@@ -61,14 +61,14 @@ class UserDeleteOperationTest extends TestCase
             $feasibilityChecker
                 ->expects($this->once())
                 ->method('assertAllowed')
-                ->with(Action::DELETE, $user);
+                ->with(Action::Delete, $user);
             $userRepository->expects(self::once())->method('delete')->with($user);
         } else {
             $exception = $this->createMock(FeasibilityExceptionInterface::class);
             $feasibilityChecker
                 ->expects(self::once())
                 ->method('assertAllowed')
-                ->with(Action::DELETE, $user)
+                ->with(Action::Delete, $user)
                 ->willThrowException($exception);
             $this->expectException(FeasibilityExceptionInterface::class);
         }

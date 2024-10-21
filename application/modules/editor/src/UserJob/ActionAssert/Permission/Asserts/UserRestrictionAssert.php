@@ -75,7 +75,7 @@ class UserRestrictionAssert implements PermissionAssertInterface
         $user = $this->userRepository->getByGuid($object->getUserGuid());
 
         try {
-            $this->userPermissionAssert->assertGranted(Action::READ, $user, $context);
+            $this->userPermissionAssert->assertGranted(Action::Read, $user, $context);
         } catch (PermissionExceptionInterface) {
             throw new NoAccessToUserJobException($object);
         }

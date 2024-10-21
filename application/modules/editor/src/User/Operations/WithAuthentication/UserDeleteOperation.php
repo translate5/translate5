@@ -92,7 +92,7 @@ class UserDeleteOperation implements UserDeleteOperationInterface
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
         $this->userPermissionAssert->assertGranted(
-            Action::DELETE,
+            Action::Delete,
             $user,
             new PermissionAssertContext($authUser)
         );

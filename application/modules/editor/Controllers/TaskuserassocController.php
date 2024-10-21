@@ -31,16 +31,19 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
+use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobInUseException;
+use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobWhichTaskIsLockedByUserException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\UserHasAlreadyOpenedTheTaskForEditingException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\UserJob\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\UserJob\Operation\Factory\NewUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
-use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobAssignmentAssignmentOperation;
+use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\DeleteUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\UpdateUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\ViewDataProvider;
+use ZfExtended_Models_Entity_Conflict as EntityConflictException;
 use ZfExtended_UnprocessableEntity as UnprocessableEntity;
 
 /**
@@ -99,6 +102,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         ]);
 
         ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1061' => 'The job can not be removed, since the user is using the task.',
+            'E1062' => 'The job can not be removed, since the task is locked by the user.',
             'E1161' => "The job can not be modified, since the user has already opened the task for editing."
                 . " You are to late.",
             'E1542' => QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS,
@@ -207,7 +212,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
             $dto = NewUserJobDtoFactory::create()->fromRequest($this->getRequest());
-            $job = CreateUserJobAssignmentAssignmentOperation::create()->assignJob($dto);
+            $job = CreateUserJobAssignmentOperation::create()->assignJob($dto);
 
             $this->view->rows = (object) $this->viewDataProvider->buildJobView($job, $authUser);
         } catch (Throwable $e) {
@@ -233,10 +238,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         } catch (Throwable $e) {
             throw $this->transformException($e);
         }
-
-        $this->log->info('E1012', 'job deleted', [
-            'tua' => $this->entity->getSanitizedEntityForLog(),
-        ]);
     }
 
     /**
@@ -253,20 +254,20 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                     ],
                 ],
             ),
-            UserHasAlreadyOpenedTheTaskForEditingException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+            UserHasAlreadyOpenedTheTaskForEditingException::class => EntityConflictException::createResponse(
                 'E1161',
                 [
                     'id' => 'Sie können den Job zur Zeit nicht bearbeiten,'
                         . ' der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.',
                 ]
             ),
-            InvalidSegmentRangeFormatException::class => ZfExtended_UnprocessableEntity::createResponse(
+            InvalidSegmentRangeFormatException::class => UnprocessableEntity::createResponse(
                 'E1280',
                 [
                     'id' => 'Das Format für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9',
                 ]
             ),
-            InvalidSegmentRangeSemanticException::class => ZfExtended_UnprocessableEntity::createResponse(
+            InvalidSegmentRangeSemanticException::class => UnprocessableEntity::createResponse(
                 'E1280',
                 [
                     'id' => 'Der Inhalt für die editierbaren Segmente ist nicht valide.'
@@ -274,12 +275,30 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                         . ' weder innerhalb der Eingabe noch mit anderen Usern von derselben Rolle.',
                 ]
             ),
-            TaskHasCriticalQualityErrorsException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+            TaskHasCriticalQualityErrorsException::class => EntityConflictException::createResponse(
                 'E1542',
                 [QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS],
                 [
                     'task' => $e->task,
                     'categories' => implode('</br>', $e->categories),
+                ]
+            ),
+            AttemptToRemoveJobInUseException::class => EntityConflictException::createResponse(
+                'E1061',
+                [
+                    'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.',
+                ],
+                [
+                    'job' => $e->job,
+                ]
+            ),
+            AttemptToRemoveJobWhichTaskIsLockedByUserException::class => EntityConflictException::createResponse(
+                'E1062',
+                [
+                    'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.',
+                ],
+                [
+                    'job' => $this,
                 ]
             ),
             default => $e,
