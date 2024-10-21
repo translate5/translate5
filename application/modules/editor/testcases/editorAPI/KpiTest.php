@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
@@ -112,7 +113,7 @@ class KpiTest extends ImportTestAbstract
                 $config
                     ->addTask('en', 'de', -1, 'testcase-de-en.xlf')
                     ->setProperty('taskName', static::$taskNameBase . '_' . $taskNameSuffix)
-                    ->addUser('testlector', params: [
+                    ->addUser(TestUser::TestLector->value, params: [
                         'workflow' => 'default',
                         'workflowStepName' => 'reviewing',
                     ]);
@@ -128,7 +129,7 @@ class KpiTest extends ImportTestAbstract
         for ($i = 0; $i < count(static::$tasksForKPI); $i++) {
             $task = static::getTaskAt($i);
             static::$taskIds[static::$tasksForKPI[$i]['taskNameSuffix']] = $task->getId();
-            static::$taskUserAssocMap[$task->getId()] = $task->getUserAssoc('testlector')->id;
+            static::$taskUserAssocMap[$task->getId()] = $task->getUserAssoc(TestUser::TestLector->value)->id;
         }
     }
 

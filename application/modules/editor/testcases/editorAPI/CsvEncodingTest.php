@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
@@ -56,8 +57,8 @@ class CsvEncodingTest extends JsonTestAbstract
             ->addTask('en', 'de')
             ->addUploadFolder('CSV-testfiles')
             ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
-            ->addUser('testlector')
-            ->addUser('testtranslator', 'waiting', 'translation')
+            ->addUser(TestUser::TestLector->value)
+            ->addUser(TestUser::TestTranslator->value, 'waiting', 'translation')
             ->setProperty('taskName', static::NAME_PREFIX . 'CsvEncodingTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
 
@@ -70,12 +71,12 @@ class CsvEncodingTest extends JsonTestAbstract
     public function testEncodingAfterImport()
     {
         //check that testtranslator is waiting
-        static::api()->login('testtranslator');
+        static::api()->login(TestUser::TestTranslator->value);
         static::getTask()->reload(static::api());
         $this->assertEquals('waiting', static::getTask()->getProperty('userState'));
 
         //check that testlector is open
-        static::api()->login('testlector');
+        static::api()->login(TestUser::TestLector->value);
         static::getTask()->reload(static::api());
         $this->assertEquals('open', static::getTask()->getProperty('userState'));
 
@@ -172,7 +173,7 @@ class CsvEncodingTest extends JsonTestAbstract
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToCompare)
     {
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         static::api()->get($exportUrl);
 
         $removeMqmIds = function ($text) {

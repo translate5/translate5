@@ -33,7 +33,7 @@ use MittagQI\Translate5\Test\Api\Helper;
 /**
  * Represents the general api-request configuration for a language-resource
  */
-abstract class LanguageResource extends Resource
+abstract class LanguageResource extends AbstractResource
 {
     public const OPEN_TM2 = 'opentm2';
 

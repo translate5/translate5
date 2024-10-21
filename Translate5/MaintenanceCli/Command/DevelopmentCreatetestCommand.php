@@ -150,6 +150,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\JsonTestAbstract;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Enums\TestLogins;
 
 /**
  * Testcase for ' . $issue . ' //TODO FOR TEST USAGE: add a description
@@ -176,7 +177,7 @@ class ' . $name . ' extends JsonTestAbstract {
     protected static bool $setupOwnCustomer = false;
     
 //TODO FOR TEST USAGE: This is the user that will be logged in after the auto setup. Also all imported tasks will be associated with this user
-    protected static string $setupUserLogin = \'testmanager\';
+    protected static TestLogins $setupUserLogin = TestLogins::TEST_MANAGER;
     
     protected static function setupImport(Config $config): void
     {
@@ -242,7 +243,7 @@ class ' . $name . ' extends JsonTestAbstract {
      */
     public function testExport()
     {
-        static::api()->login(\'testmanager\');
+        static::api()->login(TestLogins::TEST_MANAGER);
         $task = static::getTask();
         
         //start task export        

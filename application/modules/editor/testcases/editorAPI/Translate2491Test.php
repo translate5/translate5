@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
@@ -69,8 +70,8 @@ class Translate2491Test extends JsonTestAbstract
         $english = $english[0];
 
         // Log in as proposer
-        static::api()->login('testtermproposer');
-        self::assertLogin('testtermproposer');
+        static::api()->login(TestUser::TestTermProposer->value);
+        self::assertLogin(TestUser::TestTermProposer->value);
 
         // [4] find imported term by *-query and en-EN language id
         $termsearch = static::api()->getJson('editor/plugins_termportal_data/search', [
