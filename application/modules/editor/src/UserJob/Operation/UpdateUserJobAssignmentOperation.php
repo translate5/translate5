@@ -33,6 +33,8 @@ namespace MittagQI\Translate5\UserJob\Operation;
 use editor_Models_TaskUserAssoc as UserJob;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
@@ -45,6 +47,8 @@ use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilit
 use MittagQI\Translate5\UserJob\Contract\UpdateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowStepProvidedException;
+use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
+use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\UserJob\Exception\WorkflowUpdateProhibitedForLspJobsException;
 use MittagQI\Translate5\UserJob\Operation\DTO\UpdateUserJobDto;
@@ -99,6 +103,8 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         if (null !== $dto->state) {
             $job->setState($dto->state);
         }
+
+        $this->updateAssignedUser($job, $dto);
 
         $this->updateWorkflow($job, $dto);
 
@@ -220,5 +226,30 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         if (null !== $dto->canAcceptOrRejectTrackChanges) {
             $job->setTrackchangesAcceptReject((int) $dto->canAcceptOrRejectTrackChanges);
         }
+    }
+
+    /**
+     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
+     * @throws AssignedUserCanBeChangedOnlyForLspJobException
+     */
+    public function updateAssignedUser(UserJob $job, UpdateUserJobDto $dto): void
+    {
+        if (null === $dto->userGuid) {
+            return;
+        }
+
+        $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
+
+        if (! $job->isLspJob()) {
+            throw new AssignedUserCanBeChangedOnlyForLspJobException();
+        }
+
+        try {
+            JobCoordinator::fromLspUser($lspUser);
+        } catch (CantCreateCoordinatorFromUserException) {
+            throw new OnlyCoordinatorCanBeAssignedToLspJobException();
+        }
+
+        $job->setUserGuid($dto->userGuid);
     }
 }

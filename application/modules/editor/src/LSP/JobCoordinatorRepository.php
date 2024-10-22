@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\LSP;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\Exception\CoordinatorNotFoundException;
 use MittagQI\Translate5\LSP\Exception\LspUserNotFoundException;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
@@ -68,38 +69,44 @@ class JobCoordinatorRepository
     {
         try {
             return $this->getByUser($user);
-        } catch (NotFoundException|CantCreateCoordinatorFromUserException) {
+        } catch (CoordinatorNotFoundException) {
             return null;
         }
     }
 
     /**
-     * @throws CantCreateCoordinatorFromUserException
-     * @throws LspUserNotFoundException
+     * @throws CoordinatorNotFoundException
      */
     public function getByUser(User $user): JobCoordinator
     {
-        $lspUser = $this->lspUserRepository->getByUser($user);
+        try {
+            $lspUser = $this->lspUserRepository->getByUser($user);
 
-        return JobCoordinator::fromLspUser($lspUser);
+            return JobCoordinator::fromLspUser($lspUser);
+        } catch (CantCreateCoordinatorFromUserException|LspUserNotFoundException) {
+            throw new CoordinatorNotFoundException($user->getUserGuid());
+        }
     }
 
     /**
-     * @throws CantCreateCoordinatorFromUserException
-     * @throws LspUserNotFoundException
+     * @throws CoordinatorNotFoundException
      */
     public function getByUserGuid(string $userGuid): JobCoordinator
     {
-        $lspUser = $this->lspUserRepository->getByUserGuid($userGuid);
+        try {
+            $lspUser = $this->lspUserRepository->getByUserGuid($userGuid);
 
-        return JobCoordinator::fromLspUser($lspUser);
+            return JobCoordinator::fromLspUser($lspUser);
+        } catch (CantCreateCoordinatorFromUserException|LspUserNotFoundException) {
+            throw new CoordinatorNotFoundException($userGuid);
+        }
     }
 
     public function findByUserGuid(string $userGuid): ?JobCoordinator
     {
         try {
             return $this->getByUserGuid($userGuid);
-        } catch (LspUserNotFoundException|CantCreateCoordinatorFromUserException) {
+        } catch (CoordinatorNotFoundException) {
             return null;
         }
     }

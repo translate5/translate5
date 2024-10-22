@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\UserJob\Exception;
 
-use LogicException;
+use InvalidArgumentException;
 
-class WrongOperationUsedForLspJobDeletionException extends LogicException
+class AssignedUserCanBeChangedOnlyForLspJobException extends InvalidArgumentException
 {
 }

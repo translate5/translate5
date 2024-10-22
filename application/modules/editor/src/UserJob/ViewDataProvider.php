@@ -202,6 +202,8 @@ class ViewDataProvider
             'firstName' => $assignedUser->getFirstName(),
             'surName' => $assignedUser->getSurName(),
             'longUserName' => $assignedUser->getUsernameLong(),
+            'isLspJob' => $job->isLspJob(),
+            'isLspUserJob' => $job->isLspUserJob(),
         ];
 
         if ($this->acl->isInAllowedRoles($viewer->getRoles(), Rights::ID, Rights::READ_AUTH_HASH)) {

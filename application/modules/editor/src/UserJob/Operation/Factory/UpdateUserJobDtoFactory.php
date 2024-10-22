@@ -35,6 +35,7 @@ use editor_Workflow_Default as Workflow;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
@@ -51,6 +52,7 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
     public function __construct(
         private readonly TaskRepository $taskRepository,
         private readonly UserJobRepository $userJobRepository,
+        private readonly UserRepository $userRepository,
         private readonly editor_Workflow_Manager $workflowManager,
         ZfExtended_Logger $logger,
         SegmentRangeValidator $segmentRangeValidator,
@@ -66,6 +68,7 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
         return new self(
             new TaskRepository(),
             UserJobRepository::create(),
+            new UserRepository(),
             new editor_Workflow_Manager(),
             Zend_Registry::get('logger')->cloneMe('userJob.update'),
             SegmentRangeValidator::create(),
@@ -96,6 +99,10 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
 
         $state = $data['state'] ?? null;
 
+        $userGuid = empty($data['userGuid'])
+            ? null
+            : $this->userRepository->getByGuid($data['userGuid'])->getUserGuid();
+
         $deadlineDate = $data['deadlineDate'] ?? null;
 
         $segmentRanges = $this->getSegmentRanges(
@@ -106,6 +113,7 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
         );
 
         return new UpdateUserJobDto(
+            $userGuid,
             $state,
             $workflowDto,
             $segmentRanges,

@@ -71,18 +71,6 @@ class UserRepository
         return $user;
     }
 
-    /**
-     * @throws InexistentUserException
-     */
-    public function resolveUser(string $identifier): User
-    {
-        if (is_numeric($identifier)) {
-            return $this->get((int) $identifier);
-        }
-
-        return $this->getByGuid($identifier);
-    }
-
     public function getEmptyModel(): User
     {
         return ZfExtended_Factory::get(User::class);

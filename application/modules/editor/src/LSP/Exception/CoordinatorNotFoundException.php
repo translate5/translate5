@@ -35,8 +35,8 @@ use ZfExtended_Models_Entity_NotFoundException;
 class CoordinatorNotFoundException extends ZfExtended_Models_Entity_NotFoundException
 {
     public function __construct(
-        public readonly string $userGuid
+        public readonly int|string $userIdentifier
     ) {
-        parent::__construct('Coordinator with User GUID ' . $userGuid . ' not found');
+        parent::__construct('Coordinator with User identifier ' . $userIdentifier . ' not found');
     }
 }

@@ -91,9 +91,9 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
 
         if (null !== $lspUser) {
             $lspJob = $this->resolveLspJob($lspUser, $dto);
-        }
 
-        $this->validateLspUserJob($lspJob, $dto);
+            $this->validateLspUserJob($lspJob, $dto);
+        }
 
         $job = $this->userJobRepository->getEmptyModel();
         $job->setTaskGuid($dto->taskGuid);
@@ -160,12 +160,8 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
     /**
      * @throws TrackChangesRightsAreNotSubsetOfLspJobException
      */
-    private function validateLspUserJob(?LspJobAssociation $lspJob, NewUserJobDto $dto): void
+    private function validateLspUserJob(LspJobAssociation $lspJob, NewUserJobDto $dto): void
     {
-        if (null === $lspJob) {
-            return;
-        }
-
         if (TypeEnum::LSP === $dto->type) {
             return;
         }

@@ -37,6 +37,7 @@ use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
 class UpdateUserJobDto
 {
     public function __construct(
+        public readonly ?string $userGuid,
         public readonly ?string $state,
         public readonly ?WorkflowDto $workflow,
         public readonly ?string $segmentRange,
@@ -49,10 +50,12 @@ class UpdateUserJobDto
             throw new InvalidStateProvidedException();
         }
 
-        try {
-            new \DateTime($deadlineDate);
-        } catch (\Exception) {
-            throw new InvalidDeadlineDateStringProvidedException();
+        if (null !== $deadlineDate) {
+            try {
+                new \DateTime($deadlineDate);
+            } catch (\Exception) {
+                throw new InvalidDeadlineDateStringProvidedException();
+            }
         }
     }
 }

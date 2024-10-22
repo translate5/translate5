@@ -30,13 +30,18 @@ use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobInUseException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobWhichTaskIsLockedByUserException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\UserHasAlreadyOpenedTheTaskForEditingException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeSemanticException;
+use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidTypeProvidedException;
+use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
+use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\UserJob\Operation\Factory\NewUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobAssignmentOperation;
@@ -172,7 +177,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
                 'E1232',
-                'Job list: this route deprecated, use /editor/task/job instead'
+                'Job list: this route deprecated, use /editor/task/:taskId/job instead'
             );
         }
 
@@ -222,6 +227,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     public function deleteAction()
     {
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
+            Zend_Registry::get('logger')->warn(
+                'E1232',
+                'Job list: this route deprecated, use /editor/task/:taskId/job instead'
+            );
+        }
+
         $this->log->request();
 
         try {
@@ -234,7 +247,13 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
             $this->processClientReferenceVersion($job);
 
-            DeleteUserJobAssignmentOperation::create()->delete($job);
+            $deleteJobOperation = DeleteUserJobAssignmentOperation::create();
+
+            if ($this->getRequest()->has('force')) {
+                $deleteJobOperation->forceDelete($job);
+            } else {
+                $deleteJobOperation->delete($job);
+            }
         } catch (Throwable $e) {
             throw $this->transformException($e);
         }
@@ -245,12 +264,38 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
      */
     private function transformException(Throwable $e): ZfExtended_ErrorCodeException|Throwable
     {
+        $invalidValueProvidedMessage = 'Ungültiger Wert bereitgestellt';
+
         return match ($e::class) {
             InvalidTypeProvidedException::class => UnprocessableEntity::createResponse(
                 'E1012',
                 [
                     'type' => [
-                        'Ungültiger Wert bereitgestellt',
+                        $invalidValueProvidedMessage,
+                    ],
+                ],
+            ),
+            InexistentUserException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'userGuid' => [
+                        $invalidValueProvidedMessage,
+                    ],
+                ],
+            ),
+            InexistentTaskException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'taskGuid' => [
+                        $invalidValueProvidedMessage,
+                    ],
+                ],
+            ),
+            InvalidStateProvidedException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'state' => [
+                        $invalidValueProvidedMessage,
                     ],
                 ],
             ),
@@ -300,6 +345,22 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 [
                     'job' => $this,
                 ]
+            ),
+            OnlyCoordinatorCanBeAssignedToLspJobException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'userGuid' => [
+                        'Nur der Koordinator kann einem LSP-Auftrag zugewiesen werden',
+                    ],
+                ],
+            ),
+            AssignedUserCanBeChangedOnlyForLspJobException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'userGuid' => [
+                        'Ein LSP-Benutzer kann nur LSP-bezogenen Auftrag zugewiesen werden.',
+                    ],
+                ],
             ),
             default => $e,
         };

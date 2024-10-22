@@ -10009,6 +10009,14 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Ungültiger Wert bereitgestellt</source>
                 <target>Ungültiger Wert bereitgestellt</target>
             </trans-unit>
+            <trans-unit id='TnVyIGRlciBLb29yZGluYXRvciBrYW5uIGVpbmVtIExTUC1BdWZ0cmFnIHp1Z2V3aWVzZW4gd2VyZGVu'>
+                <source>Nur der Koordinator kann einem LSP-Auftrag zugewiesen werden</source>
+                <target>Nur der Koordinator kann einem LSP-Auftrag zugewiesen werden</target>
+            </trans-unit>
+            <trans-unit id='RGVyIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGthbm4gbnVyIGbDvHIgTFNQLUF1ZnRyYWcgZ2XDpG5kZXJ0IHdlcmRlbi4='>
+                <source>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</source>
+                <target>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

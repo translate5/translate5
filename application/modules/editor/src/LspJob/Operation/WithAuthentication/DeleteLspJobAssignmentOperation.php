@@ -28,25 +28,36 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\Operation\WithAuthentication;
+namespace MittagQI\Translate5\LspJob\Operation\WithAuthentication;
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
+use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 
-class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperationInterface
+class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperationInterface
 {
+    /**
+     * @param ZfExtended_AuthenticationInterface $authentication
+     * @param UserRepository $userRepository
+     * @param DeleteLspJobAssignmentOperationInterface $operation
+     * @param ActionPermissionAssertInterface<UserJob> $permissionAssert
+     * @param UserJobRepository $userJobRepository
+     */
     public function __construct(
-        private readonly ActionPermissionAssertInterface $permissionAssert,
-        private readonly DeleteUserJobAssignmentOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly DeleteLspJobAssignmentOperationInterface $operation,
+        private readonly ActionPermissionAssertInterface $permissionAssert,
+        private readonly UserJobRepository $userJobRepository,
     ) {
     }
 
@@ -56,33 +67,39 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
     public static function create(): self
     {
         return new self(
-            UserJobActionPermissionAssert::create(),
-            \MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            \MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation::create(),
+            UserJobActionPermissionAssert::create(),
+            UserJobRepository::create(),
         );
     }
-    public function delete(UserJob $job): void
+
+    /**
+     * @throws LspJobAlreadyExistsException
+     */
+    public function delete(LspJobAssociation $job): void
     {
         $this->assertAccess($job);
 
         $this->operation->delete($job);
     }
 
-    public function forceDelete(UserJob $job): void
+    public function forceDelete(LspJobAssociation $job): void
     {
         $this->assertAccess($job);
 
         $this->operation->forceDelete($job);
     }
 
-    private function assertAccess(UserJob $job): void
+    private function assertAccess(LspJobAssociation $job): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
+        $dataJob = $this->userJobRepository->getDataJobByLspJob($job);
 
         $this->permissionAssert->assertGranted(
             Action::Delete,
-            $job,
+            $dataJob,
             new PermissionAssertContext($authUser),
         );
     }

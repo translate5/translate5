@@ -10185,7 +10185,15 @@ Synchronization always takes place in one direction: source data -> target
             </trans-unit>
             <trans-unit id='VW5nw7xsdGlnZXIgV2VydCBiZXJlaXRnZXN0ZWxsdA=='>
                 <source>Ungültiger Wert bereitgestellt</source>
-                <target>Ivalid value provided</target>
+                <target>Invalid value provided</target>
+            </trans-unit>
+            <trans-unit id='TnVyIGRlciBLb29yZGluYXRvciBrYW5uIGVpbmVtIExTUC1BdWZ0cmFnIHp1Z2V3aWVzZW4gd2VyZGVu'>
+                <source>Nur der Koordinator kann einem LSP-Auftrag zugewiesen werden</source>
+                <target>Only Coordinator can be assigned to LSP job</target>
+            </trans-unit>
+            <trans-unit id='RGVyIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGthbm4gbnVyIGbDvHIgTFNQLUF1ZnRyYWcgZ2XDpG5kZXJ0IHdlcmRlbi4='>
+                <source>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</source>
+                <target>The assigned user can only be changed for LSP job</target>
             </trans-unit>
         </body>
     </file>
