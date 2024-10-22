@@ -67,9 +67,6 @@ class UserRestrictionAssert implements PermissionAssertInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         $user = $this->userRepository->getByGuid($object->getUserGuid());

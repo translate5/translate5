@@ -96,7 +96,7 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
             throw new TaskIdentificatorNotProvidedException();
         }
 
-        if (!isset($data['userGuid'])) {
+        if (! isset($data['userGuid'])) {
             throw new UserGuidNotProvidedException();
         }
 

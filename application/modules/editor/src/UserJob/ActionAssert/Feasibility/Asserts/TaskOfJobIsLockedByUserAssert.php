@@ -61,9 +61,6 @@ class TaskOfJobIsLockedByUserAssert implements FeasibilityAssertInterface
         return $action === Action::Delete;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertAllowed(object $object): void
     {
         $task = $this->taskRepository->getByGuid($object->getTaskGuid());

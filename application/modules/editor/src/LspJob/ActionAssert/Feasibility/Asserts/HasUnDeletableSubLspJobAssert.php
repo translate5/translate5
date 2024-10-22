@@ -63,9 +63,6 @@ class HasUnDeletableSubLspJobAssert implements FeasibilityAssertInterface
         return $action === Action::Delete;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertAllowed(object $object): void
     {
         foreach ($this->lspJobRepository->getSubLspJobs($object) as $subJob) {

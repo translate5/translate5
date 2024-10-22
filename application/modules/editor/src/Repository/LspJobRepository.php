@@ -30,30 +30,21 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
 use MittagQI\Translate5\LspJob\Exception\InexistentLspJobException;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\UserJob\TypeEnum;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
-
 use ZfExtended_Models_Entity_NotFoundException;
-
-use function _PHPStan_adbc35a1c\RingCentral\Psr7\str;
 
 class LspJobRepository
 {
     public function __construct(
         private readonly Zend_Db_Adapter_Abstract $db,
-        private readonly LspRepositoryInterface $lspRepository,
     ) {
     }
 
@@ -64,7 +55,6 @@ class LspJobRepository
     {
         return new self(
             Zend_Db_Table::getDefaultAdapter(),
-            LspRepository::create(),
         );
     }
 
@@ -94,7 +84,6 @@ class LspJobRepository
     }
 
     /**
-     * @param LspJobAssociation $job
      * @throws LspJobAlreadyExistsException
      */
     public function save(LspJobAssociation $job): void
@@ -196,10 +185,5 @@ class LspJobRepository
         );
 
         return $lspJob;
-    }
-
-    public function getAvailableWorkflowSteps()
-    {
-
     }
 }

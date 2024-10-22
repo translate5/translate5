@@ -70,9 +70,6 @@ class JobRestrictionAssert implements FeasibilityAssertInterface
         return $action === Action::Delete;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertAllowed(object $object): void
     {
         foreach ($this->userJobRepository->getJobsByUserGuid($object->getUserGuid()) as $job) {

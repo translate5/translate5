@@ -37,7 +37,6 @@ use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
-use MittagQI\Translate5\Task\TaskService;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
 use MittagQI\ZfExtended\Controller\Response\Header;
@@ -118,7 +117,6 @@ class editor_TaskController extends ZfExtended_RestController
     protected editor_Workflow_Manager $workflowManager;
 
     private QualityService $qualityService;
-
 
     private BeforeFinishStateTaskValidator $beforeFinishStateTaskValidator;
 

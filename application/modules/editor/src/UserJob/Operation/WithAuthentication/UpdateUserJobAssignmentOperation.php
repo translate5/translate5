@@ -72,9 +72,6 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function update(UserJob $job, UpdateUserJobDto $dto): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
@@ -90,7 +87,7 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         if ($coordinator !== null) {
             try {
                 $this->lspJobRepository->getByTaskGuidAndWorkflow(
-                    (int)$coordinator->lsp->getId(),
+                    (int) $coordinator->lsp->getId(),
                     $job->getTaskGuid(),
                     $dto->workflow->workflow,
                     $dto->workflow->workflowStepName,

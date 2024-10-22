@@ -38,7 +38,6 @@ use MittagQI\Translate5\Task\NoJobFoundException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\User\DataProvider\RolesDataProvider;
-use MittagQI\ZfExtended\Acl\SetAclRoleResource as BaseRoles;
 use MittagQI\ZfExtended\CsrfProtection;
 
 /**

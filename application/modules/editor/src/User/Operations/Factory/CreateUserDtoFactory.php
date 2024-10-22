@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations\Factory;
 
 use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
@@ -46,7 +47,6 @@ use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
-use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use REST_Controller_Request_Http as Request;
 use ZfExtended_Authentication;

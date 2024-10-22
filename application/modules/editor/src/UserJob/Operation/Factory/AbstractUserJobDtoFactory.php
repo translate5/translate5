@@ -55,7 +55,6 @@ abstract class AbstractUserJobDtoFactory
     }
 
     /**
-     * @param Request $request
      * @return Dto
      */
     abstract public function fromRequest(Request $request);

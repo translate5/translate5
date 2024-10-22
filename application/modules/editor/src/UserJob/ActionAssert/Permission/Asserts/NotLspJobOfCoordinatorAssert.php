@@ -65,9 +65,6 @@ class NotLspJobOfCoordinatorAssert implements PermissionAssertInterface
         return $action->isMutable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         $authCoordinator = $this->jobCoordinatorRepository->findByUser($context->authUser);

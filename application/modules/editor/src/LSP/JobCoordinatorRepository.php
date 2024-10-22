@@ -41,7 +41,6 @@ use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException as NotFoundException;
 use ZfExtended_Models_User;
 
 class JobCoordinatorRepository

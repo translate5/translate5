@@ -67,9 +67,6 @@ class TaskRestrictionAssert implements PermissionAssertInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
         $task = $this->taskRepository->getByGuid($object->getTaskGuid());

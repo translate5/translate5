@@ -31,8 +31,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LspJob\ActionAssert\Feasibility;
 
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
-use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Asserts\HasUnDeletableUserJobAssert;
 use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Asserts\HasUnDeletableSubLspJobAssert;
+use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Asserts\HasUnDeletableUserJobAssert;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 
 /**

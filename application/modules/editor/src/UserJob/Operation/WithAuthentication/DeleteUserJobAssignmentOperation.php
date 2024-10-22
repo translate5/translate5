@@ -62,6 +62,7 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
             new UserRepository(),
         );
     }
+
     public function delete(UserJob $job): void
     {
         $this->assertAccess($job);

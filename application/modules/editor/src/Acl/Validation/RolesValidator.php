@@ -44,7 +44,6 @@ use ZfExtended_Acl;
 
 class RolesValidator
 {
-
     public function __construct(
         private readonly ZfExtended_Acl $acl,
         private readonly Roles $roles,

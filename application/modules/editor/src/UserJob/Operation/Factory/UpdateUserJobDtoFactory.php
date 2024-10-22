@@ -76,8 +76,6 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
     }
 
     /**
-     * @param Request $request
-     *
      * @throws InexistentTaskException
      * @throws InexistentUserException
      * @throws InvalidStateProvidedException
@@ -120,7 +118,7 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
             $deadlineDate,
             isset($data['trackchangesShow']) ? (bool) $data['trackchangesShow'] : null,
             isset($data['trackchangesShowAll']) ? (bool) $data['trackchangesShowAll'] : null,
-                isset($data['trackchangesAcceptReject']) ? (bool) $data['trackchangesAcceptReject'] : null,
+            isset($data['trackchangesAcceptReject']) ? (bool) $data['trackchangesAcceptReject'] : null,
         );
     }
 

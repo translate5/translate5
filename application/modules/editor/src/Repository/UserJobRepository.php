@@ -67,7 +67,6 @@ class UserJobRepository
     }
 
     /**
-     * @param int $id
      * @throws \ZfExtended_Models_Entity_NotFoundException
      */
     public function get(int $id): UserJob

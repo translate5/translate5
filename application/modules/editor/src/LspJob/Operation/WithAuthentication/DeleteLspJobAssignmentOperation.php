@@ -46,11 +46,7 @@ use ZfExtended_AuthenticationInterface;
 class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperationInterface
 {
     /**
-     * @param ZfExtended_AuthenticationInterface $authentication
-     * @param UserRepository $userRepository
-     * @param DeleteLspJobAssignmentOperationInterface $operation
      * @param ActionPermissionAssertInterface<UserJob> $permissionAssert
-     * @param UserJobRepository $userJobRepository
      */
     public function __construct(
         private readonly ZfExtended_AuthenticationInterface $authentication,

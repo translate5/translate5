@@ -45,9 +45,9 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\UserJob\Contract\UpdateUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
 use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowStepProvidedException;
-use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\UserJob\Exception\WorkflowUpdateProhibitedForLspJobsException;
@@ -89,9 +89,6 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function update(UserJob $job, UpdateUserJobDto $dto): void
     {
         $this->feasibilityAssert->assertAllowed(Action::Update, $job);
@@ -216,11 +213,11 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         }
 
         if (null !== $dto->canSeeTrackChangesOfPrevSteps) {
-            $job->setTrackchangesShow((int)$dto->canSeeTrackChangesOfPrevSteps);
+            $job->setTrackchangesShow((int) $dto->canSeeTrackChangesOfPrevSteps);
         }
 
         if (null !== $dto->canSeeAllTrackChanges) {
-            $job->setTrackchangesShowAll((int)$dto->canSeeAllTrackChanges);
+            $job->setTrackchangesShowAll((int) $dto->canSeeAllTrackChanges);
         }
 
         if (null !== $dto->canAcceptOrRejectTrackChanges) {

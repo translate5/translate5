@@ -76,9 +76,6 @@ class JobIsAlreadyInEditingModeAssert implements FeasibilityAssertInterface
         return $action === Action::Update;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertAllowed(object $object): void
     {
         if (empty($object->getUsedState())) {
