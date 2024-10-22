@@ -122,6 +122,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             params: {data: JSON.stringify({...this.getView().getValues(), onlyCount: true})},
             async: true,
             method: 'POST',
+            timeout: 900000,
             success: xhr => {
                 this.getViewModel().set('totalAmount', JSON.parse(xhr.responseText).totalAmount);
             },
