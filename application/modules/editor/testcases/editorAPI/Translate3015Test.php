@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
@@ -94,7 +95,7 @@ class Translate3015Test extends JsonTestAbstract
         $this->assertTrue($termsEntryAtributeCount === (int) $attributes->termsEntryAtributeCount, $fileName . ' file test.Invalid and number of entry attribute created.Terms entry attribute count:' . $attributes->termsEntryAtributeCount . ', expected:' . $termsEntryAtributeCount);
         $this->assertTrue($languageAtributeCount === (int) $attributes->languageAtributeCount, $fileName . ' file test.Invalid and number of language level attribute created.Language level attribute count:' . $attributes->languageAtributeCount . ', expected:' . $languageAtributeCount);
 
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         static::api()->delete('editor/termcollection/' . $collectionId);
     }
 }

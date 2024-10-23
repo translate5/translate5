@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
@@ -55,7 +56,7 @@ class Translate2081Test extends JsonTestAbstract
             'workflow' => 'default',
             'sourceLang' => static::$sourceLangRfc,
             'targetLang' => static::$targetLangRfc,
-            'userGuid' => static::api()->getUserGuid('testtranslator'),
+            'userGuid' => static::api()->getUserGuid(TestUser::TestTranslator->value),
             'workflowStepName' => 'translation',
         ];
         $result = static::api()->postJson('editor/userassocdefault', $params);

@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 use MittagQI\Translate5\Test\JsonTestAbstract;
@@ -61,14 +62,14 @@ class Translate2417Test extends JsonTestAbstract
     public function testSegments()
     {
         $tmId = static::$translationMemory->getId();
-        static::api()->addUser('testmanager');
+        static::api()->addUser(TestUser::TestManager->value);
         static::api()->setTaskToEdit(static::getTask()->getId());
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!', true, true);
 
         // now test editing the segments
-        self::assertLogin('testmanager');
+        self::assertLogin(TestUser::TestManager->value);
         // load the first segment
         $segments = static::api()->getSegments(null, 1);
         // test the first segment

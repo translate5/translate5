@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
@@ -69,7 +70,7 @@ class SessionApiTest extends ImportTestAbstract
     public function testWrongCredentials()
     {
         $response = static::api()->post('editor/session', [
-            'login' => 'wrongUsername',
+            'login' => TestUser::WrongUserName->value,
             'passwd' => 'wrongPassword',
         ]);
         $msg403 = '{"errorCode":null,"httpStatus":403,"errorMessage":"Keine Zugriffsberechtigung!","message":"Forbidden","success":false}';
@@ -78,14 +79,14 @@ class SessionApiTest extends ImportTestAbstract
         $this->assertEquals($msg403, $response->getBody());
 
         $response = static::api()->post('editor/session', [
-            'login' => 'testlector',
+            'login' => TestUser::TestLector->value,
             'passwd' => 'wrongPassword',
         ]);
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
 
         $response = static::api()->post('editor/session', [
-            'login' => 'wrongUsername',
+            'login' => TestUser::WrongUserName->value,
             'passwd' => Helper::PASSWORD,
         ]);
         $this->assertEquals(403, $response->getStatus());
@@ -98,11 +99,11 @@ class SessionApiTest extends ImportTestAbstract
      */
     public function testLogin()
     {
-        static::api()->login('testlector');
-        static::assertLogin('testlector');
+        static::api()->login(TestUser::TestLector->value);
+        static::assertLogin(TestUser::TestLector->value);
 
-        static::api()->login('testmanager');
-        static::assertLogin('testmanager');
+        static::api()->login(TestUser::TestManager->value);
+        static::assertLogin(TestUser::TestManager->value);
 
         $authCookie = Helper::getAuthCookie();
         static::api()->logout();
@@ -157,7 +158,7 @@ class SessionApiTest extends ImportTestAbstract
         $taskGuid = $task->taskGuid;
         static::api()->logout();
         $loginData = [
-            'login' => 'testmanager',
+            'login' => TestUser::TestManager->value,
             'passwd' => Helper::PASSWORD,
         ];
         if ($withTask) {
@@ -176,7 +177,7 @@ class SessionApiTest extends ImportTestAbstract
         $sessionToken = $response->sessionToken;
 
         // restore authentication-data in API
-        Helper::setAuthentication($sessionId, 'testmanager');
+        Helper::setAuthentication($sessionId, TestUser::TestManager->value);
 
         $this->assertEquals(200, $plainResponse->getStatus(), 'Server did not respond HTTP 200');
         $this->assertNotFalse($response, 'JSON Login request was not successful!');
@@ -227,14 +228,14 @@ class SessionApiTest extends ImportTestAbstract
     public function __testSingleClickAuthentication()
     {
         static::api()->logout();
-        static::api()->login('testmanager2');
-        static::assertLogin('testmanager2');
+        static::api()->login(TestUser::TestManager2->value);
+        static::assertLogin(TestUser::TestManager2->value);
         static::api()->reloadTask();
-        $assoc = static::api()->addUser('testlector');
+        $assoc = static::api()->addUser(TestUser::TestLector->value);
         $this->assertFalse(isset($assoc->staticAuthHash), 'staticAuthHash for non API user must be empty!');
 
-        static::api()->login('testapiuser');
-        static::assertLogin('testapiuser');
+        static::api()->login(TestUser::TestApiUser->value);
+        static::assertLogin(TestUser::TestApiUser->value);
         $assoc = static::api()->getJson('editor/taskuserassoc/' . $assoc->id);
         $hash = $assoc->staticAuthHash;
         $this->assertMatchesRegularExpression('/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/', $hash, 'Single click auth hash is no valid guid');
@@ -242,7 +243,7 @@ class SessionApiTest extends ImportTestAbstract
         $response = static::api()->get('editor/session?authhash=' . $hash);
         $taskGuid = static::api()->getTask()->taskGuid;
         $this->assertNotFalse(strpos($response->getBody(), '"taskGuid":"' . $taskGuid . '"'), 'The editor page does not contain the expected taskGuid for the opened task.');
-        static::assertLogin('testlector'); //must be testlector after single click auth
+        static::assertLogin(TestUser::TestLector->value); //must be testlector after single click auth
         static::api()->logout();
     }
 
@@ -255,13 +256,13 @@ class SessionApiTest extends ImportTestAbstract
     public function testSessionImpersonate()
     {
         static::api()->logout();
-        static::api()->login('testmanager');
-        static::assertLogin('testmanager');
+        static::api()->login(TestUser::TestManager->value);
+        static::assertLogin(TestUser::TestManager->value);
         // This will replace the testmanager session with testlector
         static::api()->get('editor/session/impersonate', [
-            'login' => 'testlector',
+            'login' => TestUser::TestLector->value,
         ]);
-        static::assertLogin('testlector');
+        static::assertLogin(TestUser::TestLector->value);
         static::api()->logout();
     }
 }

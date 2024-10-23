@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Api;
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Task;
 use MittagQI\ZfExtended\Service\ConfigHelper;
 use stdClass;
@@ -99,16 +100,6 @@ final class Helper extends ZfExtended_Test_ApiHelper
      */
     protected stdClass $customer;
 
-    protected static array $testusers = [
-        'testmanager' => '{00000000-0000-0000-C100-CCDDEE000001}',
-        'testlector' => '{00000000-0000-0000-C100-CCDDEE000002}',
-        'testtranslator' => '{00000000-0000-0000-C100-CCDDEE000003}',
-        'testapiuser' => '{00000000-0000-0000-C100-CCDDEE000004}',
-        'testtermproposer' => '{00000000-0000-0000-C100-CCDDEE000005}',
-        'testmanager2' => '{00000000-0000-0000-C100-CCDDEE000006}',
-        'testclientpm' => '{00000000-0000-0000-C100-CCDDEE000007}',
-    ];
-
     //region Import API
     /******************************************************* IMPORT API *******************************************************/
 
@@ -151,7 +142,8 @@ final class Helper extends ZfExtended_Test_ApiHelper
         if ($task->taskType === self::INITIAL_TASKTYPE_PROJECT) {
             return $this->waitForProjectImported($task, $failOnError);
         } else {
-            DbHelper::waitForWorkers( /** @phpstan-ignore-next-line */
+            DbHelper::waitForWorkers(
+                /** @phpstan-ignore-next-line */
                 $this->test,
                 \editor_Models_Import_Worker_SetTaskToOpen::class,
                 [$task->taskGuid],
@@ -184,7 +176,8 @@ final class Helper extends ZfExtended_Test_ApiHelper
             }
         }
         if (count($taskGuids) > 0) {
-            DbHelper::waitForWorkers( /** @phpstan-ignore-next-line */
+            DbHelper::waitForWorkers(
+                /** @phpstan-ignore-next-line */
                 $this->test,
                 \editor_Models_Import_Worker_SetTaskToOpen::class,
                 $taskGuids,
@@ -210,7 +203,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
         int $taskId,
         string $stateToWaitFor,
         bool $failOnError = true,
-        int $maxSeconds = self::RELOAD_TASK_LIMIT
+        int $maxSeconds = self::RELOAD_TASK_LIMIT,
     ): bool {
         $counter = 0;
         while (true) {
@@ -279,7 +272,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
         $allowedStatuses = $this->getAllowHttpStatusOnce();
 
         // make sure testmanager or testclientpm is logged in
-        $this->test::assertLogins(['testmanager', 'testclientpm']);
+        $this->test::assertLogins([TestUser::TestManager->value, TestUser::TestClientPm->value]);
 
         $response = $this->postJson('editor/task', $task, expectedToFail: ! $failOnError);
 
@@ -537,13 +530,13 @@ final class Helper extends ZfExtended_Test_ApiHelper
         array $params = [],
     ) {
         $this->test::assertFalse(
-            empty(static::$testusers[$username]),
+            empty(self::getUsersGuid()[$username]),
             'Given testuser "' . $username . '" does not exist!'
         );
         $p = [
             "id" => 0,
             "taskGuid" => $taskGuid,
-            "userGuid" => static::$testusers[$username],
+            "userGuid" => self::getUsersGuid()[$username],
             "state" => $state,
             "workflowStepName" => $step,
         ];
@@ -560,8 +553,8 @@ final class Helper extends ZfExtended_Test_ApiHelper
      */
     public function getUserGuid(string $login): string
     {
-        if (array_key_exists($login, static::$testusers)) {
-            return static::$testusers[$login];
+        if (array_key_exists($login, static::getUsersGuid())) {
+            return static::getUsersGuid()[$login];
         }
 
         throw new Exception('User \'' . $login . '\' is no valid test user.');
@@ -1035,5 +1028,23 @@ final class Helper extends ZfExtended_Test_ApiHelper
         );
 
         return preg_replace('/sdl:revid="[^"]{36}"/', 'sdl:revid="replaced-for-testing"', $changesXml);
+    }
+
+    /**
+     * Get coincidence between test user and guid.
+     *
+     * @return array<string, string>
+     */
+    private static function getUsersGuid(): array
+    {
+        return [
+            TestUser::TestManager->value => '{00000000-0000-0000-C100-CCDDEE000001}',
+            TestUser::TestLector->value => '{00000000-0000-0000-C100-CCDDEE000002}',
+            TestUser::TestTranslator->value => '{00000000-0000-0000-C100-CCDDEE000003}',
+            TestUser::TestApiUser->value => '{00000000-0000-0000-C100-CCDDEE000004}',
+            TestUser::TestTermProposer->value => '{00000000-0000-0000-C100-CCDDEE000005}',
+            TestUser::TestManager2->value => '{00000000-0000-0000-C100-CCDDEE000006}',
+            TestUser::TestClientPm->value => '{00000000-0000-0000-C100-CCDDEE000007}',
+        ];
     }
 }

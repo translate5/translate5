@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
@@ -63,14 +64,14 @@ class ClientPmTest extends ImportTestAbstract
         $config->import($task1);
 
         // the pm should see both tasks
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         $tasks = static::api()->getJson('editor/task');
 
         // take number of tasks at the beginning into account
         static::assertCount(2 + self::$numTasksBefore, $tasks);
 
         // ... while the clientpm only can see the one bound to him
-        static::api()->login('testclientpm');
+        static::api()->login(TestUser::TestClientPm->value);
         $tasks = static::api()->getJson('editor/task');
         static::assertCount(1, $tasks); // sees only one
         static::assertEquals('2', $tasks[0]->foreignId); // identify the one by foreign-id
@@ -93,7 +94,7 @@ class ClientPmTest extends ImportTestAbstract
         $secondClientPmClientId = static::getTestCustomerId(2);
 
         // add a User to work with, bound to the main customer
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         $newUser = static::api()->postJson('editor/user/', [
             "firstName" => "Just",
             "surName" => "A Test",
@@ -113,7 +114,7 @@ class ClientPmTest extends ImportTestAbstract
         );
 
         // login as testclientpm and add the second client-pm customer to the user
-        static::api()->login('testclientpm');
+        static::api()->login(TestUser::TestClientPm->value);
         $result = static::api()->putJson('editor/user/' . static::$newUserId, [
             'customers' => $firstClientPmClientId . ',' . $secondClientPmClientId, // mimicing the frontend, we just send the two customers the clientpm can access !
         ]);
@@ -139,7 +140,7 @@ class ClientPmTest extends ImportTestAbstract
         static::assertStringContainsString('not allowed due to client-restriction', $result->error);
 
         // login as pm
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         // assign only the main customer the client-pm is not restricted for
         $result = static::api()->putJson('editor/user/' . static::$newUserId, [
             'customers' => $mainClientId,
@@ -150,7 +151,7 @@ class ClientPmTest extends ImportTestAbstract
         );
 
         // now the user must be inaccessible for the client-pm
-        static::api()->login('testclientpm');
+        static::api()->login(TestUser::TestClientPm->value);
         $result = static::api()->getJson('editor/user/' . static::$newUserId, [], null, true);
         static::assertEquals(403, $result->status);
         static::assertStringContainsString('not accessible due to the users client-restriction', $result->error);
@@ -162,7 +163,7 @@ class ClientPmTest extends ImportTestAbstract
     public function testLanguageResources()
     {
         // import the two language-resources to test (assigned to different customers)
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         $config = static::getConfig();
         $dummyMt0 = $config->addLanguageResource(
             LanguageResource::DUMMY_TM,
@@ -182,7 +183,7 @@ class ClientPmTest extends ImportTestAbstract
         $config->import($dummyMt1);
 
         // make sure, the clientpm can only see the single resource he is entitled for
-        static::api()->login('testclientpm');
+        static::api()->login(TestUser::TestClientPm->value);
         $resources = static::api()->getJson('editor/languageresourceinstance');
         static::assertCount(1, $resources);
         static::assertEquals($dummyMt1->getId(), $resources[0]->id);
@@ -202,7 +203,7 @@ class ClientPmTest extends ImportTestAbstract
         $secondClientPmClientId = static::getTestCustomerId(2);
 
         // add customer to TM 2
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         $result = static::api()->putJson('editor/languageresourceinstance/' . $dummyMt0->getId(), [
             'customerIds' => [$mainClientId, $firstClientPmClientId],
         ]);
@@ -212,7 +213,7 @@ class ClientPmTest extends ImportTestAbstract
         );
 
         // the clientpm now should have access
-        static::api()->login('testclientpm');
+        static::api()->login(TestUser::TestClientPm->value);
         $result = static::api()->getJson('editor/languageresourceinstance/' . $dummyMt0->getId());
         static::assertEquals(
             $this->normalizeCustomers([$mainClientId, $firstClientPmClientId]),

@@ -165,7 +165,7 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
     public function nameStartsWith(string $name): array
     {
         $s = $this->db->select()
-            ->where('name LIKE ?', $name . '%')
+            ->where('lower(name) LIKE lower(?)', $name . '%')
             ->order('name ASC');
 
         return $this->db->fetchAll($s)->toArray();

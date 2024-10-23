@@ -13,3 +13,4 @@ parameters:
 		- application
 		- library
 		- Translate5
+		- vendor

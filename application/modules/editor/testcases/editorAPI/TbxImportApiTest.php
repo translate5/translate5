@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\ApiTestAbstract;
+use MittagQI\Translate5\Test\Enums\TestUser;
 
 /**
  * Test the tbx import into the term collection with multiple tbx files with modified and new terms.
@@ -77,7 +78,7 @@ class TbxImportApiTest extends ApiTestAbstract
         $this->singleTest($collectionId, 'ExportTermChange.tbx', 16, 91, 10, 9);
 
         // clean up
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         static::api()->delete('editor/termcollection/' . $collectionId);
     }
 

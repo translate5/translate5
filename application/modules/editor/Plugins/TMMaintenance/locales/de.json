@@ -73,7 +73,7 @@
     "totalAmount": "Gesamtzahl der gefundenen Segmente: ",
     "calculating": "Wird berechnet...",
     "loadingSegmentPlaceholder": "Laden...",
-    "loadingSegmentNumber": "ladesegment #",
+    "loadingSegmentNumber": "Ladesegment #",
     "saving": "Speichert, bitte warten.",
     "columns": {
       "sourceText": "Quelle",

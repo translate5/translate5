@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
@@ -44,7 +45,7 @@ class XlfSegmentLinesPixelLengthTest extends JsonTestAbstract
         'import.xlf.preserveWhitespace' => 0,
     ];
 
-    protected static string $setupUserLogin = 'testlector';
+    protected static TestUser $setupUserLogin = TestUser::TestLector;
 
     protected static function setupImport(Config $config): void
     {
@@ -181,7 +182,7 @@ class XlfSegmentLinesPixelLengthTest extends JsonTestAbstract
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToExport, $fileToCompare)
     {
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         static::api()->get($exportUrl);
 
         //get the exported file content
