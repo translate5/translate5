@@ -19,6 +19,44 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.11.3] - 2024-10-16
+
+### Important Notes:
+#### [TRANSLATE-4229](https://jira.translate5.net/browse/TRANSLATE-4229)
+Please note, that before being able to use TM maintenance for a TM, the TM needs to be reorganized because of changes in its data structures. translate5 will do that automatically for a TM as soon as you start to try to use it in TM maintenance, yet with big TMs that will take some time and the UI might run into timeouts then.
+You can also migrate all TMs first on the CMD to the new format by using the command line interface. Go to the document-root of your translate5 installation dir in your php-docker-container and call there:
+t5 t5memory:reorganize
+
+The command has the following parameters
+
+--tmName=TMNAME If no UUID was given this will filter the list of all TMs if provided
+--batchSize=BATCHSIZE Number of memories to reorganize at once. Works only if no UUID and tmName was given
+--startFromId=STARTFROMID
+
+The IDs of the TMs you see when showing the “id” column in the language resource management in the UI.
+ 
+
+
+### Changed
+**[TRANSLATE-4229](https://jira.translate5.net/browse/TRANSLATE-4229): TM Maintenance - Make TM Maintenance plugin to be enabled by default** <br>
+TM Maintenance plugin is now enabled by default
+
+
+### Bugfixes
+**[TRANSLATE-4236](https://jira.translate5.net/browse/TRANSLATE-4236): MatchAnalysis & Pretranslation - Deadlocks in segment processing leads to follow up error** <br>
+Fixed error about already active transactions in auto QA segment processing.
+
+**[TRANSLATE-4225](https://jira.translate5.net/browse/TRANSLATE-4225): GroupShare integration - GroupShare TMs should not be deletable via translate5** <br>
+Since the list of GroupShare TMs is synchronized from GroupShare itself, there should be no way to delete such TMs in translate5.
+
+**[TRANSLATE-4223](https://jira.translate5.net/browse/TRANSLATE-4223): Import/Export - Fix mxliff (Phrase) internal Tags (very strange, non xliff-standard format)** <br>
+Converts the mxliff custom markup({b>, {i> etc...) to ph (placeholder) tags and restore the markup on export.
+
+**[TRANSLATE-4222](https://jira.translate5.net/browse/TRANSLATE-4222): Editor general - CTRL+f in editor should not remember last search** <br>
+FIXED: search field's text is now empty on first search/replace window open, and pre-selected on further opens for easy overwriting with Ctrl+V 
+
+
 ## [7.11.2] - 2024-10-06
 
 ### Important Notes:
