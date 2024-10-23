@@ -28,30 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Exception;
 
-use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorCanBeDeletedAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\JobRestrictionAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\PmInTaskFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\UserIsEditableFeasibilityAssert;
-use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 
-/**
- * @extends ActionFeasibilityAssert<User>
- */
-final class UserActionFeasibilityAssert extends ActionFeasibilityAssert
+final class CoordinatorHasBlockingLspJobException extends \Exception implements FeasibilityExceptionInterface
 {
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self([
-            new UserIsEditableFeasibilityAssert(),
-            PmInTaskFeasibilityAssert::create(),
-            JobRestrictionAssert::create(),
-            CoordinatorCanBeDeletedAssert::create(),
-        ]);
+    public function __construct(
+        public readonly JobCoordinator $coordinator,
+        public readonly LspJobAssociation $lspJob,
+    ) {
+        parent::__construct();
     }
 }

@@ -34,7 +34,7 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\LastCoordinatorFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\CoordinatorAsserts\LastCoordinatorFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;

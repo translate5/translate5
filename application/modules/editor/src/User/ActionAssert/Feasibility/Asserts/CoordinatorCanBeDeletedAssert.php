@@ -28,25 +28,28 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Asserts;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
-use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
-use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
-use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
-use MittagQI\Translate5\UserJob\TypeEnum;
+use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\CoordinatorAsserts\LastCoordinatorFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\CoordinatorAsserts\LspJobRestrictionAssert;
+use MittagQI\Translate5\User\Model\User;
 
 /**
- * @implements FeasibilityAssertInterface<LspJobAssociation>
+ * @extends ActionFeasibilityAssert<User>
  */
-class HasUnDeletableUserJobAssert implements FeasibilityAssertInterface
+final class CoordinatorCanBeDeletedAssert implements FeasibilityAssertInterface
 {
+    /**
+     * @param FeasibilityAssertInterface<JobCoordinator>[] $asserts
+     */
     public function __construct(
-        private readonly UserJobRepository $userJobRepository,
-        private readonly UserJobActionFeasibilityAssert $userJobActionFeasibilityAssert,
+        private readonly JobCoordinatorRepository $jcRepository,
+        private readonly array $asserts,
     ) {
     }
 
@@ -56,8 +59,11 @@ class HasUnDeletableUserJobAssert implements FeasibilityAssertInterface
     public static function create(): self
     {
         return new self(
-            UserJobRepository::create(),
-            UserJobActionFeasibilityAssert::create(),
+            JobCoordinatorRepository::create(),
+            [
+                LastCoordinatorFeasibilityAssert::create(),
+                LspJobRestrictionAssert::create(),
+            ],
         );
     }
 
@@ -66,18 +72,20 @@ class HasUnDeletableUserJobAssert implements FeasibilityAssertInterface
         return $action === Action::Delete;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function assertAllowed(object $object): void
     {
-        try {
-            foreach ($this->userJobRepository->getUserJobsByLspJob($object) as $job) {
-                if ($job->isLspJob()) {
-                    continue;
-                }
+        // Possible coordinator that we try to delete
+        $coordinator = $this->jcRepository->findByUser($object);
 
-                $this->userJobActionFeasibilityAssert->assertAllowed(Action::Delete, $job);
-            }
-        } catch (FeasibilityExceptionInterface) {
-            throw new ThereIsUnDeletableBoundJobException();
+        if (null === $coordinator) {
+            return;
+        }
+
+        foreach ($this->asserts as $assert) {
+            $assert->assertAllowed($coordinator);
         }
     }
 }

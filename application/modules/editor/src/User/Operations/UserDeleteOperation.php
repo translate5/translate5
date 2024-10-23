@@ -32,8 +32,10 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
+use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorCanBeDeletedAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use MittagQI\Translate5\User\Model\User;
@@ -43,6 +45,7 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly ActionFeasibilityAssertInterface $userActionFeasibilityChecker,
+        private readonly FeasibilityAssertInterface $coordinatorCanBeDeletedAssert,
     ) {
     }
 
@@ -54,6 +57,7 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
         return new self(
             new UserRepository(),
             UserActionFeasibilityAssert::create(),
+            CoordinatorCanBeDeletedAssert::create(),
         );
     }
 
@@ -70,6 +74,8 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
 
     public function forceDelete(User $user): void
     {
+        $this->coordinatorCanBeDeletedAssert->assertAllowed($user);
+
         // TODO delete user jobs
         $this->userRepository->delete($user);
     }

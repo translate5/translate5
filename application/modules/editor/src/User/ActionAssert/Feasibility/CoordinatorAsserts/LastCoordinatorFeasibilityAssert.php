@@ -28,32 +28,24 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\CoordinatorAsserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
-use MittagQI\Translate5\User\Model\User;
 
 /**
- * @implements FeasibilityAssertInterface<User>
+ * @implements FeasibilityAssertInterface<JobCoordinator>
  */
 final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterface
 {
-    public function __construct(
-        private readonly JobCoordinatorRepository $jcRepository,
-    ) {
-    }
-
     /**
      * @codeCoverageIgnore
      */
     public static function create(): self
     {
-        return new self(
-            JobCoordinatorRepository::create(),
-        );
+        return new self();
     }
 
     public function supports(Action $action): bool
@@ -67,16 +59,9 @@ final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterfa
      */
     public function assertAllowed(object $object): void
     {
-        // Possible coordinator that we try to delete
-        $coordinator = $this->jcRepository->findByUser($object);
-
-        if (null === $coordinator) {
-            return;
-        }
-
         // Nobody can delete the last coordinator of an LSP
-        if ($this->jcRepository->getCoordinatorsCount($coordinator->lsp) === 1) {
-            throw new LastCoordinatorException($coordinator);
+        if ($this->jcRepository->getCoordinatorsCount($object->lsp) === 1) {
+            throw new LastCoordinatorException($object);
         }
     }
 }
