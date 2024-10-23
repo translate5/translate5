@@ -99,6 +99,11 @@
       "_README": "A fork of the openai-php/client OpenAI PHP Client to be able to deliver fixes more rapidly",
       "type": "git",
       "url": "https://github.com/translate5/openai-client/"
+    },
+    {
+      "_README" : "A Fork of the paquettg/php-html-parser PHP HTML-parser to be able to support newer PHP versions",
+      "type" : "git",
+      "url" : "https://github.com/translate5/php-html-parser/"
     }
   ],
   "require": {
@@ -133,7 +138,6 @@
     "google/cloud-translate": "~1.7",
     "dream-group/horde-text-diff": "dev-master",
     "lesstif/php-jira-rest-client": "~2.4",
-    "paquettg/php-html-parser": "^3.1",
     "jquery/jquery-ui": "1.13.0",
     "translate5/instanttranslate-roboto-font": "26",
     "translate5/rangy-lib": "1.3.1-dev",
@@ -154,7 +158,8 @@
     "guzzlehttp/psr7": "^2.7",
     "psr/event-dispatcher": "^1.0",
     "psr/http-client": "^1.0",
-    "phar-io/version": "^3.2"
+    "phar-io/version": "^3.2",
+    "translate5/php-html-parser": "dev-master"
   },
   "extra": {
     "merge-plugin": {
