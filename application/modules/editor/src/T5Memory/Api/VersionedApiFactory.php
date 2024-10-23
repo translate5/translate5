@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory\Api;
 
 use Psr\Http\Client\ClientInterface;
+use Zend_Config;
 
 /**
  * @template T
@@ -39,6 +40,7 @@ class VersionedApiFactory
 {
     public function __construct(
         private ClientInterface $client,
+        private readonly Zend_Config $config
     ) {
     }
 
@@ -50,7 +52,7 @@ class VersionedApiFactory
     {
         return match ($apiClass) {
             V5\VersionedApi::class => new V5\VersionedApi($this->client),
-            V6\VersionedApi::class => new V6\VersionedApi($this->client),
+            V6\VersionedApi::class => new V6\VersionedApi($this->client, $this->config),
 
             default => throw new \InvalidArgumentException("Unknown API class: $apiClass"),
         };
