@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\Exception;
 use MittagQI\Translate5\Test\Import\TermCollectionResource;
@@ -53,7 +54,7 @@ class Translate3117Test extends JsonTestAbstract
 
     protected static bool $setupOwnCustomer = true;
 
-    protected static string $setupUserLogin = 'testmanager';
+    protected static TestUser $setupUserLogin = TestUser::TestManager;
 
     /***
      * Segment target on import

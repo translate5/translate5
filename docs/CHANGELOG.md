@@ -16,6 +16,136 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+
+## [7.11.3] - 2024-10-16
+
+### Important Notes:
+#### [TRANSLATE-4229](https://jira.translate5.net/browse/TRANSLATE-4229)
+Please note, that before being able to use TM maintenance for a TM, the TM needs to be reorganized because of changes in its data structures. translate5 will do that automatically for a TM as soon as you start to try to use it in TM maintenance, yet with big TMs that will take some time and the UI might run into timeouts then.
+You can also migrate all TMs first on the CMD to the new format by using the command line interface. Go to the document-root of your translate5 installation dir in your php-docker-container and call there:
+t5 t5memory:reorganize
+
+The command has the following parameters
+
+--tmName=TMNAME If no UUID was given this will filter the list of all TMs if provided
+--batchSize=BATCHSIZE Number of memories to reorganize at once. Works only if no UUID and tmName was given
+--startFromId=STARTFROMID
+
+The IDs of the TMs you see when showing the “id” column in the language resource management in the UI.
+ 
+
+
+### Changed
+**[TRANSLATE-4229](https://jira.translate5.net/browse/TRANSLATE-4229): TM Maintenance - Make TM Maintenance plugin to be enabled by default** <br>
+TM Maintenance plugin is now enabled by default
+
+
+### Bugfixes
+**[TRANSLATE-4236](https://jira.translate5.net/browse/TRANSLATE-4236): MatchAnalysis & Pretranslation - Deadlocks in segment processing leads to follow up error** <br>
+Fixed error about already active transactions in auto QA segment processing.
+
+**[TRANSLATE-4225](https://jira.translate5.net/browse/TRANSLATE-4225): GroupShare integration - GroupShare TMs should not be deletable via translate5** <br>
+Since the list of GroupShare TMs is synchronized from GroupShare itself, there should be no way to delete such TMs in translate5.
+
+**[TRANSLATE-4223](https://jira.translate5.net/browse/TRANSLATE-4223): Import/Export - Fix mxliff (Phrase) internal Tags (very strange, non xliff-standard format)** <br>
+Converts the mxliff custom markup({b>, {i> etc...) to ph (placeholder) tags and restore the markup on export.
+
+**[TRANSLATE-4222](https://jira.translate5.net/browse/TRANSLATE-4222): Editor general - CTRL+f in editor should not remember last search** <br>
+FIXED: search field's text is now empty on first search/replace window open, and pre-selected on further opens for easy overwriting with Ctrl+V 
+
+
+## [7.11.2] - 2024-10-06
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4220](https://jira.translate5.net/browse/TRANSLATE-4220): InstantTranslate - Instant translate: segmentation search does not clean the results list correctly** <br>
+Fix for not correctly cleaned instant translate results blocks.
+
+
+## [7.11.1] - 2024-10-04
+
+### Important Notes:
+ 
+
+
+## [7.11.0] - 2024-10-04
+
+### Important Notes:
+#### [TRANSLATE-4198](https://jira.translate5.net/browse/TRANSLATE-4198)
+We need to make TM Maintenance available for all deployments
+See https://jira.translate5.net/browse/TRANSLATE-4198 for formatted instructions.
+
+Needed steps:
+- update PHP and t5memory (t5memory tag should be :latest) container, recreate
+- docker compose pull php t5memory
+- docker compose up --force-recreate -d php t5memory 
+- activate plugin - go to the document-root of your translate5 installation dir in your php-docker-container and call there
+t5 plugin:enable TMMaintenance
+- the needed access roles are added automatically to all sysadmin and admin users
+- admins and PM users can set the needed roles to each user in the UIs user administration panel
+- log in with such user and you are able to use TM Maintenance with that user.
+
+Please note, that before being able to use TM maintenance for a TM, the TM needs to be reorganized because of changes in its data structures. translate5 will do that automatically for a TM as soon as you start to try to use it in TM maintenance, yet with big TMs that will take some time and the UI might run into timeouts then.
+You can also migrate all TMs first on the CMD to the new format by using the command line interface. Go to the document-root of your translate5 installation dir in your php-docker-container and call there:
+t5 t5memory:reorganize
+
+The command has the following parameters
+
+--tmName=TMNAME If no UUID was given this will filter the list of all TMs if provided
+--batchSize=BATCHSIZE Number of memories to reorganize at once. Works only if no UUID and tmName was given
+--startFromId=STARTFROMID
+
+The IDs of the TMs you see when showing the “id” column in the language resource management in the UI.
+ 
+
+
+### Changed
+**[TRANSLATE-4206](https://jira.translate5.net/browse/TRANSLATE-4206): TM Maintenance - Add user name and timestamp to error modal in TMMaintenance** <br>
+Added debug info to the error modal in TM Maintenance
+
+**[TRANSLATE-4201](https://jira.translate5.net/browse/TRANSLATE-4201): InstantTranslate - InstantTranslate: If multi-segment: Highlight different resources in result** <br>
+Multi-segment mode: best results from different language resources are highlighted and merged into single result block
+
+**[TRANSLATE-4198](https://jira.translate5.net/browse/TRANSLATE-4198): t5memory - Instruction how to enable TM Maintenance** <br>
+TM Maintenance is now enabled by default
+
+
+### Bugfixes
+**[TRANSLATE-4219](https://jira.translate5.net/browse/TRANSLATE-4219): LanguageResources - Unable to add or remove client from default read/write in language resources** <br>
+Fix customer assignment meta data update
+
+**[TRANSLATE-4216](https://jira.translate5.net/browse/TRANSLATE-4216): Import/Export - Across hotfolder: bconf causes import error** <br>
+Fix bconf passing between plugins
+
+**[TRANSLATE-4205](https://jira.translate5.net/browse/TRANSLATE-4205): Main back-end mechanisms (Worker, Logging, etc.) - Delayed worker leads to slow import for small tasks** <br>
+Smaller tasks were running to long due delayed termtagger workers, this is fixed.
+
+**[TRANSLATE-4199](https://jira.translate5.net/browse/TRANSLATE-4199): file format settings - Import of BCONFs with corrupt Extension-mapping is possible (and maybe editing also)** <br>
+FIX: It was possible to import a BCONF with faulty extension-mapping (only "." as extension)
+
+**[TRANSLATE-4194](https://jira.translate5.net/browse/TRANSLATE-4194): Configuration - make page number in system log readable** <br>
+FIXED: page number was clipped if due to insufficient input field width within paging toolbar
+
+**[TRANSLATE-4193](https://jira.translate5.net/browse/TRANSLATE-4193): OpenTM2 integration - T5Memory import memory split does not work** <br>
+Fix large TMX files import into t5memory
+
+**[TRANSLATE-4189](https://jira.translate5.net/browse/TRANSLATE-4189): Content Protection - html escaped in UI** <br>
+Updated addQTip in TaskGrid.js and contentRecognition's GridController to retain linebreak tags
+
+**[TRANSLATE-4163](https://jira.translate5.net/browse/TRANSLATE-4163): Auto-QA - Terminology panel does not show the correct terminology when using "CTRL + ENTER" to save** <br>
+FIX: wrong terminology shown when segment saved with "CTRL + ENTER"
+
+**[TRANSLATE-4056](https://jira.translate5.net/browse/TRANSLATE-4056): TermTagger integration - Delayed Workers: Improve Termtagging & Spellchecking to not stop when Containers are busy** <br>
+7.10.0: Enhancement: When a single Segment have a TermTagger error in the Import, a warning is reported to the task-events instead of an exception rendering the task erroneous
+7.11.0: Fix performance problem with smaller task
+
+
 ## [7.10.0] - 2024-09-19
 
 ### Important Notes:

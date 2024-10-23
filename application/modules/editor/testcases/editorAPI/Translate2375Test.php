@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
@@ -57,16 +58,16 @@ class Translate2375Test extends ImportTestAbstract
 
     public function testDeadlineDate()
     {
-        self::assertLogin('testmanager');
+        self::assertLogin(TestUser::TestManager->value);
         $assocParams = [
             'deadlineDate' => 'default',
             'assignmentDate' => self::$fixedDate,
         ];
-        static::api()->addUser('testtranslator', 'open', 'reviewing', $assocParams);
+        static::api()->addUser(TestUser::TestTranslator->value, 'open', 'reviewing', $assocParams);
         static::api()->reloadTask();
-        static::api()->addUser('testtranslator', 'waiting', 'translation', $assocParams);
+        static::api()->addUser(TestUser::TestTranslator->value, 'waiting', 'translation', $assocParams);
         static::api()->reloadTask();
-        static::api()->addUser('testtranslator', 'waiting', 'translatorCheck', $assocParams);
+        static::api()->addUser(TestUser::TestTranslator->value, 'waiting', 'translatorCheck', $assocParams);
 
         $data = static::api()->getJson('editor/taskuserassoc', [
             'filter' => '[{"operator":"eq","value":"' . static::api()->getTask()->taskGuid . '","property":"taskGuid"}]',

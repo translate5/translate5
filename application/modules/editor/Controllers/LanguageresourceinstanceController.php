@@ -1414,10 +1414,25 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         return false;
     }
 
+    /**
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_Conflict
+     * @throws Zend_Db_Table_Exception
+     * @throws ReflectionException
+     * @throws ZfExtended_NoAccessException
+     */
     public function deleteAction()
     {
         //load the entity and store a copy for later use.
         $this->entityLoad();
+
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
+        $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
+        if (! $resource->getDeletable()) {
+            throw new ZfExtended_BadMethodCallException(__CLASS__ . ' -> ' . __FUNCTION__ . ' due service type.');
+        }
+
         $clone = clone $this->entity;
 
         // Client-restricted users can only delete language-resources, that are associated only to "their" customers

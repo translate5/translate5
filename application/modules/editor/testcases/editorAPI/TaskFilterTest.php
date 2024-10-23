@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
@@ -41,10 +42,10 @@ class TaskFilterTest extends ImportTestAbstract
         $config
             ->addTask('en', 'de', -1, 'simple-en-de.zip')
             ->setUsageMode('simultaneous')
-            ->addUser('testlector', 'open', 'reviewing', [
+            ->addUser(TestUser::TestLector->value, 'open', 'reviewing', [
                 'deadlineDate' => date("Y-m-d 00:00:00", strtotime("+1 day")),
             ])
-            ->addUser('testtranslator', 'waiting', 'translation', [
+            ->addUser(TestUser::TestTranslator->value, 'waiting', 'translation', [
                 'deadlineDate' => date("Y-m-d 00:00:00", strtotime("+2 day")),
             ])
             ->setProperty('taskName', static::NAME_PREFIX . 'TaskFilterTest'); // TODO FIXME: we better generate data independent from resource-names ...

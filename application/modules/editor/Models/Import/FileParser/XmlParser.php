@@ -279,9 +279,10 @@ class editor_Models_Import_FileParser_XmlParser
         for ($i = 0; $i < $length; $i++) {
             $idx = $index + $i;
             if (! is_string($replacement) && is_callable($replacement)) {
-                $replacement = call_user_func($replacement, $idx, $this->xmlChunks[$idx]);
+                $this->xmlChunks[$idx] = call_user_func($replacement, $idx, $this->xmlChunks[$idx]);
+            } else {
+                $this->xmlChunks[$idx] = $replacement;
             }
-            $this->xmlChunks[$idx] = $replacement;
         }
     }
 

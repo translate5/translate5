@@ -71,7 +71,7 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
         state.replaceTab && me.down('#replaceTab').form.setValues(state.replaceTab);
 
         //the search fields of replace and search are on a magical way in sync, so we just set one here
-        if(search && state.searchValue) {
+        if(search && state.searchValue && ctrl.searchReplaceOpenedAtLeastOnce) {
             search.setValue(state.searchValue);
         }
         //the searchInField is calculated, depending on how the search is started. 

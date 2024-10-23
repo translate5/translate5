@@ -186,15 +186,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         action: 'edit',
                         iconCls: 'ico-tm-edit',
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return record.get('status') === 'novalidlicense' ? true : false;
+                            return record.get('status') === 'novalidlicense';
                         }
                     },{
                         tooltip: me.strings.erase,
                         action: 'delete',
                         iconCls: 'ico-tm-delete',
-                        hidden: canNotDeleteLangresource,
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return record.get('status') === 'novalidlicense' ? true : false;
+                            item.hidden = canNotDeleteLangresource || !record.get('deletable');
+                            return record.get('status') === 'novalidlicense';
                         }
                     },{
                         tooltip: me.strings.tasks,

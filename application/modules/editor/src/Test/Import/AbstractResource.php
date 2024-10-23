@@ -33,7 +33,7 @@ use MittagQI\Translate5\Test\Api\Helper;
 /**
  * General base-Class for all resources
  */
-abstract class Resource
+abstract class AbstractResource
 {
     protected string $_name;
 
@@ -133,8 +133,6 @@ abstract class Resource
                 $error .= ' [ ' . $result->error . ' ]';
             }
             $api->getTest()::fail($error);
-
-            return false;
         }
         $this->applyResult($result);
 
@@ -146,7 +144,7 @@ abstract class Resource
      * @return $this
      * @throws Exception
      */
-    public function setProperty(string $name, $val): Resource
+    public function setProperty(string $name, $val): AbstractResource
     {
         if (str_starts_with($name, '_')) {
             throw new Exception('Resource::setProperty: you can not set internal vars');
@@ -172,7 +170,7 @@ abstract class Resource
      * @return $this
      * @throws Exception
      */
-    public function addProperty(string $name, $val): Resource
+    public function addProperty(string $name, $val): AbstractResource
     {
         if (str_starts_with($name, '_')) {
             throw new Exception('Resource::addProperty: you can not add internal vars');
@@ -229,9 +227,6 @@ abstract class Resource
         return $this->_index;
     }
 
-    /**
-     * @return int
-     */
     public function getInternalName(): string
     {
         return $this->_name;
@@ -258,13 +253,11 @@ abstract class Resource
 
     /**
      * Imports the resource in the setup-phase of the test
-     * @return mixed
      */
     abstract public function import(Helper $api, Config $config): void;
 
     /**
      * Removes the imported resources in the teardown-phase of the test
-     * @return mixed
      */
     abstract public function cleanup(Helper $api, Config $config): void;
 }

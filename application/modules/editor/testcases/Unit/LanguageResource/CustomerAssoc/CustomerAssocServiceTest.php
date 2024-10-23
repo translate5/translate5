@@ -58,10 +58,39 @@ class CustomerAssocServiceTest extends TestCase
             $languageResourceRepository,
         );
 
+        $calledMethod = null;
+
         $assoc = $this->createMock(Association::class);
-        $assoc->method('__call')->willReturnMap([
-            ['getCustomerId', [], 1],
-        ]);
+        $assoc->method('__call')
+            ->with(
+                self::callback(function ($value) use (&$calledMethod) {
+                    $calledMethod = $value;
+
+                    if ($value === 'getCustomerId') {
+                        return true;
+                    }
+
+                    return in_array($value, [
+                        'setUseAsDefault',
+                        'setWriteAsDefault',
+                        'setPivotAsDefault',
+                    ]);
+                }),
+                self::callback(function ($value) use (&$calledMethod) {
+                    if ($calledMethod === 'getCustomerId') {
+                        return true;
+                    }
+
+                    if ('setUseAsDefault' === $calledMethod) {
+                        return $value[0];
+                    }
+
+                    return ! $value[0];
+                }),
+            )
+            ->willReturnMap([
+                ['getCustomerId', [], 1],
+            ]);
 
         $assocToDelete = $this->createMock(Association::class);
         $assocToDelete->method('__call')->willReturnMap([
@@ -79,18 +108,27 @@ class CustomerAssocServiceTest extends TestCase
 
         $languageResourceRepository->method('get')->willReturn($lr);
 
-        $newAssoc = new Association();
-        $newAssoc->setLanguageResourceId((int) $lr->getId());
-        $newAssoc->setLanguageResourceServiceName($lr->getServiceName());
-        $newAssoc->setCustomerId(3);
-        $newAssoc->setUseAsDefault(true);
-        $newAssoc->setWriteAsDefault(true);
-        $newAssoc->setPivotAsDefault(true);
+        $newCustomerId = 3;
 
         $assocRepository
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('save')
-            ->with($newAssoc);
+            ->with(
+                self::callback(function (Association $value) use ($assoc, $lr, $newCustomerId) {
+                    if ($value === $assoc) {
+                        return true;
+                    }
+
+                    self::assertSame($lr->getId(), $value->getLanguageResourceId(), 'languageResourceId');
+                    self::assertSame($lr->getServiceName(), $value->getLanguageResourceServiceName(), 'languageResourceServiceName');
+                    self::assertSame($newCustomerId, $value->getCustomerId(), 'customerId');
+                    self::assertTrue((bool) $value->getUseAsDefault(), 'useAsDefault');
+                    self::assertTrue((bool) $value->getWriteAsDefault(), 'writeAsDefault');
+                    self::assertTrue((bool) $value->getPivotAsDefault(), 'pivotAsDefault');
+
+                    return true;
+                })
+            );
 
         $i = 0;
         $eventDispatcher
@@ -111,16 +149,17 @@ class CustomerAssocServiceTest extends TestCase
             1,
             [
                 (int) $assoc->getCustomerId(),
-                (int) $newAssoc->getCustomerId(),
+                $newCustomerId,
             ],
             [
-                (int) $newAssoc->getCustomerId(),
+                (int) $assoc->getCustomerId(),
+                $newCustomerId,
             ],
             [
-                (int) $newAssoc->getCustomerId(),
+                $newCustomerId,
             ],
             [
-                (int) $newAssoc->getCustomerId(),
+                $newCustomerId,
             ]
         );
 

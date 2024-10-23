@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
@@ -94,7 +95,7 @@ class Translate3303Test extends JsonTestAbstract
      */
     public function testExport()
     {
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         $task = static::getTask();
 
         //start task export

@@ -78,8 +78,8 @@ class Namespaces extends AbstractNamespace
     protected function call(
         string $function,
         array $arguments,
-        array|bool|null $default = null
-    ): ContentConverter|array|bool|null {
+        array|bool|null|string $default = null
+    ): ContentConverter|array|bool|null|string {
         //it is slightly unusual that a XLF file has multiple namespaces, but still it can happen
         // we handle it, that if an empty result is produced, we proceed with the next namespace
         foreach ($this->namespaces as $namespace) {
@@ -120,5 +120,10 @@ class Namespaces extends AbstractNamespace
     {
         //return the contentconverter given by namespace, or if none the default one
         return $this->call(__FUNCTION__, func_get_args()) ?? parent::getContentConverter($task, $filename);
+    }
+
+    public function preProcessFile(string $xml): string
+    {
+        return $this->call(__FUNCTION__, func_get_args(), $xml);
     }
 }

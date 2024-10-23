@@ -51,8 +51,6 @@ class Translate2149Test extends JsonTestAbstract
         'import.xlf.ignoreFramingTags' => 'paired',
     ];
 
-    // protected static string $setupUserLogin = 'testlector';
-
     protected static function setupImport(Config $config): void
     {
         $config

@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**+
@@ -170,7 +171,7 @@ class Translate2717Test extends JsonTestAbstract
 
     private function addUserDefaults(array $data)
     {
-        $user = self::assertLogin('testmanager');
+        $user = self::assertLogin(TestUser::TestManager->value);
         $newData = array_merge([
             "customerId" => self::$sourceCustomerId,
             "deadlineDate" => 1,
@@ -192,7 +193,7 @@ class Translate2717Test extends JsonTestAbstract
      */
     public static function afterTests(): void
     {
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         static::api()->delete('editor/customer/' . self::$sourceCustomerId);
         static::api()->delete('editor/customer/' . self::$targetCustomerId);
     }

@@ -6,6 +6,7 @@ use PhpCsFixer\Fixer\Import\NoUnusedImportsFixer;
 use PhpCsFixer\Fixer\Whitespace\ArrayIndentationFixer;
 use PhpCsFixer\Fixer\Whitespace\BlankLineBeforeStatementFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
+use Translate5\PHPCodeSniffer\EnumPascalCaseFixer;
 
 return ECSConfig::configure()
     ->withPaths([
@@ -19,6 +20,7 @@ return ECSConfig::configure()
         NoUnusedImportsFixer::class,
         ArrayIndentationFixer::class,
         BlankLineBeforeStatementFixer::class,
+        EnumPascalCaseFixer::class,
     ])
 
     // add sets - group of rules

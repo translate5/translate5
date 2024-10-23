@@ -75,6 +75,7 @@ class CustomerAssocService
             $customers = [];
         }
 
+        /** @var array<int, Association> $associatedCustomers */
         $associatedCustomers = [];
 
         foreach ($this->assocRepository->getByLanguageResource($formValues->languageResourceId) as $association) {
@@ -84,19 +85,33 @@ class CustomerAssocService
                 continue;
             }
 
-            $associatedCustomers[] = (int) $association->getCustomerId();
+            $associatedCustomers[(int) $association->getCustomerId()] = $association;
         }
 
         foreach ($customers as $customerId) {
-            if (! in_array($customerId, $associatedCustomers)) {
-                $this->associate(
-                    $formValues->languageResourceId,
-                    $customerId,
-                    in_array($customerId, $formValues->useAsDefaultCustomers),
-                    in_array($customerId, $formValues->writeAsDefaultCustomers),
-                    in_array($customerId, $formValues->pivotAsDefaultCustomers)
-                );
+            $useAsDefault = in_array($customerId, $formValues->useAsDefaultCustomers);
+            $writeAsDefault = in_array($customerId, $formValues->writeAsDefaultCustomers);
+            $pivotAsDefault = in_array($customerId, $formValues->pivotAsDefaultCustomers);
+
+            if (isset($associatedCustomers[$customerId])) {
+                $association = $associatedCustomers[$customerId];
+
+                $association->setUseAsDefault($useAsDefault);
+                $association->setWriteAsDefault($writeAsDefault);
+                $association->setPivotAsDefault($pivotAsDefault);
+
+                $this->assocRepository->save($association);
+
+                continue;
             }
+
+            $this->associate(
+                $formValues->languageResourceId,
+                $customerId,
+                $useAsDefault,
+                $writeAsDefault,
+                $pivotAsDefault,
+            );
         }
     }
 

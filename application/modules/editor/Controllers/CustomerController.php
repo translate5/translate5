@@ -31,6 +31,7 @@ use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInt
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\CustomerService;
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Repository\UserRepository;
 
 class Editor_CustomerController extends ZfExtended_RestController
@@ -279,7 +280,7 @@ class Editor_CustomerController extends ZfExtended_RestController
      */
     protected function setupTextExportResourcesLogData(int $customerId = null)
     {
-        $allowed = ['testmanager', 'testapiuser'];
+        $allowed = [TestUser::TestManager->value, TestUser::TestApiUser->value];
         if (! in_array(ZfExtended_Authentication::getInstance()->getLogin(), $allowed)) {
             throw new ZfExtended_Models_Entity_NoAccessException('The current user is not alowed to use the resources log export data.');
         }

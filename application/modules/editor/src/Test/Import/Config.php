@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Test\Import;
 
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\Enums\TestUser;
 
 /**
  * Holds all tasks/resources to import, processes them and exposes the results of the requests
@@ -59,7 +60,7 @@ final class Config
     private array $termCollections = [];
 
     /**
-     * @var resource[]
+     * @var AbstractResource[]
      */
     private array $otherResources = [];
 
@@ -130,7 +131,7 @@ final class Config
     /**
      * Helper to cleanup a resource. Will catch any exceptions and collects them as we want to cleanup as much as possible
      */
-    private function cleanupResource(Resource $resource, array &$errors)
+    private function cleanupResource(AbstractResource $resource, array &$errors)
     {
         if ($resource->wasImported()) {
             try {
@@ -207,8 +208,10 @@ final class Config
      * @param array|int $customerIds
      * @throws Exception
      */
-    public function addTermCollection(string $tbxFile, $customerIds, string $userlogin = 'testtermproposer', bool $mergeTerms = true): TermCollection
+    public function addTermCollection(string $tbxFile, $customerIds, string $userlogin = null, bool $mergeTerms = true): TermCollection
     {
+        $userlogin = $userlogin ?? TestUser::TestTermProposer->value;
+
         $next = count($this->termCollections);
         $termCollection = new TermCollection($this->testClass, $next, $tbxFile, $userlogin);
         $termCollection->setProperty('customerIds', $customerIds);
@@ -312,14 +315,14 @@ final class Config
 
     public function hasTestlectorLogin(): bool
     {
-        return $this->login === 'testlector';
+        return $this->login === TestUser::TestLector->value;
     }
 
     /**
      * Can be used to add resources after the setup-phase of an test
      * Resources imported this way will be cleaned up automatically nevertheless
      */
-    public function import(Resource $resource)
+    public function import(AbstractResource $resource)
     {
         $resource->import($this->api, $this);
     }

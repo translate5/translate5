@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\ApiTestAbstract;
+use MittagQI\Translate5\Test\Enums\TestUser;
 
 class Translate3013Test extends ApiTestAbstract
 {
@@ -54,7 +55,7 @@ class Translate3013Test extends ApiTestAbstract
     /**
      * We need the termproposer to be logged in for the test
      */
-    protected static string $setupUserLogin = 'testtermproposer';
+    protected static TestUser $setupUserLogin = TestUser::TestTermProposer;
 
     /***
      * Test [collectionId <=> dataTypeId] mappings behaviour and influence on interaction with TermCollections and TermPortal
@@ -310,7 +311,7 @@ class Translate3013Test extends ApiTestAbstract
      */
     public static function afterTests(): void
     {
-        static::api()->login('testtermproposer');
+        static::api()->login(TestUser::TestTermProposer->value);
         static::api()->delete('editor/termcollection/' . self::$collection1Id);
         static::api()->delete('editor/termcollection/' . self::$collection2Id);
     }

@@ -91,14 +91,14 @@ class editor_Models_Segment_EditablesFinder
      *
      * @return null|integer
      */
-    public function find(bool $next, array $autoStateIds = null)
+    public function find(bool $next, string $workflowStep = '')
     {
         $outerSql = $this->getOuterSql();
         //for the inner sort we have to swap the direction for the prev filter
         if (! $next) {
             $this->filterInner->swapSortDirection();
         }
-        $this->prepareInnerFilter($autoStateIds);
+        $this->prepareInnerFilter($workflowStep);
         $innerSql = $this->getInnerSql();
 
         foreach ($this->sortParameter as $sort) {
@@ -255,15 +255,15 @@ class editor_Models_Segment_EditablesFinder
     }
 
     /**
-     * prepares the inner filter: adds the filterung condition for only editable and if provided the filter for specific autostates
+     * prepares the inner filter: adds the filtering condition for only editable and if provided the filter for specific workflowStep
      */
-    protected function prepareInnerFilter(array $autoStateIds = null)
+    protected function prepareInnerFilter(string $workflowStep = '')
     {
-        if (! empty($autoStateIds)) {
+        if (! empty($workflowStep)) {
             $this->filterInner->addFilter((object) [
-                'field' => 'autoStateId',
+                'field' => 'workflowStep',
                 'type' => 'notInList',
-                'value' => $autoStateIds,
+                'value' => [$workflowStep],
             ]);
         }
         $editableFilter = null;

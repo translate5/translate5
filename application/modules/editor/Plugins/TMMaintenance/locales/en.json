@@ -73,7 +73,7 @@
     "totalAmount": "Total found segments: ",
     "calculating": "calculating...",
     "loadingSegmentPlaceholder": "Loading...",
-    "loadingSegmentNumber": "loading segment #",
+    "loadingSegmentNumber": "Loading segment #",
     "saving": "Saving. Please wait a while.",
     "columns": {
       "sourceText": "Source text",

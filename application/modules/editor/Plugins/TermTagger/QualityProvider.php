@@ -114,6 +114,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
             return;
         }
         // in case of an import and no terminology is applied, there needs to be no workers, nothing to do ...
+        // if its not in import and no terminology flag: then the tag remover is scheduled
         if ($processingMode === editor_Segment_Processing::IMPORT && ! $task->getTerminologie()) {
             return;
         }

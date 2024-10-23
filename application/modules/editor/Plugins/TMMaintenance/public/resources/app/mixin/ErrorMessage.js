@@ -36,6 +36,12 @@ Ext.define('TMMaintenance.mixin.ErrorMessage', {
             errorMessage = l10n.error.couldNotProcessRequest + '<br>' + errorMessage;
         }
 
+        const info = Editor.userLogin;
+
+        errorMessage += '<br>' +
+            '<p style="font-size: 10px;color: #808080;font-style: italic;user-select: text;">'
+            + info + ' ' + Ext.Date.format(new Date(), 'Y-m-d H:i:sO') + '</p>'
+
         return errorMessage;
     },
 
