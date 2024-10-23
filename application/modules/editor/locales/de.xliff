@@ -10017,6 +10017,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</source>
                 <target>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</target>
             </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gZsO8ciBkaWVzZW4gQmVudXR6ZXIga2VpbmUge1JvbGxlbn0gZmVzdGxlZ2VuLg=='>
+                <source>Sie können für diesen Benutzer keine {Rollen} festlegen.</source>
+                <target>Sie können für diesen Benutzer keine {Rollen} festlegen.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -10195,6 +10195,10 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</source>
                 <target>The assigned user can only be changed for LSP job</target>
             </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gZsO8ciBkaWVzZW4gQmVudXR6ZXIga2VpbmUge1JvbGxlbn0gZmVzdGxlZ2VuLg=='>
+                <source>Sie können für diesen Benutzer keine {Rollen} festlegen.</source>
+                <target>You cannot set {roles} for this user.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

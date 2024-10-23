@@ -99,10 +99,10 @@ class UpdateUserDtoFactory
         $this->rolesValidator->assertUserCanSetRoles($authUser, $roles);
 
         return new UpdateUserDto(
-            $data['login'],
-            $data['email'],
-            $data['firstName'],
-            $data['surName'],
+            $data['login'] ?? null,
+            $data['email'] ?? null,
+            $data['firstName'] ?? null,
+            $data['surName'] ?? null,
             $data['gender'] ?? ZfExtended_Models_User::GENDER_NONE,
             $roles,
             $customerIds,

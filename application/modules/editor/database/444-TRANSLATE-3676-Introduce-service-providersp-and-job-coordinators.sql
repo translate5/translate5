@@ -28,12 +28,12 @@
 DELETE FROM Zf_acl_rules
 WHERE `resource` = 'auto_set_role'
   AND `role` = 'admin'
-  AND `right` IN ('TMMaintenance', 'termPM');
+  AND `right` IN ('TMMaintenance', 'termPM', 'instantTranslate', 'termCustomerSearch', 'termFinalizer', 'termProposer', 'termReviewer');
 
 DELETE FROM Zf_acl_rules
 WHERE `resource` = 'auto_set_role'
   AND `role` = 'systemadmin'
-  AND `right` IN ('TMMaintenance', 'termPM');
+  AND `right` IN ('TMMaintenance', 'termPM', 'instantTranslate', 'termCustomerSearch', 'termFinalizer', 'termProposer', 'termReviewer');
 
 DELETE FROM Zf_acl_rules
 WHERE `resource` = 'auto_set_role'

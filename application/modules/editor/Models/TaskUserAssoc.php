@@ -101,12 +101,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
 
     public function isLspJob(): bool
     {
-        return TypeEnum::LSP === $this->getType();
+        return TypeEnum::Lsp === $this->getType();
     }
 
     public function isLspUserJob(): bool
     {
-        return TypeEnum::LSP !== $this->getType() && ! empty($this->getLspJobId());
+        return TypeEnum::Lsp !== $this->getType() && ! empty($this->getLspJobId());
     }
 
     /***

@@ -70,7 +70,7 @@ class HasUnDeletableUserJobAssert implements FeasibilityAssertInterface
     {
         try {
             foreach ($this->userJobRepository->getUserJobsByLspJob($object) as $job) {
-                if (TypeEnum::LSP === $job->type) {
+                if (TypeEnum::Lsp === $job->type) {
                     continue;
                 }
 

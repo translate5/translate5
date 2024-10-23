@@ -127,7 +127,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
      */
     public function resolveLspJob(LspUser $lspUser, NewUserJobDto $dto): LspJobAssociation
     {
-        if (TypeEnum::LSP === $dto->type) {
+        if (TypeEnum::Lsp === $dto->type) {
             try {
                 JobCoordinator::fromLspUser($lspUser);
             } catch (CantCreateCoordinatorFromUserException) {
@@ -162,7 +162,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
      */
     private function validateLspUserJob(LspJobAssociation $lspJob, NewUserJobDto $dto): void
     {
-        if (TypeEnum::LSP === $dto->type) {
+        if (TypeEnum::Lsp === $dto->type) {
             return;
         }
 

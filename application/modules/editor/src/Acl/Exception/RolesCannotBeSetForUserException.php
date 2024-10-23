@@ -28,28 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Contract;
+namespace MittagQI\Translate5\Acl\Exception;
 
-use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
-use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
-use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
-use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
-use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
-use MittagQI\Translate5\User\Model\User;
-use Zend_Acl_Exception;
-use ZfExtended_ValidateException;
+use InvalidArgumentException;
 
-interface UserSetRolesOperationInterface
+class RolesCannotBeSetForUserException extends InvalidArgumentException implements ConflictingRolesExceptionInterface
 {
     /**
      * @param string[] $roles
-     * @throws RolesetHasConflictingRolesException
-     * @throws RoleConflictWithRoleThatPopulatedToRolesetException
-     * @throws UserIsNotAuthorisedToAssignRoleException
-     * @throws ConflictingRolesExceptionInterface
-     * @throws RolesCannotBeSetForUserException
-     * @throws Zend_Acl_Exception
-     * @throws ZfExtended_ValidateException
      */
-    public function setRoles(User $user, array $roles): void;
+    public function __construct(
+        public readonly array $roles,
+    ) {
+        parent::__construct();
+    }
 }

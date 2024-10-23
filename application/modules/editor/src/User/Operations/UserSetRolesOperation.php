@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
+use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
@@ -64,6 +65,7 @@ final class UserSetRolesOperation implements UserSetRolesOperationInterface
     /**
      * @param string[] $roles
      * @throws ConflictingRolesExceptionInterface
+     * @throws RolesCannotBeSetForUserException
      * @throws Zend_Acl_Exception
      * @throws ZfExtended_ValidateException
      */
@@ -72,6 +74,8 @@ final class UserSetRolesOperation implements UserSetRolesOperationInterface
         $this->rolesValidator->assertRolesDontConflict($roles);
 
         $roles = $this->roles->expandListWithAutoRoles($roles, []);
+
+        $this->rolesValidator->assertRolesCanBeSetForUser($roles, $user);
 
         $user->setRoles($roles);
 

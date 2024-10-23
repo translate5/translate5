@@ -25,7 +25,7 @@
 
 CREATE TABLE `LEK_language_service_provider` (
     `id` int (11) NOT NULL AUTO_INCREMENT,
-    `parentId` int (11) DEFAULT NULL COMMENT 'Foreign Key to LEK_language_service_provider',
+    `parentId` int (11) DEFAULT NULL,
     `name` varchar(255) NOT NULL,
     `description` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`),
@@ -34,8 +34,8 @@ CREATE TABLE `LEK_language_service_provider` (
 
 CREATE TABLE `LEK_language_service_provider_customer` (
     `id` int (11) NOT NULL AUTO_INCREMENT,
-    `lspId` int (11) DEFAULT NULL COMMENT 'Foreign Key to LEK_language_service_provider',
-    `customerId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
+    `lspId` int (11) DEFAULT NULL,
+    `customerId` int (11) NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE CASCADE,
     CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
@@ -44,13 +44,27 @@ CREATE TABLE `LEK_language_service_provider_customer` (
 CREATE TABLE `LEK_language_service_provider_user` (
     `id` int (11) NOT NULL AUTO_INCREMENT,
     `guid` varchar(38) NOT NULL,
-    `lspId` int (11) DEFAULT NULL COMMENT 'Foreign Key to LEK_language_service_provider',
-    `userId` int (11) NOT NULL COMMENT 'Foreign Key to Zf_users',
+    `lspId` int (11) DEFAULT NULL,
+    `userId` int (11) NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT,
     CONSTRAINT FOREIGN KEY (`userId`) REFERENCES `Zf_users` (`id`) ON DELETE CASCADE,
     UNIQUE (`userId`)
 );
 
-ALTER TABLE `LEK_taskUserAssoc` ADD `type` TINYINT DEFAULT 1 NOT NULL;
+CREATE TABLE `LEK_lsp_job_association` (
+    `id` int (11) NOT NULL AUTO_INCREMENT,
+    `taskGuid` varchar(38) NOT NULL,
+    `lspId` int (11) DEFAULT NULL,
+    `workflow` int (128) NOT NULL,
+    `workflowStepName` int (128) NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT,
+    CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
+    UNIQUE (`taskGuid`, `lspId`, `workflow`, `workflowStepName`)
+);
 
+ALTER TABLE `LEK_taskUserAssoc`
+    ADD `type` TINYINT DEFAULT 1 NOT NULL,
+    ADD `lspJobId` INT (11) DEFAULT NULL,
+    ADD CONSTRAINT FOREIGN KEY (`lspJobId`) REFERENCES `LEK_lsp_job_association` (`id`) ON DELETE RESTRICT;

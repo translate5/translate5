@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Acl\Exception\ClientRestrictedAndNotRolesProvidedTogetherException;
 use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
+use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
 use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
@@ -103,6 +104,7 @@ class Editor_UserController extends ZfExtended_RestController
             'E1094' => 'User can not be saved: the chosen login does already exist.',
             'E1095' => 'User can not be saved: the chosen userGuid does already exist.',
             'E1631' => 'Role "Job Coordinator" can be set only on User creation process or to LSP User',
+            'E1635' => 'You cannot set {roles} for this user.',
         ], 'editor.user');
 
         ZfExtended_Models_Entity_Conflict::addCodes([
@@ -316,6 +318,17 @@ class Editor_UserController extends ZfExtended_RestController
         }
 
         return match ($e::class) {
+            RolesCannotBeSetForUserException::class => UnprocessableEntity::createResponse(
+                'E1635',
+                [
+                    'roles' => [
+                        'Sie können für diesen Benutzer keine {Rollen} festlegen.',
+                    ],
+                ],
+                [
+                    'roles' => implode(', ', $e->roles),
+                ]
+            ),
             RolesetHasConflictingRolesException::class => UnprocessableEntity::createResponse(
                 'E1630',
                 [

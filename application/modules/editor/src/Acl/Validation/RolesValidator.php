@@ -33,8 +33,11 @@ namespace MittagQI\Translate5\Acl\Validation;
 use MittagQI\Translate5\Acl\Exception\ClientRestrictedAndNotRolesProvidedTogetherException;
 use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
+use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
 use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
@@ -47,6 +50,7 @@ class RolesValidator
     public function __construct(
         private readonly ZfExtended_Acl $acl,
         private readonly Roles $roles,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
     ) {
     }
 
@@ -58,6 +62,7 @@ class RolesValidator
         return new self(
             ZfExtended_Acl::getInstance(),
             Roles::create(),
+            LspUserRepository::create(),
         );
     }
 
@@ -75,6 +80,16 @@ class RolesValidator
             if (! in_array($role, $user->getRoles(), true)) {
                 throw new UserIsNotAuthorisedToAssignRoleException($role);
             }
+        }
+    }
+
+    public function assertRolesCanBeSetForUser(array $roles, User $user): void
+    {
+        $lspUser = $this->lspUserRepository->findByUser($user);
+        $providedAdminRoles = array_intersect($roles, Roles::getAdminRoles());
+
+        if ($lspUser !== null && ! empty($providedAdminRoles)) {
+            throw new RolesCannotBeSetForUserException($providedAdminRoles);
         }
     }
 

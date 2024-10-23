@@ -134,7 +134,7 @@ class UserJobRepository
         $select = $this->db
             ->select()
             ->from($job->db->info($job->db::NAME))
-            ->where('type = ?', TypeEnum::LSP->value)
+            ->where('type = ?', TypeEnum::Lsp->value)
             ->where('lspJobId = ?', $lspJob->getId());
 
         $job->init(
