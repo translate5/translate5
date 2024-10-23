@@ -56,6 +56,15 @@ class UserRepository
         return $user;
     }
 
+    public function find(int $id): ?User
+    {
+        try {
+            return $this->get($id);
+        } catch (InexistentUserException) {
+            return null;
+        }
+    }
+
     /**
      * @throws InexistentUserException
      */

@@ -227,13 +227,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                                 tag: 'div',
                                                 'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
                                             },
-                                            items: [
-                                                this.createRoleFieldSet('General roles', 'general', Editor.data.app.groupedRoles.general),
-                                                this.createRoleFieldSet('Admin roles', 'admins', Editor.data.app.groupedRoles.admins),
-                                                this.createRoleFieldSet('Not client restricted roles', 'managers', Editor.data.app.groupedRoles.managers),
-                                                this.createRoleFieldSet('Client restricted roles', 'clientRestricted', Editor.data.app.groupedRoles.clientRestricted),
-                                                this.createRoleFieldSet(me.strings.clientPmSubRoles, 'clientPmSubRoles', Editor.data.app.groupedRoles.clientPmSubRoles, true),
-                                            ],
+                                            items: this.getRoleGroupSets(),
                                         },
                                         {
                                             xtype: 'Editor.combobox',
@@ -400,6 +394,26 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         return me.callParent([config]);
     },
 
+    getRoleGroupSets: function () {
+        let sets = [];
+        const groupedRoles = Editor.data.app.groupedRoles;
+
+        sets.push(this.createRoleFieldSet('General roles', 'general', groupedRoles.general));
+
+        if (groupedRoles.hasOwnProperty('admins')) {
+            sets.push(this.createRoleFieldSet('Admin roles', 'admins', groupedRoles.admins));
+        }
+
+        if (groupedRoles.hasOwnProperty('managers')) {
+            sets.push(this.createRoleFieldSet('Not client restricted roles', 'managers', groupedRoles.managers));
+        }
+
+        sets.push(this.createRoleFieldSet('Client restricted roles', 'clientRestricted', groupedRoles.clientRestricted));
+        sets.push(this.createRoleFieldSet(this.strings.clientPmSubRoles, 'clientPmSubRoles', groupedRoles.clientPmSubRoles, true));
+
+        return sets;
+    },
+
     createRoleFieldSet: function (title, groupType, roles, hidden = false) {
         const userWindow = this;
         let items = [];
@@ -464,15 +478,15 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         }
 
         if (this.hasRoleFromGroup(roles, ['clientRestricted'])) {
-            adminGroup.setHidden(true);
-            adminGroup.down('checkboxgroup').reset();
-            managersGroup.setHidden(true);
-            managersGroup.down('checkboxgroup').reset();
+            adminGroup?.setHidden(true);
+            adminGroup?.down('checkboxgroup').reset();
+            managersGroup?.setHidden(true);
+            managersGroup?.down('checkboxgroup').reset();
 
             this.toggleRequirementOfCustomersField(form, true);
         } else {
-            adminGroup.setHidden(false);
-            managersGroup.setHidden(false);
+            adminGroup?.setHidden(false);
+            managersGroup?.setHidden(false);
 
             this.toggleRequirementOfCustomersField(form, false);
         }
@@ -508,19 +522,22 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         lspField.allowBlank = true;
         lspField.setDisabled(true);
         lspField.forceSelection = false;
-        lspField.setValue(null);
     },
 
     hasRoleFromGroup: function (selectedRoles, groups) {
-        return groups.some(function (group) {
-            return selectedRoles.some(function (role) {
-                if (! Editor.data.app.groupedRoles.hasOwnProperty(group)) {
-                    return false;
-                }
+        return groups.some(
+            group => selectedRoles.some(
+                role => this.isRoleFromGroup(role, group)
+            )
+        );
+    },
 
-                return Editor.data.app.groupedRoles[group].some(node => node.role === role);
-            });
-        });
+    isRoleFromGroup: function (role, group) {
+        if (! Editor.data.app.groupedRoles.hasOwnProperty(group)) {
+            return false;
+        }
+
+        return Editor.data.app.groupedRoles[group].some(node => node.role === role);
     },
 
     onLspChange: function (fld, newValue) {
@@ -541,7 +558,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
 
     /**
      * loads the record into the form, does set the role checkboxes according to the roles value
-     * @param record
+     * @param {Editor.model.admin.User} record
      */
     loadRecord: function (record) {
         var me = this,
@@ -551,13 +568,18 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         form.loadRecord(record);
 
         me.query('#rolesGroup checkbox').forEach(function (box) {
+            const
+                isAdminRole = me.isRoleFromGroup(box.initialConfig.value, 'admins'),
+                isManagerRole = me.isRoleFromGroup(box.initialConfig.value, 'managers'),
+                disabled = (record.isLspUser() && (isAdminRole || isManagerRole)) || (record.isClientRestricted() && isManagerRole);
             let boxInitValue = box.initialConfig.value;
             box.setValue(roles.includes(boxInitValue));
+            box.setDisabled(disabled);
         });
 
-        this.toggleRoleGroupsVisibility(form, roles);
+        me.toggleRoleGroupsVisibility(form, roles);
 
-        this.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
+        me.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
 
         const lspField = form.down('#lsp');
         const lspStore = lspField.getStore();
@@ -574,7 +596,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 lspField.setHidden(! lsp);
 
                 if (lsp) {
-                    this.updateCustomerField(form, lsp.get('customers'));
+                    me.updateCustomerField(form, lsp.get('customers'));
                 }
             }
         });

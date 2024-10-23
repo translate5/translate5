@@ -110,19 +110,6 @@ Ext.define('Editor.model.admin.User', {
         }
         return roles;
     },
-    /**
-     * Retrieves the clientPM's subroles
-     * @return {Array}
-     */
-    getClientPmSubRoles: function() {
-        var roles = [];
-        for (const role of this.self.getRoles(this)) {
-            if(role.startsWith('clientpm_')){
-                roles.push(role);
-            }
-        }
-        return roles;
-    },
   /**
    * @param role {String}
    * @return {Boolean}
@@ -245,5 +232,12 @@ Ext.define('Editor.model.admin.User', {
      */
     getRestrictedClientIds: function(){
         return Editor.util.Util.integerizeArray(Editor.data.app.user.restrictedClientIds);
+    },
+
+    /**
+     * @returns {Boolean}
+     */
+    isLspUser: function() {
+        return this.get('lsp') > 0;
     }
 });

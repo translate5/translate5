@@ -64,6 +64,6 @@ class User extends \ZfExtended_Models_User
 
     public function isClientRestricted(): bool
     {
-        return Roles::isClientRestricted($this->getRoles());
+        return ! $this->isAdmin() && Roles::isClientRestricted($this->getRoles());
     }
 }
