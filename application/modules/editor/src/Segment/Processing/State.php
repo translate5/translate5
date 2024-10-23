@@ -33,9 +33,9 @@ use editor_Models_Task;
 use editor_Segment_Tags;
 use Exception;
 use MittagQI\Translate5\Segment\Db\Processing;
+use MittagQI\Translate5\Segment\Db\ProcessingRow;
 use Zend_Db_Exception;
 use Zend_Db_Select;
-use Zend_Db_Table_Row_Abstract;
 use Zend_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Db_DeadLockHandlerTrait;
@@ -122,6 +122,7 @@ final class State
                 'segmentId' => $segmentId,
             ]);
         }
+        /** @var ProcessingRow $row */
 
         return new State($serviceId, $row);
     }
@@ -132,16 +133,16 @@ final class State
 
     private int $segmentId;
 
-    private ?Zend_Db_Table_Row_Abstract $row;
+    private ?ProcessingRow $row;
 
     /**
      * If instantiated without $row the instance can only be used to save states non-persistent
      * Or to use the API not dealing with our row
      */
-    public function __construct(string $serviceId, Zend_Db_Table_Row_Abstract $row = null)
+    public function __construct(string $serviceId, ProcessingRow $row = null)
     {
         $this->serviceId = $serviceId;
-        $this->segmentId = (is_null($row)) ? -1 : $row->segmentId;
+        $this->segmentId = (is_null($row)) ? -1 : (int) $row->segmentId;
         if (! isset(self::$table)) {
             self::$table = new Processing();
         }
@@ -159,7 +160,7 @@ final class State
     /**
      * Sets a new state for the entry and saves it
      */
-    public function setState(int $newState)
+    public function setState(int $newState): void
     {
         $this->state = $newState;
         if ($this->row !== null) {
@@ -173,9 +174,23 @@ final class State
     }
 
     /**
-     * Sets the state to "processed"
+     * Checks if a state is still globally processing
      */
-    public function setProcessed()
+    public function isProcessing(): bool
+    {
+        if ($this->row !== null) {
+            // important: dirty data will always be seen as "processing" as it means
+            //the rowset somehow was changed but not saved by the processor
+            return $this->row->isDirty() || (int) $this->row->processing === 1;
+        }
+
+        return false;
+    }
+
+    /**
+     * Sets the state to "processed" - what alo ends the internal global "processing" state
+     */
+    public function setProcessed(): void
     {
         $this->setState(self::PROCESSED);
     }
@@ -229,12 +244,12 @@ final class State
     }
 
     /**
-     * Saves JSON back to the tags-model
+     * Saves JSON back to the tags-model and sets the state to processed
      */
     public function saveTagsJson(string $jsonString)
     {
         $this->row->tagsJson = $jsonString;
-        $this->setState(self::PROCESSED); // this also saves the row
+        $this->setProcessed(); // this also saves the row
     }
 
     /**
@@ -275,24 +290,26 @@ final class State
                 ->limit($limit);
 
             try {
-                foreach (self::$table->fetchAll($where) as $row) {
-                    $segmentIds[] = $row->segmentId;
-                    $states[] = new static($this->serviceId, $row);
-                }
-                if (count($segmentIds) > 1) {
+                /** @var ProcessingRow[] $rows */
+                $rows = self::$table->fetchAll($where);
+
+                // to improve db-performance we save multiple segments at once
+                if (count($rows) > 0) {
+                    foreach ($rows as $row) {
+                        $segmentIds[] = $row->segmentId;
+                    }
                     self::$table->update([
                         $column => self::INPROGRESS,
                         'processing' => 1,
                     ], [
                         'segmentId IN (?)' => $segmentIds,
                     ]);
-                } elseif (count($segmentIds) === 1) {
-                    // first row of foreach loop - phpstan does not get that existance of row is certain here
-                    $row->$column = self::INPROGRESS; // @phpstan-ignore-line
-                    $row->processing = 1; // @phpstan-ignore-line - why is phpstan not seeing __get(...) ?
-                    $row->save();
+                    // ugly: to have a up-to-date row we mimic the update stuff for each Zend-row
+                    foreach ($rows as $row) {
+                        $row->mimicStateUpdate($column, self::INPROGRESS);
+                        $states[] = new static($this->serviceId, $row);
+                    }
                 }
-
                 $db->commit();
             } catch (Zend_Db_Exception $e) {
                 $db->rollBack();
