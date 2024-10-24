@@ -574,7 +574,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 isManagerRole = me.isRoleFromGroup(box.initialConfig.value, 'managers'),
                 boxInitValue = box.initialConfig.value,
                 hidden = (record.isLspUser() && (isAdminRole || isManagerRole))
-                    || (! record.isLspUser() && 'jobCoordinator' === boxInitValue)
+                    || (record.get('userGuid').length !== 0 && ! record.isLspUser() && 'jobCoordinator' === boxInitValue)
                     || (record.isLspUser() && 'clientpm' === boxInitValue)
             ;
 
