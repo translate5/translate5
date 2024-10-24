@@ -465,7 +465,8 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         const adminGroup = this.lookupReference('adminsFieldSet'),
             managersGroup = this.lookupReference('managersFieldSet'),
             clientRestrictedGroup = this.lookupReference('clientRestrictedFieldSet'),
-            clientPmSubRolesGroup = this.lookupReference('clientPmSubRolesFieldSet')
+            clientPmSubRolesGroup = this.lookupReference('clientPmSubRolesFieldSet'),
+            isLspUser = form.getRecord().isLspUser()
         ;
 
         if (this.hasRoleFromGroup(roles, ['admins', 'managers'])) {
@@ -477,7 +478,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             clientRestrictedGroup.setHidden(false);
         }
 
-        if (this.hasRoleFromGroup(roles, ['clientRestricted'])) {
+        if (this.hasRoleFromGroup(roles, ['clientRestricted']) || isLspUser) {
             adminGroup?.setHidden(true);
             adminGroup?.down('checkboxgroup').reset();
             managersGroup?.setHidden(true);
@@ -571,10 +572,14 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             const
                 isAdminRole = me.isRoleFromGroup(box.initialConfig.value, 'admins'),
                 isManagerRole = me.isRoleFromGroup(box.initialConfig.value, 'managers'),
-                disabled = (record.isLspUser() && (isAdminRole || isManagerRole)) || (record.isClientRestricted() && isManagerRole);
-            let boxInitValue = box.initialConfig.value;
+                boxInitValue = box.initialConfig.value,
+                hidden = (record.isLspUser() && (isAdminRole || isManagerRole))
+                    || (! record.isLspUser() && 'jobCoordinator' === boxInitValue)
+                    || (record.isLspUser() && 'clientpm' === boxInitValue)
+            ;
+
             box.setValue(roles.includes(boxInitValue));
-            box.setDisabled(disabled);
+            box.setHidden(hidden);
         });
 
         me.toggleRoleGroupsVisibility(form, roles);
