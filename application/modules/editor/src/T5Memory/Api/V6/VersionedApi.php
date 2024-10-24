@@ -42,13 +42,15 @@ use PharIo\Version\VersionConstraintParser;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\StreamInterface;
+use Zend_Config;
 
 class VersionedApi extends AbstractVersionedApi
 {
     public const VERSION = '^0.6';
 
     public function __construct(
-        private ClientInterface $client
+        private ClientInterface $client,
+        private readonly Zend_Config $config
     ) {
     }
 
@@ -101,16 +103,41 @@ class VersionedApi extends AbstractVersionedApi
         int $chunkSize,
         ?string $startFromInternalKey = null,
     ): DownloadTmxChunkResponse {
-        $request = new DownloadTmxChunkRequest($baseUrl, $tmName, $chunkSize, $startFromInternalKey);
-        $response = $this->client->sendRequest($request);
+        $tries = 0;
 
-        $this->throwExceptionOnNotSuccessfulResponse($response, $request);
+        while ($tries < $this->getMaxRequestRetries()) {
+            $tries++;
+            $request = new DownloadTmxChunkRequest($baseUrl, $tmName, $chunkSize, $startFromInternalKey);
+            $response = $this->client->sendRequest($request);
 
-        return DownloadTmxChunkResponse::fromResponse($response, $startFromInternalKey);
+            // Retry on timeout error if not the last retry
+            if ($this->isTimeoutErrorOccurred($response) && $tries !== $this->getMaxRequestRetries()) {
+                sleep($this->getRetryDelaySeconds());
+
+                continue;
+            }
+
+            $this->throwExceptionOnNotSuccessfulResponse($response, $request);
+
+            return DownloadTmxChunkResponse::fromResponse($response, $startFromInternalKey);
+        }
+
+        // This should be never reached
+        throw new \RuntimeException('Failed to fetch TMX chunk');
     }
 
     protected static function supportedVersion(): VersionConstraint
     {
         return (new VersionConstraintParser())->parse(self::VERSION);
+    }
+
+    protected function getMaxRequestRetries(): int
+    {
+        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestMaxRetriesBackground;
+    }
+
+    protected function getRetryDelaySeconds(): int
+    {
+        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestRetryDelaySecondsBackground;
     }
 }

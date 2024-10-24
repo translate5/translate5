@@ -72,6 +72,27 @@ class ConnectorTest extends TestCase
                 'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
+            'Waiting to be loaded' => [
+                'status' => 'waiting for loading',
+                'tmxImportStatus' => null,
+                'importTime' => null,
+                'reorganizeStatus' => null,
+                'expectedResult' => LanguageResourceStatus::WAITING_FOR_LOADING,
+            ],
+            'Loading' => [
+                'status' => 'loading',
+                'tmxImportStatus' => null,
+                'importTime' => null,
+                'reorganizeStatus' => null,
+                'expectedResult' => LanguageResourceStatus::LOADING,
+            ],
+            'Failed to load' => [
+                'status' => 'failed to open',
+                'tmxImportStatus' => null,
+                'importTime' => null,
+                'reorganizeStatus' => null,
+                'expectedResult' => LanguageResourceStatus::FAILED_TO_OPEN,
+            ],
             'Additional file import not finished' => [
                 'status' => "open",
                 'tmxImportStatus' => "available",

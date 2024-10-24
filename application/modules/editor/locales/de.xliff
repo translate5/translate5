@@ -5569,6 +5569,18 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Reorganisation gescheitert</source>
                 <target>Reorganisation gescheitert</target>
             </trans-unit>
+            <trans-unit id='V2FydGV0IGF1ZiBMYWRlbg=='>
+                <source>Wartet auf Laden</source>
+                <target>Waiting for load</target>
+            </trans-unit>
+            <trans-unit id='V2lyZCBnZWxhZGVu'>
+                <source>Wird geladen</source>
+                <target>Loading</target>
+            </trans-unit>
+            <trans-unit id='TGFkZWZlaGxlcg=='>
+                <source>Ladefehler</source>
+                <target>Failed to load</target>
+            </trans-unit>
             <trans-unit id='S29udGluZ2VudCDDvGJlcnNjaHJpdHRlbg=='>
                 <source>Kontingent überschritten</source>
                 <target>Kontingent überschritten</target>
