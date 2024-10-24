@@ -40,5 +40,8 @@ interface UserDeleteOperationInterface
      */
     public function delete(User $user): void;
 
+    /**
+     * @throws FeasibilityExceptionInterface
+     */
     public function forceDelete(User $user): void;
 }

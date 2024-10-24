@@ -9893,6 +9893,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</source>
                 <target>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</target>
             </trans-unit>
+            <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZGEgZXIgSm9iLUtvb3JkaW5hdG9yIHZvbiBlaW5pZ2VuIExTUC1BdWZ0csOkZ2VuIGlzdC4='>
+                <source>Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen LSP-Aufträgen ist.</source>
+                <target>Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen LSP-Aufträgen ist.</target>
+            </trans-unit>
             <trans-unit id='dXNlci52YWxpZGF0aW9uLmVycm9yLmRlbGV0ZV9ub3RpZmlhYmxlX2Nvb3JkaW5hdG9y'>
                 <source>user.validation.error.delete_notifiable_coordinator</source>
                 <target>Der Benutzer kann nicht gelöscht werden, da er derzeit als Jobkoordinator konfiguriert ist, der benachrichtigt wird, wenn dem LSP "{lsp}" ein neuer Job zugewiesen wird.</target>

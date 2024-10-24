@@ -43,8 +43,10 @@ use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
+use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
 use ZfExtended_ValidateException;
 
 class UserUpdateOperation implements UserUpdateOperationInterface
@@ -54,6 +56,7 @@ class UserUpdateOperation implements UserUpdateOperationInterface
         private readonly UserUpdateOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -64,6 +67,7 @@ class UserUpdateOperation implements UserUpdateOperationInterface
             \MittagQI\Translate5\User\Operations\UserUpdateOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            Zend_Registry::get('logger')->cloneMe('user.update'),
         );
     }
 
@@ -79,11 +83,46 @@ class UserUpdateOperation implements UserUpdateOperationInterface
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->permissionAssert->assertGranted(
-            Action::Update,
-            $user,
-            new PermissionAssertContext($authUser)
-        );
+        try {
+            $this->permissionAssert->assertGranted(
+                Action::Update,
+                $user,
+                new PermissionAssertContext($authUser)
+            );
+
+            $this->logger->info(
+                'E1637',
+                'User audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to update User (guid: "%s") by AuthUser (guid: %s) was granted',
+                        $user->getUserGuid(),
+                        $authUser->getUserGuid()
+                    ),
+                    'user' => $user->getUserGuid(),
+                    'authUser' => $authUser->getLogin(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                ]
+            );
+        } catch (PermissionExceptionInterface $e) {
+            $this->logger->info(
+                'E1637',
+                'User audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to update User (guid: "%s") by AuthUser (guid: %s) was not granted',
+                        $user->getUserGuid(),
+                        $authUser->getUserGuid()
+                    ),
+                    'user' => $user->getLogin(),
+                    'authUser' => $authUser->getLogin(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                    'reason' => $e::class,
+                ]
+            );
+
+            throw $e;
+        }
 
         $this->operation->updateUser($user, $dto);
     }

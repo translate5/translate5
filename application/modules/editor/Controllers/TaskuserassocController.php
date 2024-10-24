@@ -76,12 +76,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
      */
     protected $log;
 
-    /**
-     * contains if available the task to the current tua
-     * @var editor_Models_Task
-     */
-    protected $task;
-
     private UserRepository $userRepository;
 
     private TaskRepository $taskRepository;
@@ -93,7 +87,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     public function init()
     {
         parent::init();
-        $this->task = ZfExtended_Factory::get(editor_Models_Task::class);
         $this->log = ZfExtended_Factory::get(editor_Logger_Workflow::class, [$this->task]);
         $this->userRepository = new UserRepository();
         $this->taskRepository = new TaskRepository();
@@ -103,14 +96,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E1012' => 'Multi Purpose Code logging in the context of jobs (task user association)',
-            'E1280' => "The format of the segmentrange that is assigned to the user is not valid.",
+            'E1280' => 'The format of the segmentrange that is assigned to the user is not valid.',
         ]);
 
         ZfExtended_Models_Entity_Conflict::addCodes([
             'E1061' => 'The job can not be removed, since the user is using the task.',
             'E1062' => 'The job can not be removed, since the task is locked by the user.',
-            'E1161' => "The job can not be modified, since the user has already opened the task for editing."
-                . " You are to late.",
+            'E1161' => 'The job can not be modified, since the user has already opened the task for editing.'
+                . ' You are to late.',
             'E1542' => QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS,
         ]);
     }
@@ -123,7 +116,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if (! $this->getRequest()->getParam('taskId')) {
             Zend_Registry::get('logger')->warn(
                 'E1232',
-                'Job list: this route deprecated, use /editor/task/:taskId/job instead'
+                'Job list: this route deprecated, use /editor/task/:taskId/job instead',
             );
 
             $rows = $this->viewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
@@ -150,7 +143,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
                 'E1232',
-                'Job list: this route deprecated, use editor/project/:projectId/jobs instead'
+                'Job list: this route deprecated, use editor/project/:projectId/jobs instead',
             );
         }
 
@@ -210,7 +203,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
                 'E1232',
-                'Job list: this route deprecated, use /editor/task/:taskId/job instead'
+                'Job list: this route deprecated, use /editor/task/:taskId/job instead',
             );
         }
 
@@ -231,7 +224,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
                 'E1232',
-                'Job list: this route deprecated, use /editor/task/:taskId/job instead'
+                'Job list: this route deprecated, use /editor/task/:taskId/job instead',
             );
         }
 

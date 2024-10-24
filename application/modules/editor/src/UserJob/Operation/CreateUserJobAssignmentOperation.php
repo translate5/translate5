@@ -43,7 +43,9 @@ use MittagQI\Translate5\LspJob\Operation\CreateLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
@@ -52,6 +54,8 @@ use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJob
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\UserJob\TypeEnum;
 use MittagQI\Translate5\UserJob\Validation\TrackChangesRightsValidator;
+use Zend_Registry;
+use ZfExtended_Logger;
 
 class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperationInterface
 {
@@ -60,7 +64,9 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         private readonly CreateLspJobAssignmentOperationInterface $createLspJobAssignmentOperation,
         private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly LspJobRepository $lspJobRepository,
+        private readonly TaskRepository $taskRepository,
         private readonly TrackChangesRightsValidator $trackChangesRightsValidator,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -74,12 +80,15 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
             CreateLspJobAssignmentOperation::create(),
             LspUserRepository::create(),
             LspJobRepository::create(),
+            new TaskRepository(),
             TrackChangesRightsValidator::create(),
+            Zend_Registry::get('logger')->cloneMe('userJob.create'),
         );
     }
 
     /**
      * @throws AttemptToAssignLspUserToAJobBeforeLspJobCreatedException
+     * @throws InexistentTaskException
      * @throws OnlyCoordinatorCanBeAssignedToLspJobException
      * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
      * @throws TrackChangesRightsAreNotSubsetOfLspJobException
@@ -95,8 +104,10 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
             $this->validateLspUserJob($lspJob, $dto);
         }
 
+        $task = $this->taskRepository->getByGuid($dto->taskGuid);
+
         $job = $this->userJobRepository->getEmptyModel();
-        $job->setTaskGuid($dto->taskGuid);
+        $job->setTaskGuid($task->getTaskGuid());
         $job->setUserGuid($dto->userGuid);
         $job->setState($dto->state);
         $job->setRole($dto->workflow->role);
@@ -116,6 +127,11 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         $job->createstaticAuthHash();
 
         $this->userJobRepository->save($job);
+
+        $this->logger->info('E1012', 'job created', [
+            'task' => $task,
+            'tua' => $job->getSanitizedEntityForLog(),
+        ]);
 
         return $job;
     }

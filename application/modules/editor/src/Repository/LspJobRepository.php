@@ -30,6 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LspJob\Exception\InexistentLspJobException;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
@@ -104,6 +106,26 @@ class LspJobRepository
             ->from($job->db->info($job->db::NAME), 'COUNT(*)')
             ->where('taskGuid = ?', $taskGuid)
             ->where('lspId = ?', $lspId);
+
+        return (int) $this->db->fetchOne($select) > 0;
+    }
+
+    public function coordinatorAssignedToLspJobs(JobCoordinator $coordinator): bool
+    {
+        $lspJob = ZfExtended_Factory::get(LspJobAssociation::class);
+        $userJob = ZfExtended_Factory::get(UserJob::class);
+
+        $select = $this->db
+            ->select()
+            ->from($lspJob->db->info($lspJob->db::NAME), 'COUNT(*)')
+            ->join(
+                [
+                    'userJob' => $userJob->db->info($userJob->db::NAME),
+                ],
+                'userJob.lspJobId = lspJob.Id',
+                []
+            )
+            ->where('userGuid = ?', $coordinator->user->getUserGuid());
 
         return (int) $this->db->fetchOne($select) > 0;
     }

@@ -91,6 +91,10 @@ class RolesValidator
         if ($lspUser !== null && ! empty($providedAdminRoles)) {
             throw new RolesCannotBeSetForUserException($providedAdminRoles);
         }
+
+        if ($lspUser === null && ! in_array(Roles::JOB_COORDINATOR, $roles, true)) {
+            throw new RolesCannotBeSetForUserException([Roles::JOB_COORDINATOR]);
+        }
     }
 
     /**

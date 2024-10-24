@@ -28,40 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility\CoordinatorAsserts;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Exception;
 
-use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 
-/**
- * @implements FeasibilityAssertInterface<JobCoordinator>
- */
-final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterface
+final class CoordinatorHassAssignedLspJobException extends \Exception implements FeasibilityExceptionInterface
 {
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self();
-    }
-
-    public function supports(Action $action): bool
-    {
-        return $action === Action::Delete;
-    }
-
-    /**
-     * Restrict deletion of the last coordinator in the LSP
-     * {@inheritDoc}
-     */
-    public function assertAllowed(object $object): void
-    {
-        // Nobody can delete the last coordinator of an LSP
-        if ($this->jcRepository->getCoordinatorsCount($object->lsp) === 1) {
-            throw new LastCoordinatorException($object);
-        }
+    public function __construct(
+        public readonly JobCoordinator $coordinator,
+    ) {
+        parent::__construct();
     }
 }

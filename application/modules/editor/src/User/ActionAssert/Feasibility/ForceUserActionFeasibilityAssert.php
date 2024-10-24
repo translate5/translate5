@@ -28,18 +28,24 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Exception;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility;
 
-use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorCanBeDeletedAssert;
+use MittagQI\Translate5\User\Model\User;
 
-final class CoordinatorHasBlockingLspJobException extends \Exception implements FeasibilityExceptionInterface
+/**
+ * @extends ActionFeasibilityAssert<User>
+ */
+final class ForceUserActionFeasibilityAssert extends ActionFeasibilityAssert
 {
-    public function __construct(
-        public readonly JobCoordinator $coordinator,
-        public readonly LspJobAssociation $lspJob,
-    ) {
-        parent::__construct();
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self([
+            CoordinatorCanBeDeletedAssert::create(),
+        ]);
     }
 }

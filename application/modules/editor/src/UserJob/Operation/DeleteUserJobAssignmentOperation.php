@@ -36,6 +36,7 @@ use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterfac
 use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
 use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
@@ -51,6 +52,7 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
         private readonly ActionFeasibilityAssertInterface $feasibilityAssert,
         private readonly UserJobRepository $userJobRepository,
         private readonly LspJobRepository $lspJobRepository,
+        private readonly TaskRepository $taskRepository,
         private readonly DeleteLspJobAssignmentOperationInterface $deleteLspJobOperation,
         private readonly ZfExtended_Logger $logger,
     ) {
@@ -65,6 +67,7 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
             UserJobActionFeasibilityAssert::create(),
             UserJobRepository::create(),
             LspJobRepository::create(),
+            new TaskRepository(),
             DeleteLspJobAssignmentOperation::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.delete'),
         );
@@ -82,7 +85,7 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
             return;
         }
 
-        $this->forceDelete($job);
+        $this->deleteUserJob($job);
     }
 
     public function forceDelete(UserJob $job): void
@@ -95,9 +98,17 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
             return;
         }
 
+        $this->deleteUserJob($job);
+    }
+
+    private function deleteUserJob(UserJob $job): void
+    {
         $this->userJobRepository->delete($job);
 
+        $task = $this->taskRepository->getByGuid($job->getTaskGuid());
+
         $this->logger->info('E1012', 'job deleted', [
+            'task' => $task,
             'tua' => $job->getSanitizedEntityForLog(),
         ]);
     }

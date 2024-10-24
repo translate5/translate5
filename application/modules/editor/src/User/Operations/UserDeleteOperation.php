@@ -32,20 +32,26 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
-use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
-use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorCanBeDeletedAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\ForceUserActionFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
+use Zend_Registry;
+use ZfExtended_Logger;
 
 final class UserDeleteOperation implements UserDeleteOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly ActionFeasibilityAssertInterface $userActionFeasibilityChecker,
-        private readonly FeasibilityAssertInterface $coordinatorCanBeDeletedAssert,
+        private readonly UserJobRepository $userJobRepository,
+        private readonly ActionFeasibilityAssertInterface $userFeasibilityAssert,
+        private readonly ActionFeasibilityAssertInterface $forceUserFeasibilityAssert,
+        private readonly DeleteUserJobAssignmentOperationInterface $deleteUserJobAssignmentOperation,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -56,27 +62,49 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
     {
         return new self(
             new UserRepository(),
+            UserJobRepository::create(),
             UserActionFeasibilityAssert::create(),
-            CoordinatorCanBeDeletedAssert::create(),
+            ForceUserActionFeasibilityAssert::create(),
+            DeleteUserJobAssignmentOperation::create(),
+            Zend_Registry::get('logger')->cloneMe('user.delete'),
         );
     }
 
     /**
-     * @throws FeasibilityExceptionInterface
+     * {@inheritDoc}
      */
     public function delete(User $user): void
     {
-        $this->userActionFeasibilityChecker->assertAllowed(Action::Delete, $user);
+        $this->userFeasibilityAssert->assertAllowed(Action::Delete, $user);
 
-        // TODO delete user jobs
-        $this->userRepository->delete($user);
+        $this->deleteUser($user);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function forceDelete(User $user): void
     {
-        $this->coordinatorCanBeDeletedAssert->assertAllowed($user);
+        $this->forceUserFeasibilityAssert->assertAllowed(Action::Delete, $user);
 
-        // TODO delete user jobs
+        $this->deleteUser($user);
+    }
+
+    private function deleteUser(User $user): void
+    {
+        foreach ($this->userJobRepository->getJobsByUserGuid($user->getUserGuid()) as $job) {
+            $this->deleteUserJobAssignmentOperation->forceDelete($job);
+        }
+
         $this->userRepository->delete($user);
+
+        $this->logger->info(
+            'E1637',
+            'User audit: {message}',
+            [
+                'message' => sprintf('User (login: "%s") was deleted', $user->getLogin()),
+                'user' => $user->getLogin(),
+            ]
+        );
     }
 }

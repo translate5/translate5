@@ -10067,6 +10067,10 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</source>
                 <target>The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".</target>
             </trans-unit>
+            <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZGEgZXIgSm9iLUtvb3JkaW5hdG9yIHZvbiBlaW5pZ2VuIExTUC1BdWZ0csOkZ2VuIGlzdC4='>
+                <source>Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen LSP-Aufträgen ist.</source>
+                <target>The user can not be deleted, he is Job Coordinator of some LSP jobs.</target>
+            </trans-unit>
             <trans-unit id='dXNlci52YWxpZGF0aW9uLmVycm9yLmRlbGV0ZV9ub3RpZmlhYmxlX2Nvb3JkaW5hdG9y'>
                 <source>user.validation.error.delete_notifiable_coordinator</source>
                 <target>The user cannot be deleted because the user is currently configured as a Job Coordinator who will be notified when a new job is assigned to LSP "{lsp}".</target>

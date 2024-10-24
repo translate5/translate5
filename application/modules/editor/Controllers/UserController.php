@@ -40,6 +40,7 @@ use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHassAssignedLspJobException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
@@ -113,6 +114,7 @@ class Editor_UserController extends ZfExtended_RestController
             'E1626' => 'The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".',
             'E1627' => 'Attempts to manipulate not accessible user.',
             'E1628' => 'Tried to manipulate a not editable user.',
+            'E1636' => 'The user can not be deleted, he is Job Coordinator of some LSP jobs.',
         ], 'editor.user');
     }
 
@@ -504,6 +506,19 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1626',
                 [
                     'Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".',
+                ],
+                [
+                    'lsp' => $e->coordinator->lsp->getName(),
+                    'lspId' => $e->coordinator->lsp->getId(),
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            ),
+            CoordinatorHassAssignedLspJobException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1636',
+                [
+                    'Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen LSP-Aufträgen ist.',
                 ],
                 [
                     'lsp' => $e->coordinator->lsp->getName(),

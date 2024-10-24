@@ -39,8 +39,10 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use MittagQI\Translate5\User\Model\User;
+use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
 
 class UserDeleteOperation implements UserDeleteOperationInterface
 {
@@ -49,6 +51,7 @@ class UserDeleteOperation implements UserDeleteOperationInterface
         private readonly UserDeleteOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -59,6 +62,7 @@ class UserDeleteOperation implements UserDeleteOperationInterface
             \MittagQI\Translate5\User\Operations\UserDeleteOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            Zend_Registry::get('logger')->cloneMe('user.delete'),
         );
     }
 
@@ -91,10 +95,45 @@ class UserDeleteOperation implements UserDeleteOperationInterface
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->userPermissionAssert->assertGranted(
-            Action::Delete,
-            $user,
-            new PermissionAssertContext($authUser)
-        );
+        try {
+            $this->userPermissionAssert->assertGranted(
+                Action::Delete,
+                $user,
+                new PermissionAssertContext($authUser)
+            );
+
+            $this->logger->info(
+                'E1637',
+                'User audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to delete User (login: "%s") by AuthUser (guid: %s) was granted',
+                        $user->getLogin(),
+                        $authUser->getUserGuid()
+                    ),
+                    'user' => $user->getLogin(),
+                    'authUser' => $authUser->getLogin(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                ]
+            );
+        } catch (PermissionExceptionInterface $e) {
+            $this->logger->info(
+                'E1637',
+                'User audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to delete User (login: "%s") by AuthUser (guid: %s) was not granted',
+                        $user->getLogin(),
+                        $authUser->getUserGuid()
+                    ),
+                    'user' => $user->getLogin(),
+                    'authUser' => $authUser->getLogin(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                    'reason' => $e::class,
+                ]
+            );
+
+            throw $e;
+        }
     }
 }

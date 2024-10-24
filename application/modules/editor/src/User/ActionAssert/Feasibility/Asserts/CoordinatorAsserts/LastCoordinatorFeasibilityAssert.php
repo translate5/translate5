@@ -28,31 +28,21 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility\CoordinatorAsserts;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
-use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
-use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHasBlockingLspJobException;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 
 /**
  * @implements FeasibilityAssertInterface<JobCoordinator>
  */
-class LspJobRestrictionAssert implements FeasibilityAssertInterface
+final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterface
 {
-    /**
-     * @param ActionFeasibilityAssertInterface<LspJobAssociation> $lsJobActionFeasibilityAssert
-     */
     public function __construct(
-        private readonly UserJobRepository $userRepository,
-        private readonly LspJobRepository $lspJobRepository,
-        private readonly ActionFeasibilityAssertInterface $lsJobActionFeasibilityAssert,
+        private readonly JobCoordinatorRepository $jcRepository,
     ) {
     }
 
@@ -62,9 +52,7 @@ class LspJobRestrictionAssert implements FeasibilityAssertInterface
     public static function create(): self
     {
         return new self(
-            UserJobRepository::create(),
-            LspJobRepository::create(),
-            LspJobActionFeasibilityAssert::create(),
+            JobCoordinatorRepository::create(),
         );
     }
 
@@ -74,22 +62,14 @@ class LspJobRestrictionAssert implements FeasibilityAssertInterface
     }
 
     /**
+     * Restrict deletion of the last coordinator in the LSP
      * {@inheritDoc}
      */
     public function assertAllowed(object $object): void
     {
-        foreach ($this->userRepository->getJobsByUserGuid($object->user->getUserGuid()) as $job) {
-            if (! $job->isLspJob()) {
-                continue;
-            }
-
-            $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
-
-            try {
-                $this->lsJobActionFeasibilityAssert->assertAllowed(Action::Delete, $lspJob);
-            } catch (FeasibilityExceptionInterface) {
-                throw new CoordinatorHasBlockingLspJobException($object, $lspJob);
-            }
+        // Nobody can delete the last coordinator of an LSP
+        if ($this->jcRepository->getCoordinatorsCount($object->lsp) <= 1) {
+            throw new LastCoordinatorException($object);
         }
     }
 }

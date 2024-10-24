@@ -144,6 +144,7 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
                     'tua' => $job->getSanitizedEntityForLog(),
                     'oldState' => $job->getState(),
                     'newState' => $dto->state,
+                    'task' => $task,
                 ]
             );
         }
