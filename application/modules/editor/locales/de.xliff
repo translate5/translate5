@@ -8592,6 +8592,26 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Zusätzliche Infos</source>
                 <target>Zusätzliche Infos</target>
             </trans-unit>
+            <trans-unit id='QXVmZ2FiZW4tVE0='>
+                <source>Aufgaben-TM</source>
+                <target>Aufgaben-TM</target>
+            </trans-unit>
+            <trans-unit id='QXVmZ2FiZW4tVE0gYW56ZWlnZW4='>
+                <source>Aufgaben-TM anzeigen</source>
+                <target>Aufgaben-TMs anzeigen</target>
+            </trans-unit>
+            <trans-unit id='QXVmZ2FiZW4tVE0gYXVzYmxlbmRlbg=='>
+                <source>Aufgaben-TM ausblenden</source>
+                <target>Aufgaben-TMs ausblenden</target>
+            </trans-unit>
+            <trans-unit id='QW5kZXJlIEF1ZmdhYmVuLVRNIGVpbmJsZW5kZW4='>
+                <source>Andere Aufgaben-TM einblenden</source>
+                <target>Andere Aufgaben-TMs einblenden</target>
+            </trans-unit>
+            <trans-unit id='QW5kZXJlIEF1ZmdhYmVuLVRNIGF1c2JsZW5kZW4='>
+                <source>Andere Aufgaben-TM ausblenden</source>
+                <target>Andere Aufgaben-TMs ausblenden</target>
+            </trans-unit>
             <trans-unit id='ZmlsZU5hbWVfT3BlblRNMg=='>
                 <source>fileName_OpenTM2</source>
                 <target>Datenbankname</target>

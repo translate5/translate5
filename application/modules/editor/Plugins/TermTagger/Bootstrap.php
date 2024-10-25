@@ -27,6 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Cronjob\CronEventTrigger;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\RecalcTransFound;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
 use MittagQI\Translate5\Terminology\CleanupCollection;
@@ -88,8 +90,11 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', [$this, 'termtaggerStateHandler']);
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', [$this, 'handleBeforeSaveAlike']);
 
-        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterPost#TermCollection', [$this, 'handleAfterTermCollectionAssocChange']);
-        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterDelete#TermCollection', [$this, 'handleAfterTermCollectionAssocChange']);
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            LanguageResourceTaskAssociationChangeEvent::class,
+            [$this, 'onAfterTermCollectionAssocChange']
+        );
 
         //checks if the term taggers are available.
         $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', [$this, 'handleTermTaggerCheck']);
@@ -210,32 +215,37 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract
         $meta->addImporter($importer);
     }
 
-    /***
-     * After post action handler in language resources task assoc
-     * @param Zend_EventManager_Event $event
+    /**
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event)
+    public function onAfterTermCollectionAssocChange(Zend_EventManager_Event $zendEvent): void
     {
-        $entity = $event->getParam('entity');
-        $entityGuid = $entity->getTaskGuid();
+        /** @var LanguageResourceTaskAssociationChangeEvent $event */
+        $event = $zendEvent->getParam('event');
 
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+        if ($event->languageResource->getServiceName() !== editor_Services_TermCollection_Service::NAME) {
+            return;
+        }
+
+        $entityGuid = $event->taskGuid;
+
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($entityGuid);
 
         $taskGuids = [$task->getTaskGuid()];
+
         //check if the current task is project.
         if ($task->isProject()) {
-            //collect all project tasks to check the terminologie
-            $taskGuids = $task->loadProjectTasks($task->getProjectId(), true);
+            //collect all project tasks to check the terminology
+            $taskGuids = $task->loadProjectTasks((int) $task->getProjectId(), true);
             $taskGuids = array_column($taskGuids, 'taskGuid');
         }
+
         foreach ($taskGuids as $taskGuid) {
             $this->removeTerminologieFile($taskGuid);
-
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            //update the terminologie flag, based on if there is a termcollection
+            $task = ZfExtended_Factory::get(editor_Models_Task::class);
+            //update the terminology flag, based on if there is a termcollection
             //as language resource associated to the task
             $task->updateIsTerminologieFlag($taskGuid);
         }

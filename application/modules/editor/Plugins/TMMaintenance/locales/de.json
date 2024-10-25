@@ -36,6 +36,7 @@
     "sourceLanguage": "Quellsprache",
     "targetLanguage": "Zielsprache",
     "clients": "Kunden",
+    "taskTm": "Aufgaben-TM",
     "select": "Auswählen",
     "close": "Schließen",
     "emptyText" : "Keine Datensätze verfügbar"

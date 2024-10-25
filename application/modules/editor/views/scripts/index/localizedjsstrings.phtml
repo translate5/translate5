@@ -1733,7 +1733,7 @@ Ext.define('Editor.controller.Localizer', {
             source: '<?php echo $this->translate->_('Quellsprache');?>',
             target: '<?php echo $this->translate->_('Zielsprache');?>',
             serviceName: '<?php echo $this->translate->_('Ressource');?>',
-            taskGuid: '<?php echo $this->translate->_('Aufgabenname');?>'
+            taskGuid: '<?php echo $this->translate->_('Aufgabenname');?>',
         }
     });
     Ext.define("Editor.locale.controller.TmOverview", {
@@ -1975,7 +1975,10 @@ Editor.data.l10n = {
         en: '<?php echo $this->translate->_('Englisch');?>'
     },
     tmOverview:{
-        more: '<?php echo $this->translate->_('mehr');?>'
+        more: '<?php echo $this->translate->_('mehr');?>',
+        taskTm: '<?php echo $this->translate->_('Aufgaben-TM');?>',
+        showTaskTm: '<?php echo $this->translate->_('Aufgaben-TM anzeigen');?>',
+        hideTaskTm: '<?php echo $this->translate->_('Aufgaben-TM ausblenden');?>',
     },
     segmentGrid: {
         batchOperations: {
@@ -2282,8 +2285,13 @@ Editor.data.l10n = {
                 title:'<?php echo $this->translate->_('Übersetzerpaket re-importieren');?>',
             },
             taskManageFiles:{
-                title: '<?php echo $this->translate->_('Dateien verwalten');?>'
-            }
+                title: '<?php echo $this->translate->_('Dateien verwalten');?>',
+            },
+            languageResourceAssoc: {
+                taskTm: '<?php echo $this->translate->_('Aufgaben-TM');?>',
+                showForeignTaskTms: '<?php echo $this->translate->_('Andere Aufgaben-TM einblenden');?>',
+                hideForeignTaskTms: '<?php echo $this->translate->_('Andere Aufgaben-TM ausblenden');?>',
+            },
         }
     },
     languageResources:{

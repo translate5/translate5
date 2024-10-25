@@ -36,6 +36,7 @@
     "sourceLanguage": "Source language",
     "targetLanguage": "Target language",
     "clients": "Clients",
+    "taskTm": "Task TM",
     "select": "Select",
     "close": "Close",
     "emptyText" : "No records available"

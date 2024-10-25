@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,28 +25,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class Editor.plugins.pluginFeasibilityTest.view.Panel
- * @extends Ext.panel.Panel
- */
 Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
-    extend : 'Ext.panel.Panel',
-    alias : 'widget.languageResourceTaskAssocPanel',
-    itemId:'languageResourceTaskAssocPanel',
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.languageResourceTaskAssocPanel',
+    itemId: 'languageResourceTaskAssocPanel',
     viewModel: {
-        type: 'languageResourceTaskAssocPanel'
+        type: 'languageResourceTaskAssocPanel',
     },
-    requires: [
-        'Editor.view.admin.TaskActionColumn',
-        'Editor.view.LanguageResources.TaskAssocPanelViewModel'
-    ],
-    cls : 'adminTaskGrid',
+    requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.LanguageResources.TaskAssocPanelViewModel'],
+    cls: 'adminTaskGrid',
     title: '#UT#Sprachressourcen',
     strings: {
         reload: '#UT#Aktualisieren',
@@ -59,144 +45,191 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache',
         serviceName: '#UT#Ressource',
-        taskGuid:'#UT#Aufgabename'
+        taskGuid: '#UT#Aufgabename',
     },
     padding: 0,
-    layout:'fit',
+    layout: 'fit',
     border: 0,
-    bind:{
-        loading:'{isLoadingActive}'
+    bind: {
+        loading: '{isLoadingActive}',
     },
-    initConfig : function(instanceConfig) {
+    initConfig: function (instanceConfig) {
         var me = this,
-        config = {
-            title: me.title, //see EXT6UPD-9
-            dockedItems : [],
-            items : [{
-                xtype : 'grid',
-                border: 0,
-                itemId : 'languageResourcesTaskAssocGrid',
-            	bind:{
-            		store:'{taskAssoc}',
-            		disabled:'{!enablePanel}'
-    			},
-                emptyText: me.strings.empty,
-                features : [ {
-                    id: 'group',
-                    ftype: 'grouping',
-                    groupHeaderTpl: Ext.create('Ext.XTemplate',
-                            '{columnName}: {[this.formatValue(values)]}',
+            config = {
+                title: me.title, //see EXT6UPD-9
+                dockedItems: [],
+                items: [
+                    {
+                        xtype: 'grid',
+                        border: 0,
+                        itemId: 'languageResourcesTaskAssocGrid',
+                        bind: {
+                            store: '{taskAssoc}',
+                            disabled: '{!enablePanel}',
+                        },
+                        plugins: ['gridfilters'],
+                        emptyText: me.strings.empty,
+                        features: [
                             {
-                                formatValue: function(values) {
-                                    var ret=values.name;
-                                    if(values.groupField === 'taskGuid'){
-                                        //when taskGuid is active as grouping, render the task name as group value
-                                        var data=values.rows && values.rows[0];
-                                        return data ? Ext.String.htmlEncode(data.get('taskName')) : ret;
+                                id: 'group',
+                                ftype: 'grouping',
+                                groupHeaderTpl: Ext.create(
+                                    'Ext.XTemplate',
+                                    '{columnName}: {[this.formatValue(values)]}',
+                                    {
+                                        formatValue: function (values) {
+                                            var ret = values.name;
+
+                                            if (values.groupField === 'taskGuid') {
+                                                //when taskGuid is active as grouping, render the task name as group value
+                                                var data = values.rows && values.rows[0];
+
+                                                return data ? Ext.String.htmlEncode(data.get('taskName')) : ret;
+                                            }
+
+                                            return Ext.String.htmlEncode(ret);
+                                        },
+                                    },
+                                ),
+                                hideGroupedHeader: false,
+                                enableGroupingMenu: true,
+                                groupers: [{ property: 'serviceName' }, { property: 'targetLang' }],
+                            },
+                        ],
+                        columns: [
+                            {
+                                xtype: 'checkcolumn',
+                                tooltip: me.strings.checked,
+                                text: me.strings.checked,
+                                dataIndex: 'checked',
+                                sortable: true,
+                                cls: 'taskAssocChecked',
+                                width: 60,
+                            },
+                            {
+                                xtype: 'gridcolumn',
+                                tooltip: me.strings.taskGuid,
+                                text: me.strings.taskGuid,
+                                dataIndex: 'taskGuid',
+                                sortable: true,
+                                hidden: true,
+                                width: 60,
+                            },
+                            {
+                                xtype: 'checkcolumn',
+                                tooltip: me.strings.segmentsUpdateable,
+                                text: me.strings.segmentsUpdateable,
+                                cls: 'segmentsUpdateable',
+                                dataIndex: 'segmentsUpdateable',
+                                sortable: true,
+                                renderer: function (value, meta, record) {
+                                    return record.get('writable') ? this.defaultRenderer(value, meta, record) : '';
+                                },
+                                width: 60,
+                            },
+                            {
+                                xtype: 'gridcolumn',
+                                text: me.strings.name,
+                                renderer: function (value, metaData, record) {
+                                    const style = 'float: left; width: 15px; height: 15px;margin-right:5px;';
+                                    let className = '';
+                                    let tooltip = '';
+
+                                    if (record.get('tmNeedsConversion')) {
+                                        className = 'ico-tm-converseTm';
+                                        tooltip = Editor.data.l10n.contentProtection.tm_not_converted;
                                     }
-                                    return Ext.String.htmlEncode(ret);
+
+                                    if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
+                                        className = 'ico-tm-converseTm-inProgress';
+                                        tooltip = Editor.data.l10n.contentProtection.tm_conversion_in_progress;
+                                    }
+
+                                    return (
+                                        '<div style="' +
+                                        style +
+                                        ' border: 1px solid rgba(0, 0, 0, .2);background: #' +
+                                        record.get('color') +
+                                        ';"></div>' +
+                                        (record.get('tmNeedsConversion')
+                                            ? '<div style="' +
+                                              style +
+                                              '" class="' +
+                                              className +
+                                              '" data-qtip="' +
+                                              tooltip +
+                                              '"></div>'
+                                            : '') +
+                                        Ext.String.htmlEncode(value)
+                                    );
+                                },
+                                dataIndex: 'name',
+                                sortable: true,
+                                flex: 50 / 100,
+                            },
+                            {
+                                xtype: 'gridcolumn',
+                                text: me.strings.serviceName,
+                                dataIndex: 'serviceName',
+                                sortable: true,
+                                flex: 25 / 100,
+                            },
+                            {
+                                xtype: 'gridcolumn',
+                                tooltip: me.strings.source,
+                                text: me.strings.source,
+                                cls: 'source-lang',
+                                dataIndex: 'sourceLang',
+                                renderer: me.langRenderer,
+                                sortable: true,
+                                flex: 25 / 100,
+                            },
+                            {
+                                xtype: 'gridcolumn',
+                                tooltip: me.strings.target,
+                                text: me.strings.target,
+                                cls: 'target-lang',
+                                dataIndex: 'targetLang',
+                                renderer: me.langRenderer,
+                                flex: 25 / 100,
+                                sortable: true,
+                            },
+                            {
+                                xtype: 'owncheckcolumn',
+                                text: Editor.data.l10n.projectOverview.taskManagement.languageResourceAssoc.taskTm,
+                                dataIndex: 'isTaskTm',
+                                flex: 25 / 100,
+                                filter:{
+                                    local: true,
+                                    type: 'boolean',
+                                    yesText: Editor.data.l10n.projectOverview.taskManagement.languageResourceAssoc
+                                        .showForeignTaskTms,
+                                    noText: Editor.data.l10n.projectOverview.taskManagement.languageResourceAssoc
+                                        .hideForeignTaskTms
                                 }
-                            }
-                    ),
-                    hideGroupedHeader: false,
-                    enableGroupingMenu: true,
-                    groupers:[{property:'serviceName'},{property:'targetLang'}]
-                } ],
-                columns : [ {
-                    xtype : 'checkcolumn',
-                    tooltip : me.strings.checked,
-                    text : me.strings.checked,
-                    dataIndex : 'checked',
-                    sortable : true,
-                    cls: 'taskAssocChecked',
-                    width:60,
-                }, {
-                    xtype : 'gridcolumn',
-                    tooltip : me.strings.taskGuid,
-                    text : me.strings.taskGuid,
-                    dataIndex : 'taskGuid',
-                    sortable : true,
-                    hidden:true,
-                    width:60,
-                },{
-                    xtype : 'checkcolumn',
-                    tooltip : me.strings.segmentsUpdateable,
-                    text : me.strings.segmentsUpdateable,
-                    cls: 'segmentsUpdateable',
-                    dataIndex : 'segmentsUpdateable',
-                    sortable : true,
-                    renderer: function(value, meta, record) {
-                        return record.get('writable') ? this.defaultRenderer(value, meta, record) : '';
+                            },
+                        ],
                     },
-                    width:60,
-                }, {
-                    xtype: 'gridcolumn',
-                    text: me.strings.name,
-                    renderer: function(value, metaData, record) {
-                        const style = 'float: left; width: 15px; height: 15px;margin-right:5px;';
-                        let className = '';
-                        let tooltip = '';
+                ],
+            };
 
-                        if (record.get('tmNeedsConversion')) {
-                            className = 'ico-tm-converseTm';
-                            tooltip = Editor.data.l10n.contentProtection.tm_not_converted;
-                        }
-
-                        if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
-                            className = 'ico-tm-converseTm-inProgress';
-                            tooltip = Editor.data.l10n.contentProtection.tm_conversion_in_progress;
-                        }
-
-                        return '<div style="' + style + ' border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'
-                            + (
-                                record.get('tmNeedsConversion')
-                                    ? '<div style="' + style + '" class="' + className + '" data-qtip="'+ tooltip +'"></div>'
-                                    : ''
-                            )
-                            + Ext.String.htmlEncode(value);
-                    },
-                    dataIndex : 'name',
-                    sortable : true,
-                    flex : 50 / 100
-                }, {
-                	xtype : 'gridcolumn',
-                	text: me.strings.serviceName,
-                    dataIndex : 'serviceName',
-                    sortable : true,
-                    flex : 25 / 100,
-                },{
-                    xtype : 'gridcolumn',
-                    tooltip : me.strings.source,
-                    text : me.strings.source,
-                    cls : 'source-lang',
-                    dataIndex : 'sourceLang',
-                    renderer : me.langRenderer,
-                    sortable : true,
-                    flex : 25 / 100,
-                }, {
-                    xtype : 'gridcolumn',
-                    tooltip : me.strings.target,
-                    text : me.strings.target,
-                    cls : 'target-lang',
-                    dataIndex : 'targetLang',
-                    renderer : me.langRenderer,
-                    flex : 25 / 100,
-                    sortable : true
-                } ]
-            }],// end of items
-        };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
-        return me.callParent([ config ]);
+
+        return me.callParent([config]);
     },
-    langRenderer : function(val, md) {
-        var lang = Ext.StoreMgr.get('admin.Languages').getById(val), label;
+    langRenderer: function (val, md) {
+        var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
+            label;
+
         if (lang) {
             label = lang.get('label');
             md.tdAttr = 'data-qtip="' + label + '"';
+
             return label;
         }
+
         return '';
-    }
+    },
 });

@@ -73,8 +73,6 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action
     public function deeplAction()
     {
         //for deepl we expect always that requests:
-        $this->expectHeader('accept', 'application/json; charset=utf-8');
-        $this->expectHeader('accept-charset', 'UTF-8');
         $authKey = Zend_Registry::get('config')->runtimeOptions->plugins->DeepL->authkey;
         $this->expectHeader('authorization', 'DeepL-Auth-Key ' . $authKey);
 

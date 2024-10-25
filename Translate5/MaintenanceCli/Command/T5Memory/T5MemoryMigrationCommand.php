@@ -38,6 +38,7 @@ use editor_Services_OpenTM2_Service as Service;
 use Exception;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
+use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use RuntimeException;
@@ -493,11 +494,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     private function revertChanges(LanguageResource $languageResource, array $primaryData): void
     {
         if ($languageResource->getId() !== $primaryData['id']) {
-            $remover = ZfExtended_Factory::get(
-                \editor_Models_LanguageResources_Remover::class,
-                [$languageResource]
-            );
-            $remover->remove(forced: true);
+            DeleteLanguageResourceOperation::create()->delete($languageResource, forced: true);
 
             return;
         }

@@ -6758,6 +6758,26 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Zusätzliche Infos</source>
                 <target>Additional info</target>
             </trans-unit>
+            <trans-unit id='QXVmZ2FiZW4tVE0='>
+                <source>Aufgaben-TM</source>
+                <target>Task TM</target>
+            </trans-unit>
+            <trans-unit id='QXVmZ2FiZW4tVE0gYW56ZWlnZW4='>
+                <source>Aufgaben-TM anzeigen</source>
+                <target>Show task TMs</target>
+            </trans-unit>
+            <trans-unit id='QXVmZ2FiZW4tVE0gYXVzYmxlbmRlbg=='>
+                <source>Aufgaben-TM ausblenden</source>
+                <target>Hide task TMs</target>
+            </trans-unit>
+            <trans-unit id='QW5kZXJlIEF1ZmdhYmVuLVRNIGVpbmJsZW5kZW4='>
+                <source>Andere Aufgaben-TM einblenden</source>
+                <target>Show foreign task TMs</target>
+            </trans-unit>
+            <trans-unit id='QW5kZXJlIEF1ZmdhYmVuLVRNIGF1c2JsZW5kZW4='>
+                <source>Andere Aufgaben-TM ausblenden</source>
+                <target>Hide foreign task TMs</target>
+            </trans-unit>
             <trans-unit id='ZmlsZU5hbWVfT3BlblRNMg=='>
                 <source>fileName_OpenTM2</source>
                 <target>Database name</target>

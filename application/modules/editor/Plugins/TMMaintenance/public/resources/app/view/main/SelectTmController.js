@@ -10,5 +10,17 @@ Ext.define('TMMaintenance.view.main.SelectTmController', {
     onTmDoubleTap: function(grid, location) {
         this.getViewModel().set('selectedTm', location.record.getId());
         this.getView().up('app-main').down('#selectTmDialog').hide();
+    },
+
+    showTaskTms: function() {
+        const store = this.getView().getStore();
+
+        store.filter('isTaskTm', true);
+    },
+
+    hideTaskTms: function() {
+        const store = this.getView().getStore();
+
+        store.filter('isTaskTm', false);
     }
 });
