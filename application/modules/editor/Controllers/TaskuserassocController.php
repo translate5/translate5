@@ -71,11 +71,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
      */
     protected $postBlacklist = ['id'];
 
-    /**
-     *  @var editor_Logger_Workflow
-     */
-    protected $log;
-
     private UserRepository $userRepository;
 
     private TaskRepository $taskRepository;
@@ -87,7 +82,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     public function init()
     {
         parent::init();
-        $this->log = ZfExtended_Factory::get(editor_Logger_Workflow::class, [$this->task]);
         $this->userRepository = new UserRepository();
         $this->taskRepository = new TaskRepository();
         $this->userJobRepository = UserJobRepository::create();
@@ -174,8 +168,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             );
         }
 
-        $this->log->request();
-
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
             $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
@@ -227,8 +219,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 'Job list: this route deprecated, use /editor/task/:taskId/job instead',
             );
         }
-
-        $this->log->request();
 
         try {
             $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));

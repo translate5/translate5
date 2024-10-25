@@ -37,6 +37,7 @@ use MittagQI\Translate5\LspJob\Exception\InexistentLspJobException;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use ZfExtended_Factory;
@@ -133,6 +134,37 @@ class LspJobRepository
     /**
      * @return iterable<LspJobAssociation>
      */
+    public function getLspJobs(int $lspId): iterable
+    {
+        $job = ZfExtended_Factory::get(LspJobAssociation::class);
+
+        $select = $this->db
+            ->select()
+            ->from($job->db->info($job->db::NAME))
+            ->where('lspId = ?', $lspId)
+        ;
+
+        $stmt = $this->db->query($select);
+
+        while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $job->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $job;
+        }
+    }
+
+    /**
+     * @return iterable<LspJobAssociation>
+     */
     public function getSubLspJobs(LspJobAssociation $lspJob): iterable
     {
         $job = ZfExtended_Factory::get(LspJobAssociation::class);
@@ -140,7 +172,7 @@ class LspJobRepository
 
         $select = $this->db
             ->select()
-            ->from($job->db->info($job->db::NAME))
+            ->from(['lspJob' => $job->db->info($job->db::NAME)])
             ->join(
                 [
                     'lsp' => $lsp->db->info($lsp->db::NAME),

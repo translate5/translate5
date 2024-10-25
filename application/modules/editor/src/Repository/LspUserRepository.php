@@ -168,7 +168,7 @@ class LspUserRepository implements LspUserRepositoryInterface
     /**
      * @return iterable<User>
      */
-    public function getUsers(LanguageServiceProvider $lsp): iterable
+    public function getUsers(int $lspId): iterable
     {
         $user = ZfExtended_Factory::get(User::class);
         $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
@@ -184,7 +184,7 @@ class LspUserRepository implements LspUserRepositoryInterface
             ->join([
                 'lspToUser' => $lspToUserTable,
             ], 'user.id = lspToUser.userId', [])
-            ->where('lspToUser.lspId = ?', $lsp->getId());
+            ->where('lspToUser.lspId = ?', $lspId);
 
         $rows = $userDb->fetchAll($select);
 

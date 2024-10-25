@@ -32,19 +32,30 @@ namespace MittagQI\Translate5\LSP\Operations;
 
 use MittagQI\Translate5\LSP\Contract\LspDeleteOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use MittagQI\Translate5\User\Operations\UserDeleteOperation;
+use Zend_Registry;
+use ZfExtended_Logger;
 
 final class LspDeleteOperation implements LspDeleteOperationInterface
 {
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
-        private readonly UserDeleteOperationInterface $userDeleteOperation,
         private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly LspJobRepository $lspJobRepository,
+        private readonly UserRepository $userRepository,
+        private readonly UserDeleteOperationInterface $deleteUserOperation,
+        private readonly DeleteLspJobAssignmentOperationInterface $lspJobDeleteOperation,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -53,27 +64,67 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
      */
     public static function create(): self
     {
-        $lspRepository = LspRepository::create();
-
         return new self(
-            $lspRepository,
-            UserDeleteOperation::create(),
+            LspRepository::create(),
             LspUserRepository::create(),
+            LspJobRepository::create(),
+            new UserRepository(),
+            UserDeleteOperation::create(),
+            DeleteLspJobAssignmentOperation::create(),
+            Zend_Registry::get('logger')->cloneMe('lsp.delete')
         );
     }
 
     public function deleteLsp(LanguageServiceProvider $lsp): void
     {
-        $usersOfLsp = $this->lspUserRepository->getUsers($lsp);
+        $this->deleteLspJobs($lsp);
 
-        foreach ($usersOfLsp as $user) {
-            $this->userDeleteOperation->forceDelete($user);
-        }
+        $this->deleteLspUsers($lsp);
 
         foreach ($this->lspRepository->getSubLspList($lsp) as $subLsp) {
             $this->deleteLsp($subLsp);
         }
 
         $this->lspRepository->delete($lsp);
+
+        $this->logger->info(
+            'E1638',
+            'LSP audit: {message}',
+            [
+                'message' => sprintf('LSP "%s" was deleted', $lsp->getName()),
+                'lsp' => $lsp->getName(),
+            ]
+        );
+    }
+
+    public function deleteLspJobs(LanguageServiceProvider $lsp): void
+    {
+        $lspJobs = $this->lspJobRepository->getLspJobs((int) $lsp->getId());
+
+        foreach ($lspJobs as $lspJob) {
+            $this->lspJobDeleteOperation->forceDelete($lspJob);
+        }
+    }
+
+    public function deleteLspUsers(LanguageServiceProvider $lsp): void
+    {
+        $usersOfLsp = $this->lspUserRepository->getUsers((int) $lsp->getId());
+
+        foreach ($usersOfLsp as $user) {
+            try {
+                $this->deleteUserOperation->forceDelete($user);
+            } catch (LastCoordinatorException) {
+                $this->userRepository->delete($user);
+
+                $this->logger->info(
+                    'E1637',
+                    'User audit: {message}',
+                    [
+                        'message' => sprintf('User (login: "%s") was deleted', $user->getLogin()),
+                        'user' => $user->getLogin(),
+                    ]
+                );
+            }
+        }
     }
 }

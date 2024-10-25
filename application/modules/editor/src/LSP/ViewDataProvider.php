@@ -129,7 +129,7 @@ class ViewDataProvider
             ];
         }
 
-        $users = $this->lspUserRepository->getUsers($lsp);
+        $users = $this->lspUserRepository->getUsers((int) $lsp->getId());
         /**
          * @var array<array{id: int, name: string}> $usersData
          */

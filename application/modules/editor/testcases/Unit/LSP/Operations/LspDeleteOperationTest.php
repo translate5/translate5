@@ -152,6 +152,11 @@ class LspDeleteOperationTest extends TestCase
             public function getEmptyLspCustomerModel(): LanguageServiceProviderCustomer
             {
             }
+
+            public function getSubLspIds(LanguageServiceProvider $lsp): array
+            {
+                // TODO: Implement getSubLspIds() method.
+            }
         };
 
         $service = new LspDeleteOperation(
