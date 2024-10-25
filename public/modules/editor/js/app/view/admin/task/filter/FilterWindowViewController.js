@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -29,32 +28,67 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.editorAdminTaskFilterFilterWindow',
-    
-    onFilterWindowRender:function(component){
-    	var me=this,
-    		fields=me.getView().query('[filter]');
-    	
-    	//create a simple filter array object from the fields
-    	Ext.Array.each(fields, function(field) {
-    		field.on({
-    			change:'applyFilters'
-    		})
-    	});
+
+    onFilterWindowRender: function (component) {
+        var me = this,
+            fields = me.getView().query('[filter]');
+
+        //create a simple filter array object from the fields
+        Ext.Array.each(fields, function (field) {
+            field.on({
+                change: 'applyFilters'
+            })
+        });
     },
-    
-    applyFilters:function(){
-    	var me=this,
-    		fields=me.getView().query('[filter]'),
-    		filter=[];
-    	
-    	//create a simple filter array object from the fields
-    	Ext.Array.each(fields, function(field) {
-			filter.push(Ext.Object.merge(field.filter,{
-				value:field.getValue()
-				//'label':field.filter.property+' '+field.filter.operator+' '+field.getValue()
-			}))
-    	});
-    	
-    	me.getView().fireEvent('advancedFilterChange',filter)
+
+    workflowFieldChange: function (fld, workflowIds) {
+        var allSteps = [],
+            oSteps = Editor.data.app.workflows.default.steps;
+
+        ["no workflow", "pmCheck", "workflowEnded"].forEach(function (stepId) {
+            if (oSteps[stepId]) {
+                allSteps.push({
+                    id: stepId,
+                    text: oSteps[stepId],
+                    group: ""
+                });
+            }
+        });
+
+        Ext.Object.each(Editor.data.app.workflows, function (key, workflow) {
+            Ext.Object.each(workflow.steps, function (stepId, stepText) {
+                if (workflowIds.length > 0 && !workflowIds.includes(workflow.id)) {
+                    return;
+                }
+                if (!["no workflow", "pmCheck", "workflowEnded"].includes(stepId)) {
+                    allSteps.push({
+                        id: stepId,
+                        text: stepText,
+                        group: workflow.label
+                    });
+                }
+            });
+        });
+
+        var wfStepCmp = Ext.ComponentQuery.query('#workflowStep')[0],
+            store = new Ext.data.Store();
+        store.loadData(allSteps, false);
+        wfStepCmp.setStore(store);
+    },
+
+    applyFilters: function () {
+        var me = this,
+            fields = me.getView().query('[filter]'),
+            filter = [];
+
+        //create a simple filter array object from the fields
+        Ext.Array.each(fields, function (field) {
+            filter.push(Ext.Object.merge(field.filter, {
+                value: field.getValue()
+                //'label':field.filter.property+' '+field.filter.operator+' '+field.getValue()
+            }))
+        });
+
+        me.getView().fireEvent('advancedFilterChange', filter)
     }
 });
