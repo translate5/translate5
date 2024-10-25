@@ -100,5 +100,12 @@ Ext.define('Editor.view.LanguageResources.services.OpenTM2', {
         }
 
         return Editor.data.l10n.contentProtection.tm_not_converted;
+    },
+    getEditIconClass: (record) => {
+        if (record.get('isTaskTm')) {
+            return 'x-hidden-display';
+        }
+
+        return 'ico-tm-delete';
     }
 });

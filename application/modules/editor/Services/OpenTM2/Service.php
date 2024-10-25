@@ -26,16 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\SupportsContentProtectionInterface;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\LanguageResource\TaskTm\Operation\CreateTaskTmOperation;
+use MittagQI\Translate5\LanguageResource\TaskTm\SupportsTaskTmInterface;
+
 /**
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
  * T5memory / OpenTM2 Service Base Class
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract
+class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract implements SupportsTaskTmInterface, SupportsContentProtectionInterface
 {
     public const NAME = 'OpenTM2';
 
@@ -49,9 +50,6 @@ class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract
      */
     protected static $helpPage = 'https://confluence.translate5.net/display/BUS/OpenTM2';
 
-    /**
-     * @see editor_Services_ServiceAbstract::isConfigured()
-     */
     public function isConfigured(): bool
     {
         // since tmprefix and showMultiple100PercentMatches have workable defaults
@@ -59,21 +57,24 @@ class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract
         return $this->isConfigSet($this->config->runtimeOptions->LanguageResources->opentm2->server);
     }
 
-    /**
-     * @see editor_Services_ServiceAbstract::embedService()
-     */
     protected function embedService(): void
     {
         $urls = $this->config->runtimeOptions->LanguageResources->opentm2->server;
         $this->addResourceForeachUrl($this->getName(), $urls->toArray());
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_ServiceAbstract::getName()
-     */
     public function getName(): string
     {
         return self::NAME;
+    }
+
+    public function getCreateTaskTmOperation(): CreateTaskTmOperation
+    {
+        return CreateTaskTmOperation::create();
+    }
+
+    public function getTmConversionService(): TmConversionService
+    {
+        return TmConversionService::create();
     }
 }

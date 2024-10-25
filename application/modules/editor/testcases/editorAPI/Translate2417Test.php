@@ -99,6 +99,18 @@ class Translate2417Test extends JsonTestAbstract
         $segToTest->targetEdit = "Aleks test tm update.";
         static::api()->saveSegment($segToTest->id, $segToTest->targetEdit);
 
+        $filters = [[
+            'property' => 'taskGuid',
+            'operator' => 'eq',
+            'value' => static::getTask()->getTaskGuid(),
+        ]];
+        $tms = $this->cleanTimestamps(static::api()->getJson(
+            'editor/languageresourcetaskassoc?filter=' . urlencode(json_encode($filters, flags: JSON_THROW_ON_ERROR)),
+        ));
+        // Task TM is the TM where saving segment is performed
+        $taskTm = array_filter($tms, static fn ($tm) => $tm->isTaskTm === true);
+        $tmId = array_shift($taskTm)->languageResourceId;
+
         // after the segment save, check for the tm results for the same segment
         $jsonFileName = 'tmResultsAfterEdit.json';
         $tmResults = $this->cleanTimestamps(

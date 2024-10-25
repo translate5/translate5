@@ -5,7 +5,7 @@
         "matchrate": 103,
         "source": "Across Language Server",
         "languageResourceType": "tm",
-        "languageResourceColor": null,
+        "languageResourceColor": "aaff7f",
         "state": "loaded",
         "timestamp": "TEST_TIMESTAMP",
         "tmNeedsConversion": false,

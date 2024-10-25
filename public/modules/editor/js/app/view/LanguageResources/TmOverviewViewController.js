@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -34,28 +33,30 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmOverviewPanel',
     routes: {
-        'languageresource': 'onTmOverviewRoute'
+        languageresource: 'onTmOverviewRoute',
     },
     listen: {
         component: {
             // This selector will select all menuitems inside toolbar's overflow-menu
             // so that click event is triggered on toolbar's corresponding item
             'button[iconCls="x-toolbar-more-icon"] > menu > menuitem': {
-                click: menuitem => menuitem.masterComponent.fireEvent('click')
-            }
-        }
+                click: (menuitem) => menuitem.masterComponent.fireEvent('click'),
+            },
+        },
     },
-    onTmOverviewRoute: function() {
+    onTmOverviewRoute: function () {
         Editor.app.openAdministrationSection(this.getView());
     },
-    onShowOnlyNotConverted: function(btn, pressed) {
+    onShowOnlyNotConverted: function (btn, pressed) {
         if (pressed) {
             btn.setText(Editor.data.l10n.general.showAll);
-            this.getView().getStore().load({
-                params: {
-                    filterTmNeedsConversion: true
-                }
-            });
+            this.getView()
+                .getStore()
+                .load({
+                    params: {
+                        filterTmNeedsConversion: true,
+                    },
+                });
 
             btn.up().down('#btnConvertTms').show();
 
@@ -77,18 +78,21 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
                 }
 
                 let resources = [];
-                me.getView().getStore().each(rec => resources.push(rec.get('id')))
+                me.getView()
+                    .getStore()
+                    .each((rec) => resources.push(rec.get('id')));
 
                 Ext.Ajax.request({
                     url: Editor.data.restpath + 'languageresourceinstance/synchronizetm/batch',
                     jsonData: {
-                        data: resources
+                        data: resources,
                     },
                     method: 'POST',
-                    failure: (records, op) => Editor.app.getController('ServerException').handleException(op.error.response),
-                    success: () => Editor.MessageBox.addSuccess(Editor.data.l10n.contentProtection.conversionStarted)
+                    failure: (records, op) =>
+                        Editor.app.getController('ServerException').handleException(op.error.response),
+                    success: () => Editor.MessageBox.addSuccess(Editor.data.l10n.contentProtection.conversionStarted),
                 });
-            }
+            },
         );
-    }
+    },
 });

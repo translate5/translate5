@@ -30,6 +30,7 @@ declare(strict_types=1);
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource;
+use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -101,8 +102,11 @@ class T5MemoryDeleteTmCommand extends Translate5AbstractCommand
     private function deleteLanguageResource($languageResource): bool
     {
         try {
-            $remover = ZfExtended_Factory::get(\editor_Models_LanguageResources_Remover::class, [$languageResource]);
-            $remover->remove(forced: true, deleteInResource: true);
+            DeleteLanguageResourceOperation::create()->delete(
+                $languageResource,
+                forced: true,
+                deleteInResource: true
+            );
 
             return true;
         } catch (\ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {

@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\LanguageResource\ReimportSegments;
+use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
+use MittagQI\Translate5\LanguageResource\LanguageResourceReimportQueue;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsService;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
@@ -200,19 +202,17 @@ class editor_FileController extends ZfExtended_RestController
         $resources = $assoc->getTaskUpdatable($this->getCurrentTask()->getTaskGuid());
 
         foreach ($resources as $resource) {
-            $worker = ZfExtended_Factory::get('editor_Models_LanguageResources_Worker');
-            /* @var editor_Models_LanguageResources_Worker $worker */
-
-            // init worker and queue it
-            // Since it has to be done in a none worker request to have session access,
-            // we have to insert the worker before the taskPost
-            if (! $worker->init($this->getCurrentTask()->getTaskGuid(), [
-                'languageResourceId' => $resource['languageResourceId'],
-                ReimportSegments::FILTER_TIMESTAMP => NOW_ISO,
-            ])) {
+            try {
+                (new LanguageResourceReimportQueue())->queueReimport(
+                    $this->getCurrentTask()->getTaskGuid(),
+                    $resource['languageResourceId'],
+                    [
+                        ReimportSegmentsService::FILTER_TIMESTAMP => NOW_ISO,
+                    ]
+                );
+            } catch (ReimportQueueException) {
                 throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
             }
-            $worker->queue();
         }
     }
 

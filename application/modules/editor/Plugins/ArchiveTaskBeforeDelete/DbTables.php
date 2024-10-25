@@ -132,6 +132,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_cross_language_resource_synchronization_connection' => false,
         'LEK_queued_export' => false,
         'LEK_cross_language_resource_synchronization_connection_customer' => false,
+        'LEK_task_tm_task_association' => false,
     ];
 
     /**

@@ -6,40 +6,59 @@ use editor_Models_LanguageResources_CustomerAssoc;
 use editor_Models_LanguageResources_Languages;
 use editor_Models_Languages;
 use editor_Models_Task as Task;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
+use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeType;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use Zend_Cache_Exception;
 use ZfExtended_Factory;
 
 class LanguageResourcesDefaults implements ITaskDefaults
 {
+    public function __construct(
+        private readonly LanguageResourceRepository $languageResourceRepository
+    ) {
+    }
+
     public function applyDefaults(Task $task, bool $importWizardUsed = false): void
     {
         $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
 
-        $data = $customerAssoc->loadByCustomerIdsUseAsDefault([$task->getCustomerId()]);
+        $customerAssocData = $customerAssoc->loadByCustomerIdsUseAsDefault([$task->getCustomerId()]);
 
-        if (empty($data)) {
+        if (empty($customerAssocData)) {
             return;
         }
 
         $taskGuid = $task->getTaskGuid();
 
-        $this->applyAssocData(
-            $this->findMatchingAssocData(
-                (int) $task->getSourceLang(),
-                (int) $task->getTargetLang(),
-                $data
-            ),
-            function ($assocRow) use ($taskGuid) {
-                $taskAssoc = ZfExtended_Factory::get(TaskAssociation::class);
-                $taskAssoc->setLanguageResourceId($assocRow['languageResourceId']);
-                $taskAssoc->setTaskGuid($taskGuid);
-                if (! empty($assocRow['writeAsDefault'])) {
-                    $taskAssoc->setSegmentsUpdateable(true);
-                }
-                $taskAssoc->save();
-            }
+        $data = $this->findMatchingAssocData(
+            (int) $task->getSourceLang(),
+            (int) $task->getTargetLang(),
+            $customerAssocData
         );
+
+        foreach ($data as $assocRow) {
+            $taskAssoc = ZfExtended_Factory::get(TaskAssociation::class);
+            $taskAssoc->setLanguageResourceId($assocRow['languageResourceId']);
+            $taskAssoc->setTaskGuid($taskGuid);
+
+            if (! empty($assocRow['writeAsDefault'])) {
+                $taskAssoc->setSegmentsUpdateable(true);
+            }
+
+            $taskAssoc->save();
+
+            EventDispatcher::create()->dispatch(
+                new LanguageResourceTaskAssociationChangeEvent(
+                    $this->languageResourceRepository->get((int) $assocRow['languageResourceId']),
+                    $taskGuid,
+                    LanguageResourceTaskAssociationChangeType::Add,
+                )
+            );
+        }
+
         $task->updateIsTerminologieFlag($task->getTaskGuid());
     }
 
@@ -53,9 +72,7 @@ class LanguageResourcesDefaults implements ITaskDefaults
         array $defaultData,
     ): iterable {
         if (0 === $sourceLang || 0 === $targetLang) {
-            yield from [];
-
-            return;
+            return yield from [];
         }
 
         $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
@@ -72,13 +89,6 @@ class LanguageResourcesDefaults implements ITaskDefaults
             if ($sourceLangMatch && $targetLangMatch) {
                 yield $data;
             }
-        }
-    }
-
-    protected function applyAssocData(iterable $dataIterator, callable $saveCallback): void
-    {
-        foreach ($dataIterator as $data) {
-            $saveCallback($data);
         }
     }
 }

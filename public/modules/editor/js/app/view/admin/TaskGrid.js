@@ -803,21 +803,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }]
         };
 
-        if (Editor.data.debug && Editor.data.debug.showTaskGuid) {
-            config.columns.items.unshift({
-                xtype: 'gridcolumn',
-                width: 120,
-                dataIndex: 'workflow',
-                stateId: 'workflow',
-                renderer: function (val, meta, rec) {
-                    return val + ' (' + Editor.util.Util.getWorkflowStepNameTranslated(rec.get('workflowStepName')) + ')';
-                },
-                filter: {
-                    type: 'string'
-                },
-                text: 'workflow'
-            });
-        }
         if (instanceConfig) {
             config = me.self.getConfigurator().merge(me, config, instanceConfig);
         }

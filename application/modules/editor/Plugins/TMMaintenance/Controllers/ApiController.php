@@ -81,6 +81,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
                     'sourceLanguage' => $resource['sourceLangCode'],
                     'targetLanguage' => $resource['targetLangCode'],
                     'clients' => $resource['customers'],
+                    'isTaskTm' => (bool) $resource['isTaskTm'],
                 ];
             },
             $languageResources
