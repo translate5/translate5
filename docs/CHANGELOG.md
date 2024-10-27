@@ -21,6 +21,36 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.13.0] - 2024-10-27
+
+### Important Notes:
+#### [TRANSLATE-4067](https://jira.translate5.net/browse/TRANSLATE-4067)
+For tasks, that are assigned with "write" rights to a TM, if a user saves segments to the task from now on segments are not immediately saved to the TM anymore. So far this was the case and lead to unreviewed segments and segments that even were about to be changed within the current work of a single translator could already appear in pre-translations of other tasks.
+This can be seen as a major bug.
+Now as a new feature a task TM is introduced, that makes sure, those segments are only saved into the TM with write access for the task, when the whole workflow is finished.
+So this is an important downwards incompatible change, that at the same time is a bug fix in the way of how translate5 works and therefore is rolled out to everyone.
+ 
+
+
+### Added
+**[TRANSLATE-4067](https://jira.translate5.net/browse/TRANSLATE-4067): LanguageResources, Task Management - Introduce Task TM in translate5** <br>
+Introduced Task TM concept for t5memory
+
+
+### Bugfixes
+**[TRANSLATE-4181](https://jira.translate5.net/browse/TRANSLATE-4181): Task Management, Workflows - Add missing workflow select field  and workflow steps from all existing workflows to task overview "advanced filters"** <br>
+Added filter by Workflow in task overview
+
+**[TRANSLATE-3987](https://jira.translate5.net/browse/TRANSLATE-3987): file format settings - wrong segmentation** <br>
+So far in certain cases it was segmented after a full stop (.), even if no whitespace followed. This is removed (the rule 
+<rule break="yes">
+<beforebreak>[\.!?…]['"\u00BB\u2019\u201D\u203A\p{Pe}\u0002]*</beforebreak>
+<afterbreak>\p{Lu}[^\p{Lu}]</afterbreak>
+</rule>
+got removed from srx)
+
+
 ## [7.12.0] - 2024-10-23
 
 ### Important Notes:
