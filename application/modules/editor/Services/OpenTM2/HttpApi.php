@@ -558,6 +558,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function reorganizeTm(string $tmName): bool
     {
         $http = $this->getHttpWithMemory('GET', $tmName, 'reorganize');
+
+        // TODO remove when version 0.4 is abandoned
         if ($this->processResponse($http->request())) {
             // since Version 0.4.48 we have the number of invalid segments in the result
             // {
