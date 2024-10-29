@@ -32,28 +32,20 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
-use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
-use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
 use MittagQI\Translate5\User\Contract\UserUpdateOperationInterface;
-use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
-use ZfExtended_ValidateException;
+use MittagQI\Translate5\User\Operations\Setters\UserPasswordSetter;
 
 final class UserUpdateOperation implements UserUpdateOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly ActionFeasibilityAssertInterface $userActionFeasibilityChecker,
-        private readonly UserSetRolesOperationInterface $setRoles,
-        private readonly UserSetPasswordOperation $setPassword,
-        private readonly UserAssignCustomersOperationInterface $assignCustomers,
+        private readonly UserPasswordSetter $setPassword,
         private readonly ResetPasswordEmail $resetPasswordEmail,
     ) {
     }
@@ -66,19 +58,13 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
         return new self(
             new UserRepository(),
             UserActionFeasibilityAssert::create(),
-            UserSetRolesOperation::create(),
-            UserSetPasswordOperation::create(),
-            UserAssignCustomersOperation::create(),
+            UserPasswordSetter::create(),
             ResetPasswordEmail::create(),
         );
     }
 
     /**
-     * @throws FeasibilityExceptionInterface
-     * @throws GuidAlreadyInUseException
-     * @throws LoginAlreadyInUseException
-     * @throws UserExceptionInterface
-     * @throws ZfExtended_ValidateException
+     * {@inheritDoc}
      */
     public function updateUser(User $user, UpdateUserDto $dto): void
     {
@@ -110,14 +96,6 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
 
         if (null !== $dto->password) {
             $this->setPassword->setPassword($user, $dto->password->password);
-        }
-
-        if (null !== $dto->roles) {
-            $this->setRoles->setRoles($user, $dto->roles);
-        }
-
-        if (null !== $dto->customers) {
-            $this->assignCustomers->assignCustomers($user, $dto->customers);
         }
 
         $user->validate();

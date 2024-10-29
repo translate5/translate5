@@ -33,11 +33,13 @@ namespace MittagQI\Translate5\LspJob\Contract;
 use MittagQI\Translate5\LspJob\DTO\NewLspJobDto;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
 
 interface CreateLspJobAssignmentOperationInterface
 {
     /**
      * @throws LspJobAlreadyExistsException
+     * @throws NotLspCustomerTaskException
      */
     public function assignJob(NewLspJobDto $dto): LspJobAssociation;
 }

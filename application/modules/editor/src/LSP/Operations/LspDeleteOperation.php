@@ -88,8 +88,8 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
         $this->lspRepository->delete($lsp);
 
         $this->logger->info(
-            'E1638',
-            'LSP audit: {message}',
+            'E1637',
+            'Audit: {message}',
             [
                 'message' => sprintf('LSP "%s" was deleted', $lsp->getName()),
                 'lsp' => $lsp->getName(),
@@ -118,7 +118,7 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
 
                 $this->logger->info(
                     'E1637',
-                    'User audit: {message}',
+                    'Audit: {message}',
                     [
                         'message' => sprintf('User (login: "%s") was deleted', $user->getLogin()),
                         'user' => $user->getLogin(),

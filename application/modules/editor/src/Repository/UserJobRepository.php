@@ -97,13 +97,54 @@ class UserJobRepository
     /**
      * @return iterable<UserJob>
      */
-    public function getUserJobsByLspJob(LspJobAssociation $lspJob): iterable
+    public function getUserJobsOfCustomer(string $userGuid, int $customerId): iterable
+    {
+        $job = ZfExtended_Factory::get(UserJob::class);
+        $taskDb = ZfExtended_Factory::get(Task::class)->db;
+
+        $select = $this->db
+            ->select()
+            ->from(['job' => $job->db->info($job->db::NAME)])
+            ->join(
+                [
+                    'task' => $taskDb->info($taskDb::NAME),
+                ],
+                'job.taskGuid = task.taskGuid',
+                []
+            )
+            ->where('job.type != ?', TypeEnum::Lsp->value)
+            ->where('job.userGuid = ?', $userGuid)
+            ->where('task.customerId = ?', $customerId)
+        ;
+
+        $stmt = $this->db->query($select);
+
+        while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $job->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $job;
+        }
+    }
+
+    /**
+     * @return iterable<UserJob>
+     */
+    public function getUserJobsByLspJob(int $lspJobId): iterable
     {
         $job = ZfExtended_Factory::get(UserJob::class);
         $select = $this->db
             ->select()
             ->from($job->db->info($job->db::NAME))
-            ->where('lspJobId = ?', $lspJob->getId());
+            ->where('lspJobId = ?', $lspJobId);
 
         foreach ($this->db->fetchAll($select) as $jobData) {
             $job->init(

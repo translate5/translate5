@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
+use MittagQI\Translate5\LspJob\Operation\WithAuthentication\DeleteLspJobAssignmentOperation;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -37,10 +41,12 @@ use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemo
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobWhichTaskIsLockedByUserException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\UserHasAlreadyOpenedTheTaskForEditingException;
 use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
+use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidTypeProvidedException;
+use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\UserJob\Operation\Factory\NewUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
@@ -230,15 +236,26 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
             $this->processClientReferenceVersion($job);
 
-            $deleteJobOperation = DeleteUserJobAssignmentOperation::create();
-
-            if ($this->getRequest()->has('force')) {
-                $deleteJobOperation->forceDelete($job);
-            } else {
-                $deleteJobOperation->delete($job);
-            }
+            $this->deleteJob($job);
         } catch (Throwable $e) {
             throw $this->transformException($e);
+        }
+    }
+
+    private function deleteJob(UserJob $job): void
+    {
+        $deleteJobOperation = $job->isLspJob()
+            ? DeleteLspJobAssignmentOperation::create()
+            : DeleteUserJobAssignmentOperation::create();
+
+        if ($job->isLspJob()) {
+            $job = LspJobRepository::create()->get((int) $job->getLspJobId());
+        }
+
+        if ($this->getRequest()->has('force')) {
+            $deleteJobOperation->forceDelete($job);
+        } else {
+            $deleteJobOperation->delete($job);
         }
     }
 
@@ -342,6 +359,30 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 [
                     'userGuid' => [
                         'Ein LSP-Benutzer kann nur LSP-bezogenen Auftrag zugewiesen werden.',
+                    ],
+                ],
+            ),
+            NotLspCustomerTaskException::class => EntityConflictException::createResponse(
+                'E1012',
+                [
+                    'id' => [
+                        'Aufgabe gehört nicht zu einem der LSP-KundenAufgabe gehört nicht zu einem der LSP-Kunden',
+                    ],
+                ],
+            ),
+            CoordinatorDontBelongToLspException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'userGuid' => [
+                        'Der Koordinator gehört nicht zum LSP',
+                    ],
+                ],
+            ),
+            AttemptToAssignLspUserToAJobBeforeLspJobCreatedException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'userGuid' => [
+                        'LSP-Benutzer kann einem Auftrag nicht zugewiesen werden, bevor der LSP-Auftrag erstellt wurde',
                     ],
                 ],
             ),

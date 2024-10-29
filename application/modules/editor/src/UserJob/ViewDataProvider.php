@@ -197,7 +197,7 @@ class ViewDataProvider
             'trackchangesShow' => (bool) $job->getTrackchangesShow(),
             'trackchangesShowAll' => (bool) $job->getTrackchangesShowAll(),
             'trackchangesAcceptReject' => (bool) $job->getTrackchangesAcceptReject(),
-            'type' => $job->getType()->name,
+            'type' => $job->getType()->value,
             'login' => $assignedUser->getLogin(),
             'firstName' => $assignedUser->getFirstName(),
             'surName' => $assignedUser->getSurName(),

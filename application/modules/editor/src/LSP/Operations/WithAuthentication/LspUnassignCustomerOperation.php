@@ -42,8 +42,12 @@ use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Contract\LspUnassignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
+use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
+use ZfExtended_NotAuthenticatedException;
 
 final class LspUnassignCustomerOperation implements LspUnassignCustomerOperationInterface
 {
@@ -57,6 +61,7 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
         private readonly ActionPermissionAssertInterface $customerActionPermissionAssert,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -71,6 +76,7 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
             CustomerActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            Zend_Registry::get('logger')->cloneMe('lsp.customer.unassign'),
         );
     }
 
@@ -78,24 +84,79 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
      * @throws NoAccessToLspException
      * @throws NoAccessToCustomerException
      * @throws PermissionExceptionInterface
-     * @throws \ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_NotAuthenticatedException
      */
     public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
-        $authUser = $this->userRepository->get($this->authentication->getUserId());
-
-        $this->lspActionPermissionAssert->assertGranted(
-            Action::Update,
-            $lsp,
-            new PermissionAssertContext($authUser)
-        );
-
-        $this->customerActionPermissionAssert->assertGranted(
-            Action::Read,
-            $customer,
-            new PermissionAssertContext($authUser)
-        );
+        $this->assertPermissionsGranted($lsp, $customer);
 
         $this->generalOperation->unassignCustomer($lsp, $customer);
+    }
+
+    /**
+     * @throws NoAccessToLspException
+     * @throws NoAccessToCustomerException
+     * @throws PermissionExceptionInterface
+     * @throws ZfExtended_NotAuthenticatedException
+     */
+    public function forceUnassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
+    {
+        $this->assertPermissionsGranted($lsp, $customer);
+
+        $this->generalOperation->forceUnassignCustomer($lsp, $customer);
+    }
+
+    private function assertPermissionsGranted(LanguageServiceProvider $lsp, Customer $customer): void
+    {
+        try {
+            $authUser = $this->userRepository->get($this->authentication->getUserId());
+        } catch (InexistentUserException) {
+            throw new ZfExtended_NotAuthenticatedException();
+        }
+
+        try {
+            $context = new PermissionAssertContext($authUser);
+
+            $this->lspActionPermissionAssert->assertGranted(Action::Update, $lsp, $context);
+            $this->customerActionPermissionAssert->assertGranted(Action::Read, $customer, $context);
+
+            $this->logger->info(
+                'E1637',
+                'Audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to unassign Customer (number: "%s") from LSP (name: %s) by AuthUser (guid: %s) was granted',
+                        $customer->getNumber(),
+                        $lsp->getName(),
+                        $authUser->getUserGuid()
+                    ),
+                    'customerNumber' => $customer->getNumber(),
+                    'customerId' => $customer->getId(),
+                    'lsp' => $lsp->getName(),
+                    'lspId' => $lsp->getId(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                ]
+            );
+        } catch (PermissionExceptionInterface $e) {
+            $this->logger->info(
+                'E1637',
+                'Audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to unassign Customer (number: "%s") from LSP (name: %s) by AuthUser (guid: %s) was not granted',
+                        $customer->getNumber(),
+                        $lsp->getName(),
+                        $authUser->getUserGuid()
+                    ),
+                    'customerNumber' => $customer->getNumber(),
+                    'customerId' => $customer->getId(),
+                    'lsp' => $lsp->getName(),
+                    'lspId' => $lsp->getId(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                ]
+            );
+
+            throw $e;
+        }
     }
 }

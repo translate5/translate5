@@ -102,14 +102,14 @@ class LspRepository implements LspRepositoryInterface
     }
 
     public function findCustomerAssignment(
-        LanguageServiceProvider $lsp,
-        Customer $customer,
+        int $lspId,
+        int $customerId,
     ): ?LanguageServiceProviderCustomer {
         $model = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
         $db = $model->db;
         $select = $db->select()
-            ->where('lspId = ?', $lsp->getId())
-            ->where('customerId = ?', $customer->getId());
+            ->where('lspId = ?', $lspId)
+            ->where('customerId = ?', $customerId);
 
         $row = $db->fetchRow($select);
 
@@ -127,9 +127,15 @@ class LspRepository implements LspRepositoryInterface
         $lspCustomer->save();
     }
 
-    public function deleteCustomerAssignment(LanguageServiceProviderCustomer $lspCustomer): void
+    public function deleteCustomerAssignment(int $lspId, int $customerId): void
     {
-        $lspCustomer->delete();
+        $model = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
+        $model->db->delete(
+            [
+                'lspId = ?' => $lspId,
+                'customerId = ?' => $customerId,
+            ]
+        );
     }
 
     /**
@@ -194,7 +200,7 @@ class LspRepository implements LspRepositoryInterface
     /**
      * @return int[]
      */
-    public function getCustomerIds(LanguageServiceProvider $lsp): array
+    public function getCustomerIds(int $lspId): array
     {
         $customer = ZfExtended_Factory::get(Customer::class);
         $lspToCustomerTable = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class)
@@ -213,7 +219,7 @@ class LspRepository implements LspRepositoryInterface
             ->join([
                 'lspToCustomer' => $lspToCustomerTable,
             ], 'customer.id = lspToCustomer.customerId', [])
-            ->where('lspToCustomer.lspId = ?', $lsp->getId())
+            ->where('lspToCustomer.lspId = ?', $lspId)
             ->group('customer.id')
         ;
 

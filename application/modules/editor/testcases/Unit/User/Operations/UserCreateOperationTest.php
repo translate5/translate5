@@ -38,13 +38,13 @@ use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
+use MittagQI\Translate5\User\Contract\UserRolesSetterInterface;
 use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
+use MittagQI\Translate5\User\Operations\Setters\UserPasswordSetter;
 use MittagQI\Translate5\User\Operations\UserCreateOperation;
-use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -52,9 +52,9 @@ class UserCreateOperationTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
 
-    private UserSetRolesOperationInterface|MockObject $setRoles;
+    private UserRolesSetterInterface|MockObject $setRoles;
 
-    private UserSetPasswordOperation|MockObject $setPassword;
+    private UserPasswordSetter|MockObject $setPassword;
 
     private UserAssignCustomersOperationInterface|MockObject $assignCustomers;
 
@@ -71,8 +71,8 @@ class UserCreateOperationTest extends TestCase
     public function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->setRoles = $this->createMock(UserSetRolesOperationInterface::class);
-        $this->setPassword = $this->createMock(UserSetPasswordOperation::class);
+        $this->setRoles = $this->createMock(UserRolesSetterInterface::class);
+        $this->setPassword = $this->createMock(UserPasswordSetter::class);
         $this->assignCustomers = $this->createMock(UserAssignCustomersOperationInterface::class);
         $this->lspUserCreate = $this->createMock(LspUserCreateOperation::class);
         $this->resetPasswordEmail = $this->createMock(ResetPasswordEmail::class);

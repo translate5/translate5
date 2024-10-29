@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations;
 use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\Operations\UserSetRolesOperation;
+use MittagQI\Translate5\User\Operations\Setters\UserRolesSetter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
@@ -44,14 +44,14 @@ class UserSetRolesOperationTest extends TestCase
 
     private ZfExtended_Acl|MockObject $acl;
 
-    private UserSetRolesOperation $operation;
+    private UserRolesSetter $operation;
 
     protected function setUp(): void
     {
         $this->rolesValidator = $this->createMock(RolesValidator::class);
         $this->acl = $this->createMock(ZfExtended_Acl::class);
 
-        $this->operation = new UserSetRolesOperation(
+        $this->operation = new UserRolesSetter(
             $this->rolesValidator,
             $this->acl,
         );

@@ -31,23 +31,18 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations\WithAuthentication;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Contract\UserUpdateOperationInterface;
-use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
 use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Logger;
-use ZfExtended_ValidateException;
 
 class UserUpdateOperation implements UserUpdateOperationInterface
 {
@@ -72,17 +67,22 @@ class UserUpdateOperation implements UserUpdateOperationInterface
     }
 
     /**
-     * @throws FeasibilityExceptionInterface
-     * @throws GuidAlreadyInUseException
-     * @throws LoginAlreadyInUseException
-     * @throws PermissionExceptionInterface
-     * @throws UserExceptionInterface
-     * @throws ZfExtended_ValidateException
+     * {@inheritDoc}
      */
     public function updateUser(User $user, UpdateUserDto $dto): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
+        $this->checkPermissions($user, $authUser);
+
+        $this->operation->updateUser($user, $dto);
+    }
+
+    /**
+     * @throws PermissionExceptionInterface
+     */
+    public function checkPermissions(User $user, User $authUser): void
+    {
         try {
             $this->permissionAssert->assertGranted(
                 Action::Update,
@@ -92,7 +92,7 @@ class UserUpdateOperation implements UserUpdateOperationInterface
 
             $this->logger->info(
                 'E1637',
-                'User audit: {message}',
+                'Audit: {message}',
                 [
                     'message' => sprintf(
                         'Attempt to update User (guid: "%s") by AuthUser (guid: %s) was granted',
@@ -107,7 +107,7 @@ class UserUpdateOperation implements UserUpdateOperationInterface
         } catch (PermissionExceptionInterface $e) {
             $this->logger->info(
                 'E1637',
-                'User audit: {message}',
+                'Audit: {message}',
                 [
                     'message' => sprintf(
                         'Attempt to update User (guid: "%s") by AuthUser (guid: %s) was not granted',
@@ -123,7 +123,5 @@ class UserUpdateOperation implements UserUpdateOperationInterface
 
             throw $e;
         }
-
-        $this->operation->updateUser($user, $dto);
     }
 }

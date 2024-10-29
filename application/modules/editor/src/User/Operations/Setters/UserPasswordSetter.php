@@ -28,22 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Asserts;
+namespace MittagQI\Translate5\User\Operations\Setters;
 
-use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
-use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
-use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
-use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\User\Model\User;
+use Zend_Exception;
+use ZfExtended_Authentication;
+use ZfExtended_AuthenticationInterface;
+use ZfExtended_ValidateException;
 
-/**
- * @implements FeasibilityAssertInterface<LspJobAssociation>
- */
-class HasUnDeletableSubLspJobAssert implements FeasibilityAssertInterface
+class UserPasswordSetter
 {
     public function __construct(
-        private readonly LspJobRepository $lspJobRepository,
-        private readonly LspJobActionFeasibilityAssert $lspJobActionFeasibilityAssert,
+        private readonly ZfExtended_AuthenticationInterface $authentication,
     ) {
     }
 
@@ -53,20 +49,28 @@ class HasUnDeletableSubLspJobAssert implements FeasibilityAssertInterface
     public static function create(): self
     {
         return new self(
-            LspJobRepository::create(),
-            LspJobActionFeasibilityAssert::create(),
+            ZfExtended_Authentication::getInstance(),
         );
     }
 
-    public function supports(Action $action): bool
+    /**
+     * @throws Zend_Exception
+     * @throws ZfExtended_ValidateException
+     */
+    public function setPassword(User $user, ?string $password): void
     {
-        return $action === Action::Delete;
-    }
-
-    public function assertAllowed(object $object): void
-    {
-        foreach ($this->lspJobRepository->getSubLspJobs($object) as $subJob) {
-            $this->lspJobActionFeasibilityAssert->assertAllowed(Action::Delete, $subJob);
+        if (null !== $password && '' === trim($password)) {
+            throw new \InvalidArgumentException('Password cannot be empty string');
         }
+
+        if (null !== $password) {
+            $user->setPasswd($password);
+
+            $user->validate();
+        }
+
+        $password = null === $password ? null : $this->authentication->createSecurePassword($password);
+
+        $user->setPasswd($password);
     }
 }

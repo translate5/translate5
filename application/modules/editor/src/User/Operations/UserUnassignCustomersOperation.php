@@ -28,28 +28,38 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Contract;
+namespace MittagQI\Translate5\User\Operations;
 
-use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
-use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
-use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
-use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
-use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Contract\UserUnassignCustomersOperationInterface;
 use MittagQI\Translate5\User\Model\User;
-use Zend_Acl_Exception;
-use ZfExtended_ValidateException;
 
-interface UserSetRolesOperationInterface
+final class UserUnassignCustomersOperation implements UserUnassignCustomersOperationInterface
 {
+    public function __construct(
+        private readonly UserRepository $userRepository,
+    ) {
+    }
+
     /**
-     * @param string[] $roles
-     * @throws RolesetHasConflictingRolesException
-     * @throws RoleConflictWithRoleThatPopulatedToRolesetException
-     * @throws UserIsNotAuthorisedToAssignRoleException
-     * @throws ConflictingRolesExceptionInterface
-     * @throws RolesCannotBeSetForUserException
-     * @throws Zend_Acl_Exception
-     * @throws ZfExtended_ValidateException
+     * @codeCoverageIgnore
      */
-    public function setRoles(User $user, array $roles): void;
+    public static function create(): self
+    {
+        return new self(
+            new UserRepository(),
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function unassignCustomers(User $user, int ...$unassignCustomerIds): void
+    {
+        $customerIds = $user->getCustomersArray();
+
+        $user->assignCustomers(array_diff($customerIds, $unassignCustomerIds));
+
+        $this->userRepository->save($user);
+    }
 }

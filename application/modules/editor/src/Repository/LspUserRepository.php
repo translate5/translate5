@@ -166,7 +166,7 @@ class LspUserRepository implements LspUserRepositoryInterface
     }
 
     /**
-     * @return iterable<User>
+     * {@inheritDoc}
      */
     public function getUsers(int $lspId): iterable
     {
@@ -196,6 +196,16 @@ class LspUserRepository implements LspUserRepositoryInterface
             $user->init($row);
 
             yield clone $user;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getLspUsers(LanguageServiceProvider $lsp): iterable
+    {
+        foreach ($this->getUsers((int) $lsp->getId()) as $user) {
+            yield new LspUser($user->getUserGuid(), $user, $lsp);
         }
     }
 }

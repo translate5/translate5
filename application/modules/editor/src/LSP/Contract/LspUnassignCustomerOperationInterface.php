@@ -31,9 +31,15 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP\Contract;
 
 use editor_Models_Customer_Customer as Customer;
+use MittagQI\Translate5\LSP\Exception\LspHasUnDeletableJobException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
 interface LspUnassignCustomerOperationInterface
 {
+    /**
+     * @throws LspHasUnDeletableJobException
+     */
     public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void;
+
+    public function forceUnassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void;
 }

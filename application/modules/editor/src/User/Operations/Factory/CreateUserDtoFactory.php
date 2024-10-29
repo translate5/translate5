@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations\Factory;
 
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
@@ -43,11 +42,8 @@ use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
-use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
-use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
-use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
 use REST_Controller_Request_Http as Request;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
@@ -62,8 +58,6 @@ class CreateUserDtoFactory
         private readonly LspRepositoryInterface $lspRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly ActionPermissionAssertInterface $lspPermissionAssert,
-        private readonly RolesValidator $rolesValidator,
-        private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
     ) {
     }
 
@@ -78,16 +72,13 @@ class CreateUserDtoFactory
             LspRepository::create(),
             JobCoordinatorRepository::create(),
             LspActionPermissionAssert::create(),
-            RolesValidator::create(),
-            UserCustomerAssociationValidator::create(),
         );
     }
 
     /**
      * @throws AttemptToSetLspForNonJobCoordinatorException
-     * @throws CustomerDoesNotBelongToUserException
      * @throws PermissionExceptionInterface
-     * @throws UserIsNotAuthorisedToAssignRoleException
+     * @throws \MittagQI\Translate5\LSP\Exception\LspNotFoundException
      */
     public function fromRequest(Request $request): CreateUserDto
     {
@@ -108,10 +99,6 @@ class CreateUserDtoFactory
         );
 
         $authUser = $this->userRepository->get($this->authentication->getUserId());
-
-        $this->userCustomerAssociationValidator->assertUserCanAssignCustomers($authUser, $customerIds);
-
-        $this->rolesValidator->assertUserCanSetRoles($authUser, $roles);
 
         $lsp = $this->fetchLspForAssignment($data['lsp'] ?? null, $authUser);
 
@@ -134,6 +121,10 @@ class CreateUserDtoFactory
         );
     }
 
+    /**
+     * @throws PermissionExceptionInterface
+     * @throws \MittagQI\Translate5\LSP\Exception\LspNotFoundException
+     */
     private function fetchLspForAssignment(?int $lspId, User $authUser): ?LanguageServiceProvider
     {
         if (null !== $lspId) {
@@ -150,10 +141,6 @@ class CreateUserDtoFactory
 
         $coordinator = $this->coordinatorRepository->findByUser($authUser);
 
-        if ($coordinator) {
-            return $coordinator->lsp;
-        }
-
-        return null;
+        return $coordinator?->lsp;
     }
 }

@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\User\Operations;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\User\Operations\Setters\UserPasswordSetter;
 use Zend_Exception;
 use ZfExtended_ValidateException;
 
@@ -40,7 +41,7 @@ final class UserUpdatePasswordOperation
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly UserSetPasswordOperation $setPassword,
+        private readonly UserPasswordSetter $setPassword,
         private readonly ResetPasswordEmail $resetPasswordEmail,
     ) {
     }
@@ -52,7 +53,7 @@ final class UserUpdatePasswordOperation
     {
         return new self(
             new UserRepository(),
-            UserSetPasswordOperation::create(),
+            UserPasswordSetter::create(),
             ResetPasswordEmail::create(),
         );
     }

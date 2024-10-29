@@ -34,11 +34,14 @@ use editor_Models_TaskUserAssoc as UserJob;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
@@ -61,6 +64,7 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
         private readonly TaskRepository $taskRepository,
+        private readonly LspRepositoryInterface $lspRepository,
         private readonly LspJobRepository $lspJobRepository,
         private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly UserJobActionFeasibilityAssert $feasibilityAssert,
@@ -79,6 +83,7 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         return new self(
             UserJobRepository::create(),
             new TaskRepository(),
+            LspRepository::create(),
             LspJobRepository::create(),
             LspUserRepository::create(),
             UserJobActionFeasibilityAssert::create(),
@@ -246,6 +251,12 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
             JobCoordinator::fromLspUser($lspUser);
         } catch (CantCreateCoordinatorFromUserException) {
             throw new OnlyCoordinatorCanBeAssignedToLspJobException();
+        }
+
+        $currentCoordinator = $this->lspUserRepository->getByUserGuid($job->getUserGuid());
+
+        if (! $currentCoordinator->lsp->same($lspUser->lsp)) {
+            throw new CoordinatorDontBelongToLspException();
         }
 
         $job->setUserGuid($dto->userGuid);

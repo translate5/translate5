@@ -30,10 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LspJob\ActionAssert\Feasibility;
 
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
-use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Asserts\HasUnDeletableSubLspJobAssert;
+use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Asserts\HasUnDeletableUserJobAssert;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\Repository\LspJobRepository;
 
 /**
  * @extends ActionFeasibilityAssert<LspJobAssociation>
@@ -41,13 +43,41 @@ use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 final class LspJobActionFeasibilityAssert extends ActionFeasibilityAssert
 {
     /**
+     * @param FeasibilityAssertInterface<LspJobAssociation>[] $asserts
+     */
+    public function __construct(
+        private readonly LspJobRepository $lspJobRepository,
+        array $asserts,
+    ) {
+        parent::__construct($asserts);
+    }
+
+    /**
      * @codeCoverageIgnore
      */
     public static function create(): self
     {
-        return new self([
-            HasUnDeletableUserJobAssert::create(),
-            HasUnDeletableSubLspJobAssert::create(),
-        ]);
+        return new self(
+            LspJobRepository::create(),
+            [
+                HasUnDeletableUserJobAssert::create(),
+            ],
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function assertAllowed(Action $action, object $object): void
+    {
+        parent::assertAllowed($action, $object);
+
+        if (Action::Delete !== $action) {
+            return;
+        }
+
+        foreach ($this->lspJobRepository->getSubLspJobs($object) as $subJob) {
+            $this->assertAllowed($action, $subJob);
+        }
     }
 }

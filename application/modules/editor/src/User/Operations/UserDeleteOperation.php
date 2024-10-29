@@ -100,7 +100,7 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
 
         $this->logger->info(
             'E1637',
-            'User audit: {message}',
+            'Audit: {message}',
             [
                 'message' => sprintf('User (login: "%s") was deleted', $user->getLogin()),
                 'user' => $user->getLogin(),

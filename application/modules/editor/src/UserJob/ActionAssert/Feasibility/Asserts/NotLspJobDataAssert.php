@@ -28,16 +28,38 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Exception;
+namespace MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Asserts;
 
-use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\LSP\JobCoordinator;
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
+use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobInUseException;
 
-final class CoordinatorHassAssignedLspJobException extends \Exception implements FeasibilityExceptionInterface
+/**
+ * @implements FeasibilityAssertInterface<UserJob>
+ */
+class NotLspJobDataAssert implements FeasibilityAssertInterface
 {
-    public function __construct(
-        public readonly JobCoordinator $coordinator,
-    ) {
-        parent::__construct();
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self();
+    }
+
+    public function supports(Action $action): bool
+    {
+        return $action === Action::Delete;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function assertAllowed(object $object): void
+    {
+        if ($object->isLspJob()) {
+            throw new AttemptToRemoveJobInUseException($object);
+        }
     }
 }

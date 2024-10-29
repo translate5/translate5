@@ -161,7 +161,11 @@ class editor_LspcustomerController extends ZfExtended_RestController
         $customer = $this->customerRepository->get((int) $this->getRequest()->getParam('id'));
 
         try {
-            $this->lspUnassignCustomerOperation->unassignCustomer($lsp, $customer);
+            if ($this->getRequest()->getParam('force')) {
+                $this->lspUnassignCustomerOperation->forceUnassignCustomer($lsp, $customer);
+            } else {
+                $this->lspUnassignCustomerOperation->unassignCustomer($lsp, $customer);
+            }
         } catch (NoAccessException $e) {
             throw new ZfExtended_NoAccessException(previous: $e);
         }

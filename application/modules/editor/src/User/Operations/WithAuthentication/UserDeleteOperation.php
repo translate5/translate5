@@ -104,7 +104,7 @@ class UserDeleteOperation implements UserDeleteOperationInterface
 
             $this->logger->info(
                 'E1637',
-                'User audit: {message}',
+                'Audit: {message}',
                 [
                     'message' => sprintf(
                         'Attempt to delete User (login: "%s") by AuthUser (guid: %s) was granted',
@@ -119,7 +119,7 @@ class UserDeleteOperation implements UserDeleteOperationInterface
         } catch (PermissionExceptionInterface $e) {
             $this->logger->info(
                 'E1637',
-                'User audit: {message}',
+                'Audit: {message}',
                 [
                     'message' => sprintf(
                         'Attempt to delete User (login: "%s") by AuthUser (guid: %s) was not granted',

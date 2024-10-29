@@ -28,18 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Operations;
+namespace MittagQI\Translate5\User\Operations\Setters;
 
+use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\Acl\Validation\RolesValidator;
+use MittagQI\Translate5\User\Contract\UserRolesSetterInterface;
 use MittagQI\Translate5\User\Model\User;
-use Zend_Exception;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
-use ZfExtended_ValidateException;
 
-class UserSetPasswordOperation
+final class UserRolesSetter implements UserRolesSetterInterface
 {
     public function __construct(
-        private readonly ZfExtended_AuthenticationInterface $authentication,
+        private readonly RolesValidator $rolesValidator,
+        private readonly Roles $roles,
     ) {
     }
 
@@ -49,28 +49,24 @@ class UserSetPasswordOperation
     public static function create(): self
     {
         return new self(
-            ZfExtended_Authentication::getInstance(),
+            RolesValidator::create(),
+            Roles::create(),
         );
     }
 
     /**
-     * @throws Zend_Exception
-     * @throws ZfExtended_ValidateException
+     * {@inheritDoc}
      */
-    public function setPassword(User $user, ?string $password): void
+    public function setRoles(User $user, array $roles): void
     {
-        if (null !== $password && '' === trim($password)) {
-            throw new \InvalidArgumentException('Password cannot be empty string');
-        }
+        $this->rolesValidator->assertRolesDontConflict($roles);
 
-        if (null !== $password) {
-            $user->setPasswd($password);
+        $roles = $this->roles->expandListWithAutoRoles($roles, []);
 
-            $user->validate();
-        }
+        $this->rolesValidator->assertRolesCanBeSetForUser($roles, $user);
 
-        $password = null === $password ? null : $this->authentication->createSecurePassword($password);
+        $user->setRoles($roles);
 
-        $user->setPasswd($password);
+        $user->validate();
     }
 }

@@ -1315,6 +1315,10 @@ div.internal-tag.number span.full::after {
     color: #b6b6b6;
 }
 
+.lsp-job-row {
+    background-color: rgb(181 217 250 / 60%);
+}
+
 .x-boundlist-item .x-item-disabled {
     color: #ccc;
     cursor: not-allowed;

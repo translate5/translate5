@@ -37,9 +37,8 @@ use MittagQI\Translate5\User\Model\User;
 interface UserAssignCustomersOperationInterface
 {
     /**
-     * @param int[] $associatedCustomerIds
      * @throws CustomerDoesNotBelongToUserException
      * @throws CustomerDoesNotBelongToLspException
      */
-    public function assignCustomers(User $user, array $associatedCustomerIds): void;
+    public function assignCustomers(User $user, int ...$newCustomerIds): void;
 }

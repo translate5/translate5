@@ -55,13 +55,13 @@ class LspCustomerAssociationValidator
     /**
      * @throws CustomerDoesNotBelongToLspException
      */
-    public function assertCustomersAreSubsetForLSP(LanguageServiceProvider $lsp, int ...$customerIds): void
+    public function assertCustomersAreSubsetForLSP(int $lspId, int ...$customerIds): void
     {
-        $lspCustomersIds = $this->lspRepository->getCustomerIds($lsp);
+        $lspCustomersIds = $this->lspRepository->getCustomerIds($lspId);
 
         foreach ($customerIds as $customerId) {
             if (! in_array($customerId, $lspCustomersIds, true)) {
-                throw new CustomerDoesNotBelongToLspException($customerId, (int) $lsp->getId());
+                throw new CustomerDoesNotBelongToLspException($customerId, $lspId);
             }
         }
     }

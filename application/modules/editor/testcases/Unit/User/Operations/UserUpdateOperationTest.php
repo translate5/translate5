@@ -35,12 +35,12 @@ use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionI
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
+use MittagQI\Translate5\User\Contract\UserRolesSetterInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\PasswordDto;
 use MittagQI\Translate5\User\Operations\DTO\UpdateUserDto;
-use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
+use MittagQI\Translate5\User\Operations\Setters\UserPasswordSetter;
 use MittagQI\Translate5\User\Operations\UserUpdateOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -52,9 +52,9 @@ class UserUpdateOperationTest extends TestCase
 
     private ActionFeasibilityAssertInterface|MockObject $userActionFeasibilityChecker;
 
-    private UserSetRolesOperationInterface|MockObject $setRoles;
+    private UserRolesSetterInterface|MockObject $setRoles;
 
-    private UserSetPasswordOperation|MockObject $setPassword;
+    private UserPasswordSetter|MockObject $setPassword;
 
     private UserAssignCustomersOperationInterface|MockObject $assignCustomers;
 
@@ -66,8 +66,8 @@ class UserUpdateOperationTest extends TestCase
     {
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->userActionFeasibilityChecker = $this->createMock(ActionFeasibilityAssertInterface::class);
-        $this->setRoles = $this->createMock(UserSetRolesOperationInterface::class);
-        $this->setPassword = $this->createMock(UserSetPasswordOperation::class);
+        $this->setRoles = $this->createMock(UserRolesSetterInterface::class);
+        $this->setPassword = $this->createMock(UserPasswordSetter::class);
         $this->assignCustomers = $this->createMock(UserAssignCustomersOperationInterface::class);
         $this->resetPasswordEmail = $this->createMock(ResetPasswordEmail::class);
 

@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LspJob\Operation;
 
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
 use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
@@ -42,10 +43,13 @@ use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
 
 class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperationInterface
 {
+    /**
+     * @param ActionFeasibilityAssert<LspJobAssociation> $lspJobActionFeasibilityAssert
+     */
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
         private readonly UserJobRepository $userJobRepository,
-        private readonly LspJobActionFeasibilityAssert $userJobActionFeasibilityAssert,
+        private readonly ActionFeasibilityAssert $lspJobActionFeasibilityAssert,
         private readonly DeleteUserJobAssignmentOperationInterface $deleteUserJobAssignmentOperation,
     ) {
     }
@@ -68,7 +72,7 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
      */
     public function delete(LspJobAssociation $job): void
     {
-        $this->userJobActionFeasibilityAssert->assertAllowed(Action::Delete, $job);
+        $this->lspJobActionFeasibilityAssert->assertAllowed(Action::Delete, $job);
 
         $this->forceDelete($job);
     }
@@ -79,15 +83,12 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
             $this->forceDelete($subJob);
         }
 
-        foreach ($this->userJobRepository->getUserJobsByLspJob($job) as $userJob) {
-            if ($userJob->isLspJob()) {
-                $this->userJobRepository->delete($userJob);
-
-                continue;
-            }
-
+        foreach ($this->userJobRepository->getUserJobsByLspJob((int) $job->getId()) as $userJob) {
             $this->deleteUserJobAssignmentOperation->forceDelete($userJob);
         }
+
+        $dataJob = $this->userJobRepository->getDataJobByLspJob($job);
+        $this->userJobRepository->delete($dataJob);
 
         $this->lspJobRepository->delete($job);
     }

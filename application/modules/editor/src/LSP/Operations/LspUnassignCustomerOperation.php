@@ -31,19 +31,32 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP\Operations;
 
 use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\LSP\Contract\LspUnassignCustomerOperationInterface;
-use MittagQI\Translate5\LSP\Event\CustomerUnassignedFromLspEvent;
+use MittagQI\Translate5\LSP\Contract\LspUserUnassignCustomersOperationInterface;
+use MittagQI\Translate5\LSP\Exception\LspHasUnDeletableJobException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
+use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspRepository;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use MittagQI\Translate5\Repository\LspUserRepository;
 
 final class LspUnassignCustomerOperation implements LspUnassignCustomerOperationInterface
 {
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly LspJobRepository $lspJobRepository,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly ActionFeasibilityAssert $lspJobActionFeasibilityAssert,
+        private readonly DeleteLspJobAssignmentOperationInterface $deleteLspJobAssignmentOperation,
+        private readonly LspUserUnassignCustomersOperationInterface $lspUserUnassignCustomersOperation,
     ) {
     }
 
@@ -54,20 +67,79 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
     {
         return new self(
             LspRepository::create(),
-            EventDispatcher::create(),
+            LspJobRepository::create(),
+            LspUserRepository::create(),
+            LspJobActionFeasibilityAssert::create(),
+            DeleteLspJobAssignmentOperation::create(),
+            LspUserUnassignCustomersOperation::create(),
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
-        $lspCustomer = $this->lspRepository->findCustomerAssignment($lsp, $customer);
+        $lspCustomer = $this->lspRepository->findCustomerAssignment((int) $lsp->getId(), (int) $customer->getId());
 
         if (! $lspCustomer) {
             return;
         }
 
-        $this->lspRepository->deleteCustomerAssignment($lspCustomer);
+        $this->assertLspJobsCanBeDeleted((int) $lsp->getId(), (int) $customer->getId());
+        $this->deleteAssociationWithDependencies($lsp, $customer);
+    }
 
-        $this->eventDispatcher->dispatch(new CustomerUnassignedFromLspEvent($lsp, $customer));
+    /**
+     * {@inheritDoc}
+     */
+    public function forceUnassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
+    {
+        $lspCustomer = $this->lspRepository->findCustomerAssignment((int) $lsp->getId(), (int) $customer->getId());
+
+        if (! $lspCustomer) {
+            return;
+        }
+
+        $this->deleteAssociationWithDependencies($lsp, $customer);
+    }
+
+    private function deleteAssociationWithDependencies(LanguageServiceProvider $lsp, Customer $customer): void
+    {
+        foreach ($this->lspRepository->getSubLspList($lsp) as $subLsp) {
+            error_log($subLsp->getName());
+            $this->forceUnassignCustomer($subLsp, $customer);
+        }
+
+        $lspJobs = $this->getLspJobsIterator((int) $lsp->getId(), (int) $customer->getId());
+
+        foreach ($lspJobs as $lspJob) {
+            $this->deleteLspJobAssignmentOperation->forceDelete($lspJob);
+        }
+
+        foreach ($this->lspUserRepository->getLspUsers($lsp) as $lspUser) {
+            $this->lspUserUnassignCustomersOperation->forceUnassignCustomers($lspUser, (int) $customer->getId());
+        }
+
+        $this->lspRepository->deleteCustomerAssignment((int) $lsp->getId(), (int) $customer->getId());
+    }
+
+    private function assertLspJobsCanBeDeleted(int $lspId, int $customerId): void
+    {
+        try {
+            foreach ($this->getLspJobsIterator($lspId, $customerId) as $lspJob) {
+                $this->lspJobActionFeasibilityAssert->assertAllowed(Action::Delete, $lspJob);
+            }
+        } catch (FeasibilityExceptionInterface $e) {
+            throw new LspHasUnDeletableJobException(previous: $e);
+        }
+    }
+
+    /**
+     * @return iterable<LspJobAssociation>
+     */
+    private function getLspJobsIterator(int $lspId, int $customerId): iterable
+    {
+        return $this->lspJobRepository->getLspJobsOfCustomer($lspId, $customerId);
     }
 }

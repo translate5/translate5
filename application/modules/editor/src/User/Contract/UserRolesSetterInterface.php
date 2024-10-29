@@ -28,57 +28,28 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Operations;
+namespace MittagQI\Translate5\User\Contract;
 
 use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
+use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\Acl\Validation\RolesValidator;
-use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
+use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
+use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use Zend_Acl_Exception;
 use ZfExtended_ValidateException;
 
-/**
- * Ment to be used to initialize roles for a user.
- * So only on User creation or in special cases where the roles need to be reinitialized.
- */
-final class UserSetRolesOperation implements UserSetRolesOperationInterface
+interface UserRolesSetterInterface
 {
-    public function __construct(
-        private readonly RolesValidator $rolesValidator,
-        private readonly Roles $roles,
-    ) {
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self(
-            RolesValidator::create(),
-            Roles::create(),
-        );
-    }
-
     /**
      * @param string[] $roles
+     * @throws RolesetHasConflictingRolesException
+     * @throws RoleConflictWithRoleThatPopulatedToRolesetException
+     * @throws UserIsNotAuthorisedToAssignRoleException
      * @throws ConflictingRolesExceptionInterface
      * @throws RolesCannotBeSetForUserException
      * @throws Zend_Acl_Exception
      * @throws ZfExtended_ValidateException
      */
-    public function setRoles(User $user, array $roles): void
-    {
-        $this->rolesValidator->assertRolesDontConflict($roles);
-
-        $roles = $this->roles->expandListWithAutoRoles($roles, []);
-
-        $this->rolesValidator->assertRolesCanBeSetForUser($roles, $user);
-
-        $user->setRoles($roles);
-
-        $user->validate();
-    }
+    public function setRoles(User $user, array $roles): void;
 }

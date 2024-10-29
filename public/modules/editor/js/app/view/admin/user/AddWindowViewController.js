@@ -79,8 +79,18 @@ Ext.define('Editor.view.admin.user.AddWindowViewController', {
 
                 if (response.errorsTranslated && typeof response.errorsTranslated[Symbol.iterator] === 'function') {
                     for (const error of response.errorsTranslated) {
-                        if (basic.findField(error.id).hidden) {
-                            Editor.MessageBox.addWarning(error.msg);
+                        if (! error.id || basic.findField(error.id).hidden) {
+                            if (error.hasOwnProperty('msg')) {
+                                Editor.MessageBox.addWarning(error.msg);
+
+                                continue;
+                            }
+
+                            if (typeof error[Symbol.iterator] === 'function') {
+                                for (const msg of error) {
+                                    Editor.MessageBox.addWarning(msg);
+                                }
+                            }
                         }
                     }
 

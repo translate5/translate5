@@ -38,7 +38,7 @@ use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
-use MittagQI\Translate5\User\Contract\UserSetRolesOperationInterface;
+use MittagQI\Translate5\User\Contract\UserRolesSetterInterface;
 use MittagQI\Translate5\User\Exception\CustomerNotProvidedOnClientRestrictedUserCreationException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
@@ -47,6 +47,8 @@ use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
+use MittagQI\Translate5\User\Operations\Setters\UserPasswordSetter;
+use MittagQI\Translate5\User\Operations\Setters\UserRolesSetter;
 use Throwable;
 use ZfExtended_ValidateException;
 
@@ -54,8 +56,8 @@ final class UserCreateOperation implements UserCreateOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly UserSetRolesOperationInterface $setRoles,
-        private readonly UserSetPasswordOperation $setPassword,
+        private readonly UserRolesSetterInterface $setRoles,
+        private readonly UserPasswordSetter $setPassword,
         private readonly UserAssignCustomersOperationInterface $assignCustomers,
         private readonly LspUserCreateOperation $lspUserCreate,
         private readonly ResetPasswordEmail $resetPasswordEmail,
@@ -71,8 +73,8 @@ final class UserCreateOperation implements UserCreateOperationInterface
     {
         return new self(
             new UserRepository(),
-            UserSetRolesOperation::create(),
-            UserSetPasswordOperation::create(),
+            UserRolesSetter::create(),
+            UserPasswordSetter::create(),
             UserAssignCustomersOperation::create(),
             LspUserCreateOperation::create(),
             ResetPasswordEmail::create(),
@@ -116,16 +118,14 @@ final class UserCreateOperation implements UserCreateOperationInterface
 
         $this->userRepository->save($user);
 
+        $lspUser = null;
+
+        if (null !== $lsp) {
+            $lspUser = $this->lspUserCreate->createLspUser($lsp, $user);
+        }
+
         try {
-            $lspUser = null;
-
-            if (null !== $lsp) {
-                $lspUser = $this->lspUserCreate->createLspUser($lsp, $user);
-            }
-
             $this->assignCustomers->assignCustomers($user, $dto->customers);
-
-            $this->userRepository->save($user);
         } catch (Throwable $e) {
             if ($lspUser) {
                 $this->lspUserRepository->delete($lspUser);

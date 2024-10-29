@@ -51,13 +51,13 @@ interface LspRepositoryInterface
     public function delete(LanguageServiceProvider $lsp): void;
 
     public function findCustomerAssignment(
-        LanguageServiceProvider $lsp,
-        Customer $customer,
+        int $lspId,
+        int $customerId,
     ): ?LanguageServiceProviderCustomer;
 
     public function saveCustomerAssignment(LanguageServiceProviderCustomer $lspCustomer): void;
 
-    public function deleteCustomerAssignment(LanguageServiceProviderCustomer $lspCustomer): void;
+    public function deleteCustomerAssignment(int $lspId, int $customerId): void;
 
     /**
      * @return iterable<LanguageServiceProvider>
@@ -72,7 +72,7 @@ interface LspRepositoryInterface
     /**
      * @return int[]
      */
-    public function getCustomerIds(LanguageServiceProvider $lsp): array;
+    public function getCustomerIds(int $lspId): array;
 
     /**
      * @return iterable<LanguageServiceProvider>

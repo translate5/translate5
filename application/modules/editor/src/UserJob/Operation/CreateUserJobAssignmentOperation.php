@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\UserJob\Operation;
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LspJob\Contract\CreateLspJobAssignmentOperationInterface;
@@ -48,6 +49,7 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
+use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\UserJob\Exception\OnlyOneUniqueLspJobCanBeAssignedPerTaskException;
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
@@ -92,6 +94,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
      * @throws OnlyCoordinatorCanBeAssignedToLspJobException
      * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
      * @throws TrackChangesRightsAreNotSubsetOfLspJobException
+     * @throws NotLspCustomerTaskException
      */
     public function assignJob(NewUserJobDto $dto): UserJob
     {
@@ -114,7 +117,6 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         $job->setWorkflow($dto->workflow->workflow);
         $job->setWorkflowStepName($dto->workflow->workflowStepName);
         $job->setType($dto->type);
-        $job->setSegmentrange($dto->segmentRange);
         $job->setAssignmentDate($dto->assignmentDate);
         $job->setDeadlineDate($dto->deadlineDate);
         $job->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
@@ -122,11 +124,23 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         $job->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
         $job->setLspJobId($lspJob?->getId());
 
-        $job->validate();
+        if (null !== $dto->segmentRange) {
+            $job->setSegmentrange($dto->segmentRange);
+        }
 
-        $job->createstaticAuthHash();
+        try {
+            $job->validate();
 
-        $this->userJobRepository->save($job);
+            $job->createstaticAuthHash();
+
+            $this->userJobRepository->save($job);
+        } catch (\Throwable $e) {
+            if (null !== $lspJob) {
+                $this->lspJobRepository->delete($lspJob);
+            }
+
+            throw $e;
+        }
 
         $this->logger->info('E1012', 'job created', [
             'task' => $task,
@@ -140,6 +154,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
      * @throws AttemptToAssignLspUserToAJobBeforeLspJobCreatedException
      * @throws OnlyCoordinatorCanBeAssignedToLspJobException
      * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
+     * @throws NotLspCustomerTaskException
      */
     public function resolveLspJob(LspUser $lspUser, NewUserJobDto $dto): LspJobAssociation
     {

@@ -36,6 +36,7 @@ use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterfac
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserHasUnDeletableJobException;
 use MittagQI\Translate5\User\Model\User;
@@ -53,6 +54,7 @@ class JobRestrictionAssert implements FeasibilityAssertInterface
         private readonly UserJobRepository $userJobRepository,
         private readonly ActionFeasibilityAssertInterface $userJobActionFeasibilityAssert,
         private readonly ActionFeasibilityAssertInterface $lspJobActionFeasibilityAssert,
+        private readonly LspJobRepository $lspJobRepository,
     ) {
     }
 
@@ -65,6 +67,7 @@ class JobRestrictionAssert implements FeasibilityAssertInterface
             UserJobRepository::create(),
             UserJobActionFeasibilityAssert::create(),
             LspJobActionFeasibilityAssert::create(),
+            LspJobRepository::create(),
         );
     }
 
@@ -77,7 +80,9 @@ class JobRestrictionAssert implements FeasibilityAssertInterface
     {
         foreach ($this->userJobRepository->getJobsByUserGuid($object->getUserGuid()) as $job) {
             if ($job->isLspJob()) {
-                $this->lspJobActionFeasibilityAssert->assertAllowed(Action::Delete, $job);
+                $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
+
+                $this->lspJobActionFeasibilityAssert->assertAllowed(Action::Delete, $lspJob);
 
                 continue;
             }

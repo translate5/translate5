@@ -46,7 +46,6 @@ final class LspAssignCustomerOperation implements LspAssignCustomerOperationInte
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
         private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
-        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -63,13 +62,16 @@ final class LspAssignCustomerOperation implements LspAssignCustomerOperationInte
     }
 
     /**
-     * @throws CustomerDoesNotBelongToLspException
+     * {@inheritDoc}
      */
     public function assignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
         if (! $lsp->isDirectLsp()) {
             $parentLsp = $this->lspRepository->get((int) $lsp->getParentId());
-            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($parentLsp, (int) $customer->getId());
+            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(
+                (int) $parentLsp->getId(),
+                (int) $customer->getId()
+            );
         }
 
         $lspCustomer = $this->lspRepository->getEmptyLspCustomerModel();
@@ -77,7 +79,5 @@ final class LspAssignCustomerOperation implements LspAssignCustomerOperationInte
         $lspCustomer->setCustomerId((int) $customer->getId());
 
         $this->lspRepository->saveCustomerAssignment($lspCustomer);
-
-        $this->eventDispatcher->dispatch(new CustomerAssignedToLspEvent($lsp, $customer));
     }
 }

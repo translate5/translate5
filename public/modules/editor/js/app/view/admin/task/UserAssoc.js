@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -39,6 +38,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     alias: 'widget.adminTaskUserAssoc',
     itemId: 'adminTaskUserAssoc',
     strings: {
+        type: '#UT#Typ',
         fieldStep: '#UT#Workflowschritt',
         fieldState: '#UT#Status',
         fieldUser: '#UT#Benutzer',
@@ -61,149 +61,181 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     },
     border: 0,
     initConfig: function (instanceConfig) {
-        var me = this,
-            config;
+        var me = this, config;
 
         config = {
             title: me.title, //see EXT6UPD-9
-            items: [{
-                xtype: 'adminTaskUserAssocGrid',
-                bind:{
-                    //INFO: this will load only the users of the task when projectTaskGrid selection is changed
-                    //override the store binding in the place where the component is used/defined
-                    //the default usage is in the task properties panel
-                    store:'{userAssoc}'
+            items: [
+                {
+                    xtype: 'adminTaskUserAssocGrid', bind: {
+                        //INFO: this will load only the users of the task when projectTaskGrid selection is changed
+                        //override the store binding in the place where the component is used/defined
+                        //the default usage is in the task properties panel
+                        store: '{userAssoc}'
+                    }, region: 'center'
                 },
-                region: 'center'
-            }, {
-                xtype: 'container',
-                region: 'east',
-                autoScroll: true,
-                height: 'auto',
-                width: 300,
-                items: [{
+                {
                     xtype: 'container',
-                    itemId: 'editInfoOverlay',
-                    cls: 'edit-info-overlay',
-                    padding: 10,
-                    bind: {
-                        html: '{editInfoHtml}'
-                    }
-                },
-                    {
-                    xtype: 'form',
-                    title: me.strings.formTitleAdd,
-                    hidden: true,
-                    bodyPadding: 10,
                     region: 'east',
-                    reference: 'assocForm',
-                    itemId: 'userAssocForm',
-                    defaults: {
-                        labelAlign: 'top'
-                    },
-                    items: [{
-                        anchor: '100%',
-                        xtype: 'combo',
-                        allowBlank: false,
-                        editable: false,
-                        forceSelection: true,
-                        queryMode: 'local',
-                        name: 'workflowStepName',
-                        fieldLabel: me.strings.fieldStep,
-                        valueField: 'id',
-                        bind: {
-                            store: '{steps}'
-                        }
-                    }, {
-                        anchor: '100%',
-                        xtype: 'combo',
-                        allowBlank: false,
-                        listConfig: {
-                            loadMask: false
-                        },
-                        bind: {
-                            store: '{users}'
-                        },
-                        forceSelection: true,
-                        anyMatch: true,
-                        queryMode: 'local',
-                        name: 'userGuid',
-                        displayField: 'longUserName',
-                        valueField: 'userGuid',
-                        fieldLabel: me.strings.fieldUser
-                    }, {
-                        anchor: '100%',
-                        xtype: 'combo',
-                        allowBlank: false,
-                        editable: false,
-                        forceSelection: true,
-                        name: 'state',
-                        queryMode: 'local',
-                        fieldLabel: me.strings.fieldState,
-                        valueField: 'id',
-                        displayField: 'text',
-                        bind: {
-                            store: '{states}'
-                        },
-                        listConfig: {
-                            getInnerTpl: function() {
-                                // add css class to the selection item if the state is disabled.
-                                // disabled state is for example the auto-finish state
-                                return '<div class="{[values.disabled ? "x-item-disabled" : ""]}">{text}</div>';
+                    autoScroll: true,
+                    height: 'auto',
+                    width: 300,
+                    items: [
+                        {
+                            xtype: 'container',
+                            itemId: 'editInfoOverlay',
+                            cls: 'edit-info-overlay',
+                            padding: 10,
+                            bind: {
+                                html: '{editInfoHtml}'
                             }
                         },
-                        listeners: {
-                            beforeselect: me.onUserStateBeforeSelect
+                        {
+                            xtype: 'form',
+                            title: me.strings.formTitleAdd,
+                            hidden: true,
+                            bodyPadding: 10,
+                            region: 'east',
+                            reference: 'assocForm',
+                            itemId: 'userAssocForm',
+                            defaults: {
+                                labelAlign: 'top'
+                            },
+                            items: [
+                                {
+                                    anchor: '100%',
+                                    xtype: 'combo',
+                                    allowBlank: false,
+                                    editable: false,
+                                    forceSelection: true,
+                                    queryMode: 'local',
+                                    name: 'type',
+                                    fieldLabel: me.strings.type,
+                                    displayField: 'name',
+                                    valueField: 'value',
+                                    store: {
+                                        fields: ['name', 'value'],
+                                        data: [
+                                            { name: 'Editor', value: 1 },
+                                            { name: 'LSP', value: 2 },
+                                        ]
+                                    }
+                                },
+                                {
+                                    anchor: '100%',
+                                    xtype: 'combo',
+                                    allowBlank: false,
+                                    editable: false,
+                                    forceSelection: true,
+                                    queryMode: 'local',
+                                    name: 'workflowStepName',
+                                    fieldLabel: me.strings.fieldStep,
+                                    valueField: 'id',
+                                    bind: {
+                                        store: '{steps}'
+                                    }
+                                },
+                                {
+                                    anchor: '100%',
+                                    xtype: 'combo',
+                                    allowBlank: false,
+                                    listConfig: {
+                                        loadMask: false
+                                    },
+                                    bind: {
+                                        store: '{users}'
+                                    },
+                                    forceSelection: true,
+                                    anyMatch: true,
+                                    queryMode: 'local',
+                                    name: 'userGuid',
+                                    displayField: 'longUserName',
+                                    valueField: 'userGuid',
+                                    fieldLabel: me.strings.fieldUser
+                                },
+                                {
+                                    anchor: '100%',
+                                    xtype: 'combo',
+                                    allowBlank: false,
+                                    editable: false,
+                                    forceSelection: true,
+                                    name: 'state',
+                                    queryMode: 'local',
+                                    fieldLabel: me.strings.fieldState,
+                                    valueField: 'id',
+                                    displayField: 'text',
+                                    bind: {
+                                        store: '{states}'
+                                    },
+                                    listConfig: {
+                                        getInnerTpl: function () {
+                                            // add css class to the selection item if the state is disabled.
+                                            // disabled state is for example the auto-finish state
+                                            return '<div class="{[values.disabled ? "x-item-disabled" : ""]}">{text}</div>';
+                                        }
+                                    },
+                                    listeners: {
+                                        beforeselect: me.onUserStateBeforeSelect
+                                    }
+                                },
+                                {
+                                    xtype: 'datetimefield',
+                                    name: 'deadlineDate',
+                                    format: Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
+                                    fieldLabel: me.strings.fieldDeadline,
+                                    labelCls: 'labelInfoIcon',
+                                    cls: 'userAssocLabelIconField',
+                                    autoEl: {
+                                        tag: 'span',
+                                        'data-qtip': me.strings.deadlineDateInfoTooltip
+                                    },
+                                    anchor: '100%'
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    itemId: 'segmentrange',
+                                    name: 'segmentrange',
+                                    fieldLabel: me.strings.fieldSegmentrange,
+                                    labelCls: 'labelInfoIcon',
+                                    cls: 'userAssocLabelIconField',
+                                    bind: {
+                                        disabled: '{disableRanges}'
+                                    },
+                                    autoEl: {
+                                        tag: 'span',
+                                        'data-qtip': me.strings.fieldSegmentrangeInfo
+                                    },
+                                    anchor: '100%'
+                                }
+                            ],
+                            dockedItems: [
+                                {
+                                    xtype: 'toolbar',
+                                    dock: 'bottom',
+                                    ui: 'footer',
+                                    items: [
+                                        {
+                                            xtype: 'tbfill'
+                                        },
+                                        {
+                                            xtype: 'button',
+                                            itemId: 'save-assoc-btn',
+                                            glyph: 'f00c@FontAwesome5FreeSolid',
+                                            text: me.strings.btnSave
+                                        },
+                                        {
+                                            xtype: 'button',
+                                            glyph: 'f00d@FontAwesome5FreeSolid',
+                                            itemId: 'cancel-assoc-btn',
+                                            text: me.strings.btnCancel
+                                        }
+                                    ]
+                                }
+                            ]
                         }
-                    }, {
-                        xtype: 'datetimefield',
-                        name: 'deadlineDate',
-                        format: Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
-                        fieldLabel: me.strings.fieldDeadline,
-                        labelCls: 'labelInfoIcon',
-                        cls: 'userAssocLabelIconField',
-                        autoEl: {
-                            tag: 'span',
-                            'data-qtip': me.strings.deadlineDateInfoTooltip
-                        },
-                        anchor: '100%'
-                    }, {
-                        xtype: 'textfield',
-                        itemId: 'segmentrange',
-                        name: 'segmentrange',
-                        fieldLabel: me.strings.fieldSegmentrange,
-                        labelCls: 'labelInfoIcon',
-                        cls: 'userAssocLabelIconField',
-                        bind:{
-                            disabled: '{disableRanges}'
-                        },
-                        autoEl: {
-                            tag: 'span',
-                            'data-qtip': me.strings.fieldSegmentrangeInfo
-                        },
-                        anchor: '100%'
-                    }],
-                    dockedItems: [{
-                        xtype: 'toolbar',
-                        dock: 'bottom',
-                        ui: 'footer',
-                        items: [{
-                            xtype: 'tbfill'
-                        }, {
-                            xtype: 'button',
-                            itemId: 'save-assoc-btn',
-                            glyph: 'f00c@FontAwesome5FreeSolid',
-                            text: me.strings.btnSave
-                        },
-                            {
-                                xtype: 'button',
-                                glyph: 'f00d@FontAwesome5FreeSolid',
-                                itemId: 'cancel-assoc-btn',
-                                text: me.strings.btnCancel
-                            }]
-                    }]
-                }]
-            }]
+                    ]
+                }
+            ]
         };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
@@ -212,7 +244,6 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     },
     /**
      * loads all or all available users into the dropdown, the store is reused to get the username to userguids
-     * @param {Boolean} edit true if edit an assoc, false if add a new one
      */
     loadUsers: function () {
         var me = this,
@@ -226,25 +257,39 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
      * @param {Editor.data.model.admin.TaskUserAssoc} rec
      */
     loadRecord: function (rec) {
-        var me = this,
+        const me = this,
             edit = !rec.phantom,
             form = me.down('form'),
-            user = me.down('combo[name="userGuid"]');
+            user = me.down('combo[name="userGuid"]'),
+            typeCombo = form.down('combo[name="type"]'),
+            workflowStepCombo = form.down('combo[name="workflowStepName"]')
+        ;
+
         form.loadRecord(rec);
+
         if (edit) {
             form.setTitle(Ext.String.format(me.strings.formTitleEdit, rec.get('longUserName')));
         } else {
-            me.loadUsers(edit);
             form.setTitle(me.strings.formTitleAdd);
         }
-        user.setVisible(!edit);
-        user.setDisabled(edit);
+
+        if (! edit || rec.get('isLspJob')) {
+            me.loadUsers(edit);
+        }
+
+        user.setVisible(! edit || rec.get('isLspJob'));
+        user.setDisabled(edit && ! rec.get('isLspJob'));
+
+        workflowStepCombo.setVisible(! edit || ! rec.get('isLspJob'));
+        workflowStepCombo.setDisabled(edit && rec.get('isLspJob'));
+
+        typeCombo.setDisabled(edit);
+        typeCombo.setVisible(! edit);
     },
 
-    onUserStateBeforeSelect: function(combo, record) {
+    onUserStateBeforeSelect: function (combo, record) {
         // if record is loaded in the form or when we change the user state to the same state, allow selection
-        if(combo.getValue() === null || combo.getValue() === record.get('id'))
-        {
+        if (combo.getValue() === null || combo.getValue() === record.get('id')) {
             return true;
         }
         // prevent selection if the record is disabled

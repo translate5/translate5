@@ -10203,6 +10203,34 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Sie können für diesen Benutzer keine {Rollen} festlegen.</source>
                 <target>You cannot set {roles} for this user.</target>
             </trans-unit>
+            <trans-unit id='RGllIEtvb3JkaW5hdG9yZW5yb2xsZSBrYW5uIGRlbSBCZW51dHplciBuaWNodCBlbnR6b2dlbiB3ZXJkZW46IHtyZWFzb259'>
+                <source>Die Koordinatorenrolle kann dem Benutzer nicht entzogen werden:</source>
+                <target>Can't remove Coordinator role from user: {reason}</target>
+            </trans-unit>
+            <trans-unit id='QmVudXR6ZXIgaXN0IGxldHp0ZXIgSm9iLUtvb3JkaW5hdG9yIGRlcyBMU1A='>
+                <source>Benutzer ist letzter Job-Koordinator des LSP</source>
+                <target>The user is last Job Coordinator of LSP</target>
+            </trans-unit>
+            <trans-unit id='RGVyIEJlbnV0emVyIGlzdCBKb2ItS29vcmRpbmF0b3IgZsO8ciBlaW5pZ2UgTFNQIEF1ZnRyw6RnZS4='>
+                <source>Der Benutzer ist Job-Koordinator für einige LSP Aufträge.</source>
+                <target>The user is the job coordinator for some LSP jobs.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIEt1bmRlICJ7Y3VzdG9tZXJ9IiBrYW5uIG5pY2h0IGF1cyBkZW0gS29vcmRpbmF0b3IgZW50ZmVybnQgd2VyZGVuLCBkYSBlciBlaW5pZ2UgTFNQLUF1ZnRyw6RnZSBoYXQsIGRpZSB6dSBkaWVzZW0gS3VuZGVuIGdlaMO2cmVuLg=='>
+                <source>Der Kunde "{customer}" kann nicht aus dem Koordinator entfernt werden, da er einige LSP-Aufträge hat, die zu diesem Kunden gehören.</source>
+                <target>The customer “{customer}” cannot be removed from the Coordinator because it has some LSP jobs that belong to the customer.</target>
+            </trans-unit>
+            <trans-unit id='QXVmZ2FiZSBnZWjDtnJ0IG5pY2h0IHp1IGVpbmVtIGRlciBMU1AtS3VuZGVuQXVmZ2FiZSBnZWjDtnJ0IG5pY2h0IHp1IGVpbmVtIGRlciBMU1AtS3VuZGVu'>
+                <source>Aufgabe gehört nicht zu einem der LSP-KundenAufgabe gehört nicht zu einem der LSP-Kunden</source>
+                <target>Task does not belong to one of LSP customers</target>
+            </trans-unit>
+            <trans-unit id='RGVyIEtvb3JkaW5hdG9yIGdlaMO2cnQgbmljaHQgenVtIExTUA=='>
+                <source>Der Koordinator gehört nicht zum LSP</source>
+                <target>Coordinator does not belong to LSP</target>
+            </trans-unit>
+            <trans-unit id='TFNQLUJlbnV0emVyIGthbm4gZWluZW0gQXVmdHJhZyBuaWNodCB6dWdld2llc2VuIHdlcmRlbiwgYmV2b3IgZGVyIExTUC1BdWZ0cmFnIGVyc3RlbGx0IHd1cmRl'>
+                <source>LSP-Benutzer kann einem Auftrag nicht zugewiesen werden, bevor der LSP-Auftrag erstellt wurde</source>
+                <target>LSP user cannot be assigned to a job before the LSP job has been created</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

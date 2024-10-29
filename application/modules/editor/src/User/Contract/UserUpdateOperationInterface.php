@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Contract;
 
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
@@ -43,6 +44,7 @@ interface UserUpdateOperationInterface
      * @throws FeasibilityExceptionInterface
      * @throws GuidAlreadyInUseException
      * @throws LoginAlreadyInUseException
+     * @throws PermissionExceptionInterface
      * @throws UserExceptionInterface
      * @throws \ZfExtended_ValidateException
      */

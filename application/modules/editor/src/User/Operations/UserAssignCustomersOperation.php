@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations;
 
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
@@ -39,6 +39,7 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
 {
     public function __construct(
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -49,18 +50,23 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
     {
         return new self(
             UserCustomerAssociationValidator::create(),
+            new UserRepository(),
         );
     }
 
     /**
-     * @param int[] $associatedCustomerIds
-     * @throws CustomerDoesNotBelongToLspException
+     * {@inheritDoc}
      */
-    public function assignCustomers(User $user, array $associatedCustomerIds): void
+    public function assignCustomers(User $user, int ...$newCustomerIds): void
     {
-        $this->userCustomerAssociationValidator
-            ->assertCustomersMayBeAssociatedWithUser($user, ...$associatedCustomerIds);
+        if (empty($newCustomerIds)) {
+            return;
+        }
 
-        $user->assignCustomers($associatedCustomerIds);
+        $this->userCustomerAssociationValidator->assertCustomersMayBeAssociatedWithUser($user, ...$newCustomerIds);
+
+        $user->assignCustomers(array_merge($user->getCustomersArray(), $newCustomerIds));
+
+        $this->userRepository->save($user);
     }
 }

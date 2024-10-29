@@ -214,9 +214,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
 
         if (emptySel) {
             formPanel.getForm().reset();
-        } else {
-            me.getUserAssoc().loadRecord(selection[0]);
+
+            return;
         }
+
+        me.getUserAssoc().loadRecord(selection[0]);
+
+        me.getUserAssoc().fireEvent('editassoc', selection[0], formPanel);
     },
 
     /**

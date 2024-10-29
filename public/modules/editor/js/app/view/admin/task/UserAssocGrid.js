@@ -42,6 +42,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
         confirmDeleteTitle: '#UT#Eintrag löschen?',
         confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
         userGuidCol: '#UT#Benutzer',
+        typeCol: '#UT#Typ',
         roleCol: '#UT#Rolle',
         stepCol: '#UT#Workflowschritt',
         segmentrangeCol: '#UT#Segmente',
@@ -88,6 +89,22 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                         type: 'string'
                     },
                     text: me.strings.userGuidCol
+                }, {
+                    xtype: 'gridcolumn',
+                    width: 120,
+                    dataIndex: 'type',
+                    renderer: function (v, meta, rec) {
+                        const types = {
+                            1: 'Editor',
+                            2: 'LSP',
+                        };
+
+                        return types[v];
+                    },
+                    filter: {
+                        type: 'string'
+                    },
+                    text: me.strings.typeCol
                 }, {
                     xtype: 'gridcolumn',
                     width: 100,
@@ -196,6 +213,12 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                     }]
                 }]
             };
+
+        config.viewConfig = {
+            getRowClass: function (record, rowIndex, rowParams, store) {
+                return record.get('isLspJob') ? 'lsp-job-row' : '';
+            }
+        };
 
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

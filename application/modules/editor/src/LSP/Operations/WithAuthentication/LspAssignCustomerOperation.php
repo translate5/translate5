@@ -40,6 +40,7 @@ use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessToLspException;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Contract\LspAssignCustomerOperationInterface;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\UserRepository;
 use ZfExtended_Authentication;
@@ -75,6 +76,7 @@ class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
     }
 
     /**
+     * @throws CustomerDoesNotBelongToLspException
      * @throws NoAccessToLspException
      * @throws NoAccessToCustomerException
      * @throws PermissionExceptionInterface

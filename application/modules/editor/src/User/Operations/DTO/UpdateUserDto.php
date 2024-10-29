@@ -30,6 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations\DTO;
 
+use MittagQI\Translate5\User\Exception\AttemptToChangeLspForUserException;
+use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
+use REST_Controller_Request_Http as Request;
+use ZfExtended_Models_User;
+
 class UpdateUserDto
 {
     /**
@@ -47,5 +52,46 @@ class UpdateUserDto
         public readonly ?PasswordDto $password = null,
         public readonly ?string $locale = null,
     ) {
+    }
+
+    /**
+     * @throws AttemptToSetLspForNonJobCoordinatorException
+     */
+    public static function fromRequest(Request $request): UpdateUserDto
+    {
+        $data = $request->getParam('data');
+        $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
+
+        if (isset($data['lsp'])) {
+            throw new AttemptToChangeLspForUserException((int) $request->getParam('id'));
+        }
+
+        $roles = explode(',', trim($data['roles'] ?? '', ' ,'));
+
+        $customerIds = array_filter(
+            array_map(
+                'intval',
+                explode(',', trim($data['customers'] ?? '', ' ,'))
+            )
+        );
+
+        $password = null;
+
+        if (array_key_exists('passwd', $data)) {
+            $passwd = null !== $data['passwd'] ? trim($data['passwd']) : null;
+            $password = new PasswordDto($passwd);
+        }
+
+        return new UpdateUserDto(
+            $data['login'] ?? null,
+            $data['email'] ?? null,
+            $data['firstName'] ?? null,
+            $data['surName'] ?? null,
+            $data['gender'] ?? ZfExtended_Models_User::GENDER_NONE,
+            $roles,
+            $customerIds,
+            $password,
+            $data['locale'] ?? null,
+        );
     }
 }

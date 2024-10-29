@@ -129,7 +129,11 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
 
         Ext.Msg.confirm(
             l10n.unassignCustomer,
-            Ext.String.format(l10n.confirmUnassignCustomer, customer.get('name'), lsp.get('name')),
+            Ext.String.format(
+                l10n.confirmUnassignCustomer,
+                Ext.String.htmlEncode(customer.get('name')),
+                Ext.String.htmlEncode(lsp.get('name'))
+            ),
             (btn) => {
                 if (btn === 'no') {
                     return;
@@ -142,6 +146,7 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
                         lsp.load({
                             callback: (record) => {
                                 Ext.ComponentQuery.query('lspEditCustomerWindow')[0].loadRecord(record);
+                                this.onRefreshClick();
                             },
                         });
                     },

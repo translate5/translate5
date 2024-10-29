@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
@@ -160,6 +161,76 @@ class LspJobRepository
 
             yield clone $job;
         }
+    }
+
+    /**
+     * @return iterable<LspJobAssociation>
+     */
+    public function getLspJobsOfCustomer(int $lspId, int $customerId): iterable
+    {
+        $job = ZfExtended_Factory::get(LspJobAssociation::class);
+        $taskDb = ZfExtended_Factory::get(Task::class)->db;
+
+        $select = $this->db
+            ->select()
+            ->from(['lspJob' => $job->db->info($job->db::NAME)])
+            ->join(
+                [
+                    'task' => $taskDb->info($taskDb::NAME),
+                ],
+                'lspJob.taskGuid = task.taskGuid',
+                []
+            )
+            ->where('lspJob.lspId = ?', $lspId)
+            ->where('task.customerId = ?', $customerId)
+        ;
+
+        $stmt = $this->db->query($select);
+
+        while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $job->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $job;
+        }
+    }
+
+    public function coordinatorHasLspJobsOfCustomer(string $userGuid, int $customerId): bool
+    {
+        $job = ZfExtended_Factory::get(LspJobAssociation::class);
+        $userJobDb = ZfExtended_Factory::get(UserJob::class)->db;
+        $taskDb = ZfExtended_Factory::get(Task::class)->db;
+
+        $select = $this->db
+            ->select()
+            ->from(['lspJob' => $job->db->info($job->db::NAME)], 'COUNT(*)')
+            ->join(
+                [
+                    'userJob' => $userJobDb->info($userJobDb::NAME),
+                ],
+                'lspJob.id = userJob.lspJobId',
+                []
+            )
+            ->join(
+                [
+                    'task' => $taskDb->info($taskDb::NAME),
+                ],
+                'lspJob.taskGuid = task.taskGuid',
+                []
+            )
+            ->where('userJob.userGuid = ?', $userGuid)
+            ->where('task.customerId = ?', $customerId)
+        ;
+
+        return (int) $this->db->fetchOne($select) > 0;
     }
 
     /**

@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 
 /**
  * @template T of object
@@ -40,7 +40,7 @@ interface FeasibilityAssertInterface
 {
     /**
      * @param T $object
-     * @throws PermissionExceptionInterface
+     * @throws FeasibilityExceptionInterface
      */
     public function assertAllowed(object $object): void;
 

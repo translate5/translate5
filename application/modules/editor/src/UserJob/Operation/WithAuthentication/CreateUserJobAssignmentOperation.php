@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\UserJob\Operation\WithAuthentication;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
@@ -40,9 +41,15 @@ use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
+use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
+use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
+use MittagQI\Translate5\UserJob\Exception\OnlyOneUniqueLspJobCanBeAssignedPerTaskException;
+use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
@@ -80,6 +87,18 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         );
     }
 
+    /**
+     * @throws InexistentUserException
+     * @throws ZfExtended_NotAuthenticatedException
+     * @throws ZfExtended_NotFoundException
+     * @throws PermissionExceptionInterface
+     * @throws AttemptToAssignLspUserToAJobBeforeLspJobCreatedException
+     * @throws InexistentTaskException
+     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
+     * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
+     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
+     * @throws NotLspCustomerTaskException
+     */
     public function assignJob(NewUserJobDto $dto): UserJob
     {
         try {

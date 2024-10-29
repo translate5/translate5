@@ -31,12 +31,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHassAssignedLspJobException;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHasAssignedLspJobException;
 
 /**
  * @implements FeasibilityAssertInterface<JobCoordinator>
@@ -69,7 +67,7 @@ class LspJobRestrictionAssert implements FeasibilityAssertInterface
     public function assertAllowed(object $object): void
     {
         if ($this->lspJobRepository->coordinatorAssignedToLspJobs($object)) {
-            throw new CoordinatorHassAssignedLspJobException($object);
+            throw new CoordinatorHasAssignedLspJobException($object);
         }
     }
 }

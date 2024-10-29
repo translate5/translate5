@@ -55,16 +55,20 @@ class NewUserJobDto
             throw new InvalidStateProvidedException();
         }
 
-        try {
-            new DateTime($deadlineDate);
-        } catch (Exception) {
-            throw new InvalidDeadlineDateStringProvidedException();
+        if (null !== $deadlineDate) {
+            try {
+                new DateTime($deadlineDate);
+            } catch (Exception) {
+                throw new InvalidDeadlineDateStringProvidedException();
+            }
         }
 
-        try {
-            new DateTime($assignmentDate);
-        } catch (Exception) {
-            throw new InvalidAssignmentDateStringProvidedException();
+        if (null !== $assignmentDate) {
+            try {
+                new DateTime($assignmentDate);
+            } catch (Exception) {
+                throw new InvalidAssignmentDateStringProvidedException();
+            }
         }
     }
 }

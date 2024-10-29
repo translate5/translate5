@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
+use MittagQI\Translate5\User\Operations\Setters\UserPasswordSetter;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_ValidateException;
@@ -45,7 +45,7 @@ class UserSetPasswordOperationTest extends TestCase
 
         $user->expects(self::once())->method('__call')->with('setPasswd', [null]);
 
-        $service = new UserSetPasswordOperation($authentication);
+        $service = new UserPasswordSetter($authentication);
         $service->setPassword($user, null);
     }
 
@@ -58,7 +58,7 @@ class UserSetPasswordOperationTest extends TestCase
 
         $user->expects(self::never())->method('__call')->with('setPasswd');
 
-        $service = new UserSetPasswordOperation($authentication);
+        $service = new UserPasswordSetter($authentication);
         $service->setPassword($user, '');
     }
 
@@ -76,7 +76,7 @@ class UserSetPasswordOperationTest extends TestCase
             ->method('validate')
             ->willThrowException($this->createMock(ZfExtended_ValidateException::class));
 
-        $service = new UserSetPasswordOperation($authentication);
+        $service = new UserPasswordSetter($authentication);
         $service->setPassword($user, $password);
     }
 
@@ -126,7 +126,7 @@ class UserSetPasswordOperationTest extends TestCase
             ->with($password)
             ->willReturn($encodedPassword);
 
-        $service = new UserSetPasswordOperation($authentication);
+        $service = new UserPasswordSetter($authentication);
         $service->setPassword($user, $password);
 
         self::assertEquals(2, $user->count());

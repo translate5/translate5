@@ -31,9 +31,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP\Contract;
 
 use editor_Models_Customer_Customer as Customer;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
 interface LspAssignCustomerOperationInterface
 {
+    /**
+     * @throws CustomerDoesNotBelongToLspException
+     */
     public function assignCustomer(LanguageServiceProvider $lsp, Customer $customer): void;
 }

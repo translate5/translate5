@@ -70,15 +70,23 @@ class UserCustomerAssociationValidator
      */
     public function assertCustomersMayBeAssociatedWithUser(User $user, int ...$customerIds): void
     {
+        if (empty($customerIds)) {
+            return;
+        }
+
         $lspUser = $this->lspUserRepository->findByUser($user);
 
         if (null !== $lspUser) {
-            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP($lspUser->lsp, ...$customerIds);
+            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(
+                (int) $lspUser->lsp->getId(),
+                ...$customerIds
+            );
         }
     }
 
     /**
      * @param int[] $customerIds
+     * @throws CustomerDoesNotBelongToUserException
      */
     public function assertUserCanAssignCustomers(User $authUser, array $customerIds): void
     {

@@ -62,7 +62,6 @@ final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterfa
     }
 
     /**
-     * Restrict deletion of the last coordinator in the LSP
      * {@inheritDoc}
      */
     public function assertAllowed(object $object): void

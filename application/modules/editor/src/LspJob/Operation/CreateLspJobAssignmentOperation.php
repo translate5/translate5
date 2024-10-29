@@ -30,16 +30,21 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LspJob\Operation;
 
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\LspJob\Contract\CreateLspJobAssignmentOperationInterface;
 use MittagQI\Translate5\LspJob\DTO\NewLspJobDto;
-use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
 
 class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperationInterface
 {
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
+        private readonly TaskRepository $taskRepository,
+        private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
     ) {
     }
 
@@ -50,21 +55,33 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
     {
         return new self(
             LspJobRepository::create(),
+            new TaskRepository(),
+            LspCustomerAssociationValidator::create(),
         );
     }
 
     /**
-     * @throws LspJobAlreadyExistsException
+     * {@inheritDoc}
      */
     public function assignJob(NewLspJobDto $dto): LspJobAssociation
     {
+        // todo: sub lsp job validation
+        $task = $this->taskRepository->getByGuid($dto->taskGuid);
+
+        try {
+            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(
+                $dto->lspId,
+                (int)$task->getCustomerId()
+            );
+        } catch (CustomerDoesNotBelongToLspException) {
+            throw new NotLspCustomerTaskException();
+        }
+
         $job = $this->lspJobRepository->getEmptyModel();
         $job->setTaskGuid($dto->taskGuid);
         $job->setLspId($dto->lspId);
         $job->setWorkflow($dto->workflow->workflow);
         $job->setWorkflowStepName($dto->workflow->workflowStepName);
-
-        $job->validate();
 
         $this->lspJobRepository->save($job);
 

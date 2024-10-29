@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\Test\Unit\User\Operations;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\User\Operations\UserSetPasswordOperation;
+use MittagQI\Translate5\User\Operations\Setters\UserPasswordSetter;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -42,7 +42,7 @@ class UserUpdatePasswordOperationTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
 
-    private UserSetPasswordOperation|MockObject $setPassword;
+    private UserPasswordSetter|MockObject $setPassword;
 
     private ResetPasswordEmail|MockObject $resetPasswordEmail;
 
@@ -51,7 +51,7 @@ class UserUpdatePasswordOperationTest extends TestCase
     protected function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->setPassword = $this->createMock(UserSetPasswordOperation::class);
+        $this->setPassword = $this->createMock(UserPasswordSetter::class);
         $this->resetPasswordEmail = $this->createMock(ResetPasswordEmail::class);
 
         $this->operation = new UserUpdatePasswordOperation(

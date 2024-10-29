@@ -40,6 +40,7 @@ use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
+use RuntimeException;
 use Zend_Registry;
 use ZfExtended_Logger;
 
@@ -51,9 +52,7 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
     public function __construct(
         private readonly ActionFeasibilityAssertInterface $feasibilityAssert,
         private readonly UserJobRepository $userJobRepository,
-        private readonly LspJobRepository $lspJobRepository,
         private readonly TaskRepository $taskRepository,
-        private readonly DeleteLspJobAssignmentOperationInterface $deleteLspJobOperation,
         private readonly ZfExtended_Logger $logger,
     ) {
     }
@@ -66,24 +65,18 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
         return new self(
             UserJobActionFeasibilityAssert::create(),
             UserJobRepository::create(),
-            LspJobRepository::create(),
             new TaskRepository(),
-            DeleteLspJobAssignmentOperation::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.delete'),
         );
     }
 
     public function delete(UserJob $job): void
     {
-        $this->feasibilityAssert->assertAllowed(Action::Delete, $job);
-
         if ($job->isLspJob()) {
-            $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
-
-            $this->deleteLspJobOperation->delete($lspJob);
-
-            return;
+            throw new RuntimeException('Use DeleteLspJobAssignmentOperationInterface::delete for LSP jobs');
         }
+
+        $this->feasibilityAssert->assertAllowed(Action::Delete, $job);
 
         $this->deleteUserJob($job);
     }
@@ -91,11 +84,7 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
     public function forceDelete(UserJob $job): void
     {
         if ($job->isLspJob()) {
-            $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
-
-            $this->deleteLspJobOperation->forceDelete($lspJob);
-
-            return;
+            throw new RuntimeException('Use DeleteLspJobAssignmentOperationInterface::forceDelete for LSP jobs');
         }
 
         $this->deleteUserJob($job);
@@ -103,9 +92,9 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
 
     private function deleteUserJob(UserJob $job): void
     {
-        $this->userJobRepository->delete($job);
-
         $task = $this->taskRepository->getByGuid($job->getTaskGuid());
+
+        $this->userJobRepository->delete($job);
 
         $this->logger->info('E1012', 'job deleted', [
             'task' => $task,
