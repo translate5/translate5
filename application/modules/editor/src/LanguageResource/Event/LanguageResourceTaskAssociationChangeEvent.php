@@ -28,14 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource;
+namespace MittagQI\Translate5\LanguageResource\Event;
 
-class ReimportSegmentsResult
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\EventDispatcher\EventInterface;
+
+class LanguageResourceTaskAssociationChangeEvent implements EventInterface
 {
     public function __construct(
-        public readonly int $emptySegmentsAmount,
-        public readonly int $successfulSegmentsAmount,
-        public readonly array $failedSegmentIds
+        public readonly LanguageResource $languageResource,
+        public readonly string $taskGuid,
+        public readonly LanguageResourceTaskAssociationChangeType $change,
     ) {
     }
 }

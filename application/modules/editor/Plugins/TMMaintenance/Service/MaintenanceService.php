@@ -252,6 +252,16 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 $successful = $this->api->deleteBatch($tmName, $deleteDto);
             }
 
+            if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
+                $retries = 0;
+                while ($retries < $this->getMaxRequestRetries() && ! $successful) {
+                    sleep($this->getRetryDelaySeconds());
+                    $retries++;
+
+                    $successful = $this->api->deleteBatch($tmName, $deleteDto);
+                }
+            }
+
             if (! $successful) {
                 $this->logger->exception($this->getBadGatewayException($tmName));
             }
@@ -334,6 +344,17 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
             }
 
+            if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
+                $retries = 0;
+
+                while ($retries < $this->getMaxRequestRetries() && ! $successful) {
+                    sleep($this->getRetryDelaySeconds());
+                    $retries++;
+
+                    $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
+                }
+            }
+
             if (! $successful) {
                 $this->logger->exception($this->getBadGatewayException($tmName));
 
@@ -401,6 +422,17 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $this->assertMemoryAvailable($tmName);
 
             $successful = $this->api->search($tmName, '', 0, $searchDTO);
+
+            if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
+                $retries = 0;
+
+                while ($retries < $this->getMaxRequestRetries() && ! $successful) {
+                    sleep($this->getRetryDelaySeconds());
+                    $retries++;
+
+                    $successful = $this->api->search($tmName, '', 0, $searchDTO);
+                }
+            }
 
             if (! $successful) {
                 $this->logger->exception($this->getBadGatewayException($tmName));
@@ -472,6 +504,17 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
         }
 
+        if ($this->isLockingTimeoutOccurred($apiError)) {
+            $retries = 0;
+
+            while ($retries < $this->getMaxRequestRetries() && ! $successful) {
+                sleep($this->getRetryDelaySeconds());
+                $retries++;
+
+                $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
+            }
+        }
+
         if (! $successful) {
             $apiError = $this->api->getError() ?? $apiError;
             $this->logger->error('E1306', 'Failed to save segment to TM', [
@@ -481,6 +524,15 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
             throw new \editor_Services_Connector_Exception('E1306');
         }
+    }
+
+    private function isLockingTimeoutOccurred(?object $error): bool
+    {
+        if (null === $error) {
+            return false;
+        }
+
+        return $error->returnValue === 506;
     }
 
     /**
@@ -910,5 +962,15 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     public function checkUpdatedSegment(SegmentModel $segment): void
     {
+    }
+
+    protected function getMaxRequestRetries(): int
+    {
+        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestMaxRetries;
+    }
+
+    protected function getRetryDelaySeconds(): int
+    {
+        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestRetryDelaySeconds;
     }
 }

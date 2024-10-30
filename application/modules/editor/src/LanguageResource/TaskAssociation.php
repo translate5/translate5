@@ -102,13 +102,12 @@ class TaskAssociation extends AssociationAbstract
      */
     public function loadByAssociatedTaskAndLanguage(string $taskGuid): mixed
     {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid((string) $taskGuid);
+        $task = ZfExtended_Factory::get(\editor_Models_Task::class);
+        $task->loadByTaskGuid($taskGuid);
 
         if ($task->isProject()) {
             //get all project tasks and get the resources for each task
-            $projectGuids = array_column($task->loadProjectTasks($task->getProjectId(), true), 'taskGuid');
+            $projectGuids = array_column($task->loadProjectTasks((int) $task->getProjectId(), true), 'taskGuid');
             $result = [];
             foreach ($projectGuids as $pg) {
                 $result = array_merge($result, $this->loadByAssociatedTaskAndLanguage($pg));
@@ -122,12 +121,11 @@ class TaskAssociation extends AssociationAbstract
         $db = $this->db;
         $adapter = $db->getAdapter();
 
-        $languageModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languageModel editor_Models_Languages */
+        $languageModel = ZfExtended_Factory::get(\editor_Models_Languages::class);
 
         //get source and target language fuzzies
-        $sourceLangs = $languageModel->getFuzzyLanguages($task->getSourceLang(), 'id', true);
-        $targetLangs = $languageModel->getFuzzyLanguages($task->getTargetLang(), 'id', true);
+        $sourceLangs = $languageModel->getFuzzyLanguages((int) $task->getSourceLang(), 'id', true);
+        $targetLangs = $languageModel->getFuzzyLanguages((int) $task->getTargetLang(), 'id', true);
 
         //get all available services
         $services = ZfExtended_Factory::get('editor_Services_Manager');
@@ -144,12 +142,12 @@ class TaskAssociation extends AssociationAbstract
                 [
                     new Zend_Db_Expr($adapter->quote($task->getTaskName()) . ' as taskName'),
                     new Zend_Db_Expr($adapter->quote($taskGuid) . ' as taskGuid'),
-                    "languageResource.id AS languageResourceId", "languageResource.langResUuid", "languageResource.name",
-                    "languageResource.color", "languageResource.resourceId", "languageResource.serviceType",
-                    "languageResource.serviceName", "languageResource.specificData", "languageResource.timestamp",
-                    "languageResource.resourceType", "languageResource.writeSource",
-                    "ta.id AS taskassocid",
-                    "ta.segmentsUpdateable"]
+                    'languageResource.id AS languageResourceId', 'languageResource.langResUuid',
+                    'languageResource.name', 'languageResource.color', 'languageResource.resourceId',
+                    'languageResource.serviceType', 'languageResource.serviceName', 'languageResource.specificData',
+                    'languageResource.timestamp', 'languageResource.resourceType', 'languageResource.writeSource',
+                    'ta.id AS taskassocid', 'ta.segmentsUpdateable',
+                ]
             )
             ->join([
                 "la" => "LEK_languageresources_languages",
@@ -178,6 +176,22 @@ class TaskAssociation extends AssociationAbstract
         $s->joinLeft([
             "ta" => "LEK_languageresources_taskassoc",
         ], $on, $checkColumns);
+
+        // By default, we filter out all project TMs that are not associated to the task
+        if (
+            ! $this->filter->hasFilter('isTaskTm')
+            || (false === (bool) $this->filter->getFilter('isTaskTm')->value)
+        ) {
+            $s->joinLeft(
+                [
+                    'ttm' => 'LEK_task_tm_task_association',
+                ],
+                'languageResource.id = ttm.languageResourceId',
+                'IF(ISNULL(ttm.id), 0, 1) AS isTaskTm'
+            );
+            $s->where('ISNULL(ttm.id) OR ta.id IS NOT NULL');
+        }
+        $this->filter->deleteFilter('isTaskTm');
 
         // Only match resources can be associated to a task, that are associated to the same client as the task is.
         $s->join([
@@ -250,6 +264,7 @@ class TaskAssociation extends AssociationAbstract
             if (! empty($resource)) {
                 $languageresource = array_merge($languageresource, $resource->getMetaData());
                 $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
+                $languageresource['isTaskTm'] = ($languageresource['isTaskTm'] ?? 0) === '1';
 
                 if (editor_Services_Manager::SERVICE_OPENTM2 === $languageresource['serviceType']) {
                     $languageresource['tmNeedsConversion'] = ! $tmConversionService->isTmConverted(

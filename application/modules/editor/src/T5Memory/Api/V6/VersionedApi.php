@@ -48,7 +48,7 @@ class VersionedApi extends AbstractVersionedApi
     public const VERSION = '^0.6';
 
     public function __construct(
-        private ClientInterface $client
+        private readonly ClientInterface $client
     ) {
     }
 
@@ -101,16 +101,39 @@ class VersionedApi extends AbstractVersionedApi
         int $chunkSize,
         ?string $startFromInternalKey = null,
     ): DownloadTmxChunkResponse {
-        $request = new DownloadTmxChunkRequest($baseUrl, $tmName, $chunkSize, $startFromInternalKey);
-        $response = $this->client->sendRequest($request);
+        $timeElapsed = 0;
 
-        $this->throwExceptionOnNotSuccessfulResponse($response, $request);
+        while (true) {
+            $request = new DownloadTmxChunkRequest($baseUrl, $tmName, $chunkSize, $startFromInternalKey);
+            $response = $this->client->sendRequest($request);
 
-        return DownloadTmxChunkResponse::fromResponse($response, $startFromInternalKey);
+            // Retry on timeout error if not the last retry
+            if ($this->isTimeoutErrorOccurred($response) && $timeElapsed < $this->getMaxWaitingTimeForALockSeconds()) {
+                sleep($this->getRetryDelaySeconds());
+                $timeElapsed += $this->getRetryDelaySeconds();
+
+                continue;
+            }
+
+            $this->throwExceptionOnNotSuccessfulResponse($response, $request);
+
+            return DownloadTmxChunkResponse::fromResponse($response, $startFromInternalKey);
+        }
     }
 
     protected static function supportedVersion(): VersionConstraint
     {
         return (new VersionConstraintParser())->parse(self::VERSION);
+    }
+
+    private function getMaxWaitingTimeForALockSeconds(): int
+    {
+        // 1 hour max waiting time
+        return 3600;
+    }
+
+    private function getRetryDelaySeconds(): int
+    {
+        return 2;
     }
 }

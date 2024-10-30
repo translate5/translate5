@@ -134,7 +134,7 @@ class UserRepository
 
             $roles = $userModel->getRoles();
 
-            if (in_array(Roles::PM, $roles, true)) {
+            if (in_array(Roles::PM, $roles)) {
                 yield clone $userModel;
 
                 continue;

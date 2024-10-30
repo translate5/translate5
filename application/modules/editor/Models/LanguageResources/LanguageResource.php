@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAttributeDataType;
+use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation;
 
 /**
  * Languageresources Entity Object
@@ -54,6 +55,8 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
  * @method void setResourceType(string $resourceType)
  * @method string getWriteSource()
  * @method void setWriteSource(bool $writeSource)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $taskGuid)
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract
 {
@@ -113,7 +116,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $this->setResourceType($resource->getType());
     }
 
-    /***
+    // region Repository methods
+    /**
      * Load all resources for all available services
      *
      * @return array
@@ -132,15 +136,22 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         }
         $allservices = array_unique($allservices);
         $s = $this->db->select()
-            ->where('LEK_languageresources.serviceType IN(?)', $allservices);
+            ->from('LEK_languageresources')
+            ->where('LEK_languageresources.serviceType IN(?)', $allservices)
+            ->setIntegrityCheck(false)
+            ->joinLeft(
+                [
+                    'ttm' => TaskTmTaskAssociation::TABLE,
+                ],
+                'LEK_languageresources.id = ttm.languageResourceId',
+                'IF(ISNULL(ttm.id), 0, 1) AS isTaskTm'
+            );
 
         return $this->loadFilterdCustom($s);
     }
 
-    /***
+    /**
      * Load all language resource by given service name
-     * @param string $serviceName
-     * @return array
      */
     public function loadByService(string $serviceName): array
     {
@@ -150,15 +161,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         return $this->db->fetchAll($s)->toArray();
     }
 
-    /***
+    /**
      * Load language resource by given name and type associated with particular task
-     *
-     * @param string $type
-     * @param string $name
-     * @param array $data
-     * @param editor_Models_Task $task
-     *
-     * @return array
      */
     public function getByTypeNameAndSpecificDataForTask(
         string $type,
@@ -644,6 +648,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
         return $this->row;
     }
+
+    // endregion Repository methods
 
     /**
      * returns the resource used by this languageResource instance

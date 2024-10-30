@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_Task;
+use editor_Models_Task as Task;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -40,10 +40,10 @@ class TaskRepository
     /**
      * @throws InexistentTaskException
      */
-    public function get(int $id): editor_Models_Task
+    public function get(int $id): Task
     {
         try {
-            $task = ZfExtended_Factory::get(editor_Models_Task::class);
+            $task = ZfExtended_Factory::get(Task::class);
             $task->load($id);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             throw new InexistentTaskException((string) $id);
@@ -55,10 +55,10 @@ class TaskRepository
     /**
      * @throws InexistentTaskException
      */
-    public function getByGuid(string $guid): editor_Models_Task
+    public function getByGuid(string $guid): Task
     {
         try {
-            $task = ZfExtended_Factory::get(editor_Models_Task::class);
+            $task = ZfExtended_Factory::get(Task::class);
             $task->loadByTaskGuid($guid);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             throw new InexistentTaskException($guid);
@@ -70,21 +70,21 @@ class TaskRepository
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getProjectBy(editor_Models_Task $task): editor_Models_Task
+    public function getProjectBy(Task $task): Task
     {
         return $this->get((int) $task->getProjectId());
     }
 
     /**
-     * @return iterable<editor_Models_Task>
+     * @return iterable<Task>
      */
     public function getProjectTaskList(int $projectId): iterable
     {
-        $db = ZfExtended_Factory::get(editor_Models_Task::class)->db;
+        $db = ZfExtended_Factory::get(Task::class)->db;
         $s = $db->select()->where('projectId = ?', $projectId)->where('id != ?', $projectId);
         $tasksData = $db->fetchAll($s);
 
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
+        $task = ZfExtended_Factory::get(Task::class);
 
         foreach ($tasksData as $taskData) {
             $task->init($taskData);
@@ -100,7 +100,7 @@ class TaskRepository
      */
     public function loadListByPmGuid(string $pmGuid): array
     {
-        $db = ZfExtended_Factory::get(editor_Models_Task::class)->db;
+        $db = ZfExtended_Factory::get(Task::class)->db;
         $s = $db->select()->where('pmGuid = ?', $pmGuid);
 
         return $db->fetchAll($s)->toArray();

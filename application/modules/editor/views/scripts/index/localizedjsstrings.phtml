@@ -129,14 +129,14 @@ Ext.define('Editor.controller.Localizer', {
     Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
 
     Editor.view.QuickTip.prototype.strings = {
-		loading: '<?php echo $this->translate->_('Lade...');?>'
-	};
+        loading: '<?php echo $this->translate->_('Lade...');?>'
+    };
 
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('QS &amp; Dateien');?>';
-  	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
-  	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_(' - [LESEMODUS]');?>';
-  	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
-  	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
+    Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
+    Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_(' - [LESEMODUS]');?>';
+    Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
+    Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
 
     Ext.define("Editor.locale.view.segments.grid.Header", {
         override: "Editor.view.segments.grid.Header",
@@ -153,8 +153,8 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-  	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
-  	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
+    Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
+    Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
 
     Ext.define("Editor.locale.view.segments.column.Content", {
         override: "Editor.view.segments.column.Content",
@@ -238,17 +238,17 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-  	Editor.view.segments.column.Editable.prototype.text = '<?php echo $this->translate->_('Gesperrt');?>';
-  	Editor.view.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Bearbeitungsstatus');?>';
-  	Editor.view.ui.segments.column.State.prototype.text = '<?php echo $this->translate->_('Status');?>';
-  	Editor.view.ui.segments.column.UserName.prototype.text = '<?php echo $this->translate->_('letzter Bearbeiter');?>';
-  	Editor.view.segments.column.WorkflowStep.prototype.text = '<?php echo $this->translate->_('bearbeitet bei');?>';
-  	Editor.view.segments.column.Comments.prototype.text = '<?php echo $this->translate->_('Kommentare');?>';
-  	Editor.view.segments.column.Comments.prototype.text_morecomments = '<?php echo $this->translate->_('({0} weitere Kommentare)');?>';
-  	Editor.view.segments.column.Comments.prototype.text_morecomment = '<?php echo $this->translate->_('({0} weiterer Kommentar)');?>';
-  	Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)');?>';
+    Editor.view.segments.column.Editable.prototype.text = '<?php echo $this->translate->_('Gesperrt');?>';
+    Editor.view.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Bearbeitungsstatus');?>';
+    Editor.view.ui.segments.column.State.prototype.text = '<?php echo $this->translate->_('Status');?>';
+    Editor.view.ui.segments.column.UserName.prototype.text = '<?php echo $this->translate->_('letzter Bearbeiter');?>';
+    Editor.view.segments.column.WorkflowStep.prototype.text = '<?php echo $this->translate->_('bearbeitet bei');?>';
+    Editor.view.segments.column.Comments.prototype.text = '<?php echo $this->translate->_('Kommentare');?>';
+    Editor.view.segments.column.Comments.prototype.text_morecomments = '<?php echo $this->translate->_('({0} weitere Kommentare)');?>';
+    Editor.view.segments.column.Comments.prototype.text_morecomment = '<?php echo $this->translate->_('({0} weiterer Kommentar)');?>';
+    Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)');?>';
 
-	Editor.view.segments.column.SegmentNrInTask.prototype.text = '<?php echo $this->translate->_('Nr.');?>';
+    Editor.view.segments.column.SegmentNrInTask.prototype.text = '<?php echo $this->translate->_('Nr.');?>';
 
     Ext.define("Editor.locale.de.controller.ViewModes", {
         override: "Editor.controller.ViewModes",
@@ -257,19 +257,19 @@ Ext.define('Editor.controller.Localizer', {
     });
 
     Editor.view.Filepanel.prototype.title = '<?php echo $this->translate->_('Dateien');?>';
-  	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
-  	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
+    Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
+    Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
 
-  	Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('QS Statistik');?>';
-  	Editor.view.quality.FilterPanel.prototype.strings = {
-		modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
-		modeErrors: '<?php echo $this->translate->_('Nur Fehler');?>',
-		modeFalsePositives: '<?php echo $this->translate->_('Nur ignorierte Fehler');?>',
-		incompleteCatCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
-		incompleteCatText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
-		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
+    Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('QS Statistik');?>';
+    Editor.view.quality.FilterPanel.prototype.strings = {
+        modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
+        modeErrors: '<?php echo $this->translate->_('Nur Fehler');?>',
+        modeFalsePositives: '<?php echo $this->translate->_('Nur ignorierte Fehler');?>',
+        incompleteCatCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
+        incompleteCatText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
+        startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
-	};
+    };
 
     Ext.define("Editor.locale.view.comments.Navigation", {
         override: "Editor.view.comments.Navigation",
@@ -281,15 +281,15 @@ Ext.define('Editor.controller.Localizer', {
         'videoAnnotation': '<?php echo $this->translate->_('Video-Anmerkung');?>',
     }
 
-  	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('Manuelle QS (im Segment)');?>';
-  	Editor.view.quality.mqm.Fieldset.prototype.strings = {
-		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
-		commentLabel: '<?php echo $this->translate->_('Kommentar');?>',
-		qmAddBtn: '<?php echo $this->translate->_('Manuelle QS hinzufügen');?>'
-	};
-	Editor.controller.QualityMqm.prototype.strings = {
-    	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
-    	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
+    Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('Manuelle QS (im Segment)');?>';
+    Editor.view.quality.mqm.Fieldset.prototype.strings = {
+        severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
+        commentLabel: '<?php echo $this->translate->_('Kommentar');?>',
+        qmAddBtn: '<?php echo $this->translate->_('Manuelle QS hinzufügen');?>'
+    };
+    Editor.controller.QualityMqm.prototype.strings = {
+        buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
+        buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
     Editor.view.quality.SegmentQm.prototype.title = '<?php echo $this->translate->_('Manuelle QS (ganzes Segment)');?>';
     Editor.view.quality.SegmentQmController.prototype.messages = {
@@ -297,8 +297,8 @@ Ext.define('Editor.controller.Localizer', {
         qmHasBeenRemoved: '<?php echo $this->translate->_('Die Qualität wurde entfernt');?>'
     };
     Editor.view.quality.admin.TaskQualities.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
-  	Editor.view.quality.admin.TaskQualities.prototype.strings = {
-		category: '<?php echo $this->translate->_('Kategorie');?>',
+    Editor.view.quality.admin.TaskQualities.prototype.strings = {
+        category: '<?php echo $this->translate->_('Kategorie');?>',
         total: '<?php echo $this->translate->_('Anzahl');?>',
         errors: '<?php echo $this->translate->_('Fehler');?>',
         falsePositives: '<?php echo $this->translate->_('Falsch erkannte Fehler');?>',
@@ -310,7 +310,7 @@ Ext.define('Editor.controller.Localizer', {
         faultyTipCaption: '<?php echo $this->translate->_('Interne Tag Fehler');?>',
         faultyTipText: '<?php echo $this->translate->_('Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern');?>',
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
-	};
+    };
 
     Ext.define("Editor.locale.de.view.segments.SpecialCharacters", {
         override: "Editor.view.segments.SpecialCharacters",
@@ -377,15 +377,15 @@ Ext.define('Editor.controller.Localizer', {
             segmentToShort: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
             segmentToLong: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>',
             segmentTooManyLines: '<?php echo $this->translate->_('Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.');?>',
-      		segmentLinesTooLong: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).');?>',
-      		segmentLinesTooShort: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).');?>',
-      		min: '<?php echo $this->translate->_('min');?>',
-        	max: '<?php echo $this->translate->_('max');?>',
-      		line: '<?php echo $this->translate->_('Zeile');?>',
-      		lines: '<?php echo $this->translate->_('Zeilen');?>',
-      		current: '<?php echo $this->translate->_('Aktuell');?>',
-      		together: '<?php echo $this->translate->_('insgesamt');?>',
-      		siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>',
+            segmentLinesTooLong: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).');?>',
+            segmentLinesTooShort: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).');?>',
+            min: '<?php echo $this->translate->_('min');?>',
+            max: '<?php echo $this->translate->_('max');?>',
+            line: '<?php echo $this->translate->_('Zeile');?>',
+            lines: '<?php echo $this->translate->_('Zeilen');?>',
+            current: '<?php echo $this->translate->_('Aktuell');?>',
+            together: '<?php echo $this->translate->_('insgesamt');?>',
+            siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>',
             numberOfChars: '<?php echo $this->translate->_('Anzahl Zeichen');?>'
         }
     });
@@ -434,13 +434,13 @@ Ext.define('Editor.controller.Localizer', {
         Ext.grid.filters.filter.Date.prototype.config.fields.lt.text = '<?php echo $this->translate->_('bevor');?>';
         //Ext.grid.filters.filter.DateFilter.prototype.dateFormat = Editor.DATE_ISO_FORMAT;
 
-	Editor.MessageBox.prototype.titles = {
-		ok: '<?php echo $this->translate->_('Ok!');?>',
-		error: '<?php echo $this->translate->_('Fehler!');?>',
-		directError: '<?php echo $this->translate->_('Es ist ein Fehler aufgetreten!');?>',
-		warning: '<?php echo $this->translate->_('Warnung!');?>',
-		notice: '<?php echo $this->translate->_('Hinweis!');?>'
-	};
+    Editor.MessageBox.prototype.titles = {
+        ok: '<?php echo $this->translate->_('Ok!');?>',
+        error: '<?php echo $this->translate->_('Fehler!');?>',
+        directError: '<?php echo $this->translate->_('Es ist ein Fehler aufgetreten!');?>',
+        warning: '<?php echo $this->translate->_('Warnung!');?>',
+        notice: '<?php echo $this->translate->_('Hinweis!');?>'
+    };
 
     Editor.view.comments.Grid.prototype.text_edited = '<?php echo $this->translate->_('bearbeitet');?>';
     Editor.view.comments.Grid.prototype.text_edit = '<?php echo $this->translate->_('Bearbeiten');?>';
@@ -574,8 +574,9 @@ Ext.define('Editor.controller.Localizer', {
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>',
             segmentCount: '<?php echo $this->translate->_('Segmentanzahl');?>',
             segmentFinishCount: '<?php echo $this->translate->_('% abgeschlossen');?>',
+            workflowStep: '<?php echo $this->translate->_('Workflow-Schritt');?>',
             workflowState: '<?php echo $this->translate->_('Workflow-Status');?>',
-            workflowUserRole: '<?php echo $this->translate->_('Benutzer-Rolle');?>',
+            workflowUserRole: '<?php echo $this->translate->_('Workflowschritt-Typ');?>',
             userName: '<?php echo $this->translate->_('Benutzer');?>',
             id: '<?php echo $this->translate->_('Id');?>',
             taskGuid: '<?php echo $this->translate->_('Task-Guid');?>',
@@ -634,17 +635,26 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.task.filter.FilterWindow", {
         override: "Editor.view.admin.task.filter.FilterWindow",
         strings:{
-        	workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status');?>',
-        	workflowUserRoleLabel: '<?php echo $this->translate->_('Zugewiesene Benutzer-Rolle/n');?>',
-        	userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer');?>',
-        	applyBtn: '<?php echo $this->translate->_('Anwenden');?>',
-        	cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
-        	title:'<?php echo $this->translate->_('Erweiterte Filter');?>',
-        	anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar');?>',
-        	gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>',
+            workflowLabel: '<?php echo $this->translate->_('Workflow');?>',
+            workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status');?>',
+            workflowUserRoleLabel: '<?php echo $this->translate->_('Workflowschritt-Typ');?>',
+            workflowUserRoleTip: '<?php echo $this->translate->_('Filtert alle Aufgaben, denen ein Job mit einem Workflow-Schritt des gewählten Typs zugewiesen ist');?>',
+            workflowStepLabel: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+            workflowStepTip: '<?php echo $this->translate->_('Filtert alle Aufgaben, denen ein Job mit dem gewählten Workflow-Schritt zugewiesen ist');?>',
+            userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer');?>',
+            applyBtn: '<?php echo $this->translate->_('Anwenden');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            title:'<?php echo $this->translate->_('Erweiterte Filter');?>',
+            anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar');?>',
+            gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>',
             assignmentDateText:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum');?>',
             finishedDateText:'<?php echo $this->translate->_('Benutzer-Abschlussdatum');?>',
-            deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
+            deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>',
+            type:'<?php echo $this->translate->_('Typ');?>',
+            translatorStep:'<?php echo $this->translate->_('Übersetzung');?>',
+            reviewerStep:'<?php echo $this->translate->_('Lektorat');?>',
+            translatorCheckStep:'<?php echo $this->translate->_('Finales Lektorat');?>',
+            visitorStep:'<?php echo $this->translate->_('Nur lesen');?>'
         }
     });
 
@@ -810,20 +820,20 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-  	Ext.define("Editor.locale.de.view.project.ProjectPanel", {
+    Ext.define("Editor.locale.de.view.project.ProjectPanel", {
         override: "Editor.view.project.ProjectPanel",
         title:'<?php echo $this->translate->_('Projekte');?>',
         strings:{
-        	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt');?>'
+            projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt');?>'
         }
     });
 
     Ext.define("Editor.locale.de.view.project.ProjectPanelViewController", {
         override: "Editor.view.project.ProjectPanelViewController",
         strings:{
-        	noProjectMessage:'<?php echo $this->translate->_('Das angeforderte Projekt existiert nicht');?>',
-        	noProjectTaskMessage:'<?php echo $this->translate->_('Die angeforderte Projektaufgabe existiert nicht');?>',
-        	noProjectInFilter:'<?php echo $this->translate->_('Projekt im aktuellen Filter nicht gefunden');?>'
+            noProjectMessage:'<?php echo $this->translate->_('Das angeforderte Projekt existiert nicht');?>',
+            noProjectTaskMessage:'<?php echo $this->translate->_('Die angeforderte Projektaufgabe existiert nicht');?>',
+            noProjectInFilter:'<?php echo $this->translate->_('Projekt im aktuellen Filter nicht gefunden');?>'
         }
     });
 
@@ -1233,7 +1243,7 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.util.LanguageResources", {
         override: "Editor.util.LanguageResources",
         strings: {
-		    exactMatch: '<?php echo $this->translate->_('101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.');?>',
+            exactMatch: '<?php echo $this->translate->_('101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.');?>',
             repetitionMatch: '<?php echo $this->translate->_('102% ist eine Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.');?>',
             contextMatch: '<?php echo $this->translate->_('103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.');?>',
             termcollectionMatch: '<?php echo $this->translate->_('104% ist ein 100% Treffer, der aus einer Termcollection kommt.');?>'
@@ -1312,7 +1322,7 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-	Ext.define("Editor.locale.de.view.searchandreplace.TabPanel", {
+    Ext.define("Editor.locale.de.view.searchandreplace.TabPanel", {
         override: "Editor.view.searchandreplace.TabPanel",
         strings: {
             searchTabTitle: '<?php echo $this->translate->_('Suchen');?>',
@@ -1735,7 +1745,7 @@ Ext.define('Editor.controller.Localizer', {
             source: '<?php echo $this->translate->_('Quellsprache');?>',
             target: '<?php echo $this->translate->_('Zielsprache');?>',
             serviceName: '<?php echo $this->translate->_('Ressource');?>',
-            taskGuid: '<?php echo $this->translate->_('Aufgabenname');?>'
+            taskGuid: '<?php echo $this->translate->_('Aufgabenname');?>',
         }
     });
     Ext.define("Editor.locale.controller.TmOverview", {
@@ -1977,7 +1987,10 @@ Editor.data.l10n = {
         en: '<?php echo $this->translate->_('Englisch');?>'
     },
     tmOverview:{
-        more: '<?php echo $this->translate->_('mehr');?>'
+        more: '<?php echo $this->translate->_('mehr');?>',
+        taskTm: '<?php echo $this->translate->_('Aufgaben-TM');?>',
+        showTaskTm: '<?php echo $this->translate->_('Aufgaben-TM anzeigen');?>',
+        hideTaskTm: '<?php echo $this->translate->_('Aufgaben-TM ausblenden');?>',
     },
     segmentGrid: {
         batchOperations: {
@@ -2284,8 +2297,13 @@ Editor.data.l10n = {
                 title:'<?php echo $this->translate->_('Übersetzerpaket re-importieren');?>',
             },
             taskManageFiles:{
-                title: '<?php echo $this->translate->_('Dateien verwalten');?>'
-            }
+                title: '<?php echo $this->translate->_('Dateien verwalten');?>',
+            },
+            languageResourceAssoc: {
+                taskTm: '<?php echo $this->translate->_('Aufgaben-TM');?>',
+                showForeignTaskTms: '<?php echo $this->translate->_('Andere Aufgaben-TM einblenden');?>',
+                hideForeignTaskTms: '<?php echo $this->translate->_('Andere Aufgaben-TM ausblenden');?>',
+            },
         }
     },
     languageResources:{

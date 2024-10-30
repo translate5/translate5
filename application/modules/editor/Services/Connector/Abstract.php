@@ -464,15 +464,6 @@ abstract class editor_Services_Connector_Abstract
         $this->log(__METHOD__);
     }
 
-    /**
-     * Closes the connected TM on the configured Resource (on task close, not after each request)
-     */
-    public function close()
-    {
-        //to be implemented if needed
-        $this->log(__METHOD__);
-    }
-
     /***
      * Return the available language codes for the current resource endpoint(api)
      * Use SOURCE_LANGUAGES_KEY and TARGET_LANGUAGES_KEY as languages grouped results when

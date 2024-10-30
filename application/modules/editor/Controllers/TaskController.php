@@ -28,6 +28,9 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Export\QueuedExportService;
+use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
@@ -128,6 +131,9 @@ class editor_TaskController extends ZfExtended_RestController
             ],
             'workflowState' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid'),
+            ],
+            'workflowStep' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'workflowStepName', 'taskGuid', 'taskGuid'),
             ],
             'workflowUserRole' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'role', 'taskGuid', 'taskGuid'),
@@ -938,7 +944,11 @@ class editor_TaskController extends ZfExtended_RestController
         $dpFactory = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
         $dataProvider = $dpFactory->createFromTask($this->entity);
 
-        $cloner = ZfExtended_Factory::get(editor_Task_Cloner::class);
+        $cloner = new editor_Task_Cloner(
+            new LanguageResourceRepository(),
+            AssociateTaskOperation::create(),
+            new LanguageResourceTaskAssocRepository(),
+        );
 
         $this->entity = $cloner->clone($this->entity);
 
@@ -1181,8 +1191,6 @@ class editor_TaskController extends ZfExtended_RestController
         if (empty($tua)) {
             //if the task was already in session, we must delete it.
             //If not the user will always receive an error in JS, and would not be able to do anything.
-            $this->unregisterTask();
-
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1163', [
                 'userState' => 'Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.',
             ]);
@@ -1190,8 +1198,6 @@ class editor_TaskController extends ZfExtended_RestController
 
         //the tua state was changed by a PM, then the task may not be edited anymore by the user
         if ($isTaskDisallowEditing && $this->data->userStatePrevious != $tua->getState()) {
-            $this->unregisterTask();
-
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1164', [
                 'userState' => 'Sie haben versucht die Aufgabe zur Bearbeitung zu öffnen. Das ist in der Zwischenzeit nicht mehr möglich.',
             ]);
@@ -1199,7 +1205,6 @@ class editor_TaskController extends ZfExtended_RestController
         //if reading is allowed the edit request is converted to a read request later by openAndLock
         //if reading is also disabled, we have to throw no access here
         if ($isTaskDisallowEditing && $isTaskDisallowReading) {
-            $this->unregisterTask();
             //no access as generic fallback
             $this->log->info('E9999', 'Debug data to E9999 - Keine Zugriffsberechtigung!', [
                 '$mayLoadAllTasks' => $mayLoadAllTasks,
@@ -1382,14 +1387,11 @@ class editor_TaskController extends ZfExtended_RestController
                     'openState' => $this->data->userState,
                 ]
             );
-            $manager = ZfExtended_Factory::get('editor_Services_Manager');
-            /* @var $manager editor_Services_Manager */
-            $manager->openForTask($task);
         }
     }
 
     /**
-     * unlocks the current task if its an request that closes the task (set state to open, end, finish)
+     * unlocks the current task if it's a request that closes the task (set state to open, end, finish)
      * removes the task from session
      */
     protected function closeAndUnlock()
@@ -1406,7 +1408,6 @@ class editor_TaskController extends ZfExtended_RestController
             return;
         }
         $this->entity->unlockForUser($this->authenticatedUser->getUserGuid());
-        $this->unregisterTask();
 
         if ($resetToOpen) {
             $this->updateUserState($this->authenticatedUser->getUserGuid(), true);
@@ -1420,16 +1421,6 @@ class editor_TaskController extends ZfExtended_RestController
                 'openState' => $this->data->userState ?? null,
             ]
         );
-    }
-
-    /**
-     * unregisters the task from the session and close all open services
-     */
-    protected function unregisterTask()
-    {
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-        $manager->closeForTask($this->entity);
     }
 
     /**

@@ -56,6 +56,14 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     strings:{
         wizardTitle:'#UT#Sprachressourcen zuweisen'
     },
+    listeners: {
+        activate:function (panel) {
+            // the languageResourceTaskAssocPanel component is used in 2 different contexts (import,and projectTask properties)
+            // in the import wizard we dont need to hide the panel based on the task state. Tha is why we enable the panel
+            // manually here.
+            panel.down('#languageResourceTaskAssocPanel').getViewModel().set('enablePanel', true);
+        }
+    },
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
@@ -73,11 +81,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     initComponent:function(){
     	var me=this;
     	me.callParent([arguments]);
-    	//the languageResourceTaskAssocPanel component is used in 2 different contexts (import,and projectTask properties)
-    	//in the import wizard, no auto binding is required, just normal store
-    	var assocGrid=me.down('#languageResourcesTaskAssocGrid');
-    	assocGrid.setBind(null);
-    	assocGrid.setStore('Editor.store.LanguageResources.TaskAssocStore');
     },
     
     //called when next button is clicked

@@ -34,42 +34,31 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
 {
     public const DEFAULT_COLOR = '19737d';
 
+    public const NAME = 'TermCollection';
+
     /**
      * URL to confluence-page
      * @var string
      */
     protected static $helpPage = "https://confluence.translate5.net/display/TAD/Term+Collection";
 
-    protected $resourceClass = 'editor_Services_TermCollection_Resource';
+    protected $resourceClass = editor_Services_TermCollection_Resource::class;
 
-    /**
-     * @inheritdoc
-     */
     public $queryMode = 'batch';
 
-    /**
-     * @see editor_Services_ServiceAbstract::isConfigured()
-     */
     public function isConfigured(): bool
     {
         return true;
     }
 
-    /**
-     * @see editor_Services_ServiceAbstract::embedService()
-     */
     protected function embedService()
     {
         $this->addResource([$this->getServiceNamespace(), $this->getName()]);
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_ServiceAbstract::getName()
-     */
-    public function getName()
+    public function getName(): string
     {
-        return 'TermCollection';
+        return self::NAME;
     }
 
     public function getSynchronisationService(): SynchronisationInterface

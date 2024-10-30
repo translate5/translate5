@@ -13,29 +13,28 @@ class PivotResourceDefaults extends LanguageResourcesDefaults
     public function applyDefaults(Task $task, bool $importWizardUsed = false): void
     {
         $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
-        $data = $customerAssoc->loadByCustomerIdsPivotAsDefault([$task->getCustomerId()]);
+        $customerAssocData = $customerAssoc->loadByCustomerIdsPivotAsDefault([$task->getCustomerId()]);
 
-        if (empty($data)) {
+        if (empty($customerAssocData)) {
             return;
         }
 
         $taskGuid = $task->getTaskGuid();
 
-        $this->applyAssocData(
-            $this->findMatchingAssocData(
-                (int) $task->getSourceLang(),
-                (int) $task->getRelaisLang(),
-                $data
-            ),
-            function ($assocRow) use ($taskGuid) {
-                $pivotAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
-                // @phpstan-ignore-next-line
-                $pivotAssoc->setLanguageResourceId($assocRow['languageResourceId']);
-                // @phpstan-ignore-next-line
-                $pivotAssoc->setTaskGuid($taskGuid);
-                $pivotAssoc->save();
-            }
+        $data = $this->findMatchingAssocData(
+            (int) $task->getSourceLang(),
+            (int) $task->getRelaisLang(),
+            $customerAssocData
         );
+
+        foreach ($data as $assocRow) {
+            $pivotAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
+            // @phpstan-ignore-next-line
+            $pivotAssoc->setLanguageResourceId($assocRow['languageResourceId']);
+            // @phpstan-ignore-next-line
+            $pivotAssoc->setTaskGuid($taskGuid);
+            $pivotAssoc->save();
+        }
 
         if ($importWizardUsed) {
             $this->handlePivotAutostart($task);

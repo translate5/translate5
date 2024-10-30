@@ -20,6 +20,60 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.12.0] - 2024-10-23
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4239](https://jira.translate5.net/browse/TRANSLATE-4239): TM Maintenance - Increase request timeouts for TMMaintenance** <br>
+Timeout for requests in TM Maintenance increased to 15 minutes
+
+**[TRANSLATE-4228](https://jira.translate5.net/browse/TRANSLATE-4228): TM Maintenance - Change limit for the first request in TM Maintenance** <br>
+First 20 segments are now loaded one by one via separate requests instead of via single request
+
+**[TRANSLATE-4215](https://jira.translate5.net/browse/TRANSLATE-4215): t5memory - Implement new t5memory statuses processing** <br>
+Add support for new t5memory statuses and support of requests timeout with retry
+
+**[TRANSLATE-4136](https://jira.translate5.net/browse/TRANSLATE-4136): Hotfolder Import - Hotfolder: PM client override doesn't work** <br>
+Get PM from customer default if customer provided and specific PM not provided in instructions.xml
+
+**[TRANSLATE-4008](https://jira.translate5.net/browse/TRANSLATE-4008): Configuration - Use noreply address as default sender** <br>
+Now a noreply address is used as sender in default installations instead the support address.
+
+**[TRANSLATE-4005](https://jira.translate5.net/browse/TRANSLATE-4005): Test framework - Create enum containing all test user logins as constants** <br>
+Code clean-up: replace hard coded usernames in the tests.
+
+**[TRANSLATE-3941](https://jira.translate5.net/browse/TRANSLATE-3941): t5memory - Handle t5memory TM splitting in connection with size** <br>
+Added new code to handle t5memory overflow error
+
+
+### Bugfixes
+**[TRANSLATE-4237](https://jira.translate5.net/browse/TRANSLATE-4237): InstantTranslate - Text translations stay visible after switch to Translate file** <br>
+FIXED: text translations do not stay visible anymore when user switched to 'Translate file' mode
+
+**[TRANSLATE-4235](https://jira.translate5.net/browse/TRANSLATE-4235): Hotfolder Import, TBX-Import - SFTP TermImport: tbx import via zip with images inside is not working** <br>
+FIXED: tbx import via zip with images inside is now working via SFTP TermImport
+
+**[TRANSLATE-4234](https://jira.translate5.net/browse/TRANSLATE-4234): MatchAnalysis & Pretranslation - MatchAnalysis may lead to hanging delayed workers** <br>
+Using the match analysis after the import may lead to hanging workers in status delayed.
+
+**[TRANSLATE-4188](https://jira.translate5.net/browse/TRANSLATE-4188): Content Protection - Content Protection for InstantTranslate** <br>
+Fix content unprotect logic.
+
+**[TRANSLATE-4187](https://jira.translate5.net/browse/TRANSLATE-4187): Editor general, Workflows - CTRL+ENTER does not correctly work in complex workflow's multiple review steps** <br>
+Fix CTRL+ENTER behavior for segments editing within complex workflows: use current workflow step instead of autostates map
+
+**[TRANSLATE-4127](https://jira.translate5.net/browse/TRANSLATE-4127): Auto-QA - RootCause: this.getView() is null** <br>
+translate - 7.8.0 : added logging for further investigation of a problem with AutoQA filters
+translate - 7.12.0: bug fixed
+
+**[TRANSLATE-4112](https://jira.translate5.net/browse/TRANSLATE-4112): InstantTranslate - InstantTranslate target text should not be bold** <br>
+FIXED: styles are stripped from translation result when copied to clipboard
+
+
 ## [7.11.3] - 2024-10-16
 
 ### Important Notes:

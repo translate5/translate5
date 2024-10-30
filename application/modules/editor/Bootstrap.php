@@ -138,6 +138,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 
         $taskDeadlineDateEventHandler = new TaskDeadlineEventHandler($eventManager);
         $taskDeadlineDateEventHandler->register();
+
+        \MittagQI\Translate5\LanguageResource\TaskTm\EventListener::create($eventManager)->atachAll();
     }
 
     public static function initModuleSpecific()
