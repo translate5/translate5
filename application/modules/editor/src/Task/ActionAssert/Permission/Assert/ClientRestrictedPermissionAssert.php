@@ -55,7 +55,7 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
     {
         return;
 
-        if (! $context->authUser-s>isClientRestricted()) {
+        if (! $context->authUser->isClientRestricted()) {
             return;
         }
 
