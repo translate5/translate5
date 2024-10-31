@@ -28,16 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LspJob\DTO;
+namespace MittagQI\Translate5\LspJob\Exception;
 
-use MittagQI\Translate5\UserJob\Operation\DTO\WorkflowDto;
-
-class NewLspJobDto
+class CoordinatorAttemptedToCreateLspJobForHisLspException extends \Exception
 {
-    public function __construct(
-        public readonly string $taskGuid,
-        public readonly int $lspId,
-        public readonly WorkflowDto $workflow,
-    ) {
-    }
 }

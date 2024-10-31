@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
+use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
+use MittagQI\Translate5\LspJob\Operation\WithAuthentication\CreateLspJobAssignmentOperation;
 use MittagQI\Translate5\LspJob\Operation\WithAuthentication\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
@@ -42,6 +44,7 @@ use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemo
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\UserHasAlreadyOpenedTheTaskForEditingException;
 use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
+use MittagQI\Translate5\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
@@ -53,6 +56,7 @@ use MittagQI\Translate5\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\DeleteUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\UpdateUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\TypeEnum;
 use MittagQI\Translate5\UserJob\ViewDataProvider;
 use ZfExtended_Models_Entity_Conflict as EntityConflictException;
 use ZfExtended_UnprocessableEntity as UnprocessableEntity;
@@ -208,6 +212,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
             $dto = NewUserJobDtoFactory::create()->fromRequest($this->getRequest());
+
+            if (TypeEnum::Lsp === $dto->type) {
+                CreateLspJobAssignmentOperation::create()->assignJob(NewLspJobDto::fromUserJobDto($dto));
+            }
+
             $job = CreateUserJobAssignmentOperation::create()->assignJob($dto);
 
             $this->view->rows = (object) $this->viewDataProvider->buildJobView($job, $authUser);
@@ -383,6 +392,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 [
                     'userGuid' => [
                         'LSP-Benutzer kann einem Auftrag nicht zugewiesen werden, bevor der LSP-Auftrag erstellt wurde',
+                    ],
+                ],
+            ),
+            AttemptToAssignSubLspJobBeforeParentJobCreatedException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'userGuid' => [
+                        'Der elterliche LSP verfügt nicht über eine angemessene Aufgabenverteilung',
                     ],
                 ],
             ),

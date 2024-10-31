@@ -32,7 +32,8 @@ namespace MittagQI\Translate5\Task\ActionAssert\Permission;
 
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\LspUserReadPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\ClientRestrictedPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\LspUserPermissionAssert;
 
 /**
  * @extends ActionPermissionAssert<Task>
@@ -45,7 +46,8 @@ final class TaskActionPermissionAssert extends ActionPermissionAssert
     public static function create(): self
     {
         return new self([
-            LspUserReadPermissionAssert::create(),
+            ClientRestrictedPermissionAssert::create(),
+            LspUserPermissionAssert::create(),
         ]);
     }
 }

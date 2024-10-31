@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,18 +28,20 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\Operation\DTO;
+namespace MittagQI\Translate5\LspJob\Operation\DTO;
 
 use DateTime;
 use editor_Workflow_Default as Workflow;
 use Exception;
-use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\UserJob\Exception\InvalidAssignmentDateStringProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidDeadlineDateStringProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
+use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
+use MittagQI\Translate5\UserJob\Operation\DTO\TrackChangesRightsDto;
+use MittagQI\Translate5\UserJob\Operation\DTO\WorkflowDto;
 use MittagQI\Translate5\UserJob\TypeEnum;
 
-class NewUserJobDto
+class NewLspJobDto
 {
     public function __construct(
         public readonly string $taskGuid,
@@ -73,7 +75,7 @@ class NewUserJobDto
         }
     }
 
-    public static function fromLspJobDto(NewLspJobDto $userJobDto): self
+    public static function fromUserJobDto(NewUserJobDto $userJobDto): self
     {
         return new self(
             $userJobDto->taskGuid,

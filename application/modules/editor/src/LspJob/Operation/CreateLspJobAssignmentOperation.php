@@ -31,20 +31,33 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LspJob\Operation;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\LspJob\Contract\CreateLspJobAssignmentOperationInterface;
-use MittagQI\Translate5\LspJob\DTO\NewLspJobDto;
+use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
 use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
+use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
+use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
+use MittagQI\Translate5\UserJob\Operation\CreateUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
+use MittagQI\Translate5\UserJob\TypeEnum;
+use MittagQI\Translate5\UserJob\Validation\TrackChangesRightsValidator;
 
 class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperationInterface
 {
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
         private readonly TaskRepository $taskRepository,
+        private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
+        private readonly TrackChangesRightsValidator $trackChangesRightsValidator,
+        private readonly CreateUserJobAssignmentOperationInterface $createUserJobOperation,
     ) {
     }
 
@@ -56,7 +69,10 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
         return new self(
             LspJobRepository::create(),
             new TaskRepository(),
+            JobCoordinatorRepository::create(),
             LspCustomerAssociationValidator::create(),
+            TrackChangesRightsValidator::create(),
+            CreateUserJobAssignmentOperation::create(),
         );
     }
 
@@ -65,13 +81,36 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
      */
     public function assignJob(NewLspJobDto $dto): LspJobAssociation
     {
-        // todo: sub lsp job validation
+        $coordinator = $this->coordinatorRepository->findByUserGuid($dto->userGuid);
+
+        if ($coordinator === null) {
+            throw new OnlyCoordinatorCanBeAssignedToLspJobException();
+        }
+
+        $lsp = $coordinator->lsp;
+
+        if (! $lsp->isDirectLsp()) {
+            try {
+                // check if parent LSP Job exists. Sub LSP can have only jobs related to its parent LSP
+                $parentJob = $this->lspJobRepository->getByTaskGuidAndWorkflow(
+                    (int)$lsp->getParentId(),
+                    $dto->taskGuid,
+                    $dto->workflow->workflow,
+                    $dto->workflow->workflowStepName,
+                );
+            } catch (NotFoundLspJobException) {
+                throw new AttemptToAssignSubLspJobBeforeParentJobCreatedException();
+            }
+
+            $this->validateTrackChangesSettings($parentJob, $dto);
+        }
+
         $task = $this->taskRepository->getByGuid($dto->taskGuid);
 
         try {
             $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(
-                $dto->lspId,
-                (int)$task->getCustomerId()
+                (int) $lsp->getId(),
+                (int) $task->getCustomerId()
             );
         } catch (CustomerDoesNotBelongToLspException) {
             throw new NotLspCustomerTaskException();
@@ -79,12 +118,37 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
 
         $job = $this->lspJobRepository->getEmptyModel();
         $job->setTaskGuid($dto->taskGuid);
-        $job->setLspId($dto->lspId);
+        $job->setLspId((int) $coordinator->lsp->getId());
         $job->setWorkflow($dto->workflow->workflow);
         $job->setWorkflowStepName($dto->workflow->workflowStepName);
 
         $this->lspJobRepository->save($job);
 
+        try {
+            $this->createUserJobOperation->assignJob(NewUserJobDto::fromLspJobDto($dto));
+        } catch (\Throwable $e) {
+            $this->lspJobRepository->delete($job);
+
+            throw $e;
+        }
+
         return $job;
+    }
+
+    /**
+     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
+     */
+    private function validateTrackChangesSettings(LspJobAssociation $lspJob, NewLspJobDto $dto): void
+    {
+        if (TypeEnum::Lsp === $dto->type) {
+            return;
+        }
+
+        $this->trackChangesRightsValidator->assertTrackChangesRightsAreSubsetOfLspJob(
+            $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps,
+            $dto->trackChangesRights->canSeeAllTrackChanges,
+            $dto->trackChangesRights->canAcceptOrRejectTrackChanges,
+            $lspJob,
+        );
     }
 }

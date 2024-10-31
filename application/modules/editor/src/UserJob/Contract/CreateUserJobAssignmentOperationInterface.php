@@ -35,7 +35,6 @@ use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInt
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
-use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\UserJob\Exception\OnlyOneUniqueLspJobCanBeAssignedPerTaskException;
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
@@ -53,7 +52,6 @@ interface CreateUserJobAssignmentOperationInterface
      * @throws OnlyCoordinatorCanBeAssignedToLspJobException
      * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
      * @throws TrackChangesRightsAreNotSubsetOfLspJobException
-     * @throws NotLspCustomerTaskException
      */
     public function assignJob(NewUserJobDto $dto): UserJob;
 }

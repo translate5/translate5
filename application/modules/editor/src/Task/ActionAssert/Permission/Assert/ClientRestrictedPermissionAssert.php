@@ -28,17 +28,39 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\ActionAssert\Permission\Exception;
+namespace MittagQI\Translate5\Task\ActionAssert\Permission\Assert;
 
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserHasNoAccessToTaskOfForbiddenClientException;
 
-class NoAccessToTaskException extends NoAccessException implements PermissionExceptionInterface
+/**
+ * @implements PermissionAssertInterface<Task>
+ */
+final class ClientRestrictedPermissionAssert implements PermissionAssertInterface
 {
-    public function __construct(
-        public readonly Task $user
-    ) {
-        parent::__construct();
+    public static function create(): self
+    {
+        return new self();
+    }
+
+    public function supports(Action $action): bool
+    {
+        return Action::Read === $action;
+    }
+
+    public function assertGranted(object $object, PermissionAssertContext $context): void
+    {
+        return;
+
+        if (! $context->authUser-s>isClientRestricted()) {
+            return;
+        }
+
+        if (! in_array((int) $object->getCustomerId(), $context->authUser->getCustomersArray(), true)) {
+            throw new UserHasNoAccessToTaskOfForbiddenClientException($object);
+        }
     }
 }

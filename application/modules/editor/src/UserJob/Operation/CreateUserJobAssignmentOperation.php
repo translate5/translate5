@@ -32,15 +32,10 @@ namespace MittagQI\Translate5\UserJob\Operation;
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\LspJob\Contract\CreateLspJobAssignmentOperationInterface;
-use MittagQI\Translate5\LspJob\DTO\NewLspJobDto;
-use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
-use MittagQI\Translate5\LspJob\Operation\CreateLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
@@ -49,7 +44,6 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
-use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\UserJob\Exception\OnlyOneUniqueLspJobCanBeAssignedPerTaskException;
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
@@ -63,7 +57,6 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
-        private readonly CreateLspJobAssignmentOperationInterface $createLspJobAssignmentOperation,
         private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly LspJobRepository $lspJobRepository,
         private readonly TaskRepository $taskRepository,
@@ -79,7 +72,6 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
     {
         return new self(
             UserJobRepository::create(),
-            CreateLspJobAssignmentOperation::create(),
             LspUserRepository::create(),
             LspJobRepository::create(),
             new TaskRepository(),
@@ -94,17 +86,19 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
      * @throws OnlyCoordinatorCanBeAssignedToLspJobException
      * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
      * @throws TrackChangesRightsAreNotSubsetOfLspJobException
-     * @throws NotLspCustomerTaskException
      */
     public function assignJob(NewUserJobDto $dto): UserJob
     {
         $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
+
+        $this->assertLspUserCanBeAssignedToJobType($lspUser, $dto->type);
+
         $lspJob = null;
 
         if (null !== $lspUser) {
-            $lspJob = $this->resolveLspJob($lspUser, $dto);
+            $lspJob = $this->resolveLspJob((int) $lspUser->lsp->getId(), $dto);
 
-            $this->validateLspUserJob($lspJob, $dto);
+            $this->validateTrackChangesSettings($lspJob, $dto);
         }
 
         $task = $this->taskRepository->getByGuid($dto->taskGuid);
@@ -128,19 +122,11 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
             $job->setSegmentrange($dto->segmentRange);
         }
 
-        try {
-            $job->validate();
+        $job->validate();
 
-            $job->createstaticAuthHash();
+        $job->createstaticAuthHash();
 
-            $this->userJobRepository->save($job);
-        } catch (\Throwable $e) {
-            if (null !== $lspJob) {
-                $this->lspJobRepository->delete($lspJob);
-            }
-
-            throw $e;
-        }
+        $this->userJobRepository->save($job);
 
         $this->logger->info('E1012', 'job created', [
             'task' => $task,
@@ -152,33 +138,12 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
 
     /**
      * @throws AttemptToAssignLspUserToAJobBeforeLspJobCreatedException
-     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
-     * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
-     * @throws NotLspCustomerTaskException
      */
-    public function resolveLspJob(LspUser $lspUser, NewUserJobDto $dto): LspJobAssociation
+    public function resolveLspJob(int $lspId, NewUserJobDto $dto): LspJobAssociation
     {
-        if (TypeEnum::Lsp === $dto->type) {
-            try {
-                JobCoordinator::fromLspUser($lspUser);
-            } catch (CantCreateCoordinatorFromUserException) {
-                throw new OnlyCoordinatorCanBeAssignedToLspJobException();
-            }
-
-            // UserJob with type LSP plays role of data store for LSP job
-            $newLspJobDto = new NewLspJobDto($dto->taskGuid, (int) $lspUser->lsp->getId(), $dto->workflow);
-
-            try {
-                return $this->createLspJobAssignmentOperation->assignJob($newLspJobDto);
-            } catch (LspJobAlreadyExistsException) {
-                // unique(taskId, lspId, workflow, workflowStepName)
-                throw new OnlyOneUniqueLspJobCanBeAssignedPerTaskException();
-            }
-        }
-
         try {
             return $this->lspJobRepository->getByTaskGuidAndWorkflow(
-                (int) $lspUser->lsp->getId(),
+                $lspId,
                 $dto->taskGuid,
                 $dto->workflow->workflow,
                 $dto->workflow->workflowStepName,
@@ -191,7 +156,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
     /**
      * @throws TrackChangesRightsAreNotSubsetOfLspJobException
      */
-    private function validateLspUserJob(LspJobAssociation $lspJob, NewUserJobDto $dto): void
+    private function validateTrackChangesSettings(LspJobAssociation $lspJob, NewUserJobDto $dto): void
     {
         if (TypeEnum::Lsp === $dto->type) {
             return;
@@ -203,5 +168,25 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
             $dto->trackChangesRights->canAcceptOrRejectTrackChanges,
             $lspJob,
         );
+    }
+
+    /**
+     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
+     */
+    private function assertLspUserCanBeAssignedToJobType(?LspUser $lspUser, TypeEnum $type): void
+    {
+        if (TypeEnum::Lsp !== $type) {
+            return;
+        }
+
+        if (null === $lspUser) {
+            throw new OnlyCoordinatorCanBeAssignedToLspJobException();
+        }
+
+        try {
+            JobCoordinator::fromLspUser($lspUser);
+        } catch (CantCreateCoordinatorFromUserException) {
+            throw new OnlyCoordinatorCanBeAssignedToLspJobException();
+        }
     }
 }

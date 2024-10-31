@@ -28,17 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\ActionAssert\Permission\Exception;
+namespace MittagQI\Translate5\UserJob\Exception;
 
-use editor_Models_Task as Task;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use InvalidArgumentException;
 
-class NoAccessToTaskException extends NoAccessException implements PermissionExceptionInterface
+class AttemptToAssignSubLspJobBeforeParentJobCreatedException extends InvalidArgumentException
 {
-    public function __construct(
-        public readonly Task $user
-    ) {
-        parent::__construct();
-    }
 }

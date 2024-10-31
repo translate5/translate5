@@ -10097,6 +10097,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>LSP-Benutzer kann einem Auftrag nicht zugewiesen werden, bevor der LSP-Auftrag erstellt wurde</source>
                 <target>LSP-Benutzer kann einem Auftrag nicht zugewiesen werden, bevor der LSP-Auftrag erstellt wurde</target>
             </trans-unit>
+            <trans-unit id='RGVyIGVsdGVybGljaGUgTFNQIHZlcmbDvGd0IG5pY2h0IMO8YmVyIGVpbmUgYW5nZW1lc3NlbmUgQXVmZ2FiZW52ZXJ0ZWlsdW5n'>
+                <source>Der elterliche LSP verfügt nicht über eine angemessene Aufgabenverteilung</source>
+                <target>Parent LSP does not have appropriate job assignment</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

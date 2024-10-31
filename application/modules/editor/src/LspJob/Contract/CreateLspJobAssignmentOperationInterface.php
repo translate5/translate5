@@ -30,16 +30,36 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LspJob\Contract;
 
-use MittagQI\Translate5\LspJob\DTO\NewLspJobDto;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\LspJob\Exception\CoordinatorAttemptedToCreateLspJobForHisLspException;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
+use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
+use MittagQI\Translate5\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
 use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
+use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
+use MittagQI\Translate5\UserJob\Exception\OnlyOneUniqueLspJobCanBeAssignedPerTaskException;
+use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 
 interface CreateLspJobAssignmentOperationInterface
 {
     /**
+     * @throws AttemptToAssignSubLspJobBeforeParentJobCreatedException
+     * @throws CoordinatorAttemptedToCreateLspJobForHisLspException
      * @throws LspJobAlreadyExistsException
      * @throws NotLspCustomerTaskException
+     * @throws InexistentUserException
+     * @throws \ZfExtended_NotAuthenticatedException
+     * @throws \ZfExtended_NotFoundException
+     * @throws PermissionExceptionInterface
+     * @throws AttemptToAssignLspUserToAJobBeforeLspJobCreatedException
+     * @throws InexistentTaskException
+     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
+     * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
+     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
      */
     public function assignJob(NewLspJobDto $dto): LspJobAssociation;
 }

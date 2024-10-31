@@ -270,6 +270,21 @@ class LspJobRepository
         }
     }
 
+    public function hasJobInTaskGuidAndWorkflow(
+        int $lspId,
+        string $taskGuid,
+        string $workflow,
+        string $workflowStepName,
+    ): bool {
+        try {
+            $this->getByTaskGuidAndWorkflow($lspId, $taskGuid, $workflow, $workflowStepName);
+
+            return true;
+        } catch (NotFoundLspJobException) {
+            return false;
+        }
+    }
+
     /**
      * @throws NotFoundLspJobException
      */

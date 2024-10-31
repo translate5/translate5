@@ -40,12 +40,12 @@ use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\LspUserHasNoAccessToTaskException;
 
 /**
  * @implements PermissionAssertInterface<Task>
  */
-final class LspUserReadPermissionAssert implements PermissionAssertInterface
+final class LspUserPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly LspUserRepositoryInterface $lspUserRepository,
@@ -65,7 +65,7 @@ final class LspUserReadPermissionAssert implements PermissionAssertInterface
 
     public function supports(Action $action): bool
     {
-        return Action::Read === $action;
+        return true;
     }
 
     public function assertGranted(object $object, PermissionAssertContext $context): void
@@ -83,11 +83,11 @@ final class LspUserReadPermissionAssert implements PermissionAssertInterface
         try {
             JobCoordinator::fromLspUser($lspUser);
         } catch (CantCreateCoordinatorFromUserException) {
-            throw new NoAccessToTaskException($object);
+            throw new LspUserHasNoAccessToTaskException($object);
         }
 
         if (! $this->lspJobRepository->lspHasJobInTask((int) $lspUser->lsp->getId(), $object->getTaskGuid())) {
-            throw new NoAccessToTaskException($object);
+            throw new LspUserHasNoAccessToTaskException($object);
         }
     }
 }
