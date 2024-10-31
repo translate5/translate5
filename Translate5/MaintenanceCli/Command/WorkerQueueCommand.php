@@ -34,7 +34,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
-use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 
 class WorkerQueueCommand extends Translate5AbstractCommand
@@ -96,18 +95,8 @@ class WorkerQueueCommand extends Translate5AbstractCommand
 
         $this->writeTitle('trigger worker queue');
 
-        $worker = new ZfExtended_Models_Worker();
-
-        $workerQueue = ZfExtended_Factory::get(Queue::class);
-
-        if ($workerQueue->lockAcquire()) {
-            $foundWorkers = $workerQueue->process();
-            while ($foundWorkers) {
-                sleep(1);
-                $foundWorkers = $workerQueue->process();
-            }
-            $workerQueue->lockRelease();
-        }
+        // trigger the queue if possible
+        Queue::processQueueMutexed();
 
         $this->io->text('scheduling workers...');
 
@@ -117,6 +106,7 @@ class WorkerQueueCommand extends Translate5AbstractCommand
 
         sleep(4);
 
+        $worker = new ZfExtended_Models_Worker();
         $allWorker = $worker->loadByState($worker::STATE_PREPARE);
         if (empty($allWorker)) {
             $this->io->info('No worker set to running.');

@@ -241,7 +241,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 		html = (html.substring(html.length - 1) === '<') ? html.substring(0, html.length - 1) : html;
 		// recursively remove tags to ensure that the returned string doesn't contain forbidden tags html previous passes (e.g. '<<bait/>switch/>')
 		while (true) {
-			before = html
+			before = html;
 			html = before.replace(comments, '').replace(tags, function (p0, p1){
 				return allowed.indexOf('<' + p1.toLowerCase() + '>') > -1 ? p0 : '';
 			});
