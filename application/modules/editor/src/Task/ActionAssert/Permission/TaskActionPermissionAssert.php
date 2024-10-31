@@ -46,7 +46,6 @@ final class TaskActionPermissionAssert extends ActionPermissionAssert
     public static function create(): self
     {
         return new self([
-            ClientRestrictedPermissionAssert::create(),
             LspUserPermissionAssert::create(),
         ]);
     }
