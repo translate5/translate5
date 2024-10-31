@@ -28,53 +28,70 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\ActionAssert\Permission\Asserts;
+namespace MittagQI\Translate5\Task\ActionAssert\Permission\Assert;
 
-use editor_Models_TaskUserAssoc as UserJob;
+use editor_Models_Task as Task;
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
-use MittagQI\Translate5\UserJob\ActionAssert\Permission\Exception\NoAccessToUserJobException;
+use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
+use MittagQI\Translate5\User\Model\User;
+use Zend_Acl_Exception;
+use ZfExtended_Acl;
 
 /**
- * @implements PermissionAssertInterface<UserJob>
+ * @implements PermissionAssertInterface<Task>
  */
-class TaskRestrictionAssert implements PermissionAssertInterface
+final class UserHasJobInTaskPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
-        private readonly ActionPermissionAssertInterface $taskPermissionAssert,
-        private readonly TaskRepository $taskRepository,
+        private readonly UserJobRepository $userJobRepository,
+        private readonly ZfExtended_Acl $acl,
     ) {
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public static function create(): self
     {
         return new self(
-            TaskActionPermissionAssert::create(),
-            new TaskRepository(),
+            UserJobRepository::create(),
+            ZfExtended_Acl::getInstance(),
         );
     }
 
     public function supports(Action $action): bool
     {
-        return true;
+        return Action::Read === $action;
     }
 
+    /**
+     * to access a task the user must either have the loadAllTasks right,
+     * or must be the tasks PM, or must be associated to the task
+     *
+     * {@inheritDoc}
+     */
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        $task = $this->taskRepository->getByGuid($object->getTaskGuid());
+        if ($context->authUser->getUserGuid() === $object->getTaskGuid()) {
+            return;
+        }
 
+        if ($this->userJobRepository->userHasJobsInTask($context->authUser->getUserGuid(), $object->getTaskGuid())) {
+            return;
+        }
+
+        if (! $this->canLoadAllTasks($context->authUser)) {
+            throw new NoAccessToTaskException($object);
+        }
+    }
+
+    private function canLoadAllTasks(User $authUser): bool
+    {
         try {
-            $this->taskPermissionAssert->assertGranted(Action::Update, $task, $context);
-        } catch (PermissionExceptionInterface) {
-            throw new NoAccessToUserJobException($object);
+            return $this->acl->isInAllowedRoles($authUser->getRoles(), Rights::ID, Rights::LOAD_ALL_TASKS);
+        } catch (Zend_Acl_Exception) {
+            return false;
         }
     }
 }

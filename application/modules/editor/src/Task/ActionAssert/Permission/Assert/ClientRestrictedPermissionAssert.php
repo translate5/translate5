@@ -48,13 +48,11 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
 
     public function supports(Action $action): bool
     {
-        return Action::Read === $action;
+        return $action->isMutable();
     }
 
     public function assertGranted(object $object, PermissionAssertContext $context): void
     {
-        return;
-
         if (! $context->authUser->isClientRestricted()) {
             return;
         }

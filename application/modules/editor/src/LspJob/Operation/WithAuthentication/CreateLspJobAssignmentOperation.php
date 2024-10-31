@@ -94,7 +94,7 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
         $task = $this->taskRepository->getByGuid($dto->taskGuid);
         $user = $this->userRepository->getByGuid($dto->userGuid);
 
-        $this->taskPermissionAssert->assertGranted(Action::Read, $task, $context);
+        $this->taskPermissionAssert->assertGranted(Action::Update, $task, $context);
         $this->userPermissionAssert->assertGranted(Action::Read, $user, $context);
 
         $coordinator = $this->coordinatorRepository->findByUser($user);

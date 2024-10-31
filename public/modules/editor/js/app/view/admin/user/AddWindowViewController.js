@@ -43,8 +43,11 @@ Ext.define('Editor.view.admin.user.AddWindowViewController', {
         },
     },
     handleUserCancel: function () {
-        var win = this.getView();
-        win.down('form').getForm().reset();
+        const win = this.getView(),
+            form = win.down('form'),
+            rec = form.getRecord()
+        form.reset();
+        rec.reject();
         win.close();
     },
     /**

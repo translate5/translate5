@@ -40,6 +40,7 @@ use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\Contract\UpdateUserRolesOperationInterface;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource;
+use Zend_Acl_Exception;
 use Zend_Registry;
 use ZfExtended_Acl;
 use ZfExtended_Authentication;
