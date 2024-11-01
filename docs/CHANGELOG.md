@@ -22,6 +22,38 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.14.0] - 2024-11-01
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4246](https://jira.translate5.net/browse/TRANSLATE-4246): LanguageResources - Adding Terminology to OpenAI translation Requests when importing tasks or do a pretranslation in the Analysis** <br>
+Improvement: OpenAI Plugin uses assigned Terminology when translating
+
+**[TRANSLATE-4243](https://jira.translate5.net/browse/TRANSLATE-4243): t5memory - Wait until reorganization is finished in background tasks** <br>
+Background running tasks now wait until t5memory reorganization is finished.
+
+**[TRANSLATE-4240](https://jira.translate5.net/browse/TRANSLATE-4240): file format settings - Remove warning when using a custom BCONF in the zip** <br>
+Remove warning when using a custom BCONF in the import-ZIP
+
+**[TRANSLATE-4213](https://jira.translate5.net/browse/TRANSLATE-4213): Configuration - Define Callback in config client-overwritable** <br>
+triggerCallbackAction URLs are configurable through the config now, with the ability to override it at the client level. Users can define or modify the callback URLs without need for manual database changes.
+
+
+### Bugfixes
+**[TRANSLATE-4254](https://jira.translate5.net/browse/TRANSLATE-4254): LanguageResources - Client-PM can only filebased LR-types** <br>
+FIX: a client-PM could add only filebased LR-types, added non-filebased
+
+**[TRANSLATE-4250](https://jira.translate5.net/browse/TRANSLATE-4250): Main back-end mechanisms (Worker, Logging, etc.) - Small tasks hang on import due to delayed workers with no cronjobs enabled Edit Add comment Assign More Waiting for support  Share this issue Export** <br>
+FIX: A bug in the worker scheduler lead to hanging import on small tasks in conjuction with worker-delay
+
+**[TRANSLATE-4238](https://jira.translate5.net/browse/TRANSLATE-4238): Editor general - Only my project button produces UI error when clicked from menu** <br>
+Fix for UI problem when filtering out "Only my projects" from menu item in project grid.
+
+
 ## [7.13.0] - 2024-10-27
 
 ### Important Notes:
