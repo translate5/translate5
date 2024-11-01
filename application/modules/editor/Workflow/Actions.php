@@ -271,14 +271,26 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
      */
     public function triggerCallbackAction(): void
     {
+        $webhooks = $this->config->task->getConfig()->runtimeOptions->task->workflow->webhooks ?? null;
+        $webhooks = is_null($webhooks) ? [] : $webhooks->toArray();
+        $url = '';
+
+        $trigger = $this->config->trigger;
+        if (! empty($trigger) && ! empty($webhooks[$trigger])) {
+            $url = trim($webhooks[$trigger]);
+        }
+
         $triggerConfig = $this->config->parameters;
-        $url = $triggerConfig->url ?? '';
-        // set the data parameters from the trigger config if exist
-        // this can be used for api authentication
-        $data = $triggerConfig->params ?? new stdClass();
+        if (empty($url)) {
+            $url = $triggerConfig->url ?? '';
+        }
+
         if (empty($url)) {
             return;
         }
+        // set the data parameters from the trigger config if exist
+        // this can be used for api authentication
+        $data = $triggerConfig->params ?? new stdClass();
 
         $task = $this->config->task;
 

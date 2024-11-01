@@ -658,12 +658,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             error_log('OKAPI::handleAfterDirectoryParsing: task ' . $task->getTaskGuid() . ', bconf: ' . $importFilter->getBconfDisplayName());
         }
 
-        // there should be a warning if the deprecated bconf in import-zip was used
+        // TRANSLATE-4240 Deactivated: there should be a warning if the deprecated bconf in import-zip was used
+        /*
         if ($importFilter->hasEmbeddedBconf()) {
             $task->logger('editor.task.okapi')->warn('E1387', 'Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated', [
                 'bconf' => $importFilter->getBconfName(),
             ]);
         }
+        */
 
         $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
         foreach ($filelist as $fileId => $filePath) {
