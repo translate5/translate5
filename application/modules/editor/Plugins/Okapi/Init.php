@@ -406,7 +406,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
 
     protected function initEvents(): void
     {
-        // adds the system-default filetypes to the global registry
+        // adds the task's bconf filetypes to the global registry
         $this->eventManager->attach(
             FileTypeSupport::class,
             'registerSupportedFileTypes',

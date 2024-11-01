@@ -49,6 +49,9 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             '#onlyMyProjects': {
                 click: 'onlyMyProjectsClick'
             },
+            '#projectToolbar menuitem': {
+                click: menuitem => menuitem.masterComponent.fireEvent('click')
+            },
             'projectGrid': {
                 filterchange: 'onProjectGridFilterChange'
             }
@@ -82,14 +85,22 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             grid = me.getView(),
             column = grid.down('[dataIndex=pmName]');
 
+        // this function is called in 2 different contexts
+        // 1. on the actual button click
+        // 2. on menu item click
+        // in the 2nd case, the button is not passed in and not needed.
+        if(!btn)
+        {
+            return;
+        }
+
         if (column && column.filter) {
-            if (btn.pressed) {
+            var active = btn.pressed || btn.checked;
+            if (active) {
                 column.filter.filter.setValue(Editor.data.app.user.longUserName);
                 column.filter.active = false;
-                column.filter.setActive(true);
-            } else {
-                column.filter.setActive(false);
             }
+            column.filter.setActive(active);
         }
     },
 
@@ -112,10 +123,6 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         });
 
         button.setPressed(pressed);
-    },
-
-    handleProjectReload: function (task, ev) {
-        this.onTriggerTaskReload({taskId: task.get('id')});
     },
 
     /***
