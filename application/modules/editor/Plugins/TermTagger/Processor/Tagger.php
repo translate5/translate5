@@ -193,7 +193,7 @@ final class Tagger extends AbstractProcessor
         // request our service / tag the terms
         $result = $this->tagTerms($this->serviceUrl);
         // apply the result to the tags
-        $this->applyTaggingResult($result, $segmentsTags, true);
+        $this->applyTaggingResult($result, $segmentsTags);
     }
 
     /**
@@ -210,6 +210,43 @@ final class Tagger extends AbstractProcessor
         $result = $this->tagTerms($this->serviceUrl);
         // apply the result to the tags
         $this->applyTaggingResult($result, [$segmentTags], $saveTags);
+    }
+
+    /**
+     * Returns an array of terms applicable for particular segment
+     */
+    public function retrieveTermsForSegmentTags(editor_Segment_Tags $segmentsTags): iterable
+    {
+        $segmentsTags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
+
+        // creating the service-data model used by the termtagger-service
+        $this->serviceData = $this->createServiceData([$segmentsTags]);
+        // check TBX hash
+        $this->checkTermTaggerTbx($this->serviceUrl, $this->serviceData->tbxFile);
+        // request our service / tag the terms
+        $result = $this->tagTerms($this->serviceUrl);
+
+        $termsProvider = TermsProvider::create();
+
+        foreach ($result->segments as $segment) {
+            $result = [];
+
+            $groupedTerms = $termsProvider->retrieveTermsBasedOnTaggedString(
+                $segment->source,
+                (int) $this->task->getSourceLang(),
+                (int) $this->task->getTargetLang(),
+                $this->task->getTaskGuid()
+            );
+
+            foreach ($groupedTerms as $termId => $terms) {
+                foreach ($terms as $term) {
+                    $key = $term['isSource'] ? 'source' : 'target';
+                    $result[$termId][$key][] = $term;
+                }
+            }
+
+            yield $result;
+        }
     }
 
     /**

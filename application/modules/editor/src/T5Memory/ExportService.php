@@ -71,7 +71,7 @@ class ExportService
             \Zend_Registry::get('logger'),
             new VersionService(new VersionFetchingApi($httpClient)),
             TmConversionService::create(),
-            new Api\VersionedApiFactory($httpClient, $config),
+            new Api\VersionedApiFactory($httpClient),
             new PersistenceService($config),
         );
     }
