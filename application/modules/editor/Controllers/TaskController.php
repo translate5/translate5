@@ -31,7 +31,9 @@ use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Task\DataProvider\TaskViewDataProvider;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Import\ImportService;
@@ -42,6 +44,7 @@ use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
@@ -49,8 +52,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Exception;
 class editor_TaskController extends ZfExtended_RestController
 {
     use TaskContextTrait;
-
-    public const BACKEND = 'backend';
 
     protected $entityClass = 'editor_Models_Task';
 
@@ -63,7 +64,7 @@ class editor_TaskController extends ZfExtended_RestController
     /**
      * logged in user
      */
-    protected ?ZfExtended_Models_User $authenticatedUser;
+    protected User $authenticatedUser;
 
     /**
      * @var editor_Models_Task
@@ -123,6 +124,8 @@ class editor_TaskController extends ZfExtended_RestController
 
     private BeforeFinishStateTaskValidator $beforeFinishStateTaskValidator;
 
+    private TaskViewDataProvider $taskViewDataProvider;
+
     public function init(): void
     {
         $this->_filterTypeMap = [
@@ -177,7 +180,10 @@ class editor_TaskController extends ZfExtended_RestController
 
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
-        $this->authenticatedUser = ZfExtended_Authentication::getInstance()->getUser();
+
+        $userRepository = new UserRepository();
+        $this->authenticatedUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+
         $this->workflowManager = ZfExtended_Factory::get(editor_Workflow_Manager::class);
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->config = Zend_Registry::get('config');
@@ -189,6 +195,7 @@ class editor_TaskController extends ZfExtended_RestController
         $this->importService = new ImportService();
         $this->workersHandler = new ProjectWorkersService();
         $this->qualityService = new QualityService();
+        $this->taskViewDataProvider = TaskViewDataProvider::create();
 
         //create a new logger instance writing only to the configured taskLogger
         $this->taskLog = ZfExtended_Factory::get(ZfExtended_Logger::class, [[
@@ -259,20 +266,19 @@ class editor_TaskController extends ZfExtended_RestController
      */
     public function indexAction()
     {
-        //set default sort
-        $this->addDefaultSort();
         if ($this->handleProjectRequest()) {
-            $this->view->rows = $this->loadAllForProjectOverview();
+            $result = $this->loadAllForProjectOverview();
         } else {
-            $this->view->rows = $this->loadAllForTaskOverview();
+            $result = $this->loadAllForTaskOverview();
         }
+
+        $this->view->total = $result['totalCount'];
+        $this->view->rows = $result['rows'];
 
         // Load overall and users-specific progress for each task in $this->view->rows
         ZfExtended_Factory
             ::get(editor_Models_TaskProgress::class)
                 ->loadForRows($this->view->rows);
-
-        $this->view->total = $this->totalCount;
     }
 
     /**
@@ -335,39 +341,41 @@ class editor_TaskController extends ZfExtended_RestController
         $isAllowedToLoadAll = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS);
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
+
         if ($isAllowedToLoadAll) {
             $this->totalCount = $this->entity->getTotalCount();
-            $rows = $this->entity->loadAll();
-        } else {
-            $this->totalCount = $this->entity->getTotalCountByUserAssoc(
-                $this->authenticatedUser->getUserGuid(),
-                $isAllowedToLoadAll
-            );
-            $rows = $this->entity->loadListByUserAssoc($this->authenticatedUser->getUserGuid(), $isAllowedToLoadAll);
+
+            return $this->entity->loadAll();
         }
 
-        return $rows;
+        $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->authenticatedUser->getUserGuid());
+
+        return $this->entity->loadListByUserAssoc($this->authenticatedUser->getUserGuid());
     }
 
     /**
      * returns all (filtered) tasks with added user data
      * uses $this->entity->loadAll
      */
-    protected function loadAllForProjectOverview()
+    protected function loadAllForProjectOverview(): array
     {
-        $rows = $this->loadAll();
-        $customerData = $this->getCustomersForRendering($rows);
+        $projectList = $this->taskViewDataProvider->getProjectList(
+            $this->authenticatedUser,
+            $this->entity->getFilter(),
+        );
+
+        $customerData = $this->getCustomersForRendering($projectList['rows']);
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
-        $isTransfer = $file->getTransfersPerTasks(array_column($rows, 'taskGuid'));
+        $isTransfer = $file->getTransfersPerTasks(array_column($projectList['rows'], 'taskGuid'));
 
         // If the config for mailto link in project grid pm user column is configured
         $isMailTo = $this->config->runtimeOptions->frontend->tasklist->pmMailTo;
         if ($isMailTo) {
-            $userData = $this->getUsersForRendering($rows);
+            $userData = $this->getUsersForRendering($projectList['rows']);
         }
 
-        foreach ($rows as &$row) {
+        foreach ($projectList['rows'] as &$row) {
             unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
@@ -376,7 +384,7 @@ class editor_TaskController extends ZfExtended_RestController
             }
         }
 
-        return $rows;
+        return $projectList;
     }
 
     /**
@@ -385,20 +393,29 @@ class editor_TaskController extends ZfExtended_RestController
      */
     protected function loadAllForTaskOverview(): array
     {
-        $rows = $this->loadAll();
+        $limit = (int) $this->getParam('limit', 0);
+
+        $taskDataList = $this->taskViewDataProvider->getTaskList(
+            $this->authenticatedUser,
+            $this->entity->getFilter(),
+            (int) $this->getParam('start', 0),
+            $limit,
+        );
 
         //if we have no paging parameters, we omit all additional data gathering to improve performace!
-        if ($this->getParam('limit', 0) === 0 && ! $this->getParam('filter', false)) {
-            return $rows;
+        if ($limit === 0 && ! $this->getParam('filter', false)) {
+            $this->log->warn('E0000', 'Task overview without paging and filter is deprecated!');
+
+            return $taskDataList;
         }
 
-        $taskGuids = array_map(fn ($item) => $item['taskGuid'], $rows);
+        $taskGuids = array_map(fn ($item) => $item['taskGuid'], $taskDataList['rows']);
 
         $file = ZfExtended_Factory::get(editor_Models_File::class);
         $fileCount = $file->getFileCountPerTasks($taskGuids);
         $isTransfer = $file->getTransfersPerTasks($taskGuids);
 
-        $this->_helper->TaskUserInfo->initUserAssocInfos($rows);
+        $this->_helper->TaskUserInfo->initUserAssocInfos($taskDataList['rows']);
 
         //load the task assocs
         $languageResourcemodel = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
@@ -416,16 +433,16 @@ class editor_TaskController extends ZfExtended_RestController
         //if the config for mailto link in task grid pm user column is configured
         $isMailTo = $this->config->runtimeOptions->frontend->tasklist->pmMailTo;
 
-        $customerData = $this->getCustomersForRendering($rows);
+        $customerData = $this->getCustomersForRendering($taskDataList['rows']);
 
         if ($isMailTo) {
-            $userData = $this->getUsersForRendering($rows);
+            $userData = $this->getUsersForRendering($taskDataList['rows']);
         }
 
         $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
         $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
 
-        foreach ($rows as &$row) {
+        foreach ($taskDataList['rows'] as &$row) {
             try {
                 $tua->loadByStepOrSortedState($sessionUser->getUserGuid(), $row['taskGuid'], $row['workflowStepName']);
                 $row['hasCriticalErrors'] = $this->qualityService->taskHasCriticalErrors($row['taskGuid'], $tua);
@@ -475,11 +492,11 @@ class editor_TaskController extends ZfExtended_RestController
                 }
             }
 
-            $columns = array_column($rows, 'qualityErrorCount');
-            array_multisort($columns, $direction, $rows);
+            $columns = array_column($taskDataList['rows'], 'qualityErrorCount');
+            array_multisort($columns, $direction, $taskDataList['rows']);
         }
 
-        return $rows;
+        return $taskDataList;
     }
 
     /**
@@ -2195,18 +2212,18 @@ class editor_TaskController extends ZfExtended_RestController
             return false;
         }
 
-        if ($projectOnly) {
-            $filterValues = $taskTypes->getProjectTypes();
-        } else {
-            $filterValues = $taskTypes->getNonInternalTaskTypes();
-        }
-
-        $filter->addFilter((object) [
-            'field' => 'taskType',
-            'value' => $filterValues,
-            'type' => 'list',
-            'comparison' => 'in',
-        ]);
+//        if ($projectOnly) {
+//            $filterValues = $taskTypes->getProjectTypes();
+//        } else {
+//            $filterValues = $taskTypes->getNonInternalTaskTypes();
+//        }
+//
+//        $filter->addFilter((object) [
+//            'field' => 'taskType',
+//            'value' => $filterValues,
+//            'type' => 'list',
+//            'comparison' => 'in',
+//        ]);
 
         return $projectOnly;
     }

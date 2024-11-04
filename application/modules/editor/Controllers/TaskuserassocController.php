@@ -51,13 +51,14 @@ use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
+use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\UserJob\Operation\Factory\NewUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\DeleteUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\UpdateUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\TypeEnum;
-use MittagQI\Translate5\UserJob\ViewDataProvider;
+use MittagQI\Translate5\UserJob\UserJobViewDataProvider;
 use ZfExtended_Models_Entity_Conflict as EntityConflictException;
 use ZfExtended_UnprocessableEntity as UnprocessableEntity;
 
@@ -85,7 +86,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     private TaskRepository $taskRepository;
 
-    private ViewDataProvider $viewDataProvider;
+    private UserJobViewDataProvider $viewDataProvider;
 
     private UserJobRepository $userJobRepository;
 
@@ -96,7 +97,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->taskRepository = new TaskRepository();
         $this->userJobRepository = UserJobRepository::create();
 
-        $this->viewDataProvider = ViewDataProvider::create();
+        $this->viewDataProvider = UserJobViewDataProvider::create();
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E1012' => 'Multi Purpose Code logging in the context of jobs (task user association)',
@@ -214,12 +215,13 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             $dto = NewUserJobDtoFactory::create()->fromRequest($this->getRequest());
 
             if (TypeEnum::Lsp === $dto->type) {
-                CreateLspJobAssignmentOperation::create()->assignJob(NewLspJobDto::fromUserJobDto($dto));
+                $lspJob = CreateLspJobAssignmentOperation::create()->assignJob(NewLspJobDto::fromUserJobDto($dto));
+                $userJob = UserJobRepository::create()->getDataJobByLspJob($lspJob);
+            } else {
+                $userJob = CreateUserJobAssignmentOperation::create()->assignJob($dto);
             }
 
-            $job = CreateUserJobAssignmentOperation::create()->assignJob($dto);
-
-            $this->view->rows = (object) $this->viewDataProvider->buildJobView($job, $authUser);
+            $this->view->rows = (object) $this->viewDataProvider->buildJobView($userJob, $authUser);
         } catch (Throwable $e) {
             throw $this->transformException($e);
         }
@@ -400,6 +402,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 [
                     'userGuid' => [
                         'Der elterliche LSP verfügt nicht über eine angemessene Aufgabenverteilung',
+                    ],
+                ],
+            ),
+            TrackChangesRightsAreNotSubsetOfLspJobException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'permission' => [
+                        'Die Rechte des LSP-Benutzers sollten eine Teilmenge der Rechte des LSP- Auftrags sein.',
                     ],
                 ],
             ),

@@ -49,12 +49,20 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
 
     public function assertGranted(Action $action, object $object, PermissionAssertContext $context): void
     {
+        $atLeastOneAssertionMade = false;
+
         foreach ($this->asserts as $assert) {
             if (! $assert->supports($action)) {
                 continue;
             }
 
+            $atLeastOneAssertionMade = true;
+
             $assert->assertGranted($object, $context);
+        }
+
+        if (! $atLeastOneAssertionMade) {
+            throw new \RuntimeException('No assertion made for action ' . $action->value);
         }
     }
 }

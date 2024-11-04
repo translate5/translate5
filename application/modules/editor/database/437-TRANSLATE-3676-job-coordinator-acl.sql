@@ -50,7 +50,7 @@ VALUES
     ('editor', 'jobCoordinator', 'frontend', 'editorEditUser'),
     ('editor', 'jobCoordinator', 'frontend', 'editorMenuProject'),
     ('editor', 'jobCoordinator', 'frontend', 'editorProjectTask'),
-    ('editor', 'jobCoordinator', 'frontend', 'loadAllTasks'),
+    ('editor', 'jobCoordinator', 'frontend', 'taskUserAssocFrontendController'),
     ('editor', 'jobCoordinator', 'frontend', 'userAdministration'),
     ('editor', 'jobCoordinator', 'editor_user', 'index'),
     ('editor', 'jobCoordinator', 'editor_user', 'post'),

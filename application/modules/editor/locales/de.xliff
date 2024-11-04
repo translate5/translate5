@@ -10101,6 +10101,10 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Der elterliche LSP verfügt nicht über eine angemessene Aufgabenverteilung</source>
                 <target>Parent LSP does not have appropriate job assignment</target>
             </trans-unit>
+            <trans-unit id='RGllIFJlY2h0ZSBkZXMgTFNQLUJlbnV0emVycyBzb2xsdGVuIGVpbmUgVGVpbG1lbmdlIGRlciBSZWNodGUgZGVzIExTUC0gQXVmdHJhZ3Mgc2Vpbi4='>
+                <source>Die Rechte des LSP-Benutzers sollten eine Teilmenge der Rechte des LSP- Auftrags sein.</source>
+                <target>Die Rechte des LSP-Benutzers sollten eine Teilmenge der Rechte des LSP- Auftrags sein.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

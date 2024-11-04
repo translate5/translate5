@@ -73,7 +73,7 @@ use ZfExtended_Factory;
  * longUserName: string
  * }
  */
-class ViewDataProvider
+class UserJobViewDataProvider
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,

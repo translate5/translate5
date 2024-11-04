@@ -286,9 +286,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * @param bool $loadAll optional, per default false
      * @return array
      */
-    public function loadListByUserAssoc(string $userGuid, $loadAll = false)
+    public function loadListByUserAssoc(string $userGuid)
     {
-        return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid, '*', $loadAll));
+        return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid));
     }
 
     /**
@@ -357,7 +357,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         if ($loadAll) {
             $s = $this->db->select()->setIntegrityCheck(false);
         } else {
-            $s = $this->getSelectByUserAssocSql($userGuid, '*', $loadAll);
+            $s = $this->getSelectByUserAssocSql($userGuid);
         }
         //apply the frontend task filters
         $this->applyFilterAndSort($s);
@@ -383,11 +383,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * @param bool $loadAll
      * @return int
      */
-    public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false)
+    public function getTotalCountByUserAssoc(string $userGuid)
     {
         $s = $this->getSelectByUserAssocSql($userGuid, [
             'numrows' => 'count(*)',
-        ], $loadAll);
+        ]);
         $this->applyFilterToSelect($s);
 
         return $this->db->fetchRow($s)->numrows;
@@ -395,34 +395,28 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns the SQL to retrieve the tasks of an user oder of all users joined with the users assoc infos
-     * if $loadAll is true, load all tasks, user infos joined only where possible,
-     *   if false only the associated tasks to the user
      * TODO: when state filter is refactored, remove the tasuserassoc object cast here
-     * @param string $cols column definition
-     * @param bool $loadAll
-     * @return Zend_Db_Table_Select
      */
-    protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false)
+    protected function getSelectByUserAssocSql(string $userGuid, string|array $cols = '*'): Zend_Db_Table_Select
     {
-        $s = $this->db->select()
-            ->from('LEK_task', $cols);
+        $select = $this->db->select()->from('LEK_task', $cols);
         $defaultTable = $this->db->info($this->db::NAME);
+
         if (! empty($this->filter)) {
             $this->filter->setDefaultTable($defaultTable);
         }
-        if ($loadAll) {
-            $on = 'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid AND LEK_taskUserAssoc_1.userGuid = ' . $s->getAdapter()->quote($userGuid);
-            $s->joinLeft([
-                'LEK_taskUserAssoc_1' => 'LEK_taskUserAssoc',
-            ], $on, []);
-        } else {
-            $s->joinLeft([
-                'LEK_taskUserAssoc_1' => 'LEK_taskUserAssoc',
-            ], 'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid', [])
-                ->where('LEK_taskUserAssoc_1.userGuid = ? OR LEK_task.pmGuid = ?', $userGuid);
-        }
 
-        return $s;
+        $select
+            ->joinLeft(
+                [
+                    'LEK_taskUserAssoc_1' => 'LEK_taskUserAssoc',
+                ],
+                'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid',
+                []
+            )
+            ->where('LEK_taskUserAssoc_1.userGuid = ? OR LEK_task.pmGuid = ?', $userGuid);
+
+        return $select;
     }
 
     /**

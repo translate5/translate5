@@ -48,7 +48,7 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
 
     public function supports(Action $action): bool
     {
-        return $action->isMutable();
+        return true;
     }
 
     public function assertGranted(object $object, PermissionAssertContext $context): void

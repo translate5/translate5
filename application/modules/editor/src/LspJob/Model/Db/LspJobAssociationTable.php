@@ -57,7 +57,9 @@ use Zend_Db_Table_Abstract;
 
 class LspJobAssociationTable extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_lsp_job_association';
+    public const TABLE_NAME = 'LEK_lsp_job_association';
+
+    protected $_name = self::TABLE_NAME;
 
     public $_primary = 'id';
 }
