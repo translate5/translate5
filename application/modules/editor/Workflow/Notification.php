@@ -519,6 +519,30 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
         $this->notifyUser($user);
     }
 
+    public function notifyAutoclosed(string $userGuid): void
+    {
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $user->loadByGuid($this->config->task->getPmGuid());
+
+        $this->createNotification(ACL_ROLE_PM, __FUNCTION__, [
+            'task' => $this->config->task,
+            'user' => (array) $user->getDataObject(),
+        ]);
+
+        // Notify PM
+        $this->notifyUser($user);
+
+        $user->loadByGuid($userGuid);
+
+        $this->createNotification('', __FUNCTION__, [
+            'task' => $this->config->task,
+            'user' => (array) $user->getDataObject(),
+        ]);
+
+        // Notify the assigned user
+        $this->notifyUser($user);
+    }
+
     /***
      * Notify the task assock when the delivery date is over the defined days in the config
      */
