@@ -98,8 +98,6 @@ final class UserCreateOperation implements UserCreateOperationInterface
             $this->setPassword->setPassword($user, $dto->password);
         }
 
-        $this->setRoles->setRoles($user, $dto->roles);
-
         $user->validate();
 
         if ($user->isClientRestricted() && empty($dto->customers)) {
@@ -125,7 +123,8 @@ final class UserCreateOperation implements UserCreateOperationInterface
         }
 
         try {
-            $this->assignCustomers->assignCustomers($user, $dto->customers);
+            $this->setRoles->setRoles($user, $dto->roles);
+            $this->assignCustomers->assignCustomers($user, ...$dto->customers);
         } catch (Throwable $e) {
             if ($lspUser) {
                 $this->lspUserRepository->delete($lspUser);

@@ -80,6 +80,10 @@ Ext.define('Editor.view.admin.user.AddWindowViewController', {
 
                 const response = Ext.decode(op.error.response.responseText);
 
+                if (! response.hasOwnProperty('errorsTranslated')) {
+                    return;
+                }
+
                 if (response.errorsTranslated && typeof response.errorsTranslated[Symbol.iterator] === 'function') {
                     for (const error of response.errorsTranslated) {
                         if (! error.id || basic.findField(error.id).hidden) {
