@@ -362,6 +362,8 @@ class editor_TaskController extends ZfExtended_RestController
         $projectList = $this->taskViewDataProvider->getProjectList(
             $this->authenticatedUser,
             $this->entity->getFilter(),
+            (int) $this->getParam('start', 0),
+            (int) $this->getParam('limit', 0),
         );
 
         $customerData = $this->getCustomersForRendering($projectList['rows']);
