@@ -21,6 +21,68 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [7.14.0] - 2024-11-01
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4246](https://jira.translate5.net/browse/TRANSLATE-4246): LanguageResources - Adding Terminology to OpenAI translation Requests when importing tasks or do a pretranslation in the Analysis** <br>
+Improvement: OpenAI Plugin uses assigned Terminology when translating
+
+**[TRANSLATE-4243](https://jira.translate5.net/browse/TRANSLATE-4243): t5memory - Wait until reorganization is finished in background tasks** <br>
+Background running tasks now wait until t5memory reorganization is finished.
+
+**[TRANSLATE-4240](https://jira.translate5.net/browse/TRANSLATE-4240): file format settings - Remove warning when using a custom BCONF in the zip** <br>
+Remove warning when using a custom BCONF in the import-ZIP
+
+**[TRANSLATE-4213](https://jira.translate5.net/browse/TRANSLATE-4213): Configuration - Define Callback in config client-overwritable** <br>
+triggerCallbackAction URLs are configurable through the config now, with the ability to override it at the client level. Users can define or modify the callback URLs without need for manual database changes.
+
+
+### Bugfixes
+**[TRANSLATE-4254](https://jira.translate5.net/browse/TRANSLATE-4254): LanguageResources - Client-PM can only filebased LR-types** <br>
+FIX: a client-PM could add only filebased LR-types, added non-filebased
+
+**[TRANSLATE-4250](https://jira.translate5.net/browse/TRANSLATE-4250): Main back-end mechanisms (Worker, Logging, etc.) - Small tasks hang on import due to delayed workers with no cronjobs enabled Edit Add comment Assign More Waiting for support  Share this issue Export** <br>
+FIX: A bug in the worker scheduler lead to hanging import on small tasks in conjuction with worker-delay
+
+**[TRANSLATE-4238](https://jira.translate5.net/browse/TRANSLATE-4238): Editor general - Only my project button produces UI error when clicked from menu** <br>
+Fix for UI problem when filtering out "Only my projects" from menu item in project grid.
+
+
+## [7.13.0] - 2024-10-27
+
+### Important Notes:
+#### [TRANSLATE-4067](https://jira.translate5.net/browse/TRANSLATE-4067)
+For tasks, that are assigned with "write" rights to a TM, if a user saves segments to the task from now on segments are not immediately saved to the TM anymore. So far this was the case and lead to unreviewed segments and segments that even were about to be changed within the current work of a single translator could already appear in pre-translations of other tasks.
+This can be seen as a major bug.
+Now as a new feature a task TM is introduced, that makes sure, those segments are only saved into the TM with write access for the task, when the whole workflow is finished.
+So this is an important downwards incompatible change, that at the same time is a bug fix in the way of how translate5 works and therefore is rolled out to everyone.
+ 
+
+
+### Added
+**[TRANSLATE-4067](https://jira.translate5.net/browse/TRANSLATE-4067): LanguageResources, Task Management - Introduce Task TM in translate5** <br>
+Introduced Task TM concept for t5memory
+
+
+### Bugfixes
+**[TRANSLATE-4181](https://jira.translate5.net/browse/TRANSLATE-4181): Task Management, Workflows - Add missing workflow select field  and workflow steps from all existing workflows to task overview "advanced filters"** <br>
+Added filter by Workflow in task overview
+
+**[TRANSLATE-3987](https://jira.translate5.net/browse/TRANSLATE-3987): file format settings - wrong segmentation** <br>
+So far in certain cases it was segmented after a full stop (.), even if no whitespace followed. This is removed (the rule 
+<rule break="yes">
+<beforebreak>[\.!?…]['"\u00BB\u2019\u201D\u203A\p{Pe}\u0002]*</beforebreak>
+<afterbreak>\p{Lu}[^\p{Lu}]</afterbreak>
+</rule>
+got removed from srx)
+
+
 ## [7.12.0] - 2024-10-23
 
 ### Important Notes:

@@ -36,6 +36,8 @@ use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
  */
 trait editor_Services_Connector_BatchTrait
 {
+    protected ?editor_Models_Segment $currentSegment = null;
+
     /**
      * Number of segments which the batch query sends at once
      * @var integer
@@ -140,8 +142,10 @@ trait editor_Services_Connector_BatchTrait
                 'tagMap' => $this->tagHandler->getTagMap(),
             ];
 
+            $this->currentSegment = $segment;
             // collect the segment size in bytes in temporary variable
             $bufferSize = $this->calculateBufferSize($bufferSize, $querySegment, count($batchQuery) - 1);
+            $this->currentSegment = null;
 
             // is the collected buffer size above the allowed limit (if the buffer size limit is not allowed for the resource, this will return true)
             $allowByContent = $this->isAllowedByContentSize($bufferSize);
@@ -306,16 +310,12 @@ trait editor_Services_Connector_BatchTrait
     abstract protected function getResponseData(): mixed;
 
     /**
-     * @param int $segmentId
-     * @param string $taskGuid
-     * @return void
      * @throws ReflectionException
      * @throws Zend_Db_Adapter_Exception
      * @throws Zend_Db_Table_Exception
      */
     protected function saveBatchResults(int $segmentId, string $taskGuid): void
     {
-
         $batchResult = ZfExtended_Factory::get(BatchResult::class);
         $batchResult->saveResult(
             $segmentId,

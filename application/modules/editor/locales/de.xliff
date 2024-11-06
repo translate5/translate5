@@ -9832,6 +9832,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.</source>
                 <target>Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.</target>
             </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUgJXMgd3VyZGUgdm9uIHRyYW5zbGF0ZTUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3NlbiB1bmQgaXN0IG5pY2h0IG1laHIgYmVhcmJlaXRiYXIgZsO8ciBkZW4genVnZXdpZXNlbmVuIEJlbnV0emVyLg=='>
+                <source>Die Aufgabe %s wurde von translate5 automatisch abgeschlossen und ist nicht mehr bearbeitbar für den zugewiesenen Benutzer.</source>
+                <target>Die Aufgabe %s wurde von translate5 automatisch abgeschlossen und ist nicht mehr bearbeitbar für den zugewiesenen Benutzer.</target>
+            </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUgJXMgd3VyZGUgdm9uIHRyYW5zbGF0ZTUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3NlbiB1bmQgaXN0IG5pY2h0IG1laHIgYmVhcmJlaXRiYXIuIEJlaSBGcmFnZW4gd2VuZGVuIFNpZSBzaWNoIGJpdHRlIGFuIElociBQcm9qZWt0bWFuYWdlbWVudC1UZWFtLg=='>
+                <source>Die Aufgabe %s wurde von translate5 automatisch abgeschlossen und ist nicht mehr bearbeitbar. Bei Fragen wenden Sie sich bitte an Ihr Projektmanagement-Team.</source>
+                <target>Die Aufgabe %s wurde von translate5 automatisch abgeschlossen und ist nicht mehr bearbeitbar. Bei Fragen wenden Sie sich bitte an Ihr Projektmanagement-Team.</target>
+            </trans-unit>
             <trans-unit id='U3ByYWNow7xiZXJncmVpZmVuZGUgU3luY2hyb25pc2llcnVuZyB2b24gUmVzc291cmNlbg=='>
                 <source>Sprachübergreifende Synchronisierung von Ressourcen</source>
                 <target>Sprachübergreifende Synchronisierung von Ressourcen</target>

@@ -7,7 +7,9 @@ use editor_ModelInstances;
 use editor_Models_Db_TaskUserAssoc;
 use editor_Models_Task;
 use editor_Workflow_Actions_Abstract;
+use editor_Workflow_Actions_Config;
 use editor_Workflow_Default;
+use editor_Workflow_Notification;
 use Throwable;
 use ZfExtended_Factory;
 
@@ -24,13 +26,18 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
         }
 
         $idsToAutoClose = [];
+        /* @var $tasksToNotify[] editor_Models_Task */
         foreach ($jobs as $tuaData) {
             try {
                 $task = editor_ModelInstances::taskByGuid($tuaData['taskGuid']);
-                if ($task->hasValidDeadlineDate() && $task->getConfig()->runtimeOptions->workflow->autoCloseJobs) {
+                $config = $task->getConfig();
+                if ($task->hasValidDeadlineDate() && $config->runtimeOptions->workflow->autoCloseJobs) {
                     $idsToAutoClose[] = $tuaData['id'];
+                    if (! $config->runtimeOptions->workflow->disableNotifications) {
+                        $this->notifyAutoclosed($task, $tuaData['userGuid']);
+                    }
                 }
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 // this can happen when actions in the instance overlap with cronjob triggered actions
                 // no need to "really" log
                 error_log('AutocloseJob: cannot find task ' . $tuaData['taskGuid']);
@@ -53,6 +60,15 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
                 ]
             );
         }
+    }
+
+    private function notifyAutoclosed(editor_Models_Task $task, string $userGuid): void
+    {
+        $config = new editor_Workflow_Actions_Config();
+        $config->task = $task;
+        $notifier = new editor_Workflow_Notification();
+        $notifier->init($config);
+        $notifier->notifyAutoclosed($userGuid);
     }
 
     private function findJobs(): array
