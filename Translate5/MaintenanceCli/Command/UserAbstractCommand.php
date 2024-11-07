@@ -149,9 +149,6 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
             '   <info>Locale:</info> ' . OutputFormatter::escape((string) $data->locale),
         ];
 
-        if (! empty($data->parentIds)) {
-            $out[] = '<info>Parent IDs:</info> ' . OutputFormatter::escape((string) $data->parentIds);
-        }
         if (! empty($data->customers)) {
             $out[] = '<info>Customers:</info> ' . OutputFormatter::escape((string) $data->customers);
         }

@@ -333,9 +333,13 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
             ->from([
                 'tua' => $db->info($db::NAME),
             ])
-            ->join([
-                'u' => $user->db->info($db::NAME),
-            ], 'tua.userGuid = u.userGuid', ['login', 'surName', 'firstName', 'parentIds'])
+            ->join(
+                [
+                    'u' => $user->db->info($db::NAME),
+                ],
+                'tua.userGuid = u.userGuid',
+                ['login', 'surName', 'firstName']
+            )
             ->where('tua.isPmOverride = 0');
         //->where('tua.taskGuid = ?', $this->getTaskGuid()); kommt per filter aktuell!
 
@@ -366,9 +370,13 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
             ->from([
                 'tua' => $db->info($db::NAME),
             ])
-            ->join([
-                'u' => $user->db->info($db::NAME),
-            ], 'tua.userGuid = u.userGuid', ['login', 'surName', 'firstName', 'parentIds'])
+            ->join(
+                [
+                    'u' => $user->db->info($db::NAME),
+                ],
+                'tua.userGuid = u.userGuid',
+                ['login', 'surName', 'firstName']
+            )
             ->join([
                 't' => 'LEK_task',
             ], 't.taskGuid = tua.taskGuid', ['t.sourceLang', 't.targetLang'])

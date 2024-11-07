@@ -326,17 +326,11 @@ class Editor_UserController extends ZfExtended_RestController
      */
     public function pmAction(): void
     {
-        $parentId = ZfExtended_Authentication::getInstance()->getUserId();
-        //check if the user is allowed to see all users
-        if ($this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
-            $parentId = -1;
-        }
-
         $pmRoles = explode(',', $this->getParam('pmRoles', ''));
         $pmRoles[] = 'pm';
         $pmRoles = array_unique(array_filter($pmRoles));
-        $this->view->rows = $this->entity->loadAllByRole($pmRoles, $parentId);
-        $this->view->total = $this->entity->getTotalByRole($pmRoles, $parentId);
+        $this->view->rows = $this->entity->loadAllByRole($pmRoles);
+        $this->view->total = $this->entity->getTotalByRole($pmRoles);
     }
 
     /**
