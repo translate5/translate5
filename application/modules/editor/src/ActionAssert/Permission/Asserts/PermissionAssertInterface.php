@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\ActionAssert\Action;
+use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 
@@ -43,7 +43,7 @@ interface PermissionAssertInterface
      * @param T $object
      * @throws PermissionExceptionInterface
      */
-    public function assertGranted(object $object, PermissionAssertContext $context): void;
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void;
 
-    public function supports(Action $action): bool;
+    public function supports(BackedEnum $action): bool;
 }

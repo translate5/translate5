@@ -28,24 +28,25 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\ActionAssert\Permission\Asserts;
+namespace MittagQI\Translate5\LspJob\ActionAssert\Permission\Asserts;
 
-use editor_Models_TaskUserAssoc as UserJob;
-use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\UserJob\ActionAssert\Permission\Exception\NoAccessToUserJobException;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
+use MittagQI\Translate5\LspJob\ActionAssert\Permission\Exception\NoAccessToLspJobException;
+use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 
 /**
- * @implements PermissionAssertInterface<UserJob>
+ * @implements PermissionAssertInterface<LspJobAssociation>
  */
-class NotLspJobOfCoordinatorAssert implements PermissionAssertInterface
+class LspJobOfAllowedLspAssert implements PermissionAssertInterface
 {
     public function __construct(
-        private readonly JobCoordinatorRepository $jobCoordinatorRepository,
-        private readonly LspJobRepository $lspJobRepository,
+        private readonly ActionPermissionAssertInterface $lspActionPermissionAssert,
     ) {
     }
 
@@ -55,32 +56,26 @@ class NotLspJobOfCoordinatorAssert implements PermissionAssertInterface
     public static function create(): self
     {
         return new self(
-            JobCoordinatorRepository::create(),
-            LspJobRepository::create(),
+            LspActionPermissionAssert::create(),
         );
     }
 
-    public function supports(Action $action): bool
+    public function supports(\BackedEnum $action): bool
     {
-        return $action->isMutable();
+        return true;
     }
 
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    /**
+     * {@inheritDoc}
+     */
+    public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $authCoordinator = $this->jobCoordinatorRepository->findByUser($context->authUser);
+        $lspAction = UserJobAction::Read === $action ? LspAction::Read : LspAction::Update;
 
-        if (null === $authCoordinator) {
-            return;
-        }
-
-        if (! $object->isLspJob()) {
-            return;
-        }
-
-        $lspJob = $this->lspJobRepository->get((int) $object->getLspJobId());
-
-        if ((int) $lspJob->getLspId() === (int) $authCoordinator->lsp->getId()) {
-            throw new NoAccessToUserJobException($object);
+        try {
+            $this->lspActionPermissionAssert->assertGranted($lspAction, $object, $context);
+        } catch (PermissionExceptionInterface) {
+            throw new NoAccessToLspJobException((int) $object->getId());
         }
     }
 }

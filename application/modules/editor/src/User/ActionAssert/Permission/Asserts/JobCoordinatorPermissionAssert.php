@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\ActionAssert\Action;
+use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
@@ -63,20 +63,25 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
         );
     }
 
-    public function supports(Action $action): bool
+    public function supports(BackedEnum $action): bool
     {
         return true;
     }
 
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    /**
+     * Coordinator allowed to manage only his LSP users and Coordinators of his sub LSPs
+     *
+     * {@inheritDoc}
+     */
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         if ($object->getId() === $context->authUser->getId()) {
             return;
         }
 
-        $coordinator = $this->coordinatorRepository->findByUser($context->authUser);
+        $authCoordinator = $this->coordinatorRepository->findByUser($context->authUser);
 
-        if (null === $coordinator) {
+        if (null === $authCoordinator) {
             return;
         }
 
@@ -86,7 +91,15 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
             throw new NoAccessToUserException($object);
         }
 
-        if (! $coordinator->isSupervisorOf($lspUser)) {
+        if ($authCoordinator->isSupervisorOf($lspUser)) {
+            return;
+        }
+
+        if (! $lspUser->isCoordinator()) {
+            throw new NoAccessToUserException($object);
+        }
+
+        if (! $lspUser->lsp->isSubLspOf($authCoordinator->lsp)) {
             throw new NoAccessToUserException($object);
         }
     }

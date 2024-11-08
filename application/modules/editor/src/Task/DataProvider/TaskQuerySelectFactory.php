@@ -165,6 +165,23 @@ class TaskQuerySelectFactory
 
     private function restrictSelect(Zend_Db_Select $select, User $viewer): void
     {
+        if ($viewer->isClientPm()) {
+            $select
+                ->joinLeft(
+                    [
+                        'userJob' => UserJobDb::TABLE_NAME,
+                    ],
+                    'userJob.taskGuid = task.taskGuid',
+                    []
+                )
+                ->where('userJob.userGuid = ?', $viewer->getUserGuid())
+                ->orWhere('task.pmGuid = ?', $viewer->getUserGuid())
+                ->orWhere('task.customerId in (?)', $viewer->getCustomersArray())
+            ;
+
+            return;
+        }
+
         $lspUser = $this->lspUserRepository->findByUser($viewer);
 
         if (null === $lspUser) {

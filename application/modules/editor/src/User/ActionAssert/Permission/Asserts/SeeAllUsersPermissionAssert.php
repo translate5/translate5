@@ -30,17 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\SystemResource;
 use ZfExtended_Acl;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
 
 /**
  * @implements PermissionAssertInterface<User>
@@ -49,7 +47,6 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly ZfExtended_Acl $acl,
-        private readonly ZfExtended_AuthenticationInterface $auth,
         private readonly LspUserRepositoryInterface $lspUserRepository,
     ) {
     }
@@ -61,36 +58,27 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
     {
         return new self(
             ZfExtended_Acl::getInstance(),
-            ZfExtended_Authentication::getInstance(),
             LspUserRepository::create(),
         );
     }
 
-    public function supports(Action $action): bool
+    public function supports(\BackedEnum $action): bool
     {
-        return in_array($action, [Action::Update, Action::Delete, Action::Read], true);
+        return in_array($action, [UserAction::Update, UserAction::Delete, UserAction::Read], true);
     }
 
     /**
-     * Restrict access if user is not same as the manager or a child of the manager
-     *
      * {@inheritDoc}
      */
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $manager = $context->authUser;
+        $authUser = $context->authUser;
 
-        // if user is current user, also everything is OK
-        if ($manager->getUserGuid() === $object->getUserGuid()) {
+        if ($authUser->getUserGuid() === $object->getUserGuid()) {
             return;
         }
 
-        // Am I allowed to see all users:
-        if ($this->acl->isInAllowedRoles(
-            $this->auth->getUserRoles(),
-            SystemResource::ID,
-            SystemResource::SEE_ALL_USERS
-        )) {
+        if ($this->acl->isInAllowedRoles($authUser->getRoles(), SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
             return;
         }
 

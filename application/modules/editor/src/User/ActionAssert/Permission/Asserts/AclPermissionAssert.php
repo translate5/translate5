@@ -30,10 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\ActionAssert\Action;
+use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 
 /**
@@ -41,9 +42,9 @@ use MittagQI\Translate5\User\Model\User;
  */
 final class AclPermissionAssert implements PermissionAssertInterface
 {
-    public function supports(Action $action): bool
+    public function supports(BackedEnum $action): bool
     {
-        return in_array($action, [Action::Update, Action::Delete], true);
+        return in_array($action, [UserAction::Update, UserAction::Delete], true);
     }
 
     /**
@@ -53,7 +54,7 @@ final class AclPermissionAssert implements PermissionAssertInterface
      *
      * {@inheritDoc}
      */
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         if ($object->isEditableFor($context->authUser)) {
             return;

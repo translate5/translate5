@@ -30,13 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\ActionAssert\Permission\Assert;
 
+use BackedEnum;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\Acl\Rights;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\User\Model\User;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
@@ -60,9 +62,9 @@ final class UserHasJobInTaskPermissionAssert implements PermissionAssertInterfac
         );
     }
 
-    public function supports(Action $action): bool
+    public function supports(BackedEnum $action): bool
     {
-        return Action::Read === $action;
+        return TaskAction::Read === $action || TaskAction::Open === $action;
     }
 
     /**
@@ -71,13 +73,13 @@ final class UserHasJobInTaskPermissionAssert implements PermissionAssertInterfac
      *
      * {@inheritDoc}
      */
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if ($context->authUser->getUserGuid() === $object->getTaskGuid()) {
+        if ($this->userJobRepository->userHasJobsInTask($context->authUser->getUserGuid(), $object->getTaskGuid())) {
             return;
         }
 
-        if ($this->userJobRepository->userHasJobsInTask($context->authUser->getUserGuid(), $object->getTaskGuid())) {
+        if ($context->authUser->isCoordinator()) {
             return;
         }
 

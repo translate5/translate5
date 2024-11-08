@@ -165,13 +165,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
     /**
-     * Tasks must be filtered by role-driven restrictions
-     */
-    protected ?array $clientAccessRestriction = [
-        'field' => 'customerId',
-    ];
-
-    /**
      * @var editor_Models_Task_Meta
      */
     protected $meta;

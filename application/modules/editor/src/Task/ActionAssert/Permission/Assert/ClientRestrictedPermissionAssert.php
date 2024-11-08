@@ -30,11 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\ActionAssert\Permission\Assert;
 
+use BackedEnum;
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserHasNoAccessToTaskOfForbiddenClientException;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 
 /**
  * @implements PermissionAssertInterface<Task>
@@ -46,18 +47,18 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
         return new self();
     }
 
-    public function supports(Action $action): bool
+    public function supports(BackedEnum $action): bool
     {
-        return true;
+        return TaskAction::AssignJob === $action || TaskAction::Update === $action || TaskAction::Delete === $action;
     }
 
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if (! $context->authUser->isClientRestricted()) {
+        if (in_array((int) $object->getCustomerId(), $context->authUser->getCustomersArray(), true)) {
             return;
         }
 
-        if (! in_array((int) $object->getCustomerId(), $context->authUser->getCustomersArray(), true)) {
+        if ($context->authUser->isClientPm()) {
             throw new UserHasNoAccessToTaskOfForbiddenClientException($object);
         }
     }

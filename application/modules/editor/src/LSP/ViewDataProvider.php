@@ -84,7 +84,7 @@ class ViewDataProvider
             $lspRepository,
             LspUserRepository::create(),
             $jobCoordinatorRepository,
-            LspActionPermissionAssert::create($jobCoordinatorRepository),
+            LspActionPermissionAssert::create(),
             CustomerActionPermissionAssert::create(),
             UserActionPermissionAssert::create(),
         );

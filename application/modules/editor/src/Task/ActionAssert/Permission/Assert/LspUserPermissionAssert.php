@@ -30,17 +30,16 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\ActionAssert\Permission\Assert;
 
+use BackedEnum;
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
-use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\LspUserHasNoAccessToTaskException;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 
 /**
  * @implements PermissionAssertInterface<Task>
@@ -63,12 +62,15 @@ final class LspUserPermissionAssert implements PermissionAssertInterface
         );
     }
 
-    public function supports(Action $action): bool
+    public function supports(BackedEnum $action): bool
     {
         return true;
     }
 
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    /**
+     * {@inheritDoc}
+     */
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $lspUser = $this->lspUserRepository->findByUser($context->authUser);
 
@@ -76,13 +78,21 @@ final class LspUserPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        if ($this->userJobRepository->userHasJobsInTask($context->authUser->getUserGuid(), $object->getTaskGuid())) {
+        if (TaskAction::Update === $action || TaskAction::Delete === $action) {
+            throw new LspUserHasNoAccessToTaskException($object);
+        }
+
+        if (TaskAction::AssignJob === $action && ! $lspUser->isCoordinator()) {
+            throw new LspUserHasNoAccessToTaskException($object);
+        }
+
+        $authUser = $context->authUser;
+
+        if ($this->userJobRepository->userHasJobsInTask($authUser->getUserGuid(), $object->getTaskGuid())) {
             return;
         }
 
-        try {
-            JobCoordinator::fromLspUser($lspUser);
-        } catch (CantCreateCoordinatorFromUserException) {
+        if (! $lspUser->isCoordinator()) {
             throw new LspUserHasNoAccessToTaskException($object);
         }
 

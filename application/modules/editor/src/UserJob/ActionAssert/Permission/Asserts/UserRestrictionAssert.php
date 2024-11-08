@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\UserJob\ActionAssert\Permission\Asserts;
 
+use BackedEnum;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
@@ -62,12 +63,12 @@ class UserRestrictionAssert implements PermissionAssertInterface
         );
     }
 
-    public function supports(Action $action): bool
+    public function supports(BackedEnum $action): bool
     {
         return true;
     }
 
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $user = $this->userRepository->getByGuid($object->getUserGuid());
 

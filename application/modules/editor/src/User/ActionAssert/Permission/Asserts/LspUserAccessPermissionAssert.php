@@ -30,17 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\ActionAssert\Action;
+use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
-use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 
 /**
@@ -65,9 +63,9 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
         );
     }
 
-    public function supports(Action $action): bool
+    public function supports(BackedEnum $action): bool
     {
-        return in_array($action, [Action::Update, Action::Delete, Action::Read], true);
+        return in_array($action, [UserAction::Update, UserAction::Delete, UserAction::Read], true);
     }
 
     /**
@@ -75,17 +73,15 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
      *
      * {@inheritDoc}
      */
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $manager = $context->authUser;
+        $authUser = $context->authUser;
 
-        if ($manager->getId() === $object->getId()) {
+        if ($authUser->getId() === $object->getId()) {
             return;
         }
 
-        $roles = $manager->getRoles();
-
-        if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
+        if ($authUser->isAdmin()) {
             return;
         }
 
@@ -95,21 +91,17 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        if (in_array(Roles::PM, $roles, true)) {
-            if ($this->isGrantedForPm($lspUser)) {
-                return;
-            }
-
+        if ($authUser->isPm() && ! $this->isGrantedForPm($lspUser)) {
             throw new NotAccessibleLspUserException($lspUser);
         }
 
-        $managerCoordinator = $this->coordinatorRepository->findByUser($manager);
+        $authCoordinator = $this->coordinatorRepository->findByUser($authUser);
 
-        if (null === $managerCoordinator) {
+        if (null === $authCoordinator) {
             throw new NotAccessibleLspUserException($lspUser);
         }
 
-        if (! $managerCoordinator->isSupervisorOf($lspUser)) {
+        if (! $authCoordinator->isSupervisorOf($lspUser)) {
             throw new NotAccessibleLspUserException($lspUser);
         }
     }
@@ -120,12 +112,6 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             return false;
         }
 
-        try {
-            JobCoordinator::fromLspUser($lspUser);
-
-            return true;
-        } catch (CantCreateCoordinatorFromUserException) {
-            return false;
-        }
+        return $lspUser->isCoordinator();
     }
 }

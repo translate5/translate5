@@ -28,24 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert\Permission;
+namespace MittagQI\Translate5\LspJob\ActionAssert\Permission\Exception;
 
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RoleBasedPermissionAssert;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 
-/**
- * @extends ActionPermissionAssert<LanguageServiceProvider>
- */
-final class LspActionPermissionAssert extends ActionPermissionAssert
+class NoAccessToLspJobException extends NoAccessException
 {
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self([
-            RoleBasedPermissionAssert::create(),
-        ]);
+    public function __construct(
+        public readonly int $lspJobId
+    ) {
+        parent::__construct('No access to LSP Job with ID ' . $lspJobId);
     }
 }

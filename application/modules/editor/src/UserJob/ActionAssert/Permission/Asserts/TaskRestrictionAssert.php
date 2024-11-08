@@ -30,15 +30,18 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\UserJob\ActionAssert\Permission\Asserts;
 
+use BackedEnum;
 use editor_Models_TaskUserAssoc as UserJob;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\Exception\NoAccessToUserJobException;
+use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 
 /**
  * @implements PermissionAssertInterface<UserJob>
@@ -62,18 +65,22 @@ class TaskRestrictionAssert implements PermissionAssertInterface
         );
     }
 
-    public function supports(Action $action): bool
+    public function supports(BackedEnum $action): bool
     {
         return true;
     }
 
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    /**
+     * {@inheritDoc}
+     */
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $task = $this->taskRepository->getByGuid($object->getTaskGuid());
-
         try {
-            $this->taskPermissionAssert->assertGranted(Action::Update, $task, $context);
-        } catch (PermissionExceptionInterface) {
+            $task = $this->taskRepository->getByGuid($object->getTaskGuid());
+            $taskAction = UserJobAction::Read === $action ? TaskAction::Open : TaskAction::AssignJob;
+
+            $this->taskPermissionAssert->assertGranted($taskAction, $task, $context);
+        } catch (PermissionExceptionInterface|InexistentTaskException) {
             throw new NoAccessToUserJobException($object);
         }
     }

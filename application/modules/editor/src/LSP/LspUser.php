@@ -41,4 +41,9 @@ class LspUser
         public readonly LanguageServiceProvider $lsp,
     ) {
     }
+
+    public function isCoordinator(): bool
+    {
+        return $this->user->isCoordinator();
+    }
 }

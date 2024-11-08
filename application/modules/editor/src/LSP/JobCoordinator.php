@@ -41,7 +41,7 @@ class JobCoordinator extends LspUser
      */
     public static function fromLspUser(LspUser $lspUser): self
     {
-        if (! in_array(Roles::JOB_COORDINATOR, $lspUser->user->getRoles(), true)) {
+        if (! $lspUser->isCoordinator()) {
             throw new CantCreateCoordinatorFromUserException($lspUser->user->getUserGuid());
         }
 

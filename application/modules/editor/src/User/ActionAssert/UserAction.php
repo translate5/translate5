@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,24 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert\Permission;
+namespace MittagQI\Translate5\User\ActionAssert;
 
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RoleBasedPermissionAssert;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-
-/**
- * @extends ActionPermissionAssert<LanguageServiceProvider>
- */
-final class LspActionPermissionAssert extends ActionPermissionAssert
+enum UserAction: string
 {
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self([
-            RoleBasedPermissionAssert::create(),
-        ]);
-    }
+    case Read = 'read';
+    case Update = 'update';
+    case Delete = 'delete';
 }

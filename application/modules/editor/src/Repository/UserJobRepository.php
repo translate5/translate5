@@ -89,7 +89,9 @@ class UserJobRepository
             ->select()
             ->from($job->db->info($job->db::NAME), 'COUNT(*)')
             ->where('taskGuid = ?', $taskGuid)
-            ->where('userGuid = ?', $userGuid);
+            ->where('userGuid = ?', $userGuid)
+            ->where('type != ?', TypeEnum::Lsp->value)
+        ;
 
         return (int) $this->db->fetchOne($select) > 0;
     }

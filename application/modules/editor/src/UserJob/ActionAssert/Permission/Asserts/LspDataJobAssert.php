@@ -28,40 +28,54 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
+namespace MittagQI\Translate5\UserJob\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\ActionAssert\Action;
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
-use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\LspJob\ActionAssert\Permission\LspJobActionPermissionAssert;
+use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 
 /**
- * @implements PermissionAssertInterface<User>
+ * @implements PermissionAssertInterface<UserJob>
  */
-final class ClientRestrictedPermissionAssert implements PermissionAssertInterface
+class LspDataJobAssert implements PermissionAssertInterface
 {
-    public function supports(Action $action): bool
-    {
-        return Action::Delete === $action;
+    public function __construct(
+        private readonly LspJobRepository $lspJobRepository,
+        private readonly ActionPermissionAssertInterface $lspJobActionPermissionAssert,
+    ) {
     }
 
     /**
-     * Restrict access by clients
-     *
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self(
+            LspJobRepository::create(),
+            LspJobActionPermissionAssert::create(),
+        );
+    }
+
+    public function supports(\BackedEnum $action): bool
+    {
+        return UserJobAction::Update === $action || UserJobAction::Delete === $action;
+    }
+
+    /**
      * {@inheritDoc}
      */
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if (! $context->authUser->isClientRestricted()) {
+        if (! $object->isLspJob()) {
             return;
         }
 
-        $allowedCustomerIs = $context->authUser->getCustomersArray();
+        $lspJob = $this->lspJobRepository->get((int) $object->getLspJobId());
 
-        // don't allow to delete a user that have customers that don't belong to auth user
-        if (! empty(array_diff($object->getCustomersArray(), $allowedCustomerIs))) {
-            throw new ClientRestrictionException();
-        }
+        $this->lspJobActionPermissionAssert->assertGranted($action, $lspJob, $context);
     }
 }

@@ -41,7 +41,7 @@ use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
  */
 final class AssignedCustomerAssert implements PermissionAssertInterface
 {
-    public function supports(Action $action): bool
+    public function supports(\BackedEnum $action): bool
     {
         return in_array($action, [Action::Update, Action::Delete, Action::Read], true);
     }
@@ -49,7 +49,7 @@ final class AssignedCustomerAssert implements PermissionAssertInterface
     /**
      * @throws NoAccessToCustomerException
      */
-    public function assertGranted(object $object, PermissionAssertContext $context): void
+    public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         if (! $context->authUser->isClientRestricted()) {
             return;

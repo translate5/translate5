@@ -30,17 +30,18 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\Acl\Roles;
+use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessToLspException;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
 /**
  * @implements PermissionAssertInterface<LanguageServiceProvider>
  */
-abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
+final class RoleBasedPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly JobCoordinatorRepository $jobCoordinatorRepository,
@@ -48,41 +49,55 @@ abstract class RuleBasedPermissionAssert implements PermissionAssertInterface
     }
 
     /**
-     * @throws NoAccessToLspException
+     * @codeCoverageIgnore
      */
-    final public function assertGranted(object $object, PermissionAssertContext $context): void
+    public static function create(): self
     {
-        if ($this->doesPermissionGranted($object, $context)) {
+        return new self(
+            JobCoordinatorRepository::create(),
+        );
+    }
+
+    public function supports(BackedEnum $action): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    final public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
+    {
+        if ($this->doesPermissionGranted($action, $object, $context)) {
             return;
         }
 
         throw new NoAccessToLspException((int) $object->getId());
     }
 
-    private function doesPermissionGranted(LanguageServiceProvider $lsp, PermissionAssertContext $context): bool
-    {
-        $roles = $context->authUser->getRoles();
-
-        if (array_intersect([Roles::ADMIN, Roles::SYSTEMADMIN], $roles)) {
+    private function doesPermissionGranted(
+        BackedEnum $action,
+        LanguageServiceProvider $lsp,
+        PermissionAssertContext $context
+    ): bool {
+        if ($context->authUser->isAdmin()) {
             return true;
         }
 
-        if (in_array(Roles::PM, $roles, true)) {
+        if ($context->authUser->isPm()) {
             return $lsp->isDirectLsp();
+        }
+
+        if (! $context->authUser->isCoordinator()) {
+            return false;
         }
 
         $coordinator = $this->jobCoordinatorRepository->findByUser($context->authUser);
 
-        if (null === $coordinator) {
-            return false;
-        }
-
         if ($coordinator->lsp->same($lsp)) {
-            return $this->coordinatorHasAccessToHisLsp();
+            return LspAction::Read === $action;
         }
 
         return $lsp->isSubLspOf($coordinator->lsp);
     }
-
-    abstract protected function coordinatorHasAccessToHisLsp(): bool;
 }

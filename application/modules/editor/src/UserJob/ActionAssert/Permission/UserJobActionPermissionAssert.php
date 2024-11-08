@@ -46,7 +46,7 @@ class UserJobActionPermissionAssert extends ActionPermissionAssert
         return new self([
             Asserts\TaskRestrictionAssert::create(),
             Asserts\UserRestrictionAssert::create(),
-            Asserts\NotLspJobOfCoordinatorAssert::create(),
+            Asserts\LspDataJobAssert::create(),
         ]);
     }
 }

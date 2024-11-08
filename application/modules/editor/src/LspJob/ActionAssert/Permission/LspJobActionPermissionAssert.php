@@ -28,16 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LSP\ActionAssert\Permission;
+namespace MittagQI\Translate5\LspJob\ActionAssert\Permission;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RoleBasedPermissionAssert;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 
 /**
- * @extends ActionPermissionAssert<LanguageServiceProvider>
+ * @extends ActionPermissionAssert<LspJobAssociation>
  */
-final class LspActionPermissionAssert extends ActionPermissionAssert
+class LspJobActionPermissionAssert extends ActionPermissionAssert
 {
     /**
      * @codeCoverageIgnore
@@ -45,7 +44,7 @@ final class LspActionPermissionAssert extends ActionPermissionAssert
     public static function create(): self
     {
         return new self([
-            RoleBasedPermissionAssert::create(),
+            Asserts\LspJobOfAllowedLspAssert::create(),
         ]);
     }
 }

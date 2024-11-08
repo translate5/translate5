@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ActionAssert\Permission;
 
-use MittagQI\Translate5\ActionAssert\Action;
+use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 
 /**
@@ -47,7 +47,7 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
     ) {
     }
 
-    public function assertGranted(Action $action, object $object, PermissionAssertContext $context): void
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $atLeastOneAssertionMade = false;
 
@@ -58,7 +58,7 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
 
             $atLeastOneAssertionMade = true;
 
-            $assert->assertGranted($object, $context);
+            $assert->assertGranted($action, $object, $context);
         }
 
         if (! $atLeastOneAssertionMade) {
