@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\ForceUserActionFeasibilityAssert;
@@ -47,6 +48,7 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
+        private readonly LspUserRepository $lspUserRepository,
         private readonly UserJobRepository $userJobRepository,
         private readonly ActionFeasibilityAssertInterface $userFeasibilityAssert,
         private readonly ActionFeasibilityAssertInterface $forceUserFeasibilityAssert,
@@ -60,8 +62,11 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
      */
     public static function create(): self
     {
+        $userRepository = new UserRepository();
+
         return new self(
-            new UserRepository(),
+            $userRepository,
+            new LspUserRepository($userRepository),
             UserJobRepository::create(),
             UserActionFeasibilityAssert::create(),
             ForceUserActionFeasibilityAssert::create(),
@@ -94,6 +99,12 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
     {
         foreach ($this->userJobRepository->getJobsByUserGuid($user->getUserGuid()) as $job) {
             $this->deleteUserJobAssignmentOperation->forceDelete($job);
+        }
+
+        $lspUser = $this->lspUserRepository->findByUser($user);
+
+        if ($lspUser !== null) {
+            $this->lspUserRepository->delete($lspUser);
         }
 
         $this->userRepository->delete($user);
