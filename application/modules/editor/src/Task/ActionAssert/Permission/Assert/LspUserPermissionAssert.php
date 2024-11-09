@@ -82,8 +82,12 @@ final class LspUserPermissionAssert implements PermissionAssertInterface
             throw new LspUserHasNoAccessToTaskException($object);
         }
 
-        if (TaskAction::AssignJob === $action && ! $lspUser->isCoordinator()) {
-            throw new LspUserHasNoAccessToTaskException($object);
+        if (TaskAction::AssignJob === $action) {
+            if (! $lspUser->isCoordinator()) {
+                throw new LspUserHasNoAccessToTaskException($object);
+            }
+
+            $this->assertLspHasJobInTask((int) $lspUser->lsp->getId(), $object);
         }
 
         $authUser = $context->authUser;
@@ -96,7 +100,12 @@ final class LspUserPermissionAssert implements PermissionAssertInterface
             throw new LspUserHasNoAccessToTaskException($object);
         }
 
-        if (! $this->lspJobRepository->lspHasJobInTask((int) $lspUser->lsp->getId(), $object->getTaskGuid())) {
+        $this->assertLspHasJobInTask((int) $lspUser->lsp->getId(), $object);
+    }
+
+    private function assertLspHasJobInTask(int $lspId, Task $object): void
+    {
+        if (! $this->lspJobRepository->lspHasJobInTask($lspId, $object->getTaskGuid())) {
             throw new LspUserHasNoAccessToTaskException($object);
         }
     }
