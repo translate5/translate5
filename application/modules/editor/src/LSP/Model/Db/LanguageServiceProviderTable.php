@@ -57,7 +57,7 @@ use Zend_Db_Table_Abstract;
 
 class LanguageServiceProviderTable extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_language_service_provider';
+    protected $_name = 'LEK_lsp';
 
     public $_primary = 'id';
 }

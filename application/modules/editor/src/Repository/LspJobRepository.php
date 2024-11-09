@@ -119,12 +119,17 @@ class LspJobRepository
 
         $select = $this->db
             ->select()
-            ->from($lspJob->db->info($lspJob->db::NAME), 'COUNT(*)')
+            ->from(
+                [
+                    'lspJob' => $lspJob->db->info($lspJob->db::NAME),
+                ],
+                'COUNT(*)'
+            )
             ->join(
                 [
                     'userJob' => $userJob->db->info($userJob->db::NAME),
                 ],
-                'userJob.lspJobId = lspJob.Id',
+                'userJob.lspJobId = lspJob.id',
                 []
             )
             ->where('userGuid = ?', $coordinator->user->getUserGuid());
