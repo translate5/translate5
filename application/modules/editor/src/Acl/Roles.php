@@ -121,11 +121,15 @@ final class Roles
      * @var array<string, string[]>
      */
     public const CONFLICTING_ROLES = [
-        Roles::JOB_COORDINATOR => [
-            Roles::ADMIN,
-            Roles::SYSTEMADMIN,
-            Roles::PM,
-            Roles::CLIENTPM,
+        self::JOB_COORDINATOR => [
+            self::ADMIN,
+            self::SYSTEMADMIN,
+            self::PM,
+            self::CLIENTPM,
+        ],
+        self::PM => [
+            self::CLIENTPM,
+            self::PMLIGHT,
         ],
     ];
 
@@ -144,7 +148,7 @@ final class Roles
         );
     }
 
-    /***
+    /**
      * @param string[] $newUserRoles
      * @param string[] $oldUserRoles
      * @return string[]
@@ -157,16 +161,16 @@ final class Roles
     public static function getGeneralRoles(): array
     {
         return [
-            Roles::EDITOR,
+            self::EDITOR,
         ];
     }
 
     public static function getAdminRoles(): array
     {
         return [
-            Roles::ADMIN,
-            Roles::SYSTEMADMIN,
-            Roles::API,
+            self::ADMIN,
+            self::SYSTEMADMIN,
+            self::API,
         ];
     }
 
@@ -188,6 +192,13 @@ final class Roles
     public static function getClientRestrictedRoles(): array
     {
         return [
+            self::CLIENTPM,
+        ];
+    }
+
+    public static function getRolesRequireClient(): array
+    {
+        return [
             self::INSTANTTRANSLATE,
             self::INSTANTTRANSLATEWRITETM,
             self::TERMPM,
@@ -198,7 +209,6 @@ final class Roles
             self::TERMREVIEWER,
             self::TM_MAINTENANCE,
             self::CLIENTPM,
-            self::JOB_COORDINATOR,
         ];
     }
 
@@ -206,14 +216,9 @@ final class Roles
     {
         return array_diff(
             self::FRONTEND_ROLES,
-            self::getClientRestrictedRoles(),
+            self::getRolesRequireClient(),
             self::getAdminRoles(),
             self::getGeneralRoles()
         );
-    }
-
-    public static function isClientRestricted(array $userRoles): bool
-    {
-        return array_intersect(self::getClientRestrictedRoles(), $userRoles) !== [];
     }
 }

@@ -61,18 +61,21 @@ class RolesDataProvider
      * @return array{
      *     general: RoleNode[],
      *     clientRestricted: RoleNode[],
-     *     clientPmSubRoles: RoleNode[]
+     *     clientPmSubRoles: RoleNode[],
+     *     requireClient: RoleNode[]
      * } | array{
      *     general: RoleNode[],
      *     admins: RoleNode[],
      *     clientRestricted: RoleNode[],
-     *     clientPmSubRoles: RoleNode[]
+     *     clientPmSubRoles: RoleNode[],
+     *     requireClient: RoleNode[]
      * } | array{
-     *      general: RoleNode[],
-     *      admins: RoleNode[],
-     *      managers: RoleNode[],
-     *      clientRestricted: RoleNode[],
-     *      clientPmSubRoles: RoleNode[]
+     *     general: RoleNode[],
+     *     admins: RoleNode[],
+     *     managers: RoleNode[],
+     *     clientRestricted: RoleNode[],
+     *     clientPmSubRoles: RoleNode[],
+     *     requireClient: RoleNode[]
      *  }
      */
     public function getGroupedRoles(User $viewer): array
@@ -81,6 +84,7 @@ class RolesDataProvider
             'general' => $this->composeRoleSet(Roles::getGeneralRoles(), $viewer),
             'clientRestricted' => $this->composeRoleSet(Roles::getClientRestrictedRoles(), $viewer),
             'clientPmSubRoles' => $this->composeRoleSet(Roles::getClientPmSubRoles(), $viewer, false),
+            'requireClient' => $this->composeRoleSet(Roles::getRolesRequireClient(), $viewer),
         ];
 
         if ($viewer->isAdmin()) {

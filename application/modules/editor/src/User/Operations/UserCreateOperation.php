@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations;
 
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Operations\LspUserCreateOperation;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
@@ -100,11 +101,11 @@ final class UserCreateOperation implements UserCreateOperationInterface
 
         $user->validate();
 
-        if ($user->isClientRestricted() && empty($dto->customers)) {
+        if ([] !== array_intersect($dto->roles, Roles::getRolesRequireClient()) && empty($dto->customers)) {
             throw new CustomerNotProvidedOnClientRestrictedUserCreationException();
         }
 
-        if ($user->isCoordinator() && null === $dto->lsp) {
+        if (in_array(Roles::JOB_COORDINATOR, $dto->roles) && null === $dto->lsp) {
             throw new LspMustBeProvidedInJobCoordinatorCreationProcessException();
         }
 
