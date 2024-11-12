@@ -48,6 +48,7 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskExceptio
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\DataProvider\UserComboDataProvider;
 use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\CantRemoveCoordinatorRoleFromUserException;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
@@ -126,6 +127,20 @@ class Editor_UserController extends ZfExtended_RestController
 
     public function getAction(): void
     {
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+
+        if ($this->hasParam('combo')) {
+            $dataProvider = UserComboDataProvider::create();
+
+            // @phpstan-ignore-next-line
+            $this->view->rows = match ($this->getParam('combo')) {
+                'coordinators' => $dataProvider->coordinators($authUser),
+                default => $dataProvider->users($authUser),
+            };
+
+            return;
+        }
+
         $user = $this->userRepository->get($this->getParam('id'));
 
         if ($user->getLogin() == ZfExtended_Models_User::SYSTEM_LOGIN) {
@@ -136,8 +151,6 @@ class Editor_UserController extends ZfExtended_RestController
         }
 
         $this->view->rows = $user->getDataObject();
-
-        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
 
         try {
             $this->permissionAssert->assertGranted(

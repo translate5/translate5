@@ -41,6 +41,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
     strings: {
         confirmDeleteTitle: '#UT#Eintrag löschen?',
         confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
+        confirmDeleteLspJob: '#UT#Soll dieser Eintrag wirklich gelöscht werden? Dieser Eintrag ist ein LSP-Job und wird auch in der LSP-Übersicht gelöscht.',
         userGuidCol: '#UT#Benutzer',
         typeCol: '#UT#Typ',
         roleCol: '#UT#Rolle',
@@ -184,9 +185,18 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                         disabled: true,
                         itemId: 'remove-user-btn',
                         handler: function () {
-                            Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function (btn) {
-                                var toDelete = me.getSelectionModel().getSelection();
-                                if (btn == 'yes') {
+                            const toDelete = me.getSelectionModel().getSelection();
+
+                            if (toDelete.length === 0) {
+                                return;
+                            }
+
+                            let confirmDeleteMessage = toDelete[0].get('isLspJob')
+                                ? me.strings.confirmDeleteLspJob
+                                : me.strings.confirmDelete;
+
+                            Ext.Msg.confirm(me.strings.confirmDeleteTitle, confirmDeleteMessage, function (btn) {
+                                if (btn === 'yes') {
                                     me.fireEvent('confirmDelete', me, toDelete, this);
                                 }
                             });

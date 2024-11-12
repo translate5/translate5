@@ -32,10 +32,7 @@ namespace MittagQI\Translate5\User\DataProvider;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\Validation\RolesValidator;
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Model\User;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
 use ZfExtended_Zendoverwrites_Translate;
 
 /**
@@ -46,8 +43,6 @@ class RolesDataProvider
     public function __construct(
         private readonly RolesValidator $rolesValidator,
         private readonly ZfExtended_Zendoverwrites_Translate $translate,
-        private readonly ZfExtended_AuthenticationInterface $authentication,
-        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -59,8 +54,6 @@ class RolesDataProvider
         return new self(
             RolesValidator::create(),
             ZfExtended_Zendoverwrites_Translate::getInstance(),
-            ZfExtended_Authentication::getInstance(),
-            new UserRepository(),
         );
     }
 
@@ -84,23 +77,17 @@ class RolesDataProvider
      */
     public function getGroupedRoles(User $viewer): array
     {
-        $authUser = $this->userRepository->find($this->authentication->getUserId());
-
         $groups = [
             'general' => $this->composeRoleSet(Roles::getGeneralRoles(), $viewer),
             'clientRestricted' => $this->composeRoleSet(Roles::getClientRestrictedRoles(), $viewer),
             'clientPmSubRoles' => $this->composeRoleSet(Roles::getClientPmSubRoles(), $viewer, false),
         ];
 
-        if (null === $authUser) {
-            return $groups;
-        }
-
-        if ($authUser->isAdmin()) {
+        if ($viewer->isAdmin()) {
             $groups['admins'] = $this->composeRoleSet(Roles::getAdminRoles(), $viewer);
         }
 
-        if (! $authUser->isClientRestricted()) {
+        if (! $viewer->isClientRestricted()) {
             $groups['managers'] = $this->composeRoleSet(Roles::getManagerRoles(), $viewer);
         }
 

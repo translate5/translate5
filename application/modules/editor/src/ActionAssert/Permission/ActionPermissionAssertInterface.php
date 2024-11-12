@@ -43,4 +43,6 @@ interface ActionPermissionAssertInterface
      * @throws PermissionExceptionInterface
      */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void;
+
+    public function isGranted(BackedEnum $action, object $object, PermissionAssertContext $context): bool;
 }

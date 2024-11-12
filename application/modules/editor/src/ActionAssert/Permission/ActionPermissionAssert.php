@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\ActionAssert\Permission;
 
 use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 
 /**
  * @template T of object
@@ -43,7 +44,7 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
      * @param PermissionAssertInterface[] $asserts
      */
     public function __construct(
-        private readonly array $asserts
+        private readonly array $asserts,
     ) {
     }
 
@@ -63,6 +64,17 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
 
         if (! $atLeastOneAssertionMade) {
             throw new \RuntimeException('No assertion made for action ' . $action->value);
+        }
+    }
+
+    public function isGranted(BackedEnum $action, object $object, PermissionAssertContext $context): bool
+    {
+        try {
+            $this->assertGranted($action, $object, $context);
+
+            return true;
+        } catch (PermissionExceptionInterface $e) {
+            return false;
         }
     }
 }

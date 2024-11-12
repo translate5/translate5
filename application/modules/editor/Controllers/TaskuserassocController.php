@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
+use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
 use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\LspJob\Operation\WithAuthentication\CreateLspJobAssignmentOperation;
 use MittagQI\Translate5\LspJob\Operation\WithAuthentication\DeleteLspJobAssignmentOperation;
@@ -410,6 +411,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 [
                     'permission' => [
                         'Die Rechte des LSP-Benutzers sollten eine Teilmenge der Rechte des LSP- Auftrags sein.',
+                    ],
+                ],
+            ),
+            ThereIsUnDeletableBoundJobException::class => EntityConflictException::createResponse(
+                'E1012',
+                [
+                    'id' => [
+                        'LSP-Auftrag hat einen zugehörigen LSP-Benutzerjob, der nicht gelöscht werden kann.',
                     ],
                 ],
             ),

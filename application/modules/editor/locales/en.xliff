@@ -10291,6 +10291,14 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Die Rechte des LSP-Benutzers sollten eine Teilmenge der Rechte des LSP- Auftrags sein.</source>
                 <target>The permissions of the LSP user should be a subset of the permissions of the LSP job.</target>
             </trans-unit>
+            <trans-unit id="dXNlckpvYi5kZWxldGUuY29uZmlybURlbGV0ZUxzcEpvYg==">
+                <source>userJob.delete.confirmDeleteLspJob</source>
+                <target>Should this entry really be deleted? This entry is an LSP job and by deleting it all sub LSP jobs as well as related LSP user jobs will be deleted.</target>
+            </trans-unit>
+            <trans-unit id="TFNQLUF1ZnRyYWcgaGF0IGVpbmVuIHp1Z2Vow7ZyaWdlbiBMU1AtQmVudXR6ZXJqb2IsIGRlciBuaWNodCBnZWzDtnNjaHQgd2VyZGVuIGthbm4u">
+                <source>LSP job has an associated LSP user job that cannot be deleted.</source>
+                <target>LSP-Auftrag hat einen zugehörigen LSP-Benutzerjob, der nicht gelöscht werden kann.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

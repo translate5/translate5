@@ -42,6 +42,52 @@ use ZfExtended_Models_User;
 class UserRepository
 {
     /**
+     * @return iterable<User>
+     */
+    public function getAll(): iterable
+    {
+        $userModel = ZfExtended_Factory::get(User::class);
+
+        foreach (ZfExtended_Factory::get(User::class)->loadAll() as $user) {
+            $userModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $userModel->db,
+                        'data' => $user,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield $userModel;
+        }
+    }
+
+    /**
+     * @return iterable<User>
+     */
+    public function getCoordinators(): iterable
+    {
+        $userModel = ZfExtended_Factory::get(User::class);
+
+        foreach (ZfExtended_Factory::get(User::class)->loadAllByRole([Roles::JOB_COORDINATOR]) as $user) {
+            $userModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $userModel->db,
+                        'data' => $user,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield $userModel;
+        }
+    }
+
+    /**
      * @throws InexistentUserException
      */
     public function get(int $id): User

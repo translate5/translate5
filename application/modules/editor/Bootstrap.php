@@ -507,16 +507,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         );
         $this->front->getRouter()->addRoute('editorUserPm', $pmRoute);
 
-        $pmRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/user/parents/*',
-            [
-                'module' => 'editor',
-                'controller' => 'user',
-                'action' => 'allowedparentusers',
-            ]
-        );
-        $this->front->getRouter()->addRoute('editorUserParents', $pmRoute);
-
         $termsRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/terms/*',
             [

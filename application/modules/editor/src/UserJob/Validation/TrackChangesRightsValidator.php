@@ -63,9 +63,9 @@ class TrackChangesRightsValidator
         $dataJob = $this->userJobRepository->getDataJobByLspJob($lspJob);
 
         $rightsAreSubset =
-            (null === $canAcceptOrReject || $canAcceptOrReject && $dataJob->getTrackchangesAcceptReject())
-            && (null === $canSeeAll || $canSeeAll && $dataJob->getTrackchangesShowAll())
-            && (null === $canSeePrevSteps || $canSeePrevSteps && $dataJob->getTrackchangesShow())
+            (null === $canAcceptOrReject || ! $canAcceptOrReject || $dataJob->getTrackchangesAcceptReject())
+            && (null === $canSeeAll || ! $canSeeAll || $dataJob->getTrackchangesShowAll())
+            && (null === $canSeePrevSteps || ! $canSeePrevSteps || $dataJob->getTrackchangesShow())
         ;
 
         if (! $rightsAreSubset) {
