@@ -81,9 +81,6 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assignJob(NewUserJobDto $dto): UserJob
     {
         try {

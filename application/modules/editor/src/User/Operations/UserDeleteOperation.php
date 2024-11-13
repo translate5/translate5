@@ -75,9 +75,6 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function delete(User $user): void
     {
         $this->userFeasibilityAssert->assertAllowed(Action::Delete, $user);
@@ -85,9 +82,6 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
         $this->deleteUser($user);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function forceDelete(User $user): void
     {
         $this->forceUserFeasibilityAssert->assertAllowed(Action::Delete, $user);

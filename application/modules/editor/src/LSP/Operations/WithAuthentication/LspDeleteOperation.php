@@ -32,13 +32,16 @@ namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Contract\LspDeleteOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\UserRepository;
+use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
 
 final class LspDeleteOperation implements LspDeleteOperationInterface
 {
@@ -47,6 +50,7 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
         private readonly ActionPermissionAssertInterface $permissionAssert,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -60,6 +64,7 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
             LspActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            Zend_Registry::get('logger')->cloneMe('lsp.delete')
         );
     }
 
@@ -67,7 +72,42 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->permissionAssert->assertGranted(Action::Delete, $lsp, new PermissionAssertContext($authUser));
+        try {
+            $this->permissionAssert->assertGranted(Action::Delete, $lsp, new PermissionAssertContext($authUser));
+
+            $this->logger->info(
+                'E1637',
+                'Audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to delete LSP (name: "%s") by AuthUser (guid: %s) was granted',
+                        $lsp->getName(),
+                        $authUser->getUserGuid()
+                    ),
+                    'lsp' => $lsp->getName(),
+                    'authUser' => $authUser->getLogin(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                ]
+            );
+        } catch (PermissionExceptionInterface $e) {
+            $this->logger->warn(
+                'E1637',
+                'Audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to delete LSP (name: "%s") by AuthUser (guid: %s) was not granted',
+                        $lsp->getName(),
+                        $authUser->getUserGuid()
+                    ),
+                    'lsp' => $lsp->getName(),
+                    'authUser' => $authUser->getLogin(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                    'reason' => $e::class,
+                ]
+            );
+
+            throw $e;
+        }
 
         $this->operation->deleteLsp($lsp);
     }

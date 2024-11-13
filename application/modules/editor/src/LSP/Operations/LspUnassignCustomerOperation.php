@@ -75,9 +75,6 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
         $lspCustomer = $this->lspRepository->findCustomerAssignment((int) $lsp->getId(), (int) $customer->getId());
@@ -90,9 +87,6 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
         $this->deleteAssociationWithDependencies($lsp, $customer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function forceUnassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
         $lspCustomer = $this->lspRepository->findCustomerAssignment((int) $lsp->getId(), (int) $customer->getId());
@@ -107,7 +101,6 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
     private function deleteAssociationWithDependencies(LanguageServiceProvider $lsp, Customer $customer): void
     {
         foreach ($this->lspRepository->getSubLspList($lsp) as $subLsp) {
-            error_log($subLsp->getName());
             $this->forceUnassignCustomer($subLsp, $customer);
         }
 

@@ -37,7 +37,6 @@ use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDelet
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
-use MittagQI\Translate5\UserJob\TypeEnum;
 
 /**
  * @implements FeasibilityAssertInterface<LspJobAssociation>
@@ -66,9 +65,6 @@ class HasUnDeletableUserJobAssert implements FeasibilityAssertInterface
         return $action === Action::Delete;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertAllowed(object $object): void
     {
         try {

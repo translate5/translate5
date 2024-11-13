@@ -43,8 +43,10 @@ use MittagQI\Translate5\LSP\Contract\LspAssignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\UserRepository;
+use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
 
 class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
 {
@@ -58,6 +60,7 @@ class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
         private readonly ActionPermissionAssertInterface $customerActionPermissionAssert,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -72,6 +75,7 @@ class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
             CustomerActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            Zend_Registry::get('logger')->cloneMe('lsp.customer.assign'),
         );
     }
 
@@ -86,17 +90,58 @@ class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->lspActionPermissionAssert->assertGranted(
-            Action::Update,
-            $lsp,
-            new PermissionAssertContext($authUser)
-        );
+        try {
+            $this->lspActionPermissionAssert->assertGranted(
+                Action::Update,
+                $lsp,
+                new PermissionAssertContext($authUser)
+            );
 
-        $this->customerActionPermissionAssert->assertGranted(
-            Action::Read,
-            $customer,
-            new PermissionAssertContext($authUser)
-        );
+            $this->customerActionPermissionAssert->assertGranted(
+                Action::Read,
+                $customer,
+                new PermissionAssertContext($authUser)
+            );
+
+            $this->logger->info(
+                'E1637',
+                'Audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to assign Customer (number: "%s") to LSP (name: %s) by AuthUser (guid: %s) was granted',
+                        $customer->getNumber(),
+                        $lsp->getName(),
+                        $authUser->getUserGuid()
+                    ),
+                    'customerNumber' => $customer->getNumber(),
+                    'customerId' => $customer->getId(),
+                    'lsp' => $lsp->getName(),
+                    'lspId' => $lsp->getId(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                ]
+            );
+        } catch (PermissionExceptionInterface $e) {
+            $this->logger->warn(
+                'E1637',
+                'Audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to assign Customer (number: "%s") to LSP (name: %s) by AuthUser (guid: %s) was not granted',
+                        $customer->getNumber(),
+                        $lsp->getName(),
+                        $authUser->getUserGuid()
+                    ),
+                    'customerNumber' => $customer->getNumber(),
+                    'customerId' => $customer->getId(),
+                    'lsp' => $lsp->getName(),
+                    'lspId' => $lsp->getId(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                    'reason' => $e::class,
+                ]
+            );
+
+            throw $e;
+        }
 
         $this->generalOperation->assignCustomer($lsp, $customer);
     }

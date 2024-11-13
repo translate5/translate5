@@ -165,9 +165,6 @@ class LspUserRepository implements LspUserRepositoryInterface
         return array_column($assocs, 'lspId', 'userId');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getUsers(int $lspId): iterable
     {
         $user = ZfExtended_Factory::get(User::class);
@@ -199,9 +196,6 @@ class LspUserRepository implements LspUserRepositoryInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getLspUsers(LanguageServiceProvider $lsp): iterable
     {
         foreach ($this->getUsers((int) $lsp->getId()) as $user) {

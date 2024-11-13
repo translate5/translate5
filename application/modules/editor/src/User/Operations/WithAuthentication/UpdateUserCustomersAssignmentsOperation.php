@@ -53,7 +53,6 @@ class UpdateUserCustomersAssignmentsOperation implements UpdateUserCustomersAssi
         private readonly UserRepository $userRepository,
         private readonly UserCustomerAssociationValidator $userCustomerAssociationValidator,
         private readonly ZfExtended_Logger $logger,
-
     ) {
     }
 
@@ -72,9 +71,6 @@ class UpdateUserCustomersAssignmentsOperation implements UpdateUserCustomersAssi
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function updateCustomers(User $user, array $customers, bool $forceUnassignment = false): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
@@ -133,7 +129,7 @@ class UpdateUserCustomersAssignmentsOperation implements UpdateUserCustomersAssi
                 ]
             );
         } catch (PermissionExceptionInterface $e) {
-            $this->logger->info(
+            $this->logger->warn(
                 'E1637',
                 'Audit: {message}',
                 [

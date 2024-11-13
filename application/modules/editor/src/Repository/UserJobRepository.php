@@ -106,7 +106,9 @@ class UserJobRepository
 
         $select = $this->db
             ->select()
-            ->from(['job' => $job->db->info($job->db::NAME)])
+            ->from([
+                'job' => $job->db->info($job->db::NAME),
+            ])
             ->join(
                 [
                     'task' => $taskDb->info($taskDb::NAME),

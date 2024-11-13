@@ -66,9 +66,6 @@ class UserUpdateOperation implements UserUpdateOperationInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function updateUser(User $user, UpdateUserDto $dto): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
@@ -105,7 +102,7 @@ class UserUpdateOperation implements UserUpdateOperationInterface
                 ]
             );
         } catch (PermissionExceptionInterface $e) {
-            $this->logger->info(
+            $this->logger->warn(
                 'E1637',
                 'Audit: {message}',
                 [

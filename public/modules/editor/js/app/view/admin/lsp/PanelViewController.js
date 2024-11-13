@@ -182,7 +182,9 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
 
     _showDeletePrompt: function (record, value) {
         const l10n = Editor.data.l10n.lsp;
-        const text = Ext.String.format(l10n.confirmDeleteText, record.get('name')) + '<br><br>' + l10n.enterLspName;
+        const text = Ext.String.format(l10n.confirmDeleteText, Ext.String.htmlEncode(record.get('name')))
+            + '<br><br>'
+            + l10n.enterLspName;
         const store = this.getView().down('gridpanel').getStore();
 
         Ext.Msg.prompt(

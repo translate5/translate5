@@ -65,9 +65,6 @@ class LspDataJobAssert implements PermissionAssertInterface
         return UserJobAction::Update === $action || UserJobAction::Delete === $action;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         if (! $object->isLspJob()) {

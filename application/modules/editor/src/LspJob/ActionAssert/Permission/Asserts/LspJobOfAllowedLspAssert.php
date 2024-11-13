@@ -65,9 +65,6 @@ class LspJobOfAllowedLspAssert implements PermissionAssertInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $lspAction = UserJobAction::Read === $action ? LspAction::Read : LspAction::Update;

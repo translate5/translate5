@@ -71,9 +71,6 @@ final class UpdateUserRolesOperation implements UpdateUserRolesOperationInterfac
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function updateRoles(User $user, array $roles): void
     {
         $this->userActionFeasibilityChecker->assertAllowed(Action::Update, $user);

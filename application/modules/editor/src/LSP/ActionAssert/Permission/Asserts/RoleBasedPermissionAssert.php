@@ -63,9 +63,6 @@ final class RoleBasedPermissionAssert implements PermissionAssertInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     final public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         if ($this->doesPermissionGranted($action, $object, $context)) {

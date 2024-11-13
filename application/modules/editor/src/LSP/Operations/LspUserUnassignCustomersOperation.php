@@ -76,9 +76,6 @@ final class LspUserUnassignCustomersOperation implements LspUserUnassignCustomer
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function unassignCustomers(LspUser $lspUser, int ...$customerIds): void
     {
         if (empty($customerIds)) {
@@ -96,9 +93,6 @@ final class LspUserUnassignCustomersOperation implements LspUserUnassignCustomer
         $this->userUnassignCustomerOperation->unassignCustomers($lspUser->user, ...$customerIds);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function forceUnassignCustomers(LspUser $lspUser, int ...$customerIds): void
     {
         if (empty($customerIds)) {

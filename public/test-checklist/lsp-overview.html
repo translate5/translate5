@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSP overview test checklist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/test-checklist/todo.css" rel="stylesheet">
+    <script>
+        const todos = [
+            {
+                "check": "Admin can see/access all LSPs",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "Admin can update all LSPs",
+                        "how_to_check": null,
+                    },
+                ]
+            },
+            {
+                "check": "PM can see/access only direct LSPs",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "PM can update direct LSPs",
+                        "how_to_check": null,
+                    },
+                ]
+            },
+            {
+                "check": "Job Coordinator can see his LSP and direct sub LSPs",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "Job Coordinator can not see other direct LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can not see other sub LSPs of other LSP (including his sub LSP)",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "Job Coordinator always creates sub LSP",
+                "how_to_check": "LSP visible for Job Coordinator and not visible for PM",
+            },
+            {
+                "check": "Job Coordinator can see/access his LSP and direct sub LSPs",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "Job Coordinator can not change list of assigned clients of his LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can not delete his LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can not change his LSP",
+                        "how_to_check": null
+                    },
+                    {
+                        "check": "Job Coordinator can not see sub LSP of his sub LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can change sub LSP of his LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can change list of assigned clients of sub LSP",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "Only clients of parent LSP can be assigned to sub LSP",
+                "how_to_check": "Login as admin. Try assign client that is not assigned to parent LSP to sub LSP",
+            },
+            {
+                "check": "Prompt is shown on attempt to delete LSP",
+                "how_to_check": "In LSP overview click delete button",
+                "subchecks": [
+                    {
+                        "check": "Dialog warns user about consequences of deleting LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Prompt asks for LSP name to confirm deletion",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "If wrong name is entered, deletion is not performed",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "All entities are deleted when LSP is deleted",
+                "how_to_check": "Alongside with LSP, all sub LSPs, users and jobs are deleted recursively",
+                "subchecks": [
+                    {
+                        "check": "LSP users are deleted",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "LSP jobs are deleted",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "User jobs are deleted",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Sub LSPs are deleted",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "All entities of sub LSPs are deleted",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "Customer unassignment works as expected",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "If LSP and Sub LSP with same client don't have active LSP user jobs, client is unassigned silently",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "On Customer unassignment, all related to LSP jobs in Customer tasks are deleted",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Jobs also deleted for Sub LSPs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "If LSP or Sub LSP have active LSP user jobs, dialog window shown.",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Dialog window warns about active jobs and proposes to forcefully unassign client",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "On force unassignment, all related to LSP jobs in Customer tasks are deleted",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "On cancel, client is not unassigned, no jobs are deleted",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+        ];
+    </script>
+</head>
+<body>
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>LSP overview checklist</h2>
+        <div>
+            <a class="btn btn-primary me-2 not-printable" href="/test-checklist/index.html">Back to list</a>
+            <button class="btn btn-info not-printable" onclick="downloadTodoList()">Download Report</button>
+        </div>
+    </div>
+    <div id="todoList" class="list-group"></div>
+</div>
+<script src="/test-checklist/todo.js"></script>
+</body>
+</html>

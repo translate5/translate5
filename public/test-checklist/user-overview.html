@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User overview test checklist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/test-checklist/todo.css" rel="stylesheet">
+    <script>
+        const todos = [
+            {
+                "check": "User can be created",
+                "how_to_check": "Open users overview. Click on Add user button. Fill the form and click on Save button",
+            },
+            {
+                "check": "Job Coordinator can not be created without provided LSP",
+                "how_to_check": "In user creation process select Job Coordinator role. Try to save the form without selecting LSP"
+            },
+            {
+                "check": "User should not be able to assign Job Coordinator role to already existing user",
+                "how_to_check": null,
+            },
+            {
+                "check": "User should not be able to change LSP of any LSP user",
+                "how_to_check": null,
+            },
+            {
+                "check": "Conflicting roles should not be assigned to a user",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "Job Coordinator and PM, Client PM, Admin, System Admin roles",
+                        "how_to_check": null
+                    },
+                    {
+                        "check": "TM Maintenance (all clients) and TM Maintenance (selected clients)",
+                        "how_to_check": null
+                    },
+                    {
+                        "check": "Term PM (all clients) and other Term roles",
+                        "how_to_check": null
+                    }
+                ]
+            },
+            {
+                "check": "User can not be saved if role requires client selection and no client is selected",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "Client PM",
+                        "how_to_check": null
+                    },
+                    {
+                        "check": "Instant translate",
+                        "how_to_check": null
+                    },
+                    {
+                        "check": "TM Maintenance (selected clients)",
+                        "how_to_check": null
+                    },
+                    {
+                        "check": "Term roles except Term PM (all clients)",
+                        "how_to_check": null
+                    }
+                ]
+            },
+            {
+                "check": "Job Coordinator always creates LSP users and can not create simple user",
+                "how_to_check": "Login as Job Coordinator. Create a user. Check if the user has LSP",
+                "subchecks": [
+                    {
+                        "check": "LSP of new LSP user is same as LSP of Job Coordinator",
+                        "how_to_check": null
+                    }
+                ]
+            },
+            {
+                "check": "Job Coordinator always creates LSP users and can not create simple user",
+                "how_to_check": "Login as Job Coordinator. Create a user. Check if the user has LSP",
+            },
+            {
+                "check": "Job Coordinator can create Job Coordinator of his own LSP and direct Sub LSP of his LSP",
+                "how_to_check": null,
+            },
+            {
+                "check": "Job Coordinator can provide only roles that he has",
+                "how_to_check": null,
+            },
+            {
+                "check": "Job Coordinator can assign clients that assigned to his LSP",
+                "how_to_check": null,
+            },
+            {
+                "check": "Job Coordinator can see users of his LSP and Job Coordinators of direct sub LSP",
+                "how_to_check": null,
+            },
+            {
+                "check": "Manager can see all simple users and Job Coordinators of direct LSP",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "LSP users and Job Coordinators of sub LSPs are not visible",
+                        "how_to_check": null
+                    }
+                ]
+            },
+            {
+                "check": "Admin can see all users",
+                "how_to_check": null
+            },
+            {
+                "check": "Client PM can assign clients that assigned to him",
+                "how_to_check": "In user form Client PM should see only clients that assigned to him",
+                "subchecks": [
+                    {
+                        "check": "Client PM can not unassign clients that not assigned to him",
+                        "how_to_check": "Login as admin. Assign not Client PM client to user. Login as Client PM. Update user clients while logged in as Client PM. Then check clients of user with admin authorisation"
+                    }
+                ]
+            }
+        ];
+    </script>
+</head>
+<body>
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>User overview checklist</h2>
+        <div>
+            <a class="btn btn-primary me-2" href="/test-checklist/index.html">Back to list</a>
+            <button class="btn btn-info" onclick="downloadTodoList()">Download Report</button>
+        </div>
+    </div>
+    <div id="todoList" class="list-group"></div>
+</div>
+<script src="/test-checklist/todo.js"></script>
+</body>
+</html>

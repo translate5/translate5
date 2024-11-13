@@ -76,9 +76,6 @@ class UpdateUserRolesOperation implements UpdateUserRolesOperationInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function updateRoles(User $user, array $roles): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
@@ -129,7 +126,7 @@ class UpdateUserRolesOperation implements UpdateUserRolesOperationInterface
                 ]
             );
         } catch (PermissionExceptionInterface $e) {
-            $this->logger->info(
+            $this->logger->warn(
                 'E1637',
                 'Audit: {message}',
                 [

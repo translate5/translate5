@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP;
 
-use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 

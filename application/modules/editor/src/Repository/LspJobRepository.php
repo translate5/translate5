@@ -178,7 +178,9 @@ class LspJobRepository
 
         $select = $this->db
             ->select()
-            ->from(['lspJob' => $job->db->info($job->db::NAME)])
+            ->from([
+                'lspJob' => $job->db->info($job->db::NAME),
+            ])
             ->join(
                 [
                     'task' => $taskDb->info($taskDb::NAME),
@@ -216,7 +218,12 @@ class LspJobRepository
 
         $select = $this->db
             ->select()
-            ->from(['lspJob' => $job->db->info($job->db::NAME)], 'COUNT(*)')
+            ->from(
+                [
+                    'lspJob' => $job->db->info($job->db::NAME),
+                ],
+                'COUNT(*)'
+            )
             ->join(
                 [
                     'userJob' => $userJobDb->info($userJobDb::NAME),
@@ -248,7 +255,9 @@ class LspJobRepository
 
         $select = $this->db
             ->select()
-            ->from(['lspJob' => $job->db->info($job->db::NAME)])
+            ->from([
+                'lspJob' => $job->db->info($job->db::NAME),
+            ])
             ->join(
                 [
                     'lsp' => $lsp->db->info($lsp->db::NAME),

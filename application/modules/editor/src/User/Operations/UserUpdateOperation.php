@@ -63,9 +63,6 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function updateUser(User $user, UpdateUserDto $dto): void
     {
         $this->userActionFeasibilityChecker->assertAllowed(Action::Update, $user);

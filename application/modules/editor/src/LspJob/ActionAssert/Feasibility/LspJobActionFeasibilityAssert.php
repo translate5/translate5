@@ -65,9 +65,6 @@ final class LspJobActionFeasibilityAssert extends ActionFeasibilityAssert
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertAllowed(Action $action, object $object): void
     {
         parent::assertAllowed($action, $object);

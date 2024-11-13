@@ -54,9 +54,6 @@ final class UserAssignCustomersOperation implements UserAssignCustomersOperation
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assignCustomers(User $user, int ...$newCustomerIds): void
     {
         if (empty($newCustomerIds)) {

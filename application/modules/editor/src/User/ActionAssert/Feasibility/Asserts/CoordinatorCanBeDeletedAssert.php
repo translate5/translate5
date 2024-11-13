@@ -71,9 +71,6 @@ final class CoordinatorCanBeDeletedAssert implements FeasibilityAssertInterface
         return $action === Action::Delete;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertAllowed(object $object): void
     {
         // Possible coordinator that we try to delete

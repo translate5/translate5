@@ -1,0 +1,6 @@
+.failure.form-check-input:checked {
+    background-color: #fd0d0d;
+    border-color: #fd190d;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e%3cline x1='5' y1='5' x2='15' y2='15' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3cline x1='15' y1='5' x2='5' y2='15' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e")
+}
+.hidden { display: none; }

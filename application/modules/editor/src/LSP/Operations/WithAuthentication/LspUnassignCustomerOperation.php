@@ -138,7 +138,7 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
                 ]
             );
         } catch (PermissionExceptionInterface $e) {
-            $this->logger->info(
+            $this->logger->warn(
                 'E1637',
                 'Audit: {message}',
                 [
@@ -153,6 +153,7 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
                     'lsp' => $lsp->getName(),
                     'lspId' => $lsp->getId(),
                     'authUserGuid' => $authUser->getUserGuid(),
+                    'reason' => $e::class,
                 ]
             );
 

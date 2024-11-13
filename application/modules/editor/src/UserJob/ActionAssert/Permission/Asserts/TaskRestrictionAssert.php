@@ -70,9 +70,6 @@ class TaskRestrictionAssert implements PermissionAssertInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         try {

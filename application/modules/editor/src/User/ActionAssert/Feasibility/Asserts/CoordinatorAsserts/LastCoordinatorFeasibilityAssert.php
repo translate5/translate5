@@ -61,9 +61,6 @@ final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterfa
         return $action === Action::Delete;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertAllowed(object $object): void
     {
         // Nobody can delete the last coordinator of an LSP

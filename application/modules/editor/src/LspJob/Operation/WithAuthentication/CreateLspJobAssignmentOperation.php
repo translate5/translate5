@@ -79,9 +79,6 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assignJob(NewLspJobDto $dto): LspJobAssociation
     {
         try {

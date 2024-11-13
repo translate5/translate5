@@ -67,9 +67,6 @@ final class UpdateUserCustomersAssignmentsOperation implements UpdateUserCustome
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function updateCustomers(User $user, array $customers, bool $forceUnassignment = false): void
     {
         $this->userActionFeasibilityChecker->assertAllowed(Action::Update, $user);

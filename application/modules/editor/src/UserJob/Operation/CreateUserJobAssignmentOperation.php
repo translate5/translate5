@@ -41,11 +41,9 @@ use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
-use MittagQI\Translate5\UserJob\Exception\OnlyOneUniqueLspJobCanBeAssignedPerTaskException;
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\UserJob\TypeEnum;
@@ -80,13 +78,6 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         );
     }
 
-    /**
-     * @throws AttemptToAssignLspUserToAJobBeforeLspJobCreatedException
-     * @throws InexistentTaskException
-     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
-     * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
-     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
-     */
     public function assignJob(NewUserJobDto $dto): UserJob
     {
         $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);

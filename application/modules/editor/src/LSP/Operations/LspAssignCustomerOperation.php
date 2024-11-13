@@ -33,13 +33,10 @@ namespace MittagQI\Translate5\LSP\Operations;
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LSP\Contract\LspAssignCustomerOperationInterface;
-use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 final class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
 {
@@ -61,9 +58,6 @@ final class LspAssignCustomerOperation implements LspAssignCustomerOperationInte
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
         if (! $lsp->isDirectLsp()) {

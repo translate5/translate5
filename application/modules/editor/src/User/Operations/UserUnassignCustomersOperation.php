@@ -51,9 +51,6 @@ final class UserUnassignCustomersOperation implements UserUnassignCustomersOpera
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function unassignCustomers(User $user, int ...$unassignCustomerIds): void
     {
         $customerIds = $user->getCustomersArray();

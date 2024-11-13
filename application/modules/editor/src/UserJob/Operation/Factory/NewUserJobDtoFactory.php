@@ -176,8 +176,8 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
     {
         return new TrackChangesRightsDto(
             (bool) $data['trackchangesShow'] ?? false,
-                (bool) $data['trackchangesShowAll'] ?? false,
-                (bool) $data['trackchangesAcceptReject'] ?? false,
+            (bool) $data['trackchangesShowAll'] ?? false,
+            (bool) $data['trackchangesAcceptReject'] ?? false,
         );
     }
 }

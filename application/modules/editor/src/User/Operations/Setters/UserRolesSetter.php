@@ -54,9 +54,6 @@ final class UserRolesSetter implements UserRolesSetterInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setRoles(User $user, array $roles): void
     {
         $this->rolesValidator->assertRolesDontConflict($roles);

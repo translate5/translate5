@@ -117,7 +117,7 @@ class UserDeleteOperation implements UserDeleteOperationInterface
                 ]
             );
         } catch (PermissionExceptionInterface $e) {
-            $this->logger->info(
+            $this->logger->warn(
                 'E1637',
                 'Audit: {message}',
                 [

@@ -61,9 +61,6 @@ class LspJobRestrictionAssert implements FeasibilityAssertInterface
         return $action === Action::Delete;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertAllowed(object $object): void
     {
         if ($this->lspJobRepository->coordinatorAssignedToLspJobs($object)) {

@@ -120,7 +120,12 @@ class TaskQuerySelectFactory
     ): Zend_Db_Select {
         $select = $this->db
             ->select()
-            ->from(['task' => TaskDb::TABLE_NAME], $columns)
+            ->from(
+                [
+                    'task' => TaskDb::TABLE_NAME,
+                ],
+                $columns
+            )
             ->where('task.taskType in (?)', $this->taskType->getNonInternalTaskTypes())
         ;
 
@@ -143,14 +148,21 @@ class TaskQuerySelectFactory
     ): Zend_Db_Select {
         $select = $this->db
             ->select()
-            ->from(['project' => TaskDb::TABLE_NAME], $columns)
+            ->from(
+                [
+                    'project' => TaskDb::TABLE_NAME,
+                ],
+                $columns
+            )
             ->join(
-                ['task' => TaskDb::TABLE_NAME],
+                [
+                    'task' => TaskDb::TABLE_NAME,
+                ],
                 'task.projectId = project.id',
                 []
             )
             ->where('project.taskType in (?)', $this->taskType->getProjectTypes())
-            ;
+        ;
 
         if (! $this->canLoadAllTasks($viewer)) {
             $this->restrictSelect($select, $viewer);

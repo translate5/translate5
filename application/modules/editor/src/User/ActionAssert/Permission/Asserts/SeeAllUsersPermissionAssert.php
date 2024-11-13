@@ -67,9 +67,6 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
         return in_array($action, [UserAction::Update, UserAction::Delete, UserAction::Read], true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $authUser = $context->authUser;
