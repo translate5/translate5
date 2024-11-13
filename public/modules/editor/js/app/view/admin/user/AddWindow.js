@@ -405,10 +405,10 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         }
 
         if (groupedRoles.hasOwnProperty('managers')) {
-            sets.push(this.createRoleFieldSet('Not client restricted roles', 'managers', groupedRoles.managers));
+            sets.push(this.createRoleFieldSet('Roles don\'t require client', 'managers', groupedRoles.managers));
         }
 
-        sets.push(this.createRoleFieldSet('Client restricted roles', 'clientRestricted', groupedRoles.clientRestricted));
+        sets.push(this.createRoleFieldSet('Roels require client', 'requireClient', groupedRoles.requireClient));
         sets.push(this.createRoleFieldSet(this.strings.clientPmSubRoles, 'clientPmSubRoles', groupedRoles.clientPmSubRoles, true));
 
         return sets;
@@ -428,7 +428,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                     scope: userWindow
                 }
             });
-        })
+        });
 
         return {
             xtype: 'fieldset',
@@ -454,50 +454,9 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         const form = checkbox.up('form'),
             selectedRoles = this.getSelectedRoles(form);
 
-        this.toggleRoleGroupsVisibility(form, selectedRoles);
-
         form.down('hidden[name="roles"]').setValue(selectedRoles.join(','));
 
         this.toggleLspField(form, selectedRoles);
-    },
-
-    toggleRoleGroupsVisibility: function (form, roles) {
-        const adminGroup = this.lookupReference('adminsFieldSet'),
-            managersGroup = this.lookupReference('managersFieldSet'),
-            clientRestrictedGroup = this.lookupReference('clientRestrictedFieldSet'),
-            clientPmSubRolesGroup = this.lookupReference('clientPmSubRolesFieldSet'),
-            isLspUser = form.getRecord().isLspUser()
-        ;
-
-        if (this.hasRoleFromGroup(roles, ['admins', 'managers'])) {
-            clientRestrictedGroup.setHidden(true);
-            clientRestrictedGroup.down('checkboxgroup').reset();
-            clientPmSubRolesGroup.setHidden(true);
-            clientPmSubRolesGroup.down('checkboxgroup').reset();
-        } else {
-            clientRestrictedGroup.setHidden(false);
-        }
-
-        if (this.hasRoleFromGroup(roles, ['clientRestricted']) || isLspUser) {
-            adminGroup?.setHidden(true);
-            adminGroup?.down('checkboxgroup').reset();
-            managersGroup?.setHidden(true);
-            managersGroup?.down('checkboxgroup').reset();
-
-            this.toggleRequirementOfCustomersField(form, true);
-        } else {
-            adminGroup?.setHidden(false);
-            managersGroup?.setHidden(false);
-
-            this.toggleRequirementOfCustomersField(form, false);
-        }
-
-        if (roles.includes('clientpm')) {
-            clientPmSubRolesGroup.setHidden(false);
-        } else {
-            clientPmSubRolesGroup.setHidden(true);
-            clientPmSubRolesGroup.down('checkboxgroup').reset();
-        }
     },
 
     toggleRequirementOfCustomersField: function (form, required) {
@@ -581,8 +540,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             box.setValue(roles.includes(boxInitValue));
             box.setHidden(hidden);
         });
-
-        me.toggleRoleGroupsVisibility(form, roles);
 
         me.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
 
