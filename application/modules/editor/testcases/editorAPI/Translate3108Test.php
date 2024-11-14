@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /***
@@ -34,8 +35,6 @@ use MittagQI\Translate5\Test\ImportTestAbstract;
  */
 class Translate3108Test extends ImportTestAbstract
 {
-    private const USER_TESTMANAGER = 'testmanager';
-
     private const EDITOR_TASK_URL = 'editor/task/';
 
     private static ?ZfExtended_Auth_Token_Entity $authTokenEntity = null;
@@ -56,7 +55,7 @@ class Translate3108Test extends ImportTestAbstract
     {
         // Create a temporary app-token for the test
         static::$authTokenEntity = ZfExtended_Factory::get('ZfExtended_Auth_Token_Entity');
-        static::$appToken = self::$authTokenEntity->create(self::USER_TESTMANAGER);
+        static::$appToken = self::$authTokenEntity->create(TestUser::TestManager->value);
     }
 
     /**
@@ -86,7 +85,7 @@ class Translate3108Test extends ImportTestAbstract
         self::api()->logout();
 
         $response = static::api()->postJson('editor/session', [
-            'login' => self::USER_TESTMANAGER,
+            'login' => TestUser::TestManager->value,
             'passwd' => static::$appToken,
         ]);
 
@@ -94,7 +93,7 @@ class Translate3108Test extends ImportTestAbstract
         $sessionId = $response->sessionId;
 
         Helper::unsetApplicationToken();
-        Helper::setAuthentication($sessionId, 'testmanager');
+        Helper::setAuthentication($sessionId, TestUser::TestManager->value);
         self::$csrfTokenCache = Helper::getCsrfToken();
         Helper::setCsrfToken(); //CRUCIAL: unset CSRF token since we want to mimic a plain API request
 

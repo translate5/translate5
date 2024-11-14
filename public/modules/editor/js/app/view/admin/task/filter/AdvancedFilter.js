@@ -92,7 +92,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
         me.filterFieldSourceMap['workflowState']='workflowState';
         me.filterFieldSourceMap['workflowUserRole']='workflowUserRole';
         me.filterFieldSourceMap['workflowStepName']='workflowStepName';
-        
+
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
@@ -140,7 +140,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     	filterHolder.suspendEvents('beforedeselect');
     	filterHolder.clearValue();
     	filterHolder.resumeEvents('beforedeselect');
-    	
+
     	//update the selected filters sellection
     	me.getViewModel().set('selectedFilters',records);
     	//update the active filter count view model
@@ -221,6 +221,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
 		  		  }
 		  	    return values.join(',');
         	};
+
     	switch(source) {
     	  case 'language':
     		  //it is langauge field, use the languages store to find the record by language id
@@ -240,6 +241,6 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     	  default:
     	    return value;
     	}
-    },
+    }
     
 });

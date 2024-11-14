@@ -64,7 +64,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         this.getViewModel().set('selectedTm', values.tm);
         this.getViewModel().set('lastOffset', null);
         this.getViewModel().set('totalAmount', null);
-        this.loadPageByChunks(20,20, false, true);
+        this.loadPageByChunks(20,1, false, true);
         this.updateUrl(values);
     },
 
@@ -122,6 +122,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             params: {data: JSON.stringify({...this.getView().getValues(), onlyCount: true})},
             async: true,
             method: 'POST',
+            timeout: 900000,
             success: xhr => {
                 this.getViewModel().set('totalAmount', JSON.parse(xhr.responseText).totalAmount);
             },
@@ -224,7 +225,100 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
     getStrings: function () {
         return this.getViewModel().get('l10n').list;
-    }
-}, function() {
-    this.borrow(TMMaintenance.view.main.MainController, ['loadPageByChunks']);
+    },
+
+    loadPageByChunks: function(pageSize, chunkSize, append, abortPrev) {
+        let me = this,
+            vm = this.getViewModel(),
+            view = Ext.getCmp('mainlist'),
+            store = view.getStore(),
+            values = Ext.ComponentQuery.query('searchform').pop().getValues(),
+            offset = me.getViewModel().get('lastOffset'),
+            loadingId = 'TM-offset-' + offset;
+
+        if (abortPrev || !append) {
+            me.loadedQty = 0;
+        }
+
+        if (abortPrev) {
+            store.getProxy().abortByPurpose = true;
+            store.getProxy().abort();
+        }
+
+        // Add dummy loading entry
+        store.loadRawData([{
+            id: loadingId,
+            metaData: {
+                internalKey: null,
+                sourceLang: '',
+                targetLang: '',
+                author: '',
+                timestamp: '',
+                documentName: '',
+                additionalInfo: ''
+            },
+            source: vm.get('l10n.list.loadingSegmentPlaceholder'),
+            target: vm.get('l10n.list.loadingSegmentPlaceholder'),
+        }], true);
+
+        //
+        vm.set('loadingRecordNumber', store.getCount());
+
+        if (me.loadedQty === 0) {
+            view.ensureVisible(store.last());
+        }
+
+        store.load({
+            params: {data: JSON.stringify({...values, offset: offset})},
+            limit: chunkSize,
+            addRecords: append,
+            callback: (records, operation, success) => {
+                var loaderRec = store.getById(loadingId);
+
+                // Remove dummy loading entry
+                if (loaderRec) {
+                    store.remove(loaderRec, false, true);
+                }
+
+                if (!success) {
+
+                    if (operation.getError().statusText !== 'transaction aborted' || !operation.getProxy().abortByPurpose) {
+                        me.showServerError(operation.getError());
+                    }
+                    if (operation.getProxy().abortByPurpose) {
+                        delete operation.getProxy().abortByPurpose;
+                    }
+
+                    return;
+                }
+
+                const offset = operation.getProxy().getReader().metaData.offset;
+                me.loadedQty += records.length;
+
+                me.getViewModel().set('lastOffset', offset);
+                me.getViewModel().set('hasMoreRecords', null !== offset);
+                console.log(store.getCount(), pageSize, me.loadedQty);
+                if (store.getCount() === pageSize) {
+                    me.getViewModel().set('hasRecords', records.length > 0);
+                    me.getViewModel().set('loadingTotalAmount', true);
+                    me.readTotalAmount();
+                } else {
+                    me.getViewModel().set('loadingTotalAmount', false);
+                }
+                if (null !== offset && me.loadedQty < pageSize) {
+                    me.loadPageByChunks(pageSize, 1,true);
+                } else {
+                    vm.set('loadingRecordNumber', false);
+                }
+            },
+        });
+    },
+
+    onContainerScrollEnd: function () {
+        if (!this.getViewModel().get('hasMoreRecords')) {
+            return;
+        }
+
+        this.loadPageByChunks(20,1, true, true);
+    },
 });

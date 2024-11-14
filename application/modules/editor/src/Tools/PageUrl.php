@@ -62,6 +62,11 @@ final class PageUrl
 {
     public const MAX_REDIRECTS = 3;
 
+    /**
+     * User-agent as used by CURL and WGET for the visual. Should be updated every year or so ...
+     */
+    public const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0';
+
     private ?string $url;
 
     private string $original;
@@ -187,6 +192,7 @@ final class PageUrl
     {
         $ch = curl_init();
 
+        curl_setopt($ch, CURLOPT_USERAGENT, self::USER_AGENT);
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_NOBODY, true);

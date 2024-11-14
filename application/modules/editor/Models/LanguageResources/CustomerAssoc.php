@@ -108,6 +108,12 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     public function loadByCustomerIdsUseAsDefault(array $customerIds = [], string $column = '')
     {
         $s = $this->getCustomerIdsSelect($customerIds);
+        $s->from('LEK_languageresources_customerassoc');
+        $s->setIntegrityCheck(false);
+        $s->joinLeft(
+            'LEK_languageresources',
+            'LEK_languageresources_customerassoc.languageResourceId = LEK_languageresources.id',
+        );
         $s->where('useAsDefault=1');
         $return = $this->db->fetchAll($s)->toArray();
 

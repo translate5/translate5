@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
@@ -41,7 +42,7 @@ class SegmentCommentRoundtripTest extends JsonTestAbstract
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap',
     ];
 
-    protected static string $setupUserLogin = 'testlector';
+    protected static TestUser $setupUserLogin = TestUser::TestLector;
 
     protected static function setupImport(Config $config): void
     {
@@ -142,7 +143,7 @@ class SegmentCommentRoundtripTest extends JsonTestAbstract
      */
     public function testExport()
     {
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         $task = static::api()->getTask();
         //start task export
 

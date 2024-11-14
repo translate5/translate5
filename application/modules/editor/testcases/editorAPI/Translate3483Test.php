@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
@@ -45,7 +46,7 @@ class Translate3483Test extends JsonTestAbstract
 
     protected static bool $setupOwnCustomer = false;
 
-    protected static string $setupUserLogin = 'testmanager';
+    protected static TestUser $setupUserLogin = TestUser::TestManager;
 
     private static stdClass $customFieldTaskAssigned;
 

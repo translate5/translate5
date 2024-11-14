@@ -26,14 +26,28 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
+use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeType;
+use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
+
 /**
  * Clones an existing task
  */
 class editor_Task_Cloner
 {
-    protected editor_Models_Task $clone;
+    private editor_Models_Task $clone;
 
-    protected editor_Models_Task $original;
+    private editor_Models_Task $original;
+
+    public function __construct(
+        private readonly LanguageResourceRepository $languageResourceRepository,
+        private readonly AssociateTaskOperation $associateTaskOperation,
+        private readonly LanguageResourceTaskAssocRepository $taskAssocRepository,
+    ) {
+    }
 
     /**
      * Clones the given task and returns the cloned instance
@@ -115,25 +129,36 @@ class editor_Task_Cloner
     /**
      * Clone existing language resources from oldTaskGuid for newTaskGuid.
      */
-    protected function cloneLanguageResources()
+    protected function cloneLanguageResources(): void
     {
-        /** @var MittagQI\Translate5\LanguageResource\TaskAssociation $job */
-        $job = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
-        $jobs = $job->loadByTaskGuids([$this->original->getTaskGuid()]);
-        if (empty($jobs)) {
-            return;
-        }
-        foreach ($jobs as $jobData) {
-            unset($jobData['id']);
-            if (! empty($jobData['autoCreatedOnImport'])) {
-                //do not clone such TermCollection associations, since they are recreated through the cloned import package
+        $oldTaskAssociations = $this->taskAssocRepository->getAllByTaskGuid($this->original->getTaskGuid());
+
+        foreach ($oldTaskAssociations as $oldTaskAssociation) {
+            if (! empty($oldTaskAssociation['autoCreatedOnImport'])) {
+                // do not clone such TermCollection associations,
+                // since they are recreated through the cloned import package
                 continue;
             }
-            $jobData['taskGuid'] = $this->clone->getTaskGuid();
-            $job->init($jobData);
+
+            if ($oldTaskAssociation['isOriginalTaskTm']) {
+                // do not clone the original task TM association
+                continue;
+            }
 
             try {
-                $job->save();
+                $this->associateTaskOperation->associate(
+                    (int) $oldTaskAssociation['languageResourceId'],
+                    $this->clone->getTaskGuid(),
+                    (bool) $oldTaskAssociation['segmentsUpdateable'],
+                );
+
+                EventDispatcher::create()->dispatch(
+                    new LanguageResourceTaskAssociationChangeEvent(
+                        $this->languageResourceRepository->get((int) $oldTaskAssociation['languageResourceId']),
+                        $this->clone->getTaskGuid(),
+                        LanguageResourceTaskAssociationChangeType::Add,
+                    )
+                );
             } catch (Zend_Db_Statement_Exception | ZfExtended_Models_Entity_Exceptions_IntegrityConstraint | ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
                 // do nothing here
             }

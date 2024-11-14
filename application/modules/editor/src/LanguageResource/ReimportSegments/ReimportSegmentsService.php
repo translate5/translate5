@@ -25,9 +25,10 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource;
+namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
 use editor_Models_ConfigException;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
@@ -39,6 +40,7 @@ use editor_Services_Connector;
 use editor_Services_Manager;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Segment\FilteredIterator;
 use ReflectionException;
 use stdClass;
@@ -52,7 +54,7 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Filter_ExtJs6;
 
-class ReimportSegments
+class ReimportSegmentsService
 {
     public const FILTER_TIMESTAMP = 'timestamp';
 
@@ -66,10 +68,9 @@ class ReimportSegments
 
     private ZfExtended_Logger $logger;
 
-    public function __construct(
-        private readonly LanguageResource $languageResource,
-        private readonly Task $task,
-    ) {
+    public static function create(): self
+    {
+        return new self();
     }
 
     /**
@@ -79,14 +80,12 @@ class ReimportSegments
      * @throws Zend_Exception
      * @throws ReflectionException
      */
-    public function reimport(array $params): bool
+    public function reimport(LanguageResource $languageResource, Task $task, array $params): bool
     {
-        $task = $this->task;
-
         $locked = $task->lock(NOW_ISO, self::STATE_REIMPORT);
 
         if (! $locked) {
-            $this->getLogger()->error(
+            $this->getLogger($task, $languageResource)->error(
                 'E1169',
                 'The task is in use and cannot be reimported into the associated language resources.'
             );
@@ -106,16 +105,18 @@ class ReimportSegments
         $segments = $this->getSegmentIterator($task, $filters);
 
         $result = $this->updateSegments(
+            $languageResource,
+            $task,
             $segments,
             $params[self::USE_SEGMENT_TIMESTAMP] ?? false
         );
 
-        $this->reopenTask();
+        $this->reopenTask($task);
 
         $message = 'No segments for reimport';
         $params = [
-            'taskId' => $this->task->getId(),
-            'tmId' => $this->languageResource->getId(),
+            'taskId' => $task->getId(),
+            'tmId' => $languageResource->getId(),
         ];
 
         if ($result !== null) {
@@ -127,7 +128,7 @@ class ReimportSegments
             ]);
         }
 
-        $this->getLogger()->info('E0000', $message, $params);
+        $this->getLogger($task, $languageResource)->info('E0000', $message, $params);
 
         return true;
     }
@@ -137,30 +138,30 @@ class ReimportSegments
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      */
-    public function reopenTask(): void
+    public function reopenTask(Task $task): void
     {
         if ($this->oldState === self::STATE_REIMPORT) {
-            $this->oldState = $this->task::STATE_OPEN;
+            $this->oldState = $task::STATE_OPEN;
         }
-        $this->task->setState($this->oldState);
-        $this->task->save();
+        $task->setState($this->oldState);
+        $task->save();
 
-        if ($this->oldState === $this->task::STATE_END) {
-            $this->task->dropMaterializedView();
+        if ($this->oldState === $task::STATE_END) {
+            $task->dropMaterializedView();
         }
 
-        $this->task->unlock();
+        $task->unlock();
     }
 
     /**
      * @throws Zend_Exception
      */
-    public function getLogger(): ZfExtended_Logger
+    public function getLogger(Task $task, LanguageResource $languageResource): ZfExtended_Logger
     {
         if (! isset($this->logger)) {
             $this->logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource', [
-                'task' => $this->task ?? null,
-                'languageResource' => $this->languageresource ?? null,
+                'task' => $task,
+                'languageResource' => $languageResource,
             ]);
         }
 
@@ -219,6 +220,8 @@ class ReimportSegments
      * @throws editor_Models_ConfigException
      */
     private function updateSegments(
+        LanguageResource $languageResource,
+        Task $task,
         editor_Models_Segment_Iterator $segments,
         bool $useSegmentTimestamp
     ): ?ReimportSegmentsResult {
@@ -230,7 +233,7 @@ class ReimportSegments
 
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
 
-        $assoc->loadByTaskGuidAndTm($this->task->getTaskGuid(), (int) $this->languageResource->getId());
+        $assoc->loadByTaskGuidAndTm($task->getTaskGuid(), (int) $languageResource->getId());
 
         // check if the current language resources is updatable before updating
         if (empty($assoc->getSegmentsUpdateable())) {
@@ -241,9 +244,9 @@ class ReimportSegments
 
         /** @var UpdatableAdapterInterface|editor_Services_Connector $connector */
         $connector = $manager->getConnector(
-            $this->languageResource,
-            config: $this->task->getConfig(),
-            customerId: (int) $this->task->getCustomerId(),
+            $languageResource,
+            config: $task->getConfig(),
+            customerId: (int) $task->getCustomerId(),
         );
 
         $emptySegmentsAmount = 0;

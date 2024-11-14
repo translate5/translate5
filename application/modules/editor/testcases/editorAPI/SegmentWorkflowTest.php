@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Workflow_Default as DefaultWorkflow;
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
@@ -38,10 +39,6 @@ use MittagQI\Translate5\Test\ImportTestAbstract;
 class SegmentWorkflowTest extends ImportTestAbstract
 {
     public const WORKFLOW_COMPLEX = 'complex';
-
-    public const USER_REVIEWER = 'testlector';
-
-    public const USER_TRANSLATOR = 'testtranslator';
 
     protected static bool $termtaggerRequired = true;
 
@@ -65,9 +62,9 @@ class SegmentWorkflowTest extends ImportTestAbstract
     {
         $config
             ->addTask('en', 'de', -1, 'simple-en-de.zip')
-            ->addUser(self::USER_TRANSLATOR, workflowStep: 'firsttranslation')
-            ->addUser(self::USER_REVIEWER, DefaultWorkflow::STATE_WAITING, 'review1stlanguage')
-            ->addUser(self::USER_TRANSLATOR, DefaultWorkflow::STATE_WAITING, 'review2ndlanguage')
+            ->addUser(TestUser::TestTranslator->value, workflowStep: 'firsttranslation')
+            ->addUser(TestUser::TestLector->value, DefaultWorkflow::STATE_WAITING, 'review1stlanguage')
+            ->addUser(TestUser::TestTranslator->value, DefaultWorkflow::STATE_WAITING, 'review2ndlanguage')
             ->setProperty('edit100PercentMatch', 0)
             ->setProperty('workflow', self::WORKFLOW_COMPLEX)
             ->setProperty('taskName', static::NAME_PREFIX . 'SegmentWorkflowTest');
@@ -89,7 +86,7 @@ class SegmentWorkflowTest extends ImportTestAbstract
     public function testWorkflowSetup()
     {
         //check that USER_REVIEWER (in review1stlanguage) is waiting
-        static::api()->login(self::USER_REVIEWER);
+        static::api()->login(TestUser::TestLector->value);
         $task = static::api()->reloadTask();
         $this->assertEquals(DefaultWorkflow::STATE_WAITING, $task->userState);
 
@@ -97,7 +94,7 @@ class SegmentWorkflowTest extends ImportTestAbstract
         $this->assertEquals('firsttranslation', $task->workflowStepName);
 
         //check that USER_TRANSLATOR is open (for translation)
-        static::api()->login(self::USER_TRANSLATOR);
+        static::api()->login(TestUser::TestTranslator->value);
         $this->assertEquals(DefaultWorkflow::STATE_OPEN, static::api()->reloadTask()->userState);
 
         //USER_TRANSLATOR finish step translation
@@ -116,7 +113,7 @@ class SegmentWorkflowTest extends ImportTestAbstract
         $this->assertEquals(DefaultWorkflow::STATE_FINISH, static::api()->reloadTask()->userState);
 
         //check that USER_REVIEWER (in review1stlanguage) is now open
-        static::api()->login(self::USER_REVIEWER);
+        static::api()->login(TestUser::TestLector->value);
         $task = static::api()->reloadTask();
         $this->assertEquals(DefaultWorkflow::STATE_OPEN, $task->userState);
     }
@@ -255,7 +252,7 @@ class SegmentWorkflowTest extends ImportTestAbstract
     public function testSecondReviewStep(): void
     {
         //check that task is open for translator now
-        static::api()->login(self::USER_TRANSLATOR);
+        static::api()->login(TestUser::TestTranslator->value);
         $this->assertEquals('open', static::api()->reloadTask()->userState);
 
         static::api()->setTaskToEdit();

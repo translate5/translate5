@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
@@ -40,7 +41,7 @@ class Translate1841Test extends ImportTestAbstract
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap',
     ];
 
-    protected static string $setupUserLogin = 'testlector';
+    protected static TestUser $setupUserLogin = TestUser::TestLector;
 
     protected static function setupImport(Config $config): void
     {
@@ -86,7 +87,7 @@ class Translate1841Test extends ImportTestAbstract
 
         $task = static::api()->getTask();
         //start task export
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         static::api()->get('editor/task/export/id/' . $task->id . '?format=xliff2');
 
         //get the exported file content

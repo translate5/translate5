@@ -2,11 +2,11 @@
 
 ### IMPORTANT: Only translate5 adjusted stuff (in a subfolder "/translate5") can be adjusted. Anything else is not customizable !
 
-### 1) translate5 adjuatedSegmentation / SRX-files
+### 1) translate5 adjustedSegmentation / SRX-files
 
 if the translate5 adjusted SRX is updated, it must be added to the folder "/translate5/application/modules/editor/Plugins/Okapi/data/srx/translate5/"
 This folder holds all SRX versions from the rollout of the feature on, what may is useful to track the changes of the rules.
-The naming should be "languages-N.srx" if source/target are identical or "languages-source-N.srx" / "languages-source-N.srx" if different.
+The naming should be "languages-N.srx" if source/target are identical or "languages-source-N.srx" / "languages-starget-N.srx" if different.
 "N" here relates to the counter/order of files in the directory and is not really relevant.
 The added files then **must** be added to the SRX Inventory file "/translate5/application/modules/editor/Plugins/Okapi/data/srx/translate5-segmentation.json" as well.
 This file is the Inventory of the translate5 adjusted SRX files and their hashes. Since - opposed to FPRM files - the SRX files have no database-based versioning, we need all the hash-values of default-SRX files to identify them when importing bconfs.
@@ -23,10 +23,10 @@ To add an entry there, a new JSON Item **must** be added to the **top** of the l
 Hash and BCONF-Version-Index will be automatically set with the use of the "t5 dev:okapibconfversion" command (see 4), which not only increases the version but also evaluates the hashes & the correct version of an added SRX.
 The adjusted SRX **must** be added with this command to become the new default SRX. Note, that the "version" in the JSON relates to the global BCONF-Version-Index and needs not to be in-sync with the file-numbering!
 
-### 2) translate5 adjuated FPRMs
+### 2) translate5 adjusted FPRMs
 
-The translate5 adjuated FPRMs are hold inside the folder "translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5/" which has a JSON inventory-file "translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5-filters.json"
-To add new Verions of a already existing translate5 adjuated FPRM the FPRM-file simply is changed on file-base and the BCONF-Version-Index needs to be increased (With "dev:okapibconfversion" command, see 4).
+The translate5 adjusted FPRMs are hold inside the folder "translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5/" which has a JSON inventory-file "translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5-filters.json"
+To add new Verions of a already existing translate5 adjusted FPRM the FPRM-file simply is changed on file-base and the BCONF-Version-Index needs to be increased (With "dev:okapibconfversion" command, see 4).
 To add a new translate5 adjusted FPRM it has to be added as file in the afromentioned folder. Note, that the naming-scheme is mandatory like "okf_openxml@translate5.fprm" or "okf_openxml@translate5-SOME_SPECIAL_PURPOSE.fprm".
 The naming structure is 
 
@@ -44,7 +44,7 @@ Each FPRM-file must have a complementary entry in the JSON inventory-file, which
     "extensions": ["odp","ods","odt"]
 }`
  
-- "id" is always "translate5" or "translate5-SPECIALPURPOSE" for translate5 adjuated FPRMs
+- "id" is always "translate5" or "translate5-SPECIALPURPOSE" for translate5 adjusted FPRMs
 - "type" represents the okapi-type
 - "replaceId" forces, that all OKAPI default FPRMs will this id will be replaced with this translate5 adjusted version. Note the difference betweenb okapi-type (eg. okf_xml) and okapi-id (e.g. okf_regex-macStrings)
 - "name" and "description" and "mime" are shown in the "Filter"-frontend in the app

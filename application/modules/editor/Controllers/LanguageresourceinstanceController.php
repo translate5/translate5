@@ -31,10 +31,14 @@ use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
-use MittagQI\Translate5\LanguageResource\ReimportSegments;
+use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
+use MittagQI\Translate5\LanguageResource\LanguageResourceReimportQueue;
+use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsService;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\ExportMemoryWorker;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
@@ -122,6 +126,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //add custom filters
         $this->handleFilterCustom();
 
+        // Should be called before load because of filters mutation inside
+        $showTaskTm = $this->shouldShowTaskTms();
+
         $rows = $this->entity->loadAllByServices();
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
@@ -160,6 +167,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $filterTmNeedsConversion = $this->getParam('filterTmNeedsConversion', false);
 
         foreach ($rows as $rowId => &$lrData) {
+            if (! $showTaskTm && true === (bool) $lrData['isTaskTm']) {
+                unset($rows[$rowId]);
+
+                continue;
+            }
+
             $resource = $getResource($lrData['serviceType'], $lrData['resourceId']);
             /* @var editor_Models_LanguageResources_Resource $resource */
             if (! empty($resource)) {
@@ -217,6 +230,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
             $lrData['categories'] = $categoryLabels;
             $lrData['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (int) $eventLoggerGroupped[$id] : 0;
+            $lrData['isTaskTm'] = (bool) $lrData['isTaskTm'];
         }
 
         $this->view->rows = array_values($rows);
@@ -232,12 +246,20 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $data = $customerAssoc->loadByCustomerIdsUseAsDefault([$postData['customerId']]);
 
-        $languageResourcesDefaults = new LanguageResourcesDefaults();
+        $languageResourcesDefaults = new LanguageResourcesDefaults(new LanguageResourceRepository());
 
-        $iterator = $languageResourcesDefaults->findMatchingAssocData($postData['sourceId'], $postData['targetId'], $data);
+        $iterator = $languageResourcesDefaults->findMatchingAssocData(
+            $postData['sourceId'],
+            $postData['targetId'],
+            $data
+        );
 
         $has = false;
         foreach ($iterator as $data) {
+            if ($data['resourceType'] !== 'tm') {
+                continue;
+            }
+
             if (! $tmConversionService->isTmConverted($data['languageResourceId'])) {
                 $has = true;
 
@@ -379,22 +401,21 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function getAction()
     {
         parent::getAction();
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
         $this->addAssocData();
 
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $t ZfExtended_Zendoverwrites_Translate */
 
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
-        /* @var $resource editor_Models_LanguageResources_Resource */
-        if (empty($resource)) {
+
+        if ($resource === null) {
             $this->view->rows->status = LanguageResourceStatus::NOCONNECTION;
             $this->view->rows->statusInfo = $t->_('Keine Verbindung zur Ressource oder Ressource nicht gefunden.');
 
             return;
         }
+
         $meta = $resource->getMetaData();
         foreach ($meta as $key => $v) {
             $this->view->rows->{$key} = $v;
@@ -403,10 +424,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /** @phpstan-ignore-next-line */
         $this->view->rows->serviceName = $serviceManager->getUiNameByType($this->view->rows->serviceType);
 
-        $eventLogger = ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
-        /* @var $eventLogger editor_Models_Logger_LanguageResources */
+        $eventLogger = ZfExtended_Factory::get(editor_Models_Logger_LanguageResources::class);
         $eventLoggerGroupped = $eventLogger->getLatesEventsCount([$this->entity->getId()]);
-        $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (int) $eventLoggerGroupped[$this->entity->getId()] : 0;
+        $this->view->rows->eventsCount =
+            isset($eventLoggerGroupped[$this->entity->getId()]) ? (int) $eventLoggerGroupped[$this->entity->getId()] : 0;
 
         $connector = $this->getConnector();
 
@@ -767,8 +788,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->setDataInEntity($this->postBlacklist);
         $this->entity->createLangResUuid();
 
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
+        $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
 
         if ($resource && ! $resource->getCreatable()) {
@@ -820,7 +840,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 )
             );
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-            $this->entity->delete();
+            DeleteLanguageResourceOperation::create()->delete(
+                $this->entity,
+                forced: true,
+            );
 
             throw $e;
         }
@@ -832,7 +855,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         try {
             $categoryAssoc->saveAssocRequest($this->data);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-            $this->entity->delete();
+            DeleteLanguageResourceOperation::create()->delete(
+                $this->entity,
+                forced: true,
+            );
 
             throw $e;
         }
@@ -855,14 +881,20 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             try {
                 $this->handleInitialFileUpload();
             } catch (ZfExtended_ErrorCodeException $e) {
-                $this->entity->delete();
+                DeleteLanguageResourceOperation::create()->delete(
+                    $this->entity,
+                    forced: true,
+                );
 
                 throw $e;
             }
 
             //when there are errors, we cannot set it to true
             if (! $this->validateUpload()) {
-                $this->entity->delete();
+                DeleteLanguageResourceOperation::create()->delete(
+                    $this->entity,
+                    forced: true,
+                );
 
                 return;
             }
@@ -870,9 +902,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->entity->save();
         }
 
-        if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
-            TmConversionService::create()->setRulesHash($this->entity, $sourceLangId, $targetLangId);
-        }
+        $manager->getTmConversionService($resource->getServiceType())?->setRulesHash(
+            $this->entity,
+            $sourceLangId,
+            $targetLangId
+        );
 
         $this->view->rows = $this->entity->getDataObject();
         $this->view->success = true;
@@ -1109,25 +1143,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->decodePutData();
             if (! empty($this->data) && ! empty($this->data->toReImport)) {
                 foreach ($this->data->toReImport as $taskGuid) {
-                    $worker = ZfExtended_Factory::get(editor_Models_LanguageResources_Worker::class);
-
-                    // init worker and queue it
-                    $success = $worker->init(
-                        $taskGuid,
-                        [
-                            'languageResourceId' => $this->entity->getId(),
-                            ReimportSegments::FILTER_ONLY_EDITED => $this->data->onlyEdited,
-                            ReimportSegments::USE_SEGMENT_TIMESTAMP => $this->data->timeOption === 'segment',
-                        ]
-                    );
-
-                    // Since it has to be done in a none worker request to have session access,
-                    // we have to insert the worker before the taskPost
-                    if (! $success) {
+                    try {
+                        (new LanguageResourceReimportQueue())->queueReimport(
+                            $taskGuid,
+                            $this->entity->getId(),
+                            [
+                                ReimportSegmentsService::FILTER_ONLY_EDITED => $this->data->onlyEdited,
+                                ReimportSegmentsService::USE_SEGMENT_TIMESTAMP => $this->data->timeOption === 'segment',
+                            ]
+                        );
+                    } catch (ReimportQueueException) {
                         throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
                     }
-
-                    $worker->queue();
                 }
             }
         }
@@ -1414,10 +1441,25 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         return false;
     }
 
+    /**
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_Conflict
+     * @throws Zend_Db_Table_Exception
+     * @throws ReflectionException
+     * @throws ZfExtended_NoAccessException
+     */
     public function deleteAction()
     {
         //load the entity and store a copy for later use.
         $this->entityLoad();
+
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
+        $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
+        if (! $resource->getDeletable()) {
+            throw new ZfExtended_BadMethodCallException(__CLASS__ . ' -> ' . __FUNCTION__ . ' due service type.');
+        }
+
         $clone = clone $this->entity;
 
         // Client-restricted users can only delete language-resources, that are associated only to "their" customers
@@ -1435,8 +1477,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         // now try to remove the language-resource associations, customer and task
         try {
-            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [$this->entity]);
-            $remover->remove(forced: $forced, deleteInResource: $deleteInResource);
+            DeleteLanguageResourceOperation::create()->delete(
+                $this->entity,
+                forced: $forced,
+                deleteInResource: $deleteInResource
+            );
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             //if there are associated tasks we can not delete the language resource
             ZfExtended_Models_Entity_Conflict::addCodes([
@@ -1893,5 +1938,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         );
 
         return $result;
+    }
+
+    private function shouldShowTaskTms(): bool
+    {
+        $showTaskTm = $this->entity->getFilter()->hasFilter('isTaskTm')
+            && ($this->entity->getFilter()->getFilter('isTaskTm')->value[0] ?? '') === 'showTaskTms';
+        $this->entity->getFilter()->deleteFilter('isTaskTm');
+
+        return $showTaskTm;
     }
 }

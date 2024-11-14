@@ -62,6 +62,54 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
             groupable: false,
         },
         {
+            dataIndex: 'isTaskTm',
+            bind: {
+                text: '{l10n.selectTm.taskTm}',
+            },
+            filter: {
+                type: 'boolean',
+                checked: true,
+                menu: {
+                    items: {
+                        yes: {
+                            listeners: {
+                                checkchange: (item, value) => {
+                                    if (!value) {
+                                        return;
+                                    }
+
+                                    Ext.ComponentQuery.query('selecttm')[0].getController().showTaskTms();
+                                }
+                            }
+                        },
+                        no: {
+                            listeners: {
+                                checkchange: (item, value) => {
+                                    if (!value) {
+                                        return;
+                                    }
+
+                                    Ext.ComponentQuery.query('selecttm')[0].getController().hideTaskTms();
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            groupable: false,
+            renderer: function(value){
+                if (value === true) {
+                    return '<span style="color:green;">&#10003;</span>';
+                } else {
+                    return '';
+                }
+            },
+            cell: {
+                encodeHtml: false,
+            },
+            hidden: true,
+        },
+        {
             menuDisabled: true,
             cell: {
                 xtype: 'widgetcell',
@@ -76,6 +124,6 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
         },
     ],
     listeners: {
-        childdoubletap: 'onTmDoubleTap'
+        childdoubletap: 'onTmDoubleTap',
     }
 });

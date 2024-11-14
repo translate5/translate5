@@ -162,9 +162,6 @@ class Editor_SegmentController extends ZfExtended_RestController
     public function nextsegmentsAction()
     {
         $segmentId = (int) $this->_getParam('segmentId');
-        if ($this->_getParam('nextFiltered', false) || $this->_getParam('prevFiltered', false)) {
-            $autoStates = $this->getUsersAutoStateIds();
-        }
         $this->entity->load($segmentId);
         $this->checkTaskGuidAndEditable();
 
@@ -173,17 +170,18 @@ class Editor_SegmentController extends ZfExtended_RestController
         $context->types = explode(',', $this->_getParam('parsertypes', 'editable,workflow'));
         $context->field = $this->_getParam('editedField', null);
 
+        $workflowStepName = $this->getCurrentJob()->getWorkflowStepName();
+
         foreach ($context->types as $type) {
+            $workflowStep = ($type == 'workflow') ? $workflowStepName : '';
             if ($type == 'editable' || $type == 'workflow') {
                 $param = 'next_' . $type;
                 if ($this->_getParam($param, false)) {
-                    $autoStates = ($type == 'workflow') ? $this->getUsersAutoStateIds() : null;
-                    $context->result[$param] = $this->entity->findSurroundingEditables(true, $autoStates);
+                    $context->result[$param] = $this->entity->findSurroundingEditables(true, $workflowStep);
                 }
                 $param = 'prev_' . $type;
                 if ($this->_getParam($param, false)) {
-                    $autoStates = ($type == 'workflow') ? $this->getUsersAutoStateIds() : null;
-                    $context->result[$param] = $this->entity->findSurroundingEditables(false, $autoStates);
+                    $context->result[$param] = $this->entity->findSurroundingEditables(false, $workflowStep);
                 }
             }
         }
@@ -221,35 +219,6 @@ class Editor_SegmentController extends ZfExtended_RestController
     }
 
     /**
-     * returns a list of autoStateIds, belonging to the users role in the currently loaded task
-     * is neede for the autostate filter in the frontend
-     * @throws \MittagQI\Translate5\Task\Current\Exception
-     */
-    protected function getUsersAutoStateIds()
-    {
-        if ($this->cachedAutostates == null) {
-            $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid(
-                ZfExtended_Authentication::getInstance()->getUserGuid(),
-                $this->getCurrentTask()->getTaskGuid()
-            );
-            if ($taskUserAssoc->getIsPmOverride()) {
-                $userRole = 'pm';
-            } else {
-                $userRole = $taskUserAssoc->getRole();
-            }
-            $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-            /* @var $states editor_Models_Segment_AutoStates */
-            $autoStateMap = $states->getRoleToStateMap();
-            if (empty($userRole) || empty($autoStateMap[$userRole])) {
-                return null;
-            }
-            $this->cachedAutostates = $autoStateMap[$userRole];
-        }
-
-        return $this->cachedAutostates;
-    }
-
-    /**
      * adds the optional is first of file info to the affected segments
      */
     protected function addIsFirstFileInfo(string $taskGuid)
@@ -283,7 +252,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             $this->view->metaData = new stdClass();
         }
 
-        //loop over the loaded segments, if there is an editable use that
+        $segment = [];
         foreach ($this->view->rows as $idx => $segment) {
             if ($segment['editable']) {
                 $this->view->metaData->firstEditable = $idx;

@@ -59,7 +59,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      * This must be increased each time, a git-based fprm or srx is changed
      * @var int
      */
-    public const BCONF_VERSION_INDEX = 8;
+    public const BCONF_VERSION_INDEX = 9;
 
     /**
      * The filename of the system default import bconf
@@ -436,7 +436,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
 
     protected function initEvents(): void
     {
-        // adds the system-default filetypes to the global registry
+        // adds the task's bconf filetypes to the global registry
         $this->eventManager->attach(
             FileTypeSupport::class,
             'registerSupportedFileTypes',
@@ -716,7 +716,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
                 . $importFilter->getBconfDisplayName());
         }
 
-        // there should be a warning if the deprecated bconf in import-zip was used
+        // TRANSLATE-4240 Deactivated: there should be a warning if the deprecated bconf in import-zip was used
+        /*
         if ($importFilter->hasEmbeddedBconf()) {
             $task->logger('editor.task.okapi')->warn(
                 'E1387',
@@ -726,6 +727,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
                 ]
             );
         }
+        */
 
         $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
         foreach ($filelist as $fileId => $filePath) {

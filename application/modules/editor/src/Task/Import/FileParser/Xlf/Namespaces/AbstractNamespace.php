@@ -43,7 +43,7 @@ abstract class AbstractNamespace
 {
     public function __construct(
         protected XmlParser $xmlparser,
-        protected Comments $comments
+        protected Comments $comments,
     ) {
     }
 
@@ -71,6 +71,12 @@ abstract class AbstractNamespace
     public function currentTarget(array $currentTargetTag, SegmentAttributes $segmentAttributes): void
     {
         //method stub
+    }
+
+    public function preProcessFile(string $xml): string
+    {
+        //method stub
+        return $xml;
     }
 
     /**

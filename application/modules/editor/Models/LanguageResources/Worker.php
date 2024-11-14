@@ -29,14 +29,14 @@ END LICENSE AND COPYRIGHT
 declare(strict_types=1);
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\LanguageResource\ReimportSegments;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsService;
 
 /**
  * Re-imports the segments of a task back into the chosen TM
  */
 class editor_Models_LanguageResources_Worker extends editor_Models_Task_AbstractWorker
 {
-    private ReimportSegments $reimport;
+    private ReimportSegmentsService $reimport;
 
     private LanguageResource $languageResource;
 
@@ -56,9 +56,9 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Task_Abstract
         $this->languageResource = \ZfExtended_Factory::get(LanguageResource::class);
         $this->languageResource->load($params['languageResourceId']);
 
-        $this->reimport = new ReimportSegments($this->languageResource, $this->task);
+        $this->reimport = ReimportSegmentsService::create();
 
-        return $this->reimport->reimport($params);
+        return $this->reimport->reimport($this->languageResource, $this->task, $params);
     }
 
     /**
@@ -69,8 +69,8 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Task_Abstract
      */
     protected function handleWorkerException(Throwable $workException): void
     {
-        $this->reimport->reopenTask();
-        $this->reimport->getLogger()->error(
+        $this->reimport->reopenTask($this->task);
+        $this->reimport->getLogger($this->task, $this->languageResource)->error(
             'E0000',
             'Task reimport in TM failed - please check log for reason and restart!'
         );

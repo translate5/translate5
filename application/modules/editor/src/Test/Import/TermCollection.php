@@ -33,7 +33,7 @@ use MittagQI\Translate5\Test\Api\Helper;
 /**
  * Represents the api-request configuration for a termcollection
  */
-final class TermCollection extends Resource
+final class TermCollection extends AbstractResource
 {
     public string $name;
 

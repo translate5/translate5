@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -21,7 +20,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -33,11 +32,12 @@ Ext.define('Editor.view.CheckColumn', {
     extend: 'Ext.grid.column.Column',
     alias: 'widget.owncheckcolumn',
     renderer : function(value){
-        var cls = ['grid-ownchecker'];
+        const cls = ['grid-ownchecker'];
 
-        if (value) {
+        if (!! value && value !== '0') {
             cls.push('grid-ownchecker-checked');
         }
+
         return '<div class="' + cls.join(' ') + '">&#160;&#160;&#160;&#160;&#160;</div>';
     }
 });

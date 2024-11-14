@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
+use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
 
 /***
  *
@@ -86,8 +87,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
         $this->processClientReferenceVersion();
 
         try {
-            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [$this->entity]);
-            $remover->remove(true);
+            DeleteLanguageResourceOperation::create()->delete($this->entity, true);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint) {
             //if there are associated tasks we can not delete the language resource
             ZfExtended_Models_Entity_Conflict::addCodes([

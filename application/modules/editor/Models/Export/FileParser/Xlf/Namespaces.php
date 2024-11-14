@@ -50,4 +50,30 @@ class editor_Models_Export_FileParser_Xlf_Namespaces extends editor_Models_Expor
         parent::__construct($xmlparser, $comments);
         $this->namespaces = $registry->getImplementations($xmlparser, $comments);
     }
+
+    protected function call(
+        string $function,
+        array $arguments,
+        string $default = null
+    ): string {
+        // it is slightly unusual that a XLF file has multiple namespaces, but still it can happen
+        // we handle it, that if an empty result is produced, we proceed with the next namespace
+        foreach ($this->namespaces as $namespace) {
+            $result = call_user_func_array([$namespace, $function], $arguments);
+            if ((is_array($result) && empty($result)) || is_null($result)) {
+                //empty array or null means, check next namespace
+                continue;
+            }
+
+            return $result;
+        }
+
+        //if no namespace was defined, or nothing was returned by them, we return the default result
+        return $default;
+    }
+
+    public function postProcessFile(string $xml): string
+    {
+        return $this->call(__FUNCTION__, func_get_args(), $xml);
+    }
 }

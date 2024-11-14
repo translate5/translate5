@@ -596,9 +596,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                     averageProcessingTimeMessage = [],
                     excelExportUsageMessage;
 
-
                 // KPI: averageProcessingTime
-                averageProcessingTimeMessage.push(me.strings.averageProcessingTimeTranslatorLabel + ': ' + resp.averageProcessingTimeTranslator)
+                averageProcessingTimeMessage.push(me.strings.averageProcessingTimeTranslatorLabel + ': ' + resp.averageProcessingTimeTranslator);
                 averageProcessingTimeMessage.push(me.strings.averageProcessingTimeLabel + ': ' + resp.averageProcessingTimeReviewer);
                 averageProcessingTimeMessage.push(me.strings.averageProcessingTimeSecondTranslatorLabel + ': ' + resp.averageProcessingTimeSecondTranslator)
 

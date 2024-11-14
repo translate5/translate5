@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\ApiTestAbstract;
+use MittagQI\Translate5\Test\Enums\TestUser;
 
 class TbxSpecialcharsTest extends ApiTestAbstract
 {
@@ -46,7 +47,7 @@ class TbxSpecialcharsTest extends ApiTestAbstract
     /**
      * We need the termproposer to be logged in for the test
      */
-    protected static string $setupUserLogin = 'testtermproposer';
+    protected static TestUser $setupUserLogin = TestUser::TestTermProposer;
 
     /***
      * Test term and term attribute proposals.
@@ -119,7 +120,7 @@ class TbxSpecialcharsTest extends ApiTestAbstract
         $exported = preg_match_all('~&lt;~', $result->data);
         $this->assertEquals($original, $exported, 'Specialchars quantities in original and exported files are not equal');
 
-        static::api()->login('testtermproposer');
+        static::api()->login(TestUser::TestTermProposer->value);
         static::api()->delete('editor/termcollection/' . $collectionId);
     }
 }

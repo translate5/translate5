@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -128,5 +129,41 @@ class LanguageResourceRepository
         );
 
         return $languageResource;
+    }
+
+    /**
+     * @return array<string, array> - an array with the service name as key and an array of language resources as value
+     */
+    public function getAssociatedToTaskGroupedByType(string $taskGuid): array
+    {
+        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+        $db = $languageResource->db;
+
+        $taskAssocTable = ZfExtended_Factory::get(TaskAssociation::class)->db->info($db::NAME);
+        $s = $db->select()
+            ->from(
+                [
+                    'languageResources' => $db->info($db::NAME),
+                ],
+                ['*', 'taskAssoc.taskGuid', 'taskAssoc.segmentsUpdateable']
+            )
+            ->setIntegrityCheck(false)
+            ->join(
+                [
+                    'taskAssoc' => $taskAssocTable,
+                ],
+                'taskAssoc.languageResourceId = ' . 'languageResources.id',
+                []
+            )
+            ->where('taskAssoc.`taskGuid` = ?', $taskGuid);
+
+        $languageResources = $db->fetchAll($s)->toArray();
+
+        $grouped = [];
+        foreach ($languageResources as $languageResource) {
+            $grouped[$languageResource['serviceType']][] = $languageResource;
+        }
+
+        return $grouped;
     }
 }

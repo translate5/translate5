@@ -30,6 +30,7 @@ namespace MittagQI\Translate5\Test;
 
 use MittagQI\Translate5\Test\Api\DbHelper;
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Task;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -104,7 +105,7 @@ abstract class ApiTestAbstract extends TestCase
      * The user that will be logged in in the base setup. This is the user logged in when ::beforeTests is called
      * When this is set to "testlector" imported tasks will be automatically assigned to the testlector
      */
-    protected static string $setupUserLogin = 'testmanager';
+    protected static TestUser $setupUserLogin = TestUser::TestManager;
 
     /**
      * If set, a test-specific customer will be created on test-setup and removed on teardown. The customer will be
@@ -164,7 +165,7 @@ abstract class ApiTestAbstract extends TestCase
      */
     final public static function getTestLogin(): string
     {
-        return static::$setupUserLogin;
+        return static::$setupUserLogin->value;
     }
 
     /**
@@ -309,7 +310,7 @@ abstract class ApiTestAbstract extends TestCase
                 );
             } else {
                 // make sure the setup always happens as testmanager
-                static::api()->login('testmanager');
+                static::api()->login(TestUser::TestManager->value);
 
                 // checks for the plugin & config dependencies that have been defined for this test
                 self::assertAppState();
@@ -322,8 +323,8 @@ abstract class ApiTestAbstract extends TestCase
                 static::testSpecificSetup();
 
                 // log the user in that is setup as the needed test-user. Asserts the success if pretests shall not be skipped
-                if (static::api()->login(static::$setupUserLogin) && ! self::$_api->doSkipPretests()) {
-                    static::assertLogin(static::$setupUserLogin);
+                if (static::api()->login(static::$setupUserLogin->value) && ! self::$_api->doSkipPretests()) {
+                    static::assertLogin(static::$setupUserLogin->value);
                 }
                 // this can be used in concrete tests as replacement for setUpBeforeClass()
                 static::beforeTests();
@@ -340,7 +341,7 @@ abstract class ApiTestAbstract extends TestCase
         self::logTestEnd();
 
         // ensure the teardown happens as testmanager
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         // everything is wrapped in try-catch to make sure, all cleanups are executed. Anyone knows a better way to collect exceptions ?
         $errors = [];
         // for single tests, the cleanup can be prevented via KEEP_DATA
@@ -424,8 +425,8 @@ abstract class ApiTestAbstract extends TestCase
     private static function evaluateAppState(Helper $api)
     {
         // the initial login of the current Test suite
-        $api->login('testapiuser');
-        static::assertLogin('testapiuser');
+        $api->login(TestUser::TestApiUser->value);
+        static::assertLogin(TestUser::TestApiUser->value);
         $state = $api->getJson('editor/index/applicationstate');
         if (! is_object($state)) {
             // UGLY: no Exception can terminate the suite with a single "Explanation", so to avoid all tests failing we simply die ...
@@ -513,30 +514,30 @@ abstract class ApiTestAbstract extends TestCase
      */
     private static function assertNeededUsers()
     {
-        static::api()->login('testlector');
-        $json = static::assertLogin('testlector');
+        static::api()->login(TestUser::TestLector->value);
+        $json = static::assertLogin(TestUser::TestLector->value);
         static::assertContains('editor', $json->user->roles, 'Checking users roles:');
         static::assertNotContains('pm', $json->user->roles, 'Checking users roles:');
         static::assertContains('basic', $json->user->roles, 'Checking users roles:');
         static::assertContains('noRights', $json->user->roles, 'Checking users roles:');
 
-        static::api()->login('testtranslator');
-        $json = static::assertLogin('testtranslator');
+        static::api()->login(TestUser::TestTranslator->value);
+        $json = static::assertLogin(TestUser::TestTranslator->value);
         static::assertContains('editor', $json->user->roles, 'Checking users roles:');
         static::assertNotContains('pm', $json->user->roles, 'Checking users roles:');
         static::assertContains('basic', $json->user->roles, 'Checking users roles:');
         static::assertContains('noRights', $json->user->roles, 'Checking users roles:');
 
-        static::api()->login('testtermproposer');
-        $json = static::assertLogin('testtermproposer');
+        static::api()->login(TestUser::TestTermProposer->value);
+        $json = static::assertLogin(TestUser::TestTermProposer->value);
         static::assertContains('termProposer', $json->user->roles, 'Checking users roles:');
         static::assertContains('editor', $json->user->roles, 'Checking users roles:');
         static::assertContains('pm', $json->user->roles, 'Checking users roles:');
         static::assertContains('basic', $json->user->roles, 'Checking users roles:');
         static::assertContains('noRights', $json->user->roles, 'Checking users roles:');
 
-        static::api()->login('testmanager');
-        $json = static::assertLogin('testmanager');
+        static::api()->login(TestUser::TestManager->value);
+        $json = static::assertLogin(TestUser::TestManager->value);
         static::assertContains('editor', $json->user->roles, 'Checking users roles:');
         static::assertContains('pm', $json->user->roles, 'Checking users roles:');
         static::assertContains('basic', $json->user->roles, 'Checking users roles:');

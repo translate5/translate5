@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
@@ -58,10 +59,10 @@ class SegmentsToUsersTest extends ImportTestAbstract
         $config
             ->addTask('en', 'de', -1, 'testcase-de-en.xlf')
             ->setUsageMode('simultaneous')
-            ->addUser('testlector', 'open', self::STEP, [
+            ->addUser(TestUser::TestLector->value, 'open', self::STEP, [
                 'segmentrange' => self::SEGMENTRANGE_USER1,
             ])
-            ->addUser('testtranslator', 'open', self::STEP, [
+            ->addUser(TestUser::TestTranslator->value, 'open', self::STEP, [
                 'segmentrange' => self::SEGMENTRANGE_USER2,
             ]);
     }
@@ -81,7 +82,7 @@ class SegmentsToUsersTest extends ImportTestAbstract
      */
     public function testEditableSegmentsForUser1()
     {
-        static::api()->login('testlector');
+        static::api()->login(TestUser::TestLector->value);
         $taskId = static::getTask()->reload(static::api())->getId();
         //open task
         static::api()->setTaskToEdit($taskId);
@@ -97,7 +98,7 @@ class SegmentsToUsersTest extends ImportTestAbstract
      */
     public function testEditableSegmentsForUser2()
     {
-        static::api()->login('testtranslator');
+        static::api()->login(TestUser::TestTranslator->value);
         $taskId = static::getTask()->reload(static::api())->getId();
         //open task
         static::api()->setTaskToEdit($taskId);

@@ -46,6 +46,8 @@ final class Processing extends Zend_Db_Table_Abstract
 
     protected $_name = 'LEK_segment_processing';
 
+    protected $_rowClass = ProcessingRow::class;
+
     public $_primary = 'segmentId';
 
     public function getName(): string

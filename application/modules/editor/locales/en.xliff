@@ -4070,6 +4070,18 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Reorganisation gescheitert</source>
                 <target>Reorganization failed</target>
             </trans-unit>
+            <trans-unit id='V2FydGV0IGF1ZiBMYWRlbg=='>
+                <source>Wartet auf Laden</source>
+                <target>Waiting for load</target>
+            </trans-unit>
+            <trans-unit id='V2lyZCBnZWxhZGVu'>
+                <source>Wird geladen</source>
+                <target>Loading</target>
+            </trans-unit>
+            <trans-unit id='TGFkZWZlaGxlcg=='>
+                <source>Ladefehler</source>
+                <target>Failed to load</target>
+            </trans-unit>
             <trans-unit id='S29udGluZ2VudCDDvGJlcnNjaHJpdHRlbg=='>
                 <source>Kontingent überschritten</source>
                 <target>Quota exceeded</target>
@@ -4970,10 +4982,6 @@ another user took responsibility for the task
                 <source>Workflow-Status</source>
                 <target>Workflow status</target>
             </trans-unit>
-            <trans-unit id='QmVudXR6ZXItUm9sbGU='>
-                <source>Benutzer-Rolle</source>
-                <target>User role</target>
-            </trans-unit>
             <trans-unit id='V2VpdGVyZSBGaWx0ZXIgaW0gS29wZiBqZWRlciBTcGFsdGU='>
                 <source>Weitere Filter im Kopf jeder Spalte</source>
                 <target>More filters in the head of each column</target>
@@ -5041,10 +5049,6 @@ another user took responsibility for the task
             <trans-unit id='WnVnZXdpZXNlbmUvciBCZW51dHplcg=='>
                 <source>Zugewiesene/r Benutzer</source>
                 <target>Assigned user/s</target>
-            </trans-unit>
-            <trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXItUm9sbGUvbg=='>
-                <source>Zugewiesene Benutzer-Rolle/n</source>
-                <target>Assigned user role/s</target>
             </trans-unit>
             <trans-unit id='S2VpbiBXb3JrZmxvdw=='>
                 <source>Kein Workflow</source>
@@ -6745,6 +6749,26 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='WnVzw6R0emxpY2hlIEluZm9z'>
                 <source>Zusätzliche Infos</source>
                 <target>Additional info</target>
+            </trans-unit>
+            <trans-unit id='QXVmZ2FiZW4tVE0='>
+                <source>Aufgaben-TM</source>
+                <target>Task TM</target>
+            </trans-unit>
+            <trans-unit id='QXVmZ2FiZW4tVE0gYW56ZWlnZW4='>
+                <source>Aufgaben-TM anzeigen</source>
+                <target>Show task TMs</target>
+            </trans-unit>
+            <trans-unit id='QXVmZ2FiZW4tVE0gYXVzYmxlbmRlbg=='>
+                <source>Aufgaben-TM ausblenden</source>
+                <target>Hide task TMs</target>
+            </trans-unit>
+            <trans-unit id='QW5kZXJlIEF1ZmdhYmVuLVRNIGVpbmJsZW5kZW4='>
+                <source>Andere Aufgaben-TM einblenden</source>
+                <target>Show foreign task TMs</target>
+            </trans-unit>
+            <trans-unit id='QW5kZXJlIEF1ZmdhYmVuLVRNIGF1c2JsZW5kZW4='>
+                <source>Andere Aufgaben-TM ausblenden</source>
+                <target>Hide foreign task TMs</target>
             </trans-unit>
             <trans-unit id='ZmlsZU5hbWVfT3BlblRNMg=='>
                 <source>fileName_OpenTM2</source>
@@ -9982,6 +10006,14 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.</source>
                 <target>Note: Some users have individual deadline dates set. Please review and adjust them manually if necessary.</target>
             </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUgJXMgd3VyZGUgdm9uIHRyYW5zbGF0ZTUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3NlbiB1bmQgaXN0IG5pY2h0IG1laHIgYmVhcmJlaXRiYXIgZsO8ciBkZW4genVnZXdpZXNlbmVuIEJlbnV0emVyLg=='>
+                <source>Die Aufgabe %s wurde von translate5 automatisch abgeschlossen und ist nicht mehr bearbeitbar für den zugewiesenen Benutzer.</source>
+                <target>The task %s has been auto-closed by translate5 and is no longer editable for the assigned user.</target>
+            </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUgJXMgd3VyZGUgdm9uIHRyYW5zbGF0ZTUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3NlbiB1bmQgaXN0IG5pY2h0IG1laHIgYmVhcmJlaXRiYXIuIEJlaSBGcmFnZW4gd2VuZGVuIFNpZSBzaWNoIGJpdHRlIGFuIElociBQcm9qZWt0bWFuYWdlbWVudC1UZWFtLg=='>
+                <source>Die Aufgabe %s wurde von translate5 automatisch abgeschlossen und ist nicht mehr bearbeitbar. Bei Fragen wenden Sie sich bitte an Ihr Projektmanagement-Team.</source>
+                <target>The task %s has been auto-closed by translate5 and is no longer editable. Please contact you project management team for any questions.</target>
+            </trans-unit>
             <trans-unit id='U3ByYWNow7xiZXJncmVpZmVuZGUgU3luY2hyb25pc2llcnVuZyB2b24gUmVzc291cmNlbg=='>
                 <source>Sprachübergreifende Synchronisierung von Ressourcen</source>
                 <target>Cross Language Resource synchronisation</target>
@@ -10045,6 +10077,26 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='SFRNTC3DnGJlcnNpY2h0IGhlcnVudGVybGFkZW4='>
                 <source>HTML-Übersicht herunterladen</source>
                 <target>Download HTML overview</target>
+            </trans-unit>
+            <trans-unit id='V29ya2Zsb3dzY2hyaXR0LVR5cA=='>
+                <source>Workflowschritt-Typ</source>
+                <target>Workflow step type</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVydCBhbGxlIEF1ZmdhYmVuLCBkZW5lbiBlaW4gSm9iIG1pdCBlaW5lbSBXb3JrZmxvdy1TY2hyaXR0IGRlcyBnZXfDpGhsdGVuIFR5cHMgenVnZXdpZXNlbiBpc3Q='>
+                <source>Filtert alle Aufgaben, denen ein Job mit einem Workflow-Schritt des gewählten Typs zugewiesen ist</source>
+                <target>Filters all tasks that have a job assigned with a workflow step that is of the selected type</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVydCBhbGxlIEF1ZmdhYmVuLCBkZW5lbiBlaW4gSm9iIG1pdCBkZW0gZ2V3w6RobHRlbiBXb3JrZmxvdy1TY2hyaXR0IHp1Z2V3aWVzZW4gaXN0'>
+                <source>Filtert alle Aufgaben, denen ein Job mit dem gewählten Workflow-Schritt zugewiesen ist</source>
+                <target>Filters all tasks that have a job assigned with a workflow step that is selected</target>
+            </trans-unit>
+            <trans-unit id='RmluYWxlcyBMZWt0b3JhdA=='>
+                <source>Finales Lektorat</source>
+                <target>Final Review</target>
+            </trans-unit>
+            <trans-unit id='TnVyIGxlc2Vu'>
+                <source>Nur lesen</source>
+                <target>Read only</target>
             </trans-unit>
             <trans-unit id='Y3Jvc3NMYW5ndWFnZVJlc291cmNlU3luY2hyb25pemF0aW9uLmVtcHR5VGFibGVUZXh0'>
                 <source>crossLanguageResourceSynchronization.emptyTableText</source>

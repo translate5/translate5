@@ -663,7 +663,7 @@ class Models_Installer_Standalone
             $content[] = 'phpSettings.date.timezone = "' . $additionalParameters['timezone'] . '"';
         }
         $content[] = '';
-        $content[] = 'resources.mail.defaultFrom.email = support@translate5.net';
+        $content[] = 'resources.mail.defaultFrom.email = noreply@translate5.net';
         $content[] = 'runtimeOptions.sendMailDisabled = 1';
 
         $bytes = file_put_contents($this->currentWorkingDir . self::INSTALL_INI, join("\n", $content));
@@ -844,7 +844,7 @@ class Models_Installer_Standalone
             $this->log("For informations how to set up openTMSTermTagger or enable the application to send E-Mails, see http://confluence.translate5.net.\n\n");
         }
         $this->log('  In case of errors on installation / update please visit http://confluence.translate5.net');
-        $this->log('  or write an email to support@translate5.net');
+        $this->log('  or write an email to noreply@translate5.net');
     }
 
     protected function log($msg): void

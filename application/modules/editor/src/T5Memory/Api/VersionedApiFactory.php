@@ -38,7 +38,7 @@ use Psr\Http\Client\ClientInterface;
 class VersionedApiFactory
 {
     public function __construct(
-        private ClientInterface $client,
+        private readonly ClientInterface $client
     ) {
     }
 

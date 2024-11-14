@@ -5002,21 +5002,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/LanguageResources/Remover.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property editor_Models_LanguageResources_Resource\\:\\:\\$defaultColor\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/LanguageResources/Resource.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property editor_Models_LanguageResources_Resource\\:\\:\\$id\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/LanguageResources/Resource.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property editor_Models_LanguageResources_Resource\\:\\:\\$serviceType\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/LanguageResources/Resource.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Dead catch \\- Exception is never thrown in the try block\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/LanguageResources/SdlResources.php',
@@ -7580,16 +7565,6 @@ $ignoreErrors[] = [
 	'message' => '#^Static property editor_Plugins_GroupShare_Resource\\:\\:\\$noConnection \\(string\\) does not accept true\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/GroupShare/Init.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property editor_Plugins_GroupShare_Resource\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/GroupShare/Resource.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Static property editor_Plugins_GroupShare_Resource\\:\\:\\$noConnection \\(string\\) does not accept default value of type false\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/GroupShare/Resource.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$runtimeOptions\\.$#',
@@ -12475,11 +12450,6 @@ $ignoreErrors[] = [
 	'message' => '#^Static property editor_Plugins_GroupShare_Resource\\:\\:\\$noConnection \\(string\\) does not accept true\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/GroupShare/Init.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property editor_Plugins_GroupShare_Resource\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/GroupShare/Resource.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Static property editor_Plugins_GroupShare_Resource\\:\\:\\$noConnection \\(string\\) does not accept default value of type false\\.$#',

@@ -33,7 +33,7 @@ use MittagQI\Translate5\Test\Api\Helper;
 /**
  * Abstract base for task-operations
  */
-abstract class Operation extends Resource
+abstract class Operation extends AbstractResource
 {
     protected int $_taskId;
 

@@ -36,6 +36,7 @@
     "sourceLanguage": "Source language",
     "targetLanguage": "Target language",
     "clients": "Clients",
+    "taskTm": "Task TM",
     "select": "Select",
     "close": "Close",
     "emptyText" : "No records available"
@@ -73,7 +74,7 @@
     "totalAmount": "Total found segments: ",
     "calculating": "calculating...",
     "loadingSegmentPlaceholder": "Loading...",
-    "loadingSegmentNumber": "loading segment #",
+    "loadingSegmentNumber": "Loading segment #",
     "saving": "Saving. Please wait a while.",
     "columns": {
       "sourceText": "Source text",

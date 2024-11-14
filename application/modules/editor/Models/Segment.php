@@ -1227,12 +1227,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns the first and the last EDITABLE segment of the actual filtered request
-     * @param array $autoStateIds a list of autoStates where the prev/next page segments are additionaly compared to
+     * @param string $workflowStep where the prev/next page segments are additionally compared to
      * @return array
      */
-    public function findSurroundingEditables($next, array $autoStateIds = null)
+    public function findSurroundingEditables($next, string $workflowStep = '')
     {
-        return $this->initSegmentFinder()->find($next, $autoStateIds);
+        return $this->initSegmentFinder()->find($next, $workflowStep);
     }
 
     /**

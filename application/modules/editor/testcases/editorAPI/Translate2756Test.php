@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 use MittagQI\Translate5\Test\JsonTestAbstract;
@@ -45,7 +46,7 @@ class Translate2756Test extends JsonTestAbstract
         'editor_Plugins_ZDemoMT_Init',
     ];
 
-    protected static string $setupUserLogin = 'testlector';
+    protected static TestUser $setupUserLogin = TestUser::TestLector;
 
     private static LanguageResource $dummyTm;
 
@@ -111,7 +112,7 @@ class Translate2756Test extends JsonTestAbstract
      */
     public function test30_AnalysisResult()
     {
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         $jsonFileName = 'expectedAnalysis.json';
         $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
             'taskGuid' => static::api()->getTask()->taskGuid,

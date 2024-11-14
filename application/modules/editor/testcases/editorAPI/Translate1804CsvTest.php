@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
+
 require_once 'Translate1804Test.php';
 
 /**
@@ -44,7 +46,7 @@ class Translate1804CsvTest extends Translate1804Test
      */
     public function testExport()
     {
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
         $task = static::api()->getTask();
         //start task export
 

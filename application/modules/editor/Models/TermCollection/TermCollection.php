@@ -33,18 +33,21 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function importTbx(array $filePath, array $params): ?bool
     {
-        $import = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
-        /* @var $import editor_Models_Import_TermListParser_Tbx */
-        $import->mergeTerms = $params['mergeTerms'] ?? false;
-        //import source (filesystem or crossApi)
-        $import->importSource = $params['importSource'] ?? "";
-        if (is_string($params['customerIds'])) {
-            $params['customerIds'] = explode(',', $params['customerIds']);
+        $connector = ZfExtended_Factory::get('editor_Services_TermCollection_Connector');
+        $this->load($params['collectionId']);
+        $connector->setLanguageResource($this);
+        $params['userGuid'] = $this->getUserGuid($params);
+        $success = true;
+        foreach ($filePath as $path) {
+            $success = $connector->addTm([
+                'name' => $name = pathinfo($path, PATHINFO_BASENAME),
+                'full_path' => $name,
+                'type' => mime_content_type($path),
+                'tmp_name' => $path,
+            ], $params) && $success;
         }
-        $import->customerIds = $params['customerIds'];
-        $import->loadUser($this->getUserGuid($params));
 
-        return $import->parseTbxFile($filePath, $params['collectionId']);
+        return $success;
     }
 
     private function getUserGuid(array $params): string

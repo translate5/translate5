@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Integration\FileBasedInterface;
+use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 
 /**
@@ -144,11 +145,8 @@ class editor_Models_Segment_Updater
         }
         // TODO TRANSLATE-3579 Delete this branch of logic and config above
         else {
-            /* @var $segment editor_Models_Segment */
-            $manager = ZfExtended_Factory::get('editor_Services_Manager');
-            /* @var $manager editor_Services_Manager */
             if (editor_Models_Segment_MatchRateType::isUpdatable($this->segment->getMatchRateType())) {
-                $manager->updateSegment($this->segment);
+                UpdateSegmentOperation::create()->updateSegment($this->segment);
             }
         }
 

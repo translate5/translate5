@@ -36,6 +36,7 @@
     "sourceLanguage": "Quellsprache",
     "targetLanguage": "Zielsprache",
     "clients": "Kunden",
+    "taskTm": "Aufgaben-TM",
     "select": "Auswählen",
     "close": "Schließen",
     "emptyText" : "Keine Datensätze verfügbar"
@@ -73,7 +74,7 @@
     "totalAmount": "Gesamtzahl der gefundenen Segmente: ",
     "calculating": "Wird berechnet...",
     "loadingSegmentPlaceholder": "Laden...",
-    "loadingSegmentNumber": "ladesegment #",
+    "loadingSegmentNumber": "Ladesegment #",
     "saving": "Speichert, bitte warten.",
     "columns": {
       "sourceText": "Quelle",

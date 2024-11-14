@@ -340,6 +340,16 @@ abstract class editor_Services_Connector_Abstract
     }
 
     /***
+     * Set the connector language resource
+     *
+     * @return editor_Models_LanguageResources_LanguageResource
+     */
+    public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageResource)
+    {
+        return $this->languageResource = $languageResource;
+    }
+
+    /***
      * Get the connector service resource
      * @return editor_Models_LanguageResources_Resource
      */
@@ -449,15 +459,6 @@ abstract class editor_Services_Connector_Abstract
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
      */
     public function open()
-    {
-        //to be implemented if needed
-        $this->log(__METHOD__);
-    }
-
-    /**
-     * Closes the connected TM on the configured Resource (on task close, not after each request)
-     */
-    public function close()
     {
         //to be implemented if needed
         $this->log(__METHOD__);
