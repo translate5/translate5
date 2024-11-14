@@ -129,6 +129,7 @@ class Editor_UserController extends ZfExtended_RestController
     {
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
 
+        // our routing can't process url like /user/combo/coordinators as additional action
         if ($this->hasParam('combo')) {
             $dataProvider = UserComboDataProvider::create();
 

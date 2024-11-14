@@ -119,11 +119,14 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                                             { name: 'Editor', value: 1 },
                                             { name: 'LSP', value: 2 },
                                         ]
+                                    },
+                                    listeners: {
+                                        change: (fld, newValue) => newValue === 1 ? me.loadUsers() : me.loadCoordinators()
                                     }
                                 },
                                 {
                                     anchor: '100%',
-                                    xtype: 'combo',
+                                    xtype: 'Editor.combobox',
                                     allowBlank: false,
                                     editable: false,
                                     forceSelection: true,
@@ -137,13 +140,13 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                                 },
                                 {
                                     anchor: '100%',
-                                    xtype: 'combo',
+                                    xtype: 'Editor.combobox',
                                     allowBlank: false,
                                     listConfig: {
                                         loadMask: false
                                     },
                                     store: {
-                                        xtype: 'store',
+                                        fields: ['userGuid', 'longUserName'],
                                         data: [] // Initially empty, will be set dynamically
                                     },
                                     forceSelection: true,
@@ -248,15 +251,17 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
      */
     loadUsers: function () {
         const combo = this.down('combo[name=userGuid]');
-        const store = combo.getStore();
 
         Ext.Ajax.request({
             url: Editor.data.restpath + 'user/combo/all',
             method: 'GET',
-            success: response => {
+            success: function (response) {
                 const data = Ext.decode(response.responseText);
 
-                store.loadData(data.rows)
+                combo.setStore({
+                    fields: ['userGuid', 'longUserName'],
+                    data: data.rows
+                })
             },
             failure: function (response) {
                 Editor.app.getController('ServerException').handleException(response);
@@ -267,15 +272,17 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
 
     loadCoordinators: function () {
         const combo = this.down('combo[name=userGuid]');
-        const store = combo.getStore();
 
         Ext.Ajax.request({
             url: Editor.data.restpath + 'user/combo/coordinators',
             method: 'GET',
-            success: response => {
+            success: function (response) {
                 const data = Ext.decode(response.responseText);
 
-                store.loadData(data.rows)
+                combo.setStore({
+                    fields: ['userGuid', 'longUserName'],
+                    data: data.rows
+                })
             },
             failure: function (response) {
                 Editor.app.getController('ServerException').handleException(response);

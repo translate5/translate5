@@ -265,7 +265,7 @@ class LspJobRepository
                 'lsp.Id = lspJob.lspId',
                 []
             )
-            ->where('lsp.parentId = ?', $lspJob->getId())
+            ->where('lsp.parentId = ?', $lspJob->getLspId())
         ;
 
         foreach ($this->db->fetchAll($select) as $jobData) {

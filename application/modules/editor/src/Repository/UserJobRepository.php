@@ -116,8 +116,8 @@ class UserJobRepository
                 'job.taskGuid = task.taskGuid',
                 []
             )
-            ->where('job.type != ?', TypeEnum::Lsp->value)
             ->where('job.userGuid = ?', $userGuid)
+            ->where('job.type != ?', TypeEnum::Lsp->value)
             ->where('task.customerId = ?', $customerId)
         ;
 
