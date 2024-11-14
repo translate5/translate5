@@ -252,6 +252,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ],
         ));
 
+        $this->front->getRouter()->addRoute('editorTaskUserJobCoordinators', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:taskId/job/:id/coordinators',
+            [
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => 'coordinators',
+            ]
+        ));
+
         $this->front->getRouter()->addRoute('editorFiletreeRootRoute', new ZfExtended_Controller_RestLikeRoute(
             'editor/filetree/root',
             [

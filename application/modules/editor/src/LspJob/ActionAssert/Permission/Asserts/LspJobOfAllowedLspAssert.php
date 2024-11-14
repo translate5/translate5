@@ -38,6 +38,8 @@ use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LspJob\ActionAssert\Permission\Exception\NoAccessToLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 
 /**
@@ -47,6 +49,7 @@ class LspJobOfAllowedLspAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly ActionPermissionAssertInterface $lspActionPermissionAssert,
+        private readonly LspRepositoryInterface $lspRepository,
     ) {
     }
 
@@ -57,6 +60,7 @@ class LspJobOfAllowedLspAssert implements PermissionAssertInterface
     {
         return new self(
             LspActionPermissionAssert::create(),
+            LspRepository::create(),
         );
     }
 
@@ -68,9 +72,10 @@ class LspJobOfAllowedLspAssert implements PermissionAssertInterface
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $lspAction = UserJobAction::Read === $action ? LspAction::Read : LspAction::Update;
+        $lsp = $this->lspRepository->get((int) $object->getLspId());
 
         try {
-            $this->lspActionPermissionAssert->assertGranted($lspAction, $object, $context);
+            $this->lspActionPermissionAssert->assertGranted($lspAction, $lsp, $context);
         } catch (PermissionExceptionInterface) {
             throw new NoAccessToLspJobException((int) $object->getId());
         }

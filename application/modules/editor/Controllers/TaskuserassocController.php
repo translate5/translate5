@@ -27,12 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
 use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\LspJob\Operation\WithAuthentication\CreateLspJobAssignmentOperation;
 use MittagQI\Translate5\LspJob\Operation\WithAuthentication\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -43,6 +46,8 @@ use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobInUseException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobWhichTaskIsLockedByUserException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\UserHasAlreadyOpenedTheTaskForEditingException;
+use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
+use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
@@ -89,6 +94,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     private UserJobViewDataProvider $viewDataProvider;
 
+    private UserJobActionPermissionAssert $permissionAssert;
+
     private UserJobRepository $userJobRepository;
 
     public function init()
@@ -97,6 +104,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->userRepository = new UserRepository();
         $this->taskRepository = new TaskRepository();
         $this->userJobRepository = UserJobRepository::create();
+        $this->permissionAssert = UserJobActionPermissionAssert::create();
 
         $this->viewDataProvider = UserJobViewDataProvider::create();
 
@@ -170,6 +178,45 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->view->total = count($rows);
     }
 
+    public function coordinatorsAction()
+    {
+        try {
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
+
+            $this->assertJobBelongsToTask($job);
+
+            $this->permissionAssert->assertGranted(
+                UserJobAction::Update,
+                $job,
+                new PermissionAssertContext($authUser)
+            );
+
+            if (! $job->isLspJob()) {
+                throw new ZfExtended_BadMethodCallException('Only LSP jobs can have coordinators');
+            }
+
+            $lspRepository = LspRepository::create();
+            $lspJobRepository = LspJobRepository::create();
+            $jobCoordinatorRepository = JobCoordinatorRepository::create();
+
+            $lspJob = $lspJobRepository->get((int) $job->getLspJobId());
+            $coordinators = $jobCoordinatorRepository->getByLSP($lspRepository->get((int) $lspJob->getLspId()));
+
+            $rows = [];
+            foreach ($coordinators as $coordinator) {
+                $rows = [
+                    'userGuid' => $coordinator->user->getUserGuid(),
+                    'longUserName' => $coordinator->user->getUsernameLong(),
+                ];
+            }
+
+            $this->view->rows = (object) $rows;
+        } catch (Throwable $e) {
+            throw $this->transformException($e);
+        }
+    }
+
     public function putAction()
     {
         /** @deprecated App logic should not tolerate requests without task in scope */
@@ -183,11 +230,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
             $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
-            $task = $this->taskRepository->getByGuid($job->getTaskGuid());
 
-            if ((int) $task->getId() !== (int) $this->getRequest()->getParam('taskId')) {
-                throw new ZfExtended_NotFoundException('Job not found');
-            }
+            $this->assertJobBelongsToTask($job);
 
             $this->processClientReferenceVersion($job);
 
@@ -240,11 +284,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
         try {
             $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
-            $task = $this->taskRepository->getByGuid($job->getTaskGuid());
 
-            if ((int) $task->getId() !== (int) $this->getRequest()->getParam('taskId')) {
-                throw new ZfExtended_NotFoundException('Job not found');
-            }
+            $this->assertJobBelongsToTask($job);
 
             $this->processClientReferenceVersion($job);
 
@@ -418,11 +459,26 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 'E1012',
                 [
                     'id' => [
-                        'LSP-Auftrag hat einen zugehörigen LSP-Benutzerjob, der nicht gelöscht werden kann.',
+                        'LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.',
                     ],
                 ],
             ),
             default => $e,
         };
+    }
+
+    /**
+     * @throws InexistentTaskException
+     * @throws ZfExtended_NotFoundException
+     */
+    public function assertJobBelongsToTask(editor_Models_TaskUserAssoc $job): void
+    {
+        if ($this->hasParam('taskId')) {
+            $task = $this->taskRepository->getByGuid($job->getTaskGuid());
+
+            if ((int)$task->getId() !== (int)$this->getRequest()->getParam('taskId')) {
+                throw new ZfExtended_NotFoundException('Job not found');
+            }
+        }
     }
 }

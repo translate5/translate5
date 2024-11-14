@@ -189,7 +189,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         userAssocForm.show();
         userAssocForm.setDisabled(false);
         me.filterStepsCombo(newRec);
-        userAssoc.loadRecord(newRec);
+        userAssoc.loadRecord(newRec, task);
         me.initState(null, step, '');
     },
 
@@ -218,7 +218,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             return;
         }
 
-        me.getUserAssoc().loadRecord(selection[0]);
+        me.getUserAssoc().loadRecord(selection[0], me.getPrefWindow().getCurrentTask());
 
         me.getUserAssoc().fireEvent('editassoc', selection[0], formPanel);
     },
@@ -246,7 +246,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
 
                     //reload only the task, not the whole task prefs, should be OK
                     task.load({
-                        callback:function (){
+                        callback: function () {
                             Editor.MessageBox.addByOperation(op); //does nothing since content is not provided from server :(
                             Editor.MessageBox.addSuccess(me.messages.assocDeleted);
                             userAssocPanel.setLoading(false);
@@ -256,6 +256,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                 failure: function () {
                     me.application.getController('admin.TaskPreferences').handleReload();
                     userAssocPanel.setLoading(false);
+                    me.getUserAssocGrid().store.reload();
                 }
             });
         });

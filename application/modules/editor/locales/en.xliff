@@ -10295,9 +10295,9 @@ Synchronization always takes place in one direction: source data -> target
                 <source>userJob.delete.confirmDeleteLspJob</source>
                 <target>Should this entry really be deleted? This entry is an LSP job and by deleting it all sub LSP jobs as well as related LSP user jobs will be deleted.</target>
             </trans-unit>
-            <trans-unit id="TFNQLUF1ZnRyYWcgaGF0IGVpbmVuIHp1Z2Vow7ZyaWdlbiBMU1AtQmVudXR6ZXJqb2IsIGRlciBuaWNodCBnZWzDtnNjaHQgd2VyZGVuIGthbm4u">
-                <source>LSP job has an associated LSP user job that cannot be deleted.</source>
-                <target>LSP-Auftrag hat einen zugehörigen LSP-Benutzerjob, der nicht gelöscht werden kann.</target>
+            <trans-unit id="TFNQLUF1ZnRyYWcgaGF0IHZlcndhbmR0ZSBBdWZ0csOkZ2UsIGRpZSBuaWNodCBnZWzDtnNjaHQgd2VyZGVuIGvDtm5uZW4u">
+                <source>LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.</source>
+                <target>LSP job has related jobs that cannot be deleted.</target>
             </trans-unit>
         </body>
     </file>

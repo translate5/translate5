@@ -10117,9 +10117,9 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>userJob.delete.confirmDeleteLspJob</source>
                 <target>Soll dieser Eintrag wirklich gelöscht werden? Bei diesem Eintrag handelt es sich um einen LSP-Auftrag, und durch das Löschen dieses Eintrags werden alle untergeordneten LSP-Aufträge sowie die damit verbundenen LSP-Benutzeraufträge gelöscht.</target>
             </trans-unit>
-            <trans-unit id="TFNQLUF1ZnRyYWcgaGF0IGVpbmVuIHp1Z2Vow7ZyaWdlbiBMU1AtQmVudXR6ZXJqb2IsIGRlciBuaWNodCBnZWzDtnNjaHQgd2VyZGVuIGthbm4u">
-                <source>LSP-Auftrag hat einen zugehörigen LSP-Benutzerjob, der nicht gelöscht werden kann.</source>
-                <target>LSP-Auftrag hat einen zugehörigen LSP-Benutzerjob, der nicht gelöscht werden kann.</target>
+            <trans-unit id="TFNQLUF1ZnRyYWcgaGF0IHZlcndhbmR0ZSBBdWZ0csOkZ2UsIGRpZSBuaWNodCBnZWzDtnNjaHQgd2VyZGVuIGvDtm5uZW4u">
+                <source>LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.</source>
+                <target>LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.</target>
             </trans-unit>
         </body>
     </file>

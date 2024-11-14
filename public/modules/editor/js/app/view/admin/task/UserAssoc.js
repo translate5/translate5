@@ -250,7 +250,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
      * loads all or all available users into the dropdown, the store is reused to get the username to userguids
      */
     loadUsers: function () {
-        const combo = this.down('combo[name=userGuid]');
+        const combo = this.down('combo[name=userGuid]'),
+            record = this.down('form').getRecord();
 
         Ext.Ajax.request({
             url: Editor.data.restpath + 'user/combo/all',
@@ -262,19 +263,24 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                     fields: ['userGuid', 'longUserName'],
                     data: data.rows
                 })
+
+                if (record && record.get('userGuid')) {
+                    const userGuid = record.get('userGuid');
+                    combo.setValue(userGuid);
+                }
             },
             failure: function (response) {
                 Editor.app.getController('ServerException').handleException(response);
-                me.hideLoadingMask();
             }
         });
     },
 
-    loadCoordinators: function () {
-        const combo = this.down('combo[name=userGuid]');
+    loadCoordinators: function (taskId = null, jobId = null) {
+        const combo = this.down('combo[name=userGuid]'),
+            record = this.down('form').getRecord();
 
         Ext.Ajax.request({
-            url: Editor.data.restpath + 'user/combo/coordinators',
+            url: Editor.data.restpath + (taskId && jobId ? `task/${taskId}/job/${jobId}/coordinators` : 'user/combo/coordinators'),
             method: 'GET',
             success: function (response) {
                 const data = Ext.decode(response.responseText);
@@ -283,37 +289,44 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                     fields: ['userGuid', 'longUserName'],
                     data: data.rows
                 })
+
+                if (record && record.get('userGuid')) {
+                    const userGuid = record.get('userGuid');
+                    combo.setValue(userGuid);
+                }
             },
             failure: function (response) {
                 Editor.app.getController('ServerException').handleException(response);
-                me.hideLoadingMask();
             }
         });
     },
     /**
      * loads the given record into the userAssoc form
      * @param {Editor.data.model.admin.TaskUserAssoc} rec
+     * @param {Editor.data.model.admin.Task} task
      */
-    loadRecord: function (rec) {
+    loadRecord: function (rec, task) {
         const me = this,
             edit = !rec.phantom,
             form = me.down('form'),
             userCombo = me.down('combo[name="userGuid"]'),
             typeCombo = form.down('combo[name="type"]'),
-            workflowStepCombo = form.down('combo[name="workflowStepName"]')
+            workflowStepCombo = form.down('combo[name="workflowStepName"]'),
+            segmentrange = form.down('textfield[name="segmentrange"]')
         ;
 
         form.loadRecord(rec);
 
         if (edit) {
             form.setTitle(Ext.String.format(me.strings.formTitleEdit, rec.get('longUserName')));
+
+            rec.get('isLspJob') ? me.loadCoordinators(task.get('id'), rec.get('id')) : me.loadUsers();
         } else {
             form.setTitle(me.strings.formTitleAdd);
+            me.loadUsers();
         }
 
-        if (! edit || rec.get('isLspJob')) {
-            rec.get('isLspJob') ? me.loadCoordinators() : me.loadUsers();
-        }
+        segmentrange.setDisabled(edit && rec.get('isLspJob'));
 
         userCombo.setVisible(! edit || rec.get('isLspJob'));
         userCombo.setDisabled(edit && ! rec.get('isLspJob'));

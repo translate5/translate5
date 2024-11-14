@@ -38,7 +38,6 @@ use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspRepository;
@@ -64,7 +63,6 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
         private readonly TaskRepository $taskRepository,
-        private readonly LspRepositoryInterface $lspRepository,
         private readonly LspJobRepository $lspJobRepository,
         private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly UserJobActionFeasibilityAssert $feasibilityAssert,
@@ -83,7 +81,6 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         return new self(
             UserJobRepository::create(),
             new TaskRepository(),
-            LspRepository::create(),
             LspJobRepository::create(),
             LspUserRepository::create(),
             UserJobActionFeasibilityAssert::create(),
@@ -114,7 +111,7 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
             $job->setLspJobId($lspJob->getId());
         }
 
-        if (null !== $dto->segmentRange) {
+        if (null !== $dto->segmentRange && ! $job->isLspJob()) {
             $job->setSegmentrange($dto->segmentRange);
         }
 
