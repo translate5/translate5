@@ -30,11 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
@@ -60,7 +60,7 @@ use MittagQI\Translate5\User\Model\User;
  *     customers: C[]
  * }
  */
-class ViewDataProvider
+class LspViewDataProvider
 {
     public function __construct(
         private readonly LspRepositoryInterface $lspRepository,
@@ -114,9 +114,9 @@ class ViewDataProvider
      */
     public function buildViewData(User $viewer, LanguageServiceProvider $lsp): array
     {
-        $this->lspPermissionAssert->assertGranted(Action::Read, $lsp, new PermissionAssertContext($viewer));
+        $this->lspPermissionAssert->assertGranted(LspAction::Read, $lsp, new PermissionAssertContext($viewer));
 
-        $coordinators = $this->jobCoordinatorRepository->getByLSP($lsp);
+        $coordinators = $this->jobCoordinatorRepository->getByLsp($lsp);
         /**
          * @var array<array{guid: string, name: string}> $coordinatorData
          */
@@ -138,7 +138,7 @@ class ViewDataProvider
         foreach ($users as $user) {
             try {
                 $this->userActionPermissionAssert->assertGranted(
-                    Action::Read,
+                    LspAction::Read,
                     $user,
                     new PermissionAssertContext($viewer)
                 );
@@ -161,7 +161,7 @@ class ViewDataProvider
         foreach ($customers as $customer) {
             try {
                 $this->customerActionPermissionAssert->assertGranted(
-                    Action::Read,
+                    LspAction::Read,
                     $customer,
                     new PermissionAssertContext($viewer)
                 );
@@ -191,7 +191,7 @@ class ViewDataProvider
     private function userCanEditLsp(User $viewer, LanguageServiceProvider $lsp): bool
     {
         try {
-            $this->lspPermissionAssert->assertGranted(Action::Update, $lsp, new PermissionAssertContext($viewer));
+            $this->lspPermissionAssert->assertGranted(LspAction::Update, $lsp, new PermissionAssertContext($viewer));
 
             return true;
         } catch (PermissionExceptionInterface) {
@@ -202,7 +202,7 @@ class ViewDataProvider
     private function userCanDeleteLsp(User $viewer, LanguageServiceProvider $lsp): bool
     {
         try {
-            $this->lspPermissionAssert->assertGranted(Action::Delete, $lsp, new PermissionAssertContext($viewer));
+            $this->lspPermissionAssert->assertGranted(LspAction::Delete, $lsp, new PermissionAssertContext($viewer));
 
             return true;
         } catch (PermissionExceptionInterface) {

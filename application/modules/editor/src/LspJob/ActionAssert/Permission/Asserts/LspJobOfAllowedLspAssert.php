@@ -71,11 +71,10 @@ class LspJobOfAllowedLspAssert implements PermissionAssertInterface
 
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $lspAction = UserJobAction::Read === $action ? LspAction::Read : LspAction::Update;
         $lsp = $this->lspRepository->get((int) $object->getLspId());
 
         try {
-            $this->lspActionPermissionAssert->assertGranted($lspAction, $lsp, $context);
+            $this->lspActionPermissionAssert->assertGranted(LspAction::Read, $lsp, $context);
         } catch (PermissionExceptionInterface) {
             throw new NoAccessToLspJobException((int) $object->getId());
         }

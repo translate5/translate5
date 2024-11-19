@@ -107,7 +107,10 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         $job->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
         $job->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
         $job->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
-        $job->setLspJobId($lspJob?->getId());
+
+        if (null !== $lspJob) {
+            $job->setLspJobId($lspJob->getId());
+        }
 
         if (null !== $dto->segmentRange) {
             $job->setSegmentrange($dto->segmentRange);

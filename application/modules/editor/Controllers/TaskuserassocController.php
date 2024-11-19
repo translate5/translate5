@@ -29,23 +29,26 @@ END LICENSE AND COPYRIGHT
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
+use MittagQI\Translate5\LspJob\DataProvider\CoordinatorProvider;
+use MittagQI\Translate5\LspJob\DataProvider\UserProvider;
 use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\LspJob\Operation\WithAuthentication\CreateLspJobAssignmentOperation;
 use MittagQI\Translate5\LspJob\Operation\WithAuthentication\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobInUseException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobWhichTaskIsLockedByUserException;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\Exception\UserHasAlreadyOpenedTheTaskForEditingException;
+use MittagQI\Translate5\UserJob\ActionAssert\Permission\Exception\ActionNotAllowedException;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
@@ -92,11 +95,19 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     private TaskRepository $taskRepository;
 
+    private UserJobRepository $userJobRepository;
+
+    private LspJobRepository $lspJobRepository;
+
     private UserJobViewDataProvider $viewDataProvider;
 
     private UserJobActionPermissionAssert $permissionAssert;
 
-    private UserJobRepository $userJobRepository;
+    private CoordinatorProvider $coordinatorProvider;
+
+    private UserProvider $userProvider;
+
+    private TaskActionPermissionAssert $taskActionPermissionAssert;
 
     public function init()
     {
@@ -104,9 +115,13 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->userRepository = new UserRepository();
         $this->taskRepository = new TaskRepository();
         $this->userJobRepository = UserJobRepository::create();
+        $this->lspJobRepository = LspJobRepository::create();
         $this->permissionAssert = UserJobActionPermissionAssert::create();
+        $this->taskActionPermissionAssert = TaskActionPermissionAssert::create();
 
         $this->viewDataProvider = UserJobViewDataProvider::create();
+        $this->coordinatorProvider = CoordinatorProvider::create();
+        $this->userProvider = UserProvider::create();
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E1012' => 'Multi Purpose Code logging in the context of jobs (task user association)',
@@ -178,7 +193,45 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->view->total = count($rows);
     }
 
-    public function coordinatorsAction()
+    public function usersfornewjobAction()
+    {
+        try {
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+            $task = $this->taskRepository->get((int) $this->getRequest()->getParam('taskId'));
+
+            $this->taskActionPermissionAssert->assertGranted(
+                TaskAction::Read,
+                $task,
+                new PermissionAssertContext($authUser)
+            );
+
+            // @phpstan-ignore-next-line
+            $this->view->rows = $this->userProvider->getPossibleUsersForNewJobInTask($task, $authUser);
+        } catch (Throwable $e) {
+            throw $this->transformException($e);
+        }
+    }
+
+    public function jobcoordinatorsfornewjobAction()
+    {
+        try {
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+            $task = $this->taskRepository->get((int) $this->getRequest()->getParam('taskId'));
+
+            $this->taskActionPermissionAssert->assertGranted(
+                TaskAction::Read,
+                $task,
+                new PermissionAssertContext($authUser)
+            );
+
+            // @phpstan-ignore-next-line
+            $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForNewJobInTask($task, $authUser);
+        } catch (Throwable $e) {
+            throw $this->transformException($e);
+        }
+    }
+
+    public function coordinatorsforupdateAction()
     {
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
@@ -196,22 +249,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 throw new ZfExtended_BadMethodCallException('Only LSP jobs can have coordinators');
             }
 
-            $lspRepository = LspRepository::create();
-            $lspJobRepository = LspJobRepository::create();
-            $jobCoordinatorRepository = JobCoordinatorRepository::create();
+            $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
 
-            $lspJob = $lspJobRepository->get((int) $job->getLspJobId());
-            $coordinators = $jobCoordinatorRepository->getByLSP($lspRepository->get((int) $lspJob->getLspId()));
-
-            $rows = [];
-            foreach ($coordinators as $coordinator) {
-                $rows = [
-                    'userGuid' => $coordinator->user->getUserGuid(),
-                    'longUserName' => $coordinator->user->getUsernameLong(),
-                ];
-            }
-
-            $this->view->rows = (object) $rows;
+            // @phpstan-ignore-next-line
+            $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForLspJobUpdate($lspJob, $authUser);
         } catch (Throwable $e) {
             throw $this->transformException($e);
         }
@@ -463,6 +504,19 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                     ],
                 ],
             ),
+            ActionNotAllowedException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'deadlineDate' => [
+                        $invalidValueProvidedMessage,
+                    ],
+                ],
+                [
+                    'exception' => ActionNotAllowedException::class,
+                    'action' => $e->jobAction->value,
+                    'job' => $e->userJob->getId(),
+                ]
+            ),
             default => $e,
         };
     }
@@ -476,7 +530,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if ($this->hasParam('taskId')) {
             $task = $this->taskRepository->getByGuid($job->getTaskGuid());
 
-            if ((int)$task->getId() !== (int)$this->getRequest()->getParam('taskId')) {
+            if ((int) $task->getId() !== (int) $this->getRequest()->getParam('taskId')) {
                 throw new ZfExtended_NotFoundException('Job not found');
             }
         }

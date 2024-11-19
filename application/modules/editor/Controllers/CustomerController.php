@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\CustomerService;
 use MittagQI\Translate5\Test\Enums\TestUser;
@@ -86,7 +86,7 @@ class Editor_CustomerController extends ZfExtended_RestController
             );
 
             try {
-                $this->permissionAssert->assertGranted(Action::Read, $customerModel, $context);
+                $this->permissionAssert->assertGranted(CustomerAction::Read, $customerModel, $context);
             } catch (PermissionExceptionInterface) {
                 unset($rows[$key]);
 

@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\UserJob\Operation\WithAuthentication;
 
 use editor_Models_TaskUserAssoc as UserJob;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
@@ -42,6 +41,7 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
@@ -94,7 +94,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         $user = $this->userRepository->getByGuid($dto->userGuid);
 
         $this->taskPermissionAssert->assertGranted(TaskAction::AssignJob, $task, $context);
-        $this->userPermissionAssert->assertGranted(Action::Read, $user, $context);
+        $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
 
         $coordinator = $this->coordinatorRepository->findByUserGuid($this->authentication->getUserGuid());
 

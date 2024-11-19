@@ -34,7 +34,7 @@ use MittagQI\Translate5\LSP\Operations\Fabric\UpdateLspDtoFactory;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspCreateOperation;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspDeleteOperation;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspUpdateOperation;
-use MittagQI\Translate5\LSP\ViewDataProvider;
+use MittagQI\Translate5\LSP\LspViewDataProvider;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
@@ -52,12 +52,12 @@ class editor_LspController extends ZfExtended_RestController
 
     protected bool $decodePutAssociative = true;
 
-    private ViewDataProvider $viewDataProvider;
+    private LspViewDataProvider $viewDataProvider;
 
     public function init()
     {
         parent::init();
-        $this->viewDataProvider = ViewDataProvider::create();
+        $this->viewDataProvider = LspViewDataProvider::create();
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E2000' => 'Param "{0}" - is not given',

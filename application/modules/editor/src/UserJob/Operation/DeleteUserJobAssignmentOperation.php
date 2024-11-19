@@ -91,11 +91,13 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
     {
         $task = $this->taskRepository->getByGuid($job->getTaskGuid());
 
+        $jobData = $job->getSanitizedEntityForLog();
+
         $this->userJobRepository->delete($job);
 
         $this->logger->info('E1012', 'job deleted', [
             'task' => $task,
-            'tua' => $job->getSanitizedEntityForLog(),
+            'job' => $jobData,
         ]);
     }
 }

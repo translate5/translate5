@@ -33,15 +33,14 @@ namespace MittagQI\Translate5\UserJob;
 use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\Acl\Rights;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
+use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
 
@@ -70,7 +69,10 @@ use ZfExtended_Factory;
  * login: string,
  * firstName: string,
  * surName: string,
- * longUserName: string
+ * longUserName: string,
+ * isLspJob: bool,
+ * isLspUserJob: bool,
+ * staticAuthHash?: string,
  * }
  */
 class UserJobViewDataProvider
@@ -111,9 +113,7 @@ class UserJobViewDataProvider
         foreach ($jobs as $job) {
             $job = $this->getJob($job);
 
-            try {
-                $this->userJobPermissionAssert->assertGranted(Action::Read, $job, $context);
-            } catch (PermissionExceptionInterface) {
+            if (! $this->userJobPermissionAssert->isGranted(UserJobAction::Read, $job, $context)) {
                 continue;
             }
 
@@ -138,7 +138,7 @@ class UserJobViewDataProvider
 
     public function getListFor(Task $task, User $viewer): array
     {
-        $jobs = $this->userJobRepository->getTaskJobs($task, true);
+        $jobs = $this->userJobRepository->getTaskJobs($task->getTaskGuid(), true);
 
         return $this->buildViewForList($jobs, $viewer);
     }

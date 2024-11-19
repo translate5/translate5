@@ -34,8 +34,10 @@ use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LspJob\ActionAssert\Permission\LspJobActionPermissionAssert;
 use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\UserJob\ActionAssert\Permission\Exception\ActionNotAllowedException;
 use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 
 /**
@@ -45,6 +47,7 @@ class LspDataJobAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
+        private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly ActionPermissionAssertInterface $lspJobActionPermissionAssert,
     ) {
     }
@@ -56,13 +59,14 @@ class LspDataJobAssert implements PermissionAssertInterface
     {
         return new self(
             LspJobRepository::create(),
+            JobCoordinatorRepository::create(),
             LspJobActionPermissionAssert::create(),
         );
     }
 
     public function supports(\BackedEnum $action): bool
     {
-        return UserJobAction::Update === $action || UserJobAction::Delete === $action;
+        return true;
     }
 
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
@@ -74,5 +78,19 @@ class LspDataJobAssert implements PermissionAssertInterface
         $lspJob = $this->lspJobRepository->get((int) $object->getLspJobId());
 
         $this->lspJobActionPermissionAssert->assertGranted($action, $lspJob, $context);
+
+        if (! in_array($action, [UserJobAction::UpdateDeadline, UserJobAction::Delete], true)) {
+            return;
+        }
+
+        if (! $context->authUser->isCoordinator()) {
+            return;
+        }
+
+        $coordinator = $this->coordinatorRepository->getByUser($context->authUser);
+
+        if ((int) $coordinator->lsp->getId() === (int) $lspJob->getLspId()) {
+            throw new ActionNotAllowedException($action, $object);
+        }
     }
 }

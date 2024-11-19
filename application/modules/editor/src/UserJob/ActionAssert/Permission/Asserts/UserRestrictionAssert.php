@@ -32,13 +32,13 @@ namespace MittagQI\Translate5\UserJob\ActionAssert\Permission\Asserts;
 
 use BackedEnum;
 use editor_Models_TaskUserAssoc as UserJob;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\Exception\NoAccessToUserJobException;
 
 /**
@@ -73,7 +73,7 @@ class UserRestrictionAssert implements PermissionAssertInterface
         $user = $this->userRepository->getByGuid($object->getUserGuid());
 
         try {
-            $this->userPermissionAssert->assertGranted(Action::Read, $user, $context);
+            $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
         } catch (PermissionExceptionInterface) {
             throw new NoAccessToUserJobException($object);
         }

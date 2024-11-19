@@ -1520,7 +1520,9 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.admin.task.Preferences.prototype.editInfo = '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>';
 
     Editor.controller.admin.TaskPreferences.prototype.strings = {
+      taskWorkflowChangeConfirm: '<?= $this->translate->_('Bestätigen Sie die Änderung des Workflows') ?>',
       taskWorkflowSaved: '<?php echo $this->translate->_('Änderung des Workflows der Aufgabe gespeichert!');?>',
+      taskWorkflowChangeWarning: '<?= $this->translate->_('Eine Änderung des Aufgaben-Workflows führt zur Löschung aller Auftragszuweisungen. Möchten Sie fortfahren?'); ?>',
       entrySaved: '<?php echo $this->translate->_('Eintrag gespeichert');?>',
       entryDeleted: '<?php echo $this->translate->_('Eintrag gelöscht');?>',
       entrySaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',

@@ -60,6 +60,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
         disabled: '{!enablePanel}'
     },
     border: 0,
+    task: null,
     initConfig: function (instanceConfig) {
         var me = this, config;
 
@@ -251,10 +252,11 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
      */
     loadUsers: function () {
         const combo = this.down('combo[name=userGuid]'),
-            record = this.down('form').getRecord();
+            record = this.down('form').getRecord(),
+            taskId = this.task.get('id');
 
         Ext.Ajax.request({
-            url: Editor.data.restpath + 'user/combo/all',
+            url: Editor.data.restpath + `task/${taskId}/job/combo/users`,
             method: 'GET',
             success: function (response) {
                 const data = Ext.decode(response.responseText);
@@ -275,12 +277,15 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
         });
     },
 
-    loadCoordinators: function (taskId = null, jobId = null) {
+    loadCoordinators: function (jobId = null) {
         const combo = this.down('combo[name=userGuid]'),
-            record = this.down('form').getRecord();
+            record = this.down('form').getRecord(),
+            taskId = this.task.get('id');
 
         Ext.Ajax.request({
-            url: Editor.data.restpath + (taskId && jobId ? `task/${taskId}/job/${jobId}/coordinators` : 'user/combo/coordinators'),
+            url: Editor.data.restpath + (
+                jobId ? `task/${taskId}/lsp-job/${jobId}/combo/coordinators` : `task/${taskId}/lsp-job/combo/coordinators`
+            ),
             method: 'GET',
             success: function (response) {
                 const data = Ext.decode(response.responseText);
@@ -312,20 +317,24 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
             userCombo = me.down('combo[name="userGuid"]'),
             typeCombo = form.down('combo[name="type"]'),
             workflowStepCombo = form.down('combo[name="workflowStepName"]'),
-            segmentrange = form.down('textfield[name="segmentrange"]')
+            segmentrange = form.down('textfield[name="segmentrange"]'),
+            deadlineDate = form.down('textfield[name="deadlineDate"]')
         ;
+
+        me.task = task;
 
         form.loadRecord(rec);
 
         if (edit) {
             form.setTitle(Ext.String.format(me.strings.formTitleEdit, rec.get('longUserName')));
 
-            rec.get('isLspJob') ? me.loadCoordinators(task.get('id'), rec.get('id')) : me.loadUsers();
+            rec.get('isLspJob') ? me.loadCoordinators(rec.get('id')) : me.loadUsers();
         } else {
             form.setTitle(me.strings.formTitleAdd);
             me.loadUsers();
         }
 
+        deadlineDate.setDisabled(edit && rec.get('isLspJob'));
         segmentrange.setDisabled(edit && rec.get('isLspJob'));
 
         userCombo.setVisible(! edit || rec.get('isLspJob'));

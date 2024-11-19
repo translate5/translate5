@@ -252,12 +252,30 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ],
         ));
 
-        $this->front->getRouter()->addRoute('editorTaskUserJobCoordinators', new ZfExtended_Controller_RestLikeRoute(
-            'editor/task/:taskId/job/:id/coordinators',
+        $this->front->getRouter()->addRoute('editorJobCoordinatorsOnJobUpdate', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:taskId/lsp-job/:id/combo/coordinators',
             [
                 'module' => 'editor',
                 'controller' => 'taskuserassoc',
-                'action' => 'coordinators',
+                'action' => 'coordinatorsforupdate',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorCoordinatorsForNewJobInTask', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:taskId/lsp-job/combo/coordinators',
+            [
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => 'jobcoordinatorsfornewjob',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorTaskUserJobUsersOnCreate', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:taskId/job/combo/users',
+            [
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => 'usersfornewjob',
             ]
         ));
 

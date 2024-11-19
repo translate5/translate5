@@ -31,13 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
 
 use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessToLspException;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Contract\LspUnassignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
@@ -117,8 +118,8 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
         try {
             $context = new PermissionAssertContext($authUser);
 
-            $this->lspActionPermissionAssert->assertGranted(Action::Update, $lsp, $context);
-            $this->customerActionPermissionAssert->assertGranted(Action::Read, $customer, $context);
+            $this->lspActionPermissionAssert->assertGranted(LspAction::Update, $lsp, $context);
+            $this->customerActionPermissionAssert->assertGranted(CustomerAction::Read, $customer, $context);
 
             $this->logger->info(
                 'E1637',

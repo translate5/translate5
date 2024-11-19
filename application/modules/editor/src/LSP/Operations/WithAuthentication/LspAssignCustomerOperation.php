@@ -31,13 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
 
 use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\Exception\NoAccessToLspException;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Contract\LspAssignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
@@ -92,13 +93,13 @@ class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
 
         try {
             $this->lspActionPermissionAssert->assertGranted(
-                Action::Update,
+                LspAction::Update,
                 $lsp,
                 new PermissionAssertContext($authUser)
             );
 
             $this->customerActionPermissionAssert->assertGranted(
-                Action::Read,
+                CustomerAction::Read,
                 $customer,
                 new PermissionAssertContext($authUser)
             );

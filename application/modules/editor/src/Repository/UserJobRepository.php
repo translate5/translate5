@@ -228,11 +228,11 @@ class UserJobRepository
     /**
      * @return iterable<UserJob>
      */
-    public function getTaskJobs(Task $task, bool $excludePmOverride = false): iterable
+    public function getTaskJobs(string $taskGuid, bool $excludePmOverride = false): iterable
     {
         $job = ZfExtended_Factory::get(UserJob::class);
 
-        $jobs = $job->loadByTaskGuidList([$task->getTaskGuid()]);
+        $jobs = $job->loadByTaskGuidList([$taskGuid]);
 
         foreach ($jobs as $jobData) {
             $job->init(

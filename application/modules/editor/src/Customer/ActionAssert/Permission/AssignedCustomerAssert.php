@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Customer\ActionAssert\Permission;
 
 use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
@@ -43,7 +42,7 @@ final class AssignedCustomerAssert implements PermissionAssertInterface
 {
     public function supports(\BackedEnum $action): bool
     {
-        return in_array($action, [Action::Update, Action::Delete, Action::Read], true);
+        return true;
     }
 
     /**

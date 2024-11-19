@@ -73,7 +73,7 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
             $this->assertGranted($action, $object, $context);
 
             return true;
-        } catch (PermissionExceptionInterface $e) {
+        } catch (PermissionExceptionInterface) {
             return false;
         }
     }

@@ -14,7 +14,7 @@ START LICENSE AND COPYRIGHT
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
 
- There is a plugin exception availabel for use with this release of translate5 for
+ There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
 
@@ -28,71 +28,68 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\DataProvider;
+namespace MittagQI\Translate5\LspJob\DataProvider;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
+use PDO;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Select;
+use Zend_Db_Table;
+use Zend_Db_Table_Row;
+use ZfExtended_Factory;
 
-class UserComboDataProvider
+class PermissionAwareUserFetcher
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly ActionPermissionAssertInterface $userPermissionAssert,
+        private readonly Zend_Db_Adapter_Abstract $db,
+        private readonly ActionPermissionAssertInterface $userActionPermissionAssert,
     ) {
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public static function create(): self
     {
         return new self(
-            new UserRepository(),
+            Zend_Db_Table::getDefaultAdapter(),
             UserActionPermissionAssert::create(),
         );
     }
 
     /**
-     * @return array{'userGuid': string, 'longUserName': string}[]
+     * @return array{userGuid: string, longUserName: string}[]
      */
-    public function users(User $viewer): array
+    public function fetchVisible(Zend_Db_Select $select, User $viewer): array
     {
-        $list = [];
+        $users = [];
+        $user = ZfExtended_Factory::get(User::class);
+
+        $stmt = $this->db->query($select);
+
         $context = new PermissionAssertContext($viewer);
 
-        foreach ($this->userRepository->getAll() as $user) {
-            if ($this->userPermissionAssert->isGranted(UserAction::Read, $user, $context)) {
-                $list[] = [
+        while ($userData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $user->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $user->db,
+                        'data' => $userData,
+                        'stored' => true,
+                        'readOnly' => true,
+                    ]
+                )
+            );
+
+            if ($this->userActionPermissionAssert->isGranted(UserAction::Read, $user, $context)) {
+                $users[] = [
                     'userGuid' => $user->getUserGuid(),
                     'longUserName' => $user->getUsernameLong(),
                 ];
             }
         }
 
-        return $list;
-    }
-
-    /**
-     * @return array{'userGuid': string, 'longUserName': string}[]
-     */
-    public function coordinators(User $viewer): array
-    {
-        $list = [];
-        $context = new PermissionAssertContext($viewer);
-
-        foreach ($this->userRepository->getCoordinators() as $user) {
-            if ($this->userPermissionAssert->isGranted(UserAction::Read, $user, $context)) {
-                $list[] = [
-                    'userGuid' => $user->getUserGuid(),
-                    'longUserName' => $user->getUsernameLong(),
-                ];
-            }
-        }
-
-        return $list;
+        return $users;
     }
 }

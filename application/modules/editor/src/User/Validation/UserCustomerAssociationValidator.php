@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Validation;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
@@ -95,7 +95,7 @@ class UserCustomerAssociationValidator
 
         foreach ($customers as $customer) {
             try {
-                $this->customerPermissionAssert->assertGranted(Action::Read, $customer, $context);
+                $this->customerPermissionAssert->assertGranted(CustomerAction::Read, $customer, $context);
             } catch (PermissionExceptionInterface) {
                 throw new CustomerDoesNotBelongToUserException(
                     (int) $customer->getId(),

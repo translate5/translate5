@@ -10121,6 +10121,14 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.</source>
                 <target>LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.</target>
             </trans-unit>
+            <trans-unit id="RWluZSDDhG5kZXJ1bmcgZGVzIEF1ZmdhYmVuLVdvcmtmbG93cyBmw7xocnQgenVyIEzDtnNjaHVuZyBhbGxlciBBdWZ0cmFnc3p1d2Vpc3VuZ2VuLiBNw7ZjaHRlbiBTaWUgZm9ydGZhaHJlbj8=">
+                <source>Eine Änderung des Aufgaben-Workflows führt zur Löschung aller Auftragszuweisungen. Möchten Sie fortfahren?</source>
+                <target>Change of task workflow will result in deletion of all job assignments. Would you like to continue?</target>
+            </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRpZSDDhG5kZXJ1bmcgZGVzIFdvcmtmbG93cw=='>
+                <source>Bestätigen Sie die Änderung des Workflows</source>
+                <target>Bestätigen Sie die Änderung des Workflows</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

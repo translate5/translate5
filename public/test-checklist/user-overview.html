@@ -13,19 +13,19 @@
                 "how_to_check": "Open users overview. Click on Add user button. Fill the form and click on Save button",
             },
             {
-                "check": "Job Coordinator can not be created without provided LSP",
+                "check": "Job Coordinator can NOT be created without provided LSP",
                 "how_to_check": "In user creation process select Job Coordinator role. Try to save the form without selecting LSP"
             },
             {
-                "check": "User should not be able to assign Job Coordinator role to already existing user",
+                "check": "User should NOT be able to assign Job Coordinator role to already existing user",
                 "how_to_check": null,
             },
             {
-                "check": "User should not be able to change LSP of any LSP user",
+                "check": "User should NOT be able to change LSP of any LSP user",
                 "how_to_check": null,
             },
             {
-                "check": "Conflicting roles should not be assigned to a user",
+                "check": "Conflicting roles should NOT be assigned to a user",
                 "how_to_check": null,
                 "subchecks": [
                     {
@@ -43,7 +43,7 @@
                 ]
             },
             {
-                "check": "User can not be saved if role requires client selection and no client is selected",
+                "check": "User can NOT be saved if role requires client selection and no client is selected",
                 "how_to_check": null,
                 "subchecks": [
                     {
@@ -65,7 +65,7 @@
                 ]
             },
             {
-                "check": "Job Coordinator always creates LSP users and can not create simple user",
+                "check": "Job Coordinator always creates LSP users and can NOT create simple user",
                 "how_to_check": "Login as Job Coordinator. Create a user. Check if the user has LSP",
                 "subchecks": [
                     {
@@ -75,7 +75,7 @@
                 ]
             },
             {
-                "check": "Job Coordinator always creates LSP users and can not create simple user",
+                "check": "Job Coordinator always creates LSP users and can NOT create simple user",
                 "how_to_check": "Login as Job Coordinator. Create a user. Check if the user has LSP",
             },
             {
@@ -99,7 +99,7 @@
                 "how_to_check": null,
                 "subchecks": [
                     {
-                        "check": "LSP users and Job Coordinators of sub LSPs are not visible",
+                        "check": "LSP users and Job Coordinators of sub LSPs are NOT visible",
                         "how_to_check": null
                     }
                 ]
@@ -113,8 +113,8 @@
                 "how_to_check": "In user form Client PM should see only clients that assigned to him",
                 "subchecks": [
                     {
-                        "check": "Client PM can not unassign clients that not assigned to him",
-                        "how_to_check": "Login as admin. Assign not Client PM client to user. Login as Client PM. Update user clients while logged in as Client PM. Then check clients of user with admin authorisation"
+                        "check": "Client PM can NOT unassign clients that NOT assigned to him",
+                        "how_to_check": "Login as admin. Assign NOT Client PM client to user. Login as Client PM. Update user clients while logged in as Client PM. Then check clients of user with admin authorisation"
                     }
                 ]
             }

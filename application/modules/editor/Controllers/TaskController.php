@@ -33,6 +33,7 @@ use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\DataProvider\TaskViewDataProvider;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
@@ -40,6 +41,7 @@ use MittagQI\Translate5\Task\Import\ImportService;
 use MittagQI\Translate5\Task\Import\ProjectWorkersService;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
+use MittagQI\Translate5\Task\JobsPurger;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
@@ -73,7 +75,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * loadAll counter buffer
-     * @var integer
+     * @var int
      */
     protected $totalCount;
 
@@ -1107,6 +1109,21 @@ class editor_TaskController extends ZfExtended_RestController
         $this->entity->validate();
         $this->initWorkflow();
 
+        if ($oldTask->getWorkflow() !== $this->entity->getWorkflow()) {
+            $this->logInfo('Workflow change from {oldWorkflow} to {workflow}', [
+                'oldWorkflow' => $oldTask->getWorkflow(),
+                'workflow' => $this->entity->getWorkflow(),
+            ]);
+
+            // we have to save task here as job purge will change task version through DB triggers
+            $this->entity->save();
+
+            JobsPurger::create()->purgeTaskJobs($taskguid);
+
+            // refresh it here to get the new entity version
+            $this->entity->refresh();
+        }
+
         //throws exceptions if task not accessable
         $this->checkTaskAccess();
 
@@ -1317,7 +1334,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * returns true if PUT Requests opens a task for editing or readonly
-     * @return boolean
+     * @return bool
      */
     protected function isOpenTaskRequest(): bool
     {
@@ -1326,7 +1343,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * returns true if PUT Requests opens a task for open or finish
-     * @return boolean
+     * @return bool
      */
     protected function isLeavingTaskRequest(): bool
     {
@@ -1339,7 +1356,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * returns true if PUT Requests opens a task for editing
-     * @return boolean
+     * @return bool
      */
     protected function isEditTaskRequest(): bool
     {
@@ -1352,7 +1369,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * returns true if PUT Requests opens a task for viewing(readonly)
-     * @return boolean
+     * @return bool
      */
     protected function isViewTaskRequest(): bool
     {
@@ -1604,7 +1621,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         $isTaskTypeAllowed = $acl->isInAllowedRoles(
             ZfExtended_Authentication::getInstance()->getUserRoles(),
-            \editor_Task_Type::ID,
+            editor_Task_Type::ID,
             $this->entity->getTaskType()->id()
         );
 
@@ -1679,7 +1696,7 @@ class editor_TaskController extends ZfExtended_RestController
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws \MittagQI\Translate5\Task\Current\Exception
-     * @throws \MittagQI\Translate5\Task\Current\NoAccessException
+     * @throws NoAccessException
      */
     public function packagestatusAction(): void
     {
@@ -2033,7 +2050,7 @@ class editor_TaskController extends ZfExtended_RestController
     /**
      * Check if the given pmGuid(userGuid) is the same with the current logged user userGuid
      *
-     * @return boolean
+     * @return bool
      */
     protected function isAuthUserTaskPm($taskPmGuid): bool
     {
@@ -2195,7 +2212,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * Handle the project/task load request.
-     * @return boolean true if loading projects, or false if tasks only
+     * @return bool true if loading projects, or false if tasks only
      */
     protected function handleProjectRequest(): bool
     {

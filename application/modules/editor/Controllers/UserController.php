@@ -30,7 +30,6 @@ use MittagQI\Translate5\Acl\Exception\ClientRestrictedAndNotRolesProvidedTogethe
 use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
 use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
@@ -48,7 +47,7 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskExceptio
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
-use MittagQI\Translate5\User\DataProvider\UserComboDataProvider;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\CantRemoveCoordinatorRoleFromUserException;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
@@ -68,7 +67,6 @@ use MittagQI\Translate5\User\Operations\WithAuthentication\UpdateUserRolesOperat
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
-use MittagQI\ZfExtended\Acl\SystemResource;
 use ZfExtended_UnprocessableEntity as UnprocessableEntity;
 
 class Editor_UserController extends ZfExtended_RestController
@@ -128,20 +126,6 @@ class Editor_UserController extends ZfExtended_RestController
     public function getAction(): void
     {
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
-
-        // our routing can't process url like /user/combo/coordinators as additional action
-        if ($this->hasParam('combo')) {
-            $dataProvider = UserComboDataProvider::create();
-
-            // @phpstan-ignore-next-line
-            $this->view->rows = match ($this->getParam('combo')) {
-                'coordinators' => $dataProvider->coordinators($authUser),
-                default => $dataProvider->users($authUser),
-            };
-
-            return;
-        }
-
         $user = $this->userRepository->get($this->getParam('id'));
 
         if ($user->getLogin() == ZfExtended_Models_User::SYSTEM_LOGIN) {
@@ -155,7 +139,7 @@ class Editor_UserController extends ZfExtended_RestController
 
         try {
             $this->permissionAssert->assertGranted(
-                Action::Read,
+                UserAction::Read,
                 $user,
                 new PermissionAssertContext($authUser)
             );
@@ -195,7 +179,7 @@ class Editor_UserController extends ZfExtended_RestController
             );
 
             try {
-                $this->permissionAssert->assertGranted(Action::Read, $userModel, $context);
+                $this->permissionAssert->assertGranted(UserAction::Read, $userModel, $context);
             } catch (PermissionExceptionInterface) {
                 unset($rows[$key]);
 

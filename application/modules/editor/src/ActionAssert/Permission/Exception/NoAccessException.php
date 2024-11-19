@@ -30,6 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ActionAssert\Permission\Exception;
 
-class NoAccessException extends \Exception implements PermissionExceptionInterface
+class NoAccessException extends \ZfExtended_NoAccessException implements PermissionExceptionInterface
 {
 }

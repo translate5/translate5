@@ -31,10 +31,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations\Factory;
 
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
@@ -131,7 +131,7 @@ class CreateUserDtoFactory
             $lsp = $this->lspRepository->get($lspId);
 
             $this->lspPermissionAssert->assertGranted(
-                Action::Read,
+                LspAction::Read,
                 $lsp,
                 new PermissionAssertContext($authUser)
             );

@@ -40,6 +40,7 @@ use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Model\User;
+use Zend_Db_Table;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;
 
@@ -113,7 +114,17 @@ class JobCoordinatorRepository
     /**
      * @return iterable<JobCoordinator>
      */
-    public function getByLSP(LanguageServiceProvider $lsp): iterable
+    public function getByLspId(int $lspId): iterable
+    {
+        $lsp = $this->lspRepository->get($lspId);
+
+        yield from $this->getByLsp($lsp);
+    }
+
+    /**
+     * @return iterable<JobCoordinator>
+     */
+    public function getByLsp(LanguageServiceProvider $lsp): iterable
     {
         $user = ZfExtended_Factory::get(User::class);
         $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
@@ -155,7 +166,7 @@ class JobCoordinatorRepository
     public function getSubLspJobCoordinators(JobCoordinator $coordinator): iterable
     {
         foreach ($this->lspRepository->getSubLspList($coordinator->lsp) as $subLsp) {
-            yield from $this->getByLSP($subLsp);
+            yield from $this->getByLsp($subLsp);
         }
     }
 

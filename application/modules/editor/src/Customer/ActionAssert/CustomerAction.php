@@ -28,12 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\ActionAssert;
+namespace MittagQI\Translate5\Customer\ActionAssert;
 
-enum UserJobAction: string
+enum CustomerAction: string
 {
     case Read = 'read';
     case Update = 'update';
     case Delete = 'delete';
-    case UpdateDeadline = 'update.deadline';
 }

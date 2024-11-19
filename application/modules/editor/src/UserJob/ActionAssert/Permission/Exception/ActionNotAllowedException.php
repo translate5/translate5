@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,12 +28,19 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\ActionAssert;
+namespace MittagQI\Translate5\UserJob\ActionAssert\Permission\Exception;
 
-enum UserJobAction: string
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
+
+final class ActionNotAllowedException extends NoAccessException implements PermissionExceptionInterface
 {
-    case Read = 'read';
-    case Update = 'update';
-    case Delete = 'delete';
-    case UpdateDeadline = 'update.deadline';
+    public function __construct(
+        public readonly UserJobAction $jobAction,
+        public readonly UserJob $userJob,
+    ) {
+        parent::__construct();
+    }
 }

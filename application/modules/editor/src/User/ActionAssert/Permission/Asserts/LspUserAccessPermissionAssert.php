@@ -91,7 +91,11 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        if ($authUser->isPm() && ! $this->isGrantedForPm($lspUser)) {
+        if ($authUser->isPm()) {
+            if ($this->isGrantedForPm($lspUser)) {
+                return;
+            }
+
             throw new NotAccessibleLspUserException($lspUser);
         }
 

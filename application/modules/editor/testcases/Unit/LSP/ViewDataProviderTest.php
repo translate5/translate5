@@ -39,7 +39,7 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\ViewDataProvider;
+use MittagQI\Translate5\LSP\LspViewDataProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\User\Model\User;
@@ -60,7 +60,7 @@ class ViewDataProviderTest extends TestCase
 
     private ActionPermissionAssertInterface|MockObject $userActionPermissionAssert;
 
-    private ViewDataProvider $viewDataProvider;
+    private LspViewDataProvider $viewDataProvider;
 
     public function setUp(): void
     {
@@ -71,7 +71,7 @@ class ViewDataProviderTest extends TestCase
         $this->customerActionPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
         $this->userActionPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
 
-        $this->viewDataProvider = new ViewDataProvider(
+        $this->viewDataProvider = new LspViewDataProvider(
             $this->lspRepository,
             $this->lspUserRepository,
             $this->jobCoordinatorRepository,
@@ -202,7 +202,7 @@ class ViewDataProviderTest extends TestCase
             )
         ;
 
-        $this->jobCoordinatorRepository->method('getByLSP')->willReturn([$coordinator1]);
+        $this->jobCoordinatorRepository->method('getByLsp')->willReturn([$coordinator1]);
 
         $this->lspUserRepository->method('getUsers')->willReturn([$user1, $user2, $user3]);
 
@@ -226,7 +226,7 @@ class ViewDataProviderTest extends TestCase
 
         $viewer = $this->createMock(User::class);
 
-        $viewDataProvider = new ViewDataProvider(
+        $viewDataProvider = new LspViewDataProvider(
             $this->lspRepository,
             $this->lspUserRepository,
             $this->jobCoordinatorRepository,

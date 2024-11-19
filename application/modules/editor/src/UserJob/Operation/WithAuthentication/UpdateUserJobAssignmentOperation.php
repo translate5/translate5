@@ -31,14 +31,15 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\UserJob\Operation\WithAuthentication;
 
 use editor_Models_TaskUserAssoc as UserJob;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
+use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\UserJob\Contract\UpdateUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowStepProvidedException;
 use MittagQI\Translate5\UserJob\Operation\DTO\UpdateUserJobDto;
@@ -75,28 +76,40 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
     public function update(UserJob $job, UpdateUserJobDto $dto): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
+        $context = new PermissionAssertContext($authUser);
 
-        $this->permissionAssert->assertGranted(
-            Action::Update,
-            $job,
-            new PermissionAssertContext($authUser),
-        );
+        $this->permissionAssert->assertGranted(UserJobAction::Update, $job, $context);
 
         $coordinator = $this->coordinatorRepository->findByUserGuid($this->authentication->getUserGuid());
 
         if ($coordinator !== null) {
-            try {
-                $this->lspJobRepository->getByTaskGuidAndWorkflow(
-                    (int) $coordinator->lsp->getId(),
-                    $job->getTaskGuid(),
-                    $dto->workflow->workflow,
-                    $dto->workflow->workflowStepName,
-                );
-            } catch (NotFoundLspJobException) {
-                throw new InvalidWorkflowStepProvidedException();
-            }
+            $this->coordinatorAsserts($coordinator, $job, $dto, $context);
         }
 
         $this->operation->update($job, $dto);
+    }
+
+    private function coordinatorAsserts(
+        JobCoordinator $coordinator,
+        UserJob $job,
+        UpdateUserJobDto $dto,
+        PermissionAssertContext $context,
+    ): void {
+        try {
+            $this->lspJobRepository->getByTaskGuidAndWorkflow(
+                (int) $coordinator->lsp->getId(),
+                $job->getTaskGuid(),
+                $dto->workflow->workflow,
+                $dto->workflow->workflowStepName,
+            );
+        } catch (NotFoundLspJobException) {
+            throw new InvalidWorkflowStepProvidedException();
+        }
+
+        if (null === $dto->deadlineDate) {
+            return;
+        }
+
+        $this->permissionAssert->assertGranted(UserJobAction::UpdateDeadline, $job, $context);
     }
 }

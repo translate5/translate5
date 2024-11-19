@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LspJob\Operation\WithAuthentication;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
@@ -42,7 +41,9 @@ use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use ZfExtended_Authentication;
@@ -91,8 +92,8 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
         $task = $this->taskRepository->getByGuid($dto->taskGuid);
         $user = $this->userRepository->getByGuid($dto->userGuid);
 
-        $this->taskPermissionAssert->assertGranted(Action::Update, $task, $context);
-        $this->userPermissionAssert->assertGranted(Action::Read, $user, $context);
+        $this->taskPermissionAssert->assertGranted(TaskAction::Update, $task, $context);
+        $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
 
         $coordinator = $this->coordinatorRepository->findByUser($user);
 
