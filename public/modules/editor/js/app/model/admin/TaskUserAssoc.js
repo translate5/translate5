@@ -59,6 +59,9 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
         {name: 'trackchangesShowAll', type: 'bool'},
         {name: 'trackchangesAcceptReject', type: 'bool'},
         {name: 'type', type: 'int'},
+        {name: 'lspId', type: 'int', persist: false},
+        {name: 'isLspJob', type: 'bool', persist: false},
+        {name: 'isLspUserJob', type: 'bool', persist: false},
     ],
     validators: {
         taskGuid: 'presence',

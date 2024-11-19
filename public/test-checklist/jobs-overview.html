@@ -105,7 +105,15 @@
                         "how_to_check": null,
                     },
                     {
-                        "check": "Job Coordinator can NOT update LSP jobs of his LSP",
+                        "check": "Job Coordinator can update assigned coordinator in LSP jobs of his LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can update status of LSP jobs of his LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can NOT update deadline of LSP jobs of his LSP",
                         "how_to_check": null,
                     },
                     {
@@ -155,125 +163,6 @@
             {
                 "check": "Job Coordinator shouldn't be able to assign Coordinator as editor",
                 "how_to_check": null,
-            },
-
-
-
-            {
-                "check": "Job Coordinator always creates sub LSP",
-                "how_to_check": "LSP visible for Job Coordinator and NOT visible for PM",
-            },
-            {
-                "check": "Job Coordinator can see/access his LSP and direct sub LSPs",
-                "how_to_check": null,
-                "subchecks": [
-                    {
-                        "check": "Job Coordinator can NOT change list of assigned clients of his LSP",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "Job Coordinator can NOT delete his LSP",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "Job Coordinator can NOT change his LSP",
-                        "how_to_check": null
-                    },
-                    {
-                        "check": "Job Coordinator can NOT see sub LSP of his sub LSP",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "Job Coordinator can change sub LSP of his LSP",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "Job Coordinator can change list of assigned clients of sub LSP",
-                        "how_to_check": null,
-                    }
-                ]
-            },
-            {
-                "check": "Only clients of parent LSP can be assigned to sub LSP",
-                "how_to_check": "Login as admin. Try assign client that is NOT assigned to parent LSP to sub LSP",
-            },
-            {
-                "check": "Prompt is shown on attempt to delete LSP",
-                "how_to_check": "In LSP overview click delete button",
-                "subchecks": [
-                    {
-                        "check": "Dialog warns user about consequences of deleting LSP",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "Prompt asks for LSP name to confirm deletion",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "If wrong name is entered, deletion is NOT performed",
-                        "how_to_check": null,
-                    }
-                ]
-            },
-            {
-                "check": "All entities are deleted when LSP is deleted",
-                "how_to_check": "Alongside with LSP, all sub LSPs, users and jobs are deleted recursively",
-                "subchecks": [
-                    {
-                        "check": "LSP users are deleted",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "LSP jobs are deleted",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "User jobs are deleted",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "Sub LSPs are deleted",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "All entities of sub LSPs are deleted",
-                        "how_to_check": null,
-                    }
-                ]
-            },
-            {
-                "check": "Customer unassignment works as expected",
-                "how_to_check": null,
-                "subchecks": [
-                    {
-                        "check": "If LSP and Sub LSP with same client don't have active LSP user jobs, client is unassigned silently",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "On Customer unassignment, all related to LSP jobs in Customer tasks are deleted",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "Jobs also deleted for Sub LSPs",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "If LSP or Sub LSP have active LSP user jobs, dialog window shown.",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "Dialog window warns about active jobs and proposes to forcefully unassign client",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "On force unassignment, all related to LSP jobs in Customer tasks are deleted",
-                        "how_to_check": null,
-                    },
-                    {
-                        "check": "On cancel, client is NOT unassigned, no jobs are deleted",
-                        "how_to_check": null,
-                    }
-                ]
             },
         ];
     </script>

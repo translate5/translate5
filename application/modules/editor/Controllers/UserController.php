@@ -196,7 +196,7 @@ class Editor_UserController extends ZfExtended_RestController
                 $rows[$key]['editable'] = '0';
             }
 
-            $rows[$key]['lsp'] = $userIdToLspIdMap[$row['id']] ?? null;
+            $rows[$key]['lsp'] = isset($userIdToLspIdMap[$row['id']]) ? (int) $userIdToLspIdMap[$row['id']] : null;
         }
 
         $this->view->rows = array_values($rows);

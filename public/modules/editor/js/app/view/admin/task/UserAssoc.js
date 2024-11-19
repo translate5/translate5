@@ -334,7 +334,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
             me.loadUsers();
         }
 
-        deadlineDate.setDisabled(edit && rec.get('isLspJob'));
+        const sameLsp = Editor.app.authenticatedUser.get('lsp') === rec.get('lspId');
+
+        deadlineDate.setDisabled(edit && rec.get('isLspJob') && sameLsp);
         segmentrange.setDisabled(edit && rec.get('isLspJob'));
 
         userCombo.setVisible(! edit || rec.get('isLspJob'));

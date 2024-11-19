@@ -35,6 +35,7 @@ use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -46,7 +47,7 @@ use ZfExtended_Factory;
 
 /**
  * @template Job of array{
- * id: string,
+ * id: int,
  * taskGuid: string,
  * userGuid: string,
  * sourceLang: int,
@@ -65,11 +66,12 @@ use ZfExtended_Factory;
  * trackchangesShow: bool,
  * trackchangesShowAll: bool,
  * trackchangesAcceptReject: bool,
- * type: string,
+ * type: int,
  * login: string,
  * firstName: string,
  * surName: string,
  * longUserName: string,
+ * lspId: int|null,
  * isLspJob: bool,
  * isLspUserJob: bool,
  * staticAuthHash?: string,
@@ -79,6 +81,7 @@ class UserJobViewDataProvider
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
+        private readonly LspJobRepository $lspJobRepository,
         private readonly ActionPermissionAssertInterface $userJobPermissionAssert,
         private readonly UserRepository $userRepository,
         private readonly TaskRepository $taskRepository,
@@ -93,6 +96,7 @@ class UserJobViewDataProvider
     {
         return new self(
             UserJobRepository::create(),
+            LspJobRepository::create(),
             UserJobActionPermissionAssert::create(),
             new UserRepository(),
             new TaskRepository(),
@@ -177,8 +181,14 @@ class UserJobViewDataProvider
         Task $task,
         User $viewer,
     ): array {
+        $lspJob = null;
+
+        if ($job->isLspJob()) {
+            $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
+        }
+
         $row = [
-            'id' => $job->getId(),
+            'id' => (int) $job->getId(),
             'taskGuid' => $job->getTaskGuid(),
             'userGuid' => $job->getUserGuid(),
             'sourceLang' => (int) $task->getSourceLang(),
@@ -202,6 +212,7 @@ class UserJobViewDataProvider
             'firstName' => $assignedUser->getFirstName(),
             'surName' => $assignedUser->getSurName(),
             'longUserName' => $assignedUser->getUsernameLong(),
+            'lspId' => $lspJob ? (int) $lspJob->getLspId() : null,
             'isLspJob' => $job->isLspJob(),
             'isLspUserJob' => $job->isLspUserJob(),
         ];

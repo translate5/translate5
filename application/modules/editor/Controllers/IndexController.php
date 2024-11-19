@@ -30,6 +30,7 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Cronjob\CronIpFactory;
+use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\CustomFields\Field as TaskCustomField;
@@ -537,6 +538,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $auth = ZfExtended_Authentication::getInstance();
 
         $userData = (array) $auth->getUserData();
+
+        $lspUserRepository = LspUserRepository::create();
+        $lspUser = $lspUserRepository->findByUserGuid($auth->getUserGuid());
+
+        if (null !== $lspUser) {
+            $userData['lsp'] = (int) $lspUser->lsp->getId();
+        }
 
         // Trim TermPortal-roles if TermPortal plugin is disabled
         if (! $this->pluginManager->isActive('TermPortal')) {
