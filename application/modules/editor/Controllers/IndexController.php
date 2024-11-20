@@ -570,6 +570,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $groupedRoles = $rolesDataProvider->getGroupedRoles($authUser);
 
         $php2js->set('app.groupedRoles', $groupedRoles);
+        $php2js->set('app.conflictingRoles', Roles::CONFLICTING_ROLES);
 
         $roles = array_merge(...array_values($groupedRoles));
 

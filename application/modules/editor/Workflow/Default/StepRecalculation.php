@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\JobAssignment\Operation\DeleteJobAssignmentOperation;
 use MittagQI\Translate5\Repository\TaskRepository;
 
 /**
@@ -38,7 +39,9 @@ class editor_Workflow_Default_StepRecalculation
      */
     protected $workflow;
 
-    private TaskRepository $taskRepository;
+    private readonly TaskRepository $taskRepository;
+
+    private readonly DeleteJobAssignmentOperation $deleteJobOperation;
 
     protected $nextStepWasSet = [];
 
@@ -46,6 +49,7 @@ class editor_Workflow_Default_StepRecalculation
     {
         $this->workflow = $workflow;
         $this->taskRepository = TaskRepository::create();
+        $this->deleteJobOperation = DeleteJobAssignmentOperation::create();
     }
 
     /**
@@ -170,9 +174,7 @@ class editor_Workflow_Default_StepRecalculation
         //delete jobs created by default which are not belonging to the tasks workflow and collect used steps
         foreach ($jobs as $rawJob) {
             if ($rawJob['workflow'] !== $task->getWorkflow()) {
-                $job->db->delete([
-                    'id = ?' => $rawJob['id'],
-                ]);
+                $this->deleteJobOperation->forceDelete((int) $rawJob['id']);
 
                 continue;
             }

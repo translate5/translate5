@@ -1402,19 +1402,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * Updates the usercount of a task.
-     * @param string|null $taskGuid Optional, if omitted operate on current task
-     */
-    public function updateTask(string $taskGuid = null)
-    {
-        $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ? and isPmOverride = 0) tua
-            set t.userCount = tua.cnt where t.taskGuid = tua.taskGuid';
-        $db = $this->db->getAdapter();
-        $sql = $db->quoteInto($sql, $taskGuid ?? $this->getTaskGuid(), 'string', 2);
-        $db->query($sql);
-    }
-
-    /**
      * Retrieves the ids of all faulty segments of this task (=segments with internal tag errors)
      * The result is cached so don't use this API in the context of e.g. an import
      * @return int[]

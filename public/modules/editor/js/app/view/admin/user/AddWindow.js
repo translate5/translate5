@@ -408,7 +408,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             sets.push(this.createRoleFieldSet('Roles don\'t require client', 'managers', groupedRoles.managers));
         }
 
-        sets.push(this.createRoleFieldSet('Roels require client', 'requireClient', groupedRoles.requireClient));
+        sets.push(this.createRoleFieldSet('Roles require client', 'requireClient', groupedRoles.requireClient));
         sets.push(this.createRoleFieldSet(this.strings.clientPmSubRoles, 'clientPmSubRoles', groupedRoles.clientPmSubRoles, true));
 
         return sets;
@@ -450,9 +450,47 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         return form.down('#rolesGroup').query('checkbox[checked=true]').map(box => box.initialConfig.value);
     },
 
+    toggleEnableForConflictingRoles: function (form) {
+        const checkboxes = form.down('#rolesGroup').query('checkbox'),
+            findCheckbox = (role) => checkboxes.find(box => box.initialConfig.value === role);
+
+        checkboxes.map(box => box.setDisabled(false));
+
+        form.down('#rolesGroup').query('checkbox[checked=true]').map(function (box) {
+            if (Editor.data.app.conflictingRoles.hasOwnProperty(box.initialConfig.value)) {
+                Editor.data.app.conflictingRoles[box.initialConfig.value].forEach(function (role) {
+                    findCheckbox(role).setDisabled(true);
+                });
+
+                return;
+            }
+
+            for (let role in Editor.data.app.conflictingRoles) {
+                if (Editor.data.app.conflictingRoles[role].includes(box.initialConfig.value)) {
+                    findCheckbox(role).setDisabled(true);
+                }
+            }
+        });
+    },
+
     onRoleCheckChange: function (checkbox, checked) {
         const form = checkbox.up('form'),
-            selectedRoles = this.getSelectedRoles(form);
+            selectedRoles = this.getSelectedRoles(form),
+            clientPmSubRolesGroup = this.lookupReference('clientPmSubRolesFieldSet');
+
+        this.toggleEnableForConflictingRoles(form);
+
+        if (selectedRoles.includes('clientpm')) {
+            clientPmSubRolesGroup.setHidden(false);
+        } else {
+            clientPmSubRolesGroup.setHidden(true);
+            clientPmSubRolesGroup.down('checkboxgroup').reset();
+        }
+
+        this.toggleRequirementOfCustomersField(
+            form,
+            this.hasRoleFromGroup(selectedRoles, ['requireClient'])
+        );
 
         form.down('hidden[name="roles"]').setValue(selectedRoles.join(','));
 

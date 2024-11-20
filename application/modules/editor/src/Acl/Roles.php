@@ -122,14 +122,35 @@ final class Roles
      */
     public const CONFLICTING_ROLES = [
         self::JOB_COORDINATOR => [
+            self::API,
             self::ADMIN,
             self::SYSTEMADMIN,
             self::PM,
             self::CLIENTPM,
-        ],
-        self::PM => [
-            self::CLIENTPM,
             self::PMLIGHT,
+            self::ERP,
+        ],
+        self::CLIENTPM => [
+            self::API,
+            self::ADMIN,
+            self::SYSTEMADMIN,
+            self::PM,
+            self::PMLIGHT,
+            self::JOB_COORDINATOR,
+        ],
+        self::PMLIGHT => [
+            self::API,
+            self::ADMIN,
+            self::SYSTEMADMIN,
+            self::PM,
+            self::CLIENTPM,
+            self::JOB_COORDINATOR,
+        ],
+        self::TM_MAINTENANCE => [
+            self::TM_MAINTENANCE_ALL_CLIENTS
+        ],
+        self::TERMPM_ALLCLIENTS => [
+            self::TERMPM,
         ],
     ];
 

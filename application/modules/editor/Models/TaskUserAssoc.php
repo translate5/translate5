@@ -515,9 +515,9 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      */
     protected function updateTask($taskGuid)
     {
-        /* @var $task editor_Models_Task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        $task->updateTask($taskGuid);
+        // TODO: REMOVE ME LATER! It is here for not to duplicate code.
+        // TODO: Task update should be done explicitly and not as side effect of a TUA save or delete
+        \MittagQI\Translate5\Repository\TaskRepository::create()->updateTaskUserCount($taskGuid);
     }
 
     /**
