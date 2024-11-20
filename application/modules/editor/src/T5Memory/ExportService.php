@@ -65,13 +65,14 @@ class ExportService
     public static function create(): self
     {
         $httpClient = new Client();
+        $config = \Zend_Registry::get('config');
 
         return new self(
             \Zend_Registry::get('logger'),
             new VersionService(new VersionFetchingApi($httpClient)),
             TmConversionService::create(),
             new Api\VersionedApiFactory($httpClient),
-            new PersistenceService(\Zend_Registry::get('config')),
+            new PersistenceService($config),
         );
     }
 

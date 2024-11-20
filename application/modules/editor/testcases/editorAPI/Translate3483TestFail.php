@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 use PHPUnit\Framework\AssertionFailedError as AssertionFailedErrorAlias;
 
@@ -44,7 +45,7 @@ class Translate3483TestFail extends JsonTestAbstract
 
     protected static bool $setupOwnCustomer = false;
 
-    protected static string $setupUserLogin = 'testmanager';
+    protected static TestUser $setupUserLogin = TestUser::TestManager;
 
     /**
      * @throws Zend_Http_Client_Exception

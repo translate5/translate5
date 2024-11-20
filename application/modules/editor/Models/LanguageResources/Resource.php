@@ -69,6 +69,8 @@ class editor_Models_LanguageResources_Resource
      */
     protected $writable = true;
 
+    protected bool $deletable = true;
+
     /***
      * Flag if the resource can be used by match analysis
      *
@@ -120,6 +122,14 @@ class editor_Models_LanguageResources_Resource
     protected bool $creatable = true;
 
     protected bool $engineBased = false;
+
+    protected string $defaultColor;
+
+    protected string $queryMode;
+
+    protected mixed $id;
+
+    protected string $serviceType;
 
     public function __construct($id, $name, $url)
     {
@@ -179,6 +189,14 @@ class editor_Models_LanguageResources_Resource
     }
 
     /**
+     * return if resource is deletable
+     */
+    public function getDeletable(): bool
+    {
+        return $this->deletable;
+    }
+
+    /**
      * returns the service name
      * @return string
      */
@@ -189,9 +207,8 @@ class editor_Models_LanguageResources_Resource
 
     /**
      * returns the service type
-     * @return string
      */
-    public function getServiceType()
+    public function getServiceType(): string
     {
         return $this->serviceType;
     }
@@ -207,11 +224,15 @@ class editor_Models_LanguageResources_Resource
 
     /**
      * returns the service type
-     * @return string
      */
-    public function getDefaultColor()
+    public function getDefaultColor(): string
     {
         return $this->defaultColor;
+    }
+
+    public function getQueryMode(): string
+    {
+        return $this->queryMode;
     }
 
     /**
@@ -333,6 +354,7 @@ class editor_Models_LanguageResources_Resource
     public function getMetaData()
     {
         return [
+            'deletable' => $this->deletable,
             'writable' => $this->writable,
             'analysable' => $this->analysable,
             'searchable' => $this->searchable,

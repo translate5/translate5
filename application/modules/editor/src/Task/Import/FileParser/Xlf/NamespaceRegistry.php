@@ -35,6 +35,7 @@ use MittagQI\Translate5\Task\Export\FileParser\Xlf\Comments as ExportComments;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments as ImportComments;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Across;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\MemoQ;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Mxliff;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Namespaces as XlfImportNamespace;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Tmgr;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Translate5;
@@ -55,6 +56,7 @@ class NamespaceRegistry
         'translate5' => Translate5::class,
         'across' => Across::class,
         'memoq' => MemoQ::class,
+        'mxlif' => Mxliff::class,
     ];
 
     /**

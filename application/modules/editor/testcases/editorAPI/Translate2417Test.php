@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 use MittagQI\Translate5\Test\JsonTestAbstract;
@@ -61,14 +62,14 @@ class Translate2417Test extends JsonTestAbstract
     public function testSegments()
     {
         $tmId = static::$translationMemory->getId();
-        static::api()->addUser('testmanager');
+        static::api()->addUser(TestUser::TestManager->value);
         static::api()->setTaskToEdit(static::getTask()->getId());
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!', true, true);
 
         // now test editing the segments
-        self::assertLogin('testmanager');
+        self::assertLogin(TestUser::TestManager->value);
         // load the first segment
         $segments = static::api()->getSegments(null, 1);
         // test the first segment
@@ -97,6 +98,18 @@ class Translate2417Test extends JsonTestAbstract
         // set dummy translation for the first segment and save it. This should upload this translation to the tm to.
         $segToTest->targetEdit = "Aleks test tm update.";
         static::api()->saveSegment($segToTest->id, $segToTest->targetEdit);
+
+        $filters = [[
+            'property' => 'taskGuid',
+            'operator' => 'eq',
+            'value' => static::getTask()->getTaskGuid(),
+        ]];
+        $tms = $this->cleanTimestamps(static::api()->getJson(
+            'editor/languageresourcetaskassoc?filter=' . urlencode(json_encode($filters, flags: JSON_THROW_ON_ERROR)),
+        ));
+        // Task TM is the TM where saving segment is performed
+        $taskTm = array_filter($tms, static fn ($tm) => $tm->isTaskTm === true);
+        $tmId = array_shift($taskTm)->languageResourceId;
 
         // after the segment save, check for the tm results for the same segment
         $jsonFileName = 'tmResultsAfterEdit.json';

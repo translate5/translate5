@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Filter;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
@@ -44,7 +45,7 @@ class QualityBaseTest extends JsonTestAbstract
         'autoQA.enableQm' => 1,
     ];
 
-    protected static string $setupUserLogin = 'testlector';
+    protected static TestUser $setupUserLogin = TestUser::TestLector;
 
     /**
      * @var stdClass[]

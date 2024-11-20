@@ -36,7 +36,12 @@ abstract class editor_Models_Export_FileParser_Xlf_Namespaces_Abstract
 {
     public function __construct(
         protected XmlParser $xmlparser,
-        protected Comments $comments
+        protected Comments $comments,
     ) {
+    }
+
+    public function postProcessFile(string $xml): string
+    {
+        return $xml;
     }
 }

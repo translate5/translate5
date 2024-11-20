@@ -26,19 +26,26 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
+use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeType;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 
 /**
  * Controller for the LanguageResources Associations
  */
 class editor_LanguageresourcetaskassocController extends ZfExtended_RestController
 {
-    protected $entityClass = 'MittagQI\Translate5\LanguageResource\TaskAssociation'; //→ _Taskassoc
+    protected $entityClass = TaskAssociation::class; //→ _Taskassoc
 
     /**
-     * @var MittagQI\Translate5\LanguageResource\TaskAssociation;
+     * @var TaskAssociation;
      */
     protected $entity;
+
+    private LanguageResourceRepository $languageResourceRepository;
 
     /**
      * ignoring ID field for POST Requests
@@ -46,20 +53,21 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
      */
     protected $postBlacklist = ['id'];
 
-    public function init()
+    public function init(): void
     {
         ZfExtended_Models_Entity_Conflict::addCodes([
             'E1050' => 'Referenced language resource not found.',
             'E1051' => 'Cannot remove language resource from task since task is used at the moment.',
         ], 'editor.languageresource.taskassoc');
         parent::init();
+
+        $this->languageResourceRepository = new LanguageResourceRepository();
     }
 
     /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::indexAction()
+     * @throws ZfExtended_Exception
      */
-    public function indexAction()
+    public function indexAction(): void
     {
         $filter = $this->entity->getFilter();
         if (! $filter->hasFilter('taskGuid', $taskGuid)) { //handle the rest default case
@@ -75,92 +83,120 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         $this->view->total = count($result);
     }
 
+    /**
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     */
     public function postAction(): void
     {
         try {
             parent::postAction();
-            $this->fireAfterAssocChangeEvent('post', $this->entity);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
-            //duplicate entries are OK, since the user tried to create it
+            //duplicate entries are OK, since the user tried to create it,
             //but we have to load and return the already existing duplicate
             $this->entity->loadByTaskGuidAndTm($this->data->taskGuid, $this->data->languageResourceId);
             $this->view->rows = $this->entity->getDataObject();
+
+            return;
         }
+
+        EventDispatcher::create()->dispatch(
+            new LanguageResourceTaskAssociationChangeEvent(
+                $this->getLanguageResource((int) $this->entity->getLanguageResourceId()),
+                $this->entity->getTaskGuid(),
+                LanguageResourceTaskAssociationChangeType::Add,
+            )
+        );
     }
 
-    public function deleteAction()
+    public function putAction(): void
     {
-        try {
-            $this->entityLoad();
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            if ($task->isUsed($this->entity->getTaskGuid())) {
-                throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
-                    'Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht von der Aufgabe entfernt werden!',
-                ]);
-            }
-            $clone = clone $this->entity;
-            $this->entity->delete();
-            $this->fireAfterAssocChangeEvent('delete', $clone);
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            //do nothing since it was already deleted, and thats ok since user tried to delete it
-        }
+        parent::putAction();
+
+        EventDispatcher::create()->dispatch(
+            new LanguageResourceTaskAssociationChangeEvent(
+                $this->getLanguageResource((int) $this->entity->getLanguageResourceId()),
+                $this->entity->getTaskGuid(),
+                LanguageResourceTaskAssociationChangeType::Update,
+            )
+        );
     }
 
     /**
-     * does some prechecking of the data
-     * {@inheritDoc}
-     * @see ZfExtended_RestController::decodePutData()
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ReflectionException
+     * @throws Zend_Exception
      */
-    protected function decodePutData()
+    public function deleteAction(): void
+    {
+        try {
+            $this->entityLoad();
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            //do nothing since it was already deleted, and thats ok since user tried to delete it
+            return;
+        }
+
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
+
+        if ($task->isUsed($this->entity->getTaskGuid())) {
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
+                'Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment ' .
+                'nicht von der Aufgabe entfernt werden!',
+            ]);
+        }
+
+        $clone = clone $this->entity;
+        $this->entity->delete();
+
+        EventDispatcher::create()->dispatch(
+            new LanguageResourceTaskAssociationChangeEvent(
+                $this->getLanguageResource((int) $clone->getLanguageResourceId()),
+                $clone->getTaskGuid(),
+                LanguageResourceTaskAssociationChangeType::Remove,
+            )
+        );
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Services_Exceptions_NoService
+     */
+    protected function decodePutData(): void
     {
         parent::decodePutData();
 
         //this flag may not be set via API
         unset($this->data->autoCreatedOnImport);
 
-        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-
-        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-        try {
-            $languageresource->load($this->data->languageResourceId);
-        } catch (ZfExtended_NotFoundException) {
-            throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
-                'languageResourceId' => 'Die gewünschte Sprachressource gibt es nicht!',
-            ], [
-                'languageresourceId' => $this->data->languageResourceId,
-            ]);
-        }
-        $resource = $languageresource->getResource();
-
+        $languageResource = $this->getLanguageResource($this->data->languageResourceId);
+        $resource = $languageResource->getResource();
         //segments can only be updated when resource is writable:
         $this->data->segmentsUpdateable = $resource->getWritable() && $this->data->segmentsUpdateable;
     }
 
-    /***
-     * Fire after post/delete special event with language resources service name in it.
-     * The event and the service name will be separated with #
-     * ex: afterPost#OpenTM2
-     *     afterDelete#TermCollection
-     *
-     * @param string $action
-     * @param TaskAssociation $entity
-     * @return editor_Models_LanguageResources_LanguageResource
+    /**
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ReflectionException
+     * @throws Zend_Exception
      */
-    protected function fireAfterAssocChangeEvent($action, TaskAssociation $entity): editor_Models_LanguageResources_LanguageResource
+    protected function getLanguageResource(int $languageResourceId): LanguageResource
     {
-        $lr = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $lr editor_Models_LanguageResources_LanguageResource */
-        $lr->load($entity->getLanguageResourceId());
-
-        //fire event with name of the saved language resource service name
-        //separate with # so it is more clear that is is not regular after/before action event
-        //ex: afterPost#OpenTM2
-        $eventName = "after" . ucfirst($action) . '#' . $lr->getServiceName();
-        $this->events->trigger($eventName, $this, [
-            'entity' => $entity,
-        ]);
-
-        return $lr;
+        try {
+            return $this->languageResourceRepository->get($languageResourceId);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1050',
+                [
+                    'languageResourceId' => 'Die gewünschte Sprachressource gibt es nicht!',
+                ],
+                [
+                    'languageresourceId' => $this->data->languageResourceId,
+                ]
+            );
+        }
     }
 }

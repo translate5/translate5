@@ -59,6 +59,12 @@ class Status
 
     public const IMPORT = 'import';
 
+    public const WAITING_FOR_LOADING = 'waitingForLoading';
+
+    public const LOADING = 'loading';
+
+    public const FAILED_TO_OPEN = 'failedToOpen';
+
     /**
      * Retrieve the linguistic equivalent of the status values above
      * @throws Zend_Exception
@@ -77,6 +83,9 @@ class Status
             self::REORGANIZE_IN_PROGRESS => $translate->_('Wird reorganisiert'),
             self::REORGANIZE_FAILED => $translate->_('Reorganisation gescheitert'),
             self::TUNING_IN_PROGRESS => $translate->_('Wird trainiert'),
+            self::WAITING_FOR_LOADING => $translate->_('Wartet auf Laden'),
+            self::LOADING => $translate->_('Wird geladen'),
+            self::FAILED_TO_OPEN => $translate->_('Ladefehler'),
             default => $translate->_('unbekannt')
         };
     }

@@ -218,7 +218,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      * Updates the filename of the language resource instance with the filename coming from the TM system
      * @throws Zend_Exception
      */
-    protected function addMemoryToLanguageResource(
+    private function addMemoryToLanguageResource(
         LanguageResource $languageResource,
         string $tmName,
         bool $isInternalFuzzy = false
@@ -380,54 +380,64 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $saveToDisk = $options[UpdatableAdapterInterface::SAVE_TO_DISK] ?? true;
         $saveToDisk = $saveToDisk && ! $this->isInternalFuzzy();
         $useSegmentTimestamp = $options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false;
-
         $timestamp = $useSegmentTimestamp
             ? $this->api->getDate(strtotime($segment->getTimestamp()))
             : $this->api->getNowDate();
-
-        $successful = $this->api->update(
-            $source,
-            $target,
-            $segment->getUserName(),
-            $segment->getMid(),
-            $timestamp,
-            $fileName,
-            $tmName,
-            $saveToDisk,
-        );
+        $userName = $segment->getUserName();
+        $context = $segment->getMid();
 
         $recheckOnUpdate = $options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false;
         $dataSent = [
             'source' => $source,
             'target' => $target,
-            'userName' => $segment->getUserName(),
-            'context' => $segment->getMid(),
+            'userName' => $userName,
+            'context' => $context,
             'timestamp' => $timestamp,
             'fileName' => $fileName,
         ];
 
-        if ($successful) {
-            $this->checkUpdateResponse($dataSent, $this->api->getResult());
-            $this->checkUpdatedSegmentIfNeeded($segment, $recheckOnUpdate);
+        $this->updateWithRetry(
+            $source,
+            $target,
+            $userName,
+            $context,
+            $timestamp,
+            $fileName,
+            $tmName,
+            $saveToDisk,
+            $dataSent,
+            $segment,
+            $recheckOnUpdate
+        );
+    }
 
-            return;
-        }
+    private function updateWithRetry(
+        string $source,
+        string $target,
+        string $userName,
+        string $context,
+        string $timestamp,
+        string $fileName,
+        string $tmName,
+        bool $saveToDisk,
+        array $dataSent,
+        editor_Models_Segment $segment,
+        bool $recheckOnUpdate
+    ): void {
+        $attempts = 0;
+        $elapsedTime = 0;
+        $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
 
-        $apiError = $this->api->getError();
-
-        if ($this->needsReorganizing($apiError, $tmName)) {
-            $this->addReorganizeWarning($segment->getTask());
-            $this->reorganizeTm($tmName);
-
+        while ($elapsedTime < $maxWaitingTime) {
             $successful = $this->api->update(
                 $source,
                 $target,
-                $segment->getUserName(),
-                $segment->getMid(),
+                $userName,
+                $context,
                 $timestamp,
                 $fileName,
                 $tmName,
-                $saveToDisk,
+                $saveToDisk
             );
 
             if ($successful) {
@@ -436,42 +446,59 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
                 return;
             }
-        } elseif ($this->isMemoryOverflown($apiError)) {
-            $this->addOverflowWarning($segment->getTask());
 
-            $newName = $this->generateNextMemoryName($this->languageResource);
-            $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
-            $this->addMemoryToLanguageResource($this->languageResource, $newName);
+            $apiError = $this->api->getError();
 
-            $successful = $this->api->update(
-                $source,
-                $target,
-                $segment->getUserName(),
-                $segment->getMid(),
-                $timestamp,
-                $fileName,
-                $tmName,
-                $saveToDisk,
-            );
+            if ($attempts === 0 && $this->needsReorganizing($apiError, $tmName)) {
+                $this->addReorganizeWarning($segment->getTask());
+                $this->reorganizeTm($tmName);
+            } elseif ($attempts === 0 && $this->isMemoryOverflown($apiError)) {
+                $this->addOverflowWarning($segment->getTask());
+                $newName = $this->generateNextMemoryName($this->languageResource);
+                $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
 
-            if ($successful) {
-                $this->checkUpdateResponse($dataSent, $this->api->getResult());
-                $this->checkUpdatedSegmentIfNeeded($segment, $recheckOnUpdate);
+                if (null === $newName) {
+                    $this->logger->error('E1305', 'OpenTM2: could not create TM', [
+                        'languageResource' => $this->languageResource,
+                        'apiError' => $this->api->getError(),
+                    ]);
 
-                return;
+                    break;
+                }
+
+                $this->addMemoryToLanguageResource($this->languageResource, $newName);
+                $tmName = $newName;
+            } elseif ($this->isLockingTimeoutOccurred($apiError)) {
+                // Wait before retrying
+                sleep($this->getRetryDelaySeconds());
+            } else {
+                // If no specific error handling is applicable, break the loop
+                break;
             }
+
+            $attempts++;
+            $elapsedTime = $this->getRetryDelaySeconds();
         }
 
         // send the error to the frontend
-        editor_Services_Manager::reportTMUpdateError($apiError);
+        editor_Services_Manager::reportTMUpdateError($apiError ?? null);
 
         $this->logger->error('E1306', 'OpenTM2: could not save segment to TM', [
             'languageResource' => $this->languageResource,
             'segment' => $segment,
-            'apiError' => $apiError,
+            'apiError' => $apiError ?? '',
         ]);
 
         throw new SegmentUpdateException();
+    }
+
+    private function isLockingTimeoutOccurred(?object $error): bool
+    {
+        if (null === $error) {
+            return false;
+        }
+
+        return $error->returnValue === 506;
     }
 
     public function updateTranslation(string $source, string $target, string $tmName = '')
@@ -479,6 +506,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         if (empty($tmName)) {
             $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
         }
+
+        // TODO why we don't process any errors here?
         $this->api->updateText($source, $target, $tmName);
     }
 
@@ -602,6 +631,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
             }
 
+            if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
+                $elapsedTime = 0;
+                $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
+
+                while ($elapsedTime < $maxWaitingTime && ! $successful) {
+                    sleep($this->getRetryDelaySeconds());
+                    $elapsedTime += $this->getRetryDelaySeconds();
+
+                    $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
+                }
+            }
+
             if (! $successful) {
                 $this->logger->exception($this->getBadGatewayException($tmName));
 
@@ -643,7 +684,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $resultList;
     }
 
-    /***
+    /**
      * Search the resource for available translation. Where the source text is in
      * resource source language and the received results are in the resource target language
      *
@@ -652,8 +693,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     public function translate(string $searchString)
     {
         //create dummy segment so we can use the lookup
-        $dummySegment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $dummySegment editor_Models_Segment */
+        $dummySegment = ZfExtended_Factory::get(editor_Models_Segment::class);
         $dummySegment->init();
 
         return $this->queryTm($searchString, $dummySegment, 'source');
@@ -906,6 +946,31 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
                 break;
 
+            case 'reorganize running':
+                $result = LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+
+                break;
+
+            case 'import running':
+                $result = LanguageResourceStatus::IMPORT;
+
+                break;
+
+            case 'waiting for loading':
+                $result = LanguageResourceStatus::WAITING_FOR_LOADING;
+
+                break;
+
+            case 'loading':
+                $result = LanguageResourceStatus::LOADING;
+
+                break;
+
+            case 'failed to open':
+                $result = LanguageResourceStatus::FAILED_TO_OPEN;
+
+                break;
+
             default:
                 break;
         }
@@ -957,7 +1022,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $matchRate;
     }
 
-    /***
+    /**
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be returned.
      * @param int $analysisId
      * @return editor_Services_Connector_Abstract
@@ -1014,11 +1079,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $connector;
     }
 
-    /***
+    /**
      * Get the result list where the >=100 matches with the same target are grouped as 1 match.
-     * @return editor_Services_ServiceResult|number
      */
-    private function getResultListGrouped(editor_Services_ServiceResult $resultList)
+    private function getResultListGrouped(editor_Services_ServiceResult $resultList): editor_Services_ServiceResult
     {
         $allResults = $resultList->getResult();
         if (empty($allResults)) {
@@ -1132,7 +1196,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $resultList;
     }
 
-    /***
+    /**
      * Reduce the given matchrate to given percent.
      * It is used when unsupported tags are found in the response result, and those tags are removed.
      * @param integer $matchrate
@@ -1152,6 +1216,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private const REORGANIZE_STARTED_AT = 'reorganize_started_at';
 
+    // Applicable only for version < 0.5.x
     private const MAX_REORGANIZE_TIME_MINUTES = 30;
 
     private const REORGANIZE_WAIT_TIME_SECONDS = 60;
@@ -1287,7 +1352,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $elapsedTime = 0;
         $sleepTime = 5;
 
-        while ($elapsedTime < self::REORGANIZE_WAIT_TIME_SECONDS) {
+        while ($elapsedTime < $this->getReorganizeWaitingTimeSeconds()) {
             if (! $this->isReorganizingAtTheMoment($tmName)) {
                 return true;
             }
@@ -1297,6 +1362,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         return false;
+    }
+
+    private function getReorganizeWaitingTimeSeconds(): int
+    {
+        return $this->canWaitLongTaskFinish()
+            ? self::REORGANIZE_WAIT_TIME_SECONDS * 60
+            : self::REORGANIZE_WAIT_TIME_SECONDS;
     }
 
     private function isMaxReorganizeAttemptsReached(?LanguageResource $languageResource): bool
@@ -1403,7 +1475,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $tmName = $memory['filename'];
 
             if ($this->isReorganizingAtTheMoment($tmName)) {
-                continue;
+                if (! $this->canWaitLongTaskFinish()) {
+                    continue;
+                }
+
+                $this->waitReorganizeFinished();
             }
 
             $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
@@ -1412,6 +1488,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $this->addReorganizeWarning($segment->getTask());
                 $this->reorganizeTm($tmName);
                 $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
+            }
+
+            if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
+                $elapsedTime = 0;
+                $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
+
+                while ($elapsedTime < $maxWaitingTime && ! $successful) {
+                    sleep($this->getRetryDelaySeconds());
+                    $elapsedTime += $this->getRetryDelaySeconds();
+
+                    $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
+                }
             }
 
             if (! $successful) {
@@ -1490,41 +1578,48 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         string $tmName,
         StripFramingTags $stripFramingTags,
     ): bool {
+        $gotLock = false;
         $successful = false;
 
-        try {
+        while (! $gotLock) {
             if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_6, $this->languageResource)) {
                 $successful = $this->api->importMemoryAsFile($importFilename, $tmName, $stripFramingTags);
             } else {
                 $successful = $this->api->importMemory(file_get_contents($importFilename), $tmName, $stripFramingTags);
             }
 
-            if (! $successful) {
-                $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
-                    'languageResource' => $this->languageResource,
-                    'apiError' => $this->api->getError(),
-                ]);
+            $error = $this->api->getError();
+
+            if (! $successful && $this->isLockingTimeoutOccurred($error)) {
+                sleep($this->getRetryDelaySeconds());
+
+                continue;
             }
 
-            if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
+            if (! $successful && $this->needsReorganizing($error, $tmName)) {
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
+
+                continue;
             }
-        } catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
-            $e->addExtraData([
-                'languageResource' => $this->languageResource,
-            ]);
-            $this->logger->exception($e);
+
+            $gotLock = true;
         }
 
+        if (! $successful) {
+            $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
+                'languageResource' => $this->languageResource,
+                'apiError' => $this->api->getError(),
+            ]);
+        }
+
+        $this->waitForImportFinish($tmName);
         // At current point LR is in Import status to prevent race conditions
         // Here we resetting state to fetch the actual status from t5memory
         $this->languageResource->setStatus(LanguageResourceStatus::NOTCHECKED);
-
-        $this->waitForImportFinish($tmName);
         $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
-
         $error = $this->api->getError();
+
         // In case we've got memory overflow error we need to create another memory and import further
         if ($status === LanguageResourceStatus::ERROR && $this->isMemoryOverflown($error)) {
             $this->addOverflowWarning();
@@ -1753,5 +1848,36 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     private function generateTmFilename(editor_Models_LanguageResources_LanguageResource $languageResource): string
     {
         return 'ID' . $languageResource->getId() . '-' . $this->filterName($languageResource->getName());
+    }
+
+    private function getMaxRequestRetries(): int
+    {
+        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestMaxRetries;
+    }
+
+    private function getRetryDelaySeconds(): int
+    {
+        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestRetryDelaySeconds;
+    }
+
+    private function getMaxWaitingTimeSeconds(): int
+    {
+        if ($this->canWaitLongTaskFinish()) {
+            // 1 hour max waiting time
+            return 3600;
+        }
+
+        return $this->getRetryDelaySeconds() * $this->getMaxRequestRetries();
+    }
+
+    /**
+     * Shows if connector can wait for a long-running task (e.g. reorganize, import, export) to finish before do
+     * fuzzy requests or other operations.
+     */
+    private function canWaitLongTaskFinish(): bool
+    {
+        // This should be moved to config, but this requires refactoring of the connectors
+        // and introducing a connector factory instead of manager as it is implemented at the moment
+        return defined('ZFEXTENDED_IS_WORKER_THREAD');
     }
 }

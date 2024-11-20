@@ -33,7 +33,7 @@ use MittagQI\Translate5\Test\Api\Helper;
 /**
  * Represents the api-request configuration for a bconf upload
  */
-final class Bconf extends Resource
+final class Bconf extends AbstractResource
 {
     public string $name;
 

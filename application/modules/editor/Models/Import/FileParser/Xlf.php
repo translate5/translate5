@@ -242,6 +242,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
 
         try {
+            $this->_origFile = $this->namespaces->preProcessFile($this->_origFile);
+
             $this->skeletonFile = $parser->parse($this->_origFile, $preserveWhitespaceDefault);
         } catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
             $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.xlf');

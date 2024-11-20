@@ -24,5 +24,10 @@ Ext.define('TMMaintenance.view.main.SelectTmDialog', {
                 Ext.ComponentQuery.query('#selectTmDialog')[0].hide();
             },
         },
-    ]
+    ],
+    listeners: {
+        beforeshow: function () {
+            this.down('selecttm').getController().hideTaskTms();
+        },
+    },
 });

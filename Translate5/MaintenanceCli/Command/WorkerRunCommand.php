@@ -34,6 +34,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Zend_Exception;
+use Zend_Registry;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_Installer_Maintenance;
 use ZfExtended_Models_MaintenanceException;
@@ -122,8 +123,11 @@ class WorkerRunCommand extends Translate5AbstractCommand
                     return self::FAILURE;
                 }
             }
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            // if a worker was gone before we don't log that
+            return self::FAILURE;
         } catch (Throwable $e) {
-            \Zend_Registry::get('logger')->exception($e);
+            Zend_Registry::get('logger')->exception($e);
 
             return self::FAILURE;
         }
@@ -137,7 +141,7 @@ class WorkerRunCommand extends Translate5AbstractCommand
     private function changeProcessTitle(?ZfExtended_Models_Worker $workerModel): void
     {
         $additionalInfos = '';
-        $dbName = \Zend_Registry::get('config')->resources->db->params->dbname;
+        $dbName = Zend_Registry::get('config')->resources->db->params->dbname;
         if ($dbName != 'translate5') { //we ignore default tables in debugging
             $additionalInfos .= ' instance: ' . $dbName;
         }

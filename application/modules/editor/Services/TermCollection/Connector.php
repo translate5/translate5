@@ -73,6 +73,19 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
 
         $import->mergeTerms = isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
 
+        // Setup import source (filesystem or crossApi), if given in $params
+        if ($params['importSource'] ?? 0) {
+            $import->importSource = $params['importSource'];
+        }
+
+        // Setup customerIds, if given in $params
+        if ($params['customerIds'] ?? 0) {
+            if (is_string($params['customerIds'])) {
+                $import->customerIds = explode(',', $params['customerIds']);
+            } else {
+                $import->customerIds = $params['customerIds'];
+            }
+        }
         $userGuid = $params['userGuid'] ?? ZfExtended_Authentication::getInstance()->getUserGuid();
         $import->loadUser($userGuid);
 

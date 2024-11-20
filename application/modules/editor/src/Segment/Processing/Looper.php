@@ -104,6 +104,14 @@ final class Looper
             }
             // report the progress of processed segments
             $this->progressReporter->reportProcessed($this->numProcessed);
+            // FALLBACK: if there are states still in "processing", we need to reset their state
+            // this may happens when processors decide, there is nothing to do with the segment -
+            // the saving of the segments also saves the state to avoid updating a row twice
+            foreach ($this->toProcess as $state) {
+                if ($state->isProcessing()) {
+                    $state->setProcessed();
+                }
+            }
             // if configured, we wait before fetching the next segments
             if ($this->loopingPause > 0) {
                 usleep($this->loopingPause);
@@ -122,7 +130,7 @@ final class Looper
     }
 
     /**
-     * Retrieves the TagStates currently being procesed
+     * Retrieves the TagStates currently being processed
      * @return State[]
      */
     public function getProcessedStates(): array
@@ -133,7 +141,7 @@ final class Looper
     /**
      * @param State[] $problematicStates
      */
-    public function setUnprocessedStates(array $problematicStates, int $errorState, bool $doDebug = false)
+    public function setUnprocessedStates(array $problematicStates, int $errorState, bool $doDebug = false): void
     {
         foreach ($problematicStates as $state) {
             if ($state->getState() != State::PROCESSED) {

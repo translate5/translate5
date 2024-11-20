@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
@@ -75,7 +76,7 @@ class Translate2483Test extends JsonTestAbstract
      */
     public static function beforeTests(): void
     {
-        $json = self::assertLogin('testmanager');
+        $json = self::assertLogin(TestUser::TestManager->value);
         self::assertContains('instantTranslate', $json->user->roles, 'Missing role for user.');
         self::assertContains('instantTranslateWriteTm', $json->user->roles, 'Missing role for user.');
         $userIds = [];
@@ -108,7 +109,7 @@ class Translate2483Test extends JsonTestAbstract
      */
     private function createAndWrite(): void
     {
-        self::assertLogin('testmanager');
+        self::assertLogin(TestUser::TestManager->value);
         $response = static::api()->postJson(
             'editor/instanttranslateapi/writetm',
             [

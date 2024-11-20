@@ -922,7 +922,7 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
     {
         try {
             $packer = new Packer($this);
-            $packer->process($isOutdatedRepack, $this->isSystemDefault());
+            $packer->createExtraction($isOutdatedRepack, $this->isSystemDefault());
         } catch (BconfInvalidException $e) {
             // in case of a BconfInvalidException, the exception came from the packer
             $name = $this->getName();

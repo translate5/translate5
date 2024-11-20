@@ -30,8 +30,13 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TMMaintenance\Repository;
 
+use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_LanguageResources_Languages as Languages;
 use editor_Services_Manager as ServicesManager;
+use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation;
+use Zend_Db_Table_Select;
+use ZfExtended_Factory;
 
 class LanguageResourceRepository
 {
@@ -39,7 +44,7 @@ class LanguageResourceRepository
 
     public function __construct()
     {
-        $this->db = \ZfExtended_Factory::get(LanguageResource::class)->db;
+        $this->db = ZfExtended_Factory::get(LanguageResource::class)->db;
     }
 
     public function getT5MemoryTypeFilteredByCustomers(int ...$customerIds): array
@@ -63,19 +68,23 @@ class LanguageResourceRepository
         return $this->mapLanguageCodes($result);
     }
 
-    private function getT5MemoryTypeSelect(): \Zend_Db_Table_Select
+    private function getT5MemoryTypeSelect(): Zend_Db_Table_Select
     {
+        $languageResourceTable = $this->db->info($this->db::NAME);
+        $languageResourceCustomerAssocTable = ZfExtended_Factory::get(CustomerAssoc::class)->db->info($this->db::NAME);
+        $languagesTable = ZfExtended_Factory::get(Languages::class)->db->info($this->db::NAME);
+
         return $this->db->select()
             ->from(
                 [
-                    'tm' => 'LEK_languageresources',
+                    'tm' => $languageResourceTable,
                 ],
                 ['tm.*']
             )
             ->setIntegrityCheck(false)
             ->joinLeft(
                 [
-                    'ca' => 'LEK_languageresources_customerassoc',
+                    'ca' => $languageResourceCustomerAssocTable,
                 ],
                 'tm.id = ca.languageResourceId',
                 ''
@@ -89,13 +98,20 @@ class LanguageResourceRepository
             )
             ->joinLeft(
                 [
-                    'l' => 'LEK_languageresources_languages',
+                    'l' => $languagesTable,
                 ],
                 'tm.id = l.languageResourceId',
                 [
-                    'GROUP_CONCAT(`l`.`sourceLang`) as sourceLang',
-                    'GROUP_CONCAT(`l`.`targetLang`) as targetLang',
+                    'GROUP_CONCAT(DISTINCT `l`.`sourceLang`) as sourceLang',
+                    'GROUP_CONCAT(DISTINCT `l`.`targetLang`) as targetLang',
                 ]
+            )
+            ->joinLeft(
+                [
+                    'ttm' => TaskTmTaskAssociation::TABLE,
+                ],
+                'tm.id = ttm.languageResourceId',
+                'IF(ISNULL(ttm.id), 0, 1) AS isTaskTm'
             )
             ->where('tm.serviceType = ?', ServicesManager::SERVICE_OPENTM2)
             ->group('tm.id');
@@ -111,7 +127,7 @@ class LanguageResourceRepository
             return [];
         }
 
-        $languages = \ZfExtended_Factory::get(\editor_Models_Languages::class);
+        $languages = ZfExtended_Factory::get(\editor_Models_Languages::class);
         $languagesMapping = $languages->loadAllKeyValueCustom('id', 'rfc5646');
 
         // explode the language codes and map them to their rfc5646 representation

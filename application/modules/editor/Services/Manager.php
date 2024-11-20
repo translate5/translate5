@@ -33,11 +33,14 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\ContentProtection\SupportsContentProtectionInterface;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionServiceInterface;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
 use MittagQI\Translate5\CrossSynchronization\SynchronizableIntegrationInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
-use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\LanguageResource\TaskTm\Operation\CreateTaskTmOperation;
+use MittagQI\Translate5\LanguageResource\TaskTm\SupportsTaskTmInterface;
 use MittagQI\Translate5\Service\DetectLanguageInterface;
 use MittagQI\Translate5\Service\HasLanguageDetector;
 
@@ -166,6 +169,36 @@ class editor_Services_Manager
         }
 
         return $synchronizableServiceTypes;
+    }
+
+    public function getCreateTaskTmOperation(string $serviceType): ?CreateTaskTmOperation
+    {
+        try {
+            $service = $this->getService($serviceType);
+        } catch (editor_Services_Exceptions_NoService) {
+            return null;
+        }
+
+        if (! $service instanceof SupportsTaskTmInterface) {
+            return null;
+        }
+
+        return $service->getCreateTaskTmOperation();
+    }
+
+    public function getTmConversionService(string $serviceType): ?TmConversionServiceInterface
+    {
+        try {
+            $service = $this->getService($serviceType);
+        } catch (editor_Services_Exceptions_NoService) {
+            return null;
+        }
+
+        if (! $service instanceof SupportsContentProtectionInterface) {
+            return null;
+        }
+
+        return $service->getTmConversionService();
     }
 
     public function getAllUiNames(): array
@@ -315,15 +348,15 @@ class editor_Services_Manager
         return $resource ?? null;
     }
 
-    /***
+    /**
      * returns the desired connector, connection to the given resource
      *
-     * @param editor_Models_LanguageResources_LanguageResource $languageResource
-     * @param int|null $sourceLang
-     * @param int|null $targetLang
-     * @param Zend_Config|null $config : this will overwritte the default connector config value
+     * @param Zend_Config|null $config : this will overwrite the default connector config value
+     *
      * @return editor_Services_Connector
+     *
      * @throws ZfExtended_Exception
+     * @throws editor_Services_Exceptions_NoService
      */
     public function getConnector(
         editor_Models_LanguageResources_LanguageResource $languageResource,
@@ -331,12 +364,12 @@ class editor_Services_Manager
         int $targetLang = null,
         Zend_Config $config = null,
         ?int $customerId = null,
-    ) {
+    ): editor_Services_Connector|UpdatableAdapterInterface|FileBasedInterface {
         $serviceType = $languageResource->getServiceType();
         $this->checkService($serviceType);
-        $connector = ZfExtended_Factory::get('editor_Services_Connector');
-        /* @var $connector editor_Services_Connector */
+        $connector = ZfExtended_Factory::get(editor_Services_Connector::class);
         $connector->connectTo($languageResource, $sourceLang, $targetLang);
+
         if (isset($config)) {
             $connector->setConfig($config);
         }
@@ -382,121 +415,6 @@ class editor_Services_Manager
     public function hasService(string $namespace)
     {
         return in_array($namespace, self::$registeredServices);
-    }
-
-    public function openForTask(editor_Models_Task $task)
-    {
-        $this->visitAllAssociatedTms($task, function (editor_Services_Connector $connector) {
-            $connector->open();
-        });
-    }
-
-    public function closeForTask(editor_Models_Task $task)
-    {
-        $this->visitAllAssociatedTms($task, function (editor_Services_Connector $connector) {
-            $connector->close();
-        });
-    }
-
-    /**
-     * @throws Zend_Exception
-     * @throws editor_Models_ConfigException
-     * @throws RescheduleUpdateNeededException
-     * @see \editor_Services_OpenTM2_Connector::update
-     */
-    public function updateSegment(editor_Models_Segment $segment)
-    {
-        // segments with empty sources or targets will not be updated
-        // TODO FIXME: In the Frontend we should show an error when editing segments without source and save-back is active
-        if ($segment->hasEmptySource() || $segment->hasEmptyTarget()) {
-            return;
-        }
-
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-        $task->loadByTaskGuid($segment->getTaskGuid());
-        $this->visitAllAssociatedTms(
-            $task,
-            function (editor_Services_Connector $connector, $languageResource, $assoc) use ($segment): void {
-                if (! empty($assoc['segmentsUpdateable'])) {
-                    try {
-                        $connector->update(
-                            $segment,
-                            [
-                                UpdatableAdapterInterface::RECHECK_ON_UPDATE => true,
-                                UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR => true,
-                            ]
-                        );
-                    } catch (SegmentUpdateException) {
-                        // Ignore the error here as we don't care about the result
-                    }
-                }
-            },
-            function (
-                Exception $e,
-                editor_Models_LanguageResources_LanguageResource $languageResource,
-                ZfExtended_Logger_Event $event,
-            ): void {
-                self::reportTMUpdateError(null, $event->message, $event->eventCode);
-            }
-        );
-    }
-
-    /**
-     * The todo callback is called on each visited TM and receives the following parameters:
-     *   editor_Services_Connector $connector
-     *   editor_Models_LanguageResources_LanguageResource $languageResource
-     *   array $data the lang res data
-     * The optional exceptionHandler callback is called on exceptions in the todo call, and receives the parameters:
-     *   Exception $e
-     *   editor_Models_LanguageResources_LanguageResource $languageResource
-     *
-     * @throws Zend_Exception
-     * @throws editor_Models_ConfigException
-     */
-    protected function visitAllAssociatedTms(editor_Models_Task $task, Closure $todo, Closure $exceptionHandler = null)
-    {
-        $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
-        $list = $languageResources->loadByAssociatedTaskGuid($task->getTaskGuid());
-        foreach ($list as $one) {
-            /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
-            $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-            // TODO $assumeDatabase is skipped here which leads to that we can not manipulate language resourse
-            // inside of the connector. Need to check if we can normally load language resource from DB here.
-            $languageResource->init($one);
-
-            try {
-                $connector = $this->getConnector(
-                    $languageResource,
-                    config: $task->getConfig(),
-                    customerId: (int) $task->getCustomerId(),
-                );
-                $todo($connector, $languageResource, $one);
-            } catch (editor_Services_Exceptions_NoService | editor_Services_Connector_Exception | ZfExtended_BadGateway $e) {
-                $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service');
-                /* @var $logger ZfExtended_Logger */
-
-                $extraData = [
-                    'languageResource' => $languageResource,
-                    'task' => $task,
-                ];
-
-                //UGLY: remove on refactoring of ZfExtended_BadGateway
-                if ($e instanceof ZfExtended_BadGateway) {
-                    $e->setErrors(array_merge($e->getErrors(), $extraData));
-                } else {
-                    $e->addExtraData($extraData);
-                }
-                $event = $logger->exception($e, [
-                    'level' => $logger::LEVEL_WARN,
-                ], true);
-                if (! is_null($exceptionHandler)) {
-                    $exceptionHandler($e, $languageResource, $event);
-                }
-
-                continue;
-            }
-        }
     }
 
     private function getServiceClassName(string $namePart): string

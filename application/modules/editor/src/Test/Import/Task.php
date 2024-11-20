@@ -30,6 +30,7 @@ namespace MittagQI\Translate5\Test\Import;
 
 use MittagQI\Translate5\Test\Api\Helper;
 use MittagQI\Translate5\Test\ApiTestAbstract;
+use MittagQI\Translate5\Test\Enums\TestUser;
 use Zend_Http_Client_Exception;
 
 /**
@@ -39,7 +40,7 @@ use Zend_Http_Client_Exception;
  * Another problem is, that api-calls may manipulate the task without the changes reflected in this object.
  * To avoid this, simply use this class exclusively for task-api-calls ...
  */
-final class Task extends Resource
+final class Task extends AbstractResource
 {
     public const TASK_CONFIG_INI = 'task-config.ini';
 
@@ -371,7 +372,7 @@ final class Task extends Resource
             throw new Exception('You cannot import a Task twice.');
         }
         // tasks will be uploaded as testmanager
-        $api->login('testmanager');
+        $api->login(TestUser::TestManager->value);
 
         // has to be evaluated before the data is re-set by request
         $isMultiLanguage = (is_array($this->targetLang) && count($this->targetLang) > 1);
@@ -424,15 +425,20 @@ final class Task extends Resource
             ]);
         }
         // if testlector shall be loged in after setup, we add him to the task automatically
-        if ($config->getLogin() === 'testlector') {
-            $this->_userAssocs['testlector'] = $api->addUserToTask($this->getTaskGuid(), 'testlector');
-            $api->login('testlector');
+        if ($config->getLogin() === TestUser::TestLector->value) {
+            $this->_userAssocs[TestUser::TestLector->value] = $api->addUserToTask($this->getTaskGuid(), TestUser::TestLector->value);
+            $api->login(TestUser::TestLector->value);
         }
         // add additional defined users
         if ($this->_importUsers !== null) {
             foreach ($this->_importUsers as $data) {
-                if ($data['name'] === 'testlector' && $config->getLogin() === 'testlector') {
-                    throw new Exception('You cannot setup the \'testlector\' login and assign it as seperate user to the task at the same time.');
+                if ($data['name'] === TestUser::TestLector->value && $config->getLogin() === TestUser::TestLector->value) {
+                    throw new Exception(
+                        sprintf(
+                            "You cannot setup the '%s' login and assign it as seperate user to the task at the same time.",
+                            TestUser::TestLector->value
+                        )
+                    );
                 }
                 // $this->reload($api); // some tests added this always between user-adds but it seems to be unneccessary
                 $this->_userAssocs[$data['name']] = $api->addUserToTask($this->getTaskGuid(), $data['name'], $data['state'], $data['step'], $data['params']);
@@ -476,7 +482,7 @@ final class Task extends Resource
      */
     public function cleanup(Helper $api, Config $config): void
     {
-        $api->login('testmanager');
+        $api->login(TestUser::TestManager->value);
         // TODO FIXME: this is just neccessary because of quirks in the helper API ... see class comment
         if ($this->_failOnError) {
             $this->reload($api);
@@ -488,11 +494,11 @@ final class Task extends Resource
             // project tasks or tasks in error/import state can not be opened
             // Note that it can not be guaranteed here, that the state of the task is persistent as there is a task-cache in the API still
             if (! $this->isProjectTask() && $taskState !== 'error' && $taskState !== 'import') {
-                $login = ($config->hasTestlectorLogin()) ? 'testlector' : 'testmanager';
+                $login = ($config->hasTestlectorLogin()) ? TestUser::TestLector->value : TestUser::TestManager->value;
                 $api->login($login);
                 $api->setTaskToOpen($taskId);
             }
-            $api->login('testmanager');
+            $api->login(TestUser::TestManager->value);
             $api->delete('editor/task/' . $taskId);
         }
         // remnove zipped file when imported by folder

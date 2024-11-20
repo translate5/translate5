@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory\Api;
 
 use Http\Client\Exception\HttpException;
+use JsonException;
 use PharIo\Version\Version;
 use PharIo\Version\VersionConstraint;
 use Psr\Http\Message\RequestInterface;
@@ -50,10 +51,30 @@ abstract class AbstractVersionedApi
      */
     protected function throwExceptionOnNotSuccessfulResponse(
         ResponseInterface $response,
-        RequestInterface $request
+        RequestInterface $request,
     ): void {
         if ($response->getStatusCode() !== 200) {
             throw new HttpException($response->getReasonPhrase(), $request, $response);
         }
+    }
+
+    protected function tryParseResponseAsJson(ResponseInterface $response): array
+    {
+        try {
+            return json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return [];
+        }
+    }
+
+    protected function isTimeoutErrorOccurred(ResponseInterface $response): bool
+    {
+        if ($response->getStatusCode() === 200) {
+            return false;
+        }
+
+        $data = $this->tryParseResponseAsJson($response);
+
+        return 506 === (int) ($data['ReturnValue'] ?? 0);
     }
 }

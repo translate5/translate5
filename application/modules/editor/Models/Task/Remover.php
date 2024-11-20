@@ -26,12 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
+declare(strict_types=1);
+
+use MittagQI\Translate5\LanguageResource\Db\TaskAssociation;
+use MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation;
+use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
+use MittagQI\Translate5\LanguageResource\TaskTm\Operation\DeleteTaskTmOperation;
+
 /**
  * Task Remover - on task deletion several things should happen, this is all encapsulated in this class
  */
@@ -41,6 +42,8 @@ final class editor_Models_Task_Remover
 
     private ZfExtended_EventManager $eventManager;
 
+    private DeleteTaskTmOperation $deleteTaskTmOperation;
+
     /**
      * Sets the task to be removed from system
      */
@@ -48,6 +51,7 @@ final class editor_Models_Task_Remover
     {
         $this->task = $task;
         $this->eventManager = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
+        $this->deleteTaskTmOperation = DeleteTaskTmOperation::create();
     }
 
     /**
@@ -68,14 +72,16 @@ final class editor_Models_Task_Remover
         }
 
         // on import error project may not be created
-        // TODO FIXME: why is that called ? It seems this case can not happen as everything is removed already with the code above ...
+        // TODO FIXME: why is that called ?
+        // It seems this case can not happen as everything is removed already with the code above ...
         if ($projectId > 0) {
             $this->cleanupProject($projectId);
         }
     }
 
     /***
-     * Remove the current loaded task. The task data on the disk will be removed by default ($removeFiles). To disable this set $removeFiles to false.
+     * Remove the current loaded task. The task data on the disk will be removed by default ($removeFiles).
+     * To disable this set $removeFiles to false.
      * @param false $forced
      * @param true $removeFiles: should the task files be removed
      * @throws ZfExtended_ErrorCodeException
@@ -213,6 +219,7 @@ final class editor_Models_Task_Remover
         // so all languageresource entries in LEK_languageresources_taskassoc and LEK_languageresources_taskpivotassoc
         // where field "autoCreatedOnImport" is set to 1 will be removed
         $this->removeAutocreatedOnImportLanguageResources();
+        $this->deleteTaskTmOperation->removeTaskTmsForTask($taskGuid);
     }
 
     /**
@@ -223,14 +230,20 @@ final class editor_Models_Task_Remover
     {
         // first detect all IDs of the languageresources that need to be deleted
 
-        $db = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\Db\TaskAssociation::class);
-        $taskAssocTable = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\Db\TaskAssociation::class);
-        $select = $taskAssocTable->select()->where('autoCreatedOnImport = 1 AND taskGuid = ?', $this->task->getTaskGuid());
+        $db = ZfExtended_Factory::get(TaskAssociation::class);
+        $taskAssocTable = ZfExtended_Factory::get(TaskAssociation::class);
+        $select = $taskAssocTable->select()->where(
+            'autoCreatedOnImport = 1 AND taskGuid = ?',
+            $this->task->getTaskGuid()
+        );
         $rowsTaskAssoc = $db->fetchAll($select)->toArray();
 
-        $db = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation::class);
-        $taskPivotAssocTable = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation::class);
-        $select = $taskPivotAssocTable->select()->where('autoCreatedOnImport = 1 AND taskGuid = ?', $this->task->getTaskGuid());
+        $db = ZfExtended_Factory::get(TaskPivotAssociation::class);
+        $taskPivotAssocTable = ZfExtended_Factory::get(TaskPivotAssociation::class);
+        $select = $taskPivotAssocTable->select()->where(
+            'autoCreatedOnImport = 1 AND taskGuid = ?',
+            $this->task->getTaskGuid()
+        );
         $rowsTaskPivotAssoc = $db->fetchAll($select)->toArray();
 
         $allEntries = array_merge($rowsTaskAssoc, $rowsTaskPivotAssoc);
@@ -240,12 +253,12 @@ final class editor_Models_Task_Remover
             return;
         }
 
+        $deleteOperation = DeleteLanguageResourceOperation::create();
         foreach ($allEntries as $entry) {
             $languageResourceId = (int) $entry['languageResourceId'];
             $languageResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
             $languageResource->load($languageResourceId);
-            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [$languageResource]);
-            $remover->remove(forced: true, deleteInResource: true);
+            $deleteOperation->delete($languageResource, forced: true, deleteInResource: true);
         }
     }
 }

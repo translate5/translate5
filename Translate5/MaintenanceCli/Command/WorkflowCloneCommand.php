@@ -83,7 +83,14 @@ class WorkflowCloneCommand extends Translate5AbstractCommand
 
         //TODO: make also available as optional switch
         $newWorkflowLabel = $this->io->ask('Please provide the UI label of the target workflow:');
-        $newWorkflowName = $this->io->ask('Please provide the technical name of the target workflow:');
+
+        $newWorkflowName = '';
+        while (! preg_match('/^[a-z_0-9]+$/i', $newWorkflowName)) {
+            if (! empty($newWorkflowName)) {
+                $this->io->warning('The entered name is invalid, please use only [a-zA-Z0-9_]');
+            }
+            $newWorkflowName = $this->io->ask('Please provide the technical name of the target workflow:');
+        }
 
         $workflow = ZfExtended_Factory::get(editor_Models_Workflow::class);
         $workflow->loadByName($input->getArgument('workflowSource'));

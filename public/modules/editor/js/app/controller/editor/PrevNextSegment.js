@@ -62,13 +62,12 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
          * returns true if segment was not edited by the current role yet
          */
         workflow: function(record, field){
-            var role = Editor.data.task.get('userRole') || 'pm',
-                map = Editor.data.segments.roleAutoStateMap,
-                autoState = record.get('autoStateId');
-            if(!map[role]) {
-                return true;
+            var userStep = Editor.data.task.get('userStep') || 'pmCheck';
+            if (userStep == record.get('workflowStep')) {
+                return false;
             }
-            return map[role].indexOf(autoState) < 0 && autoState != 999; // if segment is saving, consider it as edited!
+            // before: autoState != 999 // if segment is saving, consider it as edited!
+            return !record.isModified(field);
         }
     },
     /**
@@ -292,17 +291,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             }
         }
     },
-    
-    isNextInWorkflowStep: function(newRec) {
-        var role = Editor.data.task.get('userRole') || 'pm',
-            map = Editor.data.segments.roleAutoStateMap,
-            autoState = newRec.get('autoStateId');
-        if(!map[role]) {
-            return true;
-        }
-        return map[role].indexOf(autoState) < 0 && autoState != 999; //if segment is saving, consider it as edited!
-    },
-    
+
     fetchFromServer: function(editedField){
         var me = this,
             store = me.editingPlugin.grid.store,

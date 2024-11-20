@@ -140,7 +140,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
     /**
      * Adds the users of the given cc/bcc step config to the email - if receiverStep is configured in config
      * @param stdClass $triggerConfig the config object given in action matrix
-     * @param string $receiverStep the original receiver step of the notification to be sended
+     * @param string $receiverStep the original receiver step of the notification to be sent
      */
     protected function addCopyReceivers(stdClass $triggerConfig, $receiverStep)
     {
@@ -186,7 +186,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
     }
 
     /**
-     * Initiales the internal trigger configuration through the given parameters and returns it
+     * Initiates the internal trigger configuration through the given parameters and returns it
      * currently the following configuration parameters exist:
      * pmBcc boolean, true if the pm of the task should also receive the notification
      * rolesBcc array, list of workflow roles which also should receive the notification
@@ -516,6 +516,33 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
 
         $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params);
         $this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
+        $this->notifyUser($user);
+    }
+
+    public function notifyAutoclosed(array $triggerConfigArgs, string $userGuid, string $workflowStepName): void
+    {
+        $triggerConfig = $this->initTriggerConfig($triggerConfigArgs);
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $user->loadByGuid($this->config->task->getPmGuid());
+
+        $this->createNotification(ACL_ROLE_PM, __FUNCTION__, [
+            'task' => $this->config->task,
+            'user' => (array) $user->getDataObject(),
+        ]);
+
+        // Notify PM
+        $this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
+        $this->notifyUser($user);
+
+        $user->loadByGuid($userGuid);
+
+        $this->createNotification('', __FUNCTION__, [
+            'task' => $this->config->task,
+            'user' => (array) $user->getDataObject(),
+        ]);
+
+        // Notify the assigned user
+        $this->addCopyReceivers($triggerConfig, $workflowStepName);
         $this->notifyUser($user);
     }
 

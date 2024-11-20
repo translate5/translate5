@@ -71,7 +71,8 @@ Ext.define('Editor.controller.SearchReplace', {
             },
             '#searchField':{
                 change:'onSearchFieldChange',
-                keyup:'triggerSearchOnEnter'
+                keyup:'triggerSearchOnEnter',
+                render: 'onSearchFieldRender'
             },
             '#searchInField':{
                 keyup:'triggerSearchOnEnter'
@@ -136,7 +137,14 @@ Ext.define('Editor.controller.SearchReplace', {
      * the search/replace will be performed only on filtered segments
      */
     isFilterActive:false,
-    
+
+    /**
+     * Flag indicating whether searchreplacewindow was already opened at least once since the current task was opened
+     * This is used to set up empty value for search field whe searchreplacewindow is opened for the first time
+     * because when that window is opened 2nd and further times - previous value is set to search field in there
+     */
+    searchReplaceOpenedAtLeastOnce: false,
+
     /***
      * The segment information.
      * matchIndex -> the match index in the currently edited segment
@@ -377,7 +385,10 @@ Ext.define('Editor.controller.SearchReplace', {
         
         //add the menu item to the grid menu
         me.addSearchReplaceMenu(menu);
-        
+
+        // Reset searchreplacewindow instantiation flag
+        this.searchReplaceOpenedAtLeastOnce = false;
+
         //add menu handler, so we hide and show the search/replace menu item
         menu.on({
             beforeshow:{
@@ -714,6 +725,8 @@ Ext.define('Editor.controller.SearchReplace', {
             //rec = plug.editing && plug.context.record,
             //grid = me.getSegmentGrid(),
             //selModel = grid.getSelectionModel();
+
+        this.searchReplaceOpenedAtLeastOnce = true;
 
         if(plug.editor && plug.editor.editingPlugin.editing){
             me.activeColumnDataIndex = plug.editor.columnClicked;
@@ -1775,5 +1788,16 @@ Ext.define('Editor.controller.SearchReplace', {
     	return isValid;
     },
 
+    /**
+     * Make sure field value is selected on field render,
+     * so that it can be immediately replaced when Ctrl+V is pressed
+     *
+     * @param field
+     */
+    onSearchFieldRender: function(field) {
+        Ext.defer(() => {
+            field.selectText();
+        }, 100);
+    }
 });
     

@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Api\Helper;
 use MittagQI\Translate5\Test\ApiTestAbstract;
+use MittagQI\Translate5\Test\Enums\TestUser;
 
 /**
  * Test for the CSRF Protection
@@ -114,7 +115,7 @@ class Translate3048Test extends ApiTestAbstract
     {
         // generate an auth-token temporarily
         static::$authTokenEntity = ZfExtended_Factory::get(ZfExtended_Auth_Token_Entity::class);
-        $appToken = static::$authTokenEntity->create('testmanager', static::class);
+        $appToken = static::$authTokenEntity->create(TestUser::TestManager->value, static::class);
 
         // logout & destroy session & use app origin
         static::api()->logout();
@@ -127,7 +128,7 @@ class Translate3048Test extends ApiTestAbstract
         // restore original state
         Helper::unsetApplicationToken();
         Helper::setCsrfToken(static::$apitestToken);
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
     }
 
     /**
@@ -140,7 +141,7 @@ class Translate3048Test extends ApiTestAbstract
         static::assertTrue(is_array($users), 'Fetching the Users-List failed');
         $testmanagerFound = false;
         foreach ($users as $user) {
-            if ($user->login === 'testmanager') {
+            if ($user->login === TestUser::TestManager->value) {
                 $testmanagerFound = true;
             }
         }
@@ -154,7 +155,7 @@ class Translate3048Test extends ApiTestAbstract
         Helper::activateOriginHeader(false);
         Helper::setCsrfToken($token);
         // Login to generate a proper session token
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
     }
 
     private function switchToTestToken()
@@ -163,7 +164,7 @@ class Translate3048Test extends ApiTestAbstract
         static::api()->logout();
         Helper::activateOriginHeader(true);
         Helper::setCsrfToken(static::$apitestToken);
-        static::api()->login('testmanager');
+        static::api()->login(TestUser::TestManager->value);
     }
 
     public static function afterTests(): void

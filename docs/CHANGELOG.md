@@ -18,6 +18,172 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+
+
+## [7.14.0] - 2024-11-01
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4246](https://jira.translate5.net/browse/TRANSLATE-4246): LanguageResources - Adding Terminology to OpenAI translation Requests when importing tasks or do a pretranslation in the Analysis** <br>
+Improvement: OpenAI Plugin uses assigned Terminology when translating
+
+**[TRANSLATE-4243](https://jira.translate5.net/browse/TRANSLATE-4243): t5memory - Wait until reorganization is finished in background tasks** <br>
+Background running tasks now wait until t5memory reorganization is finished.
+
+**[TRANSLATE-4240](https://jira.translate5.net/browse/TRANSLATE-4240): file format settings - Remove warning when using a custom BCONF in the zip** <br>
+Remove warning when using a custom BCONF in the import-ZIP
+
+**[TRANSLATE-4213](https://jira.translate5.net/browse/TRANSLATE-4213): Configuration - Define Callback in config client-overwritable** <br>
+triggerCallbackAction URLs are configurable through the config now, with the ability to override it at the client level. Users can define or modify the callback URLs without need for manual database changes.
+
+
+### Bugfixes
+**[TRANSLATE-4254](https://jira.translate5.net/browse/TRANSLATE-4254): LanguageResources - Client-PM can only filebased LR-types** <br>
+FIX: a client-PM could add only filebased LR-types, added non-filebased
+
+**[TRANSLATE-4250](https://jira.translate5.net/browse/TRANSLATE-4250): Main back-end mechanisms (Worker, Logging, etc.) - Small tasks hang on import due to delayed workers with no cronjobs enabled Edit Add comment Assign More Waiting for support  Share this issue Export** <br>
+FIX: A bug in the worker scheduler lead to hanging import on small tasks in conjuction with worker-delay
+
+**[TRANSLATE-4238](https://jira.translate5.net/browse/TRANSLATE-4238): Editor general - Only my project button produces UI error when clicked from menu** <br>
+Fix for UI problem when filtering out "Only my projects" from menu item in project grid.
+
+
+## [7.13.0] - 2024-10-27
+
+### Important Notes:
+#### [TRANSLATE-4067](https://jira.translate5.net/browse/TRANSLATE-4067)
+For tasks, that are assigned with "write" rights to a TM, if a user saves segments to the task from now on segments are not immediately saved to the TM anymore. So far this was the case and lead to unreviewed segments and segments that even were about to be changed within the current work of a single translator could already appear in pre-translations of other tasks.
+This can be seen as a major bug.
+Now as a new feature a task TM is introduced, that makes sure, those segments are only saved into the TM with write access for the task, when the whole workflow is finished.
+So this is an important downwards incompatible change, that at the same time is a bug fix in the way of how translate5 works and therefore is rolled out to everyone.
+ 
+
+
+### Added
+**[TRANSLATE-4067](https://jira.translate5.net/browse/TRANSLATE-4067): LanguageResources, Task Management - Introduce Task TM in translate5** <br>
+Introduced Task TM concept for t5memory
+
+
+### Bugfixes
+**[TRANSLATE-4181](https://jira.translate5.net/browse/TRANSLATE-4181): Task Management, Workflows - Add missing workflow select field  and workflow steps from all existing workflows to task overview "advanced filters"** <br>
+Added filter by Workflow in task overview
+
+**[TRANSLATE-3987](https://jira.translate5.net/browse/TRANSLATE-3987): file format settings - wrong segmentation** <br>
+So far in certain cases it was segmented after a full stop (.), even if no whitespace followed. This is removed (the rule 
+<rule break="yes">
+<beforebreak>[\.!?…]['"\u00BB\u2019\u201D\u203A\p{Pe}\u0002]*</beforebreak>
+<afterbreak>\p{Lu}[^\p{Lu}]</afterbreak>
+</rule>
+got removed from srx)
+
+
+## [7.12.0] - 2024-10-23
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4239](https://jira.translate5.net/browse/TRANSLATE-4239): TM Maintenance - Increase request timeouts for TMMaintenance** <br>
+Timeout for requests in TM Maintenance increased to 15 minutes
+
+**[TRANSLATE-4228](https://jira.translate5.net/browse/TRANSLATE-4228): TM Maintenance - Change limit for the first request in TM Maintenance** <br>
+First 20 segments are now loaded one by one via separate requests instead of via single request
+
+**[TRANSLATE-4215](https://jira.translate5.net/browse/TRANSLATE-4215): t5memory - Implement new t5memory statuses processing** <br>
+Add support for new t5memory statuses and support of requests timeout with retry
+
+**[TRANSLATE-4136](https://jira.translate5.net/browse/TRANSLATE-4136): Hotfolder Import - Hotfolder: PM client override doesn't work** <br>
+Get PM from customer default if customer provided and specific PM not provided in instructions.xml
+
+**[TRANSLATE-4008](https://jira.translate5.net/browse/TRANSLATE-4008): Configuration - Use noreply address as default sender** <br>
+Now a noreply address is used as sender in default installations instead the support address.
+
+**[TRANSLATE-4005](https://jira.translate5.net/browse/TRANSLATE-4005): Test framework - Create enum containing all test user logins as constants** <br>
+Code clean-up: replace hard coded usernames in the tests.
+
+**[TRANSLATE-3941](https://jira.translate5.net/browse/TRANSLATE-3941): t5memory - Handle t5memory TM splitting in connection with size** <br>
+Added new code to handle t5memory overflow error
+
+
+### Bugfixes
+**[TRANSLATE-4237](https://jira.translate5.net/browse/TRANSLATE-4237): InstantTranslate - Text translations stay visible after switch to Translate file** <br>
+FIXED: text translations do not stay visible anymore when user switched to 'Translate file' mode
+
+**[TRANSLATE-4235](https://jira.translate5.net/browse/TRANSLATE-4235): Hotfolder Import, TBX-Import - SFTP TermImport: tbx import via zip with images inside is not working** <br>
+FIXED: tbx import via zip with images inside is now working via SFTP TermImport
+
+**[TRANSLATE-4234](https://jira.translate5.net/browse/TRANSLATE-4234): MatchAnalysis & Pretranslation - MatchAnalysis may lead to hanging delayed workers** <br>
+Using the match analysis after the import may lead to hanging workers in status delayed.
+
+**[TRANSLATE-4188](https://jira.translate5.net/browse/TRANSLATE-4188): Content Protection - Content Protection for InstantTranslate** <br>
+Fix content unprotect logic.
+
+**[TRANSLATE-4187](https://jira.translate5.net/browse/TRANSLATE-4187): Editor general, Workflows - CTRL+ENTER does not correctly work in complex workflow's multiple review steps** <br>
+Fix CTRL+ENTER behavior for segments editing within complex workflows: use current workflow step instead of autostates map
+
+**[TRANSLATE-4127](https://jira.translate5.net/browse/TRANSLATE-4127): Auto-QA - RootCause: this.getView() is null** <br>
+translate - 7.8.0 : added logging for further investigation of a problem with AutoQA filters
+translate - 7.12.0: bug fixed
+
+**[TRANSLATE-4112](https://jira.translate5.net/browse/TRANSLATE-4112): InstantTranslate - InstantTranslate target text should not be bold** <br>
+FIXED: styles are stripped from translation result when copied to clipboard
+
+
+## [7.11.3] - 2024-10-16
+
+### Important Notes:
+#### [TRANSLATE-4229](https://jira.translate5.net/browse/TRANSLATE-4229)
+Please note, that before being able to use TM maintenance for a TM, the TM needs to be reorganized because of changes in its data structures. translate5 will do that automatically for a TM as soon as you start to try to use it in TM maintenance, yet with big TMs that will take some time and the UI might run into timeouts then.
+You can also migrate all TMs first on the CMD to the new format by using the command line interface. Go to the document-root of your translate5 installation dir in your php-docker-container and call there:
+t5 t5memory:reorganize
+
+The command has the following parameters
+
+--tmName=TMNAME If no UUID was given this will filter the list of all TMs if provided
+--batchSize=BATCHSIZE Number of memories to reorganize at once. Works only if no UUID and tmName was given
+--startFromId=STARTFROMID
+
+The IDs of the TMs you see when showing the “id” column in the language resource management in the UI.
+ 
+
+
+### Changed
+**[TRANSLATE-4229](https://jira.translate5.net/browse/TRANSLATE-4229): TM Maintenance - Make TM Maintenance plugin to be enabled by default** <br>
+TM Maintenance plugin is now enabled by default
+
+
+### Bugfixes
+**[TRANSLATE-4236](https://jira.translate5.net/browse/TRANSLATE-4236): MatchAnalysis & Pretranslation - Deadlocks in segment processing leads to follow up error** <br>
+Fixed error about already active transactions in auto QA segment processing.
+
+**[TRANSLATE-4225](https://jira.translate5.net/browse/TRANSLATE-4225): GroupShare integration - GroupShare TMs should not be deletable via translate5** <br>
+Since the list of GroupShare TMs is synchronized from GroupShare itself, there should be no way to delete such TMs in translate5.
+
+**[TRANSLATE-4223](https://jira.translate5.net/browse/TRANSLATE-4223): Import/Export - Fix mxliff (Phrase) internal Tags (very strange, non xliff-standard format)** <br>
+Converts the mxliff custom markup({b>, {i> etc...) to ph (placeholder) tags and restore the markup on export.
+
+**[TRANSLATE-4222](https://jira.translate5.net/browse/TRANSLATE-4222): Editor general - CTRL+f in editor should not remember last search** <br>
+FIXED: search field's text is now empty on first search/replace window open, and pre-selected on further opens for easy overwriting with Ctrl+V 
+
+
+## [7.11.2] - 2024-10-06
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4220](https://jira.translate5.net/browse/TRANSLATE-4220): InstantTranslate - Instant translate: segmentation search does not clean the results list correctly** <br>
+Fix for not correctly cleaned instant translate results blocks.
+
+
 ## [7.11.1] - 2024-10-04
 
 ### Important Notes:
