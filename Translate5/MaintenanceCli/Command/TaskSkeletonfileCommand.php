@@ -37,7 +37,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * List and show the content of a tasks import data skeleton file(s)
  */
-class TaskSkeletonfileCommand extends Translate5AbstractCommand
+class TaskSkeletonfileCommand extends TaskCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'task:skeletonfile';
@@ -50,9 +50,13 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Task ID or GUID must be given, then the available skeleton files could be listed or the content of one or all skeleton files can be shown.');
+            ->setHelp('A task-identifier must be given, then the available skeleton files could be listed or the content of one or all skeleton files can be shown.');
 
-        $this->addArgument('identifier', InputArgument::REQUIRED, 'Either a complete numeric task ID or the task GUID (with or without curly braces)');
+        $this->addArgument(
+            'taskIdentifier',
+            InputArgument::REQUIRED,
+            TaskCommand::IDENTIFIER_DESCRIPTION
+        );
 
         $this->addOption(
             'list-files',
@@ -72,7 +76,7 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
             'dump-one',
             'd',
             InputOption::VALUE_REQUIRED,
-            'Dumps one raw file for redirecting on CLI, needs the fileid as argument'
+            'Dumps one raw file for redirecting on CLI, needs the file-id as argument'
         );
 
         $this->addOption(
@@ -81,29 +85,35 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Unpacks all files to the source-directory with additional extension ".xliff"'
         );
+
+        $this->addOption(
+            'pack-all',
+            'p',
+            InputOption::VALUE_NONE,
+            'Packs all files in the source-directory that have the additional extension ".xliff". Only existing files will be packed'
+        );
     }
 
-    /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        if (! $this->input->getOption('dump-one')) {
-            $this->writeTitle('Task Skeletonfiles');
+        $silent = ! empty($this->input->getOption('dump-one'));
+
+        $task = static::findTaskFromArgument(
+            $this->io,
+            $input->getArgument('taskIdentifier'),
+            $silent,
+            TaskCommand::taskTypesWithData()
+        );
+
+        if ($task === null) {
+            return self::FAILURE;
         }
 
-        $task = new \editor_Models_Task();
-        $id = $input->getArgument('identifier');
-        if (is_numeric($id)) {
-            $task->load($id);
-        } else {
-            $id = trim($id, '{}');
-            $task->loadByTaskGuid('{' . $id . '}');
+        if (! $silent) {
+            $this->writeTitle('Task Skeletonfiles');
         }
 
         $fileTree = new \editor_Models_Foldertree();
@@ -121,22 +131,32 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
         }
 
         $dumpAll = $this->input->getOption('dump-all');
-        $saveAll = $this->input->getOption('save-all');
+        $saveAll = ! $dumpAll && $this->input->getOption('save-all');
+        $packAll = ! $saveAll && $this->input->getOption('pack-all');
 
         $skeletonFile = new SkeletonFile($task);
-        if ($dumpAll || $saveAll) {
+        if ($dumpAll || $saveAll || $packAll) {
             foreach ($files as $fileId => $path) {
                 $file = new \editor_Models_File();
                 $file->load($fileId);
-
-                $skel = $skeletonFile->loadFromDisk($file);
-                if ($dumpAll) {
-                    $this->io->section($fileId . ': ' . $path);
-                    $this->io->write($skel);
+                if ($packAll) {
+                    $packedFile = $skeletonFile->getSkeletonPath($file);
+                    $unpackedFile = $packedFile . '.xliff';
+                    if (file_exists($unpackedFile)) {
+                        unlink($packedFile);
+                        $skeletonFile->saveToDisk($file, file_get_contents($unpackedFile));
+                        $this->io->success('Repacked file ' . $fileId . ' from ' . basename($unpackedFile));
+                    }
                 } else {
-                    $tmpName = $skeletonFile->getSkeletonPath($file) . '.xliff';
-                    @file_put_contents($tmpName, $skel);
-                    $this->io->success('saved file ' . $fileId . ' as ' . basename($tmpName));
+                    $skel = $skeletonFile->loadFromDisk($file);
+                    if ($dumpAll) {
+                        $this->io->section($fileId . ': ' . $path);
+                        $this->io->write($skel);
+                    } else {
+                        $unpackedFile = $skeletonFile->getSkeletonPath($file) . '.xliff';
+                        @file_put_contents($unpackedFile, $skel);
+                        $this->io->success('Saved file ' . $fileId . ' as ' . basename($unpackedFile));
+                    }
                 }
             }
 

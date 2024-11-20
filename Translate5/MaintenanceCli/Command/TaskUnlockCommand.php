@@ -50,21 +50,27 @@ class TaskUnlockCommand extends TaskInfoCommand
             // the "--help" option
             ->setHelp('Unlocks a locked task - ensure that you know what you are doing when using that command!');
 
-        $this->addArgument('taskId', InputArgument::REQUIRED, 'Just the numeric task ID.');
+        $this->addArgument(
+            'taskIdentifier',
+            InputArgument::REQUIRED,
+            TaskCommand::IDENTIFIER_DESCRIPTION
+        );
     }
 
-    /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $task = new \editor_Models_Task();
-        $task->load($input->getArgument('taskId'));
+        $task = static::findTaskFromArgument(
+            $this->io,
+            $input->getArgument('taskIdentifier')
+        );
+
+        if ($task === null) {
+            return self::FAILURE;
+        }
+
         $this->writeTask($task);
 
         Lock::taskUnlock($task);
