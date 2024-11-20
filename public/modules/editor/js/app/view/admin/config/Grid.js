@@ -517,7 +517,8 @@ Ext.define('Editor.view.admin.config.Grid', {
         
         if(desc){
             html.push('<i>');
-            html.push(Ext.String.htmlEncode(desc));
+            desc = Ext.String.htmlEncode(desc);
+            html.push(this.makeURLsClickable(desc));
             html.push('</i>');
             html.push('</br>');
         }
@@ -546,5 +547,24 @@ Ext.define('Editor.view.admin.config.Grid', {
         }
         
         return html.join("");
+    },
+
+    /**
+     * renders URLs as HTML
+     * @private
+     */
+    makeURLsClickable: function(str) {
+        if (!str || str.indexOf('://') < 0) {
+            return str;
+        }
+        return str.replace(/https?:\/\/\w\S+/g, function(url){
+            let end = url.match(/[.;]+$/);
+            if (end) {
+                end = end[0];
+                url = url.substring(0, url.length-end.length);
+            }
+            return '<a href="'+url+'" target=_blank>'+url+'</a>'+(end?end:'');
+        });
     }
+
 });
