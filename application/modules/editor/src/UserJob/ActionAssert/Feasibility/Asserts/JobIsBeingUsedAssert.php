@@ -55,7 +55,7 @@ class JobIsBeingUsedAssert implements FeasibilityAssertInterface
 
     public function assertAllowed(object $object): void
     {
-        if (! $object->isUsed()) {
+        if ($object->isUsed()) {
             throw new AttemptToRemoveJobInUseException($object);
         }
     }

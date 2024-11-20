@@ -56,7 +56,7 @@ class ExportService
     {
         return new self(
             SegmentDataProviderFactory::create(),
-            new TaskRepository(),
+            TaskRepository::create(),
             Zend_Registry::get('config'),
             new ReplaceInternalTagWithSpanFormatter(),
             new TermTagFormatter(),

@@ -37,6 +37,7 @@ use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
@@ -49,6 +50,7 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
         private readonly UserJobRepository $userJobRepository,
+        private readonly TaskRepository $taskRepository,
         private readonly ActionFeasibilityAssert $lspJobActionFeasibilityAssert,
         private readonly DeleteUserJobAssignmentOperationInterface $deleteUserJobAssignmentOperation,
     ) {
@@ -62,6 +64,7 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
         return new self(
             LspJobRepository::create(),
             UserJobRepository::create(),
+            TaskRepository::create(),
             LspJobActionFeasibilityAssert::create(),
             DeleteUserJobAssignmentOperation::create(),
         );
@@ -89,6 +92,8 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
 
         $dataJob = $this->userJobRepository->getDataJobByLspJob($job);
         $this->userJobRepository->delete($dataJob);
+
+        $this->taskRepository->updateTaskUserCount($dataJob->getTaskGuid());
 
         $this->lspJobRepository->delete($job);
     }

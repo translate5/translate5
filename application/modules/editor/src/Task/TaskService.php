@@ -62,7 +62,7 @@ class TaskService
 
     public function __construct()
     {
-        $this->taskRepository = new TaskRepository();
+        $this->taskRepository = TaskRepository::create();
     }
 
     public function isProjectFinished(int $projectId): bool

@@ -229,38 +229,69 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     handleDeleteConfirmClick: function (grid, toDelete) {
         var me = this,
             userAssocPanel = me.getPrefWindow(),
-            task = userAssocPanel.getCurrentTask(),
-            assoc = me.getAdminTaskUserAssocsStore();
+            task = userAssocPanel.getCurrentTask();
 
         userAssocPanel.setLoading(true);
 
         Ext.Array.each(toDelete, function (toDel) {
-
-            toDel.eraseVersioned(task, {
-
-                success: function (rec, op) {
-
-                    assoc.remove(toDel);
-
-                    me.fireEvent('removeUserAssoc', me, toDel, assoc);
-
-                    //reload only the task, not the whole task prefs, should be OK
-                    task.load({
-                        callback: function () {
-                            Editor.MessageBox.addByOperation(op); //does nothing since content is not provided from server :(
-                            Editor.MessageBox.addSuccess(me.messages.assocDeleted);
-                            userAssocPanel.setLoading(false);
-                        }
-                    });
-                },
-                failure: function () {
-                    me.application.getController('admin.TaskPreferences').handleReload();
-                    userAssocPanel.setLoading(false);
-                    me.getUserAssocGrid().store.reload();
-                }
-            });
+            me.deleteJob(task, toDel);
         });
     },
+
+    deleteJob: function (task, job) {
+        const me = this,
+            l10n = Editor.data.l10n,
+            jobAssignmentPanel = me.getPrefWindow(),
+            jobStore = me.getAdminTaskUserAssocsStore();
+
+        job.eraseVersioned(task, {
+            preventDefaultHandler: true,
+            success: function (rec, op) {
+                me.deleteForceParamFromJobProxy(job);
+
+                jobStore.remove(job);
+
+                me.fireEvent('removeUserAssoc', me, job, jobStore);
+
+                jobAssignmentPanel.setLoading(false);
+                me.reloadTaskUserAssocGrid();
+            },
+            failure: function (rec, result) {
+                me.deleteForceParamFromJobProxy(job);
+
+                const errorCode = result.error.response?.responseJson?.errorCode;
+
+                me.application.getController('admin.TaskPreferences').handleReload();
+                jobAssignmentPanel.setLoading(false);
+                me.reloadTaskUserAssocGrid();
+
+                if (['E1061', 'E1062', 'E1162'].includes(errorCode)) {
+                    const message = result.error.response.responseJson.errorMessage
+                        + '<br/>'
+                        + l10n.general.confirmDelete;
+
+                    Ext.Msg.confirm(l10n.general.confirmDeleteTitle, message, function (btn) {
+                        if (btn === 'yes') {
+                            job.getProxy().setExtraParam('force', true);
+                            me.deleteJob(task, job);
+                        }
+                    });
+
+                    return;
+                }
+
+                Editor.app.getController('ServerException').handleException(result.error.response);
+            }
+        });
+    },
+
+    deleteForceParamFromJobProxy: function (job) {
+        let extraParams = job.getProxy().getExtraParams();
+        delete extraParams.force;
+
+        job.getProxy().setExtraParams(extraParams);
+    },
+
     /**
      * save the user task assoc info.
      */

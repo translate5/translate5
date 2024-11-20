@@ -67,7 +67,7 @@ class JobIsAlreadyInEditingModeAssert implements FeasibilityAssertInterface
     {
         return new self(
             new editor_Workflow_Manager(),
-            new TaskRepository(),
+            TaskRepository::create(),
         );
     }
 

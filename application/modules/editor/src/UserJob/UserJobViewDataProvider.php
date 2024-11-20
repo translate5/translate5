@@ -99,7 +99,7 @@ class UserJobViewDataProvider
             LspJobRepository::create(),
             UserJobActionPermissionAssert::create(),
             new UserRepository(),
-            new TaskRepository(),
+            TaskRepository::create(),
             ZfExtended_Acl::getInstance(),
         );
     }

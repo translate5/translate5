@@ -75,7 +75,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
             TaskActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
-            new TaskRepository(),
+            TaskRepository::create(),
             LspJobRepository::create(),
             JobCoordinatorRepository::create(),
         );

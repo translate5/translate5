@@ -79,7 +79,10 @@ class UserJobRepository
 
     public function delete(UserJob $job): void
     {
-        $job->delete();
+        $this->db->delete(
+            $job->db->info($job->db::NAME),
+            $this->db->quoteInto('id = ?', $job->getId())
+        );
     }
 
     public function userHasJobsInTask(string $userGuid, string $taskGuid): bool

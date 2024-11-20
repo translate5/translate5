@@ -80,7 +80,7 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
     {
         return new self(
             UserJobRepository::create(),
-            new TaskRepository(),
+            TaskRepository::create(),
             LspJobRepository::create(),
             LspUserRepository::create(),
             UserJobActionFeasibilityAssert::create(),

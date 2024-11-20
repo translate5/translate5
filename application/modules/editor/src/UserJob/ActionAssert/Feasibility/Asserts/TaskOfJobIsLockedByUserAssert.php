@@ -52,7 +52,7 @@ class TaskOfJobIsLockedByUserAssert implements FeasibilityAssertInterface
     public static function create(): self
     {
         return new self(
-            new TaskRepository(),
+            TaskRepository::create(),
         );
     }
 

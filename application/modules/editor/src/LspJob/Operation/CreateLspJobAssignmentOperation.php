@@ -68,7 +68,7 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
     {
         return new self(
             LspJobRepository::create(),
-            new TaskRepository(),
+            TaskRepository::create(),
             JobCoordinatorRepository::create(),
             LspCustomerAssociationValidator::create(),
             TrackChangesRightsValidator::create(),

@@ -62,7 +62,7 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
         return new self(
             UserJobActionFeasibilityAssert::create(),
             UserJobRepository::create(),
-            new TaskRepository(),
+            TaskRepository::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.delete'),
         );
     }
@@ -94,6 +94,8 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
         $jobData = $job->getSanitizedEntityForLog();
 
         $this->userJobRepository->delete($job);
+
+        $this->taskRepository->updateTaskUserCount($task->getTaskGuid());
 
         $this->logger->info('E1012', 'job deleted', [
             'task' => $task,

@@ -66,7 +66,7 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
     public static function create(): self
     {
         return new self(
-            new TaskRepository(),
+            TaskRepository::create(),
             UserJobRepository::create(),
             new UserRepository(),
             new editor_Workflow_Manager(),

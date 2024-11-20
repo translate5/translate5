@@ -71,7 +71,7 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
     {
         return new self(
             new UserRepository(),
-            new TaskRepository(),
+            TaskRepository::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.create'),
             new editor_Workflow_Manager(),
             SegmentRangeValidator::create(),

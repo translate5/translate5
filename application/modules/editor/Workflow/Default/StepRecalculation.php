@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Repository\TaskRepository;
+
 /**
  * Workflow Step recalculation
  */
@@ -36,11 +38,14 @@ class editor_Workflow_Default_StepRecalculation
      */
     protected $workflow;
 
+    private TaskRepository $taskRepository;
+
     protected $nextStepWasSet = [];
 
     public function __construct(editor_Workflow_Default $workflow)
     {
         $this->workflow = $workflow;
+        $this->taskRepository = TaskRepository::create();
     }
 
     /**
@@ -150,9 +155,9 @@ class editor_Workflow_Default_StepRecalculation
     }
 
     /**
-     * - cleans the not needed automatically added task user associations from the job list
-     * - sets the tasks workflow step depending the associated jobs
-     * - sets the initial states depending on the workflow step of the task and task usage mode
+     * - cleans the not needed automatically added jobs from the job list
+     * - sets task's workflow step depending on associated jobs
+     * - sets initial states depending on the workflow step of the task and task usage mode
      * @throws ReflectionException
      */
     public function setupInitialWorkflow(editor_Models_Task $task): void
@@ -171,6 +176,7 @@ class editor_Workflow_Default_StepRecalculation
 
                 continue;
             }
+
             // if the tua step name is not in the workflow chain, ignore the job collection
             // workflow step names which are not part of the workflow chain should not be used for calculation the
             // initial workflow step
@@ -181,7 +187,9 @@ class editor_Workflow_Default_StepRecalculation
             $usedJobs[] = $rawJob;
             $usedSteps[] = $rawJob['workflowStepName'];
         }
-        $task->updateTask();
+
+        $this->taskRepository->updateTaskUserCount($task->getTaskGuid());
+
         if (empty($usedJobs)) {
             return;
         }
@@ -196,6 +204,7 @@ class editor_Workflow_Default_StepRecalculation
         $task->updateWorkflowStep($currentStep, false);
 
         $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
+
         foreach ($usedJobs as $rawJob) {
             //current step jobs are open
             if ($currentStep === $rawJob['workflowStepName']) {
@@ -204,6 +213,7 @@ class editor_Workflow_Default_StepRecalculation
                 //all other steps are coming later in the chain, so they are waiting
                 $state = $this->workflow::STATE_WAITING;
             }
+
             $job->db->update([
                 'state' => $state,
             ], [

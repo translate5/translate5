@@ -61,7 +61,7 @@ class TaskRestrictionAssert implements PermissionAssertInterface
     {
         return new self(
             TaskActionPermissionAssert::create(),
-            new TaskRepository(),
+            TaskRepository::create(),
         );
     }
 

@@ -152,7 +152,7 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
      */
     protected function deleteTemporaryUser(ZfExtended_Models_User $user): void
     {
-        $taskRepository = new TaskRepository();
+        $taskRepository = TaskRepository::create();
         $tasks = $taskRepository->loadListByPmGuid($user->getUserGuid());
 
         if (! empty($tasks)) {

@@ -51,7 +51,7 @@ final class PmInTaskFeasibilityAssert implements FeasibilityAssertInterface
      */
     public static function create(): self
     {
-        return new self(new TaskRepository());
+        return new self(TaskRepository::create());
     }
 
     public function supports(Action $action): bool

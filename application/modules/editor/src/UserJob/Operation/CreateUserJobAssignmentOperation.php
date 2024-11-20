@@ -72,7 +72,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
             UserJobRepository::create(),
             LspUserRepository::create(),
             LspJobRepository::create(),
-            new TaskRepository(),
+            TaskRepository::create(),
             TrackChangesRightsValidator::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.create'),
         );

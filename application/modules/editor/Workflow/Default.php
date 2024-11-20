@@ -645,7 +645,7 @@ class editor_Workflow_Default
 
     public function getStepRecalculation(): editor_Workflow_Default_StepRecalculation
     {
-        return ZfExtended_Factory::get('editor_Workflow_Default_StepRecalculation', [$this]);
+        return new editor_Workflow_Default_StepRecalculation($this);
     }
 
     /**

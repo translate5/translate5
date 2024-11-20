@@ -26,15 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\JobAssignment\Operation\WithAuthentication\DeleteJobAssignmentOperation;
 use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
 use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
 use MittagQI\Translate5\LspJob\DataProvider\CoordinatorProvider;
 use MittagQI\Translate5\LspJob\DataProvider\UserProvider;
 use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\LspJob\Operation\WithAuthentication\CreateLspJobAssignmentOperation;
-use MittagQI\Translate5\LspJob\Operation\WithAuthentication\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
@@ -64,7 +63,6 @@ use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJob
 use MittagQI\Translate5\UserJob\Operation\Factory\NewUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobAssignmentOperation;
-use MittagQI\Translate5\UserJob\Operation\WithAuthentication\DeleteUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\Operation\WithAuthentication\UpdateUserJobAssignmentOperation;
 use MittagQI\Translate5\UserJob\TypeEnum;
 use MittagQI\Translate5\UserJob\UserJobViewDataProvider;
@@ -113,7 +111,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         parent::init();
         $this->userRepository = new UserRepository();
-        $this->taskRepository = new TaskRepository();
+        $this->taskRepository = TaskRepository::create();
         $this->userJobRepository = UserJobRepository::create();
         $this->lspJobRepository = LspJobRepository::create();
         $this->permissionAssert = UserJobActionPermissionAssert::create();
@@ -330,26 +328,15 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
             $this->processClientReferenceVersion($job);
 
-            $this->deleteJob($job);
+            $deleteJobOperation = DeleteJobAssignmentOperation::create();
+
+            if ($this->getRequest()->has('force')) {
+                $deleteJobOperation->forceDelete((int) $job->getId());
+            } else {
+                $deleteJobOperation->delete((int) $job->getId());
+            }
         } catch (Throwable $e) {
             throw $this->transformException($e);
-        }
-    }
-
-    private function deleteJob(UserJob $job): void
-    {
-        $deleteJobOperation = $job->isLspJob()
-            ? DeleteLspJobAssignmentOperation::create()
-            : DeleteUserJobAssignmentOperation::create();
-
-        if ($job->isLspJob()) {
-            $job = LspJobRepository::create()->get((int) $job->getLspJobId());
-        }
-
-        if ($this->getRequest()->has('force')) {
-            $deleteJobOperation->forceDelete($job);
-        } else {
-            $deleteJobOperation->delete($job);
         }
     }
 
@@ -437,7 +424,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                     'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.',
                 ],
                 [
-                    'job' => $this,
+                    'job' => $e->job,
                 ]
             ),
             OnlyCoordinatorCanBeAssignedToLspJobException::class => UnprocessableEntity::createResponse(
@@ -497,7 +484,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 ],
             ),
             ThereIsUnDeletableBoundJobException::class => EntityConflictException::createResponse(
-                'E1012',
+                'E1162',
                 [
                     'id' => [
                         'LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.',

@@ -30,13 +30,33 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use editor_Models_Db_Task;
+use editor_Models_Db_TaskUserAssoc;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
+use MittagQI\Translate5\UserJob\TypeEnum;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class TaskRepository
 {
+    public function __construct(
+        private readonly Zend_Db_Adapter_Abstract $db,
+    ) {
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self(
+            Zend_Db_Table::getDefaultAdapter(),
+        );
+    }
+
     /**
      * @throws InexistentTaskException
      */
@@ -104,5 +124,25 @@ class TaskRepository
         $s = $db->select()->where('pmGuid = ?', $pmGuid);
 
         return $db->fetchAll($s)->toArray();
+    }
+
+    public function updateTaskUserCount(string $taskGuid): void
+    {
+        $sql = <<<SQL
+update %s task,
+    (
+        select count(*) cnt from %s where taskGuid = ? and isPmOverride = 0 and type != %d
+    ) job
+set task.userCount = job.cnt where task.taskGuid = ?
+SQL;
+        $sql = sprintf(
+            $sql,
+            editor_Models_Db_Task::TABLE_NAME,
+            editor_Models_Db_TaskUserAssoc::TABLE_NAME,
+            TypeEnum::Lsp->value,
+        );
+        $sql = $this->db->quoteInto($sql, $taskGuid, 'string', 2);
+
+        $this->db->query($sql);
     }
 }
