@@ -60,12 +60,13 @@ final class Packer
     }
 
     /**
+     * Creates a BCONF usable for Extraction/Import
      * @throws BconfInvalidException
      * @throws Throwable
      * @throws ZfExtended_Exception
      * @throws OkapiException
      */
-    public function process(bool $isOutdatedRepack, bool $isSystemDefault = false): void
+    public function createExtraction(bool $isOutdatedRepack, bool $isSystemDefault = false): void
     {
         // we must catch all exceptions of the RandomAccessFile to be able to release the file-pointer properly!
         try {
