@@ -79,7 +79,7 @@ class RolesDataProvider
         }
 
         if (! $viewer->isClientRestricted()) {
-            $groups['managers'] = $this->composeRoleSet(Roles::getManagerRoles(), $viewer);
+            $groups['notRequireClient'] = $this->composeRoleSet(Roles::getRolesNotRequireClient(), $viewer);
         }
 
         return $groups;

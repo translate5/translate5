@@ -164,6 +164,44 @@
                 "check": "Job Coordinator shouldn't be able to assign Coordinator as editor",
                 "how_to_check": null,
             },
+            {
+                "check": "On attempt to delete active job or job in use additional confirmation should be asked",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "On OK button job should be deleted",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "On attempt to delete LSP job with blocking LSP user job additional confirmation should be asked",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "First confirmation message warns about cascade deletion of LSP user jobs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "On OK button job should be deleted",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "LSP job deletes cascade",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "LSP user jobs are deleted",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Sub LSP jobs are deleted",
+                        "how_to_check": null,
+                    }
+                ]
+            }
         ];
     </script>
 </head>

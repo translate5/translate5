@@ -404,8 +404,8 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             sets.push(this.createRoleFieldSet('Admin roles', 'admins', groupedRoles.admins));
         }
 
-        if (groupedRoles.hasOwnProperty('managers')) {
-            sets.push(this.createRoleFieldSet('Roles don\'t require client', 'managers', groupedRoles.managers));
+        if (groupedRoles.hasOwnProperty('notRequireClient')) {
+            sets.push(this.createRoleFieldSet('Roles don\'t require client', 'notRequireClient', groupedRoles.notRequireClient));
         }
 
         sets.push(this.createRoleFieldSet('Roles require client', 'requireClient', groupedRoles.requireClient));
@@ -568,9 +568,10 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         me.query('#rolesGroup checkbox').forEach(function (box) {
             const
                 isAdminRole = me.isRoleFromGroup(box.initialConfig.value, 'admins'),
-                isManagerRole = me.isRoleFromGroup(box.initialConfig.value, 'managers'),
+                isNotRequireClientRole = me.isRoleFromGroup(box.initialConfig.value, 'notRequireClient'),
                 boxInitValue = box.initialConfig.value,
-                hidden = (record.isLspUser() && (isAdminRole || isManagerRole))
+                hidden = (record.isLspUser() && (isAdminRole || isNotRequireClientRole) && 'jobCoordinator' !== boxInitValue)
+                    // existing user is not LSP user. Can't set jobCoordinator role
                     || (record.get('userGuid').length !== 0 && ! record.isLspUser() && 'jobCoordinator' === boxInitValue)
                     || (record.isLspUser() && 'clientpm' === boxInitValue)
             ;

@@ -128,7 +128,6 @@ final class Roles
             self::PM,
             self::CLIENTPM,
             self::PMLIGHT,
-            self::ERP,
         ],
         self::CLIENTPM => [
             self::API,
@@ -233,7 +232,7 @@ final class Roles
         ];
     }
 
-    public static function getManagerRoles(): array
+    public static function getRolesNotRequireClient(): array
     {
         return array_diff(
             self::FRONTEND_ROLES,

@@ -142,7 +142,7 @@ class RolesValidator
         $roles = $this->roles->expandListWithAutoRoles($roles, []);
 
         $hasPrivilegedRoles = ! empty(array_intersect($roles, Roles::getAdminRoles()))
-            || ! empty(array_intersect($roles, Roles::getManagerRoles()));
+            || ! empty(array_intersect($roles, Roles::getRolesNotRequireClient()));
 
         if ($hasPrivilegedRoles && ! empty(array_intersect($roles, Roles::getClientRestrictedRoles()))) {
             throw new ClientRestrictedAndNotRolesProvidedTogetherException();
