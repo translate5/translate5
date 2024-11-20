@@ -1,6 +1,6 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/IDML_Filter",
-    "maxAttributeSize": "Maximal attribute size of idml attributes",
+    "maxAttributeSize": "Maximal attribute size of idml attributes", // visible as "Maximal attribute size" in UI now
     "untagXmlStructures": "Untag XML structures",
     "extractNotes": "Extract notes",
     "extractMasterSpreads": "Extract master spreads",
@@ -10,6 +10,9 @@
     "extractBreaksInline": "Extract breaks inline",
     "extractCustomTextVariables": "Extract custom text variables",
     "extractIndexTopics": "Extract index topics",
+    "extractHyperlinkTextSourcesInline": "Extract hyperlink text sources inline",
+    "extractExternalHyperlinks": "Extract external hyperlinks",
+    "specialCharacterPattern": "Special character pattern",
     "ignoreCharacterKerning": "Ignore character kerning",
     "characterKerningMinIgnoranceThreshold": "Character kerning minimum ignorance threshold",
     "characterKerningMaxIgnoranceThreshold": "Character kerning maximum ignorance threshold",

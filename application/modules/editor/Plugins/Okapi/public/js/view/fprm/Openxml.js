@@ -81,19 +81,24 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'bPreferenceTranslateComments.b': {},
             'bPreferenceAggressiveCleanup.b': {},
             'bPreferenceAddTabAsCharacter.b': {},
-            'bPreferenceAddLineSeparatorAsCharacter.b': {}
-
+            'bPreferenceAddLineSeparatorAsCharacter.b': {},
+            'bExtractExternalHyperlinks.b': {} // moved to "General" tab
         }},
         /* Word Options */
         'tabWordOptions': { type: 'tab', icon: 'fa-file-word-o', children: {
             'bPreferenceTranslateWordHeadersFooters.b': {},
+            'translateWordNumberingLevelText.b': {},
             'bPreferenceTranslateWordHidden.b': {},
             'bPreferenceTranslateWordExcludeGraphicMetaData.b': {},
             'bPreferenceAutomaticallyAcceptRevisions.b': {},
             'bPreferenceIgnoreSoftHyphenTag.b': {},
             'bPreferenceReplaceNoBreakHyphenTag.b': {},
-            'bExtractExternalHyperlinks.b': {},
+            'allowWordStyleOptimisation.b': {},
             'tsComplexFieldDefinitionsToExtract.i': { type: 'tagfield', identifier: 'cfd', guiData: 'translateableHyperlinkFields' },
+            'ignoreWordFontColors.b': { type: 'boolset', children: {
+                    'wordFontColorsMinIgnoranceThreshold': { config: { ignoreEmpty: true }},
+                    'wordFontColorsMaxIgnoranceThreshold': { config: { ignoreEmpty: true }}
+            }},
             'bInExcludeMode.b': { type: 'radio' },
             'tsExcludeWordStyles.i': { type: 'tagfield', identifier: 'sss', guiData: 'wordStyles' },
             'bInExcludeHighlightMode.b': { type: 'radio' },
@@ -105,11 +110,14 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         'tabExcelOptions': { type: 'tab', icon: 'fa-file-excel-o', children: {
             'bPreferenceTranslateExcelHidden.b': {},
             'bPreferenceTranslateExcelSheetNames.b': {},
+            'translateExcelCellsCopied': {},
             'bPreferenceTranslateExcelDiagramData.b': {},
             'bPreferenceTranslateExcelDrawings.b': {},
+            'preserveExcelStylesInTargetColumns.b': {},
             'tsExcelExcludedColors.i': { type: 'tagfield', identifier: 'ccc', guiData: 'colors', dataPrefix: 'FF' },
             'bPreferenceTranslateExcelExcludeColors.b': { config: { hidden: true }},
-            'subfilter': { config: {}},
+            'subfilter': {},
+            // no more bPreferenceTranslateExcelExcludeColumns and tsExcelExcludedColumns ?!
             'bPreferenceTranslateExcelExcludeColumns.b': { type: 'boolset', children: { // if not true, tsExcelExcludedColumns, tsExcelExcludedColumnsSheetN will not be processed
                 'tsExcelExcludedColumnsSheet1.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '1' }, // this is a "virtual" field that does not show up in the data
                 'tsExcelExcludedColumnsSheet2.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '2' }, // this is a "virtual" field that does not show up in the data
@@ -122,9 +130,19 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         'tabPowerpointOptions': { type: 'tab', icon: 'fa-file-powerpoint-o', children: {
             'bPreferenceTranslatePowerpointHidden.b': { config: { hidden: true }},
             'bReorderPowerpointNotesAndComments.b': { config: { hidden: true }}, // not visible in Rainbow
+            'translatePowerpointDocProperties.b': {},
+            'translatePowerpointDiagramData.b': {},
+            'translatePowerpointCharts.b': {},
             'bPreferenceTranslatePowerpointNotes.b': {},
+            'bPreferenceTranslatePowerpointComments.b': {},
             'bPreferenceTranslatePowerpointMasters.b': {},
             'bPreferenceIgnorePlaceholdersInPowerpointMasters.b': {},
+            'reorderPowerpointDocProperties.b': {},
+            'reorderPowerpointDiagramData.b': {},
+            'reorderPowerpointCharts.b': {},
+            'bPreferenceReorderPowerpointNotes.b': {},
+            'reorderPowerpointComments.b': {},
+            'reorderPowerpointRelationships.b': {},
             'bPreferencePowerpointIncludedSlideNumbersOnly.b': { type: 'boolset', children: {
                 'tsPowerpointIncludedSlideNumbers.i': { type: 'tagfield', identifier: 'sln', guiData: 'numbers' }
             }}

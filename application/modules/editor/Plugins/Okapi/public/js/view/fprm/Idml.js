@@ -38,6 +38,14 @@
  ignoreCharacterTracking.b=true
  ignoreCharacterLeading.b=true
  ignoreCharacterBaselineShift.b=true
+ extractHyperlinkTextSourcesInline.b=false
+ extractCustomTextVariables.b=false
+ extractIndexTopics.b=false
+ extractExternalHyperlinks.b=false
+ specialCharacterPattern= | | | | | | | | | |​|‌|­|‑|﻿
+ codeFinderRules.count.i=0
+ codeFinderRules.sample=
+ codeFinderRules.useAllRulesWhenTesting.b=true
 
  // optional string-params that actually must be validated as floats
  characterTrackingMaxIgnoranceThreshold=63636.0
@@ -56,7 +64,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
     width: 700,
     formPanelLayout: 'form',
     fieldDefinitions: {
-        'maxAttributeSize.i': { config: { hidden: true, valueDefault: 4194304 }},  // not visible in Rainbow, default value = 4kB as defined in rainbow-code
+        'maxAttributeSize.i': { config: { valueDefault: 4194304 }},  // not visible in Rainbow, default value = 4kB as defined in rainbow-code
         'untagXmlStructures.b': {},
         'extractNotes.b': {},
         'extractMasterSpreads.b': {},
@@ -66,6 +74,14 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
         'extractBreaksInline.b': {},
         'extractCustomTextVariables.b': {},
         'extractIndexTopics.b': {},
+        'extractHyperlinkTextSourcesInline.b': {},
+        'extractExternalHyperlinks.b': {},
+        'specialCharacterPattern': { config: { valueDefault: ' | | | | | | | | | |​|‌|­|‑|﻿' }},
+        // should not be hidden ?
+        'codeFinderRules.count.i': { config: { hidden: true, valueDefault: 0 }},
+        'codeFinderRules.sample': { config: { hidden: true }},
+        'codeFinderRules.useAllRulesWhenTesting.b': { config: { hidden: true, valueDefault: true }},
+
         'ignoreCharacterKerning.b': { type: 'boolset', children: {
             'characterKerningMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
             'characterKerningMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}

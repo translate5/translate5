@@ -10,6 +10,9 @@
     "extractBreaksInline": "Umbrüche auslassen",
     "extractCustomTextVariables": "Benutzerdefinierte Textvariablen extrahieren",
     "extractIndexTopics": "Index Elemente extrahieren",
+    "extractHyperlinkTextSourcesInline": "Extrahieren Sie Hyperlink-Textquellen inline", //Google translate ok ?
+    "extractExternalHyperlinks": "Extrahieren externer Hyperlinks",
+    "specialCharacterPattern": "Sonderzeichenmuster",
     "ignoreCharacterKerning": "Unterschneidung ignorieren",
     "characterKerningMinIgnoranceThreshold": "Min. Schwellenwert Unterschneidung ignorieren",
     "characterKerningMaxIgnoranceThreshold": "Max. Schwellenwert Unterschneidung ignorieren",
