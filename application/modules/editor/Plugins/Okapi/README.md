@@ -1,6 +1,6 @@
 
-
 # OKAPI Plugin General functionality
+
 
 * OKAPI is used to convert almost any input format to translatable, bilingual XLF files which then is imported to translate5
 * translate5 can only work with XLF/XLIFF (there is an outdated parser for CSV)
@@ -31,7 +31,6 @@
 * there can be system-bconfs & client/customer-bconfs, on each level a "default" can be set (that is preselected in the import-wizard & is used in e.g. InstantTranslate)
 * the used file-format settings & the used OKAPI-version are logged to the task's event-log
 * each bconf has a "content.json" created on unpacking which is an inventory of all relevant parts: the linked SRX files, the pipeline-steps and the customized FPRMs
-* 
 
 
 ### BCONF: Individual Export BCONFs (TODO)
@@ -55,7 +54,15 @@
 - TODO: add full pipeline validation on BCONF import
 - TODO: add version-update of the 3 base-steps in case of a internal version update
 
+
 ### BCONF: Extension-Mapping
+
+* the extension-mapping defines, which file-extension is processed with which Filter/FPRM in the RawDocumentToFilterEventsStep
+* all customized and translate5-adjusted FPRMS (represented by their identifier) **must** be embedded in the BCONF
+* the OKAPI-default FPRMs (as in `translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi`) do **not** need to be embedded as they are part of longhorn
+* the frontend uses the extension-mapping to gather the data shown in the grid (as only file-based information)
+* errors in the extension-mapping (invalid identifiers, non-existing FPRMs) will result in invalid BCONFs
+
 
 ### BCONF: SRX (aka Segmentation)
 
@@ -66,6 +73,7 @@
 * The versioning is achieved by comparing the hash-values of an uploaded/changed SRX with the known translate5 SRXs
 * therefore all SRX files delivered with translate5 are in the SRX-inventory with their hashes
 * the inventory is in `translate5/application/modules/editor/Plugins/Okapi/data/srx/translate5-segmentation.json`
+
 
 ### BCONF: FPRM (aka Filters)
 
@@ -85,7 +93,6 @@
 * there is only one "plain" FPRM (okf_wiki), if we implement a real JSON-editor for it, we should rename it to "JSON"
 * editable FPRMs are noted in Filters::GUIS
 * if e.g. "okf_xml" is editable, all variants will be editable as well, the editing-capabilities apply to the base-type
-
 
 
 ### BCONF: Properties based FPRMs
