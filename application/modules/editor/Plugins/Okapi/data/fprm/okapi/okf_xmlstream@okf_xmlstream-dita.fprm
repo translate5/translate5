@@ -36,6 +36,9 @@ elements:
   map:
     ruleTypes: [ATTRIBUTES_ONLY]
     translatableAttributes: [title]
+  state:
+    ruleTypes: [ATTRIBUTES_ONLY, INLINE]
+    translatableAttributes: [value]
   data:
     ruleTypes: [ATTRIBUTES_ONLY]
     translatableAttributes: [label]
@@ -48,9 +51,16 @@ elements:
     ruleTypes: [PRESERVE_WHITESPACE]
   screen:
     ruleTypes: [PRESERVE_WHITESPACE]
+  msgblock:
+    ruleTypes: [PRESERVE_WHITESPACE]
+  codeblock:
+    ruleTypes: [PRESERVE_WHITESPACE]
   .*:
     ruleTypes: [EXCLUDE]
-    conditions: [translate, EQUALS, 'no']
+    conditions: [translate, EQUALS, no]
+  .+:
+    ruleTypes: [INCLUDE]
+    conditions: [translate, EQUALS, yes]
   stylesheet:
     ruleTypes: [EXCLUDE]
   coords:
@@ -114,8 +124,6 @@ elements:
   sep:
     ruleTypes: [INLINE]
   shortcut:
-    ruleTypes: [INLINE]
-  state:
     ruleTypes: [INLINE]
   sub:
     ruleTypes: [INLINE]

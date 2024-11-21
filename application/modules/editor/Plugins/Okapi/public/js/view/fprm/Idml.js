@@ -64,7 +64,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
     width: 700,
     formPanelLayout: 'form',
     fieldDefinitions: {
-        'maxAttributeSize.i': { config: { valueDefault: 4194304 }},  // not visible in Rainbow, default value = 4kB as defined in rainbow-code
+        'maxAttributeSize.i': {},
         'untagXmlStructures.b': {},
         'extractNotes.b': {},
         'extractMasterSpreads.b': {},
@@ -76,10 +76,11 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
         'extractIndexTopics.b': {},
         'extractHyperlinkTextSourcesInline.b': {},
         'extractExternalHyperlinks.b': {},
-        'specialCharacterPattern': { config: { valueDefault: ' | | | | | | | | | |​|‌|­|‑|﻿' }},
-        // should not be hidden ?
+        'specialCharacterPattern': {},
+        // 4 params below are hidden until "Use codefinder" functionality is implemented
+        'useCodeFinder.b': { config: { hidden: true, valueDefault: false }},
         'codeFinderRules.count.i': { config: { hidden: true, valueDefault: 0 }},
-        'codeFinderRules.sample': { config: { hidden: true }},
+        'codeFinderRules.sample': { config: { hidden: true, valueDefault: '' }},
         'codeFinderRules.useAllRulesWhenTesting.b': { config: { hidden: true, valueDefault: true }},
 
         'ignoreCharacterKerning.b': { type: 'boolset', children: {

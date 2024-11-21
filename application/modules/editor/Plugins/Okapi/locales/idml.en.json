@@ -1,6 +1,6 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/IDML_Filter",
-    "maxAttributeSize": "Maximal attribute size of idml attributes", // visible as "Maximal attribute size" in UI now
+    "maxAttributeSize": "Maximal attribute size",
     "untagXmlStructures": "Untag XML structures",
     "extractNotes": "Extract notes",
     "extractMasterSpreads": "Extract master spreads",
@@ -24,5 +24,7 @@
     "characterLeadingMaxIgnoranceThreshold": "Character leading maximum ignorance threshold",
     "ignoreCharacterBaselineShift": "Ignore character baseline shift",
     "characterBaselineShiftMinIgnoranceThreshold": "Character baseline shift minimum ignorance threshold",
-    "characterBaselineShiftMaxIgnoranceThreshold": "Character baseline shift maximum ignorance threshold"
+    "characterBaselineShiftMaxIgnoranceThreshold": "Character baseline shift maximum ignorance threshold",
+    "useCodeFinder": "Use codefinder",
+    "codeFinderRules.useAllRulesWhenTesting": "Test using all rules"
 }

@@ -20,7 +20,8 @@ elements:
       - [http-equiv, EQUALS, keywords]
       - - name
         - EQUALS
-        - [keywords, description]
+        - [keywords, description, 'twitter:title', 'twitter:description', 'og:title',
+          'og:description', 'og:site_name']
     writableLocalizableAttributes:
       content:
       - http-equiv
@@ -270,7 +271,10 @@ elements:
     ruleTypes: [INLINE]
   .*:
     ruleTypes: [EXCLUDE]
-    conditions: [translate, EQUALS, 'no']
+    conditions: [translate, EQUALS, no]
+  .+:
+    ruleTypes: [INCLUDE]
+    conditions: [translate, EQUALS, yes]
   style:
     ruleTypes: [EXCLUDE]
   stylesheet:

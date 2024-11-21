@@ -1,18 +1,24 @@
 {
     "colorNames": [
-        "blue", "dark blue", "dark red", "green", "light blue", "light green", "orange", "purple", "red", "yellow"
+      "Black", "Blue", "Cyan", "Dark Blue", "Dark Cyan", "Dark Gray", "Dark Green", "Dark Magenta", "Dark Red", "Dark Yellow",
+      "Green", "Light Gray", "Magenta", "None", "Red", "White", "Yellow"
     ],
     "colors": [
-        ["0070C0", "blue"],
-        ["002060", "dark blue"],
-        ["C00000", "dark red"],
-        ["00B050", "green"],
-        ["00B0F0", "light blue"],
-        ["92D050", "light green"],
-        ["FFC000", "orange"],
-        ["7030A0", "purple"],
-        ["FF0000", "red"],
-        ["FFFF00", "yellow"]
+      "Alice Blue", "Antique White", "Azure", "Beige", "Bisque", "Black", "Blanched Almond", "Blue", "Blue Violet", "Brown", "Burly Wood",
+      "Cadet Blue", "Chartreuse", "Chocolate", "Coral", "Cornflower Blue", "Cornsilk", "Crimson", "Cyan", "Dark Blue", "Dark Cyan",
+      "Dark Goldenrod", "Dark Gray", "Dark Green", "Dark Khaki", "Dark Magenta", "Dark Olive Green", "Dark Orange", "Dark Orchid",
+      "Dark Red", "Dark Salmon", "Dark Sea Green", "Dark Slate Blue", "Dark Slate Gray", "Dark Turquoise", "Dark Violet", "Deep Pink",
+      "Deep Sky Blue", "Dim Gray", "Dodger Blue", "Firebrick", "Floral White", "Forest Green", "Fuchsia", "Gainsboro", "Ghost White",
+      "Gold", "Goldenrod", "Gray", "Green", "Green Yellow", "Honeydew", "Hot Pink", "Indian Red", "Indigo", "Ivory", "Khaki", "Lavender",
+      "Lavender Blush", "Lawn Green", "Lemon Chiffon", "Light Blue", "Light Coral", "Light Cyan", "Light Goldenrod Yellow", "Light Gray",
+      "Light Green", "Light Pink", "Light Salmon", "Light Sea Green", "Light Sky Blue", "Light Slate Gray", "Light Steel Blue",
+      "Light Yellow", "Lime", "Lime Green", "Linen", "Magenta", "Maroon", "Medium Aquamarine", "Medium Blue", "Medium Orchid",
+      "Medium Purple", "Medium Sea Green", "Medium Slate Blue", "Medium Spring Green", "Medium Turquoise", "Medium Violet Red",
+      "Midnight Blue", "Mint Cream", "Misty Rose", "Moccasin", "Navajo White", "Navy", "Old Lace", "Olive", "Olive Drab", "Orange",
+      "Orange Red", "Orchid", "Pale Goldenrod", "Pale Green", "Pale Turquoise", "Pale Violet Red", "Papaya Whip", "Peach Puff",
+      "Peru", "Pink", "Plum", "Powder Blue", "Purple", "Red", "Rosy Brown", "Royal Blue", "Saddle Brown", "Salmon", "Sandy Brown",
+      "Sea Green", "Sea Shell", "Sienna", "Silver", "Sky Blue", "Slate Blue", "Slate Gray", "Snow", "Spring Green", "Steel Blue", "Tan",
+      "Teal", "Thistle", "Tomato", "Turquoise", "Violet", "Wheat", "White", "White Smoke", "Yellow", "Yellow Green"
     ],
     "columns": [
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "X", "Y", "Z",

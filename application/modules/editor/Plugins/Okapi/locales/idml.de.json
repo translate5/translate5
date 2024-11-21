@@ -1,6 +1,6 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/IDML_Filter",
-    "maxAttributeSize": "Maximale Attribut-Größe von IDML Attributen",
+    "maxAttributeSize": "Maximale Attribut-Größe",
     "untagXmlStructures": "XML-Strukturen auflösen",
     "extractNotes": "Notizen extrahieren",
     "extractMasterSpreads": "Musterseiten extrahieren",
@@ -10,7 +10,7 @@
     "extractBreaksInline": "Umbrüche auslassen",
     "extractCustomTextVariables": "Benutzerdefinierte Textvariablen extrahieren",
     "extractIndexTopics": "Index Elemente extrahieren",
-    "extractHyperlinkTextSourcesInline": "Extrahieren Sie Hyperlink-Textquellen inline", //Google translate ok ?
+    "extractHyperlinkTextSourcesInline": "Extrahieren Sie Hyperlink-Textquellen inline",
     "extractExternalHyperlinks": "Extrahieren externer Hyperlinks",
     "specialCharacterPattern": "Sonderzeichenmuster",
     "ignoreCharacterKerning": "Unterschneidung ignorieren",
@@ -24,5 +24,7 @@
     "characterLeadingMaxIgnoranceThreshold": "Max. Schwellenwert Zeilenabstand ignorieren",
     "ignoreCharacterBaselineShift": "Grundlinienversatz ignorieren",
     "characterBaselineShiftMinIgnoranceThreshold": "Min. Schwellenwert Grundlinienversatz ignorieren",
-    "characterBaselineShiftMaxIgnoranceThreshold": "Max. Schwellenwert Grundlinienversatz ignorieren"
+    "characterBaselineShiftMaxIgnoranceThreshold": "Max. Schwellenwert Grundlinienversatz ignorieren",
+    "useCodeFinder": "Codefinder verwenden",
+    "codeFinderRules.useAllRulesWhenTesting": "Testen unter Anwendung aller Regeln"
 }

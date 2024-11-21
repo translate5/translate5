@@ -430,7 +430,7 @@ doxygen_commands:
   rtfonly: {type: OPENING, pair: endrtfonly, translatable: false}
   verbatim: {type: OPENING, pair: endverbatim, preserve_whitespace: true}
   xmlonly: {type: OPENING, pair: endxmlonly, translatable: false}
-  '~':
+  ~:
     type: PLACEHOLDER
     parameters:
     - {name: LanguageId, length: WORD, required: true, translatable: true}
@@ -444,6 +444,7 @@ html_commands:
   br: {type: PLACEHOLDER}
   center: {type: OPENING}
   caption: {type: OPENING}
+  code: {type: OPENING, inline: true}
   dd: {type: PLACEHOLDER}
   dfn: {type: OPENING, inline: true}
   div: {type: OPENING}
@@ -478,7 +479,6 @@ html_commands:
   ul: {type: OPENING}
   var: {type: OPENING, inline: true}
   c: {type: OPENING, inline: true}
-  code: {type: OPENING, inline: true}
   description: {type: OPENING}
   example: {type: OPENING}
   exception: {type: OPENING}

@@ -13,3 +13,9 @@ ignoreCharacterKerning.b=false
 ignoreCharacterTracking.b=false
 ignoreCharacterLeading.b=false
 ignoreCharacterBaselineShift.b=false
+extractHyperlinkTextSourcesInline.b=false
+extractExternalHyperlinks.b=false
+specialCharacterPattern= | | | | | | | | | |​|‌|­|‑|﻿
+codeFinderRules.count.i=0
+codeFinderRules.sample=
+codeFinderRules.useAllRulesWhenTesting.b=true
