@@ -98,6 +98,7 @@
 ### BCONF: Properties based FPRMs
 
 * custom properties FPRMs will be validated against the okapi-default ones after editing
+* the translate5-adjusted FPRMs are not validated against the defaults but it is expected they are complete
 * generally properties -based FPRMs have only 3 types of data: boolean (suffixed `.b`), integer (suffixed `.i`) and string (no suffix)
 * the frontend for "properties" files is complex as lists and collections of complex items are deserialized by index:
 * lists example:
