@@ -47,6 +47,7 @@ use MittagQI\Translate5\User\Operations\Setters\UserPasswordSetter;
 use MittagQI\Translate5\User\Operations\UserCreateOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ZfExtended_Utils;
 
 class UserCreateOperationTest extends TestCase
 {
@@ -95,24 +96,18 @@ class UserCreateOperationTest extends TestCase
     {
         $this->expectException(LspMustBeProvidedInJobCoordinatorCreationProcessException::class);
         $dto = new CreateUserDto(
-            'guid',
-            'login',
+            ZfExtended_Utils::guid(true),
+            'test-login',
             'email@translate5.com',
             'firstname',
             'surname',
             'm',
-            ['role1', 'role2'],
+            ['role1', 'role2', Roles::JOB_COORDINATOR],
             [1, 2, 3],
             null,
+            null,
+            'en'
         );
-
-        $user = $this->createMock(User::class);
-        $user->expects(self::once())->method('setInitialFields');
-        $user->method('isCoordinator')->willReturn(true);
-
-        $this->userRepository->method('getEmptyModel')->willReturn($user);
-
-        $this->setRoles->expects(self::once())->method('setRoles')->with($user, $dto->roles);
 
         $this->userRepository->expects(self::never())->method('save');
 
@@ -122,8 +117,8 @@ class UserCreateOperationTest extends TestCase
     public function testCoordinatorCreated(): void
     {
         $dto = new CreateUserDto(
-            'guid',
-            'login',
+            ZfExtended_Utils::guid(true),
+            'test-login',
             'email@translate5.com',
             'firstname',
             'surname',
@@ -135,32 +130,26 @@ class UserCreateOperationTest extends TestCase
             'en',
         );
 
-        $user = $this->createMock(User::class);
-        $user->expects(self::once())->method('setInitialFields');
-        $user->method('isCoordinator')->willReturn(true);
-        $user->expects(self::once())->method('validate');
-
-        $this->userRepository->method('getEmptyModel')->willReturn($user);
-
-        $this->setRoles->expects(self::once())->method('setRoles')->with($user, $dto->roles);
-
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
         $this->lspRepository->method('get')->willReturn($lsp);
 
-        $this->userRepository->expects(self::exactly(2))->method('save')->with($user);
-
         $this->lspUserCreate
-            ->expects(self::once())
             ->method('createLspUser')
-            ->with($lsp, $user)
-            ->willReturn($this->createMock(LspUser::class));
-
-        $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $dto->customers);
+            ->willReturn($this->createMock(LspUser::class))
+        ;
 
         $this->resetPasswordEmail->expects(self::never())->method('sendTo');
 
-        self::assertSame($user, $this->operation->createUser($dto));
+        $user = $this->operation->createUser($dto);
+
+        self::assertSame($user->getUserGuid(), $dto->guid);
+        self::assertSame($user->getLogin(), $dto->login);
+        self::assertSame($user->getEmail(), $dto->email);
+        self::assertSame($user->getFirstName(), $dto->firstName);
+        self::assertSame($user->getSurName(), $dto->surName);
+        self::assertSame($user->getGender(), $dto->gender);
+        self::assertSame($user->getLocale(), $dto->locale);
     }
 
     public function testLspUserCreated(): void

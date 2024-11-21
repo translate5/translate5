@@ -77,13 +77,10 @@ class LspViewDataProvider
      */
     public static function create(): self
     {
-        $lspRepository = LspRepository::create();
-        $jobCoordinatorRepository = JobCoordinatorRepository::create($lspRepository);
-
         return new self(
-            $lspRepository,
+            LspRepository::create(),
             LspUserRepository::create(),
-            $jobCoordinatorRepository,
+            JobCoordinatorRepository::create(),
             LspActionPermissionAssert::create(),
             CustomerActionPermissionAssert::create(),
             UserActionPermissionAssert::create(),

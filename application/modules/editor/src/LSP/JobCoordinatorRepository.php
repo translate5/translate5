@@ -36,32 +36,29 @@ use MittagQI\Translate5\LSP\Exception\CoordinatorNotFoundException;
 use MittagQI\Translate5\LSP\Exception\LspUserNotFoundException;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Model\User;
+use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
-use ZfExtended_Factory;
-use ZfExtended_Models_User;
+use Zend_Db_Table_Row;
+use ZfExtended_Models_Db_User;
 
 class JobCoordinatorRepository
 {
     public function __construct(
+        private readonly Zend_Db_Adapter_Abstract $db,
         private readonly LspRepository $lspRepository,
         private readonly LspUserRepository $lspUserRepository,
     ) {
     }
 
-    public static function create(
-        ?LspRepository $lspRepository = null,
-        ?LspUserRepository $lspUserRepository = null
-    ): self {
-        $lspRepository = $lspRepository ?? LspRepository::create();
-        $lspUserRepository = $lspUserRepository ?? LspUserRepository::create();
-
+    public static function create(): self
+    {
         return new self(
-            $lspRepository,
-            $lspUserRepository,
+            Zend_Db_Table::getDefaultAdapter(),
+            LspRepository::create(),
+            LspUserRepository::create(),
         );
     }
 
@@ -126,35 +123,38 @@ class JobCoordinatorRepository
      */
     public function getByLsp(LanguageServiceProvider $lsp): iterable
     {
-        $user = ZfExtended_Factory::get(User::class);
-        $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
-            ->db
-            ->info(LanguageServiceProviderUserTable::NAME);
-        $userDb = $user->db;
+        $user = new User();
 
-        $select = $userDb->select()
-            ->setIntegrityCheck(false)
+        $select = $this->db
+            ->select()
             ->from([
-                'user' => $user->db->info($user->db::NAME),
+                'user' => ZfExtended_Models_Db_User::TABLE_NAME,
             ])
             ->join([
-                'lspToUser' => $lspToUserTable,
+                'lspToUser' => LanguageServiceProviderUserTable::TABLE_NAME,
             ], 'user.id = lspToUser.userId', ['lspToUser.guid'])
             ->where('lspToUser.lspId = ?', $lsp->getId())
             ->where('user.roles LIKE ?', '%' . Roles::JOB_COORDINATOR . '%');
 
-        $rows = $userDb->fetchAll($select);
+        $rows = $this->db->fetchAll($select);
 
-        if (! $rows->valid()) {
+        if (empty($rows)) {
             return yield from [];
         }
 
         foreach ($rows as $row) {
             $guid = $row['guid'];
 
-            $row->offsetUnset('guid');
+            unset($row['guid']);
 
-            $user->init($row);
+            $user->init(new Zend_Db_Table_Row(
+                [
+                    'table' => $user->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            ));
 
             yield new JobCoordinator($guid, clone $user, clone $lsp);
         }
@@ -172,25 +172,19 @@ class JobCoordinatorRepository
 
     public function getCoordinatorsCount(LanguageServiceProvider $lsp): int
     {
-        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $lspToUserTable = ZfExtended_Factory::get(LanguageServiceProviderUser::class)
-            ->db
-            ->info(LanguageServiceProviderUserTable::NAME);
-        $userDb = $user->db;
-
-        $select = $userDb->select()
-            ->setIntegrityCheck(false)
+        $select = $this->db
+            ->select()
             ->from([
-                'user' => $user->db->info($user->db::NAME),
+                'user' => ZfExtended_Models_Db_User::TABLE_NAME,
             ], [
                 'count' => 'COUNT(*)',
             ])
             ->join([
-                'lspToUser' => $lspToUserTable,
+                'lspToUser' => LanguageServiceProviderUserTable::TABLE_NAME,
             ], 'user.id = lspToUser.userId', [])
             ->where('lspToUser.lspId = ?', $lsp->getId())
             ->where('user.roles LIKE ?', '%' . Roles::JOB_COORDINATOR . '%');
 
-        return (int) $userDb->fetchRow($select)['count'];
+        return (int) $this->db->fetchRow($select)['count'];
     }
 }

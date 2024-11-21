@@ -46,32 +46,9 @@ class UserRepository
      */
     public function getAll(): iterable
     {
-        $userModel = ZfExtended_Factory::get(User::class);
+        $userModel = new User();
 
         foreach (ZfExtended_Factory::get(User::class)->loadAll() as $user) {
-            $userModel->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $userModel->db,
-                        'data' => $user,
-                        'stored' => true,
-                        'readOnly' => false,
-                    ]
-                )
-            );
-
-            yield $userModel;
-        }
-    }
-
-    /**
-     * @return iterable<User>
-     */
-    public function getCoordinators(): iterable
-    {
-        $userModel = ZfExtended_Factory::get(User::class);
-
-        foreach (ZfExtended_Factory::get(User::class)->loadAllByRole([Roles::JOB_COORDINATOR]) as $user) {
             $userModel->init(
                 new Zend_Db_Table_Row(
                     [
@@ -93,7 +70,7 @@ class UserRepository
     public function get(int $id): User
     {
         try {
-            $user = ZfExtended_Factory::get(User::class);
+            $user = new User();
             $user->load($id);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             throw new InexistentUserException((string) $id);
@@ -117,18 +94,13 @@ class UserRepository
     public function getByGuid(string $guid): User
     {
         try {
-            $user = ZfExtended_Factory::get(User::class);
+            $user = new User();
             $user->loadByGuid($guid);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             throw new InexistentUserException($guid);
         }
 
         return $user;
-    }
-
-    public function getEmptyModel(): User
-    {
-        return ZfExtended_Factory::get(User::class);
     }
 
     /**
@@ -158,13 +130,13 @@ class UserRepository
     }
 
     /**
-     * @return iterable<ZfExtended_Models_User>
+     * @return iterable<User>
      */
     public function getPmList(array $roles, ?int $customerInContext = null): iterable
     {
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $userModel = new User();
 
-        $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
+        $users = $userModel->loadAllByRole($roles);
 
         foreach ($users as $user) {
             $userModel->init(

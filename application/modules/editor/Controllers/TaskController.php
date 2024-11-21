@@ -1206,7 +1206,7 @@ class editor_TaskController extends ZfExtended_RestController
                 $this->authenticatedUser->getUserGuid(),
                 $this->entity
             );
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
             $tua = null;
         }
 

@@ -92,7 +92,7 @@ final class UserCreateOperation implements UserCreateOperationInterface
      */
     public function createUser(CreateUserDto $dto): User
     {
-        $user = $this->userRepository->getEmptyModel();
+        $user = new User();
         $user->setInitialFields($dto);
 
         if (! empty($dto->password)) {

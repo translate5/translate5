@@ -55,11 +55,9 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
      */
     public static function create(): self
     {
-        $lsUserRepository = LspUserRepository::create();
-
         return new self(
-            JobCoordinatorRepository::create(lspUserRepository: $lsUserRepository),
-            $lsUserRepository,
+            JobCoordinatorRepository::create(),
+            LspUserRepository::create(),
         );
     }
 

@@ -221,7 +221,6 @@ class TaskQuerySelectFactory
                 []
             )
             ->where('lspJob.lspId = ?', $lspUser->lsp->getId())
-            ->where('task.customerId in (?)', $viewer->getCustomersArray())
         ;
 
         if ($viewer->isCoordinator()) {
