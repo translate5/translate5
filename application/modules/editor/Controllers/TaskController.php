@@ -27,12 +27,17 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserJobIsNotEditableException;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\JobAssignmentWasDeletedInTheMeantimeException;
+use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\DataProvider\TaskViewDataProvider;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
@@ -128,6 +133,8 @@ class editor_TaskController extends ZfExtended_RestController
 
     private TaskViewDataProvider $taskViewDataProvider;
 
+    private TaskActionPermissionAssert $taskActionPermissionAssert;
+
     public function init(): void
     {
         $this->_filterTypeMap = [
@@ -198,6 +205,7 @@ class editor_TaskController extends ZfExtended_RestController
         $this->workersHandler = new ProjectWorkersService();
         $this->qualityService = new QualityService();
         $this->taskViewDataProvider = TaskViewDataProvider::create();
+        $this->taskActionPermissionAssert = TaskActionPermissionAssert::create();
 
         //create a new logger instance writing only to the configured taskLogger
         $this->taskLog = ZfExtended_Factory::get(ZfExtended_Logger::class, [[
@@ -1019,7 +1027,11 @@ class editor_TaskController extends ZfExtended_RestController
     {
         $this->entityLoad();
 
-        $this->isTaskAccessibleForCurrentUser();
+        $this->taskActionPermissionAssert->assertGranted(
+            TaskAction::Read,
+            $this->entity,
+            new PermissionAssertContext($this->authenticatedUser)
+        );
 
         $events = ZfExtended_Factory::get(editor_Models_Logger_Task::class);
 
@@ -1065,8 +1077,37 @@ class editor_TaskController extends ZfExtended_RestController
             ]);
         }
 
-        // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time.
+        // check if the user is allowed to open the task based on the session.
+        // The user is not able to open 2 different task in same time.
         $this->decodePutData();
+
+        $userState = $this->data->userState ?? null;
+
+        $action = match ($userState) {
+            'edit' => TaskAction::Edit,
+            'view', 'open' => TaskAction::View,
+            default => TaskAction::Update,
+        };
+
+        try {
+            $this->taskActionPermissionAssert->assertGranted(
+                $action,
+                $this->entity,
+                new PermissionAssertContext($this->authenticatedUser)
+            );
+        } catch (JobAssignmentWasDeletedInTheMeantimeException) {
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1163', [
+                'userState' => 'Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.',
+            ]);
+        } catch (UserJobIsNotEditableException $e) {
+            if ($this->data->userStatePrevious !== $e->userJob->getState()) {
+                throw ZfExtended_Models_Entity_Conflict::createResponse('E1164', [
+                    'userState' => 'Sie haben versucht die Aufgabe zur Bearbeitung zu öffnen. Das ist in der Zwischenzeit nicht mehr möglich.',
+                ]);
+            }
+
+            throw $e;
+        }
 
         //throws exceptions if task not closable
         $this->checkTaskStateTransition();
@@ -1125,7 +1166,7 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         //throws exceptions if task not accessable
-        $this->checkTaskAccess();
+//        $this->checkTaskAccess();
 
         //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
@@ -1364,7 +1405,7 @@ class editor_TaskController extends ZfExtended_RestController
             return false;
         }
 
-        return $this->data->userState == $this->workflow::STATE_EDIT;
+        return $this->data->userState == editor_Workflow_Default::STATE_EDIT;
     }
 
     /**
@@ -1377,7 +1418,7 @@ class editor_TaskController extends ZfExtended_RestController
             return false;
         }
 
-        return $this->data->userState == $this->workflow::STATE_VIEW;
+        return $this->data->userState == editor_Workflow_Default::STATE_VIEW;
     }
 
     /**
@@ -1644,7 +1685,11 @@ class editor_TaskController extends ZfExtended_RestController
         parent::getAction();
         $this->initWorkflow();
 
-        $hasRightForTask = $this->isTaskAccessibleForCurrentUser();
+        $this->taskActionPermissionAssert->assertGranted(
+            TaskAction::Read,
+            $this->entity,
+            new PermissionAssertContext($this->authenticatedUser)
+        );
 
         $obj = $this->entity->getDataObject();
 

@@ -63,7 +63,7 @@ final class UserHasJobInTaskPermissionAssert implements PermissionAssertInterfac
 
     public function supports(BackedEnum $action): bool
     {
-        return TaskAction::Read === $action || TaskAction::Open === $action;
+        return TaskAction::Read === $action;
     }
 
     /**

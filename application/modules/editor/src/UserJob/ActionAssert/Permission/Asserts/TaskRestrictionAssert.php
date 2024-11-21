@@ -74,9 +74,8 @@ class TaskRestrictionAssert implements PermissionAssertInterface
     {
         try {
             $task = $this->taskRepository->getByGuid($object->getTaskGuid());
-            $taskAction = UserJobAction::Read === $action ? TaskAction::Open : TaskAction::AssignJob;
 
-            $this->taskPermissionAssert->assertGranted($taskAction, $task, $context);
+            $this->taskPermissionAssert->assertGranted(TaskAction::AssignJob, $task, $context);
         } catch (PermissionExceptionInterface|InexistentTaskException) {
             throw new NoAccessToUserJobException($object);
         }

@@ -31,17 +31,20 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Task as Task;
-use editor_Models_TaskUserAssoc as UserJob;
+use editor_Models_Db_TaskUserAssoc as UserJobTable;
 use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LspJob\Exception\InexistentLspJobException;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
+use MittagQI\Translate5\LspJob\Model\Db\LspJobAssociationTable;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use ZfExtended_Factory;
+use ZfExtended_Models_Db_User;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -112,22 +115,49 @@ class LspJobRepository
         return (int) $this->db->fetchOne($select) > 0;
     }
 
-    public function coordinatorAssignedToLspJobs(JobCoordinator $coordinator): bool
+    public function coordinatorHasLspJobInTask(string $userGuid, string $taskGuid): bool
     {
-        $lspJob = ZfExtended_Factory::get(LspJobAssociation::class);
-        $userJob = ZfExtended_Factory::get(UserJob::class);
-
         $select = $this->db
             ->select()
             ->from(
                 [
-                    'lspJob' => $lspJob->db->info($lspJob->db::NAME),
+                    'lspJob' => LspJobAssociationTable::TABLE_NAME,
                 ],
                 'COUNT(*)'
             )
             ->join(
                 [
-                    'userJob' => $userJob->db->info($userJob->db::NAME),
+                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
+                ],
+                'lspUser.lspId = lspJob.lspId',
+                []
+            )
+            ->join(
+                [
+                    'user' => ZfExtended_Models_Db_User::TABLE_NAME,
+                ],
+                'lspUser.userId = user.id',
+                []
+            )
+            ->where('lspJob.taskGuid = ?', $taskGuid)
+            ->where('user.userGuid = ?', $userGuid);
+
+        return (int) $this->db->fetchOne($select) > 0;
+    }
+
+    public function coordinatorAssignedToLspJobs(JobCoordinator $coordinator): bool
+    {
+        $select = $this->db
+            ->select()
+            ->from(
+                [
+                    'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                ],
+                'COUNT(*)'
+            )
+            ->join(
+                [
+                    'userJob' => UserJobTable::TABLE_NAME,
                 ],
                 'userJob.lspJobId = lspJob.id',
                 []
@@ -213,7 +243,6 @@ class LspJobRepository
     public function coordinatorHasLspJobsOfCustomer(string $userGuid, int $customerId): bool
     {
         $job = ZfExtended_Factory::get(LspJobAssociation::class);
-        $userJobDb = ZfExtended_Factory::get(UserJob::class)->db;
         $taskDb = ZfExtended_Factory::get(Task::class)->db;
 
         $select = $this->db
@@ -226,7 +255,7 @@ class LspJobRepository
             )
             ->join(
                 [
-                    'userJob' => $userJobDb->info($userJobDb::NAME),
+                    'userJob' => UserJobTable::TABLE_NAME,
                 ],
                 'lspJob.id = userJob.lspJobId',
                 []

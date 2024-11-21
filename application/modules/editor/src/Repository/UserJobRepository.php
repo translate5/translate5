@@ -31,13 +31,16 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Task as Task;
+use editor_Models_Db_Task as TaskTable;
 use editor_Models_TaskUserAssoc as UserJob;
+use editor_Models_Db_TaskUserAssoc as UserJobTable;
 use editor_Models_TaskUserAssoc_Segmentrange;
 use editor_Task_Type;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\UserJob\TypeEnum;
 use PDO;
 use Zend_Db_Adapter_Abstract;
+use Zend_Db_Expr;
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
@@ -80,17 +83,16 @@ class UserJobRepository
     public function delete(UserJob $job): void
     {
         $this->db->delete(
-            $job->db->info($job->db::NAME),
+            UserJobTable::TABLE_NAME,
             $this->db->quoteInto('id = ?', $job->getId())
         );
     }
 
     public function userHasJobsInTask(string $userGuid, string $taskGuid): bool
     {
-        $job = ZfExtended_Factory::get(UserJob::class);
         $select = $this->db
             ->select()
-            ->from($job->db->info($job->db::NAME), 'COUNT(*)')
+            ->from(UserJobTable::TABLE_NAME, 'COUNT(*)')
             ->where('taskGuid = ?', $taskGuid)
             ->where('userGuid = ?', $userGuid)
             ->where('type != ?', TypeEnum::Lsp->value)
@@ -104,17 +106,16 @@ class UserJobRepository
      */
     public function getUserJobsOfCustomer(string $userGuid, int $customerId): iterable
     {
-        $job = ZfExtended_Factory::get(UserJob::class);
-        $taskDb = ZfExtended_Factory::get(Task::class)->db;
+        $job = new UserJob();
 
         $select = $this->db
             ->select()
             ->from([
-                'job' => $job->db->info($job->db::NAME),
+                'job' => UserJobTable::TABLE_NAME,
             ])
             ->join(
                 [
-                    'task' => $taskDb->info($taskDb::NAME),
+                    'task' => TaskTable::TABLE_NAME,
                 ],
                 'job.taskGuid = task.taskGuid',
                 []
@@ -147,10 +148,10 @@ class UserJobRepository
      */
     public function getUserJobsByLspJob(int $lspJobId): iterable
     {
-        $job = ZfExtended_Factory::get(UserJob::class);
+        $job = new UserJob();
         $select = $this->db
             ->select()
-            ->from($job->db->info($job->db::NAME))
+            ->from(UserJobTable::TABLE_NAME)
             ->where('lspJobId = ?', $lspJobId);
 
         foreach ($this->db->fetchAll($select) as $jobData) {
@@ -178,10 +179,10 @@ class UserJobRepository
      */
     public function getDataJobByLspJob(LspJobAssociation $lspJob): UserJob
     {
-        $job = ZfExtended_Factory::get(UserJob::class);
+        $job = new UserJob();
         $select = $this->db
             ->select()
-            ->from($job->db->info($job->db::NAME))
+            ->from(UserJobTable::TABLE_NAME)
             ->where('type = ?', TypeEnum::Lsp->value)
             ->where('lspJobId = ?', $lspJob->getId());
 
@@ -204,7 +205,7 @@ class UserJobRepository
      */
     public function getJobsByUserGuid(string $userGuid): iterable
     {
-        $tua = ZfExtended_Factory::get(UserJob::class);
+        $tua = new UserJob();
         $jobs = $tua->loadByUserGuid($userGuid);
 
         foreach ($jobs as $job) {
@@ -221,6 +222,48 @@ class UserJobRepository
 
             yield clone $tua;
         }
+    }
+
+    public function findUserJobInTask(string $userGuid, string $taskGuid, string $workflowStepName): ?UserJob
+    {
+        //order first by matching role, then by the states as defined
+        $order = $this->db->quoteInto(
+            'workflowStepName = ? DESC,'
+            . 'state="edit" DESC,'
+            . 'state="view" DESC,'
+            . 'state="unconfirmed" DESC,'
+            . 'state="open" DESC,'
+            . 'state="waiting" DESC,'
+            . 'state="finished" DESC',
+            $workflowStepName
+        );
+
+        $s = $this->db->select()
+            ->from(UserJobTable::TABLE_NAME)
+            ->where('userGuid = ?', $userGuid)
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('type != ?', TypeEnum::Lsp->value)
+            ->order(new Zend_Db_Expr($order));
+
+        $row = $this->db->fetchRow($s);
+
+        if (empty($row)) {
+            return null;
+        }
+
+        $job = new UserJob();
+        $job->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $job->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $job;
     }
 
     public function save(UserJob $job): void
@@ -262,17 +305,16 @@ class UserJobRepository
      */
     public function getProjectJobs(int $projectId, ?string $workflow = null): iterable
     {
-        $job = ZfExtended_Factory::get(UserJob::class);
-        $task = ZfExtended_Factory::get(Task::class);
+        $job = new UserJob();
 
         $s = $this->db
             ->select()
             ->from([
-                'tua' => $job->db->info($job->db::NAME),
+                'tua' => UserJobTable::TABLE_NAME,
             ])
             ->join(
                 [
-                    't' => $task->db->info($task->db::NAME),
+                    't' => TaskTable::TABLE_NAME,
                 ],
                 't.taskGuid = tua.taskGuid',
             )
@@ -312,11 +354,9 @@ class UserJobRepository
         string $taskGuid,
         string $workflowStepName,
     ): array {
-        $job = ZfExtended_Factory::get(UserJob::class);
-
         $s = $this->db
             ->select()
-            ->from($job->db->info($job->db::NAME))
+            ->from(UserJobTable::TABLE_NAME)
             ->where('taskGuid = ?', $taskGuid)
             ->where('workflowStepName = ?', $workflowStepName)
             ->where('userGuid != ?', $exceptUserGuid)

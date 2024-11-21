@@ -34,6 +34,7 @@ use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\ClientRestrictedPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\LspUserPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\OpenPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\UserHasJobInTaskPermissionAssert;
 
 /**
@@ -50,6 +51,7 @@ final class TaskActionPermissionAssert extends ActionPermissionAssert
             ClientRestrictedPermissionAssert::create(),
             LspUserPermissionAssert::create(),
             UserHasJobInTaskPermissionAssert::create(),
+            OpenPermissionAssert::create(),
         ]);
     }
 }

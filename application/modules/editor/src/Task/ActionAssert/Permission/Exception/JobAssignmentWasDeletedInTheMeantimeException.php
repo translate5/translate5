@@ -30,15 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\ActionAssert\Permission\Exception;
 
-use editor_Models_Task as Task;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-
-class NoAccessToTaskException extends NoAccessException implements PermissionExceptionInterface
+final class JobAssignmentWasDeletedInTheMeantimeException extends NoAccessToTaskException
 {
-    public function __construct(
-        public readonly Task $task
-    ) {
-        parent::__construct();
-    }
 }

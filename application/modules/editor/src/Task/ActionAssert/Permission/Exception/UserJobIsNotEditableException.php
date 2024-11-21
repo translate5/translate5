@@ -31,14 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task\ActionAssert\Permission\Exception;
 
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use editor_Models_TaskUserAssoc as UserJob;
 
-class NoAccessToTaskException extends NoAccessException implements PermissionExceptionInterface
+final class UserJobIsNotEditableException extends NoAccessToTaskException
 {
     public function __construct(
-        public readonly Task $task
+        public readonly UserJob $userJob,
+        Task $task,
     ) {
-        parent::__construct();
+        parent::__construct($task);
     }
 }
