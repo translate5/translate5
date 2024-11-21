@@ -85,7 +85,7 @@ class Filters
         'okf_icml' => [
             'class' => 'Icml',
             'extensions' => [],
-        ], // TODO BCONF: a testfile would be great
+        ],
         'okf_idml' => [
             'class' => 'Idml',
             'extensions' => ['idml'],
@@ -116,6 +116,8 @@ class Filters
      * A list of file-extensions, that validation files exist for.
      * These files reside in .../Plugins/Okapi/data/$self::TESTFILE_FOLDER and are all called "test.$EXTENSION"
      * For each extension here a file must exist, the language is expected to be be english / en
+     *
+     * TODO: a testfile for "icml" would be great
      */
     public const TESTABLE_EXTENSIONS = [
         'txt',

@@ -12,13 +12,15 @@ The added files then **must** be added to the SRX Inventory file "/translate5/ap
 This file is the Inventory of the translate5 adjusted SRX files and their hashes. Since - opposed to FPRM files - the SRX files have no database-based versioning, we need all the hash-values of default-SRX files to identify them when importing bconfs.
 To add an entry there, a new JSON Item **must** be added to the **top** of the list like this:
 
-`{
+```
+{
     "version": -1,
     "source": "languages-source-27.srx",
     "target": "languages-target-27.srx",
     "sourceHash": "",
     "targetHash": ""
-}`
+}
+```
 
 Hash and BCONF-Version-Index will be automatically set with the use of the "t5 dev:okapibconfversion" command (see 4), which not only increases the version but also evaluates the hashes & the correct version of an added SRX.
 The adjusted SRX **must** be added with this command to become the new default SRX. Note, that the "version" in the JSON relates to the global BCONF-Version-Index and needs not to be in-sync with the file-numbering!
@@ -34,7 +36,8 @@ The naming structure is
 
 Each FPRM-file must have a complementary entry in the JSON inventory-file, which looks like this:
 
-`{
+```
+{
     "id": "translate5",
     "type": "okf_openoffice",
     "replaceId": "okf_openoffice",
@@ -42,7 +45,8 @@ Each FPRM-file must have a complementary entry in the JSON inventory-file, which
     "description": "translate5 adjusted filter for OpenOffice.org documents",
     "mime": "application/x-openoffice",
     "extensions": ["odp","ods","odt"]
-}`
+}
+```
  
 - "id" is always "translate5" or "translate5-SPECIALPURPOSE" for translate5 adjusted FPRMs
 - "type" represents the okapi-type
@@ -57,7 +61,8 @@ After adding or updating a FPRM, the BCONF-Version-Index has to be updated. This
 The OKAPI default FPRMs are hold inside the folder "translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi/" which has a JSON inventory-file "translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi-filters.json"
 This inventory follows the same rules as described in 2), the entries of the inventory-file are like:
 
-`{
+```
+{
     "id": "okf_xml-AppleStringsdict",
     "type": "okf_xml",
     "name": "Apple Stringsdict",
@@ -65,7 +70,8 @@ This inventory follows the same rules as described in 2), the entries of the inv
     "mime": "text/xml",
     "extensions": ["stringsdict"],
     "settings": true
-}`
+}
+```
 
 - "id" is the filter-ID as used in RAINBOW
 - "type" represents the okapi-type

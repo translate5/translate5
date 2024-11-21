@@ -43,7 +43,7 @@ use ZfExtended_UnprocessableEntity;
  * This class can only be used for already imported bconfs and will temporarily pack this bconf with the new filter
  * The passed FPRM filter must not already be flushed, otherwise the restoration of the original state is impossible
  * After validation, the filter will be flushed and the bconf packed,
- * only toe update of the filter's hash in the DB is left to do.
+ * only to update of the filter's hash in the DB is left to do.
  * If you do not want this behaviour, use ::validateWithoutPacking
  */
 final class FprmValidation extends BconfValidation
