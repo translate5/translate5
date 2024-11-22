@@ -30,11 +30,13 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\UserJob\Validation;
 
+use editor_Models_Task as Task;
+use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
+use MittagQI\Translate5\UserJob\Exception\CoordinatorHasNotConfirmedLspJobYetException;
 
-class TrackChangesRightsValidator
+class CompetitiveJobCreationValidator
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
@@ -52,24 +54,33 @@ class TrackChangesRightsValidator
     }
 
     /**
-     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
+     * @throws ConfirmedCompetitiveJobAlreadyExistsException
+     * @throws CoordinatorHasNotConfirmedLspJobYetException
      */
-    public function assertTrackChangesRightsAreSubsetOfLspJob(
-        ?bool $canSeePrevSteps,
-        ?bool $canSeeAll,
-        ?bool $canAcceptOrReject,
-        LspJobAssociation $lspJob
+    public function assertCanCreate(
+        Task $task,
+        ?LspJobAssociation $lspJob,
+        string $workflow,
+        string $workflowStepName
     ): void {
+        if (! $task->isCompetitive()) {
+            return;
+        }
+
+        $taskHasConfirmedJob = $this->userJobRepository->taskHasConfirmedJob(
+            $task->getTaskGuid(),
+            $workflow,
+            $workflowStepName
+        );
+
+        if (null === $lspJob && $taskHasConfirmedJob) {
+            throw new ConfirmedCompetitiveJobAlreadyExistsException();
+        }
+
         $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
 
-        $rightsAreSubset =
-            (null === $canAcceptOrReject || ! $canAcceptOrReject || $dataJob->getTrackchangesAcceptReject())
-            && (null === $canSeeAll || ! $canSeeAll || $dataJob->getTrackchangesShowAll())
-            && (null === $canSeePrevSteps || ! $canSeePrevSteps || $dataJob->getTrackchangesShow())
-        ;
-
-        if (! $rightsAreSubset) {
-            throw new TrackChangesRightsAreNotSubsetOfLspJobException();
+        if (! $dataJob->isConfirmed()) {
+            throw new CoordinatorHasNotConfirmedLspJobYetException();
         }
     }
 }

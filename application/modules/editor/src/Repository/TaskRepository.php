@@ -30,14 +30,13 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_Db_Task;
+use editor_Models_Db_Task as TaskTable;
 use editor_Models_Db_TaskUserAssoc;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\UserJob\TypeEnum;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
-use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class TaskRepository
@@ -63,7 +62,7 @@ class TaskRepository
     public function get(int $id): Task
     {
         try {
-            $task = ZfExtended_Factory::get(Task::class);
+            $task = new Task();
             $task->load($id);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             throw new InexistentTaskException((string) $id);
@@ -78,13 +77,54 @@ class TaskRepository
     public function getByGuid(string $guid): Task
     {
         try {
-            $task = ZfExtended_Factory::get(Task::class);
+            $task = new Task();
             $task->loadByTaskGuid($guid);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             throw new InexistentTaskException($guid);
         }
 
         return $task;
+    }
+
+    /**
+     * @throws InexistentTaskException
+     */
+    public function getWithLockByGuid(string $guid): Task
+    {
+        $task = new Task();
+
+        $this->db->beginTransaction();
+
+        $select = $this->db->select()
+            ->forUpdate()
+            ->from(TaskTable::TABLE_NAME)
+            ->where('taskGuid = ?', $guid)
+        ;
+        $row = $this->db->fetchRow($select);
+
+        if (empty($row)) {
+            $this->db->rollBack();
+
+            throw new InexistentTaskException($guid);
+        }
+
+        $task->init(
+            new \Zend_Db_Table_Row(
+                [
+                    'table' => $task->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $task;
+    }
+
+    public function release()
+    {
+
     }
 
     /**
@@ -100,14 +140,26 @@ class TaskRepository
      */
     public function getProjectTaskList(int $projectId): iterable
     {
-        $db = ZfExtended_Factory::get(Task::class)->db;
-        $s = $db->select()->where('projectId = ?', $projectId)->where('id != ?', $projectId);
-        $tasksData = $db->fetchAll($s);
+        $s = $this->db->select()
+            ->from(TaskTable::TABLE_NAME)
+            ->where('projectId = ?', $projectId)
+            ->where('id != ?', $projectId)
+        ;
+        $tasksData = $this->db->fetchAll($s);
 
-        $task = ZfExtended_Factory::get(Task::class);
+        $task = new Task();
 
         foreach ($tasksData as $taskData) {
-            $task->init($taskData);
+            $task->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $task->db,
+                        'data' => $taskData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
             yield clone $task;
         }
@@ -120,10 +172,9 @@ class TaskRepository
      */
     public function loadListByPmGuid(string $pmGuid): array
     {
-        $db = ZfExtended_Factory::get(Task::class)->db;
-        $s = $db->select()->where('pmGuid = ?', $pmGuid);
+        $s = $this->db->select()->from(TaskTable::TABLE_NAME)->where('pmGuid = ?', $pmGuid);
 
-        return $db->fetchAll($s)->toArray();
+        return $this->db->fetchAll($s);
     }
 
     public function updateTaskUserCount(string $taskGuid): void
@@ -137,7 +188,7 @@ set task.userCount = job.cnt where task.taskGuid = ?
 SQL;
         $sql = sprintf(
             $sql,
-            editor_Models_Db_Task::TABLE_NAME,
+            TaskTable::TABLE_NAME,
             editor_Models_Db_TaskUserAssoc::TABLE_NAME,
             TypeEnum::Lsp->value,
         );

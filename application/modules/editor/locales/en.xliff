@@ -10307,6 +10307,14 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Bestätigen Sie die Änderung des Workflows</source>
                 <target>Confirm workflow change</target>
             </trans-unit>
+            <trans-unit id='RXMgZ2lidCBiZXJlaXRzIGVpbmUgYmVzdMOkdGlndGUga29ua3VycmllcmVuZGUgQXVmdHJhZ3N2ZXJnYWJlRXMgZ2lidCBiZXJlaXRzIGVpbmUgYmVzdMOkdGlndGUga29ua3VycmllcmVuZGUgQXVmdHJhZ3N2ZXJnYWJl'>
+                <source>Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe</source>
+                <target>Confirmed competitive job assignment already exsists</target>
+            </trans-unit>
+            <trans-unit id='RGVyIEtvb3JkaW5hdG9yIGhhdCBkZW4gTFNQLUF1ZnRyYWcgbm9jaCBuaWNodCBiZXN0w6R0aWd0'>
+                <source>Der Koordinator hat den LSP-Auftrag noch nicht bestätigt</source>
+                <target>Coordinator has not yet confirmed the LSP job</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -30,13 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_Task as Task;
 use editor_Models_Db_Task as TaskTable;
 use editor_Models_TaskUserAssoc as UserJob;
 use editor_Models_Db_TaskUserAssoc as UserJobTable;
 use editor_Models_TaskUserAssoc_Segmentrange;
 use editor_Task_Type;
-use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use editor_Workflow_Default as Workflow;
 use MittagQI\Translate5\UserJob\TypeEnum;
 use PDO;
 use Zend_Db_Adapter_Abstract;
@@ -177,14 +176,14 @@ class UserJobRepository
     /**
      * Returns bound UserJob with type LSP of LspJob
      */
-    public function getDataJobByLspJob(LspJobAssociation $lspJob): UserJob
+    public function getDataJobByLspJob(int $lspJobId): UserJob
     {
         $job = new UserJob();
         $select = $this->db
             ->select()
             ->from(UserJobTable::TABLE_NAME)
             ->where('type = ?', TypeEnum::Lsp->value)
-            ->where('lspJobId = ?', $lspJob->getId());
+            ->where('lspJobId = ?', $lspJobId);
 
         $job->init(
             new Zend_Db_Table_Row(
@@ -198,6 +197,20 @@ class UserJobRepository
         );
 
         return $job;
+    }
+
+    public function taskHasConfirmedJob(string $taskGuid, string $workflow, string $workflowStepName): bool
+    {
+        $select = $this->db
+            ->select()
+            ->from(UserJobTable::TABLE_NAME, 'count(*)')
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('workflow != ?', $workflow)
+            ->where('workflowStepName = ?', $workflowStepName)
+            ->where('state in (?)', [Workflow::STATE_WAITING, Workflow::STATE_OPEN])
+        ;
+
+        return (int) $this->db->fetchOne($select) > 0;
     }
 
     /**

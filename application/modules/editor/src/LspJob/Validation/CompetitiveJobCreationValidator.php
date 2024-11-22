@@ -28,13 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\Validation;
+namespace MittagQI\Translate5\LspJob\Validation;
 
-use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use editor_Models_Task as Task;
+use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 
-class TrackChangesRightsValidator
+class CompetitiveJobCreationValidator
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
@@ -52,24 +53,24 @@ class TrackChangesRightsValidator
     }
 
     /**
-     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
+     * @throws ConfirmedCompetitiveJobAlreadyExistsException
      */
-    public function assertTrackChangesRightsAreSubsetOfLspJob(
-        ?bool $canSeePrevSteps,
-        ?bool $canSeeAll,
-        ?bool $canAcceptOrReject,
-        LspJobAssociation $lspJob
+    public function assertCanCreate(
+        Task $task,
+        LanguageServiceProvider $lsp,
+        string $workflow,
+        string $workflowStepName
     ): void {
-        $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
+        if (! $task->isCompetitive()) {
+            return;
+        }
 
-        $rightsAreSubset =
-            (null === $canAcceptOrReject || ! $canAcceptOrReject || $dataJob->getTrackchangesAcceptReject())
-            && (null === $canSeeAll || ! $canSeeAll || $dataJob->getTrackchangesShowAll())
-            && (null === $canSeePrevSteps || ! $canSeePrevSteps || $dataJob->getTrackchangesShow())
-        ;
+        if (! $lsp->isDirectLsp()) {
+            return;
+        }
 
-        if (! $rightsAreSubset) {
-            throw new TrackChangesRightsAreNotSubsetOfLspJobException();
+        if ($this->userJobRepository->taskHasConfirmedJob($task->getTaskGuid(), $workflow, $workflowStepName)) {
+            throw new ConfirmedCompetitiveJobAlreadyExistsException();
         }
     }
 }

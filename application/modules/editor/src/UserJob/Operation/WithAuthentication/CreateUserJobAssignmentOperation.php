@@ -33,9 +33,6 @@ namespace MittagQI\Translate5\UserJob\Operation\WithAuthentication;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
-use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
@@ -47,7 +44,6 @@ use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterfa
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_NotAuthenticatedException;
 use ZfExtended_NotFoundException;
 
 class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperationInterface
@@ -59,8 +55,6 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
         private readonly TaskRepository $taskRepository,
-        private readonly LspJobRepository $lspJobRepository,
-        private readonly JobCoordinatorRepository $coordinatorRepository,
     ) {
     }
 
@@ -76,8 +70,6 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
             TaskRepository::create(),
-            LspJobRepository::create(),
-            JobCoordinatorRepository::create(),
         );
     }
 
@@ -95,22 +87,6 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
 
         $this->taskPermissionAssert->assertGranted(TaskAction::AssignJob, $task, $context);
         $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
-
-        $coordinator = $this->coordinatorRepository->findByUserGuid($this->authentication->getUserGuid());
-
-        if ($coordinator !== null) {
-            // check if the LSP Job exists. Coordinator can only assign sub jobs of LSP Job
-            try {
-                $this->lspJobRepository->getByTaskGuidAndWorkflow(
-                    (int) $coordinator->lsp->getId(),
-                    $dto->taskGuid,
-                    $dto->workflow->workflow,
-                    $dto->workflow->workflowStepName,
-                );
-            } catch (NotFoundLspJobException) {
-                throw new ZfExtended_NotAuthenticatedException();
-            }
-        }
 
         return $this->operation->assignJob($dto);
     }

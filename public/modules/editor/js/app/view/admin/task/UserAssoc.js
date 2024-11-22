@@ -277,10 +277,12 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
         });
     },
 
-    loadCoordinators: function (jobId = null) {
+    loadCoordinators: function () {
         const combo = this.down('combo[name=userGuid]'),
             record = this.down('form').getRecord(),
-            taskId = this.task.get('id');
+            taskId = this.task.get('id'),
+            jobId = Number.isInteger(Number.parseInt(record.get('id'))) ? record.get('id') : null
+        ;
 
         Ext.Ajax.request({
             url: Editor.data.restpath + (
@@ -328,7 +330,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
         if (edit) {
             form.setTitle(Ext.String.format(me.strings.formTitleEdit, rec.get('longUserName')));
 
-            rec.get('isLspJob') ? me.loadCoordinators(rec.get('id')) : me.loadUsers();
+            rec.get('isLspJob') ? me.loadCoordinators() : me.loadUsers();
         } else {
             form.setTitle(me.strings.formTitleAdd);
             me.loadUsers();

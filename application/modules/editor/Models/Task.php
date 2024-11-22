@@ -200,6 +200,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         $this->createTaskGuidIfNeeded();
     }
 
+    public function isCompetitive(): bool
+    {
+        return self::USAGE_MODE_COMPETITIVE === $this->getUsageMode();
+    }
+
     /**
      * returns the task type instance (can be casted to string)
      */
@@ -210,8 +215,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /***
      * Returns all task specific configs for the current task.
-     * For all configs for which there is no task specific overwrite, overwrite for the task client will be used as a value.
-     * For all configs for which there is no task customer specific overwrite, instance-level config value will be used
+     * For all configs for which there is no task specific overwrite, overwrite for the task client will be used as a
+     * value. For all configs for which there is no task customer specific overwrite, instance-level config value will
+     * be used
      *
      * @param bool $disableCache : disable the config cache. Load always fresh config from the db
      * @return Zend_Config
@@ -845,7 +851,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = givenUser) and respects multiuser editing
+     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = givenUser) and
+     * respects multiuser editing
      * @param string|null $taskGuid optional, use the internally loaded taskGuid by default
      * @return boolean false if task had not been locked or does not exist,
      *          true if task has been unlocked successfully
@@ -1252,8 +1259,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * (2) if the currently logged in user does not have the role admin, PM or api.
      * If the $checkUser-param is set to "false", the user-check is omitted (= only the
      * task's anonymizeUsers-config is taken into account).
-     * @param bool $checkUser optional, set to false to check only the config (and do not consider the ACLs behind the currently logged in user or the roles given in $customRoles)
-     * @param bool $customRoles (optional) if checkUser = true the here provided roles are used for ACL check instead the currently logged in user
+     * @param bool $checkUser optional, set to false to check only the config (and do not consider the ACLs behind the
+     *     currently logged in user or the roles given in $customRoles)
+     * @param bool $customRoles (optional) if checkUser = true the here provided roles are used for ACL check instead
+     *     the currently logged in user
      * @return boolean
      */
     public function anonymizeUsers(bool $checkUser = true, array $customRoles = null)
@@ -1284,7 +1293,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * Get info to be further used to count finished segments per current task and per each user associated with that task
+     * Get info to be further used to count finished segments per current task and per each user associated with that
+     * task
      */
     public function getWorkflowEndedOrFinishedAutoStates(): ?array
     {

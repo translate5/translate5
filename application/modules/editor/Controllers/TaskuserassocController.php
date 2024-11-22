@@ -27,6 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
+use MittagQI\Translate5\JobAssignment\JobAssignmentViewDataProvider;
 use MittagQI\Translate5\JobAssignment\Operation\WithAuthentication\DeleteJobAssignmentOperation;
 use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
 use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
@@ -53,6 +55,7 @@ use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
+use MittagQI\Translate5\UserJob\Exception\CoordinatorHasNotConfirmedLspJobYetException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
@@ -97,7 +100,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     private LspJobRepository $lspJobRepository;
 
-    private UserJobViewDataProvider $viewDataProvider;
+    private UserJobViewDataProvider $userJobViewDataProvider;
 
     private UserJobActionPermissionAssert $permissionAssert;
 
@@ -117,7 +120,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->permissionAssert = UserJobActionPermissionAssert::create();
         $this->taskActionPermissionAssert = TaskActionPermissionAssert::create();
 
-        $this->viewDataProvider = UserJobViewDataProvider::create();
+        $this->userJobViewDataProvider = UserJobViewDataProvider::create();
+        $this->jobAssignmentViewDataProvider = JobAssignmentViewDataProvider::create();
         $this->coordinatorProvider = CoordinatorProvider::create();
         $this->userProvider = UserProvider::create();
 
@@ -146,7 +150,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 'Job list: this route deprecated, use /editor/task/:taskId/job instead',
             );
 
-            $rows = $this->viewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
+            $rows = $this->userJobViewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
 
             // @phpstan-ignore-next-line
             $this->view->rows = $rows;
@@ -157,7 +161,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
         $task = $this->taskRepository->get((int) $this->getRequest()->getParam('taskId'));
 
-        $rows = $this->viewDataProvider->getListFor($task, $authUser);
+        $rows = $this->jobAssignmentViewDataProvider->getListFor($task, $authUser);
 
         // @phpstan-ignore-next-line
         $this->view->rows = $rows;
@@ -184,7 +188,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
         $jobs = $this->userJobRepository->getProjectJobs((int) $projectId, $workflow);
 
-        $rows = $this->viewDataProvider->buildViewForList($jobs, $authUser);
+        $rows = $this->userJobViewDataProvider->buildViewForList($jobs, $authUser);
 
         // @phpstan-ignore-next-line
         $this->view->rows = $rows;
@@ -278,7 +282,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
             UpdateUserJobAssignmentOperation::create()->update($job, $dto);
 
-            $this->view->rows = (object) $this->viewDataProvider->buildJobView($job, $authUser);
+            $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($job, $authUser);
         } catch (Throwable $e) {
             throw $this->transformException($e);
         }
@@ -300,12 +304,12 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
             if (TypeEnum::Lsp === $dto->type) {
                 $lspJob = CreateLspJobAssignmentOperation::create()->assignJob(NewLspJobDto::fromUserJobDto($dto));
-                $userJob = UserJobRepository::create()->getDataJobByLspJob($lspJob);
+                $userJob = UserJobRepository::create()->getDataJobByLspJob((int) $lspJob->getId());
             } else {
                 $userJob = CreateUserJobAssignmentOperation::create()->assignJob($dto);
             }
 
-            $this->view->rows = (object) $this->viewDataProvider->buildJobView($userJob, $authUser);
+            $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($userJob, $authUser);
         } catch (Throwable $e) {
             throw $this->transformException($e);
         }
@@ -503,6 +507,22 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                     'action' => $e->jobAction->value,
                     'job' => $e->userJob->getId(),
                 ]
+            ),
+            ConfirmedCompetitiveJobAlreadyExistsException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'id' => [
+                        'Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe',
+                    ],
+                ],
+            ),
+            CoordinatorHasNotConfirmedLspJobYetException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'id' => [
+                        'Der Koordinator hat den LSP-Auftrag noch nicht bestätigt',
+                    ],
+                ],
             ),
             default => $e,
         };

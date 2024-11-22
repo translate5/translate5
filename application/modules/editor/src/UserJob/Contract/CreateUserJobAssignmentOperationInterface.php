@@ -32,9 +32,11 @@ namespace MittagQI\Translate5\UserJob\Contract;
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
+use MittagQI\Translate5\UserJob\Exception\CoordinatorHasNotConfirmedLspJobYetException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\UserJob\Exception\OnlyOneUniqueLspJobCanBeAssignedPerTaskException;
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
@@ -43,6 +45,8 @@ use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 interface CreateUserJobAssignmentOperationInterface
 {
     /**
+     * @throws ConfirmedCompetitiveJobAlreadyExistsException
+     * @throws CoordinatorHasNotConfirmedLspJobYetException
      * @throws InexistentUserException
      * @throws \ZfExtended_NotAuthenticatedException
      * @throws \ZfExtended_NotFoundException

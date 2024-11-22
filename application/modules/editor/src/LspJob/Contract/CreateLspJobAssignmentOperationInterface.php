@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LspJob\Contract;
 
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Exception\CoordinatorAttemptedToCreateLspJobForHisLspException;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
@@ -49,6 +50,7 @@ interface CreateLspJobAssignmentOperationInterface
     /**
      * @throws AttemptToAssignSubLspJobBeforeParentJobCreatedException
      * @throws CoordinatorAttemptedToCreateLspJobForHisLspException
+     * @throws ConfirmedCompetitiveJobAlreadyExistsException
      * @throws LspJobAlreadyExistsException
      * @throws NotLspCustomerTaskException
      * @throws InexistentUserException

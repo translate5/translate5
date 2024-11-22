@@ -337,12 +337,12 @@ class LspJobRepository
         string $workflow,
         string $workflowStepName,
     ): LspJobAssociation {
-        $lspJob = ZfExtended_Factory::get(LspJobAssociation::class);
+        $lspJob = new LspJobAssociation();
 
         $select = $this->db
             ->select()
             ->from([
-                'lspJob' => $lspJob->db->info($lspJob->db::NAME),
+                'lspJob' => LspJobAssociationTable::TABLE_NAME,
             ])
             ->where('lspJob.lspId = ?', $lspId)
             ->where('lspJob.taskGuid = ?', $taskGuid)
@@ -368,5 +368,33 @@ class LspJobRepository
         );
 
         return $lspJob;
+    }
+
+    public function getTaskLspJobs(string $taskGuid): iterable
+    {
+        $lspJob = new LspJobAssociation();
+
+        $select = $this->db
+            ->select()
+            ->from([
+                'lspJob' => LspJobAssociationTable::TABLE_NAME,
+            ])
+            ->where('lspJob.taskGuid = ?', $taskGuid)
+        ;
+
+        foreach ($this->db->fetchAll($select) as $jobData) {
+            $lspJob->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $lspJob->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $lspJob;
+        }
     }
 }

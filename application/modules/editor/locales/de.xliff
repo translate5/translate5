@@ -10129,6 +10129,14 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Bestätigen Sie die Änderung des Workflows</source>
                 <target>Bestätigen Sie die Änderung des Workflows</target>
             </trans-unit>
+            <trans-unit id='RXMgZ2lidCBiZXJlaXRzIGVpbmUgYmVzdMOkdGlndGUga29ua3VycmllcmVuZGUgQXVmdHJhZ3N2ZXJnYWJlRXMgZ2lidCBiZXJlaXRzIGVpbmUgYmVzdMOkdGlndGUga29ua3VycmllcmVuZGUgQXVmdHJhZ3N2ZXJnYWJl'>
+                <source>Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe</source>
+                <target>Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe</target>
+            </trans-unit>
+            <trans-unit id='RGVyIEtvb3JkaW5hdG9yIGhhdCBkZW4gTFNQLUF1ZnRyYWcgbm9jaCBuaWNodCBiZXN0w6R0aWd0'>
+                <source>Der Koordinator hat den LSP-Auftrag noch nicht bestätigt</source>
+                <target>Der Koordinator hat den LSP-Auftrag noch nicht bestätigt</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

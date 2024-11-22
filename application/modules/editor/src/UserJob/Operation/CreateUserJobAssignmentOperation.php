@@ -47,6 +47,7 @@ use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobEx
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\UserJob\TypeEnum;
+use MittagQI\Translate5\UserJob\Validation\CompetitiveJobCreationValidator;
 use MittagQI\Translate5\UserJob\Validation\TrackChangesRightsValidator;
 use Zend_Registry;
 use ZfExtended_Logger;
@@ -59,6 +60,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         private readonly LspJobRepository $lspJobRepository,
         private readonly TaskRepository $taskRepository,
         private readonly TrackChangesRightsValidator $trackChangesRightsValidator,
+        private readonly CompetitiveJobCreationValidator $competitiveJobCreationValidator,
         private readonly ZfExtended_Logger $logger,
     ) {
     }
@@ -74,6 +76,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
             LspJobRepository::create(),
             TaskRepository::create(),
             TrackChangesRightsValidator::create(),
+            CompetitiveJobCreationValidator::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.create'),
         );
     }
@@ -93,6 +96,15 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         }
 
         $task = $this->taskRepository->getByGuid($dto->taskGuid);
+
+        if (TypeEnum::Lsp !== $dto->type) {
+            $this->competitiveJobCreationValidator->assertCanCreate(
+                $task,
+                $lspJob,
+                $dto->workflow->workflow,
+                $dto->workflow->workflowStepName,
+            );
+        }
 
         $job = $this->userJobRepository->getEmptyModel();
         $job->setTaskGuid($task->getTaskGuid());

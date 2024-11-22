@@ -37,6 +37,7 @@ use MittagQI\Translate5\LspJob\Contract\CreateLspJobAssignmentOperationInterface
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
+use MittagQI\Translate5\LspJob\Validation\CompetitiveJobCreationValidator;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
@@ -57,6 +58,7 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
         private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
         private readonly TrackChangesRightsValidator $trackChangesRightsValidator,
+        private readonly CompetitiveJobCreationValidator $competitiveJobCreationValidator,
         private readonly CreateUserJobAssignmentOperationInterface $createUserJobOperation,
     ) {
     }
@@ -72,6 +74,7 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
             JobCoordinatorRepository::create(),
             LspCustomerAssociationValidator::create(),
             TrackChangesRightsValidator::create(),
+            CompetitiveJobCreationValidator::create(),
             CreateUserJobAssignmentOperation::create(),
         );
     }
@@ -85,6 +88,14 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
         }
 
         $lsp = $coordinator->lsp;
+        $task = $this->taskRepository->getByGuid($dto->taskGuid);
+
+        $this->competitiveJobCreationValidator->assertCanCreate(
+            $task,
+            $lsp,
+            $dto->workflow->workflow,
+            $dto->workflow->workflowStepName
+        );
 
         if (! $lsp->isDirectLsp()) {
             try {
@@ -101,8 +112,6 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
 
             $this->validateTrackChangesSettings($parentJob, $dto);
         }
-
-        $task = $this->taskRepository->getByGuid($dto->taskGuid);
 
         try {
             $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(

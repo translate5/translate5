@@ -91,7 +91,7 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
     private function assertAccess(LspJobAssociation $job): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
-        $dataJob = $this->userJobRepository->getDataJobByLspJob($job);
+        $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $job->getId());
 
         $this->permissionAssert->assertGranted(
             Action::Delete,

@@ -90,7 +90,7 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
             $this->deleteUserJobAssignmentOperation->forceDelete($userJob);
         }
 
-        $dataJob = $this->userJobRepository->getDataJobByLspJob($job);
+        $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $job->getId());
         $this->userJobRepository->delete($dataJob);
 
         $this->taskRepository->updateTaskUserCount($dataJob->getTaskGuid());
