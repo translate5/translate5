@@ -56,11 +56,9 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Languages as LRLanguages;
 use editor_Models_Languages as Languages;
 use editor_Services_Manager;
-use Iterator;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceContentProtector;
 use MittagQI\Translate5\Repository\LanguageRepository;
-use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 use ZfExtended_Factory;
 
@@ -79,7 +77,7 @@ class ContentProtectionRepository
     }
 
     /**
-     * @var ContentProtectionDto[]
+     * @var array<string, ContentProtectionDto[]>
      */
     private array $cachedQueryResults = [];
 
@@ -130,14 +128,20 @@ class ContentProtectionRepository
             return false;
         }
 
-        return $this->getAllForSource($sourceLang, $targetLang)->valid();
+        return ! empty($this->getAllForSource($sourceLang, $targetLang));
     }
 
     /**
-     * @return Iterator<ContentProtectionDto>
+     * @return iterable<ContentProtectionDto>
      */
-    public function getAllForSource(Languages $sourceLang, Languages $targetLang, bool $useCache = true): Iterator
+    public function getAllForSource(Languages $sourceLang, Languages $targetLang, bool $useCache = true): iterable
     {
+        $cacheKey = sprintf('%s-%s-source', $sourceLang->getRfc5646(), $targetLang->getRfc5646());
+
+        if ($useCache && isset($this->cachedQueryResults[$cacheKey])) {
+            return $this->cachedQueryResults[$cacheKey];
+        }
+
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
         $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
@@ -193,13 +197,20 @@ class ContentProtectionRepository
         ;
 
         $rows = array_merge(
-            $this->getQueryResult($dbInputMapping, $this->getKeepAsIsSelect($sourceIds), $useCache),
-            $this->getQueryResult($dbInputMapping, $select, $useCache),
+            $dbInputMapping->fetchAll($this->getKeepAsIsSelect($sourceIds))->toArray(),
+            $dbInputMapping->fetchAll($select)->toArray(),
         );
 
+        $collection = [];
         foreach ($rows as $formatData) {
-            yield ContentProtectionDto::fromRow($formatData);
+            $collection[] = ContentProtectionDto::fromRow($formatData);
         }
+
+        if ($useCache && ! isset($this->cachedQueryResults[$cacheKey])) {
+            $this->cachedQueryResults[$cacheKey] = $collection;
+        }
+
+        return $collection;
     }
 
     /**
@@ -207,6 +218,12 @@ class ContentProtectionRepository
      */
     public function getAllForTarget(Languages $sourceLang, Languages $targetLang, bool $useCache = true): iterable
     {
+        $cacheKey = sprintf('%s-%s-target', $sourceLang->getRfc5646(), $targetLang->getRfc5646());
+
+        if ($useCache && isset($this->cachedQueryResults[$cacheKey])) {
+            return $this->cachedQueryResults[$cacheKey];
+        }
+
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
         $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
@@ -263,13 +280,20 @@ class ContentProtectionRepository
         ;
 
         $rows = array_merge(
-            $this->getQueryResult($dbOutputMapping, $this->getKeepAsIsSelect($sourceIds), $useCache),
-            $this->getQueryResult($dbOutputMapping, $select, $useCache),
+            $dbOutputMapping->fetchAll($this->getKeepAsIsSelect($sourceIds))->toArray(),
+            $dbOutputMapping->fetchAll($select)->toArray(),
         );
 
+        $collection = [];
         foreach ($rows as $formatData) {
-            yield ContentProtectionDto::fromRow($formatData);
+            $collection[] = ContentProtectionDto::fromRow($formatData);
         }
+
+        if ($useCache && ! isset($this->cachedQueryResults[$cacheKey])) {
+            $this->cachedQueryResults[$cacheKey] = $collection;
+        }
+
+        return $collection;
     }
 
     public function getContentRecognitionForOutputMappingForm(): array
@@ -397,25 +421,6 @@ class ContentProtectionRepository
         }
 
         return $hashes;
-    }
-
-    /**
-     * @return array[]
-     * @throws \Zend_Db_Table_Select_Exception
-     */
-    private function getQueryResult(Zend_Db_Table_Abstract $db, Zend_Db_Table_Select $select, bool $useCache): array
-    {
-        if (! $useCache) {
-            return $db->fetchAll($select)->toArray();
-        }
-
-        $cacheKey = md5($select->assemble());
-
-        if (! isset($this->cachedQueryResults[$cacheKey])) {
-            $this->cachedQueryResults[$cacheKey] = $db->fetchAll($select)->toArray();
-        }
-
-        return $this->cachedQueryResults[$cacheKey];
     }
 
     private function getKeepAsIsSelect(array $sourceIds): Zend_Db_Table_Select

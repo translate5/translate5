@@ -308,10 +308,8 @@ class NumberProtector implements ProtectorInterface
             // if we'll try to protect for example integers in a row like "string 12 45 67 string"
             // then we'll need to do that in a couple of tries because in current case will get result as:
             // string <number ... source="12" ... /> 145 <number ... source="67" ... /> string
-            while ($tries++ < 2) {
-                if (! $this->hasProcessableMatches($textNode, $protectionDto)) {
-                    $tries = 0;
-
+            while ($tries < 2) {
+                if (0 === $tries && ! $this->hasProcessableMatches($textNode, $protectionDto)) {
                     continue 2;
                 }
 
@@ -319,7 +317,14 @@ class NumberProtector implements ProtectorInterface
 
                 // reloading document with potential new tags
                 $this->loadXML($this->getCurrentTextNode());
+
+                if (0 === $tries && $this->fullSegmentMatch($textNode, $protectionDto)) {
+                    break 2;
+                }
+
+                $tries++;
             }
+
             $tries = 0;
         }
 
@@ -330,12 +335,40 @@ class NumberProtector implements ProtectorInterface
         return preg_replace('/<skip content="(.+)"\/>/U', '$1', $matches[1]);
     }
 
+    // In case we got text like: "string &lt;goba&gt;string"
+    // and user expects us to protect <goba> in: "string <goba> string"
+    // entity encoding is part of upper processing logic
+    private function decodeTextNode(string $textNode): string
+    {
+        return html_entity_decode($textNode, ENT_XML1);
+    }
+
+    private function fullSegmentMatch(string $textNode, ContentProtectionDto $protectionDto): bool
+    {
+        if (preg_match('#<seg>(.*)</seg>#', $textNode, $segMatches)) {
+            $textNode = $segMatches[1];
+        }
+
+        $decoded = $this->decodeTextNode($textNode);
+
+        if (
+            ! preg_match_all($protectionDto->regex, $this->document->textContent, $matches)
+            && ! preg_match_all($protectionDto->regex, $decoded, $matches)
+        ) {
+            return false;
+        }
+
+        // more then one match shows that regex don't match the whole text
+        if (count($matches[0]) > 1) {
+            return false;
+        }
+
+        return $textNode === $matches[$protectionDto->matchId][0];
+    }
+
     private function hasProcessableMatches(string $textNode, ContentProtectionDto $protectionDto): bool
     {
-        // In case we got text like: "string &lt;goba&gt;string"
-        // and user expects us to protect <goba> in: "string <goba> string"
-        // entity encoding is part of upper processing logic
-        $decoded = html_entity_decode($textNode, ENT_XML1);
+        $decoded = $this->decodeTextNode($textNode);
 
         if (
             ! preg_match_all($protectionDto->regex, $this->document->textContent, $matches)
@@ -549,10 +582,7 @@ class NumberProtector implements ProtectorInterface
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
     ): bool {
-        // In case we got text like: "string &lt;goba&gt;string"
-        // and user expects us to protect <goba> in: "string <goba> string"
-        // entity encoding is part of upper processing logic
-        $decoded = html_entity_decode($this->unprotectHtmlEntities($text->textContent), ENT_XML1);
+        $decoded = $this->decodeTextNode($this->unprotectHtmlEntities($text->textContent));
 
         if (preg_match_all($langFormat->regex, $text->textContent, $matches)) {
             $parts = preg_split($langFormat->regex, $text->textContent);

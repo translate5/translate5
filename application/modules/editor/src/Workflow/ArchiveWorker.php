@@ -123,16 +123,20 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
      */
     protected function replaceTargetPathVariables(string $targetPath, object $taskJson): string
     {
-        $charsToProtect = str_split('#%&{}\\<>*?/$!\'":@+`|=');
+        $charsToProtect = str_split('#%&{}\\<>*?/$!\'":@+`|=()[] ');
 
-        return preg_replace_callback('#{([a-zA-Z0-9_-]+)}#', function ($matches) use ($taskJson, $charsToProtect) {
-            $var = $matches[1];
-            if ($var === 'time') {
-                return NOW_ISO;
-            }
+        return preg_replace(
+            '/-+/',
+            '-',
+            preg_replace_callback('#{([a-zA-Z0-9_-]+)}#', function ($matches) use ($taskJson, $charsToProtect) {
+                $var = $matches[1];
+                if ($var === 'time') {
+                    return NOW_ISO;
+                }
 
-            return str_replace($charsToProtect, '-', $taskJson->$var ?? $var);
-        }, $targetPath);
+                return str_replace($charsToProtect, '-', $taskJson->$var ?? $var);
+            }, $targetPath)
+        );
     }
 
     /**
