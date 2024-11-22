@@ -9,8 +9,7 @@
             "ccc",
             "sln",
             "wordFontColorsMinIgnoranceThreshold",
-            "wordFontColorsMaxIgnoranceThreshold",
-            "tsPowerpointIncludedSlideNumbers"
+            "wordFontColorsMaxIgnoranceThreshold"
         ]
     },
     {
@@ -23,8 +22,17 @@
             "characterLeadingMinIgnoranceThreshold",
             "characterLeadingMaxIgnoranceThreshold",
             "characterBaselineShiftMinIgnoranceThreshold",
-            "characterBaselineShiftMaxIgnoranceThreshold"
+            "characterBaselineShiftMaxIgnoranceThreshold",
+            "fontMappings"
         ]
+    },
+    {
+        "type": "okf_icml",
+        "properties": []
+    },
+    {
+        "type": "okf_ttx",
+        "properties": []
     }
 ]
 

@@ -32,8 +32,15 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\FileInventory;
 
 /**
  * Class representing the special volatile properties for X-Properties based FPRMs
- * Volatile Properties are those property-names, that can dynamically be added when editing a FPRM of the given
- * okapi-type An entry has the following structure:
+ * Volatile Properties are those property-names, that can dynamically be added when editing a FPRM of the given okapi-type.
+ *
+ * Volatile variables always define the first name-part of the prop without a potential type
+ *  cfd0=HYPERLINK                          => cfd
+ *  codeFinderRules0                        => codeFinderRules
+ *  rule0.codeFinderRules.rule1             => rule
+ *  fontMappings.1.sourceLocalePattern      => fontMappings
+ *
+ * An entry has the following structure:
  *  {
  *      "type": "okf_openxml",
  *      "properties": [

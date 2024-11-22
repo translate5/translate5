@@ -1,5 +1,5 @@
 #v1
-maxAttributeSize.i=4194304
+maxAttributeSize.i=14194304
 untagXmlStructures.b=true
 extractNotes.b=false
 extractMasterSpreads.b=true

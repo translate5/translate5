@@ -64,6 +64,10 @@ final class PropertiesValidation extends ResourceFile
 
     private PropertiesParser $referenceProps;
 
+    private bool $strict = false;
+
+    private array $volatiles = [];
+
     /**
      * @throws ZfExtended_Exception
      */
@@ -72,6 +76,12 @@ final class PropertiesValidation extends ResourceFile
         parent::__construct($path, $content);
         $identifier = Filters::createIdentifierFromPath($path);
         $idata = Filters::parseIdentifier($identifier);
+        // find volatile-props - if already defined
+        $volatiles = VolatileProperties::instance()->getPropertyNames($idata->type);
+        if ($volatiles !== null) {
+            $this->strict = true;
+            $this->volatiles = $volatiles;
+        }
         // try to get the default validation file
         $validationFile = Filters::instance()->getOkapiDefaultFilterPathById($idata->type);
         if (empty($validationFile)) {
@@ -113,16 +123,24 @@ final class PropertiesValidation extends ResourceFile
         }
     }
 
+    /**
+     * Retrieves if we know all dynamic/volatile properties a FPRM can have and
+     * are able to remove obsolete ones therefore
+     */
+    public function isStrict(): bool
+    {
+        return $this->strict;
+    }
+
     public function hasToBeRepaired(): bool
     {
         return $this->needsRepair;
     }
 
-    /**The file has an invalid value
+    /**
      * Validates a FPRM based on it's type
      * We will ignore extra-values that may be in the FPRM compared to the reference
      * We will add missing values in comparision to the original file
-     * @return bool
      */
     public function validate(bool $forImport = false): bool
     {
@@ -196,8 +214,35 @@ final class PropertiesValidation extends ResourceFile
         return $valid;
     }
 
+    /**
+     * Evaluates, if a variable-name represents a volatile/dynamic property
+     * A volatile property results from serialized array or collection data and can have certain forms:
+     *  cfd0=HYPERLINK // simple list
+     *  codeFinderRules0=[A-Z]+ // simple list
+     *  rule0.codeFinderRules.rule1=a-z0-9]+// double nested collection
+     *  fontMappings.1.sourceLocalePattern=[a-z0-9]+ // another type of nested collection
+     */
     private function isVolatileProperty($name): bool
     {
-        return (in_array(substr($name, 0, 3), self::VOLATILE_VARS) && is_numeric(substr($name, 3)));
+        // we only regard the first part of a nested variable or dismiss the type
+        if (str_contains($name, '.')) {
+            $parts = explode('.', $name);
+            $name = $parts[0];
+        }
+        $name = $this->removeIntegerSuffix($name);
+
+        return in_array($name, $this->volatiles);
+    }
+
+    private function removeIntegerSuffix(string $name): string
+    {
+        if (preg_match('/^(.*?)(\d+)$/', $name, $matches)) {
+            // we do not regard e.g. "777" as integer suffixed
+            if ($matches[1] !== '') {
+                return $matches[1];
+            }
+        }
+
+        return $name;
     }
 }
