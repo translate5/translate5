@@ -1,0 +1,30 @@
+[
+    {
+        "type": "okf_openxml",
+        "properties": [
+            "cfd",
+            "sss",
+            "hlt",
+            "yyy",
+            "ccc",
+            "sln",
+            "wordFontColorsMinIgnoranceThreshold",
+            "wordFontColorsMaxIgnoranceThreshold",
+            "tsPowerpointIncludedSlideNumbers"
+        ]
+    },
+    {
+        "type": "okf_idml",
+        "properties": [
+            "characterKerningMinIgnoranceThreshold",
+            "characterKerningMaxIgnoranceThreshold",
+            "characterTrackingMinIgnoranceThreshold",
+            "characterTrackingMaxIgnoranceThreshold",
+            "characterLeadingMinIgnoranceThreshold",
+            "characterLeadingMaxIgnoranceThreshold",
+            "characterBaselineShiftMinIgnoranceThreshold",
+            "characterBaselineShiftMaxIgnoranceThreshold"
+        ]
+    }
+]
+

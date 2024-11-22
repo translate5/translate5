@@ -118,8 +118,6 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
     public static function getUserDataDir(): string
     {
         if (empty(self::$userDataDir)) {
-            $errorMsg = null;
-
             try {
                 /** @var Zend_Config $config */
                 $config = Zend_Registry::get('config');

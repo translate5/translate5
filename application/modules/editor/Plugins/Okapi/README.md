@@ -73,6 +73,7 @@
 * The versioning is achieved by comparing the hash-values of an uploaded/changed SRX with the known translate5 SRXs
 * therefore all SRX files delivered with translate5 are in the SRX-inventory with their hashes
 * the inventory is in `translate5/application/modules/editor/Plugins/Okapi/data/srx/translate5-segmentation.json`
+* to edit SRX files / Segmentation rules, Ratel (a tool within of Rainbow) has to be used
 
 
 ### BCONF: FPRM (aka Filters)
