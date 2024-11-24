@@ -95,8 +95,18 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
 
     /**
      * The general version of bconfs we support
+     * This is largely without meaning, 1 was for the .NET implementation
+     * 2 is the current JAVA implementation
      */
     public const VERSION = 2;
+
+    /**
+     * The corresponding framework-version that is currently implemented
+     * This means, that all FPRMs and Pipelines are tailored to this version
+     * Note, that BCONFS are not always version-compatible, e.g.
+     * 1.47 BCONFs will not work with 1.44 and vice versa
+     */
+    public const FRAMEWORK_VERSION = '1.47.0';
 
     /**
      * The signature written int the bconf-files
@@ -509,7 +519,7 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
         } catch (ZfExtended_Models_Entity_NotFoundException) {
         }
 
-        // if not found, generate it
+        // if not found, generate it.0
         return $this->importSystemDefault();
     }
 
