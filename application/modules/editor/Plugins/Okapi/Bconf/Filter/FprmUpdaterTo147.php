@@ -57,6 +57,7 @@ final class FprmUpdaterTo147
         if (empty($json['fprm'])) {
             return;
         }
+        $errors = [];
         foreach ($json['fprm'] as $fprmEntry) {
             [$okfType] = explode('@', $fprmEntry);
 
@@ -65,8 +66,6 @@ final class FprmUpdaterTo147
             }
 
             $fprm = new Fprm($fprmFile);
-            $errors = [];
-
             // x-properties: upgrade according to the new defaults
             if ($fprm->getType() === Fprm::TYPE_XPROPERTIES) {
                 $validation = new PropertiesValidation($fprmFile);
@@ -91,16 +90,15 @@ final class FprmUpdaterTo147
                     $errors[] = 'Invalid FPRM "' . basename($fprmFile) . '"';
                 }
             }
-
-            if (! empty($errors)) {
-                error_log(
-                    'ERROR: BCONF "' . $bconf->getName() . '" (id: ' . $bconf->getId() . ') could not be upgraded'
-                    . ' to OKAPI 1.47, the following errors occured: ' . "\n    " . implode("\n    ", $errors)
-                );
-            } else {
-                // TODO: for production we should remove/uncomment this
-                error_log('Successfully converted FPRMs to OKAPI 1.47 for BCONF ' . $bconf->getName());
-            }
+        }
+        if (! empty($errors)) {
+            error_log(
+                'ERROR: BCONF "' . $bconf->getName() . '" (id: ' . $bconf->getId() . ') could not be upgraded'
+                . ' to OKAPI 1.47, the following errors occured: ' . "\n    " . implode("\n    ", $errors)
+            );
+        } else {
+            // TODO: for production we should remove/uncomment this
+            error_log('Successfully converted FPRMs to OKAPI 1.47 for BCONF ' . $bconf->getName());
         }
     }
 }
