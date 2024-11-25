@@ -54,8 +54,8 @@ class Mxliff extends AbstractNamespace
 
     private function processSegmentChunk(string $segmentChunk): string
     {
-        $pattern1 = '/\{([a-zA-Z]+)&gt;/';
-        $pattern2 = '/&lt;([a-zA-Z]+)\}/';
+        $pattern1 = '/\{([a-zA-Z0-9]+)&gt;/';
+        $pattern2 = '/&lt;([a-zA-Z0-9]+)\}/';
 
         $callback = function ($matches) {
             return "<ph>{$matches[0]}</ph>";
