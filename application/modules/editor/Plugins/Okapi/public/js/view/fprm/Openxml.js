@@ -52,12 +52,6 @@
     sln0.i=1
     sln1.i=2
     sln2.i=3
-    zzz0=1AC
-    zzz1=1AD
-    zzz2=2A
-    zzz3=2F
-    zzz4=3B
-    zzz5=3C
 
     see /okapi-ui/swt/filters/openxml-ui/src/main/java/net/sf/okapi/filters/openxml/ui/Editor.java
     see /okapi/filters/openxml/src/main/java/net/sf/okapi/filters/openxml/ConditionalParameters.java

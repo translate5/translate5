@@ -61,7 +61,7 @@ preserveExcelStylesInTargetColumns.b=false',
     private array $addPropertyData = [];
 
     private const removePropertyData = [
-        'okf_openxml' => ['bPreferenceTranslateExcelExcludeColumns.b', 'tsExcelExcludedColumns.i'],
+        'okf_openxml' => ['bPreferenceTranslateExcelExcludeColumns.b', 'tsExcelExcludedColumns.i', '/zzz\d+/'],
     ];
 
     private const replaceYamlData = [
@@ -115,7 +115,8 @@ preserveExcelStylesInTargetColumns.b=false',
             }
             if (! empty(self::removePropertyData[$okfType])) {
                 foreach (self::removePropertyData[$okfType] as $propName) {
-                    $fileContentsNew = preg_replace('/^' . preg_quote($propName) . '=.*?(\n|$)/m', '', $fileContentsNew);
+                    $regExp = $propName[0] === '/' ? trim($propName, '/') : preg_quote($propName);
+                    $fileContentsNew = preg_replace('/^' . $regExp . '=.*?(\n|$)/m', '', $fileContentsNew);
                 }
             }
             if (! empty(self::replaceYamlData[$okfType])) {
