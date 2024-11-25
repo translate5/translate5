@@ -75,7 +75,7 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
         type: 'languageResourceTaskGridWindow'
     },
     height: 500,
-    width: 800,
+    width: 1000,
     modal: true,
     layout: 'fit',
     initConfig: function (instanceConfig) {
