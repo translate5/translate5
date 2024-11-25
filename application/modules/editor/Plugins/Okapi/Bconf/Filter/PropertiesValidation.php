@@ -154,7 +154,6 @@ final class PropertiesValidation extends ResourceFile
                     $this->referenceProps->set($varName, $this->props->get($varName));
                 } catch (Throwable $e) {
                     // highly improbable but who knows ...
-                    // DEBUG
                     if ($this->doDebug) {
                         error_log(
                             'PROPERTIES VALIDATION PROBLEM: The file "' . $this->path
@@ -253,7 +252,7 @@ final class PropertiesValidation extends ResourceFile
                     $newProps->add($varName, $this->props->get($varName));
                 }
             }
-            // replace & return
+            // replace
             $this->props = $newProps;
         } else {
             // if not strict, we just amend non-existing props
