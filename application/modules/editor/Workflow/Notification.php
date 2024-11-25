@@ -552,17 +552,21 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
             return;
         }
 
-        $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');
-        /* @var $taskLog editor_Models_Logger_Task */
-        $logEntries = $taskLog->loadByTaskGuid($task->getTaskGuid());
+        $taskLog = ZfExtended_Factory::get(editor_Models_Logger_Task::class);
+        $logEntries = $taskLog->loadByLevel(
+            $task->getTaskGuid(),
+            [
+                ZfExtended_Logger::LEVEL_FATAL,
+                ZfExtended_Logger::LEVEL_ERROR,
+            ]
+        );
 
         //if there is no or only the one default info log, we send no mail
         if (empty($logEntries) || count($logEntries) == 1 && ((object) reset($logEntries))->level == ZfExtended_Logger::LEVEL_INFO) {
             return;
         }
 
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         $user->loadByGuid($task->getPmGuid());
 
         $this->createNotification('pm', __FUNCTION__, [
