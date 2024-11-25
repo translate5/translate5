@@ -59,9 +59,11 @@ final class PropertiesParser
 
     private array $errors = [];
 
-    public function __construct(string $content)
+    public function __construct(string $content = null)
     {
-        $this->parse($content);
+        if($content !== null){
+            $this->parse($content);
+        }
     }
 
     /**
@@ -270,9 +272,6 @@ final class PropertiesParser
                     $this->errors[] = 'Found invalid line (' . $line . ')';
                 }
             }
-        }
-        if (count($this->map) < 1) {
-            $this->errors[] = 'Found no valid lines';
         }
     }
 

@@ -1,40 +1,64 @@
 [
-    {
-        "type": "okf_openxml",
-        "properties": [
-            "cfd",
-            "sss",
-            "hlt",
-            "yyy",
-            "ccc",
-            "wordFontColorsMinIgnoranceThreshold",
-            "wordFontColorsMaxIgnoranceThreshold",
-            "worksheetConfigurations",
-            "fontMappings"
-        ]
-    },
-    {
-        "type": "okf_idml",
-        "properties": [
-            "characterKerningMinIgnoranceThreshold",
-            "characterKerningMaxIgnoranceThreshold",
-            "characterTrackingMinIgnoranceThreshold",
-            "characterTrackingMaxIgnoranceThreshold",
-            "characterLeadingMinIgnoranceThreshold",
-            "characterLeadingMaxIgnoranceThreshold",
-            "characterBaselineShiftMinIgnoranceThreshold",
-            "characterBaselineShiftMaxIgnoranceThreshold",
-            "useCodeFinder",
-            "fontMappings"
-        ]
-    },
-    {
-        "type": "okf_icml",
-        "properties": []
-    },
-    {
-        "type": "okf_ttx",
-        "properties": []
-    }
+  {
+    "type": "okf_icml",
+    "properties": []
+  },
+  {
+    "type": "okf_idml",
+    "properties": [
+      "characterKerningMinIgnoranceThreshold",
+      "characterKerningMaxIgnoranceThreshold",
+      "characterTrackingMinIgnoranceThreshold",
+      "characterTrackingMaxIgnoranceThreshold",
+      "characterLeadingMinIgnoranceThreshold",
+      "characterLeadingMaxIgnoranceThreshold",
+      "characterBaselineShiftMinIgnoranceThreshold",
+      "characterBaselineShiftMaxIgnoranceThreshold",
+      "fontMappings",
+      "useCodeFinder",
+      "codeFinderRules"
+    ]
+  },
+  {
+    "type": "okf_openxml",
+    "properties": [
+      "wordFontColorsMinIgnoranceThreshold",
+      "wordFontColorsMaxIgnoranceThreshold",
+      "cfd",
+      "ccc",
+      "sss",
+      "hlt",
+      "yyy",
+      "sln",
+      "worksheetConfigurations",
+      "fontMappings"
+    ]
+  },
+  {
+    "type": "okf_ttml",
+    "properties": [
+      "keepTimecodes",
+      "splitWords"
+    ]
+  },
+  {
+    "type": "okf_regex",
+    "properties": [
+      "rule"
+    ]
+  },
+  {
+    "type": "okf_ttx",
+    "properties": []
+  },
+  {
+    "type": "okf_vtt",
+    "properties": [
+      "keepTimecodes",
+      "discardCues",
+      "splitWords",
+      "cueSettings"
+    ]
+  }
 ]
 

@@ -28,6 +28,7 @@
 
 namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
 
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filters;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Parser\PropertiesParser;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\ResourceFile;
@@ -48,14 +49,6 @@ use ZfExtended_Exception;
  */
 final class PropertiesValidation extends ResourceFile
 {
-    /**
-     * UGLY: there are "volitile" variables that mimic a list (the properties-format has no support for arrays/lists)
-     * They are included as properties but are not mandatory and represent the state of other properties
-     * The concrete naming is like "zzz0", "hlt1", ...
-     * @var array
-     */
-    public const VOLATILE_VARS = ['ccc', 'cfd', 'hlt', 'sln', 'sss', 'yyy', 'zzz']; // are from the openxml filter
-
     protected string $mime = 'text/x-properties';
 
     private bool $needsRepair = false;
@@ -102,8 +95,10 @@ final class PropertiesValidation extends ResourceFile
             if (! $this->referenceProps->isValid()) {
                 // DEBUG
                 if ($this->doDebug) {
-                    error_log('PROPERTIES VALIDATION ERROR: Invalid reference file "' . $validationFile
-                        . '": (' . $this->referenceProps->getErrorString(', ') . ')');
+                    error_log(
+                        'PROPERTIES VALIDATION ERROR: Invalid reference file "' . $validationFile
+                        . '": (' . $this->referenceProps->getErrorString(', ') . ')'
+                    );
                 }
 
                 throw new ZfExtended_Exception(
@@ -115,8 +110,10 @@ final class PropertiesValidation extends ResourceFile
             if (! $this->props->isValid()) {
                 // DEBUG
                 if ($this->doDebug) {
-                    error_log('PROPERTIES VALIDATION ERROR: Invalid fprm "' . $path
-                        . '": (' . $this->props->getErrorString(', ') . ')');
+                    error_log(
+                        'PROPERTIES VALIDATION ERROR: Invalid fprm "' . $path
+                        . '": (' . $this->props->getErrorString(', ') . ')'
+                    );
                 }
                 $this->validationError = trim($this->validationError . ' ' . $this->props->getErrorString());
             }
@@ -159,11 +156,15 @@ final class PropertiesValidation extends ResourceFile
                     // highly improbable but who knows ...
                     // DEBUG
                     if ($this->doDebug) {
-                        error_log('PROPERTIES VALIDATION PROBLEM: The file has an invalid value "'
-                            . $varName . '": ' . $e->getMessage());
+                        error_log(
+                            'PROPERTIES VALIDATION PROBLEM: The file "' . $this->path
+                            . '" has an invalid value "' . $varName . '": ' . $e->getMessage()
+                        );
                     }
-                    $this->validationError = trim($this->validationError . "\n"
-                        . ' The file has an invalid value: ' . $varName);
+                    $this->validationError = trim(
+                        $this->validationError . "\n"
+                        . ' The file "' . $this->path . '" has an invalid value: ' . $varName
+                    );
                     $valid = false;
                 }
             }
@@ -184,8 +185,11 @@ final class PropertiesValidation extends ResourceFile
         $additionalProps = array_diff($this->props->getPropertyNames(), $this->referenceProps->getPropertyNames());
         if (count($additionalProps) > 0) {
             if ($this->doDebug) {
-                error_log('PROPERTIES VALIDATION PROBLEM: The file has additional values compared to the reference:'
-                    . ' (' . implode(', ', $additionalProps) . ')');
+                error_log(
+                    'PROPERTIES VALIDATION PROBLEM: The file "' . $this->path
+                    . '" has additional values compared to the reference:'
+                    . ' (' . implode(', ', $additionalProps) . ')'
+                );
             }
             foreach ($additionalProps as $propName) {
                 $this->referenceProps->add($propName, $this->props->get($propName));
@@ -195,11 +199,17 @@ final class PropertiesValidation extends ResourceFile
         if (count($missingProps) > 0) {
             // DEBUG
             if ($this->doDebug) {
-                error_log('PROPERTIES VALIDATION PROBLEM: The file has missing values compared to the reference:'
-                    . ' (' . implode(', ', $missingProps) . ')');
+                error_log(
+                    'PROPERTIES VALIDATION PROBLEM: The file "' . $this->path
+                    . '" has missing values compared to the reference:'
+                    . ' (' . implode(', ', $missingProps) . ')'
+                );
             }
-            $this->validationError = trim($this->validationError . "\n" . 'The file has missing values ('
-                . implode(', ', $missingProps) . ')');
+            $this->validationError = trim(
+                $this->validationError . "\n" . 'The file "'
+                . $this->path . '" has missing values ('
+                . implode(', ', $missingProps) . ')'
+            );
             // SPECIAL: when importing, we silently ignore missing props, when validating edited FPRMs,
             // we need to be more picky as this hints to an incomplete GUI (maybe due to rainbow updates)
             if (! $forImport) {
@@ -215,34 +225,73 @@ final class PropertiesValidation extends ResourceFile
     }
 
     /**
+     * Upgrades a x-properties FPRM based on the okapi reference-file
+     * This amends/cleans our internal structure
+     * Returns the success of the action
+     */
+    public function upgrade(): bool
+    {
+        if (! $this->props->isValid()) {
+            return false;
+        }
+
+        if ($this->isStrict()) {
+            // in strict-mode, we recreate the properties from scratch: remove outdated, amend not present
+            // create from scratch
+            $newProps = new PropertiesParser(null);
+            // transfer all mandatory either from existing or reference if not found
+            foreach ($this->referenceProps->getPropertyNames() as $varName) {
+                if ($this->props->has($varName)) {
+                    $newProps->add($varName, $this->props->get($varName));
+                } else {
+                    $newProps->add($varName, $this->referenceProps->get($varName));
+                }
+            }
+            // transfer all volatile vars to the new props
+            foreach ($this->props->getPropertyNames() as $varName) {
+                if (! $newProps->has($varName) && $this->isVolatileProperty($varName)) {
+                    $newProps->add($varName, $this->props->get($varName));
+                }
+            }
+            // replace & return
+            $this->props = $newProps;
+        } else {
+            // if not strict, we just amend non-existing props
+            foreach ($this->referenceProps->getPropertyNames() as $varName) {
+                if (! $this->props->has($varName)) {
+                    $this->props->add($varName, $this->referenceProps->get($varName));
+                }
+            }
+        }
+        $oldContent = $this->content;
+        $this->content = $this->props->unparse();
+
+        if ($this->doDebug && $oldContent !== $this->content) {
+            error_log(
+                'PROPERTIES FPRM UPGRADE: upgraded ' . $this->path . ' to ' . BconfEntity::FRAMEWORK_VERSION
+            );
+        }
+
+        return true;
+    }
+
+    /**
      * Evaluates, if a variable-name represents a volatile/dynamic property
      * A volatile property results from serialized array or collection data and can have certain forms:
      *  cfd0=HYPERLINK // simple list
      *  codeFinderRules0=[A-Z]+ // simple list
      *  rule0.codeFinderRules.rule1=a-z0-9]+// double nested collection
      *  fontMappings.1.sourceLocalePattern=[a-z0-9]+ // another type of nested collection
+     * The frontend "knows" the volatiles in all details, in the backend, we simply allow them by their "base name"
      */
     private function isVolatileProperty($name): bool
     {
-        // we only regard the first part of a nested variable or dismiss the type
-        if (str_contains($name, '.')) {
-            $parts = explode('.', $name);
-            $name = $parts[0];
-        }
-        $name = $this->removeIntegerSuffix($name);
-
-        return in_array($name, $this->volatiles);
-    }
-
-    private function removeIntegerSuffix(string $name): string
-    {
-        if (preg_match('/^(.*?)(\d+)$/', $name, $matches)) {
-            // we do not regard e.g. "777" as integer suffixed
-            if ($matches[1] !== '') {
-                return $matches[1];
+        foreach ($this->volatiles as $nameStart) {
+            if (str_starts_with($name, $nameStart)) {
+                return true;
             }
         }
 
-        return $name;
+        return false;
     }
 }

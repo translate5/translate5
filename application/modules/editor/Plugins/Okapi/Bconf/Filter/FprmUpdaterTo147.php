@@ -28,42 +28,14 @@
 
 namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
 
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+
 /**
  * Class representing updates to v1.47
  * Supported FPRMs: okf_idml, okf_openxml, okf_html
  */
 final class FprmUpdaterTo147
 {
-    private const ADDED_PROPERTIES = [
-        'okf_idml' => 'extractHyperlinkTextSourcesInline.b=false
-extractExternalHyperlinks.b=false
-specialCharacterPattern= | | | | | | | | | |​|‌|­|‑|﻿
-codeFinderRules.count.i=0
-codeFinderRules.sample=
-codeFinderRules.useAllRulesWhenTesting.b=true',
-        'okf_openxml' => 'translatePowerpointDocProperties.b=true
-translatePowerpointDiagramData.b=true
-translatePowerpointCharts.b=true
-translatePowerpointComments.b=true
-reorderPowerpointDocProperties.b=false
-reorderPowerpointDiagramData.b=false
-reorderPowerpointCharts.b=false
-bPreferenceReorderPowerpointNotes.b=false
-reorderPowerpointComments.b=false
-reorderPowerpointRelationships.b=false
-translateWordNumberingLevelText.b=false
-allowWordStyleOptimisation.b=true
-ignoreWordFontColors.b=false
-translateExcelCellsCopied.b=true
-preserveExcelStylesInTargetColumns.b=false',
-    ];
-
-    private array $addPropertyData = [];
-
-    private const removePropertyData = [
-        'okf_openxml' => ['bPreferenceTranslateExcelExcludeColumns.b', 'tsExcelExcludedColumns.i', '/zzz\d+/'],
-    ];
-
     private const replaceYamlData = [
         'okf_html' => [
             "[keywords, description]" => "[keywords, description, 'twitter:title', 'twitter:description', 'og:title', 'og:description', 'og:site_name']",
@@ -78,19 +50,9 @@ preserveExcelStylesInTargetColumns.b=false',
         ],
     ];
 
-    public function __construct()
+    public function updateInDir(BconfEntity $bconf): void
     {
-        foreach (array_keys(self::ADDED_PROPERTIES) as $okfType) {
-            $this->addPropertyData[$okfType] = [];
-            foreach (preg_split("/[\r\n]+/", self::ADDED_PROPERTIES[$okfType]) as $line) {
-                $line = explode('=', $line);
-                $this->addPropertyData[$okfType][$line[0]] = $line[1];
-            }
-        }
-    }
-
-    public function updateInDir(string $dir): void
-    {
+        $dir = $bconf->getDataDirectory();
         $json = json_decode(file_get_contents($dir . '/content.json'), true);
         if (empty($json['fprm'])) {
             return;
@@ -98,48 +60,46 @@ preserveExcelStylesInTargetColumns.b=false',
         foreach ($json['fprm'] as $fprmEntry) {
             [$okfType] = explode('@', $fprmEntry);
 
-            if (! isset($this->addPropertyData[$okfType]) && ! isset(self::replaceYamlData[$okfType]) && ! isset(self::removePropertyData[$okfType])) {
-                continue;
-            }
             if (! file_exists($fprmFile = $dir . '/' . $fprmEntry . '.fprm')) {
                 continue;
             }
-            $fileContents = rtrim(file_get_contents($fprmFile));
-            $fileContentsNew = $fileContents;
-            if (! empty($this->addPropertyData[$okfType])) {
-                foreach ($this->addPropertyData[$okfType] as $propName => $propValue) {
-                    if (! preg_match('/^' . preg_quote($propName) . '=/m', $fileContentsNew)) {
-                        $fileContentsNew .= "\n$propName=$propValue";
-                    }
-                }
-            }
-            if (! empty(self::removePropertyData[$okfType])) {
-                foreach (self::removePropertyData[$okfType] as $propName) {
-                    $regExp = $propName[0] === '/' ? trim($propName, '/') : preg_quote($propName);
-                    $fileContentsNew = preg_replace('/^' . $regExp . '=.*?(\n|$)/m', '', $fileContentsNew);
-                }
-            }
-            if (! empty(self::replaceYamlData[$okfType])) {
-                foreach (self::replaceYamlData[$okfType] as $str1 => $str2) {
-                    $fileContentsNew = str_replace($str1, $str2, $fileContentsNew);
-                }
-            }
-            if ($fileContentsNew !== $fileContents) {
-                // temp file for Fprm:validate() only
-                $fprmTempFile = $fprmFile . '.tmp';
-                file_put_contents($fprmTempFile, $fileContentsNew);
 
-                $fprmNameWithinData = substr($dir, strpos($dir, '/data/') + 1);
-                $fprm = new Fprm($fprmTempFile);
-                if ($fprm->validate()) {
-                    // replace old file
-                    file_put_contents($fprmFile, $fileContentsNew);
-                    $errMsg = "Successfully converted FPRM to OKAPI 1.47: $fprmNameWithinData";
+            $fprm = new Fprm($fprmFile);
+            $errors = [];
+
+            // x-properties: upgrade according to the new defaults
+            if ($fprm->getType() === Fprm::TYPE_XPROPERTIES) {
+                $validation = new PropertiesValidation($fprmFile);
+                $validation->upgrade();
+                if ($validation->validate()) {
+                    $validation->flush();
                 } else {
-                    $errMsg = "Error converting FPRM to OKAPI 1.47: " . $fprm->getValidationError() . " [$fprmNameWithinData]";
+                    $errors[] = 'Failed to upgrade x-properties FPRM "' . basename($fprmFile) . '"';
                 }
-                error_log($errMsg);
-                unlink($fprmTempFile);
+            } else {
+                // amend selected Yaml-based FPRMs
+                if ($fprm->getType() === Fprm::TYPE_YAML && ! empty(self::replaceYamlData[$okfType])) {
+                    $fileContents = rtrim(file_get_contents($fprmFile));
+                    foreach (self::replaceYamlData[$okfType] as $str1 => $str2) {
+                        $fileContents = str_replace($str1, $str2, $fileContents);
+                    }
+                    $fprm = new Fprm($fprmFile, $fileContents);
+                    $fprm->flush();
+                }
+                // we validate every FPRM
+                if (! $fprm->validate()) {
+                    $errors[] = 'Invalid FPRM "' . basename($fprmFile) . '"';
+                }
+            }
+
+            if (! empty($errors)) {
+                error_log(
+                    'ERROR: BCONF "' . $bconf->getName() . '" (id: ' . $bconf->getId() . ') could not be upgraded'
+                    . ' to OKAPI 1.47, the following errors occured: ' . "\n    " . implode("\n    ", $errors)
+                );
+            } else {
+                // TODO: for production we should remove/uncomment this
+                error_log('Successfully converted FPRMs to OKAPI 1.47 for BCONF ' . $bconf->getName());
             }
         }
     }
