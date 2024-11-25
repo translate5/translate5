@@ -31,6 +31,7 @@ use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
+use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Import\ImportService;
@@ -1022,6 +1023,18 @@ class editor_TaskController extends ZfExtended_RestController
      *   corresponding userGuid, if the passed locked value is set
      *   if locked = 0, task is unlocked
      * - set finished: removes locked implictly, and sets the userGuid of the "finishers"
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_Conflict
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_ValidateException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws editor_Models_Segment_Exception
      * @see ZfExtended_RestController::putAction()
      */
     public function putAction()
@@ -1111,9 +1124,16 @@ class editor_TaskController extends ZfExtended_RestController
 
         //if the edit100PercentMatch is changed, update the value for all segments in the task
         if (isset($this->data->edit100PercentMatch)) {
-            $bulkUpdater = ZfExtended_Factory::get('editor_Models_Segment_AutoStates_BulkUpdater');
-            /* @var editor_Models_Segment_AutoStates_BulkUpdater $bulkUpdater */
-            $bulkUpdater->updateSegmentsEdit100PercentMatch($this->entity, (bool) $this->data->edit100PercentMatch);
+            $applyFullMatchChange = new ApplyEditFullMatchOperation(
+                ZfExtended_Factory::get(editor_Models_Segment_AutoStates::class),
+                ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class),
+                ZfExtended_Factory::get(editor_Models_Segment_Meta::class),
+            );
+            $applyFullMatchChange->updateSegmentsEdit100PercentMatch(
+                $this->entity,
+                ZfExtended_Factory::get(editor_Models_Segment_Iterator::class, [$this->entity->getTaskGuid()]),
+                (bool) $this->data->edit100PercentMatch,
+            );
         }
 
         //if the totals segment count is not set, update it before the entity is saved
