@@ -7,9 +7,10 @@
             "hlt",
             "yyy",
             "ccc",
-            "sln",
             "wordFontColorsMinIgnoranceThreshold",
-            "wordFontColorsMaxIgnoranceThreshold"
+            "wordFontColorsMaxIgnoranceThreshold",
+            "worksheetConfigurations",
+            "fontMappings"
         ]
     },
     {
@@ -23,6 +24,7 @@
             "characterLeadingMaxIgnoranceThreshold",
             "characterBaselineShiftMinIgnoranceThreshold",
             "characterBaselineShiftMaxIgnoranceThreshold",
+            "useCodeFinder",
             "fontMappings"
         ]
     },
