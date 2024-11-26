@@ -69,7 +69,7 @@ final class LspUserPermissionAssert implements PermissionAssertInterface
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $lspUser = $this->lspUserRepository->findByUser($context->authUser);
+        $lspUser = $this->lspUserRepository->findByUser($context->actor);
 
         if (null === $lspUser) {
             return;
@@ -87,7 +87,7 @@ final class LspUserPermissionAssert implements PermissionAssertInterface
             $this->assertLspHasJobInTask((int) $lspUser->lsp->getId(), $object);
         }
 
-        $authUser = $context->authUser;
+        $authUser = $context->actor;
 
         if ($this->userJobRepository->userHasJobsInTask($authUser->getUserGuid(), $object->getTaskGuid())) {
             return;

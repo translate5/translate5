@@ -30,16 +30,17 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use editor_Models_Db_Task as TaskTable;
 use editor_Models_Task as Task;
 use editor_Models_Db_TaskUserAssoc as UserJobTable;
 use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LspJob\Exception\InexistentLspJobException;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\Db\LspJobAssociationTable;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\UserJob\TypeEnum;
 use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
@@ -115,7 +116,7 @@ class LspJobRepository
         return (int) $this->db->fetchOne($select) > 0;
     }
 
-    public function coordinatorHasLspJobInTask(string $userGuid, string $taskGuid): bool
+    public function lspOfCoordinatorHasJobForTaskWorkflowStep(string $userGuid, string $taskGuid): bool
     {
         $select = $this->db
             ->select()
@@ -127,9 +128,16 @@ class LspJobRepository
             )
             ->join(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
+                    'task' => TaskTable::TABLE_NAME,
                 ],
-                'lspUser.lspId = lspJob.lspId',
+                'lspJob.taskGuid = task.taskGuid AND task.workflowStepName = lspJob.workflowStepName',
+                []
+            )
+            ->join(
+                [
+                    'userJob' => UserJobTable::TABLE_NAME,
+                ],
+                'userJob.lspJobId = lspJob.id',
                 []
             )
             ->join(
@@ -140,7 +148,8 @@ class LspJobRepository
                 []
             )
             ->where('lspJob.taskGuid = ?', $taskGuid)
-            ->where('user.userGuid = ?', $userGuid);
+            ->where('user.userGuid = ?', $userGuid)
+        ;
 
         return (int) $this->db->fetchOne($select) > 0;
     }
@@ -162,7 +171,9 @@ class LspJobRepository
                 'userJob.lspJobId = lspJob.id',
                 []
             )
-            ->where('userGuid = ?', $coordinator->user->getUserGuid());
+            ->where('userJob.userGuid = ?', $coordinator->user->getUserGuid())
+            ->where('userJob.type = ?', TypeEnum::Lsp->value)
+        ;
 
         return (int) $this->db->fetchOne($select) > 0;
     }
@@ -320,7 +331,7 @@ class LspJobRepository
         string $workflowStepName,
     ): bool {
         try {
-            $this->getByTaskGuidAndWorkflow($lspId, $taskGuid, $workflow, $workflowStepName);
+            $this->getByLspIdTaskGuidAndWorkflow($lspId, $taskGuid, $workflow, $workflowStepName);
 
             return true;
         } catch (NotFoundLspJobException) {
@@ -331,7 +342,7 @@ class LspJobRepository
     /**
      * @throws NotFoundLspJobException
      */
-    public function getByTaskGuidAndWorkflow(
+    public function getByLspIdTaskGuidAndWorkflow(
         int $lspId,
         string $taskGuid,
         string $workflow,
@@ -351,6 +362,46 @@ class LspJobRepository
         ;
 
         $row = $this->db->fetchRow($select);
+
+        if (empty($row)) {
+            throw new NotFoundLspJobException($lspId, $taskGuid, $workflow, $workflowStepName);
+        }
+
+        $lspJob->init(
+            new \Zend_Db_Table_Row(
+                [
+                    'table' => $lspJob->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $lspJob;
+    }
+
+    /**
+     * @throws NotFoundLspJobException
+     */
+    public function getByTaskGuidAndWorkflow(
+        string $taskGuid,
+        string $workflow,
+        string $workflowStepName,
+    ): LspJobAssociation {
+        $lspJob = new LspJobAssociation();
+
+        $select = $this->db
+            ->select()
+            ->from([
+                'lspJob' => LspJobAssociationTable::TABLE_NAME,
+            ])
+            ->where('lspJob.taskGuid = ?', $taskGuid)
+            ->where('lspJob.workflow = ?', $workflow)
+            ->where('lspJob.workflowStepName = ?', $workflowStepName)
+        ;
+
+        $row = $this->db->fetchAll($select);
 
         if (empty($row)) {
             throw new NotFoundLspJobException($lspId, $taskGuid, $workflow, $workflowStepName);

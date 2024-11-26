@@ -83,11 +83,11 @@ class LspDataJobAssert implements PermissionAssertInterface
             return;
         }
 
-        if (! $context->authUser->isCoordinator()) {
+        if (! $context->actor->isCoordinator()) {
             return;
         }
 
-        $coordinator = $this->coordinatorRepository->getByUser($context->authUser);
+        $coordinator = $this->coordinatorRepository->getByUser($context->actor);
 
         if ((int) $coordinator->lsp->getId() === (int) $lspJob->getLspId()) {
             throw new ActionNotAllowedException($action, $object);

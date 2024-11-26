@@ -100,7 +100,7 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
         if (! $lsp->isDirectLsp()) {
             try {
                 // check if parent LSP Job exists. Sub LSP can have only jobs related to its parent LSP
-                $parentJob = $this->lspJobRepository->getByTaskGuidAndWorkflow(
+                $parentJob = $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
                     (int) $lsp->getParentId(),
                     $dto->taskGuid,
                     $dto->workflow->workflow,

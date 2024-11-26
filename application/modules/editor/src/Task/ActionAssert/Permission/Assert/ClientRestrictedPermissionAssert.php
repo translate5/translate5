@@ -54,11 +54,11 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if (in_array((int) $object->getCustomerId(), $context->authUser->getCustomersArray(), true)) {
+        if (in_array((int) $object->getCustomerId(), $context->actor->getCustomersArray(), true)) {
             return;
         }
 
-        if ($context->authUser->isClientPm()) {
+        if ($context->actor->isClientPm()) {
             throw new UserHasNoAccessToTaskOfForbiddenClientException($object);
         }
     }

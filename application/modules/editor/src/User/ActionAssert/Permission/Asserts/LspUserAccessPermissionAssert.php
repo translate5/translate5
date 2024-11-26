@@ -75,7 +75,7 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
      */
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $authUser = $context->authUser;
+        $authUser = $context->actor;
 
         if ($authUser->getId() === $object->getId()) {
             return;

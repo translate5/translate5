@@ -73,11 +73,11 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
      */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if ($object->getId() === $context->authUser->getId()) {
+        if ($object->getId() === $context->actor->getId()) {
             return;
         }
 
-        $authCoordinator = $this->coordinatorRepository->findByUser($context->authUser);
+        $authCoordinator = $this->coordinatorRepository->findByUser($context->actor);
 
         if (null === $authCoordinator) {
             return;

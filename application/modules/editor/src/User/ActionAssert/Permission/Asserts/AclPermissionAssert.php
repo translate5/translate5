@@ -56,7 +56,7 @@ final class AclPermissionAssert implements PermissionAssertInterface
      */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if ($object->isEditableFor($context->authUser)) {
+        if ($object->isEditableFor($context->actor)) {
             return;
         }
 

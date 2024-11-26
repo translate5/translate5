@@ -50,11 +50,11 @@ final class AssignedCustomerAssert implements PermissionAssertInterface
      */
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if (! $context->authUser->isClientRestricted()) {
+        if (! $context->actor->isClientRestricted()) {
             return;
         }
 
-        $allowedCustomerIs = $context->authUser->getCustomersArray();
+        $allowedCustomerIs = $context->actor->getCustomersArray();
 
         if (! in_array((int) $object->getId(), $allowedCustomerIs, true)) {
             throw new NoAccessToCustomerException((int) $object->getId());

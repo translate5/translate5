@@ -77,19 +77,19 @@ final class RoleBasedPermissionAssert implements PermissionAssertInterface
         LanguageServiceProvider $lsp,
         PermissionAssertContext $context
     ): bool {
-        if ($context->authUser->isAdmin()) {
+        if ($context->actor->isAdmin()) {
             return true;
         }
 
-        if ($context->authUser->isPm()) {
+        if ($context->actor->isPm()) {
             return $lsp->isDirectLsp();
         }
 
-        if (! $context->authUser->isCoordinator()) {
+        if (! $context->actor->isCoordinator()) {
             return false;
         }
 
-        $coordinator = $this->jobCoordinatorRepository->findByUser($context->authUser);
+        $coordinator = $this->jobCoordinatorRepository->findByUser($context->actor);
 
         if ($coordinator->lsp->same($lsp)) {
             return LspAction::Read === $action;

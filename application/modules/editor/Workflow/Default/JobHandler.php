@@ -236,9 +236,9 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
 
     /**
      * Calculates the workflow step confirmation status
-     * Warning: this function may only be called in doConfirm (which is called if there was a state unconfirmed which is now set to edit)
-     *  For all other usages the calculation will not be correct, since we don't know if a state was unconfirmed before,
-     *  we see only that all states are now not unconfirmed.
+     * Warning: this function may only be called in doConfirm (which is called if there was a state unconfirmed which
+     * is now set to edit) For all other usages the calculation will not be correct, since we don't know if a state was
+     * unconfirmed before, we see only that all states are now not unconfirmed.
      */
     protected function calculateConfirm()
     {

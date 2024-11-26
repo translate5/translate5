@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\Export\Package\Remover;
 use MittagQI\Translate5\Workflow\ArchiveConfigDTO;
 use MittagQI\Translate5\Workflow\ArchiveTaskActions;
@@ -36,6 +37,18 @@ use MittagQI\Translate5\Workflow\ArchiveTaskActions;
  */
 class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
 {
+    public function __construct(
+        private readonly UserJobRepository $userJobRepository,
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            UserJobRepository::create(),
+        );
+    }
+
     /**
      * sets all segments to untouched state - if they are untouched by the user
      */
@@ -118,13 +131,18 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
         }
 
         $userGuid = $this->currentUser()->getUserGuid();
-        if (empty($this->config->newTua)) {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
-        } else {
-            $tua = $this->config->newTua;
+        $tua = $this->config->newTua;
+
+        if (null === $tua) {
+            $tua = $this->userJobRepository->findUserJobInTask(
+                $userGuid,
+                $task->getTaskGuid(),
+                $task->getWorkflowStepName()
+            );
         }
 
         $deleted = $tua->deleteOtherUsers($task->getTaskGuid(), $userGuid, $tua->getWorkflowStepName());
+
         if ($deleted !== false) {
             $notifier = ZfExtended_Factory::get('editor_Workflow_Notification');
             /* @var $notifier editor_Workflow_Notification */

@@ -190,7 +190,7 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         $lspUser = $this->lspUserRepository->getByUserGuid($job->getUserGuid());
 
         try {
-            return $this->lspJobRepository->getByTaskGuidAndWorkflow(
+            return $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
                 (int) $lspUser->lsp->getId(),
                 $job->getTaskGuid(),
                 $dto->workflow->workflow,

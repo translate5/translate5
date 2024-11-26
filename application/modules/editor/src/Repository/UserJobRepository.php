@@ -43,6 +43,7 @@ use Zend_Db_Expr;
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
 use ZfExtended_Factory;
+use ZfExtended_Models_Db_User as UserTable;
 
 class UserJobRepository
 {
@@ -98,6 +99,39 @@ class UserJobRepository
         ;
 
         return (int) $this->db->fetchOne($select) > 0;
+    }
+
+    /**
+     * @return iterable<UserJob>
+     */
+    public function getJobsByTaskAndStep(string $taskGuid, string $workflowStepName): iterable
+    {
+        $job = new UserJob();
+
+        $select = $this->db
+            ->select()
+            ->from(UserJobTable::TABLE_NAME)
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('workflowStepName = ?', $workflowStepName)
+            ->where('type != ?', TypeEnum::Lsp->value)
+        ;
+
+        $stmt = $this->db->query($select);
+
+        while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $job->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $job;
+        }
     }
 
     /**
@@ -378,5 +412,42 @@ class UserJobRepository
         $tuaRows = $this->db->fetchAll($s, [], PDO::FETCH_ASSOC);
 
         return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
+    }
+
+    /**
+     * returns all users to the taskGuid and role of the given UserJob
+     *
+     * @param array $assocFields optional, column names of the assoc table to be added in the result set
+     * @param string $state string or null, additional filter for state of the job
+     */
+    public function loadUsersOfTaskWithStep(
+        string $taskGuid,
+        ?string $workflowStepName,
+        array $assocFields = [],
+        ?string $state = null
+    ): array {
+        $s = $this->db->select()
+            ->from([
+                'user' => UserTable::TABLE_NAME,
+            ])
+            ->join(
+                [
+                    'job' => UserJobTable::TABLE_NAME,
+                ],
+                'job.userGuid = user.userGuid',
+                $assocFields
+            )
+            ->where('job.isPmOverride = 0')
+            ->where('job.taskGuid = ?', $taskGuid);
+
+        if (! empty($workflowStepName)) {
+            $s->where('job.workflowStepName = ?', $workflowStepName);
+        }
+
+        if (! empty($state)) {
+            $s->where('job.state = ?', $state);
+        }
+
+        return $this->db->fetchAll($s);
     }
 }

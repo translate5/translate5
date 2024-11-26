@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,14 +28,17 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ActionAssert\Permission;
+namespace MittagQI\Translate5\Workflow\Notification\DTO;
 
-use MittagQI\Translate5\User\Model\User;
-
-final class PermissionAssertContext
+class CopyReceiversDto
 {
+    /**
+     * @param array<string, string[]> $cc
+     * @param array<string, string[]> $bcc
+     */
     public function __construct(
-        public readonly User $actor
+        public readonly array $cc,
+        public readonly array $bcc,
     ) {
     }
 }

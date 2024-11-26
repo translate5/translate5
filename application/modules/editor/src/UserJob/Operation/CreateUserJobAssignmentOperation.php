@@ -148,7 +148,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
     public function resolveLspJob(int $lspId, NewUserJobDto $dto): LspJobAssociation
     {
         try {
-            return $this->lspJobRepository->getByTaskGuidAndWorkflow(
+            return $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
                 $lspId,
                 $dto->taskGuid,
                 $dto->workflow->workflow,

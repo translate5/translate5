@@ -96,7 +96,7 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
         PermissionAssertContext $context,
     ): void {
         try {
-            $this->lspJobRepository->getByTaskGuidAndWorkflow(
+            $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
                 (int) $coordinator->lsp->getId(),
                 $job->getTaskGuid(),
                 $dto->workflow->workflow,

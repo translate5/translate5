@@ -99,7 +99,7 @@ class UserCustomerAssociationValidator
             } catch (PermissionExceptionInterface) {
                 throw new CustomerDoesNotBelongToUserException(
                     (int) $customer->getId(),
-                    $context->authUser->getUserGuid()
+                    $context->actor->getUserGuid()
                 );
             }
         }

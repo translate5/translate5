@@ -103,6 +103,27 @@ class UserRepository
         return $user;
     }
 
+    public function findByGuid(string $guid): ?User
+    {
+        try {
+            return $this->getByGuid($guid);
+        } catch (InexistentUserException) {
+            return null;
+        }
+    }
+
+    public function findByLogin(string $login): ?User
+    {
+        try {
+            $user = new User();
+            $user->loadByLogin($login);
+
+            return $user;
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
+    }
+
     /**
      * @throws GuidAlreadyInUseException
      * @throws LoginAlreadyInUseException

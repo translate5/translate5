@@ -69,7 +69,7 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
 
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $authUser = $context->authUser;
+        $authUser = $context->actor;
 
         if ($authUser->getUserGuid() === $object->getUserGuid()) {
             return;

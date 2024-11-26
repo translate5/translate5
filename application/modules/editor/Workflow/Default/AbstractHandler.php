@@ -85,35 +85,51 @@ abstract class editor_Workflow_Default_AbstractHandler
         ];
         $actions = $actions->loadByTrigger([$config->workflow->getName()], $config->trigger, $step, $role, $state);
         $this->actionDebugMessage([$config->workflow->getName()], $debugData);
-        $instances = [];
+
         foreach ($actions as $action) {
             $class = $action['actionClass'];
             $method = $action['action'];
             $config->parameters = $this->decodeParameters($config, $action);
+
             if (empty($instances[$class])) {
-                $instance = ZfExtended_Factory::get($class);
-                /* @var $instance editor_Workflow_Actions_Abstract */
-                $instance->init($config);
+                $instance = $this->instantiateActions($class, $config);
                 $instances[$class] = $instance;
             } else {
                 $instance = $instances[$class];
             }
 
             $this->actionDebugMessage($action, $debugData);
+
             if (is_null($config->parameters)) {
-                call_user_func([$instance, $method]);
+                $instance->{$method}();
             } else {
-                call_user_func([$instance, $method], $config->parameters);
+                $instance->{$method}($config->parameters);
             }
         }
 
         // Trigger afterWorkflowCallAction-event
-        if ($this->events) {
-            $this->events->trigger('afterWorkflowCallAction', $this, [
-                'entity' => $this,
-                'task' => $this->config->task,
-            ]);
+        $this->events?->trigger('afterWorkflowCallAction', $this, [
+            'entity' => $this,
+            'task' => $this->config->task,
+        ]);
+    }
+
+    /**
+     * @param class-string<editor_Workflow_Actions_Abstract> $className
+     */
+    private function instantiateActions(
+        string $className,
+        editor_Workflow_Actions_Config $config
+    ): editor_Workflow_Actions_Abstract {
+        if (method_exists($className, 'create')) {
+            $instance = $className::create();
+        } else {
+            $instance =ZfExtended_Factory::get($className);
         }
+
+        $instance->init($config);
+
+        return $instance;
     }
 
     protected function decodeParameters(editor_Workflow_Actions_Config $config, array $action): ?stdClass

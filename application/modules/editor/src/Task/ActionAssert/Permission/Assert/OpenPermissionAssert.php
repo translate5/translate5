@@ -83,16 +83,16 @@ class OpenPermissionAssert implements PermissionAssertInterface
      */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $granted = $context->authUser->getUserGuid() === $object->getPmGuid()
-            || $this->canLoadAllTasks($context->authUser)
+        $granted = $context->actor->getUserGuid() === $object->getPmGuid()
+            || $this->canLoadAllTasks($context->actor)
             || (
-                $context->authUser->isCoordinator()
-                && $this->coordinatorHasJobInTask($context->authUser->getUserGuid(), $object->getTaskGuid())
+                $context->actor->isCoordinator()
+                && $this->lspOfCoordinatorHasJobForTaskWorkflowStep($context->actor->getUserGuid(), $object->getTaskGuid())
             )
         ;
 
         $job = $this->userJobRepository->findUserJobInTask(
-            $context->authUser->getUserGuid(),
+            $context->actor->getUserGuid(),
             $object->getTaskGuid(),
             $object->getWorkflowStepName(),
         );
@@ -117,13 +117,13 @@ class OpenPermissionAssert implements PermissionAssertInterface
 
         // the job state was changed by a PM, then the task may not be edited anymore by the user
         if (TaskAction::Edit === $action && ! $workflow->isWriteable($job)) {
-            $this->logAccessNotGranted($object, $context->authUser, $job, TaskAction::Edit);
+            $this->logAccessNotGranted($object, $context->actor, $job, TaskAction::Edit);
 
             throw new UserJobIsNotEditableException($job, $object);
         }
 
         if (TaskAction::View === $action && ! $workflow->isReadable($job)) {
-            $this->logAccessNotGranted($object, $context->authUser, $job, TaskAction::View);
+            $this->logAccessNotGranted($object, $context->actor, $job, TaskAction::View);
 
             throw new NoAccessToTaskException($object);
         }
@@ -144,9 +144,9 @@ class OpenPermissionAssert implements PermissionAssertInterface
         ]);
     }
 
-    private function coordinatorHasJobInTask(string $userGuid, string $taskGuid): bool
+    private function lspOfCoordinatorHasJobForTaskWorkflowStep(string $coordinatorUserGuid, string $taskGuid): bool
     {
-        return $this->lspJobRepository->coordinatorHasLspJobInTask($userGuid, $taskGuid);
+        return $this->lspJobRepository->lspOfCoordinatorHasJobForTaskWorkflowStep($coordinatorUserGuid, $taskGuid);
     }
 
     private function canLoadAllTasks(User $authUser): bool
