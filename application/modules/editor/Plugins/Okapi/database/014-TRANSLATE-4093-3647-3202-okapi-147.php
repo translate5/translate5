@@ -63,3 +63,6 @@ foreach ($bconf->loadAll() as $bconfData) {
         error_log($msg);
     }
 }
+
+$db = Zend_Db_Table::getDefaultAdapter();
+$db->query("DELETE FROM `Zf_configuration` WHERE `name`='runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName'");
