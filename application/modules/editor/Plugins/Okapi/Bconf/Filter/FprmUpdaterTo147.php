@@ -32,7 +32,6 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 
 /**
  * Class representing updates to v1.47
- * Supported FPRMs: okf_idml, okf_openxml, okf_html
  */
 final class FprmUpdaterTo147
 {
@@ -97,7 +96,7 @@ final class FprmUpdaterTo147
                 . ' to OKAPI 1.47, the following errors occured: ' . "\n    " . implode("\n    ", $errors)
             );
         } else {
-            // TODO: for production we should remove/uncomment this
+            // TODO: for production we should remove/comment out this
             error_log('Successfully converted FPRMs to OKAPI 1.47 for BCONF ' . $bconf->getName());
         }
     }

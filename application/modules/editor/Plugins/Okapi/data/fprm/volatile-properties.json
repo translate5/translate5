@@ -59,6 +59,14 @@
       "splitWords",
       "cueSettings"
     ]
+  },
+  {
+    "type": "okf_json",
+    "properties": [
+      "subfilter",
+      "subfilterRules",
+      "maxwidthRules"
+    ]
   }
 ]
 
