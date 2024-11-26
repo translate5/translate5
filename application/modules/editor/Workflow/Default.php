@@ -181,13 +181,14 @@ class editor_Workflow_Default
     public function __construct($name)
     {
         $cache = Zend_Registry::get('cache');
-        $this->definition = $cache->load(self::CACHE_KEY . $name);
+        $cacheId = str_contains($name, '-') ? md5($name) : $name;
+        $this->definition = $cache->load(self::CACHE_KEY . $cacheId);
         if ($this->definition === false) {
             /* @var $def editor_Workflow_CachableDefinition */
             $this->definition = ZfExtended_Factory::get('editor_Workflow_CachableDefinition');
             $workflow = $this->initWorkflow($name);
             $this->initWorkflowSteps($workflow);
-            $cache->save($this->definition, self::CACHE_KEY . $name);
+            $cache->save($this->definition, self::CACHE_KEY . $cacheId);
             $this->checkForMissingConfiguration();
         }
 

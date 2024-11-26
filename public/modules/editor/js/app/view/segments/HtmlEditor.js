@@ -1019,7 +1019,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         if (!this.tagsCheckResult.isSuccessful()) {
             const referenceField = this.getReferenceField(
                 me.currentSegment.get('target'),
-                me.currentSegment.get('pretrans')
+                me.currentSegment.get('pretrans'),
+                me.currentSegment.get('matchRateType')
             );
 
             //first item the field to check, second item: the error text:
@@ -1478,9 +1479,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      *
      * @param {String} targetContent
      * @param {number} pretrans
+     * @param {number} matchRateType
      * @returns {string}
      */
-    getReferenceField: function (targetContent, pretrans) {
+    getReferenceField: function (targetContent, pretrans, matchRateType) {
         const useSourceAsReference = Editor.app.getTaskConfig('editor.frontend.reviewTask.useSourceForReference');
 
         if (useSourceAsReference) {
@@ -1491,11 +1493,32 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             return 'source';
         }
 
+
         // If target was filled during pretranslation, use source as reference
-        if (0 !== pretrans) {
+        if (this.isExternalTranslation(matchRateType) === false && 0 !== pretrans) {
             return 'source';
         }
 
         return 'target';
-    }
+    },
+
+    /**
+     * Is external translation when the match type is "import" and the match source is not empty
+     * @param {string} matchRateType
+     * @returns {boolean}
+     */
+    isExternalTranslation: function (matchRateType) {
+
+        if (matchRateType.startsWith("import;")) {
+            const remainingValue = matchRateType.substring(7);
+
+            const parts = remainingValue.split(";");
+
+            // ensure the second part exists (tm or mt) and there's a name following it
+            if (parts.length >= 2 && (parts[0] === "tm" || parts[0] === "mt")) {
+                return true;
+            }
+        }
+        return false;
+    },
 });

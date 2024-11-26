@@ -52,6 +52,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TermImport\Service\Filesystem;
 
+use Iterator;
+use IteratorIterator;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\MountManager;
 use League\Flysystem\StorageAttributes;
@@ -94,7 +96,10 @@ class FilesystemService
                 return false;
             }
 
-            return $this->mountManager->listContents($path)->getIterator()->valid();
+            $contents = $this->mountManager->listContents($path);
+            $iterator = $contents instanceof Iterator ? $contents : new IteratorIterator($contents);
+
+            return $iterator->valid();
         } catch (FilesystemException) {
             return false;
         }
@@ -146,33 +151,45 @@ class FilesystemService
         return $file->isFile() && str_contains($file->path(), self::INSTRUCTION_FILE_NAME);
     }
 
-    private function moveReadyProjectDir(StorageAttributes $item, string $dirPath, array &$projectDirs): bool
+    /**
+     * Move contents of dir if instruction.ini file exists in that dir
+     *
+     * @throws FilesystemException
+     * @throws \ReflectionException
+     */
+    private function moveReadyProjectDir(StorageAttributes $item, string $sourceDir, array &$projectDirs): bool
     {
+        // If $item does not refer to instruction file - return false
         if (! $this->isInstructionFile($item)) {
             return false;
         }
 
+        // Get ini-file contents
         $temp_ini_path = tempnam(APPLICATION_DATA . '/tmp', 'termimport');
         file_put_contents($temp_ini_path, $this->mountManager->read($item->path()));
         $instructions = parse_ini_file($temp_ini_path, true, INI_SCANNER_TYPED);
 
+        // If unable to parse ini-file - log that and return false
         if (false === $instructions) {
             $this->logger->invalidInstructions($item->path(), ['Invalid INI file']);
 
             return false;
         }
 
-        $targetPath = str_replace(self::IMPORT_DIR, self::PROCESSING_DIR, $dirPath);
+        // Prepare target dir name from source one
+        $targetDir = str_replace(self::IMPORT_DIR, self::PROCESSING_DIR, $sourceDir);
 
+        // Check ini-file validity and on failure - log and return false
         try {
-            $projectDirs[$targetPath] = new InstructionsDTO($instructions, $this->logger);
+            $projectDirs[$targetDir] = new InstructionsDTO($instructions, $this->logger);
         } catch (InvalidInstructionsIniFileException $e) {
             $this->logger->invalidInstructions($item->path(), $e->errors);
 
             return false;
         }
 
-        $this->mountManager->move($dirPath, $targetPath);
+        // Move contents from source dir to target dir and return true
+        $this->moveContents($sourceDir, $targetDir);
 
         return true;
     }
@@ -197,43 +214,94 @@ class FilesystemService
         }
     }
 
-    public function moveFailedDir(string $dirPath): void
+    /**
+     * Move not importable tbx files from Import/ to Error/ dir
+     *
+     * @throws FilesystemException
+     */
+    public function moveFailedDir(string $sourceDir): void
     {
-        if (! $this->validDir($dirPath) || ! str_contains($dirPath, self::PROCESSING_DIR)) {
+        // If source dir is not a processing dir - return
+        if (! str_contains($sourceDir, self::PROCESSING_DIR)) {
             return;
         }
 
-        $targetPath = str_replace(self::PROCESSING_DIR, self::FAILED_DIR, $dirPath);
+        // Prepare target dir name from source one
+        $targetDir = str_replace(self::PROCESSING_DIR, self::FAILED_DIR, $sourceDir);
 
-        $this->mountManager->move($dirPath, $targetPath);
-        $this->logger->importResultedInError($dirPath);
+        // Do move and log if something moved
+        if ($this->moveContents($sourceDir, $targetDir)) {
+            $this->logger->importResultedInError($sourceDir);
+        }
     }
 
-    public function moveSuccessfulDir(string $dirPath, array $successfulTbxFiles): void
+    /**
+     * Move successfully imported tbx files from Import/ to Import-success/ dir
+     *
+     * @throws FilesystemException
+     */
+    public function moveSuccessfulDir(string $sourceDir, array $successfulTbxFiles): void
     {
-        if (! $this->validDir($dirPath) || ! str_contains($dirPath, self::PROCESSING_DIR)) {
+        // If source dir is not a processing dir - return
+        if (! str_contains($sourceDir, self::PROCESSING_DIR)) {
             return;
         }
 
-        $targetPath = str_replace(self::PROCESSING_DIR, self::IMPORT_SUCCESS_DIR, $dirPath);
+        // Prepare target dir name from source one
+        $targetDir = str_replace(self::PROCESSING_DIR, self::IMPORT_SUCCESS_DIR, $sourceDir);
 
-        $fullSuccess = true;
+        // Do move and log if something moved
+        if ($this->moveContents($sourceDir, $targetDir, $successfulTbxFiles)) {
+            $this->logger->importSuccess($sourceDir);
+        }
+    }
+
+    /**
+     * Move contents of source dir into target dir, so the source dir is kept
+     *
+     * @param array|null $whiteList If given - only explicitly listed files will be moved
+     * @throws FilesystemException
+     */
+    private function moveContents(string $sourceDir, string $targetDir, ?array $whiteList = null): int
+    {
+        // If $sourceDir is not a valid dir - return
+        if (! $this->validDir($sourceDir)) {
+            return 0;
+        }
+
+        // Moved files counter
+        $movedQty = 0;
+
         /** @var StorageAttributes $item */
-        foreach ($this->mountManager->listContents($dirPath) as $item) {
+        foreach ($this->mountManager->listContents($sourceDir) as $item) {
+            // Get base name (i.e. filename and extension)
             $name = pathinfo($item->path(), PATHINFO_BASENAME);
+
+            // If $item is not a file
             if (! $item->isFile()
+
+                // Or is a file but is not a tbx-file
                 || strtolower(pathinfo($item->path(), PATHINFO_EXTENSION)) !== 'tbx'
-                || in_array($name, $successfulTbxFiles)) {
-                $this->mountManager->move($dirPath . '/' . $name, $targetPath . '/' . $name);
-            } else {
-                $fullSuccess = false;
+
+                // Or is a tbx-file but no whitelist is given
+                || ! isset($whiteList)
+
+                // Or is but tbx is in whitelist
+                || in_array($name, $whiteList)) {
+                // Delete target item if already exists
+                if ($this->mountManager->has($target = "$targetDir/$name")) {
+                    $this->mountManager->delete($target);
+                }
+
+                // Move item from source dir to target dir
+                $this->mountManager->move("$sourceDir/$name", $target);
+
+                // Increment moved items counters
+                $movedQty++;
             }
         }
 
-        if ($fullSuccess) {
-            $this->mountManager->deleteDirectory($dirPath);
-        }
-
-        $this->logger->importSuccess($dirPath);
+        // Return total quantity of moved files
+        return $movedQty;
     }
 }

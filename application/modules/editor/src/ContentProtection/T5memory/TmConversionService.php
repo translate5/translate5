@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection\T5memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Languages as Language;
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
@@ -276,7 +277,12 @@ class TmConversionService implements TmConversionServiceInterface
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                 $writtenElements++;
                 $writer->writeRaw(
-                    $this->convertTransUnit($reader->readOuterXML(), $sourceLangId, $targetLangId, $brokenTus)
+                    $this->convertTransUnit(
+                        $reader->readOuterXML(),
+                        $sourceLang,
+                        $targetLang,
+                        $brokenTus
+                    )
                 );
             }
 
@@ -324,11 +330,15 @@ class TmConversionService implements TmConversionServiceInterface
         return $resultFilename;
     }
 
-    private function convertTransUnit(string $transUnit, int $sourceLang, int $targetLang, int &$brokenTus): string
-    {
+    private function convertTransUnit(
+        string $transUnit,
+        Language $sourceLang,
+        Language $targetLang,
+        int &$brokenTus
+    ): string {
         $transUnit = $this->convertT5MemoryTagToContent($transUnit);
         preg_match_all(
-            '/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n)?.+(\n|\r|\r\n)*)+<\/tuv>/Uum',
+            '/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n)?\s*<seg>.+<\/seg>(\n|\r|\r\n)*)+\s*<\/tuv>/Uum',
             $transUnit,
             $matches,
             PREG_SET_ORDER
@@ -336,31 +346,35 @@ class TmConversionService implements TmConversionServiceInterface
 
         $numberTagMap = [];
 
+        // if there is no source or target tuv, then we assume that tu is broken
         if (empty($matches[0][0]) || empty($matches[1][0])) {
             $brokenTus++;
 
             return '';
         }
 
+        $sourceMatchId = str_contains(strtolower($matches[0][1]), $sourceLang->getMajorRfc5646()) ? 0 : 1;
+        $targetMatchId = $sourceMatchId === 0 ? 1 : 0;
+
         [$source, $target] = $this->contentProtector->filterTags(
             $this->contentProtector->protect(
-                $matches[0][0],
+                $matches[$sourceMatchId][0],
                 true,
-                $sourceLang,
-                $targetLang,
+                (int) $sourceLang->getId(),
+                (int) $targetLang->getId(),
                 ContentProtector::ENTITY_MODE_OFF
             ),
             $this->contentProtector->protect(
-                $matches[1][0],
+                $matches[$targetMatchId][0],
                 false,
-                $sourceLang,
-                $targetLang,
+                (int) $sourceLang->getId(),
+                (int) $targetLang->getId(),
                 ContentProtector::ENTITY_MODE_OFF
             )
         );
 
         return str_replace(
-            [$matches[0][0], $matches[1][0]],
+            [$matches[$sourceMatchId][0], $matches[$targetMatchId][0]],
             [
                 $this->convertContentTagToT5MemoryTag($source, true, $numberTagMap),
                 $this->convertContentTagToT5MemoryTag($target, false, $numberTagMap),

@@ -44,7 +44,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 //FIXME https://github.com/bamarni/symfony-console-autocomplete
 
-class TaskInfoCommand extends Translate5AbstractCommand
+class TaskInfoCommand extends TaskCommand
 {
     protected const WORKER_SECTION_END = [
         editor_Models_Import_Worker_FinalStep::class,
@@ -100,26 +100,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
 
         $this->writeTitle('Task Information');
 
-        $task = new Task();
-        $search = $input->getArgument('identifier');
-        $s = $task->db->select()
-            //languages here too?
-            ->from($task->db, [
-                'ID' => 'id',
-                'TaskGUID' => 'taskGuid',
-                'Order No.' => 'taskNr',
-                'Task name' => 'taskName',
-                'External ID' => 'foreignId',
-            ])
-            ->where('id = ?', $search);
-        if (empty($input->getOption('id-only'))) {
-            $s->orWhere('foreignId = ?', $search)
-                ->orWhere('taskGuid like ?', '%' . $search . '%')
-                ->orWhere('taskName like ?', '%' . $search . '%')
-                ->orWhere('taskNr like ?', '%' . $search . '%');
-        }
-        $allFound = $task->db->fetchAll($s);
-        $tasks = $allFound->toArray();
+        $tasks = static::searchTasksFromArgument($input->getArgument('identifier'));
         $taskCount = count($tasks);
         if ($taskCount === 0) {
             $this->io->warning('No task(s) found matching the given identifier!');
@@ -131,6 +112,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
 
             return 0;
         }
+        $task = new Task();
         $task->load($tasks[0]['ID']);
         $data = (array) $task->getDataObject();
         unset($data['qmSubsegmentFlags']);
@@ -210,7 +192,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
 
     private function writeTimings(Task $task): void
     {
-        $segmentCount = $task->getSegmentCount();
+        $segmentCount = (int) $task->getSegmentCount();
         $segmentDivisor = max(1, $segmentCount / 100);
 
         $events = \ZfExtended_Factory::get(editor_Models_Logger_Task::class);
@@ -291,7 +273,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
 
     private function writeTasks(Task $project)
     {
-        $tasks = (new Task())->loadProjectTasks($project->getId(), true);
+        $tasks = (new Task())->loadProjectTasks((int) $project->getId(), true);
 
         $table = $this->io->createTable();
         $table->setHeaders([

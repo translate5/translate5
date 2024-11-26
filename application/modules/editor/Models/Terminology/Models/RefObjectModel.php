@@ -84,6 +84,13 @@ class editor_Models_Terminology_Models_RefObjectModel extends editor_Models_Term
         // Re-structure to make tbx-exportable
         $respPerson = [];
         foreach ($userByGuidA as $key => $data) {
+            // sort roles alphabetically ignore case
+            // this sorting is important for our test cases
+            $roles = explode(',', $data['role']);
+            asort($roles, SORT_STRING | SORT_FLAG_CASE);
+            $roles = implode(',', $roles);
+            $data['role'] = $roles;
+
             $respPerson[] = [
                 'key' => $key,
                 'data' => json_encode($data),

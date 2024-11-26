@@ -878,12 +878,18 @@ Ext.define('Editor.view.admin.TaskGrid', {
         this.callParent(arguments);
     },
 
-    /***
+    /**
      * Set/add filter to the task grid from filter object.
-     * If the filter is not found as grid column, it will only be applied to the store
+     * If the filter is not found as grid column, it will only be applied to the store.
+     * Info: this is not native extjs feature, in fact this kind of filter manipulation is not supported by extjs.
+     *       We are doing custom filter manipulation just to achieve the desired result. Basically what this function
+     *       will do is, find the grid column for the active store filters and check the header filter checkbox manually.
+     *       In some cases when the task grid is not rendered yet, it is required to re-create the filter items for some
+     *       filters so the desired effect can be achieved.
      */
     activateGridColumnFilter: function (filters, suspendFilterchange) {
         var me = this;
+
         if (suspendFilterchange) {
             me.suspendEvents('filterchange');
         }
@@ -905,6 +911,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 });
                 return true;
             }
+
             gridFilter.setActive(true);
             switch (gridFilter.type) {
                 case 'date':
@@ -926,7 +933,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     break;
                 default :
                     try {
-                        gridFilter.setValue(value);
+                        // In case the filter menu is not created yet, we do custom values setting just to achieve this.
+                        // The first call (gridFilter.filter.setValue(value)) will set the value of the inner filter object and mark internal component as
+                        // checked which will be evaluated on menu creation.
+                        gridFilter.filter.setValue(value);
+                        gridFilter.createMenu();
                     } catch (e) {
                         console.log('Filter type ' + gridFilter.type);
                         console.log('Filter dataIndex ' + gridFilter.dataIndex);
@@ -935,6 +946,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     break;
             }
         });
+
         if (suspendFilterchange) {
             me.resumeEvents('filterchange');
         }
@@ -944,15 +956,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
      * Get grid column filter by property
      */
     getColumnFilter: function (property) {
-        var cols = this.getColumns(),
-            filter = null;
-        Ext.each(cols, function (col) {
-            if (col.filter && col.filter.dataIndex == property) {
-                filter = col.filter;
-                return false;
-            }
-        });
-        return filter;
+        let col = this.down('[dataIndex=' + property + ']');
+        return col && col.filter;
     },
 
     /***

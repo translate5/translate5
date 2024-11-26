@@ -214,9 +214,6 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
                 'priceAdjustment' => [
                     'rex' => 'decimal112',
                 ],
-                'isDefault' => [
-                    'rex' => 'bool',
-                ],
             ]);
 
             // If this preset is system default

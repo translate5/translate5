@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * The termtranslation task type is same as default, but have different ID so
+ * The termtranslation type is same as "project", but have different ID so
  * that it appears the possibility for distinction between termtranslation- and other tasks
  * Currently it is only used to decide whether reimport back to TermCollection export menu option should be shown
  */

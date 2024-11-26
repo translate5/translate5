@@ -48,7 +48,7 @@ Ext.define('Ext.translate5.Editor', {
 
         const data = this.getData();
 
-        if (location.record.get(this.config.editingDataIndex) === data.data) {
+        if (location.record.get(this.config.editingDataIndex) === RichTextEditor.stringToDom(data.data).innerText) {
             return result;
         }
 

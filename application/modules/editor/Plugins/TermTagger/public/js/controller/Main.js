@@ -150,7 +150,15 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
      * @param segment
      */
     onSegmentSaved: function(segment) {
-        var selectedSegmentId = this.getSegmentGrid().getSelection().pop()?.getId();
+        var segmentGrid = this.getSegmentGrid();
+
+        // Since this is called in segment save context, and it can happen that the editor view port is already destroyed
+        // we need to check if the segment grid is still available
+        if(!segmentGrid){
+            return;
+        }
+
+        var  selectedSegmentId = segmentGrid.getSelection().pop()?.getId();
 
         // If selection was changed after save-request started - do nothing
         if (selectedSegmentId && selectedSegmentId !== segment.getId()) {

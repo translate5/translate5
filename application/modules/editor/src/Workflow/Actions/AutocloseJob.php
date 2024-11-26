@@ -15,6 +15,8 @@ use ZfExtended_Factory;
 
 class AutocloseJob extends editor_Workflow_Actions_Abstract
 {
+    private array $triggerConfigArgs;
+
     public function closeByDeadline(): void
     {
         if (! $this->itsAboutTime()) {
@@ -25,8 +27,9 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
             return;
         }
 
+        $this->triggerConfigArgs = func_get_args();
+
         $idsToAutoClose = [];
-        /* @var $tasksToNotify[] editor_Models_Task */
         foreach ($jobs as $tuaData) {
             try {
                 $task = editor_ModelInstances::taskByGuid($tuaData['taskGuid']);
@@ -34,7 +37,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
                 if ($task->hasValidDeadlineDate() && $config->runtimeOptions->workflow->autoCloseJobs) {
                     $idsToAutoClose[] = $tuaData['id'];
                     if (! $config->runtimeOptions->workflow->disableNotifications) {
-                        $this->notifyAutoclosed($task, $tuaData['userGuid']);
+                        $this->notifyAutoclosed($task, $tuaData['userGuid'], $tuaData['workflowStepName']);
                     }
                 }
             } catch (Throwable) {
@@ -62,13 +65,13 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
         }
     }
 
-    private function notifyAutoclosed(editor_Models_Task $task, string $userGuid): void
+    private function notifyAutoclosed(editor_Models_Task $task, string $userGuid, string $workflowStepName): void
     {
         $config = new editor_Workflow_Actions_Config();
         $config->task = $task;
         $notifier = new editor_Workflow_Notification();
         $notifier->init($config);
-        $notifier->notifyAutoclosed($userGuid);
+        $notifier->notifyAutoclosed($this->triggerConfigArgs, $userGuid, $workflowStepName);
     }
 
     private function findJobs(): array
