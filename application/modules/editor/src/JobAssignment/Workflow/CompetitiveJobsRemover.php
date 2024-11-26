@@ -30,14 +30,20 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\Workflow;
 
+use editor_Models_Task;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\JobAssignment\Notification\DeletedCompetitorsNotification;
+use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
 use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
+use MittagQI\Translate5\Workflow\Notification\DTO\DeletedJobDto;
 
 class CompetitiveJobsRemover
 {
@@ -47,6 +53,7 @@ class CompetitiveJobsRemover
         private readonly LspJobRepository $lspJobRepository,
         private readonly TaskRepository $taskRepository,
         private readonly DeleteUserJobAssignmentOperationInterface $deleteUserJobOperation,
+        private readonly DeleteLspJobAssignmentOperationInterface $deleteLspJobOperation,
         private readonly DeletedCompetitorsNotification $notificator,
     ) {
     }
@@ -59,6 +66,7 @@ class CompetitiveJobsRemover
             LspJobRepository::create(),
             TaskRepository::create(),
             DeleteUserJobAssignmentOperation::create(),
+            DeleteLspJobAssignmentOperation::create(),
             DeletedCompetitorsNotification::create(),
         );
     }
@@ -76,23 +84,67 @@ class CompetitiveJobsRemover
         );
 
         foreach ($lspJobs as $toDelete) {
-            if ($job->getId() !== $toDelete->getId()) {
-                $clone = clone $toDelete;
-                $this->deleteUserJobOperation->forceDelete($toDelete);
-
-                $this->notificator->sendNotification($task, $clone, $responsibleUser, $anonymizeUsers);
-            }
+            $this->deleteLspJob($toDelete, $task, $responsibleUser, $anonymizeUsers);
         }
 
         $userJobs = $this->userJobRepository->getJobsByTaskAndStep($job->getTaskGuid(), $job->getWorkflowStepName());
 
         foreach ($userJobs as $toDelete) {
             if ($job->getId() !== $toDelete->getId()) {
-                $clone = clone $toDelete;
-                $this->deleteUserJobOperation->forceDelete($toDelete);
-
-                $this->notificator->sendNotification($task, $clone, $responsibleUser, $anonymizeUsers);
+                $this->deleteUserJob($toDelete, $task, $responsibleUser, $anonymizeUsers);
             }
         }
+    }
+
+    public function removeCompetitorsOfLspJob(LspJobAssociation $job): void
+    {
+        $task = $this->taskRepository->getByGuid($job->getTaskGuid());
+        $responsibleUser = $this->userRepository->getByGuid($job->getUserGuid());
+        $anonymizeUsers = $task->anonymizeUsers(false);
+
+        $lspJobs = $this->lspJobRepository->getByTaskGuidAndWorkflow(
+            $job->getTaskGuid(),
+            $job->getWorkflow(),
+            $job->getWorkflowStepName()
+        );
+
+        foreach ($lspJobs as $toDelete) {
+            if ($job->getId() !== $toDelete->getId()) {
+                $this->deleteLspJob($toDelete, $task, $responsibleUser, $anonymizeUsers);
+            }
+        }
+
+        $userJobs = $this->userJobRepository->getJobsByTaskAndStep($job->getTaskGuid(), $job->getWorkflowStepName());
+
+        foreach ($userJobs as $toDelete) {
+            $this->deleteUserJob($toDelete, $task, $responsibleUser, $anonymizeUsers);
+        }
+    }
+
+    public function deleteLspJob(
+        mixed $toDelete,
+        editor_Models_Task $task,
+        User $responsibleUser,
+        bool $anonymizeUsers
+    ): void {
+        $dataJob = $this->userJobRepository->getDataJobByLspJob($toDelete->getId());
+        $deletedJobData = DeletedJobDto::fromUserJob($dataJob);
+
+        $this->deleteLspJobOperation->forceDelete($toDelete);
+
+        $this->notificator->sendNotification($task, $deletedJobData, $responsibleUser, $anonymizeUsers);
+    }
+
+    public function deleteUserJob(
+        mixed $toDelete,
+        editor_Models_Task $task,
+        User $responsibleUser,
+        bool $anonymizeUsers
+    ): void {
+        $deletedGobData = DeletedJobDto::fromUserJob($toDelete);
+
+        $this->deleteUserJobOperation->forceDelete($toDelete);
+
+        $this->notificator->sendNotification($task, $deletedGobData, $responsibleUser, $anonymizeUsers);
     }
 }

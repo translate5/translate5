@@ -382,14 +382,14 @@ class LspJobRepository
     }
 
     /**
-     * @throws NotFoundLspJobException
+     * @return iterable<LspJobAssociation>
      */
     public function getByTaskGuidAndWorkflow(
         string $taskGuid,
         string $workflow,
         string $workflowStepName,
-    ): LspJobAssociation {
-        $lspJob = new LspJobAssociation();
+    ): iterable {
+        $job = new LspJobAssociation();
 
         $select = $this->db
             ->select()
@@ -401,24 +401,20 @@ class LspJobRepository
             ->where('lspJob.workflowStepName = ?', $workflowStepName)
         ;
 
-        $row = $this->db->fetchAll($select);
+        foreach ($this->db->fetchAll($select) as $jobData) {
+            $job->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
-        if (empty($row)) {
-            throw new NotFoundLspJobException($lspId, $taskGuid, $workflow, $workflowStepName);
+            yield clone $job;
         }
-
-        $lspJob->init(
-            new \Zend_Db_Table_Row(
-                [
-                    'table' => $lspJob->db,
-                    'data' => $row,
-                    'stored' => true,
-                    'readOnly' => false,
-                ]
-            )
-        );
-
-        return $lspJob;
     }
 
     public function getTaskLspJobs(string $taskGuid): iterable

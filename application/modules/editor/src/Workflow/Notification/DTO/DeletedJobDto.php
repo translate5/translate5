@@ -30,6 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Workflow\Notification\DTO;
 
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
+
 class DeletedJobDto
 {
     public function __construct(
@@ -37,5 +40,14 @@ class DeletedJobDto
         public readonly string $role,
         public readonly string $workflowStepName,
     ) {
+    }
+
+    public static function fromUserJob(UserJob $job): self
+    {
+        return new self(
+            $job->getUserGuid(),
+            $job->getRole(),
+            $job->getWorkflowStepName(),
+        );
     }
 }

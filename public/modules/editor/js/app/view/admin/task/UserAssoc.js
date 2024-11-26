@@ -108,7 +108,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                                     xtype: 'combo',
                                     allowBlank: false,
                                     editable: false,
-                                    forceSelection: true,
+                                    forceSelection: false,
                                     queryMode: 'local',
                                     name: 'type',
                                     fieldLabel: me.strings.type,
@@ -122,7 +122,13 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                                         ]
                                     },
                                     listeners: {
-                                        change: (fld, newValue) => newValue === 1 ? me.loadUsers() : me.loadCoordinators()
+                                        change: (fld, newValue) => {
+                                            if (null === newValue) {
+                                                return;
+                                            }
+
+                                            newValue === 1 ? me.loadUsers() : me.loadCoordinators()
+                                        }
                                     }
                                 },
                                 {

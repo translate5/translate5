@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\JobAssignment\Workflow\CompetitiveJobsRemover;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\Export\Package\Remover;
 use MittagQI\Translate5\Workflow\ArchiveConfigDTO;
@@ -39,6 +40,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
+        private readonly CompetitiveJobsRemover $competitiveJobsRemover
     ) {
     }
 
@@ -46,6 +48,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
     {
         return new self(
             UserJobRepository::create(),
+            CompetitiveJobsRemover::create(),
         );
     }
 

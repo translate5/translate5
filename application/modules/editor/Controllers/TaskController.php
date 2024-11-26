@@ -1165,9 +1165,6 @@ class editor_TaskController extends ZfExtended_RestController
             $this->entity->refresh();
         }
 
-        //throws exceptions if task not accessable
-//        $this->checkTaskAccess();
-
         //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
 
@@ -1230,71 +1227,6 @@ class editor_TaskController extends ZfExtended_RestController
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
-    }
-
-    /**
-     * Checks the task access by workflow
-     * @throws ZfExtended_Models_Entity_NoAccessException
-     * @throws ZfExtended_Models_Entity_Conflict
-     */
-    protected function checkTaskAccess()
-    {
-        $mayLoadAllTasks = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS)
-            || $this->isAuthUserTaskPm($this->entity->getPmGuid());
-
-        try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask(
-                $this->authenticatedUser->getUserGuid(),
-                $this->entity
-            );
-        } catch (ZfExtended_Models_Entity_NotFoundException) {
-            $tua = null;
-        }
-
-        //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly.
-        // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.
-        $mayLoadAllTasks = $mayLoadAllTasks && (empty($tua) || $tua->getIsPmOverride());
-
-        //if the user may load all tasks, check workflow access is non sense
-        if ($mayLoadAllTasks) {
-            return;
-        }
-
-        $isTaskDisallowEditing = $this->isEditTaskRequest() && ! $this->workflow->isWriteable($tua);
-        $isTaskDisallowReading = $this->isViewTaskRequest() && ! $this->workflow->isReadable($tua);
-
-        //if now there is no tua, that means it was deleted in the meantime.
-        // A PM will not reach here, a editor user may not access the task then anymore
-        if (empty($tua)) {
-            //if the task was already in session, we must delete it.
-            //If not the user will always receive an error in JS, and would not be able to do anything.
-            throw ZfExtended_Models_Entity_Conflict::createResponse('E1163', [
-                'userState' => 'Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.',
-            ]);
-        }
-
-        //the tua state was changed by a PM, then the task may not be edited anymore by the user
-        if ($isTaskDisallowEditing && $this->data->userStatePrevious != $tua->getState()) {
-            throw ZfExtended_Models_Entity_Conflict::createResponse('E1164', [
-                'userState' => 'Sie haben versucht die Aufgabe zur Bearbeitung zu öffnen. Das ist in der Zwischenzeit nicht mehr möglich.',
-            ]);
-        }
-        //if reading is allowed the edit request is converted to a read request later by openAndLock
-        //if reading is also disabled, we have to throw no access here
-        if ($isTaskDisallowEditing && $isTaskDisallowReading) {
-            //no access as generic fallback
-            $this->log->info('E9999', 'Debug data to E9999 - Keine Zugriffsberechtigung!', [
-                '$mayLoadAllTasks' => $mayLoadAllTasks,
-                'tua' => $tua ? $tua->getDataObject() : 'no tua',
-                'isPmOver' => $tua && $tua->getIsPmOverride(),
-                'loadAllTasks' => $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS),
-                'isAuthUserTaskPm' => $this->isAuthUserTaskPm($this->entity->getPmGuid()),
-                '$isTaskDisallowEditing' => $isTaskDisallowEditing,
-                '$isTaskDisallowReading' => $isTaskDisallowReading,
-            ]);
-
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
     }
 
     /**
