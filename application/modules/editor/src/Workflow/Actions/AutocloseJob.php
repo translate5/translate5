@@ -11,6 +11,14 @@ use editor_Workflow_Default;
 use Throwable;
 use ZfExtended_Factory;
 
+/**
+ * Each night at 21:00 this action will try to find all relevant jobs for auto-close.
+ * User job will be automatically closed if:
+ * - The job deadline date passed
+ * - The job is not already closed
+ * - The job task is in state open
+ * - It is enabled by workflow->autoCloseJobs config
+ */
 class AutocloseJob extends editor_Workflow_Actions_Abstract
 {
     public function closeByDeadline(): void
@@ -27,7 +35,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
         foreach ($jobs as $tuaData) {
             try {
                 $task = editor_ModelInstances::taskByGuid($tuaData['taskGuid']);
-                if ($task->hasValidDeadlineDate() && $task->getConfig()->runtimeOptions->workflow->autoCloseJobs) {
+                if ($task->getConfig()->runtimeOptions->workflow->autoCloseJobs) {
                     $idsToAutoClose[] = $tuaData['id'];
                 }
             } catch (Throwable $e) {
@@ -73,7 +81,6 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
                 editor_Workflow_Default::STATE_AUTO_FINISH,
                 editor_Workflow_Default::STATE_FINISH,
             ])
-            ->where('t.deadlineDate IS NOT NULL')
             ->where('tua.deadlineDate < NOW()');
 
         return $tua->fetchAll($select)->toArray();
