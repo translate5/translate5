@@ -214,6 +214,8 @@ class StatusCommand extends Translate5AbstractCommand
             'running' => $workerSummary[$worker::STATE_RUNNING],
             'waiting' => $workerSummary[$worker::STATE_WAITING],
             'scheduled' => $workerSummary[$worker::STATE_SCHEDULED],
+            'delayed' => $workerSummary[$worker::STATE_DELAYED],
+            'prepared' => $workerSummary[$worker::STATE_PREPARE],
             'defunct' => $workerSummary[$worker::STATE_DEFUNCT],
         ];
 
