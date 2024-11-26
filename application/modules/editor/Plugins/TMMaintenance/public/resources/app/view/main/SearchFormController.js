@@ -237,7 +237,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             loadingId = 'TM-offset-' + offset;
 
         if (abortPrev || !append) {
-            me.loadedQty = 0;
+            vm.set('loadedQty', 0);
         }
 
         if (abortPrev) {
@@ -264,7 +264,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         //
         vm.set('loadingRecordNumber', store.getCount());
 
-        if (me.loadedQty === 0) {
+        if (vm.get('loadedQty') === 0) {
             view.ensureVisible(store.last());
         }
 
@@ -277,7 +277,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
                 // Remove dummy loading entry
                 if (loaderRec) {
-                    store.remove(loaderRec, false, true);
+                    store.remove(loaderRec, false, false);
                 }
 
                 if (!success) {
@@ -293,19 +293,19 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                 }
 
                 const offset = operation.getProxy().getReader().metaData.offset;
-                me.loadedQty += records.length;
+                vm.set('loadedQty', vm.get('loadedQty') + records.length);
 
-                me.getViewModel().set('lastOffset', offset);
-                me.getViewModel().set('hasMoreRecords', null !== offset);
-                console.log(store.getCount(), pageSize, me.loadedQty);
+                vm.set('lastOffset', offset);
+                vm.set('hasMoreRecords', null !== offset);
+
                 if (store.getCount() === pageSize) {
-                    me.getViewModel().set('hasRecords', records.length > 0);
-                    me.getViewModel().set('loadingTotalAmount', true);
+                    vm.set('hasRecords', records.length > 0);
+                    vm.set('loadingTotalAmount', true);
                     me.readTotalAmount();
                 } else {
                     me.getViewModel().set('loadingTotalAmount', false);
                 }
-                if (null !== offset && me.loadedQty < pageSize) {
+                if (null !== offset && vm.get('loadedQty') < pageSize) {
                     me.loadPageByChunks(pageSize, 1,true);
                 } else {
                     vm.set('loadingRecordNumber', false);
