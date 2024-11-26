@@ -26,9 +26,9 @@
  END LICENSE AND COPYRIGHT
  */
 
-namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
+declare(strict_types=1);
 
-use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
 
 /**
  * Class representing updates to v1.47
@@ -49,10 +49,9 @@ final class FprmUpdaterTo147
         ],
     ];
 
-    public function updateInDir(BconfEntity $bconf): void
+    public function updateInDir(string $bconfDir, string $bconfId, string $bconfName): void
     {
-        $dir = $bconf->getDataDirectory();
-        $json = json_decode(file_get_contents($dir . '/content.json'), true);
+        $json = json_decode(file_get_contents($bconfDir . '/content.json'), true);
         if (empty($json['fprm'])) {
             return;
         }
@@ -60,7 +59,7 @@ final class FprmUpdaterTo147
         foreach ($json['fprm'] as $fprmEntry) {
             [$okfType] = explode('@', $fprmEntry);
 
-            if (! file_exists($fprmFile = $dir . '/' . $fprmEntry . '.fprm')) {
+            if (! file_exists($fprmFile = $bconfDir . '/' . $fprmEntry . '.fprm')) {
                 continue;
             }
 
@@ -92,12 +91,12 @@ final class FprmUpdaterTo147
         }
         if (! empty($errors)) {
             error_log(
-                'ERROR: BCONF "' . $bconf->getName() . '" (id: ' . $bconf->getId() . ') could not be upgraded'
+                'ERROR: BCONF "' . $bconfName . '" (id: ' . $bconfId . ') could not be upgraded'
                 . ' to OKAPI 1.47, the following errors occured: ' . "\n    " . implode("\n    ", $errors)
             );
         } else {
             // TODO: for production we should remove/comment out this
-            error_log('Successfully converted FPRMs to OKAPI 1.47 for BCONF ' . $bconf->getName());
+            error_log('Successfully converted FPRMs to OKAPI 1.47 for BCONF ' . $bconfName);
         }
     }
 }

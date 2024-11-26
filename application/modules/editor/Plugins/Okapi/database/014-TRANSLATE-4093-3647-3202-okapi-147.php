@@ -54,7 +54,7 @@ $bconf = new BconfEntity();
 foreach ($bconf->loadAll() as $bconfData) {
     try {
         $bconf->load($bconfData['id']);
-        $updater->updateInDir($bconf);
+        $updater->updateInDir($bconf->getDataDirectory(), $bconf->getId(), $bconf->getName());
         $extensionMapping = $bconf->getExtensionMapping();
         $extensionMapping->rescanFilters();
         $bconf->repackIfOutdated(true);
