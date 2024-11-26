@@ -28,27 +28,30 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Actions;
+namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
-use editor_Models_Task as Task;
-use editor_Workflow_Actions_Abstract as AbstractAction;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
-use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
-use MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Executors\ReimportSegmentsActionExecutor;
-use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
 
-class ReimportSegmentsAction extends AbstractAction
+class ReimportSegmentsQueue
 {
-    public function reimportSegments(): void
-    {
-        /** @var Task $task */
-        $task = $this->config->task;
+    /**
+     * @throws ReimportQueueException
+     */
+    public function queueReimport(
+        string $taskGuid,
+        int $languageResourceId,
+        array $options = []
+    ): void {
+        $worker = new PrepareReimportSegmentsWorker();
 
-        (new ReimportSegmentsActionExecutor(
-            $this->log,
-            new ReimportSegmentsQueue(),
-            new LanguageResourceRepository(),
-            new TaskTmRepository(),
-        ))->reimportSegments($task);
+        $options['languageResourceId'] = $languageResourceId;
+
+        $success = $worker->init($taskGuid, $options);
+
+        if (! $success) {
+            throw new ReimportQueueException();
+        }
+
+        $worker->queue();
     }
 }

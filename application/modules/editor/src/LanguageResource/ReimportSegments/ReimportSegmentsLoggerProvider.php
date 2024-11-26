@@ -28,27 +28,20 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Actions;
+namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
-use editor_Models_Task as Task;
-use editor_Workflow_Actions_Abstract as AbstractAction;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
-use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
-use MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Executors\ReimportSegmentsActionExecutor;
-use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use ZfExtended_Logger;
 
-class ReimportSegmentsAction extends AbstractAction
+class ReimportSegmentsLoggerProvider
 {
-    public function reimportSegments(): void
-    {
-        /** @var Task $task */
-        $task = $this->config->task;
+    private ZfExtended_Logger $logger;
 
-        (new ReimportSegmentsActionExecutor(
-            $this->log,
-            new ReimportSegmentsQueue(),
-            new LanguageResourceRepository(),
-            new TaskTmRepository(),
-        ))->reimportSegments($task);
+    public function getLogger(): ZfExtended_Logger
+    {
+        if (! isset($this->logger)) {
+            $this->logger = \Zend_Registry::get('logger')->cloneMe('editor.languageresource');
+        }
+
+        return $this->logger;
     }
 }

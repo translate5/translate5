@@ -28,27 +28,13 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Actions;
+namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
-use editor_Models_Task as Task;
-use editor_Workflow_Actions_Abstract as AbstractAction;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
-use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
-use MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Executors\ReimportSegmentsActionExecutor;
-use MittagQI\Translate5\Repository\LanguageResourceRepository;
-
-class ReimportSegmentsAction extends AbstractAction
+class ReimportSegmentsOptions
 {
-    public function reimportSegments(): void
-    {
-        /** @var Task $task */
-        $task = $this->config->task;
+    public const FILTER_TIMESTAMP = 'timestamp';
 
-        (new ReimportSegmentsActionExecutor(
-            $this->log,
-            new ReimportSegmentsQueue(),
-            new LanguageResourceRepository(),
-            new TaskTmRepository(),
-        ))->reimportSegments($task);
-    }
+    public const FILTER_ONLY_EDITED = 'onlyEdited';
+
+    public const USE_SEGMENT_TIMESTAMP = 'useSegmentTimestamp';
 }

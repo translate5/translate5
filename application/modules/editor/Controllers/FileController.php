@@ -27,8 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
-use MittagQI\Translate5\LanguageResource\LanguageResourceReimportQueue;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsService;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
@@ -203,11 +203,11 @@ class editor_FileController extends ZfExtended_RestController
 
         foreach ($resources as $resource) {
             try {
-                (new LanguageResourceReimportQueue())->queueReimport(
+                (new ReimportSegmentsQueue())->queueReimport(
                     $this->getCurrentTask()->getTaskGuid(),
                     $resource['languageResourceId'],
                     [
-                        ReimportSegmentsService::FILTER_TIMESTAMP => NOW_ISO,
+                        ReimportSegmentsOptions::FILTER_TIMESTAMP => NOW_ISO,
                     ]
                 );
             } catch (ReimportQueueException) {
