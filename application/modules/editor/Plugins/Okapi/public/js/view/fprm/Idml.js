@@ -76,7 +76,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
         'extractIndexTopics.b': {},
         'extractHyperlinkTextSourcesInline.b': {},
         'extractExternalHyperlinks.b': {},
-        'specialCharacterPattern': {},
+        'specialCharacterPattern': { config: { hasTooltip: true }},
         // 4 params below are hidden until "Use codefinder" functionality is implemented
         'useCodeFinder.b': { config: { hidden: true, valueDefault: false }},
         'codeFinderRules.count.i': { config: { hidden: true, valueDefault: 0 }},
