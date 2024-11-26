@@ -28,24 +28,24 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-class PhpLogCommand extends AbstractLogfileCommand
+class LogWorkerCommand extends AbstractLogfileCommand
 {
-    protected static $defaultName = 'php:log';
+    protected static $defaultName = 'log:worker';
 
     protected function configure()
     {
-        $this->setAliases(['plog']);
+        $this->setAliases(['wlog', 'worker:log']);
 
         parent::configure();
     }
 
     protected function getLogFilePath(): string
     {
-        return APPLICATION_DATA . '/logs/php.log';
+        return APPLICATION_DATA . '/logs/worker.log';
     }
 
     protected function getCommandDescription(): string
     {
-        return 'Traces the php-log, by default the last ' . self::LIMIT . ' lines';
+        return 'Traces the worker-log, by default the last ' . self::LIMIT . ' lines';
     }
 }
