@@ -85,9 +85,9 @@ class WorkflowCloneCommand extends Translate5AbstractCommand
         $newWorkflowLabel = $this->io->ask('Please provide the UI label of the target workflow:');
 
         $newWorkflowName = '';
-        while (! preg_match('/^[a-z_0-9]+$/i', $newWorkflowName)) {
+        while (! preg_match('/^[a-z_0-9\-]+$/i', $newWorkflowName)) {
             if (! empty($newWorkflowName)) {
-                $this->io->warning('The entered name is invalid, please use only [a-zA-Z0-9_]');
+                $this->io->warning('The entered name is invalid, please use only [a-zA-Z0-9_-]');
             }
             $newWorkflowName = $this->io->ask('Please provide the technical name of the target workflow:');
         }
