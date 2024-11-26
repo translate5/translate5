@@ -32,8 +32,8 @@ namespace MittagQI\Translate5\Test\Unit\LanguageResource\ProjectTm\Workflow\Exec
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task;
-use MittagQI\Translate5\LanguageResource\LanguageResourceReimportQueue;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsService;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
 use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
 use MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Executors\ReimportSegmentsActionExecutor;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
@@ -47,7 +47,7 @@ class ReimportSegmentsActionExecutorTest extends TestCase
 
     private editor_Models_Task|MockObject $task;
 
-    private LanguageResourceReimportQueue|MockObject $reimportQueue;
+    private ReimportSegmentsQueue|MockObject $reimportQueue;
 
     private LanguageResourceRepository|MockObject $languageResourceRepository;
 
@@ -57,7 +57,7 @@ class ReimportSegmentsActionExecutorTest extends TestCase
     {
         $this->logger = $this->createMock(ZfExtended_Logger::class);
         $this->task = $this->createMock(editor_Models_Task::class);
-        $this->reimportQueue = $this->createMock(LanguageResourceReimportQueue::class);
+        $this->reimportQueue = $this->createMock(ReimportSegmentsQueue::class);
         $this->languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
         $this->taskTmRepository = $this->createMock(TaskTmRepository::class);
     }
@@ -172,8 +172,8 @@ class ReimportSegmentsActionExecutorTest extends TestCase
                     return $languageResourceIds[$loopIndex++] === $languageResourceId;
                 }),
                 [
-                    ReimportSegmentsService::FILTER_ONLY_EDITED => true,
-                    ReimportSegmentsService::USE_SEGMENT_TIMESTAMP => true,
+                    ReimportSegmentsOptions::FILTER_ONLY_EDITED => true,
+                    ReimportSegmentsOptions::USE_SEGMENT_TIMESTAMP => true,
                 ]
             );
 

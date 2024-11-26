@@ -589,6 +589,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return false;
     }
 
+    public function flush(string $tmName): void
+    {
+        $http = $this->getHttpWithMemory('GET', $tmName, 'flush');
+        $http->request();
+    }
+
     public function resources(): bool
     {
         $http = $this->getHttp('GET', '/resources');

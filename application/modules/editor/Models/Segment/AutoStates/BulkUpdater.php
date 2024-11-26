@@ -30,36 +30,36 @@ use editor_Models_Segment_AutoStates as AutoStates;
 
 class editor_Models_Segment_AutoStates_BulkUpdater
 {
-    /**
-     * @var editor_Models_SegmentFieldManager
-     */
-    protected $segmentFieldManager = null;
+    protected editor_Models_SegmentFieldManager $segmentFieldManager;
 
-    /**
-     * @var editor_Models_Db_Segments
-     */
-    protected $db = null;
+    protected editor_Models_Db_Segments $db;
 
     /**
      * The user which should be used as bulk updater, does not update user info if null
-     * @var ZfExtended_Models_User
      */
-    protected $user = null;
+    protected ?ZfExtended_Models_User $user = null;
 
     /**
-     * @param ZfExtended_Models_User $user OPTIONAL, if given the user on whom the bulk changes behalf of
+     * @param ZfExtended_Models_User|null $user OPTIONAL, if given the user on whom the bulk changes behalf of
+     * @throws ReflectionException
      */
     public function __construct(ZfExtended_Models_User $user = null)
     {
-        $this->db = ZfExtended_Factory::get('editor_Models_Db_Segments');
-        $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->db = ZfExtended_Factory::get(editor_Models_Db_Segments::class);
+        $this->segmentFieldManager = ZfExtended_Factory::get(editor_Models_SegmentFieldManager::class);
         $this->user = $user;
     }
 
     /**
      * Bulk updating a specific autoState of a task
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Db_Table_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function updateAutoState(string $taskGuid, int $oldState, int $newState)
+    public function updateAutoState(string $taskGuid, int $oldState, int $newState): void
     {
         $sfm = $this->segmentFieldManager;
         $sfm->initFields($taskGuid);
@@ -78,16 +78,25 @@ class editor_Models_Segment_AutoStates_BulkUpdater
         $affectedSegmentsQty = $this->db->getAdapter()->query($sql, $bind)->rowCount();
         ZfExtended_Factory
             ::get(editor_Models_TaskProgress::class)
-            ->adjustTaskEditableSegmentsCount(
-                $taskGuid, $affectedSegmentsQty, $oldState, $newState
-            );
+                ->adjustTaskEditableSegmentsCount(
+                    $taskGuid,
+                    $affectedSegmentsQty,
+                    $oldState,
+                    $newState
+                );
         $this->db->getAdapter()->commit();
     }
 
     /**
      * Bulk updating a specific autoState of a task to status "not translated", affects only non edited segments
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Db_Table_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function updateAutoStateNotTranslated(string $taskGuid, int $oldState)
+    public function updateAutoStateNotTranslated(string $taskGuid, int $oldState): void
     {
         $sfm = $this->segmentFieldManager;
         $sfm->initFields($taskGuid);
@@ -133,9 +142,12 @@ class editor_Models_Segment_AutoStates_BulkUpdater
         $affectedSegmentsQty = $this->db->getAdapter()->query($sql, $bind)->rowCount();
         ZfExtended_Factory
             ::get(editor_Models_TaskProgress::class)
-            ->adjustTaskEditableSegmentsCount(
-                $taskGuid, $affectedSegmentsQty, $oldState, AutoStates::NOT_TRANSLATED
-            );
+                ->adjustTaskEditableSegmentsCount(
+                    $taskGuid,
+                    $affectedSegmentsQty,
+                    $oldState,
+                    AutoStates::NOT_TRANSLATED
+                );
         $this->db->getAdapter()->commit();
     }
 
@@ -154,12 +166,11 @@ class editor_Models_Segment_AutoStates_BulkUpdater
         return 'UPDATE `%s` set autoStateId = ?, userGuid = ?, userName = ? where autoStateId = ? and taskGuid = ?';
     }
 
-    /***
+    /**
      * Find last editor from segment history, and update it in the lek segment table
-     * @param string $taskGuid
-     * @param int $autoState
+     * @throws Zend_Db_Statement_Exception
      */
-    public function resetUntouchedFromHistory(string $taskGuid, int $autoState)
+    public function resetUntouchedFromHistory(string $taskGuid, int $autoState): void
     {
         if (empty($taskGuid) || empty($autoState)) {
             return;
@@ -206,10 +217,10 @@ class editor_Models_Segment_AutoStates_BulkUpdater
 
     /**
      * shortcut to db->query catching errors complaining missing segment view
-     * returns true if query was successfull, returns false if view was missing
-     * @param string $sql
+     * returns true if query was successful, returns false if view was missing
+     * @throws Zend_Db_Statement_Exception
      */
-    protected function queryViewIfExists($sql, array $bind)
+    protected function queryViewIfExists(string $sql, array $bind): void
     {
         try {
             $this->db->getAdapter()->query($sql, $bind);
@@ -219,87 +230,5 @@ class editor_Models_Segment_AutoStates_BulkUpdater
                 throw $e;
             }
         }
-    }
-
-    /***
-     * Update the $edit100PercentMatch flag for all segments in the task.
-     * See https://confluence.translate5.net/display/MI/TRANSLATE-1643++A+separate+autostatus+pretranslated+is+missing+for+pretranslation
-     *  for auto status change matrix
-     * @param editor_Models_Task $task
-     * @param bool $edit100PercentMatch
-     * @throws editor_Models_Segment_Exception
-     */
-    public function updateSegmentsEdit100PercentMatch(editor_Models_Task $task, bool $edit100PercentMatch)
-    {
-        /** @var editor_Models_Segment_AutoStates $autoState */
-        $autoState = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-
-        // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
-        //  since the first segment is loaded on construction, the construction must be directly before usage!
-        /** @var editor_Models_Segment_Iterator $segments */
-        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
-
-        /** @var editor_Models_Segment_InternalTag $internalTag */
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-
-        foreach ($segments as $segment) {
-            //we can ignore segments where the editable state is already as the desired $edit100PercentMatch state
-            // or where the matchrate is lower as 100% since such segments should always be editable and no locked change is needed
-            if ($autoState->isBlocked($segment->getAutoStateId()) || $segment->getEditable() == $edit100PercentMatch || $segment->getMatchRate() < 100) {
-                continue;
-            }
-
-            $autoStateId = null;
-            $editable = null;
-            $history = $segment->getNewHistoryEntity();
-
-            //is locked config has precendence over all other calculations!
-            $isLocked = $segment->meta()->getLocked() && (bool) $task->getLockLocked();
-
-            //if we want editable 100% matches, the segment should be not ediable before, which is checked in the foreach head
-            if ($edit100PercentMatch) {
-                $hasText = $internalTag->hasText($segment->getSource());
-
-                // calc and change new autoState only if it is not hard locked and hasText
-                if (! $isLocked && $hasText) {
-                    $autoStateId = $autoState->recalculateUnLockedState($segment);
-                    $editable = true;
-                }
-            } else {
-                //all other pretrans values mean that it was either modified (PRETRANS_TRANSLATED) or it was not pre-translated at all so it could not be a 100% match
-                $initialPretrans = $segment->getPretrans() == $segment::PRETRANS_INITIAL;
-
-                $wasFromTM = editor_Models_Segment_MatchRateType::isFromTM($segment->getMatchRateType());
-
-                //if we do NOT want editable 100% matches, the segment should be editable before, which is checked outside
-                // and not explicitly unlocked with autopropagation:
-                $allowToBlock = (! $segment->meta()->getAutopropagated() || $isLocked);
-                if ($allowToBlock && $initialPretrans && $wasFromTM) {
-                    //if segment.pretrans = 1 and matchrate >= 100% (checked in head) and matchtype ^= import;tm
-                    // then
-                    // TRANSLATED → LOCKED
-                    // REVIEWED_UNTOUCHED → LOCKED
-                    // REVIEWED_UNCHANGED → LOCKED
-                    // REVIEWED_UNCHANGED_AUTO → LOCKED
-                    // REVIEWED_PM_UNCHANGED → LOCKED
-                    // REVIEWED_PM_UNCHANGED_AUTO → LOCKED
-                    // PRETRANSLATED → LOCKED
-                    $autoStateId = $autoState->recalculateLockedState($segment);
-                    $editable = $autoStateId != $autoState::LOCKED;
-                }
-            }
-
-            if (! is_null($autoStateId)) {
-                $segment->setAutoStateId($autoStateId);
-                $segment->setEditable($editable);
-                $history->save();
-                $segment->save();
-            }
-        }
-
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $meta editor_Models_Segment_Meta */
-        //update task word count when 100% matches editable is changed
-        $task->setWordCount($meta->getWordCountSum($task));
     }
 }

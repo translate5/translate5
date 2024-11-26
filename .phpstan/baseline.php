@@ -117,6 +117,26 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/StatusCommand.php',
 ];
 $ignoreErrors[] = [
+    'message' => '#^Call to an undefined method editor_Plugins_FrontEndMessageBus_Bus\\:\\:setExceptionHandler\\(\\)\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/UserOnlineCommand.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Cannot access property \\$instanceResult on array\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/UserOnlineCommand.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Expression on left side of \\?\\? is not nullable\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/UserOnlineCommand.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Using nullsafe property access on non\\-nullable type array\\. Use \\-\\> instead\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/UserOnlineCommand.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$instanceResult on array\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/StatusCommand.php',

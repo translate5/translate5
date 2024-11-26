@@ -320,6 +320,12 @@ class editor_Models_Segment_MatchRateType
         return strpos($type, self::PREFIX_IMPORT . ';' . self::TYPE_TM) === 0 || strpos($type, self::PREFIX_PRETRANSLATED . ';' . self::TYPE_TM) === 0;
     }
 
+    public static function isFromTermCollection(string $type): bool
+    {
+        return str_starts_with($type, self::PREFIX_IMPORT . ';' . self::TYPE_TERM_COLLECTION)
+            || str_starts_with($type, self::PREFIX_PRETRANSLATED . ';' . self::TYPE_TERM_COLLECTION);
+    }
+
     /**
      * retrieves if the matchRateType originates from a taken over Translation Memory / TM match
      */
