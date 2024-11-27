@@ -12,6 +12,7 @@
         "okf_html@local-html",
         "okf_idml@local-idml",
         "okf_openxml@local-openxml",
-        "okf_json@local-json"
+        "okf_json@local-json",
+        "okf_xmlstream@local-xmlstream-dita"
     ]
 }

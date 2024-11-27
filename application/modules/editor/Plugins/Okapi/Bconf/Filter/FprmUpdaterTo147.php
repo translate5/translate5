@@ -47,6 +47,25 @@ final class FprmUpdaterTo147
     ruleTypes: [INCLUDE]
     conditions: [translate, EQUALS, yes]",
         ],
+        'okf_xmlstream' => [
+            // "xmlstream-dita"
+            ".*:
+    ruleTypes: [EXCLUDE]
+    conditions: [translate, EQUALS, 'no']" => ".*:
+    ruleTypes: [EXCLUDE]
+    conditions: [translate, EQUALS, no]
+  .+:
+    ruleTypes: [INCLUDE]
+    conditions: [translate, EQUALS, yes]
+  msgblock:
+    ruleTypes: [PRESERVE_WHITESPACE]
+  codeblock:
+    ruleTypes: [PRESERVE_WHITESPACE]",
+            "state:
+    ruleTypes: [INLINE]" => "state:
+    ruleTypes: [ATTRIBUTES_ONLY, INLINE]
+    translatableAttributes: [value]",
+        ],
     ];
 
     public function updateInDir(string $bconfDir, string $bconfId, string $bconfName): void
