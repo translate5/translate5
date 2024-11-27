@@ -89,22 +89,62 @@ class MatchAnalysisTest extends ImportTestAbstract
         $this->exportXmlResults(false);
     }
 
-    /***
-     * @return void
-     */
-    public function testExportXmlResultsCharacter(): void
-    {
-        $this->exportXmlResults(true);
-    }
-
     public function testWordBasedResults(): void
     {
-        $this->validateResults(false);
+        $this->validateGroupedResults(false);
     }
 
     public function testCharacterBasedResults(): void
     {
-        $this->validateResults(true);
+        $this->validateGroupedResults(true);
+    }
+
+    /***
+     * Validate all analysis results.
+     */
+    public function testValidateAllResults(): void
+    {
+        $unitType = 'word';
+        $jsonFileName = 'allanalysis-' . $unitType . '.json';
+        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
+            'taskGuid' => static::api()->getTask()->taskGuid,
+            'notGrouped' => static::api()->getTask()->taskGuid,
+        ], $jsonFileName);
+        $this->assertNotEmpty($analysis, 'No results found for the ' . $unitType . '-based not-grouped matchanalysis.');
+
+        static::api()->isCapturing() && file_put_contents(static::api()->getFile($jsonFileName, null, false), json_encode($this->filterUngroupedAnalysis($analysis), JSON_PRETTY_PRINT));
+
+        $expectedAnalysis = static::api()->getFileContent($jsonFileName);
+
+        $this->assertEquals(
+            $this->filterUngroupedAnalysis($expectedAnalysis),
+            $this->filterUngroupedAnalysis($analysis),
+            'The expected file and the data does not match for the ' . $unitType . '-based not-grouped matchanalysis..'
+        );
+    }
+
+    /***
+     * Validate the grouped analysis results.
+     */
+    private function validateGroupedResults(bool $characterBased): void
+    {
+        $unitType = $characterBased ? 'character' : 'word';
+
+        $jsonFileName = 'analysis-' . $unitType . '.json';
+        // fetch task data
+        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
+            'taskGuid' => static::api()->getTask()->taskGuid,
+            'unitType' => $unitType,
+        ], $jsonFileName);
+        $this->assertNotEmpty($analysis, 'No results found for the ' . $unitType . '-based task-specific matchanalysis.');
+        //check for differences between the expected and the actual content
+        $expectedAnalysis = static::api()->getFileContent($jsonFileName);
+
+        $this->assertEquals(
+            $this->filterTaskAnalysis($expectedAnalysis),
+            $this->filterTaskAnalysis($analysis),
+            'The expected file and the data does not match for the ' . $unitType . '-based task-specific matchanalysis.'
+        );
     }
 
     /***
@@ -138,54 +178,6 @@ class MatchAnalysisTest extends ImportTestAbstract
 
         //check for differences between the expected and the actual content
         self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
-    }
-
-    /***
-     * Validate the analysis results.
-     * 1. the first validation will validate the grouped results for the analysis
-     * 2. the second validation will validate the all existing results for the analysis
-     *
-     * @param bool $characterBased
-     * @return void
-     */
-    private function validateResults(bool $characterBased): void
-    {
-        $unitType = $characterBased ? 'character' : 'word';
-
-        $jsonFileName = 'analysis-' . $unitType . '.json';
-        // fetch task data
-        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
-            'taskGuid' => static::api()->getTask()->taskGuid,
-            'unitType' => $unitType,
-        ], $jsonFileName);
-        $this->assertNotEmpty($analysis, 'No results found for the ' . $unitType . '-based task-specific matchanalysis.');
-        //check for differences between the expected and the actual content
-        $expectedAnalysis = static::api()->getFileContent($jsonFileName);
-
-        $this->assertEquals(
-            $this->filterTaskAnalysis($expectedAnalysis),
-            $this->filterTaskAnalysis($analysis),
-            'The expected file and the data does not match for the ' . $unitType . '-based task-specific matchanalysis.'
-        );
-
-        //now test all results and matches
-        $jsonFileName = 'allanalysis-' . $unitType . '.json';
-        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
-            'taskGuid' => static::api()->getTask()->taskGuid,
-            'notGrouped' => static::api()->getTask()->taskGuid,
-        ], $jsonFileName);
-        $this->assertNotEmpty($analysis, 'No results found for the ' . $unitType . '-based not-grouped matchanalysis.');
-        //check for differences between the expected and the actual content
-        $expectedAnalysis = static::api()->getFileContent($jsonFileName);
-        //check for differences between the expected and the actual content
-
-        //file_put_contents(static::api()->getFile($jsonFileName, null, false), json_encode($this->filterUngroupedAnalysis($analysis), JSON_PRETTY_PRINT));
-
-        $this->assertEquals(
-            $this->filterUngroupedAnalysis($expectedAnalysis),
-            $this->filterUngroupedAnalysis($analysis),
-            'The expected file and the data does not match for the ' . $unitType . '-based not-grouped matchanalysis..'
-        );
     }
 
     public static function afterTests(): void

@@ -346,6 +346,19 @@ class editor_Models_Segment_MatchRateType
         return (count(array_intersect($types, self::RESOURCE_TYPES)) > 0);
     }
 
+    public static function getLangResourceType(string $type): ?string
+    {
+        if (preg_match(
+            '/;(' . implode('|', self::RESOURCE_TYPES) . ')(?:;|$)/i',
+            $type,
+            $matches
+        )) {
+            return strtolower($matches[1]);
+        }
+
+        return null;
+    }
+
     /**
      * generates the matchRateType type by imported segment data
      * @param mixed $mid segment mid for logging purposes only

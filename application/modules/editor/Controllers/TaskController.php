@@ -353,6 +353,7 @@ class editor_TaskController extends ZfExtended_RestController
     {
         $rows = $this->loadAll();
         $customerData = $this->getCustomersForRendering($rows);
+        $customerRenderConfigs = $this->getCustomerRenderConfigs($rows);
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $isTransfer = $file->getTransfersPerTasks(array_column($rows, 'taskGuid'));
@@ -369,6 +370,9 @@ class editor_TaskController extends ZfExtended_RestController
             $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
             if ($isMailTo) {
                 $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
+            }
+            if (! empty($customerRenderConfigs[$row['customerId']]) && $customerRenderConfigs[$row['customerId']]['hideWordCount']) {
+                $row['wordCount'] = '-';
             }
         }
 
@@ -413,6 +417,7 @@ class editor_TaskController extends ZfExtended_RestController
         $isMailTo = $this->config->runtimeOptions->frontend->tasklist->pmMailTo;
 
         $customerData = $this->getCustomersForRendering($rows);
+        $customerRenderConfigs = $this->getCustomerRenderConfigs($rows);
 
         if ($isMailTo) {
             $userData = $this->getUsersForRendering($rows);
@@ -449,6 +454,10 @@ class editor_TaskController extends ZfExtended_RestController
 
             if ($isMailTo) {
                 $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
+            }
+
+            if (! empty($customerRenderConfigs[$row['customerId']]) && $customerRenderConfigs[$row['customerId']]['hideWordCount']) {
+                $row['wordCount'] = '-';
             }
 
             if (empty($this->entity->getTaskGuid())) {
@@ -533,6 +542,22 @@ class editor_TaskController extends ZfExtended_RestController
         $customerData = $customer->loadByIds($customerIds);
 
         return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
+    }
+
+    protected function getCustomerRenderConfigs(array $rows)
+    {
+        if (empty($rows)) {
+            return [];
+        }
+
+        $customerConfig = new editor_Models_Customer_CustomerConfig();
+
+        $configs = [];
+        foreach ($rows as $row) {
+            $configs[$row['customerId']]['hideWordCount'] = $customerConfig->getCustomerConfig($row['customerId'])->runtimeOptions->frontend->tasklist->hideWordCount;
+        }
+
+        return $configs;
     }
 
     /***

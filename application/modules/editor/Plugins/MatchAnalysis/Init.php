@@ -290,6 +290,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         /* @var editor_Models_Task $task */
         $task = $event->getParam('task');
         $config = $task->getConfig();
+        if ($config->runtimeOptions->plugins?->MatchAnalysis?->readImportAnalysis) {
+            $this->handleReadImportAnalysis($task);
+        }
         if ($config->runtimeOptions->plugins?->MatchAnalysis?->autoPretranslateOnTaskImport) {
             $this->handleOperation($task, [
                 'pretranslate' => true,
@@ -306,6 +309,20 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
     {
         $batchCache = ZfExtended_Factory::get(BatchResult::class);
         $batchCache->deleteOlderRecords();
+    }
+
+    protected function handleReadImportAnalysis($task): void
+    {
+        $taskGuids = [$task->getTaskGuid()];
+        //if the requested operation is from project, queue analysis for each project task
+        if ($task->isProject()) {
+            $taskModel = new editor_Models_Task();
+            $projects = $taskModel->loadProjectTasks((int) $task->getProjectId(), true);
+            $taskGuids = array_column($projects, 'taskGuid');
+        }
+        foreach ($taskGuids as $taskGuid) {
+            $this->queueReadImportAnalysis($taskGuid);
+        }
     }
 
     /**
@@ -518,6 +535,25 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
             throw $e;
         }
+    }
+
+    protected function queueReadImportAnalysis(string $taskGuid): void
+    {
+        $task = new editor_Models_Task();
+        $task->loadByTaskGuid($taskGuid);
+
+        // if we are not in import this is an error
+        if (! $task->isImporting()) {
+            $this->addWarn($task, 'MatchAnalysis Plug-In: task is not in import state.');
+
+            return;
+        }
+
+        // init worker and queue it
+        $worker = new editor_Plugins_MatchAnalysis_MatchrateWorker();
+        $worker->init($taskGuid);
+        // use the import worker as parentId, on import state scheduled is ok
+        $worker->queue($this->fetchImportWorkerId($taskGuid), ZfExtended_Models_Worker::STATE_SCHEDULED, false);
     }
 
     /**
