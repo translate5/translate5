@@ -1,0 +1,5 @@
+#v1
+preserveSegmentation.b=false
+returnRawDocument.b=false
+forceTargetLocale.b=false
+overrideOutputPath=

@@ -1,0 +1,14 @@
+#v1
+writerClass=net.sf.okapi.steps.rainbowkit.xliff.XLIFFPackageWriter
+packageName=pack1
+packageDirectory=${inputRootDir}
+supportFiles=
+message=
+outputManifest.b=true
+createZip.b=false
+sendOutput.b=false
+writerOptions.placeholderMode.b=false
+writerOptions.includeNoTranslate.b=true
+writerOptions.copySource.b=false
+writerOptions.useSkeleton.b=false
+writerOptions.escapeGT.b=true
