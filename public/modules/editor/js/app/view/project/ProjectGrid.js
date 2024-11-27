@@ -100,6 +100,14 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         text: '{l10n.projectGrid.text_cols.taskActions}'
                     }
         		},{
+                    xtype: 'checkcolumn',
+                    dataIndex: 'checked',
+                    sortable: false,
+                    bind: {
+                        tooltip: '{l10n.projectGrid.strings.batchSetTooltip}'
+                    },
+                    width: 20
+                },{
         			xtype: 'gridcolumn',
                     width: 220,
                     dataIndex: 'taskName',
@@ -253,6 +261,12 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         enableToggle: true,
                         bind: {
         	                text: '{l10n.projectGrid.strings.onlyMyProjects}'
+                        }
+                    }, {
+                        xtype: 'button',
+                        itemId: 'batch-set-btn',
+                        bind: {
+                            text: '{l10n.projectGrid.strings.batchSetProperties}'
                         }
                     }]
         		}]
