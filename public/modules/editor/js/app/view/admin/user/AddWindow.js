@@ -459,7 +459,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         form.down('#rolesGroup').query('checkbox[checked=true]').map(function (box) {
             if (Editor.data.app.conflictingRoles.hasOwnProperty(box.initialConfig.value)) {
                 Editor.data.app.conflictingRoles[box.initialConfig.value].forEach(function (role) {
-                    findCheckbox(role).setDisabled(true);
+                    findCheckbox(role)?.setDisabled(true);
                 });
 
                 return;
