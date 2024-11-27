@@ -94,6 +94,10 @@ class RolesDataProvider
         $roles = [];
 
         foreach ($potentialRoles as $role) {
+            if ($viewer->isCoordinator() && ! in_array($role, $viewer->getRoles(), true)) {
+                continue;
+            }
+
             if ($this->rolesValidator->hasAclPermissionToSetRole($viewer, $role)) {
                 $roles[] = [
                     'role' => $role,

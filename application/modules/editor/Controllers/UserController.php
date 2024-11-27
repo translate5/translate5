@@ -394,7 +394,17 @@ class Editor_UserController extends ZfExtended_RestController
                     'becauseOf' => $e->becauseOf,
                 ]
             ),
-            UserIsNotAuthorisedToAssignRoleException::class => new ZfExtended_NoAccessException(previous: $e),
+            UserIsNotAuthorisedToAssignRoleException::class => UnprocessableEntity::createResponse(
+                'E1635',
+                [
+                    'roles' => [
+                        'Sie können für diesen Benutzer keine {Rollen} festlegen.',
+                    ],
+                ],
+                [
+                    'roles' => implode(', ', $e->role),
+                ]
+            ),
             InexistentCustomerException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E2002',
                 [
