@@ -100,7 +100,11 @@ class TaskInfoCommand extends TaskCommand
 
         $this->writeTitle('Task Information');
 
-        $tasks = static::searchTasksFromArgument($input->getArgument('identifier'));
+        $tasks = static::searchTasksFromArgument(
+            $input->getArgument('identifier'),
+            (bool) $input->getOption('id-only')
+        );
+
         $taskCount = count($tasks);
         if ($taskCount === 0) {
             $this->io->warning('No task(s) found matching the given identifier!');
