@@ -14,7 +14,8 @@ Ext.define('TMMaintenance.view.main.MainModel', {
         tms: {},
         totalAmount: false,
         loadingTotalAmount: false,
-        loadingRecordNumber: null
+        loadingRecordNumber: null,
+        loadedQty: 0
     },
     formulas: {
         listTitle: function(get) {
@@ -38,6 +39,10 @@ Ext.define('TMMaintenance.view.main.MainModel', {
             }
             if (chunk) {
                 title += get('l10n.list.loadingSegmentNumber') + chunk + ' ...';
+            }
+
+            if (chunk === false && get('lastOffset') === null) {
+                title = get('l10n.list.totalAmount') + get('loadedQty');
             }
             return  title;
         }

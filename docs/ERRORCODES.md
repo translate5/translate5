@@ -38,6 +38,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1219"></a>E1219 | Worker                | Worker "{worker}" failed on initialisation.                                               | Check other errors , this message is just for debugging.                                                                                                                                                                                                                                                                                                                                                   |
 | <a id="E1547"></a>E1547 | Worker                | Worker {worker} ({id}) needed {duration}s and is now {state}                              | Just an info how long the worker was running.                                                                                                                                                                                                                                                                                                                                                              |
 | <a id="E1613"></a>E1613 | Worker                | The worker "{worker}" was too often delayed - the service "{service}" still malfunctions  | A requested service is not available for longer times and probably is malfunctioning                                                                                                                                                                                                                                                                                                                       |  
+| <a id="E1639"></a>E1639 | Worker                | The worker "{worker}" was delayed for too long                                            | A worker was continuously delayed for too long and probably is malfunctioning                                                                                                                                                                                                                                                                                                                              |  
 | <a id="E1640"></a>E1640 | Synchronous Worker    | Worker {worker} is defunct!                                                               | Check the log for further errors.                                                                                                                                                                                                                                                                                                                                                                          |
 | <a id="E1641"></a>E1641 | Synchronous Worker    | Worker {worker} was queued blocking and timed out!                                        | Check the log for further errors.                                                                                                                                                                                                                                                                                                                                                                          |
 | <a id="E1201"></a>E1201 | DB                    | Still producing a DB DeadLock after {retries} retries.                                    | A transaction was repeated X times after a deadlock and it is still producing a deadlock. <br />The original dead lock exception is contained in this exception.                                                                                                                                                                                                                                           |
@@ -816,6 +817,43 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1619"></a>E1619 | Private Plug-In | not able to connect to Plunet                       | check connection config to access Plunet                                  |
 | <a id="E1620"></a>E1620 | Private Plug-In | not able to identify Plunet project or find CUS-job | see message text for more information                                     |
 | <a id="E1621"></a>E1621 | Private Plug-In | can not set state in Plunet CUS-job                 | Check if "customer" and "ressource" is set correct for this job in Plunet |
+
+#### Private plug-in Plunet-Connector
+| EventCode               | Context                         | EventMessage                                        | Description/Solution                                                   |
+|:------------------------|:--------------------------------|:----------------------------------------------------|:-----------------------------------------------------------------------|
+| <a id="E1642"></a>E1642  | Private Plugin Plunet Connector | Plunet API login failed ||
+| <a id="E1643"></a>E1643  | Private Plugin Plunet Connector | Couldn't determine translate5 customer ID that corresponds to the Plunet customer ||
+| <a id="E1644"></a>E1644  | Private Plugin Plunet Connector | No workflow step configured for Plunet jo ||
+| <a id="E1645"></a>E1645  | Private Plugin Plunet Connector | Workflow step configured for Plunet job doesn't exist ||
+| <a id="E1646"></a>E1646  | Private Plugin Plunet Connector | Job to WorkflowStep mapping has wrong format ||
+| <a id="E1647"></a>E1647  | Private Plugin Plunet Connector | Workflow doesn't exist ||
+| <a id="E1648"></a>E1648  | Private Plugin Plunet Connector | Language mapping configuration has wrong format ||
+| <a id="E1649"></a>E1649  | Private Plugin Plunet Connector | No entry found for Plunet language in language mapping configuration ||
+| <a id="E1650"></a>E1650  | Private Plugin Plunet Connector | No SOAP callback authentication token configured ||
+| <a id="E1651"></a>E1651  | Private Plugin Plunet Connector | No translate5 API token configured ||
+| <a id="E1652"></a>E1652  | Private Plugin Plunet Connector | No translate5 base URL configured ||
+| <a id="E1653"></a>E1653  | Private Plugin Plunet Connector | Can't connect to Plunet API ||
+| <a id="E1654"></a>E1654  | Private Plugin Plunet Connector | Failed loading customer for updating their import settings ||
+| <a id="E1655"></a>E1655  | Private Plugin Plunet Connector | Failed activating autoPretranslateOnTaskImport in customer config ||
+| <a id="E1656"></a>E1656  | Private Plugin Plunet Connector | Translate5 language from language mapping config doesn't exist ||
+| <a id="E1657"></a>E1657  | Private Plugin Plunet Connector | Plunet quote or order has multiple source languages ||
+| <a id="E1658"></a>E1658  | Private Plugin Plunet Connector | Plunet quote or order has no items ||
+| <a id="E1659"></a>E1659  | Private Plugin Plunet Connector | Technical error ||
+| <a id="E1660"></a>E1660  | Private Plugin Plunet Connector | Project manager doesn't exist ||
+| <a id="E1661"></a>E1661  | Private Plugin Plunet Connector | Plunet quote or order does not exist ||
+| <a id="E1662"></a>E1662  | Private Plugin Plunet Connector | Plunet quote or order has no customer ||
+| <a id="E1663"></a>E1663  | Private Plugin Plunet Connector | Plunet job does not exist ||
+| <a id="E1664"></a>E1664  | Private Plugin Plunet Connector | Configured JobTypeShort of finish translate5 task is empty ||
+| <a id="E1665"></a>E1665  | Private Plugin Plunet Connector | Duplicated translate5 task for a Plunet item ||
+| <a id="E1666"></a>E1666  | Private Plugin Plunet Connector | Plunet item does not exist ||
+| <a id="E1667"></a>E1667  | Private Plugin Plunet Connector | Plunet customer requested by resource ID does not exist ||
+| <a id="E1668"></a>E1668  | Private Plugin Plunet Connector | Creation of translate5 task export failed ||
+| <a id="E1669"></a>E1669  | Private Plugin Plunet Connector | Creation of translate5 task export failed ||
+| <a id="E1670"></a>E1670  | Private Plugin Plunet Connector | Failed opening zip export of task ||
+| <a id="E1671"></a>E1671  | Private Plugin Plunet Connector | Failed reading zip export of task ||
+| <a id="E1672"></a>E1672  | Private Plugin Plunet Connector | Failed ending task ||
+| <a id="E1673"></a>E1673  | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Quotes ||
+| <a id="E1674"></a>E1674  | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Orders ||
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number

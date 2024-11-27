@@ -7,7 +7,9 @@ use editor_ModelInstances;
 use editor_Models_Db_TaskUserAssoc;
 use editor_Models_Task;
 use editor_Workflow_Actions_Abstract;
+use editor_Workflow_Actions_Config;
 use editor_Workflow_Default;
+use editor_Workflow_Notification;
 use Throwable;
 use ZfExtended_Factory;
 
@@ -21,6 +23,8 @@ use ZfExtended_Factory;
  */
 class AutocloseJob extends editor_Workflow_Actions_Abstract
 {
+    private array $triggerConfigArgs;
+
     public function closeByDeadline(): void
     {
         if (! $this->itsAboutTime()) {
@@ -31,14 +35,20 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
             return;
         }
 
+        $this->triggerConfigArgs = func_get_args();
+
         $idsToAutoClose = [];
         foreach ($jobs as $tuaData) {
             try {
                 $task = editor_ModelInstances::taskByGuid($tuaData['taskGuid']);
-                if ($task->getConfig()->runtimeOptions->workflow->autoCloseJobs) {
+                $config = $task->getConfig();
+                if ($config->runtimeOptions->workflow->autoCloseJobs) {
                     $idsToAutoClose[] = $tuaData['id'];
+                    if (! $config->runtimeOptions->workflow->disableNotifications) {
+                        $this->notifyAutoclosed($task, $tuaData['userGuid'], $tuaData['workflowStepName']);
+                    }
                 }
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 // this can happen when actions in the instance overlap with cronjob triggered actions
                 // no need to "really" log
                 error_log('AutocloseJob: cannot find task ' . $tuaData['taskGuid']);
@@ -61,6 +71,15 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
                 ]
             );
         }
+    }
+
+    private function notifyAutoclosed(editor_Models_Task $task, string $userGuid, string $workflowStepName): void
+    {
+        $config = new editor_Workflow_Actions_Config();
+        $config->task = $task;
+        $notifier = new editor_Workflow_Notification();
+        $notifier->init($config);
+        $notifier->notifyAutoclosed($this->triggerConfigArgs, $userGuid, $workflowStepName);
     }
 
     private function findJobs(): array

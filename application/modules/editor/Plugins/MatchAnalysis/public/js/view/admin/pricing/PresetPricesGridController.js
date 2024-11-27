@@ -269,7 +269,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetPricesGridCont
             from = parseInt(range.from);
             till = parseInt(range.till);
             text = this.rangeText(from, till);
-            width = tm.getWidth(text) + 25
+            width = tm.getWidth(text) + (range.from === range.till ? 35 : 25)
 
             // Prepare colsNow-array
             colsNow.push({

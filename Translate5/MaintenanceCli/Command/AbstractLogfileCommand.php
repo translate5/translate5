@@ -99,8 +99,8 @@ abstract class AbstractLogfileCommand extends Translate5AbstractCommand
         }
 
         $limit = $input->getOption('last');
-        if ($limit !== false) { // if === false, then it was not given at all
-            $limit = ($limit ?? static::LIMIT); //if $limit is null, then it was given empty, so defaulting to 5
+        if (! empty($limit)) {
+            $limit = (int) trim($limit, '-=');
         } else {
             $limit = static::LIMIT;
         }

@@ -36,8 +36,6 @@ use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
  */
 trait editor_Services_Connector_BatchTrait
 {
-    protected ?editor_Models_Segment $currentSegment = null;
-
     /**
      * Number of segments which the batch query sends at once
      * @var integer
@@ -142,10 +140,8 @@ trait editor_Services_Connector_BatchTrait
                 'tagMap' => $this->tagHandler->getTagMap(),
             ];
 
-            $this->currentSegment = $segment;
             // collect the segment size in bytes in temporary variable
-            $bufferSize = $this->calculateBufferSize($bufferSize, $querySegment, count($batchQuery) - 1);
-            $this->currentSegment = null;
+            $bufferSize = $this->calculateBufferSize($bufferSize, $querySegment, count($batchQuery) - 1, $segment);
 
             // is the collected buffer size above the allowed limit (if the buffer size limit is not allowed for the resource, this will return true)
             $allowByContent = $this->isAllowedByContentSize($bufferSize);
@@ -174,7 +170,7 @@ trait editor_Services_Connector_BatchTrait
                 $this->initBatchQuery();
 
                 // set the current buffer size to the last segment size
-                $bufferSize = $this->calculateBufferSize(0, $querySegment, 0);
+                $bufferSize = $this->calculateBufferSize(0, $querySegment, 0, $segment);
             } else {
                 //send batch query request, and save the results to the batch cache
                 $this->handleBatchQuerys($batchQuery);
@@ -223,8 +219,12 @@ trait editor_Services_Connector_BatchTrait
     /**
      * Calculates the buffer size of the current batch
      */
-    protected function calculateBufferSize(int|float $currentBufferSize, string $querySegment, int $batchIndex): float|int
-    {
+    protected function calculateBufferSize(
+        int|float $currentBufferSize,
+        string $querySegment,
+        int $batchIndex,
+        editor_Models_Segment $relatedSegment
+    ): float|int {
         return $currentBufferSize + $this->getQuerySegmentSize($querySegment);
     }
 

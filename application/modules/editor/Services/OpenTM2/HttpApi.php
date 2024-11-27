@@ -346,7 +346,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         }
 
         $this->http->setConfig([
-            'timeout' => $this->createTimeout(3),
+            'timeout' => isset($tmName) ? $this->createTimeout(3) : 20,
         ]);
 
         try {
