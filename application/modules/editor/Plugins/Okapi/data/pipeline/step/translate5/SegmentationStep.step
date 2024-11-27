@@ -1,0 +1,10 @@
+#v1
+segmentSource.b=true
+segmentTarget.b=true
+renumberCodes.b=false
+checkSegments.b=false
+forceSegmentedOutput.b=true
+overwriteSegmentation.b=false
+deepenSegmentation.b=true
+doNotSegmentIfHasTarget.b=false
+copySource.b=false
