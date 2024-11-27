@@ -127,6 +127,7 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
      */
     public static function getUserDataDir(): string
     {
+        $errorMsg = null;
         if (empty(self::$userDataDir)) {
             try {
                 /** @var Zend_Config $config */
@@ -440,17 +441,17 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
      * Creates the path for the bconf itself which follllows a fixed naming-schema
      * @throws OkapiException
      */
-    public function getPath(): string
+    public function getPath(string $suffix = ''): string
     {
-        return $this->createPath($this->getFile());
+        return $this->createPath($this->getFile($suffix));
     }
 
     /**
      * Generates the file-name in our data-dir
      */
-    public function getFile(): string
+    public function getFile(string $suffix = ''): string
     {
-        return 'bconf-' . $this->getId() . '.' . self::EXTENSION;
+        return 'bconf-' . $suffix . $this->getId() . '.' . self::EXTENSION;
     }
 
     /**

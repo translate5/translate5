@@ -28,9 +28,10 @@
 
 namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
 
-use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use editor_Plugins_Okapi_Init;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FilterEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use Throwable;
 use ZfExtended_Debug;
 use ZfExtended_Exception;
@@ -61,12 +62,28 @@ final class Packer
 
     /**
      * Creates a BCONF usable for Extraction/Import
+     */
+    public function createExtraction(bool $isOutdatedRepack, bool $isSystemDefault = false): void
+    {
+        $this->createBConf($isOutdatedRepack, $isSystemDefault);
+    }
+
+    /**
+     * Creates a BCONF usable for Merging/Export
+     */
+    public function createMerging(bool $isSystemDefault = false): void
+    {
+        $this->createBConf(false, $isSystemDefault, true);
+    }
+
+    /**
+     * Creates a BCONF
      * @throws BconfInvalidException
      * @throws Throwable
      * @throws ZfExtended_Exception
      * @throws OkapiException
      */
-    public function createExtraction(bool $isOutdatedRepack, bool $isSystemDefault = false): void
+    private function createBConf(bool $isOutdatedRepack, bool $isSystemDefault = false, bool $isExport = false): void
     {
         // we must catch all exceptions of the RandomAccessFile to be able to release the file-pointer properly!
         try {
@@ -76,17 +93,22 @@ final class Packer
             }
 
             // so we can access all files in the bconf's data-dir with file name only
-            $this->raf = new RandomAccessFile($this->bconf->getPath(), 'wb');
+            $this->raf = new RandomAccessFile($this->bconf->getPath($isExport ? 'export-' : ''), 'wb');
 
             $this->raf->writeUTF(BconfEntity::SIGNATURE, false);
             $this->raf->writeInt(BconfEntity::VERSION);
             // TODO BCONF: currently plugins are not supported
             $this->raf->writeInt(BconfEntity::NUM_PLUGINS);
 
-            $content = $this->bconf->getContent();
-            $pipeline = $this->bconf->getPipeline();
-            $this->harvestReferencedFile(1, $content->getSrxFile('source'), $isOutdatedRepack);
-            $this->harvestReferencedFile(2, $content->getSrxFile('target'), $isOutdatedRepack);
+            if ($isExport) {
+                $pipeline = editor_Plugins_Okapi_Init::getDataDir() . 'pipeline/translate5-merging.pln';
+                $pipeline = new Pipeline($pipeline, null, (int) $this->bconf->getId());
+            } else {
+                $content = $this->bconf->getContent();
+                $pipeline = $this->bconf->getPipeline();
+                $this->harvestReferencedFile(1, $content->getSrxFile('source'), $isOutdatedRepack);
+                $this->harvestReferencedFile(2, $content->getSrxFile('target'), $isOutdatedRepack);
+            }
             // Last ID=-1 to mark no more references
             $this->raf->writeInt(-1);
             $this->raf->writeInt(1);
@@ -112,7 +134,7 @@ final class Packer
                 $extensionMapping->complementTranslate5Extensions();
             }
             $extensionMapData = $extensionMapping->getMapForPacking($customIdentifiers);
-            // retrieves an array of pathes !
+            // retrieves an array of paths !
             $defaultFilterFiles = $extensionMapping->getOkapiDefaultFprmsForPacking($customIdentifiers);
 
             // DEBUG
@@ -135,7 +157,7 @@ final class Packer
                 // These are either OKAPI defaults or translate5 adjusted defaults
                 $this->writeFprm($identifier, $path);
             }
-            // write the adjuated extension map
+            // write the adjusted extension map
             $countLines = count($extensionMapData);
             $extMapBinary = ''; // we'll build up the binary format in memory instead of wirting every line itself to file
             foreach ($extensionMapData as $lineData) {
