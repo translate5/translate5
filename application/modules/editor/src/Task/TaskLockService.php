@@ -29,16 +29,37 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Task;
 
 use editor_Models_Task;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\FlockStore;
 use Zend_Registry;
 
-class Lock
+class TaskLockService
 {
-    /***
+    private const LOCK_TTL_SECONDS = 30;
+
+    public function __construct(
+        private readonly LockFactory $lockFactory,
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            new LockFactory(new FlockStore(APPLICATION_DATA . '/lock/task')),
+        );
+    }
+
+    public function getLockForTask(string $taskGuid): TaskLock
+    {
+        return new TaskLock($taskGuid, $this->lockFactory->createLock($taskGuid, self::LOCK_TTL_SECONDS));
+    }
+
+    /**
      * Locking task for given stateId.
      * @param editor_Models_Task $task
      * @return bool
      */
-    public static function taskLock(editor_Models_Task $task, string $lockId): bool
+    public function lockTask(editor_Models_Task $task, string $lockId): bool
     {
         $log = Zend_Registry::get('logger')->cloneMe('editor.task');
 
@@ -61,12 +82,12 @@ class Lock
         return true;
     }
 
-    /***
+    /**
      * Unlock the task if locked and set it to STATE_OPEN
      * @param editor_Models_Task $task
      * @return bool
      */
-    public static function taskUnlock(editor_Models_Task $task): bool
+    public function unlockTask(editor_Models_Task $task): bool
     {
         $log = Zend_Registry::get('logger')->cloneMe('editor.task');
 

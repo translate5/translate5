@@ -73,7 +73,7 @@ final class LspJobActionFeasibilityAssert extends ActionFeasibilityAssert
             return;
         }
 
-        foreach ($this->lspJobRepository->getSubLspJobs($object) as $subJob) {
+        foreach ($this->lspJobRepository->getSubLspJobsOf((int) $object->getId()) as $subJob) {
             $this->assertAllowed($action, $subJob);
         }
     }

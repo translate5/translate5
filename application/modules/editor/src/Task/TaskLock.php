@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,13 +28,30 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\UserJob\Contract;
+namespace MittagQI\Translate5\Task;
 
-use editor_Models_TaskUserAssoc as UserJob;
+use Symfony\Component\Lock\LockInterface;
 
-interface DeleteUserJobAssignmentOperationInterface
+class TaskLock
 {
-    public function delete(UserJob $job): void;
+    public function __construct(
+        public readonly string $taskGuid,
+        private readonly LockInterface $lock,
+    ) {
+    }
 
-    public function forceDelete(UserJob $job): void;
+    public function acquire(bool $blocking = true): bool
+    {
+        return $this->lock->acquire($blocking);
+    }
+
+    public function release(): void
+    {
+        $this->lock->release();
+    }
+
+    public function isAcquired(): bool
+    {
+        return $this->lock->isAcquired();
+    }
 }

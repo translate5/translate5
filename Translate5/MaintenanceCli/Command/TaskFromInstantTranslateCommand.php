@@ -30,7 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Task;
 use editor_Task_Type_Default;
-use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\TaskLockService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -77,7 +77,7 @@ class TaskFromInstantTranslateCommand extends TaskInfoCommand
         }
 
         $wasError = $task->getState() === editor_Models_Task::STATE_ERROR;
-        Lock::taskUnlock($task);
+        TaskLockService::create()->unlockTask($task);
         $task->setState($task::STATE_OPEN);
         $task->setTaskType(editor_Task_Type_Default::ID);
         $task->save();

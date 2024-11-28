@@ -46,7 +46,7 @@ use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
-use MittagQI\Translate5\UserJob\Contract\UpdateUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\UserJob\Contract\UpdateUserJobOperationInterface;
 use MittagQI\Translate5\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
 use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowStepProvidedException;
@@ -58,7 +58,7 @@ use MittagQI\Translate5\UserJob\Validation\TrackChangesRightsValidator;
 use Zend_Registry;
 use ZfExtended_Logger;
 
-class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperationInterface
+class UpdateUserJobOperation implements UpdateUserJobOperationInterface
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,

@@ -34,6 +34,7 @@ use DateTime;
 use editor_Workflow_Default as Workflow;
 use Exception;
 use MittagQI\Translate5\LspJob\Operation\DTO\NewLspJobDto;
+use MittagQI\Translate5\Task\TaskLock;
 use MittagQI\Translate5\UserJob\Exception\InvalidAssignmentDateStringProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidDeadlineDateStringProvidedException;
 use MittagQI\Translate5\UserJob\Exception\InvalidStateProvidedException;
@@ -51,6 +52,7 @@ class NewUserJobDto
         public readonly string $assignmentDate,
         public readonly ?string $deadlineDate,
         public readonly TrackChangesRightsDto $trackChangesRights,
+        public readonly ?TaskLock $taskLock = null,
     ) {
         if (! in_array($state, Workflow::getAllStates())) {
             throw new InvalidStateProvidedException();
@@ -64,16 +66,14 @@ class NewUserJobDto
             }
         }
 
-        if (null !== $assignmentDate) {
-            try {
-                new DateTime($assignmentDate);
-            } catch (Exception) {
-                throw new InvalidAssignmentDateStringProvidedException();
-            }
+        try {
+            new DateTime($assignmentDate);
+        } catch (Exception) {
+            throw new InvalidAssignmentDateStringProvidedException();
         }
     }
 
-    public static function fromLspJobDto(NewLspJobDto $userJobDto): self
+    public static function fromLspJobDto(NewLspJobDto $userJobDto, TaskLock $taskLock): self
     {
         return new self(
             $userJobDto->taskGuid,
@@ -85,6 +85,7 @@ class NewUserJobDto
             $userJobDto->assignmentDate,
             $userJobDto->deadlineDate,
             $userJobDto->trackChangesRights,
+            $taskLock
         );
     }
 }

@@ -31,22 +31,30 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\UserJob\Operation\WithAuthentication;
 
 use editor_Models_TaskUserAssoc as UserJob;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
+use MittagQI\Translate5\UserJob\Contract\CreateUserJobOperationInterface;
+use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_NotFoundException;
 
-class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperationInterface
+class CreateUserJobOperation implements CreateUserJobOperationInterface
 {
     public function __construct(
-        private readonly ActionPermissionAssertInterface $permissionAssert,
-        private readonly DeleteUserJobAssignmentOperationInterface $operation,
+        private readonly CreateUserJobOperationInterface $operation,
+        private readonly ActionPermissionAssertInterface $userPermissionAssert,
+        private readonly ActionPermissionAssertInterface $taskPermissionAssert,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly TaskRepository $taskRepository,
     ) {
     }
 
@@ -56,35 +64,30 @@ class DeleteUserJobAssignmentOperation implements DeleteUserJobAssignmentOperati
     public static function create(): self
     {
         return new self(
-            UserJobActionPermissionAssert::create(),
-            \MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation::create(),
+            \MittagQI\Translate5\UserJob\Operation\CreateUserJobOperation::create(),
+            UserActionPermissionAssert::create(),
+            TaskActionPermissionAssert::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            TaskRepository::create(),
         );
     }
 
-    public function delete(UserJob $job): void
+    public function assignJob(NewUserJobDto $dto): UserJob
     {
-        $this->assertAccess($job);
+        try {
+            $authUser = $this->userRepository->get($this->authentication->getUserId());
+        } catch (InexistentUserException) {
+            throw new ZfExtended_NotFoundException();
+        }
 
-        $this->operation->delete($job);
-    }
+        $context = new PermissionAssertContext($authUser);
+        $task = $this->taskRepository->getByGuid($dto->taskGuid);
+        $user = $this->userRepository->getByGuid($dto->userGuid);
 
-    public function forceDelete(UserJob $job): void
-    {
-        $this->assertAccess($job);
+        $this->taskPermissionAssert->assertGranted(TaskAction::AssignJob, $task, $context);
+        $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
 
-        $this->operation->forceDelete($job);
-    }
-
-    private function assertAccess(UserJob $job): void
-    {
-        $authUser = $this->userRepository->get($this->authentication->getUserId());
-
-        $this->permissionAssert->assertGranted(
-            Action::Delete,
-            $job,
-            new PermissionAssertContext($authUser),
-        );
+        return $this->operation->assignJob($dto);
     }
 }

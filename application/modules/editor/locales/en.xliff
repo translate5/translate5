@@ -10307,13 +10307,17 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Bestätigen Sie die Änderung des Workflows</source>
                 <target>Confirm workflow change</target>
             </trans-unit>
-            <trans-unit id='RXMgZ2lidCBiZXJlaXRzIGVpbmUgYmVzdMOkdGlndGUga29ua3VycmllcmVuZGUgQXVmdHJhZ3N2ZXJnYWJlRXMgZ2lidCBiZXJlaXRzIGVpbmUgYmVzdMOkdGlndGUga29ua3VycmllcmVuZGUgQXVmdHJhZ3N2ZXJnYWJl'>
+            <trans-unit id='RXMgZ2lidCBiZXJlaXRzIGVpbmUgYmVzdMOkdGlndGUga29ua3VycmllcmVuZGUgQXVmdHJhZ3N2ZXJnYWJl'>
                 <source>Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe</source>
                 <target>Confirmed competitive job assignment already exsists</target>
             </trans-unit>
             <trans-unit id='RGVyIEtvb3JkaW5hdG9yIGhhdCBkZW4gTFNQLUF1ZnRyYWcgbm9jaCBuaWNodCBiZXN0w6R0aWd0'>
                 <source>Der Koordinator hat den LSP-Auftrag noch nicht bestätigt</source>
                 <target>Coordinator has not yet confirmed the LSP job</target>
+            </trans-unit>
+            <trans-unit id='SWhyZSBadXdlaXN1bmcgenVyIEF1ZmdhYmUgd3VyZGUgZW50ZmVybnQsIGRhaGVyIGvDtm5uZW4gU2llIGRpZXNlIG5pY2h0IG1laHIgenVyIEJlYXJiZWl0dW5nIMO2ZmZuZW4u'>
+                <source>Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.</source>
+                <target>Your job was removed, therefore you are not allowed to access that task anymore.</target>
             </trans-unit>
         </body>
     </file>

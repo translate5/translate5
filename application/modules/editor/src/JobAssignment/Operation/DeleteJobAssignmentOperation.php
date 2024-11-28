@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\JobAssignment\Operation;
 use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class DeleteJobAssignmentOperation
@@ -42,7 +42,7 @@ class DeleteJobAssignmentOperation
         private readonly UserJobRepository $userJobRepository,
         private readonly LspJobRepository $lspJobRepository,
         private readonly DeleteLspJobAssignmentOperation $deleteLspJob,
-        private readonly DeleteUserJobAssignmentOperation $deleteUserJob,
+        private readonly DeleteUserJobOperation $deleteUserJob,
     ) {
     }
 
@@ -52,7 +52,7 @@ class DeleteJobAssignmentOperation
             UserJobRepository::create(),
             LspJobRepository::create(),
             DeleteLspJobAssignmentOperation::create(),
-            DeleteUserJobAssignmentOperation::create(),
+            DeleteUserJobOperation::create(),
         );
     }
 

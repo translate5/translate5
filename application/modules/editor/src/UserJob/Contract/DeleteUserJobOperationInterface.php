@@ -28,8 +28,13 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\Exception;
+namespace MittagQI\Translate5\UserJob\Contract;
 
-class CompetitiveJobAlreadyTakenException extends \Exception
+use MittagQI\Translate5\UserJob\Operation\DTO\UserJobToDelete;
+
+interface DeleteUserJobOperationInterface
 {
+    public function delete(UserJobToDelete $toDelete): void;
+
+    public function forceDelete(UserJobToDelete $toDelete): void;
 }

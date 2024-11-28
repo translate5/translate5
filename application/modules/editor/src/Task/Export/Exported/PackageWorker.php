@@ -33,12 +33,21 @@ use editor_Models_Export_Exported_ZipDefaultWorker;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Export\Package\ExportSource;
-use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\TaskLockService;
 use SplFileInfo;
 use ZfExtended_Utils;
 
 class PackageWorker extends editor_Models_Export_Exported_ZipDefaultWorker
 {
+    private TaskLockService $lock;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->lock = TaskLockService::create();
+    }
+
     /**
      * Inits the worker in a way to create an export.zip, returns the temp zip name
      * @param string $taskGuid
@@ -66,6 +75,6 @@ class PackageWorker extends editor_Models_Export_Exported_ZipDefaultWorker
         // add the worker id as file suffix, so we can make difference between exports
         rename($params['zipFile'], Downloader::getZipFile($task, $this->workerModel->getId()));
 
-        Lock::taskUnlock($task);
+        $this->lock->unlockTask($task);
     }
 }

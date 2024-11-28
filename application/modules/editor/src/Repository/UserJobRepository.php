@@ -80,11 +80,11 @@ class UserJobRepository
         return $job;
     }
 
-    public function delete(UserJob $job): void
+    public function delete(int $jobId): void
     {
         $this->db->delete(
             UserJobTable::TABLE_NAME,
-            $this->db->quoteInto('id = ?', $job->getId())
+            $this->db->quoteInto('id = ?', $jobId)
         );
     }
 
@@ -239,9 +239,9 @@ class UserJobRepository
             ->select()
             ->from(UserJobTable::TABLE_NAME, 'count(*)')
             ->where('taskGuid = ?', $taskGuid)
-            ->where('workflow != ?', $workflow)
+            ->where('workflow = ?', $workflow)
             ->where('workflowStepName = ?', $workflowStepName)
-            ->where('state in (?)', [Workflow::STATE_WAITING, Workflow::STATE_OPEN])
+            ->where('state in (?)', [Workflow::STATE_WAITING, Workflow::STATE_OPEN, Workflow::STATE_EDIT])
         ;
 
         return (int) $this->db->fetchOne($select) > 0;

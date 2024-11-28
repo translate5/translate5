@@ -31,30 +31,23 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\UserJob\Operation\WithAuthentication;
 
 use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\TaskAction;
-use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\UserAction;
-use MittagQI\Translate5\User\Exception\InexistentUserException;
-use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
+use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
+use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
+use MittagQI\Translate5\UserJob\Operation\DTO\UserJobToDelete;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_NotFoundException;
 
-class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperationInterface
+class DeleteUserJobOperation implements DeleteUserJobOperationInterface
 {
     public function __construct(
-        private readonly CreateUserJobAssignmentOperationInterface $operation,
-        private readonly ActionPermissionAssertInterface $userPermissionAssert,
-        private readonly ActionPermissionAssertInterface $taskPermissionAssert,
+        private readonly ActionPermissionAssertInterface $permissionAssert,
+        private readonly DeleteUserJobOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
-        private readonly TaskRepository $taskRepository,
     ) {
     }
 
@@ -64,30 +57,35 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
     public static function create(): self
     {
         return new self(
-            \MittagQI\Translate5\UserJob\Operation\CreateUserJobAssignmentOperation::create(),
-            UserActionPermissionAssert::create(),
-            TaskActionPermissionAssert::create(),
+            UserJobActionPermissionAssert::create(),
+            \MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
-            TaskRepository::create(),
         );
     }
 
-    public function assignJob(NewUserJobDto $dto): UserJob
+    public function delete(UserJobToDelete $toDelete): void
     {
-        try {
-            $authUser = $this->userRepository->get($this->authentication->getUserId());
-        } catch (InexistentUserException) {
-            throw new ZfExtended_NotFoundException();
-        }
+        $this->assertAccess($toDelete->job);
 
-        $context = new PermissionAssertContext($authUser);
-        $task = $this->taskRepository->getByGuid($dto->taskGuid);
-        $user = $this->userRepository->getByGuid($dto->userGuid);
+        $this->operation->delete($toDelete);
+    }
 
-        $this->taskPermissionAssert->assertGranted(TaskAction::AssignJob, $task, $context);
-        $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
+    public function forceDelete(UserJobToDelete $toDelete): void
+    {
+        $this->assertAccess($toDelete->job);
 
-        return $this->operation->assignJob($dto);
+        $this->operation->forceDelete($toDelete);
+    }
+
+    private function assertAccess(UserJob $job): void
+    {
+        $authUser = $this->userRepository->get($this->authentication->getUserId());
+
+        $this->permissionAssert->assertGranted(
+            Action::Delete,
+            $job,
+            new PermissionAssertContext($authUser),
+        );
     }
 }

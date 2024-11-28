@@ -31,10 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Db_Task as TaskTable;
-use editor_Models_Task as Task;
 use editor_Models_Db_TaskUserAssoc as UserJobTable;
+use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
 use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LspJob\Exception\InexistentLspJobException;
 use MittagQI\Translate5\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
@@ -86,9 +85,12 @@ class LspJobRepository
         }
     }
 
-    public function delete(LspJobAssociation $job): void
+    public function delete(int $jobId): void
     {
-        $job->delete();
+        $this->db->delete(
+            LspJobAssociationTable::TABLE_NAME,
+            $this->db->quoteInto('id = ?', $jobId)
+        );
     }
 
     /**
@@ -154,6 +156,63 @@ class LspJobRepository
         return (int) $this->db->fetchOne($select) > 0;
     }
 
+    public function findLspJobOfCoordinatorInTas(
+        string $userGuid,
+        string $taskGuid,
+        string $workflowStepName
+    ): ?LspJobAssociation {
+        $select = $this->db
+            ->select()
+            ->from([
+                'lspJob' => LspJobAssociationTable::TABLE_NAME,
+            ])
+            ->join(
+                [
+                    'task' => TaskTable::TABLE_NAME,
+                ],
+                'lspJob.taskGuid = task.taskGuid',
+                []
+            )
+            ->join(
+                [
+                    'userJob' => UserJobTable::TABLE_NAME,
+                ],
+                'userJob.lspJobId = lspJob.id',
+                []
+            )
+            ->join(
+                [
+                    'user' => ZfExtended_Models_Db_User::TABLE_NAME,
+                ],
+                'lspUser.userId = user.id',
+                []
+            )
+            ->where('lspJob.taskGuid = ?', $taskGuid)
+            ->where('lspJob.workflowStepName = ?', $workflowStepName)
+            ->where('user.userGuid = ?', $userGuid)
+        ;
+
+        $row = $this->db->fetchRow($select);
+
+        if (empty($row)) {
+            return null;
+        }
+
+        $job = new LspJobAssociation();
+        $job->init(
+            new \Zend_Db_Table_Row(
+                [
+                    'table' => $job->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $job;
+    }
+
     public function coordinatorAssignedToLspJobs(JobCoordinator $coordinator): bool
     {
         $select = $this->db
@@ -183,11 +242,11 @@ class LspJobRepository
      */
     public function getLspJobs(int $lspId): iterable
     {
-        $job = ZfExtended_Factory::get(LspJobAssociation::class);
+        $job = new LspJobAssociation();
 
         $select = $this->db
             ->select()
-            ->from($job->db->info($job->db::NAME))
+            ->from(LspJobAssociationTable::TABLE_NAME)
             ->where('lspId = ?', $lspId)
         ;
 
@@ -214,17 +273,16 @@ class LspJobRepository
      */
     public function getLspJobsOfCustomer(int $lspId, int $customerId): iterable
     {
-        $job = ZfExtended_Factory::get(LspJobAssociation::class);
-        $taskDb = ZfExtended_Factory::get(Task::class)->db;
+        $job = new LspJobAssociation();
 
         $select = $this->db
             ->select()
             ->from([
-                'lspJob' => $job->db->info($job->db::NAME),
+                'lspJob' => LspJobAssociationTable::TABLE_NAME,
             ])
             ->join(
                 [
-                    'task' => $taskDb->info($taskDb::NAME),
+                    'task' => TaskTable::TABLE_NAME,
                 ],
                 'lspJob.taskGuid = task.taskGuid',
                 []
@@ -253,14 +311,11 @@ class LspJobRepository
 
     public function coordinatorHasLspJobsOfCustomer(string $userGuid, int $customerId): bool
     {
-        $job = ZfExtended_Factory::get(LspJobAssociation::class);
-        $taskDb = ZfExtended_Factory::get(Task::class)->db;
-
         $select = $this->db
             ->select()
             ->from(
                 [
-                    'lspJob' => $job->db->info($job->db::NAME),
+                    'lspJob' => LspJobAssociationTable::TABLE_NAME,
                 ],
                 'COUNT(*)'
             )
@@ -273,7 +328,7 @@ class LspJobRepository
             )
             ->join(
                 [
-                    'task' => $taskDb->info($taskDb::NAME),
+                    'task' => TaskTable::TABLE_NAME,
                 ],
                 'lspJob.taskGuid = task.taskGuid',
                 []
@@ -288,24 +343,30 @@ class LspJobRepository
     /**
      * @return iterable<LspJobAssociation>
      */
-    public function getSubLspJobs(LspJobAssociation $lspJob): iterable
+    public function getSubLspJobsOf(int $lspJobId): iterable
     {
         $job = ZfExtended_Factory::get(LspJobAssociation::class);
-        $lsp = ZfExtended_Factory::get(LanguageServiceProvider::class);
 
         $select = $this->db
             ->select()
             ->from([
-                'lspJob' => $job->db->info($job->db::NAME),
+                'lspJob' => LspJobAssociationTable::TABLE_NAME,
             ])
             ->join(
                 [
-                    'lsp' => $lsp->db->info($lsp->db::NAME),
+                    'parentLspJob' => LspJobAssociationTable::TABLE_NAME,
                 ],
-                'lsp.Id = lspJob.lspId',
+                implode(
+                    ' AND ',
+                    [
+                        'lspJob.lspId = lspJob.lspId',
+                        'lspJob.taskGuid = parentLspJob.taskGuid',
+                        'lspJob.workflowStepName = parentLspJob.workflowStepName',
+                    ]
+                ),
                 []
             )
-            ->where('lsp.parentId = ?', $lspJob->getLspId())
+            ->where('parentLspJob.id = ?', $lspJobId)
         ;
 
         foreach ($this->db->fetchAll($select) as $jobData) {

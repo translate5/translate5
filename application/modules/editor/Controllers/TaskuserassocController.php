@@ -65,8 +65,8 @@ use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobEx
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\UserJob\Operation\Factory\NewUserJobDtoFactory;
 use MittagQI\Translate5\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
-use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobAssignmentOperation;
-use MittagQI\Translate5\UserJob\Operation\WithAuthentication\UpdateUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\Operation\WithAuthentication\CreateUserJobOperation;
+use MittagQI\Translate5\UserJob\Operation\WithAuthentication\UpdateUserJobOperation;
 use MittagQI\Translate5\UserJob\TypeEnum;
 use MittagQI\Translate5\UserJob\UserJobViewDataProvider;
 use ZfExtended_Models_Entity_Conflict as EntityConflictException;
@@ -280,7 +280,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
             $dto = UpdateUserJobDtoFactory::create()->fromRequest($this->getRequest());
 
-            UpdateUserJobAssignmentOperation::create()->update($job, $dto);
+            UpdateUserJobOperation::create()->update($job, $dto);
 
             $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($job, $authUser);
         } catch (Throwable $e) {
@@ -306,7 +306,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 $lspJob = CreateLspJobAssignmentOperation::create()->assignJob(NewLspJobDto::fromUserJobDto($dto));
                 $userJob = UserJobRepository::create()->getDataJobByLspJob((int) $lspJob->getId());
             } else {
-                $userJob = CreateUserJobAssignmentOperation::create()->assignJob($dto);
+                $userJob = CreateUserJobOperation::create()->assignJob($dto);
             }
 
             $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($userJob, $authUser);

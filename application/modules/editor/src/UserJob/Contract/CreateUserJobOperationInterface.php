@@ -42,7 +42,7 @@ use MittagQI\Translate5\UserJob\Exception\OnlyOneUniqueLspJobCanBeAssignedPerTas
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 
-interface CreateUserJobAssignmentOperationInterface
+interface CreateUserJobOperationInterface
 {
     /**
      * @throws ConfirmedCompetitiveJobAlreadyExistsException

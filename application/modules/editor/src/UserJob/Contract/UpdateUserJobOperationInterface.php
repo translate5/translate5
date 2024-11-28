@@ -28,8 +28,24 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\Exception;
+namespace MittagQI\Translate5\UserJob\Contract;
 
-class CompetitiveJobAlreadyTakenException extends \Exception
+use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
+use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowStepProvidedException;
+use MittagQI\Translate5\UserJob\Operation\DTO\UpdateUserJobDto;
+
+interface UpdateUserJobOperationInterface
 {
+    /**
+     * @throws FeasibilityExceptionInterface
+     * @throws TaskHasCriticalQualityErrorsException
+     * @throws InvalidWorkflowStepProvidedException
+     * @throws PermissionExceptionInterface
+     * @throws InexistentUserException
+     */
+    public function update(UserJob $job, UpdateUserJobDto $dto): void;
 }

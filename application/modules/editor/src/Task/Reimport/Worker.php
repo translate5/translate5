@@ -33,7 +33,7 @@ use editor_Models_Task as Task;
 use editor_Models_Task_AbstractWorker;
 use editor_Models_TaskUserAssoc;
 use MittagQI\Translate5\Acl\Rights;
-use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use ReflectionException;
@@ -60,6 +60,15 @@ class Worker extends editor_Models_Task_AbstractWorker
      */
     public const FILEFILTER_CONTEXT_NEW = 'REIMPORT_CHECK_NEW';
 
+    private TaskLockService $lock;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->lock = TaskLockService::create();
+    }
+
     protected function validateParameters(array $parameters): bool
     {
         $neededEntries = ['files', 'userGuid', 'segmentTimestamp', 'dataProviderClass'];
@@ -81,7 +90,7 @@ class Worker extends editor_Models_Task_AbstractWorker
         $tua = $this->prepareTaskUserAssociation($this->task, $user);
 
         try {
-            Lock::taskLock($this->task, $this->task::STATE_REIMPORT);
+            $this->lock->lockTask($this->task, $this->task::STATE_REIMPORT);
 
             $reimportFile = ZfExtended_Factory::get(ReimportFile::class, [
                 $this->task,
@@ -103,7 +112,7 @@ class Worker extends editor_Models_Task_AbstractWorker
             if ($tua->getIsPmOverride()) {
                 $tua->delete();
             }
-            Lock::taskUnlock($this->task);
+            $this->lock->unlockTask($this->task);
 
             $this->archiveImportedData($this->task, $params['files']);
             $this->cleanupImportFolder($params['dataProviderClass'], $this->task);

@@ -41,7 +41,8 @@ use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Contract\CreateUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\Task\TaskLockService;
+use MittagQI\Translate5\UserJob\Contract\CreateUserJobOperationInterface;
 use MittagQI\Translate5\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
@@ -49,10 +50,11 @@ use MittagQI\Translate5\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\UserJob\TypeEnum;
 use MittagQI\Translate5\UserJob\Validation\CompetitiveJobCreationValidator;
 use MittagQI\Translate5\UserJob\Validation\TrackChangesRightsValidator;
+use RuntimeException;
 use Zend_Registry;
 use ZfExtended_Logger;
 
-class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperationInterface
+class CreateUserJobOperation implements CreateUserJobOperationInterface
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
@@ -61,6 +63,7 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
         private readonly TaskRepository $taskRepository,
         private readonly TrackChangesRightsValidator $trackChangesRightsValidator,
         private readonly CompetitiveJobCreationValidator $competitiveJobCreationValidator,
+        private readonly TaskLockService $taskLockService,
         private readonly ZfExtended_Logger $logger,
     ) {
     }
@@ -77,69 +80,80 @@ class CreateUserJobAssignmentOperation implements CreateUserJobAssignmentOperati
             TaskRepository::create(),
             TrackChangesRightsValidator::create(),
             CompetitiveJobCreationValidator::create(),
+            TaskLockService::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.create'),
         );
     }
 
     public function assignJob(NewUserJobDto $dto): UserJob
     {
-        $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
+        $taskLock = $dto->taskLock ?: $this->taskLockService->getLockForTask($dto->taskGuid);
 
-        $this->assertLspUserCanBeAssignedToJobType($lspUser, $dto->type);
-
-        $lspJob = null;
-
-        if (null !== $lspUser) {
-            $lspJob = $this->resolveLspJob((int) $lspUser->lsp->getId(), $dto);
-
-            $this->validateTrackChangesSettings($lspJob, $dto);
+        if (! $taskLock->isAcquired() && ! $taskLock->acquire()) {
+            throw new RuntimeException('Could not acquire lock for task ' . $dto->taskGuid);
         }
 
-        $task = $this->taskRepository->getByGuid($dto->taskGuid);
+        try {
+            $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
 
-        if (TypeEnum::Lsp !== $dto->type) {
-            $this->competitiveJobCreationValidator->assertCanCreate(
-                $task,
-                $lspJob,
-                $dto->workflow->workflow,
-                $dto->workflow->workflowStepName,
-            );
+            $this->assertLspUserCanBeAssignedToJobType($lspUser, $dto->type);
+
+            $lspJob = null;
+
+            if (null !== $lspUser) {
+                $lspJob = $this->resolveLspJob((int)$lspUser->lsp->getId(), $dto);
+
+                $this->validateTrackChangesSettings($lspJob, $dto);
+            }
+
+            $task = $this->taskRepository->getByGuid($dto->taskGuid);
+
+            if (TypeEnum::Lsp !== $dto->type) {
+                $this->competitiveJobCreationValidator->assertCanCreate(
+                    $task,
+                    $lspJob,
+                    $dto->workflow->workflow,
+                    $dto->workflow->workflowStepName,
+                );
+            }
+
+            $job = $this->userJobRepository->getEmptyModel();
+            $job->setTaskGuid($task->getTaskGuid());
+            $job->setUserGuid($dto->userGuid);
+            $job->setState($dto->state);
+            $job->setRole($dto->workflow->role);
+            $job->setWorkflow($dto->workflow->workflow);
+            $job->setWorkflowStepName($dto->workflow->workflowStepName);
+            $job->setType($dto->type);
+            $job->setAssignmentDate($dto->assignmentDate);
+            $job->setDeadlineDate($dto->deadlineDate);
+            $job->setTrackchangesShow((int)$dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
+            $job->setTrackchangesShowAll((int)$dto->trackChangesRights->canSeeAllTrackChanges);
+            $job->setTrackchangesAcceptReject((int)$dto->trackChangesRights->canAcceptOrRejectTrackChanges);
+
+            if (null !== $lspJob) {
+                $job->setLspJobId($lspJob->getId());
+            }
+
+            if (null !== $dto->segmentRange) {
+                $job->setSegmentrange($dto->segmentRange);
+            }
+
+            $job->validate();
+
+            $job->createstaticAuthHash();
+
+            $this->userJobRepository->save($job);
+
+            $this->logger->info('E1012', 'job created', [
+                'task' => $task,
+                'tua' => $job->getSanitizedEntityForLog(),
+            ]);
+
+            return $job;
+        } finally {
+            $taskLock->release();
         }
-
-        $job = $this->userJobRepository->getEmptyModel();
-        $job->setTaskGuid($task->getTaskGuid());
-        $job->setUserGuid($dto->userGuid);
-        $job->setState($dto->state);
-        $job->setRole($dto->workflow->role);
-        $job->setWorkflow($dto->workflow->workflow);
-        $job->setWorkflowStepName($dto->workflow->workflowStepName);
-        $job->setType($dto->type);
-        $job->setAssignmentDate($dto->assignmentDate);
-        $job->setDeadlineDate($dto->deadlineDate);
-        $job->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
-        $job->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
-        $job->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
-
-        if (null !== $lspJob) {
-            $job->setLspJobId($lspJob->getId());
-        }
-
-        if (null !== $dto->segmentRange) {
-            $job->setSegmentrange($dto->segmentRange);
-        }
-
-        $job->validate();
-
-        $job->createstaticAuthHash();
-
-        $this->userJobRepository->save($job);
-
-        $this->logger->info('E1012', 'job created', [
-            'task' => $task,
-            'tua' => $job->getSanitizedEntityForLog(),
-        ]);
-
-        return $job;
     }
 
     /**

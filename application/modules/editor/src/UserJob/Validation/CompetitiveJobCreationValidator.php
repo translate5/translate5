@@ -73,7 +73,11 @@ class CompetitiveJobCreationValidator
             $workflowStepName
         );
 
-        if (null === $lspJob && $taskHasConfirmedJob) {
+        if (! $taskHasConfirmedJob) {
+            return;
+        }
+
+        if (null === $lspJob) {
             throw new ConfirmedCompetitiveJobAlreadyExistsException();
         }
 

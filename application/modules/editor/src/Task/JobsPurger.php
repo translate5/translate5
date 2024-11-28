@@ -34,15 +34,15 @@ use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface
 use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
+use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 
 class JobsPurger
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
         private readonly LspJobRepository $lspJobRepository,
-        private readonly DeleteUserJobAssignmentOperationInterface $deleteUserJobAssignmentOperation,
+        private readonly DeleteUserJobOperationInterface $deleteUserJobAssignmentOperation,
         private readonly DeleteLspJobAssignmentOperationInterface $deleteLspJobAssignmentOperation,
     ) {
     }
@@ -52,7 +52,7 @@ class JobsPurger
         return new self(
             UserJobRepository::create(),
             LspJobRepository::create(),
-            DeleteUserJobAssignmentOperation::create(),
+            DeleteUserJobOperation::create(),
             DeleteLspJobAssignmentOperation::create(),
         );
     }

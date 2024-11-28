@@ -40,17 +40,17 @@ use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\UserJob\ActionAssert\UserJobAction;
-use MittagQI\Translate5\UserJob\Contract\UpdateUserJobAssignmentOperationInterface;
+use MittagQI\Translate5\UserJob\Contract\UpdateUserJobOperationInterface;
 use MittagQI\Translate5\UserJob\Exception\InvalidWorkflowStepProvidedException;
 use MittagQI\Translate5\UserJob\Operation\DTO\UpdateUserJobDto;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 
-class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperationInterface
+class UpdateUserJobOperation implements UpdateUserJobOperationInterface
 {
     public function __construct(
         private readonly ActionPermissionAssertInterface $permissionAssert,
-        private readonly UpdateUserJobAssignmentOperationInterface $operation,
+        private readonly UpdateUserJobOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
@@ -65,7 +65,7 @@ class UpdateUserJobAssignmentOperation implements UpdateUserJobAssignmentOperati
     {
         return new self(
             UserJobActionPermissionAssert::create(),
-            \MittagQI\Translate5\UserJob\Operation\UpdateUserJobAssignmentOperation::create(),
+            \MittagQI\Translate5\UserJob\Operation\UpdateUserJobOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
             JobCoordinatorRepository::create(),

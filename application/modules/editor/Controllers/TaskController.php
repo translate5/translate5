@@ -47,7 +47,7 @@ use MittagQI\Translate5\Task\Import\ProjectWorkersService;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\JobsPurger;
-use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
@@ -1679,6 +1679,7 @@ class editor_TaskController extends ZfExtended_RestController
     {
         $this->initCurrentTask(false);
         $task = $this->getCurrentTask();
+        $lock = TaskLockService::create();
 
         try {
             $data = [];
@@ -1696,12 +1697,12 @@ class editor_TaskController extends ZfExtended_RestController
             if ($data['file_available']) {
                 $data['download_link'] = $downloader->getDownloadLink($task, $this->getParam('workerId'));
 
-                Lock::taskUnlock($task);
+                $lock->unlockTask($task);
             }
 
             echo Zend_Json::encode($data);
         } catch (Throwable $throwable) {
-            Lock::taskUnlock($task);
+            $lock->unlockTask($task);
 
             throw $throwable;
         }
@@ -1721,6 +1722,8 @@ class editor_TaskController extends ZfExtended_RestController
             echo 'Maintenance is scheduled, exports are not possible at the moment.';
             exit;
         }
+
+        $lock = TaskLockService::create();
 
         // Info: only 1 task export per task is allowed. In case user trys to export task which has already running
         // exports, the user will get error message. This is checked by checkExportAllowed and this function must be
@@ -1790,7 +1793,7 @@ class editor_TaskController extends ZfExtended_RestController
                     // check the view bellow for more info
                     echo $this->view->render('task/packageexport.phtml');
                 } catch (Throwable $exception) {
-                    Lock::taskUnlock($this->entity);
+                    $lock->unlockTask($this->entity);
 
                     $this->taskLog->exception($exception, [
                         'extra' => [

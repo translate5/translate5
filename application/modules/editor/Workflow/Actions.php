@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\JobAssignment\Exception\CompetitiveJobAlreadyTakenException;
 use MittagQI\Translate5\JobAssignment\Workflow\CompetitiveJobsRemover;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\Export\Package\Remover;
@@ -129,44 +130,30 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
     public function removeCompetitiveUsers(): void
     {
         $task = $this->config->task;
+
         if ($task->getUsageMode() !== $task::USAGE_MODE_COMPETITIVE) {
             return;
         }
 
         $userGuid = $this->currentUser()->getUserGuid();
-        $tua = $this->config->newTua;
 
-        if (null === $tua) {
-            $tua = $this->userJobRepository->findUserJobInTask(
+        try {
+            $this->competitiveJobsRemover->removeCompetitorsOfJobFor(
                 $userGuid,
                 $task->getTaskGuid(),
                 $task->getWorkflowStepName()
             );
-        }
-
-        $deleted = $tua->deleteOtherUsers($task->getTaskGuid(), $userGuid, $tua->getWorkflowStepName());
-
-        if ($deleted !== false) {
-            $notifier = ZfExtended_Factory::get('editor_Workflow_Notification');
-            /* @var $notifier editor_Workflow_Notification */
-            $notifier->init($this->config);
-            $notifier->notifyCompetitiveDeleted([
-                'deleted' => $deleted,
-                'currentUser' => $this->currentUser()->getDataObject(),
+        } catch (CompetitiveJobAlreadyTakenException) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1160' => 'The competitive users can not be removed, '
+                    . 'probably some other user was faster and you are not assigned anymore to that task.',
             ]);
 
-            return;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1160', [
+                'noField' => 'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, '
+                    . 'eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.',
+            ]);
         }
-
-        ZfExtended_Models_Entity_Conflict::addCodes([
-            'E1160' => 'The competitive users can not be removed, '
-                . 'probably some other user was faster and you are not assigned anymore to that task.',
-        ]);
-
-        throw ZfExtended_Models_Entity_Conflict::createResponse('E1160', [
-            'noField' => 'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, '
-                . 'eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.',
-        ]);
     }
 
     /***

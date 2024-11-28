@@ -30,20 +30,25 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\Workflow;
 
-use editor_Models_Task;
+use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\JobAssignment\Exception\CompetitiveJobAlreadyTakenException;
 use MittagQI\Translate5\JobAssignment\Notification\DeletedCompetitorsNotification;
 use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
+use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 use MittagQI\Translate5\Workflow\Notification\DTO\DeletedJobDto;
+use RuntimeException;
 
 class CompetitiveJobsRemover
 {
@@ -52,9 +57,11 @@ class CompetitiveJobsRemover
         private readonly UserJobRepository $userJobRepository,
         private readonly LspJobRepository $lspJobRepository,
         private readonly TaskRepository $taskRepository,
-        private readonly DeleteUserJobAssignmentOperationInterface $deleteUserJobOperation,
+        private readonly LspRepositoryInterface $lspRepository,
+        private readonly DeleteUserJobOperationInterface $deleteUserJobOperation,
         private readonly DeleteLspJobAssignmentOperationInterface $deleteLspJobOperation,
         private readonly DeletedCompetitorsNotification $notificator,
+        private readonly TaskLockService $lock,
     ) {
     }
 
@@ -65,17 +72,73 @@ class CompetitiveJobsRemover
             UserJobRepository::create(),
             LspJobRepository::create(),
             TaskRepository::create(),
-            DeleteUserJobAssignmentOperation::create(),
+            LspRepository::create(),
+            DeleteUserJobOperation::create(),
             DeleteLspJobAssignmentOperation::create(),
             DeletedCompetitorsNotification::create(),
+            TaskLockService::create(),
         );
     }
 
-    public function removeCompetitorsOfUserJob(UserJob $job): void
+    /**
+     * @throws CompetitiveJobAlreadyTakenException
+     */
+    public function removeCompetitorsOfJobFor(string $userGuid, string $taskGuid, string $workflowStepName): void
     {
-        $task = $this->taskRepository->getByGuid($job->getTaskGuid());
-        $responsibleUser = $this->userRepository->getByGuid($job->getUserGuid());
-        $anonymizeUsers = $task->anonymizeUsers(false);
+        $lock = $this->lock->getLockForTask($taskGuid);
+
+        if (! $lock->acquire()) {
+            throw new RuntimeException('Could not acquire lock for task ' . $taskGuid);
+        }
+
+        try {
+            $task = $this->taskRepository->getByGuid($taskGuid);
+            $responsibleUser = $this->userRepository->getByGuid($userGuid);
+            $anonymizeUsers = $task->anonymizeUsers(false);
+
+            $userJob = $this->userJobRepository->findUserJobInTask(
+                $userGuid,
+                $taskGuid,
+                $workflowStepName,
+            );
+
+            if (null !== $userJob) {
+                $this->removeCompetitorsOfUserJob($userJob, $task, $responsibleUser, $anonymizeUsers);
+
+                return;
+            }
+
+            $lspJob = $this->lspJobRepository->findLspJobOfCoordinatorInTas(
+                $userGuid,
+                $taskGuid,
+                $workflowStepName,
+            );
+
+            if (null !== $lspJob) {
+                $this->removeCompetitorsOfLspJob($lspJob, $task, $responsibleUser, $anonymizeUsers);
+
+                return;
+            }
+
+            throw new CompetitiveJobAlreadyTakenException();
+        } finally {
+            $lock->release();
+        }
+    }
+
+    /**
+     * @throws CompetitiveJobAlreadyTakenException
+     */
+    private function removeCompetitorsOfUserJob(
+        UserJob $job,
+        Task $task,
+        User $responsibleUser,
+        bool $anonymizeUsers,
+    ): void {
+        if ($job->isLspUserJob()) {
+            // for now LSP user jobs behave like cooperative jobs
+            return;
+        }
 
         $lspJobs = $this->lspJobRepository->getByTaskGuidAndWorkflow(
             $job->getTaskGuid(),
@@ -96,11 +159,21 @@ class CompetitiveJobsRemover
         }
     }
 
-    public function removeCompetitorsOfLspJob(LspJobAssociation $job): void
-    {
-        $task = $this->taskRepository->getByGuid($job->getTaskGuid());
-        $responsibleUser = $this->userRepository->getByGuid($job->getUserGuid());
-        $anonymizeUsers = $task->anonymizeUsers(false);
+    /**
+     * @throws CompetitiveJobAlreadyTakenException
+     */
+    private function removeCompetitorsOfLspJob(
+        LspJobAssociation $job,
+        Task $task,
+        User $responsibleUser,
+        bool $anonymizeUsers,
+    ): void {
+        $lsp = $this->lspRepository->get((int) $job->getLspId());
+
+        if (! $lsp->isDirectLsp()) {
+            // for now Sub LSP jobs behave like cooperative jobs
+            return;
+        }
 
         $lspJobs = $this->lspJobRepository->getByTaskGuidAndWorkflow(
             $job->getTaskGuid(),
@@ -121,9 +194,9 @@ class CompetitiveJobsRemover
         }
     }
 
-    public function deleteLspJob(
-        mixed $toDelete,
-        editor_Models_Task $task,
+    private function deleteLspJob(
+        LspJobAssociation $toDelete,
+        Task $task,
         User $responsibleUser,
         bool $anonymizeUsers
     ): void {
@@ -135,9 +208,9 @@ class CompetitiveJobsRemover
         $this->notificator->sendNotification($task, $deletedJobData, $responsibleUser, $anonymizeUsers);
     }
 
-    public function deleteUserJob(
-        mixed $toDelete,
-        editor_Models_Task $task,
+    private function deleteUserJob(
+        UserJob $toDelete,
+        Task $task,
         User $responsibleUser,
         bool $anonymizeUsers
     ): void {

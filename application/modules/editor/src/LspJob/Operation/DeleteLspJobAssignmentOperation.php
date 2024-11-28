@@ -39,8 +39,10 @@ use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
+use MittagQI\Translate5\Task\TaskLockService;
+use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
+use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
+use RuntimeException;
 
 class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperationInterface
 {
@@ -52,7 +54,8 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
         private readonly UserJobRepository $userJobRepository,
         private readonly TaskRepository $taskRepository,
         private readonly ActionFeasibilityAssert $lspJobActionFeasibilityAssert,
-        private readonly DeleteUserJobAssignmentOperationInterface $deleteUserJobAssignmentOperation,
+        private readonly DeleteUserJobOperationInterface $deleteUserJobAssignmentOperation,
+        private readonly TaskLockService $taskLockService,
     ) {
     }
 
@@ -66,7 +69,8 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
             UserJobRepository::create(),
             TaskRepository::create(),
             LspJobActionFeasibilityAssert::create(),
-            DeleteUserJobAssignmentOperation::create(),
+            DeleteUserJobOperation::create(),
+            TaskLockService::create(),
         );
     }
 
@@ -82,19 +86,27 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
 
     public function forceDelete(LspJobAssociation $job): void
     {
-        foreach ($this->lspJobRepository->getSubLspJobs($job) as $subJob) {
-            $this->forceDelete($subJob);
+        $lock = $this->taskLockService->getLockForTask($job->getTaskGuid());
+
+        if (! $lock->acquire()) {
+            throw new RuntimeException('Could not acquire lock for task ' . $job->getTaskGuid());
         }
 
-        foreach ($this->userJobRepository->getUserJobsByLspJob((int) $job->getId()) as $userJob) {
-            $this->deleteUserJobAssignmentOperation->forceDelete($userJob);
+        try {
+            foreach ($this->lspJobRepository->getSubLspJobsOf((int)$job->getId()) as $subJob) {
+                $this->forceDelete($subJob);
+            }
+
+            foreach ($this->userJobRepository->getUserJobsByLspJob((int)$job->getId()) as $userJob) {
+                $this->deleteUserJobAssignmentOperation->forceDelete($userJob);
+            }
+
+            $dataJob = $this->userJobRepository->getDataJobByLspJob((int)$job->getId());
+            $this->userJobRepository->delete((int)$dataJob->getId());
+
+            $this->taskRepository->updateTaskUserCount($job->getTaskGuid());
+
+            $this->lspJobRepository->delete((int)$job->getId());
         }
-
-        $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $job->getId());
-        $this->userJobRepository->delete($dataJob);
-
-        $this->taskRepository->updateTaskUserCount($dataJob->getTaskGuid());
-
-        $this->lspJobRepository->delete($job);
     }
 }

@@ -30,7 +30,7 @@ namespace MittagQI\Translate5\Task\Export\Package;
 
 use editor_Models_Export_Worker;
 use editor_Models_Task;
-use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\TaskLockService;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_Authentication;
@@ -43,6 +43,15 @@ class Worker extends editor_Models_Export_Worker
      * @var ExportSource
      */
     private ExportSource $exportSource;
+
+    private TaskLockService $lock;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->lock = TaskLockService::create();
+    }
 
     /**
      * @throws Exception
@@ -113,7 +122,7 @@ class Worker extends editor_Models_Export_Worker
         }
 
         try {
-            Lock::taskLock($this->task, editor_Models_Task::STATE_PACKAGE_EXPORT);
+            $this->lock->lockTask($this->task, editor_Models_Task::STATE_PACKAGE_EXPORT);
 
             $this->exportSource = ZfExtended_Factory::get(ExportSource::class, [
                 $this->task,
@@ -128,7 +137,7 @@ class Worker extends editor_Models_Export_Worker
                 ],
             ]);
 
-            Lock::taskUnlock($this->task);
+            $this->lock->unlockTask($this->task);
 
             throw $throwable;
         }

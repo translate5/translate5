@@ -46,8 +46,8 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\User\Contract\UserUnassignCustomersOperationInterface;
 use MittagQI\Translate5\User\Operations\UserUnassignCustomersOperation;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
+use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 
 final class LspUserUnassignCustomersOperation implements LspUserUnassignCustomersOperationInterface
 {
@@ -57,7 +57,7 @@ final class LspUserUnassignCustomersOperation implements LspUserUnassignCustomer
         private readonly CustomerRepository $customerRepository,
         private readonly ActionFeasibilityAssert $userJobActionFeasibilityAssert,
         private readonly UserUnassignCustomersOperationInterface $userUnassignCustomerOperation,
-        private readonly DeleteUserJobAssignmentOperationInterface $deleteUserJobAssignmentOperation,
+        private readonly DeleteUserJobOperationInterface $deleteUserJobAssignmentOperation,
     ) {
     }
 
@@ -72,7 +72,7 @@ final class LspUserUnassignCustomersOperation implements LspUserUnassignCustomer
             CustomerRepository::create(),
             UserJobActionFeasibilityAssert::create(),
             UserUnassignCustomersOperation::create(),
-            DeleteUserJobAssignmentOperation::create(),
+            DeleteUserJobOperation::create(),
         );
     }
 

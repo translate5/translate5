@@ -32,7 +32,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsServic
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
-use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\Task\Reimport\DataProvider\DataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
@@ -50,6 +50,8 @@ class editor_FileController extends ZfExtended_RestController
      */
     protected $entity;
 
+    private TaskLockService $lock;
+
     /**
      * inits the internal entity Object, handles given limit, filter and sort parameters
      *
@@ -65,6 +67,7 @@ class editor_FileController extends ZfExtended_RestController
 
         /* @var ZfExtended_Logger $log */
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
+        $this->lock = TaskLockService::create();
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E1426' => 'Reimport: Missing required request parameter fileId.',
@@ -174,7 +177,7 @@ class editor_FileController extends ZfExtended_RestController
 
             $this->view->success = true;
         } catch (Throwable $exception) {
-            Lock::taskUnlock($task);
+            $this->lock->unlockTask($task);
             $dataProvider->cleanup();
 
             throw $exception;

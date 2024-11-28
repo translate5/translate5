@@ -39,8 +39,8 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\ForceUserActionFeasibility
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobAssignmentOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DeleteUserJobAssignmentOperation;
+use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
+use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 use Zend_Registry;
 use ZfExtended_Logger;
 
@@ -52,7 +52,7 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
         private readonly UserJobRepository $userJobRepository,
         private readonly ActionFeasibilityAssertInterface $userFeasibilityAssert,
         private readonly ActionFeasibilityAssertInterface $forceUserFeasibilityAssert,
-        private readonly DeleteUserJobAssignmentOperationInterface $deleteUserJobAssignmentOperation,
+        private readonly DeleteUserJobOperationInterface $deleteUserJobAssignmentOperation,
         private readonly ZfExtended_Logger $logger,
     ) {
     }
@@ -70,7 +70,7 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
             UserJobRepository::create(),
             UserActionFeasibilityAssert::create(),
             ForceUserActionFeasibilityAssert::create(),
-            DeleteUserJobAssignmentOperation::create(),
+            DeleteUserJobOperation::create(),
             Zend_Registry::get('logger')->cloneMe('user.delete'),
         );
     }
