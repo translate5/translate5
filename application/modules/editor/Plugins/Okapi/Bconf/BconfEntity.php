@@ -441,17 +441,17 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
      * Creates the path for the bconf itself which follllows a fixed naming-schema
      * @throws OkapiException
      */
-    public function getPath(string $suffix = ''): string
+    public function getPath(bool $isExport = false): string
     {
-        return $this->createPath($this->getFile($suffix));
+        return $this->createPath($this->getFile($isExport));
     }
 
     /**
      * Generates the file-name in our data-dir
      */
-    public function getFile(string $suffix = ''): string
+    public function getFile(bool $isExport = false): string
     {
-        return 'bconf-' . $suffix . $this->getId() . '.' . self::EXTENSION;
+        return 'bconf-' . ($isExport ? 'export-' : '') . $this->getId() . '.' . self::EXTENSION;
     }
 
     /**
@@ -932,6 +932,7 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
         try {
             $packer = new Packer($this);
             $packer->createExtraction($isOutdatedRepack, $this->isSystemDefault());
+            $packer->createMerging();
         } catch (BconfInvalidException $e) {
             // in case of a BconfInvalidException, the exception came from the packer
             $name = $this->getName();

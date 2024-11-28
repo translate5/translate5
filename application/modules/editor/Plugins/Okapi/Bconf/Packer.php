@@ -71,9 +71,9 @@ final class Packer
     /**
      * Creates a BCONF usable for Merging/Export
      */
-    public function createMerging(bool $isSystemDefault = false): void
+    public function createMerging(): void
     {
-        $this->createBConf(false, $isSystemDefault, true);
+        $this->createBConf(false, false, true);
     }
 
     /**
@@ -93,7 +93,7 @@ final class Packer
             }
 
             // so we can access all files in the bconf's data-dir with file name only
-            $this->raf = new RandomAccessFile($this->bconf->getPath($isExport ? 'export-' : ''), 'wb');
+            $this->raf = new RandomAccessFile($this->bconf->getPath($isExport), 'wb');
 
             $this->raf->writeUTF(BconfEntity::SIGNATURE, false);
             $this->raf->writeInt(BconfEntity::VERSION);

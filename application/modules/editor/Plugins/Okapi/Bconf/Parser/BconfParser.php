@@ -28,6 +28,7 @@
 
 namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Parser;
 
+use editor_Plugins_Okapi_Init;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Content;
@@ -201,6 +202,10 @@ abstract class BconfParser
                 $content->setSteps($pipeline->getSteps());
                 $content->setSrxFile('source', $pipeline->getSrxFile('source'));
                 $content->setSrxFile('target', $pipeline->getSrxFile('target'));
+
+                $pipelineSrc = editor_Plugins_Okapi_Init::getDataDir() . 'pipeline/translate5-merging.pln';
+                $pipelineDest = $this->bconf->getDataDirectory() . '/export-pipeline.pln';
+                copy($pipelineSrc, $pipelineDest);
             }
 
             $startFilterConfigs = $this->raf->ftell();

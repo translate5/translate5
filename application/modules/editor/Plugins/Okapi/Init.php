@@ -96,7 +96,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     private static bool $doDebug = false;
 
     /**
-     * Retrieves the config-based path to the default export bconf
+     * Retrieves path to task bconf if it exists (or config-based path to the default export bconf otherwise)
      * @throws ReflectionException
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
@@ -105,6 +105,18 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      */
     public static function getExportBconfPath(editor_Models_Task $task): string
     {
+        $meta = $task->meta(true); // copied with this note from getImportBconf(): TODO FIXME: why reinit ?
+        if ($meta->getBconfInZip()) {
+            return self::getDataDir() . 'okapi_default_export.bconf';
+        }
+
+        $bconf = new BconfEntity();
+        $bconf->load((int) $meta->getBconfId());
+        $exportBconf = $bconf->getPath(true);
+        if (is_file($exportBconf)) {
+            return $exportBconf;
+        }
+
         $config = $task->getConfig();
         $defaultExportBconf = $config->runtimeOptions->plugins->Okapi->export->okapiBconfDefaultName ?? null;
         if (empty($defaultExportBconf)) {
