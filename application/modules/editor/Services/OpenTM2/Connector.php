@@ -165,7 +165,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             && preg_match('/(\.tmx|\.zip)$/', strtolower($fileinfo['name']));
 
         if ($noFile || $tmxUpload) {
-            $tmName = $this->api->createEmptyMemory($name, $sourceLang);
+            $tmName = $this->createEmptyMemoryWithRetry($name, $sourceLang);
 
             if (null !== $tmName) {
                 $this->addMemoryToLanguageResource($this->languageResource, $tmName);
@@ -529,7 +529,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             } elseif ($attempts === 0 && $this->isMemoryOverflown($apiError)) {
                 $this->addOverflowWarning($segment->getTask());
                 $newName = $this->generateNextMemoryName($this->languageResource);
-                $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
+                $newName = $this->createEmptyMemoryWithRetry($newName, $this->languageResource->getSourceLangCode());
 
                 if (null === $newName) {
                     $this->logger->error('E1305', 'OpenTM2: could not create TM', [
@@ -1132,7 +1132,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $this->api->setResource($fuzzyLanguageResource->getResource());
 
-        $newTmFileName = $this->api->createEmptyMemory(
+        $newTmFileName = $this->createEmptyMemoryWithRetry(
             $this->generateTmFilename($fuzzyLanguageResource),
             $this->languageResource->getSourceLangCode()
         );
@@ -1705,7 +1705,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->addOverflowWarning();
 
             $newName = $this->generateNextMemoryName($this->languageResource);
-            $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
+            $newName = $this->createEmptyMemoryWithRetry($newName, $this->languageResource->getSourceLangCode());
             $this->addMemoryToLanguageResource($this->languageResource, $newName);
 
             // Filter TMX data from already imported segments
@@ -1959,5 +1959,35 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         // This should be moved to config, but this requires refactoring of the connectors
         // and introducing a connector factory instead of manager as it is implemented at the moment
         return defined('ZFEXTENDED_IS_WORKER_THREAD');
+    }
+
+    private function createEmptyMemoryWithRetry(string $name, string $sourceLang): ?string
+    {
+        $t5memoryName = null;
+        $elapsedTime = 0;
+        $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
+
+        while ($elapsedTime < $maxWaitingTime) {
+            $t5memoryName = $this->api->createEmptyMemory($name, $sourceLang);
+
+            if ($t5memoryName) {
+                break;
+            }
+
+            $this->logger->warn(
+                'E1305',
+                't5memory: Could not create empty memory - waiting for {elapsedTime} seconds.',
+                [
+                    'languageResource' => $this->languageResource,
+                    'apiError' => $this->api->getError(),
+                    'elapsedTime' => $elapsedTime,
+                ]
+            );
+
+            sleep($this->getRetryDelaySeconds());
+            $elapsedTime += $this->getRetryDelaySeconds();
+        }
+
+        return $t5memoryName;
     }
 }

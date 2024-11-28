@@ -149,6 +149,8 @@ $commands = [
     new LogPhpCommand(),
     new LogWorkerCommand(),
     new LogLoginCommand(),
+    new LogPhpCommand(),
+    new LogWorkerCommand(),
     new L10nAddCommand(),
     new L10nRemoveCommand(),
     new L10nTaskcreateCommand(),
