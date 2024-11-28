@@ -45,4 +45,8 @@ interface UpdatableAdapterInterface
     public function update(SegmentModel $segment, array $options = []): void;
 
     public function checkUpdatedSegment(SegmentModel $segment): void;
+
+    public function getUpdateDTO(SegmentModel $segment, array $options = []): UpdateSegmentDTO;
+
+    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, SegmentModel $segment): void;
 }

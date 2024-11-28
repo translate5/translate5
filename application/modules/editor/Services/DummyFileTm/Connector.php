@@ -35,6 +35,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 
 /**
  * FIXME reactivate me for pretranslation and analysis tests!
@@ -135,6 +136,52 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         $row = $this->db->fetchRow($s);
 
         if ($row) {
+            /** @phpstan-ignore-next-line */
+            $row->target = $target;
+        } else {
+            $row = $this->db->createRow([
+                'languageResourceId' => $this->languageResource->getId(),
+                'mid' => $segment->getMid(),
+                'internalFuzzy' => (int) $this->isInternalFuzzy(),
+                'source' => $source,
+                'target' => $target,
+            ]);
+        }
+
+        $row->save();
+    }
+
+    public function getUpdateDTO(
+        \editor_Models_Segment $segment,
+        array $options = []
+    ): UpdateSegmentDTO {
+        return new UpdateSegmentDTO(
+            $segment->getTaskGuid(),
+            (int) $segment->getId(),
+            $this->getQueryString($segment),
+            $segment->getTargetEdit(),
+            '',
+            '',
+            '',
+            $segment->getMid(),
+        );
+    }
+
+    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, editor_Models_Segment $segment): void
+    {
+        $source = $this->tagHandler->prepareQuery($dto->source);
+        $target = $this->tagHandler->prepareQuery($dto->target);
+
+        $s = $this->db->select()->where('source = ?', $source);
+
+        if ($this->isInternalFuzzy()) {
+            $s->where('internalFuzzy = 1');
+        }
+
+        $row = $this->db->fetchRow($s);
+
+        if ($row) {
+            /** @phpstan-ignore-next-line */
             $row->target = $target;
         } else {
             $row = $this->db->createRow([

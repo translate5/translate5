@@ -49,8 +49,8 @@ class Mxliff extends editor_Models_Export_FileParser_Xlf_Namespaces_Abstract
     {
         $this->xmlparser->registerElement('ph', null, function ($tag, $key, $opener) {
             $chunk = $this->xmlparser->getChunk($key - 1);
-            $openerPatern = '/\{([a-zA-Z]+)&gt;/';
-            $closerPatern = '/&lt;([a-zA-Z]+)\}/';
+            $openerPatern = '/\{([a-zA-Z0-9]+)&gt;/';
+            $closerPatern = '/&lt;([a-zA-Z0-9]+)\}/';
 
             if (preg_match($openerPatern, $chunk)) {
                 $this->xmlparser->replaceChunk($opener['openerKey'], '');

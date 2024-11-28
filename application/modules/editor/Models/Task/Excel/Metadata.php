@@ -28,13 +28,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Task\CustomFields\Field;
 use ZfExtended_Factory as Factory;
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
-
- /**
+/**
  * General model for Excel Metadata (= task overview and statistics).
  * Handles all interactions with the PHPSpreadsheet (via ZfExtended_Models_Entity_ExcelExport).
  */
@@ -297,7 +291,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
             Array ( [en] => first value dropdown
                     [de] => erster Wert Dropdown )
             */
-            if(is_array($value)){
+            if (is_array($value)) {
                 continue;
             }
             $sheet->setCellValue($sheetCol . $this->taskRow, $value);

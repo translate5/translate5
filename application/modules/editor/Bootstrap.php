@@ -444,12 +444,22 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
+
         $this->front->getRouter()->addRoute('editorProjectUserJobs', new ZfExtended_Controller_RestLikeRoute(
             'editor/project/:projectId/jobs/:workflow',
             [
                 'module' => 'editor',
                 'controller' => 'taskuserassoc',
                 'action' => 'project',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorBatchSet', new ZfExtended_Controller_RestLikeRoute(
+            'editor/taskuserassoc/batchset',
+            [
+                'module' => 'editor',
+                'controller' => 'batchset',
+                'action' => 'index',
             ]
         ));
 

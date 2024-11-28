@@ -93,6 +93,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
         'QualityMqm' => true,
         'SegmentQualitiesBase' => true,
+        'BatchEditing' => [Rights::EDITOR_BATCH_EDITING],
     ];
 
     private ZfExtended_Acl $acl;

@@ -70,6 +70,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
         wordBased:"#UT#Wortbasiert",
         characterBased:"#UT#Zeichenbasiert",
         basedOn:'#Basiert auf',
+        fromImportedFile:'#UT#Aus importierter Datei',
         hasErrors: '#UT#Bei der Analyse sind {0} Fehler in der Kommunikation mit den Sprachressourcen aufgetreten. <br />Die Analyse kann daher unvollständig sein. Bitte prüfen Sie die Ereignisse der Aufgabe und das System Log und erstellen ggf. die Analyse erneut.'
     },
 
@@ -288,6 +289,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                     return me.strings.repetitions;
                 } else if (value === 'summary' || value === 'amount') {
                     return vm.get('l10n.MatchAnalysis.analysisWindow.' + value) + ':';
+                } else if (value === 'source') {
+                    return me.strings.fromImportedFile+':';
                 } else if (!record.get('resourceColor')) {
                     return value;
                 }

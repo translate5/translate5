@@ -322,6 +322,10 @@
             <source>Bei der Analyse sind {0} Fehler in der Kommunikation mit den Sprachressourcen aufgetreten. <br />Die Analyse kann daher unvollständig sein. Bitte prüfen Sie die Ereignisse der Aufgabe und das System Log und erstellen ggf. die Analyse erneut.</source>
             <target>Bei der Analyse sind {0} Fehler in der Kommunikation mit den Sprachressourcen aufgetreten. <br />Die Analyse kann daher unvollständig sein. Bitte prüfen Sie die Ereignisse der Aufgabe und das System Log und erstellen ggf. die Analyse erneut.</target>
         </trans-unit>
+		<trans-unit id='QXVzIGltcG9ydGllcnRlciBEYXRlaQ=='>
+		    <source>Aus importierter Datei</source>
+		    <target>Aus importierter Datei</target>
+		</trans-unit>
     </body>
   </file>
 </xliff>

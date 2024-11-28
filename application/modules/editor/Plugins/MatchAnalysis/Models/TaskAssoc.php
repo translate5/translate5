@@ -49,6 +49,12 @@ END LICENSE AND COPYRIGHT
  *
  * @method string getFinishedAt()
  * @method void setFinishedAt(string $finishedAt)
+ *
+ * @method string getName()
+ * @method void setName(string $name)
+ *
+ * @method string getIsExternal()
+ * @method void setIsExternal(bool $isExternal)
  */
 class editor_Plugins_MatchAnalysis_Models_TaskAssoc extends ZfExtended_Models_Entity_Abstract
 {

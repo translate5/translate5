@@ -70,6 +70,7 @@ Ext.define('Editor.view.admin.config.type.FixedMap', {
 
     initConfig: function (instanceConfig) {
         instanceConfig.hideTbar = true;
+        instanceConfig.readonlyIndex = true;
         return this.callParent(arguments);
     }
 });

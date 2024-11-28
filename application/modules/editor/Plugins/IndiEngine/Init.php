@@ -64,11 +64,20 @@ class editor_Plugins_IndiEngine_Init extends ZfExtended_Plugin_Abstract
         /** @var ZfExtended_Logger $logger */
         $logger = Zend_Registry::get('logger');
 
-        // Setup writer
-        $this->writer = ZfExtended_Logger_Writer_Abstract::create([
-            'type' => EventWriter::class,
-            'filter' => ['level <= info'],
-        ]);
+        try {
+            // Setup writer
+            $this->writer = EventWriter::create([
+                'type' => EventWriter::class,
+                'filter' => ['level <= info'],
+            ]);
+            /** @phpstan-ignore-next-line  */
+        } catch (TypeError $e) {
+            $logger->exception($e, [
+                'message' => 'TypeError in indi engine setup. Missing Config?',
+            ]);
+
+            return;
+        }
 
         // Spoof current db writer with $this->writer
         $logger->addWriter('db', $this->writer);

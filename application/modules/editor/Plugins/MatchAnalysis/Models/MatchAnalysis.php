@@ -46,7 +46,7 @@ use ZfExtended_Factory as Factory;
  * @method void setSegmentNrInTask(int $segmentNrInTask)
  *
  * @method string getLanguageResourceid()
- * @method void setLanguageResourceid(int $languageResourceid)
+ * @method void setLanguageResourceid(?int $languageResourceid)
  *
  * @method string getMatchRate()
  * @method void setMatchRate(int $matchrate)
@@ -266,8 +266,10 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        //init the language reources group array
+        //init the language resources group array
         $groupedResults = $this->initResultArray($analysisAssoc);
+        //flag, indicating if analysis contains imported match rate info (to avoid duplicates info output)
+        $withImportedMatchRates = false;
         foreach ($results as $res) {
             //the key will be languageResource->ServiceType + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
             //because for the internal fuzzy additional row is displayed
@@ -277,6 +279,9 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 $rowKey = $this->getFuzzyName($lr?->getResourceId() ?? 'deleted ressource');
             } else {
                 $rowKey = $res['languageResourceid'];
+                if (! $withImportedMatchRates && $rowKey === null) {
+                    $withImportedMatchRates = true;
+                }
             }
 
             //results found in group
@@ -324,6 +329,9 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 $groupedResults[$rowKey]['unitCountTotal'] += $res['unitCount'];
             }
         }
+
+        // Either no duplicates or no imported match rates
+        unset($groupedResults[$withImportedMatchRates ? 0 : null]);
 
         return array_values($groupedResults);
     }
@@ -416,6 +424,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
         //init the repetition
         $initGroups = $initGroups + $initRow(0, "", "", editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED);
+        //init matchrate data from the imported file, see TRANSLATE-4221
+        $initGroups = $initGroups + $initRow(null, editor_Models_Segment_MatchRateType::TYPE_SOURCE, "", "");
 
         return $initGroups;
     }

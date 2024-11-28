@@ -391,6 +391,15 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     xtype: 'taskActionColumn',
                     sortable: false
                 }, {
+                    xtype: 'checkcolumn',
+                    dataIndex: 'checked',
+                    sortable: false,
+                    hidden: true,
+                    bind: {
+                        tooltip: '{l10n.projectGrid.strings.batchSetTooltip}'
+                    },
+                    width: 20
+                }, {
                     xtype: 'gridcolumn',
                     width: 70,
                     dataIndex: 'state',

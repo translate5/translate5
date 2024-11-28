@@ -33,8 +33,8 @@ namespace MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Executors;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
-use MittagQI\Translate5\LanguageResource\LanguageResourceReimportQueue;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsService;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
 use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use ZfExtended_Factory;
@@ -44,7 +44,7 @@ class ReimportSegmentsActionExecutor
 {
     public function __construct(
         private readonly ZfExtended_Logger $logger,
-        private readonly LanguageResourceReimportQueue $languageResourceReimportQueue,
+        private readonly ReimportSegmentsQueue $languageResourceReimportQueue,
         private readonly LanguageResourceRepository $languageResourceRepository,
         private readonly TaskTmRepository $taskTmRepository,
     ) {
@@ -82,8 +82,8 @@ class ReimportSegmentsActionExecutor
                     $task->getTaskGuid(),
                     (int) $languageResource->getId(),
                     [
-                        ReimportSegmentsService::FILTER_ONLY_EDITED => true,
-                        ReimportSegmentsService::USE_SEGMENT_TIMESTAMP => true,
+                        ReimportSegmentsOptions::FILTER_ONLY_EDITED => true,
+                        ReimportSegmentsOptions::USE_SEGMENT_TIMESTAMP => true,
                     ]
                 );
             } catch (ReimportQueueException) {

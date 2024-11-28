@@ -32,7 +32,8 @@ namespace Translate5\MaintenanceCli\Command\T5Memory;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use editor_Services_OpenTM2_Service as Service;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsService;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegments;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsSnapshot;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -101,15 +102,21 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
                 $task->load($taskId);
                 $this->io->info('Reimporting segments for task ' . $task->getTaskName());
 
-                $reimport = ReimportSegmentsService::create();
-                $reimport->reimport(
-                    $languageResource,
+                $runId = bin2hex(random_bytes(16));
+
+                ReimportSegmentsSnapshot::create()->createSnapshot(
                     $task,
-                    [
-                        ReimportSegmentsService::FILTER_ONLY_EDITED => true,
-                        ReimportSegmentsService::USE_SEGMENT_TIMESTAMP =>
-                            (bool) $input->getOption(self::OPTION_USE_SEGMENT_TIMESTAMP),
-                    ]
+                    $runId,
+                    $languageResourceId,
+                    null,
+                    true,
+                    (bool) $input->getOption(self::OPTION_USE_SEGMENT_TIMESTAMP)
+                );
+
+                ReimportSegments::create()->reimport(
+                    $task,
+                    $runId,
+                    $languageResourceId,
                 );
             }
         }

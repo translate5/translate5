@@ -984,7 +984,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     public function hasValidDeadlineDate(): bool
     {
         return ! empty($this->getDeadlineDate())
-            && strtotime($this->getDeadlineDate()) > strtotime($this->getCreated());
+            && strtotime($this->getDeadlineDate()) >= strtotime($this->getCreated());
     }
 
     /**

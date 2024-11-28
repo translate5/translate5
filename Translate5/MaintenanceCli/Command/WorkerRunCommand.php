@@ -68,6 +68,13 @@ class WorkerRunCommand extends Translate5AbstractCommand
             'The worker ID to be started.'
         );
 
+        $this->addOption(
+            'force-delayed',
+            null,
+            InputOption::VALUE_NONE,
+            'Forces a delayed worker to be run.'
+        );
+
         // during API-tests the test-flag is set via option
         $this->addOption(
             'test',
@@ -117,11 +124,22 @@ class WorkerRunCommand extends Translate5AbstractCommand
 
             $this->changeProcessTitle($workerModel);
 
+            if ($this->input->getOption('force-delayed')
+                && $workerModel->getState() == $workerModel::STATE_DELAYED) {
+                $workerModel->setState($workerModel::STATE_WAITING);
+                $workerModel->save();
+            }
+
             if ($workerModel->getState() == $workerModel::STATE_WAITING) {
                 $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
                 if (! $worker || ! $worker->runQueued()) {
                     return self::FAILURE;
                 }
+            } elseif ($workerModel->getState() == $workerModel::STATE_DELAYED && ! $this->isPorcelain) {
+                $this->io->warning([
+                    'Worker is delayed! ',
+                    'To run explicitly a delayed worker please use --force-delayed option.',
+                ]);
             }
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             // if a worker was gone before we don't log that
