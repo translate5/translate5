@@ -48,18 +48,46 @@ $SCRIPT_IDENTIFIER = '014-TRANSLATE-4093-3647-3202-okapi-147.php';
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
-$updater = new FprmUpdaterTo147();
+$fprmUpdater = new FprmUpdaterTo147();
 $bconf = new BconfEntity();
+
+$pipelineProps = [
+    'doNotSegmentIfHasTarget.b=false' => 'SegmentationStep',
+    'writerOptions.includeNoTranslate.b=true' => 'ExtractionStep',
+    'writerOptions.escapeGT.b=true' => 'ExtractionStep',
+];
 
 foreach ($bconf->loadAll() as $bconfData) {
     try {
         $bconf->load($bconfData['id']);
-        $updater->updateInDir($bconf->getDataDirectory(), $bconf->getId(), $bconf->getName());
+        $bconfDir = $bconf->getDataDirectory();
+        $pipelineFile = $bconfDir . '/pipeline.pln';
+        $pipelineChanged = false;
+        $pipelineData = file_get_contents($pipelineFile);
+        foreach ($pipelineProps as $propLine => $step) {
+            if (str_contains($pipelineData, $propLine)) {
+                continue;
+            }
+            [$propKey] = explode('=', $propLine);
+            if (str_contains($pipelineData, $propKey)) {
+                $pipelineData = preg_replace('/' . $propKey . '=\w*/', $propLine, $pipelineData);
+            } else {
+                $pipelineData = preg_replace('/\.' . $step . '">#v1[\r\n]+/', '\\0' . $propLine . "\n", $pipelineData);
+            }
+            $pipelineChanged = true;
+        }
+        if ($pipelineChanged) {
+            file_put_contents($pipelineFile, $pipelineData);
+        }
+
+        $fprmUpdater->updateInDir($bconfDir, $bconf->getId(), $bconf->getName());
+
         $extensionMapping = $bconf->getExtensionMapping();
         $extensionMapping->rescanFilters();
         $bconf->repackIfOutdated(true);
     } catch (Exception $e) {
-        $msg = 'ERROR rescanning filters for bconf ' . $bconf->getId() . ', "' . $bconf->getName() . '": ' . $e->getMessage();
+        $msg = 'ERROR rescanning filters for bconf ' . $bconf->getId() . ', "' . $bconf->getName(
+        ) . '": ' . $e->getMessage();
         error_log($msg);
     }
 }
