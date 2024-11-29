@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
+use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
@@ -544,17 +545,21 @@ class editor_TaskController extends ZfExtended_RestController
         return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
     }
 
-    protected function getCustomerRenderConfigs(array $rows)
+    protected function getCustomerRenderConfigs(array $rows): array
     {
         if (empty($rows)) {
             return [];
         }
 
-        $customerConfig = new editor_Models_Customer_CustomerConfig();
+        $default = $this->config->runtimeOptions->frontend->tasklist->hideWordCount;
+        $customerRepository = new CustomerRepository();
 
         $configs = [];
         foreach ($rows as $row) {
-            $configs[$row['customerId']]['hideWordCount'] = $customerConfig->getCustomerConfig($row['customerId'])->runtimeOptions->frontend->tasklist->hideWordCount;
+            if (! isset($configs[$row['customerId']]['hideWordCount'])) {
+                $customerValue = $customerRepository->getConfigValue($row['customerId'], 'runtimeOptions.frontend.tasklist.hideWordCount');
+                $configs[$row['customerId']]['hideWordCount'] = $customerValue ?? $default;
+            }
         }
 
         return $configs;
