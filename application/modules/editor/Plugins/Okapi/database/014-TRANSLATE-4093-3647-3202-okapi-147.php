@@ -116,3 +116,34 @@ WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"', [
         'descr' => trim($descr, '.') . '. ' . $okapiInfo147,
     ]);
 }
+
+$specialCharacters = json_decode($config->runtimeOptions->editor->segments->editorSpecialCharacters, true);
+if (!isset($specialCharacters['all'])) {
+    $specialCharacters['all'] = [];
+}
+
+$charsToAdd = [];
+$newCharsList = json_decode(file_get_contents(__DIR__ . '014-new-special-chars.json'), true);
+foreach ($newCharsList as $newChar) {
+    $charFound = false;
+    foreach ($specialCharacters['all'] as $specialChar) {
+        if ($newChar['unicode'] === $specialChar['unicode']) {
+            $charFound = true;
+            break;
+        }
+    }
+    if (!$charFound) {
+        $charsToAdd[] = $newChar;
+    }
+}
+if (!empty($charsToAdd)) {
+    $specialCharacters['all'] = array_merge($specialCharacters['all'], $charsToAdd);
+    $specialCharactersJson = json_encode(
+        $specialCharacters,
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    );
+    $db->query('UPDATE `Zf_configuration` SET `value` = :value
+WHERE `name` = "runtimeOptions.editor.segments.editorSpecialCharacters"', [
+        'value' => $specialCharactersJson,
+    ]);
+}
