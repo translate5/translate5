@@ -36,10 +36,10 @@ class CustomerDoesNotBelongToJobCoordinatorException extends InvalidArgumentExce
 {
     public function __construct(
         public readonly int $customerId,
-        public readonly string $jobCoordinatorGuid
+        public readonly string $jobCoordinatorIdentifier
     ) {
         parent::__construct(
-            "Customer with ID [$customerId] does not belong to the job coordinator [$jobCoordinatorGuid]"
+            "Customer with ID [$customerId] does not belong to the job coordinator [$jobCoordinatorIdentifier]"
         );
     }
 }

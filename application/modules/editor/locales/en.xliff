@@ -10215,7 +10215,6 @@ Synchronization always takes place in one direction: source data -> target
                 <source>automatisch abgeschlossen</source>
                 <target>auto-close</target>
             </trans-unit>
-<<<<<<< HEAD
             <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='>
                 <source>Kunden bearbeiten</source>
                 <target>Edit clients</target>

@@ -109,7 +109,7 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
                 $dto->workflow->workflowStepName
             );
 
-            if (!$lsp->isDirectLsp()) {
+            if (! $lsp->isDirectLsp()) {
                 try {
                     // check if parent LSP Job exists. Sub LSP can have only jobs related to its parent LSP
                     $parentJob = $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
@@ -127,8 +127,8 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
 
             try {
                 $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(
-                    (int)$lsp->getId(),
-                    (int)$task->getCustomerId()
+                    (int) $lsp->getId(),
+                    (int) $task->getCustomerId()
                 );
             } catch (CustomerDoesNotBelongToLspException) {
                 throw new NotLspCustomerTaskException();

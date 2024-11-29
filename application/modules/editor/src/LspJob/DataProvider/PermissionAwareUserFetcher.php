@@ -40,7 +40,6 @@ use Zend_Db_Adapter_Abstract;
 use Zend_Db_Select;
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
-use ZfExtended_Factory;
 
 class PermissionAwareUserFetcher
 {
@@ -59,12 +58,12 @@ class PermissionAwareUserFetcher
     }
 
     /**
-     * @return array{userGuid: string, longUserName: string}[]
+     * @return array{userId: int, userGuid: string, longUserName: string}[]
      */
     public function fetchVisible(Zend_Db_Select $select, User $viewer): array
     {
         $users = [];
-        $user = ZfExtended_Factory::get(User::class);
+        $user = new User();
 
         $stmt = $this->db->query($select);
 
@@ -84,6 +83,7 @@ class PermissionAwareUserFetcher
 
             if ($this->userActionPermissionAssert->isGranted(UserAction::Read, $user, $context)) {
                 $users[] = [
+                    'userId' => (int) $user->getId(),
                     'userGuid' => $user->getUserGuid(),
                     'longUserName' => $user->getUsernameLong(),
                 ];

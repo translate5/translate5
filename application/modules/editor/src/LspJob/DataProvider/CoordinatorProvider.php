@@ -34,17 +34,22 @@ use editor_Models_Task as Task;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
+use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\LspJob\Model\Db\LspJobAssociationTable;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\UserJob\Exception\NotLspCustomerTaskException;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use ZfExtended_Factory;
+use ZfExtended_Models_Db_User;
 
 /**
  * @template Coordinator as array{userGuid: string, longUserName: string}
@@ -56,6 +61,7 @@ class CoordinatorProvider
         private readonly ActionPermissionAssertInterface $taskActionPermissionAssert,
         private readonly JobCoordinatorRepository $jobCoordinatorRepository,
         private readonly PermissionAwareUserFetcher $permissionAwareUserFetcher,
+        private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
     ) {
     }
 
@@ -66,6 +72,7 @@ class CoordinatorProvider
             TaskActionPermissionAssert::create(),
             JobCoordinatorRepository::create(),
             PermissionAwareUserFetcher::create(),
+            LspCustomerAssociationValidator::create(),
         );
     }
 
@@ -77,9 +84,12 @@ class CoordinatorProvider
         $context = new PermissionAssertContext($viewer);
 
         if ($viewer->isAdmin()) {
-            return array_merge(
-                $this->getDirectCoordinators($viewer),
-                $this->getSubCoordinators($task->getTaskGuid(), $viewer)
+            return $this->filterCoordinatorsByTaskCustomer(
+                array_merge(
+                    $this->getDirectCoordinators($viewer),
+                    $this->getSubCoordinators($task->getTaskGuid(), $viewer)
+                ),
+                (int) $task->getCustomerId()
             );
         }
 
@@ -88,7 +98,10 @@ class CoordinatorProvider
         }
 
         if ($viewer->isPm()) {
-            return $this->getDirectCoordinators($viewer);
+            return $this->filterCoordinatorsByTaskCustomer(
+                $this->getDirectCoordinators($viewer),
+                (int) $task->getCustomerId()
+            );
         }
 
         if (! $viewer->isCoordinator()) {
@@ -100,12 +113,40 @@ class CoordinatorProvider
 
         foreach ($this->jobCoordinatorRepository->getSubLspJobCoordinators($viewerCoordinator) as $coordinator) {
             $coordinators[] = [
+                'userId' => (int) $coordinator->user->getId(),
                 'userGuid' => $coordinator->user->getUserGuid(),
                 'longUserName' => $coordinator->user->getUsernameLong(),
             ];
         }
 
-        return $coordinators;
+        return $this->filterCoordinatorsByTaskCustomer($coordinators, (int) $task->getCustomerId());
+    }
+
+    /**
+     * @param array{userId: int, userGuid: string, longUserName: string}[] $coordinators
+     * @return Coordinator[]
+     */
+    private function filterCoordinatorsByTaskCustomer(array $coordinators, int $customerId): array
+    {
+        $filteredCoordinators = [];
+
+        foreach ($coordinators as $coordinator) {
+            try {
+                $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLspOfCoordinator(
+                    $coordinator['userId'],
+                    $customerId
+                );
+
+                $filteredCoordinators[] = [
+                    'userGuid' => $coordinator['userGuid'],
+                    'longUserName' => $coordinator['longUserName'],
+                ];
+            } catch (CustomerDoesNotBelongToJobCoordinatorException) {
+                // do nothing
+            }
+        }
+
+        return $filteredCoordinators;
     }
 
     /**
@@ -116,6 +157,7 @@ class CoordinatorProvider
         $coordinators = [];
         foreach ($this->jobCoordinatorRepository->getByLspId((int) $lspJob->getLspId()) as $coordinator) {
             $coordinators[] = [
+                'userId' => (int) $coordinator->user->getId(),
                 'userGuid' => $coordinator->user->getUserGuid(),
                 'longUserName' => $coordinator->user->getUsernameLong(),
             ];
@@ -176,14 +218,12 @@ class CoordinatorProvider
      */
     private function getDirectCoordinators(User $viewer): array
     {
-        $user = ZfExtended_Factory::get(User::class);
-
         $select = $this->db
             ->select()
             ->distinct()
             ->from(
                 [
-                    'user' => $user->db->info($user->db::NAME)
+                    'user' => ZfExtended_Models_Db_User::TABLE_NAME
                 ]
             )
             ->join(

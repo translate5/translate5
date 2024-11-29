@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\Repository;
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderCustomerTable;
+use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
@@ -59,12 +60,12 @@ class LspRepository implements LspRepositoryInterface
 
     public function getEmptyModel(): LanguageServiceProvider
     {
-        return ZfExtended_Factory::get(LanguageServiceProvider::class);
+        return new LanguageServiceProvider();
     }
 
     public function getEmptyLspCustomerModel(): LanguageServiceProviderCustomer
     {
-        return ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
+        return new LanguageServiceProviderCustomer();
     }
 
     /**
@@ -73,7 +74,7 @@ class LspRepository implements LspRepositoryInterface
     public function get(int $id): LanguageServiceProvider
     {
         try {
-            $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
+            $model = new LanguageServiceProvider();
             $model->load($id);
 
             return $model;
@@ -105,7 +106,7 @@ class LspRepository implements LspRepositoryInterface
         int $lspId,
         int $customerId,
     ): ?LanguageServiceProviderCustomer {
-        $model = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
+        $model = new LanguageServiceProviderCustomer();
         $db = $model->db;
         $select = $db->select()
             ->where('lspId = ?', $lspId)
@@ -129,7 +130,7 @@ class LspRepository implements LspRepositoryInterface
 
     public function deleteCustomerAssignment(int $lspId, int $customerId): void
     {
-        $model = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class);
+        $model = new LanguageServiceProviderCustomer();
         $model->db->delete(
             [
                 'lspId = ?' => $lspId,
@@ -143,7 +144,7 @@ class LspRepository implements LspRepositoryInterface
      */
     public function getAll(): iterable
     {
-        $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
+        $model = new LanguageServiceProvider();
 
         foreach ($model->loadAll() as $row) {
             $model->init(
@@ -166,10 +167,7 @@ class LspRepository implements LspRepositoryInterface
      */
     public function getCustomers(LanguageServiceProvider $lsp): iterable
     {
-        $customer = ZfExtended_Factory::get(Customer::class);
-        $lspToCustomerTable = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class)
-            ->db
-            ->info(LanguageServiceProviderCustomerTable::NAME);
+        $customer = new Customer();
         $customerDb = $customer->db;
 
         $select = $customerDb->select()
@@ -178,7 +176,7 @@ class LspRepository implements LspRepositoryInterface
                 'customer' => $customer->db->info($customer->db::NAME),
             ])
             ->join([
-                'lspToCustomer' => $lspToCustomerTable,
+                'lspToCustomer' => LanguageServiceProviderCustomerTable::TABLE_NAME,
             ], 'customer.id = lspToCustomer.customerId', [])
             ->where('lspToCustomer.lspId = ?', $lsp->getId())
             ->group('customer.id')
@@ -202,32 +200,60 @@ class LspRepository implements LspRepositoryInterface
      */
     public function getCustomerIds(int $lspId): array
     {
-        $customer = ZfExtended_Factory::get(Customer::class);
-        $lspToCustomerTable = ZfExtended_Factory::get(LanguageServiceProviderCustomer::class)
-            ->db
-            ->info(LanguageServiceProviderCustomerTable::NAME);
+        $customer = new Customer();
         $customerDb = $customer->db;
 
         $select = $customerDb->select()
             ->setIntegrityCheck(false)
+            ->distinct()
             ->from(
                 [
-                    'customer' => $customer->db->info($customer->db::NAME),
+                    'lspToCustomer' => LanguageServiceProviderCustomerTable::TABLE_NAME,
                 ],
-                ['id']
+                ['customerId']
             )
-            ->join([
-                'lspToCustomer' => $lspToCustomerTable,
-            ], 'customer.id = lspToCustomer.customerId', [])
             ->where('lspToCustomer.lspId = ?', $lspId)
-            ->group('customer.id')
         ;
 
         $rows = $customerDb->fetchAll($select);
 
         $rows->rewind();
 
-        return array_map('intval', array_column($rows->toArray(), 'id'));
+        return array_map('intval', array_column($rows->toArray(), 'customerId'));
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getCustomerIdsOfCoordinatorsLsp(int $coordinatorUserId): array
+    {
+        $customer = new Customer();
+        $customerDb = $customer->db;
+
+        $select = $customerDb->select()
+            ->setIntegrityCheck(false)
+            ->distinct()
+             ->from(
+                [
+                    'lspToCustomer' => LanguageServiceProviderCustomerTable::TABLE_NAME,
+                ],
+                ['customerId']
+            )
+            ->join(
+                [
+                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
+                ],
+                'lspUser.lspId = lspToCustomer.lspId',
+                []
+            )
+            ->where('lspUser.userId = ?', $coordinatorUserId)
+        ;
+
+        $rows = $customerDb->fetchAll($select);
+
+        $rows->rewind();
+
+        return array_map('intval', array_column($rows->toArray(), 'customerId'));
     }
 
     /**
@@ -235,7 +261,7 @@ class LspRepository implements LspRepositoryInterface
      */
     public function getSubLspList(LanguageServiceProvider $lsp): iterable
     {
-        $model = ZfExtended_Factory::get(LanguageServiceProvider::class);
+        $model = new LanguageServiceProvider();
 
         $select = $model->db->select()->where('parentId = ?', $lsp->getId());
 

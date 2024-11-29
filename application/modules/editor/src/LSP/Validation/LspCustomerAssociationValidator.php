@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Validation;
 
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
@@ -61,6 +62,20 @@ class LspCustomerAssociationValidator
         foreach ($customerIds as $customerId) {
             if (! in_array($customerId, $lspCustomersIds, true)) {
                 throw new CustomerDoesNotBelongToLspException($customerId, $lspId);
+            }
+        }
+    }
+
+    /**
+     * @throws CustomerDoesNotBelongToJobCoordinatorException
+     */
+    public function assertCustomersAreSubsetForLspOfCoordinator(int $userId, int ...$customerIds): void
+    {
+        $lspCustomersIds = $this->lspRepository->getCustomerIdsOfCoordinatorsLsp($userId);
+
+        foreach ($customerIds as $customerId) {
+            if (! in_array($customerId, $lspCustomersIds, true)) {
+                throw new CustomerDoesNotBelongToJobCoordinatorException($customerId, (string) $userId);
             }
         }
     }

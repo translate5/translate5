@@ -28,7 +28,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_Db_Customer extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_customer';
+    public const TABLE_NAME = 'LEK_customer';
+
+    protected $_name = self::TABLE_NAME;
 
     public $_primary = 'id';
 }
