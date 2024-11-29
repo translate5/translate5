@@ -112,18 +112,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
 
         $bconf = new BconfEntity();
         $bconf->load((int) $meta->getBconfId());
-        $exportBconf = $bconf->getPath(true);
-        if (is_file($exportBconf)) {
-            return $exportBconf;
-        }
-
-        $config = $task->getConfig();
-        $defaultExportBconf = $config->runtimeOptions->plugins->Okapi->export->okapiBconfDefaultName ?? null;
-        if (empty($defaultExportBconf)) {
-            throw new OkapiException('E1340');
-        }
-
-        return self::getDataDir() . $defaultExportBconf;
+        return $bconf->getPath(true);
     }
 
     /**
