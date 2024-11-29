@@ -284,10 +284,6 @@
                 <source>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet. Daher werden die Filteroptionen in der Okapi-Hilfe erläutert.</source>
                 <target>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet. Daher werden die Filteroptionen in der Okapi-Hilfe erläutert.</target>
             </trans-unit>
-            <trans-unit id='S2VpbmUgVmVyc2lvbiB1bnRlciAxLjQ3IGthbm4gbWl0IFQ1LURhdGVpZm9ybWF0ZWluc3RlbGx1bmdlbiB2ZXJ3ZW5kZXQgd2VyZGVuLCBudXIg4oCeYmNvbmYtaW4temlw4oCcIGZ1bmt0aW9uaWVydCBtaXQgw6RsdGVyZW4gVmVyc2lvbmVu'>
-                <source>Keine Version unter 1.47 kann mit T5-Dateiformateinstellungen verwendet werden, nur „bconf-in-zip“ funktioniert mit älteren Versionen</source>
-                <target>Keine Version unter 1.47 kann mit T5-Dateiformateinstellungen verwendet werden, nur „bconf-in-zip“ funktioniert mit älteren Versionen</target>
-            </trans-unit>
         </body>
     </file>
 </xliff>

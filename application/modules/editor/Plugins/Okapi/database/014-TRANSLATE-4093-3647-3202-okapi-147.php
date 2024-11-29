@@ -48,6 +48,17 @@ $SCRIPT_IDENTIFIER = '014-TRANSLATE-4093-3647-3202-okapi-147.php';
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
+$argc = count($argv);
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+    die("please dont call the script direct! Call it by using DBUpdater!\n\n");
+}
+
+if (! isset($config) || ! str_contains($config->runtimeOptions->plugins->Okapi->serverUsed, '147')) {
+    throw new ZfExtended_Exception(
+        __FILE__ . ': searching for Okapi 1.47 in config FAILED - stop migration script'
+    );
+}
+
 $fprmUpdater = new FprmUpdaterTo147();
 $bconf = new BconfEntity();
 
@@ -95,3 +106,13 @@ foreach ($bconf->loadAll() as $bconfData) {
 $db = Zend_Db_Table::getDefaultAdapter();
 $db->query("DELETE FROM `Zf_configuration` WHERE `name` IN
 ('runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName','runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName')");
+
+$okapiInfo147 = 'No version below 1.47 can be used with t5 file-format-settings, only "bconf-in-zip" works with older versions';
+$descr = $db->fetchOne('SELECT `description` FROM `Zf_configuration` WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"');
+
+if (! str_contains($descr, $okapiInfo147)) {
+    $db->query('UPDATE `Zf_configuration` SET `description` = :descr
+WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"', [
+        'descr' => trim($descr, '.') . '. ' . $okapiInfo147,
+    ]);
+}

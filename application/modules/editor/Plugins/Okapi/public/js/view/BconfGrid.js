@@ -103,7 +103,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         uniqueName: '#UT#Eindeutiger Name',
         upload: '#UT#Upload',
         uploadBconf: '#UT#Bconf hochladen',
-        okapiUpgradeMsg: '',
         supportetFormats: '#UT#Unterstützte Dateiformate'
     },
     viewConfig: {
@@ -377,11 +376,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     handler: function(btn){
                         window.open(btn.up('grid').helpLink, '_blank');
                     }
-                },
-                {
-                    xtype: 'displayfield',
-                    fieldLabel: '',
-                    value: me.strings.okapiUpgradeMsg
                 },
                 {
                     xtype: 'tbspacer',
