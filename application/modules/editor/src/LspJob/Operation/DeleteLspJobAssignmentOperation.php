@@ -40,7 +40,6 @@ use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\TaskLockService;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
 use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 use RuntimeException;
 
@@ -54,7 +53,7 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
         private readonly UserJobRepository $userJobRepository,
         private readonly TaskRepository $taskRepository,
         private readonly ActionFeasibilityAssert $lspJobActionFeasibilityAssert,
-        private readonly DeleteUserJobOperationInterface $deleteUserJobAssignmentOperation,
+        private readonly DeleteUserJobOperation $deleteUserJobAssignmentOperation,
         private readonly TaskLockService $taskLockService,
     ) {
     }
@@ -93,20 +92,27 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
         }
 
         try {
-            foreach ($this->lspJobRepository->getSubLspJobsOf((int)$job->getId()) as $subJob) {
-                $this->forceDelete($subJob);
-            }
-
-            foreach ($this->userJobRepository->getUserJobsByLspJob((int)$job->getId()) as $userJob) {
-                $this->deleteUserJobAssignmentOperation->forceDelete($userJob);
-            }
-
-            $dataJob = $this->userJobRepository->getDataJobByLspJob((int)$job->getId());
-            $this->userJobRepository->delete((int)$dataJob->getId());
-
-            $this->taskRepository->updateTaskUserCount($job->getTaskGuid());
-
-            $this->lspJobRepository->delete((int)$job->getId());
+            $this->deleteLspJob($job);
+        } finally {
+            $lock->release();
         }
+    }
+
+    public function deleteLspJob(LspJobAssociation $job): void
+    {
+        foreach ($this->lspJobRepository->getSubLspJobsOf((int) $job->getId()) as $subJob) {
+            $this->deleteLspJob($subJob);
+        }
+
+        foreach ($this->userJobRepository->getUserJobsByLspJob((int) $job->getId()) as $userJob) {
+            $this->deleteUserJobAssignmentOperation->deleteUserJob($userJob);
+        }
+
+        $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $job->getId());
+        $this->userJobRepository->delete((int) $dataJob->getId());
+
+        $this->taskRepository->updateTaskUserCount($job->getTaskGuid());
+
+        $this->lspJobRepository->delete((int) $job->getId());
     }
 }

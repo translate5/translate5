@@ -39,7 +39,6 @@ use MittagQI\Translate5\Task\TaskLock;
 use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DTO\UserJobToDelete;
 use RuntimeException;
 use Zend_Registry;
 use ZfExtended_Logger;
@@ -72,39 +71,39 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
         );
     }
 
-    public function delete(UserJobToDelete $toDelete): void
+    public function delete(UserJob $job): void
     {
-        if ($toDelete->job->isLspJob()) {
+        if ($job->isLspJob()) {
             throw new RuntimeException('Use DeleteLspJobAssignmentOperationInterface::delete for LSP jobs');
         }
 
-        $taskLock = $this->acquireLock($toDelete);
+        $taskLock = $this->acquireLock($job->getTaskGuid());
 
         try {
-            $this->feasibilityAssert->assertAllowed(Action::Delete, $toDelete->job);
+            $this->feasibilityAssert->assertAllowed(Action::Delete, $job);
 
-            $this->deleteUserJob($toDelete->job);
+            $this->deleteUserJob($job);
         } finally {
             $taskLock->release();
         }
     }
 
-    public function forceDelete(UserJobToDelete $toDelete): void
+    public function forceDelete(UserJob $job): void
     {
-        if ($toDelete->job->isLspJob()) {
+        if ($job->isLspJob()) {
             throw new RuntimeException('Use DeleteLspJobAssignmentOperationInterface::forceDelete for LSP jobs');
         }
 
-        $taskLock = $this->acquireLock($toDelete);
+        $taskLock = $this->acquireLock($job->getTaskGuid());
 
         try {
-            $this->deleteUserJob($toDelete->job);
+            $this->deleteUserJob($job);
         } finally {
             $taskLock->release();
         }
     }
 
-    private function deleteUserJob(UserJob $job): void
+    public function deleteUserJob(UserJob $job): void
     {
         $task = $this->taskRepository->getByGuid($job->getTaskGuid());
 
@@ -124,12 +123,12 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
         ]);
     }
 
-    private function acquireLock(UserJobToDelete $toDelete): TaskLock
+    private function acquireLock(string $taskGuid): TaskLock
     {
-        $taskLock = $toDelete->taskLock ?: $this->taskLockService->getLockForTask($toDelete->job->getTaskGuid());
+        $taskLock = $this->taskLockService->getLockForTask($taskGuid);
 
-        if (! $taskLock->isAcquired() && ! $taskLock->acquire()) {
-            throw new RuntimeException('Could not acquire lock for task ' . $toDelete->job->getTaskGuid());
+        if (! $taskLock->acquire()) {
+            throw new RuntimeException('Could not acquire lock for task ' . $taskGuid);
         }
 
         return $taskLock;

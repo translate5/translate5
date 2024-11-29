@@ -40,10 +40,10 @@ use MittagQI\Translate5\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\UserJob\Contract\UpdateUserJobOperationInterface;
@@ -55,6 +55,7 @@ use MittagQI\Translate5\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJob
 use MittagQI\Translate5\UserJob\Exception\WorkflowUpdateProhibitedForLspJobsException;
 use MittagQI\Translate5\UserJob\Operation\DTO\UpdateUserJobDto;
 use MittagQI\Translate5\UserJob\Validation\TrackChangesRightsValidator;
+use RuntimeException;
 use Zend_Registry;
 use ZfExtended_Logger;
 
@@ -70,6 +71,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         private readonly editor_Workflow_Manager $workflowManager,
         private readonly BeforeFinishStateTaskValidator $beforeFinishStateTaskValidator,
         private readonly TrackChangesRightsValidator $trackChangesRightsValidator,
+        private readonly TaskLockService $taskLockService,
     ) {
     }
 
@@ -88,74 +90,85 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
             new editor_Workflow_Manager(),
             BeforeFinishStateTaskValidator::create(),
             TrackChangesRightsValidator::create(),
+            TaskLockService::create(),
         );
     }
 
     public function update(UserJob $job, UpdateUserJobDto $dto): void
     {
-        $this->feasibilityAssert->assertAllowed(Action::Update, $job);
+        $lock = $this->taskLockService->getLockForTask($job->getTaskGuid());
 
-        $lspJob = $this->resolveLspJob($job, $dto);
-
-        $oldJob = clone $job;
-
-        if (null !== $dto->state) {
-            $job->setState($dto->state);
+        if (! $lock->acquire()) {
+            throw new RuntimeException('Could not acquire lock for task ' . $job->getTaskGuid());
         }
 
-        $this->updateAssignedUser($job, $dto);
+        try {
+            $this->feasibilityAssert->assertAllowed(Action::Update, $job);
 
-        $this->updateWorkflow($job, $dto);
+            $lspJob = $this->resolveLspJob($job, $dto);
 
-        if (null !== $lspJob) {
-            $job->setLspJobId($lspJob->getId());
-        }
+            $oldJob = clone $job;
 
-        if (null !== $dto->segmentRange && ! $job->isLspJob()) {
-            $job->setSegmentrange($dto->segmentRange);
-        }
-
-        if (null !== $dto->deadlineDate) {
-            $job->setDeadlineDate($dto->deadlineDate);
-        }
-
-        $this->updateTrackChangesRights($job, $lspJob, $dto);
-
-        $job->validate();
-
-        $task = $this->taskRepository->getByGuid($job->getTaskGuid());
-        $workflow = $this->workflowManager->getActiveByTask($task);
-
-        $workflow->hookin()->doWithUserAssoc(
-            $oldJob,
-            $job,
-            function (?string $state) use ($job, $task) {
-                if (null !== $state) {
-                    $this->beforeFinishStateTaskValidator->validateForTaskFinish($state, $job, $task);
-                }
-
-                $this->userJobRepository->save($job);
+            if (null !== $dto->state) {
+                $job->setState($dto->state);
             }
-        );
 
-        if (null !== $dto->state && $oldJob->getState() !== $dto->state) {
-            $this->logger->info(
-                'E1012',
-                'job status changed from {oldState} to {newState}',
-                [
-                    'tua' => $job->getSanitizedEntityForLog(),
-                    'oldState' => $job->getState(),
-                    'newState' => $dto->state,
-                    'task' => $task,
-                ]
+            $this->updateAssignedUser($job, $dto);
+
+            $this->updateWorkflow($job, $dto);
+
+            if (null !== $lspJob) {
+                $job->setLspJobId($lspJob->getId());
+            }
+
+            if (null !== $dto->segmentRange && !$job->isLspJob()) {
+                $job->setSegmentrange($dto->segmentRange);
+            }
+
+            if (null !== $dto->deadlineDate) {
+                $job->setDeadlineDate($dto->deadlineDate);
+            }
+
+            $this->updateTrackChangesRights($job, $lspJob, $dto);
+
+            $job->validate();
+
+            $task = $this->taskRepository->getByGuid($job->getTaskGuid());
+            $workflow = $this->workflowManager->getActiveByTask($task);
+
+            $workflow->hookin()->doWithUserAssoc(
+                $oldJob,
+                $job,
+                function (?string $state) use ($job, $task) {
+                    if (null !== $state) {
+                        $this->beforeFinishStateTaskValidator->validateForTaskFinish($state, $job, $task);
+                    }
+
+                    $this->userJobRepository->save($job);
+                }
             );
+
+            if (null !== $dto->state && $oldJob->getState() !== $dto->state) {
+                $this->logger->info(
+                    'E1012',
+                    'job status changed from {oldState} to {newState}',
+                    [
+                        'tua' => $job->getSanitizedEntityForLog(),
+                        'oldState' => $job->getState(),
+                        'newState' => $dto->state,
+                        'task' => $task,
+                    ]
+                );
+            }
+        } finally {
+            $lock->release();
         }
     }
 
     /**
      * @throws WorkflowUpdateProhibitedForLspJobsException
      */
-    public function updateWorkflow(UserJob $job, UpdateUserJobDto $dto): void
+    private function updateWorkflow(UserJob $job, UpdateUserJobDto $dto): void
     {
         if (null === $dto->workflow) {
             return;
@@ -232,7 +245,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
      * @throws OnlyCoordinatorCanBeAssignedToLspJobException
      * @throws AssignedUserCanBeChangedOnlyForLspJobException
      */
-    public function updateAssignedUser(UserJob $job, UpdateUserJobDto $dto): void
+    private function updateAssignedUser(UserJob $job, UpdateUserJobDto $dto): void
     {
         if (null === $dto->userGuid) {
             return;

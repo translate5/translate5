@@ -34,7 +34,6 @@ use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\JobAssignment\Exception\CompetitiveJobAlreadyTakenException;
 use MittagQI\Translate5\JobAssignment\Notification\DeletedCompetitorsNotification;
-use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
 use MittagQI\Translate5\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
@@ -45,7 +44,6 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
 use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 use MittagQI\Translate5\Workflow\Notification\DTO\DeletedJobDto;
 use RuntimeException;
@@ -58,10 +56,10 @@ class CompetitiveJobsRemover
         private readonly LspJobRepository $lspJobRepository,
         private readonly TaskRepository $taskRepository,
         private readonly LspRepositoryInterface $lspRepository,
-        private readonly DeleteUserJobOperationInterface $deleteUserJobOperation,
-        private readonly DeleteLspJobAssignmentOperationInterface $deleteLspJobOperation,
+        private readonly DeleteUserJobOperation $deleteUserJobOperation,
+        private readonly DeleteLspJobAssignmentOperation $deleteLspJobOperation,
         private readonly DeletedCompetitorsNotification $notificator,
-        private readonly TaskLockService $lock,
+        private readonly TaskLockService $taskLockService,
     ) {
     }
 
@@ -85,7 +83,7 @@ class CompetitiveJobsRemover
      */
     public function removeCompetitorsOfJobFor(string $userGuid, string $taskGuid, string $workflowStepName): void
     {
-        $lock = $this->lock->getLockForTask($taskGuid);
+        $lock = $this->taskLockService->getLockForTask($taskGuid);
 
         if (! $lock->acquire()) {
             throw new RuntimeException('Could not acquire lock for task ' . $taskGuid);
@@ -203,7 +201,7 @@ class CompetitiveJobsRemover
         $dataJob = $this->userJobRepository->getDataJobByLspJob($toDelete->getId());
         $deletedJobData = DeletedJobDto::fromUserJob($dataJob);
 
-        $this->deleteLspJobOperation->forceDelete($toDelete);
+        $this->deleteLspJobOperation->deleteLspJob($toDelete);
 
         $this->notificator->sendNotification($task, $deletedJobData, $responsibleUser, $anonymizeUsers);
     }
@@ -214,10 +212,10 @@ class CompetitiveJobsRemover
         User $responsibleUser,
         bool $anonymizeUsers
     ): void {
-        $deletedGobData = DeletedJobDto::fromUserJob($toDelete);
+        $deletedJobData = DeletedJobDto::fromUserJob($toDelete);
 
-        $this->deleteUserJobOperation->forceDelete($toDelete);
+        $this->deleteUserJobOperation->deleteUserJob($toDelete);
 
-        $this->notificator->sendNotification($task, $deletedGobData, $responsibleUser, $anonymizeUsers);
+        $this->notificator->sendNotification($task, $deletedJobData, $responsibleUser, $anonymizeUsers);
     }
 }

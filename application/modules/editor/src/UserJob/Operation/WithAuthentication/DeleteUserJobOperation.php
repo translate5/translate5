@@ -37,7 +37,6 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DTO\UserJobToDelete;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 
@@ -64,18 +63,18 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
         );
     }
 
-    public function delete(UserJobToDelete $toDelete): void
+    public function delete(UserJob $job): void
     {
-        $this->assertAccess($toDelete->job);
+        $this->assertAccess($job);
 
-        $this->operation->delete($toDelete);
+        $this->operation->delete($job);
     }
 
-    public function forceDelete(UserJobToDelete $toDelete): void
+    public function forceDelete(UserJob $job): void
     {
-        $this->assertAccess($toDelete->job);
+        $this->assertAccess($job);
 
-        $this->operation->forceDelete($toDelete);
+        $this->operation->forceDelete($job);
     }
 
     private function assertAccess(UserJob $job): void

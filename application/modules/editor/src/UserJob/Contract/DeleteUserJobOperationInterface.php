@@ -30,11 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\UserJob\Contract;
 
-use MittagQI\Translate5\UserJob\Operation\DTO\UserJobToDelete;
+use editor_Models_TaskUserAssoc as UserJob;
 
 interface DeleteUserJobOperationInterface
 {
-    public function delete(UserJobToDelete $toDelete): void;
+    public function delete(UserJob $job): void;
 
-    public function forceDelete(UserJobToDelete $toDelete): void;
+    public function forceDelete(UserJob $job): void;
 }

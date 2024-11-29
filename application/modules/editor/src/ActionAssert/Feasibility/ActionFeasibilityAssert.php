@@ -44,7 +44,7 @@ abstract class ActionFeasibilityAssert implements ActionFeasibilityAssertInterfa
      * @param FeasibilityAssertInterface<T>[] $asserts
      */
     public function __construct(
-        private readonly array $asserts
+        private readonly iterable $asserts
     ) {
     }
 

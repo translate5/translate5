@@ -44,7 +44,7 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
      * @param PermissionAssertInterface[] $asserts
      */
     public function __construct(
-        private readonly array $asserts,
+        private readonly iterable $asserts,
     ) {
     }
 

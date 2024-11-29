@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\JobAssignment\Exception\CompetitiveJobAlreadyTakenException;
 use MittagQI\Translate5\JobAssignment\Workflow\CompetitiveJobsRemover;
-use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use MittagQI\Translate5\Task\Export\Package\Remover;
 use MittagQI\Translate5\Workflow\ArchiveConfigDTO;
@@ -41,7 +40,6 @@ use MittagQI\Translate5\Workflow\ArchiveTaskActions;
 class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
 {
     public function __construct(
-        private readonly UserJobRepository $userJobRepository,
         private readonly CompetitiveJobsRemover $competitiveJobsRemover
     ) {
     }
@@ -49,7 +47,6 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
     public static function create(): self
     {
         return new self(
-            UserJobRepository::create(),
             CompetitiveJobsRemover::create(),
         );
     }
@@ -168,7 +165,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
         /* @var $task editor_Models_Task */
 
         // check if the order date is set. With empty order data, no deadline date from config is posible
-        if (empty($task->getOrderdate()) || is_null($task->getOrderdate())) {
+        if (empty($task->getOrderdate())) {
             return;
         }
 
@@ -356,13 +353,13 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
         $edit100PercentMatch = (bool) ($this->config->parameters->edit100PercentMatch ?? true);
 
         $applyFullMatchChange = new ApplyEditFullMatchOperation(
-            ZfExtended_Factory::get(editor_Models_Segment_AutoStates::class),
-            ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class),
-            ZfExtended_Factory::get(editor_Models_Segment_Meta::class),
+            new editor_Models_Segment_AutoStates(),
+            new editor_Models_Segment_InternalTag(),
+            new editor_Models_Segment_Meta(),
         );
         $applyFullMatchChange->updateSegmentsEdit100PercentMatch(
             $this->config->task,
-            ZfExtended_Factory::get(editor_Models_Segment_Iterator::class, [$this->config->task->getTaskGuid()]),
+            new editor_Models_Segment_Iterator($this->config->task->getTaskGuid()),
             $edit100PercentMatch,
         );
 
