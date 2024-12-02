@@ -1,62 +1,62 @@
 [
   {
     "unicode": "U+202F",
-    "visualized": "NNBSP"
+    "visualized": "N⎵"
   },
   {
     "unicode": "U+200A",
-    "visualized": "HSP"
+    "visualized": "H⎵"
   },
   {
     "unicode": "U+2009",
-    "visualized": "THSP"
+    "visualized": "T⎵"
   },
   {
     "unicode": "U+2008",
-    "visualized": "PSP"
+    "visualized": "P⎵"
   },
   {
     "unicode": "U+2007",
-    "visualized": "FSP"
+    "visualized": "F⎵"
   },
   {
     "unicode": "U+2006",
-    "visualized": "6/MSP"
+    "visualized": "6⎵"
   },
   {
     "unicode": "U+2005",
-    "visualized": "4/MSP"
+    "visualized": "4⎵"
   },
   {
     "unicode": "U+2004",
-    "visualized": "3/MSP"
+    "visualized": "3⎵"
   },
   {
     "unicode": "U+2001",
-    "visualized": "MQSP"
+    "visualized": "M⎵"
   },
   {
     "unicode": "U+2028",
-    "visualized": "LSEP"
+    "visualized": "LS"
   },
   {
     "unicode": "U+200B",
-    "visualized": "ZWSP"
+    "visualized": "Z⎵"
   },
   {
     "unicode": "U+200C",
-    "visualized": "ZWNJ"
+    "visualized": "ZJ"
   },
   {
     "unicode": "U+00AD",
-    "visualized": "SHY"
+    "visualized": "SH"
   },
   {
     "unicode": "U+2011",
-    "visualized": "NBH"
+    "visualized": "NH"
   },
   {
     "unicode": "U+00AD",
-    "visualized": "ZWNBSP"
+    "visualized": "ZB"
   }
 ]
