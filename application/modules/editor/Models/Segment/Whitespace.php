@@ -140,6 +140,11 @@ class editor_Models_Segment_Whitespace
             'text' => self::LABEL_NBSP,
             'title' => 'No-Break Space (NBSP)',
         ],
+        '/\x{00AD}/u' => [
+            'ts' => 'c2ad',
+            'text' => '[SHY]',
+            'title' => 'Soft Hyphen',
+        ],
         '/\x{1680}/u' => [
             'ts' => 'e19a80',
             'text' => self::LABEL_CHARACTER,
@@ -209,6 +214,16 @@ class editor_Models_Segment_Whitespace
             'ts' => 'e2808b',
             'text' => '[ZWSP]',
             'title' => 'Zero Width Space (ZWSP)',
+        ],
+        '/\x{200C}/u' => [
+            'ts' => 'e2808c',
+            'text' => '[ZWNJ]',
+            'title' => 'Zero Width Non-Joiner (ZWNJ)',
+        ],
+        '/\x{2011}/u' => [ // should it be here ?
+            'ts' => 'e28091',
+            'text' => '‑',
+            'title' => 'Non-Breaking Hyphen',
         ],
         '/\x{2028}/u' => [
             'ts' => 'e280a8',
