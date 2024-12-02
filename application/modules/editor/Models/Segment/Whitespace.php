@@ -220,7 +220,7 @@ class editor_Models_Segment_Whitespace
             'text' => '[ZWNJ]',
             'title' => 'Zero Width Non-Joiner (ZWNJ)',
         ],
-        '/\x{2011}/u' => [ // should it be here ?
+        '/\x{2011}/u' => [
             'ts' => 'e28091',
             'text' => '‑',
             'title' => 'Non-Breaking Hyphen',
@@ -265,7 +265,7 @@ class editor_Models_Segment_Whitespace
     /**
      * tag map for usage in language resources
      */
-    private array $tagShortcutNumberMap = [];
+    // private array $tagShortcutNumberMap = [];
 
     private array $protectedCharLabels = [];
 
