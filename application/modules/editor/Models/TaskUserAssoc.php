@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Workflow_Default as Workflow;
-use MittagQI\Translate5\UserJob\TypeEnum;
+use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\ZfExtended\Logger\CustomFileLogger;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 

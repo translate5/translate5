@@ -35,12 +35,12 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
+use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserHasUnDeletableJobException;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 
 /**
  * @implements FeasibilityAssertInterface<User>

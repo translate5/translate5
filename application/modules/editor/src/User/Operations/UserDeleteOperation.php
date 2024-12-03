@@ -32,6 +32,8 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
+use MittagQI\Translate5\JobAssignment\UserJob\Contract\DeleteUserJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -39,8 +41,6 @@ use MittagQI\Translate5\User\ActionAssert\Feasibility\ForceUserActionFeasibility
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\Contract\UserDeleteOperationInterface;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 use Zend_Registry;
 use ZfExtended_Logger;
 

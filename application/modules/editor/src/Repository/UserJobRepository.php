@@ -31,12 +31,12 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Db_Task as TaskTable;
-use editor_Models_TaskUserAssoc as UserJob;
 use editor_Models_Db_TaskUserAssoc as UserJobTable;
+use editor_Models_TaskUserAssoc as UserJob;
 use editor_Models_TaskUserAssoc_Segmentrange;
 use editor_Task_Type;
 use editor_Workflow_Default as Workflow;
-use MittagQI\Translate5\UserJob\TypeEnum;
+use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Expr;

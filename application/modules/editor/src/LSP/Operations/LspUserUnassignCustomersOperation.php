@@ -34,6 +34,9 @@ use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\Contract\DeleteUserJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
 use MittagQI\Translate5\LSP\Contract\LspUserUnassignCustomersOperationInterface;
 use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
 use MittagQI\Translate5\LSP\Exception\CustomerCanNotBeUnAssignedFromCoordinatorAsItHasRelatedLspJobsException;
@@ -45,9 +48,6 @@ use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\User\Contract\UserUnassignCustomersOperationInterface;
 use MittagQI\Translate5\User\Operations\UserUnassignCustomersOperation;
-use MittagQI\Translate5\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
-use MittagQI\Translate5\UserJob\Contract\DeleteUserJobOperationInterface;
-use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 
 final class LspUserUnassignCustomersOperation implements LspUserUnassignCustomersOperationInterface
 {

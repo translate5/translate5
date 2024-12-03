@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\Operation;
 
-use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
+use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobAssignmentOperation;
+use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\UserJob\Operation\DeleteUserJobOperation;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class DeleteJobAssignmentOperation

@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations;
 
+use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\LSP\Contract\LspDeleteOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
-use MittagQI\Translate5\LspJob\Operation\DeleteLspJobAssignmentOperation;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;

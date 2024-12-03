@@ -30,15 +30,14 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment;
 
-use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LspJob\ActionAssert\Permission\LspJobActionPermissionAssert;
+use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Permission\LspJobActionPermissionAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\UserJobViewDataProvider;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\Translate5\UserJob\UserJobViewDataProvider;
 
 /**
  * @template Job of array{
