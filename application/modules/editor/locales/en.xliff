@@ -482,66 +482,6 @@
                 <source>Gedankenstrich (Breite m) einfügen</source>
                 <target>Insert dash (width m)</target>
             </trans-unit>
-            <trans-unit id="RW0gUXVhZCBlaW5mw7xnZW4=">
-                <source>Em Quad einfügen</source>
-                <target>Insert Em Quad</target>
-            </trans-unit>
-            <trans-unit id="U2NobWFsZXMgZ2VzY2jDvHR6dGVzIExlZXJ6ZWljaGVuIGVpbmbDvGdlbg==">
-                <source>Schmales geschütztes Leerzeichen einfügen</source>
-                <target>Insert narrow no-break space</target>
-            </trans-unit>
-            <trans-unit id="SGFhcmzDvGNrZSBlaW5mw7xnZW4=">
-                <source>Haarlücke einfügen</source>
-                <target>Insert hair space</target>
-            </trans-unit>
-            <trans-unit id="TGVlcnplaWNoZW4gbWl0IGRlciBCcmVpdGUgTnVsbCBlaW5mw7xnZW4=">
-                <source>Leerzeichen mit der Breite Null einfügen</source>
-                <target>Insert zero width space</target>
-            </trans-unit>
-            <trans-unit id="TmljaHR2ZXJiaW5kZXIgbWl0IE51bGxicmVpdGUgZWluZsO8Z2Vu">
-                <source>Nichtverbinder mit Nullbreite einfügen</source>
-                <target>Insert zero width non-joiner</target>
-            </trans-unit>
-            <trans-unit id="U2NobWFsc3B1ciBlaW5mw7xnZW4=">
-                <source>Schmalspur einfügen</source>
-                <target>Insert thin space</target>
-            </trans-unit>
-            <trans-unit id="U2F0enplaWNoZW4gZWluZsO8Z2Vu">
-                <source>Satzzeichen einfügen</source>
-                <target>Insert punctuation space</target>
-            </trans-unit>
-            <trans-unit id="QWJiaWxkdW5nc2Fic3RhbmQgZWluZsO8Z2Vu">
-                <source>Abbildungsabstand einfügen</source>
-                <target>Insert figure space</target>
-            </trans-unit>
-            <trans-unit id="U2VjaHMtUGVyLUVtLVJhdW0gZWluZsO8Z2Vu">
-                <source>Sechs-Per-Em-Raum einfügen</source>
-                <target>Insert six-per-em space</target>
-            </trans-unit>
-            <trans-unit id="Vmllci1QZXItRW0tUmF1bSBlaW5mw7xnZW4=">
-                <source>Vier-Per-Em-Raum einfügen</source>
-                <target>Insert four-per-em space</target>
-            </trans-unit>
-            <trans-unit id="RHJlaS1QZXItRW0tUmF1bSBlaW5mw7xnZW4=">
-                <source>Drei-Per-Em-Raum einfügen</source>
-                <target>Insert three-per-em space</target>
-            </trans-unit>
-            <trans-unit id="WmVpbGVudHJlbm56ZWljaGVuIGVpbmbDvGdlbg==">
-                <source>Zeilentrennzeichen einfügen</source>
-                <target>Insert line separator</target>
-            </trans-unit>
-            <trans-unit id="R2VyaW5nZSBUcmVubnN0cmljaGUgZWluZsO8Z2Vu">
-                <source>Geringe Trennstriche einfügen</source>
-                <target>Insert soft hyphen</target>
-            </trans-unit>
-            <trans-unit id="R2VzY2jDvHR6dGVuIEJpbmRlc3RyaWNoIGVpbmbDvGdlbg==">
-                <source>Geschützten Bindestrich einfügen</source>
-                <target>Insert non-breaking hyphen</target>
-            </trans-unit>
-            <trans-unit id="R2VzY2jDvHR6dGVzIExlZXJ6ZWljaGVuIG1pdCBOdWxsYnJlaXRlIGVpbmbDvGdlbg==">
-                <source>Geschütztes Leerzeichen mit Nullbreite einfügen</source>
-                <target>Insert zero width no-break space</target>
-            </trans-unit>
             <trans-unit id="QW5nZXdpbmtlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gbGlua3MgZWluZsO8Z2Vu">
                 <source>Angewinkeltes Anführungszeichen links einfügen</source>
                 <target>Insert angled quotation mark on the left</target>

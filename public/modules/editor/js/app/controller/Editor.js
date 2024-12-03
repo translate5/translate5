@@ -170,6 +170,9 @@ Ext.define('Editor.controller.Editor', {
             'segmentsToolbar specialCharactersButton': {
                 click: 'insertSpecialCharacter'
             },
+            'segmentsToolbar specialCharactersButtonTagged': {
+                click: 'insertWhitespaceTagged'
+            },
             '#segmentMinMaxLength': {
                 insertNewline: 'insertWhitespaceNewline'
             },
@@ -1722,6 +1725,9 @@ Ext.define('Editor.controller.Editor', {
     insertWhitespaceTab: function(key,e) {
         this.insertWhitespace(key,e,'tab');
     },
+    insertWhitespaceTagged: function(key,e) {
+        this.insertWhitespace(key,e,key.value);
+    },
 
     /***
      * Button handler for special characters buttons.
@@ -1730,11 +1736,11 @@ Ext.define('Editor.controller.Editor', {
      */
     insertSpecialCharacter: function (button, e){
 
-        /*if(button.xtype === 'specialCharactersButtonTagged') {
+        if(button.xtype === 'specialCharactersButtonTagged') {
             // proper implementation is needed, this doesn't work:
-            editor.insertMarkup('<char ts="e28087" length="1"/>')
+            // editor.insertMarkup('<char ts="e28087" length="1"/>')
             return;
-        }*/
+        }
 
         var me = this,
             plug = me.getEditPlugin(),

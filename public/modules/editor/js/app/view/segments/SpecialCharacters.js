@@ -131,16 +131,14 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                 Ext.Array.each(decoded[rec], function(r) {
 
                     var value = Editor.util.Util.toUnicodeCodePointEscape(r.unicode),
-                    hasTag = r.hasOwnProperty('ts');
+                    hasTag = r.hasOwnProperty('tagInfo');
 
                     if (!addedValues.has(value)) {
                         items.push({
                             xtype: 'specialCharactersButton' + (hasTag?'Tagged':''),
                             text: r.visualized,
-                            value: (hasTag ? r.ts : Editor.util.Util.toUnicodeCodePointEscape(r.unicode)),
-                            tooltip: Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode]
-                            // OR if translations are not needed:
-                            // tooltip: (hasTag ? r.visualized : Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode])
+                            value: (hasTag ? r.tagInfo + '|' + r.visualized : Editor.util.Util.toUnicodeCodePointEscape(r.unicode)),
+                            tooltip: (hasTag ? r.visualized : Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode])
                         });
 
                         addedValues.add(value);
