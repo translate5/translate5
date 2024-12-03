@@ -34,7 +34,7 @@ use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
@@ -43,7 +43,7 @@ use MittagQI\Translate5\Repository\UserRepository;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 
-class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperationInterface
+class DeleteLspJobOperation implements DeleteLspJobOperationInterface
 {
     /**
      * @param ActionPermissionAssertInterface<UserJob> $permissionAssert
@@ -51,7 +51,7 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
     public function __construct(
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
-        private readonly DeleteLspJobAssignmentOperationInterface $operation,
+        private readonly DeleteLspJobOperationInterface $operation,
         private readonly ActionPermissionAssertInterface $permissionAssert,
         private readonly UserJobRepository $userJobRepository,
     ) {
@@ -65,7 +65,7 @@ class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperation
         return new self(
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
-            \MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobAssignmentOperation::create(),
+            \MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation::create(),
             UserJobActionPermissionAssert::create(),
             UserJobRepository::create(),
         );

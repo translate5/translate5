@@ -34,7 +34,7 @@ use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\JobAssignment\Exception\CompetitiveJobAlreadyTakenException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobAssignmentOperation;
+use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
 use MittagQI\Translate5\JobAssignment\Notification\DeletedCompetitorsNotification;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
@@ -57,7 +57,7 @@ class CompetitiveJobsRemover
         private readonly TaskRepository $taskRepository,
         private readonly LspRepositoryInterface $lspRepository,
         private readonly DeleteUserJobOperation $deleteUserJobOperation,
-        private readonly DeleteLspJobAssignmentOperation $deleteLspJobOperation,
+        private readonly DeleteLspJobOperation $deleteLspJobOperation,
         private readonly DeletedCompetitorsNotification $notificator,
         private readonly TaskLockService $taskLockService,
     ) {
@@ -72,7 +72,7 @@ class CompetitiveJobsRemover
             TaskRepository::create(),
             LspRepository::create(),
             DeleteUserJobOperation::create(),
-            DeleteLspJobAssignmentOperation::create(),
+            DeleteLspJobOperation::create(),
             DeletedCompetitorsNotification::create(),
             TaskLockService::create(),
         );

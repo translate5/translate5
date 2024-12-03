@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\JobAssignment\LspJob\Contract;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
 
-interface DeleteLspJobAssignmentOperationInterface
+interface DeleteLspJobOperationInterface
 {
     /**
      * @throws LspJobAlreadyExistsException

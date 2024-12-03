@@ -35,9 +35,9 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobAssignmentOperation;
+use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
 use MittagQI\Translate5\LSP\Contract\LspUnassignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Contract\LspUserUnassignCustomersOperationInterface;
 use MittagQI\Translate5\LSP\Exception\LspHasUnDeletableJobException;
@@ -55,7 +55,7 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
         private readonly LspJobRepository $lspJobRepository,
         private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly ActionFeasibilityAssert $lspJobActionFeasibilityAssert,
-        private readonly DeleteLspJobAssignmentOperationInterface $deleteLspJobAssignmentOperation,
+        private readonly DeleteLspJobOperationInterface $deleteLspJobAssignmentOperation,
         private readonly LspUserUnassignCustomersOperationInterface $lspUserUnassignCustomersOperation,
     ) {
     }
@@ -70,7 +70,7 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
             LspJobRepository::create(),
             LspUserRepository::create(),
             LspJobActionFeasibilityAssert::create(),
-            DeleteLspJobAssignmentOperation::create(),
+            DeleteLspJobOperation::create(),
             LspUserUnassignCustomersOperation::create(),
         );
     }

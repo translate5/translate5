@@ -33,7 +33,7 @@ use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\Exception\
 use MittagQI\Translate5\JobAssignment\LspJob\DataProvider\CoordinatorProvider;
 use MittagQI\Translate5\JobAssignment\LspJob\DataProvider\UserProvider;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication\CreateLspJobAssignmentOperation;
+use MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication\CreateLspJobOperation;
 use MittagQI\Translate5\JobAssignment\Operation\WithAuthentication\DeleteJobAssignmentOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobInUseException;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobWhichTaskIsLockedByUserException;
@@ -303,7 +303,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             $dto = NewUserJobDtoFactory::create()->fromRequest($this->getRequest());
 
             if (TypeEnum::Lsp === $dto->type) {
-                $lspJob = CreateLspJobAssignmentOperation::create()->assignJob(NewLspJobDto::fromUserJobDto($dto));
+                $lspJob = CreateLspJobOperation::create()->assignJob(NewLspJobDto::fromUserJobDto($dto));
                 $userJob = UserJobRepository::create()->getDataJobByLspJob((int) $lspJob->getId());
             } else {
                 $userJob = CreateUserJobOperation::create()->assignJob($dto);

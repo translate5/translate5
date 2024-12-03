@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobAssignmentOperation;
+use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
 use MittagQI\Translate5\LSP\Contract\LspDeleteOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
@@ -54,7 +54,7 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
         private readonly LspJobRepository $lspJobRepository,
         private readonly UserRepository $userRepository,
         private readonly UserDeleteOperationInterface $deleteUserOperation,
-        private readonly DeleteLspJobAssignmentOperationInterface $lspJobDeleteOperation,
+        private readonly DeleteLspJobOperationInterface $lspJobDeleteOperation,
         private readonly ZfExtended_Logger $logger,
     ) {
     }
@@ -70,7 +70,7 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
             LspJobRepository::create(),
             new UserRepository(),
             UserDeleteOperation::create(),
-            DeleteLspJobAssignmentOperation::create(),
+            DeleteLspJobOperation::create(),
             Zend_Registry::get('logger')->cloneMe('lsp.delete')
         );
     }

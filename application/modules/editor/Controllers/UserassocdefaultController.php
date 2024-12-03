@@ -26,9 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
- *
- */
+use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+
 class Editor_UserassocdefaultController extends ZfExtended_RestController
 {
     protected $entityClass = 'editor_Models_UserAssocDefault';
@@ -44,10 +43,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
      */
     protected $postBlacklist = ['id'];
 
-    /***
-     * @return void
-     */
-    protected function decodePutData()
+    protected function decodePutData(): void
     {
         parent::decodePutData();
         // check and convert the languages to lek_languages id
@@ -57,5 +53,11 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
         if (property_exists($this->data, 'targetLang')) {
             $this->_helper->Api->convertLanguageParameters($this->data->targetLang);
         }
+    }
+
+    public function coordinatorscomboAction(): void
+    {
+        $jobCoordinatorRepository = JobCoordinatorRepository::create();
+        $jobCoordinatorRepository->getCoordinatorsCount();
     }
 }

@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\JobAssignment\LspJob\Operation;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
@@ -43,7 +43,7 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\TaskLockService;
 use RuntimeException;
 
-class DeleteLspJobAssignmentOperation implements DeleteLspJobAssignmentOperationInterface
+class DeleteLspJobOperation implements DeleteLspJobOperationInterface
 {
     /**
      * @param ActionFeasibilityAssert<LspJobAssociation> $lspJobActionFeasibilityAssert

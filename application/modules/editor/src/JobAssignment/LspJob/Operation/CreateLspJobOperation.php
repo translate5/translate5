@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\LspJob\Operation;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\CreateLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\JobAssignment\LspJob\Contract\CreateLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
@@ -53,7 +53,7 @@ use MittagQI\Translate5\Task\TaskLockService;
 use RuntimeException;
 use Throwable;
 
-class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperationInterface
+class CreateLspJobOperation implements CreateLspJobOperationInterface
 {
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,

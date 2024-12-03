@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobAssignmentOperationInterface;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobAssignmentOperation;
+use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\DeleteUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
@@ -43,7 +43,7 @@ class JobsPurger
         private readonly UserJobRepository $userJobRepository,
         private readonly LspJobRepository $lspJobRepository,
         private readonly DeleteUserJobOperationInterface $deleteUserJobAssignmentOperation,
-        private readonly DeleteLspJobAssignmentOperationInterface $deleteLspJobAssignmentOperation,
+        private readonly DeleteLspJobOperationInterface $deleteLspJobAssignmentOperation,
     ) {
     }
 
@@ -53,7 +53,7 @@ class JobsPurger
             UserJobRepository::create(),
             LspJobRepository::create(),
             DeleteUserJobOperation::create(),
-            DeleteLspJobAssignmentOperation::create(),
+            DeleteLspJobOperation::create(),
         );
     }
 

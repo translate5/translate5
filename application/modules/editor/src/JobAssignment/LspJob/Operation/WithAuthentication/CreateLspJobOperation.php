@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\CreateLspJobAssignmentOperationInterface;
+use MittagQI\Translate5\JobAssignment\LspJob\Contract\CreateLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\CoordinatorAttemptedToCreateLspJobForHisLspException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
@@ -49,7 +49,7 @@ use MittagQI\Translate5\User\Exception\InexistentUserException;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 
-class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperationInterface
+class CreateLspJobOperation implements CreateLspJobOperationInterface
 {
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
@@ -59,7 +59,7 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly ActionPermissionAssertInterface $userPermissionAssert,
         private readonly ActionPermissionAssertInterface $taskPermissionAssert,
-        private readonly CreateLspJobAssignmentOperationInterface $operation,
+        private readonly CreateLspJobOperationInterface $operation,
     ) {
     }
 
@@ -76,7 +76,7 @@ class CreateLspJobAssignmentOperation implements CreateLspJobAssignmentOperation
             ZfExtended_Authentication::getInstance(),
             UserActionPermissionAssert::create(),
             TaskActionPermissionAssert::create(),
-            \MittagQI\Translate5\JobAssignment\LspJob\Operation\CreateLspJobAssignmentOperation::create(),
+            \MittagQI\Translate5\JobAssignment\LspJob\Operation\CreateLspJobOperation::create(),
         );
     }
 

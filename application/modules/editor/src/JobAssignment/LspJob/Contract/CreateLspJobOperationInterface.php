@@ -45,7 +45,7 @@ use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNot
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 
-interface CreateLspJobAssignmentOperationInterface
+interface CreateLspJobOperationInterface
 {
     /**
      * @throws AttemptToAssignSubLspJobBeforeParentJobCreatedException
