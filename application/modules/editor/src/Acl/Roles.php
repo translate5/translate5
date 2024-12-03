@@ -146,7 +146,7 @@ final class Roles
             self::JOB_COORDINATOR,
         ],
         self::TM_MAINTENANCE => [
-            self::TM_MAINTENANCE_ALL_CLIENTS
+            self::TM_MAINTENANCE_ALL_CLIENTS,
         ],
         self::TERMPM_ALLCLIENTS => [
             self::TERMPM,

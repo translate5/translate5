@@ -42,7 +42,7 @@ use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\User\Model\User;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
-use ZfExtended_Factory;
+use ZfExtended_Models_Db_User;
 
 /**
  * @template User as array{userGuid: string, longUserName: string}
@@ -101,18 +101,16 @@ class UserProvider
      */
     private function getSimpleUsers(User $viewer): array
     {
-        $user = ZfExtended_Factory::get(User::class);
-
         $select = $this->db
             ->select()
             ->from(
                 [
-                    'user' => $user->db->info($user->db::NAME)
+                    'user' => ZfExtended_Models_Db_User::TABLE_NAME,
                 ]
             )
             ->joinLeft(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME
+                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
                 ],
                 'lspUser.userId = user.id',
                 ['lspUser.lspId']
@@ -130,33 +128,31 @@ class UserProvider
      */
     private function getLspUsers(string $taskGuid, User $viewer): array
     {
-        $user = ZfExtended_Factory::get(User::class);
-
         $select = $this->db
             ->select()
             ->distinct()
             ->from(
                 [
-                    'user' => $user->db->info($user->db::NAME)
+                    'user' => ZfExtended_Models_Db_User::TABLE_NAME,
                 ]
             )
             ->join(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME
+                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
                 ],
                 'lspUser.userId = user.id',
                 []
             )
             ->join(
                 [
-                    'lsp' => LanguageServiceProviderTable::TABLE_NAME
+                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
                 ],
                 'lspUser.lspId = lsp.id',
                 []
             )
             ->join(
                 [
-                    'lspJob' => LspJobTable::TABLE_NAME
+                    'lspJob' => LspJobTable::TABLE_NAME,
                 ],
                 'lspJob.lspId = lsp.id',
                 []

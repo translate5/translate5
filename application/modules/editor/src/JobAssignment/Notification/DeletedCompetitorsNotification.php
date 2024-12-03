@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\JobAssignment\Notification;
 
 use editor_Models_Task as Task;
-use editor_Models_TaskUserAssoc as UserJob;
 use editor_Workflow_Manager as WorkflowManager;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;

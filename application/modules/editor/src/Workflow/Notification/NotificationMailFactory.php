@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Workflow\Notification;
 
-use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use ZfExtended_TemplateBasedMail as Mail;
@@ -105,7 +104,7 @@ class NotificationMailFactory
         $users = [];
 
         foreach ($workflowStepNames as $stepName) {
-            $users[] =  $this->userJobRepository->loadUsersOfTaskWithStep($taskGuid, $stepName, ['deadlineDate']);
+            $users[] = $this->userJobRepository->loadUsersOfTaskWithStep($taskGuid, $stepName, ['deadlineDate']);
         }
 
         return array_merge(...$users);

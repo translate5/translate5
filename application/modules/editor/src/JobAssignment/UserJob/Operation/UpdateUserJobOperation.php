@@ -121,7 +121,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
                 $job->setLspJobId($lspJob->getId());
             }
 
-            if (null !== $dto->segmentRange && !$job->isLspJob()) {
+            if (null !== $dto->segmentRange && ! $job->isLspJob()) {
                 $job->setSegmentrange($dto->segmentRange);
             }
 

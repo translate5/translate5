@@ -124,7 +124,6 @@ class TaskRepository
 
     public function release()
     {
-
     }
 
     /**

@@ -193,7 +193,7 @@ class TaskViewDataProvider
             // we need an info about the current user in any case
             // so we set info from first job of the current user,
             // but we override info if a later assoc has the matching workflow step name
-            if ($viewersJob && (!isset($task['userRole']) || $matchingWorkflowStep)) {
+            if ($viewersJob && (! isset($task['userRole']) || $matchingWorkflowStep)) {
                 $task['userRole'] = $job['role'];
                 $task['userState'] = $job['state'];
                 $task['userStep'] = $job['workflowStepName'];
@@ -203,7 +203,7 @@ class TaskViewDataProvider
                 $task['userTrackchangesAcceptReject'] = $job['trackchangesAcceptReject'];
             }
 
-            $task['isUsed'] = $task['isUsed'] || !empty($job['usedState']);
+            $task['isUsed'] = $task['isUsed'] || ! empty($job['usedState']);
 
             if ($anonymizeUsers) {
                 $job = $this->anonymizer->anonymizeUserdata(

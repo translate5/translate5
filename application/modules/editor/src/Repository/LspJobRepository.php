@@ -39,6 +39,7 @@ use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
@@ -136,9 +137,9 @@ class LspJobRepository
             )
             ->join(
                 [
-                    'userJob' => UserJobTable::TABLE_NAME,
+                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
                 ],
-                'userJob.lspJobId = lspJob.id',
+                'lspUser.lspId = lspJob.lspId',
                 []
             )
             ->join(
@@ -155,7 +156,7 @@ class LspJobRepository
         return (int) $this->db->fetchOne($select) > 0;
     }
 
-    public function findLspJobOfCoordinatorInTas(
+    public function findLspJobOfCoordinatorInTask(
         string $userGuid,
         string $taskGuid,
         string $workflowStepName
@@ -167,16 +168,9 @@ class LspJobRepository
             ])
             ->join(
                 [
-                    'task' => TaskTable::TABLE_NAME,
+                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
                 ],
-                'lspJob.taskGuid = task.taskGuid',
-                []
-            )
-            ->join(
-                [
-                    'userJob' => UserJobTable::TABLE_NAME,
-                ],
-                'userJob.lspJobId = lspJob.id',
+                'lspUser.lspId = lspJob.lspId',
                 []
             )
             ->join(

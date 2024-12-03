@@ -222,26 +222,26 @@ class CoordinatorProvider
             ->distinct()
             ->from(
                 [
-                    'user' => ZfExtended_Models_Db_User::TABLE_NAME
+                    'user' => ZfExtended_Models_Db_User::TABLE_NAME,
                 ]
             )
             ->join(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME
+                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
                 ],
                 'lspUser.userId = user.id',
                 []
             )
             ->join(
                 [
-                    'lsp' => LanguageServiceProviderTable::TABLE_NAME
+                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
                 ],
                 'lspUser.lspId = lsp.id',
                 []
             )
             ->join(
                 [
-                    'parentLspJob' => LspJobTable::TABLE_NAME
+                    'parentLspJob' => LspJobTable::TABLE_NAME,
                 ],
                 'parentLspJob.lspId = lsp.parentId',
                 []
@@ -267,26 +267,26 @@ class CoordinatorProvider
             ->distinct()
             ->from(
                 [
-                    'user' => ZfExtended_Models_Db_User::TABLE_NAME
+                    'user' => ZfExtended_Models_Db_User::TABLE_NAME,
                 ]
             )
             ->join(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME
+                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
                 ],
                 'lspUser.userId = user.id',
                 []
             )
             ->join(
                 [
-                    'lsp' => LanguageServiceProviderTable::TABLE_NAME
+                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
                 ],
                 'lspUser.lspId = lsp.id',
                 []
             )
             ->join(
                 [
-                    'parentLspJob' => LspJobTable::TABLE_NAME
+                    'parentLspJob' => LspJobTable::TABLE_NAME,
                 ],
                 'parentLspJob.lspId = lsp.parentId',
                 []
@@ -309,19 +309,19 @@ class CoordinatorProvider
             ->distinct()
             ->from(
                 [
-                    'user' => ZfExtended_Models_Db_User::TABLE_NAME
+                    'user' => ZfExtended_Models_Db_User::TABLE_NAME,
                 ]
             )
             ->join(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME
+                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
                 ],
                 'lspUser.userId = user.id',
                 []
             )
             ->join(
                 [
-                    'lsp' => LanguageServiceProviderTable::TABLE_NAME
+                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
                 ],
                 'lspUser.lspId = lsp.id',
                 []

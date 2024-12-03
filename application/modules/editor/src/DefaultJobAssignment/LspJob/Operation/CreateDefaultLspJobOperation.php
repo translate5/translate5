@@ -113,7 +113,7 @@ class CreateDefaultLspJobOperation implements CreateLspJobOperationInterface
                 try {
                     // check if parent LSP Job exists. Sub LSP can have only jobs related to its parent LSP
                     $parentJob = $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
-                        (int)$lsp->getParentId(),
+                        (int) $lsp->getParentId(),
                         $dto->taskGuid,
                         $dto->workflow->workflow,
                         $dto->workflow->workflowStepName,
@@ -136,7 +136,7 @@ class CreateDefaultLspJobOperation implements CreateLspJobOperationInterface
 
             $job = $this->lspJobRepository->getEmptyModel();
             $job->setTaskGuid($dto->taskGuid);
-            $job->setLspId((int)$coordinator->lsp->getId());
+            $job->setLspId((int) $coordinator->lsp->getId());
             $job->setWorkflow($dto->workflow->workflow);
             $job->setWorkflowStepName($dto->workflow->workflowStepName);
 

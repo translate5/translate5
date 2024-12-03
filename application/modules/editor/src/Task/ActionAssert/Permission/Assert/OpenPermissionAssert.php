@@ -38,9 +38,9 @@ use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterfac
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserJobIsNotEditableException;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\JobAssignmentWasDeletedInTheMeantimeException;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserJobIsNotEditableException;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\User\Model\User;
 use Zend_Acl_Exception;
@@ -78,9 +78,6 @@ class OpenPermissionAssert implements PermissionAssertInterface
         return TaskAction::View === $action || TaskAction::Edit === $action;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $granted = $context->actor->getUserGuid() === $object->getPmGuid()

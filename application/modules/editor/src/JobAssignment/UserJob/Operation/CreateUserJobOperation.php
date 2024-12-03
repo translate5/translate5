@@ -101,7 +101,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             $lspJob = null;
 
             if (null !== $lspUser) {
-                $lspJob = $this->resolveLspJob((int)$lspUser->lsp->getId(), $dto);
+                $lspJob = $this->resolveLspJob((int) $lspUser->lsp->getId(), $dto);
 
                 $this->validateTrackChangesSettings($lspJob, $dto);
             }
@@ -127,9 +127,9 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             $job->setType($dto->type);
             $job->setAssignmentDate($dto->assignmentDate);
             $job->setDeadlineDate($dto->deadlineDate);
-            $job->setTrackchangesShow((int)$dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
-            $job->setTrackchangesShowAll((int)$dto->trackChangesRights->canSeeAllTrackChanges);
-            $job->setTrackchangesAcceptReject((int)$dto->trackChangesRights->canAcceptOrRejectTrackChanges);
+            $job->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
+            $job->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
+            $job->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
 
             if (null !== $lspJob) {
                 $job->setLspJobId($lspJob->getId());

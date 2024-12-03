@@ -32,6 +32,9 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission;
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\LspDataJobAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\TaskRestrictionAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\UserRestrictionAssert;
 
 /**
  * @extends ActionPermissionAssert<UserJob>
@@ -44,9 +47,9 @@ class UserJobActionPermissionAssert extends ActionPermissionAssert
     public static function create(): self
     {
         return new self([
-            \MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\TaskRestrictionAssert::create(),
-            \MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\UserRestrictionAssert::create(),
-            \MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\LspDataJobAssert::create(),
+            TaskRestrictionAssert::create(),
+            UserRestrictionAssert::create(),
+            LspDataJobAssert::create(),
         ]);
     }
 }

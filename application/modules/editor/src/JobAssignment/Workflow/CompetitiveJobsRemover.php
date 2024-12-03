@@ -106,7 +106,7 @@ class CompetitiveJobsRemover
                 return;
             }
 
-            $lspJob = $this->lspJobRepository->findLspJobOfCoordinatorInTas(
+            $lspJob = $this->lspJobRepository->findLspJobOfCoordinatorInTask(
                 $userGuid,
                 $taskGuid,
                 $workflowStepName,

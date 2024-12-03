@@ -233,7 +233,7 @@ class LspRepository implements LspRepositoryInterface
         $select = $customerDb->select()
             ->setIntegrityCheck(false)
             ->distinct()
-             ->from(
+            ->from(
                 [
                     'lspToCustomer' => LanguageServiceProviderCustomerTable::TABLE_NAME,
                 ],

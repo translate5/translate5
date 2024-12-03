@@ -4,9 +4,9 @@ namespace MittagQI\Translate5\LanguageResource\Adapter\Export;
 
 enum ExportTmFileExtension: string
 {
-    case TM = 'tm';
-    case TMX = 'tmx';
-    case ZIP = 'zip';
+    case Tm = 'tm';
+    case Tmx = 'tmx';
+    case Zip = 'zip';
 
     public static function fromMimeType(string $mime, bool $preferZip = true): self
     {

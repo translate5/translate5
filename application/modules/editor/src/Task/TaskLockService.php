@@ -56,8 +56,6 @@ class TaskLockService
 
     /**
      * Locking task for given stateId.
-     * @param editor_Models_Task $task
-     * @return bool
      */
     public function lockTask(editor_Models_Task $task, string $lockId): bool
     {
@@ -84,8 +82,6 @@ class TaskLockService
 
     /**
      * Unlock the task if locked and set it to STATE_OPEN
-     * @param editor_Models_Task $task
-     * @return bool
      */
     public function unlockTask(editor_Models_Task $task): bool
     {

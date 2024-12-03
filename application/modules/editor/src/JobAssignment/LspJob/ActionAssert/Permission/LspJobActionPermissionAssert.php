@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Permission;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Permission\Asserts\LspJobOfAllowedLspAssert;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 
 /**
@@ -44,7 +45,7 @@ class LspJobActionPermissionAssert extends ActionPermissionAssert
     public static function create(): self
     {
         return new self([
-            \MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Permission\Asserts\LspJobOfAllowedLspAssert::create(),
+            LspJobOfAllowedLspAssert::create(),
         ]);
     }
 }
