@@ -35,14 +35,14 @@ use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterfac
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Permission\Exception\NoAccessToLspJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 
 /**
- * @implements PermissionAssertInterface<LspJobAssociation>
+ * @implements PermissionAssertInterface<LspJob>
  */
 class LspJobOfAllowedLspAssert implements PermissionAssertInterface
 {

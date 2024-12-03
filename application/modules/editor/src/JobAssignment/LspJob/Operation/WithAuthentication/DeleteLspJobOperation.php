@@ -36,7 +36,7 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -74,21 +74,21 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
     /**
      * @throws LspJobAlreadyExistsException
      */
-    public function delete(LspJobAssociation $job): void
+    public function delete(LspJob $job): void
     {
         $this->assertAccess($job);
 
         $this->operation->delete($job);
     }
 
-    public function forceDelete(LspJobAssociation $job): void
+    public function forceDelete(LspJob $job): void
     {
         $this->assertAccess($job);
 
         $this->operation->forceDelete($job);
     }
 
-    private function assertAccess(LspJobAssociation $job): void
+    private function assertAccess(LspJob $job): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
         $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $job->getId());

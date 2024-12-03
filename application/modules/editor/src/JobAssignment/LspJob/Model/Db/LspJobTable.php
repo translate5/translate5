@@ -55,9 +55,9 @@ namespace MittagQI\Translate5\JobAssignment\LspJob\Model\Db;
 
 use Zend_Db_Table_Abstract;
 
-class LspJobAssociationTable extends Zend_Db_Table_Abstract
+class LspJobTable extends Zend_Db_Table_Abstract
 {
-    public const TABLE_NAME = 'LEK_lsp_job_association';
+    public const TABLE_NAME = 'LEK_lsp_job';
 
     protected $_name = self::TABLE_NAME;
 

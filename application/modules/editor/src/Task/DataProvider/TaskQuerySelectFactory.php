@@ -34,7 +34,7 @@ use editor_Models_Db_Task as TaskDb;
 use editor_Models_Db_TaskUserAssoc as UserJobDb;
 use editor_Task_Type;
 use MittagQI\Translate5\Acl\Rights;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobAssociationTable;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Model\User;
@@ -215,7 +215,7 @@ class TaskQuerySelectFactory
         $select
             ->join(
                 [
-                    'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                    'lspJob' => LspJobTable::TABLE_NAME,
                 ],
                 'lspJob.taskGuid = task.taskGuid',
                 []

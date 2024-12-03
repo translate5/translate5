@@ -35,8 +35,8 @@ use editor_Models_Db_TaskUserAssoc as UserJobTable;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\InexistentLspJobException;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobAssociationTable;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use PDO;
@@ -64,18 +64,18 @@ class LspJobRepository
         );
     }
 
-    public function getEmptyModel(): LspJobAssociation
+    public function getEmptyModel(): LspJob
     {
-        return ZfExtended_Factory::get(LspJobAssociation::class);
+        return ZfExtended_Factory::get(LspJob::class);
     }
 
     /**
      * @throws InexistentLspJobException
      */
-    public function get(int $id): LspJobAssociation
+    public function get(int $id): LspJob
     {
         try {
-            $job = ZfExtended_Factory::get(LspJobAssociation::class);
+            $job = ZfExtended_Factory::get(LspJob::class);
             $job->load($id);
 
             return $job;
@@ -87,7 +87,7 @@ class LspJobRepository
     public function delete(int $jobId): void
     {
         $this->db->delete(
-            LspJobAssociationTable::TABLE_NAME,
+            LspJobTable::TABLE_NAME,
             $this->db->quoteInto('id = ?', $jobId)
         );
     }
@@ -95,7 +95,7 @@ class LspJobRepository
     /**
      * @throws LspJobAlreadyExistsException
      */
-    public function save(LspJobAssociation $job): void
+    public function save(LspJob $job): void
     {
         try {
             $job->save();
@@ -106,7 +106,7 @@ class LspJobRepository
 
     public function lspHasJobInTask(int $lspId, string $taskGuid): bool
     {
-        $job = ZfExtended_Factory::get(LspJobAssociation::class);
+        $job = ZfExtended_Factory::get(LspJob::class);
 
         $select = $this->db
             ->select()
@@ -123,7 +123,7 @@ class LspJobRepository
             ->select()
             ->from(
                 [
-                    'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                    'lspJob' => LspJobTable::TABLE_NAME,
                 ],
                 'COUNT(*)'
             )
@@ -159,11 +159,11 @@ class LspJobRepository
         string $userGuid,
         string $taskGuid,
         string $workflowStepName
-    ): ?LspJobAssociation {
+    ): ?LspJob {
         $select = $this->db
             ->select()
             ->from([
-                'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                'lspJob' => LspJobTable::TABLE_NAME,
             ])
             ->join(
                 [
@@ -197,7 +197,7 @@ class LspJobRepository
             return null;
         }
 
-        $job = new LspJobAssociation();
+        $job = new LspJob();
         $job->init(
             new \Zend_Db_Table_Row(
                 [
@@ -218,7 +218,7 @@ class LspJobRepository
             ->select()
             ->from(
                 [
-                    'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                    'lspJob' => LspJobTable::TABLE_NAME,
                 ],
                 'COUNT(*)'
             )
@@ -237,15 +237,15 @@ class LspJobRepository
     }
 
     /**
-     * @return iterable<LspJobAssociation>
+     * @return iterable<LspJob>
      */
     public function getLspJobs(int $lspId): iterable
     {
-        $job = new LspJobAssociation();
+        $job = new LspJob();
 
         $select = $this->db
             ->select()
-            ->from(LspJobAssociationTable::TABLE_NAME)
+            ->from(LspJobTable::TABLE_NAME)
             ->where('lspId = ?', $lspId)
         ;
 
@@ -268,16 +268,16 @@ class LspJobRepository
     }
 
     /**
-     * @return iterable<LspJobAssociation>
+     * @return iterable<LspJob>
      */
     public function getLspJobsOfCustomer(int $lspId, int $customerId): iterable
     {
-        $job = new LspJobAssociation();
+        $job = new LspJob();
 
         $select = $this->db
             ->select()
             ->from([
-                'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                'lspJob' => LspJobTable::TABLE_NAME,
             ])
             ->join(
                 [
@@ -314,7 +314,7 @@ class LspJobRepository
             ->select()
             ->from(
                 [
-                    'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                    'lspJob' => LspJobTable::TABLE_NAME,
                 ],
                 'COUNT(*)'
             )
@@ -340,20 +340,20 @@ class LspJobRepository
     }
 
     /**
-     * @return iterable<LspJobAssociation>
+     * @return iterable<LspJob>
      */
     public function getSubLspJobsOf(int $lspJobId): iterable
     {
-        $job = ZfExtended_Factory::get(LspJobAssociation::class);
+        $job = ZfExtended_Factory::get(LspJob::class);
 
         $select = $this->db
             ->select()
             ->from([
-                'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                'lspJob' => LspJobTable::TABLE_NAME,
             ])
             ->join(
                 [
-                    'parentLspJob' => LspJobAssociationTable::TABLE_NAME,
+                    'parentLspJob' => LspJobTable::TABLE_NAME,
                 ],
                 implode(
                     ' AND ',
@@ -407,13 +407,13 @@ class LspJobRepository
         string $taskGuid,
         string $workflow,
         string $workflowStepName,
-    ): LspJobAssociation {
-        $lspJob = new LspJobAssociation();
+    ): LspJob {
+        $lspJob = new LspJob();
 
         $select = $this->db
             ->select()
             ->from([
-                'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                'lspJob' => LspJobTable::TABLE_NAME,
             ])
             ->where('lspJob.lspId = ?', $lspId)
             ->where('lspJob.taskGuid = ?', $taskGuid)
@@ -442,19 +442,19 @@ class LspJobRepository
     }
 
     /**
-     * @return iterable<LspJobAssociation>
+     * @return iterable<LspJob>
      */
     public function getByTaskGuidAndWorkflow(
         string $taskGuid,
         string $workflow,
         string $workflowStepName,
     ): iterable {
-        $job = new LspJobAssociation();
+        $job = new LspJob();
 
         $select = $this->db
             ->select()
             ->from([
-                'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                'lspJob' => LspJobTable::TABLE_NAME,
             ])
             ->where('lspJob.taskGuid = ?', $taskGuid)
             ->where('lspJob.workflow = ?', $workflow)
@@ -479,12 +479,12 @@ class LspJobRepository
 
     public function getTaskLspJobs(string $taskGuid): iterable
     {
-        $lspJob = new LspJobAssociation();
+        $lspJob = new LspJob();
 
         $select = $this->db
             ->select()
             ->from([
-                'lspJob' => LspJobAssociationTable::TABLE_NAME,
+                'lspJob' => LspJobTable::TABLE_NAME,
             ])
             ->where('lspJob.taskGuid = ?', $taskGuid)
         ;

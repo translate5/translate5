@@ -110,6 +110,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     private TaskActionPermissionAssert $taskActionPermissionAssert;
 
+    private JobAssignmentViewDataProvider $jobAssignmentViewDataProvider;
+
     public function init()
     {
         parent::init();
@@ -210,6 +212,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             // @phpstan-ignore-next-line
             $this->view->rows = $this->userProvider->getPossibleUsersForNewJobInTask($task, $authUser);
         } catch (Throwable $e) {
+            $this->log->exception($e);
+
             throw $this->transformException($e);
         }
     }
@@ -229,6 +233,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             // @phpstan-ignore-next-line
             $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForNewJobInTask($task, $authUser);
         } catch (Throwable $e) {
+            $this->log->exception($e);
+
             throw $this->transformException($e);
         }
     }
@@ -256,6 +262,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             // @phpstan-ignore-next-line
             $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForLspJobUpdate($lspJob, $authUser);
         } catch (Throwable $e) {
+            $this->log->exception($e);
+
             throw $this->transformException($e);
         }
     }
@@ -284,6 +292,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
             $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($job, $authUser);
         } catch (Throwable $e) {
+            $this->log->exception($e);
+
             throw $this->transformException($e);
         }
     }
@@ -311,6 +321,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
             $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($userJob, $authUser);
         } catch (Throwable $e) {
+            $this->log->exception($e);
+
             throw $this->transformException($e);
         }
     }
@@ -340,6 +352,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 $deleteJobOperation->delete((int) $job->getId());
             }
         } catch (Throwable $e) {
+            $this->log->exception($e);
+
             throw $this->transformException($e);
         }
     }

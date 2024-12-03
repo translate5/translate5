@@ -31,14 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\JobAssignment\LspJob\Contract;
 
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 
 interface DeleteLspJobOperationInterface
 {
     /**
      * @throws LspJobAlreadyExistsException
      */
-    public function delete(LspJobAssociation $job): void;
+    public function delete(LspJob $job): void;
 
-    public function forceDelete(LspJobAssociation $job): void;
+    public function forceDelete(LspJob $job): void;
 }

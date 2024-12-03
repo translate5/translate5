@@ -53,7 +53,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\LspJob\Model;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobAssociationTable;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
 use ZfExtended_Models_Entity_Abstract;
 
 /**
@@ -67,7 +67,7 @@ use ZfExtended_Models_Entity_Abstract;
  * @method string getWorkflowStepName()
  * @method void setWorkflowStepName(string $stepName)
  */
-class LspJobAssociation extends ZfExtended_Models_Entity_Abstract
+class LspJob extends ZfExtended_Models_Entity_Abstract
 {
-    protected $dbInstanceClass = LspJobAssociationTable::class;
+    protected $dbInstanceClass = LspJobTable::class;
 }

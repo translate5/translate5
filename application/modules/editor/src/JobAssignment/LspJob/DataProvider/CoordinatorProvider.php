@@ -34,8 +34,8 @@ use editor_Models_Task as Task;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobAssociationTable;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToJobCoordinatorException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
@@ -195,7 +195,7 @@ class CoordinatorProvider
     /**
      * @return Coordinator[]
      */
-    public function getPossibleCoordinatorsForLspJobUpdate(LspJobAssociation $lspJob, User $viewer): array
+    public function getPossibleCoordinatorsForLspJobUpdate(LspJob $lspJob, User $viewer): array
     {
         $coordinators = [];
         foreach ($this->jobCoordinatorRepository->getByLspId((int) $lspJob->getLspId()) as $coordinator) {
@@ -241,7 +241,7 @@ class CoordinatorProvider
             )
             ->join(
                 [
-                    'parentLspJob' => LspJobAssociationTable::TABLE_NAME
+                    'parentLspJob' => LspJobTable::TABLE_NAME
                 ],
                 'parentLspJob.lspId = lsp.parentId',
                 []
@@ -286,7 +286,7 @@ class CoordinatorProvider
             )
             ->join(
                 [
-                    'parentLspJob' => LspJobAssociationTable::TABLE_NAME
+                    'parentLspJob' => LspJobTable::TABLE_NAME
                 ],
                 'parentLspJob.lspId = lsp.parentId',
                 []

@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Operation;
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\CreateUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
@@ -159,7 +159,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
     /**
      * @throws AttemptToAssignLspUserToAJobBeforeLspJobCreatedException
      */
-    public function resolveLspJob(int $lspId, NewUserJobDto $dto): LspJobAssociation
+    public function resolveLspJob(int $lspId, NewUserJobDto $dto): LspJob
     {
         try {
             return $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
@@ -176,7 +176,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
     /**
      * @throws TrackChangesRightsAreNotSubsetOfLspJobException
      */
-    private function validateTrackChangesSettings(LspJobAssociation $lspJob, NewUserJobDto $dto): void
+    private function validateTrackChangesSettings(LspJob $lspJob, NewUserJobDto $dto): void
     {
         if (TypeEnum::Lsp === $dto->type) {
             return;

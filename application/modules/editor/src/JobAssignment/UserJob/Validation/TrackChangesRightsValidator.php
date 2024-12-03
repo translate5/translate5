@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\UserJob\Validation;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\Repository\UserJobRepository;
 
@@ -58,7 +58,7 @@ class TrackChangesRightsValidator
         ?bool $canSeePrevSteps,
         ?bool $canSeeAll,
         ?bool $canAcceptOrReject,
-        LspJobAssociation $lspJob
+        LspJob $lspJob
     ): void {
         $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
 

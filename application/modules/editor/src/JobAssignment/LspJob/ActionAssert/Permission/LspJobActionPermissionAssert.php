@@ -31,10 +31,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Permission;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 
 /**
- * @extends ActionPermissionAssert<LspJobAssociation>
+ * @extends ActionPermissionAssert<LspJob>
  */
 class LspJobActionPermissionAssert extends ActionPermissionAssert
 {

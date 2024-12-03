@@ -35,7 +35,7 @@ use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
@@ -46,7 +46,7 @@ use RuntimeException;
 class DeleteLspJobOperation implements DeleteLspJobOperationInterface
 {
     /**
-     * @param ActionFeasibilityAssert<LspJobAssociation> $lspJobActionFeasibilityAssert
+     * @param ActionFeasibilityAssert<LspJob> $lspJobActionFeasibilityAssert
      */
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
@@ -76,14 +76,14 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
     /**
      * @throws LspJobAlreadyExistsException
      */
-    public function delete(LspJobAssociation $job): void
+    public function delete(LspJob $job): void
     {
         $this->lspJobActionFeasibilityAssert->assertAllowed(Action::Delete, $job);
 
         $this->forceDelete($job);
     }
 
-    public function forceDelete(LspJobAssociation $job): void
+    public function forceDelete(LspJob $job): void
     {
         $lock = $this->taskLockService->getLockForTask($job->getTaskGuid());
 
@@ -98,7 +98,7 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
         }
     }
 
-    public function deleteLspJob(LspJobAssociation $job): void
+    public function deleteLspJob(LspJob $job): void
     {
         foreach ($this->lspJobRepository->getSubLspJobsOf((int) $job->getId()) as $subJob) {
             $this->deleteLspJob($subJob);

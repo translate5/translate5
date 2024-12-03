@@ -34,7 +34,7 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\CreateLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\CoordinatorAttemptedToCreateLspJobForHisLspException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
@@ -80,7 +80,7 @@ class CreateLspJobOperation implements CreateLspJobOperationInterface
         );
     }
 
-    public function assignJob(NewLspJobDto $dto): LspJobAssociation
+    public function assignJob(NewLspJobDto $dto): LspJob
     {
         try {
             $authUser = $this->userRepository->get($this->authentication->getUserId());
@@ -92,7 +92,7 @@ class CreateLspJobOperation implements CreateLspJobOperationInterface
         $task = $this->taskRepository->getByGuid($dto->taskGuid);
         $user = $this->userRepository->getByGuid($dto->userGuid);
 
-        $this->taskPermissionAssert->assertGranted(TaskAction::Update, $task, $context);
+        $this->taskPermissionAssert->assertGranted(TaskAction::AssignJob, $task, $context);
         $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
 
         $coordinator = $this->coordinatorRepository->findByUser($user);

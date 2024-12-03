@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\JobAssignment\Workflow;
 use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\JobAssignment\Exception\CompetitiveJobAlreadyTakenException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
 use MittagQI\Translate5\JobAssignment\Notification\DeletedCompetitorsNotification;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
@@ -161,7 +161,7 @@ class CompetitiveJobsRemover
      * @throws CompetitiveJobAlreadyTakenException
      */
     private function removeCompetitorsOfLspJob(
-        LspJobAssociation $job,
+        LspJob $job,
         Task $task,
         User $responsibleUser,
         bool $anonymizeUsers,
@@ -193,7 +193,7 @@ class CompetitiveJobsRemover
     }
 
     private function deleteLspJob(
-        LspJobAssociation $toDelete,
+        LspJob $toDelete,
         Task $task,
         User $responsibleUser,
         bool $anonymizeUsers

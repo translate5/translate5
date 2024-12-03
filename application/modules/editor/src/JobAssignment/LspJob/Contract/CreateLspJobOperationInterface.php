@@ -34,7 +34,7 @@ use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInt
 use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\CoordinatorAttemptedToCreateLspJobForHisLspException;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
@@ -63,5 +63,5 @@ interface CreateLspJobOperationInterface
      * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
      * @throws TrackChangesRightsAreNotSubsetOfLspJobException
      */
-    public function assignJob(NewLspJobDto $dto): LspJobAssociation;
+    public function assignJob(NewLspJobDto $dto): LspJob;
 }

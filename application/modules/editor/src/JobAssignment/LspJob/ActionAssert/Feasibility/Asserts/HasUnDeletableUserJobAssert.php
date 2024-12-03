@@ -34,12 +34,12 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\Repository\UserJobRepository;
 
 /**
- * @implements FeasibilityAssertInterface<LspJobAssociation>
+ * @implements FeasibilityAssertInterface<LspJob>
  */
 class HasUnDeletableUserJobAssert implements FeasibilityAssertInterface
 {

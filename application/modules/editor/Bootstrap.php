@@ -854,6 +854,24 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         );
         $this->front->getRouter()->addRoute('customer_resourceexport', $customerResourceExport);
 
+        $this->front->getRouter()->addRoute('editorCustomerDefaultJobsComboCoordinators', new ZfExtended_Controller_RestLikeRoute(
+            'editor/customer/:customerId/combo/coordinators',
+            [
+                'module' => 'editor',
+                'controller' => 'userassocdefault',
+                'action' => 'coordinatorscombo',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorCustomerDefaultJobsComboUsers', new ZfExtended_Controller_RestLikeRoute(
+            'editor/customer/:customerId/combo/users',
+            [
+                'module' => 'editor',
+                'controller' => 'userassocdefault',
+                'action' => 'userscombo',
+            ]
+        ));
+
         $sessionImpersonate = new ZfExtended_Controller_RestLikeRoute(
             'editor/session/impersonate',
             [

@@ -34,11 +34,11 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\Asserts\HasUnDeletableUserJobAssert;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\Repository\LspJobRepository;
 
 /**
- * @extends ActionFeasibilityAssert<LspJobAssociation>
+ * @extends ActionFeasibilityAssert<LspJob>
  */
 final class LspJobActionFeasibilityAssert extends ActionFeasibilityAssert
 {

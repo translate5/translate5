@@ -34,7 +34,7 @@ use editor_Models_TaskUserAssoc as UserJob;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\UpdateUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
@@ -190,7 +190,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         $job->setWorkflowStepName($dto->workflow->workflowStepName);
     }
 
-    private function resolveLspJob(UserJob $job, UpdateUserJobDto $dto): ?LspJobAssociation
+    private function resolveLspJob(UserJob $job, UpdateUserJobDto $dto): ?LspJob
     {
         if (! $job->isLspUserJob()) {
             return null;
@@ -217,7 +217,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
     /**
      * @throws TrackChangesRightsAreNotSubsetOfLspJobException
      */
-    private function updateTrackChangesRights(UserJob $job, ?LspJobAssociation $lspJob, UpdateUserJobDto $dto): void
+    private function updateTrackChangesRights(UserJob $job, ?LspJob $lspJob, UpdateUserJobDto $dto): void
     {
         if (null !== $lspJob && ! $job->isLspJob()) {
             $this->trackChangesRightsValidator->assertTrackChangesRightsAreSubsetOfLspJob(

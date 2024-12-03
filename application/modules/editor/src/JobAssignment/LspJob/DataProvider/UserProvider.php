@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\JobAssignment\LspJob\DataProvider;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobAssociationTable;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
@@ -156,7 +156,7 @@ class UserProvider
             )
             ->join(
                 [
-                    'lspJob' => LspJobAssociationTable::TABLE_NAME
+                    'lspJob' => LspJobTable::TABLE_NAME
                 ],
                 'lspJob.lspId = lsp.id',
                 []

@@ -36,7 +36,7 @@ use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJobAssociation;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
 use MittagQI\Translate5\LSP\Contract\LspUnassignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Contract\LspUserUnassignCustomersOperationInterface;
@@ -129,7 +129,7 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
     }
 
     /**
-     * @return iterable<LspJobAssociation>
+     * @return iterable<LspJob>
      */
     private function getLspJobsIterator(int $lspId, int $customerId): iterable
     {

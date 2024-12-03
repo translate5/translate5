@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\LspJob\Operation;
+namespace MittagQI\Translate5\DefaultJobAssignment\LspJob\Operation;
 
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\CreateLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
@@ -53,7 +53,7 @@ use MittagQI\Translate5\Task\TaskLockService;
 use RuntimeException;
 use Throwable;
 
-class CreateLspJobOperation implements CreateLspJobOperationInterface
+class CreateDefaultLspJobOperation implements CreateLspJobOperationInterface
 {
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
