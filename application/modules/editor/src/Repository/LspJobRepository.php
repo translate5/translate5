@@ -352,7 +352,7 @@ class LspJobRepository
                 implode(
                     ' AND ',
                     [
-                        'lspJob.lspId = lspJob.lspId',
+                        'lspJob.lspId = parentLspJob.id',
                         'lspJob.taskGuid = parentLspJob.taskGuid',
                         'lspJob.workflowStepName = parentLspJob.workflowStepName',
                     ]
