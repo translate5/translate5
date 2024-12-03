@@ -143,9 +143,9 @@ class UserJobViewDataProvider
     /**
      * @return Job[]
      */
-    public function getListFor(Task $task, User $viewer): array
+    public function getListFor(string $taskGuid, User $viewer): array
     {
-        $jobs = $this->userJobRepository->getTaskJobs($task->getTaskGuid(), true);
+        $jobs = $this->userJobRepository->getTaskJobs($taskGuid, true);
 
         return $this->buildViewForList($jobs, $viewer);
     }

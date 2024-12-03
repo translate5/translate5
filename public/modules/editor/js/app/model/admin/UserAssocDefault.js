@@ -36,6 +36,7 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
     fields: [
       {name: 'id', type: 'int',persist: false},
       {name: 'customerId', type: 'int'},
+      {name: 'type', type: 'int'},
       {name: 'sourceLang', type: 'int'},
       {name: 'targetLang', type: 'int'},
       {name: 'userGuid', type: 'string'},

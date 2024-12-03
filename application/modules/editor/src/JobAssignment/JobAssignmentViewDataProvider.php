@@ -95,12 +95,12 @@ class JobAssignmentViewDataProvider
     /**
      * @return Job[]
      */
-    public function getListFor(Task $task, User $viewer): array
+    public function getListFor(string $taskGuid, User $viewer): array
     {
         $lspJobs = [];
         $context = new PermissionAssertContext($viewer);
 
-        foreach ($this->lspJobRepository->getTaskLspJobs($task->getTaskGuid()) as $lspJob) {
+        foreach ($this->lspJobRepository->getTaskLspJobs($taskGuid) as $lspJob) {
             if ($this->lspJobActionPermissionAssert->isGranted(Action::Read, $lspJob, $context)) {
                 $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
 
@@ -108,7 +108,7 @@ class JobAssignmentViewDataProvider
             }
         }
 
-        $userJobs = $this->userJobViewDataProvider->getListFor($task, $viewer);
+        $userJobs = $this->userJobViewDataProvider->getListFor($taskGuid, $viewer);
 
         return array_merge($lspJobs, $userJobs);
     }

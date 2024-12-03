@@ -26,13 +26,39 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_TaskUserTracking;
-use ZfExtended_Factory;
+use editor_Models_Db_TaskUserTracking;
+use Exception;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 
 class TaskUserTrackingRepository
 {
+    public function __construct(
+        private readonly Zend_Db_Adapter_Abstract $db,
+    ) {
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self(
+            Zend_Db_Table::getDefaultAdapter(),
+        );
+    }
+
     public function getByTaskGuid(string $taskGuid): array
     {
-        return ZfExtended_Factory::get(editor_Models_TaskUserTracking::class)->getByTaskGuid($taskGuid);
+        try {
+            $s = $this->db
+                ->select()
+                ->from(editor_Models_Db_TaskUserTracking::TABLE_NAME)
+                ->where('taskGuid = ?', $taskGuid);
+
+            return $this->db->fetchAll($s);
+        } catch (Exception) {
+            return [];
+        }
     }
 }

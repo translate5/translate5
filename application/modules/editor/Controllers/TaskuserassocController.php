@@ -161,7 +161,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
         $task = $this->taskRepository->get((int) $this->getRequest()->getParam('taskId'));
 
-        $rows = $this->jobAssignmentViewDataProvider->getListFor($task, $authUser);
+        $rows = $this->jobAssignmentViewDataProvider->getListFor($task->getTaskGuid(), $authUser);
 
         // @phpstan-ignore-next-line
         $this->view->rows = $rows;

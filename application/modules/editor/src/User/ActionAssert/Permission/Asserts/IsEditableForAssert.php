@@ -40,7 +40,7 @@ use MittagQI\Translate5\User\Model\User;
 /**
  * @implements PermissionAssertInterface<User>
  */
-final class AclPermissionAssert implements PermissionAssertInterface
+final class IsEditableForAssert implements PermissionAssertInterface
 {
     public function supports(BackedEnum $action): bool
     {

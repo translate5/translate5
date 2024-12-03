@@ -32,6 +32,7 @@ use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use MittagQI\Translate5\Segment\QualityService;
@@ -427,8 +428,6 @@ class editor_TaskController extends ZfExtended_RestController
         $file = ZfExtended_Factory::get(editor_Models_File::class);
         $fileCount = $file->getFileCountPerTasks($taskGuids);
         $isTransfer = $file->getTransfersPerTasks($taskGuids);
-
-        $this->_helper->TaskUserInfo->initUserAssocInfos($taskDataList['rows']);
 
         //load the task assocs
         $languageResourcemodel = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
@@ -1248,15 +1247,29 @@ class editor_TaskController extends ZfExtended_RestController
         $this->entity->save();
         $obj = $this->entity->getDataObject();
 
-        $userAssocInfos = $this->_helper->TaskUserInfo->initUserAssocInfos([$obj]);
-        $this->invokeTaskUserTracking($taskguid, $userAssocInfos[$taskguid]['role'] ?? '');
+        $userJobRepository = UserJobRepository::create();
+        $currentUserJob = $userJobRepository->findUserJobInTask(
+            $this->authenticatedUser->getUserGuid(),
+            $taskguid,
+            $this->entity->getWorkflowStepName(),
+        );
+
+        $this->invokeTaskUserTracking($taskguid, $currentUserJob?->getRole() ?: '');
 
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
-        $isEditAll =
-            $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS) || $this->isAuthUserTaskPm($row['pmGuid']);
+        $isEditAll = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS)
+            || $this->isAuthUserTaskPm($row['pmGuid']);
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
-        $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll, $this->data->userState ?? null);
+
+        $row = $this->taskViewDataProvider->buildTaskView($row, $this->authenticatedUser);
+
+        $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
+
+        $givenUserState = $this->data->userState ?? null;
+        if (! isset($row['userState']) && $isEditAll && ! empty($givenUserState)) {
+            $row['userState'] = $givenUserState; //returning the given userState for usage in frontend
+        }
         $this->view->rows = (object) $row;
 
         if ($this->isOpenTaskRequest()) {
@@ -1666,13 +1679,14 @@ class editor_TaskController extends ZfExtended_RestController
 
         $obj = $this->entity->getDataObject();
 
-        $this->_helper->TaskUserInfo->initUserAssocInfos([$obj]);
-
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
 
         $isEditAll = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS);
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
+
+        $row = $this->taskViewDataProvider->buildTaskView($row, $this->authenticatedUser);
+
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->addMissingSegmentrangesToResult($row);
         $this->view->rows = (object) $row;

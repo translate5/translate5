@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\AclPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\IsEditableForAssert;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 
@@ -52,7 +52,7 @@ class AclPermissionAssertTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $auditor = new AclPermissionAssert();
+        $auditor = new IsEditableForAssert();
         $this->assertEquals($expected, $auditor->supports($action));
     }
 
@@ -77,7 +77,7 @@ class AclPermissionAssertTest extends TestCase
             $this->expectException(NoAccessException::class);
         }
 
-        $auditor = new AclPermissionAssert();
+        $auditor = new IsEditableForAssert();
         $auditor->assertGranted($user, $context);
     }
 }

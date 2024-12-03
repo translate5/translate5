@@ -259,7 +259,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             '<tpl for="users">',
             '<tr>',
             '<td class="">{#}</td>',
-            '<td class="">{[Ext.String.htmlEncode(values.userName)]}</td>',
+            '<td class="">{[Ext.String.htmlEncode(values.longUserName)]}</td>',
             '<td class="">{[this.getRole(parent, values)]}</td>',
             '<td class="">{[this.getState(parent, values)]}</td>',
             '<td class="">{[Ext.util.Format.date(values.assignmentDate,Editor.DATE_TIME_LOCALIZED_FORMAT)]}</td>',
