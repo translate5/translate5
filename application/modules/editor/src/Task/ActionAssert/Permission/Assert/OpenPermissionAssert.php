@@ -80,13 +80,12 @@ class OpenPermissionAssert implements PermissionAssertInterface
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $granted = $context->actor->getUserGuid() === $object->getPmGuid()
-            || $this->canLoadAllTasks($context->actor)
-            || (
-                $context->actor->isCoordinator()
-                && $this->lspOfCoordinatorHasJobForTaskWorkflowStep($context->actor->getUserGuid(), $object->getTaskGuid())
-            )
-        ;
+        $granted = $context->actor->getUserGuid() === $object->getPmGuid() || $this->canLoadAllTasks($context->actor);
+
+        $granted = $granted || (
+            $context->actor->isCoordinator()
+            && $this->lspOfCoordinatorHasJobForTaskWorkflowStep($context->actor->getUserGuid(), $object->getTaskGuid())
+        );
 
         $job = $this->userJobRepository->findUserJobInTask(
             $context->actor->getUserGuid(),

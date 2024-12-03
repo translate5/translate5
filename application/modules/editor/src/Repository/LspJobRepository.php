@@ -132,7 +132,7 @@ class LspJobRepository
                 [
                     'task' => TaskTable::TABLE_NAME,
                 ],
-                'lspJob.taskGuid = task.taskGuid AND task.workflowStepName = lspJob.workflowStepName',
+                'lspJob.taskGuid = task.taskGuid AND (task.workflowStepName = lspJob.workflowStepName OR task.workflowStepName = \'no workflow\')',
                 []
             )
             ->join(
