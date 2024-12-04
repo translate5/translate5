@@ -50,7 +50,10 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	                  res.push(action);
 	              }
 	          });
-	          return res.join(' ');
+
+              res.push('type-'+task.get('taskType'));
+
+              return res.join(' ');
 	      }
 	},
 	//INFO: because the filters are not wirking when the projectGrid extends the taskGrid component,
@@ -116,6 +119,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         type: 'string'
                     },
                     text: Editor.data.l10n.projectGrid.text_cols.taskName,
+                    tdCls: 'taskName',
                     bind: {
                         text: '{l10n.projectGrid.text_cols.taskName}'
                     },

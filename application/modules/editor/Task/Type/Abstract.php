@@ -32,17 +32,21 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Task_Type_Abstract
 {
     /**
-     * A internal task is not listed as task by the task controller, since they are not accessible for users. They are needed only for internal processing.
+     * An internal task is not listed as task by the task controller, since they are not accessible for users.
+     * They are needed only for internal processing.
      */
     protected bool $isInternalTask;
 
     /**
-     * A internal task is not listed as task by the task controller, since they are not accessible for users. They are needed only for internal processing.
+     * A internal task is not listed as task by the task controller, since they are not accessible for users.
+     * They are needed only for internal processing.
      */
     protected bool $isProject;
 
     /**
-     * FIXME describe what this flag is used for!
+     * For historical reasons we have tasks beeing task and project at the same time.
+     * Therefore we need that isTask property to distinguish between such hybrid taskprojects
+     *  and real projects where isTask would be false then
      */
     protected bool $isTask;
 
@@ -83,7 +87,8 @@ abstract class editor_Task_Type_Abstract
     }
 
     /**
-     * returns true if task is internal, so not listed as task in the task controller since not accessible there fore users. Only for internal processing.
+     * true if task is internal, so not listed as task in the task controller since not accessible for users.
+     * Only for internal processing.
      */
     public function isInternalTask(): bool
     {
@@ -125,7 +130,8 @@ abstract class editor_Task_Type_Abstract
     }
 
     /**
-     * calculates the project and task types to be used out of the current type (which was the desired one) and the multiTarget info
+     * calculates the project and task types to be used out of the current type
+     * (which was the desired one) and the multiTarget info
      */
     abstract public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType);
 
