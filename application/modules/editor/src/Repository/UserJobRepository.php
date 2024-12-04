@@ -325,9 +325,14 @@ class UserJobRepository
     {
         $job = ZfExtended_Factory::get(UserJob::class);
 
-        $jobs = $job->loadByTaskGuidList([$taskGuid]);
+        $s = $this->db
+            ->select()
+            ->from(UserJobTable::TABLE_NAME)
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('type != ?', TypeEnum::Lsp->value)
+        ;
 
-        foreach ($jobs as $jobData) {
+        foreach ($this->db->fetchAll($s) as $jobData) {
             $job->init(
                 new Zend_Db_Table_Row(
                     [

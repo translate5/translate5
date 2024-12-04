@@ -39,9 +39,11 @@ use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use PDO;
 use Zend_Db_Adapter_Abstract;
+use Zend_Db_Expr;
 use Zend_Db_Table;
 use ZfExtended_Factory;
 use ZfExtended_Models_Db_User;
@@ -156,11 +158,23 @@ class LspJobRepository
         return (int) $this->db->fetchOne($select) > 0;
     }
 
-    public function findLspJobOfCoordinatorInTask(
+    public function findCurrentLspJobOfCoordinatorInTask(
         string $userGuid,
         string $taskGuid,
         string $workflowStepName
     ): ?LspJob {
+        //order first by matching role, then by the states as defined
+        $order = $this->db->quoteInto(
+            'userJob.workflowStepName = ? DESC,'
+            . 'userJob.state="edit" DESC,'
+            . 'userJob.state="view" DESC,'
+            . 'userJob.state="unconfirmed" DESC,'
+            . 'userJob.state="open" DESC,'
+            . 'userJob.state="waiting" DESC,'
+            . 'userJob.state="finished" DESC',
+            $workflowStepName
+        );
+
         $select = $this->db
             ->select()
             ->from([
@@ -180,9 +194,17 @@ class LspJobRepository
                 'lspUser.userId = user.id',
                 []
             )
+            ->join(
+                [
+                    'userJob' => UserJobTable::TABLE_NAME,
+                ],
+                'userJob.lspJobId = lspJob.id',
+                []
+            )
             ->where('lspJob.taskGuid = ?', $taskGuid)
-            ->where('lspJob.workflowStepName = ?', $workflowStepName)
+            ->where('userJob.type = ?', TypeEnum::Lsp->value)
             ->where('user.userGuid = ?', $userGuid)
+            ->order(new Zend_Db_Expr($order))
         ;
 
         $row = $this->db->fetchRow($select);
@@ -347,12 +369,19 @@ class LspJobRepository
             ])
             ->join(
                 [
+                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
+                ],
+                'lspJob.lspId = lsp.id',
+                []
+            )
+            ->join(
+                [
                     'parentLspJob' => LspJobTable::TABLE_NAME,
                 ],
                 implode(
                     ' AND ',
                     [
-                        'lspJob.lspId = parentLspJob.id',
+                        'lsp.parentId = parentLspJob.lspId',
                         'lspJob.taskGuid = parentLspJob.taskGuid',
                         'lspJob.workflowStepName = parentLspJob.workflowStepName',
                     ]

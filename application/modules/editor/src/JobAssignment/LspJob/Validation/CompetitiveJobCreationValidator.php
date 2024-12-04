@@ -32,13 +32,18 @@ namespace MittagQI\Translate5\JobAssignment\LspJob\Validation;
 
 use editor_Models_Task as Task;
 use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
+use MittagQI\Translate5\JobAssignment\LspJob\Exception\CoordinatorOfParentLspHasNotConfirmedLspJobYetException;
+use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 
 class CompetitiveJobCreationValidator
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
+        private readonly LspJobRepository $lspJobRepository,
     ) {
     }
 
@@ -49,6 +54,7 @@ class CompetitiveJobCreationValidator
     {
         return new self(
             UserJobRepository::create(),
+            LspJobRepository::create(),
         );
     }
 
@@ -66,7 +72,23 @@ class CompetitiveJobCreationValidator
         }
 
         if (! $lsp->isDirectLsp()) {
-            return;
+            try {
+                // check if parent LSP Job exists. Sub LSP can have only jobs related to its parent LSP
+                $parentJob = $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
+                    (int) $lsp->getParentId(),
+                    $task->getTaskGuid(),
+                    $workflow,
+                    $workflowStepName,
+                );
+            } catch (NotFoundLspJobException) {
+                throw new AttemptToAssignSubLspJobBeforeParentJobCreatedException();
+            }
+
+            $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $parentJob->getId());
+
+            if (! $dataJob->isConfirmed()) {
+                throw new CoordinatorOfParentLspHasNotConfirmedLspJobYetException();
+            }
         }
 
         if ($this->userJobRepository->taskHasConfirmedJob($task->getTaskGuid(), $workflow, $workflowStepName)) {

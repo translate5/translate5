@@ -124,7 +124,7 @@ abstract class editor_Workflow_Default_AbstractHandler
         if (method_exists($className, 'create')) {
             $instance = $className::create();
         } else {
-            $instance =ZfExtended_Factory::get($className);
+            $instance = ZfExtended_Factory::get($className);
         }
 
         $instance->init($config);

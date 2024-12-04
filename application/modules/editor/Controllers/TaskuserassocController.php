@@ -32,6 +32,7 @@ use MittagQI\Translate5\JobAssignment\JobAssignmentViewDataProvider;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
 use MittagQI\Translate5\JobAssignment\LspJob\DataProvider\CoordinatorProvider;
 use MittagQI\Translate5\JobAssignment\LspJob\DataProvider\UserProvider;
+use MittagQI\Translate5\JobAssignment\LspJob\Exception\CoordinatorOfParentLspHasNotConfirmedLspJobYetException;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication\CreateLspJobOperation;
 use MittagQI\Translate5\JobAssignment\Operation\WithAuthentication\DeleteJobAssignmentOperation;
@@ -535,6 +536,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 [
                     'id' => [
                         'Der Koordinator hat den LSP-Auftrag noch nicht bestätigt',
+                    ],
+                ],
+            ),
+            CoordinatorOfParentLspHasNotConfirmedLspJobYetException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'id' => [
+                        'Der Koordinator des übergeordneten LSP hat die LSP-Position noch nicht bestätigt',
                     ],
                 ],
             ),

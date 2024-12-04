@@ -73,7 +73,7 @@ class CompetitiveJobCreationValidator
             $workflowStepName
         );
 
-        if (! $taskHasConfirmedJob) {
+        if (null === $lspJob && ! $taskHasConfirmedJob) {
             return;
         }
 

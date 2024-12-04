@@ -59,15 +59,13 @@ class JobsPurger
 
     public function purgeTaskJobs(string $taskGuid): void
     {
+        // first delete all LSP jobs, that will also delete the lsp user jobs if there are any
+        foreach ($this->lspJobRepository->getTaskLspJobs($taskGuid) as $job) {
+            $this->deleteLspJobAssignmentOperation->forceDelete($job);
+        }
+
+        // now delete simple user jobs
         foreach ($this->userJobRepository->getTaskJobs($taskGuid) as $job) {
-            if ($job->isLspJob()) {
-                $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
-
-                $this->deleteLspJobAssignmentOperation->forceDelete($lspJob);
-
-                continue;
-            }
-
             $this->deleteUserJobAssignmentOperation->forceDelete($job);
         }
     }

@@ -10351,6 +10351,14 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>No property is specified</target>
             </trans-unit>
+            <trans-unit id='RGVyIEtvb3JkaW5hdG9yIGRlcyDDvGJlcmdlb3JkbmV0ZW4gTFNQIGhhdCBkaWUgTFNQLVBvc2l0aW9uIG5vY2ggbmljaHQgYmVzdMOkdGlndA=='>
+                <source>Der Koordinator des übergeordneten LSP hat die LSP-Position noch nicht bestätigt</source>
+                <target>The Coordinator of the higher-level LSP has not yet confirmed the LSP job</target>
+            </trans-unit>
+            <trans-unit id='RGllIGFuZGVyZW4gQmVudXR6ZXIga8O2bm5lbiBuaWNodCBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQgd2VyZGVuLCBldmVudHVlbGwgd2FyIGVpbiBhbmRlcmVyIEJlbnV0emVyIHNjaG5lbGxlciB1bmQgaGF0IFNpZSBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQu'>
+                <source>Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.</source>
+                <target>The other users cannot be removed from the task, another user may have been quicker and removed you from the task.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

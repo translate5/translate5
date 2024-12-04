@@ -106,7 +106,7 @@ class CompetitiveJobsRemover
                 return;
             }
 
-            $lspJob = $this->lspJobRepository->findLspJobOfCoordinatorInTask(
+            $lspJob = $this->lspJobRepository->findCurrentLspJobOfCoordinatorInTask(
                 $userGuid,
                 $taskGuid,
                 $workflowStepName,
@@ -198,7 +198,7 @@ class CompetitiveJobsRemover
         User $responsibleUser,
         bool $anonymizeUsers
     ): void {
-        $dataJob = $this->userJobRepository->getDataJobByLspJob($toDelete->getId());
+        $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $toDelete->getId());
         $deletedJobData = DeletedJobDto::fromUserJob($dataJob);
 
         $this->deleteLspJobOperation->deleteLspJob($toDelete);

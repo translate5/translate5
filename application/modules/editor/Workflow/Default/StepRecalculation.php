@@ -27,7 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\JobAssignment\Operation\DeleteJobAssignmentOperation;
+use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Repository\UserJobRepository;
 
 /**
  * Workflow Step recalculation
@@ -43,6 +45,10 @@ class editor_Workflow_Default_StepRecalculation
 
     private readonly DeleteJobAssignmentOperation $deleteJobOperation;
 
+    private readonly LspJobRepository $lspJobRepository;
+
+    private readonly UserJobRepository $userJobRepository;
+
     protected $nextStepWasSet = [];
 
     public function __construct(editor_Workflow_Default $workflow)
@@ -50,6 +56,8 @@ class editor_Workflow_Default_StepRecalculation
         $this->workflow = $workflow;
         $this->taskRepository = TaskRepository::create();
         $this->deleteJobOperation = DeleteJobAssignmentOperation::create();
+        $this->lspJobRepository = LspJobRepository::create();
+        $this->userJobRepository = UserJobRepository::create();
     }
 
     /**
@@ -77,36 +85,19 @@ class editor_Workflow_Default_StepRecalculation
             return;
         }
 
-        $tuas = $tua->loadByTaskGuidList([$taskGuid]);
-
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
 
-        $matchingSteps = [];
-        $pmOverrideCount = 0;
-        foreach ($tuas as $tua) {
-            if ($tua['isPmOverride'] == 1) {
-                $pmOverrideCount++;
-            }
-        }
-        if (empty($tuas) && count($tuas) == $pmOverrideCount) {
-            $matchingSteps[] = $this->workflow::STEP_NO_WORKFLOW;
-        } else {
-            foreach ($this->workflow->getValidStates() as $step => $roleStates) {
-                if (! $this->areTuasSubset($roleStates, $step, $tuas)) {
-                    continue;
-                }
-                $matchingSteps[] = $step;
-            }
-        }
+        $matchingSteps = $this->getMatchingSteps($taskGuid);
 
-        //if the current step is one of the possible steps for the tua configuration
+        // if the current step is one of the possible steps for the tua configuration
         // then everything is OK,
         // or if no valid configuration is found, then we also could not change the step
         if (empty($matchingSteps) || in_array($task->getWorkflowStepName(), $matchingSteps)) {
             return;
         }
+
         //set the first found valid step to the current workflow step
         $step = reset($matchingSteps);
         $this->workflow->getLogger($task)->info('E1013', 'recalculate workflow to step {step} ', [
@@ -115,6 +106,53 @@ class editor_Workflow_Default_StepRecalculation
         $task->updateWorkflowStep($step, false);
         //set $step as new workflow step if different to before!
         $this->sendFrontEndNotice($step);
+    }
+
+    private function getMatchingSteps(string $taskGuid): array
+    {
+        $jobsCount = 0;
+        $pmOverrideCount = 0;
+        $matchingSteps = [];
+        $jobsData = [];
+
+        foreach ($this->lspJobRepository->getTaskLspJobs($taskGuid) as $lspJob) {
+            $jobsCount++;
+
+            $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
+            $jobsData[] = [
+                'state' => $dataJob->getState(),
+                'workflowStepName' => $dataJob->getWorkflowStepName(),
+            ];
+        }
+
+        foreach ($this->userJobRepository->getTaskJobs($taskGuid) as $userJob) {
+            $jobsCount++;
+
+            if ($userJob->getIsPmOverride()) {
+                $pmOverrideCount++;
+            }
+
+            $jobsData[] = [
+                'state' => $userJob->getState(),
+                'workflowStepName' => $userJob->getWorkflowStepName(),
+            ];
+        }
+
+        if (0 === $jobsCount || $jobsCount === $pmOverrideCount) {
+            return [
+                editor_Workflow_Default::STEP_NO_WORKFLOW,
+            ];
+        }
+
+        foreach ($this->workflow->getValidStates() as $step => $roleStates) {
+            if (! $this->areTuasSubset($roleStates, $step, $jobsData)) {
+                continue;
+            }
+
+            $matchingSteps[] = $step;
+        }
+
+        return $matchingSteps;
     }
 
     /**
