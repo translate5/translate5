@@ -1158,6 +1158,7 @@ class editor_TaskController extends ZfExtended_RestController
                 ZfExtended_Factory::get(editor_Models_Segment_AutoStates::class),
                 ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class),
                 ZfExtended_Factory::get(editor_Models_Segment_Meta::class),
+                ZfExtended_Factory::get(editor_Models_TaskProgress::class),
             );
             $applyFullMatchChange->updateSegmentsEdit100PercentMatch(
                 $this->entity,
