@@ -36,6 +36,69 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FprmUpdaterTo147;
 
 set_time_limit(0);
 
+$NEW_SPECIAL_CHARS_JSON = '[
+  {
+    "unicode": "U+202F",
+    "visualized": "NNBSP"
+  },
+  {
+    "unicode": "U+200A",
+    "visualized": "HSP"
+  },
+  {
+    "unicode": "U+2009",
+    "visualized": "THSP"
+  },
+  {
+    "unicode": "U+2008",
+    "visualized": "PSP"
+  },
+  {
+    "unicode": "U+2007",
+    "visualized": "FSP"
+  },
+  {
+    "unicode": "U+2006",
+    "visualized": "6/MSP"
+  },
+  {
+    "unicode": "U+2005",
+    "visualized": "4/MSP"
+  },
+  {
+    "unicode": "U+2004",
+    "visualized": "3/MSP"
+  },
+  {
+    "unicode": "U+2001",
+    "visualized": "MQSP"
+  },
+  {
+    "unicode": "U+2028",
+    "visualized": "LSEP"
+  },
+  {
+    "unicode": "U+200B",
+    "visualized": "ZWSP"
+  },
+  {
+    "unicode": "U+200C",
+    "visualized": "ZWNJ"
+  },
+  {
+    "unicode": "U+00AD",
+    "visualized": "SHY"
+  },
+  {
+    "unicode": "U+2011",
+    "visualized": "NBH"
+  },
+  {
+    "unicode": "U+00AD",
+    "visualized": "ZWNBSP"
+  }
+]';
+
 //uncomment the following line, so that the file is not marked as processed:
 //$this->doNotSavePhpForDebugging = false;
 
@@ -104,46 +167,55 @@ foreach ($bconf->loadAll() as $bconfData) {
 }
 
 $db = Zend_Db_Table::getDefaultAdapter();
-$db->query("DELETE FROM `Zf_configuration` WHERE `name` IN
-('runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName','runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName')");
+$db->query(
+    "DELETE FROM `Zf_configuration` WHERE `name` IN (" .
+    "'runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName'," .
+    "'runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName'" .
+    ")"
+);
 
 $okapiInfo147 = 'No version below 1.47 can be used with t5 file-format-settings, only "bconf-in-zip" works with older versions';
 $descr = $db->fetchOne('SELECT `description` FROM `Zf_configuration` WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"');
 
 if (! str_contains($descr, $okapiInfo147)) {
-    $db->query('UPDATE `Zf_configuration` SET `description` = :descr
-WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"', [
-        'descr' => trim($descr, '.') . '. ' . $okapiInfo147,
-    ]);
+    $db->query(
+        'UPDATE `Zf_configuration` SET `description` = :descr WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
+        [
+            'descr' => trim($descr, '.') . '. ' . $okapiInfo147,
+        ]
+    );
 }
 
 $specialCharacters = json_decode($config->runtimeOptions->editor->segments->editorSpecialCharacters, true);
-if (!isset($specialCharacters['all'])) {
+if (! isset($specialCharacters['all'])) {
     $specialCharacters['all'] = [];
 }
 
 $charsToAdd = [];
-$newCharsList = json_decode(file_get_contents(__DIR__ . '014-new-special-chars.json'), true);
+$newCharsList = json_decode($NEW_SPECIAL_CHARS_JSON, true);
 foreach ($newCharsList as $newChar) {
     $charFound = false;
     foreach ($specialCharacters['all'] as $specialChar) {
         if ($newChar['unicode'] === $specialChar['unicode']) {
             $charFound = true;
+
             break;
         }
     }
-    if (!$charFound) {
+    if (! $charFound) {
         $charsToAdd[] = $newChar;
     }
 }
-if (!empty($charsToAdd)) {
+if (! empty($charsToAdd)) {
     $specialCharacters['all'] = array_merge($specialCharacters['all'], $charsToAdd);
     $specialCharactersJson = json_encode(
         $specialCharacters,
         JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
     );
-    $db->query('UPDATE `Zf_configuration` SET `value` = :value
-WHERE `name` = "runtimeOptions.editor.segments.editorSpecialCharacters"', [
-        'value' => $specialCharactersJson,
-    ]);
+    $db->query(
+        'UPDATE `Zf_configuration` SET `value` = :value WHERE `name` = "runtimeOptions.editor.segments.editorSpecialCharacters"',
+        [
+            'value' => $specialCharactersJson,
+        ]
+    );
 }
