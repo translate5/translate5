@@ -72,7 +72,7 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        return $this->getBaseTaskSelect($viewer, $filter, 'COUNT(distinct(task.id)) as count', false);
+        return $this->getBaseTaskSelect($viewer, $filter, 'COUNT(distinct(' . TaskDb::TABLE_NAME . '.id)) as count', false);
     }
 
     public function createTaskSelect(
@@ -121,12 +121,10 @@ class TaskQuerySelectFactory
         $select = $this->db
             ->select()
             ->from(
-                [
-                    'task' => TaskDb::TABLE_NAME,
-                ],
+                TaskDb::TABLE_NAME,
                 $columns
             )
-            ->where('task.taskType in (?)', $this->taskType->getNonInternalTaskTypes())
+            ->where(TaskDb::TABLE_NAME . '.taskType in (?)', $this->taskType->getNonInternalTaskTypes())
         ;
 
         if (! $this->canLoadAllTasks($viewer)) {
@@ -155,10 +153,8 @@ class TaskQuerySelectFactory
                 $columns
             )
             ->join(
-                [
-                    'task' => TaskDb::TABLE_NAME,
-                ],
-                'task.projectId = project.id',
+                TaskDb::TABLE_NAME,
+                TaskDb::TABLE_NAME . '.projectId = project.id',
                 []
             )
             ->where('project.taskType in (?)', $this->taskType->getProjectTypes())
@@ -180,15 +176,13 @@ class TaskQuerySelectFactory
         if ($viewer->isClientPm()) {
             $select
                 ->joinLeft(
-                    [
-                        'userJob' => UserJobDb::TABLE_NAME,
-                    ],
-                    'userJob.taskGuid = task.taskGuid',
+                    UserJobDb::TABLE_NAME,
+                    UserJobDb::TABLE_NAME . '.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
                     []
                 )
-                ->where('userJob.userGuid = ?', $viewer->getUserGuid())
-                ->orWhere('task.pmGuid = ?', $viewer->getUserGuid())
-                ->orWhere('task.customerId in (?)', $viewer->getCustomersArray())
+                ->where(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid())
+                ->orWhere(TaskDb::TABLE_NAME . '.pmGuid = ?', $viewer->getUserGuid())
+                ->orWhere(TaskDb::TABLE_NAME . '.customerId in (?)', $viewer->getCustomersArray())
             ;
 
             return;
@@ -199,14 +193,12 @@ class TaskQuerySelectFactory
         if (null === $lspUser) {
             $select
                 ->joinLeft(
-                    [
-                        'userJob' => UserJobDb::TABLE_NAME,
-                    ],
-                    'userJob.taskGuid = task.taskGuid',
+                    UserJobDb::TABLE_NAME,
+                    UserJobDb::TABLE_NAME . '.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
                     []
                 )
-                ->where('userJob.userGuid = ?', $viewer->getUserGuid())
-                ->orWhere('task.pmGuid = ?', $viewer->getUserGuid())
+                ->where(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid())
+                ->orWhere(TaskDb::TABLE_NAME . '.pmGuid = ?', $viewer->getUserGuid())
             ;
 
             return;
@@ -217,7 +209,7 @@ class TaskQuerySelectFactory
                 [
                     'lspJob' => LspJobTable::TABLE_NAME,
                 ],
-                'lspJob.taskGuid = task.taskGuid',
+                'lspJob.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
                 []
             )
             ->where('lspJob.lspId = ?', $lspUser->lsp->getId())
@@ -229,13 +221,11 @@ class TaskQuerySelectFactory
 
         $select
             ->join(
-                [
-                    'userJob' => UserJobDb::TABLE_NAME,
-                ],
-                'userJob.taskGuid = task.taskGuid',
+                UserJobDb::TABLE_NAME,
+                UserJobDb::TABLE_NAME . '.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
                 []
             )
-            ->where('userJob.userGuid = ?', $viewer->getUserGuid())
+            ->where(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid())
         ;
     }
 
