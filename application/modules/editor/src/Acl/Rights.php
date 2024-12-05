@@ -400,6 +400,13 @@ final class Rights extends AbstractResource
      * @group User administration
      */
     public const EDITOR_RESET_PW_USER = 'editorResetPwUser';
+
+    /**
+     * Enable UI invocation of the batch editing controller
+     * @group Batch editing
+     */
+    public const EDITOR_BATCH_EDITING = 'editorBatchEditing';
+
     //region Configuration
     //FIXME link the rights somehow between the UI and PHP, the used-by ones are used only in the UI
 

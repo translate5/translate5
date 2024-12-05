@@ -48,7 +48,7 @@ trait editor_Controllers_Traits_ControllerTrait
     }
 
     /**
-     * Show confirmation prompt
+     * Show confirmation prompt if current request is an XMLHttpRequest
      *
      * @param string $buttons OKCANCEL, YESNO, YESNOCANCEL
      * @param string|null $cancelMsg Msg, that will be shown in case if 'Cancel'
@@ -56,6 +56,14 @@ trait editor_Controllers_Traits_ControllerTrait
      */
     public function confirm(string|array $msg, $buttons = 'OKCANCEL', $cancelMsg = null): string
     {
+        // If current request is not a XMLHttpRequest - imitate the answer=ok to be given on
+        // confirmation prompt so there will be no need to add '?answer=ok' into query string to proceed
+        // This is useful when this method is used during handling of 'DELETE /some/resource'-requests
+        // initiated by external REST API clients rather than by the browser window with translate5 app opened
+        if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== 'XMLHttpRequest') {
+            return 'ok';
+        }
+
         // Get answer index
         $answerIdx = editor_Utils::rif(editor_Utils::$answer, count(editor_Utils::$answer) + 1);
 

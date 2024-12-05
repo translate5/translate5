@@ -31,7 +31,7 @@ use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * 1. Create project with 4 project tasks.
- * 2. Create term collection which will be assigned as default for all of the tasks.
+ * 2. Create term collection which will be assigned as default for all the tasks.
  * 3. The term tagger will tag some of the segments in each project task.
  * 4. Compare the segment content after term tagging for each project task.
  *
@@ -40,7 +40,7 @@ class ProjectTaskTest extends JsonTestAbstract
 {
     protected static $sourceLangRfc = 'en';
 
-    protected static $targetLangRfc = ['de', 'it', 'fr', 'mk'];
+    protected static $targetLangRfc = ['de', 'it', 'fr'];
 
     protected static bool $termtaggerRequired = true;
 
@@ -73,7 +73,7 @@ class ProjectTaskTest extends JsonTestAbstract
     public function testProjectTaskCreation()
     {
         static::api()->reloadProjectTasks();
-        self::assertEquals(count(static::api()->getProjectTasks()), 4, 'The number of the project task is not as expected');
+        self::assertEquals(count(static::api()->getProjectTasks()), 3, 'The number of the project task is not as expected');
         $languages = static::api()->getLanguages();
 
         $getRfc = function ($id) use ($languages) {

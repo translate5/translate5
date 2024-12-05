@@ -52,7 +52,7 @@ class SessionSupportCommand extends Translate5AbstractCommand
                 'Generates a new session for the support-user, optionally parses a given link/url/task-id for task & segment-nr.'
             );
 
-        $this->addArgument('path', InputArgument::OPTIONAL, 'An URL or path to fetch task/segment-nr from.');
+        $this->addArgument('path', InputArgument::OPTIONAL, 'An URL or path or task-id to fetch task/segment-nr from.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

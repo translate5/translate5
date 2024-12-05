@@ -42,6 +42,11 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
 
     private ?editor_Models_Segment $currentSegment = null;
 
+    /**
+     * Escape html entities when results are restored in restoreInResult method
+     */
+    private bool $escapeHtmlEntitiesInResult = false;
+
     public function __construct()
     {
         $this->logger = ZfExtended_Factory::get('ZfExtended_Logger_Queued');
@@ -87,7 +92,12 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
         $key = 'rt' . $this->currentSegment->getId();
 
         try {
-            return $this->repairTags[$key]->recreateTags($resultString);
+            $result = $this->repairTags[$key]->recreateTags($resultString);
+            if ($this->escapeHtmlEntitiesInResult) {
+                return \MittagQI\ZfExtended\Tools\Markup::escape($result);
+            }
+
+            return $result;
         } catch (Exception $e) {
             $this->hasRestoreErrors = true;
 
@@ -98,5 +108,10 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
     public function setCurrentSegment(editor_Models_Segment $segment): void
     {
         $this->currentSegment = $segment;
+    }
+
+    public function setEscapeHtmlEntitiesInResult(bool $escapeHtmlEntitiesInResult): void
+    {
+        $this->escapeHtmlEntitiesInResult = $escapeHtmlEntitiesInResult;
     }
 }

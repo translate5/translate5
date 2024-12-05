@@ -9945,6 +9945,38 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>automatisch abgeschlossen</source>
                 <target>automatisch abgeschlossen</target>
             </trans-unit>
+            <trans-unit id='TWFzc2Vuw6RuZGVydW5nZW4='>
+                <source>Massenänderungen</source>
+                <target>Massenänderungen</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBhbGxlIHNlbGVrdGllcnRlbiDDpG5kZXJu'>
+                <source>Für alle selektierten ändern</source>
+                <target>Für alle selektierten ändern</target>
+            </trans-unit>
+            <trans-unit id='U2V0enQgRWlnZW5zY2hhZnRlbiBmw7xyIGFsbGUgYXVzZ2V3w6RobHRlbiBBdWZnYWJlbiBvZGVyIFByb2pla3Rl'>
+                <source>Setzt Eigenschaften für alle ausgewählten Aufgaben oder Projekte</source>
+                <target>Setzt Eigenschaften für alle ausgewählten Aufgaben oder Projekte</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBhbGxlIGluIEZpbHRlcnVuZyDDpG5kZXJu'>
+                <source>Für alle in Filterung ändern</source>
+                <target>Für alle in Filterung ändern</target>
+            </trans-unit>
+            <trans-unit id='QWNodHVuZyEgU2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGbDvHIgYWxsZSBBdWZnYWJlbi9Qcm9qZWt0ZSBpbiBkZXIgYWt0dWVsbCBlaW5nZXN0ZWxsdGVuIEZpbHRlcnVuZyBkZXIgUHJvamVrdGU='>
+                <source>Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte</source>
+                <target>Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte</target>
+            </trans-unit>
+            <trans-unit id='U2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGluIGFsbGVuIFByb2pla3RlbiBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZy4gQmVzc2VyIGFiYnJlY2hlbj8='>
+                <source>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?</source>
+                <target>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?</target>
+            </trans-unit>
+            <trans-unit id='RWlnZW5zY2hhZnRlbiDDpG5kZXJu'>
+                <source>Eigenschaften ändern</source>
+                <target>Eigenschaften ändern</target>
+            </trans-unit>
+            <trans-unit id='RXMgd3VyZGUga2VpbmUgRWlnZW5zY2hhZnQgYW5nZWdlYmVu'>
+                <source>Es wurde keine Eigenschaft angegeben</source>
+                <target>Es wurde keine Eigenschaft angegeben</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

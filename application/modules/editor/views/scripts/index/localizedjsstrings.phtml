@@ -658,7 +658,6 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-
     Ext.define("Editor.locale.de.view.help.HelpWindow", {
         override: "Editor.view.help.HelpWindow",
         strings:{
@@ -2099,6 +2098,8 @@ Editor.data.l10n = {
             reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren');?>',
             notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
             resetFilterText: '<?php echo $this->translate->_('Filter zurücksetzen');?>',
+            batchSetProperties: '<?php echo $this->translate->_('Massenänderungen');?>',
+            batchSetTooltip: '<?php echo $this->translate->_('Eigenschaften ändern');?>',
             onlyMyProjects: '<?php echo $this->translate->_('Nur meine Projekte');?>'
         },
         text_cols: {
@@ -2470,6 +2471,20 @@ Editor.data.l10n = {
     },
     helpButton: {
         tooltip: '<?= $this->translate->_('Tutorial-Videos aufrufen') ?>'
+    },
+    batchSetWindow: {
+        workflowLabel: '<?php echo $this->translate->_('Workflow');?>',
+        workflowStepLabel: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+        title:'<?php echo $this->translate->_('Massenänderungen');?>',
+        setForSelected:'<?php echo $this->translate->_('Für alle selektierten ändern');?>',
+        setForSelectedTip:'<?php echo $this->translate->_('Setzt Eigenschaften für alle ausgewählten Aufgaben oder Projekte');?>',
+        setForFiltered:'<?php echo $this->translate->_('Für alle in Filterung ändern');?>',
+        setForFilteredTip:'<?php echo $this->translate->_('Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte');?>',
+        allFilteredWarning:'<?php echo $this->translate->_('Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?');?>',
+        deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>',
+        warning: '<?php echo $this->translate->_('Warnung');?>',
+        noPropertySet:'<?php echo $this->translate->_('Es wurde keine Eigenschaft angegeben');?>',
+        noTasksSelected:'<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>'
     },
     crossLanguageResourceSynchronization: {
         windowTitle: '<?= $this->translate->_('Verwalten von Verbindungen') ?>',

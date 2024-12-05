@@ -34,7 +34,6 @@ use MittagQI\Translate5\Task\Lock;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class TaskFromInstantTranslateCommand extends TaskInfoCommand
 {
@@ -54,61 +53,31 @@ class TaskFromInstantTranslateCommand extends TaskInfoCommand
             );
 
         $this->addArgument(
-            'taskIdOrName',
+            'taskIdentifier',
             InputArgument::REQUIRED,
-            'The numeric task ID or the name as given in instant translate.'
+            TaskCommand::IDENTIFIER_DESCRIPTION
         );
     }
 
-    /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $task = new editor_Models_Task();
-        $taskIdOrName = $input->getArgument('taskIdOrName');
-        $matches = [];
-        $withDatePattern = '/^(.+)\s+(\([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\))$/';
-        $select = $task->db->select();
-        // we should use editor_Plugins_InstantTranslate_TaskType::ID here but this is from a private plugin ...
-        $select
-            ->where('taskType = ?', 'instanttranslate-pre-translate')
-            ->where('state IN (?)', [editor_Models_Task::STATE_OPEN, editor_Models_Task::STATE_ERROR]);
-        if (is_numeric($taskIdOrName)) {
-            $select->where('id = ?', $taskIdOrName);
-        } elseif (preg_match($withDatePattern, $taskIdOrName, $matches) === 1) {
-            $select
-                ->where('taskName LIKE ?', '%' . $matches[1] . '%')
-                ->where('created LIKE ?', '%' . $matches[2] . '%');
-        } else {
-            $select->where('taskName LIKE ?', '%' . $taskIdOrName . '%');
-        }
+        $this->io->info('HINT: sysadmins can now anyway see InstantTranslate tasks in UI!');
 
-        $tasks = $task->db->fetchAll($select)->toArray();
+        $task = static::findTaskFromArgument(
+            $this->io,
+            $input->getArgument('taskIdentifier'),
+            false,
+            [editor_Models_Task::STATE_OPEN, editor_Models_Task::STATE_ERROR],
+            [TaskCommand::TASKTYPE_INSTANTTRANSLATE]
+        );
 
-        if (count($tasks) === 0) {
-            $this->io->error('InstantTranslate-task "' . $taskIdOrName . '" not found.');
-
+        if ($task === null) {
             return self::FAILURE;
-        } elseif (count($tasks) === 1) {
-            $taskId = (int) $tasks[0]['id'];
-        } else {
-            $taskNames = [];
-            foreach ($tasks as $data) {
-                $taskNames[] = $data['taskName'] . ' (id: ' . $data['id'] . ')';
-            }
-            $question = new ChoiceQuestion('Please choose a Task', $taskNames, null);
-            $taskName = $this->io->askQuestion($question);
-            $parts = explode(' (id: ', $taskName);
-            $taskId = (int) rtrim(array_pop($parts), ')');
         }
 
-        $task->load($taskId);
         $wasError = $task->getState() === editor_Models_Task::STATE_ERROR;
         Lock::taskUnlock($task);
         $task->setState($task::STATE_OPEN);

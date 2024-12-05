@@ -396,6 +396,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
+        $this->front->getRouter()->addRoute('editorBatchSet', new ZfExtended_Controller_RestLikeRoute(
+            'editor/taskuserassoc/batchset',
+            [
+                'module' => 'editor',
+                'controller' => 'batchset',
+                'action' => 'index',
+            ]
+        ));
+
         $this->front->getRouter()->addRoute('editorTaskCommentNav', new ZfExtended_Controller_RestLikeRoute(
             'editor/commentnav',
             [

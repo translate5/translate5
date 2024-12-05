@@ -45,6 +45,12 @@ final class Looper
      */
     public const BLOCKED_DELAY = 5;
 
+    /**
+     * Defines the amount of segments we delay looping workers instead of pausing them
+     * This cannot be calculated since all segment-loopers have vastly different batch-sizes
+     */
+    public const MIN_DELAY_SEGMENTS = 150;
+
     private State $state;
 
     /**
@@ -178,16 +184,18 @@ final class Looper
         // may we are having only blocked segments, then we need to delay!
         // this may happens, when other processors are blocking our workload ... a rare case though
         if ($this->state->hasBlockedUnprocessed($taskGuid)) {
-            // different behaviour for normal doing & API-tests
-            if (defined('APPLICATION_APITEST') && APPLICATION_APITEST) {
-                // VERY UGLY special for API-tests
-                // only the last looper for the current processor will continue the loop (but with sleeps)
-                // because we want to avoid being dependent on the cronjobs when running tests
-                // we must respect the max. import time to avoid creating endless processes
-                $until = \MittagQI\Translate5\Test\Api\Helper::RELOAD_TASK_LIMIT;
+            // different behaviour for normal tasks, smaller tasks & API-tests
+            if ($this->needsToWaitForLockedSegments()) {
+                // only the first looper (worker-index 0) for the current processor will continue the loop
+                // (but with sleeps) because we want to avoid being dependent on the cronjobs
+                // we must respect the max. import time / max delay time to avoid creating endless processes
+                // higher indexes will simply finish
+                $until = (defined('APPLICATION_APITEST') && APPLICATION_APITEST) ?
+                    \MittagQI\Translate5\Test\Api\Helper::RELOAD_TASK_LIMIT // max-sleep for API-tests is shorter ...
+                    : \ZfExtended_Worker_Abstract::MAX_SINGLE_DELAYS;
                 if ($this->workerIndex === 0) {
-                    sleep(4);
-                    $until -= 4;
+                    sleep(self::BLOCKED_DELAY);
+                    $until -= self::BLOCKED_DELAY;
                     // Why in heaven is phpstan saying "Negated boolean expression is always true" for the fetch ???
                     while (
                         ! $this->fetchNextStates($fromTheTop, $taskGuid) &&
@@ -202,7 +210,7 @@ final class Looper
 
                     return true;
                 }
-            } elseif ($this->needsDelayWithoutSegments()) {
+            } elseif ($this->needsDelayForLockedSegments()) {
                 // set our worker to delayed
                 // we do this without increasing the delay-counter as we do know (if everything is properly coded)
                 // that other processing-workers will either "work through" OR
@@ -245,13 +253,27 @@ final class Looper
      * Evaluates, if a worker needs to be delayed when there are remaining segments that currently cannot be processed
      * This may is limited by ratio of batches & segments overall for tasks with low number of segments
      */
-    private function needsDelayWithoutSegments(): bool
+    private function needsDelayForLockedSegments(): bool
     {
         // hint: if there are blocked segments, these are blocked segments for all running loopers
         // we do not need to delay more batches than the task has segments
-        $maxInstances = (int) ceil((int) $this->task->getSegmentCount() / $this->processor->getBatchSize());
+        $maxInstances = (int) ceil((int) $this->task->getSegmentCount() / $this->batchSize);
 
-        // normally $maxInstances cannot be 0 but we do not know in which contexts the class may be used
+        // normally $maxInstances cannot be 0, but we do not know in which contexts the class may be used
         return $this->workerIndex < $maxInstances || $maxInstances === 0;
+    }
+
+    /**
+     * Evaluates, if it is better to wait for the blocked segments to become unblocked
+     * instead of using a delayed-exception
+     * This is crucial for API-tests (where no cronjob is available)
+     * And smaller tasks that should not take excessively long to import
+     */
+    private function needsToWaitForLockedSegments(): bool
+    {
+        return (
+            $this->task->getSegmentCount() <= self::MIN_DELAY_SEGMENTS ||
+            (defined('APPLICATION_APITEST') && APPLICATION_APITEST)
+        );
     }
 }

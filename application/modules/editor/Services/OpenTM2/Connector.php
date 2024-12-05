@@ -36,6 +36,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateExceptio
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
@@ -164,7 +165,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             && preg_match('/(\.tmx|\.zip)$/', strtolower($fileinfo['name']));
 
         if ($noFile || $tmxUpload) {
-            $tmName = $this->api->createEmptyMemory($name, $sourceLang);
+            $tmName = $this->createEmptyMemoryWithRetry($name, $sourceLang);
 
             if (null !== $tmName) {
                 $this->addMemoryToLanguageResource($this->languageResource, $tmName);
@@ -411,6 +412,79 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         );
     }
 
+    public function getUpdateDTO(\editor_Models_Segment $segment, array $options = []): UpdateSegmentDTO
+    {
+        $fileName = $this->getFileName($segment);
+        $source = $this->getQueryString($segment);
+        $target = $segment->getTargetEdit();
+        $useSegmentTimestamp = $options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false;
+        $timestamp = $useSegmentTimestamp
+            ? $this->api->getDate(strtotime($segment->getTimestamp()))
+            : $this->api->getNowDate();
+        $userName = $segment->getUserName();
+        $context = $segment->getMid();
+
+        return new UpdateSegmentDTO(
+            $segment->getTaskGuid(),
+            (int) $segment->getId(),
+            $source,
+            $target,
+            $fileName,
+            $timestamp,
+            $userName,
+            $context,
+        );
+    }
+
+    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, editor_Models_Segment $segment): void
+    {
+        $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
+
+        if ($this->isReorganizingAtTheMoment($tmName)) {
+            if ($options[UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR] ?? false) {
+                throw new RescheduleUpdateNeededException();
+            }
+
+            throw new editor_Services_Connector_Exception('E1512', [
+                'service' => $this->getResource()->getName(),
+                'languageResource' => $this->languageResource,
+            ]);
+        }
+
+        $saveToDisk = $options[UpdatableAdapterInterface::SAVE_TO_DISK] ?? true;
+        $saveToDisk = $saveToDisk && ! $this->isInternalFuzzy();
+
+        $source = $dto->source;
+        $target = $dto->target;
+        $userName = $dto->userName;
+        $context = $dto->context;
+        $timestamp = $dto->timestamp;
+        $fileName = $dto->fileName;
+        $dataSent = [
+            'source' => $source,
+            'target' => $target,
+            'userName' => $userName,
+            'context' => $context,
+            'timestamp' => $timestamp,
+            'fileName' => $fileName,
+        ];
+        $recheckOnUpdate = $options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false;
+
+        $this->updateWithRetry(
+            $source,
+            $target,
+            $userName,
+            $context,
+            $timestamp,
+            $fileName,
+            $tmName,
+            $saveToDisk,
+            $dataSent,
+            $segment,
+            $recheckOnUpdate
+        );
+    }
+
     private function updateWithRetry(
         string $source,
         string $target,
@@ -455,7 +529,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             } elseif ($attempts === 0 && $this->isMemoryOverflown($apiError)) {
                 $this->addOverflowWarning($segment->getTask());
                 $newName = $this->generateNextMemoryName($this->languageResource);
-                $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
+                $newName = $this->createEmptyMemoryWithRetry($newName, $this->languageResource->getSourceLangCode());
 
                 if (null === $newName) {
                     $this->logger->error('E1305', 'OpenTM2: could not create TM', [
@@ -490,6 +564,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         ]);
 
         throw new SegmentUpdateException();
+    }
+
+    public function flush(): void
+    {
+        $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
+        $this->api->flush($tmName);
     }
 
     private function isLockingTimeoutOccurred(?object $error): bool
@@ -1052,7 +1132,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $this->api->setResource($fuzzyLanguageResource->getResource());
 
-        $newTmFileName = $this->api->createEmptyMemory(
+        $newTmFileName = $this->createEmptyMemoryWithRetry(
             $this->generateTmFilename($fuzzyLanguageResource),
             $this->languageResource->getSourceLangCode()
         );
@@ -1625,7 +1705,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->addOverflowWarning();
 
             $newName = $this->generateNextMemoryName($this->languageResource);
-            $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
+            $newName = $this->createEmptyMemoryWithRetry($newName, $this->languageResource->getSourceLangCode());
             $this->addMemoryToLanguageResource($this->languageResource, $newName);
 
             // Filter TMX data from already imported segments
@@ -1879,5 +1959,35 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         // This should be moved to config, but this requires refactoring of the connectors
         // and introducing a connector factory instead of manager as it is implemented at the moment
         return defined('ZFEXTENDED_IS_WORKER_THREAD');
+    }
+
+    private function createEmptyMemoryWithRetry(string $name, string $sourceLang): ?string
+    {
+        $t5memoryName = null;
+        $elapsedTime = 0;
+        $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
+
+        while ($elapsedTime < $maxWaitingTime) {
+            $t5memoryName = $this->api->createEmptyMemory($name, $sourceLang);
+
+            if ($t5memoryName) {
+                break;
+            }
+
+            $this->logger->warn(
+                'E1305',
+                't5memory: Could not create empty memory - waiting for {elapsedTime} seconds.',
+                [
+                    'languageResource' => $this->languageResource,
+                    'apiError' => $this->api->getError(),
+                    'elapsedTime' => $elapsedTime,
+                ]
+            );
+
+            sleep($this->getRetryDelaySeconds());
+            $elapsedTime += $this->getRetryDelaySeconds();
+        }
+
+        return $t5memoryName;
     }
 }

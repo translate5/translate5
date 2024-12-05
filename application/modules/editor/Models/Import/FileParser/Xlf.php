@@ -393,11 +393,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                     $currentTarget['closer'] - $currentTarget['opener'] - 1 // we don't need the closing tag
                 )
             );
+
+            $isSingle = $opener['isSingle'];
+
             $altTransTarget = implode(
                 '',
                 $this->xmlparser->getChunks(
-                    $opener['openerKey'] + 1, // we don't need to opening tag
-                    $key - $opener['openerKey'] - 1 // we don't need the closing tag
+                    $isSingle ? $key : ($opener['openerKey'] + 1), // we don't need to opening tag
+                    $isSingle ? 1 : ($key - $opener['openerKey'] - 1) // we don't need the closing tag
                 )
             );
 

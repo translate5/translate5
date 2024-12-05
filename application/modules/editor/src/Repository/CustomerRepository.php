@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of ZfExtended library
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -50,6 +50,17 @@ class CustomerRepository
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             return null;
         }
+    }
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getByNumber(string $number): editor_Models_Customer_Customer
+    {
+        $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+        $customer->loadByNumber($number);
+
+        return $customer;
     }
 
     public function delete(editor_Models_Customer_Customer $customer): void

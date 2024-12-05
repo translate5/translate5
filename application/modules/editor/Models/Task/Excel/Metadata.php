@@ -28,13 +28,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Task\CustomFields\Field;
 use ZfExtended_Factory as Factory;
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
-
- /**
+/**
  * General model for Excel Metadata (= task overview and statistics).
  * Handles all interactions with the PHPSpreadsheet (via ZfExtended_Models_Entity_ExcelExport).
  */
@@ -289,6 +283,16 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     $value = $this->taskCustomColumns[$colName]['value'][$task[$colName]] ?? $task[$colName];
 
                     break;
+            }
+
+            // Fix taken from https://bitbucket.org/mittagqi/translate5/pull-requests/1520/diff
+            // According to Marc we don't spend time to fix it correctly
+            /* Fix when customField1 has value:
+            Array ( [en] => first value dropdown
+                    [de] => erster Wert Dropdown )
+            */
+            if (is_array($value)) {
+                continue;
             }
             $sheet->setCellValue($sheetCol . $this->taskRow, $value);
             $sheetCol++;

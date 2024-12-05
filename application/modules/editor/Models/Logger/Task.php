@@ -115,6 +115,19 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
+     * Loads task logs by level
+     */
+    public function loadByLevel(string $taskGuid, array $levels): array
+    {
+        $s = $this->db->select();
+        $s->where('taskGuid = ?', $taskGuid);
+        $s->where('level in (?)', [$levels]);
+        $s->order('id DESC');
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+
+    /**
      * loads all events to the given taskGuid
      * sorts from newest to oldest
      */

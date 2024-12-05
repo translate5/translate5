@@ -35,6 +35,7 @@ use editor_Models_Segment as SegmentModel;
 use editor_Models_Task as Task;
 use editor_Services_OpenTM2_Connector as T5MemoryConnector;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
@@ -105,12 +106,31 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     public function update(\editor_Models_Segment $segment, array $options = []): void
     {
-        // TODO not used
+        // Not used
+    }
+
+    public function getUpdateDTO(SegmentModel $segment, array $options = []): UpdateSegmentDTO
+    {
+        return new UpdateSegmentDTO(
+            '',
+            $segment->getId(),
+            $segment->getSource(),
+            $segment->getTarget(),
+            '',
+            $segment->getTimestamp(),
+            '',
+            ''
+        );
+    }
+
+    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, \editor_Models_Segment $segment): void
+    {
+        // Not used
     }
 
     public function updateTranslation(string $source, string $target, string $tmName = '')
     {
-        // TODO not used
+        // Not used
     }
 
     /**

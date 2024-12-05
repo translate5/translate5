@@ -46,6 +46,40 @@ class UserRepository
     }
 
     /**
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     */
+    public function get(int $id): ZfExtended_Models_User
+    {
+        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $userModel->load($id);
+
+        return $userModel;
+    }
+
+    /**
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getByGuid(string $guid): ZfExtended_Models_User
+    {
+        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $userModel->loadByGuid($guid);
+
+        return $userModel;
+    }
+
+    public function findByLogin(string $login): ?ZfExtended_Models_User
+    {
+        try {
+            $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+            $userModel->loadByLogin($login);
+
+            return $userModel;
+        } catch (\ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
+    }
+
+    /**
      * @return iterable<ZfExtended_Models_User>
      */
     public function getPmList(array $roles, ?int $customerInContext = null): iterable

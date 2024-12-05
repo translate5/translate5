@@ -468,7 +468,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetGridController
         // Make request
         Ext.Ajax.request({
             url: Editor.data.restpath + 'plugins_matchanalysis_pricingpreset/setdefault',
-            method: 'GET',
+            method: 'PUT',
             headers: {
                 'Accept': 'application/json'
             },

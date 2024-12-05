@@ -32,9 +32,9 @@ use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
-use MittagQI\Translate5\LanguageResource\LanguageResourceReimportQueue;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsService;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
@@ -1144,12 +1144,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             if (! empty($this->data) && ! empty($this->data->toReImport)) {
                 foreach ($this->data->toReImport as $taskGuid) {
                     try {
-                        (new LanguageResourceReimportQueue())->queueReimport(
+                        (new ReimportSegmentsQueue())->queueReimport(
                             $taskGuid,
                             $this->entity->getId(),
                             [
-                                ReimportSegmentsService::FILTER_ONLY_EDITED => $this->data->onlyEdited,
-                                ReimportSegmentsService::USE_SEGMENT_TIMESTAMP => $this->data->timeOption === 'segment',
+                                ReimportSegmentsOptions::FILTER_ONLY_EDITED => $this->data->onlyEdited,
+                                ReimportSegmentsOptions::USE_SEGMENT_TIMESTAMP => $this->data->timeOption === 'segment',
                             ]
                         );
                     } catch (ReimportQueueException) {

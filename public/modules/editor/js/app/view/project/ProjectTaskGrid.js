@@ -38,6 +38,7 @@ Ext.define('Editor.view.project.ProjectTaskGrid', {
 	visibleColumns:[
 		'id',
 		'taskGridActionColumn',
+        'checked',
 		'state',
 		'workflowStepName',
 		'segmentFinishCount',
