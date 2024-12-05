@@ -30,13 +30,16 @@ declare(strict_types=1);
 
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
+use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\LSP\Exception\LspHasUnDeletableJobException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspAssignCustomerOperation;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspUnassignCustomerOperation;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use ZfExtended_Models_Entity_Conflict as EntityConflictException;
 
 class editor_LspcustomerController extends ZfExtended_RestController
 {
@@ -72,8 +75,9 @@ class editor_LspcustomerController extends ZfExtended_RestController
             'E2003' => 'Wrong value',
         ], 'editor.lsp.customer');
 
-        ZfExtended_Models_Entity_Conflict::addCodes([
+        EntityConflictException::addCodes([
             'E2002' => 'No object of type "{0}" was found by key "{1}"',
+            'E1676' => 'LSP has un-deletable job of customer',
         ], 'editor.lsp.customer');
     }
 
@@ -166,8 +170,23 @@ class editor_LspcustomerController extends ZfExtended_RestController
             } else {
                 $this->lspUnassignCustomerOperation->unassignCustomer($lsp, $customer);
             }
-        } catch (NoAccessException $e) {
-            throw new ZfExtended_NoAccessException(previous: $e);
+        } catch (Throwable $e) {
+            throw $this->transformException($e);
         }
+    }
+
+    private function transformException(Throwable $e): Throwable
+    {
+        return match ($e::class) {
+            LspHasUnDeletableJobException::class => EntityConflictException::createResponse(
+                'E1676',
+                [
+                    'id' => [
+                        'LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.',
+                    ],
+                ],
+            ),
+            default => $e,
+        };
     }
 }

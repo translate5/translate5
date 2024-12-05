@@ -1119,6 +1119,7 @@ class editor_TaskController extends ZfExtended_RestController
         $action = match ($userState) {
             'edit' => TaskAction::Edit,
             'view', 'open' => TaskAction::View,
+            'finished' => TaskAction::Finish,
             default => TaskAction::Update,
         };
 

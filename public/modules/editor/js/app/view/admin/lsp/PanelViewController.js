@@ -139,23 +139,65 @@ Ext.define('Editor.view.admin.lsp.PanelViewController', {
                     return;
                 }
 
-                Ext.Ajax.request({
-                    url: '/editor/lsp/' + lsp.get('id') + '/customer/' + customer.get('id'),
-                    method: 'DELETE',
-                    success: () => {
-                        lsp.load({
-                            callback: (record) => {
-                                Ext.ComponentQuery.query('lspEditCustomerWindow')[0].loadRecord(record);
-                                this.onRefreshClick();
-                            },
-                        });
-                    },
-                    failure: (response) => {
-                        Editor.app.getController('ServerException').handleException(response);
+                this.tryUnassignCustomer(lsp, customer);
+            },
+        );
+    },
+
+    tryUnassignCustomer: function (lsp, customer) {
+        const me = this;
+
+        Ext.Ajax.request({
+            url: '/editor/lsp/' + lsp.get('id') + '/customer/' + customer.get('id'),
+            method: 'DELETE',
+            success: () => {
+                lsp.load({
+                    callback: (record) => {
+                        Ext.ComponentQuery.query('lspEditCustomerWindow')[0].loadRecord(record);
+                        me.onRefreshClick();
                     },
                 });
             },
-        );
+            failure: (response) => {
+                const errorCode = response?.responseJson?.errorCode;
+
+                if (['E1676'].includes(errorCode)) {
+                    const message = response.responseJson.errorMessage
+                        + '<br/>'
+                        + Editor.data.l10n.general.confirmDelete;
+
+                    Ext.Msg.confirm(Editor.data.l10n.general.confirmDeleteTitle, message, function (btn) {
+                        if (btn === 'yes') {
+                            me.forceUnassignCustomer(lsp, customer);
+                        }
+                    });
+
+                    return;
+                }
+
+                Editor.app.getController('ServerException').handleException(response);
+            },
+        });
+    },
+
+    forceUnassignCustomer: function (lsp, customer) {
+        const me = this;
+
+        Ext.Ajax.request({
+            url: '/editor/lsp/' + lsp.get('id') + '/customer/' + customer.get('id') + '?force=true',
+            method: 'DELETE',
+            success: () => {
+                lsp.load({
+                    callback: (record) => {
+                        Ext.ComponentQuery.query('lspEditCustomerWindow')[0].loadRecord(record);
+                        me.onRefreshClick();
+                    },
+                });
+            },
+            failure: (response) => {
+                Editor.app.getController('ServerException').handleException(response);
+            },
+        });
     },
 
     assignCustomer: function (lsp, customer) {

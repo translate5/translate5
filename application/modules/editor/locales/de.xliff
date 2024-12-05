@@ -10054,9 +10054,9 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Zuweisung des Kunden aufheben</source>
                 <target>Zuweisung des Kunden aufheben</target>
             </trans-unit>
-            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIHZvbiBLdW5kZSB7MH0genUgTFNQIHsxfSBhdWZoZWJlbiB3b2xsZW4/'>
-                <source>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen?</source>
-                <target>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen?</target>
+            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIHZvbiBLdW5kZSB7MH0genUgTFNQIHsxfSBhdWZoZWJlbiB3b2xsZW4/IERhZHVyY2ggd2VyZGVuIGF1Y2ggYWxsZSBLdW5kZW4tTFNQIGJlem9nZW5lbiBKb2JzIGdlbMO2c2NodCBpbiBkZXIgZ2VzYW10ZW4gTGllZmVya2V0dGUgKFN1Yi1MU1BzIGV0Yy4pLg=='>
+                <source>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen? Dadurch werden auch alle Kunden-LSP bezogenen Jobs gelöscht in der gesamten Lieferkette (Sub-LSPs etc.).</source>
+                <target>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen? Dadurch werden auch alle Kunden-LSP bezogenen Jobs gelöscht in der gesamten Lieferkette (Sub-LSPs etc.).</target>
             </trans-unit>
             <trans-unit id='VW5nw7xsdGlnZXIgSm9iIEtvb3JkaW5hdG9y'>
                 <source>Ungültiger Job Koordinator</source>

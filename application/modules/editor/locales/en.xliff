@@ -10231,9 +10231,9 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Zuweisung des Kunden aufheben</source>
                 <target>Unassign client</target>
             </trans-unit>
-            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIHZvbiBLdW5kZSB7MH0genUgTFNQIHsxfSBhdWZoZWJlbiB3b2xsZW4/'>
-                <source>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen?</source>
-                <target>Are you sure you want to unassign customer {0} from LSP {1}</target>
+            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIHZvbiBLdW5kZSB7MH0genUgTFNQIHsxfSBhdWZoZWJlbiB3b2xsZW4/IERhZHVyY2ggd2VyZGVuIGF1Y2ggYWxsZSBLdW5kZW4tTFNQIGJlem9nZW5lbiBKb2JzIGdlbMO2c2NodCBpbiBkZXIgZ2VzYW10ZW4gTGllZmVya2V0dGUgKFN1Yi1MU1BzIGV0Yy4pLg=='>
+                <source>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen? Dadurch werden auch alle Kunden-LSP bezogenen Jobs gelöscht in der gesamten Lieferkette (Sub-LSPs etc.).</source>
+                <target>Are you sure you want to unassign client {0} from LSP {1}? This will delete all client-LSP related jobs including all jobs of the whole supply chain (Sub LSPs etc.).</target>
             </trans-unit>
             <trans-unit id='VW5nw7xsdGlnZXIgSm9iIEtvb3JkaW5hdG9y'>
                 <source>Ungültiger Job Koordinator</source>

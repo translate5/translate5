@@ -33,9 +33,10 @@ namespace MittagQI\Translate5\Task\ActionAssert;
 enum TaskAction: string
 {
     case AssignJob = 'assign-job';
-    case View = 'view';
+    case Delete = 'delete';
     case Edit = 'edit';
+    case Finish = 'finish';
     case Read = 'read';
     case Update = 'update';
-    case Delete = 'delete';
+    case View = 'view';
 }
