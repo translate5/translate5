@@ -10037,7 +10037,6 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>automatisch abgeschlossen</source>
                 <target>automatisch abgeschlossen</target>
             </trans-unit>
-<<<<<<< HEAD
             <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='>
                 <source>Kunden bearbeiten</source>
                 <target>Kunden bearbeiten</target>
@@ -10182,7 +10181,6 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.</source>
                 <target>Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.</target>
             </trans-unit>
-            The other users cannot be removed from the task, another user may have been quicker and removed you from the task.
         </body>
     </file>
 </xliff>
