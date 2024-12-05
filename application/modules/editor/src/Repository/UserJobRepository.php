@@ -185,7 +185,9 @@ class UserJobRepository
         $select = $this->db
             ->select()
             ->from(UserJobTable::TABLE_NAME)
-            ->where('lspJobId = ?', $lspJobId);
+            ->where('lspJobId = ?', $lspJobId)
+            ->where('type != ?', TypeEnum::Lsp->value)
+        ;
 
         foreach ($this->db->fetchAll($select) as $jobData) {
             $job->init(

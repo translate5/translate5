@@ -134,7 +134,7 @@ class CreateLspJobOperation implements CreateLspJobOperationInterface
                 throw new NotLspCustomerTaskException();
             }
 
-            $job = $this->lspJobRepository->getEmptyModel();
+            $job = new LspJob();
             $job->setTaskGuid($dto->taskGuid);
             $job->setLspId((int) $coordinator->lsp->getId());
             $job->setWorkflow($dto->workflow->workflow);

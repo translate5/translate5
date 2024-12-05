@@ -69,10 +69,6 @@ class HasUnDeletableUserJobAssert implements FeasibilityAssertInterface
     {
         try {
             foreach ($this->userJobRepository->getUserJobsByLspJob((int) $object->getId()) as $job) {
-                if ($job->isLspJob()) {
-                    continue;
-                }
-
                 $this->userJobActionFeasibilityAssert->assertAllowed(Action::Delete, $job);
             }
         } catch (FeasibilityExceptionInterface) {

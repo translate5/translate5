@@ -37,6 +37,7 @@ use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterfac
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Exception\NoAccessToUserJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
@@ -70,6 +71,10 @@ class UserRestrictionAssert implements PermissionAssertInterface
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
+        if ($object->getUserGuid() === $context->actor->getUserGuid() && UserJobAction::Read === $action) {
+            return;
+        }
+
         $user = $this->userRepository->getByGuid($object->getUserGuid());
 
         try {
