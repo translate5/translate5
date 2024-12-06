@@ -356,6 +356,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
             new editor_Models_Segment_AutoStates(),
             new editor_Models_Segment_InternalTag(),
             new editor_Models_Segment_Meta(),
+            new editor_Models_TaskProgress(),
         );
         $applyFullMatchChange->updateSegmentsEdit100PercentMatch(
             $this->config->task,

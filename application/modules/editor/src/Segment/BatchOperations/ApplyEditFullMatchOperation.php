@@ -29,6 +29,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\BatchOperations;
 
+use editor_Models_Segment as Segment;
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Models_Segment_Exception;
 use editor_Models_Segment_InternalTag as InternalTag;
@@ -36,6 +37,10 @@ use editor_Models_Segment_Iterator as SegmentIterator;
 use editor_Models_Segment_MatchRateType;
 use editor_Models_Segment_Meta as SegmentMeta;
 use editor_Models_Task as Task;
+use editor_Models_TaskProgress as TaskProgress;
+use Zend_Db_Statement_Exception;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint as IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey as IntegrityDuplicateKey;
 
 /**
  * Applies the edit full match flag to the task segments
@@ -46,6 +51,7 @@ class ApplyEditFullMatchOperation
         private readonly AutoStates $autoState,
         private readonly InternalTag $internalTag,
         private readonly SegmentMeta $segmentMeta,
+        private readonly TaskProgress $taskProgress,
     ) {
     }
 
@@ -70,58 +76,68 @@ class ApplyEditFullMatchOperation
                 continue;
             }
 
-            $autoStateId = null;
-            $editable = null;
             $history = $segment->getNewHistoryEntity();
-
-            //is locked config has precendence over all other calculations!
-            $isLocked = $segment->meta()->getLocked() && $task->getLockLocked();
-
-            //if we want editable 100% matches, the segment should be not ediable before,
-            // which is checked in the foreach head
-            if ($edit100PercentMatch) {
-                $hasText = $this->internalTag->hasText($segment->getSource());
-
-                // calc and change new autoState only if it is not hard locked and hasText
-                if (! $isLocked && $hasText) {
-                    $autoStateId = $this->autoState->recalculateUnLockedState($segment);
-                    $editable = true;
-                }
-            } else {
-                //all other pretrans values mean that it was either modified (PRETRANS_TRANSLATED)
-                // or it was not pre-translated at all so it could not be a 100% match
-                $initialPretrans = $segment->getPretrans() == $segment::PRETRANS_INITIAL;
-
-                $wasFromTMOrTermCollection = editor_Models_Segment_MatchRateType::isFromTM($segment->getMatchRateType())
-                    || editor_Models_Segment_MatchRateType::isFromTermCollection($segment->getMatchRateType());
-
-                //if we do NOT want editable 100% matches, the segment should be editable before,
-                // which is checked outside and not explicitly unlocked with autopropagation:
-                $allowToBlock = (! $segment->meta()->getAutopropagated() || $isLocked);
-                if ($allowToBlock && $initialPretrans && $wasFromTMOrTermCollection) {
-                    //if segment.pretrans = 1 and matchrate >= 100% (checked in head) and matchtype ^= import;tm
-                    // then
-                    // TRANSLATED → LOCKED
-                    // REVIEWED_UNTOUCHED → LOCKED
-                    // REVIEWED_UNCHANGED → LOCKED
-                    // REVIEWED_UNCHANGED_AUTO → LOCKED
-                    // REVIEWED_PM_UNCHANGED → LOCKED
-                    // REVIEWED_PM_UNCHANGED_AUTO → LOCKED
-                    // PRETRANSLATED → LOCKED
-                    $autoStateId = $this->autoState->recalculateLockedState($segment);
-                    $editable = $autoStateId != $this->autoState::LOCKED;
-                }
-            }
+            $autoStateId = $this->calculateAutoStateId($segment, $task, $edit100PercentMatch);
 
             if (! is_null($autoStateId)) {
                 $segment->setAutoStateId($autoStateId);
-                $segment->setEditable($editable);
+                $segment->setEditable($autoStateId != $this->autoState::LOCKED);
                 $history->save();
                 $segment->save();
             }
         }
 
+        try {
+            $this->taskProgress->updateSegmentEditableCount($task);
+        } catch (Zend_Db_Statement_Exception | IntegrityConstraint | IntegrityDuplicateKey) {
+            // we just du nothing here, since update progress is called frequently
+        }
+
         //update task word count when 100% matches editable is changed
         $task->setWordCount($this->segmentMeta->getWordCountSum($task));
+    }
+
+    private function calculateAutoStateId(Segment $segment, Task $task, bool $edit100PercentMatch): ?int
+    {
+        $autoStateId = null;
+
+        //is locked config has precendence over all other calculations!
+        $isLocked = $segment->meta()->getLocked() && $task->getLockLocked();
+
+        //if we want editable 100% matches, the segment should be not editable before,
+        // which is checked in the foreach head
+        if ($edit100PercentMatch) {
+            $hasText = $this->internalTag->hasText($segment->getSource());
+
+            // calc and change new autoState only if it is not hard locked and hasText
+            if (! $isLocked && $hasText) {
+                $autoStateId = $this->autoState->recalculateUnLockedState($segment);
+            }
+        } else {
+            //all other pretrans values mean that it was either modified (PRETRANS_TRANSLATED)
+            // or it was not pre-translated at all so it could not be a 100% match
+            $initialPretrans = $segment->getPretrans() == $segment::PRETRANS_INITIAL;
+
+            $wasFromTMOrTermCollection = editor_Models_Segment_MatchRateType::isFromTM($segment->getMatchRateType())
+                || editor_Models_Segment_MatchRateType::isFromTermCollection($segment->getMatchRateType());
+
+            //if we do NOT want editable 100% matches, the segment should be editable before,
+            // which is checked outside and not explicitly unlocked with autopropagation:
+            $allowToBlock = (! $segment->meta()->getAutopropagated() || $isLocked);
+            if ($allowToBlock && $initialPretrans && $wasFromTMOrTermCollection) {
+                //if segment.pretrans = 1 and matchrate >= 100% (checked in head) and matchtype ^= import;tm
+                // then
+                // TRANSLATED → LOCKED
+                // REVIEWED_UNTOUCHED → LOCKED
+                // REVIEWED_UNCHANGED → LOCKED
+                // REVIEWED_UNCHANGED_AUTO → LOCKED
+                // REVIEWED_PM_UNCHANGED → LOCKED
+                // REVIEWED_PM_UNCHANGED_AUTO → LOCKED
+                // PRETRANSLATED → LOCKED
+                $autoStateId = $this->autoState->recalculateLockedState($segment);
+            }
+        }
+
+        return $autoStateId;
     }
 }

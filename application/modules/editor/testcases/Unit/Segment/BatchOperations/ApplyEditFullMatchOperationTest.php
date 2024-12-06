@@ -10,6 +10,7 @@ use editor_Models_Segment_Iterator as SegmentIterator;
 use editor_Models_Segment_Meta as SegmentMeta;
 use editor_Models_SegmentHistory as SegmentHistory;
 use editor_Models_Task as Task;
+use editor_Models_TaskProgress as TaskProgress;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -30,12 +31,21 @@ class ApplyEditFullMatchOperationTest extends TestCase
             ->onlyMethods(['recalculateLockedState', 'recalculateUnLockedState'])
             ->getMock();
 
+        $taskProgress = $this->getMockBuilder(TaskProgress::class)
+            ->onlyMethods(['updateSegmentEditableCount'])
+            ->getMock();
+
         // Create an instance of the class under test
         $operation = new ApplyEditFullMatchOperation(
             $autoStates,
             new InternalTag(),
             $this->createMock(SegmentMeta::class),
+            $taskProgress,
         );
+
+        $taskProgress
+            ->expects($this->once())
+            ->method('updateSegmentEditableCount');
 
         $autoStates
             ->expects($this->any())

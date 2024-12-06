@@ -156,6 +156,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 }
             });
 
+            res.push('type-'+task.get('taskType'));
+
             if (isNotAssociated) { //with this user
                 res.push('not-associated');
             }
@@ -544,6 +546,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         width: 220,
                         dataIndex: 'taskName',
                         stateId: 'taskName',
+                        tdCls: 'taskName',
                         filter: {
                             type: 'string'
                         },

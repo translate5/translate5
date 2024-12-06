@@ -64,6 +64,8 @@ class TaskFromInstantTranslateCommand extends TaskInfoCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
+        $this->io->info('HINT: sysadmins can now anyway see InstantTranslate tasks in UI!');
+
         $task = static::findTaskFromArgument(
             $this->io,
             $input->getArgument('taskIdentifier'),

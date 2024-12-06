@@ -47,7 +47,7 @@ class editor_Services_OpenTM2_Resource extends editor_Models_LanguageResources_R
                 [StripFramingTags::All->value, 'Alle'],
                 [StripFramingTags::Paired->value, 'Tagpaare'],
             ],
-            self::STRIP_FRAMING_TAGS_FILE_EXTENSIONS => ['.tmx'],
+            self::STRIP_FRAMING_TAGS_FILE_EXTENSIONS => ['.tmx', '.zip'],
         ];
     }
 
