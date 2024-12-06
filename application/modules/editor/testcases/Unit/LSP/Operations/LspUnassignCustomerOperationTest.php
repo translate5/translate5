@@ -63,7 +63,7 @@ class LspUnassignCustomerOperationTest extends TestCase
     {
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
-        $this->lspRepository->method('findCustomerAssignment')->willReturn(null);
+        $this->lspRepository->method('findCustomerConnection')->willReturn(null);
 
         $customer = $this->createMock(editor_Models_Customer_Customer::class);
 
@@ -80,7 +80,7 @@ class LspUnassignCustomerOperationTest extends TestCase
         $customer = $this->createMock(editor_Models_Customer_Customer::class);
         $lspCustomer = $this->createMock(LanguageServiceProviderCustomer::class);
 
-        $this->lspRepository->method('findCustomerAssignment')->willReturn($lspCustomer);
+        $this->lspRepository->method('findCustomerConnection')->willReturn($lspCustomer);
 
         $this->lspRepository->expects(self::once())->method('deleteCustomerAssignment')->with($lspCustomer);
 

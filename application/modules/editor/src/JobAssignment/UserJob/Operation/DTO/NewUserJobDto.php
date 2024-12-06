@@ -33,6 +33,8 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO;
 use DateTime;
 use editor_Workflow_Default as Workflow;
 use Exception;
+use MittagQI\Translate5\JobAssignment\DTO\TrackChangesRightsDto;
+use MittagQI\Translate5\JobAssignment\DTO\WorkflowDto;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidAssignmentDateStringProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidDeadlineDateStringProvidedException;
@@ -49,7 +51,7 @@ class NewUserJobDto
         public readonly WorkflowDto $workflow,
         public readonly TypeEnum $type,
         public readonly ?string $segmentRange,
-        public readonly string $assignmentDate,
+        public readonly ?string $assignmentDate,
         public readonly ?string $deadlineDate,
         public readonly TrackChangesRightsDto $trackChangesRights,
         public readonly ?TaskLock $taskLock = null,
@@ -80,7 +82,7 @@ class NewUserJobDto
             $userJobDto->userGuid,
             $userJobDto->state,
             $userJobDto->workflow,
-            $userJobDto->type,
+            TypeEnum::Lsp,
             $userJobDto->segmentRange,
             $userJobDto->assignmentDate,
             $userJobDto->deadlineDate,

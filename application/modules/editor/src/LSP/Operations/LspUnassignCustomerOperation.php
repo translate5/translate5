@@ -77,7 +77,7 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
 
     public function unassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
-        $lspCustomer = $this->lspRepository->findCustomerAssignment((int) $lsp->getId(), (int) $customer->getId());
+        $lspCustomer = $this->lspRepository->findCustomerConnection((int) $lsp->getId(), (int) $customer->getId());
 
         if (! $lspCustomer) {
             return;
@@ -89,7 +89,7 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
 
     public function forceUnassignCustomer(LanguageServiceProvider $lsp, Customer $customer): void
     {
-        $lspCustomer = $this->lspRepository->findCustomerAssignment((int) $lsp->getId(), (int) $customer->getId());
+        $lspCustomer = $this->lspRepository->findCustomerConnection((int) $lsp->getId(), (int) $customer->getId());
 
         if (! $lspCustomer) {
             return;

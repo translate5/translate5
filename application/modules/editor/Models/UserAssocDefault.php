@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
+/**
 * @method void setId(int $id)
 * @method string getId()
 * @method void setCustomerId(int $customerId)
@@ -49,27 +49,10 @@ END LICENSE AND COPYRIGHT
 * @method void setTrackchangesShowAll(int $isAllowed)
 * @method string getTrackchangesAcceptReject()
 * @method void setTrackchangesAcceptReject(int $isAllowed)
-*
 */
-
 class editor_Models_UserAssocDefault extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = editor_Models_Db_UserAssocDefault::class;
 
     protected $validatorInstanceClass = editor_Models_Validator_UserAssocDefault::class;
-
-    /***
-     * Load all default assocs for given task. The rows are filtered for workflow,customerId, sourceLang and targetLang
-     * @param editor_Models_Task $task
-     * @return array|null
-     */
-    public function loadDefaultsForTask(editor_Models_Task $task)
-    {
-        $s = $this->db->select()
-            ->where('customerId = ?', $task->getCustomerId())
-            ->where('sourceLang = ?', $task->getSourceLang())
-            ->where('targetLang = ?', $task->getTargetLang());
-
-        return $this->db->getAdapter()->fetchAll($s);
-    }
 }

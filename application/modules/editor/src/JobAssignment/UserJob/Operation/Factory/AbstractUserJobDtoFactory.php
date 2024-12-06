@@ -34,13 +34,12 @@ use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc_Segmentrange as SegmentRange;
 use editor_Workflow_Default as Workflow;
 use editor_Workflow_Manager;
+use MittagQI\Translate5\JobAssignment\DTO\WorkflowDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\WorkflowStepNotProvidedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\WorkflowDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\SegmentRangeValidator;
 use REST_Controller_Request_Http as Request;
-use ZfExtended_Logger;
 
 /**
  * @template Dto
@@ -48,7 +47,6 @@ use ZfExtended_Logger;
 abstract class AbstractUserJobDtoFactory
 {
     public function __construct(
-        private readonly ZfExtended_Logger $logger,
         private readonly editor_Workflow_Manager $workflowManager,
         private readonly SegmentRangeValidator $segmentRangeValidator,
     ) {

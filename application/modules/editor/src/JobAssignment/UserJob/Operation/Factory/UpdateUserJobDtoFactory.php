@@ -44,8 +44,6 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use REST_Controller_Request_Http as Request;
-use Zend_Registry;
-use ZfExtended_Logger;
 
 class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
 {
@@ -54,10 +52,9 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
         private readonly UserJobRepository $userJobRepository,
         private readonly UserRepository $userRepository,
         private readonly editor_Workflow_Manager $workflowManager,
-        ZfExtended_Logger $logger,
         SegmentRangeValidator $segmentRangeValidator,
     ) {
-        parent::__construct($logger, $workflowManager, $segmentRangeValidator);
+        parent::__construct($workflowManager, $segmentRangeValidator);
     }
 
     /**
@@ -70,7 +67,6 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
             UserJobRepository::create(),
             new UserRepository(),
             new editor_Workflow_Manager(),
-            Zend_Registry::get('logger')->cloneMe('userJob.update'),
             SegmentRangeValidator::create(),
         );
     }

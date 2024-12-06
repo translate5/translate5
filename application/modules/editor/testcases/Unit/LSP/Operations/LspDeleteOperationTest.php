@@ -103,7 +103,7 @@ class LspDeleteOperationTest extends TestCase
             /**
              * @phpstan-ignore-next-line
              */
-            public function findCustomerAssignment(
+            public function findCustomerConnection(
                 int $lspId,
                 int $customerId,
             ): ?LanguageServiceProviderCustomer {

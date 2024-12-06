@@ -50,7 +50,7 @@ interface LspRepositoryInterface
 
     public function delete(LanguageServiceProvider $lsp): void;
 
-    public function findCustomerAssignment(
+    public function findCustomerConnection(
         int $lspId,
         int $customerId,
     ): ?LanguageServiceProviderCustomer;

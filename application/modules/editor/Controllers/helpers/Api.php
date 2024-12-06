@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
 class Editor_Controller_Helper_Api extends Zend_Controller_Action_Helper_Abstract
 {
     /**
+     * @deprecated use \MittagQI\Translate5\Language\LanguageResolver instead
+     *
      * Since numeric IDs aren't really sexy to be used for languages in API,
      *  this method can also deal with rfc5646 strings and LCID numbers. The LCID numbers must be prefixed with 'lcid-' for example lcid-123
      * Not found / invalid languages are converted to 0, this should then be handled afterwards

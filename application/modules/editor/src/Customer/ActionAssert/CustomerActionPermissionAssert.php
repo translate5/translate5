@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\Customer\ActionAssert;
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\Customer\ActionAssert\Permission\AssignedCustomerAssert;
+use MittagQI\Translate5\Customer\ActionAssert\Permission\CoordinatorCanCreateDefaultJobAssert;
 
 /**
  * @extends ActionPermissionAssert<Customer>
@@ -46,6 +47,7 @@ final class CustomerActionPermissionAssert extends ActionPermissionAssert
     {
         return new self([
             new AssignedCustomerAssert(),
+            CoordinatorCanCreateDefaultJobAssert::create(),
         ]);
     }
 }

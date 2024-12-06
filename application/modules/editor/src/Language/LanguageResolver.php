@@ -28,14 +28,41 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO;
+namespace MittagQI\Translate5\Language;
 
-class TrackChangesRightsDto
+use editor_Models_Languages;
+
+class LanguageResolver
 {
-    public function __construct(
-        public readonly bool $canSeeTrackChangesOfPrevSteps,
-        public readonly bool $canSeeAllTrackChanges,
-        public readonly bool $canAcceptOrRejectTrackChanges,
-    ) {
+    public static function create(): self
+    {
+        return new self();
+    }
+
+    public function resolveLanguage(string|int $identifier): ?editor_Models_Languages
+    {
+        // TODO: redo this method using LanguageRepository. code below was extracted from model as is.
+
+        $language = new editor_Models_Languages();
+
+        //ignoring if already integer like value or empty
+        try {
+            //if empty a notFound is triggered
+            if (empty($identifier) || (int) $identifier > 0) {
+                $language->load($identifier);
+
+                return $language;
+            }
+            $matches = [];
+            if (preg_match('/^lcid-([0-9]+)$/i', $identifier, $matches)) {
+                $language->loadByLcid($matches[1]);
+            } else {
+                $language->loadByRfc5646($identifier);
+            }
+        } catch (\ZfExtended_Models_Entity_NotFoundException $e) {
+            return null;
+        }
+
+        return $language;
     }
 }

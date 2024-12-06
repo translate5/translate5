@@ -32,6 +32,9 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use MittagQI\Translate5\Language\LanguageResolver;
+
 /**
  * Editor specific language class
  */
@@ -42,37 +45,30 @@ class editor_Models_Languages extends ZfExtended_Languages
     protected $validatorInstanceClass = 'editor_Models_Validator_Language';
 
     /**
+     * @deprecated use \MittagQI\Translate5\Language\LanguageResolver instead
+     *
      * Since numeric IDs aren't really sexy to be used for languages in API,
      *  this method can also deal with rfc5646 strings and LCID numbers. The LCID numbers must be prefixed with 'lcid-' for example lcid-123
      * Not found / invalid languages are converted to 0, this should then be handled afterwards
      *
-     * @param mixed $languageParameter IN: the given language ID/rfc/lcid, OUT: the numeric language DB ID
+     * TODO: redo this method using LanguageRepository and place logic in LanguageResolver
+     *
+     * @param string|int $languageParameter IN: the given language ID/rfc/lcid, OUT: the numeric language DB ID
      * @return editor_Models_Languages
      */
     public function convertLanguage(&$languageParameter)
     {
-        //ignoring if already integer like value or empty
-        try {
-            //if empty a notFound is triggered
-            if (empty($languageParameter) || (int) $languageParameter > 0) {
-                $this->load($languageParameter);
+        $language = LanguageResolver::create()->resolveLanguage($languageParameter);
 
-                return $this;
-            }
-            $matches = [];
-            if (preg_match('/^lcid-([0-9]+)$/i', $languageParameter, $matches)) {
-                $this->loadByLcid($matches[1]);
-            } else {
-                $this->loadByRfc5646($languageParameter);
-            }
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+        if (null === $language) {
             $languageParameter = 0;
 
-            return null;
+            return $this;
         }
-        $languageParameter = $this->getId();
 
-        return $this;
+        $languageParameter = $language->getId();
+
+        return $language;
     }
 
     /**

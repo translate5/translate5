@@ -64,11 +64,6 @@ class UserJobRepository
         );
     }
 
-    public function getEmptyModel(): UserJob
-    {
-        return ZfExtended_Factory::get(UserJob::class);
-    }
-
     /**
      * @throws \ZfExtended_Models_Entity_NotFoundException
      */
@@ -313,6 +308,35 @@ class UserJobRepository
         );
 
         return $job;
+    }
+
+    /**
+     * @return iterable<UserJob>
+     */
+    public function findAllJobsInTask(string $taskGuid): iterable
+    {
+        $tua = new UserJob();
+        $s = $this->db->select()
+            ->from(UserJobTable::TABLE_NAME)
+            ->where('taskGuid = ?', $taskGuid)
+        ;
+
+        $row = $this->db->fetchRow($s);
+
+        foreach ($this->db->fetchAll($s) as $job) {
+            $tua->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $tua->db,
+                        'data' => $job,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $tua;
+        }
     }
 
     public function save(UserJob $job): void

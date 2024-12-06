@@ -35,8 +35,8 @@ use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 class NoAccessToCustomerException extends NoAccessException
 {
     public function __construct(
-        public readonly int $lspId
+        public readonly int $customerId
     ) {
-        parent::__construct('No access to Customer with ID ' . $lspId);
+        parent::__construct('No access to Customer with ID ' . $customerId);
     }
 }

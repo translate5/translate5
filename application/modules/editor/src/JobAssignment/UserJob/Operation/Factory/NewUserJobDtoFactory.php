@@ -34,13 +34,13 @@ use editor_Models_Task as Task;
 use editor_Utils;
 use editor_Workflow_Default as Workflow;
 use editor_Workflow_Manager;
+use MittagQI\Translate5\JobAssignment\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidStateProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TaskIdentificatorNotProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\UserGuidNotProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\WorkflowStepNotProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
-use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\SegmentRangeValidator;
 use MittagQI\Translate5\Repository\TaskRepository;
@@ -49,19 +49,16 @@ use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use REST_Controller_Request_Http as Request;
 use UnexpectedValueException;
-use Zend_Registry;
-use ZfExtended_Logger;
 
 class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
 {
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly TaskRepository $taskRepository,
-        ZfExtended_Logger $logger,
         editor_Workflow_Manager $workflowManager,
         SegmentRangeValidator $segmentRangeValidator,
     ) {
-        parent::__construct($logger, $workflowManager, $segmentRangeValidator);
+        parent::__construct($workflowManager, $segmentRangeValidator);
     }
 
     /**
@@ -72,7 +69,6 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
         return new self(
             new UserRepository(),
             TaskRepository::create(),
-            Zend_Registry::get('logger')->cloneMe('userJob.create'),
             new editor_Workflow_Manager(),
             SegmentRangeValidator::create(),
         );
@@ -175,9 +171,9 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
     private function getTrackChangesRightsDto(mixed $data): TrackChangesRightsDto
     {
         return new TrackChangesRightsDto(
-            (bool) $data['trackchangesShow'] ?? false,
-            (bool) $data['trackchangesShowAll'] ?? false,
-            (bool) $data['trackchangesAcceptReject'] ?? false,
+            (bool) ($data['trackchangesShow'] ?? false),
+            (bool) ($data['trackchangesShowAll'] ?? false),
+            (bool) ($data['trackchangesAcceptReject'] ?? false),
         );
     }
 }

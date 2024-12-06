@@ -33,12 +33,15 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\DeleteUserJobOperationInterface;
 use MittagQI\Translate5\Repository\UserRepository;
+use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
 
 class DeleteUserJobOperation implements DeleteUserJobOperationInterface
 {
@@ -47,6 +50,7 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
         private readonly DeleteUserJobOperationInterface $operation,
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -60,6 +64,7 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
             \MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation::create(),
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
+            Zend_Registry::get('logger')->cloneMe('userJob.delete'),
         );
     }
 
@@ -81,10 +86,44 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
+        try {
         $this->permissionAssert->assertGranted(
             Action::Delete,
             $job,
             new PermissionAssertContext($authUser),
         );
+            $this->logger->info(
+                'E1637',
+                'Audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to delete user job (id: "%s") by AuthUser (guid: %s) was granted',
+                        $job->getId(),
+                        $authUser->getUserGuid()
+                    ),
+                    'job' => $job->getId(),
+                    'authUser' => $authUser->getLogin(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                ]
+            );
+        } catch (PermissionExceptionInterface $e) {
+            $this->logger->warn(
+                'E1637',
+                'Audit: {message}',
+                [
+                    'message' => sprintf(
+                        'Attempt to delete user job (id: "%s") by AuthUser (guid: %s) was not granted',
+                        $job->getId(),
+                        $authUser->getUserGuid()
+                    ),
+                    'job' => $job->getId(),
+                    'authUser' => $authUser->getLogin(),
+                    'authUserGuid' => $authUser->getUserGuid(),
+                    'reason' => $e::class,
+                ]
+            );
+
+            throw $e;
+        }
     }
 }

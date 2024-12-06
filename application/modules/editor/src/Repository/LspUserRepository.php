@@ -38,12 +38,16 @@ use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderUser;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\User\Model\User;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 use ZfExtended_Factory;
+use ZfExtended_Models_Db_User as UserTable;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class LspUserRepository implements LspUserRepositoryInterface
 {
     public function __construct(
+        private readonly Zend_Db_Adapter_Abstract $db,
         private readonly UserRepository $userRepository,
     ) {
     }
@@ -51,6 +55,7 @@ class LspUserRepository implements LspUserRepositoryInterface
     public static function create(): self
     {
         return new self(
+            Zend_Db_Table::getDefaultAdapter(),
             new UserRepository(),
         );
     }
@@ -159,7 +164,7 @@ class LspUserRepository implements LspUserRepositoryInterface
      */
     public function getUserIdToLspIdMap(): array
     {
-        $lspToUser = ZfExtended_Factory::get(LanguageServiceProviderUser::class);
+        $lspToUser = new LanguageServiceProviderUser();
         $assocs = $lspToUser->loadAll();
 
         return array_column($assocs, 'lspId', 'userId');
@@ -194,6 +199,28 @@ class LspUserRepository implements LspUserRepositoryInterface
 
             yield clone $user;
         }
+    }
+
+    public function getUserGuids(int $lspId): array
+    {
+        $select = $this->db
+            ->select()
+            ->from(
+                [
+                    'user' => UserTable::TABLE_NAME,
+                ],
+                'userGuid',
+            )
+            ->join(
+                [
+                    'lspToUser' => LanguageServiceProviderUserTable::TABLE_NAME,
+                ],
+                'user.id = lspToUser.userId',
+                []
+            )
+            ->where('lspToUser.lspId = ?', $lspId);
+
+        return $this->db->fetchCol($select);
     }
 
     public function getLspUsers(LanguageServiceProvider $lsp): iterable

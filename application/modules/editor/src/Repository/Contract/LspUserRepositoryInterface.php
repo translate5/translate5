@@ -71,6 +71,11 @@ interface LspUserRepositoryInterface
     public function getUsers(int $lspId): iterable;
 
     /**
+     * @return array<string>
+     */
+    public function getUserGuids(int $lspId): array;
+
+    /**
      * @return iterable<LspUser>
      */
     public function getLspUsers(LanguageServiceProvider $lsp): iterable;

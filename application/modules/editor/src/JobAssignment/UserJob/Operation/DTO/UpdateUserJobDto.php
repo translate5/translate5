@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO;
 
 use editor_Workflow_Default as Workflow;
+use MittagQI\Translate5\JobAssignment\DTO\WorkflowDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidDeadlineDateStringProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidStateProvidedException;
 

@@ -102,7 +102,7 @@ class LspRepository implements LspRepositoryInterface
         $lsp->delete();
     }
 
-    public function findCustomerAssignment(
+    public function findCustomerConnection(
         int $lspId,
         int $customerId,
     ): ?LanguageServiceProviderCustomer {

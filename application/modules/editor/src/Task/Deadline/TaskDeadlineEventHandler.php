@@ -6,7 +6,7 @@ use editor_ModelInstances;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
 use Editor_TaskuserassocController;
-use MittagQI\Translate5\Task\Import\Defaults\UserAssocDefaults;
+use MittagQI\Translate5\Task\Import\Defaults\JobAssignmentDefaults;
 use Zend_EventManager_Event;
 use Zend_EventManager_StaticEventManager;
 use ZfExtended_Factory;
@@ -21,7 +21,7 @@ class TaskDeadlineEventHandler
     public function register(): void
     {
         $this->eventManager->attach(
-            UserAssocDefaults::class,
+            JobAssignmentDefaults::class,
             'userAssocDefaultsAssigned',
             [$this, 'onUserAssocDefaultsAssigned']
         );

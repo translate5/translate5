@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO;
+namespace MittagQI\Translate5\JobAssignment\DTO;
 
 class WorkflowDto
 {

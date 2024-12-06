@@ -34,7 +34,7 @@ use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Task\Import\Defaults\ITaskDefaults;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\Import\Defaults\PivotResourceDefaults;
-use MittagQI\Translate5\Task\Import\Defaults\UserAssocDefaults;
+use MittagQI\Translate5\Task\Import\Defaults\JobAssignmentDefaults;
 
 class TaskDefaults
 {
@@ -49,7 +49,7 @@ class TaskDefaults
         $this->defaults = [
             new LanguageResourcesDefaults($languageResourceRepository),
             new PivotResourceDefaults($languageResourceRepository),
-            new UserAssocDefaults(),
+            JobAssignmentDefaults::create(),
         ];
     }
 

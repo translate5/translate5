@@ -59,7 +59,7 @@ class CompetitiveJobCreationValidator
      */
     public function assertCanCreate(
         Task $task,
-        ?LspJob $lspJob,
+        ?int $lspJobId,
         string $workflow,
         string $workflowStepName
     ): void {
@@ -73,15 +73,15 @@ class CompetitiveJobCreationValidator
             $workflowStepName
         );
 
-        if (null === $lspJob && ! $taskHasConfirmedJob) {
+        if (null === $lspJobId && ! $taskHasConfirmedJob) {
             return;
         }
 
-        if (null === $lspJob) {
+        if (null === $lspJobId) {
             throw new ConfirmedCompetitiveJobAlreadyExistsException();
         }
 
-        $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
+        $dataJob = $this->userJobRepository->getDataJobByLspJob($lspJobId);
 
         if (! $dataJob->isConfirmed()) {
             throw new CoordinatorHasNotConfirmedLspJobYetException();

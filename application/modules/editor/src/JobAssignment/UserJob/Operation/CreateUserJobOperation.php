@@ -41,8 +41,6 @@ use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\CompetitiveJobCreationValidator;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\TrackChangesRightsValidator;
-use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
-use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
@@ -111,13 +109,13 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             if (TypeEnum::Lsp !== $dto->type) {
                 $this->competitiveJobCreationValidator->assertCanCreate(
                     $task,
-                    $lspJob,
+                    (int) $lspJob->getId(),
                     $dto->workflow->workflow,
                     $dto->workflow->workflowStepName,
                 );
             }
 
-            $job = $this->userJobRepository->getEmptyModel();
+            $job = new UserJob();
             $job->setTaskGuid($task->getTaskGuid());
             $job->setUserGuid($dto->userGuid);
             $job->setState($dto->state);
@@ -199,13 +197,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             return;
         }
 
-        if (null === $lspUser) {
-            throw new OnlyCoordinatorCanBeAssignedToLspJobException();
-        }
-
-        try {
-            JobCoordinator::fromLspUser($lspUser);
-        } catch (CantCreateCoordinatorFromUserException) {
+        if (null === $lspUser || ! $lspUser->isCoordinator()) {
             throw new OnlyCoordinatorCanBeAssignedToLspJobException();
         }
     }

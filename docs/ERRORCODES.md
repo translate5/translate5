@@ -862,6 +862,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1673"></a>E1673  | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Quotes ||
 | <a id="E1674"></a>E1674  | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Orders ||
 | <a id="E1676"></a>E1676  | TODO    | SET ME BY USING ME! {TEST} | TODO DESCRIPTION / SOLUTION |
+| <a id="E1677"></a>E1677  | TODO    | SET ME BY USING ME! {TEST} | TODO DESCRIPTION / SOLUTION |
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number
