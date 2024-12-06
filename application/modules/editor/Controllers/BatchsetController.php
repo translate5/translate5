@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\Task\BatchSet\TaskBatchSetter;
 
 /**
  * Controller for Batch Updates
@@ -50,93 +50,6 @@ class Editor_BatchsetController extends ZfExtended_RestController
 
     public function indexAction(): void
     {
-        $batchSet = new MittagQI\Translate5\Task\BatchSet\Strategy($this->getRequest());
-        if (! $batchSet->validate()) {
-            return;
-        }
-
-        $taskGuids = $this->prepareAllowedTaskGuids($this->getParam('projectsAndTasks'));
-        if (empty($taskGuids)) {
-            return;
-        }
-
-        $batchSet->update($taskGuids);
-    }
-
-    private function prepareAllowedTaskGuids(?string $projectsAndTaskIdsCsv): array
-    {
-        if (! empty($projectsAndTaskIdsCsv)) {
-            return $this->getTaskGuidsFromProjectsAndTasks(explode(',', $projectsAndTaskIdsCsv));
-        }
-
-        return $this->getTaskGuidsFromFilteredProjects($this->getRequest()->getRawParam('filter'));
-    }
-
-    private function loadAllowedTasks(string $jsonFilter): array
-    {
-        // handle filtered projects like in TaskController
-        $filter = new editor_Models_Filter_TaskSpecific($this->entity, $jsonFilter);
-        $this->entity->filterAndSort($filter);
-
-        // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $isAllowedToLoadAll = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS);
-        if ($isAllowedToLoadAll) {
-            return $this->entity->loadAll();
-        }
-        $authenticatedUser = ZfExtended_Authentication::getInstance()->getUser();
-
-        return $this->entity->loadListByUserAssoc($authenticatedUser->getUserGuid());
-    }
-
-    private function getTaskGuidsFromFilteredProjects(string $jsonFilter): array
-    {
-        $rows = $this->loadAllowedTasks($jsonFilter);
-        if (empty($rows)) {
-            return [];
-        }
-        $projectIds = array_column(array_filter($rows, fn ($row) => $row['id'] === $row['projectId']), 'id');
-        if (empty($projectIds)) {
-            return [];
-        }
-
-        $rows = $this->loadAllowedTasks(json_encode([[
-            'operator' => 'in',
-            'value' => $projectIds,
-            'property' => 'projectId',
-        ], [
-            'operator' => 'eq',
-            'value' => 'projectTask',
-            'property' => 'taskType',
-        ]]));
-
-        return array_column($rows, 'taskGuid');
-    }
-
-    private function getTaskGuidsFromProjectsAndTasks(array $taskAndProjectIds): array
-    {
-        $rows = $this->loadAllowedTasks(json_encode([[
-            'operator' => 'in',
-            'value' => $taskAndProjectIds,
-            'property' => 'id',
-        ]]));
-
-        $projectIds = $taskGuids = [];
-        foreach ($rows as $row) {
-            if ($row['id'] === $row['projectId']) {
-                $projectIds[] = $row['id'];
-            } else {
-                $taskGuids[] = $row['taskGuid'];
-            }
-        }
-
-        if (! empty($projectIds)) {
-            $taskGuids = array_merge($taskGuids, $this->getTaskGuidsFromFilteredProjects(json_encode([[
-                'operator' => 'in',
-                'value' => $projectIds,
-                'property' => 'projectId',
-            ]])));
-        }
-
-        return $taskGuids;
+        TaskBatchSetter::create()->process($this->getRequest());
     }
 }

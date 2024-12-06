@@ -6,16 +6,28 @@ use editor_ModelInstances;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
 use Editor_TaskuserassocController;
+use MittagQI\Translate5\JobAssignment\UserJob\BatchUpdate\UserJobDeadlineBatchUpdater;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\Import\Defaults\JobAssignmentDefaults;
 use Zend_EventManager_Event;
 use Zend_EventManager_StaticEventManager;
-use ZfExtended_Factory;
 
 class TaskDeadlineEventHandler
 {
     public function __construct(
         private readonly Zend_EventManager_StaticEventManager $eventManager,
+        private readonly UserJobDeadlineBatchUpdater $taskUserAssociationUpdater,
+        private readonly UserJobRepository $userJobRepository,
     ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            Zend_EventManager_StaticEventManager::getInstance(),
+            UserJobDeadlineBatchUpdater::create(),
+            UserJobRepository::create(),
+        );
     }
 
     public function register(): void
@@ -40,9 +52,8 @@ class TaskDeadlineEventHandler
         // if a task has a deadline-date we automatically propagate it to the jobs - adjusted
         // this always happens when user-assoc-defaults are applied
         if ($this->isCalculationTriggered($_REQUEST) && $task->hasValidDeadlineDate()) {
-            $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
-            $tuas = $model->loadByTaskGuidList([$task->getTaskGuid()]);
-            $this->updateDeadlines($tuas, $task, $model);
+            $jobIds = $this->userJobRepository->findAllJobsInTask($task->getTaskGuid());
+            $this->updateDeadlines($jobIds, $task);
         }
     }
 
@@ -51,29 +62,29 @@ class TaskDeadlineEventHandler
         // We cannot simply overwrite data sent by post - only if explicitly wanted via trigger-param
         if ($this->isCalculationTriggered($_REQUEST)) {
             /* @var editor_Models_TaskUserAssoc $tua */
-            $tua = $event->getParam('entity');
-            $task = editor_ModelInstances::taskByGuid($tua->getTaskGuid());
+            $job = $event->getParam('entity');
+            $task = editor_ModelInstances::taskByGuid($job->getTaskGuid());
+
             if ($task->hasValidDeadlineDate()) {
-                $tuas = [$tua->toArray()];
-                $model = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
-                $this->updateDeadlines($tuas, $task, $model);
+                $this->updateDeadlines([$job->getId()], $task);
             }
         }
     }
 
     private function isCalculationTriggered(array $requestParams): bool
     {
-        return array_key_exists('calculateDeadlineDate', $requestParams) &&
-            ($requestParams['calculateDeadlineDate'] === '1' || $requestParams['calculateDeadlineDate'] === 'true');
+        return array_key_exists('calculateDeadlineDate', $requestParams)
+            && ($requestParams['calculateDeadlineDate'] === '1' || $requestParams['calculateDeadlineDate'] === 'true');
     }
 
     private function updateDeadlines(
         array $associations,
         editor_Models_Task $task,
-        editor_Models_TaskUserAssoc $tuaModel,
     ): void {
         $deadlineCalculator = new DeadlineDateCalculator();
-        $tuaUpdater = new TaskUserAssociationUpdater($tuaModel);
-        $tuaUpdater->updateDeadlines($associations, $deadlineCalculator->calculateNewDeadlineDate($task));
+        $this->taskUserAssociationUpdater->updateDeadlines(
+            $associations,
+            $deadlineCalculator->calculateNewDeadlineDate($task)
+        );
     }
 }

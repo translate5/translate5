@@ -30,36 +30,40 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\BatchSet;
 
-use editor_Models_TaskUserAssoc;
+use REST_Controller_Request_Http;
 
-class BatchSetDeadlineDate extends BatchSetAbstract
+class TaskBatchSetter
 {
-    public function update(array $taskGuids): void
+    /**
+     * @param TaskBatchSetterInterface[] $setters
+     */
+    public function __construct(
+        private readonly array $setters,
+    ) {
+    }
+
+    public static function create(): self
     {
-        $deadlineDate = $this->request->getParam('deadlineDate');
-        $workflow = $this->request->getParam('batchWorkflow');
-        $workflowStep = $this->request->getParam('batchWorkflowStep');
+        return new self(
+            [
+                TaskBatchSetDeadlineDate::create(),
+            ],
+        );
+    }
 
-        if (empty($workflow) || empty($workflowStep)) {
-            $this->logger->error('', 'Missing workflow' . (empty($workflow) ? '' : 'Step') . ' parameter for batch update');
+    public function process(REST_Controller_Request_Http $request): void
+    {
+        $this->getSetter($request->getParam('updateType'))?->process($request);
+    }
 
-            return;
+    private function getSetter(string $updateType): ?TaskBatchSetterInterface
+    {
+        foreach ($this->setters as $setter) {
+            if ($setter->supports($updateType)) {
+                return $setter;
+            }
         }
 
-        try {
-            $deadlineDate = (new \DateTime($deadlineDate))->format('Y-m-d H:i:s');
-        } catch (\Exception $e) {
-            $this->logger->exception($e);
-
-            return;
-        }
-
-        $taskUserAssocModel = new editor_Models_TaskUserAssoc();
-        $tuas = $taskUserAssocModel->loadByTaskGuidList($taskGuids, $workflow, $workflowStep);
-        foreach ($tuas as $tua) {
-            $taskUserAssocModel->load($tua['id']);
-            $taskUserAssocModel->setDeadlineDate($deadlineDate);
-            $taskUserAssocModel->save();
-        }
+        return null;
     }
 }

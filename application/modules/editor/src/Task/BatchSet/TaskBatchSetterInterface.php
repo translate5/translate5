@@ -30,41 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\BatchSet;
 
-use Zend_Registry;
-use ZfExtended_Sanitized_HttpRequest;
+use REST_Controller_Request_Http;
 
-class Strategy
+interface TaskBatchSetterInterface
 {
-    private const updateClassMap = [
-        // derived from BatchSetAbstract
-        'deadlineDate' => BatchSetDeadlineDate::class,
-    ];
+    public function supports(string $updateType): bool;
 
-    public function __construct(
-        private readonly ZfExtended_Sanitized_HttpRequest $request
-    ) {
-    }
-
-    public function validate(): bool
-    {
-        $updateType = (string) $this->request->getParam('updateType');
-
-        return isset(self::updateClassMap[$updateType]);
-    }
-
-    public function update(array $taskGuids): void
-    {
-        if (! $this->validate()) {
-            return;
-        }
-        $updater = $this->getUpdater($this->request->getParam('updateType'));
-        $updater->update($taskGuids);
-    }
-
-    private function getUpdater(string $updateType): BatchSetAbstract
-    {
-        $className = self::updateClassMap[$updateType];
-
-        return new $className($this->request, Zend_Registry::get('logger'));
-    }
+    public function process(REST_Controller_Request_Http $request): void;
 }

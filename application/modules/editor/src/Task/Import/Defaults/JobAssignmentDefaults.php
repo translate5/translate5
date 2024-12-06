@@ -75,14 +75,14 @@ class JobAssignmentDefaults implements ITaskDefaults
 
         foreach ($this->defaultUserJobRepository->getDefaultLspJobsForTask($task) as $defaultUserJob) {
             try {
-                $this->assignUserJob($defaultLspJob, $taskConfig, $task);
+                $this->assignUserJob($defaultUserJob, $taskConfig, $task);
             } catch (Throwable $e) {
                 $this->logger->error(
                     'E1677',
                     'Error while assigning default lsp job',
                     [
                         'exception' => $e::class,
-                        'defaultLspJob' => $defaultLspJob->getId(),
+                        'defaultUserJob' => $defaultUserJob->getId(),
                         'task' => $task->getTaskGuid(),
                         'trace' => $e->getTraceAsString(),
                     ],
@@ -91,7 +91,6 @@ class JobAssignmentDefaults implements ITaskDefaults
         }
 
         $this->events->trigger('userAssocDefaultsAssigned', $this, [
-            'defaults' => $defaults,
             'task' => $task,
         ]);
     }

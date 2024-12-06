@@ -136,7 +136,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             $eventHandler->addDefaultPMUsersOnPutAction(DeleteOpenidUsersAction::FALLBACK_PM_CONFIG)
         );
 
-        $taskDeadlineDateEventHandler = new TaskDeadlineEventHandler($eventManager);
+        $taskDeadlineDateEventHandler = TaskDeadlineEventHandler::create();
         $taskDeadlineDateEventHandler->register();
 
         \MittagQI\Translate5\LanguageResource\TaskTm\EventListener::create($eventManager)->atachAll();
