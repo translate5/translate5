@@ -170,8 +170,8 @@ Ext.define('Editor.controller.Editor', {
             'segmentsToolbar specialCharactersButton': {
                 click: 'insertSpecialCharacter'
             },
-            'segmentsToolbar specialCharactersButtonTagged': {
-                click: 'insertWhitespaceTagged'
+            'segmentsToolbar #specialCharactersCombo': {
+                change: 'insertWhitespaceCombo'
             },
             '#segmentMinMaxLength': {
                 insertNewline: 'insertWhitespaceNewline'
@@ -1730,8 +1730,8 @@ Ext.define('Editor.controller.Editor', {
     insertWhitespaceTab: function(key,e) {
         this.insertWhitespace(key,e,'tab');
     },
-    insertWhitespaceTagged: function(key,e) {
-        this.insertWhitespace(key,e,key.value);
+    insertWhitespaceCombo: function(field, newVal, oldVal, eOpts) {
+        this.insertWhitespace(undefined,undefined,newVal);
     },
 
     /***

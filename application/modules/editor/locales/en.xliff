@@ -10151,6 +10151,10 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>No property is specified</target>
             </trans-unit>
+            <trans-unit id='Qml0dGUgd8OkaGxlbg=='>
+                <source>Bitte wählen</source>
+                <target>Please select</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

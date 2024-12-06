@@ -33,7 +33,7 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
     requires:['Editor.view.segments.SpecialCharactersButton', 'Editor.view.segments.SpecialCharactersButtonTagged'],
 
     strings:{
-        title:'#UT#Sonderzeichen hinzufügen:'
+        title:'#UT#Sonderzeichen hinzufügen:',
     },
 
     columns: 8,
@@ -124,7 +124,7 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
         matches.push('all');
 
         // To keep track of added values
-        let addedValues = new Set();
+        let addedValues = new Set(), comboData= [];
 
         Ext.Array.each(matches, function(rec) {
             if(decoded[rec] !== undefined){
@@ -134,12 +134,20 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                     hasTag = r.hasOwnProperty('tagInfo');
 
                     if (!addedValues.has(value)) {
-                        items.push({
-                            xtype: 'specialCharactersButton' + (hasTag?'Tagged':''),
-                            text: r.visualized,
-                            value: (hasTag ? r.tagInfo + '|' + r.visualized : Editor.util.Util.toUnicodeCodePointEscape(r.unicode)),
-                            tooltip: (hasTag ? r.visualized : Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode])
-                        });
+
+                        if(hasTag){
+                            comboData.push({
+                                txt: r.visualized,
+                                val: r.tagInfo + '|' + r.visualized,
+                            });
+                        } else {
+                            items.push({
+                                xtype: 'specialCharactersButton',
+                                text: r.visualized,
+                                value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode),
+                                tooltip: Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode]
+                            });
+                        }
 
                         addedValues.add(value);
                     }
@@ -147,5 +155,21 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
             }
         });
 
+        if(comboData.length){
+            items.push(
+            {   xtype: "container",
+                items: [
+            {
+                xtype: 'combo',
+                store: Ext.create('Ext.data.Store', {
+                    fields: ['txt', 'val'],
+                    data: comboData
+                }),
+                id: 'specialCharactersCombo',
+                emptyText: Editor.data.l10n.general.plsSelect,
+                displayField: 'txt',
+                valueField: 'val'
+            }]});
+        }
     }
 });
