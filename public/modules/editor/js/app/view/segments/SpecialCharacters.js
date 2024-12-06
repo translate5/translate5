@@ -30,7 +30,7 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
     alias: 'widget.specialCharacters',
     itemId: 'specialCharacters',
 
-    requires:['Editor.view.segments.SpecialCharactersButton', 'Editor.view.segments.SpecialCharactersButtonTagged'],
+    requires:['Editor.view.segments.SpecialCharactersButton'],
 
     strings:{
         title:'#UT#Sonderzeichen hinzufügen:',

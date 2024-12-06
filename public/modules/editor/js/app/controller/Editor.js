@@ -1740,13 +1740,6 @@ Ext.define('Editor.controller.Editor', {
      * @param e
      */
     insertSpecialCharacter: function (button, e){
-
-        if(button.xtype === 'specialCharactersButtonTagged') {
-            // proper implementation is needed, this doesn't work:
-            // editor.insertMarkup('<char ts="e28087" length="1"/>')
-            return;
-        }
-
         var me = this,
             plug = me.getEditPlugin(),
             editor = plug && plug.editor.mainEditor;
