@@ -34,6 +34,8 @@ use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
+use MittagQI\Translate5\DefaultJobAssignment\Contract\DeleteDefaultLspJobOperationInterface;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DeleteDefaultLspJobOperation;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
@@ -44,6 +46,7 @@ use MittagQI\Translate5\LSP\Exception\LspHasUnDeletableJobException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\DefaultLspJobRepository;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
@@ -57,6 +60,8 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
         private readonly ActionFeasibilityAssert $lspJobActionFeasibilityAssert,
         private readonly DeleteLspJobOperationInterface $deleteLspJobAssignmentOperation,
         private readonly LspUserUnassignCustomersOperationInterface $lspUserUnassignCustomersOperation,
+        private readonly DefaultLspJobRepository $defaultLspJobRepository,
+        private readonly DeleteDefaultLspJobOperationInterface $deleteDefaultLspJobOperation,
     ) {
     }
 
@@ -72,6 +77,8 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
             LspJobActionFeasibilityAssert::create(),
             DeleteLspJobOperation::create(),
             LspUserUnassignCustomersOperation::create(),
+            DefaultLspJobRepository::create(),
+            DeleteDefaultLspJobOperation::create(),
         );
     }
 
@@ -102,6 +109,15 @@ final class LspUnassignCustomerOperation implements LspUnassignCustomerOperation
     {
         foreach ($this->lspRepository->getSubLspList($lsp) as $subLsp) {
             $this->forceUnassignCustomer($subLsp, $customer);
+        }
+
+        $defaultLspJobs = $this->defaultLspJobRepository->getDefaultLspJobsOfCustomer(
+            (int) $lsp->getId(),
+            (int) $customer->getId()
+        );
+
+        foreach ($defaultLspJobs as $defaultLspJob) {
+            $this->deleteDefaultLspJobOperation->delete($defaultLspJob);
         }
 
         $lspJobs = $this->getLspJobsIterator((int) $lsp->getId(), (int) $customer->getId());

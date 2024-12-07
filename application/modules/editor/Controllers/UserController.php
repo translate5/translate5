@@ -41,6 +41,7 @@ use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHasAssignedDefaultLspJobException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHasAssignedLspJobException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
@@ -120,6 +121,7 @@ class Editor_UserController extends ZfExtended_RestController
             'E1627' => 'Attempts to manipulate not accessible user.',
             'E1628' => 'Tried to manipulate a not editable user.',
             'E1636' => 'The user can not be deleted, he is Job Coordinator of some LSP jobs.',
+            'E1679' => 'The user can not be deleted, he is Job Coordinator of some default LSP jobs.',
         ], 'editor.user');
     }
 
@@ -533,6 +535,9 @@ class Editor_UserController extends ZfExtended_RestController
                         CoordinatorHasAssignedLspJobException::class => $this->view->translate(
                             'Der Benutzer ist Job-Koordinator für einige LSP Aufträge.'
                         ),
+                        CoordinatorHasAssignedDefaultLspJobException::class => $this->view->translate(
+                            'Der Benutzer ist Job-Koordinator für einige Standard LSP Aufträge.'
+                        ),
                         default => $e->getPrevious()->getMessage(),
                     }
                 ],
@@ -597,6 +602,19 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1636',
                 [
                     'Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen LSP-Aufträgen ist.',
+                ],
+                [
+                    'lsp' => $e->coordinator->lsp->getName(),
+                    'lspId' => $e->coordinator->lsp->getId(),
+                    'user' => $this->entity->getUserGuid(),
+                    'userLogin' => $this->entity->getLogin(),
+                    'userEmail' => $this->entity->getEmail(),
+                ]
+            ),
+            CoordinatorHasAssignedDefaultLspJobException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1679',
+                [
+                    'Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen Standard LSP-Aufträgen ist.',
                 ],
                 [
                     'lsp' => $e->coordinator->lsp->getName(),

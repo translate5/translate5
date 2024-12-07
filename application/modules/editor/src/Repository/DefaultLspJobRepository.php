@@ -30,11 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use editor_Models_Db_TaskUserAssoc as DefaultUserJobTable;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\Db\DefaultLspJobTable;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultLspJobAlreadyExistsException;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\InexistentDefaultLspJobException;
+use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
+use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
+use MittagQI\Translate5\LSP\JobCoordinator;
 use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
@@ -157,6 +161,29 @@ class DefaultLspJobRepository
 
             yield clone $job;
         }
+    }
+
+    public function coordinatorAssignedToDefaultLspJobs(JobCoordinator $coordinator): bool
+    {
+        $select = $this->db
+            ->select()
+            ->from(
+                [
+                    'lspJob' => DefaultLspJobTable::TABLE_NAME,
+                ],
+                'COUNT(*)'
+            )
+            ->join(
+                [
+                    'userJob' => DefaultUserJobTable::TABLE_NAME,
+                ],
+                'lspJob.dataJobId = userJob.id',
+                []
+            )
+            ->where('userJob.userGuid = ?', $coordinator->user->getUserGuid())
+        ;
+
+        return (int) $this->db->fetchOne($select) > 0;
     }
 
     /**

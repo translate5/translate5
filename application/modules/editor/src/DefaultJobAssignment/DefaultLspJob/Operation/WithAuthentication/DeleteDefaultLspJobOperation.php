@@ -28,24 +28,29 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication;
+namespace MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\WithAuthentication;
 
 use editor_Models_TaskUserAssoc as UserJob;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
-use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
-use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
+use MittagQI\Translate5\DefaultJobAssignment\Contract\DeleteDefaultLspJobOperationInterface;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
+use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\CustomerRepository;
+use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Logger;
 
-class DeleteLspJobOperation implements DeleteLspJobOperationInterface
+class DeleteDefaultLspJobOperation implements DeleteDefaultLspJobOperationInterface
 {
     /**
      * @param ActionPermissionAssertInterface<UserJob> $permissionAssert
@@ -53,9 +58,11 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
     public function __construct(
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
-        private readonly DeleteLspJobOperationInterface $operation,
-        private readonly ActionPermissionAssertInterface $permissionAssert,
-        private readonly UserJobRepository $userJobRepository,
+        private readonly DeleteDefaultLspJobOperationInterface $operation,
+        private readonly ActionPermissionAssertInterface $userPermissionAssert,
+        private readonly ActionPermissionAssertInterface $customerPermissionAssert,
+        private readonly CustomerRepository $customerRepository,
+        private readonly LspRepositoryInterface $lspRepository,
         private readonly ZfExtended_Logger $logger,
     ) {
     }
@@ -68,36 +75,35 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
         return new self(
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
-            \MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation::create(),
-            UserJobActionPermissionAssert::create(),
-            UserJobRepository::create(),
-            Zend_Registry::get('logger')->cloneMe('lspJob.delete'),
+            \MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DeleteDefaultLspJobOperation::create(),
+            UserActionPermissionAssert::class::create(),
+            CustomerActionPermissionAssert::class::create(),
+            CustomerRepository::create(),
+            LspRepository::create(),
+            Zend_Registry::get('logger')->cloneMe('defaultLspJob.delete'),
         );
     }
 
-    public function delete(LspJob $job): void
+    /**
+     * @throws LspJobAlreadyExistsException
+     */
+    public function delete(DefaultLspJob $job): void
     {
-        $this->assertAccess($job);
+        $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $this->operation->delete($job);
-    }
+        $customer = $this->customerRepository->get((int) $job->getCustomerId());
+        $lsp = $this->lspRepository->get((int)$job->getLspId());
 
-    public function forceDelete(LspJob $job): void
-    {
-        $this->assertAccess($job);
-
-        $this->operation->forceDelete($job);
-    }
-
-    private function assertAccess(LspJob $job): void
-    {
         try {
-            $authUser = $this->userRepository->get($this->authentication->getUserId());
-            $dataJob = $this->userJobRepository->getDataJobByLspJob((int)$job->getId());
+            $this->customerPermissionAssert->assertGranted(
+                CustomerAction::DefaultJob,
+                $customer,
+                new PermissionAssertContext($authUser),
+            );
 
-            $this->permissionAssert->assertGranted(
-                Action::Delete,
-                $dataJob,
+            $this->userPermissionAssert->assertGranted(
+                LspAction::Read,
+                $lsp,
                 new PermissionAssertContext($authUser),
             );
 
@@ -106,7 +112,7 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
                 'Audit: {message}',
                 [
                     'message' => sprintf(
-                        'Attempt to delete LSP job (id: "%s") by AuthUser (guid: %s) was granted',
+                        'Attempt to delete default LSP job (id: "%s") by AuthUser (guid: %s) was granted',
                         $job->getId(),
                         $authUser->getUserGuid(),
                     ),
@@ -115,12 +121,12 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
                 ]
             );
         } catch (PermissionExceptionInterface $e) {
-            $this->logger->error(
+            $this->logger->info(
                 'E1637',
                 'Audit: {message}',
                 [
                     'message' => sprintf(
-                        'Attempt to delete LSP job (id: "%s") by AuthUser (guid: %s) was denied',
+                        'Attempt to delete default LSP job (id: "%s") by AuthUser (guid: %s) was denied',
                         $job->getId(),
                         $authUser->getUserGuid(),
                     ),
@@ -131,5 +137,7 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
 
             throw $e;
         }
+
+        $this->operation->delete($job);
     }
 }

@@ -60,7 +60,7 @@ final class CoordinatorCanCreateDefaultJobAssert implements PermissionAssertInte
 
     public function supports(\BackedEnum $action): bool
     {
-        return CustomerAction::CreateDefaultJob === $action;
+        return CustomerAction::DefaultJob === $action;
     }
 
     /**

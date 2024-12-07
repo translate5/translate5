@@ -34,7 +34,6 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
-use MittagQI\Translate5\JobAssignment\LspJob\Exception\LspJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
 use MittagQI\Translate5\Repository\LspJobRepository;
@@ -73,9 +72,6 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
         );
     }
 
-    /**
-     * @throws LspJobAlreadyExistsException
-     */
     public function delete(LspJob $job): void
     {
         $this->lspJobActionFeasibilityAssert->assertAllowed(Action::Delete, $job);

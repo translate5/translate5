@@ -109,7 +109,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             if (TypeEnum::Lsp !== $dto->type) {
                 $this->competitiveJobCreationValidator->assertCanCreate(
                     $task,
-                    (int) $lspJob->getId(),
+                    $lspJob ? (int) $lspJob->getId() : null,
                     $dto->workflow->workflow,
                     $dto->workflow->workflowStepName,
                 );

@@ -313,7 +313,7 @@ class UserJobRepository
     /**
      * @return int[]
      */
-    public function findAllJobsInTask(string $taskGuid): array
+    public function getAllJobIdsInTask(string $taskGuid): array
     {
         $s = $this->db->select()
             ->from(UserJobTable::TABLE_NAME, 'id')
@@ -321,6 +321,37 @@ class UserJobRepository
         ;
 
         return $this->db->fetchCol($s);
+    }
+
+    /**
+     * @return iterable<UserJob>
+     */
+    public function getAllJobsInTask(string $taskGuid): iterable
+    {
+        $job = new UserJob();
+
+        $s = $this->db
+            ->select()
+            ->from(UserJobTable::TABLE_NAME)
+            ->where('taskGuid = ?', $taskGuid)
+        ;
+
+        $stmt = $this->db->query($s);
+
+        while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $job->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $job;
+        }
     }
 
     public function save(UserJob $job): void

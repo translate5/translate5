@@ -52,7 +52,7 @@ class TaskDeadlineEventHandler
         // if a task has a deadline-date we automatically propagate it to the jobs - adjusted
         // this always happens when user-assoc-defaults are applied
         if ($this->isCalculationTriggered($_REQUEST) && $task->hasValidDeadlineDate()) {
-            $jobIds = $this->userJobRepository->findAllJobsInTask($task->getTaskGuid());
+            $jobIds = $this->userJobRepository->getAllJobIdsInTask($task->getTaskGuid());
             $this->updateDeadlines($jobIds, $task);
         }
     }

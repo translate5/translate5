@@ -10359,6 +10359,14 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.</source>
                 <target>The other users cannot be removed from the task, another user may have been quicker and removed you from the task.</target>
             </trans-unit>
+            <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZGEgZXIgSm9iLUtvb3JkaW5hdG9yIHZvbiBlaW5pZ2VuIFN0YW5kYXJkIExTUC1BdWZ0csOkZ2VuIGlzdC4='>
+                <source>Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen Standard LSP-Aufträgen ist.</source>
+                <target>The user can not be deleted, he is Job Coordinator of some default LSP jobs.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIEJlbnV0emVyIGlzdCBKb2ItS29vcmRpbmF0b3IgZsO8ciBlaW5pZ2UgU3RhbmRhcmQgTFNQIEF1ZnRyw6RnZS4='>
+                <source>Der Benutzer ist Job-Koordinator für einige Standard LSP Aufträge.</source>
+                <target>The user is the job coordinator for some default LSP jobs.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

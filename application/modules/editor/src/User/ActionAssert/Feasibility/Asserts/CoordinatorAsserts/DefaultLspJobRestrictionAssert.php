@@ -28,28 +28,21 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
+namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts\DefaultLspJobRestrictionAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts\LastCoordinatorFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts\LspJobRestrictionAssert;
-use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHasAssignedDefaultLspJobException;
 
 /**
- * @implements FeasibilityAssertInterface<User>
+ * @implements FeasibilityAssertInterface<JobCoordinator>
  */
-final class CoordinatorCanBeDeletedAssert implements FeasibilityAssertInterface
+class DefaultLspJobRestrictionAssert implements FeasibilityAssertInterface
 {
-    /**
-     * @param FeasibilityAssertInterface<JobCoordinator>[] $asserts
-     */
     public function __construct(
-        private readonly JobCoordinatorRepository $jcRepository,
-        private readonly array $asserts,
+        private readonly DefaultLspJobRepository $lspJobRepository,
     ) {
     }
 
@@ -59,12 +52,7 @@ final class CoordinatorCanBeDeletedAssert implements FeasibilityAssertInterface
     public static function create(): self
     {
         return new self(
-            JobCoordinatorRepository::create(),
-            [
-                LastCoordinatorFeasibilityAssert::create(),
-                LspJobRestrictionAssert::create(),
-                DefaultLspJobRestrictionAssert::create(),
-            ],
+            DefaultLspJobRepository::create(),
         );
     }
 
@@ -75,15 +63,8 @@ final class CoordinatorCanBeDeletedAssert implements FeasibilityAssertInterface
 
     public function assertAllowed(object $object): void
     {
-        // Possible coordinator that we try to delete
-        $coordinator = $this->jcRepository->findByUser($object);
-
-        if (null === $coordinator) {
-            return;
-        }
-
-        foreach ($this->asserts as $assert) {
-            $assert->assertAllowed($coordinator);
+        if ($this->lspJobRepository->coordinatorAssignedToDefaultLspJobs($object)) {
+            throw new CoordinatorHasAssignedDefaultLspJobException($object);
         }
     }
 }

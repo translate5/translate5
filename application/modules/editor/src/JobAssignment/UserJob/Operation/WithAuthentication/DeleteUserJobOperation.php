@@ -87,11 +87,12 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
         try {
-        $this->permissionAssert->assertGranted(
-            Action::Delete,
-            $job,
-            new PermissionAssertContext($authUser),
-        );
+            $this->permissionAssert->assertGranted(
+                Action::Delete,
+                $job,
+                new PermissionAssertContext($authUser),
+            );
+
             $this->logger->info(
                 'E1637',
                 'Audit: {message}',

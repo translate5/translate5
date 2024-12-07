@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,12 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Customer\ActionAssert;
+namespace MittagQI\Translate5\DefaultJobAssignment\Contract;
 
-enum CustomerAction: string
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
+
+interface DeleteDefaultLspJobOperationInterface
 {
-    case DefaultJob = 'createDefaultJob';
-    case Read = 'read';
-    case Update = 'update';
-    case Delete = 'delete';
+    public function delete(DefaultLspJob $job): void;
 }

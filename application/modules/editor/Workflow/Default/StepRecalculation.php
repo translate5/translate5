@@ -204,15 +204,14 @@ class editor_Workflow_Default_StepRecalculation
      */
     public function setupInitialWorkflow(editor_Models_Task $task): void
     {
-        $job = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
-        $jobs = $job->loadByTaskGuidList([$task->getTaskGuid()]);
+        $jobs = $this->userJobRepository->getAllJobsInTask($task->getTaskGuid());
 
         $usedJobs = [];
         $usedSteps = [];
         //delete jobs created by default which are not belonging to the tasks workflow and collect used steps
-        foreach ($jobs as $rawJob) {
-            if ($rawJob['workflow'] !== $task->getWorkflow()) {
-                $this->deleteJobOperation->forceDelete((int) $rawJob['id']);
+        foreach ($jobs as $job) {
+            if ($job->getWorkflow() !== $task->getWorkflow()) {
+                $this->deleteJobOperation->forceDelete((int) $job->getId());
 
                 continue;
             }
@@ -220,12 +219,12 @@ class editor_Workflow_Default_StepRecalculation
             // if the tua step name is not in the workflow chain, ignore the job collection
             // workflow step names which are not part of the workflow chain should not be used for calculation the
             // initial workflow step
-            if (! in_array($rawJob['workflowStepName'], $this->workflow->getStepChain())) {
+            if (! in_array($job->getWorkflowStepName(), $this->workflow->getStepChain())) {
                 continue;
             }
 
-            $usedJobs[] = $rawJob;
-            $usedSteps[] = $rawJob['workflowStepName'];
+            $usedJobs[] = $job;
+            $usedSteps[] = $job->getWorkflowStepName();
         }
 
         $this->taskRepository->updateTaskUserCount($task->getTaskGuid());
@@ -245,20 +244,18 @@ class editor_Workflow_Default_StepRecalculation
 
         $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
 
-        foreach ($usedJobs as $rawJob) {
+        foreach ($usedJobs as $job) {
             //current step jobs are open
-            if ($currentStep === $rawJob['workflowStepName']) {
+            if ($currentStep === $job->getWorkflowStepName()) {
                 $state = $isComp ? $this->workflow::STATE_UNCONFIRMED : $this->workflow::STATE_OPEN;
             } else {
                 //all other steps are coming later in the chain, so they are waiting
                 $state = $this->workflow::STATE_WAITING;
             }
 
-            $job->db->update([
-                'state' => $state,
-            ], [
-                'id = ?' => $rawJob['id'],
-            ]);
+            $job->setState($state);
+
+            $this->userJobRepository->save($job);
         }
     }
 }

@@ -85,7 +85,7 @@ class CreateDefaultUserJobOperation implements CreateDefaultUserJobOperationInte
         $customer = $this->customerRepository->get($dto->customerId);
         $user = $this->userRepository->getByGuid($dto->userGuid);
 
-        $this->customerPermissionAssert->assertGranted(CustomerAction::CreateDefaultJob, $customer, $context);
+        $this->customerPermissionAssert->assertGranted(CustomerAction::DefaultJob, $customer, $context);
         $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
 
         return $this->operation->assignJob($dto);

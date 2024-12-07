@@ -62,8 +62,9 @@ class JobAssignmentDefaults implements ITaskDefaults
             } catch (Throwable $e) {
                 $this->logger->error(
                     'E1677',
-                    'Error while assigning default lsp job',
+                    'Error while assigning default {type} job',
                     [
+                        'type' => 'lsp',
                         'exception' => $e::class,
                         'defaultLspJob' => $defaultLspJob->getId(),
                         'task' => $task->getTaskGuid(),
@@ -79,8 +80,9 @@ class JobAssignmentDefaults implements ITaskDefaults
             } catch (Throwable $e) {
                 $this->logger->error(
                     'E1677',
-                    'Error while assigning default lsp job',
+                    'Error while assigning default {type} job',
                     [
+                        'type' => 'user',
                         'exception' => $e::class,
                         'defaultUserJob' => $defaultUserJob->getId(),
                         'task' => $task->getTaskGuid(),
