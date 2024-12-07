@@ -1732,6 +1732,9 @@ Ext.define('Editor.controller.Editor', {
     },
     insertWhitespaceCombo: function(field, newVal, oldVal, eOpts) {
         this.insertWhitespace(undefined,undefined,newVal);
+        /* Doesn't help:
+        var btn = field.up('#specialChars');
+        btn.fireEvent('click', btn);*/
     },
 
     /***
