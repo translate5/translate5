@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DTO;
 
+use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DTO\NewDefaultUserJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\WorkflowDto;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\InvalidLanguageIdProvidedException;
@@ -52,5 +53,18 @@ class NewDefaultLspJobDto
         if (0 === $targetLanguageId || $sourceLanguageId === $targetLanguageId) {
             throw new InvalidLanguageIdProvidedException('targetLang');
         }
+    }
+
+    public static function fromDefaultUserJobDto(NewDefaultUserJobDto $userJobDto): self
+    {
+        return new self(
+            $userJobDto->customerId,
+            $userJobDto->userGuid,
+            $userJobDto->sourceLanguageId,
+            $userJobDto->targetLanguageId,
+            $userJobDto->workflow,
+            $userJobDto->deadline,
+            $userJobDto->trackChangesRights,
+        );
     }
 }

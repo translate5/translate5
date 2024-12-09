@@ -36,8 +36,6 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\Db\DefaultLspJo
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultLspJobAlreadyExistsException;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\InexistentDefaultLspJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
-use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use PDO;
 use Zend_Db_Adapter_Abstract;
@@ -127,6 +125,38 @@ class DefaultLspJobRepository
 
             yield clone $job;
         }
+    }
+
+    public function findDefaultLspJobByDataJobId(int $dataJobId): ?DefaultLspJob
+    {
+        $job = new DefaultLspJob();
+
+        $select = $this->db
+            ->select()
+            ->from(DefaultLspJobTable::TABLE_NAME)
+            ->where('dataJobId = ?', $dataJobId)
+        ;
+
+        $stmt = $this->db->query($select);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row === false) {
+            return null;
+        }
+
+        $job->init(
+            new \Zend_Db_Table_Row(
+                [
+                    'table' => $job->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $job;
     }
 
     /**

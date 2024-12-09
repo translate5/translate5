@@ -47,6 +47,7 @@ use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_NotAuthenticatedException;
 
 class CreateDefaultLspJobOperation implements CreateDefaultLspJobOperationInterface
 {
@@ -82,7 +83,7 @@ class CreateDefaultLspJobOperation implements CreateDefaultLspJobOperationInterf
         try {
             $authUser = $this->userRepository->get($this->authentication->getUserId());
         } catch (InexistentUserException) {
-            throw new \ZfExtended_NotAuthenticatedException();
+            throw new ZfExtended_NotAuthenticatedException();
         }
 
         $context = new PermissionAssertContext($authUser);
@@ -106,7 +107,7 @@ class CreateDefaultLspJobOperation implements CreateDefaultLspJobOperationInterf
 
         // Coordinator can only assign sub LSP jobs
         if (null !== $authCoordinator && ! $coordinator->lsp->isSubLspOf($authCoordinator->lsp)) {
-            throw new \ZfExtended_NotAuthenticatedException();
+            throw new ZfExtended_NotAuthenticatedException();
         }
 
         return $this->operation->assignJob($dto);

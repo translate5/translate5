@@ -122,10 +122,10 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
                     'message' => sprintf(
                         'Attempt to delete LSP job (id: "%s") by AuthUser (guid: %s) was denied',
                         $job->getId(),
-                        $authUser->getUserGuid(),
+                        $authUser?->getUserGuid(),
                     ),
                     'lspJobId' => $job->getId(),
-                    'authUserGuid' => $authUser->getUserGuid(),
+                    'authUserGuid' => $authUser?->getUserGuid(),
                 ]
             );
 

@@ -119,6 +119,16 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
             $jobIds = $this->userJobRepository->getAllJobIdsInTask($taskGuid);
 
             $this->userJobDeadlineBatchUpdater->updateDeadlines($jobIds, $deadlineDate);
+
+            $this->logger->info(
+                'E1012',
+                'Deadline date for user jobs in task {task} updated to {deadlineDate}',
+                [
+                    'jobs' => $jobIds,
+                    'task' => $taskGuid,
+                    'deadlineDate' => $deadlineDate,
+                ]
+            );
         }
     }
 

@@ -30,12 +30,14 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations;
 
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DeleteDefaultLspJobOperation;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
 use MittagQI\Translate5\LSP\Contract\LspDeleteOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\DefaultLspJobRepository;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
@@ -53,8 +55,10 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
         private readonly LspUserRepositoryInterface $lspUserRepository,
         private readonly LspJobRepository $lspJobRepository,
         private readonly UserRepository $userRepository,
+        private readonly DefaultLspJobRepository $defaultLspJobRepository,
         private readonly UserDeleteOperationInterface $deleteUserOperation,
         private readonly DeleteLspJobOperationInterface $lspJobDeleteOperation,
+        private readonly DeleteDefaultLspJobOperation $defaultLspJobDeleteOperation,
         private readonly ZfExtended_Logger $logger,
     ) {
     }
@@ -69,8 +73,10 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
             LspUserRepository::create(),
             LspJobRepository::create(),
             new UserRepository(),
+            DefaultLspJobRepository::create(),
             UserDeleteOperation::create(),
             DeleteLspJobOperation::create(),
+            DeleteDefaultLspJobOperation::create(),
             Zend_Registry::get('logger')->cloneMe('lsp.delete')
         );
     }
@@ -78,7 +84,7 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
     public function deleteLsp(LanguageServiceProvider $lsp): void
     {
         $this->deleteLspJobs($lsp);
-
+        $this->deleteDefaultLspJobs($lsp);
         $this->deleteLspUsers($lsp);
 
         foreach ($this->lspRepository->getSubLspList($lsp) as $subLsp) {
@@ -103,6 +109,15 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
 
         foreach ($lspJobs as $lspJob) {
             $this->lspJobDeleteOperation->forceDelete($lspJob);
+        }
+    }
+
+    public function deleteDefaultLspJobs(LanguageServiceProvider $lsp): void
+    {
+        $lspJobs = $this->defaultLspJobRepository->getDefaultLspJobs((int) $lsp->getId());
+
+        foreach ($lspJobs as $lspJob) {
+            $this->defaultLspJobDeleteOperation->delete($lspJob);
         }
     }
 

@@ -26,11 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DTO\NewDefaultLspJobDto;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\Factory\NewDefaultUserJobDtoFactory;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\WithAuthentication\CreateDefaultLspJobOperation;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\WithAuthentication\CreateDefaultUserJobOperation;
+use MittagQI\Translate5\DefaultJobAssignment\Operation\WithAuthentication\DeleteDefaultJobAssignmentOperation;
+use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\Repository\DefaultUserJobRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 
 class Editor_UserassocdefaultController extends ZfExtended_RestController
 {
-    protected $entityClass = 'editor_Models_UserAssocDefault';
+    protected $entityClass = editor_Models_UserAssocDefault::class;
 
     /**
      * @var editor_Models_UserAssocDefault
@@ -43,21 +51,50 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
      */
     protected $postBlacklist = ['id'];
 
-    protected function decodePutData(): void
+    private UserRepository $userRepository;
+
+    public function init(): void
     {
-        parent::decodePutData();
-        // check and convert the languages to lek_languages id
-        if (property_exists($this->data, 'sourceLang')) {
-            $this->_helper->Api->convertLanguageParameters($this->data->sourceLang);
-        }
-        if (property_exists($this->data, 'targetLang')) {
-            $this->_helper->Api->convertLanguageParameters($this->data->targetLang);
-        }
+        parent::init();
+
+        $this->userRepository = new UserRepository();
     }
 
     public function coordinatorscomboAction(): void
     {
         $jobCoordinatorRepository = JobCoordinatorRepository::create();
         $jobCoordinatorRepository->getCoordinatorsCount();
+    }
+
+    public function postAction(): void
+    {
+        parent::postAction();
+
+        return;
+        try {
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+            $dto = NewDefaultUserJobDtoFactory::create()->fromRequest($this->getRequest());
+
+            if (TypeEnum::Lsp === $dto->type) {
+                $lspJob = CreateDefaultLspJobOperation::create()->assignJob(
+                    NewDefaultLspJobDto::fromDefaultUserJobDto($dto)
+                );
+                $userJob = DefaultUserJobRepository::create()->get((int) $lspJob->getDataJobId());
+            } else {
+                $userJob = CreateDefaultUserJobOperation::create()->assignJob($dto);
+            }
+
+            $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($userJob, $authUser);
+        } catch (Throwable $e) {
+            $this->log->exception($e);
+
+            throw $this->transformException($e);
+        }
+    }
+
+    public function deleteAction(): void
+    {
+        $operation = DeleteDefaultJobAssignmentOperation::create();
+        $operation->delete((int) $this->getRequest()->getParam('id'));
     }
 }

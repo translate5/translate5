@@ -91,7 +91,7 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
     public function forceDelete(UserJob $job): void
     {
         if ($job->isLspJob()) {
-            throw new RuntimeException('Use DeleteLspJobAssignmentOperationInterface::forceDelete for LSP jobs');
+            throw new RuntimeException('Use DeleteLspJobOperationInterface::forceDelete for LSP jobs');
         }
 
         $taskLock = $this->acquireLock($job->getTaskGuid());

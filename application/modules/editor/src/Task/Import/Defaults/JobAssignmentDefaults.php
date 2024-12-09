@@ -12,14 +12,19 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\JobAssignment\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\JobAssignment\DTO\WorkflowDto;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\CreateLspJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\CreateLspJobOperation;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\CreateUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\CreateUserJobOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\DefaultLspJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
+use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_EventManager;
@@ -32,6 +37,9 @@ class JobAssignmentDefaults implements ITaskDefaults
         private readonly ZfExtended_EventManager $events,
         private readonly DefaultLspJobRepository $defaultLspJobRepository,
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
+        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly LspJobRepository $lspJobRepository,
+        private readonly UserJobRepository $userJobRepository,
         private readonly CreateLspJobOperationInterface $createLspJobOperation,
         private readonly CreateUserJobOperationInterface $createUserJobOperation,
         private readonly editor_Workflow_Manager $workflowManager,
@@ -45,6 +53,9 @@ class JobAssignmentDefaults implements ITaskDefaults
             new ZfExtended_EventManager(self::class),
             DefaultLspJobRepository::create(),
             DefaultUserJobRepository::create(),
+            LspUserRepository::create(),
+            LspJobRepository::create(),
+            UserJobRepository::create(),
             CreateLspJobOperation::create(),
             CreateUserJobOperation::create(),
             new editor_Workflow_Manager(),
@@ -142,6 +153,24 @@ class JobAssignmentDefaults implements ITaskDefaults
 
     public function assignUserJob(DefaultUserJob $defaultUserJob, ?editor_Models_TaskConfig $taskConfig, Task $task): void
     {
+        $lspUser = $this->lspUserRepository->findByUserGuid($defaultUserJob->getUserGuid());
+        $lspDataJob = null;
+
+        if (null !== $lspUser) {
+            try {
+                $lspJob = $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
+                    (int)$lspUser->lsp->getId(),
+                    $task->getTaskGuid(),
+                    $defaultUserJob->getWorkflow(),
+                    $defaultUserJob->getWorkflowStepName(),
+                );
+                $lspDataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
+            } catch (NotFoundLspJobException) {
+                // PM haven't assigned default LSP job for this workflow and step
+                return;
+            }
+        }
+
         $workflow = $this->workflowManager->getCached($defaultUserJob->getWorkflow());
 
         $workflowDto = new WorkflowDto(
@@ -164,11 +193,20 @@ class JobAssignmentDefaults implements ITaskDefaults
             );
         }
 
-        $trackingDto = new TrackChangesRightsDto(
-            (bool) $defaultUserJob->getTrackchangesShow(),
-            (bool) $defaultUserJob->getTrackchangesShowAll(),
-            (bool) $defaultUserJob->getTrackchangesAcceptReject(),
-        );
+        // For LSP user jobs Track changes permissions should be subset of LSP job
+        $show = $lspDataJob
+            ? $lspDataJob->getTrackchangesShow() && $defaultUserJob->getTrackchangesShow()
+            : (bool) $defaultUserJob->getTrackchangesShow();
+
+        $showAll = $lspDataJob
+            ? $lspDataJob->getTrackchangesShowAll() && $defaultUserJob->getTrackchangesShowAll()
+            : (bool) $defaultUserJob->getTrackchangesShowAll();
+
+        $acceptReject = $lspDataJob
+            ? $lspDataJob->getTrackchangesAcceptReject() && $defaultUserJob->getTrackchangesAcceptReject()
+            : (bool) $defaultUserJob->getTrackchangesAcceptReject();
+
+        $trackingDto = new TrackChangesRightsDto($show, $showAll, $acceptReject);
 
         $createDto = new NewUserJobDto(
             $task->getTaskGuid(),

@@ -2273,19 +2273,6 @@ class editor_TaskController extends ZfExtended_RestController
             return false;
         }
 
-//        if ($projectOnly) {
-//            $filterValues = $taskTypes->getProjectTypes();
-//        } else {
-//            $filterValues = $taskTypes->getNonInternalTaskTypes();
-//        }
-//
-//        $filter->addFilter((object) [
-//            'field' => 'taskType',
-//            'value' => $filterValues,
-//            'type' => 'list',
-//            'comparison' => 'in',
-//        ]);
-
         return $projectOnly;
     }
 
@@ -2444,39 +2431,5 @@ class editor_TaskController extends ZfExtended_RestController
                 . ' This happens when the user selects multiple target languages in the dropdown'
                 . ' and then imports a bilingual file via drag and drop.',
         ], [], $e);
-    }
-
-    /**
-     * Check if the current authenticated user can access the task. This method expect the entity to be loaded and
-     * will throw exception if the current user has no rights to access the task at all.
-     * @throws ZfExtended_Models_Entity_NoAccessException
-     */
-    public function isTaskAccessibleForCurrentUser(): bool
-    {
-        $hasRightForTask = $this->isAuthUserTaskPm($this->entity->getPmGuid());
-        $tua = null;
-
-        try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask(
-                $this->authenticatedUser->getUserGuid(),
-                $this->entity
-            );
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            //do nothing here
-        }
-
-        // to access a task the user must either have the loadAllTasks right,
-        // or must be the tasks PM, or must be associated to the task
-        $isTaskAccessible = $this->isAllowed(
-            Rights::ID,
-            Rights::LOAD_ALL_TASKS
-        ) || $hasRightForTask || ! is_null($tua);
-        if (! $isTaskAccessible) {
-            unset($this->view->rows);
-
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
-
-        return $hasRightForTask;
     }
 }

@@ -28,22 +28,41 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\Operation\WithAuthentication;
+namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication\DeleteLspJobOperation;
-use MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication\DeleteUserJobOperation;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\UserJobRepository;
+use editor_Models_UserAssocDefault as DefaultUserJob;
+use MittagQI\Translate5\DefaultJobAssignment\Contract\DeleteDefaultUserJobOperationInterface;
+use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultUserJobRepository;
+use RuntimeException;
 
-class DeleteJobAssignmentOperation extends \MittagQI\Translate5\JobAssignment\Operation\DeleteJobAssignmentOperation
+class DeleteDefaultUserJobOperation implements DeleteDefaultUserJobOperationInterface
 {
+    public function __construct(
+        private readonly DefaultLspJobRepository $defaultLspJobRepository,
+        private readonly DefaultUserJobRepository $defaultUserJobRepository,
+    ) {
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(
-            UserJobRepository::create(),
-            LspJobRepository::create(),
-            DeleteLspJobOperation::create(),
-            DeleteUserJobOperation::create(),
+            DefaultLspJobRepository::create(),
+            DefaultUserJobRepository::create(),
         );
+    }
+
+    public function delete(DefaultUserJob $job): void
+    {
+        $lspJob = $this->defaultLspJobRepository->findDefaultLspJobByDataJobId((int) $job->getId());
+
+        if (null !== $lspJob) {
+            throw new RuntimeException('Use DeleteDefaultLspJobOperationInterface::delete for LSP jobs');
+        }
+
+        $this->defaultUserJobRepository->delete((int) $job->getId());
     }
 }

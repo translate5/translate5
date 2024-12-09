@@ -28,22 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\Operation\WithAuthentication;
+namespace MittagQI\Translate5\DefaultJobAssignment\Contract;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication\DeleteLspJobOperation;
-use MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication\DeleteUserJobOperation;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\UserJobRepository;
+use editor_Models_UserAssocDefault as DefaultUserJob;
 
-class DeleteJobAssignmentOperation extends \MittagQI\Translate5\JobAssignment\Operation\DeleteJobAssignmentOperation
+interface DeleteDefaultUserJobOperationInterface
 {
-    public static function create(): self
-    {
-        return new self(
-            UserJobRepository::create(),
-            LspJobRepository::create(),
-            DeleteLspJobOperation::create(),
-            DeleteUserJobOperation::create(),
-        );
-    }
+    public function delete(DefaultUserJob $job): void;
 }

@@ -42,12 +42,14 @@ use MittagQI\Translate5\DefaultJobAssignment\Exception\SourceLanguageNotProvided
 use MittagQI\Translate5\DefaultJobAssignment\Exception\TargetLanguageNotProvidedException;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\WorkflowNotProvidedException;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\WorkflowStepNotProvidedException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\UserGuidNotProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\Language\LanguageResolver;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use REST_Controller_Request_Http as Request;
+use UnexpectedValueException;
 
 class NewDefaultUserJobDtoFactory
 {
@@ -111,6 +113,12 @@ class NewDefaultUserJobDtoFactory
             throw new WorkflowStepNotProvidedException();
         }
 
+        try {
+            $type = isset($data['type']) ? TypeEnum::from((int) $data['type']) : TypeEnum::Editor;
+        } catch (UnexpectedValueException) {
+            throw new InvalidTypeProvidedException();
+        }
+
         $customer = $this->customerRepository->get((int) ($customerId ?: $data['customerId']));
         $user = $this->userRepository->getByGuid($data['userGuid']);
 
@@ -132,7 +140,7 @@ class NewDefaultUserJobDtoFactory
                 $workflow->getName(),
                 $data['workflowStepName'],
             ),
-            TypeEnum::Editor,
+            $type,
             (int) $data['deadlineDate'],
             new TrackChangesRightsDto(
                 (bool) ($data['trackchangesShow'] ?? false),

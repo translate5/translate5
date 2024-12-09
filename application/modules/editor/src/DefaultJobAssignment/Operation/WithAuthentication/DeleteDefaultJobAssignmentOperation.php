@@ -28,22 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\Operation\WithAuthentication;
+namespace MittagQI\Translate5\DefaultJobAssignment\Operation\WithAuthentication;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication\DeleteLspJobOperation;
-use MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication\DeleteUserJobOperation;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\WithAuthentication\DeleteDefaultLspJobOperation;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\WithAuthentication\DeleteDefaultUserJobOperation;
+use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 
-class DeleteJobAssignmentOperation extends \MittagQI\Translate5\JobAssignment\Operation\DeleteJobAssignmentOperation
+class DeleteDefaultJobAssignmentOperation extends \MittagQI\Translate5\DefaultJobAssignment\Operation\DeleteDefaultJobAssignmentOperation
 {
     public static function create(): self
     {
         return new self(
-            UserJobRepository::create(),
-            LspJobRepository::create(),
-            DeleteLspJobOperation::create(),
-            DeleteUserJobOperation::create(),
+            DefaultUserJobRepository::create(),
+            DefaultLspJobRepository::create(),
+            DeleteDefaultLspJobOperation::create(),
+            DeleteDefaultUserJobOperation::create(),
         );
     }
 }
