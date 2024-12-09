@@ -89,6 +89,8 @@ class CompetitiveJobCreationValidator
             if (! $dataJob->isConfirmed()) {
                 throw new CoordinatorOfParentLspHasNotConfirmedLspJobYetException();
             }
+
+            return;
         }
 
         if ($this->userJobRepository->taskHasConfirmedJob($task->getTaskGuid(), $workflow, $workflowStepName)) {
