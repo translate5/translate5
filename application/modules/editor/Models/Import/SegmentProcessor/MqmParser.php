@@ -91,11 +91,12 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
     {
         $this->closeTags = [];
         $allFields = &$parser->getFieldContents();
+
         foreach ($allFields as $field => $data) {
             if ($this->mqmEnabled) {
-                $allFields[$field] = $this->restoreMqmTags($data, $field);
+                $allFields[$field] = $this->restoreMqmTags($data);
             } else {
-                $allFields[$field] = $this->removeMqmTags($data, $field);
+                $allFields[$field] = $this->removeMqmTags($data);
             }
         }
 
@@ -104,18 +105,17 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
 
     /**
      * restores the MQM Tags for the given data array (original => "FOO", originalMd5 => "123")
-     * @param string $data
      */
-    protected function restoreMqmTags(array $data, $field)
+    protected function restoreMqmTags(array $data): array
     {
         $seg = $data['original'];
 
         //start tags
         $split = preg_split('#<mqm:startIssue([^>]+)/>#', $seg, flags: PREG_SPLIT_DELIM_CAPTURE);
-        $splitCnt = count($split);
+        $splitCount = count($split);
 
         //no mqms found
-        if (count($split) == 1) {
+        if ($splitCount === 1) {
             return $data;
         }
 
@@ -123,65 +123,74 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $data['originalMd5'] = preg_replace('#<mqm:(startIssue|)([^>]+)/>#', '', $seg);
 
         $closeTags = [];
-        for ($i = 1; $i < $splitCnt; $i++) {
+        for ($i = 1; $i < $splitCount; $i++) {
             $current = $i++; // save current index and jump over content to next attributes
             //we ignore agent here
             preg_match_all('/(type|severity|note|id)="([^"]*)"/i', $split[$current], $attributes);
 
-            if (count($attributes) != 3) {
+            if (count($attributes) !== 3) {
                 $this->logError(self::ERR_TAG_INVALID, '<mqm:startIssue ' . $split[$current] . '/>');
                 $split[$current] = ''; //delete given mqm tag
 
                 continue;
             }
+
             $attributes = array_combine($attributes[1], $attributes[2]);
 
-            settype($attributes['type'], 'string');
-            settype($attributes['severity'], 'string');
-            settype($attributes['note'], 'string');
-            settype($attributes['id'], 'integer');
+            $attributes['type'] = (string) $attributes['type'];
+            $attributes['severity'] = (string) $attributes['severity'];
+            $attributes['note'] = (string) $attributes['note'];
+            $attributes['id'] = (int) $attributes['id'];
 
-            if (empty($this->issueIdsByType[$attributes['type']]) || empty($attributes['severity']) || empty($attributes['id'])) {
+            if (
+                empty($this->issueIdsByType[$attributes['type']])
+                || empty($attributes['severity'])
+                || empty($attributes['id'])
+            ) {
                 $this->logError(self::ERR_TAG_SAVE, '<mqm:startIssue ' . $split[$current] . '/>');
                 $split[$current] = ''; // delete given mqm tag
-            } else {
-                $tempQualityId = 'ext-' . strval($i);
-                // we resemble quality-ids as if they were be originating in the frontend (using ext-ids). The qualities itself are saved at a later point in the process (see editor_Segment_Quality_Manager::processSegment)
-                $categoryIndex = $this->issueIdsByType[$attributes['type']];
-                $split[$current] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, true, $categoryIndex, $attributes['severity'], $attributes['note']);
-                $closeTags[$attributes['id']] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, false, $categoryIndex, $attributes['severity'], $attributes['note']);
+
+                continue;
             }
+
+            $tempQualityId = 'ext-' . $i;
+            // we resemble quality-ids as if they were be originating in the frontend (using ext-ids). The qualities itself are saved at a later point in the process (see editor_Segment_Quality_Manager::processSegment)
+            $categoryIndex = $this->issueIdsByType[$attributes['type']];
+            $split[$current] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, true, $categoryIndex, $attributes['severity'], $attributes['note']);
+            $closeTags[$attributes['id']] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, false, $categoryIndex, $attributes['severity'], $attributes['note']);
         }
 
-        $seg = join('', $split);
+        $seg = implode('', $split);
 
         //end tags:
         $split = preg_split('#<mqm:endIssue([^>]+)/>#', $seg, flags: PREG_SPLIT_DELIM_CAPTURE);
-        $splitCnt = count($split);
-        for ($i = 1; $i < $splitCnt; $i++) {
+        $splitCount = count($split);
+
+        for ($i = 1; $i < $splitCount; $i++) {
             $current = $i++; // save current index and jump over content to next attributes
             //we ignore agent here
             preg_match('/id="([^"]*)"/i', $split[$current], $match);
-            settype($match[1], 'integer');
+            $match[1] = (int) $match[1];
+
             if (empty($match[1]) || empty($closeTags[$match[1]])) {
                 $this->logError(self::ERR_TAG_CLOSE, '<mqm:endIssue ' . $split[$current] . '/>');
                 $split[$current] = ''; //delete given mqm tag
 
                 continue;
             }
+
             $split[$current] = $closeTags[$match[1]];
         }
 
-        $data['original'] = join('', $split);
+        $data['original'] = implode('', $split);
 
         return $data;
     }
 
     /**
      * removes the MQM Tags for the given data array (original => "FOO", originalMd5 => "123")
-     * @param string $data
      */
-    protected function removeMqmTags(array $data, $field)
+    protected function removeMqmTags(array $data): array
     {
         $seg = $data['original'];
 

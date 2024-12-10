@@ -27,19 +27,29 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Represents a TrackChanges Delete Tag like <ins class="trackchanges ownttip"> ... </ins>
+ * Represents a TrackChanges Tag like <ins class="trackchanges ownttip"> ... </ins>
+ * or <del class="trackchanges ownttip deleted"> ... </del>
  */
-final class editor_Segment_TrackChanges_InsertTag extends editor_Segment_TrackChanges_TrackChangesTag
+class editor_Segment_TrackChanges_TrackChangesTag extends editor_Segment_Tag
 {
-    protected static ?string $nodeName = 'ins';
+    public const CSS_CLASS = 'trackchanges';
 
-    public function isDeleteTag(): bool
+    protected static ?string $type = editor_Segment_Tag::TYPE_TRACKCHANGES;
+
+    protected static ?string $identificationClass = self::CSS_CLASS;
+
+    public function canContain(editor_Segment_Tag $tag): bool
     {
+        if ($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex) {
+            // when tag are aligned with our boundries it is unclear if they are inside or outside,
+            // so let's decide by the parentship on creation
+            if ($tag->endIndex === $this->startIndex || $tag->startIndex === $this->endIndex) {
+                return $tag->parentOrder === $this->order || is_a($tag, editor_Segment_Mqm_Tag::class);
+            }
+
+            return true;
+        }
+
         return false;
-    }
-
-    public function isInsertTag(): bool
-    {
-        return true;
     }
 }
