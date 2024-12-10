@@ -119,6 +119,12 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         }
 
         switch ($params["type"]) {
+            case "exportDebug":
+                $this->setParam('notGrouped', true);
+                $this->indexAction();
+
+                return;
+
             case "exportExcel":
 
                 // Get rows
