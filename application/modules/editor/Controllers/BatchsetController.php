@@ -104,8 +104,8 @@ class Editor_BatchsetController extends ZfExtended_RestController
             'value' => $projectIds,
             'property' => 'projectId',
         ], [
-            'operator' => 'eq',
-            'value' => 'projectTask',
+            'operator' => 'in',
+            'value' => ['projectTask', 'default'],
             'property' => 'taskType',
         ]]));
 

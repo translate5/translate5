@@ -41,7 +41,7 @@ class BatchSetDeadlineDate extends BatchSetAbstract
         $workflowStep = $this->request->getParam('batchWorkflowStep');
 
         if (empty($workflow) || empty($workflowStep)) {
-            $this->logger->error('', 'Missing workflow' . (empty($workflow) ? '' : 'Step') . ' parameter for batch update');
+            $this->logger->error('E1012', 'Missing workflow' . (empty($workflow) ? '' : 'Step') . ' parameter for batch update');
 
             return;
         }
@@ -54,12 +54,18 @@ class BatchSetDeadlineDate extends BatchSetAbstract
             return;
         }
 
-        $taskUserAssocModel = new editor_Models_TaskUserAssoc();
-        $tuas = $taskUserAssocModel->loadByTaskGuidList($taskGuids, $workflow, $workflowStep);
+        $tuaModel = new editor_Models_TaskUserAssoc();
+        $tuas = $tuaModel->loadByTaskGuidList($taskGuids, $workflow, $workflowStep);
         foreach ($tuas as $tua) {
-            $taskUserAssocModel->load($tua['id']);
-            $taskUserAssocModel->setDeadlineDate($deadlineDate);
-            $taskUserAssocModel->save();
+            $tuaModel->load($tua['id']);
+            $prevDeadline = $tuaModel->getDeadlineDate();
+            $tuaModel->setDeadlineDate($deadlineDate);
+            $tuaModel->save();
+            $this->logger->info('E1012', 'job deadline changed (batch set)', [
+                'previous' => $prevDeadline,
+                'tua' => $tuaModel->getSanitizedEntityForLog(),
+                'task' => $tua['taskGuid'],
+            ]);
         }
     }
 }
