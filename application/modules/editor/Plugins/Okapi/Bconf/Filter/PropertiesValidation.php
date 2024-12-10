@@ -240,11 +240,7 @@ final class PropertiesValidation extends ResourceFile
             $newProps = new PropertiesParser(null);
             // transfer all mandatory either from existing or reference if not found
             foreach ($this->referenceProps->getPropertyNames() as $varName) {
-                if ($this->props->has($varName)) {
-                    $newProps->add($varName, $this->props->get($varName));
-                } else {
-                    $newProps->add($varName, $this->referenceProps->get($varName));
-                }
+                $newProps->add($varName, $this->props->has($varName) ? $this->props->get($varName) : $this->referenceProps->get($varName));
             }
             // transfer all volatile vars to the new props
             foreach ($this->props->getPropertyNames() as $varName) {

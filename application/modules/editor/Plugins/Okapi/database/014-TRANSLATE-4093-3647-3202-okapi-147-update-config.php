@@ -27,15 +27,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * This script imports all fprms extracted to the bconf-data-folders additionally to the DB
- */
-
-use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
-use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FprmUpdaterTo147;
-
-set_time_limit(0);
-
 $NEW_SPECIAL_CHARS_JSON = '[
   {
     "unicode": "U+202F",
@@ -104,7 +95,7 @@ $NEW_SPECIAL_CHARS_JSON = '[
 
 //should be not __FILE__ in the case of wanted restarts / renamings etc
 // and must not be a constant since in installation the same named constant would we defined multiple times then
-$SCRIPT_IDENTIFIER = '014-TRANSLATE-4093-3647-3202-okapi-147.php';
+$SCRIPT_IDENTIFIER = '014-TRANSLATE-4093-3647-3202-okapi-147-update-config.php';
 
 //uncomment the following line, so that the file is not marked as processed:
 // $this->doNotSavePhpForDebugging = false;
@@ -120,50 +111,6 @@ if (! isset($config) || ! str_contains($config->runtimeOptions->plugins->Okapi->
     throw new ZfExtended_Exception(
         __FILE__ . ': searching for Okapi 1.47 in config FAILED - stop migration script'
     );
-}
-
-$fprmUpdater = new FprmUpdaterTo147();
-$bconf = new BconfEntity();
-
-$pipelineProps = [
-    'doNotSegmentIfHasTarget.b=false' => 'SegmentationStep',
-    'writerOptions.includeNoTranslate.b=true' => 'ExtractionStep',
-    'writerOptions.escapeGT.b=true' => 'ExtractionStep',
-];
-
-foreach ($bconf->loadAll() as $bconfData) {
-    try {
-        $bconf->load($bconfData['id']);
-        $bconfDir = $bconf->getDataDirectory();
-        $pipelineFile = $bconfDir . '/pipeline.pln';
-        $pipelineChanged = false;
-        $pipelineData = file_get_contents($pipelineFile);
-        foreach ($pipelineProps as $propLine => $step) {
-            if (str_contains($pipelineData, $propLine)) {
-                continue;
-            }
-            [$propKey] = explode('=', $propLine);
-            if (str_contains($pipelineData, $propKey)) {
-                $pipelineData = preg_replace('/' . $propKey . '=\w*/', $propLine, $pipelineData);
-            } else {
-                $pipelineData = preg_replace('/\.' . $step . '">#v1[\r\n]+/', '\\0' . $propLine . "\n", $pipelineData);
-            }
-            $pipelineChanged = true;
-        }
-        if ($pipelineChanged) {
-            file_put_contents($pipelineFile, $pipelineData);
-        }
-
-        $fprmUpdater->updateInDir($bconfDir, $bconf->getId(), $bconf->getName());
-
-        $extensionMapping = $bconf->getExtensionMapping();
-        $extensionMapping->rescanFilters();
-        $bconf->repackIfOutdated(true);
-    } catch (Exception $e) {
-        $msg = 'ERROR rescanning filters for bconf ' . $bconf->getId() . ', "' . $bconf->getName(
-        ) . '": ' . $e->getMessage();
-        error_log($msg);
-    }
 }
 
 $db = Zend_Db_Table::getDefaultAdapter();
