@@ -36,7 +36,7 @@ use MittagQI\Translate5\Customer\ActionAssert\Permission\AssignedCustomerAssert;
 use MittagQI\Translate5\Customer\ActionAssert\Permission\CoordinatorCanCreateDefaultJobAssert;
 
 /**
- * @extends ActionPermissionAssert<Customer>
+ * @extends ActionPermissionAssert<CustomerAction, Customer>
  */
 final class CustomerActionPermissionAssert extends ActionPermissionAssert
 {

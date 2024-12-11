@@ -854,17 +854,36 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         );
         $this->front->getRouter()->addRoute('customer_resourceexport', $customerResourceExport);
 
-        $this->front->getRouter()->addRoute('editorCustomerDefaultJobsComboCoordinators', new ZfExtended_Controller_RestLikeRoute(
-            'editor/customer/:customerId/combo/coordinators',
+        $this->front->getRouter()->addRoute('editorTaskDefaultUserJob', new ZfExtended_Controller_CustomPathRestRoute(
+            $this->front,
+            'editor/customers/:customerId/workflow/:workflow/default-job',
             [
                 'module' => 'editor',
                 'controller' => 'userassocdefault',
+                'action' => '',
+            ],
+        ));
+
+        $this->front->getRouter()->addRoute('editorCustomerDefaultJobsUpdateComboCoordinators', new ZfExtended_Controller_RestLikeRoute(
+            'editor/customers/:customerId/default-lsp-job/:jobId/combo/coordinators',
+            [
+                'module' => 'editor',
+                'controller' => 'defaultlspjob',
+                'action' => 'coordinatorupdatecombo',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorCustomerDefaultJobsComboCoordinators', new ZfExtended_Controller_RestLikeRoute(
+            'editor/customers/:customerId/default-lsp-job/combo/coordinators',
+            [
+                'module' => 'editor',
+                'controller' => 'defaultlspjob',
                 'action' => 'coordinatorscombo',
             ]
         ));
 
         $this->front->getRouter()->addRoute('editorCustomerDefaultJobsComboUsers', new ZfExtended_Controller_RestLikeRoute(
-            'editor/customer/:customerId/combo/users',
+            'editor/customers/:customerId/default-job/combo/users',
             [
                 'module' => 'editor',
                 'controller' => 'userassocdefault',

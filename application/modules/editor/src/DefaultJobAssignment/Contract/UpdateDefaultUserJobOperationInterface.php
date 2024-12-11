@@ -28,10 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\UserJob\Exception;
+namespace MittagQI\Translate5\DefaultJobAssignment\Contract;
 
-use InvalidArgumentException;
+use editor_Models_UserAssocDefault as DefaultUserJob;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Exception\NotLspCustomerException;
+use MittagQI\Translate5\DefaultJobAssignment\DTO\UpdateDefaultJobDto;
+use MittagQI\Translate5\DefaultJobAssignment\Exception\InvalidWorkflowStepProvidedException;
 
-class InvalidTypeProvidedException extends InvalidArgumentException
+interface UpdateDefaultUserJobOperationInterface
 {
+    /**
+     * @throws NotLspCustomerException
+     * @throws InvalidWorkflowStepProvidedException
+     */
+    public function updateJob(DefaultUserJob $job, UpdateDefaultJobDto $dto): void;
 }

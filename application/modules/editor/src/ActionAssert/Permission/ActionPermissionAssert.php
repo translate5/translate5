@@ -35,6 +35,7 @@ use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterfac
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 
 /**
+ * @template A of BackedEnum
  * @template T of object
  * @implements ActionPermissionAssertInterface<T>
  */
@@ -48,6 +49,9 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
     ) {
     }
 
+    /**
+     * @param A $action
+     */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $atLeastOneAssertionMade = false;
@@ -67,6 +71,9 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
         }
     }
 
+    /**
+     * @param A $action
+     */
     public function isGranted(BackedEnum $action, object $object, PermissionAssertContext $context): bool
     {
         try {

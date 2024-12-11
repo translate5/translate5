@@ -68,10 +68,12 @@ class NewUserJobDto
             }
         }
 
-        try {
-            new DateTime($assignmentDate);
-        } catch (Exception) {
-            throw new InvalidAssignmentDateStringProvidedException();
+        if (null !== $assignmentDate) {
+            try {
+                new DateTime($assignmentDate);
+            } catch (Exception) {
+                throw new InvalidAssignmentDateStringProvidedException();
+            }
         }
     }
 

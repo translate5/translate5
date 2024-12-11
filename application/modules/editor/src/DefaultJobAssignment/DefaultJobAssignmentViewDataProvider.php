@@ -30,19 +30,18 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\DefaultJobAssignment;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Permission\LspJobActionPermissionAssert;
-use MittagQI\Translate5\JobAssignment\UserJob\UserJobViewDataProvider;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\DefaultUserJobActionPermissionAssert;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\DefaultUserJobViewDataProvider;
+use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use MittagQI\Translate5\User\Model\User;
 
 /**
- * @template Job of array{
+ * @template DefaultJob of array{
  * id: int,
- * customerId: string,
+ * customerId: int,
  * userGuid: string,
  * sourceLang: int,
  * targetLang: int,
@@ -55,15 +54,14 @@ use MittagQI\Translate5\User\Model\User;
  * type: int,
  * lspId: int|null,
  * isLspJob: bool,
- * isLspUserJob: bool,
  * }
  */
 class DefaultJobAssignmentViewDataProvider
 {
     public function __construct(
-        private readonly UserJobViewDataProvider $userJobViewDataProvider,
-        private readonly LspJobRepository $lspJobRepository,
-        private readonly UserJobRepository $userJobRepository,
+        private readonly DefaultUserJobViewDataProvider $defaultUserJobViewDataProvider,
+        private readonly DefaultLspJobRepository $defaultLspJobRepository,
+        private readonly DefaultUserJobRepository $defaultUserJobRepository,
         private readonly ActionPermissionAssertInterface $lspJobActionPermissionAssert,
     ) {
     }
@@ -71,31 +69,33 @@ class DefaultJobAssignmentViewDataProvider
     public static function create(): self
     {
         return new self(
-            UserJobViewDataProvider::create(),
-            LspJobRepository::create(),
-            UserJobRepository::create(),
-            LspJobActionPermissionAssert::create(),
+            DefaultUserJobViewDataProvider::create(),
+            DefaultLspJobRepository::create(),
+            DefaultUserJobRepository::create(),
+            DefaultUserJobActionPermissionAssert::create(),
         );
     }
 
     /**
-     * @return Job[]
+     * @return DefaultJob[]
      */
-    public function getListFor(string $taskGuid, User $viewer): array
+    public function getListFor(int $customerId, string $workflow, User $viewer): array
     {
-        $lspJobs = [];
+        $jobs = [];
         $context = new PermissionAssertContext($viewer);
 
-        foreach ($this->lspJobRepository->getTaskLspJobs($taskGuid) as $lspJob) {
-            if ($this->lspJobActionPermissionAssert->isGranted(Action::Read, $lspJob, $context)) {
-                $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
+        $lspJobs = $this->defaultLspJobRepository->getDefaultLspJobsOfForCustomerAndWorkflow($customerId, $workflow);
 
-                $lspJobs[] = $this->userJobViewDataProvider->buildJobView($dataJob, $viewer);
+        foreach ($lspJobs as $lspJob) {
+            if ($this->lspJobActionPermissionAssert->isGranted(DefaultJobAction::Read, $lspJob, $context)) {
+                $dataJob = $this->defaultUserJobRepository->get((int) $lspJob->getDataJobId());
+
+                $jobs[] = $this->defaultUserJobViewDataProvider->buildJobView($dataJob);
             }
         }
 
-        $userJobs = $this->userJobViewDataProvider->getListFor($taskGuid, $viewer);
+        $userJobs = $this->defaultUserJobViewDataProvider->getListFor($customerId, $workflow, $viewer);
 
-        return array_merge($lspJobs, $userJobs);
+        return array_merge($jobs, $userJobs);
     }
 }

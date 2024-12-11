@@ -45,9 +45,11 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
       {name: 'workflow', type: 'string'},
       {name: 'segmentrange', type: 'string'},
       {name: 'deadlineDate'},
-      {name: 'trackchangesShow', type: 'int'},
-      {name: 'trackchangesShowAll', type: 'int'},
-      {name: 'trackchangesAcceptReject', type: 'int'}
+      {name: 'trackchangesShow', type: 'bool'},
+      {name: 'trackchangesShowAll', type: 'bool'},
+      {name: 'trackchangesAcceptReject', type: 'bool'},
+      {name: 'lspId', type: 'int', persist: false},
+      {name: 'isLspJob', type: 'bool', persist: false},
     ],
 
     /***

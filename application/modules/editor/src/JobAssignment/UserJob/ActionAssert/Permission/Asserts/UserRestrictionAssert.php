@@ -36,7 +36,7 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Exception\NoAccessToUserJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Exception\NoAccessToDefaultUserJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
@@ -80,7 +80,7 @@ class UserRestrictionAssert implements PermissionAssertInterface
         try {
             $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
         } catch (PermissionExceptionInterface) {
-            throw new NoAccessToUserJobException($object);
+            throw new NoAccessToDefaultUserJobException($object);
         }
     }
 }

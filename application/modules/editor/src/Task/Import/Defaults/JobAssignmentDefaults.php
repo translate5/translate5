@@ -59,7 +59,7 @@ class JobAssignmentDefaults implements ITaskDefaults
             CreateLspJobOperation::create(),
             CreateUserJobOperation::create(),
             new editor_Workflow_Manager(),
-            Zend_Registry::get('logger')->cloneMe('userJob.delete'),
+            Zend_Registry::get('logger')->cloneMe('userJob.default.assign'),
         );
     }
 
@@ -140,7 +140,7 @@ class JobAssignmentDefaults implements ITaskDefaults
         $createDto = new NewLspJobDto(
             $task->getTaskGuid(),
             $dataJob->getUserGuid(),
-            editor_Workflow_Default::STATE_OPEN,
+            $this->getJobState($task),
             $workflowDto,
             null,
             null,
@@ -179,7 +179,7 @@ class JobAssignmentDefaults implements ITaskDefaults
             $defaultUserJob->getWorkflowStepName(),
         );
 
-        if ((int) $defaultUserJob->getDeadlineDate() > 0) {
+        if ((float) $defaultUserJob->getDeadlineDate() > 0) {
             $name = [
                 'runtimeOptions',
                 'workflow',
@@ -211,7 +211,7 @@ class JobAssignmentDefaults implements ITaskDefaults
         $createDto = new NewUserJobDto(
             $task->getTaskGuid(),
             $defaultUserJob->getUserGuid(),
-            editor_Workflow_Default::STATE_OPEN,
+            $this->getJobState($task),
             $workflowDto,
             TypeEnum::Editor,
             null,
@@ -238,5 +238,12 @@ class JobAssignmentDefaults implements ITaskDefaults
         }
 
         return null;
+    }
+
+    public function getJobState(Task $task): string
+    {
+        return $task->isCompetitive()
+            ? editor_Workflow_Default::STATE_UNCONFIRMED
+            : editor_Workflow_Default::STATE_OPEN;
     }
 }

@@ -303,7 +303,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         },{
                             xtype: 'adminUserAssoc',
                             bind:{
-                                customer:'{record}',
+                                customer:'{record.id}',
                                 disabled:'{isNewRecord}'
                             }
                         },{

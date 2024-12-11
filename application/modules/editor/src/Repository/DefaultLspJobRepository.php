@@ -162,7 +162,41 @@ class DefaultLspJobRepository
     /**
      * @return iterable<DefaultLspJob>
      */
-    public function getDefaultLspJobsOfCustomer(int $lspId, int $customerId): iterable
+    public function getDefaultLspJobsOfForCustomerAndWorkflow(int $customerId, string $workflow): iterable
+    {
+        $job = new DefaultLspJob();
+
+        $select = $this->db
+            ->select()
+            ->from([
+                'DefaultLspJob' => DefaultLspJobTable::TABLE_NAME,
+            ])
+            ->where('DefaultLspJob.customerId = ?', $customerId)
+            ->where('DefaultLspJob.workflow = ?', $workflow)
+        ;
+
+        $stmt = $this->db->query($select);
+
+        while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $job->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $job;
+        }
+    }
+
+    /**
+     * @return iterable<DefaultLspJob>
+     */
+    public function getDefaultLspJobsOfLspForCustomer(int $lspId, int $customerId): iterable
     {
         $job = new DefaultLspJob();
 

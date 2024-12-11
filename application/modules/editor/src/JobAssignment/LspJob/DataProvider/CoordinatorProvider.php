@@ -43,6 +43,7 @@ use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
+use MittagQI\Translate5\User\DataProvider\PermissionAwareUserFetcher;
 use MittagQI\Translate5\User\Model\User;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
@@ -71,52 +72,6 @@ class CoordinatorProvider
             PermissionAwareUserFetcher::create(),
             LspCustomerAssociationValidator::create(),
         );
-    }
-
-    /**
-     * @return Coordinator[]
-     */
-    public function getPossibleCoordinatorsForCustomerDefaults(int $customerId, User $viewer): array
-    {
-        $context = new PermissionAssertContext($viewer);
-
-        if ($viewer->isAdmin()) {
-            return $this->filterCoordinatorsByCustomer(
-                array_merge(
-                    $this->getDirectCoordinators($viewer),
-                    $this->getSubCoordinatorsForTask($task->getTaskGuid(), $viewer)
-                ),
-                (int) $task->getCustomerId()
-            );
-        }
-
-        if (! $this->taskActionPermissionAssert->isGranted(TaskAction::Read, $task, $context)) {
-            return [];
-        }
-
-        if ($viewer->isPm()) {
-            return $this->filterCoordinatorsByCustomer(
-                $this->getDirectCoordinators($viewer),
-                (int) $task->getCustomerId()
-            );
-        }
-
-        if (! $viewer->isCoordinator()) {
-            return [];
-        }
-
-        $coordinators = [];
-        $viewerCoordinator = $this->jobCoordinatorRepository->getByUser($viewer);
-
-        foreach ($this->jobCoordinatorRepository->getSubLspJobCoordinators($viewerCoordinator) as $coordinator) {
-            $coordinators[] = [
-                'userId' => (int) $coordinator->user->getId(),
-                'userGuid' => $coordinator->user->getUserGuid(),
-                'longUserName' => $coordinator->user->getUsernameLong(),
-            ];
-        }
-
-        return $this->filterCoordinatorsByCustomer($coordinators, (int) $task->getCustomerId());
     }
 
     /**
@@ -207,51 +162,6 @@ class CoordinatorProvider
         }
 
         return $coordinators;
-    }
-
-    /**
-     * Fetch coordinators of sub LSPs if their parent LSP has job in a customer defaults
-     * It is impossible to create LSP job for sub LSP without parent LSP job
-     *
-     * @return Coordinator[]
-     */
-    private function getSubCoordinatorsForCustomerDefaults(int $customerId, User $viewer): array
-    {
-        $select = $this->db
-            ->select()
-            ->distinct()
-            ->from(
-                [
-                    'user' => ZfExtended_Models_Db_User::TABLE_NAME,
-                ]
-            )
-            ->join(
-                [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
-                ],
-                'lspUser.userId = user.id',
-                []
-            )
-            ->join(
-                [
-                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
-                ],
-                'lspUser.lspId = lsp.id',
-                []
-            )
-            ->join(
-                [
-                    'parentLspJob' => LspJobTable::TABLE_NAME,
-                ],
-                'parentLspJob.lspId = lsp.parentId',
-                []
-            )
-            ->where('parentLspJob.taskGuid = ?', $taskGuid)
-            ->where('user.roles LIKE ?', '%' . Roles::JOB_COORDINATOR . '%')
-            ->where('lsp.parentId IS NOT NULL')
-        ;
-
-        return $this->permissionAwareUserFetcher->fetchVisible($select, $viewer);
     }
 
     /**

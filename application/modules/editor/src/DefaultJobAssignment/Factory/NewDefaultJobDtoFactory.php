@@ -28,11 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\Factory;
+namespace MittagQI\Translate5\DefaultJobAssignment\Factory;
 
 use editor_Workflow_Manager;
 use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DTO\NewDefaultUserJobDto;
+use MittagQI\Translate5\DefaultJobAssignment\DTO\NewDefaultJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\WorkflowDto;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\CustomerIdNotProvidedException;
@@ -42,7 +42,7 @@ use MittagQI\Translate5\DefaultJobAssignment\Exception\SourceLanguageNotProvided
 use MittagQI\Translate5\DefaultJobAssignment\Exception\TargetLanguageNotProvidedException;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\WorkflowNotProvidedException;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\WorkflowStepNotProvidedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidTypeProvidedException;
+use MittagQI\Translate5\JobAssignment\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\UserGuidNotProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\Language\LanguageResolver;
@@ -51,7 +51,7 @@ use MittagQI\Translate5\Repository\UserRepository;
 use REST_Controller_Request_Http as Request;
 use UnexpectedValueException;
 
-class NewDefaultUserJobDtoFactory
+class NewDefaultJobDtoFactory
 {
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -82,7 +82,7 @@ class NewDefaultUserJobDtoFactory
      * @throws UserGuidNotProvidedException
      * @throws \editor_Workflow_Exception
      */
-    public function fromRequest(Request $request): NewDefaultUserJobDto
+    public function fromRequest(Request $request): NewDefaultJobDto
     {
         $data = $request->getParam('data');
         $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
@@ -131,7 +131,7 @@ class NewDefaultUserJobDtoFactory
             throw new InvalidWorkflowStepProvidedException();
         }
 
-        return new NewDefaultUserJobDto(
+        return new NewDefaultJobDto(
             (int) $customer->getId(),
             $user->getUserGuid(),
             (int) $sourceLanguage?->getId(),
@@ -141,7 +141,7 @@ class NewDefaultUserJobDtoFactory
                 $data['workflowStepName'],
             ),
             $type,
-            (int) $data['deadlineDate'],
+            (float) $data['deadlineDate'],
             new TrackChangesRightsDto(
                 (bool) ($data['trackchangesShow'] ?? false),
                 (bool) ($data['trackchangesShowAll'] ?? false),

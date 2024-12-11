@@ -35,7 +35,7 @@ use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RoleBasedPermissionA
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
 /**
- * @extends ActionPermissionAssert<LanguageServiceProvider>
+ * @extends ActionPermissionAssert<LspAction, LanguageServiceProvider>
  */
 final class LspActionPermissionAssert extends ActionPermissionAssert
 {

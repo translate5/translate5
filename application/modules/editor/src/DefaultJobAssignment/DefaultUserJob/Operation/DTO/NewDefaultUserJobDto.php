@@ -31,9 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DTO;
 
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DTO\NewDefaultLspJobDto;
+use MittagQI\Translate5\DefaultJobAssignment\DTO\NewDefaultJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\WorkflowDto;
-use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 
 class NewDefaultUserJobDto
 {
@@ -43,10 +43,22 @@ class NewDefaultUserJobDto
         public readonly int $sourceLanguageId,
         public readonly int $targetLanguageId,
         public readonly WorkflowDto $workflow,
-        public readonly TypeEnum $type,
-        public readonly ?int $deadline,
+        public readonly ?float $deadline,
         public readonly TrackChangesRightsDto $trackChangesRights,
     ) {
+    }
+
+    public static function fromDefaultJobDto(NewDefaultJobDto $lspJobDto): self
+    {
+        return new self(
+            $lspJobDto->customerId,
+            $lspJobDto->userGuid,
+            $lspJobDto->sourceLanguageId,
+            $lspJobDto->targetLanguageId,
+            $lspJobDto->workflow,
+            $lspJobDto->deadline,
+            $lspJobDto->trackChangesRights,
+        );
     }
 
     public static function fromDefaultLspJobDto(NewDefaultLspJobDto $lspJobDto): self
@@ -57,7 +69,6 @@ class NewDefaultUserJobDto
             $lspJobDto->sourceLanguageId,
             $lspJobDto->targetLanguageId,
             $lspJobDto->workflow,
-            TypeEnum::Lsp,
             $lspJobDto->deadline,
             $lspJobDto->trackChangesRights,
         );

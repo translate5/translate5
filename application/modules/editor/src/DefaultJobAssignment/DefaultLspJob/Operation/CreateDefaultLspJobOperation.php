@@ -30,28 +30,27 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation;
 
+use editor_Models_UserAssocDefault as DefaultUserJob;
 use MittagQI\Translate5\DefaultJobAssignment\Contract\CreateDefaultLspJobOperationInterface;
-use MittagQI\Translate5\DefaultJobAssignment\Contract\CreateDefaultUserJobOperationInterface;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Exception\NotLspCustomerException;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DTO\NewDefaultLspJobDto;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\CreateDefaultUserJobOperation;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DTO\NewDefaultUserJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultLspJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use Throwable;
 
 class CreateDefaultLspJobOperation implements CreateDefaultLspJobOperationInterface
 {
     public function __construct(
         private readonly DefaultLspJobRepository $defaultLspJobRepository,
+        private readonly DefaultUserJobRepository $defaultUserJobRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
-        private readonly CreateDefaultUserJobOperationInterface $createDefaultUserJobOperation,
     ) {
     }
 
@@ -62,9 +61,9 @@ class CreateDefaultLspJobOperation implements CreateDefaultLspJobOperationInterf
     {
         return new self(
             DefaultLspJobRepository::create(),
+            DefaultUserJobRepository::create(),
             JobCoordinatorRepository::create(),
             LspCustomerAssociationValidator::create(),
-            CreateDefaultUserJobOperation::create(),
         );
     }
 
@@ -92,7 +91,21 @@ class CreateDefaultLspJobOperation implements CreateDefaultLspJobOperationInterf
             throw new NotLspCustomerException();
         }
 
-        $userJob = $this->createDefaultUserJobOperation->assignJob(NewDefaultUserJobDto::fromDefaultLspJobDto($dto));
+        $dataJob = new DefaultUserJob();
+        $dataJob->setCustomerId($dto->customerId);
+        $dataJob->setUserGuid($dto->userGuid);
+        $dataJob->setSourceLang($dto->sourceLanguageId);
+        $dataJob->setTargetLang($dto->targetLanguageId);
+        $dataJob->setWorkflow($dto->workflow->workflow);
+        $dataJob->setWorkflowStepName($dto->workflow->workflowStepName);
+        $dataJob->setDeadlineDate($dto->deadline);
+        $dataJob->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
+        $dataJob->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
+        $dataJob->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
+
+        $dataJob->validate();
+
+        $this->defaultUserJobRepository->save($dataJob);
 
         $job = new DefaultLspJob();
         $job->setCustomerId($dto->customerId);
@@ -101,9 +114,15 @@ class CreateDefaultLspJobOperation implements CreateDefaultLspJobOperationInterf
         $job->setTargetLang($dto->targetLanguageId);
         $job->setWorkflow($dto->workflow->workflow);
         $job->setWorkflowStepName($dto->workflow->workflowStepName);
-        $job->setDataJobId((int) $userJob->getId());
+        $job->setDataJobId((int) $dataJob->getId());
 
-        $this->defaultLspJobRepository->save($job);
+        try {
+            $this->defaultLspJobRepository->save($job);
+        } catch (Throwable $e) {
+            $this->defaultUserJobRepository->delete((int) $dataJob->getId());
+
+            throw $e;
+        }
 
         return $job;
     }

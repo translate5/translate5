@@ -10367,6 +10367,10 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Der Benutzer ist Job-Koordinator für einige Standard LSP Aufträge.</source>
                 <target>The user is the job coordinator for some default LSP jobs.</target>
             </trans-unit>
+            <trans-unit id='S3VuZGUgaXN0IG5pY2h0IG1pdCBMU1AgZGVzIE51dHplcnMgdmVyYnVuZGVu'>
+                <source>Kunde ist nicht mit LSP des Nutzers verbunden</source>
+                <target>Customer is not connected to LSP of user</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

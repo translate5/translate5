@@ -470,7 +470,7 @@ class UserJobRepository
         string $taskGuid,
         ?string $workflowStepName,
         array $assocFields = [],
-        ?string $state = null
+        ?string $state = null,
     ): array {
         $s = $this->db->select()
             ->from([

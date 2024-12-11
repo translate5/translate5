@@ -68,12 +68,14 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
             title: me.title, //see EXT6UPD-9
             items: [
                 {
-                    xtype: 'adminTaskUserAssocGrid', bind: {
+                    xtype: 'adminTaskUserAssocGrid',
+                    bind: {
                         //INFO: this will load only the users of the task when projectTaskGrid selection is changed
                         //override the store binding in the place where the component is used/defined
                         //the default usage is in the task properties panel
                         store: '{userAssoc}'
-                    }, region: 'center'
+                    },
+                    region: 'center'
                 },
                 {
                     xtype: 'container',
@@ -253,9 +255,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
         }
         return me.callParent([config]);
     },
-    /**
-     * loads all or all available users into the dropdown, the store is reused to get the username to userguids
-     */
+
     loadUsers: function () {
         const combo = this.down('combo[name=userGuid]'),
             record = this.down('form').getRecord(),
@@ -313,6 +313,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
             }
         });
     },
+
     /**
      * loads the given record into the userAssoc form
      * @param {Editor.data.model.admin.TaskUserAssoc} rec

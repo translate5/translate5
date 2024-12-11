@@ -37,6 +37,7 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\Db\DefaultLspJo
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultUserJobAlreadyExistsException;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\InexistentDefaultUserJobException;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use ZfExtended_Factory;
@@ -60,6 +61,15 @@ class DefaultUserJobRepository
             Zend_Db_Table::getDefaultAdapter(),
             LspUserRepository::create(),
         );
+    }
+
+    public function find(int $id): ?DefaultUserJob
+    {
+        try {
+            return $this->get($id);
+        } catch (InexistentDefaultUserJobException) {
+            return null;
+        }
     }
 
     /**
@@ -100,17 +110,66 @@ class DefaultUserJobRepository
     /**
      * @return iterable<DefaultUserJob>
      */
-    public function deleteDefaultJobsOfCustomerForUsersOfLsp(int $customerId, int $lspId): void
+    public function getDefaultUserJobsOfForCustomerAndWorkflow(int $customerId, string $workflow): iterable
+    {
+        $job = new DefaultUserJob();
+
+        $select = $this->db
+            ->select()
+            ->from([
+                'DefaultUserJob' => DefaultUserJobTable::TABLE_NAME,
+            ])
+            ->joinLeft(
+                [
+                    'DefaultLspJob' => DefaultLspJobTable::TABLE_NAME,
+                ],
+                'DefaultUserJob.id = DefaultLspJob.dataJobId',
+                []
+            )
+            ->where('DefaultUserJob.customerId = ?', $customerId)
+            ->where('DefaultUserJob.workflow = ?', $workflow)
+            ->where('DefaultLspJob.dataJobId IS NULL')
+        ;
+
+        $stmt = $this->db->query($select);
+
+        while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $job->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $job;
+        }
+    }
+
+    /**
+     * @return iterable<DefaultUserJob>
+     */
+    public function getDefaultJobsOfCustomerForUsersOfLsp(int $customerId, int $lspId): iterable
     {
         $userGuids = $this->lspUserRepository->getUserGuids($lspId);
 
-        $this->db->delete(
-            DefaultUserJobTable::TABLE_NAME,
-            [
-                'customerId = ?' => $customerId,
-                'userGuid in (?)' => $userGuids,
-            ],
-        );
+        $select = $this->db
+            ->select()
+            ->from(DefaultUserJobTable::TABLE_NAME)
+            ->where('customerId = ?', $customerId)
+            ->where('userGuid in (?)', $userGuids)
+        ;
+
+        $job = new DefaultUserJob();
+
+        foreach ($this->db->fetchAll($select) as $row) {
+            $job->init($row);
+
+            yield $job;
+        }
     }
 
     /**

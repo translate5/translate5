@@ -28,68 +28,55 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\LspJob\DataProvider;
+namespace MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\Asserts;
 
+use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\Exception\NoAccessToDefaultLspJobException;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
+use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\UserAction;
-use MittagQI\Translate5\User\Model\User;
-use PDO;
-use Zend_Db_Adapter_Abstract;
-use Zend_Db_Select;
-use Zend_Db_Table;
-use Zend_Db_Table_Row;
 
-class PermissionAwareUserFetcher
+/**
+ * @implements PermissionAssertInterface<DefaultLspJob>
+ */
+class LspRestrictionAssert implements PermissionAssertInterface
 {
     public function __construct(
-        private readonly Zend_Db_Adapter_Abstract $db,
-        private readonly ActionPermissionAssertInterface $userActionPermissionAssert,
+        private readonly ActionPermissionAssertInterface $userPermissionAssert,
+        private readonly LspRepositoryInterface $userRepository,
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(
-            Zend_Db_Table::getDefaultAdapter(),
             UserActionPermissionAssert::create(),
+            LspRepository::create(),
         );
     }
 
-    /**
-     * @return array{userId: int, userGuid: string, longUserName: string}[]
-     */
-    public function fetchVisible(Zend_Db_Select $select, User $viewer): array
+    public function supports(BackedEnum $action): bool
     {
-        $users = [];
-        $user = new User();
+        return true;
+    }
 
-        $stmt = $this->db->query($select);
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
+    {
+        $lsp = $this->userRepository->get((int) $object->getLspId());
 
-        $context = new PermissionAssertContext($viewer);
-
-        while ($userData = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $user->init(
-                new Zend_Db_Table_Row(
-                    [
-                        'table' => $user->db,
-                        'data' => $userData,
-                        'stored' => true,
-                        'readOnly' => true,
-                    ]
-                )
-            );
-
-            if ($this->userActionPermissionAssert->isGranted(UserAction::Read, $user, $context)) {
-                $users[] = [
-                    'userId' => (int) $user->getId(),
-                    'userGuid' => $user->getUserGuid(),
-                    'longUserName' => $user->getUsernameLong(),
-                ];
-            }
+        try {
+            $this->userPermissionAssert->assertGranted(LspAction::Update, $lsp, $context);
+        } catch (PermissionExceptionInterface) {
+            throw new NoAccessToDefaultLspJobException($object);
         }
-
-        return $users;
     }
 }

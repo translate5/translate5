@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\LspJob\DataProvider;
+namespace MittagQI\Translate5\JobAssignment\UserJob\DataProvider;
 
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
@@ -39,10 +39,12 @@ use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
 use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
+use MittagQI\Translate5\User\DataProvider\PermissionAwareUserFetcher;
 use MittagQI\Translate5\User\Model\User;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use ZfExtended_Models_Db_User;
+use ZfExtended_Models_User;
 
 /**
  * @template User as array{userGuid: string, longUserName: string}
@@ -85,7 +87,7 @@ class UserProvider
             return [];
         }
 
-        if ($viewer->isPm()) {
+        if ($viewer->isPm() || $viewer->isClientPm()) {
             return $this->getSimpleUsers($viewer);
         }
 
@@ -116,6 +118,7 @@ class UserProvider
                 ['lspUser.lspId']
             )
             ->where('lspUser.lspId IS NULL')
+            ->where('user.login != ?', ZfExtended_Models_User::SYSTEM_LOGIN)
         ;
 
         return $this->permissionAwareUserFetcher->fetchVisible($select, $viewer);

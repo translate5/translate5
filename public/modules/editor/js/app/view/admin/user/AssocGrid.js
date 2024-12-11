@@ -167,6 +167,12 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                 }]
             };
 
+        config.viewConfig = {
+            getRowClass: function (record, rowIndex, rowParams, store) {
+                return record.get('isLspJob') ? 'lsp-job-row' : '';
+            }
+        };
+
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }

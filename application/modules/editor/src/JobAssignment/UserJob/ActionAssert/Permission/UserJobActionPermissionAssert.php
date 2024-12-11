@@ -35,9 +35,10 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\LspDataJobAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\TaskRestrictionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\UserRestrictionAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 
 /**
- * @extends ActionPermissionAssert<UserJob>
+ * @extends ActionPermissionAssert<UserJobAction, UserJob>
  */
 class UserJobActionPermissionAssert extends ActionPermissionAssert
 {

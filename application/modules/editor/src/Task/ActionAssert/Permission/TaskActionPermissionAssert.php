@@ -37,9 +37,10 @@ use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\FinishPermissionAsse
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\LspUserPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\OpenPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\UserHasJobInTaskPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 
 /**
- * @extends ActionPermissionAssert<Task>
+ * @extends ActionPermissionAssert<TaskAction, Task>
  */
 final class TaskActionPermissionAssert extends ActionPermissionAssert
 {

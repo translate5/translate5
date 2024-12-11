@@ -117,6 +117,8 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             usersStore = Ext.StoreManager.get('admin.Users'),
             usageMode = view.down('#usageMode');
 
+        me.getView().up().down('adminUserAssoc').setCustomer(project.get('customerId'));
+
         // first set the combo value on panel activate then load the store.
         workflowCombo.setValue(project.get('workflow'));
         // set the usageMode default from the task. The default value is set from the config after the task is created

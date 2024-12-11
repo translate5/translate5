@@ -35,8 +35,8 @@ use editor_Utils;
 use editor_Workflow_Default as Workflow;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\JobAssignment\DTO\TrackChangesRightsDto;
+use MittagQI\Translate5\JobAssignment\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidStateProvidedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TaskIdentificatorNotProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\UserGuidNotProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\WorkflowStepNotProvidedException;
@@ -103,7 +103,7 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
 
         $workflowDto = $this->getWorkflowDto($data, $task);
 
-        $state = $data['state'] ?? Workflow::STATE_WAITING;
+        $state = $data['state'] ?: Workflow::STATE_WAITING;
 
         try {
             $type = isset($data['type']) ? TypeEnum::from((int) $data['type']) : TypeEnum::Editor;

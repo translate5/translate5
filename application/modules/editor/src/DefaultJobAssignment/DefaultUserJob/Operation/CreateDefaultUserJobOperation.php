@@ -32,11 +32,12 @@ namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation;
 
 use editor_Models_UserAssocDefault as DefaultUserJob;
 use MittagQI\Translate5\DefaultJobAssignment\Contract\CreateDefaultUserJobOperationInterface;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Exception\NotLspCustomerException;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DTO\NewDefaultUserJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultUserJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
-use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
-use MittagQI\Translate5\LSP\LspUser;
+use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
@@ -46,6 +47,7 @@ class CreateDefaultUserJobOperation implements CreateDefaultUserJobOperationInte
     public function __construct(
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
         private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
     ) {
     }
 
@@ -57,18 +59,29 @@ class CreateDefaultUserJobOperation implements CreateDefaultUserJobOperationInte
         return new self(
             DefaultUserJobRepository::create(),
             LspUserRepository::create(),
+            LspCustomerAssociationValidator::create(),
         );
     }
 
     /**
      * @throws DefaultUserJobAlreadyExistsException
+     * @throws NotLspCustomerException
      * @throws OnlyCoordinatorCanBeAssignedToLspJobException
      */
     public function assignJob(NewDefaultUserJobDto $dto): DefaultUserJob
     {
         $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
 
-        $this->assertLspUserCanBeAssignedToJobType($lspUser, $dto->type);
+        if (null !== $lspUser) {
+            try {
+                $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(
+                    (int) $lspUser->lsp->getId(),
+                    $dto->customerId
+                );
+            } catch (CustomerDoesNotBelongToLspException) {
+                throw new NotLspCustomerException();
+            }
+        }
 
         $job = new DefaultUserJob();
         $job->setCustomerId($dto->customerId);
@@ -87,19 +100,5 @@ class CreateDefaultUserJobOperation implements CreateDefaultUserJobOperationInte
         $this->defaultUserJobRepository->save($job);
 
         return $job;
-    }
-
-    /**
-     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
-     */
-    private function assertLspUserCanBeAssignedToJobType(?LspUser $lspUser, TypeEnum $type): void
-    {
-        if (TypeEnum::Lsp !== $type) {
-            return;
-        }
-
-        if (null === $lspUser || ! $lspUser->isCoordinator()) {
-            throw new OnlyCoordinatorCanBeAssignedToLspJobException();
-        }
     }
 }

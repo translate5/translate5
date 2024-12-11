@@ -28,10 +28,10 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
+use MittagQI\Translate5\JobAssignment\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\JobAssignment\JobAssignmentViewDataProvider;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
 use MittagQI\Translate5\JobAssignment\LspJob\DataProvider\CoordinatorProvider;
-use MittagQI\Translate5\JobAssignment\LspJob\DataProvider\UserProvider;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\CoordinatorOfParentLspHasNotConfirmedLspJobYetException;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication\CreateLspJobOperation;
@@ -42,6 +42,7 @@ use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\Exception
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Exception\ActionNotAllowedException;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
+use MittagQI\Translate5\JobAssignment\UserJob\DataProvider\UserProvider;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
@@ -49,7 +50,6 @@ use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirm
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidStateProvidedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\NotLspCustomerTaskException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
@@ -149,8 +149,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (! $this->getRequest()->getParam('taskId')) {
             Zend_Registry::get('logger')->warn(
-                'E1232',
-                'Job list: this route deprecated, use /editor/task/:taskId/job instead',
+                'E1680',
+                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
             );
 
             $rows = $this->userJobViewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
@@ -176,8 +176,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
-                'E1232',
-                'Job list: this route deprecated, use editor/project/:projectId/jobs instead',
+                'E1680',
+                'Route /editor/taskuserassoc deprecated, use editor/project/:projectId/jobs instead',
             );
         }
 
@@ -274,8 +274,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
-                'E1232',
-                'Job list: this route deprecated, use /editor/task/:taskId/job instead'
+                'E1680',
+                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead'
             );
         }
 
@@ -304,8 +304,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
-                'E1232',
-                'Job list: this route deprecated, use /editor/task/:taskId/job instead',
+                'E1680',
+                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
             );
         }
 
@@ -333,8 +333,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
-                'E1232',
-                'Job list: this route deprecated, use /editor/task/:taskId/job instead',
+                'E1680',
+                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
             );
         }
 

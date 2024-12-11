@@ -35,10 +35,11 @@ use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\IsEditableForAssert
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\JobCoordinatorPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\SeeAllUsersPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 
 /**
- * @extends ActionPermissionAssert<User>
+ * @extends ActionPermissionAssert<UserAction, User>
  */
 final class UserActionPermissionAssert extends ActionPermissionAssert
 {

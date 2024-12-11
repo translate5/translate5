@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -32,7 +31,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.user.Assoc', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.adminUserAssoc',
-    layout:'border',
+    layout: 'border',
     requires: [
         'Editor.view.admin.user.AssocViewController',
         'Editor.view.admin.user.AssocViewModel',
@@ -50,6 +49,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
     glyph: 'xf0c0@FontAwesome5FreeSolid',
     title: '#UT#Standard-Benutzerzuweisungen',
     strings: {
+        type: '#UT#Typ',
         fieldWorkflowStepName: '#UT#Workflow-Schritt',
         fieldWorkflow: '#UT#Workflow',
         fieldState: '#UT#Status',
@@ -58,36 +58,38 @@ Ext.define('Editor.view.admin.user.Assoc', {
         btnCancel: '#UT#Abbrechen',
         formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
         formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
-        fieldDeadline:'#UT#Deadline',
-        deadlineDateInfoTooltip:'#UT#Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.',
-        wizardTitle:'#UT#Standard-Benutzerzuweisungen'
+        fieldDeadline: '#UT#Deadline',
+        deadlineDateInfoTooltip: '#UT#Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.',
+        wizardTitle: '#UT#Standard-Benutzerzuweisungen'
     },
 
     /***
      */
-    customer: null,
-    
-    initConfig: function(instanceConfig) {
+    customerId: null,
+
+    initConfig: function (instanceConfig) {
         var me = this,
             config = {
                 title: me.title, //see EXT6UPD-9
-                items: [{
+                items: [
+                    {
                         xtype: 'adminUserAssocGrid',
                         itemId: 'adminUserAssocGrid',
-                        store:Ext.StoreManager.get('admin.UserAssocDefault'),
-                        bind:{
-                            selection:'{selectedAssocRecord}'
+                        store: Ext.StoreManager.get('admin.UserAssocDefault'),
+                        bind: {
+                            selection: '{selectedAssocRecord}'
                         },
                         region: 'center'
-                    },{
+                    },
+                    {
                         xtype: 'container',
                         region: 'east',
                         autoScroll: true,
                         height: 'auto',
                         width: 300,
                         items: [{
-                            xtype:'form',
-                            title : me.strings.formTitleAdd,
+                            xtype: 'form',
+                            title: me.strings.formTitleAdd,
                             bodyPadding: 10,
                             region: 'east',
                             reference: 'assocForm',
@@ -95,177 +97,281 @@ Ext.define('Editor.view.admin.user.Assoc', {
                             defaults: {
                                 labelAlign: 'top',
                                 duplicateRecord: false,
-                                validator: function(){
-                                    if(this.duplicateRecord){
+                                validator: function () {
+                                    if (this.duplicateRecord) {
                                         return 'This record entry already exist.';
                                     }
                                     return true;
                                 }
                             },
-                            items:[{
-                                xtype: 'languagecombo',
-                                name: 'sourceLang',
-                                itemId: 'sourceLang',
-                                allowBlank: false
-                            },{
-                                xtype: 'languagecombo',
-                                name: 'targetLang',
-                                itemId: 'targetLang',
-                                reference: 'targetLangUserAssoc',
-                                publishes: 'value',
-                                allowBlank: false
-                            },{
-                                anchor: '100%',
-                                xtype: 'combo',
-                                allowBlank: false,
-                                bind: {
-                                    store:'{workflowSteps}'
-                                },
-                                forceSelection: true,
-                                anyMatch: true,
-                                queryMode: 'local',
-                                name: 'workflowStepName',
-                                itemId: 'workflowStepName',
-                                displayField: 'text',
-                                valueField: 'id',
-                                fieldLabel: me.strings.fieldWorkflowStepName
-                            },{
-                                anchor: '100%',
-                                xtype: 'combo',
-                                allowBlank: false,
-                                listConfig: {
-                                    loadMask: false
-                                },
-                                bind: {
-                                    store: '{users}'
-                                },
-                                forceSelection: true,
-                                anyMatch: true,
-                                queryMode: 'local',
-                                name: 'userGuid',
-                                itemId: 'userGuid',
-                                displayField: 'longUserName',
-                                valueField: 'userGuid',
-                                fieldLabel: me.strings.fieldUser
-                            },{
-                                xtype:'numberfieldcustom',
-                                itemId: 'deadlineDate',
-                                name:'deadlineDate',
-                                decimalPrecision:2,
-                                useCustomPrecision:true,
-                                minValue:0.10,
-                                mouseWheelEnabled:true,
-                                fieldLabel: me.strings.fieldDeadline,
-                                labelCls: 'labelInfoIcon',
-                                cls:'userAssocLabelIconField',
-                                listeners:{
-                                    afterrender: function(c) {
-                                        new Ext.tip.ToolTip({
-                                            target: c.getEl(),
-                                            html: me.strings.deadlineDateInfoTooltip,
-                                            enabled: true,
-                                            showDelay: 20,
-                                            trackMouse: true,
-                                            autoShow: true
-                                        });
+                            items: [
+                                {
+                                    anchor: '100%',
+                                    xtype: 'combo',
+                                    allowBlank: false,
+                                    editable: false,
+                                    forceSelection: false,
+                                    queryMode: 'local',
+                                    name: 'type',
+                                    fieldLabel: me.strings.type,
+                                    displayField: 'name',
+                                    valueField: 'value',
+                                    store: {
+                                        fields: ['name', 'value'],
+                                        data: [
+                                            {name: 'Editor', value: 1},
+                                            {name: 'LSP', value: 2},
+                                        ]
+                                    },
+                                    listeners: {
+                                        change: (fld, newValue) => {
+                                            if (null === newValue) {
+                                                return;
+                                            }
+
+                                            newValue === 1 ? me.loadUsers() : me.loadCoordinators()
+                                        }
                                     }
                                 },
-                                autoEl: {
-                                    tag: 'span'
+                                {
+                                    xtype: 'languagecombo',
+                                    name: 'sourceLang',
+                                    itemId: 'sourceLang',
+                                    allowBlank: false
                                 },
-                                anchor: '100%'
-                            }],
+                                {
+                                    xtype: 'languagecombo',
+                                    name: 'targetLang',
+                                    itemId: 'targetLang',
+                                    reference: 'targetLangUserAssoc',
+                                    publishes: 'value',
+                                    allowBlank: false
+                                },
+                                {
+                                    anchor: '100%',
+                                    xtype: 'combo',
+                                    allowBlank: false,
+                                    bind: {
+                                        store: '{workflowSteps}'
+                                    },
+                                    forceSelection: true,
+                                    anyMatch: true,
+                                    queryMode: 'local',
+                                    name: 'workflowStepName',
+                                    itemId: 'workflowStepName',
+                                    displayField: 'text',
+                                    valueField: 'id',
+                                    fieldLabel: me.strings.fieldWorkflowStepName
+                                },
+                                {
+                                    anchor: '100%',
+                                    xtype: 'Editor.combobox',
+                                    allowBlank: false,
+                                    listConfig: {
+                                        loadMask: false
+                                    },
+                                    bind: {
+                                        store: '{users}'
+                                    },
+                                    forceSelection: true,
+                                    anyMatch: true,
+                                    queryMode: 'local',
+                                    name: 'userGuid',
+                                    itemId: 'userGuid',
+                                    displayField: 'longUserName',
+                                    valueField: 'userGuid',
+                                    fieldLabel: me.strings.fieldUser
+                                },
+                                {
+                                    xtype: 'numberfieldcustom',
+                                    itemId: 'deadlineDate',
+                                    name: 'deadlineDate',
+                                    decimalPrecision: 2,
+                                    useCustomPrecision: true,
+                                    minValue: 0.10,
+                                    mouseWheelEnabled: true,
+                                    fieldLabel: me.strings.fieldDeadline,
+                                    labelCls: 'labelInfoIcon',
+                                    cls: 'userAssocLabelIconField',
+                                    listeners: {
+                                        afterrender: function (c) {
+                                            new Ext.tip.ToolTip({
+                                                target: c.getEl(),
+                                                html: me.strings.deadlineDateInfoTooltip,
+                                                enabled: true,
+                                                showDelay: 20,
+                                                trackMouse: true,
+                                                autoShow: true
+                                            });
+                                        }
+                                    },
+                                    autoEl: {
+                                        tag: 'span'
+                                    },
+                                    anchor: '100%'
+                                }
+                            ],
                             dockedItems: [{
                                 xtype: 'toolbar',
                                 dock: 'bottom',
                                 ui: 'footer',
-                                items: [{
-                                    xtype: 'tbfill'
-                                },{
-                                    xtype: 'button',
-                                    itemId: 'saveAssocBtn',
-                                    glyph: 'f00c@FontAwesome5FreeSolid',
-                                    formBind:true,
-                                    text: me.strings.btnSave
-                                },{
-                                    xtype: 'button',
-                                    glyph: 'f00d@FontAwesome5FreeSolid',
-                                    itemId: 'cancelAssocBtn',
-                                    text: me.strings.btnCancel
-                                }]
+                                items: [
+                                    {
+                                        xtype: 'tbfill'
+                                    },
+                                    {
+                                        xtype: 'button',
+                                        itemId: 'saveAssocBtn',
+                                        glyph: 'f00c@FontAwesome5FreeSolid',
+                                        formBind: true,
+                                        text: me.strings.btnSave
+                                    },
+                                    {
+                                        xtype: 'button',
+                                        glyph: 'f00d@FontAwesome5FreeSolid',
+                                        itemId: 'cancelAssocBtn',
+                                        text: me.strings.btnCancel
+                                    }
+                                ]
                             }]
                         }]
-                    }]
+                    }
+                ]
             };
-        
+
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
     },
 
-    /***
+    loadUsers: function () {
+        const combo = this.down('combo[name=userGuid]'),
+            record = this.down('form').getRecord(),
+            customerId = this.getCustomer();
+
+        if (! customerId) {
+            return;
+        }
+
+        Ext.Ajax.request({
+            url: Editor.data.restpath + `customers/${customerId}/default-job/combo/users`,
+            method: 'GET',
+            success: function (response) {
+                const data = Ext.decode(response.responseText);
+
+                combo.setStore({
+                    fields: ['userGuid', 'longUserName'],
+                    data: data.rows
+                })
+
+                if (record && (record.get('userGuid') || record.getModified('userGuid'))) {
+                    const userGuid = record.get('userGuid') || record.getModified('userGuid');
+                    combo.setValue(userGuid);
+                }
+            },
+            failure: function (response) {
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+    },
+
+    loadCoordinators: function () {
+        const combo = this.down('combo[name=userGuid]'),
+            record = this.down('form').getRecord(),
+            customerId = this.getCustomer(),
+            jobId = Number.isInteger(Number.parseInt(record.get('id'))) ? record.get('id') : null
+        ;
+
+        if (! customerId) {
+            return;
+        }
+
+        Ext.Ajax.request({
+            url: Editor.data.restpath + (
+                jobId
+                    ? `customers/${customerId}/default-lsp-job/${jobId}/combo/coordinators`
+                    : `customers/${customerId}/default-lsp-job/combo/coordinators`
+            ),
+            method: 'GET',
+            success: function (response) {
+                const data = Ext.decode(response.responseText);
+
+                combo.setStore({
+                    fields: ['userGuid', 'longUserName'],
+                    data: data.rows
+                })
+
+                if (record && (record.get('userGuid') || record.getModified('userGuid'))) {
+                    const userGuid = record.get('userGuid') || record.getModified('userGuid');
+                    combo.setValue(userGuid);
+                }
+            },
+            failure: function (response) {
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+    },
+
+    /**
      * set the current customer. This is used for binding
      * @param newCustomer
      */
-    setCustomer:function (newCustomer){
+    setCustomer: function (newCustomer) {
         var me = this;
         me.customer = newCustomer;
         me.setDefaultWorkflow();
         me.loadAssocData();
     },
-    /**
-     * 
-     */
-    getCustomer: function(){
+
+    getCustomer: function () {
         return this.customer;
     },
 
-    /***
+    /**
      * Get default assoc form record
      * @returns {Editor.model.admin.UserAssocDefault}
      */
-    getDefaultFormRecord:function (){
-        var me=this;
-        return Ext.create('Editor.model.admin.UserAssocDefault',{
-            customerId : me.getCustomer() && me.getCustomer().get('id'),
-            deadlineDate:null,
+    getDefaultFormRecord: function () {
+        var me = this;
+        return Ext.create('Editor.model.admin.UserAssocDefault', {
+            customerId: me.getCustomer(),
+            deadlineDate: null,
             workflow: me.down('#workflowCombo').getValue()
         });
     },
 
-    /***
+    /**
      * Update the assoc grid filters with current selected customer and workflow
      */
-    loadAssocData: function (){
+    loadAssocData: function () {
         var me = this,
             workflowCombo = me.down('#workflowCombo'),
-            customerId = me.getCustomer() ? me.getCustomer().get('id') : false,
+            customerId = me.getCustomer(),
             currentWorkflow = !Ext.isEmpty(workflowCombo.getValue()) ? workflowCombo.getValue() : false;
 
-        if(customerId && currentWorkflow){
-            Ext.StoreManager.get('admin.UserAssocDefault').addFilter([{
-                property: 'customerId',
-                operator:"eq",
-                value:customerId
-            },{
-                property: 'workflow',
-                operator:"eq",
-                value:currentWorkflow
-            }]);
+        if (! customerId || ! currentWorkflow) {
+            return;
         }
+
+        const store = Ext.StoreManager.get('admin.UserAssocDefault');
+
+        store.getProxy()
+            .setUrl(Editor.data.restpath + 'customers/' + customerId + '/workflow/' + currentWorkflow + '/default-job');
+
+        store.reload();
     },
 
-    /***
+    /**
      * Set the default workflow in the workflow combo. If there is not no value defined
      * in the config, the "default" workflow will be set as default
      */
-    setDefaultWorkflow: function(){
+    setDefaultWorkflow: function () {
         var me = this,
             workflowCombo = me.down('#workflowCombo'),
             newValue = Ext.getStore('admin.CustomerConfig').getConfig('workflow.initialWorkflow');
 
-        if(!newValue){
+        if (!newValue) {
             newValue = Editor.data.app.workflow.CONST.DEFAULT_WORKFLOW;
         }
         workflowCombo.setValue(newValue);
