@@ -30,12 +30,11 @@
     Note we have 3 different color-formats !
     Also note that the data-name "zzz" applies to 3 controls e,g. "zzz1=2AB" means: second sent value, references selector "2", value "AB". it can hardly become crazier ...
     ...
-    bPreferenceTranslateExcelExcludeColumns.b=true
+    bPreferenceTranslateExcelExcludeColumns.b=true (obsolete)
     ...
     tsComplexFieldDefinitionsToExtract.i=2
     cfd0=FORMTEXT
     tsExcelExcludedColors.i=2
-    tsExcelExcludedColumns.i=6
     tsExcludeWordStyles.i=2
     tsWordHighlightColors.i=2
     tsWordExcludedColors.i=1
@@ -206,8 +205,8 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
      */
     getTagfieldValue: function(id, identifier, prefix){
         var i, val, numVals, vals = [];
-        // very special coding for the 3 tsExcelExcludedColumnsSheet. they save their data combined as zzz0 ... zzzN
-        if(id.includes('tsExcelExcludedColumnsSheet')){
+        // very special coding for the 3 tsExcelExcludedColumnsSheet. they save their data combined as zzz0 ... zzzN (obsolete)
+        /* if(id.includes('tsExcelExcludedColumnsSheet')){
             numVals = this.getFieldValue('tsExcelExcludedColumns', 0, 'integer', false);
             //  excel excluded columns only when bPreferenceTranslateExcelExcludeColumns.b is true !
             if(numVals > 0 && this.getFieldValue('bPreferenceTranslateExcelExcludeColumns', false, 'boolean', false) === true){
@@ -221,7 +220,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
                     }
                 }
             }
-        } else {
+        } else {*/
             // the "normal" case: collect by identifier
             numVals = this.getFieldValue(id, 0, 'integer', false);
             if(numVals > 0){
@@ -231,7 +230,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
                     }
                 }
             }
-        }
+        //}
         vals.sort();
         return vals;
     },
@@ -274,21 +273,21 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             // init additional values cache
             if(!this.hasOwnProperty('additionalFormVals')){
                 this.additionalFormVals = {};
-                this.additionalFormVals.zzz = [];
+                //this.additionalFormVals.zzz = [];
             }
             var identifier = fieldConfig.fieldDataIdentifier;
             if(value && Array.isArray(value) && value.length > 0){
                 // all 3 tsExcelExcludedColumnsSheetN fields will be sent with the same identifier and need further processing
-                if(name.includes('tsExcelExcludedColumnsSheet')){
+                /*if(name.includes('tsExcelExcludedColumnsSheet')){
                     this.additionalFormVals.zzz = this.additionalFormVals.zzz.concat(value);
-                } else {
+                } else {*/
                     // only the powerpoint-slidenumbers are integers and thus need a type-suffix
                     type = (name === 'tsPowerpointIncludedSlideNumbers') ? '.i' : '';
                     for(var i = 0; i < value.length; i++){
                         this.additionalFormVals[identifier + String(i) + type] = (type === '.i') ? parseInt(value[i]) : value[i];
                     }
                     return value.length;
-                }
+                //}
             }
             return 0;
         }
@@ -303,7 +302,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         // adding the tagfield-contents cached in additionalFormVals the crazy way (especially for "zzz")
         if(this.additionalFormVals){
             for(var name in this.additionalFormVals){
-                if(name === 'zzz'){
+                /*if(name === 'zzz'){ // obsolete
                     if(this.additionalFormVals.zzz.length > 0 && vals['bPreferenceTranslateExcelExcludeColumns.b'] === true){
                         vals['tsExcelExcludedColumns.i'] = this.additionalFormVals.zzz.length; // holds the number of "zzz" values
                         for(var i = 0; i < this.additionalFormVals.zzz.length; i++){
@@ -312,16 +311,16 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
                     } else {
                         vals['tsExcelExcludedColumns.i'] = 0;
                     }
-                } else {
+                } else {*/
                     vals[name] = this.additionalFormVals[name];
-                }
+                //}
             }
             delete this.additionalFormVals;
         }
-        // cleanup virtual fields
-        delete vals['tsExcelExcludedColumnsSheet1.i'];
+        // cleanup virtual fields (obsolete)
+        /*delete vals['tsExcelExcludedColumnsSheet1.i'];
         delete vals['tsExcelExcludedColumnsSheet2.i'];
-        delete vals['tsExcelExcludedColumnsSheet3.i'];
+        delete vals['tsExcelExcludedColumnsSheet3.i'];*/
         // when bPreferencePowerpointIncludedSlideNumbersOnly.b is disabled, this would not be included, but the FPRM-settings expect this value to exist
         if(!vals.hasOwnProperty('tsPowerpointIncludedSlideNumbers.i')){
             vals['tsPowerpointIncludedSlideNumbers.i'] = 0;
@@ -333,11 +332,11 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
      */
     resolveFieldDependencies: function(){
         // if the ckeckbox is not set we need to remove the Column-Choices
-        if(this.form.findField('bPreferenceTranslateExcelExcludeColumns.b').getValue() === false){
+        /*if(this.form.findField('bPreferenceTranslateExcelExcludeColumns.b').getValue() === false){
             this.form.findField('tsExcelExcludedColumnsSheet1.i').setRawValue([]);
             this.form.findField('tsExcelExcludedColumnsSheet2.i').setRawValue([]);
             this.form.findField('tsExcelExcludedColumnsSheet3.i').setRawValue([]);
-        }
+        }*/
         if(this.form.findField('bPreferencePowerpointIncludedSlideNumbersOnly.b').getValue() === false){
             this.form.findField('tsPowerpointIncludedSlideNumbers.i').setRawValue([]);
         }
