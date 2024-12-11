@@ -104,7 +104,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         'tabExcelOptions': { type: 'tab', icon: 'fa-file-excel-o', children: {
             'bPreferenceTranslateExcelHidden.b': {},
             'bPreferenceTranslateExcelSheetNames.b': {},
-            'translateExcelCellsCopied': {},
+            'translateExcelCellsCopied.b': {},
             'bPreferenceTranslateExcelDiagramData.b': {},
             'bPreferenceTranslateExcelDrawings.b': {},
             'preserveExcelStylesInTargetColumns.b': {},
@@ -136,7 +136,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'translatePowerpointDiagramData.b': {},
             'translatePowerpointCharts.b': {},
             'bPreferenceTranslatePowerpointNotes.b': {},
-            'bPreferenceTranslatePowerpointComments.b': {},
+            'translatePowerpointComments.b': {},
             'bPreferenceTranslatePowerpointMasters.b': {},
             'bPreferenceIgnorePlaceholdersInPowerpointMasters.b': {},
             'reorderPowerpointDocProperties.b': {},

@@ -37,7 +37,7 @@
     "bPreferenceTranslateExcelExcludeColors": "Aus Excel ausgeschlossene Farben übersetzen",
     "subfilter": "Name des Subfilters für Zellinhalt",
     "bPreferenceTranslatePowerpointNotes": "Anmerkungen übersetzen",
-    "bPreferenceTranslatePowerpointComments": "Kommentare übersetzen",
+    "translatePowerpointComments": "Kommentare übersetzen",
     "bPreferenceTranslatePowerpointMasters": "Vorlagen übersetzen",
     "bPreferenceIgnorePlaceholdersInPowerpointMasters": "Platzhalter-Text in Vorlagen ignorieren",
     "bPreferencePowerpointIncludedSlideNumbersOnly": "Nur ausgewählte Folien übersetzen",

@@ -37,7 +37,7 @@
     "bPreferenceTranslateExcelExcludeColors": "Translate Excel excluded colours",
     "subfilter": "Name of subfilter for cell content",
     "bPreferenceTranslatePowerpointNotes": "Translate notes",
-    "bPreferenceTranslatePowerpointComments": "Translate comments",
+    "translatePowerpointComments": "Translate comments",
     "bPreferenceTranslatePowerpointMasters": "Translate masters",
     "bPreferenceIgnorePlaceholdersInPowerpointMasters": "Ignore placeholder text in masters",
     "bPreferencePowerpointIncludedSlideNumbersOnly": "Translate selected slide numbers only",
