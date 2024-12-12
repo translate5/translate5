@@ -147,7 +147,7 @@ class editor_Models_Segment_Whitespace
         ],
         '/\x{1680}/u' => [
             'ts' => 'e19a80',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[OGSP]',
             'title' => 'Ogham Space Mark',
         ],
         '/\x{180E}/u' => [
@@ -157,57 +157,57 @@ class editor_Models_Segment_Whitespace
         ],
         '/\x{2000}/u' => [
             'ts' => 'e28080',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[NQSP]',
             'title' => 'En Quad',
         ],
         '/\x{2001}/u' => [
             'ts' => 'e28081',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[MQSP]',
             'title' => 'Em Quad',
         ],
         '/\x{2002}/u' => [
             'ts' => 'e28082',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[ENSP]',
             'title' => 'En Space',
         ],
         '/\x{2003}/u' => [
             'ts' => 'e28083',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[EMSP]',
             'title' => 'Em Space',
         ],
         '/\x{2004}/u' => [
             'ts' => 'e28084',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[3/MSP]',
             'title' => 'Three-Per-Em Space',
         ],
         '/\x{2005}/u' => [
             'ts' => 'e28085',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[4/MSP]',
             'title' => 'Four-Per-Em Space',
         ],
         '/\x{2006}/u' => [
             'ts' => 'e28086',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[6/MSP]',
             'title' => 'Six-Per-Em Space',
         ],
         '/\x{2007}/u' => [
             'ts' => 'e28087',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[FSP]',
             'title' => 'Figure Space',
         ],
         '/\x{2008}/u' => [
             'ts' => 'e28088',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[PSP]',
             'title' => 'Punctuation Space',
         ],
         '/\x{2009}/u' => [
             'ts' => 'e28089',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[THSP]',
             'title' => 'Thin Space',
         ],
         '/\x{200A}/u' => [
             'ts' => 'e2808a',
-            'text' => self::LABEL_CHARACTER,
+            'text' => '[HSP]',
             'title' => 'Hair Space',
         ],
         '/\x{200B}/u' => [
@@ -247,8 +247,8 @@ class editor_Models_Segment_Whitespace
         ],
         '/\x{3000}/u' => [
             'ts' => 'e38080',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Ideographic Space',
+            'text' => '[IDSP]',
+            'title' => 'Ideographic Space (IDSP)',
         ],
         '/\x{FEFF}/u' => [
             'ts' => 'efbbbf',

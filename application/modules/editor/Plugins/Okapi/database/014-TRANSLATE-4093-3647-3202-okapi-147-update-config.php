@@ -30,66 +30,98 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Plugins\Okapi\OkapiService;
 
 $NEW_SPECIAL_CHARS_JSON = '[
-  {
-    "unicode": "U+202F",
-    "visualized": "NNBSP"
-  },
-  {
-    "unicode": "U+200A",
-    "visualized": "HSP"
-  },
-  {
-    "unicode": "U+2009",
-    "visualized": "THSP"
-  },
-  {
-    "unicode": "U+2008",
-    "visualized": "PSP"
-  },
-  {
-    "unicode": "U+2007",
-    "visualized": "FSP"
-  },
-  {
-    "unicode": "U+2006",
-    "visualized": "6/MSP"
-  },
-  {
-    "unicode": "U+2005",
-    "visualized": "4/MSP"
-  },
-  {
-    "unicode": "U+2004",
-    "visualized": "3/MSP"
-  },
-  {
-    "unicode": "U+2001",
-    "visualized": "MQSP"
-  },
-  {
-    "unicode": "U+2028",
-    "visualized": "LSEP"
-  },
-  {
-    "unicode": "U+200B",
-    "visualized": "ZWSP"
-  },
-  {
-    "unicode": "U+200C",
-    "visualized": "ZWNJ"
-  },
-  {
+{
     "unicode": "U+00AD",
     "visualized": "SHY"
-  },
-  {
+},
+{
+    "unicode": "U+1680",
+    "visualized": "OGSP"
+},
+{
+    "unicode": "U+180E",
+    "visualized": "MVS"
+},
+{
+    "unicode": "U+2000",
+    "visualized": "NQSP"
+},
+{
+    "unicode": "U+2001",
+    "visualized": "MQSP"
+},
+{
+    "unicode": "U+2002",
+    "visualized": "ENSP"
+},
+{
+    "unicode": "U+2003",
+    "visualized": "EMSP"
+},
+{
+    "unicode": "U+2004",
+    "visualized": "3/MSP"
+},
+{
+    "unicode": "U+2005",
+    "visualized": "4/MSP"
+},
+{
+    "unicode": "U+2006",
+    "visualized": "6/MSP"
+},
+{
+    "unicode": "U+2007",
+    "visualized": "FSP"
+},
+{
+    "unicode": "U+2008",
+    "visualized": "PSP"
+},
+{
+    "unicode": "U+2009",
+    "visualized": "THSP"
+},
+{
+    "unicode": "U+200A",
+    "visualized": "HSP"
+},
+{
+    "unicode": "U+200B",
+    "visualized": "ZWSP"
+},
+{
+    "unicode": "U+200C",
+    "visualized": "ZWNJ"
+},
+{
     "unicode": "U+2011",
     "visualized": "NBH"
-  },
-  {
-    "unicode": "U+00AD",
+},
+{
+    "unicode": "U+2028",
+    "visualized": "LS"
+},
+{
+    "unicode": "U+2029",
+    "visualized": "PS"
+},
+{
+    "unicode": "U+202F",
+    "visualized": "NNBSP"
+},
+{
+    "unicode": "U+205F",
+    "visualized": "MMSP"
+},
+{
+    "unicode": "U+3000",
+    "visualized": "IDSP"
+},
+{
+    "unicode": "U+FEFF",
     "visualized": "ZWNBSP"
-  }
+}
 ]';
 
 //uncomment the following line, so that the file is not marked as processed:
