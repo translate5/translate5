@@ -176,6 +176,8 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             taskManagement = me.getView().down('adminTaskTaskManagement'),
             currentTask = taskManagement.getCurrentTask();
 
+        me.getView().down('languageResourceTaskAssocPanel').unmask();
+
         if(!currentTask || currentTask.get('taskGuid')!== params.taskGuid){
             return;
         }

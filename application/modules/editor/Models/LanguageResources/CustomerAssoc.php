@@ -47,6 +47,12 @@ END LICENSE AND COPYRIGHT
  *
  * @method string getLanguageResourceServiceName()
  * @method void setLanguageResourceServiceName(string $serviceName)
+ *
+ * @method string getPenaltyGeneral()
+ * @method void setPenaltyGeneral(int $penaltyGeneral)
+ *
+ * @method string getPenaltySublang()
+ * @method void setPenaltySublang(int $penaltySublang)
  */
 class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract
 {
@@ -65,6 +71,24 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         $s = $this->db->select();
         if ($languageResourceId) {
             $s->where('languageResourceId=?', $languageResourceId);
+        }
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+
+    /**
+     * Get all assocs by $customerId
+     * If no $customerId is provided, all assoc will be loaded
+     *
+     * @param ?int $customerId
+     * @return array
+     */
+    public function loadByCustomerId(?int $customerId = null)
+    {
+        $s = $this->db->select();
+
+        if ($customerId) {
+            $s->where('customerId = ?', $customerId);
         }
 
         return $this->db->fetchAll($s)->toArray();
@@ -244,5 +268,17 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
 
         // Get customers, assigned to all given term collections, e.g. shared customers
         return call_user_func_array('array_intersect', $customerIdAByCollectionId);
+    }
+
+    /**
+     * Load assoc record, if exists for given $customerId and $resourceId
+     */
+    public function loadRowByCustomerIdAndResourceId(int $customerId, int $resourceId): ?Zend_Db_Table_Row_Abstract
+    {
+        $s = $this->db->select();
+        $s->where('customerId = ?', $customerId);
+        $s->where('languageResourceId = ?', $resourceId);
+
+        return $this->row = $this->db->fetchRow($s);
     }
 }

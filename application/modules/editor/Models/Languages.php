@@ -91,4 +91,18 @@ class editor_Models_Languages extends ZfExtended_Languages
 
         return $converted;
     }
+
+    /**
+     * Get id of major language for the given $languageId
+     *
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function findMajorLanguageById(int $languageId): int
+    {
+        // Load language by id
+        $this->load($languageId);
+
+        // Get major language id for that language
+        return (int) $this->findMajorLanguage($this->getMajorRfc5646())['id'];
+    }
 }

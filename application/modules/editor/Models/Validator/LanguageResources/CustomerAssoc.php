@@ -33,5 +33,15 @@ class editor_Models_Validator_LanguageResources_CustomerAssoc extends ZfExtended
         $this->addValidator('id', 'int');
         $this->addValidator('languageResourceId', 'int');
         $this->addValidator('customerId', 'int');
+        $this->addValidator('penaltyGeneral', 'int');
+        $this->addValidator('penaltyGeneral', 'between', [
+            'min' => 0,
+            'max' => editor_Models_Segment_MatchRateType::MAX_VALUE,
+        ]);
+        $this->addValidator('penaltySublang', 'int');
+        $this->addValidator('penaltySublang', 'between', [
+            'min' => 0,
+            'max' => editor_Models_Segment_MatchRateType::MAX_VALUE,
+        ]);
     }
 }

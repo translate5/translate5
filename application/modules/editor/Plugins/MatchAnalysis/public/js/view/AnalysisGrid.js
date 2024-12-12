@@ -309,6 +309,16 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
             menuDisabled: true,
             text: me.strings.matchCount,
             width: metrics.getWidth(me.strings.matchCount) + paddings
+        }, {
+            xtype: 'gridcolumn',
+            dataIndex: 'penaltyTotal',
+            align: 'end',
+            cellWrap: true,
+            menuDisabled: true,
+            bind: {
+                text: '{l10n.analysisGrid.penaltyTotal}'
+            },
+            width: metrics.getWidth(Editor.data.l10n.analysisGrid.penaltyTotal) + paddings
         }];
 
         Ext.Array.each(customRanges, function(item){

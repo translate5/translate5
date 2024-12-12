@@ -73,6 +73,12 @@ Ext.define('Editor.controller.LanguageResources', {
               afterrender:'centerPanelAfterRender',
               edit: 'endEditing'
           },
+          '#displayTabPanel': { // customerPanel > tabPanel
+              added: 'addToCustomerPanel',
+          },
+          '#customerPanelGrid': {
+              selectionchange: 'onCustomerSelectionChange'
+          },
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
           }
@@ -296,5 +302,33 @@ Ext.define('Editor.controller.LanguageResources', {
       
       //disabled if only term collections and it is configuret do disable the panel
       return termCollectionCount === assocCount && disableIfTermCollectionOnly;
-  }
+  },
+
+    addToCustomerPanel: function(tabPanel) {
+        var vm = tabPanel.up('[viewModel]').getViewModel();
+        var vmStores = vm.storeInfo || {};
+        vmStores.customersLanguageResourceStore = {
+            source: 'Editor.store.LanguageResources.LanguageResource',
+            storeId: 'customersLanguageResourceStore',
+            groupField: 'serviceName',
+            filters: [{
+                id: 'assocOnlyFilter',
+                disabled: '{!langres.assocOnlyButtonPressed}',
+                property: 'customerIds',
+                value: '{record.id}',
+                filterFn: function(rec) {
+                    var customerId = this.getValue(),
+                        current = rec.get('customerIds'),
+                        initial = rec.getModified('customerIds');
+                    return current.some(id => parseInt(id) === customerId)
+                        || (initial && initial.some(id => parseInt(id) === customerId));
+                }
+            }]
+        };
+        vm.setStores(vmStores);
+    },
+
+    onCustomerSelectionChange: function(selectionModel, selectedRecords) {
+        this.fireEvent('customerchange', selectedRecords[0]?.id);
+    }
 });
