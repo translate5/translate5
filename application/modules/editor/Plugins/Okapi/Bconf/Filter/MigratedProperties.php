@@ -26,52 +26,12 @@
  END LICENSE AND COPYRIGHT
  */
 
-namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
 
-use editor_Plugins_Okapi_Init;
-
-/**
- * Class representing the static data of a filebase inventory with a JSON inventory-file
- */
-abstract class FileInventory
+class MigratedProperties extends VolatileProperties
 {
     /**
      * Relative to the static data-dir
      */
-    protected string $inventoryFile;
-
-    /**
-     * Relative to the static data-dir
-     */
-    protected string $inventoryFolder;
-
-    protected array $inventory;
-
-    protected function __construct()
-    {
-        $this->inventory = json_decode(file_get_contents($this->getFilePath()));
-    }
-
-    public function getFolderPath(): string
-    {
-        return editor_Plugins_Okapi_Init::getDataDir() . $this->inventoryFolder;
-    }
-
-    public function getFilePath(): string
-    {
-        return editor_Plugins_Okapi_Init::getDataDir() . $this->inventoryFile;
-    }
-
-    /**
-     * Retrieves all items in the inventory
-     */
-    public function getInventory(): array
-    {
-        return $this->inventory;
-    }
-
-    /**
-     * Checks if all linked files of the inventory are present
-     */
-    abstract public function validate(): bool;
+    protected string $inventoryFile = 'fprm/migrated-properties.json';
 }

@@ -51,20 +51,11 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\FileInventory;
  *      ]
  *  }
  */
-final class VolatileProperties extends FileInventory
+class VolatileProperties extends FileInventory
 {
-    private static ?VolatileProperties $_instance = null;
-
-    /**
-     * Classic Singleton
-     */
-    public static function instance(): VolatileProperties
+    public function __construct()
     {
-        if (self::$_instance == null) {
-            self::$_instance = new VolatileProperties();
-        }
-
-        return self::$_instance;
+        parent::__construct();
     }
 
     /**
@@ -88,7 +79,7 @@ final class VolatileProperties extends FileInventory
     {
         foreach ($this->inventory as $item) {
             if ($item->type === $okapiType) {
-                return $item->properties;
+                return is_object($item->properties) ? (array) $item->properties : $item->properties;
             }
         }
 

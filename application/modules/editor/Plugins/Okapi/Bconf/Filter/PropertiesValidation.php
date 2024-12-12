@@ -61,6 +61,8 @@ final class PropertiesValidation extends ResourceFile
 
     private array $volatiles = [];
 
+    private array $migratedProperties = [];
+
     /**
      * @throws ZfExtended_Exception
      */
@@ -70,10 +72,14 @@ final class PropertiesValidation extends ResourceFile
         $identifier = Filters::createIdentifierFromPath($path);
         $idata = Filters::parseIdentifier($identifier);
         // find volatile-props - if already defined
-        $volatiles = VolatileProperties::instance()->getPropertyNames($idata->type);
+        $volatiles = (new VolatileProperties())->getPropertyNames($idata->type);
         if ($volatiles !== null) {
             $this->strict = true;
             $this->volatiles = $volatiles;
+        }
+        $migratedProperties = (new MigratedProperties())->getPropertyNames($idata->type);
+        if ($migratedProperties !== null) {
+            $this->migratedProperties = $migratedProperties;
         }
         // try to get the default validation file
         $validationFile = Filters::instance()->getOkapiDefaultFilterPathById($idata->type);
@@ -240,7 +246,18 @@ final class PropertiesValidation extends ResourceFile
             $newProps = new PropertiesParser(null);
             // transfer all mandatory either from existing or reference if not found
             foreach ($this->referenceProps->getPropertyNames() as $varName) {
-                $newProps->add($varName, $this->props->has($varName) ? $this->props->get($varName) : $this->referenceProps->get($varName));
+                if ($this->props->has($varName)) {
+                    $value = $this->props->get($varName);
+                } else {
+                    $oldVarName = $this->migratedProperties[$varName] ?? null;
+                    if ($oldVarName && $this->props->has($oldVarName)) {
+                        $value = $this->props->get($oldVarName);
+                    } else {
+                        $value = $this->referenceProps->get($varName);
+                    }
+                }
+
+                $newProps->add($varName, $value);
             }
             // transfer all volatile vars to the new props
             foreach ($this->props->getPropertyNames() as $varName) {
@@ -254,7 +271,13 @@ final class PropertiesValidation extends ResourceFile
             // if not strict, we just amend non-existing props
             foreach ($this->referenceProps->getPropertyNames() as $varName) {
                 if (! $this->props->has($varName)) {
-                    $this->props->add($varName, $this->referenceProps->get($varName));
+                    $oldVarName = $this->migratedProperties[$varName] ?? null;
+                    $this->props->add(
+                        $varName,
+                        $oldVarName && $this->props->has($oldVarName) ? $this->props->get(
+                            $oldVarName
+                        ) : $this->referenceProps->get($varName)
+                    );
                 }
             }
         }
