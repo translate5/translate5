@@ -47,7 +47,7 @@ use MittagQI\Translate5\User\Model\User;
  * targetLang: int,
  * workflowStepName: string,
  * workflow: string,
- * deadlineDate: string,
+ * deadlineDate: float,
  * trackchangesShow: bool,
  * trackchangesShowAll: bool,
  * trackchangesAcceptReject: bool,

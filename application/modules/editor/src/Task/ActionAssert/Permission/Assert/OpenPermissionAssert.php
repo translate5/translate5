@@ -49,7 +49,7 @@ use ZfExtended_Acl;
 use ZfExtended_Logger;
 
 /**
- * @implements PermissionAssertInterface<Task>
+ * @implements PermissionAssertInterface<TaskAction, Task>
  */
 class OpenPermissionAssert implements PermissionAssertInterface
 {

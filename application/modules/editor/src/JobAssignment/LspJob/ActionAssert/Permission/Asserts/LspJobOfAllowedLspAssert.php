@@ -42,7 +42,7 @@ use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 
 /**
- * @implements PermissionAssertInterface<LspJob>
+ * @implements PermissionAssertInterface<LspAction, LspJob>
  */
 class LspJobOfAllowedLspAssert implements PermissionAssertInterface
 {

@@ -41,7 +41,7 @@ use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\Repository\LspJobRepository;
 
 /**
- * @implements PermissionAssertInterface<UserJob>
+ * @implements PermissionAssertInterface<UserJobAction, UserJob>
  */
 class LspDataJobAssert implements PermissionAssertInterface
 {

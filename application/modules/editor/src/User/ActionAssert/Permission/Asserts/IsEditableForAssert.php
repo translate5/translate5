@@ -38,7 +38,7 @@ use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 
 /**
- * @implements PermissionAssertInterface<User>
+ * @implements PermissionAssertInterface<UserAction, User>
  */
 final class IsEditableForAssert implements PermissionAssertInterface
 {

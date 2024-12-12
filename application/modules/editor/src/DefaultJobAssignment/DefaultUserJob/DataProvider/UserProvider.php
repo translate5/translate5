@@ -46,7 +46,7 @@ use ZfExtended_Models_Db_User;
 use ZfExtended_Models_User;
 
 /**
- * @template User as array{userGuid: string, longUserName: string}
+ * @template UserData as array{userGuid: string, longUserName: string}
  */
 class UserProvider
 {
@@ -71,7 +71,7 @@ class UserProvider
     }
 
     /**
-     * @return User[]
+     * @return UserData[]
      */
     public function getPossibleUsers(int $customerId, User $viewer): array
     {
@@ -102,7 +102,7 @@ class UserProvider
     }
 
     /**
-     * @return User[]
+     * @return UserData[]
      */
     private function getSimpleUsers(User $viewer): array
     {
@@ -130,7 +130,7 @@ class UserProvider
     /**
      * It is impossible to create LSP User job for LSP User without LSP job
      *
-     * @return User[]
+     * @return UserData[]
      */
     private function getLspUsers(int $customerId, User $viewer): array
     {

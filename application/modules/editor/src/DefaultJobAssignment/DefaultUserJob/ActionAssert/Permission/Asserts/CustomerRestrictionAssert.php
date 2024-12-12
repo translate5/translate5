@@ -39,12 +39,12 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\ActionAssert\Permission\Exception\NoAccessToDefaultUserJobException;
-use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\Repository\CustomerRepository;
 
 /**
- * @implements PermissionAssertInterface<DefaultUserJob>
+ * @implements PermissionAssertInterface<DefaultJobAction, DefaultUserJob>
  */
 class CustomerRestrictionAssert implements PermissionAssertInterface
 {
@@ -72,7 +72,7 @@ class CustomerRestrictionAssert implements PermissionAssertInterface
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if ($object->getUserGuid() === $context->actor->getUserGuid() && UserJobAction::Read === $action) {
+        if ($object->getUserGuid() === $context->actor->getUserGuid() && DefaultJobAction::Read === $action) {
             return;
         }
 

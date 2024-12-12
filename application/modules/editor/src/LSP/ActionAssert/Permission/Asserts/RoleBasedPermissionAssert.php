@@ -39,7 +39,7 @@ use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 
 /**
- * @implements PermissionAssertInterface<LanguageServiceProvider>
+ * @implements PermissionAssertInterface<LspAction, LanguageServiceProvider>
  */
 final class RoleBasedPermissionAssert implements PermissionAssertInterface
 {

@@ -47,7 +47,7 @@ use ZfExtended_Models_Db_User;
 use ZfExtended_Models_User;
 
 /**
- * @template User as array{userGuid: string, longUserName: string}
+ * @template UserData as array{userGuid: string, longUserName: string}
  */
 class UserProvider
 {
@@ -70,7 +70,7 @@ class UserProvider
     }
 
     /**
-     * @return User[]
+     * @return UserData[]
      */
     public function getPossibleUsersForNewJobInTask(Task $task, User $viewer): array
     {
@@ -99,7 +99,7 @@ class UserProvider
     }
 
     /**
-     * @return User[]
+     * @return UserData[]
      */
     private function getSimpleUsers(User $viewer): array
     {
@@ -121,13 +121,19 @@ class UserProvider
             ->where('user.login != ?', ZfExtended_Models_User::SYSTEM_LOGIN)
         ;
 
-        return $this->permissionAwareUserFetcher->fetchVisible($select, $viewer);
+        return array_map(
+            fn ($user) => [
+                'userGuid' => $user['userGuid'],
+                'longUserName' => $user['longUserName']
+            ],
+            $this->permissionAwareUserFetcher->fetchVisible($select, $viewer)
+        );
     }
 
     /**
      * It is impossible to create LSP User job for LSP User without LSP job
      *
-     * @return User[]
+     * @return UserData[]
      */
     private function getLspUsers(string $taskGuid, User $viewer): array
     {
@@ -169,6 +175,12 @@ class UserProvider
             $select->where('lsp.id = ?', $coordinator->lsp->getId());
         }
 
-        return $this->permissionAwareUserFetcher->fetchVisible($select, $viewer);
+        return array_map(
+            fn ($user) => [
+                'userGuid' => $user['userGuid'],
+                'longUserName' => $user['longUserName']
+            ],
+            $this->permissionAwareUserFetcher->fetchVisible($select, $viewer)
+        );
     }
 }

@@ -71,7 +71,7 @@ class NotificationMailFactory
     /**
      * Adds the users of the given cc/bcc step config to the email - if receiverStep is configured in config
      */
-    private function addCopyReceivers(
+    public function addCopyReceivers(
         Mail $mailer,
         string $taskGuid,
         array $receiverStepMap,

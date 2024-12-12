@@ -83,4 +83,9 @@ interface LspRepositoryInterface
      * @return int[]
      */
     public function getSubLspIds(LanguageServiceProvider $lsp): array;
+
+    /**
+     * @return int[]
+     */
+    public function getCustomerIdsOfCoordinatorsLsp(int $coordinatorUserId): array;
 }

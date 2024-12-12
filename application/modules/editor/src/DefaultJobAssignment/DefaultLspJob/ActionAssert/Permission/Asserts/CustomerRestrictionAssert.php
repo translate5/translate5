@@ -38,12 +38,13 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\Exception\NoAccessToDefaultLspJobException;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\Repository\CustomerRepository;
 
 /**
- * @implements PermissionAssertInterface<DefaultLspJob>
+ * @implements PermissionAssertInterface<DefaultJobAction, DefaultLspJob>
  */
 class CustomerRestrictionAssert implements PermissionAssertInterface
 {

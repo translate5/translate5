@@ -148,9 +148,9 @@ class CoordinatorProvider
     }
 
     /**
-     * @return Coordinator[]
+     * @return array{userId: int, userGuid: string, longUserName: string}[]
      */
-    public function getPossibleCoordinatorsForLspJobUpdate(LspJob $lspJob, User $viewer): array
+    public function getPossibleCoordinatorsForLspJobUpdate(LspJob $lspJob): array
     {
         $coordinators = [];
         foreach ($this->jobCoordinatorRepository->getByLspId((int) $lspJob->getLspId()) as $coordinator) {
@@ -168,7 +168,7 @@ class CoordinatorProvider
      * Fetch coordinators of sub LSPs if their parent LSP has job in a task
      * It is impossible to create LSP job for sub LSP without parent LSP job
      *
-     * @return Coordinator[]
+     * @return array{userId: int, userGuid: string, longUserName: string}[]
      */
     private function getSubCoordinatorsForTask(string $taskGuid, User $viewer): array
     {
@@ -210,7 +210,7 @@ class CoordinatorProvider
     }
 
     /**
-     * @return Coordinator[]
+     * @return array{userId: int, userGuid: string, longUserName: string}[]
      */
     private function getDirectCoordinators(User $viewer): array
     {

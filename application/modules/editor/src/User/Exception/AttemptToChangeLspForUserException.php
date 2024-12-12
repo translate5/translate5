@@ -35,7 +35,7 @@ use InvalidArgumentException;
 class AttemptToChangeLspForUserException extends InvalidArgumentException implements LspUserExceptionInterface
 {
     public function __construct(
-        private int $userId
+        public readonly int $userId
     ) {
         parent::__construct("The LSP of the user with the ID $userId cannot be changed.");
     }

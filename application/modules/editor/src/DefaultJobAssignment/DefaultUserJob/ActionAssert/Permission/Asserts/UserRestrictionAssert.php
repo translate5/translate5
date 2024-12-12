@@ -36,17 +36,21 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\ActionAssert\Permission\Exception\NoAccessToDefaultUserJobException;
-use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
+use MittagQI\Translate5\User\Model\User;
 
 /**
- * @implements PermissionAssertInterface<DefaultUserJob>
+ * @implements PermissionAssertInterface<DefaultJobAction, DefaultUserJob>
  */
 class UserRestrictionAssert implements PermissionAssertInterface
 {
+    /**
+     * @param ActionPermissionAssertInterface<UserAction, User> $userPermissionAssert
+     */
     public function __construct(
         private readonly ActionPermissionAssertInterface $userPermissionAssert,
         private readonly UserRepository $userRepository,
@@ -71,7 +75,7 @@ class UserRestrictionAssert implements PermissionAssertInterface
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if ($object->getUserGuid() === $context->actor->getUserGuid() && UserJobAction::Read === $action) {
+        if ($object->getUserGuid() === $context->actor->getUserGuid() && DefaultJobAction::Read === $action) {
             return;
         }
 

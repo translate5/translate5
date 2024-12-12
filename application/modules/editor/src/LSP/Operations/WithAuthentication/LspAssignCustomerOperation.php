@@ -52,8 +52,8 @@ use ZfExtended_Logger;
 class LspAssignCustomerOperation implements LspAssignCustomerOperationInterface
 {
     /**
-     * @param ActionPermissionAssertInterface<LanguageServiceProvider> $lspActionPermissionAssert
-     * @param ActionPermissionAssertInterface<Customer> $customerActionPermissionAssert
+     * @param ActionPermissionAssertInterface<LspAction, LanguageServiceProvider> $lspActionPermissionAssert
+     * @param ActionPermissionAssertInterface<CustomerAction, Customer> $customerActionPermissionAssert
      */
     public function __construct(
         private readonly LspAssignCustomerOperationInterface $generalOperation,

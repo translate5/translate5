@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\JobAssignment\LspJob\Operation;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
+use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
@@ -45,13 +45,13 @@ use RuntimeException;
 class DeleteLspJobOperation implements DeleteLspJobOperationInterface
 {
     /**
-     * @param ActionFeasibilityAssert<LspJob> $lspJobActionFeasibilityAssert
+     * @param ActionFeasibilityAssertInterface<LspJob> $lspJobActionFeasibilityAssert
      */
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
         private readonly UserJobRepository $userJobRepository,
         private readonly TaskRepository $taskRepository,
-        private readonly ActionFeasibilityAssert $lspJobActionFeasibilityAssert,
+        private readonly ActionFeasibilityAssertInterface $lspJobActionFeasibilityAssert,
         private readonly DeleteUserJobOperation $deleteUserJobAssignmentOperation,
         private readonly TaskLockService $taskLockService,
     ) {

@@ -43,7 +43,7 @@ use MittagQI\Translate5\Repository\LspJobRepository;
 final class LspJobActionFeasibilityAssert extends ActionFeasibilityAssert
 {
     /**
-     * @param FeasibilityAssertInterface $asserts
+     * @param FeasibilityAssertInterface[] $asserts
      */
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,

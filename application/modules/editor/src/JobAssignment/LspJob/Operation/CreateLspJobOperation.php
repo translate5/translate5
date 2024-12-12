@@ -36,12 +36,10 @@ use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\JobAssignment\LspJob\Validation\CompetitiveJobCreationValidator;
-use MittagQI\Translate5\JobAssignment\UserJob\Contract\CreateUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\NotLspCustomerTaskException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
-use MittagQI\Translate5\JobAssignment\UserJob\Operation\CreateUserJobOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\TrackChangesRightsValidator;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
@@ -64,7 +62,6 @@ class CreateLspJobOperation implements CreateLspJobOperationInterface
         private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
         private readonly TrackChangesRightsValidator $trackChangesRightsValidator,
         private readonly CompetitiveJobCreationValidator $competitiveJobCreationValidator,
-        private readonly CreateUserJobOperationInterface $createUserJobOperation,
         private readonly TaskLockService $taskLock,
     ) {
     }
@@ -82,7 +79,6 @@ class CreateLspJobOperation implements CreateLspJobOperationInterface
             LspCustomerAssociationValidator::create(),
             TrackChangesRightsValidator::create(),
             CompetitiveJobCreationValidator::create(),
-            CreateUserJobOperation::create(),
             TaskLockService::create(),
         );
     }
@@ -190,10 +186,6 @@ class CreateLspJobOperation implements CreateLspJobOperationInterface
      */
     private function validateTrackChangesSettings(LspJob $lspJob, NewLspJobDto $dto): void
     {
-        if (TypeEnum::Lsp === $dto->type) {
-            return;
-        }
-
         $this->trackChangesRightsValidator->assertTrackChangesRightsAreSubsetOfLspJob(
             $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps,
             $dto->trackChangesRights->canSeeAllTrackChanges,

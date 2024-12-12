@@ -62,11 +62,9 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
      */
     public static function create(): self
     {
-        $userRepository = new UserRepository();
-
         return new self(
-            $userRepository,
-            new LspUserRepository($userRepository),
+            new UserRepository(),
+            LspUserRepository::create(),
             UserJobRepository::create(),
             UserActionFeasibilityAssert::create(),
             ForceUserActionFeasibilityAssert::create(),

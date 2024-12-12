@@ -49,7 +49,7 @@ use MittagQI\Translate5\User\Model\User;
  * targetLang: int,
  * workflowStepName: string,
  * workflow: string,
- * deadlineDate: string,
+ * deadlineDate: float,
  * trackchangesShow: bool,
  * trackchangesShowAll: bool,
  * trackchangesAcceptReject: bool,
@@ -130,7 +130,7 @@ class DefaultUserJobViewDataProvider
         $lspJob = $this->defaultLspJobRepository->findDefaultLspJobByDataJobId((int) $job->getId());
         $type = null !== $lspJob ? TypeEnum::Lsp : TypeEnum::Editor;
 
-        $row = [
+        return [
             'id' => (int) $job->getId(),
             'customerId' => (int) $job->getCustomerId(),
             'userGuid' => $job->getUserGuid(),
@@ -146,7 +146,5 @@ class DefaultUserJobViewDataProvider
             'lspId' => $lspJob ? (int) $lspJob->getLspId() : null,
             'isLspJob' => null !== $lspJob,
         ];
-
-        return $row;
     }
 }

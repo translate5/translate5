@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LSP\Operations;
 
 use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LSP\Contract\LspAssignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
@@ -54,7 +53,6 @@ final class LspAssignCustomerOperation implements LspAssignCustomerOperationInte
         return new self(
             LspRepository::create(),
             LspCustomerAssociationValidator::create(),
-            EventDispatcher::create(),
         );
     }
 

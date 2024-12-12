@@ -36,7 +36,7 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Exception\NoAccessToDefaultUserJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Exception\NoAccessToUserJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
@@ -44,7 +44,7 @@ use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 
 /**
- * @implements PermissionAssertInterface<UserJob>
+ * @implements PermissionAssertInterface<UserJobAction, UserJob>
  */
 class TaskRestrictionAssert implements PermissionAssertInterface
 {
@@ -81,7 +81,7 @@ class TaskRestrictionAssert implements PermissionAssertInterface
 
             $this->taskPermissionAssert->assertGranted(TaskAction::AssignJob, $task, $context);
         } catch (PermissionExceptionInterface|InexistentTaskException) {
-            throw new NoAccessToDefaultUserJobException($object);
+            throw new NoAccessToUserJobException($object);
         }
     }
 }

@@ -44,7 +44,7 @@ use Zend_Acl_Exception;
 use ZfExtended_Acl;
 
 /**
- * @implements PermissionAssertInterface<Task>
+ * @implements PermissionAssertInterface<TaskAction, Task>
  */
 class FinishPermissionAssert implements PermissionAssertInterface
 {

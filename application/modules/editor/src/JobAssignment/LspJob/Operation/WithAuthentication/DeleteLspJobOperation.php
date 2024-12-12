@@ -31,13 +31,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication;
 
 use editor_Models_TaskUserAssoc as UserJob;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use Zend_Registry;
@@ -48,7 +48,7 @@ use ZfExtended_Logger;
 class DeleteLspJobOperation implements DeleteLspJobOperationInterface
 {
     /**
-     * @param ActionPermissionAssertInterface<UserJob> $permissionAssert
+     * @param ActionPermissionAssertInterface<UserJobAction, UserJob> $permissionAssert
      */
     public function __construct(
         private readonly ZfExtended_AuthenticationInterface $authentication,
@@ -91,12 +91,14 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
 
     private function assertAccess(LspJob $job): void
     {
+        $authUser = null;
+
         try {
             $authUser = $this->userRepository->get($this->authentication->getUserId());
             $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $job->getId());
 
             $this->permissionAssert->assertGranted(
-                Action::Delete,
+                UserJobAction::Delete,
                 $dataJob,
                 new PermissionAssertContext($authUser),
             );

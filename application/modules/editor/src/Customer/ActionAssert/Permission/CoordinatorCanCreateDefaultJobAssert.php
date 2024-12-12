@@ -40,7 +40,7 @@ use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 
 /**
- * @implements PermissionAssertInterface<Customer>
+ * @implements PermissionAssertInterface<CustomerAction, Customer>
  */
 final class CoordinatorCanCreateDefaultJobAssert implements PermissionAssertInterface
 {

@@ -43,7 +43,7 @@ use Zend_Acl_Exception;
 use ZfExtended_Acl;
 
 /**
- * @implements PermissionAssertInterface<Task>
+ * @implements PermissionAssertInterface<TaskAction, Task>
  */
 final class UserHasJobInTaskPermissionAssert implements PermissionAssertInterface
 {

@@ -33,10 +33,11 @@ namespace MittagQI\Translate5\Customer\ActionAssert\Permission;
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
 
 /**
- * @implements PermissionAssertInterface<Customer>
+ * @implements PermissionAssertInterface<CustomerAction, Customer>
  */
 final class AssignedCustomerAssert implements PermissionAssertInterface
 {

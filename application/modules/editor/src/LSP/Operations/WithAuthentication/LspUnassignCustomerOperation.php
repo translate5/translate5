@@ -53,8 +53,8 @@ use ZfExtended_NotAuthenticatedException;
 final class LspUnassignCustomerOperation implements LspUnassignCustomerOperationInterface
 {
     /**
-     * @param ActionPermissionAssertInterface<LanguageServiceProvider> $lspActionPermissionAssert
-     * @param ActionPermissionAssertInterface<Customer> $customerActionPermissionAssert
+     * @param ActionPermissionAssertInterface<LspAction, LanguageServiceProvider> $lspActionPermissionAssert
+     * @param ActionPermissionAssertInterface<CustomerAction, Customer> $customerActionPermissionAssert
      */
     public function __construct(
         private readonly LspUnassignCustomerOperationInterface $generalOperation,

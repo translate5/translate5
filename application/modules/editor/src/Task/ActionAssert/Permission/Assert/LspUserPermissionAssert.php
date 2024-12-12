@@ -42,7 +42,7 @@ use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\LspUserHasNoAcces
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 
 /**
- * @implements PermissionAssertInterface<Task>
+ * @implements PermissionAssertInterface<TaskAction, Task>
  */
 final class LspUserPermissionAssert implements PermissionAssertInterface
 {
