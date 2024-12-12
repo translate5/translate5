@@ -41,7 +41,7 @@ use MittagQI\ZfExtended\Acl\SystemResource;
 use ZfExtended_Acl;
 
 /**
- * @implements PermissionAssertInterface<User>
+ * @implements PermissionAssertInterface<UserAction, User>
  */
 final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
 {
@@ -71,7 +71,7 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
     {
         $authUser = $context->actor;
 
-        if ($authUser->getUserGuid() === $object->getUserGuid()) {
+        if ($authUser->getUserGuid() === $object->getUserGuid() && $action === UserAction::Read) {
             return;
         }
 

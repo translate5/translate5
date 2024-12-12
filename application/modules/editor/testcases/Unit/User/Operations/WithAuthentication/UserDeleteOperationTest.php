@@ -39,6 +39,7 @@ use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
 
 class UserDeleteOperationTest extends TestCase
 {
@@ -52,18 +53,22 @@ class UserDeleteOperationTest extends TestCase
 
     private UserDeleteOperation $operation;
 
+    private ZfExtended_Logger $logger;
+
     public function setUp(): void
     {
         $this->userPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
         $this->generalOperation = $this->createMock(UserDeleteOperationInterface::class);
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
+        $this->logger = $this->createMock(ZfExtended_Logger::class);
 
         $this->operation = new UserDeleteOperation(
             $this->userPermissionAssert,
             $this->generalOperation,
             $this->authentication,
             $this->userRepository,
+            $this->logger,
         );
     }
 

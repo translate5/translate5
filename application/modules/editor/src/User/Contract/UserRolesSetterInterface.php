@@ -51,5 +51,5 @@ interface UserRolesSetterInterface
      * @throws Zend_Acl_Exception
      * @throws ZfExtended_ValidateException
      */
-    public function setRoles(User $user, array $roles): void;
+    public function setExpendRolesService(User $user, array $roles): void;
 }

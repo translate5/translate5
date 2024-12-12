@@ -33,23 +33,23 @@ namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\IsEditableForAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
-use xMittagQI\Translate5\ActionAssert\Action;
 
 class IsEditableForAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
-        yield [Action::Update, true];
-        yield [Action::Delete, true];
-        yield [Action::Read, false];
+        yield [UserAction::Update, true];
+        yield [UserAction::Delete, true];
+        yield [UserAction::Read, false];
     }
 
     /**
      * @dataProvider provideSupports
      */
-    public function testSupports(Action $action, bool $expected): void
+    public function testSupports(UserAction $action, bool $expected): void
     {
         $auditor = new IsEditableForAssert();
         $this->assertEquals($expected, $auditor->supports($action));
@@ -77,6 +77,6 @@ class IsEditableForAssertTest extends TestCase
         }
 
         $auditor = new IsEditableForAssert();
-        $auditor->assertGranted($user, $context);
+        $auditor->assertGranted(UserAction::Update, $user, $context);
     }
 }

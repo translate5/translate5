@@ -91,7 +91,7 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
             $user->setLocale($dto->locale);
         }
 
-        if (null !== $dto->password) {
+        if (null !== $dto->password && null !== $dto->password->password) {
             $this->setPassword->setPassword($user, $dto->password->password);
         }
 
@@ -100,6 +100,10 @@ final class UserUpdateOperation implements UserUpdateOperationInterface
         $this->userRepository->save($user);
 
         if (null === $dto->password) {
+            return;
+        }
+
+        if (null === $dto->password->password) {
             $this->resetPasswordEmail->sendTo($user);
         }
     }

@@ -86,7 +86,7 @@ final class UpdateUserRolesOperation implements UpdateUserRolesOperationInterfac
             }
         }
 
-        $this->setRoles->setRoles($user, $roles);
+        $this->setRoles->setExpendRolesService($user, $roles);
 
         $user->validate();
 

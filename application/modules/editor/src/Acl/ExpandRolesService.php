@@ -28,14 +28,34 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\JobAssignment\UserJob\Event;
+namespace MittagQI\Translate5\Acl;
 
-use editor_Models_TaskUserAssoc as UserJob;
+use ZfExtended_Acl;
 
-class UserJobCreatedEvent
+class ExpandRolesService
 {
     public function __construct(
-        public readonly UserJob $userJob
+        private readonly ZfExtended_Acl $acl,
     ) {
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self(
+            ZfExtended_Acl::getInstance(),
+        );
+    }
+
+    /**
+     * @param string[] $newUserRoles
+     * @param string[] $oldUserRoles
+     * @return string[]
+     */
+    public function expandListWithAutoRoles(array $newUserRoles, array $oldUserRoles): array
+    {
+        return $this->acl->mergeAutoSetRoles($newUserRoles, $oldUserRoles);
     }
 }

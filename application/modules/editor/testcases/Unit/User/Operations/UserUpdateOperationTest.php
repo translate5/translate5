@@ -31,11 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
-use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
-use MittagQI\Translate5\User\Contract\UserRolesSetterInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\PasswordDto;
@@ -52,11 +50,7 @@ class UserUpdateOperationTest extends TestCase
 
     private ActionFeasibilityAssertInterface|MockObject $userActionFeasibilityChecker;
 
-    private UserRolesSetterInterface|MockObject $setRoles;
-
     private UserPasswordSetter|MockObject $setPassword;
-
-    private UserAssignCustomersOperationInterface|MockObject $assignCustomers;
 
     private ResetPasswordEmail|MockObject $resetPasswordEmail;
 
@@ -66,17 +60,13 @@ class UserUpdateOperationTest extends TestCase
     {
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->userActionFeasibilityChecker = $this->createMock(ActionFeasibilityAssertInterface::class);
-        $this->setRoles = $this->createMock(UserRolesSetterInterface::class);
         $this->setPassword = $this->createMock(UserPasswordSetter::class);
-        $this->assignCustomers = $this->createMock(UserAssignCustomersOperationInterface::class);
         $this->resetPasswordEmail = $this->createMock(ResetPasswordEmail::class);
 
         $this->operation = new UserUpdateOperation(
             $this->userRepository,
             $this->userActionFeasibilityChecker,
-            $this->setRoles,
             $this->setPassword,
-            $this->assignCustomers,
             $this->resetPasswordEmail,
         );
     }
@@ -257,7 +247,7 @@ class UserUpdateOperationTest extends TestCase
             null,
             null,
             null,
-            password: null,
+            password: new PasswordDto(null),
         );
 
         $this->userActionFeasibilityChecker->expects(self::once())
@@ -290,8 +280,6 @@ class UserUpdateOperationTest extends TestCase
             ->method('assertAllowed')
             ->with(Action::Update, $user);
 
-        $this->setRoles->expects(self::once())->method('setRoles')->with($user, $dto->roles);
-
         $user->expects(self::once())->method('validate');
 
         $this->userRepository->expects(self::once())->method('save')->with($user);
@@ -314,8 +302,6 @@ class UserUpdateOperationTest extends TestCase
         $this->userActionFeasibilityChecker->expects(self::once())
             ->method('assertAllowed')
             ->with(Action::Update, $user);
-
-        $this->assignCustomers->expects(self::once())->method('assignCustomers')->with($user, $dto->customers);
 
         $user->expects(self::once())->method('validate');
 

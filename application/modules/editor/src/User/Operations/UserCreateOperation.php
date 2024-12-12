@@ -124,7 +124,7 @@ final class UserCreateOperation implements UserCreateOperationInterface
         }
 
         try {
-            $this->setRoles->setRoles($user, $dto->roles);
+            $this->setRoles->setExpendRolesService($user, $dto->roles);
             $this->userRepository->save($user);
             $this->assignCustomers->assignCustomers($user, ...$dto->customers);
         } catch (Throwable $e) {

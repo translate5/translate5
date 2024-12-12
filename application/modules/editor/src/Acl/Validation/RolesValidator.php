@@ -35,6 +35,7 @@ use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
 use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRolesetException;
 use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
 use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
+use MittagQI\Translate5\Acl\ExpandRolesService;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
@@ -49,7 +50,7 @@ class RolesValidator
 {
     public function __construct(
         private readonly ZfExtended_Acl $acl,
-        private readonly Roles $roles,
+        private readonly ExpandRolesService $expandRolesService,
         private readonly LspUserRepositoryInterface $lspUserRepository,
     ) {
     }
@@ -61,7 +62,7 @@ class RolesValidator
     {
         return new self(
             ZfExtended_Acl::getInstance(),
-            Roles::create(),
+            ExpandRolesService::create(),
             LspUserRepository::create(),
         );
     }
@@ -139,7 +140,7 @@ class RolesValidator
             }
         }
 
-        $roles = $this->roles->expandListWithAutoRoles($roles, []);
+        $roles = $this->expandRolesService->expandListWithAutoRoles($roles, []);
 
         $hasPrivilegedRoles = ! empty(array_intersect($roles, Roles::getAdminRoles()))
             || ! empty(array_intersect($roles, Roles::getRolesNotRequireClient()));

@@ -31,8 +31,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Validation;
 
 use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
+use MittagQI\Translate5\Acl\ExpandRolesService;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\Validation\RolesValidator;
+use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
@@ -43,11 +45,21 @@ class RolesValidatorTest extends TestCase
 
     private RolesValidator $validator;
 
+    private ExpandRolesService|MockObject $expandRolesService;
+
+    private LspUserRepositoryInterface|MockObject $lspUserRepository;
+
     public function setUp(): void
     {
         $this->acl = $this->createMock(ZfExtended_Acl::class);
+        $this->expandRolesService = $this->createMock(ExpandRolesService::class);
+        $this->lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
 
-        $this->validator = new RolesValidator($this->acl);
+        $this->validator = new RolesValidator(
+            $this->acl,
+            $this->expandRolesService,
+            $this->lspUserRepository,
+        );
     }
 
     public function testNothingHappensOnEmptyRoleList(): void

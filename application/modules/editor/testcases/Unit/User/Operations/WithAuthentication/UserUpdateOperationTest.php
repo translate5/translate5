@@ -40,6 +40,7 @@ use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
 
 class UserUpdateOperationTest extends TestCase
 {
@@ -53,18 +54,22 @@ class UserUpdateOperationTest extends TestCase
 
     private UserUpdateOperation $operation;
 
+    private ZfExtended_Logger $logger;
+
     public function setUp(): void
     {
         $this->userPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
         $this->generalOperation = $this->createMock(UserUpdateOperationInterface::class);
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
+        $this->logger = $this->createMock(ZfExtended_Logger::class);
 
         $this->operation = new UserUpdateOperation(
             $this->userPermissionAssert,
             $this->generalOperation,
             $this->authentication,
             $this->userRepository,
+            $this->logger,
         );
     }
 

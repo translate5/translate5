@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations\Setters;
 
-use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\Acl\ExpandRolesService;
 use MittagQI\Translate5\Acl\Validation\RolesValidator;
 use MittagQI\Translate5\User\Contract\UserRolesSetterInterface;
 use MittagQI\Translate5\User\Model\User;
@@ -39,7 +39,7 @@ final class UserRolesSetter implements UserRolesSetterInterface
 {
     public function __construct(
         private readonly RolesValidator $rolesValidator,
-        private readonly Roles $roles,
+        private readonly ExpandRolesService $expendRolesService,
     ) {
     }
 
@@ -50,15 +50,15 @@ final class UserRolesSetter implements UserRolesSetterInterface
     {
         return new self(
             RolesValidator::create(),
-            Roles::create(),
+            ExpandRolesService::create(),
         );
     }
 
-    public function setRoles(User $user, array $roles): void
+    public function setExpendRolesService(User $user, array $roles): void
     {
         $this->rolesValidator->assertRolesDontConflict($roles);
 
-        $roles = $this->roles->expandListWithAutoRoles($roles, []);
+        $roles = $this->expendRolesService->expandListWithAutoRoles($roles, []);
 
         $this->rolesValidator->assertRolesCanBeSetForUser($roles, $user);
 

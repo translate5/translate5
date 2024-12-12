@@ -28,8 +28,6 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Acl;
 
-use ZfExtended_Acl;
-
 /**
  * Holds additional roles for translate5
  */
@@ -152,31 +150,6 @@ final class Roles
             self::TERMPM,
         ],
     ];
-
-    public function __construct(
-        private readonly ZfExtended_Acl $acl,
-    ) {
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self(
-            ZfExtended_Acl::getInstance(),
-        );
-    }
-
-    /**
-     * @param string[] $newUserRoles
-     * @param string[] $oldUserRoles
-     * @return string[]
-     */
-    public function expandListWithAutoRoles(array $newUserRoles, array $oldUserRoles): array
-    {
-        return $this->acl->mergeAutoSetRoles($newUserRoles, $oldUserRoles);
-    }
 
     public static function getGeneralRoles(): array
     {

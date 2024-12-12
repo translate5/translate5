@@ -72,14 +72,15 @@ class SeeAllUsersPermissionAssertTest extends TestCase
         $manager->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
+        $manager->method('getRoles')->willReturn(['role1', 'role2']);
         $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
 
-        $acl->expects($this->once())
+        $acl->expects(self::once())
             ->method('isInAllowedRoles')
             ->with(
-                ['role1', 'role2'],
+                $manager->getRoles(),
                 'system',
                 'seeAllUsers'
             )
