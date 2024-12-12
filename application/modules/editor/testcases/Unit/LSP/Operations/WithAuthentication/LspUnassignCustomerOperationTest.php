@@ -31,9 +31,10 @@ declare(strict_types=1);
 namespace LSP\Operations\WithAuthentication;
 
 use editor_Models_Customer_Customer;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\Contract\LspUnassignCustomerOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspUnassignCustomerOperation;
@@ -41,6 +42,7 @@ use MittagQI\Translate5\Repository\UserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
 
 class LspUnassignCustomerOperationTest extends TestCase
 {
@@ -56,6 +58,8 @@ class LspUnassignCustomerOperationTest extends TestCase
 
     private LspUnassignCustomerOperation $operation;
 
+    private ZfExtended_Logger $logger;
+
     public function setUp(): void
     {
         $this->generalOperation = $this->createMock(LspUnassignCustomerOperationInterface::class);
@@ -63,6 +67,7 @@ class LspUnassignCustomerOperationTest extends TestCase
         $this->customerPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
+        $this->logger = $this->createMock(ZfExtended_Logger::class);
 
         $this->operation = new LspUnassignCustomerOperation(
             $this->generalOperation,
@@ -70,6 +75,7 @@ class LspUnassignCustomerOperationTest extends TestCase
             $this->customerPermissionAssert,
             $this->authentication,
             $this->userRepository,
+            $this->logger,
         );
     }
 
@@ -80,7 +86,7 @@ class LspUnassignCustomerOperationTest extends TestCase
         $this->lspPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::Update)
+            ->with(LspAction::Update)
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
@@ -99,7 +105,7 @@ class LspUnassignCustomerOperationTest extends TestCase
         $this->customerPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::Read)
+            ->with(CustomerAction::Read)
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
@@ -116,12 +122,12 @@ class LspUnassignCustomerOperationTest extends TestCase
         $this->lspPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::Update);
+            ->with(LspAction::Update);
 
         $this->customerPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::Read);
+            ->with(CustomerAction::Read);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 

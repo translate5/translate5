@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP;
 
-use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
@@ -43,28 +42,28 @@ class JobCoordinatorTest extends TestCase
     {
         yield 'same lsp' => [
             'testUserFromSameLsp' => true,
-            'roles' => ['role1', 'role2'],
+            'isCoordinator' => false,
             'testUserFromSubLsp' => false,
             'expected' => true,
         ];
 
         yield 'different lsp, test user is not coordinator' => [
             'testUserFromSameLsp' => false,
-            'roles' => ['role1', 'role2'],
+            'isCoordinator' => false,
             'testUserFromSubLsp' => false,
             'expected' => false,
         ];
 
         yield 'different lsp, test user is coordinator, user not from sub lsp' => [
             'testUserFromSameLsp' => false,
-            'roles' => ['role1', Roles::JOB_COORDINATOR],
+            'isCoordinator' => true,
             'testUserFromSubLsp' => false,
             'expected' => false,
         ];
 
         yield 'different lsp, test user is coordinator, user from sub lsp' => [
             'testUserFromSameLsp' => false,
-            'roles' => ['role1', Roles::JOB_COORDINATOR],
+            'isCoordinator' => true,
             'testUserFromSubLsp' => true,
             'expected' => true,
         ];
@@ -73,8 +72,12 @@ class JobCoordinatorTest extends TestCase
     /**
      * @dataProvider lspDataProvider
      */
-    public function testIsSupervisorOf(bool $testUserFromSameLsp, array $roles, bool $testUserFromSubLsp, bool $expected): void
-    {
+    public function testIsSupervisorOf(
+        bool $testUserFromSameLsp,
+        bool $isCoordinator,
+        bool $testUserFromSubLsp,
+        bool $expected
+    ): void {
         $coordinatorUser = $this->createMock(User::class);
         $coordinatorLsp = $this->createMock(LanguageServiceProvider::class);
         $coordinatorLsp->method('same')->willReturn($testUserFromSameLsp);
@@ -85,7 +88,7 @@ class JobCoordinatorTest extends TestCase
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
-        $user->method('getRoles')->willReturn($roles);
+        $user->method('isCoordinator')->willReturn($isCoordinator);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->method('isSubLspOf')->willReturn($testUserFromSubLsp);

@@ -88,7 +88,7 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
                 'E1678',
                 'Missing {param} parameter for batch update',
                 [
-                    'param' => 'deadlineDate'
+                    'param' => 'deadlineDate',
                 ]
             );
 
@@ -100,7 +100,7 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
                 'E1678',
                 'Missing {param} parameter for batch update',
                 [
-                    'param' => empty($workflow) ? 'batchWorkflow' : 'batchWorkflowStep'
+                    'param' => empty($workflow) ? 'batchWorkflow' : 'batchWorkflowStep',
                 ]
             );
 

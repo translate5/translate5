@@ -30,60 +30,51 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RuleBasedReadPermissionAssert;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\Asserts\RoleBasedPermissionAssert;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 
-class RuleBasedReadPermissionAssertTest extends TestCase
+class RuleBasedPermissionAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
-        yield [Action::Delete, false];
-        yield [Action::Update, false];
-        yield [Action::Read, true];
-        yield [Action::Create, false];
+        yield [LspAction::Delete, true];
+        yield [LspAction::Update, true];
+        yield [LspAction::Read, true];
     }
 
     /**
      * @dataProvider provideSupports
      */
-    public function testSupports(Action $action, bool $expected): void
+    public function testSupports(LspAction $action, bool $expected): void
     {
-        $assert = new RuleBasedReadPermissionAssert(
+        $assert = new RoleBasedPermissionAssert(
             $this->createMock(JobCoordinatorRepository::class)
         );
         $this->assertEquals($expected, $assert->supports($action));
     }
 
-    public function provideAssertGrantedAdmin(): iterable
-    {
-        yield [[Roles::ADMIN]];
-        yield [[Roles::SYSTEMADMIN]];
-    }
-
-    /**
-     * @dataProvider provideAssertGrantedAdmin
-     */
-    public function testAssertGrantedAdmin(array $roles): void
+    public function testAssertGrantedAdmin(): void
     {
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $manager->expects(self::once())->method('getRoles')->willReturn($roles);
+        $manager->method('isAdmin')->willReturn(true);
 
-        $assert = new RuleBasedReadPermissionAssert(
+        $assert = new RoleBasedPermissionAssert(
             $this->createMock(JobCoordinatorRepository::class)
         );
 
-        $assert->assertGranted($lsp, $context);
+        $assert->assertGranted(LspAction::Update, $lsp, $context);
+
+        self::assertTrue(true);
     }
 
     public function isDirectLspProvider(): array
@@ -105,16 +96,16 @@ class RuleBasedReadPermissionAssertTest extends TestCase
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $manager->method('getRoles')->willReturn([Roles::PM]);
+        $manager->method('isPm')->willReturn(true);
 
         if (! $isDirectLsp) {
             $this->expectException(NoAccessException::class);
         }
 
-        $assert = new RuleBasedReadPermissionAssert(
+        $assert = new RoleBasedPermissionAssert(
             $this->createMock(JobCoordinatorRepository::class)
         );
-        $assert->assertGranted($lsp, $context);
+        $assert->assertGranted(LspAction::Update, $lsp, $context);
     }
 
     public function testAssertNotGrantedIfNotAdminOrPmAndNotCoordinator(): void
@@ -123,20 +114,19 @@ class RuleBasedReadPermissionAssertTest extends TestCase
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $manager->method('getRoles')->willReturn(['some-role']);
+        $manager->method('isAdmin')->willReturn(false);
+        $manager->method('isPm')->willReturn(false);
+        $manager->method('isCoordinator')->willReturn(false);
 
         $jsRepo = $this->createMock(JobCoordinatorRepository::class);
-        $jsRepo->expects($this->once())
-            ->method('findByUser')
-            ->willReturn(null);
 
         $this->expectException(NoAccessException::class);
 
-        $assert = new RuleBasedReadPermissionAssert($jsRepo);
-        $assert->assertGranted($lsp, $context);
+        $assert = new RoleBasedPermissionAssert($jsRepo);
+        $assert->assertGranted(LspAction::Update, $lsp, $context);
     }
 
-    public function testAssertGrantedToLspOfCoordinator(): void
+    public function testAssertNotGrantedMutationToLspOfCoordinator(): void
     {
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->expects(self::once())->method('same')->willReturn(true);
@@ -144,7 +134,9 @@ class RuleBasedReadPermissionAssertTest extends TestCase
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $manager->method('getRoles')->willReturn(['some-role']);
+        $manager->method('isAdmin')->willReturn(false);
+        $manager->method('isPm')->willReturn(false);
+        $manager->method('isCoordinator')->willReturn(true);
 
         $coordinator = new JobCoordinator(
             'guid',
@@ -157,8 +149,39 @@ class RuleBasedReadPermissionAssertTest extends TestCase
             ->method('findByUser')
             ->willReturn($coordinator);
 
-        $assert = new RuleBasedReadPermissionAssert($jsRepo);
-        $assert->assertGranted($lsp, $context);
+        $this->expectException(NoAccessException::class);
+
+        $assert = new RoleBasedPermissionAssert($jsRepo);
+        $assert->assertGranted(LspAction::Update, $lsp, $context);
+    }
+
+    public function testAssertGrantedReadToLspOfCoordinator(): void
+    {
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $lsp->expects(self::once())->method('same')->willReturn(true);
+
+        $manager = $this->createMock(User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $manager->method('isAdmin')->willReturn(false);
+        $manager->method('isPm')->willReturn(false);
+        $manager->method('isCoordinator')->willReturn(true);
+
+        $coordinator = new JobCoordinator(
+            'guid',
+            $this->createMock(User::class),
+            $lsp
+        );
+
+        $jsRepo = $this->createMock(JobCoordinatorRepository::class);
+        $jsRepo->expects($this->once())
+            ->method('findByUser')
+            ->willReturn($coordinator);
+
+        $assert = new RoleBasedPermissionAssert($jsRepo);
+        $assert->assertGranted(LspAction::Read, $lsp, $context);
+
+        self::assertTrue(true);
     }
 
     public function testAssertGrantedToSubLspOfCoordinator(): void
@@ -169,7 +192,9 @@ class RuleBasedReadPermissionAssertTest extends TestCase
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $manager->method('getRoles')->willReturn(['some-role']);
+        $manager->method('isAdmin')->willReturn(false);
+        $manager->method('isPm')->willReturn(false);
+        $manager->method('isCoordinator')->willReturn(true);
 
         $coordinatorLsp = $this->createMock(LanguageServiceProvider::class);
         $coordinatorLsp->expects(self::once())->method('same')->willReturn(false);
@@ -184,7 +209,7 @@ class RuleBasedReadPermissionAssertTest extends TestCase
             ->method('findByUser')
             ->willReturn($coordinator);
 
-        $assert = new RuleBasedReadPermissionAssert($jsRepo);
-        $assert->assertGranted($lsp, $context);
+        $assert = new RoleBasedPermissionAssert($jsRepo);
+        $assert->assertGranted(LspAction::Update, $lsp, $context);
     }
 }

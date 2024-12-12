@@ -31,8 +31,8 @@ declare(strict_types=1);
 namespace Customer\ActionAssert\Permission;
 
 use editor_Models_Customer_Customer as Customer;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\Permission\AssignedCustomerAssert;
 use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
 use MittagQI\Translate5\User\Model\User;
@@ -42,16 +42,16 @@ class AssignedCustomerAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
-        yield [Action::Delete, true];
-        yield [Action::Update, true];
-        yield [Action::Read, true];
-        yield [Action::Create, false];
+        yield [CustomerAction::Delete, true];
+        yield [CustomerAction::Update, true];
+        yield [CustomerAction::Read, true];
+        yield [CustomerAction::DefaultJob, true];
     }
 
     /**
      * @dataProvider provideSupports
      */
-    public function testSupports(Action $action, bool $expected): void
+    public function testSupports(CustomerAction $action, bool $expected): void
     {
         $lspPermissionAuditor = new AssignedCustomerAssert();
         $this->assertEquals($expected, $lspPermissionAuditor->supports($action));
@@ -70,7 +70,7 @@ class AssignedCustomerAssertTest extends TestCase
             ->method('getCustomersArray');
 
         $lspPermissionAuditor = new AssignedCustomerAssert();
-        $lspPermissionAuditor->assertGranted($customer, $context);
+        $lspPermissionAuditor->assertGranted(CustomerAction::Update, $customer, $context);
     }
 
     public function testAssertGranted(): void
@@ -91,7 +91,7 @@ class AssignedCustomerAssertTest extends TestCase
             ->willReturn([2, 3, 4]);
 
         $lspPermissionAuditor = new AssignedCustomerAssert();
-        $lspPermissionAuditor->assertGranted($customer, $context);
+        $lspPermissionAuditor->assertGranted(CustomerAction::Update, $customer, $context);
     }
 
     public function testAccessNotGranted(): void
@@ -115,6 +115,6 @@ class AssignedCustomerAssertTest extends TestCase
 
         $lspPermissionAuditor = new AssignedCustomerAssert();
 
-        $lspPermissionAuditor->assertGranted($customer, $context);
+        $lspPermissionAuditor->assertGranted(CustomerAction::Update, $customer, $context);
     }
 }

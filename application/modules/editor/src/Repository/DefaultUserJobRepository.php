@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_Task as Task;
 use editor_Models_Db_UserAssocDefault as DefaultUserJobTable;
+use editor_Models_Task as Task;
 use editor_Models_UserAssocDefault as DefaultUserJob;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\Db\DefaultLspJobTable;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultUserJobAlreadyExistsException;
@@ -180,7 +180,7 @@ class DefaultUserJobRepository
         $select = $this->db
             ->select()
             ->from([
-                'defaultUserJob' => DefaultUserJobTable::TABLE_NAME
+                'defaultUserJob' => DefaultUserJobTable::TABLE_NAME,
             ])
             ->joinLeft(
                 [

@@ -61,15 +61,19 @@ class LastCoordinatorFeasibilityAssertTest extends TestCase
     public function testAssertAllowedNotCoordinator(): void
     {
         $user = $this->createMock(User::class);
+        $lsp = $this->createMock(LanguageServiceProvider::class);
+
+        $coordinator = new JobCoordinator('lsp', $user, $lsp);
 
         $coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
-        $coordinatorRepository->expects($this->once())
-            ->method('findByUser')
-            ->with($this->callback(fn (object $provided) => $provided === $user))
-            ->willReturn(null);
+        $coordinatorRepository
+            ->method('getCoordinatorsCount')
+            ->willReturn(2);
 
         $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($coordinatorRepository);
-        $lspPermissionAuditor->assertAllowed($user);
+        $lspPermissionAuditor->assertAllowed($coordinator);
+
+        self::assertTrue(true);
     }
 
     public function testAssertAllowedLastCoordinator(): void
@@ -77,22 +81,15 @@ class LastCoordinatorFeasibilityAssertTest extends TestCase
         $user = $this->createMock(User::class);
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
-        $coordinator = $this->getMockBuilder(JobCoordinator::class)
-            ->setConstructorArgs(['lsp', $user, $lsp])
-            ->getMock();
+        $coordinator = new JobCoordinator('lsp', $user, $lsp);
 
         $coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
-        $coordinatorRepository->expects($this->once())
-            ->method('findByUser')
-            ->with($this->callback(fn (object $provided) => $provided === $user))
-            ->willReturn($coordinator);
-        $coordinatorRepository->expects($this->once())
+        $coordinatorRepository
             ->method('getCoordinatorsCount')
-            ->with($this->callback(fn (object $provided) => $provided === $lsp))
             ->willReturn(1);
 
         $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($coordinatorRepository);
         $this->expectException(LastCoordinatorException::class);
-        $lspPermissionAuditor->assertAllowed($user);
+        $lspPermissionAuditor->assertAllowed($coordinator);
     }
 }

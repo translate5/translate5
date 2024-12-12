@@ -30,35 +30,32 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\SeeAllUsersPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
-use ZfExtended_AuthenticationInterface;
 
-class ParentPermissionAssertTest extends TestCase
+class SeeAllUsersPermissionAssertTest extends TestCase
 {
     public function provideSupports(): iterable
     {
-        yield [Action::Delete, true];
-        yield [Action::Update, true];
-        yield [Action::Read, true];
-        yield [Action::Create, false];
+        yield [UserAction::Delete, true];
+        yield [UserAction::Update, true];
+        yield [UserAction::Read, true];
     }
 
     /**
      * @dataProvider provideSupports
      */
-    public function testSupports(Action $action, bool $expected): void
+    public function testSupports(UserAction $action, bool $expected): void
     {
         $auditor = new SeeAllUsersPermissionAssert(
             $this->createMock(ZfExtended_Acl::class),
-            $this->createMock(ZfExtended_AuthenticationInterface::class),
             $this->createMock(LspUserRepositoryInterface::class)
         );
         $this->assertEquals($expected, $auditor->supports($action));
@@ -78,7 +75,6 @@ class ParentPermissionAssertTest extends TestCase
         $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
-        $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
 
         $acl->expects($this->once())
             ->method('isInAllowedRoles')
@@ -89,15 +85,11 @@ class ParentPermissionAssertTest extends TestCase
             )
             ->willReturn(true);
 
-        $authentication->expects($this->once())
-            ->method('getUserRoles')
-            ->willReturn(['role1', 'role2']);
-
         $lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
         $lspUserRepository->method('findByUser')->willReturn(null);
 
-        $auditor = new SeeAllUsersPermissionAssert($acl, $authentication, $lspUserRepository);
-        $auditor->assertGranted($user, $context);
+        $auditor = new SeeAllUsersPermissionAssert($acl, $lspUserRepository);
+        $auditor->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedSameUser(): void
@@ -109,15 +101,14 @@ class ParentPermissionAssertTest extends TestCase
         $context = new PermissionAssertContext($authUser);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
-        $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
 
         $acl->expects($this->never())->method('isInAllowedRoles');
 
         $lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
         $lspUserRepository->method('findByUser')->willReturn(null);
 
-        $auditor = new SeeAllUsersPermissionAssert($acl, $authentication, $lspUserRepository);
-        $auditor->assertGranted($authUser, $context);
+        $auditor = new SeeAllUsersPermissionAssert($acl, $lspUserRepository);
+        $auditor->assertGranted(UserAction::Read, $authUser, $context);
     }
 
     public function testAssertGrantedOnLspUser(): void
@@ -127,7 +118,6 @@ class ParentPermissionAssertTest extends TestCase
         $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
-        $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
 
         $acl->expects($this->once())
             ->method('isInAllowedRoles')
@@ -143,8 +133,8 @@ class ParentPermissionAssertTest extends TestCase
         $lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
         $lspUserRepository->method('findByUser')->willReturn($this->createMock(LspUser::class));
 
-        $auditor = new SeeAllUsersPermissionAssert($acl, $authentication, $lspUserRepository);
-        $auditor->assertGranted($user, $context);
+        $auditor = new SeeAllUsersPermissionAssert($acl, $lspUserRepository);
+        $auditor->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedNoAccess(): void
@@ -154,7 +144,6 @@ class ParentPermissionAssertTest extends TestCase
         $context = new PermissionAssertContext($manager);
 
         $acl = $this->createMock(ZfExtended_Acl::class);
-        $authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
 
         $acl->expects($this->once())
             ->method('isInAllowedRoles')
@@ -170,8 +159,8 @@ class ParentPermissionAssertTest extends TestCase
         $lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
         $lspUserRepository->method('findByUser')->willReturn(null);
 
-        $auditor = new SeeAllUsersPermissionAssert($acl, $authentication, $lspUserRepository);
+        $auditor = new SeeAllUsersPermissionAssert($acl, $lspUserRepository);
         $this->expectException(NoAccessException::class);
-        $auditor->assertGranted($user, $context);
+        $auditor->assertGranted(UserAction::Update, $user, $context);
     }
 }

@@ -93,7 +93,7 @@ class DeleteLspJobOperation implements DeleteLspJobOperationInterface
     {
         try {
             $authUser = $this->userRepository->get($this->authentication->getUserId());
-            $dataJob = $this->userJobRepository->getDataJobByLspJob((int)$job->getId());
+            $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $job->getId());
 
             $this->permissionAssert->assertGranted(
                 Action::Delete,

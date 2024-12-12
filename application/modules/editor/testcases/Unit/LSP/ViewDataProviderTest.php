@@ -30,18 +30,21 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP;
 
+use BackedEnum;
 use editor_Models_Customer_Customer;
 use Exception;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\LspViewDataProvider;
+use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -117,7 +120,7 @@ class ViewDataProviderTest extends TestCase
         $this->lspPermissionAssert
             ->method('assertGranted')
             ->with(
-                self::isInstanceOf(Action::class),
+                self::isInstanceOf(LspAction::class),
                 self::callback(
                     fn ($lsp) => $lsp === $lsp1 ? throw $permissionException : true
                 ),
@@ -126,7 +129,9 @@ class ViewDataProviderTest extends TestCase
 
         $viewer = $this->createMock(User::class);
 
-        self::assertCount(1, $this->viewDataProvider->getViewListFor($viewer));
+        $users = $this->viewDataProvider->getViewListFor($viewer);
+
+        self::assertCount(1, $users);
         self::assertEquals(
             [
                 'id' => (int) $lsp2->getId(),
@@ -139,7 +144,7 @@ class ViewDataProviderTest extends TestCase
                 'customers' => [],
                 'parentId' => null,
             ],
-            $this->viewDataProvider->getViewListFor($viewer)[0]
+            $users[0]
         );
     }
 
@@ -172,7 +177,7 @@ class ViewDataProviderTest extends TestCase
         $this->userActionPermissionAssert
             ->method('assertGranted')
             ->with(
-                self::isInstanceOf(Action::class),
+                self::isInstanceOf(UserAction::class),
                 self::callback(
                     fn ($user) => $user === $user3 ? throw $permissionException : true
                 ),
@@ -195,7 +200,7 @@ class ViewDataProviderTest extends TestCase
         $this->customerActionPermissionAssert
             ->method('assertGranted')
             ->with(
-                self::isInstanceOf(Action::class),
+                self::isInstanceOf(CustomerAction::class),
                 self::callback(
                     fn ($customer) => $customer === $customer3 ? throw $permissionException : true
                 ),
@@ -211,16 +216,20 @@ class ViewDataProviderTest extends TestCase
 
         $lspPermissionAssert = new class() implements ActionPermissionAssertInterface {
             public function assertGranted(
-                Action $action,
+                \BackedEnum $action,
                 object $object,
                 PermissionAssertContext $context,
             ): void {
-                if ($action === Action::Read) {
+                if ($action === LspAction::Read) {
                     return;
                 }
 
                 throw new class() extends Exception implements PermissionExceptionInterface {
                 };
+            }
+
+            public function isGranted(BackedEnum $action, object $object, PermissionAssertContext $context): bool
+            {
             }
         };
 

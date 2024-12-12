@@ -58,6 +58,7 @@ use ZfExtended_Models_Entity_Abstract;
 
 /**
  * @method string getId()
+ * @method void setId(int $id)
  * @method string getName()
  * @method void setName(string $name)
  * @method string getDescription()

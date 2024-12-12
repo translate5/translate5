@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\LSP;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
@@ -42,6 +43,7 @@ use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 
 /**
@@ -111,7 +113,8 @@ class LspViewDataProvider
      */
     public function buildViewData(User $viewer, LanguageServiceProvider $lsp): array
     {
-        $this->lspPermissionAssert->assertGranted(LspAction::Read, $lsp, new PermissionAssertContext($viewer));
+        $context = new PermissionAssertContext($viewer);
+        $this->lspPermissionAssert->assertGranted(LspAction::Read, $lsp, $context);
 
         $coordinators = $this->jobCoordinatorRepository->getByLsp($lsp);
         /**
@@ -135,9 +138,9 @@ class LspViewDataProvider
         foreach ($users as $user) {
             try {
                 $this->userActionPermissionAssert->assertGranted(
-                    LspAction::Read,
+                    UserAction::Read,
                     $user,
-                    new PermissionAssertContext($viewer)
+                    $context
                 );
 
                 $usersData[] = [
@@ -158,7 +161,7 @@ class LspViewDataProvider
         foreach ($customers as $customer) {
             try {
                 $this->customerActionPermissionAssert->assertGranted(
-                    LspAction::Read,
+                    CustomerAction::Read,
                     $customer,
                     new PermissionAssertContext($viewer)
                 );

@@ -34,15 +34,21 @@ use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 
 /**
+ * @template A of BackedEnum
  * @template T of object
  */
 interface ActionPermissionAssertInterface
 {
     /**
+     * @param A $action
      * @param T $object
      * @throws PermissionExceptionInterface
      */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void;
 
+    /**
+     * @param A $action
+     * @param T $object
+     */
     public function isGranted(BackedEnum $action, object $object, PermissionAssertContext $context): bool;
 }

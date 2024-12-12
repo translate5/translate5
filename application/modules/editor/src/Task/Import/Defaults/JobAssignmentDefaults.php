@@ -159,7 +159,7 @@ class JobAssignmentDefaults implements ITaskDefaults
         if (null !== $lspUser) {
             try {
                 $lspJob = $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
-                    (int)$lspUser->lsp->getId(),
+                    (int) $lspUser->lsp->getId(),
                     $task->getTaskGuid(),
                     $defaultUserJob->getWorkflow(),
                     $defaultUserJob->getWorkflowStepName(),
@@ -189,7 +189,8 @@ class JobAssignmentDefaults implements ITaskDefaults
             ];
             $taskConfig->updateInsertConfig(
                 $task->getTaskGuid(),
-                implode('.', $name), $defaultUserJob->getDeadlineDate()
+                implode('.', $name),
+                $defaultUserJob->getDeadlineDate()
             );
         }
 
@@ -234,7 +235,7 @@ class JobAssignmentDefaults implements ITaskDefaults
             ->defaultDeadlineDate ?? 0;
 
         if ($configValue > 0) {
-            return editor_Utils::addBusinessDays((string)$task->getOrderdate(), $configValue);
+            return editor_Utils::addBusinessDays((string) $task->getOrderdate(), $configValue);
         }
 
         return null;

@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Validation;
 
 use editor_Models_Task as Task;
 use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirmedLspJobYetException;
 use MittagQI\Translate5\Repository\UserJobRepository;
 

@@ -32,9 +32,9 @@ namespace MittagQI\Translate5\Task\Import;
 use editor_Models_Task;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Task\Import\Defaults\ITaskDefaults;
+use MittagQI\Translate5\Task\Import\Defaults\JobAssignmentDefaults;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\Import\Defaults\PivotResourceDefaults;
-use MittagQI\Translate5\Task\Import\Defaults\JobAssignmentDefaults;
 
 class TaskDefaults
 {

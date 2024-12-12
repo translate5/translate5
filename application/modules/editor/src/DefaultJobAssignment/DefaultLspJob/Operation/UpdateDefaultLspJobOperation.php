@@ -80,7 +80,7 @@ class UpdateDefaultLspJobOperation implements UpdateDefaultLspJobOperationInterf
                 throw new OnlyCoordinatorCanBeAssignedToLspJobException();
             }
 
-            if ((int)$job->getLspId() !== (int)$coordinator->lsp->getId()) {
+            if ((int) $job->getLspId() !== (int) $coordinator->lsp->getId()) {
                 throw new CoordinatorDontBelongToLspException();
             }
 

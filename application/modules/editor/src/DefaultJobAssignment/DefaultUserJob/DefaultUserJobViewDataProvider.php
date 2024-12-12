@@ -38,8 +38,6 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\ActionAssert\Permiss
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\Repository\DefaultLspJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
-use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Model\User;
 
 /**

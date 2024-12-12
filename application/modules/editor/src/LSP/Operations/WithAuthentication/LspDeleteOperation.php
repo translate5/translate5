@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LSP\Operations\WithAuthentication;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Contract\LspDeleteOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
@@ -73,7 +73,7 @@ final class LspDeleteOperation implements LspDeleteOperationInterface
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
         try {
-            $this->permissionAssert->assertGranted(Action::Delete, $lsp, new PermissionAssertContext($authUser));
+            $this->permissionAssert->assertGranted(LspAction::Delete, $lsp, new PermissionAssertContext($authUser));
 
             $this->logger->info(
                 'E1637',

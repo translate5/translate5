@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\LSP\Validation;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -78,11 +77,6 @@ class LspCustomerAssociationValidatorTest extends TestCase
      */
     public function testAssertCustomersAreSubsetForLSP(array $customers, array $lspCustomers, bool $valid): void
     {
-        $lsp = $this->createMock(LanguageServiceProvider::class);
-        $lsp->method('__call')->willReturnMap([
-            ['getId', [], '17'],
-        ]);
-
         $this->lspRepository->method('getCustomerIds')->willReturn($lspCustomers);
 
         if ($valid) {
@@ -91,6 +85,6 @@ class LspCustomerAssociationValidatorTest extends TestCase
             $this->expectException(CustomerDoesNotBelongToLspException::class);
         }
 
-        $this->validator->assertCustomersAreSubsetForLSP($lsp, ...$customers);
+        $this->validator->assertCustomersAreSubsetForLSP(17, ...$customers);
     }
 }

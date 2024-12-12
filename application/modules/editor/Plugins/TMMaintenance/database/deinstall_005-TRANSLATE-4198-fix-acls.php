@@ -32,7 +32,7 @@ README: deinstall_005-TRANSLATE-4198-fix-acls
 DESCRIPTION WHAT THIS SCRIPT DOES!
  */
 
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\Acl\Roles;
 
 set_time_limit(0);
 

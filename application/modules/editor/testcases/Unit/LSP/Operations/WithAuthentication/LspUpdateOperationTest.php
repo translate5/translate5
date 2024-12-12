@@ -30,17 +30,19 @@ declare(strict_types=1);
 
 namespace LSP\Operations\WithAuthentication;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\Contract\LspUpdateOperationInterface;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LSP\Operations\DTO\UpdateLspDto;
 use MittagQI\Translate5\LSP\Operations\WithAuthentication\LspUpdateOperation;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_Logger;
 
 class LspUpdateOperationTest extends TestCase
 {
@@ -54,18 +56,22 @@ class LspUpdateOperationTest extends TestCase
 
     private LspUpdateOperation $operation;
 
+    private ZfExtended_Logger $logger;
+
     public function setUp(): void
     {
         $this->lspPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
         $this->generalOperation = $this->createMock(LspUpdateOperationInterface::class);
         $this->authentication = $this->createMock(ZfExtended_AuthenticationInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
+        $this->logger = $this->createMock(ZfExtended_Logger::class);
 
         $this->operation = new LspUpdateOperation(
             $this->generalOperation,
             $this->lspPermissionAssert,
             $this->authentication,
             $this->userRepository,
+            $this->logger,
         );
     }
 
@@ -76,12 +82,14 @@ class LspUpdateOperationTest extends TestCase
         $this->lspPermissionAssert
             ->expects(self::once())
             ->method('assertGranted')
-            ->with(Action::Update)
+            ->with(LspAction::Update)
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
-        $this->operation->updateLsp($lsp, 'name', 'description');
+        $dto = new UpdateLspDto('name', 'description');
+
+        $this->operation->updateLsp($lsp, $dto);
     }
 
     public function testUpdateLsp(): void
@@ -92,12 +100,14 @@ class LspUpdateOperationTest extends TestCase
 
         $this->userRepository->expects(self::once())->method('get')->with(1)->willReturn($authUser);
 
-        $this->lspPermissionAssert->expects(self::once())->method('assertGranted')->with(Action::Update);
+        $this->lspPermissionAssert->expects(self::once())->method('assertGranted')->with(LspAction::Update);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
 
         $this->generalOperation->expects(self::once())->method('updateLsp')->with($lsp);
 
-        $this->operation->updateLsp($lsp, 'name', 'description');
+        $dto = new UpdateLspDto('name', 'description');
+
+        $this->operation->updateLsp($lsp, $dto);
     }
 }

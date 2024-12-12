@@ -30,11 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\ActionAssert\Permission;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 
@@ -48,14 +48,40 @@ class UserActionPermissionAssertTest extends TestCase
 
         $permissionAuditorMock1 = $this->createMock(PermissionAssertInterface::class);
         $permissionAuditorMock1->expects($this->once())->method('supports')->willReturn(true);
-        $permissionAuditorMock1->expects($this->once())->method('assertGranted')->with($user, $context);
+        $permissionAuditorMock1
+            ->expects($this->once())
+            ->method('assertGranted')
+            ->with(UserAction::Delete, $user, $context)
+        ;
 
         $permissionAuditorMock2 = $this->createMock(PermissionAssertInterface::class);
         $permissionAuditorMock2->expects($this->once())->method('supports')->willReturn(false);
         $permissionAuditorMock2->expects($this->never())->method('assertGranted');
 
         $auditor = new UserActionPermissionAssert([$permissionAuditorMock1, $permissionAuditorMock2]);
-        $auditor->assertGranted(Action::Delete, $user, $context);
+        $auditor->assertGranted(UserAction::Delete, $user, $context);
+    }
+
+    public function testIsGranted(): void
+    {
+        $user = $this->createMock(User::class);
+        $manager = $this->createMock(User::class);
+        $context = new PermissionAssertContext($manager);
+
+        $permissionAuditorMock1 = $this->createMock(PermissionAssertInterface::class);
+        $permissionAuditorMock1->expects($this->once())->method('supports')->willReturn(true);
+        $permissionAuditorMock1
+            ->expects($this->once())
+            ->method('assertGranted')
+            ->with(UserAction::Delete, $user, $context)
+        ;
+
+        $permissionAuditorMock2 = $this->createMock(PermissionAssertInterface::class);
+        $permissionAuditorMock2->expects($this->once())->method('supports')->willReturn(false);
+        $permissionAuditorMock2->expects($this->never())->method('assertGranted');
+
+        $auditor = new UserActionPermissionAssert([$permissionAuditorMock1, $permissionAuditorMock2]);
+        $auditor->isGranted(UserAction::Delete, $user, $context);
     }
 
     public function testAssertGrantedException(): void
@@ -65,15 +91,14 @@ class UserActionPermissionAssertTest extends TestCase
         $context = new PermissionAssertContext($manager);
 
         $permissionAuditorMock = $this->createMock(PermissionAssertInterface::class);
-        $permissionAuditorMock->expects($this->once())
+        $permissionAuditorMock
             ->method('assertGranted')
-            ->with($user, $context)
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
         $permissionAuditorMock->expects($this->once())->method('supports')->willReturn(true);
 
         $auditor = new UserActionPermissionAssert([$permissionAuditorMock]);
 
         $this->expectException(PermissionExceptionInterface::class);
-        $auditor->assertGranted(Action::Delete, $user, $context);
+        $auditor->assertGranted(UserAction::Delete, $user, $context);
     }
 }

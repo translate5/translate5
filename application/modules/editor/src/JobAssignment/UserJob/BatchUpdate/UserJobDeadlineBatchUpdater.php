@@ -52,14 +52,13 @@ class UserJobDeadlineBatchUpdater
         );
     }
 
-    /**
-     * @param int[] $tuas
-     */
     public function updateDeadlines(array $jobIds, string $newDeadlineDate): void
     {
         $this->db->update(
             editor_Models_Db_TaskUserAssoc::TABLE_NAME,
-            ['deadlineDate' => $newDeadlineDate],
+            [
+                'deadlineDate' => $newDeadlineDate,
+            ],
             $this->db->quoteInto('id IN (?)', $jobIds)
         );
 

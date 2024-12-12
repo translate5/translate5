@@ -42,7 +42,7 @@ use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 
 /**
- * @implements PermissionAssertInterface<User>
+ * @implements PermissionAssertInterface<UserAction, User>
  */
 final class LspUserAccessPermissionAssert implements PermissionAssertInterface
 {
@@ -68,18 +68,9 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
         return in_array($action, [UserAction::Update, UserAction::Delete, UserAction::Read], true);
     }
 
-    /**
-     * Restrict access to LSP users
-     *
-     * {@inheritDoc}
-     */
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $authUser = $context->actor;
-
-        if ($authUser->getId() === $object->getId()) {
-            return;
-        }
 
         if ($authUser->isAdmin()) {
             return;
@@ -97,6 +88,10 @@ final class LspUserAccessPermissionAssert implements PermissionAssertInterface
             }
 
             throw new NotAccessibleLspUserException($lspUser);
+        }
+
+        if ($authUser->getUserGuid() === $object->getUserGuid() && UserAction::Read === $action) {
+            return;
         }
 
         $authCoordinator = $this->coordinatorRepository->findByUser($authUser);

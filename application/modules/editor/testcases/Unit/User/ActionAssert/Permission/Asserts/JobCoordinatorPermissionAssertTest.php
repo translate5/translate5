@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
@@ -39,6 +38,7 @@ use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\JobCoordinatorPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -64,16 +64,15 @@ class JobCoordinatorPermissionAssertTest extends TestCase
 
     public function provideSupports(): iterable
     {
-        yield [Action::Delete, true];
-        yield [Action::Update, true];
-        yield [Action::Read, true];
-        yield [Action::Create, true];
+        yield [UserAction::Delete, true];
+        yield [UserAction::Update, true];
+        yield [UserAction::Read, true];
     }
 
     /**
      * @dataProvider provideSupports
      */
-    public function testSupports(Action $action, bool $expected): void
+    public function testSupports(UserAction $action, bool $expected): void
     {
         $this->assertEquals($expected, $this->assert->supports($action));
     }
@@ -89,7 +88,7 @@ class JobCoordinatorPermissionAssertTest extends TestCase
 
         $this->coordinatorRepository->expects(self::never())->method('findByUser');
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedWhenAuthUserIsNotCoordinator(): void
@@ -111,7 +110,7 @@ class JobCoordinatorPermissionAssertTest extends TestCase
 
         $this->coordinatorRepository->method('findByUser')->willReturn(null);
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertNotGrantedWhenAuthUserIsCoordinatorAndUserNotLspUser(): void
@@ -134,7 +133,7 @@ class JobCoordinatorPermissionAssertTest extends TestCase
         $this->coordinatorRepository->method('findByUser')->willReturn($this->createMock(JobCoordinator::class));
 
         $this->expectException(NoAccessToUserException::class);
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertNotGrantedWhenAuthCoordinatorIsNotSupervisorOfLspUser(): void
@@ -162,6 +161,6 @@ class JobCoordinatorPermissionAssertTest extends TestCase
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
         $this->expectException(NoAccessToUserException::class);
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 }

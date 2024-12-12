@@ -30,8 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\LSP\JobCoordinator;
 use MittagQI\Translate5\LSP\JobCoordinatorRepository;
@@ -40,6 +38,7 @@ use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -65,30 +64,20 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
     public function provideSupports(): iterable
     {
-        yield [Action::Delete, true];
-        yield [Action::Update, true];
-        yield [Action::Read, true];
-        yield [Action::Create, false];
+        yield [UserAction::Delete, true];
+        yield [UserAction::Update, true];
+        yield [UserAction::Read, true];
     }
 
     /**
      * @dataProvider provideSupports
      */
-    public function testSupports(Action $action, bool $expected): void
+    public function testSupports(UserAction $action, bool $expected): void
     {
         $this->assertEquals($expected, $this->assert->supports($action));
     }
 
-    public function provideAssertGrantedAdmin(): iterable
-    {
-        yield [[Roles::ADMIN]];
-        yield [[Roles::SYSTEMADMIN]];
-    }
-
-    /**
-     * @dataProvider provideAssertGrantedAdmin
-     */
-    public function testAssertGrantedAdmin(array $roles): void
+    public function testAssertGrantedAdmin(): void
     {
         $user = $this->createMock(User::class);
         $user->method('__call')->willReturnMap([
@@ -99,13 +88,13 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $manager->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('getRoles')->willReturn($roles);
+        $manager->method('isAdmin')->willReturn(true);
 
         $context = new PermissionAssertContext($manager);
 
         $this->coordinatorRepository->expects($this->never())->method('findByUser');
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedNoAccessForNotManagerRole(): void
@@ -119,7 +108,6 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $manager->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('getRoles')->willReturn(['some-role']);
 
         $context = new PermissionAssertContext($manager);
 
@@ -131,7 +119,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
         $this->expectException(NotAccessibleLspUserException::class);
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedWhenNotLspUser(): void
@@ -145,13 +133,12 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $manager->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('getRoles')->willReturn(['some-role']);
 
         $context = new PermissionAssertContext($manager);
 
         $this->lspUserRepository->expects(self::once())->method('findByUser')->willReturn(null);
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedNoAccessForPmToNotDirectLspUser(): void
@@ -165,7 +152,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $manager->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('getRoles')->willReturn([Roles::PM]);
+        $manager->method('isPm')->willReturn(true);
 
         $context = new PermissionAssertContext($manager);
 
@@ -176,7 +163,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
         $this->expectException(NotAccessibleLspUserException::class);
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedNoAccessForPmToNotDirectCoordinator(): void
@@ -185,13 +172,15 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $user->method('__call')->willReturnMap([
             ['getId', [], '16'],
         ]);
-        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $user->method('isCoordinator')->willReturn(true);
 
         $manager = $this->createMock(User::class);
         $manager->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('getRoles')->willReturn([Roles::PM]);
+        $manager->method('isAdmin')->willReturn(false);
+        $manager->method('isCoordinator')->willReturn(false);
+        $manager->method('isPm')->willReturn(true);
 
         $context = new PermissionAssertContext($manager);
 
@@ -202,7 +191,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
         $this->expectException(NotAccessibleLspUserException::class);
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedNoAccessForPmToDirectLspUser(): void
@@ -212,13 +201,12 @@ class LspUserAccessPermissionAssertTest extends TestCase
             ['getId', [], '16'],
             ['getUserGuid', [], 'user-guid'],
         ]);
-        $user->method('getRoles')->willReturn([]);
 
         $manager = $this->createMock(User::class);
         $manager->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('getRoles')->willReturn([Roles::PM]);
+        $manager->method('isPm')->willReturn(true);
 
         $context = new PermissionAssertContext($manager);
 
@@ -229,7 +217,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
         $this->expectException(NotAccessibleLspUserException::class);
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedForPmToDirectCoordinator(): void
@@ -239,13 +227,14 @@ class LspUserAccessPermissionAssertTest extends TestCase
             ['getId', [], '16'],
             ['getUserGuid', [], 'user-guid'],
         ]);
-        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $user->method('isCoordinator')->willReturn(true);
 
         $manager = $this->createMock(User::class);
         $manager->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('getRoles')->willReturn([Roles::PM]);
+        $manager->method('isAdmin')->willReturn(false);
+        $manager->method('isPm')->willReturn(true);
 
         $context = new PermissionAssertContext($manager);
 
@@ -255,7 +244,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
         self::assertTrue(true);
     }
 
@@ -269,13 +258,12 @@ class LspUserAccessPermissionAssertTest extends TestCase
             ['getUserGuid', [], 'user-guid'],
             ['getId', [], '12'],
         ]);
-        $user->method('getRoles')->willReturn([]);
 
         $manager->method('__call')->willReturnMap([
             ['getUserGuid', [], 'manager-guid'],
             ['getId', [], '14'],
         ]);
-        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $manager->method('isCoordinator')->willReturn(true);
 
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isCoordinatorOf')->willReturn(false);
@@ -288,7 +276,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
         $this->expectException(NotAccessibleLspUserException::class);
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
     public function testAssertGrantedForCoordinatorToSameLspUser(): void
@@ -300,12 +288,11 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
         ]);
-        $user->method('getRoles')->willReturn([]);
 
-        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $manager->method('isCoordinator')->willReturn(true);
 
         $coordinator = $this->createMock(JobCoordinator::class);
-        $coordinator->method('isCoordinatorOf')->willReturn(true);
+        $coordinator->method('isSupervisorOf')->willReturn(true);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lspUser = new LspUser('guid', $user, $lsp);
@@ -313,7 +300,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
 
         self::assertTrue(true);
     }
@@ -327,12 +314,12 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
         ]);
-        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $user->method('isCoordinator')->willReturn(true);
 
-        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $manager->method('isCoordinator')->willReturn(true);
 
         $coordinator = $this->createMock(JobCoordinator::class);
-        $coordinator->method('isCoordinatorOf')->willReturn(true);
+        $coordinator->method('isSupervisorOf')->willReturn(true);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lspUser = new LspUser('guid', $user, $lsp);
@@ -340,7 +327,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
 
         self::assertTrue(true);
     }
@@ -354,21 +341,20 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
         ]);
-        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $user->method('isCoordinator')->willReturn(true);
 
-        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $manager->method('isCoordinator')->willReturn(true);
 
-        $coordinatorLsp = $this->createMock(LanguageServiceProvider::class);
-        $coordinator = new JobCoordinator('coordinator-guid', $user, $coordinatorLsp);
+        $coordinator = $this->createMock(JobCoordinator::class);
+        $coordinator->method('isSupervisorOf')->willReturn(true);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
-        $lsp->method('isSubLspOf')->willReturn(true);
         $lspUser = new LspUser('user-guid', $user, $lsp);
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
         self::assertTrue(true);
     }
 
@@ -382,25 +368,24 @@ class LspUserAccessPermissionAssertTest extends TestCase
             ['getUserGuid', [], 'user-guid'],
             ['getId', [], '12'],
         ]);
-        $user->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $user->method('isCoordinator')->willReturn(true);
 
         $manager->method('__call')->willReturnMap([
             ['getUserGuid', [], 'manager-guid'],
             ['getId', [], '14'],
         ]);
-        $manager->method('getRoles')->willReturn([Roles::JOB_COORDINATOR]);
+        $manager->method('isCoordinator')->willReturn(true);
 
-        $coordinatorLsp = $this->createMock(LanguageServiceProvider::class);
-        $coordinator = new JobCoordinator('coordinator-guid', $user, $coordinatorLsp);
+        $coordinator = $this->createMock(JobCoordinator::class);
+        $coordinator->method('isSupervisorOf')->willReturn(false);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
-        $lsp->method('isSubLspOf')->willReturn(false);
         $lspUser = new LspUser('user-guid', $user, $lsp);
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
         $this->expectException(NotAccessibleLspUserException::class);
-        $this->assert->assertGranted($user, $context);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 }

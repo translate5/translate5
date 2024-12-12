@@ -37,10 +37,11 @@ use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 
 /**
- * @implements PermissionAssertInterface<User>
+ * @implements PermissionAssertInterface<UserAction, User>
  */
 final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
 {

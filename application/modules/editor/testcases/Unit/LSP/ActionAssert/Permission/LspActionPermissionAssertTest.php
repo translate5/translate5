@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\LSP\ActionAssert\Permission;
 
-use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\User\Model\User;
@@ -48,15 +48,18 @@ class LspActionPermissionAssertTest extends TestCase
         $context = new PermissionAssertContext($manager);
 
         $permissionAuditorMock1 = $this->createMock(PermissionAssertInterface::class);
-        $permissionAuditorMock1->expects($this->once())->method('supports')->willReturn(true);
-        $permissionAuditorMock1->expects($this->once())->method('assertGranted')->with($lsp, $context);
+        $permissionAuditorMock1->method('supports')->willReturn(true);
+        $permissionAuditorMock1
+            ->expects(self::once())
+            ->method('assertGranted')
+            ->with(LspAction::Delete, $lsp, $context);
 
         $permissionAuditorMock2 = $this->createMock(PermissionAssertInterface::class);
-        $permissionAuditorMock2->expects($this->once())->method('supports')->willReturn(false);
-        $permissionAuditorMock2->expects($this->never())->method('assertGranted');
+        $permissionAuditorMock2->method('supports')->willReturn(false);
+        $permissionAuditorMock2->expects(self::never())->method('assertGranted');
 
         $auditor = new LspActionPermissionAssert([$permissionAuditorMock1, $permissionAuditorMock2]);
-        $auditor->assertGranted(Action::Delete, $lsp, $context);
+        $auditor->assertGranted(LspAction::Delete, $lsp, $context);
     }
 
     public function testAssertGrantedException(): void
@@ -68,13 +71,12 @@ class LspActionPermissionAssertTest extends TestCase
         $permissionAuditorMock = $this->createMock(PermissionAssertInterface::class);
         $permissionAuditorMock->expects($this->once())
             ->method('assertGranted')
-            ->with($lsp, $context)
             ->willThrowException($this->createMock(PermissionExceptionInterface::class));
         $permissionAuditorMock->expects($this->once())->method('supports')->willReturn(true);
 
         $auditor = new LspActionPermissionAssert([$permissionAuditorMock]);
 
         $this->expectException(PermissionExceptionInterface::class);
-        $auditor->assertGranted(Action::Delete, $lsp, $context);
+        $auditor->assertGranted(LspAction::Delete, $lsp, $context);
     }
 }

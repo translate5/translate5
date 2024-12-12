@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace LSP\Operations;
 
 use editor_Models_Customer_Customer;
-use MittagQI\Translate5\LSP\Event\CustomerAssignedToLspEvent;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
 use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
@@ -40,7 +39,6 @@ use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 class LspAssignCustomerOperationTest extends TestCase
 {
@@ -48,20 +46,16 @@ class LspAssignCustomerOperationTest extends TestCase
 
     private LspCustomerAssociationValidator|MockObject $lspCustomerAssociationValidator;
 
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-
     private LspAssignCustomerOperation $operation;
 
     public function setUp(): void
     {
         $this->lspRepository = $this->createMock(LspRepositoryInterface::class);
         $this->lspCustomerAssociationValidator = $this->createMock(LspCustomerAssociationValidator::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->operation = new LspAssignCustomerOperation(
             $this->lspRepository,
             $this->lspCustomerAssociationValidator,
-            $this->eventDispatcher,
         );
     }
 
@@ -73,6 +67,9 @@ class LspAssignCustomerOperationTest extends TestCase
         $lsp->method('isDirectLsp')->willReturn(false);
 
         $parentLsp = $this->createMock(LanguageServiceProvider::class);
+        $parentLsp->method('__call')->willReturnMap([
+            ['getId', [], '10'],
+        ]);
 
         $this->lspRepository->method('get')->with((int) $lsp->getParentId())->willReturn($parentLsp);
 
@@ -84,11 +81,10 @@ class LspAssignCustomerOperationTest extends TestCase
         $this->lspCustomerAssociationValidator
             ->expects(self::once())
             ->method('assertCustomersAreSubsetForLSP')
-            ->with($parentLsp, (int) $customer->getId())
+            ->with((int) $parentLsp->getId(), (int) $customer->getId())
             ->willThrowException($this->createMock(CustomerDoesNotBelongToLspException::class));
 
         $this->lspRepository->expects(self::never())->method('saveCustomerAssignment');
-        $this->eventDispatcher->expects(self::never())->method('dispatch');
 
         $this->operation->assignCustomer($lsp, $customer);
     }
@@ -102,6 +98,9 @@ class LspAssignCustomerOperationTest extends TestCase
         ]);
 
         $parentLsp = $this->createMock(LanguageServiceProvider::class);
+        $parentLsp->method('__call')->willReturnMap([
+            ['getId', [], '10'],
+        ]);
 
         $this->lspRepository->method('get')->with((int) $lsp->getParentId())->willReturn($parentLsp);
 
@@ -113,7 +112,7 @@ class LspAssignCustomerOperationTest extends TestCase
         $this->lspCustomerAssociationValidator
             ->expects(self::once())
             ->method('assertCustomersAreSubsetForLSP')
-            ->with($parentLsp, (int) $customer->getId());
+            ->with((int) $parentLsp->getId(), (int) $customer->getId());
 
         $lspCustomer = $this->createMock(LanguageServiceProviderCustomer::class);
         $calledSetter = null;
@@ -142,11 +141,6 @@ class LspAssignCustomerOperationTest extends TestCase
             ->willReturn($lspCustomer);
 
         $this->lspRepository->expects(self::once())->method('saveCustomerAssignment');
-
-        $this->eventDispatcher
-            ->expects(self::once())
-            ->method('dispatch')
-            ->with(self::isInstanceOf(CustomerAssignedToLspEvent::class));
 
         $this->operation->assignCustomer($lsp, $customer);
     }
@@ -199,11 +193,6 @@ class LspAssignCustomerOperationTest extends TestCase
             ->willReturn($lspCustomer);
 
         $this->lspRepository->expects(self::once())->method('saveCustomerAssignment');
-
-        $this->eventDispatcher
-            ->expects(self::once())
-            ->method('dispatch')
-            ->with(self::isInstanceOf(CustomerAssignedToLspEvent::class));
 
         $this->operation->assignCustomer($lsp, $customer);
     }

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2"
+       sdl:version="1.0">
+    <doc-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+        <cmt-defs>
+            <cmt-def id="da363102-dca6-4a9e-aa70-667f91b8d030">
+                <Comments>
+                    <Comment severity="Low" user="translate5" date="2024-03-12T15:46:00.8133772+00:00" version="1.0">and a comment for Sasha!</Comment>
+                </Comments>
+            </cmt-def>
+        </cmt-defs>
+    </doc-info>
+    <file original="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+          datatype="x-sdlfilterframework2" source-language="en-US" target-language="de-DE">
+        <header>
+            <reference>
+                <internal-file form="base64">
+                    UEsDBBQAAAAIAAVnUFjPYiCzK1MBAFpaAQARAAAAaXd1bjRhaXkuZXlmLmlkbWyMeVVUG1wTbVuk
+                </internal-file>
+            </reference>
+            <sdl:ref-files>
+                <sdl:ref-file uid="0" id="http://www.sdl.com/Sdl.FileTypeSupport.Filters.Idml/OriginalFile"
+                              name="1ndofncr.o0n.idml"
+                              o-path="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+                              date="02/16/2024 12:56:10" descr="Original file before conversion."
+                              expected-use="Generation"/>
+            </sdl:ref-files>
+            <file-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <value key="SDL:FileId">edce5922-59e0-461e-a719-958337a58bf2</value>
+                <value key="SDL:CreationDate">02/16/2024 15:29:26</value>
+                <value key="SDL:OriginalFilePath">
+                    \\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml
+                </value>
+                <value key="SDL:FileTypeDllVersion">1.9.9.0</value>
+                <value key="SDL:QuickInsertsList">
+                    qBold;qItalic;qUnderline;qSubscript;qSuperscript;qSmallCaps;qNoBold;qNoItalic;qNoUnderline;qNoSuperscript;qNoSubscript;qNoSmallCaps
+                </value>
+                <value key="ProcessFileInfo">Partial</value>
+                <value key="DisplayHiddenConditionalText">False</value>
+                <value key="SkipTrackingKerningInformation">False</value>
+                <value key="DisplayFootnoteOption">False</value>
+                <value key="SDL:AutoClonedFlagSupported">True</value>
+                <value key="FirstPageId">u738c7</value>
+                <value key="ParagraphTextDirections"></value>
+                <sniff-info>
+                    <detected-source-lang detection-level="Guess" lang="en-US"/>
+                </sniff-info>
+            </file-info>
+            <sdl:filetype-info>
+                <sdl:filetype-id>IDML v 1.0.0.0</sdl:filetype-id>
+            </sdl:filetype-info>
+            <cxt-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <cxt-def id="2" type="Querverweisformate" code="XRS" name="Querverweisformate" descr="Liste mit Querverweisformaten" color="DeepSkyBlue"/>
+            </cxt-defs>
+        </header>
+        <body>
+            <group>
+                <sdl:cxts><sdl:cxt id="55"/><sdl:cxt id="4"/><sdl:cxt id="5"/><sdl:cxt id="6"/><sdl:node id="33"/></sdl:cxts>
+                <trans-unit id="3469cab8-e901-4195-9a62-5f0b2b577bdd">
+                    <source>MOV:E fördert die mobile Zusammenarbeit unabhängig von verfügbarer Gebäude-Infrastruktur. Ideal für das modernen Arbeitsumfeld – Lounges, agile Projekträume, Huddle Rooms und Collaboration Areas. MOV:E kann bis zu 4 Laptops gleichzeitig betreiben und sogar ein mobiles Flipchart bis zu 2 Stunden mit Strom versorgen. Egal wo, egal wann, egal wie - MOV:E bietet immer die richtige Stromversorgung. </source>
+                    <seg-source>
+                        <mrk mtype="seg" mid="35">Ideal für das modernen Arbeitsumfeld – Lounges, agile Projekträume, Huddle Rooms und Collaboration Areas.</mrk>
+                    </seg-source>
+                    <target>
+                        <mrk mtype="seg" mid="35">Ideal para los entornos laborales actuales: salones, salas de proyectos dinámicas, <g id="Italic">huddle rooms<g id="Italic"> </g></g>y áreas colaborativas.</mrk>
+                    </target>
+                    <sdl:seg-defs>
+                        <sdl:seg id="35" conf="ApprovedTranslation" origin="interactive" percent="83">
+                            <sdl:prev-origin origin="tm" origin-system="Q-240964-01 MOVE_Industrialisierung_Bachmann_DE-DIV" percent="83">
+                                <sdl:prev-origin>
+                                    <sdl:value key="SegmentIdentityHash">9HCPkj7OFs4lgtEQ7ZYgOJNgATA=</sdl:value>
+                                </sdl:prev-origin>
+                                <sdl:value key="created_by">one7</sdl:value>
+                                <sdl:value key="created_on">05/22/2024 09:04:11</sdl:value>
+                                <sdl:value key="last_modified_by">one7</sdl:value>
+                                <sdl:value key="modified_on">05/22/2024 09:04:11</sdl:value>
+                            </sdl:prev-origin>
+                            <sdl:value key="created_by">one7</sdl:value>
+                            <sdl:value key="created_on">05/22/2024 09:04:11</sdl:value>
+                            <sdl:value key="last_modified_by">PMTTRADOFFICE\PMTtrad</sdl:value>
+                            <sdl:value key="modified_on">05/24/2024 18:41:18</sdl:value>
+                            <sdl:value key="SDL:ProjectTranslationHash">-1626684787</sdl:value>
+                            <sdl:value key="SegmentIdentityHash">9HCPkj7OFs4lgtEQ7ZYgOJNgATA=</sdl:value>
+                        </sdl:seg>
+                    </sdl:seg-defs>
+                </trans-unit>
+            </group>
+        </body>
+    </file>
+</xliff>

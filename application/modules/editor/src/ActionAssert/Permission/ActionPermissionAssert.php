@@ -37,7 +37,7 @@ use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInt
 /**
  * @template A of BackedEnum
  * @template T of object
- * @implements ActionPermissionAssertInterface<T>
+ * @implements ActionPermissionAssertInterface<A, T>
  */
 abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
 {

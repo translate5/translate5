@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
   DESCRIPTION WHAT THIS SCRIPT DOES!
  */
 
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\Acl\Roles;
 
 set_time_limit(0);
 

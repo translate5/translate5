@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\UserAssignCustomersOperation;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
@@ -43,12 +44,16 @@ class UserAssignCustomerOperationTest extends TestCase
 
     private UserAssignCustomersOperation $operation;
 
+    private UserRepository $userRepository;
+
     public function setUp(): void
     {
         $this->userCustomerAssociationValidator = $this->createMock(UserCustomerAssociationValidator::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->operation = new UserAssignCustomersOperation(
             $this->userCustomerAssociationValidator,
+            $this->userRepository,
         );
     }
 
@@ -63,7 +68,7 @@ class UserAssignCustomerOperationTest extends TestCase
 
         $user = $this->createMock(User::class);
 
-        $this->operation->assignCustomers($user, [1]);
+        $this->operation->assignCustomers($user, 1);
     }
 
     public function testAssignCustomers(): void
@@ -75,6 +80,6 @@ class UserAssignCustomerOperationTest extends TestCase
         $user = $this->createMock(User::class);
         $user->expects(self::once())->method('assignCustomers')->with([1, 2, 3]);
 
-        $this->operation->assignCustomers($user, [1, 2, 3]);
+        $this->operation->assignCustomers($user, ...[1, 2, 3]);
     }
 }

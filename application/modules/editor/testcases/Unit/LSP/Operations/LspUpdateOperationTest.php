@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\LSP\Operations;
 
 use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\LSP\Operations\DTO\UpdateLspDto;
 use MittagQI\Translate5\LSP\Operations\LspUpdateOperation;
 use MittagQI\Translate5\Repository\LspRepository;
 use PHPUnit\Framework\TestCase;
@@ -75,6 +76,8 @@ class LspUpdateOperationTest extends TestCase
             $lspRepository,
         );
 
-        $service->updateLsp($lsp, 'name', 'description');
+        $dto = new UpdateLspDto('name', 'description');
+
+        $service->updateLsp($lsp, $dto);
     }
 }
