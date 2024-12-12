@@ -73,10 +73,8 @@ class editor_Workflow_Default_StepRecalculation
      * If the combination of roles and states are pointing to an specific workflow step, this step is used
      * If the states and roles does not match any valid combination, no step is changed.
      */
-    public function recalculateWorkflowStep(editor_Models_TaskUserAssoc $tua)
+    public function recalculateWorkflowStep(string $taskGuid)
     {
-        $taskGuid = $tua->getTaskGuid();
-
         //if the step was recalculated due setNextStep in internal workflow calculations,
         // we may not recalculate it here again!
         if (! empty($this->nextStepWasSet[$taskGuid])) {
@@ -85,9 +83,7 @@ class editor_Workflow_Default_StepRecalculation
             return;
         }
 
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
+        $task = $this->taskRepository->getByGuid($taskGuid);
 
         $matchingSteps = $this->getMatchingSteps($taskGuid);
 

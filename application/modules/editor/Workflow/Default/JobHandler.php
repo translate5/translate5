@@ -104,7 +104,7 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         //finally set the trigger to edited and call the job changed handler
         $actionConfig->trigger = self::HANDLE_JOB_EDITED;
         $this->handleUserAssociationChanged();
-        $actionConfig->workflow->getStepRecalculation()->recalculateWorkflowStep($actionConfig->newTua);
+        $actionConfig->workflow->getStepRecalculation()->recalculateWorkflowStep($actionConfig->newTua->getTaskGuid());
 
         return $actionConfig->trigger;
     }

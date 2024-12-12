@@ -338,10 +338,16 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             );
         }
 
+        $workflowManager = new editor_Workflow_Manager();
+
         try {
             $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
 
             $this->assertJobBelongsToTask($job);
+
+            // TODO: This workflow instantiating here is a workaroung to trigger editor_Workflow_Default_Hooks.
+            //      constructor there has events listeners that should be extracted.
+            $workflowManager->get($job->getWorkflow());
 
             $this->processClientReferenceVersion($job);
 

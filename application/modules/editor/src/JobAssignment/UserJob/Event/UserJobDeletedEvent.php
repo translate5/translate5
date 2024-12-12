@@ -28,44 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\User\Model;
+namespace MittagQI\Translate5\JobAssignment\UserJob\Event;
 
-use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
+use editor_Models_TaskUserAssoc as UserJob;
 
-class User extends \ZfExtended_Models_User
+class UserJobDeletedEvent
 {
-    public function isCoordinator(): bool
-    {
-        return in_array(Roles::JOB_COORDINATOR, $this->getRoles(), true);
-    }
-
-    public function isPm(): bool
-    {
-        return in_array(Roles::PM, $this->getRoles(), true);
-    }
-
-    public function isClientPm(): bool
-    {
-        return in_array(Roles::CLIENTPM, $this->getRoles(), true);
-    }
-
-    public function isAdmin(): bool
-    {
-        return in_array(Roles::ADMIN, $this->getRoles(), true)
-            || in_array(Roles::SYSTEMADMIN, $this->getRoles(), true);
-    }
-
-    public function setInitialFields(CreateUserDto $dto): void
-    {
-        $this->setUserGuid($dto->guid);
-        $this->setLogin($dto->login);
-        $this->setEmail($dto->email);
-        $this->setFirstName($dto->firstName);
-        $this->setSurName($dto->surName);
-        $this->setGender($dto->gender);
-        if (null !== $dto->locale) {
-            $this->setLocale($dto->locale);
-        }
+    public function __construct(
+        public readonly UserJob $userJob
+    ) {
     }
 }

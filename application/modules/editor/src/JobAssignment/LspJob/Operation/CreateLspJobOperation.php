@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\LspJob\Operation;
 
+use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\JobAssignment\LspJob\Contract\CreateLspJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
@@ -41,7 +42,6 @@ use MittagQI\Translate5\JobAssignment\UserJob\Exception\NotLspCustomerTaskExcept
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\CreateUserJobOperation;
-use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\TrackChangesRightsValidator;
 use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
@@ -49,6 +49,7 @@ use MittagQI\Translate5\LSP\JobCoordinatorRepository;
 use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\TaskLockService;
 use RuntimeException;
 use Throwable;
@@ -57,6 +58,7 @@ class CreateLspJobOperation implements CreateLspJobOperationInterface
 {
     public function __construct(
         private readonly LspJobRepository $lspJobRepository,
+        private readonly UserJobRepository $userJobRepository,
         private readonly TaskRepository $taskRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
@@ -74,6 +76,7 @@ class CreateLspJobOperation implements CreateLspJobOperationInterface
     {
         return new self(
             LspJobRepository::create(),
+            UserJobRepository::create(),
             TaskRepository::create(),
             JobCoordinatorRepository::create(),
             LspCustomerAssociationValidator::create(),
@@ -134,23 +137,49 @@ class CreateLspJobOperation implements CreateLspJobOperationInterface
                 throw new NotLspCustomerTaskException();
             }
 
-            $job = new LspJob();
-            $job->setTaskGuid($dto->taskGuid);
-            $job->setLspId((int) $coordinator->lsp->getId());
-            $job->setWorkflow($dto->workflow->workflow);
-            $job->setWorkflowStepName($dto->workflow->workflowStepName);
+            $lspJob = new LspJob();
+            $lspJob->setTaskGuid($dto->taskGuid);
+            $lspJob->setLspId((int) $coordinator->lsp->getId());
+            $lspJob->setWorkflow($dto->workflow->workflow);
+            $lspJob->setWorkflowStepName($dto->workflow->workflowStepName);
 
-            $this->lspJobRepository->save($job);
+            $this->lspJobRepository->save($lspJob);
+
+            $userJob = new UserJob();
+            $userJob->setTaskGuid($task->getTaskGuid());
+            $userJob->setUserGuid($dto->userGuid);
+            $userJob->setState($dto->state);
+            $userJob->setRole($dto->workflow->role);
+            $userJob->setWorkflow($dto->workflow->workflow);
+            $userJob->setWorkflowStepName($dto->workflow->workflowStepName);
+            $userJob->setType(TypeEnum::Lsp);
+            $userJob->setAssignmentDate($dto->assignmentDate);
+            $userJob->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
+            $userJob->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
+            $userJob->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
+            $userJob->setLspJobId($lspJob->getId());
+
+            if (null !== $dto->deadlineDate) {
+                $userJob->setDeadlineDate($dto->deadlineDate);
+            }
+
+            if (null !== $dto->segmentRange) {
+                $userJob->setSegmentrange($dto->segmentRange);
+            }
+
+            $userJob->createstaticAuthHash();
 
             try {
-                $this->createUserJobOperation->assignJob(NewUserJobDto::fromLspJobDto($dto, $taskLock));
+                $userJob->validate();
+
+                $this->userJobRepository->save($userJob);
             } catch (Throwable $e) {
-                $this->lspJobRepository->delete((int) $job->getId());
+                $this->lspJobRepository->delete((int) $lspJob->getId());
 
                 throw $e;
             }
 
-            return $job;
+            return $lspJob;
         } finally {
             $taskLock->release();
         }

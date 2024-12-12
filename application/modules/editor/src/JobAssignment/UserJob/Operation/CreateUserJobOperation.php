@@ -31,23 +31,24 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\JobAssignment\UserJob\Operation;
 
 use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
 use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\CreateUserJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\UserJob\Event\UserJobCreatedEvent;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\CompetitiveJobCreationValidator;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\TrackChangesRightsValidator;
-use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
 use MittagQI\Translate5\Repository\LspJobRepository;
 use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\TaskLockService;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use Zend_Registry;
 use ZfExtended_Logger;
@@ -63,6 +64,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
         private readonly CompetitiveJobCreationValidator $competitiveJobCreationValidator,
         private readonly TaskLockService $taskLockService,
         private readonly ZfExtended_Logger $logger,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -80,12 +82,13 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             CompetitiveJobCreationValidator::create(),
             TaskLockService::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.create'),
+            EventDispatcher::create(),
         );
     }
 
     public function assignJob(NewUserJobDto $dto): UserJob
     {
-        $taskLock = $dto->taskLock ?: $this->taskLockService->getLockForTask($dto->taskGuid);
+        $taskLock = $this->taskLockService->getLockForTask($dto->taskGuid);
 
         if (! $taskLock->isAcquired() && ! $taskLock->acquire()) {
             throw new RuntimeException('Could not acquire lock for task ' . $dto->taskGuid);
@@ -93,9 +96,6 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
 
         try {
             $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
-
-            $this->assertLspUserCanBeAssignedToJobType($lspUser, $dto->type);
-
             $lspJob = null;
 
             if (null !== $lspUser) {
@@ -106,14 +106,12 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
 
             $task = $this->taskRepository->getByGuid($dto->taskGuid);
 
-            if (TypeEnum::Lsp !== $dto->type) {
-                $this->competitiveJobCreationValidator->assertCanCreate(
-                    $task,
-                    $lspJob ? (int) $lspJob->getId() : null,
-                    $dto->workflow->workflow,
-                    $dto->workflow->workflowStepName,
-                );
-            }
+            $this->competitiveJobCreationValidator->assertCanCreate(
+                $task,
+                $lspJob ? (int) $lspJob->getId() : null,
+                $dto->workflow->workflow,
+                $dto->workflow->workflowStepName,
+            );
 
             $job = new UserJob();
             $job->setTaskGuid($task->getTaskGuid());
@@ -122,7 +120,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             $job->setRole($dto->workflow->role);
             $job->setWorkflow($dto->workflow->workflow);
             $job->setWorkflowStepName($dto->workflow->workflowStepName);
-            $job->setType($dto->type);
+            $job->setType(TypeEnum::Editor);
             $job->setAssignmentDate($dto->assignmentDate);
             $job->setDeadlineDate($dto->deadlineDate);
             $job->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
@@ -145,8 +143,10 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
 
             $this->logger->info('E1012', 'job created', [
                 'task' => $task,
-                'tua' => $job->getSanitizedEntityForLog(),
+                'job' => $job->getSanitizedEntityForLog(),
             ]);
+
+            $this->eventDispatcher->dispatch(new UserJobCreatedEvent($job));
 
             return $job;
         } finally {
@@ -186,19 +186,5 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             $dto->trackChangesRights->canAcceptOrRejectTrackChanges,
             $lspJob,
         );
-    }
-
-    /**
-     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
-     */
-    private function assertLspUserCanBeAssignedToJobType(?LspUser $lspUser, TypeEnum $type): void
-    {
-        if (TypeEnum::Lsp !== $type) {
-            return;
-        }
-
-        if (null === $lspUser || ! $lspUser->isCoordinator()) {
-            throw new OnlyCoordinatorCanBeAssignedToLspJobException();
-        }
     }
 }

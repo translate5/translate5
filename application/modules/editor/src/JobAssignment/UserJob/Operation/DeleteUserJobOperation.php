@@ -33,12 +33,15 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Operation;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\DeleteUserJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\UserJob\Event\UserJobDeletedEvent;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\TaskLock;
 use MittagQI\Translate5\Task\TaskLockService;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use Zend_Registry;
 use ZfExtended_Logger;
@@ -54,6 +57,7 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
         private readonly TaskRepository $taskRepository,
         private readonly ZfExtended_Logger $logger,
         private readonly TaskLockService $taskLockService,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -68,6 +72,7 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
             TaskRepository::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.delete'),
             TaskLockService::create(),
+            EventDispatcher::create(),
         );
     }
 
@@ -121,6 +126,8 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
             'task' => $task,
             'job' => $jobData,
         ]);
+
+        $this->eventDispatcher->dispatch(new UserJobDeletedEvent($job));
     }
 
     private function acquireLock(string $taskGuid): TaskLock
