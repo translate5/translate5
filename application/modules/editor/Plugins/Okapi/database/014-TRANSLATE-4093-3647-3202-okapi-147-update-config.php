@@ -139,31 +139,61 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7 || ! isset($config)) 
 
 $okapiConfig = $config->runtimeOptions->plugins->Okapi;
 
-$getOkapiVersion = function (Zend_Config $okapiConfig, string $serverName): string {
-    if ($serverName) {
-        $okapiUrl = $okapiConfig->server?->$serverName ?? '';
-        if ($okapiUrl) {
-            return OkapiService::fetchServerVersion($okapiUrl);
+$find147Version = function (array $serverList, string $serverName = ''): ?string {
+    // test configured version
+    if (array_key_exists($serverName, $serverList)) {
+        error_log('CHECKING: ' . $serverList[$serverName]);
+
+        $version = OkapiService::fetchServerVersion($serverList[$serverName]);
+        if ($version !== null && str_starts_with($version, '1.47.')) {
+            return $serverName;
+        }
+    }
+    // test other servers
+    foreach ($serverList as $otherName => $serverUrl) {
+        if (str_contains($otherName, '147') && $otherName !== $serverName) {
+            error_log('CHECKING: ' . $serverList[$otherName]);
+
+            $version = OkapiService::fetchServerVersion($serverList[$otherName]);
+            if ($version !== null && str_starts_with($version, '1.47.')) {
+                return $otherName;
+            }
         }
     }
 
-    return '';
+    return null;
 };
 
-$serverName = $okapiConfig->serverUsed ?? '';
-$okapiVersion = $getOkapiVersion($okapiConfig, $serverName);
+// find a proper 147 server in the config
+$serverName = $find147Version($okapiConfig?->server?->toArray() ?? [], $okapiConfig?->serverUsed ?? '');
 
-if (! str_starts_with($okapiVersion, '1.47.')) {
-    // detect if okapi 147 is available in the config
-    foreach ($okapiConfig->server as $okapiServerName => $okapiServerUrl) {
-        if (str_contains($okapiServerName, '147') && $okapiServerName !== $serverName) {
-            $serverName = $okapiServerName;
-            $okapiVersion = $getOkapiVersion($okapiConfig, $serverName);
+// not found, the migration has to be aborted !!
+if ($serverName === null) {
+    // UGLY SPECIAL FOR API-TESTS:
+    // When updating the database, updating the test-configs is done AFTER the db-updates have run
+    // it can not be done before, as plugin-configs do not exist then
+    // so we have to read the test-config updates and manipulate them
+    // these are stored in a global define for that purpose
+    if (defined('APPLICATION_TEST_CONFIGS') && Zend_Registry::isRegistered('test_configs')) {
+        $testConfigs = Zend_Registry::get('test_configs');
+        $serverList = json_decode($testConfigs['runtimeOptions.plugins.Okapi.server'], true) ?? [];
+        $serverUsed = $testConfigs['runtimeOptions.plugins.Okapi.serverUsed'] ?? '';
 
-            break;
+        error_log('OKAPI:' . $serverUsed . ' | ' . print_r($serverList, true));
+
+        $serverName = $find147Version($serverList, $serverUsed);
+
+        if ($serverName === null) {
+            throw new ZfExtended_Exception(
+                __FILE__ . ': searching for Okapi 1.47 in the test-configuration FAILED - stop migration script.' .
+                ' You need to add a proper OKAPI 1.47 container and config to your application.'
+            );
+        } else {
+            // crucial: we must manipulate the registered configs so the tests can run with 1.47 ...
+            $testConfigs['runtimeOptions.plugins.Okapi.serverUsed'] = $serverName;
+            Zend_Registry::set('test_configs', $testConfigs);
         }
-    }
-    if (! str_starts_with($okapiVersion, '1.47.')) {
+    } else {
         throw new ZfExtended_Exception(
             __FILE__ . ': searching for Okapi 1.47 in config FAILED - stop migration script'
         );
