@@ -157,17 +157,13 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
 
         if(comboData.length){
             if(items.length > this.columns) {
-                let missingCols = this.columns - items.length % this.columns;
+                const missingCols = this.columns - items.length % this.columns;
                 if(missingCols < this.columns){
                     // fill missing spaces
-                    while (missingCols > 0) {
-                        items.push({xtype:"container"});
-                        missingCols--;
-                    }
+                    items.push({xtype:"container",colspan:missingCols});
                 }
             }
-            items.push(
-            {
+            items.push({
                 xtype: 'combo',
                 store: Ext.create('Ext.data.Store', {
                     fields: ['txt', 'val'],
