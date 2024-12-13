@@ -28,27 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission;
+namespace MittagQI\Translate5\Task\BatchSet\Exception;
 
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\Asserts\CustomerRestrictionAssert;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\Asserts\LspRestrictionAssert;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
-
-/**
- * @extends ActionPermissionAssert<DefaultJobAction, DefaultLspJob>
- */
-class DefaultUserJobActionPermissionAssert extends ActionPermissionAssert
+class InvalidDeadlineDateStringProvidedException extends InvalidValueProvidedException
 {
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function create(): self
-    {
-        return new self([
-            CustomerRestrictionAssert::create(),
-            LspRestrictionAssert::create(),
-        ]);
-    }
 }

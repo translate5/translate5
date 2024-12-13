@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -38,7 +37,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         'Editor.view.admin.customer.CopyWindow'
     ],
 
-    stores:['admin.Customers'],
+    stores: ['admin.Customers'],
     controller: 'customerPanel',
     viewModel: {
         type: 'customerPanel'
@@ -48,31 +47,31 @@ Ext.define('Editor.view.admin.customer.Panel', {
             fn: 'onCustomerPanelActivate',
             scope: 'controller'
         },
-        render:{
-            fn:'onCustomerPanelRender',
-            scope:'controller'
+        render: {
+            fn: 'onCustomerPanelRender',
+            scope: 'controller'
         }
     },
-    strings:{
-        reload:'Aktualisieren',
-        customerName:'#UT#Kundenname',
-        customerNumber:'#UT#Kundennummer',
-        save:'#UT#Speichern',
-        cancel:'#UT#Abbrechen',
-        remove:'#UT#Löschen',
-        addCustomerTitle:'#UT#Kunde hinzufügen',
-        saveCustomerMsg:'#UT#Kunde wird gespeichert...',
-        customerSavedMsg:'#UT#Kunde gespeichert!',
-        customerDeleteMsg:'#UT#Diesen Kunden löschen?',
-        customerDeleteTitle:'#UT#Kunden löschen',
-        customerDeletedMsg:'#UT#Kunde gelöscht',
-        export:'#UT#Ressourcen-Nutzung Exportieren',
-        domain:'#UT#translate5 Domain',
+    strings: {
+        reload: 'Aktualisieren',
+        customerName: '#UT#Kundenname',
+        customerNumber: '#UT#Kundennummer',
+        save: '#UT#Speichern',
+        cancel: '#UT#Abbrechen',
+        remove: '#UT#Löschen',
+        addCustomerTitle: '#UT#Kunde hinzufügen',
+        saveCustomerMsg: '#UT#Kunde wird gespeichert...',
+        customerSavedMsg: '#UT#Kunde gespeichert!',
+        customerDeleteMsg: '#UT#Diesen Kunden löschen?',
+        customerDeleteTitle: '#UT#Kunden löschen',
+        customerDeletedMsg: '#UT#Kunde gelöscht',
+        export: '#UT#Ressourcen-Nutzung Exportieren',
+        domain: '#UT#translate5 Domain',
         propertiesTabPanelTitle: '#UT#Allgemein',
-        configTabTitle:'#UT#Überschreibung der Systemkonfiguration',
-        actionColumn:'#UT#Aktionen',
-        customerEditActionIcon:'#UT#Kundenprofil bearbeiten',
-        openIdTabPanelDisabledTooltip:'#UT#Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.'
+        configTabTitle: '#UT#Überschreibung der Systemkonfiguration',
+        actionColumn: '#UT#Aktionen',
+        customerEditActionIcon: '#UT#Kundenprofil bearbeiten',
+        openIdTabPanelDisabledTooltip: '#UT#Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -86,11 +85,15 @@ Ext.define('Editor.view.admin.customer.Panel', {
 
     domainLabelInfoTooltip: null,
 
-    initConfig: function(instanceConfig) {
+    initConfig: function (instanceConfig) {
         var me = this,
-            canNotAddCustomer = !Editor.app.authenticatedUser.isAllowed('editorAddCustomer'),
-            canNotDeleteCustomer = !Editor.app.authenticatedUser.isAllowed('editorDeleteCustomer'),
-            isNotOpenIdEditor = !Editor.app.authenticatedUser.isAllowed('customerOpenIdAdministration'),
+            canNotAddCustomer = ! Editor.app.authenticatedUser.isAllowed('editorAddCustomer'),
+            canNotDeleteCustomer = ! Editor.app.authenticatedUser.isAllowed('editorDeleteCustomer'),
+            isNotOpenIdEditor = ! Editor.app.authenticatedUser.isAllowed('customerOpenIdAdministration'),
+            resourceExportAllowed = Editor.app.authenticatedUser.isAllowed('customerResourceExport'),
+            customerConfigAllowed = Editor.app.authenticatedUser.isAllowed('customerConfig'),
+            activeTab = canNotAddCustomer ? 1 : 0,
+
             config = {
                 title: me.title, //see EXT6UPD-9
                 tooltip: Editor.data.l10n.clients.tooltip,
@@ -138,35 +141,44 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 filter: {
                                     type: 'number'
                                 }
-                            },{
+                            },
+                            {
                                 xtype: 'actioncolumn',
-                                text:  me.strings.actionColumn,
+                                text: me.strings.actionColumn,
                                 minWidth: 90,
                                 sortable: false,
-                                items:[{
-                                    glyph: 'f044@FontAwesome5FreeSolid',
-                                    tooltip: me.strings.customerEditActionIcon,
-                                    scope:'controller',
-                                    handler:'onCustomerEditClick'
-                                },{
-                                    glyph: 'f1c3@FontAwesome5FreeSolid',
-                                    tooltip: me.strings.export,
-                                    scope:'controller',
-                                    handler:'onTmExportClick'
-                                },{
-                                    glyph: 'f0c5@FontAwesome5FreeSolid',
-                                    tooltip: Editor.data.l10n.clients.copy,
-                                    scope:'controller',
-                                    handler:'onCopyActionClick',
-                                    hidden: canNotAddCustomer
-                                },{
-                                    glyph: 'f2ed@FontAwesome5FreeSolid',
-                                    tooltip:Editor.data.l10n.clients.delete,
-                                    scope:'controller',
-                                    handler:'remove',
-                                    hidden: canNotDeleteCustomer
-                                }]
-                            },{
+                                items: [
+                                    {
+                                        glyph: 'f044@FontAwesome5FreeSolid',
+                                        tooltip: me.strings.customerEditActionIcon,
+                                        scope: 'controller',
+                                        handler: 'onCustomerEditClick',
+                                        hidden: canNotAddCustomer
+                                    },
+                                    {
+                                        glyph: 'f1c3@FontAwesome5FreeSolid',
+                                        tooltip: me.strings.export,
+                                        scope: 'controller',
+                                        handler: 'onTmExportClick',
+                                        hidden: ! resourceExportAllowed
+                                    },
+                                    {
+                                        glyph: 'f0c5@FontAwesome5FreeSolid',
+                                        tooltip: Editor.data.l10n.clients.copy,
+                                        scope: 'controller',
+                                        handler: 'onCopyActionClick',
+                                        hidden: canNotAddCustomer
+                                    },
+                                    {
+                                        glyph: 'f2ed@FontAwesome5FreeSolid',
+                                        tooltip: Editor.data.l10n.clients.delete,
+                                        scope: 'controller',
+                                        handler: 'remove',
+                                        hidden: canNotDeleteCustomer
+                                    }
+                                ]
+                            },
+                            {
                                 xtype: 'gridcolumn',
                                 dataIndex: 'name',
                                 text: me.strings.customerName,
@@ -174,10 +186,11 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     type: 'string'
                                 },
                                 renderer: v => Ext.String.htmlEncode(v)
-                            },{
+                            },
+                            {
                                 xtype: 'gridcolumn',
                                 dataIndex: 'number',
-                                text:  me.strings.customerNumber,
+                                text: me.strings.customerNumber,
                                 filter: {
                                     type: 'string'
                                 }
@@ -188,147 +201,160 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         xtype: 'tabpanel',
                         flex: 0.7,
                         region: 'east',
+                        deferredRender: false,
+                        activeTab: activeTab,
                         split: true,
-                        layout:'fit',
-                        itemId:'displayTabPanel',
+                        layout: 'fit',
+                        itemId: 'displayTabPanel',
                         reference: 'display',
-                        bind:{
-                            disabled : '{!record}'
+                        bind: {
+                            disabled: '{!record}'
                         },
                         tabBar: {
                             layout: {
                                 overflowHandler: 'menu'
                             }
                         },
-                        items:[
+                        items: [
                             {
-                            xtype: 'form',
-                            itemId:'customersForm',
-                            reference: 'form',
-                            fieldDefaults: {
-                                width: '100%'
-                            },
-                            title:me.strings.propertiesTabPanelTitle,
-                            bodyPadding: 10,
-                            scrollable:true,
-                            dockedItems:[{
-                                xtype: 'toolbar',
-                                flex: 1,
-                                dock: 'bottom',
-                                ui: 'footer',
-                                layout: {
-                                    pack: 'start',
-                                    type: 'hbox'
+                                xtype: 'form',
+                                itemId: 'customersForm',
+                                reference: 'form',
+                                fieldDefaults: {
+                                    width: '100%'
                                 },
-                                bind:{
-                                    disabled:'{!record}'
-                                },
-                                enableOverflow: true,
-                                items:[{
-                                    xtype: 'button',
-                                    formBind:true,
-                                    itemId: 'saveButton',
-                                    reference: 'saveButton',
-                                    text: me.strings.save,
-                                    glyph: 'f00c@FontAwesome5FreeSolid',
-                                    bind:{
-                                        visible:'{isActiveTabIncludedInForm}'
+                                title: me.strings.propertiesTabPanelTitle,
+                                bodyPadding: 10,
+                                scrollable: true,
+                                hidden: canNotAddCustomer,
+                                dockedItems: [{
+                                    xtype: 'toolbar',
+                                    flex: 1,
+                                    dock: 'bottom',
+                                    ui: 'footer',
+                                    layout: {
+                                        pack: 'start',
+                                        type: 'hbox'
                                     },
-                                    listeners: {
-                                        click: {
-                                            fn: 'save',
-                                            scope: 'controller'
-                                        }
-                                    }
-                                },{
-                                    xtype: 'button',
-                                    itemId: 'cancelButton',
-                                    text: me.strings.cancel,
-                                    glyph: 'f00d@FontAwesome5FreeSolid',
-                                    listeners: {
-                                        click: {
-                                            fn: 'cancelEdit',
-                                            scope: 'controller'
-                                        }
-                                    }
-                                }]
-                            }],
-                            items: [
-                                {
-                                    xtype: 'textfield',
-                                    fieldLabel: me.strings.customerName,
-                                    name: 'name',
-                                    allowBlank: false,
-                                    maxLength: 255,
-                                    bind:{
-                                        readOnly: '{record.isDefaultCustomer}'
+                                    bind: {
+                                        disabled: '{!record}'
                                     },
-                                    minLength: 1
-                                },
-                                {
-                                    xtype: 'textfield',
-                                    fieldLabel: me.strings.customerNumber,
-                                    name: 'number',
-                                    allowBlank: false,
-                                    bind:{
-                                        readOnly: '{record.isDefaultCustomer}'
-                                    },
-                                    maxLength: 255
-                                },{
-                                    xtype: 'textfield',
-                                    listeners: {
-                                        afterrender: function (cmp){
-                                            // Gets the fiel label and registers tooltip for it
-                                            var label = cmp && cmp.labelEl;
-                                            if(!label){
-                                                return;
+                                    enableOverflow: true,
+                                    items: [
+                                        {
+                                            xtype: 'button',
+                                            formBind: true,
+                                            itemId: 'saveButton',
+                                            reference: 'saveButton',
+                                            text: me.strings.save,
+                                            glyph: 'f00c@FontAwesome5FreeSolid',
+                                            bind: {
+                                                visible: '{isActiveTabIncludedInForm}'
+                                            },
+                                            listeners: {
+                                                click: {
+                                                    fn: 'save',
+                                                    scope: 'controller'
+                                                }
                                             }
-                                            me.domainLabelInfoTooltip = Ext.create('Ext.tip.ToolTip', {
-                                                target: label,
-                                                title: '',
-                                                autoHide: false,
-                                                closable: true,
-                                                html: Editor.data.l10n.clients.domainInfoTooltip
-                                            });
+                                        },
+                                        {
+                                            xtype: 'button',
+                                            itemId: 'cancelButton',
+                                            text: me.strings.cancel,
+                                            glyph: 'f00d@FontAwesome5FreeSolid',
+                                            listeners: {
+                                                click: {
+                                                    fn: 'cancelEdit',
+                                                    scope: 'controller'
+                                                }
+                                            }
                                         }
+                                    ]
+                                }],
+                                items: [
+                                    {
+                                        xtype: 'textfield',
+                                        fieldLabel: me.strings.customerName,
+                                        name: 'name',
+                                        allowBlank: false,
+                                        maxLength: 255,
+                                        bind: {
+                                            readOnly: '{record.isDefaultCustomer}'
+                                        },
+                                        minLength: 1
                                     },
-                                    fieldLabel: me.strings.domain,
-                                    name: 'domain',
-                                    reference: 'customerDomain',
-                                    publishes: 'value',
-                                    labelClsExtra: 'lableInfoIcon',
-                                    itemId: 'openIdDomain',
-                                    disabled: isNotOpenIdEditor
-                                }]
-                        },{
-                            xtype: 'adminUserAssoc',
-                            bind:{
-                                customer:'{record.id}',
-                                disabled:'{isNewRecord}'
-                            }
-                        },{
-                            xtype: 'adminConfigGrid',
-                            store:'admin.CustomerConfig',
-                            title:me.strings.configTabTitle,
-                            bind: {
-                                extraParams:{
-                                    customerId : '{record.id}'
+                                    {
+                                        xtype: 'textfield',
+                                        fieldLabel: me.strings.customerNumber,
+                                        name: 'number',
+                                        allowBlank: false,
+                                        bind: {
+                                            readOnly: '{record.isDefaultCustomer}'
+                                        },
+                                        maxLength: 255
+                                    },
+                                    {
+                                        xtype: 'textfield',
+                                        listeners: {
+                                            afterrender: function (cmp) {
+                                                // Gets the fiel label and registers tooltip for it
+                                                var label = cmp && cmp.labelEl;
+                                                if (!label) {
+                                                    return;
+                                                }
+                                                me.domainLabelInfoTooltip = Ext.create('Ext.tip.ToolTip', {
+                                                    target: label,
+                                                    title: '',
+                                                    autoHide: false,
+                                                    closable: true,
+                                                    html: Editor.data.l10n.clients.domainInfoTooltip
+                                                });
+                                            }
+                                        },
+                                        fieldLabel: me.strings.domain,
+                                        name: 'domain',
+                                        reference: 'customerDomain',
+                                        publishes: 'value',
+                                        labelClsExtra: 'lableInfoIcon',
+                                        itemId: 'openIdDomain',
+                                        disabled: isNotOpenIdEditor
+                                    }
+                                ]
+                            },
+                            {
+                                xtype: 'adminUserAssoc',
+                                bind: {
+                                    customer: '{record.id}',
+                                    disabled: '{isNewRecord}'
+                                }
+                            },
+                            {
+                                xtype: 'adminConfigGrid',
+                                store: 'admin.CustomerConfig',
+                                title: me.strings.configTabTitle,
+                                hidden: !customerConfigAllowed,
+                                bind: {
+                                    extraParams: {
+                                        customerId: '{record.id}'
+                                    }
+                                }
+                            },
+                            {
+                                xtype: 'openIdPanel',
+                                tabConfig: {
+                                    style: {
+                                        // to enable tooltip when the tabpanel is disabled
+                                        pointerEvents: 'all'
+                                    },
+                                    tooltip: me.strings.openIdTabPanelDisabledTooltip
+                                },
+                                hidden: isNotOpenIdEditor,
+                                bind: {
+                                    disabled: '{!customerDomain.value}'
                                 }
                             }
-                        },{
-                            xtype:'openIdPanel',
-                            tabConfig: {
-                                style: {
-                                    // to enable tooltip when the tabpanel is disabled
-                                    pointerEvents: 'all'
-                                },
-                                tooltip: me.strings.openIdTabPanelDisabledTooltip
-                            },
-                            hidden: isNotOpenIdEditor,
-                            bind:{
-                                disabled:'{!customerDomain.value}'
-                            }
-                        }]
+                        ]
                     }
                 ],
                 dockedItems: [
@@ -361,11 +387,13 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         scope: 'controller'
                                     }
                                 }
-                            },{
+                            },
+                            {
                                 xtype: 'button',
                                 glyph: 'f1c3@FontAwesome5FreeSolid',
                                 text: me.strings.export,
                                 tooltip: Editor.data.l10n.clients.export,
+                                hidden: !resourceExportAllowed,
                                 listeners: {
                                     click: {
                                         fn: 'onTmExportClick',

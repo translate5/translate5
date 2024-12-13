@@ -37,6 +37,9 @@ use Exception;
 use MittagQI\Translate5\JobAssignment\UserJob\BatchUpdate\UserJobDeadlineBatchUpdater;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Task\BatchSet\Exception\InvalidDeadlineDateStringProvidedException;
+use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowProvidedException;
+use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowStepProvidedException;
 use MittagQI\Translate5\Task\DataProvider\TaskQuerySelectFactory;
 use REST_Controller_Request_Http as Request;
 use Zend_Db_Adapter_Abstract;
@@ -77,6 +80,11 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
         return 'deadlineDate' === $updateType;
     }
 
+    /**
+     * @throws InvalidDeadlineDateStringProvidedException
+     * @throws InvalidWorkflowProvidedException
+     * @throws InvalidWorkflowStepProvidedException
+     */
     public function process(Request $request): void
     {
         $deadlineDate = $request->getParam('deadlineDate');
@@ -84,35 +92,21 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
         $workflowStep = $request->getParam('batchWorkflowStep');
 
         if (empty($deadlineDate)) {
-            $this->logger->error(
-                'E1678',
-                'Missing {param} parameter for batch update',
-                [
-                    'param' => 'deadlineDate',
-                ]
-            );
-
-            return;
+            throw new InvalidDeadlineDateStringProvidedException();
         }
 
-        if (empty($workflow) || empty($workflowStep)) {
-            $this->logger->error(
-                'E1678',
-                'Missing {param} parameter for batch update',
-                [
-                    'param' => empty($workflow) ? 'batchWorkflow' : 'batchWorkflowStep',
-                ]
-            );
+        if (empty($workflow)) {
+            throw new InvalidWorkflowProvidedException();
+        }
 
-            return;
+        if (empty($workflowStep)) {
+            throw new InvalidWorkflowStepProvidedException();
         }
 
         try {
             $deadlineDate = (new DateTime($deadlineDate))->format('Y-m-d H:i:s');
-        } catch (Exception $e) {
-            $this->logger->exception($e);
-
-            return;
+        } catch (Exception) {
+            throw new InvalidDeadlineDateStringProvidedException();
         }
 
         foreach ($this->prepareAllowedTaskGuids($request) as $taskGuid) {
@@ -166,7 +160,7 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
 
         $taskSelect = $this->taskQuerySelectFactory->createProjectSelect($viewer, $filter);
 
-        $rows = $this->getAllowedTaskGuids(
+        return $this->getAllowedTaskGuids(
             json_encode([
                 [
                     'operator' => 'in',
@@ -175,8 +169,6 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
                 ],
             ])
         );
-
-        return array_column($rows, 'taskGuid');
     }
 
     private function getTaskGuidsFromProjectsAndTasks(array $taskAndProjectIds): array

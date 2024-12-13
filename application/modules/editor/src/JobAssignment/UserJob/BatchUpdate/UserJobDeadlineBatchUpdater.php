@@ -54,6 +54,10 @@ class UserJobDeadlineBatchUpdater
 
     public function updateDeadlines(array $jobIds, string $newDeadlineDate): void
     {
+        if (empty($jobIds)) {
+            return;
+        }
+
         $this->db->update(
             editor_Models_Db_TaskUserAssoc::TABLE_NAME,
             [

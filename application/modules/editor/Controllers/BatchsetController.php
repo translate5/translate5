@@ -28,6 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
+use MittagQI\Translate5\Task\BatchSet\Exception\InvalidDeadlineDateStringProvidedException;
+use MittagQI\Translate5\Task\BatchSet\Exception\InvalidValueProvidedException;
+use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowProvidedException;
+use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowStepProvidedException;
 use MittagQI\Translate5\Task\BatchSet\TaskBatchSetter;
 
 /**
@@ -48,8 +52,37 @@ class Editor_BatchsetController extends ZfExtended_RestController
      */
     protected $postBlacklist = ['id'];
 
+    public function init(): void
+    {
+        parent::init();
+
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1678' => 'Invalid param value provided',
+        ], 'editor.task.batch-set');
+    }
+
     public function indexAction(): void
     {
-        TaskBatchSetter::create()->process($this->getRequest());
+        $invalidValueProvidedMessage = 'Ungültiger Wert bereitgestellt';
+
+        try {
+            TaskBatchSetter::create()->process($this->getRequest());
+        } catch (InvalidValueProvidedException $e) {
+            $param = match ($e::class) {
+                InvalidDeadlineDateStringProvidedException::class => 'deadlineDate',
+                InvalidWorkflowProvidedException::class => 'batchWorkflow',
+                InvalidWorkflowStepProvidedException::class => 'batchWorkflowStep',
+                default => null,
+            };
+
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E1678',
+                [
+                    $param => [
+                        $invalidValueProvidedMessage,
+                    ],
+                ],
+            );
+        }
     }
 }

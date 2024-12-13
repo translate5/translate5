@@ -35,7 +35,7 @@ use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInt
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\DefaultJobAssignment\Contract\DeleteDefaultLspJobOperationInterface;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\DefaultUserJobActionPermissionAssert;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\DefaultLspJobActionPermissionAssert;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\Repository\UserRepository;
 use Zend_Registry;
@@ -63,7 +63,7 @@ class DeleteDefaultLspJobOperation implements DeleteDefaultLspJobOperationInterf
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
             \MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DeleteDefaultLspJobOperation::create(),
-            DefaultUserJobActionPermissionAssert::class::create(),
+            DefaultLspJobActionPermissionAssert::class::create(),
             Zend_Registry::get('logger')->cloneMe('defaultLspJob.delete'),
         );
     }

@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\DefaultJobAssignment;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\DefaultUserJobActionPermissionAssert;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\DefaultLspJobActionPermissionAssert;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\DefaultUserJobViewDataProvider;
 use MittagQI\Translate5\Repository\DefaultLspJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
@@ -72,7 +72,7 @@ class DefaultJobAssignmentViewDataProvider
             DefaultUserJobViewDataProvider::create(),
             DefaultLspJobRepository::create(),
             DefaultUserJobRepository::create(),
-            DefaultUserJobActionPermissionAssert::create(),
+            DefaultLspJobActionPermissionAssert::create(),
         );
     }
 

@@ -47,6 +47,7 @@ use MittagQI\Translate5\JobAssignment\UserJob\Exception\AssignedUserCanBeChanged
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirmedLspJobYetException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidDeadlineDateStringProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidStateProvidedException;
@@ -401,6 +402,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 'E1012',
                 [
                     'state' => [
+                        $invalidValueProvidedMessage,
+                    ],
+                ],
+            ),
+            InvalidDeadlineDateStringProvidedException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'deadlineDate' => [
                         $invalidValueProvidedMessage,
                     ],
                 ],
