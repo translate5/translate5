@@ -168,7 +168,7 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                     data: comboData
                 }),
                 colspan: 8,
-                id: 'specialCharactersCombo',
+                itemId: 'specialCharactersCombo',
                 emptyText: Editor.data.l10n.general.plsSelect,
                 displayField: 'txt',
                 valueField: 'val'
