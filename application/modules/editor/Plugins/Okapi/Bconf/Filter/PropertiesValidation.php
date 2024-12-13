@@ -249,14 +249,11 @@ final class PropertiesValidation extends ResourceFile
                 if ($this->props->has($varName)) {
                     $value = $this->props->get($varName);
                 } else {
-                    $oldVarName = $this->migratedProperties[$varName] ?? null;
-                    if ($oldVarName && $this->props->has($oldVarName)) {
-                        $value = $this->props->get($oldVarName);
-                    } else {
+                    $value = $this->migratedValueLookup($varName);
+                    if ($value === null) {
                         $value = $this->referenceProps->get($varName);
                     }
                 }
-
                 $newProps->add($varName, $value);
             }
             // transfer all volatile vars to the new props
@@ -271,13 +268,11 @@ final class PropertiesValidation extends ResourceFile
             // if not strict, we just amend non-existing props
             foreach ($this->referenceProps->getPropertyNames() as $varName) {
                 if (! $this->props->has($varName)) {
-                    $oldVarName = $this->migratedProperties[$varName] ?? null;
-                    $this->props->add(
-                        $varName,
-                        $oldVarName && $this->props->has($oldVarName) ? $this->props->get(
-                            $oldVarName
-                        ) : $this->referenceProps->get($varName)
-                    );
+                    $value = $this->migratedValueLookup($varName);
+                    if ($value === null) {
+                        $value = $this->referenceProps->get($varName);
+                    }
+                    $this->props->add($varName, $value);
                 }
             }
         }
@@ -291,6 +286,20 @@ final class PropertiesValidation extends ResourceFile
         }
 
         return true;
+    }
+
+    private function migratedValueLookup($varName): string|bool|int|null
+    {
+        if (! isset($this->migratedProperties[$varName]) || ! $this->props->has($this->migratedProperties[$varName])) {
+            return null;
+        }
+        $value = $this->props->get($this->migratedProperties[$varName]);
+        // fix booleans if needed
+        if (str_ends_with($varName, '.b') && ! str_ends_with($this->migratedProperties[$varName], '.b')) {
+            $value = ($value === 'true');
+        }
+
+        return $value;
     }
 
     /**

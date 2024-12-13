@@ -48,5 +48,5 @@ reorderPowerpointRelationships.b=false
 translateWordNumberingLevelText.b=false
 allowWordStyleOptimisation.b=true
 ignoreWordFontColors.b=false
-translateExcelCellsCopied.b=true
+translateExcelCellsCopied.b=false
 preserveExcelStylesInTargetColumns.b=false

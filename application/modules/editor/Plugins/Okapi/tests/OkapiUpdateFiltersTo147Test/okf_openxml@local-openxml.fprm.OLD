@@ -37,5 +37,6 @@ tsWordHighlightColors.i=0
 tsWordExcludedColors.i=0
 tsPowerpointIncludedSlideNumbers.i=0
 bExtractExternalHyperlinks.b=false
+translateExcelCellsCopied=false
 zzz0=
 zzz1=
