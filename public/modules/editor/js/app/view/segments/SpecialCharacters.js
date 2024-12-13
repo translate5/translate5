@@ -157,19 +157,22 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
 
         if(comboData.length){
             items.push(
-            {   xtype: "container",
-                items: [
+            {
+                xtype: "container",
+                html:'<br/>'
+            },
             {
                 xtype: 'combo',
                 store: Ext.create('Ext.data.Store', {
                     fields: ['txt', 'val'],
                     data: comboData
                 }),
+                colspan: 8,
                 id: 'specialCharactersCombo',
                 emptyText: Editor.data.l10n.general.plsSelect,
                 displayField: 'txt',
                 valueField: 'val'
-            }]});
+            });
         }
     }
 });
