@@ -29,16 +29,11 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FprmUpdaterTo147;
-use MittagQI\Translate5\Plugins\Okapi\OkapiService;
 
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
 //$this->doNotSavePhpForDebugging = false;
-
-//should be not __FILE__ in the case of wanted restarts / renamings etc
-// and must not be a constant since in installation the same named constant would we defined multiple times then
-$SCRIPT_IDENTIFIER = '014-TRANSLATE-4093-3647-3202-okapi-147-update-bconfs.php';
 
 //uncomment the following line, so that the file is not marked as processed:
 // $this->doNotSavePhpForDebugging = false;
@@ -48,25 +43,6 @@ $SCRIPT_IDENTIFIER = '014-TRANSLATE-4093-3647-3202-okapi-147-update-bconfs.php';
 $argc = count($argv);
 if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
-}
-
-$getOkapiVersion = function (Zend_Config $config): string {
-    $okapiConfig = $config->runtimeOptions->plugins->Okapi;
-    $serverUsed = $okapiConfig->serverUsed ?? '';
-    if ($serverUsed) {
-        $okapiUrl = $okapiConfig->server?->$serverUsed ?? '';
-        if ($okapiUrl) {
-            return OkapiService::fetchServerVersion($okapiUrl);
-        }
-    }
-
-    return '';
-};
-
-if (! isset($config) || ! str_starts_with($getOkapiVersion($config), '1.47.')) {
-    throw new ZfExtended_Exception(
-        __FILE__ . ': searching for Okapi 1.47 in config FAILED - stop migration script'
-    );
 }
 
 $fprmUpdater = new FprmUpdaterTo147();

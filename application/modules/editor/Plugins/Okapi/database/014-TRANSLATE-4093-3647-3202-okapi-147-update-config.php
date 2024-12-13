@@ -127,25 +127,21 @@ $NEW_SPECIAL_CHARS_JSON = '[
 //uncomment the following line, so that the file is not marked as processed:
 //$this->doNotSavePhpForDebugging = false;
 
-//should be not __FILE__ in the case of wanted restarts / renamings etc
-// and must not be a constant since in installation the same named constant would we defined multiple times then
-$SCRIPT_IDENTIFIER = '014-TRANSLATE-4093-3647-3202-okapi-147-update-config.php';
-
 //uncomment the following line, so that the file is not marked as processed:
 // $this->doNotSavePhpForDebugging = false;
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
 $argc = count($argv);
-if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7 || ! isset($config)) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$getOkapiVersion = function (Zend_Config $config): string {
-    $okapiConfig = $config->runtimeOptions->plugins->Okapi;
-    $serverUsed = $okapiConfig->serverUsed ?? '';
-    if ($serverUsed) {
-        $okapiUrl = $okapiConfig->server?->$serverUsed ?? '';
+$okapiConfig = $config->runtimeOptions->plugins->Okapi;
+
+$getOkapiVersion = function (Zend_Config $okapiConfig, string $serverName): string {
+    if ($serverName) {
+        $okapiUrl = $okapiConfig->server?->$serverName ?? '';
         if ($okapiUrl) {
             return OkapiService::fetchServerVersion($okapiUrl);
         }
@@ -154,13 +150,39 @@ $getOkapiVersion = function (Zend_Config $config): string {
     return '';
 };
 
-if (! isset($config) || ! str_starts_with($getOkapiVersion($config), '1.47.')) {
-    throw new ZfExtended_Exception(
-        __FILE__ . ': searching for Okapi 1.47 in config FAILED - stop migration script'
-    );
+$serverName = $okapiConfig->serverUsed ?? '';
+$okapiVersion = $getOkapiVersion($okapiConfig, $serverName);
+
+if (! str_starts_with($okapiVersion, '1.47.')) {
+    // detect if okapi 147 is available in the config
+    foreach ($okapiConfig->server as $okapiServerName => $okapiServerUrl) {
+        if (str_contains($okapiServerName, '147') && $okapiServerName !== $serverName) {
+            $serverName = $okapiServerName;
+            $okapiVersion = $getOkapiVersion($okapiConfig, $serverName);
+
+            break;
+        }
+    }
+    if (! str_starts_with($okapiVersion, '1.47.')) {
+        throw new ZfExtended_Exception(
+            __FILE__ . ': searching for Okapi 1.47 in config FAILED - stop migration script'
+        );
+    }
 }
 
+// update okapi's serverUsed for the general config & all customer configs
+
 $db = Zend_Db_Table::getDefaultAdapter();
+
+$db->query(
+    'UPDATE `Zf_configuration` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
+    $serverName
+);
+$db->query(
+    'UPDATE `LEK_customer_config` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
+    $serverName
+);
+
 $db->query(
     "DELETE FROM `Zf_configuration` WHERE `name` IN (" .
     "'runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName'," .
