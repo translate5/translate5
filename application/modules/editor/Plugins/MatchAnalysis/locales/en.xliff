@@ -39,7 +39,11 @@
 		    <source>Umfasst eine QS und Terminologie Prüfung</source>
 		    <target>Covers a QA and terminology check</target>
 		</trans-unit>
-		
+
+		<trans-unit id='RGllIEFuYWx5c2UgbXVzcyBlcm5ldXQgZHVyY2hnZWbDvGhydCB3ZXJkZW4sIGRhbWl0IGRpZSBNYXRjaC1SYXRlLUFiesO8Z2UgZ2VzcGVpY2hlcnQgd2VyZGVuIHVuZCB3aXJrc2FtIHdlcmRlbg=='>
+		    <source>Die Analyse muss erneut durchgeführt werden, damit die Match-Rate-Abzüge gespeichert werden und wirksam werden</source>
+		    <target>Analysis should be re-run for penalties to be saved and take effect</target>
+		</trans-unit>
 		<trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='>
 			<source>Export als Excel</source>
 			<target>Export as Excel</target>

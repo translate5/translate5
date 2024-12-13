@@ -106,7 +106,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->addValidator('taskGuid', 'guid');
         $this->addValidator('matchRate', 'between', [
             'min' => 0,
-            'max' => 104,
+            'max' => editor_Models_Segment_MatchRateType::MAX_VALUE,
         ]);
         $this->addValidator('matchRateType', 'stringLength', [
             'min' => 0,

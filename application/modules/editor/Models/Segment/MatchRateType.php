@@ -158,6 +158,11 @@ class editor_Models_Segment_MatchRateType
      */
     public const RESOURCE_TYPES = [self::TYPE_TM, self::TYPE_MT, self::TYPE_TERM_COLLECTION];
 
+    /**
+     * Highest possible match rate
+     */
+    public const MAX_VALUE = 104;
+
     /***
      * All match rate types which are requiring an icon
      * @var array

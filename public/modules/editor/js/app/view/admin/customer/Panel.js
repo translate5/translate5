@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -35,7 +34,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
         'Editor.view.admin.config.Grid',
         'Editor.view.admin.user.Assoc',
         'Editor.view.admin.customer.OpenIdPanel',
-        'Editor.view.admin.customer.CopyWindow'
+        'Editor.view.admin.customer.CopyWindow',
+        'Editor.view.LanguageResources.CustomerTmAssoc',
+        'Editor.view.LanguageResources.CustomerTmAssocController',
     ],
 
     stores:['admin.Customers'],
@@ -98,6 +99,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                     {
                         xtype: 'gridpanel',
                         cls: 'customerPanelGrid',
+                        border: 0,
                         itemId: 'customerPanelGrid',
                         stateful: true,
                         stateId: 'editor.customerPanelGrid',
@@ -191,6 +193,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         split: true,
                         layout:'fit',
                         itemId:'displayTabPanel',
+                        bodyStyle: 'border: 0',
                         reference: 'display',
                         bind:{
                             disabled : '{!record}'
@@ -300,6 +303,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     itemId: 'openIdDomain',
                                     disabled: isNotOpenIdEditor
                                 }]
+                        },{
+                            xtype: 'customerTmAssoc'
                         },{
                             xtype: 'adminUserAssoc',
                             bind:{

@@ -54,6 +54,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         ref:'matchAnalysisPanel',
         selector: 'matchAnalysisPanel'
     },{
+        ref: 'analysisRerunMsg',
+        selector: '#analysisNeedRerun'
+    }, {
         ref:'languageResourceTaskAssocPanel',
         selector:'languageResourceTaskAssocPanel'
     },{
@@ -264,6 +267,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 bind: {
                     hidden:'{isAnalysisButtonHidden}'
                 }
+            },{
+                xtype: 'container',
+                html: me.strings.analysisNeedRerun,
+                itemId: 'analysisNeedRerun',
+                hidden: true,
+                style: {
+                    color: 'red'
+                }
             }]
         },{
             xtype : 'container',
@@ -388,17 +399,37 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         this.startOperation(taskId, operation, false);
     },
     
-    matchAnalysisButtonHandler: function(button){
+    matchAnalysisButtonHandler: function(){
         var me = this,
-            taskManagement = button.up('#adminTaskTaskManagement'),
+            taskManagement = me.getAdminTaskTaskManagement(),
             tmAndTermChecked = me.isCheckboxChecked('pretranslateTmAndTerm'),
             mTChecked = me.isCheckboxChecked('pretranslateMt'),
+            assocGridChanges = me.getTaskAssocGrid().getStore().getModifiedRecords(),
+            assocController = Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc'),
             task = taskManagement.getCurrentTask(),
             operation = (mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
-        
-        me.startOperation(task.get('id'), operation, false);
+
+        // Check how much assoc-records have changes but not yet saved
+        me.unsavedAssocQueueSize = assocGridChanges.length;
+
+        // Hide rerun msg
+        me.getAnalysisRerunMsg().hide();
+
+        // If nothing unsaved - start operation
+        if (me.unsavedAssocQueueSize === 0) {
+
+            // Remove loading mask
+            taskManagement.setLoading(false);
+
+            // Start operation
+            me.startOperation(task.get('id'), operation, false);
+
+        // Else cut and save the first from unsaved and do that until no unsaved left
+        } else {
+            assocController.saveRecord(assocGridChanges.shift(), true);
+        }
     },
-    
+
     /***
      * Start the match analysis or pretranslation for the taskId.
      * Operation can contains:
@@ -429,6 +460,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     onTaskAssocSavingFinished: function(record, store){
         this.updateTaskAssoc(store);
+        if (this.unsavedAssocQueueSize) {
+            this.matchAnalysisButtonHandler();
+        }
     },
 
     /***

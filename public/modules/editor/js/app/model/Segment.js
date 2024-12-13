@@ -72,6 +72,8 @@ Ext.define('Editor.model.Segment', {
         {name: 'workflowStepNr', type: 'integer', persist: false},
         {name: 'matchRate', type: 'int'},
         {name: 'matchRateType', type: 'string'},
+        {name: 'penaltyGeneral', type: 'int'},
+        {name: 'penaltySublang', type: 'int'},
         //{name: 'terms', type: 'string'},
         {name: 'durations', defaultValue: {}}, //we are using an object here
         {name: 'comments', type: 'string', persist: false},

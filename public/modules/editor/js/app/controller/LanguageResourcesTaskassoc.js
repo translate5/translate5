@@ -55,6 +55,9 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
         ref: 'taskManagement',
         selector: 'adminTaskTaskManagement'
     }, {
+        ref: 'analysisRerunMsg',
+        selector: '#analysisNeedRerun'
+    }, {
         ref: 'adminTaskAddWindow',
         selector: '#adminTaskAddWindow'
     }],
@@ -72,6 +75,9 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
             },
             '#languageResourcesTaskAssocGrid checkcolumn[dataIndex="checked"]': {
                 checkchange: 'handleCheckedChange'
+            },
+            '#languageResourcesTaskAssocGrid': {
+                edit: 'onPenaltyEdit'
             }
         },
 
@@ -131,7 +137,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
     /**
      * Save assoc record
      */
-    saveRecord: function (record) {
+    saveRecord: function (record, isSaveSequence) {
         var me = this,
             str = me.strings,
             params = {},
@@ -140,7 +146,9 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
             checkedData = Ext.JSON.encode({
                 languageResourceId: record.get('languageResourceId'),
                 taskGuid: record.get('taskGuid'),
-                segmentsUpdateable: record.get('segmentsUpdateable')
+                segmentsUpdateable: record.get('segmentsUpdateable'),
+                penaltyGeneral: record.get('penaltyGeneral'),
+                penaltySublang: record.get('penaltySublang'),
             });
 
         if (me.getTaskManagement()) {
@@ -169,14 +177,18 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
                     Editor.MessageBox.addSuccess(str.assocDeleted);
                 }
                 record.commit();
-                me.hideLoadingMask();
+                if (!isSaveSequence) {
+                    me.hideLoadingMask();
+                }
 
                 //fire the event when all active requests are finished
                 me.fireEvent('taskAssocSavingFinished', record, me.getLanguageResourcesTaskAssocGrid().getStore());
             },
             failure: function (response) {
                 Editor.app.getController('ServerException').handleException(response);
-                me.hideLoadingMask();
+                if (!isSaveSequence) {
+                    me.hideLoadingMask();
+                }
             }
         });
     },
@@ -201,5 +213,43 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
             return addTaskWindow.down('#languageResourcesTaskAssocGrid');
         }
         return me.getTaskManagement().down('#languageResourcesTaskAssocGrid');
+    },
+
+    /**
+     * Handler for edit-event fired when penalty cell editing done
+     *
+     * @param plugin
+     * @param context
+     */
+    onPenaltyEdit: function(plugin, context) {
+
+        // Make sure assoc to be created, if not exist so far
+        var changes = context.record.getChanges(),
+            changedProps = Object.keys(changes);
+
+        // If the only modified prop remaining is checked-prop - it means
+        // checked-prop was auto-set checked but now it should be auto-set unchecked
+        if (changedProps.length === 1 && 'checked' in changes && changes.checked === true) {
+            context.record.set('checked', false);
+        } else {
+            context.record.set('checked', true);
+        }
+
+        // Add or update association with the penalty
+        // immediately only when we're in task wizard
+        if (this.getAdminTaskAddWindow()) {
+            this.saveRecord(context.record);
+
+        // Else
+        } else {
+
+            // Show/hide rerun-msg based on modified records presence
+            context.store.store.getModifiedRecords().length
+                ? this.getAnalysisRerunMsg().show()
+                : this.getAnalysisRerunMsg().hide();
+
+            // Update assoc in viewModel
+            Editor.app.getController('Editor.plugins.MatchAnalysis.controller.MatchAnalysis').updateTaskAssoc(context.store.store);
+        }
     }
 });

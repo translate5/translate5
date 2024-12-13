@@ -231,9 +231,22 @@ class editor_Plugins_MatchAnalysis_Pretranslation
      */
     protected function updateSegment(editor_Models_Segment $segment, stdClass $result, bool $isRepetition)
     {
-        //if the segment target is not empty or best match rate is not found do not pretranslate
-        //pretranslation only for editable segments
-        if ($segment->meta()->getLocked() || $segment->getAutoStateId() != editor_Models_Segment_AutoStates::NOT_TRANSLATED) {
+        // Check whether match rate and/or penalties changed
+        $penaltyChanged = array_sum([
+            'penaltyGeneral' => ((int) $segment->getPenaltyGeneral() !== (int) $result->penaltyGeneral) ? 1 : 0,
+            'penaltySublang' => ((int) $segment->getPenaltySublang() !== (int) $result->penaltySublang) ? 1 : 0,
+        ]);
+
+        // Do not pretranslate if either conditions are in place:
+        // 1. Segment is locked, as pretranslation is only for editable segments
+        // 2. Segment is not untranslated (e.g. is already pre-translated by previous match-analysis/pretranslation run)
+        //    Except case when:
+        //      Penalty was changed. In that case we need to update the penalties for that segments at least, and need
+        //      to update the best match and it's rate at most, because when penalty changed this may make previous best
+        //      match to be not the best anymore, and if so - this means we now have new best match with it's own rate,
+        //      which should be reflected in the segment data
+        if ($segment->meta()->getLocked()
+            || ($segment->getAutoStateId() != editor_Models_Segment_AutoStates::NOT_TRANSLATED && ! $penaltyChanged)) {
             return;
         }
 
@@ -278,6 +291,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             }
             $targetResult = $this->internalTag->removeIgnoredTags($targetResult);
             $segment->setMatchRate($result->matchrate);
+            $segment->setPenaltyGeneral($result->penaltyGeneral);
+            $segment->setPenaltySublang($result->penaltySublang);
             $matchType[] = $languageResource->getResourceType();
             $matchType[] = $type;
             if ($isRepetition) {

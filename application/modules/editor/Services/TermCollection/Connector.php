@@ -110,7 +110,11 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     {
         $qs = $this->getQueryStringAndSetAsDefault($segment);
 
-        return $this->queryCollectionResults($this->tagHandler->prepareQuery($qs), true);
+        return $this->queryCollectionResults(
+            queryString: $this->tagHandler->prepareQuery($qs),
+            reimportWhitespace: true,
+            useMajorLangs: true
+        );
     }
 
     /**
@@ -145,13 +149,21 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         string $queryString,
         bool $reimportWhitespace = false,
         string $field = SearchCollection::SEARCH_SOURCE,
-        bool $useWildcards = false
+        bool $useWildcards = false,
+        bool $useMajorLangs = false
     ) {
         if (empty($queryString) && $queryString !== '0') {
             return $this->resultList;
         }
         $entity = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
         $entity->load($this->languageResource->getId());
+
+        // If major langs should be used
+        if ($useMajorLangs) {
+            $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $taskMajorSourceLangId = $language->findMajorLanguageById($this->sourceLang);
+            $taskMajorTargetLangId = $language->findMajorLanguageById($this->targetLang);
+        }
 
         /***
          * Search the current term collection with given query string. All fuzzy languages will be included in the
@@ -162,8 +174,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
          */
         $searchCollection = ZfExtended_Factory::get(SearchCollection::class, [
             $entity->getId(),
-            $this->sourceLang,
-            $this->targetLang,
+            $useMajorLangs ? $taskMajorSourceLangId : $this->sourceLang,
+            $useMajorLangs ? $taskMajorTargetLangId : $this->targetLang,
         ]);
         $searchCollection->setSearchField($field);
         $results = $searchCollection->search($queryString, $useWildcards);
@@ -203,9 +215,13 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                     ? $res['default' . $field] : $res['term']);
 
                 $this->resultList->addResult(
-                    $field === SearchCollection::SEARCH_SOURCE ? $res['term'] : $res['default' . $field],
-                    $matchRate,
-                    $res
+                    target: $field === SearchCollection::SEARCH_SOURCE ? $res['term'] : $res['default' . $field],
+                    matchrate: $matchRate,
+                    metaData: $res,
+                    hook: function ($row) use ($res, $field) {
+                        $row->sourceLanguageId = $res['default' . $field . 'LanguageId'];
+                        $row->targetLanguageId = $res['languageId'];
+                    }
                 );
             }
         }

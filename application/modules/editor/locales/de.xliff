@@ -9945,6 +9945,39 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>automatisch abgeschlossen</source>
                 <target>automatisch abgeschlossen</target>
             </trans-unit>
+            <trans-unit id='VmVyd2VuZGJhciBmw7xyIEt1bmRlbg=='>
+                <source>Verwendbar für Kunden</source>
+                <target>Verwendbar für Kunden</target>
+            </trans-unit>
+            <trans-unit id='TnVyIHp1Z2V3aWVzZW5lIExpc3Rl'>
+                <source>Nur zugewiesene Liste</source>
+                <target>Nur zugewiesene Liste</target>
+            </trans-unit>
+            <trans-unit id='QWJ6dWc='>
+                <source>Abzug</source>
+                <target>Abzug</target>
+            </trans-unit>
+            <trans-unit id='RGllc2VyIFdlcnQgd2lyZCBmw7xyIGRpZSBBbmFseXNlIHZvbiBkZXIgVHJlZmZlci1SYXRlIGRlciBTcHJhY2hyZXNvdXJjZSBhYmdlem9nZW4u'>
+                <source>Dieser Wert wird für die Analyse von der Treffer-Rate der Sprachresource abgezogen.</source>
+                <target>Dieser Wert wird für die Analyse von der Treffer-Rate der Sprachresource abgezogen.</target>
+            </trans-unit>
+            <trans-unit id='U3ViLVNwcmFjaGVuYWJ6dWc6IERpZXNlciBXZXJ0IHdpcmQgZsO8ciBkaWUgQW5hbHlzZSB2b24gZGVyIFRyZWZmZXItUmF0ZSBkZXIgU3ByYWNocmVzb3VyY2UgYWJnZXpvZ2VuLCBGQUxMUyBzaWNoIGRpZSBTdWJzcHJhY2hlIGRlciBBdWZnYWJlIHZvbiBkZXIgU3Vic3ByYWNoZSBkZXIgU3ByYWNocmVzb3VyY2UgdW50ZXJzY2hlaWRldC4KPGJyLz5CZWlzcGllbGU6PGJyLz4KIC0gQXVzZ2FuZ3NzcHJhY2hlOiBTcHJhY2hyZXNvdXJjZSBkZS1ERSwgQXVmZ2FiZSBkZS1BVDogRGVyIEFienVnIGdyZWlmdDxici8+CiAtIFppZWxzcHJhY2hlOiBTcHJhY2hyZXNvdXJjZSBlbi1HQiwgQXVmZ2FiZSBlbi1VUzogRGVyIEFienVnIGdyZWlmdDxici8+CiAtIEF1c2dhbmdzc3ByYWNoZTogU3ByYWNocmVzb3VyY2UgZGUsIEF1ZmdhYmUgZGUtQVQ6IERlciBBYnp1ZyBncmVpZnQgTklDSFQ8YnIvPgogLSBaaWVsc3ByYWNoZTogU3ByYWNocmVzb3VyY2UgZGUtREUsIEF1ZmdhYmUgZGU6IERlciBBYnp1ZyBncmVpZiBOSUNIVDxici8+CmV0Yy4='>
+                <source>Sub-Sprachenabzug: Dieser Wert wird für die Analyse von der Treffer-Rate der Sprachresource abgezogen, FALLS sich die Subsprache der Aufgabe von der Subsprache der Sprachresource unterscheidet.
+<br/>Beispiele:<br/>
+ - Ausgangssprache: Sprachresource de-DE, Aufgabe de-AT: Der Abzug greift<br/>
+ - Zielsprache: Sprachresource en-GB, Aufgabe en-US: Der Abzug greift<br/>
+ - Ausgangssprache: Sprachresource de, Aufgabe de-AT: Der Abzug greift NICHT<br/>
+ - Zielsprache: Sprachresource de-DE, Aufgabe de: Der Abzug greif NICHT<br/>
+etc.</source>
+                <target>Sub-Sprachenabzug: Dieser Wert wird für die Analyse von der Treffer-Rate der Sprachresource abgezogen, FALLS sich die Subsprache der Aufgabe von der Subsprache der Sprachresource unterscheidet.
+<br/>Beispiele:<br/>
+ - Ausgangssprache: Sprachresource de-DE, Aufgabe de-AT: Der Abzug greift<br/>
+ - Zielsprache: Sprachresource en-GB, Aufgabe en-US: Der Abzug greift<br/>
+ - Ausgangssprache: Sprachresource de, Aufgabe de-AT: Der Abzug greift NICHT<br/>
+ - Zielsprache: Sprachresource de-DE, Aufgabe de: Der Abzug greif NICHT<br/>
+etc.
+                </target>
+            </trans-unit>
             <trans-unit id='TWFzc2Vuw6RuZGVydW5nZW4='>
                 <source>Massenänderungen</source>
                 <target>Massenänderungen</target>
