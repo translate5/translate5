@@ -244,7 +244,7 @@ final class ExtensionMapping extends ExtensionMappingParser
             }
             // opening a mapping from the file-system
             $content = null;
-            if (file_exists($this->path) && is_writable($this->path)) {
+            if (file_exists($this->path)) { //&& is_writable($this->path)
                 $content = file_get_contents($this->path);
             }
             if (empty($content)) {

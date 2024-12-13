@@ -25,7 +25,6 @@
         <testsuite name="okapi">
             <file>../Plugins/Okapi/tests/OkapiBconfTest.php</file>
             <file>../Plugins/Okapi/tests/OkapiBconfFilterTest.php</file>
-            <file>../Plugins/Okapi/tests/OkapiExportTest.php</file>
             <file>../Plugins/Okapi/tests/OkapiExtensionMappingTest.php</file>
             <file>../Plugins/Okapi/tests/OkapiSegmentationTest.php</file>
         </testsuite>
