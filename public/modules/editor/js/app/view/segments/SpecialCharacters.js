@@ -33,7 +33,7 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
     requires:['Editor.view.segments.SpecialCharactersButton'],
 
     strings:{
-        title:'#UT#Sonderzeichen hinzufügen:',
+        title:'#UT#Sonderzeichen hinzufügen:'
     },
 
     columns: 8,
@@ -156,11 +156,17 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
         });
 
         if(comboData.length){
+            if(items.length > this.columns) {
+                let missingCols = this.columns - items.length % this.columns;
+                if(missingCols < this.columns){
+                    // fill missing spaces
+                    while (missingCols > 0) {
+                        items.push({xtype:"container"});
+                        missingCols--;
+                    }
+                }
+            }
             items.push(
-            {
-                xtype: "container",
-                html:'<br/>'
-            },
             {
                 xtype: 'combo',
                 store: Ext.create('Ext.data.Store', {
@@ -173,6 +179,10 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                 displayField: 'txt',
                 valueField: 'val'
             });
+            if(items.length > this.columns){
+                // make combobox wider
+                items[items.length-1].width = 230;
+            }
         }
     }
 });
