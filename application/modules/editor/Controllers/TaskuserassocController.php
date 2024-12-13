@@ -261,7 +261,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
 
             // @phpstan-ignore-next-line
-            $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForLspJobUpdate($lspJob, $authUser);
+            $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForLspJobUpdate($lspJob);
         } catch (Throwable $e) {
             $this->log->exception($e);
 
