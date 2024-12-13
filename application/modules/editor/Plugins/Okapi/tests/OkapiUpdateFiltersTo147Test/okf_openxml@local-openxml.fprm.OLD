@@ -24,6 +24,7 @@ bPreferenceTranslateExcelDiagramData.b=false
 bPreferenceTranslateExcelDrawings.b=false
 subfilter=
 bInExcludeMode.b=true
+bPreferenceTranslatePowerpointComments.b=false
 bInExcludeHighlightMode.b=true
 bPreferenceTranslateWordExcludeColors.b=false
 bReorderPowerpointNotesAndComments.b=false

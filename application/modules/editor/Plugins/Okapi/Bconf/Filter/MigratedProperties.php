@@ -28,6 +28,21 @@
 
 namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
 
+/**
+ * Class representing migrated/renamed properties for X-Properties based FPRMs
+ * Migrated Properties are new property-names in the newer FPRM version of the given okapi-type.
+ *
+ * An entry has the following structure:
+ *  {
+ *      "type": "okf_openxml",
+ *      "properties": [
+ *          "translatePowerpointComments.b" : "bPreferenceTranslatePowerpointComments.b",
+ *          "_newPropertyName_" : "_oldPropertyName_"
+ *          ...
+ *      ]
+ *  }
+ */
+
 class MigratedProperties extends VolatileProperties
 {
     /**
