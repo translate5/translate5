@@ -222,8 +222,8 @@ class editor_Models_Segment_Whitespace
         ],
         '/\x{2011}/u' => [
             'ts' => 'e28091',
-            'text' => '[NBHY]',
-            'title' => 'Non-Breaking Hyphen (NBHY)',
+            'text' => '‑',
+            'title' => 'Non-Breaking Hyphen (‑)',
         ],
         '/\x{2028}/u' => [
             'ts' => 'e280a8',
