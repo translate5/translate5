@@ -142,8 +142,6 @@ $okapiConfig = $config->runtimeOptions->plugins->Okapi;
 $find147Version = function (array $serverList, string $serverName = ''): ?string {
     // test configured version
     if (array_key_exists($serverName, $serverList)) {
-        error_log('CHECKING: ' . $serverList[$serverName]);
-
         $version = OkapiService::fetchServerVersion($serverList[$serverName]);
         if ($version !== null && str_starts_with($version, '1.47.')) {
             return $serverName;
@@ -152,8 +150,6 @@ $find147Version = function (array $serverList, string $serverName = ''): ?string
     // test other servers
     foreach ($serverList as $otherName => $serverUrl) {
         if (str_contains($otherName, '147') && $otherName !== $serverName) {
-            error_log('CHECKING: ' . $serverList[$otherName]);
-
             $version = OkapiService::fetchServerVersion($serverList[$otherName]);
             if ($version !== null && str_starts_with($version, '1.47.')) {
                 return $otherName;
@@ -178,8 +174,6 @@ if ($serverName === null) {
         $testConfigs = Zend_Registry::get('test_configs');
         $serverList = json_decode($testConfigs['runtimeOptions.plugins.Okapi.server'], true) ?? [];
         $serverUsed = $testConfigs['runtimeOptions.plugins.Okapi.serverUsed'] ?? '';
-
-        error_log('OKAPI:' . $serverUsed . ' | ' . print_r($serverList, true));
 
         $serverName = $find147Version($serverList, $serverUsed);
 
