@@ -143,12 +143,12 @@ class editor_Models_Segment_Whitespace
         '/\x{00AD}/u' => [
             'ts' => 'c2ad',
             'text' => '[SHY]',
-            'title' => 'Soft Hyphen',
+            'title' => 'Soft Hyphen (SHY)',
         ],
         '/\x{1680}/u' => [
             'ts' => 'e19a80',
             'text' => '[OGSP]',
-            'title' => 'Ogham Space Mark',
+            'title' => 'Ogham Space Mark (OGSP)',
         ],
         '/\x{180E}/u' => [
             'ts' => 'e1a08e',
@@ -158,57 +158,57 @@ class editor_Models_Segment_Whitespace
         '/\x{2000}/u' => [
             'ts' => 'e28080',
             'text' => '[NQSP]',
-            'title' => 'En Quad',
+            'title' => 'En Quad (NQSP)',
         ],
         '/\x{2001}/u' => [
             'ts' => 'e28081',
             'text' => '[MQSP]',
-            'title' => 'Em Quad',
+            'title' => 'Em Quad (MQSP)',
         ],
         '/\x{2002}/u' => [
             'ts' => 'e28082',
             'text' => '[ENSP]',
-            'title' => 'En Space',
+            'title' => 'En Space (ENSP)',
         ],
         '/\x{2003}/u' => [
             'ts' => 'e28083',
             'text' => '[EMSP]',
-            'title' => 'Em Space',
+            'title' => 'Em Space (EMSP)',
         ],
         '/\x{2004}/u' => [
             'ts' => 'e28084',
             'text' => '[3/MSP]',
-            'title' => 'Three-Per-Em Space',
+            'title' => 'Three-Per-Em Space (3/MSP)',
         ],
         '/\x{2005}/u' => [
             'ts' => 'e28085',
             'text' => '[4/MSP]',
-            'title' => 'Four-Per-Em Space',
+            'title' => 'Four-Per-Em Space (4/MSP)',
         ],
         '/\x{2006}/u' => [
             'ts' => 'e28086',
             'text' => '[6/MSP]',
-            'title' => 'Six-Per-Em Space',
+            'title' => 'Six-Per-Em Space (6/MSP)',
         ],
         '/\x{2007}/u' => [
             'ts' => 'e28087',
             'text' => '[FSP]',
-            'title' => 'Figure Space',
+            'title' => 'Figure Space (FSP)',
         ],
         '/\x{2008}/u' => [
             'ts' => 'e28088',
             'text' => '[PSP]',
-            'title' => 'Punctuation Space',
+            'title' => 'Punctuation Space (PSP)',
         ],
         '/\x{2009}/u' => [
             'ts' => 'e28089',
             'text' => '[THSP]',
-            'title' => 'Thin Space',
+            'title' => 'Thin Space (THSP)',
         ],
         '/\x{200A}/u' => [
             'ts' => 'e2808a',
             'text' => '[HSP]',
-            'title' => 'Hair Space',
+            'title' => 'Hair Space (HSP)',
         ],
         '/\x{200B}/u' => [
             'ts' => 'e2808b',
@@ -222,18 +222,18 @@ class editor_Models_Segment_Whitespace
         ],
         '/\x{2011}/u' => [
             'ts' => 'e28091',
-            'text' => '‑',
-            'title' => 'Non-Breaking Hyphen',
+            'text' => '[NBHY]',
+            'title' => 'Non-Breaking Hyphen (NBHY)',
         ],
         '/\x{2028}/u' => [
             'ts' => 'e280a8',
             'text' => '[LS]',
-            'title' => 'Line Separator',
+            'title' => 'Line Separator (LS)',
         ],
         '/\x{2029}/u' => [
             'ts' => 'e280a9',
             'text' => '[PS]',
-            'title' => 'Paragraph Separator',
+            'title' => 'Paragraph Separator (PS)',
         ],
         '/\x{202F}/u' => [
             'ts' => 'e280af',
