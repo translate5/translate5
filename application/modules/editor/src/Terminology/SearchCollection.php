@@ -117,7 +117,10 @@ class SearchCollection
             if (! isset($termEntryTbxIdSearch[$res['termEntryTbxId']])) {
                 $termEntryTbxIdSearch[$res['termEntryTbxId']] = [];
             }
-            $termEntryTbxIdSearch[$res['termEntryTbxId']][] = $res['term'];
+            $termEntryTbxIdSearch[$res['termEntryTbxId']][] = [
+                'term' => $res['term'],
+                'languageId' => $res['languageId'],
+            ];
         }
 
         $targetResults = $this->findTargetTerms($termEntryTbxIds);
@@ -126,7 +129,8 @@ class SearchCollection
         foreach ($targetResults as &$single) {
             $single['default' . $this->searchField] = '';
             if (! empty($termEntryTbxIdSearch[$single['termEntryTbxId']])) {
-                $single['default' . $this->searchField] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0];
+                $single['default' . $this->searchField] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0]['term'];
+                $single['default' . $this->searchField . 'LanguageId'] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0]['languageId'];
             }
         }
 

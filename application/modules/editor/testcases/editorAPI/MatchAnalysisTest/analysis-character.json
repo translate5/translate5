@@ -15,7 +15,8 @@
         "70": 0,
         "60": 0,
         "50": 0,
-        "noMatch": 0
+        "noMatch": 0,
+        "penaltyTotal": 0
     },
     {
         "resourceName": "Internal fuzzies (OpenTM2 1)",
@@ -33,7 +34,8 @@
         "70": 0,
         "60": 0,
         "50": 0,
-        "noMatch": 0
+        "noMatch": 0,
+        "penaltyTotal": 0
     },
     {
         "resourceName": "MatchAnalysisTest_Collection",
@@ -51,7 +53,8 @@
         "70": 0,
         "60": 0,
         "50": 0,
-        "noMatch": 52
+        "noMatch": 52,
+        "penaltyTotal": 0
     },
     {
         "resourceName": "",
@@ -87,6 +90,7 @@
         "70": 0,
         "60": 0,
         "50": 0,
-        "noMatch": 52
+        "noMatch": 52,
+        "penaltyTotal": ""
     }
 ]

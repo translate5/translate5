@@ -54,12 +54,13 @@ Ext.define('Editor.view.ViewPort', {
             items = [
                 {
                     xtype: 'headPanel',
-                    region: 'north',
+                    region: 'north'
                 },
                 {
                     region: 'center',
                     xtype: 'tabpanel',
                     itemId: 'adminMainSection',
+                    bodyStyle: 'border: 0',
                     /**
                      * returns the configured default route of the active tab (if any configured)
                      * @returns {string}
@@ -81,8 +82,8 @@ Ext.define('Editor.view.ViewPort', {
                         // because they are borderless by default
                         border: false,
                         layout: {
-                            overflowHandler: 'menu',
-                        },
+                            overflowHandler: 'menu'
+                        }
                     },
 
                     defaults: {
@@ -90,9 +91,9 @@ Ext.define('Editor.view.ViewPort', {
                     },
 
                     layout: {
-                        type: 'fit',
+                        type: 'fit'
                     },
-                    items: mainSections,
+                    items: mainSections
                 },
             ];
 

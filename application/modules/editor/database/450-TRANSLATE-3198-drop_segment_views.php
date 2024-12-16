@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,21 +26,30 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\LanguageResource\Validator;
+set_time_limit(0);
 
-use ZfExtended_Models_Validator_Abstract;
+/* @var $this ZfExtended_Models_Installer_DbUpdater */
 
-class TaskAssociation extends ZfExtended_Models_Validator_Abstract
-{
-    /**
-     * Validators for Task User Assoc Entity
-     */
-    protected function defineValidators()
-    {
-        $this->addValidator('taskGuid', 'guid');
-        $this->addValidator('languageResourceId', 'int');
-        $this->addValidator('segmentsUpdateable', 'boolean');
-        $this->addValidator('penaltyGeneral', 'int');
-        $this->addValidator('penaltySublang', 'int');
+//$this->doNotSavePhpForDebugging = false;
+
+$argc = count($argv);
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+    die("please dont call the script direct! Call it by using DBUpdater!\n\n");
+}
+
+$db = Zend_Db_Table::getDefaultAdapter();
+
+// Get config
+$conf = $db->getConfig();
+
+// Gete segment view tables
+$res = $db->query('show tables from `' . $conf['dbname'] . '` like "%LEK_segment_view_%";');
+$tables = $res->fetchAll(Zend_Db::FETCH_NUM);
+
+// Remove them, if any
+if (! empty($tables)) {
+    foreach ($tables as $table) {
+        $tableName = $table[0];
+        $db->query('DROP TABLE IF EXISTS `' . $tableName . '`');
     }
 }

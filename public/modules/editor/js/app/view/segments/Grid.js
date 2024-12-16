@@ -232,6 +232,28 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'matchrateColumn',
             stateId: 'matchrateColumn',
         },{
+            xtype: 'numbercolumn',
+            stateId: 'penaltyGeneral',
+            dataIndex: 'penaltyGeneral',
+            text: 'Penalty general',
+            format: '0',
+            width: 80,
+            hidden: true,
+            filter: {
+                type: 'numeric'
+            }
+        },{
+            xtype: 'numbercolumn',
+            stateId: 'penaltySublang',
+            dataIndex: 'penaltySublang',
+            text: 'Penalty sublang',
+            format: '0',
+            width: 80,
+            hidden: true,
+            filter: {
+                type: 'numeric'
+            }
+        },{
             xtype: 'matchrateTypeColumn',
             stateId: 'matchrateTypeColumn',
             hidden: true

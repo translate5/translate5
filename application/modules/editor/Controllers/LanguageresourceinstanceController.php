@@ -1506,6 +1506,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     {
         $this->initCurrentTask();
         $languageResourceId = (int) $this->_getParam('languageResourceId');
+        $taskGuid = $this->getCurrentTask()->getTaskGuid();
 
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
@@ -1513,7 +1514,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //check taskGuid of segment against loaded taskguid for security reasons
         //checks if the current task is associated to the languageResource
-        $this->entity->checkTaskAndLanguageResourceAccess($this->getCurrentTask()->getTaskGuid(), $languageResourceId, $segment);
+        $this->entity->checkTaskAndLanguageResourceAccess($taskGuid, $languageResourceId, $segment);
 
         $this->entity->load($languageResourceId);
 
@@ -1531,6 +1532,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->languageResourceId = $this->entity->getId();
         $this->view->resourceType = $this->entity->getResourceType();
         $this->view->rows = $result->getResult();
+
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
+        $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+
+        foreach ($this->view->rows as &$row) {
+            $penalties = $assoc->getPenalties($taskGuid, $languageResourceId, $row->sourceLanguageId, $row->targetLanguageId);
+            $row->penaltyGeneral = $penalties['penaltyGeneral'];
+            $row->penaltySublang = $penalties['penaltySublang'];
+        }
+        unset($row);
+
         if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
             $this->view->tmNeedsConversion = ! $tmConversionService->isTmConverted($languageResourceId);
             $this->view->tmConversionInProgress = $tmConversionService->isConversionInProgress($languageResourceId);
@@ -1695,7 +1707,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $diffTagger->insertTagAttributes['class'] = 'tmMatchGridResultTooltip';
         $diffTagger->deleteTagAttributes['class'] = 'tmMatchGridResultTooltip';
 
-        $results = $result->getResult() ?? [];
+        $results = $result->getResult();
         foreach ($results as &$res) {
             $tags = [];
             //replace the internal tags before diff
