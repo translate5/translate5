@@ -82,6 +82,7 @@ foreach ($bconf->loadAll() as $bconfData) {
         $extensionMapping = $bconf->getExtensionMapping();
         $extensionMapping->rescanFilters();
         $bconf->repackIfOutdated(true);
+        $bconf->invalidateCaches(); // as it keeps ExtensionMapping from prev. bconf
     } catch (Exception $e) {
         $msg = 'ERROR rescanning filters for bconf ' . $bconf->getId() . ', "' . $bconf->getName(
         ) . '": ' . $e->getMessage();
