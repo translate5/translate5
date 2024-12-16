@@ -50,3 +50,4 @@ allowWordStyleOptimisation.b=true
 ignoreWordFontColors.b=false
 translateExcelCellsCopied.b=true
 preserveExcelStylesInTargetColumns.b=false
+bPreferenceAllowEmptyTargets.b=false
