@@ -149,7 +149,7 @@ $find147Version = function (array $serverList, string $serverName = ''): ?string
     }
     // test other servers
     foreach ($serverList as $otherName => $serverUrl) {
-        if ($otherName !== $serverName) {
+        if (str_contains($otherName, '147') && $otherName !== $serverName) {
             $version = OkapiService::fetchServerVersion($serverList[$otherName]);
             if ($version !== null && str_starts_with($version, '1.47.')) {
                 return $otherName;
