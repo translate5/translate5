@@ -192,6 +192,7 @@ class DefaultUserJobRepository
             ->where('defaultUserJob.customerId = ?', $task->getCustomerId())
             ->where('defaultUserJob.sourceLang = ?', $task->getSourceLang())
             ->where('defaultUserJob.targetLang = ?', $task->getTargetLang())
+            ->where('defaultUserJob.workflow = ?', $task->getWorkflow())
             ->where('defaultLspJob.dataJobId IS NULL')
         ;
 

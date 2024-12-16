@@ -63,9 +63,8 @@ Ext.define('Editor.view.admin.user.Assoc', {
         wizardTitle: '#UT#Standard-Benutzerzuweisungen'
     },
 
-    /***
-     */
     customerId: null,
+    taskGuid: null,
 
     initConfig: function (instanceConfig) {
         var me = this,
@@ -283,16 +282,22 @@ Ext.define('Editor.view.admin.user.Assoc', {
             jobId = Number.isInteger(Number.parseInt(record.get('id'))) ? record.get('id') : null
         ;
 
-        if (! customerId) {
+        if (! customerId && ! this.taskGuid) {
             return;
         }
 
+        let path = jobId
+            ? `customers/${customerId}/default-lsp-job/${jobId}/combo/coordinators`
+            : `customers/${customerId}/default-lsp-job/combo/coordinators`;
+
+        if (this.taskGuid) {
+            path = jobId
+                ? `task/${this.taskGuid}/lsp-job/${jobId}/combo/coordinators`
+                : `task/${this.taskGuid}/lsp-job/combo/coordinators`;
+        }
+
         Ext.Ajax.request({
-            url: Editor.data.restpath + (
-                jobId
-                    ? `customers/${customerId}/default-lsp-job/${jobId}/combo/coordinators`
-                    : `customers/${customerId}/default-lsp-job/combo/coordinators`
-            ),
+            url: Editor.data.restpath + path,
             method: 'GET',
             success: function (response) {
                 const data = Ext.decode(response.responseText);
@@ -326,6 +331,10 @@ Ext.define('Editor.view.admin.user.Assoc', {
 
     getCustomer: function () {
         return this.customer;
+    },
+
+    setTaskGuid: function (taskGuid) {
+        this.taskGuid = taskGuid;
     },
 
     /**

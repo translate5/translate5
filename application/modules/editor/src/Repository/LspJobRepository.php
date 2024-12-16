@@ -527,4 +527,40 @@ class LspJobRepository
             yield clone $lspJob;
         }
     }
+
+    public function getTaskDirectLspJobs(string $taskGuid): iterable
+    {
+        $lspJob = new LspJob();
+
+        $select = $this->db
+            ->select()
+            ->from([
+                'lspJob' => LspJobTable::TABLE_NAME,
+            ])
+            ->join(
+                [
+                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
+                ],
+                'lspJob.lspId = lsp.id',
+                []
+            )
+            ->where('lspJob.taskGuid = ?', $taskGuid)
+            ->where('lsp.parentId IS NULL')
+        ;
+
+        foreach ($this->db->fetchAll($select) as $jobData) {
+            $lspJob->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $lspJob->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $lspJob;
+        }
+    }
 }

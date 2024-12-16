@@ -179,7 +179,11 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
             typeCombo = form.down('combo[name="type"]')
         ;
 
+        form.up('adminUserAssoc').setTaskGuid(record.get('taskGuid'));
+
         form.getForm().loadRecord(record.clone());
+        typeCombo.setValue(null);
+        typeCombo.setValue(record.get('type'));
         typeCombo.setDisabled(true);
         typeCombo.setVisible(false);
         form.setDisabled(false);

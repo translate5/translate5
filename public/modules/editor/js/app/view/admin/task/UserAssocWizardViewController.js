@@ -99,10 +99,9 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             workflowCombo = view.down('#workflowCombo'),
             store = view.down('grid').getStore();
 
-        store.setExtraParams({
-            projectId: project.get('projectId'),
-            workflow: workflowCombo.getValue()
-        });
+        store
+            .getProxy()
+            .setUrl(Editor.data.restpath + 'project/' + project.get('projectId') + '/jobs/' + workflowCombo.getValue());
         store.load();
     },
 
@@ -117,7 +116,9 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             usersStore = Ext.StoreManager.get('admin.Users'),
             usageMode = view.down('#usageMode');
 
-        me.getView().up().down('adminUserAssoc').setCustomer(project.get('customerId'));
+       const userAssocPanel =  me.getView().up().down('adminUserAssoc');
+       userAssocPanel.setCustomer(project.get('customerId'));
+       userAssocPanel.setTaskGuid(null);
 
         // first set the combo value on panel activate then load the store.
         workflowCombo.setValue(project.get('workflow'));

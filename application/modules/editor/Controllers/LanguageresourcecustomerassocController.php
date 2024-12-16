@@ -26,6 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
+use MittagQI\Translate5\Repository\CustomerRepository;
+use MittagQI\Translate5\Repository\UserRepository;
+
 /**
  * Controller for the LanguageResources Associations
  */
@@ -46,6 +52,12 @@ class editor_LanguageresourcecustomerassocController extends ZfExtended_RestCont
      */
     protected $postBlacklist = ['id'];
 
+    private CustomerActionPermissionAssert $permissionAssert;
+
+    private UserRepository $userRepository;
+
+    private CustomerRepository $customerRepository;
+
     public function init()
     {
         ZfExtended_Models_Entity_Conflict::addCodes([
@@ -53,6 +65,10 @@ class editor_LanguageresourcecustomerassocController extends ZfExtended_RestCont
             'E1051' => 'Cannot remove language resource from task since task is used at the moment.',
         ], 'editor.languageresource.taskassoc');
         parent::init();
+
+        $this->permissionAssert = CustomerActionPermissionAssert::create();
+        $this->userRepository = new UserRepository();
+        $this->customerRepository = new CustomerRepository();
     }
 
     /**
@@ -62,6 +78,13 @@ class editor_LanguageresourcecustomerassocController extends ZfExtended_RestCont
     public function indexAction()
     {
         $customerId = (int) $this->getParam('customerId');
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+        $context = new PermissionAssertContext($authUser);
+
+        $customer = $this->customerRepository->get($customerId);
+
+        $this->permissionAssert->assertGranted(CustomerAction::Read, $customer, $context);
+
         $this->view->rows = $this->entity->loadByCustomerId($customerId);
         $this->view->total = count($this->view->rows);
     }
@@ -75,8 +98,14 @@ class editor_LanguageresourcecustomerassocController extends ZfExtended_RestCont
      */
     public function postAction()
     {
-        // Pick params from request
         $customerId = (int) $this->getParam('customerId');
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+        $context = new PermissionAssertContext($authUser);
+
+        $customer = $this->customerRepository->get($customerId);
+
+        $this->permissionAssert->assertGranted(CustomerAction::Update, $customer, $context);
+
         $resourceId = (int) $this->getParam('languageResourceId');
 
         // Check customer access restriction

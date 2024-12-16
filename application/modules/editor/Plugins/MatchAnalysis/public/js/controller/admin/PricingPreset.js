@@ -129,7 +129,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.admin.PricingPreset', {
             };
             vm.setStores(vmStores);
             // add the pricingPreset grid to the tabPanel and bind it to the customer
-            tabPanel.insert(2, {
+            tabPanel.insert(3, {
                 xtype: 'pricingPresetGrid',
                 routePrefix: 'client/:clientId/',
                 bind: {

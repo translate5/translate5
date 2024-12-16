@@ -50,7 +50,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewModel', {
              * Add additional params to the store proxy. The newExtra params will be merged into
              * the existing proxy extra params
              */
-            setExtraParams:function(newExtra){
+            setExtraParams: function (newExtra){
                 var me=this,
                     existing = me.getProxy().getExtraParams(),
                     merged = Ext.Object.merge(existing, newExtra);
@@ -58,7 +58,6 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewModel', {
             },
             proxy : {
                 type : 'rest',
-                url: Editor.data.restpath+'taskuserassoc/project',
                 reader : {
                     rootProperty: 'rows',
                     type : 'json'

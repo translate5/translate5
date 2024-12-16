@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\Exception\InvalidTypeProvidedException;
@@ -163,7 +164,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             return;
         }
 
-        $task = $this->taskRepository->get((int) $this->getRequest()->getParam('taskId'));
+        $task = $this->resolveTask();
 
         $rows = $this->jobAssignmentViewDataProvider->getListFor($task->getTaskGuid(), $authUser);
 
@@ -178,7 +179,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
                 'E1680',
-                'Route /editor/taskuserassoc deprecated, use editor/project/:projectId/jobs instead',
+                'Route /editor/taskuserassoc deprecated, use editor/project/:projectId/jobs/:workflow instead',
             );
         }
 
@@ -203,7 +204,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
-            $task = $this->taskRepository->get((int) $this->getRequest()->getParam('taskId'));
+            $task = $this->resolveTask();
 
             $this->taskActionPermissionAssert->assertGranted(
                 TaskAction::Read,
@@ -224,7 +225,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
-            $task = $this->taskRepository->get((int) $this->getRequest()->getParam('taskId'));
+            $task = $this->resolveTask();
 
             $this->taskActionPermissionAssert->assertGranted(
                 TaskAction::Read,
@@ -245,7 +246,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
-            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('jobId'));
 
             $this->assertJobBelongsToTask($job);
 
@@ -282,7 +283,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
-            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('jobId'));
 
             $this->assertJobBelongsToTask($job);
 
@@ -342,7 +343,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $workflowManager = new editor_Workflow_Manager();
 
         try {
-            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('jobId'));
 
             $this->assertJobBelongsToTask($job);
 
@@ -364,6 +365,17 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
             throw $this->transformException($e);
         }
+    }
+
+    private function resolveTask(): Task
+    {
+        $task = $this->taskRepository->find((int) $this->getRequest()->getParam('taskId'));
+        
+        if (null !== $task) {
+            return $task;
+        }
+        
+        return $this->taskRepository->getByGuid((string) $this->getRequest()->getParam('taskId'));
     }
 
     /**

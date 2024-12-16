@@ -141,7 +141,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
 
             $this->userJobRepository->save($job);
 
-            $this->logger->info('E1012', 'job created', [
+            $this->logger->info('E1012', 'User job created', [
                 'task' => $task,
                 'job' => $job->getSanitizedEntityForLog(),
             ]);

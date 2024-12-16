@@ -37,6 +37,7 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultLspJobAlreadyExistsException;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\InexistentDefaultLspJobException;
 use MittagQI\Translate5\LSP\JobCoordinator;
+use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
 use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
@@ -253,16 +254,69 @@ class DefaultLspJobRepository
     /**
      * @return iterable<DefaultLspJob>
      */
-    public function getDefaultLspJobsForTask(Task $task): iterable
+    public function getDefaultLspJobsOfDirectLspsForTask(Task $task): iterable
     {
         $job = new DefaultLspJob();
 
         $select = $this->db
             ->select()
-            ->from(DefaultLspJobTable::TABLE_NAME)
+            ->from([
+                'DefaultLspJob' => DefaultLspJobTable::TABLE_NAME
+            ])
+            ->join(
+                [
+                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
+                ],
+                'DefaultLspJob.lspId = lsp.id',
+                []
+            )
             ->where('customerId = ?', $task->getCustomerId())
             ->where('sourceLang = ?', $task->getSourceLang())
             ->where('targetLang = ?', $task->getTargetLang())
+            ->where('lsp.parentId IS NULL')
+        ;
+
+        $stmt = $this->db->query($select);
+
+        while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $job->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $job;
+        }
+    }
+
+    /**
+     * @return iterable<DefaultLspJob>
+     */
+    public function getDefaultLspJobsOfSubLspsForTask(Task $task, int ...$parentLspIds): iterable
+    {
+        $job = new DefaultLspJob();
+
+        $select = $this->db
+            ->select()
+            ->from([
+                'DefaultLspJob' => DefaultLspJobTable::TABLE_NAME
+            ])
+            ->join(
+                [
+                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
+                ],
+                'DefaultLspJob.lspId = lsp.id',
+                []
+            )
+            ->where('customerId = ?', $task->getCustomerId())
+            ->where('sourceLang = ?', $task->getSourceLang())
+            ->where('targetLang = ?', $task->getTargetLang())
+            ->where('lsp.parentId in (?)', $parentLspIds)
         ;
 
         $stmt = $this->db->query($select);

@@ -48,7 +48,11 @@ Ext.define('Editor.view.admin.customer.ViewController', {
             '#cancelOpenIdButton': {
                 click:'cancelEdit'
             },
-
+            '#adminUserAssoc': {
+                beforerender: function (panel, opts) {
+                    panel.setTaskGuid(null);
+                },
+            },
             // This selector will select all menuitems inside toolbar's overflow-menu
             // so that click event is triggered on toolbar's corresponding item
             'button[iconCls="x-toolbar-more-icon"] > menu > menuitem': {
@@ -105,7 +109,7 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         var view = this.getView(),
             grid = view && view.down('#customerPanelGrid');
 
-        if(grid && grid.isVisible(true)){
+        if (grid && grid.isVisible(true)) {
             // Set the record for editing only if the component is visible. The grid selection can be triggered
             // from multiple places (ex: reloading the customers store) which can lead to trying to edit the record,
             // when the component is not visible
@@ -192,6 +196,10 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         }
 
         vm.set('record', record);
+
+        if (! formPanel) {
+            return;
+        }
 
         formPanel.loadRecord(record);
         

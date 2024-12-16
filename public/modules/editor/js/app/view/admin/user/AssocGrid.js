@@ -51,7 +51,8 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
         notifyButtonText: '#UT#Benutzer nach Import benachrichtigen',
         notifyButtonTooltip: '#UT#Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen',
         workflowStepNameCol:'#UT#Workflow-Schritt',
-        fieldWorkflow: '#UT#Workflow'
+        fieldWorkflow: '#UT#Workflow',
+        typeCol: '#UT#Typ'
     },
 
     viewModel: {
@@ -110,13 +111,25 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
 
                         store:'admin.WorkflowSteps'
                     }
-                } ,{
+                },
+                {
                     xtype: 'gridcolumn',
-                    dataIndex: 'role',
-                    flex:1,
-                    hidden:true,
-                    text: me.strings.roleCol
-                },{
+                    width: 120,
+                    dataIndex: 'type',
+                    renderer: function (v, meta, rec) {
+                        const types = {
+                            1: 'Editor',
+                            2: 'LSP',
+                        };
+
+                        return types[v];
+                    },
+                    filter: {
+                        type: 'string'
+                    },
+                    text: me.strings.typeCol
+                },
+                {
                     xtype: 'gridcolumn',
                     dataIndex: 'deadlineDate',
                     flex:1,

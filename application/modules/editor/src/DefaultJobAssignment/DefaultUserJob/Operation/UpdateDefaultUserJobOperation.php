@@ -67,7 +67,9 @@ class UpdateDefaultUserJobOperation implements UpdateDefaultUserJobOperationInte
 
     public function updateJob(DefaultUserJob $job, UpdateDefaultJobDto $dto): void
     {
-        $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
+        $lspUser = $dto->userGuid
+            ? $this->lspUserRepository->findByUserGuid($dto->userGuid)
+            : null;
 
         if (null !== $lspUser) {
             try {

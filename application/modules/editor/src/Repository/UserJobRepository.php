@@ -403,20 +403,21 @@ class UserJobRepository
         $s = $this->db
             ->select()
             ->from([
-                'tua' => UserJobTable::TABLE_NAME,
+                'userJob' => UserJobTable::TABLE_NAME,
             ])
             ->join(
                 [
-                    't' => TaskTable::TABLE_NAME,
+                    'task' => TaskTable::TABLE_NAME,
                 ],
-                't.taskGuid = tua.taskGuid',
+                'task.taskGuid = userJob.taskGuid',
+                []
             )
-            ->where('tua.isPmOverride = 0')
-            ->where('t.projectId = ?', $projectId)
-            ->where('t.taskType not in (?)', $this->taskType->getProjectTypes(true));
+            ->where('userJob.isPmOverride = 0')
+            ->where('task.projectId = ?', $projectId)
+            ->where('task.taskType not in (?)', $this->taskType->getProjectTypes(true));
 
         if (null !== $workflow) {
-            $s->where('tua.workflow = ?', $workflow);
+            $s->where('userJob.workflow = ?', $workflow);
         }
 
         $jobs = $this->db->fetchAll($s, [], PDO::FETCH_ASSOC);

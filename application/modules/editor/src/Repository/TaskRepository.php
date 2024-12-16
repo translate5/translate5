@@ -56,6 +56,15 @@ class TaskRepository
         );
     }
 
+    public function find(int $id): ?Task
+    {
+        try {
+            return $this->get($id);
+        } catch (InexistentTaskException) {
+            return null;
+        }
+    }
+
     /**
      * @throws InexistentTaskException
      */
@@ -84,46 +93,6 @@ class TaskRepository
         }
 
         return $task;
-    }
-
-    /**
-     * @throws InexistentTaskException
-     */
-    public function getWithLockByGuid(string $guid): Task
-    {
-        $task = new Task();
-
-        $this->db->beginTransaction();
-
-        $select = $this->db->select()
-            ->forUpdate()
-            ->from(TaskTable::TABLE_NAME)
-            ->where('taskGuid = ?', $guid)
-        ;
-        $row = $this->db->fetchRow($select);
-
-        if (empty($row)) {
-            $this->db->rollBack();
-
-            throw new InexistentTaskException($guid);
-        }
-
-        $task->init(
-            new \Zend_Db_Table_Row(
-                [
-                    'table' => $task->db,
-                    'data' => $row,
-                    'stored' => true,
-                    'readOnly' => false,
-                ]
-            )
-        );
-
-        return $task;
-    }
-
-    public function release()
-    {
     }
 
     /**

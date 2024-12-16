@@ -305,6 +305,10 @@ Ext.define('Editor.controller.LanguageResources', {
   },
 
     addToCustomerPanel: function(tabPanel) {
+        if (! Editor.app.authenticatedUser.isAllowed('customerTmAssoc')) {
+            return;
+        }
+
         var vm = tabPanel.up('[viewModel]').getViewModel();
         var vmStores = vm.storeInfo || {};
         vmStores.customersLanguageResourceStore = {
