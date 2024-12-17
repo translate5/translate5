@@ -28,14 +28,17 @@
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Upgrader;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\Fprm;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\PropertiesValidation;
 
 /**
  * Class representing updates to v1.47
  */
-final class FprmUpdaterTo147
+final class UpgraderTo147
 {
-    private const replaceYamlData = [
+    private const replaceFprmYamlData = [
         'okf_html' => [
             "[keywords, description]" => "[keywords, description, 'twitter:title', 'twitter:description', 'og:title', 'og:description', 'og:site_name']",
             ".*:
@@ -68,7 +71,35 @@ final class FprmUpdaterTo147
         ],
     ];
 
-    public function updateInDir(string $bconfDir, string $bconfId, string $bconfName): void
+    private const pipelineProps = [
+        'doNotSegmentIfHasTarget.b=false' => 'SegmentationStep',
+        'writerOptions.includeNoTranslate.b=true' => 'ExtractionStep',
+        'writerOptions.escapeGT.b=true' => 'ExtractionStep',
+    ];
+
+    public static function upgradePipeline(string $bconfDir)
+    {
+        $pipelineFile = $bconfDir . '/pipeline.pln';
+        $pipelineChanged = false;
+        $pipelineData = file_get_contents($pipelineFile);
+        foreach (self::pipelineProps as $propLine => $step) {
+            if (str_contains($pipelineData, $propLine)) {
+                continue;
+            }
+            [$propKey] = explode('=', $propLine);
+            if (str_contains($pipelineData, $propKey)) {
+                $pipelineData = preg_replace('/' . $propKey . '=\w*/', $propLine, $pipelineData);
+            } else {
+                $pipelineData = preg_replace('/\.' . $step . '">#v1[\r\n]+/', '\\0' . $propLine . "\n", $pipelineData);
+            }
+            $pipelineChanged = true;
+        }
+        if ($pipelineChanged) {
+            file_put_contents($pipelineFile, $pipelineData);
+        }
+    }
+
+    public static function upgradeFprms(string $bconfDir, string $bconfId, string $bconfName): void
     {
         $json = json_decode(file_get_contents($bconfDir . '/content.json'), true);
         if (empty($json['fprm'])) {
@@ -94,9 +125,9 @@ final class FprmUpdaterTo147
                 }
             } else {
                 // amend selected Yaml-based FPRMs
-                if ($fprm->getType() === Fprm::TYPE_YAML && ! empty(self::replaceYamlData[$okfType])) {
+                if ($fprm->getType() === Fprm::TYPE_YAML && ! empty(self::replaceFprmYamlData[$okfType])) {
                     $fileContents = rtrim(file_get_contents($fprmFile));
-                    foreach (self::replaceYamlData[$okfType] as $str1 => $str2) {
+                    foreach (self::replaceFprmYamlData[$okfType] as $str1 => $str2) {
                         $fileContents = str_replace($str1, $str2, $fileContents);
                     }
                     $fprm = new Fprm($fprmFile, $fileContents);

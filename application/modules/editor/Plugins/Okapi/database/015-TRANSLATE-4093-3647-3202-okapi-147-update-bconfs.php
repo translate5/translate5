@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
-use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FprmUpdaterTo147;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Upgrader\UpgraderTo147;
 
 set_time_limit(0);
 
@@ -45,44 +45,21 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$fprmUpdater = new FprmUpdaterTo147();
 $bconf = new BconfEntity();
+$bconfAll = $bconf->loadAll();
 
-$pipelineProps = [
-    'doNotSegmentIfHasTarget.b=false' => 'SegmentationStep',
-    'writerOptions.includeNoTranslate.b=true' => 'ExtractionStep',
-    'writerOptions.escapeGT.b=true' => 'ExtractionStep',
-];
-
-foreach ($bconf->loadAll() as $bconfData) {
+foreach ($bconfAll as $bconfData) {
     try {
+        $bconf = new BconfEntity();
         $bconf->load($bconfData['id']);
         $bconfDir = $bconf->getDataDirectory();
-        $pipelineFile = $bconfDir . '/pipeline.pln';
-        $pipelineChanged = false;
-        $pipelineData = file_get_contents($pipelineFile);
-        foreach ($pipelineProps as $propLine => $step) {
-            if (str_contains($pipelineData, $propLine)) {
-                continue;
-            }
-            [$propKey] = explode('=', $propLine);
-            if (str_contains($pipelineData, $propKey)) {
-                $pipelineData = preg_replace('/' . $propKey . '=\w*/', $propLine, $pipelineData);
-            } else {
-                $pipelineData = preg_replace('/\.' . $step . '">#v1[\r\n]+/', '\\0' . $propLine . "\n", $pipelineData);
-            }
-            $pipelineChanged = true;
-        }
-        if ($pipelineChanged) {
-            file_put_contents($pipelineFile, $pipelineData);
-        }
 
-        $fprmUpdater->updateInDir($bconfDir, $bconf->getId(), $bconf->getName());
+        UpgraderTo147::upgradePipeline($bconfDir);
+        UpgraderTo147::upgradeFprms($bconfDir, $bconf->getId(), $bconf->getName());
 
         $extensionMapping = $bconf->getExtensionMapping();
         $extensionMapping->rescanFilters();
         $bconf->repackIfOutdated(true);
-        $bconf->invalidateCaches(); // as it keeps ExtensionMapping from prev. bconf
     } catch (Exception $e) {
         $msg = 'ERROR rescanning filters for bconf ' . $bconf->getId() . ', "' . $bconf->getName(
         ) . '": ' . $e->getMessage();

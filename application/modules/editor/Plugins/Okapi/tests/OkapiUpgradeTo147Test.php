@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,34 +28,42 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\Okapi\tests;
 
-use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FprmUpdaterTo147;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Upgrader\UpgraderTo147;
 use MittagQI\Translate5\Test\UnitTestAbstract;
 
-/**
- * Test whether selected FPRMs update to v1.47 works as expected
- */
-class OkapiUpdateFiltersTo147Test extends UnitTestAbstract
+class OkapiUpgradeTo147Test extends UnitTestAbstract
 {
-    public function testUpdater()
-    {
-        $bconfDir = __DIR__ . '/OkapiUpdateFiltersTo147Test';
-        $updater = new FprmUpdaterTo147();
+    private const TEST_DIR = __DIR__ . '/OkapiUpgradeTo147Test';
 
-        $json = json_decode(file_get_contents($bconfDir . '/content.json'), true);
+    /**
+     * Test whether selected FPRMs update to v1.47 works as expected
+     */
+    public function testFprmUpgrade()
+    {
+        $dataDir = self::TEST_DIR;
+
+        $json = json_decode(file_get_contents($dataDir . '/content.json'), true);
         foreach ($json['fprm'] as $fprmEntry) {
-            $fn = $bconfDir . '/' . $fprmEntry . '.fprm';
+            $fn = $dataDir . '/' . $fprmEntry . '.fprm';
             copy($fn . '.OLD', $fn);
         }
 
-        $updater->updateInDir($bconfDir, '1', 'TestCase');
+        UpgraderTo147::upgradeFprms($dataDir, '1', 'TestCase');
 
         foreach ($json['fprm'] as $fprmEntry) {
-            $fn = $bconfDir . '/' . $fprmEntry . '.fprm';
-            $this->assertEquals(
-                file_get_contents($fn),
-                file_get_contents($fn . '.NEW')
-            );
+            $fn = $dataDir . '/' . $fprmEntry . '.fprm';
+            $this->assertFileEquals($fn, $fn . '.NEW');
             unlink($fn);
         }
+    }
+
+    public function testPipelineUpgrade()
+    {
+        $dataDir = self::TEST_DIR;
+        $fn = $dataDir . '/pipeline.pln';
+        copy($fn . '.OLD', $fn);
+        UpgraderTo147::upgradePipeline($dataDir);
+        $this->assertFileEquals($fn, $fn . '.NEW');
+        unlink($fn);
     }
 }
