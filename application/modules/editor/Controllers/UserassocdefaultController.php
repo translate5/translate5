@@ -251,7 +251,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
             return;
         }
 
-        if ((int) $job->getCustomerId() !== (int) $this->hasParam('customerId')) {
+        if ((int) $job->getCustomerId() !== (int) $this->getParam('customerId')) {
             throw new ZfExtended_NotFoundException('Job not found');
         }
     }
