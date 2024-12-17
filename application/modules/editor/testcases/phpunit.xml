@@ -27,6 +27,7 @@
             <file>../Plugins/Okapi/tests/OkapiBconfFilterTest.php</file>
             <file>../Plugins/Okapi/tests/OkapiExtensionMappingTest.php</file>
             <file>../Plugins/Okapi/tests/OkapiSegmentationTest.php</file>
+            <file>../Plugins/Okapi/tests/OkapiUpgradeTo147Test.php</file>
         </testsuite>
         <testsuite name="visual">
             <file>../Plugins/VisualReview/tests/VisualTimecodeTest.php</file>

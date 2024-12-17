@@ -33,9 +33,6 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\Upgrader\UpgraderTo147;
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
-//$this->doNotSavePhpForDebugging = false;
-
-//uncomment the following line, so that the file is not marked as processed:
 // $this->doNotSavePhpForDebugging = false;
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */

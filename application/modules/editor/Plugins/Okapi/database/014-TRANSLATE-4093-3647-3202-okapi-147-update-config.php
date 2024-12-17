@@ -127,9 +127,6 @@ $NEW_SPECIAL_CHARS_JSON = '[
 //uncomment the following line, so that the file is not marked as processed:
 //$this->doNotSavePhpForDebugging = false;
 
-//uncomment the following line, so that the file is not marked as processed:
-// $this->doNotSavePhpForDebugging = false;
-
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
 $argc = count($argv);
