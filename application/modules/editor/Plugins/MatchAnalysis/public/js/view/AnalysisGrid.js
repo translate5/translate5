@@ -226,6 +226,21 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                 }]
             };
 
+        if(Editor.data.debug && Editor.data.debug.showTaskGuid) {
+            config.dockedItems[1].items.push({
+                xtype: 'button',
+                glyph: 'f188@FontAwesome5FreeSolid',
+                itemId: 'exportDebug',
+                text: 'Debug output as JSON',
+                bind: {
+                    disabled: '{!hasAnalysisData}'
+                },
+                listeners: {
+                    click: 'exportAction'
+                }
+            });
+        }
+
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }

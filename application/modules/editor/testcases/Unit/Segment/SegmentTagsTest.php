@@ -394,7 +394,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
     {
         // testing "real" segment content
         $segmentId = 688501;
-        $markup = '<ins class="trackchanges ownttip" data-usertrackingid="2923" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-02-27T23:26:32+01:00">We do <img class="open minor qmflag ownttip qmflag-21" data-t5qid="631" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-21-left.png" />not <img class="open critical qmflag ownttip qmflag-2" data-t5qid="629" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />recommend<img class="close critical qmflag ownttip qmflag-2" data-t5qid="629" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /> using a <img class="open major qmflag ownttip qmflag-3" data-t5qid="630" data-comment="Some Other  Comment" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />threaded<img class="close major qmflag ownttip qmflag-3" data-t5qid="630" data-comment="Some Other  Comment" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" /> MPM in production<img class="close minor qmflag ownttip qmflag-21" data-t5qid="631" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-21-right.png" /> with Apache 2.</ins>';
+        $markup = '<ins class="trackchanges ownttip" data-usertrackingid="2923" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-02-27T23:26:32+01:00">We do <img class="open minor qmflag ownttip qmflag-21" data-t5qid="ext-631" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-21-left.png" />not <img class="open critical qmflag ownttip qmflag-2" data-t5qid="ext-629" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />recommend<img class="close critical qmflag ownttip qmflag-2" data-t5qid="ext-629" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /> using a <img class="open major qmflag ownttip qmflag-3" data-t5qid="ext-630" data-comment="Some Other  Comment" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />threaded<img class="close major qmflag ownttip qmflag-3" data-t5qid="ext-630" data-comment="Some Other  Comment" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" /> MPM in production<img class="close minor qmflag ownttip qmflag-21" data-t5qid="ext-631" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-21-right.png" /> with Apache 2.</ins>';
         $this->createMqmDataTest($segmentId, $markup);
     }
 
@@ -440,5 +440,29 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $markup = '<img class="open critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />Apache 2.x<img class="open critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" /> auf<img class="close critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" /> Unix-Systemen<img class="close critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
         $compare = '<img class="open critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />Apache 2.x<img class="open critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" /> auf<img class="close critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" /> Unix-Systemen<img class="close critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
         $this->createMqmDataTest($segmentId, $markup, $compare);
+    }
+
+    public function testMqmTags7(): void
+    {
+        // testing "real" segment content
+        $segmentId = 688501;
+        $markup = 'Strikingly <ins class="trackchanges ownttip" data-usertrackingid="1289" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-12-03T11:16:37+02:00"><img class="open critical qmflag ownttip qmflag-1" data-t5qid="ext-631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-left.png" /></ins>dynamic<ins class="trackchanges ownttip" data-usertrackingid="1289" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-12-03T11:16:37+02:00"><img class="close critical qmflag ownttip qmflag-1" data-t5qid="ext-631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-right.png" /></ins>';
+        $this->createMqmDataTest($segmentId, $markup);
+    }
+
+    public function testMqmTags8(): void
+    {
+        // testing "real" segment content
+        $segmentId = 688501;
+        $markup = 'Strikingly <ins class="trackchanges ownttip" data-usertrackingid="1289" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-12-03T11:16:37+02:00">123<img class="open critical qmflag ownttip qmflag-1" data-t5qid="ext-631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-left.png" />123</ins>dynamic<ins class="trackchanges ownttip" data-usertrackingid="1289" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-12-03T11:16:37+02:00">123<img class="close critical qmflag ownttip qmflag-1" data-t5qid="ext-631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-right.png" />123</ins>';
+        $this->createMqmDataTest($segmentId, $markup);
+    }
+
+    public function testMqmTags9(): void
+    {
+        // testing "real" segment content
+        $segmentId = 688501;
+        $markup = '<ins class="trackchanges ownttip" data-usertrackingid="1289" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-12-03T19:39:13+02:00"><img class="open critical qmflag ownttip qmflag-2" data-t5qid="ext-726" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" /></ins>Strikingly<ins class="trackchanges ownttip" data-usertrackingid="1289" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-12-03T19:39:13+02:00"><img class="close critical qmflag ownttip qmflag-2" data-t5qid="ext-726" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /></ins> <del class="trackchanges ownttip deleted" data-usertrackingid="1289" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-12-03T19:39:09+02:00" style="visibility: visible;"><img class="open critical qmflag ownttip qmflag-1" data-t5qid="130895" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-left.png" /></del>dynamic<del class="trackchanges ownttip deleted" data-usertrackingid="1289" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-12-03T19:39:09+02:00" style="visibility: visible;"><img class="close critical qmflag ownttip qmflag-1" data-t5qid="130895" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-right.png" /></del>';
+        $this->createMqmDataTest($segmentId, $markup);
     }
 }
