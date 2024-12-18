@@ -195,7 +195,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $name,
                 $sourceLang,
                 $fileinfo['tmp_name'],
-                $this->getStripFramingTagsValue($params['stripFramingTags'] ?? null)
+                $this->getStripFramingTagsValue($params)
             );
         } else {
             $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
@@ -1952,7 +1952,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
     }
 
-    private function getStripFramingTagsValue(array $params): StripFramingTags
+    private function getStripFramingTagsValue(?array $params): StripFramingTags
     {
         return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
     }
