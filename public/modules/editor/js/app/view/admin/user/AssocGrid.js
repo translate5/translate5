@@ -104,10 +104,11 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     dataIndex: 'workflowStepName',
                     flex:1,
                     text: me.strings.workflowStepNameCol,
-                    renderer:Editor.util.Util.getWorkflowStepNameTranslated,
+                    renderer: function(value, metaData, record){
+                        return Editor.util.Util.getWorkflowStepNameTranslated(value, record.get('workflow'));
+                    },
                     filter: {
                         type: 'list',
-
                         store:'admin.WorkflowSteps'
                     }
                 } ,{

@@ -59,14 +59,14 @@ Ext.define('Editor.store.admin.WorkflowSteps', {
 
         Ext.Array.each(w.stepChain, function (key) {
             if(steps[key]){
-                me.add({id: key, text: steps[key]});
+                me.add({id: key, text: steps[key], workflow: w.id});
                 added.push(key);
             }
         });
 
         Ext.Object.each(steps,function(key,value){
             if(!Ext.Array.contains(added,key)){
-                me.add({id: key, text: value});
+                me.add({id: key, text: value, workflow: w.id});
             }
         });
     },
