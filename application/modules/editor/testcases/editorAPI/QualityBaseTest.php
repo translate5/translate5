@@ -98,7 +98,7 @@ class QualityBaseTest extends JsonTestAbstract
         $result = static::api()->getRaw('editor/quality/tasktooltip?&taskGuid=' . urlencode(static::api()->getTask()->taskGuid), [], $fileName);
         $this->assertFalse(static::api()->isJsonResultError($result), 'Task Qualities ToolTip Markup could not be requested');
         $this->assertStringContainsString('</table>', $result->data, 'Task Qualities ToolTip Markup does not match');
-        $this->assertStringContainsString('<td>487</td>', $result->data, 'Task Qualities ToolTip Markup does not match'); // number of all MQMs
+        $this->assertStringContainsString('<td>489</td>', $result->data, 'Task Qualities ToolTip Markup does not match'); // number of all MQMs
         $this->assertFileContents($fileName, $result->data, 'Task Qualities ToolTip Markup does not match'); // this test might has to be adjusted due to the translation problematic
     }
 

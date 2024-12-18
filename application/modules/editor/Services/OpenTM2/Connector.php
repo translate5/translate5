@@ -1142,7 +1142,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         //INFO: The resources logging requires resource with valid id.
         //$fuzzyLanguageResource->setId(null);
 
-        $connector = new self();
+        $connector = ZfExtended_Factory::get(static::class);
         $connector->connectTo(
             $fuzzyLanguageResource,
             $this->languageResource->getSourceLang(),

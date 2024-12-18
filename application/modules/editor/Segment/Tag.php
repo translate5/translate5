@@ -77,6 +77,8 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      */
     public const DATA_NAME_QUALITYID = 't5qid';
 
+    private const DATA_QUALITY_ID_PREFIX = 'ext-';
+
     /**
      * The counterpart to ::toJson: creates the tag from the serialized json data
      * @throws Exception
@@ -326,32 +328,33 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
         return ! empty($this->category);
     }
 
-    public function hasQualityId(): bool
-    {
-        // Compatibility with old code: if there is a existing entry we simply turn it into the current format
-        if (static::$historicDataNameQid != null && $this->hasData(static::$historicDataNameQid)) {
-            // transfer only if not present
-            if (! array_key_exists('data-' . static::DATA_NAME_QUALITYID, $this->attribs)) {
-                $this->attribs['data-' . static::DATA_NAME_QUALITYID] = $this->attribs['data-' . static::$historicDataNameQid];
-            }
-            unset($this->attribs['data-' . static::$historicDataNameQid]);
-
-            return ctype_digit($this->getData(static::DATA_NAME_QUALITYID));
-        }
-
-        return ($this->hasData(static::DATA_NAME_QUALITYID) && ctype_digit($this->getData(static::DATA_NAME_QUALITYID)));
-    }
-
     /**
      * Retrieves the quality ID. If not encoded in the tag, returns -1
      */
     public function getQualityId(): int
     {
-        if ($this->hasQualityId()) {
-            return intval($this->getData(static::DATA_NAME_QUALITYID));
+        // Compatibility with old code: if there is an existing entry we simply turn it into the current format
+        if (static::$historicDataNameQid !== null && $this->hasData(static::$historicDataNameQid)) {
+            // transfer only if not present
+            if (! array_key_exists('data-' . static::DATA_NAME_QUALITYID, $this->attribs)) {
+                $this->attribs['data-' . static::DATA_NAME_QUALITYID] =
+                    $this->attribs['data-' . static::$historicDataNameQid];
+            }
+
+            unset($this->attribs['data-' . static::$historicDataNameQid]);
         }
 
-        return -1;
+        if (! $this->hasData(static::DATA_NAME_QUALITYID)) {
+            return -1;
+        }
+
+        $qualityId = str_replace(
+            self::DATA_QUALITY_ID_PREFIX,
+            '',
+            $this->getData(static::DATA_NAME_QUALITYID)
+        );
+
+        return is_numeric($qualityId) ? (int) $qualityId : -1;
     }
 
     public function setQualityId(int $qualityId): static
@@ -359,14 +362,6 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
         $this->setData(static::DATA_NAME_QUALITYID, (string) $qualityId);
 
         return $this;
-    }
-
-    /**
-     * Retrieves the data name for the quality entity id
-     */
-    public function getDataNameQualityId(): string
-    {
-        return static::DATA_NAME_QUALITYID;
     }
 
     /**

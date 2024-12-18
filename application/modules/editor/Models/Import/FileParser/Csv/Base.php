@@ -36,6 +36,8 @@ abstract class editor_Models_Import_FileParser_Csv_Base extends editor_Models_Im
      */
     protected string $placeholderPrefix = '𓇽𓇽𓇽𓇽𓇽𓇽';
 
+    protected string $placeholderPostfix = '𓋹𓋹𓋹𓋹𓋹𓋹';
+
     /**
      * @var array syntax: array('𓇽𓇽𓇽𓇽𓇽𓇽1' => '<div class="single 73706163652074733d2263326130222f"><span title="<space/>" class="short" id="ext-gen1796">&lt;1/&gt;</span><span id="space-2-b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>');
      *      explanation: key: the string that is the placeholder for the actual to be protected string
@@ -50,22 +52,26 @@ abstract class editor_Models_Import_FileParser_Csv_Base extends editor_Models_Im
      */
     protected function parseSegmentInsertPlaceholders(string $segment, string $tagToReplaceRegex): string
     {
-        if (strpos($segment, '<') === false) {
+        if (! str_contains($segment, '<')) {
             return $segment;
         }
-        $str_replace_first = function ($search, $replace, $subject) {
+
+        $str_replace_first = static function ($search, $replace, $subject): string {
             $pos = strpos($subject, $search);
+
             if ($pos !== false) {
                 $subject = substr_replace($subject, $replace, $pos, strlen($search));
             }
 
             return $subject;
         };
+
         preg_match_all($tagToReplaceRegex, $segment, $matches, PREG_PATTERN_ORDER);
         //"<div\s*class=\"([a-z]*)\s+([gxA-Fa-f0-9]*)\"\s*.*?(?!</div>)<span[^>]*id=\"([^-]*)-.*?(?!</div>).</div>"s
         $protectedStringCount = count($this->protectedStrings);
+
         foreach ($matches[0] as $match) {
-            $placeholder = $this->placeholderPrefix . $protectedStringCount;
+            $placeholder = $this->placeholderPrefix . $protectedStringCount . $this->placeholderPostfix;
             $this->protectedStrings[$placeholder] = $match;
             $segment = $str_replace_first($match, $placeholder, $segment);
             $protectedStringCount++;

@@ -417,10 +417,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 //store best match rate results
                 $currentIsBetter = $bestResultCurrentConnector->matchrate > $bestMatchRate;
 
-                // if match of another TM has the same >=100 matchrate, use the newer one
+                // if match of another TM has the same >=100 matchrate,
+                // use the newer one but exclude internal fuzzies, since they are always newer here
                 $current100MatchIsNewer = $bestResultCurrentConnector->matchrate === $bestMatchRate
                     && $bestMatchRate >= 100
-                    && $match->timestamp > $bestMatchRateResult->timestamp;
+                    && $match->timestamp > $bestMatchRateResult->timestamp
+                    && ! $connector->isInternalFuzzy();
 
                 // if we have the same fuzzy rate, the one from an internal fuzzy is the better one
                 $internalFuzzyIsBetter = $bestResultCurrentConnector->matchrate === $bestMatchRate
