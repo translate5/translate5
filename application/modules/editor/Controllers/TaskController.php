@@ -40,6 +40,8 @@ use MittagQI\Translate5\Task\Import\ProjectWorkersService;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\Log\LogRepository;
+use MittagQI\Translate5\Task\Log\LogService;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\TaskService;
 use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
@@ -353,6 +355,7 @@ class editor_TaskController extends ZfExtended_RestController
     protected function loadAllForProjectOverview()
     {
         $rows = $this->loadAll();
+
         $customerData = $this->getCustomersForRendering($rows);
         $customerRenderConfigs = $this->getCustomerRenderConfigs($rows);
         $file = ZfExtended_Factory::get('editor_Models_File');
@@ -365,8 +368,9 @@ class editor_TaskController extends ZfExtended_RestController
             $userData = $this->getUsersForRendering($rows);
         }
 
+        $task = new editor_Models_Task();
         foreach ($rows as &$row) {
-            unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
+            unset($row['qmSubsegmentFlags']); // unnecessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
             if ($isMailTo) {
@@ -374,6 +378,20 @@ class editor_TaskController extends ZfExtended_RestController
             }
             if (! empty($customerRenderConfigs[$row['customerId']]) && $customerRenderConfigs[$row['customerId']]['hideWordCount']) {
                 $row['wordCount'] = '-';
+            }
+
+            $logRepository = new LogRepository();
+            $logService = new LogService($logRepository);
+            $task->init($row);
+
+            if ($this->shouldSkipAdditionalDataLoading()) {
+                continue;
+            }
+
+            if ($task->isProject()) {
+                $row['logInfo'] = $logService->getProjectLogSummary((int) $task->getProjectId());
+            } else {
+                $row['logInfo'] = $logService->getTaskLogSummary($task->getTaskGuid());
             }
         }
 
@@ -389,7 +407,7 @@ class editor_TaskController extends ZfExtended_RestController
         $rows = $this->loadAll();
 
         //if we have no paging parameters, we omit all additional data gathering to improve performace!
-        if ($this->getParam('limit', 0) === 0 && ! $this->getParam('filter', false)) {
+        if ($this->shouldSkipAdditionalDataLoading()) {
             return $rows;
         }
 
@@ -426,6 +444,8 @@ class editor_TaskController extends ZfExtended_RestController
 
         $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
         $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
+
+        $task = new editor_Models_Task();
 
         foreach ($rows as &$row) {
             try {
@@ -468,6 +488,14 @@ class editor_TaskController extends ZfExtended_RestController
             $this->addQualitiesToResult($row);
             // add user-segment assocs
             $this->addMissingSegmentrangesToResult($row);
+
+            if ($isEditAll) {
+                $logRepository = new LogRepository();
+                $logService = new LogService($logRepository);
+                $task->init($row);
+
+                $row['logInfo'] = $logService->getTaskLogSummary($task->getTaskGuid());
+            }
         }
         // sorting of qualityErrorCount can only be done after QS data is attached
         if ($this->entity->getFilter()->hasSort('qualityErrorCount')) {
@@ -2420,5 +2448,13 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         return $hasRightForTask;
+    }
+
+    /**
+     * If we have no paging parameters, we omit all additional data gathering to improve performance!
+     */
+    protected function shouldSkipAdditionalDataLoading(): bool
+    {
+        return $this->getParam('limit', 0) === 0 && ! $this->getParam('filter', false);
     }
 }
