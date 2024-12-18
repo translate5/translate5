@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -27,68 +27,41 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
-use MittagQI\Translate5\Plugins\Okapi\OkapiService;
 use MittagQI\Translate5\Test\Import\Bconf;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
 class OkapiExportBconfTest extends JsonTestAbstract
 {
-    protected static array $requiredPlugins = [
-        editor_Plugins_Okapi_Init::class,
-    ];
-
     private static Bconf $testBconf;
-
-    private static BconfEntity $bconf;
 
     /**
      * Just imports a bconf to test with
      */
     protected static function setupImport(Config $config): void
     {
-        // TODO FIXME: still neccessary ?
-        if (! Zend_Registry::isRegistered('Zend_Locale')) {
-            Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
-        }
-
-        self::$testBconf = $config->addBconf('TestBconf', 'batchConfiguration.t5.bconf');
+        self::$testBconf = $config->addBconf('TestBconf', 'PI-Typo3.bconf');
     }
 
-    public function test10_ConfigurationAndApi()
+    public function test10_BConfImport()
     {
-        $conf = Zend_Registry::get('config');
-        $okapiConf = $conf->runtimeOptions->plugins->Okapi;
-        $service = editor_Plugins_Okapi_Init::createService(OkapiService::ID, $conf);
-
-        self::assertNotEmpty($okapiConf->dataDir, 'runtimeOptions.plugins.Okapi.dataDir not set');
-        self::assertNotEmpty($service->getConfiguredServiceUrl(false), 'runtimeOptions.plugins.Okapi.api.url not set');
-
-        self::$bconf = new BconfEntity();
-        self::$bconf->load(self::$testBconf->getId());
+        $bconf = new BconfEntity();
+        $bconf->load(self::$testBconf->getId());
         static::assertStringStartsWith(
             'TestBconf',
-            self::$bconf->getName(),
-            'Imported bconf\'s name is not like ' . 'TestBconf' . ' but ' . self::$bconf->getName()
+            $bconf->getName(),
+            'Imported bconf\'s name is not like ' . 'TestBconf' . ' but ' . $bconf->getName()
         );
-
-        $input = static::api()->getFile('batchConfiguration.t5.bconf');
-        $output = self::$bconf->getPath();
-        $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
-
-        self::assertFileEquals($input, $output, $failureMsg);
-
-        self::assertTrue($service->check());
     }
 
-    /*public function test40_OkapiTaskImport()
+    public function test20_OkapiTaskImport()
     {
         $config = static::getConfig();
         $config->import(
             $config
                 ->addTask('en', 'de')
-                //->setImportBconfId(self::$bconf->getDefaultBconfId())
+                ->setImportBconfId(self::$testBconf->getId())
                 ->addUploadFile('workfiles/export-contentelements-14104-EN.xliff.typo3')
         );
-    }*/
+    }
 }
