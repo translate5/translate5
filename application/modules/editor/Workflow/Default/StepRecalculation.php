@@ -141,7 +141,7 @@ class editor_Workflow_Default_StepRecalculation
         }
 
         foreach ($this->workflow->getValidStates() as $step => $roleStates) {
-            if (! $this->areTuasSubset($roleStates, $step, $jobsData)) {
+            if (! $this->areJobsSubset($roleStates, $step, $jobsData)) {
                 continue;
             }
 
@@ -154,7 +154,7 @@ class editor_Workflow_Default_StepRecalculation
     /**
      * Checks if the given Jobs are a subset of the list be compared
      */
-    protected function areTuasSubset(array $toCompare, string $currentStep, array $jobs): bool
+    protected function areJobsSubset(array $toCompare, string $currentStep, array $jobs): bool
     {
         $hasStepToCurrentTaskStep = false;
         foreach ($jobs as $job) {

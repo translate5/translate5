@@ -354,6 +354,18 @@ class UserJobRepository
         }
     }
 
+    public function getWorkflowStepNamesOfJobsInTask(string $taskGuid): array
+    {
+        $s = $this->db
+            ->select()
+            ->distinct()
+            ->from(UserJobTable::TABLE_NAME, 'workflowStepName')
+            ->where('taskGuid = ?', $taskGuid)
+        ;
+
+        return $this->db->query($s)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     public function save(UserJob $job): void
     {
         $job->save();

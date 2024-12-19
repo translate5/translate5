@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Workflow\NextStepCalculator;
+
 /**
  * Encapsulates the Default Notifications triggered by the Workflow
  * Basicly the Notifications are E-Mail based. But this class can be overwritten
@@ -49,6 +51,18 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
      * @var editor_Models_TaskUserAssoc
      */
     protected $tua;
+
+    public function __construct(
+        private readonly NextStepCalculator $nextStepCalculator,
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            NextStepCalculator::create(),
+        );
+    }
 
     /**
      * generates and returns the template path.
@@ -246,7 +260,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
 
         $segmentHash = md5(print_r($segments, 1)); //hash to identify the given segments (for internal caching)
 
-        $nextStep = (string) $workflow->getNextStep($task, $currentStep);
+        $nextStep = (string) $this->nextStepCalculator->getNextStep($workflow, $task, $currentStep);
         $nextRole = $workflow->getRoleOfStep($nextStep);
 
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');

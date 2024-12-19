@@ -597,7 +597,11 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 lspField.setHidden(! lsp);
 
                 if (lsp) {
-                    me.updateCustomerField(form, lsp.get('customers'));
+                    if (Editor.app.authenticatedUser.getRoles().includes('jobCoordinator')) {
+                        form.down('customers').hide();
+                    } else {
+                        me.updateCustomerField(form, lsp.get('customers'));
+                    }
                 }
             }
         });
