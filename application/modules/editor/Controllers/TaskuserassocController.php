@@ -283,7 +283,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
         try {
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
-            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('jobId'));
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
 
             $this->assertJobBelongsToTask($job);
 
@@ -343,7 +343,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $workflowManager = new editor_Workflow_Manager();
 
         try {
-            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('jobId'));
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
 
             $this->assertJobBelongsToTask($job);
 

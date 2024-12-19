@@ -117,9 +117,4 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
             isset($data['trackchangesAcceptReject']) ? (bool) $data['trackchangesAcceptReject'] : null,
         );
     }
-
-    protected function getWorkflow(Task $task, ?string $workflowName = null): Workflow
-    {
-        return $this->workflowManager->getActiveByTask($task);
-    }
 }
