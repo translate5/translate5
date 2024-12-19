@@ -70,6 +70,13 @@ class OkapiExportBconfTest extends JsonTestAbstract
         $config->import(
             $config
                 ->addTask('en', 'de')
+                ->setImportBconfId(self::$bconf2->getId())
+                ->addUploadFile('workfiles/unity_en_newly_added_keys1.json')
+        );
+
+        $config->import(
+            $config
+                ->addTask('en', 'de')
                 ->setImportBconfId(self::$bconf1->getId())
                 ->addUploadFile('workfiles/export-contentelements-14104-EN.xliff.typo3')
                 ->setToEditAfterImport()
@@ -78,12 +85,23 @@ class OkapiExportBconfTest extends JsonTestAbstract
         $segments = static::api()->getSegments();
         $this->assertEquals(42, count($segments));
         $this->assertEquals('Reference', $segments[0]->source);
+    }
 
-        $config->import(
-            $config
-                ->addTask('en', 'de')
-                ->setImportBconfId(self::$bconf2->getId())
-                ->addUploadFile('workfiles/unity_en_newly_added_keys1.json')
-        );
+    public function test30_OkapiTaskExport()
+    {
+        static::api()->get('editor/task/export/id/' . static::api()->getTask()->id . '/diff/1');
+
+        //get the exported file content
+        $path = static::api()->getTaskDataDirectory();
+        $pathToZip = $path . 'export.zip';
+        $this->assertFileExists($pathToZip);
+
+        $exportedData = static::api()->getFileContentFromZipPath($pathToZip, 'export-contentelements-14104-EN.xliff.typo3');
+        $expectedData = static::api()->getFileContent('workfiles/export-contentelements-14104-EN.xliff.typo3');
+
+        $exportedData = str_replace("\r\n", "\n", $exportedData);
+        $expectedData = str_replace("\r\n", "\n", $expectedData);
+
+        $this->assertEquals(rtrim($expectedData), rtrim($exportedData), 'Exported result does not equal to expected XLIFF content');
     }
 }
