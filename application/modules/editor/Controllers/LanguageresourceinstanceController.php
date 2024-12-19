@@ -38,6 +38,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\ExportMemoryWorker;
 use MittagQI\Translate5\Task\Current\NoAccessException;
@@ -1533,11 +1534,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->resourceType = $this->entity->getResourceType();
         $this->view->rows = $result->getResult();
 
-        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
-        $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
         foreach ($this->view->rows as &$row) {
-            $penalties = $assoc->getPenalties($taskGuid, $languageResourceId, $row->sourceLanguageId, $row->targetLanguageId);
+            $penalties = $taskPenaltyDataProvider->getPenalties(
+                $taskGuid,
+                $languageResourceId,
+                $row->sourceLanguageId,
+                $row->targetLanguageId
+            );
             $row->penaltyGeneral = $penalties['penaltyGeneral'];
             $row->penaltySublang = $penalties['penaltySublang'];
         }

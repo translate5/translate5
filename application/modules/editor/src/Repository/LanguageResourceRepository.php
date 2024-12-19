@@ -40,6 +40,14 @@ use ZfExtended_Models_Entity_NotFoundException;
 class LanguageResourceRepository
 {
     /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self();
+    }
+
+    /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function get(int $id): LanguageResource
