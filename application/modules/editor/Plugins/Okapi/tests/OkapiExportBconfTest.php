@@ -72,7 +72,12 @@ class OkapiExportBconfTest extends JsonTestAbstract
                 ->addTask('en', 'de')
                 ->setImportBconfId(self::$bconf1->getId())
                 ->addUploadFile('workfiles/export-contentelements-14104-EN.xliff.typo3')
+                ->setToEditAfterImport()
         );
+
+        $segments = static::api()->getSegments();
+        $this->assertEquals(42, count($segments));
+        $this->assertEquals('Reference', $segments[0]->source);
 
         $config->import(
             $config
