@@ -33,35 +33,52 @@ use MittagQI\Translate5\Test\JsonTestAbstract;
 
 class OkapiExportBconfTest extends JsonTestAbstract
 {
-    private static Bconf $testBconf;
+    private static Bconf $bconf1;
+
+    private static Bconf $bconf2;
 
     /**
      * Just imports a bconf to test with
      */
     protected static function setupImport(Config $config): void
     {
-        self::$testBconf = $config->addBconf('TestBconf', 'PI-Typo3.bconf');
+        self::$bconf1 = $config->addBconf('TestBconf', 'typo3.bconf');
+        self::$bconf2 = $config->addBconf('JsonBconf', 'json.bconf');
     }
 
-    public function test10_BConfImport()
+    public function test10_BConfsImport()
     {
         $bconf = new BconfEntity();
-        $bconf->load(self::$testBconf->getId());
+        $bconf->load(self::$bconf1->getId());
         static::assertStringStartsWith(
             'TestBconf',
             $bconf->getName(),
             'Imported bconf\'s name is not like ' . 'TestBconf' . ' but ' . $bconf->getName()
         );
+        $bconf = new BconfEntity();
+        $bconf->load(self::$bconf2->getId());
+        static::assertStringStartsWith(
+            'JsonBconf',
+            $bconf->getName(),
+            'Imported bconf\'s name is not like ' . 'JsonBconf' . ' but ' . $bconf->getName()
+        );
     }
 
-    public function test20_OkapiTaskImport()
+    public function test20_OkapiTasksImport()
     {
         $config = static::getConfig();
         $config->import(
             $config
                 ->addTask('en', 'de')
-                ->setImportBconfId(self::$testBconf->getId())
+                ->setImportBconfId(self::$bconf1->getId())
                 ->addUploadFile('workfiles/export-contentelements-14104-EN.xliff.typo3')
+        );
+
+        $config->import(
+            $config
+                ->addTask('en', 'de')
+                ->setImportBconfId(self::$bconf2->getId())
+                ->addUploadFile('workfiles/unity_en_newly_added_keys1.json')
         );
     }
 }
