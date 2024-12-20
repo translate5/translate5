@@ -306,7 +306,12 @@ class editor_TaskController extends ZfExtended_RestController
     {
         //set default sort
         $this->addDefaultSort();
-        $rows = $this->loadAll();
+        $rows = $this->taskViewDataProvider->getTaskList(
+            $this->authenticatedUser,
+            $this->entity->getFilter(),
+            (int) $this->getParam('start', 0),
+            (int) $this->getParam('limit', 0),
+        );
 
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
         /* @var $kpi editor_Models_KPI */
@@ -344,28 +349,6 @@ class editor_TaskController extends ZfExtended_RestController
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
         $this->view->rows = $this->entity->loadUserList($this->authenticatedUser->getUserGuid());
-    }
-
-    /**
-     * loads all tasks according to the set filters
-     * @return array
-     */
-    protected function loadAll()
-    {
-        // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $isAllowedToLoadAll = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS);
-        //set the default table to lek_task
-        $this->entity->getFilter()->setDefaultTable('LEK_task');
-
-        if ($isAllowedToLoadAll) {
-            $this->totalCount = $this->entity->getTotalCount();
-
-            return $this->entity->loadAll();
-        }
-
-        $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->authenticatedUser->getUserGuid());
-
-        return $this->entity->loadListByUserAssoc($this->authenticatedUser->getUserGuid());
     }
 
     /**
@@ -2200,7 +2183,12 @@ class editor_TaskController extends ZfExtended_RestController
         //TODO The optimal way to implement this, is like similar to the segment::positionAction in a general way so that it is usable for all entities.
         $this->addDefaultSort();
         $this->handleProjectRequest();
-        $rows = $this->loadAll();
+        $rows = $this->taskViewDataProvider->getTaskList(
+            $this->authenticatedUser,
+            $this->entity->getFilter(),
+            (int) $this->getParam('start', 0),
+            (int) $this->getParam('limit', 0),
+        );
         $id = (int) $this->_getParam('id');
         $index = false;
         if (! empty($rows)) {

@@ -386,7 +386,7 @@ class editor_Workflow_Default_Hooks
             //FIXME UGLY: The parameters are changing by reference! Must be removed again, and unified, see below FIXME
             $config->parameters = $this->decodeParameters($config, $action);
             if (empty($instances[$class])) {
-                $instance = ZfExtended_Factory::get($class);
+                $instance = method_exists($class, 'create') ? $class::create() : ZfExtended_Factory::get($class);
                 /* @var $instance editor_Workflow_Actions_Abstract */
                 //FIXME unify this callActions with AbstractHandler::callActions
                 $instance->init($config);

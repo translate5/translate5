@@ -231,6 +231,10 @@ class TaskQuerySelectFactory
 
     private function canLoadAllTasks(User $viewer): bool
     {
+        if ($viewer->isClientPm()) {
+            return false;
+        }
+
         try {
             return $this->acl->isInAllowedRoles($viewer->getRoles(), Rights::ID, Rights::LOAD_ALL_TASKS);
         } catch (Zend_Acl_Exception) {
