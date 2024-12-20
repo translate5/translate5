@@ -127,7 +127,7 @@ class TaskQuerySelectFactory
             ->where(TaskDb::TABLE_NAME . '.taskType in (?)', $this->taskType->getNonInternalTaskTypes())
         ;
 
-        if (! $this->canLoadAllTasks($viewer)) {
+        if (! $this->hasRestrictedAccess($viewer)) {
             $this->restrictSelect($select, $viewer);
         }
 
@@ -160,7 +160,7 @@ class TaskQuerySelectFactory
             ->where('project.taskType in (?)', $this->taskType->getProjectTypes())
         ;
 
-        if (! $this->canLoadAllTasks($viewer)) {
+        if (! $this->hasRestrictedAccess($viewer)) {
             $this->restrictSelect($select, $viewer);
         }
 
@@ -174,15 +174,33 @@ class TaskQuerySelectFactory
     private function restrictSelect(Zend_Db_Select $select, User $viewer): void
     {
         if ($viewer->isClientPm()) {
+            $where = [];
+            $where[] = $this->db->quoteInto(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid());
+            $where[] = $this->db->quoteInto(TaskDb::TABLE_NAME . '.pmGuid = ?', $viewer->getUserGuid());
+            $where[] = $this->db->quoteInto(TaskDb::TABLE_NAME . '.customerId in (?)', $viewer->getCustomersArray());
             $select
                 ->joinLeft(
                     UserJobDb::TABLE_NAME,
                     UserJobDb::TABLE_NAME . '.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
                     []
                 )
-                ->where(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid())
-                ->orWhere(TaskDb::TABLE_NAME . '.pmGuid = ?', $viewer->getUserGuid())
-                ->orWhere(TaskDb::TABLE_NAME . '.customerId in (?)', $viewer->getCustomersArray())
+                ->where(implode(' OR ', $where))
+            ;
+
+            return;
+        }
+
+        if ($viewer->isPmLight()) {
+            $where = [];
+            $where[] = $this->db->quoteInto(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid());
+            $where[] = $this->db->quoteInto(TaskDb::TABLE_NAME . '.pmGuid = ?', $viewer->getUserGuid());
+            $select
+                ->joinLeft(
+                    UserJobDb::TABLE_NAME,
+                    UserJobDb::TABLE_NAME . '.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
+                    []
+                )
+                ->where(implode(' OR ', $where))
             ;
 
             return;
@@ -229,9 +247,9 @@ class TaskQuerySelectFactory
         ;
     }
 
-    private function canLoadAllTasks(User $viewer): bool
+    private function hasRestrictedAccess(User $viewer): bool
     {
-        if ($viewer->isClientPm()) {
+        if ($viewer->isClientPm() || $viewer->isPmLight()) {
             return false;
         }
 

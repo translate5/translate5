@@ -26,11 +26,26 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Db_LanguageResources_CustomerAssoc extends Zend_Db_Table_Abstract
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\LanguageResource\ActionAssert;
+
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\LanguageResource\ActionAssert\Permission\AssignedCustomerAssert;
+
+/**
+ * @extends ActionPermissionAssert<LanguageResourceAction, LanguageResource>
+ */
+final class LanguageResourceActionPermissionAssert extends ActionPermissionAssert
 {
-    public const TABLE_NAME = 'LEK_languageresources_customerassoc';
-
-    protected $_name = self::TABLE_NAME;
-
-    public $_primary = 'id';
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self([
+            AssignedCustomerAssert::create(),
+        ]);
+    }
 }

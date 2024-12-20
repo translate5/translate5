@@ -97,19 +97,6 @@ Ext.define('Editor.model.admin.User', {
   getRoles: function() {
       return this.self.getRoles(this);
   },
-    /**
-     * Retrieves the main roles (all but the clientPmSubRoles
-     * @return {Array}
-     */
-    getMainRoles: function() {
-        var roles = [];
-        for (const role of this.self.getRoles(this)) {
-            if(!role.startsWith('clientpm_')){
-                roles.push(role);
-            }
-        }
-        return roles;
-    },
   /**
    * @param role {String}
    * @return {Boolean}

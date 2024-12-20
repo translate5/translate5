@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Db_LanguageResources_CustomerAssoc extends Zend_Db_Table_Abstract
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\LanguageResource\ActionAssert;
+
+enum LanguageResourceAction: string
 {
-    public const TABLE_NAME = 'LEK_languageresources_customerassoc';
-
-    protected $_name = self::TABLE_NAME;
-
-    public $_primary = 'id';
+    case Read = 'read';
+    case Update = 'update';
+    case Delete = 'delete';
 }

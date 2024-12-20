@@ -50,6 +50,11 @@ class User extends \ZfExtended_Models_User
         return in_array(Roles::CLIENTPM, $this->getRoles(), true);
     }
 
+    public function isPmLight(): bool
+    {
+        return in_array(Roles::PMLIGHT, $this->getRoles(), true);
+    }
+
     public function isAdmin(): bool
     {
         return in_array(Roles::ADMIN, $this->getRoles(), true)

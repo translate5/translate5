@@ -561,7 +561,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
     loadRecord: function (record) {
         var me = this,
             form = me.down('form'),
-            roles = record.getMainRoles();
+            roles = record.getRoles();
 
         form.loadRecord(record);
 

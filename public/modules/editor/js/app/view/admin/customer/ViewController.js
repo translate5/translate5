@@ -202,6 +202,10 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         }
 
         formPanel.loadRecord(record);
+
+        if (! Editor.app.authenticatedUser.isAllowed('customerOpenIdAdministration')) {
+            return;
+        }
         
         var roles = record.get('openIdServerRoles').split(','),
             rolesBoxes=me.getView().down('#serverRolesGroup').items.items;

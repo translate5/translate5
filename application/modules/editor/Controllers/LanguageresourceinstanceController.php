@@ -26,8 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Export\QueuedExportService;
+use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceAction;
+use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceActionPermissionAssert;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
@@ -40,6 +43,7 @@ use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\T5Memory\ExportMemoryWorker;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
@@ -89,6 +93,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected array $_unprotectedActions = ['import', 'download', 'export', 'xlsxexport', 'tbxexport', 'testexport'];
 
+    private LanguageResourceActionPermissionAssert $languageResourceActionPermissionAssert;
+
+    private UserRepository $userRepository;
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
@@ -115,6 +123,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->categories = ZfExtended_Factory::get('editor_Models_Categories');
         parent::init();
+
+        $this->languageResourceActionPermissionAssert = LanguageResourceActionPermissionAssert::create();
+        $this->userRepository = new UserRepository();
     }
 
     /**
@@ -167,8 +178,26 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $filterTmNeedsConversion = $this->getParam('filterTmNeedsConversion', false);
 
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+        $context = new PermissionAssertContext($authUser);
+        $languageResource = new editor_Models_LanguageResources_LanguageResource();
+
         foreach ($rows as $rowId => &$lrData) {
             if (! $showTaskTm && true === (bool) $lrData['isTaskTm']) {
+                unset($rows[$rowId]);
+
+                continue;
+            }
+
+            $languageResource->init($lrData);
+
+            $isGranted = $this->languageResourceActionPermissionAssert->isGranted(
+                LanguageResourceAction::Read,
+                $languageResource,
+                $context
+            );
+
+            if (! $isGranted) {
                 unset($rows[$rowId]);
 
                 continue;
@@ -402,6 +431,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function getAction()
     {
         parent::getAction();
+
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+        $context = new PermissionAssertContext($authUser);
+
+        $this->languageResourceActionPermissionAssert->assertGranted(
+            LanguageResourceAction::Read,
+            $this->entity,
+            $context
+        );
+
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
         $this->addAssocData();
@@ -652,6 +691,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function eventsAction()
     {
         $this->getAction();
+
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+        $context = new PermissionAssertContext($authUser);
+
+        $this->languageResourceActionPermissionAssert->assertGranted(
+            LanguageResourceAction::Read,
+            $this->entity,
+            $context
+        );
+
         $events = ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
         /* @var $events editor_Models_Logger_LanguageResources */
 
@@ -742,6 +791,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function downloadAction()
     {
         $this->entityLoad();
+
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+        $context = new PermissionAssertContext($authUser);
+
+        $this->languageResourceActionPermissionAssert->assertGranted(
+            LanguageResourceAction::Read,
+            $this->entity,
+            $context
+        );
 
         //get type from extension, the part between :ID and extension does not matter
         $type = $this->getParam('type', '.tm');
@@ -916,6 +974,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function putAction()
     {
         $this->decodePutAssociative = true;
+
+        $this->entityLoad();
+
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+        $context = new PermissionAssertContext($authUser);
+
+        $this->languageResourceActionPermissionAssert->assertGranted(
+            LanguageResourceAction::Read,
+            $this->entity,
+            $context
+        );
 
         parent::putAction();
         if ($this->wasValid) {

@@ -26,11 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Db_LanguageResources_CustomerAssoc extends Zend_Db_Table_Abstract
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\LanguageResource\Exception;
+
+use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
+
+class NoAccessToLanguageResourceException extends NoAccessException
 {
-    public const TABLE_NAME = 'LEK_languageresources_customerassoc';
-
-    protected $_name = self::TABLE_NAME;
-
-    public $_primary = 'id';
+    public function __construct(
+        public readonly int $customerId
+    ) {
+        parent::__construct('No access to LanguageResource with ID ' . $customerId);
+    }
 }
