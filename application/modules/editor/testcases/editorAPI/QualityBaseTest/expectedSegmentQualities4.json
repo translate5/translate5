@@ -1,7 +1,7 @@
 [
     {
-        "id": "14",
-        "segmentId": "5",
+        "id": "2508",
+        "segmentId": "1505",
         "field": "target",
         "type": "mqm",
         "category": "mqm_3",
@@ -18,8 +18,8 @@
         "cssClass": "qmflag"
     },
     {
-        "id": "13",
-        "segmentId": "5",
+        "id": "2507",
+        "segmentId": "1505",
         "field": "target",
         "type": "mqm",
         "category": "mqm_2",

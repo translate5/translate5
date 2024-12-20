@@ -96,12 +96,12 @@ class OkapiExportBconfTest extends JsonTestAbstract
         $pathToZip = $path . 'export.zip';
         $this->assertFileExists($pathToZip);
 
+        $adjustData = function (string $s): string {
+            return rtrim(str_replace("\r\n", "\n", $s));
+        };
         $exportedData = static::api()->getFileContentFromZipPath($pathToZip, 'export-contentelements-14104-EN.xliff.typo3');
         $expectedData = static::api()->getFileContent('workfiles/export-contentelements-14104-EN.xliff.typo3');
 
-        $exportedData = str_replace("\r\n", "\n", $exportedData);
-        $expectedData = str_replace("\r\n", "\n", $expectedData);
-
-        $this->assertEquals(rtrim($expectedData), rtrim($exportedData), 'Exported result does not equal to expected XLIFF content');
+        $this->assertEquals($adjustData($expectedData), $adjustData($exportedData), 'Exported result does not equal to expected XLIFF content');
     }
 }

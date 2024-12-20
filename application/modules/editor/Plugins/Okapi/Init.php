@@ -205,10 +205,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             // otherwise this is very unlikely if not impossible: no bconf-id set for the task.
             // In that case we use the default one and add a warning
             if ($addWarning && $orderer != 'unittest' && $orderer != 'termportal') {
-                $task->logger('editor.task.okapi')->warn(
-                    'E1055',
-                    'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
-                    [
+                $task->logger('editor.task.okapi')->info('E1055', 'Okapi Plug-In: Bconf not given or not found: {bconfFile}', [
                         'bconfFile' => 'No bconf-id was set for task meta',
                     ]
                 );

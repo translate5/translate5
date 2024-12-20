@@ -1521,8 +1521,19 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
             const parts = remainingValue.split(";");
 
+            if(parts.length <=1) {
+                return false;
+            }
+
+            const isFromMtOrTm =  ['tm', 'mt'].some(
+                element =>
+                    parts.some(item =>
+                        item.toLowerCase() === element.toLowerCase()
+                    )
+            );
+
             // ensure the second part exists (tm or mt) and there's a name following it
-            if (parts.length >= 2 && (parts[0] === "tm" || parts[0] === "mt")) {
+            if (isFromMtOrTm) {
                 return true;
             }
         }
