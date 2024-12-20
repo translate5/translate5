@@ -38,39 +38,6 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\PropertiesValidation;
  */
 final class UpgraderTo147
 {
-    private const replaceFprmYamlData = [
-        'okf_html' => [
-            "[keywords, description]" => "[keywords, description, 'twitter:title', 'twitter:description', 'og:title', 'og:description', 'og:site_name']",
-            ".*:
-    ruleTypes: [EXCLUDE]
-    conditions: [translate, EQUALS, 'no']" => ".*:
-    ruleTypes: [EXCLUDE]
-    conditions: [translate, EQUALS, no]
-  .+:
-    ruleTypes: [INCLUDE]
-    conditions: [translate, EQUALS, yes]",
-        ],
-        'okf_xmlstream' => [
-            // "xmlstream-dita"
-            ".*:
-    ruleTypes: [EXCLUDE]
-    conditions: [translate, EQUALS, 'no']" => ".*:
-    ruleTypes: [EXCLUDE]
-    conditions: [translate, EQUALS, no]
-  .+:
-    ruleTypes: [INCLUDE]
-    conditions: [translate, EQUALS, yes]
-  msgblock:
-    ruleTypes: [PRESERVE_WHITESPACE]
-  codeblock:
-    ruleTypes: [PRESERVE_WHITESPACE]",
-            "state:
-    ruleTypes: [INLINE]" => "state:
-    ruleTypes: [ATTRIBUTES_ONLY, INLINE]
-    translatableAttributes: [value]",
-        ],
-    ];
-
     private const pipelineProps = [
         'doNotSegmentIfHasTarget.b=false' => 'SegmentationStep',
         'writerOptions.includeNoTranslate.b=true' => 'ExtractionStep',
@@ -125,16 +92,15 @@ final class UpgraderTo147
                 }
             } else {
                 // amend selected Yaml-based FPRMs
-                if ($fprm->getType() === Fprm::TYPE_YAML && ! empty(self::replaceFprmYamlData[$okfType])) {
-                    $fileContents = rtrim(file_get_contents($fprmFile));
-                    foreach (self::replaceFprmYamlData[$okfType] as $str1 => $str2) {
-                        $fileContents = str_replace($str1, $str2, $fileContents);
-                    }
+                if ($fprm->getType() === Fprm::TYPE_YAML && YamlTo147::isSupported($okfType)) {
+                    $fileContents = YamlTo147::upgrade($okfType, rtrim($fprm->getContent()));
                     $fprm = new Fprm($fprmFile, $fileContents);
-                    $fprm->flush();
-                }
-                // we validate every FPRM
-                if (! $fprm->validate()) {
+                    if ($fprm->validate()) {
+                        $fprm->flush();
+                    } else {
+                        $errors[] = 'Invalid FPRM "' . basename($fprmFile) . '"';
+                    }
+                } elseif (! $fprm->validate()) { // we validate every FPRM
                     $errors[] = 'Invalid FPRM "' . basename($fprmFile) . '"';
                 }
             }
