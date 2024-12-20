@@ -51,6 +51,8 @@ use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\JobsPurger;
 use MittagQI\Translate5\Task\TaskLockService;
+use MittagQI\Translate5\Task\Log\LogRepository;
+use MittagQI\Translate5\Task\Log\LogService;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
@@ -380,6 +382,7 @@ class editor_TaskController extends ZfExtended_RestController
         );
 
         $customerData = $this->getCustomersForRendering($projectList['rows']);
+        $customerRenderConfigs = $this->getCustomerRenderConfigs($projectList['rows']);
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $isTransfer = $file->getTransfersPerTasks(array_column($projectList['rows'], 'taskGuid'));
@@ -390,12 +393,32 @@ class editor_TaskController extends ZfExtended_RestController
             $userData = $this->getUsersForRendering($projectList['rows']);
         }
 
+        $logService = LogService::create();
+        $task = new editor_Models_Task();
+
         foreach ($projectList['rows'] as &$row) {
             unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
+
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
             if ($isMailTo) {
                 $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
+            }
+
+            if (! empty($customerRenderConfigs[$row['customerId']]['hideWordCount'])) {
+                $row['wordCount'] = '-';
+            }
+
+            $task->init($row);
+
+            if ($this->shouldSkipAdditionalDataLoading()) {
+                continue;
+            }
+
+            if ($task->isProject()) {
+                $row['logInfo'] = $logService->getProjectLogSummary((int) $task->getProjectId());
+            } else {
+                $row['logInfo'] = $logService->getTaskLogSummary($task->getTaskGuid());
             }
         }
 
@@ -421,6 +444,10 @@ class editor_TaskController extends ZfExtended_RestController
         if ($limit === 0 && ! $this->getParam('filter', false)) {
             $this->log->warn('E0000', 'Task overview without paging and filter is deprecated!');
 
+            return $taskDataList;
+        }
+
+        if ($this->shouldSkipAdditionalDataLoading()) {
             return $taskDataList;
         }
 
@@ -455,6 +482,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
         $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
+        $task = new editor_Models_Task();
 
         foreach ($taskDataList['rows'] as &$row) {
             try {
@@ -497,6 +525,14 @@ class editor_TaskController extends ZfExtended_RestController
             $this->addQualitiesToResult($row);
             // add user-segment assocs
             $this->addMissingSegmentrangesToResult($row);
+
+            if ($isEditAll) {
+                $logRepository = new LogRepository();
+                $logService = new LogService($logRepository);
+                $task->init($row);
+
+                $row['logInfo'] = $logService->getTaskLogSummary($task->getTaskGuid());
+            }
         }
         // sorting of qualityErrorCount can only be done after QS data is attached
         if ($this->entity->getFilter()->hasSort('qualityErrorCount')) {
@@ -2431,5 +2467,13 @@ class editor_TaskController extends ZfExtended_RestController
                 . ' This happens when the user selects multiple target languages in the dropdown'
                 . ' and then imports a bilingual file via drag and drop.',
         ], [], $e);
+    }
+
+    /**
+     * If we have no paging parameters, we omit all additional data gathering to improve performance!
+     */
+    protected function shouldSkipAdditionalDataLoading(): bool
+    {
+        return $this->getParam('limit', 0) === 0 && ! $this->getParam('filter', false);
     }
 }

@@ -34,7 +34,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
         'Editor.view.admin.customer.CustomerFilter',
         'Editor.view.admin.task.filter.AdvancedFilter',
         'Editor.view.admin.task.filter.PercentFilter',
-        'Editor.view.admin.TaskGridViewController'
+        'Editor.view.admin.TaskGridViewController',
+        'Editor.view.task.LogInfoColumn'
     ],
     controller: 'taskGrid',
     alias: 'widget.adminTaskGrid',
@@ -199,6 +200,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             return res.join(' ');
         }
     },
+
     /**
      * renders the value of the language columns
      * @param {String} val
@@ -236,16 +238,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
         var me = this,
             actions;
 
-        me.errorTipTpl = new Ext.XTemplate(
-            '<tpl for=".">',
-            '<img valign="text-bottom" class="icon-error-level-{[this.getLevel(values)]}" alt="{[this.getLevel(values)]}" src="' + Ext.BLANK_IMAGE_URL + '"/>{message}<br>',
-            '</tpl>',
-            {
-                getLevel: function (values) {
-                    return Editor.util.Util.getErrorLevelName(values.level);
-                }
-            }
-        );
         me.userTipTpl = new Ext.XTemplate(
             '<tpl>',
             '<table class="task-users">',
@@ -311,6 +303,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
         me.setVisibleColumns();
     },
+
     initConfig: function (instanceConfig) {
         var me = this,
             states = [],
@@ -417,7 +410,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             allStates = me.prepareStates(wfMeta);
 
                         if (rec.isImporting() || rec.isErroneous()) {
-                            addQtip(meta, me.errorTipTpl.apply(rec.get('lastErrors')));
                             return rec.get('state');
                         }
 
@@ -476,6 +468,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         return allStates[userState];
                     }
                 }, {
+                    xtype: 'taskLogInfoColumn',
+                    hidden: true,
+                },{
                     xtype: 'gridcolumn',
                     width: 130,
                     dataIndex: 'userAssocDeadline',

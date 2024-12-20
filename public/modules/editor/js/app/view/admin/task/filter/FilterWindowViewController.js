@@ -42,18 +42,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
     },
 
     workflowFieldChange: function (fld, workflowIds) {
-        var allSteps = [],
-            oSteps = Editor.data.app.workflows.default.steps;
-
-        ["no workflow", "pmCheck", "workflowEnded"].forEach(function (stepId) {
-            if (oSteps[stepId]) {
-                allSteps.push({
-                    id: stepId,
-                    text: oSteps[stepId],
-                    group: ""
-                });
-            }
-        });
+        var allSteps = [];
 
         Ext.Object.each(Editor.data.app.workflows, function (key, workflow) {
             Ext.Object.each(workflow.steps, function (stepId, stepText) {

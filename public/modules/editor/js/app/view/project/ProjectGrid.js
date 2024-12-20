@@ -31,7 +31,8 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	alias: 'widget.projectGrid',
 	cls:'projectGrid',
     requires:[
-    	'Editor.view.project.ProjectGridViewController'
+    	'Editor.view.project.ProjectGridViewController',
+        'Editor.view.task.LogInfoColumn'
 	],
 	controller:'projectGrid',
 	itemId: 'projectGrid',
@@ -56,7 +57,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
               return res.join(' ');
 	      }
 	},
-	//INFO: because the filters are not wirking when the projectGrid extends the taskGrid component,
+    //INFO: because the filters are not wirking when the projectGrid extends the taskGrid component,
     //the required columns,translations and renderer functions are duplicated here. With this the projectGrid does not depend on the taskGrid component.
     initConfig: function(instanceConfig) {
         var me = this,
@@ -125,6 +126,11 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     },
                     renderer: v => Ext.String.htmlEncode(v)
         		},{
+                    xtype: 'taskLogInfoColumn',
+                    renderer: function (value, metaData){
+                        return metaData.column.renderIcons.call(this, value);
+                    }
+                },{
         			xtype: 'gridcolumn',
                     width: 135,
                     renderer: me.customerRenderer,

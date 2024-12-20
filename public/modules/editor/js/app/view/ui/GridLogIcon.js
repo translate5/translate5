@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -21,48 +20,23 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.project.ProjectTaskGrid', {
-	extend: 'Editor.view.admin.TaskGrid',
-	alias: 'widget.projectTaskGrid',
-    requires:[
-    	'Editor.view.project.ProjectTaskGridViewController'
-	],
-	itemId: 'projectTaskGrid',
-	stateful:false,
-	controller:'projectTaskGrid',
-	visibleColumns:[
-		'id',
-		'taskGridActionColumn',
-        'checked',
-		'state',
-        'logInfo',
-		'workflowStepName',
-		'segmentFinishCount',
-		'qualityErrorCount',
-		'wordCount',
-		'taskName',
-		'relaisLang',
-		'targetLang',
-		'userCount',
-	],
-	height:200,
-	store: null,
-	autoLoad: false,
-	bufferedRenderer:false,//info: this will stop the store filter binding.
+/**
+ */
+Ext.define('Editor.view.ui.GridLogIcon', {
 
-    initConfig: function(instanceConfig) {
-        var me = this,
-        	config={
-        		dockedItems: [{}]
-        	};
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
+    statics: {
+        imgTpl: new Ext.Template(
+            '<img valign="text-bottom" class="icon-error-level-{0}" src="'+Ext.BLANK_IMAGE_URL+'" alt="{0}" />'
+        ),
+        getIconByLevel: function (logLevel){
+            var level = Editor.util.Util.getErrorLevelName(logLevel);
+
+            return this.imgTpl.apply([level]);
         }
-        return me.callParent([config]);
     }
 });

@@ -541,7 +541,6 @@ div.loading div#loading-indicator-text {
 
 /* additional icons about the task state */
 .adminTaskGrid .locked td.state div {padding-left:20px;background:url(../images/information.png) no-repeat left center;}
-.adminTaskGrid .error td.state div,.importUpload .error td.type div {padding-left:20px;background:url(../images/exclamation.png) no-repeat left center;}
 .adminTaskGrid .unconfirmed td.state div {padding-left:20px;background:url(../images/stamp-exclamation.png) no-repeat left center;}
 .adminTaskGrid .locked.import td.state div {padding-left:6px; background:none;}
 
@@ -588,6 +587,7 @@ div.loading div#loading-indicator-text {
     white-space: nowrap;
 }
 
+.log-info-column span.counter {background-color:#EFEFEF;display:inline-block;padding:0pt 2pt;border-radius: 50%;font-size:90%;position:relative;top:-5px;left:-2px;}
 table.task-users td {padding-right:10px;white-space: nowrap;}
 table.task-users td.username, 
 table.task-users td.state {font-weight:bold;}
