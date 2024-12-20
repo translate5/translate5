@@ -223,8 +223,8 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
      */
     getConfigDeadlineDate:function (step){
         var me = this,
-            configStore = me.getView().up('#displayTabPanel').down('adminConfigGrid').getStore();
-        return configStore.getConfig('workflow.default.'+step+'.defaultDeadlineDate');
+            configStore = me.getView().up('#displayTabPanel')?.down('adminConfigGrid')?.getStore();
+        return configStore?.getConfig('workflow.default.'+step+'.defaultDeadlineDate');
     },
 
     /***

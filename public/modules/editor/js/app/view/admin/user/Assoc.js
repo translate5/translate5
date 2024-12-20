@@ -359,7 +359,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
             customerId = me.getCustomer(),
             currentWorkflow = !Ext.isEmpty(workflowCombo.getValue()) ? workflowCombo.getValue() : false;
 
-        if (! customerId || ! currentWorkflow) {
+        if (! customerId || ! Number.isInteger(customerId) || ! currentWorkflow) {
             return;
         }
 
