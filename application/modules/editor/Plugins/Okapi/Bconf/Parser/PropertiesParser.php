@@ -61,7 +61,7 @@ final class PropertiesParser
 
     public function __construct(string $content = null)
     {
-        if($content !== null){
+        if ($content !== null) {
             $this->parse($content);
         }
     }

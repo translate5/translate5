@@ -30,9 +30,9 @@ namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
 
 use editor_Models_ConfigException;
 use editor_Utils;
-use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\T5SrxInventory;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use MittagQI\ZfExtended\MismatchException;
 use stdClass;
 use ZfExtended_Debug;

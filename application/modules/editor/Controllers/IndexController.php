@@ -991,7 +991,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             return '';
         }
 
-
         $specialCharacters = json_decode($specialCharactersJson, true);
         if (empty($specialCharacters['all'])) {
             return $specialCharactersJson;
