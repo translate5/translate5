@@ -105,7 +105,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $lspUserRepository = LspUserRepository::create();
         $authLspUser = $lspUserRepository->findByUserGuid(ZfExtended_Authentication::getInstance()->getUserGuid());
 
-        if ($authLspUser && (!$authLspUser->isCoordinator() || !$authLspUser->lsp->isDirectLsp())) {
+        if ($authLspUser) {
             $pricingPresetId = null;
             $currency = null;
             $noPricing = true;

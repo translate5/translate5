@@ -1079,20 +1079,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If we're on allExcept-mode - make sure ids will be fetched
         $fetchMode = $allExcept ? PDO::FETCH_COLUMN : null;
-        //i($termQuery, 'a');
-        //i($bindParam, 'a');
 
         // Return results
         return $this->db->getAdapter()->query($termQuery, $bindParam)->fetchAll($fetchMode);
-    }
-
-    /***
-     * It is proposal when the user is allowed for term proposal operation
-     * @return boolean
-     */
-    public function isProposableAllowed(): bool
-    {
-        return ZfExtended_Authentication::getInstance()->hasUserRole('termProposer');
     }
 
     /**
