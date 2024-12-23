@@ -90,6 +90,8 @@ class IndexController extends ZfExtended_Controllers_Action
         $conf = Zend_Registry::get('config');
         $maintenance = ZfExtended_Factory::get(ZfExtended_Models_Installer_Maintenance::class);
 
+        $this->view->isJsonQuery = (bool) $this->getParam('json', false);
+
         $monitoringConfig = $conf->runtimeOptions->maintenance->monitoring;
         $isBackup = str_contains($maintenance->status()->message ?? '', $monitoringConfig->backupMessage);
 

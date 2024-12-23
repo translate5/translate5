@@ -30,14 +30,13 @@ declare(strict_types=1);
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Models_Config;
-use editor_Models_LanguageResources_CustomerAssoc as LanguageResourcesCustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_LanguageResources_Languages as LanguageResourcesLanguages;
 use editor_Services_OpenTM2_Connector as Connector;
 use editor_Services_OpenTM2_Service as Service;
 use Exception;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
+use MittagQI\Translate5\LanguageResource\Operation\CloneLanguageResourceOperation;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
@@ -593,39 +592,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             $name = $namePart . $languageResource->getName();
         }
 
-        // TODO we have similar code in PrivatePlugins think about moving this to factory or something like that
-        $newLanguageResource = new LanguageResource();
-        $newLanguageResource->init([
-            'resourceId' => $languageResource->getResourceId(),
-            'resourceType' => $languageResource->getResourceType(),
-            'serviceType' => $languageResource->getServiceType(),
-            'serviceName' => $languageResource->getServiceName(),
-            'color' => $languageResource->getColor(),
-            'name' => $name,
-        ]);
-        $newLanguageResource->createLangResUuid();
-        $newLanguageResource->validate();
-        $newLanguageResource->save();
-
-        $resourceLanguages = ZfExtended_Factory::get(LanguageResourcesLanguages::class);
-        $resourceLanguages->setSourceLang($languageResource->getSourceLang());
-        $resourceLanguages->setSourceLangCode($languageResource->getSourceLangCode());
-        $resourceLanguages->setTargetLang($languageResource->getTargetLang());
-        $resourceLanguages->setTargetLangCode($languageResource->getTargetLangCode());
-        $resourceLanguages->setLanguageResourceId((int) $newLanguageResource->getId());
-        $resourceLanguages->save();
-
-        foreach ($languageResource->getCustomers() as $customerId) {
-            $customerAssoc = ZfExtended_Factory::get(LanguageResourcesCustomerAssoc::class);
-            $customerAssoc->setCustomerId($customerId);
-            $customerAssoc->setLanguageResourceId((int) $newLanguageResource->getId());
-            $customerAssoc->setLanguageResourceServiceName($newLanguageResource->getServiceName());
-            $customerAssoc->save();
-        }
-
-        $newLanguageResource->refresh();
-
-        return $newLanguageResource;
+        return CloneLanguageResourceOperation::create()->clone($languageResource, $name);
     }
 
     private function getLanguageResourcesData(InputInterface $input, string $sourceResourceId): array
