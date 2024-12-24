@@ -25,21 +25,22 @@
 
  END LICENSE AND COPYRIGHT
  */
+
 declare(strict_types=1);
 
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_Task as Task;
 use editor_Services_OpenTM2_Service as Service;
+use editor_Workflow_Default as Workflow;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsSnapshot;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Translate5\MaintenanceCli\Command\Translate5AbstractCommand;
-use ZfExtended_Factory as Factory;
 
 class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
 {
@@ -48,6 +49,10 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
     private const OPTION_SOURCE_LANGUAGE = 'source-language';
 
     private const OPTION_TARGET_LANGUAGE = 'target-language';
+
+    private const OPTION_ONLY_EDITED_SEGMENTS = 'only-edited-segments';
+
+    private const OPTION_ONLY_FINISHED_TASKS = 'only-finished-tasks';
 
     protected function configure(): void
     {
@@ -61,7 +66,7 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
                 self::OPTION_USE_SEGMENT_TIMESTAMP,
                 null,
                 InputOption::VALUE_NEGATABLE,
-                'Use segment timestamp for reimport, otherwise current time is used',
+                'Use segment timestamp for reimport, otherwise current time is used (default true)',
                 true
             )
             ->addOption(
@@ -75,6 +80,20 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Target language code to filter tasks or language resources'
+            )
+            ->addOption(
+                self::OPTION_ONLY_EDITED_SEGMENTS,
+                null,
+                InputOption::VALUE_NEGATABLE,
+                'Specifies if only user edited segments should be reimported (default true)',
+                true
+            )
+            ->addOption(
+                self::OPTION_ONLY_FINISHED_TASKS,
+                null,
+                InputOption::VALUE_NEGATABLE,
+                'Specifies if only tasks that are finished in workflow will be reimported (default false)',
+                false
             );
     }
 
@@ -88,40 +107,49 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
                 'The command will only reimport tasks that match the given language pair.');
         }
 
-        $strategy = $this->askReimportByStrategy();
+        $onlyEdited = $this->input->getOption(self::OPTION_ONLY_EDITED_SEGMENTS);
+        $useSegmentTimestamp = (bool) $input->getOption(self::OPTION_USE_SEGMENT_TIMESTAMP);
 
+        $strategy = $this->askReimportByStrategy();
         $taskIdsGrouped = $this->getTaskIdsForReimport($strategy);
+        $this->reimport($taskIdsGrouped, $onlyEdited, $useSegmentTimestamp);
+
+        return self::SUCCESS;
+    }
+
+    private function reimport(array $taskIdsGrouped, bool $onlyEdited, bool $useSegmentTimestamp): void
+    {
+        $languageResourceRepository = new LanguageResourceRepository();
+        $taskRepository = new TaskRepository();
+        $reimportSegmentsSnapshot = ReimportSegmentsSnapshot::create();
+        $reimportSegments = ReimportSegments::create();
 
         foreach ($taskIdsGrouped as $languageResourceId => $taskIds) {
-            $languageResource = Factory::get(LanguageResource::class);
-            $languageResource->load($languageResourceId);
+            $languageResource = $languageResourceRepository->get($languageResourceId);
             $this->io->info('Reimporting segments into ' . $languageResource->getName());
 
             foreach ($taskIds as $taskId) {
-                $task = Factory::get(Task::class);
-                $task->load($taskId);
+                $task = $taskRepository->get((int) $taskId);
                 $this->io->info('Reimporting segments for task ' . $task->getTaskName());
 
                 $runId = bin2hex(random_bytes(16));
 
-                ReimportSegmentsSnapshot::create()->createSnapshot(
+                $reimportSegmentsSnapshot->createSnapshot(
                     $task,
                     $runId,
                     $languageResourceId,
                     null,
-                    true,
-                    (bool) $input->getOption(self::OPTION_USE_SEGMENT_TIMESTAMP)
+                    $onlyEdited,
+                    $useSegmentTimestamp
                 );
 
-                ReimportSegments::create()->reimport(
+                $reimportSegments->reimport(
                     $task,
                     $runId,
                     $languageResourceId,
                 );
             }
         }
-
-        return self::SUCCESS;
     }
 
     private function getTaskIdsForReimport(string $strategy): array
@@ -154,6 +182,11 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
         }
 
         return $this->getTasksGroupedByLanguageResource(taskId: $this->askParticularTaskId());
+    }
+
+    private function isFilteringOnlyFinishedTasks(): bool
+    {
+        return (bool) $this->input->getOption(self::OPTION_ONLY_FINISHED_TASKS);
     }
 
     private function isFilteringByLanguages(): bool
@@ -258,6 +291,10 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
                 ->where('l.targetLangCode = ?', $targetLanguageCode);
         }
 
+        if ($this->isFilteringOnlyFinishedTasks()) {
+            $query->where('task.workflowStepName = ?', Workflow::STEP_WORKFLOW_ENDED);
+        }
+
         $result = [];
         foreach ($db->fetchAll($query) as $row) {
             $result[$row['languageResourceId']][] = $row['taskId'];
@@ -306,6 +343,10 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
                 ->where('l.targetLangCode = ?', $targetLanguageCode);
         }
 
+        if ($this->isFilteringOnlyFinishedTasks()) {
+            $query->where('task.workflowStepName = ?', Workflow::STEP_WORKFLOW_ENDED);
+        }
+
         $result = [];
         foreach ($db->fetchAll($query) as $row) {
             $result[] = $row['taskId'] . ' - ' . $row['taskName'];
@@ -345,8 +386,9 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
         $tmsList = [];
         foreach ($db->fetchAll($query) as $item) {
             $tmsList[$item['languageResourceId']] = sprintf(
-                '%s [ %s -> %s ]',
+                '%s [ID %d] [ %s -> %s ]',
                 $item['languageResourceName'],
+                $item['languageResourceId'],
                 $item['sourceLangCode'],
                 $item['targetLangCode']
             );

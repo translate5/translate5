@@ -195,7 +195,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $name,
                 $sourceLang,
                 $fileinfo['tmp_name'],
-                $this->getStripFramingTagsValue($params['stripFramingTags'] ?? null)
+                $this->getStripFramingTagsValue($params)
             );
         } else {
             $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
@@ -1773,9 +1773,32 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private function waitForImportFinish(string $tmName): void
     {
-        while (true) {
-            if (! $this->api->status($tmName)) {
-                break;
+        $elapsedTime = 0;
+        $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
+
+        while ($elapsedTime < $maxWaitingTime) {
+            try {
+                if (! $this->api->status($tmName)) {
+                    sleep($this->getRetryDelaySeconds());
+                    $elapsedTime += $this->getRetryDelaySeconds();
+
+                    continue;
+                }
+            } catch (\ZfExtended_Zendoverwrites_Http_Exception $e) {
+                $this->logger->error(
+                    'E1313',
+                    't5memory: We got some unexpected response. Look into system logs for details.',
+                    [
+                        'languageResource' => $this->languageResource,
+                        'error' => $e->getMessage(),
+                    ]
+                );
+                $this->logger->exception($e);
+
+                sleep($this->getRetryDelaySeconds());
+                $elapsedTime += $this->getRetryDelaySeconds();
+
+                continue;
             }
 
             $result = $this->api->getResult();
@@ -1785,7 +1808,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 break;
             }
 
-            sleep(2);
+            sleep($this->getRetryDelaySeconds());
+            $elapsedTime += $this->getRetryDelaySeconds();
         }
     }
 
@@ -1793,18 +1817,26 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     {
         $memories = $languageResource->getSpecificData('memories', parseAsArray: true);
 
+        if (empty($memories)) {
+            return $this->generateTmFilename($languageResource);
+        }
+
+        if (count($memories) === 1) {
+            return $this->generateTmFilename($languageResource) . '_next-1';
+        }
+
         $pattern = '/_next-(\d+)/';
 
         $currentMax = 0;
         foreach ($memories as $memory) {
             if (! preg_match($pattern, $memory['filename'], $matches)) {
-                return $memory['filename'] . '_next-1';
+                continue;
             }
 
             $currentMax = $currentMax > $matches[1] ? $currentMax : (int) $matches[1];
         }
 
-        return preg_replace($pattern, '_next-' . ($currentMax + 1), $memories[0]['filename']);
+        return $this->generateTmFilename($languageResource) . '_next-' . ($currentMax + 1);
     }
 
     public function export(string $mime): ?string
@@ -1920,7 +1952,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
     }
 
-    private function getStripFramingTagsValue(array $params): StripFramingTags
+    private function getStripFramingTagsValue(?array $params): StripFramingTags
     {
         return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
     }
