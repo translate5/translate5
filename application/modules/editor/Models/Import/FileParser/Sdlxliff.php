@@ -934,13 +934,17 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $this->_tagMapping[$tagId]['eptText'] = $formatName;
         }
 
-        if (! isset($this->tagIdShortTagIdentMap[$tagId])) {
+        $shortTagIdent = null;
+
+        if (str_contains($this->_tagMapping[$tagId]['text'], 'ctype=&quot;x-html-')) {
+            $shortTagIdent = $data->j++;
+        } elseif (! isset($this->tagIdShortTagIdentMap[$tagId])) {
             $this->tagIdShortTagIdentMap[$tagId] = $data->j++;
         }
 
-        $shortTagIdent = $this->tagIdShortTagIdentMap[$tagId];
+        $shortTagIdent = $shortTagIdent ?? $this->tagIdShortTagIdentMap[$tagId];
 
-        if (strpos($tagId, 'locked') !== false) {
+        if (str_contains($tagId, 'locked')) {
             //The opening tag $tagName contains a non valid tagId according to our reverse engineering
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1001', [
                 'task' => $this->task,
@@ -953,7 +957,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 
         // if the tag is a start=false tag - that is phantom tag opener
         // we do not replace it with a tag for the editor
-        if (strpos($tag, 'sdl:start="false"') === false) {
+        if (! str_contains($tag, 'sdl:start="false"')) {
             $data->openTags[$data->openCounter]['tagName'] = $tagName;
             $data->openTags[$data->openCounter]['tagId'] = $tagId;
             $data->openTags[$data->openCounter]['nr'] = $shortTagIdent;
