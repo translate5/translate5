@@ -118,7 +118,8 @@ class UpdateDefaultLspJobOperationTest extends TestCase
             ->expects(self::once())
             ->method('assertGranted')
             ->with(DefaultJobAction::Update, $defaultLspJob)
-            ->willThrowException(new class extends \Exception implements PermissionExceptionInterface {});
+            ->willThrowException(new class() extends \Exception implements PermissionExceptionInterface {
+            });
 
         $this->expectException(PermissionExceptionInterface::class);
 
@@ -156,7 +157,8 @@ class UpdateDefaultLspJobOperationTest extends TestCase
             ->expects(self::once())
             ->method('assertGranted')
             ->with(UserAction::Read, $userToSet)
-            ->willThrowException(new class extends \Exception implements PermissionExceptionInterface {});
+            ->willThrowException(new class() extends \Exception implements PermissionExceptionInterface {
+            });
 
         $this->expectException(PermissionExceptionInterface::class);
 

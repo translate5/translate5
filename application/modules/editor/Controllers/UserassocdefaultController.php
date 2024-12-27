@@ -196,7 +196,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
         try {
             $dto = UpdateDefaultJobDtoFactory::create()->fromRequest($this->getRequest());
 
-            $lspJob = $this->defaultLspJobRepository->findDefaultLspJobByDataJobId((int)$job->getId());
+            $lspJob = $this->defaultLspJobRepository->findDefaultLspJobByDataJobId((int) $job->getId());
 
             if (null !== $lspJob) {
                 UpdateDefaultLspJobOperation::create()->updateJob($lspJob, $dto);
@@ -206,7 +206,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
 
             $job->refresh();
 
-            $this->view->rows = (object)$this->defaultUserJobViewDataProvider->buildJobView($job);
+            $this->view->rows = (object) $this->defaultUserJobViewDataProvider->buildJobView($job);
         } catch (Throwable $e) {
             $this->log->exception($e);
 

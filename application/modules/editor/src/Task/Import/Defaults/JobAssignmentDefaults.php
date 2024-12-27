@@ -3,8 +3,8 @@
 namespace MittagQI\Translate5\Task\Import\Defaults;
 
 use editor_Models_Task as Task;
-use editor_Models_TaskUserAssoc as UserJob;
 use editor_Models_TaskConfig;
+use editor_Models_TaskUserAssoc as UserJob;
 use editor_Models_UserAssocDefault as DefaultUserJob;
 use editor_Utils;
 use editor_Workflow_Default;

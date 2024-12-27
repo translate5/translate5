@@ -282,7 +282,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * loads all Entities out of DB associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
-     * @param bool $loadAll optional, per default false
      * @return array
      */
     public function loadListByUserAssoc(string $userGuid)
@@ -379,7 +378,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
-     * @param bool $loadAll
      * @return int
      */
     public function getTotalCountByUserAssoc(string $userGuid)

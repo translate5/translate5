@@ -37,8 +37,8 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use MittagQI\Translate5\Segment\QualityService;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserJobIsNotEditableException;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\JobAssignmentWasDeletedInTheMeantimeException;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserJobIsNotEditableException;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\Task\Current\NoAccessException;
@@ -50,10 +50,10 @@ use MittagQI\Translate5\Task\Import\ProjectWorkersService;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\JobsPurger;
-use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\Task\Log\LogRepository;
 use MittagQI\Translate5\Task\Log\LogService;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
 use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
 use MittagQI\Translate5\User\Model\User;
@@ -1387,7 +1387,6 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * returns true if PUT Requests opens a task for editing or readonly
-     * @return bool
      */
     protected function isOpenTaskRequest(): bool
     {
@@ -1396,7 +1395,6 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * returns true if PUT Requests opens a task for open or finish
-     * @return bool
      */
     protected function isLeavingTaskRequest(): bool
     {
@@ -1409,7 +1407,6 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * returns true if PUT Requests opens a task for editing
-     * @return bool
      */
     protected function isEditTaskRequest(): bool
     {
@@ -1422,7 +1419,6 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * returns true if PUT Requests opens a task for viewing(readonly)
-     * @return bool
      */
     protected function isViewTaskRequest(): bool
     {
@@ -2110,8 +2106,6 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * Check if the given pmGuid(userGuid) is the same with the current logged user userGuid
-     *
-     * @return bool
      */
     protected function isAuthUserTaskPm($taskPmGuid): bool
     {

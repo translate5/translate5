@@ -110,7 +110,7 @@ class LspRestrictionAssertTest extends TestCase
             ->expects($this->once())
             ->method('assertGranted')
             ->with(LspAction::Update, $lsp)
-            ->willThrowException(new class extends \Exception implements PermissionExceptionInterface {
+            ->willThrowException(new class() extends \Exception implements PermissionExceptionInterface {
             });
 
         $this->expectException(NoAccessToDefaultLspJobException::class);

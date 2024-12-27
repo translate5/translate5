@@ -32,12 +32,12 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
-use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\Task\Reimport\DataProvider\DataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
 use MittagQI\Translate5\Task\Reimport\Worker;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\TaskLockService;
 
 class editor_FileController extends ZfExtended_RestController
 {

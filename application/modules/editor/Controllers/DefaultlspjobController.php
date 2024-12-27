@@ -41,7 +41,6 @@ class Editor_DefaultlspjobController extends ZfExtended_RestController
 
     private UserRepository $userRepository;
 
-
     private DefaultLspJobRepository $defaultLspJobRepository;
 
     private CoordinatorProvider $coordinatorProvider;

@@ -27,8 +27,8 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Customer_Customer;
 use editor_Models_Customer_CustomerConfig;
-use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
 use Exception;
+use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 

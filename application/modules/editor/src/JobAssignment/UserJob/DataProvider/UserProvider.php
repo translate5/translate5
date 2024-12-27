@@ -124,7 +124,7 @@ class UserProvider
         return array_map(
             fn ($user) => [
                 'userGuid' => $user['userGuid'],
-                'longUserName' => $user['longUserName']
+                'longUserName' => $user['longUserName'],
             ],
             $this->permissionAwareUserFetcher->fetchVisible($select, $viewer)
         );
@@ -178,7 +178,7 @@ class UserProvider
         return array_map(
             fn ($user) => [
                 'userGuid' => $user['userGuid'],
-                'longUserName' => $user['longUserName']
+                'longUserName' => $user['longUserName'],
             ],
             $this->permissionAwareUserFetcher->fetchVisible($select, $viewer)
         );

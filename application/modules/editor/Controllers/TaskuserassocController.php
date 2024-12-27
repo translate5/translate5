@@ -370,11 +370,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     private function resolveTask(): Task
     {
         $task = $this->taskRepository->find((int) $this->getRequest()->getParam('taskId'));
-        
+
         if (null !== $task) {
             return $task;
         }
-        
+
         return $this->taskRepository->getByGuid((string) $this->getRequest()->getParam('taskId'));
     }
 

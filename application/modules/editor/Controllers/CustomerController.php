@@ -31,8 +31,8 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\CustomerService;
-use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Test\Enums\TestUser;
 
 class Editor_CustomerController extends ZfExtended_RestController
 {

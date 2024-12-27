@@ -30,8 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\UserJob\Operation\Factory;
 
-use editor_Models_Task as Task;
-use editor_Workflow_Default as Workflow;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\JobAssignment\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidStateProvidedException;

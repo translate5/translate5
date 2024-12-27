@@ -48,9 +48,7 @@ class UserActionPermissionAssertTest extends TestCase
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $assert1 = new class implements PermissionAssertInterface
-        {
-
+        $assert1 = new class() implements PermissionAssertInterface {
             public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
             {
                 TestCase::assertSame(UserAction::Delete, $action);
@@ -63,9 +61,7 @@ class UserActionPermissionAssertTest extends TestCase
             }
         };
 
-        $assert2 = new class implements PermissionAssertInterface
-        {
-
+        $assert2 = new class() implements PermissionAssertInterface {
             public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
             {
                 throw new ExpectationFailedException('Method was not expected to be called');
@@ -87,9 +83,7 @@ class UserActionPermissionAssertTest extends TestCase
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $assert1 = new class implements PermissionAssertInterface
-        {
-
+        $assert1 = new class() implements PermissionAssertInterface {
             public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
             {
                 TestCase::assertSame(UserAction::Delete, $action);
@@ -102,9 +96,7 @@ class UserActionPermissionAssertTest extends TestCase
             }
         };
 
-        $assert2 = new class implements PermissionAssertInterface
-        {
-
+        $assert2 = new class() implements PermissionAssertInterface {
             public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
             {
                 throw new ExpectationFailedException('Method was not expected to be called');
@@ -127,13 +119,10 @@ class UserActionPermissionAssertTest extends TestCase
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $assert1 = new class implements PermissionAssertInterface
-        {
-
+        $assert1 = new class() implements PermissionAssertInterface {
             public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
             {
-                throw new class extends \Exception implements PermissionExceptionInterface
-                {
+                throw new class() extends \Exception implements PermissionExceptionInterface {
                 };
             }
 
@@ -153,13 +142,10 @@ class UserActionPermissionAssertTest extends TestCase
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $assert1 = new class implements PermissionAssertInterface
-        {
-
+        $assert1 = new class() implements PermissionAssertInterface {
             public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
             {
-                throw new class extends \Exception implements PermissionExceptionInterface
-                {
+                throw new class() extends \Exception implements PermissionExceptionInterface {
                 };
             }
 

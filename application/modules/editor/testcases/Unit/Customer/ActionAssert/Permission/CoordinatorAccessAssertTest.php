@@ -61,6 +61,7 @@ class CoordinatorAccessAssertTest extends TestCase
             $this->lspRepository,
         );
     }
+
     public function provideSupports(): iterable
     {
         yield [CustomerAction::Delete, true];

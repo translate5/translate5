@@ -35,12 +35,9 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\DefaultJobAssignment\Contract\CreateDefaultLspJobOperationInterface;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DTO\NewDefaultLspJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\WithAuthentication\CreateDefaultLspJobOperation;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\TrackChangesRightsDto;
-use MittagQI\Translate5\DefaultJobAssignment\DTO\UpdateDefaultJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\WorkflowDto;
 use MittagQI\Translate5\JobAssignment\LspJob\Exception\CoordinatorAttemptedToCreateLspJobForHisLspException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
@@ -55,7 +52,6 @@ use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_AuthenticationInterface;
-use ZfExtended_Logger;
 use ZfExtended_NotAuthenticatedException;
 
 class CreateDefaultLspJobOperationTest extends TestCase
@@ -139,7 +135,8 @@ class CreateDefaultLspJobOperationTest extends TestCase
             ->expects(self::once())
             ->method('assertGranted')
             ->with(CustomerAction::DefaultJob, $customer)
-            ->willThrowException(new class extends \Exception implements PermissionExceptionInterface {});
+            ->willThrowException(new class() extends \Exception implements PermissionExceptionInterface {
+            });
 
         $this->expectException(PermissionExceptionInterface::class);
 
@@ -179,7 +176,8 @@ class CreateDefaultLspJobOperationTest extends TestCase
             ->expects(self::once())
             ->method('assertGranted')
             ->with(UserAction::Read, $userToSet)
-            ->willThrowException(new class extends \Exception implements PermissionExceptionInterface {});
+            ->willThrowException(new class() extends \Exception implements PermissionExceptionInterface {
+            });
 
         $this->expectException(PermissionExceptionInterface::class);
 

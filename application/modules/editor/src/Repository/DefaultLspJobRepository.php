@@ -261,7 +261,7 @@ class DefaultLspJobRepository
         $select = $this->db
             ->select()
             ->from([
-                'DefaultLspJob' => DefaultLspJobTable::TABLE_NAME
+                'DefaultLspJob' => DefaultLspJobTable::TABLE_NAME,
             ])
             ->join(
                 [
@@ -304,7 +304,7 @@ class DefaultLspJobRepository
         $select = $this->db
             ->select()
             ->from([
-                'DefaultLspJob' => DefaultLspJobTable::TABLE_NAME
+                'DefaultLspJob' => DefaultLspJobTable::TABLE_NAME,
             ])
             ->join(
                 [

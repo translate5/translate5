@@ -445,7 +445,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
-
         $this->front->getRouter()->addRoute('editorProjectUserJobs', new ZfExtended_Controller_RestLikeRoute(
             'editor/project/:projectId/jobs/:workflow',
             [

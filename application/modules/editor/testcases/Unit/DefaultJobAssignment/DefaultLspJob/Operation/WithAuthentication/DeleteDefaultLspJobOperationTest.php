@@ -88,7 +88,8 @@ class DeleteDefaultLspJobOperationTest extends TestCase
             ->expects(self::once())
             ->method('assertGranted')
             ->with(DefaultJobAction::Delete, $defaultLspJob)
-            ->willThrowException(new class extends \Exception implements PermissionExceptionInterface {});
+            ->willThrowException(new class() extends \Exception implements PermissionExceptionInterface {
+            });
 
         $this->expectException(PermissionExceptionInterface::class);
 

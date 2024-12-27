@@ -65,8 +65,8 @@ use MittagQI\Translate5\User\Operations\Factory\CreateUserDtoFactory;
 use MittagQI\Translate5\User\Operations\UserUpdatePasswordOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UpdateUserCustomersAssignmentsOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UpdateUserRolesOperation;
-use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
+use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
 use ZfExtended_UnprocessableEntity as UnprocessableEntity;
 
@@ -539,7 +539,7 @@ class Editor_UserController extends ZfExtended_RestController
                             'Der Benutzer ist Job-Koordinator für einige Standard LSP Aufträge.'
                         ),
                         default => $e->getPrevious()->getMessage(),
-                    }
+                    },
                 ],
             ),
             CustomerCanNotBeUnAssignedFromCoordinatorAsItHasRelatedLspJobsException::class => ZfExtended_UnprocessableEntity::createResponse(
