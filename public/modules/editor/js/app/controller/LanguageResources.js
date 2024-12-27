@@ -196,6 +196,7 @@ Ext.define('Editor.controller.LanguageResources', {
 
               //TODO how to implement a check if user modified the match afterwards to add the "interactive" flag?
               rec.set('matchRateType', Editor.data.LanguageResources.matchrateTypeChangedState+';languageResourceid='+matchRecord.get('languageResourceid'));
+              rec.set('match', me.languageResourceValueForEditor);
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
 

@@ -229,13 +229,23 @@ class editor_Models_Segment_Updater
         /* @var $segment editor_Models_Segment */
         $givenType = $segment->getMatchRateType();
 
+        /* @var $matchrateType editor_Models_Segment_MatchRateType */
+        $matchrateType = ZfExtended_Factory::get(editor_Models_Segment_MatchRateType::class);
+
+        // If segment having a match (coming from pretranslation or UI) was opened and then saved with no changes
+        // or with some changes but except when same or another match is (possibly again) taken over in UI
+        if (str_starts_with($givenType, editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED) === false
+            && $segment->getPretrans()) {
+            // Add interactive flag
+            $matchrateType->init($givenType);
+            $matchrateType->add(editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE);
+            $segment->setMatchRateType($givenType = (string) $matchrateType);
+        }
+
         //if it was a normal segment edit, without overtaking the match we have to do nothing here
         if (! $segment->isModified('matchRateType') || strpos($givenType, editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED) !== 0) {
             return;
         }
-
-        $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
-        /* @var $matchrateType editor_Models_Segment_MatchRateType */
 
         $unknown = function () use ($matchrateType, $givenType, $segment) {
             $matchrateType->initEdited($matchrateType::TYPE_UNKNOWN, $givenType);
@@ -269,8 +279,10 @@ class editor_Models_Segment_Updater
         //set the type
         $matchrateType->initEdited($languageresource->getResource()->getType(), $type);
 
-        //REMINDER: this would be possible if we would know if the user edited the segment after using the TM
-        //$matchrateType->add($matchrateType::TYPE_INTERACTIVE);
+        // If givan match rate type has interactive-flag - append to resulting object
+        if (preg_match('~' . editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE . '~', $givenType)) {
+            $matchrateType->add($matchrateType::TYPE_INTERACTIVE);
+        }
 
         //save the type
         $segment->setMatchRateType((string) $matchrateType);
