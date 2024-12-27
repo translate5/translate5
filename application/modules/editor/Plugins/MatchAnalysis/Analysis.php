@@ -673,6 +673,19 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 continue;
             }
 
+            // $meta is a return value of TaskAssociation->getAssocTasksWithResources($taskGuid) method call,
+            // and we use that here because that method is also used to fetch the rows to be shown
+            // in the 'Language resources'-tab of the task overview panel, and each row contains the penalties
+            // to be applied during match analysis.
+            //
+            // So, if we have some $languageResourceId that does not exist as a key in $meta - this means such
+            // a language resource is never shown in that tab, and this, in it's turn, means it can be never
+            // assigned to a task by a user, and that is why we're skipping such a language resource here, as
+            // it is not assignable
+            if (! isset($meta[$languageResourceId])) {
+                continue;
+            }
+
             //store the languageResource
             $this->resources[(int) $languageResource->getId()] = $languageResource;
 

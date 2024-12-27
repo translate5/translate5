@@ -27,6 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Configuration\ConfigLoader;
+use MittagQI\Translate5\Customer\CustomerConfigService;
+use MittagQI\Translate5\DbConfig\ConfigService;
 use MittagQI\ZfExtended\Acl\ConfigLevelResource;
 use MittagQI\ZfExtended\Service\ConfigHelper;
 
@@ -190,15 +192,14 @@ class editor_ConfigController extends ZfExtended_RestController
 
                 break;
             case $this->entity::CONFIG_LEVEL_CUSTOMER:
-                $customerConfig = ZfExtended_Factory::get(editor_Models_Customer_CustomerConfig::class);
-                /* @var $customerConfig editor_Models_Customer_CustomerConfig */
-                $oldValue = $customerConfig->getCurrentValue($customerId, $this->data->name);
+                $customerConfigService = CustomerConfigService::create();
+                $oldValue = $customerConfigService->getConfigValue($customerId, $this->data->name);
 
                 if ('' === $value) {
-                    $customerConfig->deleteRecord($customerId, $this->data->name);
+                    $customerConfigService->deleteConfig($customerId, $this->data->name);
                     $this->entity->loadByName($this->data->name);
                 } else {
-                    $customerConfig->updateInsertConfig($customerId, $this->data->name, $value);
+                    $customerConfigService->upsertConfig($customerId, $this->data->name, $value);
                     //this value may not be saved! It is just for setting the return value to the gui.
                     $this->entity->setValue($value);
                 }
@@ -213,9 +214,8 @@ class editor_ConfigController extends ZfExtended_RestController
 
                 break;
             case $this->entity::CONFIG_LEVEL_INSTANCE:
-                //update system config
-                $this->entity->setValue($value);
-                $this->entity->save();
+                $configService = ConfigService::create();
+                $configService->updateConfig($this->data->name, $value);
                 $logMessage = 'Updated instance config value "{name}" to "{value}" . Old value was:"{oldValue}"';
                 $eventCode = 'E1439';
 

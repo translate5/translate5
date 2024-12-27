@@ -26,27 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* @var Zend_View $this */
+declare(strict_types=1);
 
-$f = Zend_Registry::get('frontController');
-/* @var Zend_Controller_Front $f */
+namespace MittagQI\Translate5\DbConfig\Events;
 
-//with /index/monitoring?json=1 we can use in Uptime Kuma Monitor Type "HTTP(s) - Json Query"
-// and test for status = "All Ok". If this is not the case we get the reason in the Upime Kuma log and messages.
-if ($this->isJsonQuery) {
-    $f->getResponse()->setHttpResponseCode(200);
-    $f->getResponse()->setHeader('Content-type', 'application/json');
-    $f->getResponse()->sendHeaders();
-    $res = new stdClass();
-    $res->status = $this->monitoringMessage;
-    echo json_encode($res);
-    return;
+final class ConfigUpdatedEvent
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly string $value,
+        public readonly ?string $oldValue,
+    ) {
+    }
 }
-
-$httpCode = (int) $this->monitoringHttpCode;
-if ($httpCode > 0) {
-    $f->getResponse()->setHttpResponseCode($httpCode);
-    $f->getResponse()->sendHeaders();
-}
-
-echo $this->monitoringMessage;

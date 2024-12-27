@@ -102,16 +102,19 @@ Ext.define('Editor.util.Util', {
         /***
          * Return the translated workflowStep name
          */
-        getWorkflowStepNameTranslated: function(stepName){
+        getWorkflowStepNameTranslated: function(stepName,workflowId){
             if(!stepName){
                 return '';
             }
             var store = Ext.StoreManager.get('admin.WorkflowSteps'),
-                rec = store.getById(stepName);
-            if(rec){
-                stepName = rec.get('text');
-            }
-            return stepName;
+                translatedStepName = stepName;
+
+            store.each(function(rec){
+                if(rec.get('workflow') === workflowId && rec.get('id') === stepName){
+                    translatedStepName = rec.get('text');
+                }
+            });
+            return translatedStepName;
         },
 
         /***
