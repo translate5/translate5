@@ -93,7 +93,7 @@ class editor_Models_LanguageResources_SdlResources
         //get the domain code from the specific data json
         $getDomainCode = function ($specificData) {
             try {
-                $specificData = json_decode($specificData);
+                $specificData = json_decode($specificData ?? '');
 
                 return $specificData->domainCode ?? null;
             } catch (Exception $e) {
