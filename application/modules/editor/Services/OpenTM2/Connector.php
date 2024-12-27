@@ -415,8 +415,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     public function getUpdateDTO(\editor_Models_Segment $segment, array $options = []): UpdateSegmentDTO
     {
         $fileName = $this->getFileName($segment);
-        $source = $this->getQueryString($segment);
-        $target = $segment->getTargetEdit();
+        $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
+        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
+        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
         $useSegmentTimestamp = $options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false;
         $timestamp = $useSegmentTimestamp
             ? $this->api->getDate(strtotime($segment->getTimestamp()))
