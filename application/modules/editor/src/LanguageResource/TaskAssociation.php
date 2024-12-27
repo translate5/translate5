@@ -380,7 +380,7 @@ class TaskAssociation extends AssociationAbstract
             $get = 'get' . ucfirst($penalty);
 
             // Pick task<=>langres penalty from langres<=>customer
-            $this->$set($customerAssoc->getId() ? $customerAssoc->$get($penalty) : $value);
+            $this->$set($customerAssoc->hasRow() && $customerAssoc->getId() ? $customerAssoc->$get($penalty) : $value);
         }
     }
 }

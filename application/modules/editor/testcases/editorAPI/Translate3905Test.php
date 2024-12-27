@@ -123,4 +123,36 @@ class Translate3905Test extends JsonTestAbstract
 
         $this->assertEquals(static::api()->getFileContent(self::TESTDATA_EXPORT_XLF), $res->getBody());
     }
+
+    public function testTranslateFileByPostNow()
+    {
+        $params = [
+            'source' => self::SOURCE_LANG,
+            'target' => self::TARGET_LANG,
+            'fileName' => 'test.xlf',
+            'fileData' => static::api()->getFileContentRaw('testdata.xlf'),
+        ];
+
+        static::api()->post('editor/instanttranslateapi/filepretranslatenow', $params);
+        $responseBody = json_decode(static::api()->getLastResponse()->getBody());
+        $this->assertEquals(
+            '200',
+            static::api()->getLastResponse()->getStatus(),
+            'wrong HTTP status returned on POSTing filepretranslatenow, answer: ' . print_r($responseBody, true)
+        );
+        $this->assertObjectHasProperty(
+            'taskId',
+            $responseBody,
+            'filepretranslatenow response does not contain a taskId'
+        );
+        $this->assertIsNumeric($responseBody->taskId, 'returned taskId is non numeric');
+
+        $this->assertObjectHasProperty(
+            'fileTranslation',
+            $responseBody,
+            'filepretranslatenow response does not contain a fileTranslation'
+        );
+
+        $this->assertEquals(static::api()->getFileContent(self::TESTDATA_EXPORT_XLF), $responseBody->fileTranslation);
+    }
 }

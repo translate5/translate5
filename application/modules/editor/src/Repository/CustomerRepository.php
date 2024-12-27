@@ -28,6 +28,7 @@ namespace MittagQI\Translate5\Repository;
 use editor_Models_Customer_Customer;
 use editor_Models_Customer_CustomerConfig;
 use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
+use Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -84,6 +85,27 @@ class CustomerRepository
         $config = ZfExtended_Factory::get(editor_Models_Customer_CustomerConfig::class);
 
         return $config->getCurrentValue($customerId, $configName);
+    }
+
+    public function upsertConfigValue(int $customerId, string $configName, string $value): void
+    {
+        $config = ZfExtended_Factory::get(editor_Models_Customer_CustomerConfig::class);
+
+        $config->updateInsertConfig($customerId, $configName, $value);
+    }
+
+    public function deleteConfigValue(int $customerId, string $configName): void
+    {
+        $config = ZfExtended_Factory::get(editor_Models_Customer_CustomerConfig::class);
+
+        try {
+            $config->db->delete([
+                'customerId = ?' => $customerId,
+                'name = ?' => $configName,
+            ]);
+        } catch (Exception) {
+            // ignore
+        }
     }
 
     /**
