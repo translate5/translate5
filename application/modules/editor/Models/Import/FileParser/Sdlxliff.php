@@ -63,6 +63,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 
     public const TARGET = 'target';
 
+    public const SINGLE_MARK_ID = 'singleMark';
+
     /**
      * Points to comment location/source. In this case it means that the comment is on transunit level, and it is not
      * segment specific.
@@ -122,7 +124,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * /
      */
     protected array $_tagMapping = [
-        'mrkSingle' => [
+        self::SINGLE_MARK_ID => [
             'text' => '&lt;InternalReference/&gt;',
         ],
         'mrkPaired' => [
@@ -790,7 +792,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 return 'mrkPaired';
             }
 
-            return 'mrkSingle';
+            return self::SINGLE_MARK_ID;
         }
 
         return preg_replace('"<.* id=\"([^\"]*)\".*>"', '\\1', $tag);
@@ -1055,11 +1057,15 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->verifyTagName($tagName, $data);
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
 
-        if (! isset($this->tagIdShortTagIdentMap[$tagId])) {
+        $shortTagIdent = null;
+
+        if (self::SINGLE_MARK_ID === $tagId) {
+            $shortTagIdent = $data->j++;
+        } elseif (! isset($this->tagIdShortTagIdentMap[$tagId])) {
             $this->tagIdShortTagIdentMap[$tagId] = $data->j++;
         }
 
-        $shortTagIdent = $this->tagIdShortTagIdentMap[$tagId];
+        $shortTagIdent = $shortTagIdent ?? $this->tagIdShortTagIdentMap[$tagId];
 
         if (strpos($tagId, 'locked') !== false) {
             $this->setLockedTagContent($tag, $tagId);
