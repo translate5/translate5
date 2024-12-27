@@ -3,8 +3,8 @@
         <testsuite name="unit">
             <directory>Unit</directory>
         </testsuite>
-        <testsuite name="functional">
-            <directory>Functional</directory>
+        <testsuite name="integration">
+            <directory>Integration</directory>
         </testsuite>
     </testsuites>
     <coverage>

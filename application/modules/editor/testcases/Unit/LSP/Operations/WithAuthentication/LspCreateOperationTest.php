@@ -102,7 +102,7 @@ class LspCreateOperationTest extends TestCase
             ['getId', [], '12'],
         ]);
 
-        $coordinator = new JobCoordinator('guid', $user, $lsp);
+        $coordinator = new JobCoordinator('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $lsp);
 
         $this->coordinatorRepository->method('findByUser')->with($authUser)->willReturn($coordinator);
 

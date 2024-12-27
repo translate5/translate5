@@ -158,7 +158,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->method('isDirectLsp')->willReturn(false);
-        $lspUser = new LspUser('guid', $user, $lsp);
+        $lspUser = new LspUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $lsp);
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
@@ -186,7 +186,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->method('isDirectLsp')->willReturn(false);
-        $lspUser = new LspUser('guid', $user, $lsp);
+        $lspUser = new LspUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $lsp);
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
@@ -212,7 +212,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->method('isDirectLsp')->willReturn(true);
-        $lspUser = new LspUser('guid', $user, $lsp);
+        $lspUser = new LspUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $lsp);
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
@@ -240,7 +240,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
         $lsp->method('isDirectLsp')->willReturn(true);
-        $lspUser = new LspUser('guid', $user, $lsp);
+        $lspUser = new LspUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $lsp);
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
 
@@ -269,7 +269,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $coordinator->method('isCoordinatorOf')->willReturn(false);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
-        $lspUser = new LspUser('guid', $user, $lsp);
+        $lspUser = new LspUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $lsp);
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
@@ -295,7 +295,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $coordinator->method('isSupervisorOf')->willReturn(true);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
-        $lspUser = new LspUser('guid', $user, $lsp);
+        $lspUser = new LspUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $lsp);
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
@@ -322,7 +322,7 @@ class LspUserAccessPermissionAssertTest extends TestCase
         $coordinator->method('isSupervisorOf')->willReturn(true);
 
         $lsp = $this->createMock(LanguageServiceProvider::class);
-        $lspUser = new LspUser('guid', $user, $lsp);
+        $lspUser = new LspUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $lsp);
 
         $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);

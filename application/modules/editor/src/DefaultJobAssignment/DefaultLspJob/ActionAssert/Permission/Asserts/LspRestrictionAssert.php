@@ -40,9 +40,9 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permissi
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
 use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
+use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
 use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
 use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 
 /**
  * @implements PermissionAssertInterface<DefaultJobAction, DefaultLspJob>
@@ -68,16 +68,16 @@ class LspRestrictionAssert implements PermissionAssertInterface
 
     public function supports(BackedEnum $action): bool
     {
-        return true;
+        return $action instanceof DefaultJobAction;
     }
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $lsp = $this->userRepository->get((int) $object->getLspId());
-
         try {
+            $lsp = $this->userRepository->get((int) $object->getLspId());
+
             $this->lspPermissionAssert->assertGranted(LspAction::Update, $lsp, $context);
-        } catch (PermissionExceptionInterface) {
+        } catch (PermissionExceptionInterface|LspNotFoundException) {
             throw new NoAccessToDefaultLspJobException($object);
         }
     }

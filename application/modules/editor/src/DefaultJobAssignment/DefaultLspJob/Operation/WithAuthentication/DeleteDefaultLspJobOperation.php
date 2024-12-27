@@ -38,10 +38,12 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\DefaultLspJobActionPermissionAssert;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Logger;
+use ZfExtended_NotAuthenticatedException;
 
 class DeleteDefaultLspJobOperation implements DeleteDefaultLspJobOperationInterface
 {
@@ -63,14 +65,18 @@ class DeleteDefaultLspJobOperation implements DeleteDefaultLspJobOperationInterf
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
             \MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DeleteDefaultLspJobOperation::create(),
-            DefaultLspJobActionPermissionAssert::class::create(),
+            DefaultLspJobActionPermissionAssert::create(),
             Zend_Registry::get('logger')->cloneMe('defaultLspJob.delete'),
         );
     }
 
     public function delete(DefaultLspJob $job): void
     {
-        $authUser = $this->userRepository->get($this->authentication->getUserId());
+        try {
+            $authUser = $this->userRepository->get($this->authentication->getUserId());
+        } catch (InexistentUserException) {
+            throw new ZfExtended_NotAuthenticatedException();
+        }
 
         try {
             $this->defaultLspJobPermissionAssert->assertGranted(

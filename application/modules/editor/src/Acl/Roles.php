@@ -30,6 +30,8 @@ namespace MittagQI\Translate5\Acl;
 
 /**
  * Holds additional roles for translate5
+ *
+ * @codeCoverageIgnore
  */
 final class Roles
 {

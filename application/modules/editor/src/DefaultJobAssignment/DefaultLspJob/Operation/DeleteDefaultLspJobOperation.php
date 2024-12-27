@@ -34,12 +34,15 @@ use MittagQI\Translate5\DefaultJobAssignment\Contract\DeleteDefaultLspJobOperati
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\Repository\DefaultLspJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
+use Zend_Registry;
+use ZfExtended_Logger;
 
 class DeleteDefaultLspJobOperation implements DeleteDefaultLspJobOperationInterface
 {
     public function __construct(
         private readonly DefaultLspJobRepository $defaultLspJobRepository,
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
+        private readonly ZfExtended_Logger $logger,
     ) {
     }
 
@@ -51,14 +54,32 @@ class DeleteDefaultLspJobOperation implements DeleteDefaultLspJobOperationInterf
         return new self(
             DefaultLspJobRepository::create(),
             DefaultUserJobRepository::create(),
+            Zend_Registry::get('logger')->cloneMe('defaultLspJob.update'),
         );
     }
 
     public function delete(DefaultLspJob $job): void
     {
-        $dataJob = $this->defaultUserJobRepository->get((int) $job->getDataJobId());
+        $dataJob = $this->defaultUserJobRepository->find((int) $job->getDataJobId());
 
         $this->defaultLspJobRepository->delete((int) $job->getId());
-        $this->defaultUserJobRepository->delete((int) $dataJob->getId());
+
+        if ($dataJob !== null) {
+            $this->defaultUserJobRepository->delete((int) $dataJob->getId());
+        }
+
+        $this->logger->info(
+            'E1637',
+            'Audit: {message}',
+            [
+                'message' => sprintf(
+                    'Default LSP job (id: "%s") of Customer (id: "%s") was deleted',
+                    $job->getId(),
+                    $job->getCustomerId(),
+                ),
+                'lspJobId' => $job->getId(),
+                'customerId' => $job->getCustomerId(),
+            ]
+        );
     }
 }

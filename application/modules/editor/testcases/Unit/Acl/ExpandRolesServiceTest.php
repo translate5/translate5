@@ -28,19 +28,21 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\Exception;
+namespace MittagQI\Translate5\Test\Unit\Acl;
 
-use editor_Models_UserAssocDefault as DefaultUserJob;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
+use MittagQI\Translate5\Acl\ExpandRolesService;
+use PHPUnit\Framework\TestCase;
+use ZfExtended_Acl;
 
-final class ActionNotAllowedException extends NoAccessException implements PermissionExceptionInterface
+class ExpandRolesServiceTest extends TestCase
 {
-    public function __construct(
-        public readonly DefaultJobAction $jobAction,
-        public readonly DefaultUserJob $userJob,
-    ) {
-        parent::__construct();
+    public function testExpandListWithAutoRoles(): void
+    {
+        $acl = $this->createMock(ZfExtended_Acl::class);
+        $service = new ExpandRolesService($acl);
+
+        $acl->method('mergeAutoSetRoles')->willReturn(['foo', 'bar', 'baz']);
+
+        self::assertSame(['foo', 'bar', 'baz'], $service->expandListWithAutoRoles(['foo'], ['foo', 'bar']));
     }
 }

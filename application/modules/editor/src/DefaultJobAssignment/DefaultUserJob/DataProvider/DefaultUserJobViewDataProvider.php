@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob;
+namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\DataProvider;
 
 use editor_Models_UserAssocDefault as DefaultUserJob;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;

@@ -42,7 +42,7 @@ use MittagQI\Translate5\Repository\LspRepository;
 /**
  * @implements PermissionAssertInterface<CustomerAction, Customer>
  */
-final class CoordinatorCanCreateDefaultJobAssert implements PermissionAssertInterface
+final class CoordinatorAccessAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly JobCoordinatorRepository $coordinatorRepository,
@@ -50,6 +50,9 @@ final class CoordinatorCanCreateDefaultJobAssert implements PermissionAssertInte
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(
@@ -70,6 +73,10 @@ final class CoordinatorCanCreateDefaultJobAssert implements PermissionAssertInte
     {
         if (! $context->actor->isCoordinator()) {
             return;
+        }
+
+        if (! in_array($action, [CustomerAction::Read, CustomerAction::DefaultJob], true)) {
+            throw new NoAccessToCustomerException((int) $object->getId());
         }
 
         $coordinator = $this->coordinatorRepository->findByUser($context->actor);

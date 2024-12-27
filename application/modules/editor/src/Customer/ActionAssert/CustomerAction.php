@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Customer\ActionAssert;
 
 enum CustomerAction: string
 {
-    case DefaultJob = 'createDefaultJob';
+    case DefaultJob = 'defaultJob';
     case Read = 'read';
     case Update = 'update';
     case Delete = 'delete';

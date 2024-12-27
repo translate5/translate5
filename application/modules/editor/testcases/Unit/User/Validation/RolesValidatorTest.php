@@ -31,16 +31,22 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Validation;
 
 use MittagQI\Translate5\Acl\Exception\ConflictingRolesExceptionInterface;
+use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
 use MittagQI\Translate5\Acl\ExpandRolesService;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\Validation\RolesValidator;
+use MittagQI\Translate5\LSP\LspUser;
 use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Acl;
 
 class RolesValidatorTest extends TestCase
 {
+    private const EXPANDING_ROLE = 'expanding-role';
+
     private ZfExtended_Acl|MockObject $acl;
 
     private RolesValidator $validator;
@@ -75,6 +81,7 @@ class RolesValidatorTest extends TestCase
         yield [[Roles::JOB_COORDINATOR, Roles::SYSTEMADMIN]];
         yield [[Roles::JOB_COORDINATOR, Roles::PM]];
         yield [[Roles::JOB_COORDINATOR, Roles::CLIENTPM]];
+        yield [[Roles::TERMPM_ALLCLIENTS, self::EXPANDING_ROLE]];
     }
 
     /**
@@ -82,6 +89,11 @@ class RolesValidatorTest extends TestCase
      */
     public function testThrowsExceptionOnConflictingRoles(array $conflictingRoles): void
     {
+        $this->expandRolesService->method('expandListWithAutoRoles')->willReturnCallback(
+            static fn (array $roles) => in_array(self::EXPANDING_ROLE, $roles)
+                ? array_merge($roles, [Roles::CLIENTPM])
+                : $roles
+        );
         $this->expectException(ConflictingRolesExceptionInterface::class);
 
         $this->validator->assertRolesDontConflict($conflictingRoles);
@@ -106,5 +118,137 @@ class RolesValidatorTest extends TestCase
             ->willReturn([Roles::JOB_COORDINATOR, Roles::ADMIN]);
 
         $this->validator->assertRolesDontConflict([Roles::JOB_COORDINATOR, $roleToBePopulated]);
+    }
+
+    public function aclAllowedProvider(): iterable
+    {
+        yield [true];
+        yield [false];
+    }
+
+    /**
+     * @dataProvider aclAllowedProvider
+     */
+    public function testHasAclPermissionToSetRole(bool $aclAllowed): void
+    {
+        $this->acl->method('isInAllowedRoles')->willReturn($aclAllowed);
+
+        $viewer = new User();
+
+        self::assertSame($aclAllowed, $this->validator->hasAclPermissionToSetRole($viewer, 'role'));
+    }
+
+    public function assertRolesCanBeSetForUserProvider(): iterable
+    {
+        $lspUser = $this->createMock(LspUser::class);
+
+        yield 'lsp user + admin role' => [
+            [Roles::ADMIN],
+            RolesCannotBeSetForUserException::class,
+            $lspUser,
+        ];
+
+        yield 'not lsp user + coordinator role' => [
+            [Roles::JOB_COORDINATOR],
+            RolesCannotBeSetForUserException::class,
+            null,
+        ];
+
+        yield 'lsp user + editor role' => [
+            [Roles::EDITOR],
+            null,
+            $lspUser,
+        ];
+
+        yield 'not lsp user + admin role' => [
+            [Roles::ADMIN],
+            null,
+            null,
+        ];
+    }
+
+    /**
+     * @dataProvider assertRolesCanBeSetForUserProvider
+     */
+    public function testAssertRolesCanBeSetForUser(array $roles, ?string $expectedException, ?LspUser $lspUser): void
+    {
+        if ($lspUser) {
+            $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
+        }
+
+        if ($expectedException) {
+            $this->expectException($expectedException);
+        }
+
+        $viewer = new User();
+
+        $this->validator->assertRolesCanBeSetForUser($roles, $viewer);
+
+        self::assertTrue(true);
+    }
+
+    public function assertUserCanSetRolesProvider(): iterable
+    {
+        $user = $this->createMock(User::class);
+
+        yield 'do not have acl permission' => [
+            [Roles::ADMIN],
+            false,
+            UserIsNotAuthorisedToAssignRoleException::class,
+            $user,
+        ];
+
+        $adminUser = $this->createMock(User::class);
+        $adminUser->method('isAdmin')->willReturn(true);
+
+        yield 'user is admin' => [
+            [Roles::JOB_COORDINATOR],
+            true,
+            null,
+            $adminUser,
+        ];
+
+        $pmUser = $this->createMock(User::class);
+        $pmUser->method('isPm')->willReturn(true);
+
+        yield 'user is pm' => [
+            [Roles::EDITOR],
+            true,
+            null,
+            $pmUser,
+        ];
+
+        $clientPmUser = $this->createMock(User::class);
+        $clientPmUser->method('isClientPm')->willReturn(true);
+
+        yield 'user is clientpm' => [
+            [Roles::ADMIN],
+            true,
+            null,
+            $clientPmUser,
+        ];
+
+        yield 'user do not have role he tries to set' => [
+            [Roles::ADMIN],
+            false,
+            UserIsNotAuthorisedToAssignRoleException::class,
+            $user,
+        ];
+    }
+
+    /**
+     * @dataProvider assertUserCanSetRolesProvider
+     */
+    public function testAssertUserCanSetRoles(array $roles, bool $hasAclPermission, ?string $expectedException, User $user): void
+    {
+        if ($expectedException) {
+            $this->expectException($expectedException);
+        }
+
+        $this->acl->method('isInAllowedRoles')->willReturn($hasAclPermission);
+
+        $this->validator->assertUserCanSetRoles($user, $roles);
+
+        self::assertTrue(true);
     }
 }

@@ -105,11 +105,6 @@ class CreateDefaultLspJobOperation implements CreateDefaultLspJobOperationInterf
             throw new CoordinatorAttemptedToCreateLspJobForHisLspException();
         }
 
-        // Coordinator can only assign sub LSP jobs
-        if (null !== $authCoordinator && ! $coordinator->lsp->isSubLspOf($authCoordinator->lsp)) {
-            throw new ZfExtended_NotAuthenticatedException();
-        }
-
         return $this->operation->assignJob($dto);
     }
 }

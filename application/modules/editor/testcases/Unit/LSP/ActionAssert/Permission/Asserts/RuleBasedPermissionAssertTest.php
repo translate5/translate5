@@ -139,7 +139,7 @@ class RuleBasedPermissionAssertTest extends TestCase
         $manager->method('isCoordinator')->willReturn(true);
 
         $coordinator = new JobCoordinator(
-            'guid',
+            '{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}',
             $this->createMock(User::class),
             $lsp
         );
@@ -168,7 +168,7 @@ class RuleBasedPermissionAssertTest extends TestCase
         $manager->method('isCoordinator')->willReturn(true);
 
         $coordinator = new JobCoordinator(
-            'guid',
+            '{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}',
             $this->createMock(User::class),
             $lsp
         );
@@ -199,7 +199,7 @@ class RuleBasedPermissionAssertTest extends TestCase
         $coordinatorLsp = $this->createMock(LanguageServiceProvider::class);
         $coordinatorLsp->expects(self::once())->method('same')->willReturn(false);
         $coordinator = new JobCoordinator(
-            'guid',
+            '{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}',
             $this->createMock(User::class),
             $coordinatorLsp
         );

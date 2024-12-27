@@ -39,10 +39,14 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permissi
 use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\UpdateDefaultJobDto;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
 use ZfExtended_Logger;
+use ZfExtended_NotAuthenticatedException;
 
 class UpdateDefaultLspJobOperation implements UpdateDefaultLspJobOperationInterface
 {
@@ -51,6 +55,7 @@ class UpdateDefaultLspJobOperation implements UpdateDefaultLspJobOperationInterf
         private readonly UserRepository $userRepository,
         private readonly UpdateDefaultLspJobOperationInterface $operation,
         private readonly ActionPermissionAssertInterface $defaultLspJobPermissionAssert,
+        private readonly ActionPermissionAssertInterface $userActionPermissionAssert,
         private readonly ZfExtended_Logger $logger,
     ) {
     }
@@ -64,14 +69,19 @@ class UpdateDefaultLspJobOperation implements UpdateDefaultLspJobOperationInterf
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
             \MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\UpdateDefaultLspJobOperation::create(),
-            DefaultLspJobActionPermissionAssert::class::create(),
+            DefaultLspJobActionPermissionAssert::create(),
+            UserActionPermissionAssert::create(),
             Zend_Registry::get('logger')->cloneMe('defaultLspJob.update'),
         );
     }
 
     public function updateJob(DefaultLspJob $job, UpdateDefaultJobDto $dto): void
     {
-        $authUser = $this->userRepository->get($this->authentication->getUserId());
+        try {
+            $authUser = $this->userRepository->get($this->authentication->getUserId());
+        } catch (InexistentUserException) {
+            throw new ZfExtended_NotAuthenticatedException();
+        }
 
         try {
             $this->defaultLspJobPermissionAssert->assertGranted(
@@ -79,6 +89,16 @@ class UpdateDefaultLspJobOperation implements UpdateDefaultLspJobOperationInterf
                 $job,
                 new PermissionAssertContext($authUser),
             );
+
+            if ($dto->userGuid !== null) {
+                $userToSet = $this->userRepository->getByGuid($dto->userGuid);
+
+                $this->userActionPermissionAssert->assertGranted(
+                    UserAction::Read,
+                    $userToSet,
+                    new PermissionAssertContext($authUser),
+                );
+            }
 
             $this->logger->info(
                 'E1637',
@@ -103,6 +123,7 @@ class UpdateDefaultLspJobOperation implements UpdateDefaultLspJobOperationInterf
                         $job->getId(),
                         $authUser->getUserGuid(),
                     ),
+                    'reason' => $e::class,
                     'lspJobId' => $job->getId(),
                     'authUserGuid' => $authUser->getUserGuid(),
                 ]

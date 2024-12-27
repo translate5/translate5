@@ -67,7 +67,7 @@ class CustomerRestrictionAssert implements PermissionAssertInterface
 
     public function supports(BackedEnum $action): bool
     {
-        return true;
+        return $action instanceof DefaultJobAction;
     }
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void

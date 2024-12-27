@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace Customer\ActionAssert\Permission;
+namespace MittagQI\Translate5\Test\Unit\Customer\ActionAssert\Permission;
 
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
@@ -60,13 +60,13 @@ class AssignedCustomerAssertTest extends TestCase
     public function testAssertGrantedNotClientRestricted(): void
     {
         $customer = $this->createMock(Customer::class);
-        $manager = $this->createMock(User::class);
-        $context = new PermissionAssertContext($manager);
+        $viewer = $this->createMock(User::class);
+        $context = new PermissionAssertContext($viewer);
 
-        $manager->expects($this->once())
+        $viewer->expects($this->once())
             ->method('isClientRestricted')
             ->willReturn(false);
-        $manager->expects($this->never())
+        $viewer->expects($this->never())
             ->method('getCustomersArray');
 
         $lspPermissionAuditor = new AssignedCustomerAssert();
@@ -80,13 +80,13 @@ class AssignedCustomerAssertTest extends TestCase
             ['getId', [], 3],
         ]);
 
-        $manager = $this->createMock(User::class);
-        $context = new PermissionAssertContext($manager);
+        $viewer = $this->createMock(User::class);
+        $context = new PermissionAssertContext($viewer);
 
-        $manager->expects($this->once())
+        $viewer->expects($this->once())
             ->method('isClientRestricted')
             ->willReturn(true);
-        $manager->expects($this->once())
+        $viewer->expects($this->once())
             ->method('getCustomersArray')
             ->willReturn([2, 3, 4]);
 
@@ -103,13 +103,13 @@ class AssignedCustomerAssertTest extends TestCase
             ['getId', [], 5],
         ]);
 
-        $manager = $this->createMock(User::class);
-        $context = new PermissionAssertContext($manager);
+        $viewer = $this->createMock(User::class);
+        $context = new PermissionAssertContext($viewer);
 
-        $manager->expects($this->once())
+        $viewer->expects($this->once())
             ->method('isClientRestricted')
             ->willReturn(true);
-        $manager->expects($this->once())
+        $viewer->expects($this->once())
             ->method('getCustomersArray')
             ->willReturn([2, 3, 4]);
 
