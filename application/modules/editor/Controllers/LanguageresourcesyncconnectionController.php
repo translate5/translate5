@@ -32,6 +32,7 @@ use MittagQI\Translate5\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\ZfExtended\MismatchException;
 
 /**
@@ -54,6 +55,21 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
 
     protected bool $decodePutAssociative = true;
 
+    private UserRepository $userRepository;
+
+    private LanguageRepository $languageRepository;
+
+    private LanguageResourceRepository $languageResourceRepository;
+
+    public function init(): void
+    {
+        parent::init();
+
+        $this->userRepository = new UserRepository();
+        $this->languageRepository = LanguageRepository::create();
+        $this->languageResourceRepository = new LanguageResourceRepository();
+    }
+
     /**
      * @see ZfExtended_RestController::indexAction()
      */
@@ -61,16 +77,14 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
     {
         $languageResourceId = $this->getRequest()->getParam('languageResource');
 
-        $syncRepo = new CrossSynchronizationConnectionRepository();
-        $lrRepo = new LanguageResourceRepository();
         $connectionRepo = new CrossSynchronizationConnectionRepository();
         $integrationManager = new editor_Services_Manager();
 
         $rows = [];
 
-        foreach ($syncRepo->getAllConnectionsRenderData((int) $languageResourceId) as $row) {
-            $sourceLr = $lrRepo->get((int) $row['sourceLanguageResourceId']);
-            $targetLr = $lrRepo->get((int) $row['targetLanguageResourceId']);
+        foreach ($connectionRepo->getAllConnectionsRenderData((int) $languageResourceId) as $row) {
+            $sourceLr = $this->languageResourceRepository->get((int) $row['sourceLanguageResourceId']);
+            $targetLr = $this->languageResourceRepository->get((int) $row['targetLanguageResourceId']);
             $connection = $connectionRepo->getConnection((int) $row['id']);
 
             $additionalInfo = [];
@@ -108,9 +122,6 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
     {
         $this->decodePutData();
 
-        $languageRepo = LanguageRepository::create();
-        $lrRepo = new LanguageResourceRepository();
-
         if (empty($this->data['connectionOption'])) {
             throw new MismatchException('E2000', ['connectionOption']);
         }
@@ -121,15 +132,37 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
             throw new MismatchException('E2003', ['connectionOption']);
         }
 
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+
         [$lrId, $sourceLangId, $targetLangId] = array_map('intval', $ids);
 
-        $source = $lrRepo->get((int) ($this->data['sourceLanguageResourceId'] ?? 0));
-        $target = $lrRepo->get($lrId);
+        $source = $this->languageResourceRepository->get((int) ($this->data['sourceLanguageResourceId'] ?? 0));
+        $target = $this->languageResourceRepository->get($lrId);
 
-        $sourceLang = $languageRepo->get($sourceLangId);
-        $targetLang = $languageRepo->get($targetLangId);
+        $sourceLang = $this->languageRepository->get($sourceLangId);
+        $targetLang = $this->languageRepository->get($targetLangId);
 
         CrossLanguageResourceSynchronizationService::create()->connect($source, $target, $sourceLang, $targetLang);
+
+        $this->log->info(
+            'E1685',
+            'Synchronisation Audit: {message}',
+            [
+                'message' => sprintf(
+                    'User %s connected %s:%s to %s:%s - %s->%s',
+                    $authUser->getUsernameLong(),
+                    $source->getServiceName(),
+                    $source->getName(),
+                    $target->getServiceName(),
+                    $target->getName(),
+                    $sourceLang->getRfc5646(),
+                    $targetLang->getRfc5646(),
+                ),
+                'userUserGuid' => $authUser->getUserGuid(),
+                'sourceLanguageResourceId' => $source->getId(),
+                'targetLanguageResourceId' => $lrId,
+            ]
+        );
 
         $this->view->rows = (object) [
             'id' => $source->getId() . ':' . $target->getId(),
@@ -147,6 +180,34 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
         $syncService = CrossLanguageResourceSynchronizationService::create();
         $connection = $syncService->findConnection((int) $this->_getParam('id'));
 
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+
+        $source = $this->languageResourceRepository->get((int) $connection->getSourceLanguageResourceId());
+        $target = $this->languageResourceRepository->get((int) $connection->getTargetLanguageResourceId());
+
+        $sourceLanguage = $this->languageRepository->get((int) $connection->getSourceLanguageId());
+        $targetLanguage = $this->languageRepository->get((int) $connection->getTargetLanguageId());
+
+        $this->log->info(
+            'E1685',
+            'Synchronisation Audit: {message}',
+            [
+                'message' => sprintf(
+                    'User %s deleted connection %s:%s to %s:%s - %s->%s',
+                    $authUser->getUsernameLong(),
+                    $source->getServiceName(),
+                    $source->getName(),
+                    $target->getServiceName(),
+                    $target->getName(),
+                    $sourceLanguage->getRfc5646(),
+                    $targetLanguage->getRfc5646(),
+                ),
+                'userUserGuid' => $authUser->getUserGuid(),
+                'sourceLanguageResourceId' => $connection->getSourceLanguageResourceId(),
+                'targetLanguageResourceId' => $connection->getTargetLanguageResourceId(),
+            ]
+        );
+
         if (null !== $connection) {
             $syncService->deleteConnection($connection);
         }
@@ -160,6 +221,23 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
         if ($connection === null) {
             throw new ZfExtended_Models_Entity_NotFoundException();
         }
+
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+
+        $this->log->info(
+            'E1685',
+            'Synchronisation Audit: {message}',
+            [
+                'message' => sprintf(
+                    'User %s queued synchronisation for connection %s',
+                    $authUser->getUsernameLong(),
+                    $connection->getId(),
+                ),
+                'userUserGuid' => $authUser->getUserGuid(),
+                'sourceLanguageResourceId' => $connection->getSourceLanguageResourceId(),
+                'targetLanguageResourceId' => $connection->getTargetLanguageResourceId(),
+            ]
+        );
 
         SynchronisationDirigent::create()->queueConnectionSynchronization($connection);
     }
