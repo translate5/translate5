@@ -46,10 +46,16 @@ use ZfExtended_Factory as Factory;
  * @method void setSegmentNrInTask(int $segmentNrInTask)
  *
  * @method string getLanguageResourceid()
- * @method void setLanguageResourceid(int $languageResourceid)
+ * @method void setLanguageResourceid(?int $languageResourceid)
  *
  * @method string getMatchRate()
  * @method void setMatchRate(int $matchrate)
+ *
+ * @method string getPenaltyGeneral()
+ * @method void setPenaltyGeneral(int $penaltyGeneral)
+ *
+ * @method string getPenaltySublang()
+ * @method void setPenaltySublang(int $penaltySublang)
  *
  * @method string getWordCount()
  * @method void setWordCount(int $wordCount)
@@ -193,7 +199,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                         $pricing[$prop] = ($pricing[$prop] ?? 0) + round($value * $this->pricing['prices'][$prop], 2);
                     } elseif ($prop == 'noMatch') {
                         $pricing[$prop] = ($pricing[$prop] ?? 0) + round($value * $this->pricing['noMatch'], 2);
-                    } elseif ($prop == 'unitCountTotal') {
+                    } elseif ($prop == 'unitCountTotal' || $prop == 'penaltyTotal') {
                         // Skip that prop
                     } elseif ($prop == 'resourceName') {
                         $pricing[$prop] = 'amount';
@@ -266,8 +272,10 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        //init the language reources group array
+        //init the language resources group array
         $groupedResults = $this->initResultArray($analysisAssoc);
+        //flag, indicating if analysis contains imported match rate info (to avoid duplicates info output)
+        $withImportedMatchRates = false;
         foreach ($results as $res) {
             //the key will be languageResource->ServiceType + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
             //because for the internal fuzzy additional row is displayed
@@ -277,6 +285,9 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 $rowKey = $this->getFuzzyName($lr?->getResourceId() ?? 'deleted ressource');
             } else {
                 $rowKey = $res['languageResourceid'];
+                if (! $withImportedMatchRates && $rowKey === null) {
+                    $withImportedMatchRates = true;
+                }
             }
 
             //results found in group
@@ -325,6 +336,9 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             }
         }
 
+        // Either no duplicates or no imported match rates
+        unset($groupedResults[$withImportedMatchRates ? 0 : null]);
+
         return array_values($groupedResults);
     }
 
@@ -340,6 +354,10 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $taskAssoc = Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
         /* @var $taskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $langResTaskAssocs = $taskAssoc->loadByTaskGuids([$analysisData['taskGuid']]);
+
+        // Get meta data containing single sublanguage and penalties for each assoc
+        $meta = $taskAssoc->getAssocTasksWithResources($analysisData['taskGuid']);
+        $meta = array_combine(array_column($meta, 'languageResourceId'), $meta);
 
         $isInternalFuzzy = $analysisData['internalFuzzy'] == '1';
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -361,6 +379,9 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             $row[$key]['errorCount'] = $analysisData['errorCount'];
             $row[$key]['internalFuzzy'] = $fuzzyString;
             $row[$key]['unitCountTotal'] = 0;
+            if ($type !== 'auto-propagated') {
+                $row[$key]['penaltyTotal'] = 0;
+            }
 
             //init the fuzzy range groups with 0
             foreach (array_keys($this->fuzzyRanges) as $begin) {
@@ -379,6 +400,14 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $task->loadByTaskGuid($analysisData['taskGuid']);
 
         $fuzzyTypes = [];
+
+        // Get task source and target sub languages
+        $subLang['source']['task'] = ZfExtended_Languages::sublangCodeByRfc5646($task->getSourceLanguage()->getRfc5646());
+        $subLang['target']['task'] = ZfExtended_Languages::sublangCodeByRfc5646($task->getTargetLanguage()->getRfc5646());
+
+        /** @var editor_Models_Languages $lang */
+        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
+
         foreach ($langResTaskAssocs as $res) {
             $lr = $this->getLanguageResourceCached($res['languageResourceId']);
             if ($isInternalFuzzy && $lr->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM) {
@@ -394,6 +423,29 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
             //init the group
             $initGroups = $initGroups + $initRow($lr->getId(), $lr->getName(), $lr->getColor(), $lr->getResourceType());
+
+            // Setup sublang penalty as 0 until source and/or target sublang mismatch will be detected
+            $penaltySublang = 0;
+
+            // For source and target
+            foreach (['source', 'target'] as $type) {
+                // Load language
+                $lang->load($meta[$lr->getId()][$type . 'Lang']);
+
+                // Get sublanguage
+                $subLang[$type]['langres'] = ZfExtended_Languages::sublangCodeByRfc5646($lang->getRfc5646());
+
+                // If assoc langres sublang is not empty but does not match task sublang
+                if ($subLang[$type]['langres'] && $subLang[$type]['langres'] !== $subLang[$type]['task']) {
+                    // Append sublang penalty, if not yet appended
+                    if (! $penaltySublang) {
+                        $penaltySublang = $res['penaltySublang'];
+                    }
+                }
+            }
+
+            // Apply total penalty to assoc langres row in analysis grid
+            $initGroups[$lr->getId()]['penaltyTotal'] = $res['penaltyGeneral'] + $penaltySublang;
         }
 
         if ($isInternalFuzzy) {
@@ -416,6 +468,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
         //init the repetition
         $initGroups = $initGroups + $initRow(0, "", "", editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED);
+        //init matchrate data from the imported file, see TRANSLATE-4221
+        $initGroups = $initGroups + $initRow(null, editor_Models_Segment_MatchRateType::TYPE_SOURCE, "", "");
 
         return $initGroups;
     }

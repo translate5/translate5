@@ -85,9 +85,14 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         // HINT: the existing qualities will be removed in the prepeareOperation call anyway
         if (! $spellCheckLang) {
             // Log event
-            $this->getLogger($processingMode)->warn('E1413', 'SpellCheck can not work when target language is not supported by LanguageTool.', [
-                'task' => $task,
-            ]);
+            $this->getLogger($processingMode)
+                ->info(
+                    'E1413',
+                    'SpellCheck can not work when target language is not supported by LanguageTool.',
+                    [
+                        'task' => $task,
+                    ]
+                );
 
             return;
         }
@@ -321,6 +326,10 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      */
     private function getSpellcheckLanguage(editor_Models_Task $task, string $resourcePool): string|false
     {
-        return $this->getLanguagetoolService()->getAdapter(null, $resourcePool)->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
+        return $this->getLanguagetoolService()
+            ->getAdapter(null, $resourcePool)
+            ->getSpellCheckLangByTaskTargetLangId(
+                (int) $task->getTargetLang()
+            );
     }
 }

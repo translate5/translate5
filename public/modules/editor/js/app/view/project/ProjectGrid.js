@@ -31,7 +31,8 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	alias: 'widget.projectGrid',
 	cls:'projectGrid',
     requires:[
-    	'Editor.view.project.ProjectGridViewController'
+    	'Editor.view.project.ProjectGridViewController',
+        'Editor.view.task.LogInfoColumn'
 	],
 	controller:'projectGrid',
 	itemId: 'projectGrid',
@@ -50,10 +51,13 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	                  res.push(action);
 	              }
 	          });
-	          return res.join(' ');
+
+              res.push('type-'+task.get('taskType'));
+
+              return res.join(' ');
 	      }
 	},
-	//INFO: because the filters are not wirking when the projectGrid extends the taskGrid component,
+    //INFO: because the filters are not wirking when the projectGrid extends the taskGrid component,
     //the required columns,translations and renderer functions are duplicated here. With this the projectGrid does not depend on the taskGrid component.
     initConfig: function(instanceConfig) {
         var me = this,
@@ -100,6 +104,14 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         text: '{l10n.projectGrid.text_cols.taskActions}'
                     }
         		},{
+                    xtype: 'checkcolumn',
+                    dataIndex: 'checked',
+                    sortable: false,
+                    bind: {
+                        tooltip: '{l10n.projectGrid.strings.batchSetTooltip}'
+                    },
+                    width: 20
+                },{
         			xtype: 'gridcolumn',
                     width: 220,
                     dataIndex: 'taskName',
@@ -108,11 +120,17 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         type: 'string'
                     },
                     text: Editor.data.l10n.projectGrid.text_cols.taskName,
+                    tdCls: 'taskName',
                     bind: {
                         text: '{l10n.projectGrid.text_cols.taskName}'
                     },
                     renderer: v => Ext.String.htmlEncode(v)
         		},{
+                    xtype: 'taskLogInfoColumn',
+                    renderer: function (value, metaData){
+                        return metaData.column.renderIcons.call(this, value);
+                    }
+                },{
         			xtype: 'gridcolumn',
                     width: 135,
                     renderer: me.customerRenderer,
@@ -253,6 +271,12 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         enableToggle: true,
                         bind: {
         	                text: '{l10n.projectGrid.strings.onlyMyProjects}'
+                        }
+                    }, {
+                        xtype: 'button',
+                        itemId: 'batch-set-btn',
+                        bind: {
+                            text: '{l10n.projectGrid.strings.batchSetProperties}'
                         }
                     }]
         		}]

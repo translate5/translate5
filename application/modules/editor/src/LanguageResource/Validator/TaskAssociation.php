@@ -40,5 +40,7 @@ class TaskAssociation extends ZfExtended_Models_Validator_Abstract
         $this->addValidator('taskGuid', 'guid');
         $this->addValidator('languageResourceId', 'int');
         $this->addValidator('segmentsUpdateable', 'boolean');
+        $this->addValidator('penaltyGeneral', 'int');
+        $this->addValidator('penaltySublang', 'int');
     }
 }

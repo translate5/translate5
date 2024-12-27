@@ -79,6 +79,9 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         ], [
             'name' => 'unitCountTotal',
             'type' => 'number',
+        ], [
+            'name' => 'penalty',
+            'type' => 'number',
         ]];
         foreach ($this->entity->getFuzzyRanges() as $begin => $end) {
             $fieldConfig[] = [

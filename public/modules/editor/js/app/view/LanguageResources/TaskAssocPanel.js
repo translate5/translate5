@@ -67,7 +67,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                             store: '{taskAssoc}',
                             disabled: '{!enablePanel}',
                         },
-                        plugins: ['gridfilters'],
+                        plugins: ['gridfilters', 'cellediting'],
                         emptyText: me.strings.empty,
                         features: [
                             {
@@ -208,6 +208,46 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                         .hideForeignTaskTms
                                 }
                             },
+                            {
+                                xtype: 'gridcolumn',
+                                width: 74,
+                                dataIndex: 'penaltyGeneral',
+                                menuDisabled: true,
+                                text:
+                                    '<span style="color: #df0000;"><span class="fa fa-chevron-down"></span><span> 1 </span></span>' +
+                                    '<span class="fa fa-edit" style="position: relative; top: 1px;"></span>',
+                                bind: {
+                                    tooltip: '{l10n.languageResourceTaskAssocPanel.penaltyGeneral}'
+                                },
+                                editor: {
+                                    xtype: 'combobox',
+                                    viewModel: 'languageResourceTaskAssocPanel',
+                                    forceSelection: true,
+                                    bind: {
+                                        store: '{penaltyGeneral}'
+                                    }
+                                }
+                            },
+                            {
+                                xtype: 'gridcolumn',
+                                width: 74,
+                                dataIndex: 'penaltySublang',
+                                menuDisabled: true,
+                                text:
+                                    '<span style="color: #df0000;"><span class="fa fa-chevron-down"></span><span> 2 </span></span>' +
+                                    '<span class="fa fa-edit" style="position: relative; top: 1px;"></span>',
+                                bind: {
+                                    tooltip: '{l10n.languageResourceTaskAssocPanel.penaltySublang}'
+                                },
+                                editor: {
+                                    xtype: 'combobox',
+                                    viewModel: 'languageResourceTaskAssocPanel',
+                                    forceSelection: true,
+                                    bind: {
+                                        store: '{penaltySublang}'
+                                    }
+                                }
+                            }
                         ],
                     },
                 ],

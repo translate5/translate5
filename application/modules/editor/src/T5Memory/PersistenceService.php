@@ -42,7 +42,7 @@ class PersistenceService
 
     public function getWritableMemory(LanguageResource $languageResource): string
     {
-        foreach ($languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
+        foreach ($languageResource->getSpecificData('memories', parseAsArray: true) ?? [] as $memory) {
             if (! $memory['readonly']) {
                 return $memory['filename'];
             }

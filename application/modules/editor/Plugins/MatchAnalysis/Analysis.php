@@ -30,6 +30,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Status;
+use ZfExtended_Factory as Factory;
 
 /**
  * After importing a task a match analysis will be created based on the assigned TM based MatchRessources.
@@ -86,6 +87,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     protected $repetitionUpdater;
 
     private editor_Services_Manager $manager;
+
+    /**
+     * Penalties as [languageResourceId => penalty] pairs to be deducted from match rate
+     */
+    protected array $penalty = [
+        'general' => [],
+        'sublang' => [],
+    ];
 
     /**
      * @param integer $analysisId
@@ -164,6 +173,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     //ensure that falsy values are converted to null
                     $bestMatchRateResult = null;
                 } else {
+                    // Setup penalties and deduct them from match rate
+                    $bestMatchRateResult->penaltyGeneral = $this->penalty['general'][$bestMatchRateResult->languageResourceid];
+                    $bestMatchRateResult->penaltySublang = $this->penalty['sublang'][$bestMatchRateResult->languageResourceid];
+                    $bestMatchRateResult->matchrate -= $bestMatchRateResult->penaltyGeneral + $bestMatchRateResult->penaltySublang;
+
                     //store the result for the repetitions, but only if there is not already a repeated result found
                     if ($hasRepetitions) {
                         //if we are a repetition and no master was found before, then we set it
@@ -361,6 +375,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $bestResultCurrentConnector->matchrate = null;
             //for each match, find the best match rate, and save it
             foreach ($matchResults as $match) {
+                // Setup penalties and deduct them from match rate
+                if (isset($match->languageResourceid)) {
+                    $match->penaltyGeneral = $this->penalty['general'][$match->languageResourceid];
+                    $match->penaltySublang = $this->penalty['sublang'][$match->languageResourceid];
+                    $match->matchrate -= $match->penaltyGeneral + $match->penaltySublang;
+                }
+
                 $isTermCollection = $match->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
                 if ($bestResultCurrentConnector->matchrate > $match->matchrate) {
                     continue;
@@ -578,6 +599,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $type = editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED;
         } elseif (array_key_exists($languageResourceid, $this->resources)) {
             $type = $this->resources[$languageResourceid]->getResourceType();
+            $matchAnalysis->setPenaltyGeneral($this->penalty['general'][$languageResourceid]);
+            $matchAnalysis->setPenaltySublang($this->penalty['sublang'][$languageResourceid]);
         } else {
             $type = editor_Models_Segment_MatchRateType::TYPE_UNKNOWN;
         }
@@ -626,6 +649,19 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             Status::NOT_LOADED,
         ];
 
+        // Get task source and target sub languagesf
+        $subLang['source']['task'] = ZfExtended_Languages::sublangCodeByRfc5646($this->task->getSourceLanguage()->getRfc5646());
+        $subLang['target']['task'] = ZfExtended_Languages::sublangCodeByRfc5646($this->task->getTargetLanguage()->getRfc5646());
+
+        // Get meta data containing single sublanguage and penalties for each assoc
+        $meta = Factory
+            ::get(MittagQI\Translate5\LanguageResource\TaskAssociation::class)
+                ->getAssocTasksWithResources($this->task->getTaskGuid());
+        $meta = array_combine(array_column($meta, 'languageResourceId'), $meta);
+
+        /** @var editor_Models_Languages $lang */
+        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
+
         foreach ($languageResourceIds as $languageResourceId) {
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
             $languageResource->load((int) $languageResourceId);
@@ -637,9 +673,43 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 continue;
             }
 
+            // $meta is a return value of TaskAssociation->getAssocTasksWithResources($taskGuid) method call,
+            // and we use that here because that method is also used to fetch the rows to be shown
+            // in the 'Language resources'-tab of the task overview panel, and each row contains the penalties
+            // to be applied during match analysis.
+            //
+            // So, if we have some $languageResourceId that does not exist as a key in $meta - this means such
+            // a language resource is never shown in that tab, and this, in it's turn, means it can be never
+            // assigned to a task by a user, and that is why we're skipping such a language resource here, as
+            // it is not assignable
+            if (! isset($meta[$languageResourceId])) {
+                continue;
+            }
+
             //store the languageResource
             $this->resources[(int) $languageResource->getId()] = $languageResource;
 
+            // Setup general penalty
+            $this->penalty['general'][$languageResourceId] = $meta[$languageResourceId]['penaltyGeneral'];
+
+            // Setup sublang penalty as 0 until source and/or target sublang mismatch will be detected
+            $this->penalty['sublang'][$languageResourceId] = 0;
+
+            // For source and target
+            foreach (['source', 'target'] as $type) {
+                // Load language
+                $lang->load($meta[$languageResourceId][$type . 'Lang']);
+
+                // Get sublanguage
+                $subLang[$type]['langres'] = ZfExtended_Languages::sublangCodeByRfc5646($lang->getRfc5646());
+
+                // If assoc langres sublang is not empty but does not match task sublang - setup sublang penalty
+                if ($subLang[$type]['langres'] && $subLang[$type]['langres'] !== $subLang[$type]['task']) {
+                    $this->penalty['sublang'][$languageResourceId] = $meta[$languageResourceId]['penaltySublang'];
+                }
+            }
+
+            // prepare penalties
             try {
                 $connector = $this->getConnector($languageResource);
 
@@ -741,10 +811,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
     private function getConnector(LanguageResource $languageResource): editor_Services_Connector
     {
+        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $taskMajorSourceLangId = $language->findMajorLanguageById((int) $this->task->getSourceLang());
+        $taskMajorTargetLangId = $language->findMajorLanguageById((int) $this->task->getTargetLang());
+
         $connector = $this->manager->getConnector(
             $languageResource,
-            $this->task->getSourceLang(),
-            $this->task->getTargetLang(),
+            $taskMajorSourceLangId,
+            $taskMajorTargetLangId,
             $this->task->getConfig(),
             (int) $this->task->getCustomerId()
         );

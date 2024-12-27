@@ -6,8 +6,12 @@
         "source": "Across Language Server",
         "languageResourceType": "tm",
         "languageResourceColor": null,
+        "sourceLanguageId": 4,
+        "targetLanguageId": 5,
         "state": "loaded",
         "timestamp": "TEST_TIMESTAMP",
+        "penaltyGeneral": 0,
+        "penaltySublang": 0,
         "tmNeedsConversion": false,
         "tmConversionInProgress": false
     }

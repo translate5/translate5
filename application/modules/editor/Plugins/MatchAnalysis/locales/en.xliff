@@ -39,7 +39,11 @@
 		    <source>Umfasst eine QS und Terminologie Prüfung</source>
 		    <target>Covers a QA and terminology check</target>
 		</trans-unit>
-		
+
+		<trans-unit id='RGllIEFuYWx5c2UgbXVzcyBlcm5ldXQgZHVyY2hnZWbDvGhydCB3ZXJkZW4sIGRhbWl0IGRpZSBNYXRjaC1SYXRlLUFiesO8Z2UgZ2VzcGVpY2hlcnQgd2VyZGVuIHVuZCB3aXJrc2FtIHdlcmRlbg=='>
+		    <source>Die Analyse muss erneut durchgeführt werden, damit die Match-Rate-Abzüge gespeichert werden und wirksam werden</source>
+		    <target>Analysis should be re-run for penalties to be saved and take effect</target>
+		</trans-unit>
 		<trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='>
 			<source>Export als Excel</source>
 			<target>Export as Excel</target>
@@ -319,6 +323,10 @@
             <source>Bei der Analyse sind {0} Fehler in der Kommunikation mit den Sprachressourcen aufgetreten. <br />Die Analyse kann daher unvollständig sein. Bitte prüfen Sie die Ereignisse der Aufgabe und das System Log und erstellen ggf. die Analyse erneut.</source>
             <target>During the analysis {0} error(s) occurred in the communication with the language resources. <br />Therefore, the analysis can be incomplete. Please check the task events and system log and re-run the analysis if necessary.</target>
         </trans-unit>
+		<trans-unit id='QXVzIGltcG9ydGllcnRlciBEYXRlaQ=='>
+		    <source>Aus importierter Datei</source>
+		    <target>From imported file</target>
+		</trans-unit>
     </body>
   </file>
 </xliff>

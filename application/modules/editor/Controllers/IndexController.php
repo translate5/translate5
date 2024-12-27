@@ -91,6 +91,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
         'QualityMqm' => true,
         'SegmentQualitiesBase' => true,
+        'BatchEditing' => [Rights::EDITOR_BATCH_EDITING],
     ];
 
     private ZfExtended_Acl $acl;
@@ -341,6 +342,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         //needed to give plugins the abilty to add own icons as matchrate types
         $this->view->Php2JsVars()->set('segments.matchratetypes', $typesWihtIcons);
+        $this->view->Php2JsVars()->set('segments.matchratemaxvalue', editor_Models_Segment_MatchRateType::MAX_VALUE);
 
         $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);
 

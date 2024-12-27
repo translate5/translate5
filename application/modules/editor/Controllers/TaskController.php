@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
+use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
@@ -39,6 +40,8 @@ use MittagQI\Translate5\Task\Import\ProjectWorkersService;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\Log\LogRepository;
+use MittagQI\Translate5\Task\Log\LogService;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\TaskService;
 use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
@@ -352,7 +355,9 @@ class editor_TaskController extends ZfExtended_RestController
     protected function loadAllForProjectOverview()
     {
         $rows = $this->loadAll();
+
         $customerData = $this->getCustomersForRendering($rows);
+        $customerRenderConfigs = $this->getCustomerRenderConfigs($rows);
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $isTransfer = $file->getTransfersPerTasks(array_column($rows, 'taskGuid'));
@@ -363,12 +368,30 @@ class editor_TaskController extends ZfExtended_RestController
             $userData = $this->getUsersForRendering($rows);
         }
 
+        $task = new editor_Models_Task();
         foreach ($rows as &$row) {
-            unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
+            unset($row['qmSubsegmentFlags']); // unnecessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
             if ($isMailTo) {
                 $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
+            }
+            if (! empty($customerRenderConfigs[$row['customerId']]) && $customerRenderConfigs[$row['customerId']]['hideWordCount']) {
+                $row['wordCount'] = '-';
+            }
+
+            $logRepository = new LogRepository();
+            $logService = new LogService($logRepository);
+            $task->init($row);
+
+            if ($this->shouldSkipAdditionalDataLoading()) {
+                continue;
+            }
+
+            if ($task->isProject()) {
+                $row['logInfo'] = $logService->getProjectLogSummary((int) $task->getProjectId());
+            } else {
+                $row['logInfo'] = $logService->getTaskLogSummary($task->getTaskGuid());
             }
         }
 
@@ -384,7 +407,7 @@ class editor_TaskController extends ZfExtended_RestController
         $rows = $this->loadAll();
 
         //if we have no paging parameters, we omit all additional data gathering to improve performace!
-        if ($this->getParam('limit', 0) === 0 && ! $this->getParam('filter', false)) {
+        if ($this->shouldSkipAdditionalDataLoading()) {
             return $rows;
         }
 
@@ -413,6 +436,7 @@ class editor_TaskController extends ZfExtended_RestController
         $isMailTo = $this->config->runtimeOptions->frontend->tasklist->pmMailTo;
 
         $customerData = $this->getCustomersForRendering($rows);
+        $customerRenderConfigs = $this->getCustomerRenderConfigs($rows);
 
         if ($isMailTo) {
             $userData = $this->getUsersForRendering($rows);
@@ -420,6 +444,8 @@ class editor_TaskController extends ZfExtended_RestController
 
         $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
         $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
+
+        $task = new editor_Models_Task();
 
         foreach ($rows as &$row) {
             try {
@@ -451,6 +477,10 @@ class editor_TaskController extends ZfExtended_RestController
                 $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
             }
 
+            if (! empty($customerRenderConfigs[$row['customerId']]) && $customerRenderConfigs[$row['customerId']]['hideWordCount']) {
+                $row['wordCount'] = '-';
+            }
+
             if (empty($this->entity->getTaskGuid())) {
                 $this->entity->init($row);
             }
@@ -458,6 +488,14 @@ class editor_TaskController extends ZfExtended_RestController
             $this->addQualitiesToResult($row);
             // add user-segment assocs
             $this->addMissingSegmentrangesToResult($row);
+
+            if ($isEditAll) {
+                $logRepository = new LogRepository();
+                $logService = new LogService($logRepository);
+                $task->init($row);
+
+                $row['logInfo'] = $logService->getTaskLogSummary($task->getTaskGuid());
+            }
         }
         // sorting of qualityErrorCount can only be done after QS data is attached
         if ($this->entity->getFilter()->hasSort('qualityErrorCount')) {
@@ -533,6 +571,26 @@ class editor_TaskController extends ZfExtended_RestController
         $customerData = $customer->loadByIds($customerIds);
 
         return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
+    }
+
+    protected function getCustomerRenderConfigs(array $rows): array
+    {
+        if (empty($rows)) {
+            return [];
+        }
+
+        $default = $this->config->runtimeOptions->frontend->tasklist->hideWordCount;
+        $customerRepository = new CustomerRepository();
+
+        $configs = [];
+        foreach ($rows as $row) {
+            if (! isset($configs[$row['customerId']]['hideWordCount'])) {
+                $customerValue = $customerRepository->getConfigValue($row['customerId'], 'runtimeOptions.frontend.tasklist.hideWordCount');
+                $configs[$row['customerId']]['hideWordCount'] = $customerValue ?? $default;
+            }
+        }
+
+        return $configs;
     }
 
     /***
@@ -2390,5 +2448,13 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         return $hasRightForTask;
+    }
+
+    /**
+     * If we have no paging parameters, we omit all additional data gathering to improve performance!
+     */
+    protected function shouldSkipAdditionalDataLoading(): bool
+    {
+        return $this->getParam('limit', 0) === 0 && ! $this->getParam('filter', false);
     }
 }

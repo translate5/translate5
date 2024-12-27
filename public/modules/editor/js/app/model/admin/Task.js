@@ -136,6 +136,7 @@ Ext.define('Editor.model.admin.Task', {
         },
         {name: 'reimportable', type: 'boolean'},
         {name: 'deadlineDate',type:'date',dateFormat: Editor.DATE_ISO_FORMAT,defaultValue: null},
+        {name: 'checked', type: 'boolean', persist: false}
     ],
     hasMany: [{
         model: 'Editor.model.segment.Field',

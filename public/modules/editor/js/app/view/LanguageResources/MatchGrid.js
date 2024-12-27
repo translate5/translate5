@@ -188,8 +188,16 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	              meta.tdAttr += 'data-qtip="' + Ext.String.htmlEncode(name) + "<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
 				  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              meta.tdAttr += 'bgcolor="' + str.get('color') + '"';
+                  var value = "<b style='white-space: pre;'>",
+                    pg = record.get('penaltyGeneral') || 0,
+                    ps = record.get('penaltySublang') || 0,
+                    om = matchrate,
+                    fm = matchrate - pg - ps;
 
-                  return "<b style='white-space: pre;'>"+(matchrate > 0 ? matchrate + ' [' + name + ']' : '&nbsp;')+"</b>";
+                  // Complete rendering the value
+                  value += fm > 0 ? fm + ' (=' + [om, pg, ps].join('-') + ') [' +  name + ']' : '&nbsp;';
+	              value += "</b>";
+                  return value;
 	          },
 	          text: me.strings.match
 	      }]

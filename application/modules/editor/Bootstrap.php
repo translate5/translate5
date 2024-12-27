@@ -205,7 +205,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceinstance', 'taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality', 'userassocdefault', 'log', 'collectionattributedatatype', 'token',
                 'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
-                'languageresourcesyncconnection',
+                'languageresourcesyncconnection', 'languageresourcecustomerassoc',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -393,6 +393,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'module' => 'editor',
                 'controller' => 'taskuserassoc',
                 'action' => 'project',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorBatchSet', new ZfExtended_Controller_RestLikeRoute(
+            'editor/taskuserassoc/batchset',
+            [
+                'module' => 'editor',
+                'controller' => 'batchset',
+                'action' => 'index',
             ]
         ));
 

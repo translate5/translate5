@@ -147,6 +147,8 @@ $commands = [
     new DatabaseUpdateCommand(),
     new FilesystemExternalCheckCommand(),
     new LogCommand(),
+    new LogPhpCommand(),
+    new LogWorkerCommand(),
     new LogLoginCommand(),
     new LogPhpCommand(),
     new LogWorkerCommand(),

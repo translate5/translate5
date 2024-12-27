@@ -116,7 +116,8 @@ class editor_Services_ServiceResult
         $matchrate = 0,
         array $metaData = null,
         ?string $rawTarget = null,
-        int $timestamp = 0
+        int $timestamp = 0,
+        ?callable $hook = null,
     ) {
         $result = new stdClass();
 
@@ -128,10 +129,22 @@ class editor_Services_ServiceResult
         $result->languageResourceType = $this->languageResource->getResourceType();
         $result->languageResourceColor = $this->languageResource->getColor();
 
+        // Append source and target languages of the result
+        // This will be further used to detect sub-languages mismatch between the
+        // result and the task and to apply a penalty for tha matchrate then, if mismatch is detected
+        $result->sourceLanguageId = $this->languageResource->getSourceLang();
+        $result->targetLanguageId = $this->languageResource->getTargetLang();
+
         $result->state = self::STATUS_LOADED;
 
         $result->metaData = $metaData;
         $result->timestamp = $timestamp > 0 ? $timestamp : null;
+
+        // Call the hook to additionally adjust the result.
+        // Currently this is needed to overwrite values for sourceLanguageId and targetLanguageId
+        // as the original ones set above are arrays when $this->languageResource is a TermCollection
+        // so the hook is setting the scalar language ids for those props based on matching term
+        $hook && $hook($result);
 
         $this->results[] = $result;
         $this->lastAdded = $result;
@@ -150,9 +163,9 @@ class editor_Services_ServiceResult
 
     /**
      * returns a plain array of result objects
-     * @return [stdClass]
+     * @return stdClass[]
      */
-    public function getResult()
+    public function getResult(): array
     {
         return $this->results;
     }

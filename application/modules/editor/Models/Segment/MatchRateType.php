@@ -158,6 +158,11 @@ class editor_Models_Segment_MatchRateType
      */
     public const RESOURCE_TYPES = [self::TYPE_TM, self::TYPE_MT, self::TYPE_TERM_COLLECTION];
 
+    /**
+     * Highest possible match rate
+     */
+    public const MAX_VALUE = 104;
+
     /***
      * All match rate types which are requiring an icon
      * @var array
@@ -265,6 +270,14 @@ class editor_Models_Segment_MatchRateType
     }
 
     /**
+     * Evaluates if a matchRateType has interactive-flag
+     */
+    public static function isInteractive(string $type): bool
+    {
+        return in_array(self::TYPE_INTERACTIVE, explode(';', $type));
+    }
+
+    /**
      * Evaluates if a matchRateType reflects a user edit
      * @param string $type
      * @return boolean
@@ -344,6 +357,19 @@ class editor_Models_Segment_MatchRateType
         $types = explode(';', $type);
 
         return (count(array_intersect($types, self::RESOURCE_TYPES)) > 0);
+    }
+
+    public static function getLangResourceType(string $type): ?string
+    {
+        if (preg_match(
+            '/;(' . implode('|', self::RESOURCE_TYPES) . ')(?:;|$)/i',
+            $type,
+            $matches
+        )) {
+            return strtolower($matches[1]);
+        }
+
+        return null;
     }
 
     /**

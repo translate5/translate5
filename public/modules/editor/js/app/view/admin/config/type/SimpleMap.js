@@ -92,6 +92,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
         Ext.Object.each(value, function (key, value) {
             data.push([key, value]);
         });
+
         config = {
             bind: {
                 title: '{l10n.configuration.title}'
@@ -143,11 +144,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                     bind: {
                         text: '{l10n.configuration.index}'
                     },
-                    dataIndex: 'index',
-                    editor: !(instanceConfig.readonlyIndex || {
-                        xtype: 'textfield',
-                        itemId: 'index'
-                    })
+                    dataIndex: 'index'
                 }, {
                     bind: {
                         text: '{l10n.configuration.value}'
@@ -175,6 +172,13 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
         };
         if (instanceConfig) {
             config = me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+
+        if(!config.readonlyIndex){
+            config.items.columns[0].editor = {
+                xtype: 'textfield',
+                itemId: 'index'
+            };
         }
         return me.callParent([config]);
     }
