@@ -96,11 +96,6 @@
       }
     },
     {
-      "_README": "A fork of the openai-php/client OpenAI PHP Client to be able to deliver fixes more rapidly",
-      "type": "git",
-      "url": "https://github.com/translate5/openai-client/"
-    },
-    {
       "_README" : "A Fork of the paquettg/php-html-parser PHP HTML-parser to be able to support newer PHP versions",
       "type" : "git",
       "url" : "https://github.com/translate5/php-html-parser/"
