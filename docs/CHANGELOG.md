@@ -23,6 +23,197 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.15.0] - 2024-12-27
+
+### Important Notes:
+#### [TRANSLATE-4304](https://jira.translate5.net/browse/TRANSLATE-4304)
+Until now, when collecting jobs to auto-close, the task deadline date was mandatory condition even if it did not have any effect on the process. Now this condition is removed and will not matter.
+ 
+
+
+### Added
+**[TRANSLATE-4312](https://jira.translate5.net/browse/TRANSLATE-4312): InstantTranslate - Introduce model type setting for DeepL API calls** <br>
+Introduce model_type setting for DeepL API calls
+
+**[TRANSLATE-4273](https://jira.translate5.net/browse/TRANSLATE-4273): InstantTranslate - New API endpoint for synchronous file translation** <br>
+Added new endpoint for synchronous file translation:
+editor/instanttranslateapi/filepretranslatenow
+
+**[TRANSLATE-4221](https://jira.translate5.net/browse/TRANSLATE-4221): Import/Export - Save analysis from xliff** <br>
+- Added analysis generation out of segment matchrate from the imported segments (if enabled by Task-import specific "readImportAnalysis" config and if matchrates are detected on import)
+- Added new client specific config: hideWordCount column
+
+**[TRANSLATE-3198](https://jira.translate5.net/browse/TRANSLATE-3198): LanguageResources, Task Management - Define a penalty for matches** <br>
+Added ability to define customer- and task-specific penalties for matchrates per languareresources, to be applied in general and for sublanguages mismatches
+
+**[TRANSLATE-2971](https://jira.translate5.net/browse/TRANSLATE-2971): Task Management, Workflows - Set job deadlines for multiple projects or tasks at the same time** <br>
+Added ability to set job deadlines for multiple projects or tasks at the same time
+
+
+### Changed
+**[TRANSLATE-4329](https://jira.translate5.net/browse/TRANSLATE-4329): t5memory - Create a command for creating language resource duplicates** <br>
+Added a new command for creating Language resource duplicates 
+
+**[TRANSLATE-4326](https://jira.translate5.net/browse/TRANSLATE-4326): VisualReview / VisualTranslation - "Go-To page" functionality for visual pages** <br>
+Enhancement Visual: Improve functionality of pager for multipage-reviews, which is now a dropdown with select-by-typeing
+
+**[TRANSLATE-4317](https://jira.translate5.net/browse/TRANSLATE-4317): InstantTranslate - SysAdmins see now InstantTranslate tasks** <br>
+SysAdmins see now InstantTranslate tasks in project and task list for support reasons.
+
+**[TRANSLATE-4307](https://jira.translate5.net/browse/TRANSLATE-4307): Configuration - Make index column editable in newly added "mapping values" rows in config** <br>
+Added ability to define index(key/name) values in "Edit mapping values" modal popup windows
+
+**[TRANSLATE-4306](https://jira.translate5.net/browse/TRANSLATE-4306): LanguageResources - Allow option strip framing tags for zipped files** <br>
+The "Strip framing tags" option is now allowed for .zip files
+
+**[TRANSLATE-4287](https://jira.translate5.net/browse/TRANSLATE-4287): Workflows - Replace whitespace and brackets in export backup filename** <br>
+When creating backup zips of translate5 task whites space square and normal brackets are now also replaced in the filename to a hyphen character. Multiple hyphens are condensed to a single hyphen.
+
+**[TRANSLATE-4281](https://jira.translate5.net/browse/TRANSLATE-4281): MatchAnalysis & Pretranslation - Pricing presets: REST API and UI fix** <br>
+Adjustments for API usage.
+
+**[TRANSLATE-4277](https://jira.translate5.net/browse/TRANSLATE-4277): Import/Export - SFTP TermImport: dirs should be kept despite files moved between them** <br>
+All dirs on remote sftp directory can now be permanent, so only their contents are moved between those dirs
+
+**[TRANSLATE-4276](https://jira.translate5.net/browse/TRANSLATE-4276): t5memory - Add a command for exporting memories** <br>
+Added CLI command for exporting memories from t5memory
+
+**[TRANSLATE-4275](https://jira.translate5.net/browse/TRANSLATE-4275): Configuration - Clickable URLs in System config** <br>
+URLs in descriptions of System config were made clickable
+
+**[TRANSLATE-4274](https://jira.translate5.net/browse/TRANSLATE-4274): InstantTranslate - InstantTranslate: speedup by resources list browser-side caching** <br>
+request for available resources list is not anymore done each time source text changed
+
+**[TRANSLATE-4269](https://jira.translate5.net/browse/TRANSLATE-4269): t5memory - Add retry if creating empty memory request failed** <br>
+Fixed error when t5memory failed to create an empty memory
+
+**[TRANSLATE-4267](https://jira.translate5.net/browse/TRANSLATE-4267): Content Protection - Fix cache in Content Protection** <br>
+Change cache for Content protection rule fetching
+
+**[TRANSLATE-4262](https://jira.translate5.net/browse/TRANSLATE-4262): Workflows - Workflow clone: allow hyphens in the technical name of the target workflow** <br>
+Fixed error when hyphens ("-") were part of the technical name of the cloned workflow
+
+**[TRANSLATE-4244](https://jira.translate5.net/browse/TRANSLATE-4244): LanguageResources - Fix reimport segments modal width** <br>
+UI: Increased reimport segments modal window width
+
+**[TRANSLATE-4133](https://jira.translate5.net/browse/TRANSLATE-4133): Hotfolder Import - Hotfolder: Notification email for failed task import** <br>
+Send e-mail to PM if folder can not be processed
+
+**[TRANSLATE-4106](https://jira.translate5.net/browse/TRANSLATE-4106): VisualReview / VisualTranslation - Further harmonize sequences of list-elements (lists / list-tables)** <br>
+IMPROVEMENT Visual: Make sequences of list-elements having the same max. text-width inherited from the longest item
+
+**[TRANSLATE-4104](https://jira.translate5.net/browse/TRANSLATE-4104): VisualReview / VisualTranslation - Reflow: DEV-App Enhancements** <br>
+IMPROVEMENT Visual: Improve development-app for the Reflow
+
+**[TRANSLATE-4102](https://jira.translate5.net/browse/TRANSLATE-4102): VisualReview / VisualTranslation - Improve detection of justified Text coming from MS Office** <br>
+IMPROVEMENT Visual: Justified text (e.g. coming from MS Office formats) often was not properly detected
+
+**[TRANSLATE-4078](https://jira.translate5.net/browse/TRANSLATE-4078): Import/Export, usability task overview - Show error and warning icon in new column in tasks and projects** <br>
+New log info column is added which lists the number of the important task logs for projects and tasks.
+
+
+### Bugfixes
+**[TRANSLATE-4344](https://jira.translate5.net/browse/TRANSLATE-4344): MatchAnalysis & Pretranslation - Penalties: match-analysis error** <br>
+Fix error when running match analyis.
+
+**[TRANSLATE-4342](https://jira.translate5.net/browse/TRANSLATE-4342): Editor general - Segments are saved to TM with trackchanges** <br>
+Fixed bug when segments were saved to TM with trackchanges during reimport
+
+**[TRANSLATE-4334](https://jira.translate5.net/browse/TRANSLATE-4334): Import/Export - Import SDLXLIFF x-html c-type tags** <br>
+SDLXLIFF: Add support for g tags with ctype "x-html-%"
+
+**[TRANSLATE-4333](https://jira.translate5.net/browse/TRANSLATE-4333): Content Protection - Content protection produces corrupt TMX** <br>
+Content protection: Fix full segment protection
+
+**[TRANSLATE-4332](https://jira.translate5.net/browse/TRANSLATE-4332): t5memory - t5memory: memory split works wrong** <br>
+t5memory: Fix memory split
+
+**[TRANSLATE-4331](https://jira.translate5.net/browse/TRANSLATE-4331): Editor general - Wrong workflow rendered in taskGrid** <br>
+Fix workflow column value rendered wrong.
+
+**[TRANSLATE-4327](https://jira.translate5.net/browse/TRANSLATE-4327): usability task overview - Remove special workflow step filter values** <br>
+Removed filtering options "No workflow", "PM check" and "Workflow finished" from the "Workflow step" drop-down in "Advanced Filters" window
+
+**[TRANSLATE-4322](https://jira.translate5.net/browse/TRANSLATE-4322): MatchAnalysis & Pretranslation - When comparing full match timestamps exclude fuzzy TM matches** <br>
+In some special cases internal fuzzy TM entries are considered as best match and therefore the segment is not pre-translated even if there is a 100% match in the normal TMs.
+
+**[TRANSLATE-4319](https://jira.translate5.net/browse/TRANSLATE-4319): Auto-QA - AutoQA "Not-edited Fuzzy Match" does not work as it should** <br>
+FIXED: gaps in logic for assign/remove of 'Unedited fuzzy match'-quality
+
+**[TRANSLATE-4318](https://jira.translate5.net/browse/TRANSLATE-4318): GroupShare integration - GroupShare: error on empty search text in segmented search in instant-translate** <br>
+Fix for an error where if segmented search in instant translate contains empty text in between.
+
+**[TRANSLATE-4316](https://jira.translate5.net/browse/TRANSLATE-4316): Editor general, TrackChanges - MQM tag can not be deleted** <br>
+Fixed trackchanges behavior for MQM tags
+
+**[TRANSLATE-4315](https://jira.translate5.net/browse/TRANSLATE-4315): VisualReview / VisualTranslation - Task Config not respected in Visual** <br>
+In the Visual the Task specific Configuration values may have not been respected during import
+
+**[TRANSLATE-4314](https://jira.translate5.net/browse/TRANSLATE-4314): LanguageResources - DeepL glossaries not in sync** <br>
+DeepL: Add logging for glossary related manipulations
+
+**[TRANSLATE-4310](https://jira.translate5.net/browse/TRANSLATE-4310): LanguageResources - Handle HTML entities on language resources result processing** <br>
+New option to encode html entities for resources which are using the html tag handler.
+
+**[TRANSLATE-4304](https://jira.translate5.net/browse/TRANSLATE-4304): Editor general - Remove task deadline date as job autoclose condition** <br>
+Task deadline date is removed as mandatory condition when collecting jobs to auto-close.
+
+**[TRANSLATE-4303](https://jira.translate5.net/browse/TRANSLATE-4303): Hotfolder Import - across hotfolder should handle all visual file formats** <br>
+Hotfolder: Import all visual files and not only pdf
+
+**[TRANSLATE-4284](https://jira.translate5.net/browse/TRANSLATE-4284): LanguageResources, t5memory - task not saved to TM after finishing workflow due to locked task state** <br>
+Task into TM reimport mechanism is changed so now it works in two steps: take a snapshot of a task and actual reimport
+
+**[TRANSLATE-4282](https://jira.translate5.net/browse/TRANSLATE-4282): LanguageResources - Sort roles in term export to fix failing tests** <br>
+Sort role attribute in tbx export is needed for test cases.
+
+**[TRANSLATE-4279](https://jira.translate5.net/browse/TRANSLATE-4279): Editor general - UI error: Cannot read properties of undefined (reading 'getSelection')** <br>
+Fix for UI error when leaving the task with save segment in process.
+
+**[TRANSLATE-4272](https://jira.translate5.net/browse/TRANSLATE-4272): VisualReview / VisualTranslation - Add User-Agent to Visual URL-checks & WGET downloads** <br>
+FIX: Add common user-agent to CURL & WGET when checking/downloading webpages
+
+**[TRANSLATE-4271](https://jira.translate5.net/browse/TRANSLATE-4271): InstantTranslate - InstantTranslate doing nothing when t5memory URL points to non responding server** <br>
+When t5memory server config points to a non reachable URL, InstantTranslate is not working properly even if there is no TM used.
+
+**[TRANSLATE-4265](https://jira.translate5.net/browse/TRANSLATE-4265): Task Management - Task properties check-box "edit unchanged 100 % TM matches" faulty** <br>
+TermCollection pre-translations can not be re-protected again after enabling edit100%matches
+
+**[TRANSLATE-4264](https://jira.translate5.net/browse/TRANSLATE-4264): Editor general - UI error: go to task action produces error when state filter is active** <br>
+Fix for UI error produced by "go to task" action. 
+
+**[TRANSLATE-4263](https://jira.translate5.net/browse/TRANSLATE-4263): Import/Export - Self closing target in alt-trans matchrate crashes the import** <br>
+Fix for crashing import when importing match-rate from alt-trans element.
+
+**[TRANSLATE-4261](https://jira.translate5.net/browse/TRANSLATE-4261): Main back-end mechanisms (Worker, Logging, etc.) - sleep looping workers instead delay for smaller tasks** <br>
+IMPROVEMENT: instead of being delayed blocked segment-loopers will be paused for smaller tasks
+
+**[TRANSLATE-4259](https://jira.translate5.net/browse/TRANSLATE-4259): Import/Export - List only errors in Info error summary email** <br>
+Error summary email on import will only send errors with log level fatal and error.
+
+**[TRANSLATE-4258](https://jira.translate5.net/browse/TRANSLATE-4258): LanguageResources - Terminology Integration into OpenAI is incomplete** <br>
+FIX: Terminology for OpenAI worked only for Batches, not for single segments
+
+**[TRANSLATE-4253](https://jira.translate5.net/browse/TRANSLATE-4253): VisualReview / VisualTranslation - VTT import does not work via GUI** <br>
+FIX: *vtt files could not be used via the GUI to create visual video-translations
+
+**[TRANSLATE-4249](https://jira.translate5.net/browse/TRANSLATE-4249): TM Maintenance - TMMaintenance detects changes for segments with special characters** <br>
+FIXED: special characters encoding by itself is not treated as segment change anymore leading to unwated segment save-request
+
+**[TRANSLATE-4248](https://jira.translate5.net/browse/TRANSLATE-4248): TM Maintenance - TMMaintenance showing nothin when no results found for filter** <br>
+FIXED: results grid header misleading behaviour when zero results found
+
+**[TRANSLATE-4245](https://jira.translate5.net/browse/TRANSLATE-4245): Workflows - Email notifications on auto-close** <br>
+When a job is auto-closed the associated users and the PM get now an e-mail notification about the auto close.
+
+**[TRANSLATE-4224](https://jira.translate5.net/browse/TRANSLATE-4224): Import/Export - Usage of "target at import time" as source for tags: wrong evaluation of pretrans flag** <br>
+Evaluate match-rate type for the column used for tag check compare.
+
+**[TRANSLATE-4144](https://jira.translate5.net/browse/TRANSLATE-4144): Import/Export - SDLXLIFF tags imported as InternalReference tags without unique ID** <br>
+SDLXLIFF: Handle multi mid tags with uuid
+
+
 ## [7.14.0] - 2024-11-01
 
 ### Important Notes:
