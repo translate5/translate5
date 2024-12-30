@@ -80,6 +80,7 @@ class Editor_DefaultlspjobController extends ZfExtended_RestController
 
         $this->assertJobBelongsToCustomer($defaultLspJob);
 
+        // @phpstan-ignore-next-line
         $this->view->rows = $this->coordinatorProvider->getCoordinatorsOfLsp(
             (int) $defaultLspJob->getLspId(),
             $authUser

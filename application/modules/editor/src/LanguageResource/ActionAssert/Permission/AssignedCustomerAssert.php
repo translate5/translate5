@@ -33,11 +33,12 @@ namespace MittagQI\Translate5\LanguageResource\ActionAssert\Permission;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceAction;
 use MittagQI\Translate5\LanguageResource\Exception\NoAccessToLanguageResourceException;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 
 /**
- * @implements PermissionAssertInterface<LanguageResource, LanguageResource>
+ * @implements PermissionAssertInterface<LanguageResourceAction, LanguageResource>
  */
 final class AssignedCustomerAssert implements PermissionAssertInterface
 {

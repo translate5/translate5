@@ -10251,9 +10251,9 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</source>
                 <target>The assigned user can only be changed for LSP job</target>
             </trans-unit>
-            <trans-unit id='U2llIGvDtm5uZW4gZsO8ciBkaWVzZW4gQmVudXR6ZXIga2VpbmUge1JvbGxlbn0gZmVzdGxlZ2VuLg=='>
-                <source>Sie können für diesen Benutzer keine {Rollen} festlegen.</source>
-                <target>You cannot set {roles} for this user.</target>
+            <trans-unit id='U2llIGvDtm5uZW4gZsO8ciBkaWVzZW4gQmVudXR6ZXIga2VpbmUge3JvbGV9IGZlc3RsZWdlbi4='>
+                <source>Sie können für diesen Benutzer keine {role} festlegen.</source>
+                <target>You cannot set {role} for this user.</target>
             </trans-unit>
             <trans-unit id='RGllIEtvb3JkaW5hdG9yZW5yb2xsZSBrYW5uIGRlbSBCZW51dHplciBuaWNodCBlbnR6b2dlbiB3ZXJkZW46IHtyZWFzb259'>
                 <source>Die Koordinatorenrolle kann dem Benutzer nicht entzogen werden:</source>

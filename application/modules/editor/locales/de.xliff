@@ -10073,9 +10073,9 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 <source>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</source>
                 <target>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</target>
             </trans-unit>
-            <trans-unit id='U2llIGvDtm5uZW4gZsO8ciBkaWVzZW4gQmVudXR6ZXIga2VpbmUge1JvbGxlbn0gZmVzdGxlZ2VuLg=='>
-                <source>Sie können für diesen Benutzer keine {Rollen} festlegen.</source>
-                <target>Sie können für diesen Benutzer keine {Rollen} festlegen.</target>
+            <trans-unit id='U2llIGvDtm5uZW4gZsO8ciBkaWVzZW4gQmVudXR6ZXIga2VpbmUge3JvbGV9IGZlc3RsZWdlbi4='>
+                <source>Sie können für diesen Benutzer keine {role} festlegen.</source>
+                <target>Sie können für diesen Benutzer keine {role} festlegen.</target>
             </trans-unit>
             <trans-unit id='RGllIEtvb3JkaW5hdG9yZW5yb2xsZSBrYW5uIGRlbSBCZW51dHplciBuaWNodCBlbnR6b2dlbiB3ZXJkZW46IHtyZWFzb259'>
                 <source>Die Koordinatorenrolle kann dem Benutzer nicht entzogen werden: {reason}</source>

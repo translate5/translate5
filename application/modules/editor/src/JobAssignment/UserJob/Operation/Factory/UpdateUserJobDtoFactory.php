@@ -49,7 +49,7 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
         private readonly TaskRepository $taskRepository,
         private readonly UserJobRepository $userJobRepository,
         private readonly UserRepository $userRepository,
-        private readonly editor_Workflow_Manager $workflowManager,
+        editor_Workflow_Manager $workflowManager,
         SegmentRangeValidator $segmentRangeValidator,
     ) {
         parent::__construct($workflowManager, $segmentRangeValidator);

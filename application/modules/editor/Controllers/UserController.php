@@ -351,11 +351,11 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1635',
                 [
                     'roles' => [
-                        'Sie können für diesen Benutzer keine {Rollen} festlegen.',
+                        'Sie können für diesen Benutzer keine {role} festlegen.',
                     ],
                 ],
                 [
-                    'roles' => implode(', ', $e->roles),
+                    'role' => implode(', ', $e->roles),
                 ]
             ),
             RolesetHasConflictingRolesException::class => UnprocessableEntity::createResponse(
@@ -400,11 +400,11 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1635',
                 [
                     'roles' => [
-                        'Sie können für diesen Benutzer keine {Rollen} festlegen.',
+                        'Sie können für diesen Benutzer keine {role} festlegen.',
                     ],
                 ],
                 [
-                    'roles' => implode(', ', $e->role),
+                    'role' => $e->role,
                 ]
             ),
             InexistentCustomerException::class => ZfExtended_Models_Entity_Conflict::createResponse(
