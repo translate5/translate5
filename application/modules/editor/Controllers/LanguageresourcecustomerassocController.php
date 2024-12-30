@@ -78,6 +78,7 @@ class editor_LanguageresourcecustomerassocController extends ZfExtended_RestCont
     public function indexAction()
     {
         $customerId = (int) $this->getParam('customerId');
+
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
         $context = new PermissionAssertContext($authUser);
 

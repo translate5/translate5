@@ -203,8 +203,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
         }
-
-        return [];
     }
 
     /**

@@ -1,3 +1,4 @@
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -70,10 +71,10 @@ Ext.define('Editor.view.admin.customer.Panel', {
         export: '#UT#Ressourcen-Nutzung Exportieren',
         domain: '#UT#translate5 Domain',
         propertiesTabPanelTitle: '#UT#Allgemein',
-        configTabTitle: '#UT#Überschreibung der Systemkonfiguration',
-        actionColumn: '#UT#Aktionen',
-        customerEditActionIcon: '#UT#Kundenprofil bearbeiten',
-        openIdTabPanelDisabledTooltip: '#UT#Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.'
+        configTabTitle:'#UT#Überschreibung der Systemkonfiguration',
+        actionColumn:'#UT#Aktionen',
+        customerEditActionIcon:'#UT#Kundenprofil bearbeiten',
+        openIdTabPanelDisabledTooltip:'#UT#Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.'
     },
     shrinkWrap: 0,
     layout: 'border',
