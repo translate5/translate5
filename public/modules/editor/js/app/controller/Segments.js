@@ -687,6 +687,27 @@ Ext.define('Editor.controller.Segments', {
             return;
         }
 
+        // Regex to cleanup the match and segment before comparing
+        // todo: investigate where undefined comes from?
+        var rex = /<del .*?<\/del>|<img.*?duplicatesavecheck.*?>|undefined$/g;
+
+        // If segment was edited after some match was taken over - add 'interactive' flag
+        if (record.isModified('targetEdit')
+            &&
+            ((
+                record.get('matchRateType').match(Editor.data.LanguageResources.matchrateTypeChangedState)
+                && record.get('match')
+                && record.get('match').replace(rex, '') !== record.get('targetEdit').replace(rex, '')
+            ) || (
+                record.get('matchRateType').match(/^edited/)
+
+                // Misleading extjs method name 'getModified' - is really getting the original value
+                && record.getModified('targetEdit').replace(rex, '') !== record.get('targetEdit').replace(rex, '')
+            ))
+        ) {
+            record.set('matchRateType', record.get('matchRateType') + ';interactive');
+        }
+
         record.save({
             scope: me,
             //prevent default ServerException handling

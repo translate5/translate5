@@ -270,6 +270,14 @@ class editor_Models_Segment_MatchRateType
     }
 
     /**
+     * Evaluates if a matchRateType has interactive-flag
+     */
+    public static function isInteractive(string $type): bool
+    {
+        return in_array(self::TYPE_INTERACTIVE, explode(';', $type));
+    }
+
+    /**
      * Evaluates if a matchRateType reflects a user edit
      * @param string $type
      * @return boolean

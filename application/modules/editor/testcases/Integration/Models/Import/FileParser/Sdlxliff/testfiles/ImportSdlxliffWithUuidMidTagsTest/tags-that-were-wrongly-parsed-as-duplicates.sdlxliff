@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2"
+                                             sdl:version="1.0">
+    <doc-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+        <cmt-defs><cmt-def id="da363102-dca6-4a9e-aa70-667f91b8d030"><Comments><Comment severity="Low" user="translate5" date="2024-03-12T15:46:00.8133772+00:00" version="1.0">and a comment for Sasha!</Comment></Comments>
+        </cmt-def></cmt-defs>
+    </doc-info>
+    <file original="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+          datatype="x-sdlfilterframework2" source-language="en-US" target-language="de-DE"><header><reference><internal-file form="base64">
+    UEsDBBQAAAAIAAVnUFjPYiCzK1MBAFpaAQARAAAAaXd1bjRhaXkuZXlmLmlkbWyMeVVUG1wTbVuk
+</internal-file></reference>
+        <sdl:ref-files>
+            <sdl:ref-file uid="0" id="http://www.sdl.com/Sdl.FileTypeSupport.Filters.Idml/OriginalFile" name="1ndofncr.o0n.idml" o-path="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml" date="02/16/2024 12:56:10" descr="Original file before conversion." expected-use="Generation"/>
+        </sdl:ref-files>
+        <file-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+            <value key="SDL:FileId">edce5922-59e0-461e-a719-958337a58bf2</value>
+            <value key="SDL:CreationDate">02/16/2024 15:29:26</value>
+            <value key="SDL:OriginalFilePath">\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml</value>
+            <value key="SDL:FileTypeDllVersion">1.9.9.0</value>
+            <value key="SDL:QuickInsertsList">qBold;qItalic;qUnderline;qSubscript;qSuperscript;qSmallCaps;qNoBold;qNoItalic;qNoUnderline;qNoSuperscript;qNoSubscript;qNoSmallCaps</value>
+            <value key="ProcessFileInfo">Partial</value>
+            <value key="DisplayHiddenConditionalText">False</value>
+            <value key="SkipTrackingKerningInformation">False</value>
+            <value key="DisplayFootnoteOption">False</value>
+            <value key="SDL:AutoClonedFlagSupported">True</value>
+            <value key="FirstPageId">u738c7</value>
+            <value key="ParagraphTextDirections"></value>
+            <sniff-info><detected-source-lang detection-level="Guess" lang="en-US"/></sniff-info>
+        </file-info>
+        <sdl:filetype-info><sdl:filetype-id>IDML v 1.0.0.0</sdl:filetype-id></sdl:filetype-info>
+        <cxt-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0"><cxt-def id="2" type="Querverweisformate" code="XRS" name="Querverweisformate" descr="Liste mit Querverweisformaten" color="DeepSkyBlue"/></cxt-defs>
+        <tag-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0"><tag id="117"><bpt name="g" word-end="false">&lt;g id="-sIb3ZFluzkP4jQr" ctype="x-html-STRONG"&gt;</bpt><bpt-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">Element</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="attribute:id">-sIb3ZFluzkP4jQr</value><value key="attribute:ctype">x-html-STRONG</value><value key="isStartElement">True</value><value key="SDL:AutoCloned">True</value></bpt-props><ept name="g" word-end="false">&lt;/g&gt;</ept><ept-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">EndElement</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="isEndElement">True</value></ept-props><fmt id="1" /></tag><tag id="116"><bpt name="g" word-end="false">&lt;g id="e7OrITgKjYEYtZvL" ctype="x-html-P"&gt;</bpt><bpt-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">Element</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="attribute:id">e7OrITgKjYEYtZvL</value><value key="attribute:ctype">x-html-P</value><value key="isStartElement">True</value><value key="SDL:AutoCloned">True</value></bpt-props><ept name="g" word-end="false">&lt;/g&gt;</ept><ept-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">EndElement</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="isEndElement">True</value></ept-props><fmt id="1" /></tag><tag id="118"><bpt name="g" word-end="false">&lt;g id="s-OrVst9Fj8b_qgp" ctype="x-html-U"&gt;</bpt><bpt-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">Element</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="attribute:id">s-OrVst9Fj8b_qgp</value><value key="attribute:ctype">x-html-U</value><value key="isStartElement">True</value></bpt-props><ept name="g" word-end="false">&lt;/g&gt;</ept><ept-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">EndElement</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="isEndElement">True</value></ept-props><fmt id="1" /></tag><tag id="120"><bpt name="g" word-end="false">&lt;g id="6QhTgFhxi1LORZR-" ctype="x-html-STRONG"&gt;</bpt><bpt-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">Element</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="attribute:id">6QhTgFhxi1LORZR-</value><value key="attribute:ctype">x-html-STRONG</value><value key="isStartElement">True</value><value key="SDL:AutoCloned">True</value></bpt-props><ept name="g" word-end="false">&lt;/g&gt;</ept><ept-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">EndElement</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="isEndElement">True</value></ept-props><fmt id="1" /></tag><tag id="119"><bpt name="g" word-end="false">&lt;g id="SZZohtJBYXRBbpzl" ctype="x-html-P"&gt;</bpt><bpt-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">Element</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="attribute:id">SZZohtJBYXRBbpzl</value><value key="attribute:ctype">x-html-P</value><value key="isStartElement">True</value><value key="SDL:AutoCloned">True</value></bpt-props><ept name="g" word-end="false">&lt;/g&gt;</ept><ept-props><value key="prefix"/><value key="localName">g</value><value key="namespaces"/><value key="isEmptyElement">False</value><value key="nodeType">EndElement</value><value key="displayText">g</value><value key="hasDisplayText">False</value><value key="isEndElement">True</value></ept-props><fmt id="1" /></tag></tag-defs>
+    </header>
+        <body>
+            <group>
+<sdl:cxts><sdl:cxt id="3"/></sdl:cxts>
+<trans-unit id="e6d51078-a98f-4844-b6b5-9e5044c982c5">
+<source>Anlasser und Lichtmaschine | Neuteile ohne Pfand“ - jetzt sogar mit 3 Jahren Garantie ✓ Geprüfte Qualität ✓ einfaches Handling ✓ günstiger Preis ✓</source>
+<seg-source><mrk mtype="seg" mid="3">Anlasser und Lichtmaschine | Neuteile ohne Pfand“ - jetzt sogar mit 3 Jahren Garantie ✓ Geprüfte Qualität ✓ einfaches Handling ✓ günstiger Preis ✓</mrk></seg-source>
+<target><mrk mtype="seg" mid="3"><mrk mtype="x-sdl-location" mid="84dab49c-6853-4f36-876f-d5102c3f2921"/>Starter og generator | Nye dele uden depositum - nu med 3 års garanti ✓ Gennemprøvet kvalitet ✓ Nem håndtering ✓ Fordelagtig pris ✓<mrk mtype="x-sdl-location" mid="434ef078-bac1-4692-969d-d4a592db45c7"/></mrk></target>
+<sdl:seg-defs>
+    <sdl:seg id="3" conf="ApprovedTranslation" origin="interactive" percent="98">
+        <sdl:prev-origin origin="tm" origin-system="TM HLA Hueck DE-DA" percent="98">
+            <sdl:prev-origin/>
+            <sdl:value key="SegmentIdentityHash">X3WyaJICn43yP1Wa3X9wFY/kLRY=</sdl:value>
+            <sdl:value key="created_by">LAPTOP-6L49HCO7\hej</sdl:value>
+            <sdl:value key="created_on">08/07/2024 07:23:26</sdl:value>
+            <sdl:value key="last_modified_by">LAPTOP-6L49HCO7\hej</sdl:value>
+            <sdl:value key="modified_on">08/07/2024 07:23:26</sdl:value>
+        </sdl:prev-origin>
+        <sdl:value key="SegmentIdentityHash">X3WyaJICn43yP1Wa3X9wFY/kLRY=</sdl:value>
+        <sdl:value key="created_by">LAPTOP-6L49HCO7\hej</sdl:value>
+        <sdl:value key="created_on">08/07/2024 07:23:44</sdl:value>
+        <sdl:value key="last_modified_by">ONEWORD-PC53\oneword</sdl:value>
+        <sdl:value key="modified_on">08/07/2024 12:38:37</sdl:value>
+        <sdl:value key="SDL:OriginalTranslationHash">-1663470353</sdl:value>
+    </sdl:seg>
+</sdl:seg-defs>
+</trans-unit>
+            </group>
+        </body>
+    </file>
+</xliff>

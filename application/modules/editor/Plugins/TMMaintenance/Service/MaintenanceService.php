@@ -104,7 +104,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         parent::connectTo($languageResource, $sourceLang, $targetLang);
     }
 
-    public function update(\editor_Models_Segment $segment, array $options = []): void
+    public function update(SegmentModel $segment, array $options = []): void
     {
         // Not used
     }
@@ -123,7 +123,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         );
     }
 
-    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, \editor_Models_Segment $segment): void
+    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, SegmentModel $segment): void
     {
         // Not used
     }
@@ -166,8 +166,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     }
 
     /**
-     * Update method was designed to work with editor_Models_Segment context
-     * so this method was added to be able to update a memory entry without an editor_Models_Segment
+     * Update method was designed to work with SegmentModel context
+     * so this method was added to be able to update a memory entry without an SegmentModel
      */
     public function updateSegment(
         int $memoryId,
@@ -295,7 +295,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
      *
      * {@inheritDoc}
      */
-    public function query(\editor_Models_Segment $segment): \editor_Services_ServiceResult
+    public function query(SegmentModel $segment): \editor_Services_ServiceResult
     {
         // TODO not used
         return new \editor_Services_ServiceResult();
