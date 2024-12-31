@@ -42,7 +42,6 @@ Ext.define('Editor.view.form.field.ComboField', {
     },
 
     getInnerTpl: function(displayField) {
-        console.log('getInnerTpl called');
         return '{[Ext.String.htmlEncode(values.' + displayField + ')]}';
     }
 });

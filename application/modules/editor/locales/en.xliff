@@ -10119,6 +10119,74 @@ Synchronization always takes place in one direction: source data -> target
                 <source>automatisch abgeschlossen</source>
                 <target>auto-close</target>
             </trans-unit>
+            <trans-unit id='VmVyd2VuZGJhciBmw7xyIEt1bmRlbg=='>
+                <source>Verwendbar für Kunden</source>
+                <target>Usable for client</target>
+            </trans-unit>
+            <trans-unit id='TnVyIHp1Z2V3aWVzZW5lIExpc3Rl'>
+                <source>Nur zugewiesene Liste</source>
+                <target>Only list assigned</target>
+            </trans-unit>
+            <trans-unit id='QWJ6dWc='>
+                <source>Abzug</source>
+                <target>Penalty</target>
+            </trans-unit>
+            <trans-unit id='RGllc2VyIFdlcnQgd2lyZCBmw7xyIGRpZSBBbmFseXNlIHZvbiBkZXIgVHJlZmZlci1SYXRlIGRlciBTcHJhY2hyZXNvdXJjZSBhYmdlem9nZW4u'>
+                <source>Dieser Wert wird für die Analyse von der Treffer-Rate der Sprachresource abgezogen.</source>
+                <target>Penalty: This value is subtracted from the resource's match rate for the analysis result.</target>
+            </trans-unit>
+            <trans-unit id='U3ViLVNwcmFjaGVuYWJ6dWc6IERpZXNlciBXZXJ0IHdpcmQgZsO8ciBkaWUgQW5hbHlzZSB2b24gZGVyIFRyZWZmZXItUmF0ZSBkZXIgU3ByYWNocmVzb3VyY2UgYWJnZXpvZ2VuLCBGQUxMUyBzaWNoIGRpZSBTdWJzcHJhY2hlIGRlciBBdWZnYWJlIHZvbiBkZXIgU3Vic3ByYWNoZSBkZXIgU3ByYWNocmVzb3VyY2UgdW50ZXJzY2hlaWRldC4KPGJyLz5CZWlzcGllbGU6PGJyLz4KIC0gQXVzZ2FuZ3NzcHJhY2hlOiBTcHJhY2hyZXNvdXJjZSBkZS1ERSwgQXVmZ2FiZSBkZS1BVDogRGVyIEFienVnIGdyZWlmdDxici8+CiAtIFppZWxzcHJhY2hlOiBTcHJhY2hyZXNvdXJjZSBlbi1HQiwgQXVmZ2FiZSBlbi1VUzogRGVyIEFienVnIGdyZWlmdDxici8+CiAtIEF1c2dhbmdzc3ByYWNoZTogU3ByYWNocmVzb3VyY2UgZGUsIEF1ZmdhYmUgZGUtQVQ6IERlciBBYnp1ZyBncmVpZnQgTklDSFQ8YnIvPgogLSBaaWVsc3ByYWNoZTogU3ByYWNocmVzb3VyY2UgZGUtREUsIEF1ZmdhYmUgZGU6IERlciBBYnp1ZyBncmVpZiBOSUNIVDxici8+CmV0Yy4='>
+                <source>
+Sub-Sprachenabzug: Dieser Wert wird für die Analyse von der Treffer-Rate der Sprachresource abgezogen, FALLS sich die Subsprache der Aufgabe von der Subsprache der Sprachresource unterscheidet.
+<br/>Beispiele:<br/>
+ - Ausgangssprache: Sprachresource de-DE, Aufgabe de-AT: Der Abzug greift<br/>
+ - Zielsprache: Sprachresource en-GB, Aufgabe en-US: Der Abzug greift<br/>
+ - Ausgangssprache: Sprachresource de, Aufgabe de-AT: Der Abzug greift NICHT<br/>
+ - Zielsprache: Sprachresource de-DE, Aufgabe de: Der Abzug greif NICHT<br/>
+etc.
+                </source>
+                <target>
+Sub-language penalty: This value is subtracted from the language resource's match rate for analysis IF the task's sublanguage is different from the language resource's sublanguage.
+<br/>Examples:<br/>
+ - Source language: resource de-DE, task de-AT: The deduction is made<br/>
+ - Target language: resource en-GB, task en-US: The deduction is made<br/>
+ - Source language: resource de, task de-AT: The deduction is NOT made<br/>
+ - Target language: resource de-DE, task de: The deduction is NOT made<br/>
+etc.
+                </target>
+            </trans-unit>
+            <trans-unit id='TWFzc2Vuw6RuZGVydW5nZW4='>
+                <source>Massenänderungen</source>
+                <target>Batch set properties</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBhbGxlIHNlbGVrdGllcnRlbiDDpG5kZXJu'>
+                <source>Für alle selektierten ändern</source>
+                <target>Set for all selected</target>
+            </trans-unit>
+            <trans-unit id='U2V0enQgRWlnZW5zY2hhZnRlbiBmw7xyIGFsbGUgYXVzZ2V3w6RobHRlbiBBdWZnYWJlbiBvZGVyIFByb2pla3Rl'>
+                <source>Setzt Eigenschaften für alle ausgewählten Aufgaben oder Projekte</source>
+                <target>Will set property for all selected tasks or projects</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBhbGxlIGluIEZpbHRlcnVuZyDDpG5kZXJu'>
+                <source>Für alle in Filterung ändern</source>
+                <target>Set for all in current filtering</target>
+            </trans-unit>
+            <trans-unit id='QWNodHVuZyEgU2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGbDvHIgYWxsZSBBdWZnYWJlbi9Qcm9qZWt0ZSBpbiBkZXIgYWt0dWVsbCBlaW5nZXN0ZWxsdGVuIEZpbHRlcnVuZyBkZXIgUHJvamVrdGU='>
+                <source>Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte</source>
+                <target>Caution: Will set property for all tasks/projects in the currently set filtering of projects</target>
+            </trans-unit>
+            <trans-unit id='U2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGluIGFsbGVuIFByb2pla3RlbiBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZy4gQmVzc2VyIGFiYnJlY2hlbj8='>
+                <source>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?</source>
+                <target>Changes the property in all projects in the current filtering. Better abort?</target>
+            </trans-unit>
+            <trans-unit id='RWlnZW5zY2hhZnRlbiDDpG5kZXJu'>
+                <source>Eigenschaften ändern</source>
+                <target>Select to batch set properties</target>
+            </trans-unit>
+            <trans-unit id='RXMgd3VyZGUga2VpbmUgRWlnZW5zY2hhZnQgYW5nZWdlYmVu'>
+                <source>Es wurde keine Eigenschaft angegeben</source>
+                <target>No property is specified</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

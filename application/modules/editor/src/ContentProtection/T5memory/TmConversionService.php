@@ -337,35 +337,58 @@ class TmConversionService implements TmConversionServiceInterface
         int &$brokenTus
     ): string {
         $transUnit = $this->convertT5MemoryTagToContent($transUnit);
-        preg_match_all(
-            '/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n)?\s*<seg>.+<\/seg>(\n|\r|\r\n)*)+\s*<\/tuv>/Uum',
-            $transUnit,
-            $matches,
-            PREG_SET_ORDER
-        );
-
         $numberTagMap = [];
+        $sourceLangMajor = $sourceLang->getMajorRfc5646();
+
+        $sourceSegment = '';
+        $targetSegment = '';
+
+        $xml = XMLReader::XML($transUnit);
+
+        while ($xml->read()) {
+            if ($xml->nodeType !== XMLReader::ELEMENT) {
+                continue;
+            }
+
+            if ($xml->name !== 'tuv') {
+                continue;
+            }
+
+            $tuv = $xml->readOuterXML();
+            $lang = strtolower($xml->getAttribute('xml:lang'));
+
+            $segment = str_replace(['<seg>', '</seg>'], '', trim($xml->readInnerXml()));
+
+            if (str_contains($lang, $sourceLangMajor)) {
+                $sourceSegment = $segment;
+                $transUnit = str_replace($tuv, str_replace($sourceSegment, '*source*', $tuv), $transUnit);
+            } else {
+                $targetSegment = $segment;
+                $transUnit = str_replace($tuv, str_replace($targetSegment, '*target*', $tuv), $transUnit);
+            }
+
+            if ('' !== $sourceSegment && '' !== $targetSegment) {
+                break;
+            }
+        }
 
         // if there is no source or target tuv, then we assume that tu is broken
-        if (empty($matches[0][0]) || empty($matches[1][0])) {
+        if ('' === $sourceSegment || '' === $targetSegment) {
             $brokenTus++;
 
             return '';
         }
 
-        $sourceMatchId = str_contains(strtolower($matches[0][1]), $sourceLang->getMajorRfc5646()) ? 0 : 1;
-        $targetMatchId = $sourceMatchId === 0 ? 1 : 0;
-
         [$source, $target] = $this->contentProtector->filterTags(
             $this->contentProtector->protect(
-                $matches[$sourceMatchId][0],
+                $sourceSegment,
                 true,
                 (int) $sourceLang->getId(),
                 (int) $targetLang->getId(),
                 ContentProtector::ENTITY_MODE_OFF
             ),
             $this->contentProtector->protect(
-                $matches[$targetMatchId][0],
+                $targetSegment,
                 false,
                 (int) $sourceLang->getId(),
                 (int) $targetLang->getId(),
@@ -374,7 +397,10 @@ class TmConversionService implements TmConversionServiceInterface
         );
 
         return str_replace(
-            [$matches[$sourceMatchId][0], $matches[$targetMatchId][0]],
+            [
+                '*source*',
+                '*target*',
+            ],
             [
                 $this->convertContentTagToT5MemoryTag($source, true, $numberTagMap),
                 $this->convertContentTagToT5MemoryTag($target, false, $numberTagMap),

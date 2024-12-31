@@ -33,6 +33,7 @@ Ext.define('Editor.view.admin.task.ManageFiles.Main', {
     ],
     alias: 'widget.taskManageFilesMain',
     itemId: 'taskManageFilesMain',
+    bodyStyle: 'border: 0',
     activeTab:0,
     initConfig: function(instanceConfig) {
         var me = this,

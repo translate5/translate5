@@ -29,6 +29,7 @@ Ext.define('Editor.view.admin.system.StatusPanel', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.editorSystemStatus',
     itemId: 'adminSystemStatus',
+    bodyStyle: 'border: 0',
     strings: {
         reload: "re-check"
     },

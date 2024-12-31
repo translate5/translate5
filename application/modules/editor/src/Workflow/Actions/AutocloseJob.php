@@ -41,6 +41,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
         foreach ($jobs as $tuaData) {
             try {
                 $task = editor_ModelInstances::taskByGuid($tuaData['taskGuid']);
+
                 $config = $task->getConfig();
                 if ($config->runtimeOptions->workflow->autoCloseJobs) {
                     $idsToAutoClose[] = $tuaData['id'];

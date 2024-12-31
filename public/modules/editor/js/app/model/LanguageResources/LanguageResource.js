@@ -55,10 +55,10 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         {name: 'name', type: 'string'},
         {name: 'color', type: 'string'},
         {name: 'resourceId', type: 'string'},
-        {name: 'customerUseAsDefaultIds'},
-        {name: 'customerWriteAsDefaultIds'},
-        {name: 'customerPivotAsDefaultIds'},
-        {name: 'customerIds'},
+        {name: 'customerUseAsDefaultIds', critical: true},
+        {name: 'customerWriteAsDefaultIds', critical: true},
+        {name: 'customerPivotAsDefaultIds', critical: true},
+        {name: 'customerIds', critical: true},
         {name: 'status', type: 'string', persist: false},
         {name: 'statusInfo', type: 'string', persist: false},
         {name: 'serviceName', type: 'string'},
@@ -68,7 +68,28 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         {name: 'writeSource', type: 'boolean'},
         {name: 'useAsGlossarySource', critical: true},
         {name: 'tmNeedsConversion', type: 'boolean'},
-        {name: 'tmConversionInProgress', type: 'boolean'}
+        {name: 'tmConversionInProgress', type: 'boolean'},
+
+        {
+            name: 'hasClientAssoc',
+            type: 'boolean',
+            persist: false
+        },
+        {
+            name: 'hasReadAccess',
+            type: 'boolean',
+            persist: false
+        },
+        {
+            name: 'hasWriteAccess',
+            type: 'boolean',
+            persist: false
+        },
+        {
+            name: 'hasPivotAccess',
+            type: 'boolean',
+            persist: false
+        },
     ],
     idProperty: 'id',
 
@@ -119,6 +140,24 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
 
     getName: function() {
         return Ext.String.htmlEncode(this.get('name'));
+    },
+
+    /**
+     *
+     * @param customerId
+     */
+    refreshFlags: function(customerId) {
+
+        // Setup an arrow function to check whether given customerId is in array
+        var inArray = value => parseInt(value) === customerId;
+
+        // Refresh flags
+        this.set({
+            hasClientAssoc: this.get('customerIds')              .some(inArray),
+            hasReadAccess : this.get('customerUseAsDefaultIds')  .some(inArray),
+            hasWriteAccess: this.get('customerWriteAsDefaultIds').some(inArray),
+            hasPivotAccess: this.get('customerPivotAsDefaultIds').some(inArray),
+        })
     },
 
     proxy: {

@@ -167,8 +167,9 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
 
     /**
      * loads the assocs regardless isPmOverride is set or not
+     * Optionally filtered by Workflow And WorkflowStep
      */
-    public function loadByTaskGuidList(array $list): array
+    public function loadByTaskGuidList(array $list, string $workflow = '', string $workflowStep = ''): array
     {
         if (empty($list)) {
             return [];
@@ -176,6 +177,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
 
         try {
             $s = $this->db->select()->where('taskGuid in (?)', $list);
+            if (! empty($workflow)) {
+                $s = $s->where('workflow = ?', $workflow);
+            }
+            if (! empty($workflowStep)) {
+                $s = $s->where('workflowStepName = ?', $workflowStep);
+            }
 
             return $this->db->fetchAll($s)->toArray();
         } catch (Exception $e) {

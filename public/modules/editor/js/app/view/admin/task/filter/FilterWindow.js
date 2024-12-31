@@ -39,6 +39,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
         workflowStateFilterLabel: '#UT#Workflow-Status',
         workflowUserRoleLabel: '#UT#Workflowschritt-Typ',
         workflowUserRoleTip: '#UT#Filtert alle Aufgaben, denen ein Job mit einem Workflow-Schritt des gewählten Typs zugewiesen ist',
+        workflowLabel: '#UT#Workflow',
         workflowStepLabel: '#UT#Workflow-Schritt',
         workflowStepTip: '#UT#Filtert alle Aufgaben, denen ein Job mit dem gewählten Workflow-Schritt zugewiesen ist',
         userNameLabel: '#UT#Zugewiesene/r Benutzer',

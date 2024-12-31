@@ -50,6 +50,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     },
     tabPosition: 'left',
     tabRotation: 0,
+    bodyStyle: 'border: 0',
     glyph: 'xf085@FontAwesome5FreeSolid',
     listeners:{
         tabchange: 'onTabChange',

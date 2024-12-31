@@ -58,6 +58,7 @@ Ext.define('Editor.view.ViewPort', {
                 region: 'center',
                 xtype: 'tabpanel',
                 itemId: 'adminMainSection',
+                bodyStyle: 'border: 0',
                 /**
                  * returns the configured default route of the active tab (if any configured)
                  * @returns {string}

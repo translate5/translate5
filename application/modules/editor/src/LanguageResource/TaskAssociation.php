@@ -28,8 +28,13 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource;
 
+use editor_Models_LanguageResources_CustomerAssoc;
+use editor_Models_Segment_MatchRateType;
 use editor_Services_Manager;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
 use Zend_Db_Expr;
 use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Exception;
@@ -48,6 +53,10 @@ use ZfExtended_Factory;
  * @method void setSegmentsUpdateable(bool $updateable)
  * @method string getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport(int $autoCreatedOnImport)
+ * @method string getPenaltyGeneral()
+ * @method void setPenaltyGeneral(int $penaltyGeneral)
+ * @method string getPenaltySublang()
+ * @method void setPenaltySublang(int $penaltySublang)
  */
 class TaskAssociation extends AssociationAbstract
 {
@@ -122,17 +131,21 @@ class TaskAssociation extends AssociationAbstract
         $adapter = $db->getAdapter();
 
         $languageModel = ZfExtended_Factory::get(\editor_Models_Languages::class);
+        /* @var $languageModel \editor_Models_Languages */
 
-        //get source and target language fuzzies
-        $sourceLangs = $languageModel->getFuzzyLanguages((int) $task->getSourceLang(), 'id', true);
-        $targetLangs = $languageModel->getFuzzyLanguages((int) $task->getTargetLang(), 'id', true);
+        // Make sure language resource will be offered for assignments for tasks, even if the sub-languages do not match
+        $majorLangId = $languageModel->findMajorLanguageById((int) $task->getSourceLang());
+        $sourceLangs = $languageModel->getFuzzyLanguages($majorLangId, 'id', true);
+
+        $majorLangId = $languageModel->findMajorLanguageById((int) $task->getTargetLang());
+        $targetLangs = $languageModel->getFuzzyLanguages($majorLangId, 'id', true);
 
         //get all available services
         $services = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $services editor_Services_Manager */
         $allservices = $services->getAll();
 
-        $this->filter->addTableForField('taskGuid', 'ta');
+        $this->filter?->addTableForField('taskGuid', 'ta');
         $s = $db->select()
             ->setIntegrityCheck(false)
             ->from(
@@ -146,7 +159,7 @@ class TaskAssociation extends AssociationAbstract
                     'languageResource.name', 'languageResource.color', 'languageResource.resourceId',
                     'languageResource.serviceType', 'languageResource.serviceName', 'languageResource.specificData',
                     'languageResource.timestamp', 'languageResource.resourceType', 'languageResource.writeSource',
-                    'ta.id AS taskassocid', 'ta.segmentsUpdateable',
+                    'ta.id AS taskassocid', 'ta.segmentsUpdateable', 'ta.penaltyGeneral', 'ta.penaltySublang',
                 ]
             )
             ->join([
@@ -157,13 +170,13 @@ class TaskAssociation extends AssociationAbstract
             ->where('languageResource.serviceType IN(?)', $allservices);
 
         //check filter is set true when editor needs a list of all used TMs/MTs
-        if ($this->filter->hasFilter('checked')) {
+        if ($this->filter?->hasFilter('checked')) {
             //if checked filter is set, we keep the taskGuid as filter argument,
             // but remove additional checked filter and checked info
             $this->filter->deleteFilter('checked');
             $checkColumns = '';
         } else {
-            $this->filter->deleteFilter('taskGuid');
+            $this->filter?->deleteFilter('taskGuid');
             $checkColumns = [
                 //checked is true when an assoc entry was found
                 "checked" => $adapter->quoteInto('IF(ta.taskGuid = ?,\'true\',\'false\')', $taskGuid),
@@ -179,7 +192,7 @@ class TaskAssociation extends AssociationAbstract
 
         // By default, we filter out all project TMs that are not associated to the task
         if (
-            ! $this->filter->hasFilter('isTaskTm')
+            ! $this->filter?->hasFilter('isTaskTm')
             || (false === (bool) $this->filter->getFilter('isTaskTm')->value)
         ) {
             $s->joinLeft(
@@ -191,13 +204,16 @@ class TaskAssociation extends AssociationAbstract
             );
             $s->where('ISNULL(ttm.id) OR ta.id IS NOT NULL');
         }
-        $this->filter->deleteFilter('isTaskTm');
+        $this->filter?->deleteFilter('isTaskTm');
 
         // Only match resources can be associated to a task, that are associated to the same client as the task is.
         $s->join([
             "cu" => "LEK_languageresources_customerassoc",
-        ], 'languageResource.id=cu.languageResourceId', ['cu.customerId AS customerId'])
-            ->where('cu.customerId=?', $task->getCustomerId());
+        ], 'languageResource.id=cu.languageResourceId', [
+            'cu.customerId AS customerId',
+            'IFNULL(ta.penaltyGeneral, cu.penaltyGeneral) AS penaltyGeneral',
+            'IFNULL(ta.penaltySublang, cu.penaltySublang) AS penaltySublang',
+        ])->where('cu.customerId=?', $task->getCustomerId());
 
         $s->group('languageResource.id');
 
@@ -323,5 +339,112 @@ class TaskAssociation extends AssociationAbstract
             ->where('segmentsUpdateable = 1');
 
         return $this->db->fetchAll($s)->toArray();
+    }
+
+    /**
+     * Make sure unmodified penalties - are picked from langres<=>customer assoc
+     *
+     * @throws \ReflectionException
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     */
+    public function onBeforeInsert(): void
+    {
+        // Prepare global defaults for penalties
+        $defaults = [
+            'penaltyGeneral' => 0,
+            'penaltySublang' => editor_Models_Segment_MatchRateType::MAX_VALUE,
+        ];
+
+        // Unset the ones for modified penalty props
+        foreach (array_keys($defaults) as $penalty) {
+            if ($this->isModified($penalty)) {
+                unset($defaults[$penalty]);
+            }
+        }
+
+        // If both penalties are explicitly set - no need to pick default, so nothing to do here
+        if (count($defaults) === 0) {
+            return;
+        }
+
+        // Get customer id
+        $task = ZfExtended_Factory::get(\editor_Models_Task::class);
+        $task->loadByTaskGuid($this->getTaskGuid());
+        $customerId = (int) $task->getCustomerId();
+
+        // Get langres<=>customer assoc model
+        $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
+        $customerAssoc->loadRowByCustomerIdAndResourceId($customerId, (int) $this->getLanguageResourceId());
+
+        // Foreach of unmodified defaults
+        foreach ($defaults as $penalty => $value) {
+            // Prepare setter and getter method names
+            $set = 'set' . ucfirst($penalty);
+            $get = 'get' . ucfirst($penalty);
+
+            // Pick task<=>langres penalty from langres<=>customer
+            $this->$set($customerAssoc->hasRow() && $customerAssoc->getId() ? $customerAssoc->$get($penalty) : $value);
+        }
+    }
+
+    /**
+     * @return int[]
+     * @throws \ReflectionException
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getPenalties(string $taskGuid, int $resourceId, ?int $matchSourceLangId = null, ?int $matchTargetLangId = null): array
+    {
+        // Load assoc record
+        $this->loadByTaskGuidAndTm($taskGuid, $resourceId);
+
+        // Get task and it's source and target sublangs
+        $task = ZfExtended_Factory::get(TaskRepository::class)->getByGuid($taskGuid);
+        $subLang['source']['task'] = \ZfExtended_Languages::sublangCodeByRfc5646($task->getSourceLanguage()->getRfc5646());
+        $subLang['target']['task'] = \ZfExtended_Languages::sublangCodeByRfc5646($task->getTargetLanguage()->getRfc5646());
+
+        // Shortcuts
+        $resourceM = ZfExtended_Factory::get(LanguageResourceRepository::class)->get($resourceId);
+        $languageR = ZfExtended_Factory::get(LanguageRepository::class);
+
+        // Default value that will be kept active unless sublanguages mismatch detected
+        $penaltySublang = 0;
+
+        // Prepare languages (of match or resource) to be compared with languages of task
+        $langIdToCompare = [
+            'source' => $matchSourceLangId ?? $resourceM->getSourceLang(),
+            'target' => $matchTargetLangId ?? $resourceM->getTargetLang(),
+        ];
+
+        // For source and target
+        foreach (['source', 'target'] as $type) {
+            // Get languageId of a certain $type to be compared with task's languageId of the same $type
+            $languageId = $langIdToCompare[$type];
+
+            // If it's an array - it means resource is TermCollection but
+            // neither $matchSourceLangId nor $matchTargetLangId are given
+            // so we just pick the first among languages of a $type
+            if ($languageId && is_array($languageId)) {
+                $languageId = $languageId[0];
+            }
+
+            // Get sublang
+            $subLang[$type]['langres'] = \ZfExtended_Languages::sublangCodeByRfc5646(
+                $languageR->get($languageId)->getRfc5646()
+            );
+
+            // If assoc langres sublang is not empty but does not match task sublang
+            // apply the defined sublang penalty and exit the loop
+            if ($subLang[$type]['langres'] && $subLang[$type]['langres'] !== $subLang[$type]['task']) {
+                $penaltySublang = (int) $this->getPenaltySublang();
+
+                break;
+            }
+        }
+
+        // Return penalties that should be really deducted from the matchrate
+        return [
+            'penaltyGeneral' => (int) $this->getPenaltyGeneral(),
+            'penaltySublang' => $penaltySublang,
+        ];
     }
 }

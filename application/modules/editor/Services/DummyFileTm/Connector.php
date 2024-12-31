@@ -155,11 +155,14 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         \editor_Models_Segment $segment,
         array $options = []
     ): UpdateSegmentDTO {
+        $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
+        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
+
         return new UpdateSegmentDTO(
             $segment->getTaskGuid(),
             (int) $segment->getId(),
-            $this->getQueryString($segment),
-            $segment->getTargetEdit(),
+            $source,
+            $target,
             '',
             '',
             '',

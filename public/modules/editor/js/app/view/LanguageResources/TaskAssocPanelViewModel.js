@@ -132,6 +132,20 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
         },
         hasTermcollection:function(get){
             return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TERM_COLLECTION);
+        },
+
+        penaltyOptions: {
+            get: function(get) {
+                var data = [], i = Editor.data.segments.matchratemaxvalue;
+                do data.push(i); while (--i >= 0);
+                return data;
+            }
+        },
+        penaltyGeneral: {
+            get: get => get('penaltyOptions').reverse()
+        },
+        penaltySublang: {
+            get: get => get('penaltyOptions')
         }
     },
     

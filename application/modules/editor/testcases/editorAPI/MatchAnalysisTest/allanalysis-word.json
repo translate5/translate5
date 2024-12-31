@@ -3,6 +3,8 @@
         "segmentNrInTask": "1",
         "internalFuzzy": "0",
         "matchRate": "97",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "4",
         "characterCount": "20",
         "type": "tm"
@@ -11,6 +13,8 @@
         "segmentNrInTask": "1",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "4",
         "characterCount": "20",
         "type": "termcollection"
@@ -19,6 +23,8 @@
         "segmentNrInTask": "2",
         "internalFuzzy": "0",
         "matchRate": "80",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "4",
         "characterCount": "19",
         "type": "tm"
@@ -27,6 +33,8 @@
         "segmentNrInTask": "2",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "4",
         "characterCount": "19",
         "type": "termcollection"
@@ -35,6 +43,8 @@
         "segmentNrInTask": "2",
         "internalFuzzy": "1",
         "matchRate": "80",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "4",
         "characterCount": "19",
         "type": "tm"
@@ -43,6 +53,8 @@
         "segmentNrInTask": "3",
         "internalFuzzy": "0",
         "matchRate": "80",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "4",
         "characterCount": "19",
         "type": "tm"
@@ -51,6 +63,8 @@
         "segmentNrInTask": "3",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "4",
         "characterCount": "19",
         "type": "termcollection"
@@ -59,6 +73,8 @@
         "segmentNrInTask": "3",
         "internalFuzzy": "1",
         "matchRate": "97",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "4",
         "characterCount": "19",
         "type": "tm"
@@ -67,6 +83,8 @@
         "segmentNrInTask": "4",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "2",
         "characterCount": "19",
         "type": "tm"
@@ -75,6 +93,8 @@
         "segmentNrInTask": "4",
         "internalFuzzy": "0",
         "matchRate": "104",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "2",
         "characterCount": "19",
         "type": "termcollection"
@@ -83,6 +103,8 @@
         "segmentNrInTask": "5",
         "internalFuzzy": "0",
         "matchRate": "97",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "12",
         "characterCount": "74",
         "type": "tm"
@@ -91,6 +113,8 @@
         "segmentNrInTask": "5",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "12",
         "characterCount": "74",
         "type": "termcollection"
@@ -99,6 +123,8 @@
         "segmentNrInTask": "6",
         "internalFuzzy": "0",
         "matchRate": "101",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "17",
         "characterCount": "120",
         "type": "tm"
@@ -107,6 +133,8 @@
         "segmentNrInTask": "6",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "17",
         "characterCount": "120",
         "type": "termcollection"
@@ -115,6 +143,8 @@
         "segmentNrInTask": "7",
         "internalFuzzy": "0",
         "matchRate": "102",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "12",
         "characterCount": "74",
         "type": "auto-propagated"
@@ -123,6 +153,8 @@
         "segmentNrInTask": "8",
         "internalFuzzy": "0",
         "matchRate": "97",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "30",
         "characterCount": "180",
         "type": "tm"
@@ -131,6 +163,8 @@
         "segmentNrInTask": "8",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "30",
         "characterCount": "180",
         "type": "termcollection"
@@ -139,6 +173,8 @@
         "segmentNrInTask": "9",
         "internalFuzzy": "0",
         "matchRate": "102",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "12",
         "characterCount": "74",
         "type": "auto-propagated"
@@ -147,6 +183,8 @@
         "segmentNrInTask": "10",
         "internalFuzzy": "0",
         "matchRate": "102",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "17",
         "characterCount": "120",
         "type": "auto-propagated"
@@ -155,6 +193,8 @@
         "segmentNrInTask": "11",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "10",
         "characterCount": "52",
         "type": "tm"
@@ -163,6 +203,8 @@
         "segmentNrInTask": "11",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "10",
         "characterCount": "52",
         "type": "termcollection"
@@ -171,6 +213,8 @@
         "segmentNrInTask": "12",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "10",
         "characterCount": "54",
         "type": "tm"
@@ -179,6 +223,8 @@
         "segmentNrInTask": "12",
         "internalFuzzy": "0",
         "matchRate": "0",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "10",
         "characterCount": "54",
         "type": "termcollection"
@@ -187,6 +233,8 @@
         "segmentNrInTask": "12",
         "internalFuzzy": "1",
         "matchRate": "90",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "wordCount": "10",
         "characterCount": "54",
         "type": "tm"

@@ -658,7 +658,6 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-
     Ext.define("Editor.locale.de.view.help.HelpWindow", {
         override: "Editor.view.help.HelpWindow",
         strings:{
@@ -2099,6 +2098,8 @@ Editor.data.l10n = {
             reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren');?>',
             notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
             resetFilterText: '<?php echo $this->translate->_('Filter zurücksetzen');?>',
+            batchSetProperties: '<?php echo $this->translate->_('Massenänderungen');?>',
+            batchSetTooltip: '<?php echo $this->translate->_('Eigenschaften ändern');?>',
             onlyMyProjects: '<?php echo $this->translate->_('Nur meine Projekte');?>'
         },
         text_cols: {
@@ -2193,6 +2194,31 @@ Editor.data.l10n = {
     quickSearchInfoMessage: {
         synonymSearchMessage: '<?php echo $this->translate->_('Und ALT+F3 für die Synonymsuche.');?>',
         concordenceSearchMessage: '<?php echo $this->translate->_('Drücken Sie F3, um das markierte Wort an die Konkordanzsuche zu senden.');?>'
+    },
+    languageResourceTaskAssocPanel: {
+        penaltyGeneral: '<?php echo $this->translate->_('Dieser Wert wird für die Analyse von der Treffer-Rate der Sprachresource abgezogen.');?>',
+        penaltySublang: '<?php echo $this->translate->_('Sub-Sprachenabzug: Dieser Wert wird für die Analyse von der Treffer-Rate der Sprachresource abgezogen, FALLS sich die Subsprache der Aufgabe von der Subsprache der Sprachresource unterscheidet.
+<br/>Beispiele:<br/>
+ - Ausgangssprache: Sprachresource de-DE, Aufgabe de-AT: Der Abzug greift<br/>
+ - Zielsprache: Sprachresource en-GB, Aufgabe en-US: Der Abzug greift<br/>
+ - Ausgangssprache: Sprachresource de, Aufgabe de-AT: Der Abzug greift NICHT<br/>
+ - Zielsprache: Sprachresource de-DE, Aufgabe de: Der Abzug greif NICHT<br/>
+etc.')?>'
+    },
+    customerTmAssoc: {
+        title: '<?php echo $this->translate->_('Sprachressourcen');?>',
+        serviceName: '<?php echo $this->translate->_('Ressource');?>',
+        name: '<?php echo $this->translate->_('Name');?>',
+        sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+        targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+        hasClientAssoc: '<?php echo $this->translate->_('Verwendbar für Kunden');?>',
+        hasReadAccess: '<?php echo $this->translate->_('Leserechte standardmäßig');?>',
+        hasWriteAccess: '<?php echo $this->translate->_('Schreibrechte standardmäßig');?>',
+        hasPivotAccess: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
+        onlyListAssigned: '<?php echo $this->translate->_('Nur zugewiesene Liste');?>'
+    },
+    analysisGrid: {
+        penaltyTotal: '<?php echo $this->translate->_('Abzug');?>'
     },
     preferences: {
         user: {
@@ -2471,6 +2497,20 @@ Editor.data.l10n = {
     helpButton: {
         tooltip: '<?= $this->translate->_('Tutorial-Videos aufrufen') ?>'
     },
+    batchSetWindow: {
+        workflowLabel: '<?php echo $this->translate->_('Workflow');?>',
+        workflowStepLabel: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+        title:'<?php echo $this->translate->_('Massenänderungen');?>',
+        setForSelected:'<?php echo $this->translate->_('Für alle selektierten ändern');?>',
+        setForSelectedTip:'<?php echo $this->translate->_('Setzt Eigenschaften für alle ausgewählten Aufgaben oder Projekte');?>',
+        setForFiltered:'<?php echo $this->translate->_('Für alle in Filterung ändern');?>',
+        setForFilteredTip:'<?php echo $this->translate->_('Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte');?>',
+        allFilteredWarning:'<?php echo $this->translate->_('Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?');?>',
+        deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>',
+        warning: '<?php echo $this->translate->_('Warnung');?>',
+        noPropertySet:'<?php echo $this->translate->_('Es wurde keine Eigenschaft angegeben');?>',
+        noTasksSelected:'<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>'
+    },
     crossLanguageResourceSynchronization: {
         windowTitle: '<?= $this->translate->_('Verwalten von Verbindungen') ?>',
         tooltip: '<?= $this->translate->_('Sprachübergreifende Synchronisierung von Ressourcen') ?>',
@@ -2486,6 +2526,9 @@ Editor.data.l10n = {
         failedToQueue: '<?= $this->translate->_('Synchronisierung in Warteschlange fehlgeschlagen.') ?>',
         confirmSynchronisation: '<?= $this->translate->_('Bestätigen Sie die Synchronisierung.') ?>',
         emptyTableText: '<?= $this->translate->_('crossLanguageResourceSynchronization.emptyTableText') ?>',
+    },
+    log: {
+        logColumnText: '<?= $this->translate->_('Ereignisse') ?>',
     }
 };
 

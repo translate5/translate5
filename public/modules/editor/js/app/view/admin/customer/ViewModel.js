@@ -32,7 +32,10 @@ Ext.define('Editor.view.admin.customer.ViewModel', {
 
     data: {
         title: '',
-        record: false
+        record: false,
+        langres: {
+            assocOnlyButtonPressed: true
+        }
     },
 
     formulas: {
@@ -40,6 +43,19 @@ Ext.define('Editor.view.admin.customer.ViewModel', {
             get: function (get) {
                 return get('record') && !Ext.isNumber(get('record').get('id'));
             }
+        },
+        penaltyOptions: {
+            get: function(get) {
+                var data = [], i = Editor.data.segments.matchratemaxvalue;
+                do data.push(i); while (--i >= 0);
+                return data;
+            }
+        },
+        penaltyGeneral: {
+            get: get => get('penaltyOptions').reverse()
+        },
+        penaltySublang: {
+            get: get => get('penaltyOptions')
         }
     }
 });

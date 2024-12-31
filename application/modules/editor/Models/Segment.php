@@ -60,6 +60,10 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method void setPretrans(int $pretrans)
  * @method string getMatchRate()
  * @method void setMatchRate(int $matchrate)
+ * @method string getPenaltyGeneral()
+ * @method void setPenaltyGeneral(int $penaltyGeneral)
+ * @method string getPenaltySublang()
+ * @method void setPenaltySublang(int $penaltySublang)
  * @method string getMatchRateType()
  * @method string|null getStateId()
  * @method void setStateId(int|null $id)
@@ -491,29 +495,34 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     /**
      * Convenience API to evaluate if a segment has been pretranslated (either from a TM or a MT)
      * This may also mean, that the status in an imported sdxliff was the like
-     * @return boolean
      */
-    public function isPretranslated()
+    public function isPretranslated(): bool
     {
-        return $this->getPretrans() !== 0;
+        return (int) $this->getPretrans() !== 0;
+    }
+
+    /**
+     * Check whether segment was edited after pretranslated or edited after a match was taken over in UI
+     */
+    public function isInteractive(): bool
+    {
+        return editor_Models_Segment_MatchRateType::isInteractive($this->getMatchRateType());
     }
 
     /**
      * Convenience API to evaluate if a segment has been pretranslated by a machine translation
-     * @return boolean
      */
-    public function isPretranslatedMT()
+    public function isPretranslatedMT(): bool
     {
-        return $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromMT($this->getMatchRateType());
+        return (int) $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromMT($this->getMatchRateType());
     }
 
     /**
      * Convenience API to evaluate if a segment has been pretranslated by a translation memory
-     * @return boolean
      */
-    public function isPretranslatedTM()
+    public function isPretranslatedTM(): bool
     {
-        return $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromTM($this->getMatchRateType());
+        return (int) $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromTM($this->getMatchRateType());
     }
 
     /**
