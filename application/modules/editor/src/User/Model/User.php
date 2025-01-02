@@ -66,9 +66,15 @@ class User extends \ZfExtended_Models_User
         $this->setUserGuid($dto->guid);
         $this->setLogin($dto->login);
         $this->setEmail($dto->email);
-        $this->setFirstName($dto->firstName);
-        $this->setSurName($dto->surName);
-        $this->setGender($dto->gender);
+        if (null !== $dto->firstName) {
+            $this->setFirstName($dto->firstName);
+        }
+        if (null !== $dto->surName) {
+            $this->setSurName($dto->surName);
+        }
+        if (null !== $dto->gender) {
+            $this->setGender($dto->gender);
+        }
         if (null !== $dto->locale) {
             $this->setLocale($dto->locale);
         }
