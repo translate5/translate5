@@ -49,3 +49,17 @@ define('APPLICATION_UNITTEST', true);
 if (empty(ini_get('error_log'))) {
     ini_set('error_log', APPLICATION_ROOT . '/data/php-tests.log');
 }
+
+// For Zend1 autoloader
+$db = new Zend_Db_Adapter_Pdo_Sqlite(['dbname' => 'sqlite::memory:']);
+Zend_Db_Table::setDefaultAdapter($db);
+
+$cli = new Symfony\Component\Console\Application();
+$cli->setAutoExit(false);
+$cli->add(new Translate5\MaintenanceCli\Command\DatabaseUpdateCommand());
+
+$input = new Symfony\Component\Console\Input\ArrayInput([
+    'command' => 'database:update',
+    '--import' => null,
+]);
+$cli->run($input);
