@@ -67,7 +67,15 @@ foreach ($result as $row) {
 
     $options['languageResourceId'] = $languageResourceId;
 
-    $success = $worker->init($taskGuid, $options);
+    try {
+        $success = $worker->init($taskGuid, $options);
+    } catch (\ZfExtended_Models_Entity_NotFoundException $e) {
+        $logger->info('E0000', 'Migration 449-TRANSLATE-4284: Task not found', [
+            'row' => $row,
+        ]);
+
+        continue;
+    }
 
     if (! $success) {
         $logger->info('E0000', 'Migration 449-TRANSLATE-4284: Failed to init a worker', [

@@ -24,6 +24,19 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.15.1] - 2024-12-31
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4284](https://jira.translate5.net/browse/TRANSLATE-4284): LanguageResources, t5memory - task not saved to TM after finishing workflow due to locked task state** <br>
+translate5 - 7.15.0: Task into TM reimport mechanism is changed so now it works in two steps: take a snapshot of a task and actual reimport
+translate5 - 7.15.1: Migration fix
+
+
 ## [7.15.0] - 2024-12-27
 
 ### Important Notes:
