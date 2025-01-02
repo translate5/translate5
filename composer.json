@@ -15,7 +15,6 @@
       "MittagQI\\Translate5\\Plugins\\": "application/modules/editor/Plugins",
       "Translate5\\MaintenanceCli\\": "Translate5/MaintenanceCli",
       "Translate5\\PHPCodeSniffer\\": "PHPCodeSniffer",
-      "Translate5\\MaintenanceCli\\": "Translate5/MaintenanceCli",
       "MittagQI\\Translate5\\Test\\": "application/modules/editor/testcases"
     },
     "psr-0": {
@@ -165,7 +164,8 @@
     "psr/event-dispatcher": "^1.0",
     "psr/http-client": "^1.0",
     "phar-io/version": "^3.2",
-    "translate5/php-html-parser": "dev-master"
+    "translate5/php-html-parser": "dev-master",
+    "fakerphp/faker": "^1.24"
   },
   "extra": {
     "merge-plugin": {

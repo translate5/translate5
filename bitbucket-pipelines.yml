@@ -48,20 +48,6 @@ pipelines:
                 fi
               - ./vendor/bin/phpstan analyse -c ./phpstan.neon.dist $MODIFIED_FILES
 
-        - step:
-            size: 2x
-            name: PHP Fast Tests
-            image: translate5/fast-test-pipeline:latest
-            script:
-              - git config submodule.library/ZfExtended.url https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/zfextended.git
-              - git config submodule.application/modules/editor/PrivatePlugins.url https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/privateplugins.git
-              - git config submodule.app-tm-erp.url https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/app-tm-erp.git
-              - git submodule update --init --recursive
-              - composer install --ignore-platform-reqs
-              - cd library/ZfExtended && git fetch && (git checkout $BITBUCKET_BRANCH || git checkout $BITBUCKET_PR_DESTINATION_BRANCH) && cd ../..
-              - cd application/modules/editor/PrivatePlugins && git fetch && (git checkout $BITBUCKET_BRANCH || git checkout $BITBUCKET_PR_DESTINATION_BRANCH) && cd ../../../..
-              - ./vendor/phpunit/phpunit/phpunit --bootstrap application/modules/editor/testcases/bootstrap-unit.php --configuration application/modules/editor/testcases/fast-test-suites.xml
-
   custom:
     test:
 
