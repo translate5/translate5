@@ -89,7 +89,7 @@ class ClientFactory
     {
         return Middleware::log(
             $this->logger,
-            new MessageFormatter('REQUEST: {method} {uri} HTTP/{version} {req_body}')
+            new MessageFormatter("REQUEST: {method} {uri} HTTP/{version}:\n {req_body}")
         );
     }
 
@@ -97,7 +97,7 @@ class ClientFactory
     {
         return Middleware::log(
             $this->logger,
-            new MessageFormatter('RESPONSE: {uri} {code} - {res_body}')
+            new MessageFormatter("RESPONSE: {uri} {code}:\n {res_body}")
         );
     }
 }
