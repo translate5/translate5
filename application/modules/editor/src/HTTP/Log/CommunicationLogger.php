@@ -37,7 +37,8 @@ class CommunicationLogger implements LoggerInterface
     private function __construct(
         private readonly \Zend_Config $config,
         private readonly \ZfExtended_Logger $logger,
-    ) {}
+    ) {
+    }
 
     public static function create()
     {
@@ -47,47 +48,47 @@ class CommunicationLogger implements LoggerInterface
         );
     }
 
-    public function emergency($message, array $context = array()): void
+    public function emergency($message, array $context = []): void
     {
         $this->log('emergency', $message, $context);
     }
 
-    public function alert($message, array $context = array()): void
+    public function alert($message, array $context = []): void
     {
         $this->log('alert', $message, $context);
     }
 
-    public function critical($message, array $context = array()): void
+    public function critical($message, array $context = []): void
     {
         $this->log('critical', $message, $context);
     }
 
-    public function error($message, array $context = array()): void
+    public function error($message, array $context = []): void
     {
         $this->log('error', $message, $context);
     }
 
-    public function warning($message, array $context = array()): void
+    public function warning($message, array $context = []): void
     {
         $this->log('warning', $message, $context);
     }
 
-    public function notice($message, array $context = array()): void
+    public function notice($message, array $context = []): void
     {
         $this->log('notice', $message, $context);
     }
 
-    public function info($message, array $context = array()): void
+    public function info($message, array $context = []): void
     {
         $this->log('info', $message, $context);
     }
 
-    public function debug($message, array $context = array()): void
+    public function debug($message, array $context = []): void
     {
         $this->log('debug', $message, $context);
     }
 
-    public function log($level, $message, array $context = array()): void
+    public function log($level, $message, array $context = []): void
     {
         $pattern = '/(?:REQUEST: [A-Z]+ |RESPONSE: )(?<uri>\S+)/';
 
