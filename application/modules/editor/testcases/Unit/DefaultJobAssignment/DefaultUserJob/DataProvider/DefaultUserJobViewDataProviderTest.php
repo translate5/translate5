@@ -141,9 +141,52 @@ class DefaultUserJobViewDataProviderTest extends TestCase
         $this->checkRow($row, $jobs[1], $lspJob);
     }
 
+    public function testBuildJobViewFromArray(): void
+    {
+        $jobs = $this->getJobMocks();
+
+        $lspJob = $this->createMock(DefaultLspJob::class);
+        $lspJob->method('__call')->willReturnMap([
+            ['getId', [], 12],
+            ['getLspId', [], 13],
+        ]);
+        $this->defaultLspJobRepository
+            ->method('findDefaultLspJobByDataJobId')
+            ->willReturn($lspJob);
+
+        $this->defaultUserJobPermissionAssert->method('isGranted')->willReturn(true);
+
+        $viewer = $this->createMock(User::class);
+
+        $job = $jobs[1];
+
+        $row = $this->provider->buildViewForList(
+            [
+                [
+                    'id' => (int) $job->getId(),
+                    'customerId' => (int) $job->getCustomerId(),
+                    'userGuid' => $job->getUserGuid(),
+                    'sourceLang' => (int) $job->getSourceLang(),
+                    'targetLang' => (int) $job->getTargetLang(),
+                    'workflow' => $job->getWorkflow(),
+                    'workflowStepName' => $job->getWorkflowStepName(),
+                    'deadlineDate' => (float) $job->getDeadlineDate(),
+                    'trackchangesShow' => (bool) $job->getTrackchangesShow(),
+                    'trackchangesShowAll' => (bool) $job->getTrackchangesShowAll(),
+                    'trackchangesAcceptReject' => (bool) $job->getTrackchangesAcceptReject(),
+                    'type' => TypeEnum::Lsp->value,
+                    'lspId' => $lspJob->getLspId(),
+                    'isLspJob' => true,
+                ]
+            ],
+            $viewer);
+
+        $this->checkRow($row[0], $job, $lspJob);
+    }
+
     private function checkRow(array $row, DefaultUserJob $job, ?DefaultLspJob $lspJob): void
     {
-        self::assertSame(
+        self::assertEquals(
             [
                 'id' => (int) $job->getId(),
                 'customerId' => (int) $job->getCustomerId(),

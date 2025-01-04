@@ -41,6 +41,7 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\ActionAssert\Permiss
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\User\Model\User;
 
 /**
@@ -70,20 +71,15 @@ class UserRestrictionAssert implements PermissionAssertInterface
 
     public function supports(BackedEnum $action): bool
     {
-        return true;
+        return $action instanceof DefaultJobAction;
     }
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if ($object->getUserGuid() === $context->actor->getUserGuid() && DefaultJobAction::Read === $action) {
-            return;
-        }
-
-        $user = $this->userRepository->getByGuid($object->getUserGuid());
-
         try {
+            $user = $this->userRepository->getByGuid($object->getUserGuid());
             $this->userPermissionAssert->assertGranted(UserAction::Read, $user, $context);
-        } catch (PermissionExceptionInterface) {
+        } catch (PermissionExceptionInterface|InexistentUserException) {
             throw new NoAccessToDefaultUserJobException($object);
         }
     }

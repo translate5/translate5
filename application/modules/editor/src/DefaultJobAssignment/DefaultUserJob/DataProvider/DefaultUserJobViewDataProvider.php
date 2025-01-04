@@ -80,6 +80,7 @@ class DefaultUserJobViewDataProvider
     }
 
     /**
+     * @param iterable<DefaultJob>|iterable<array> $jobs
      * @return DefaultJob[]
      */
     public function buildViewForList(iterable $jobs, User $viewer): array

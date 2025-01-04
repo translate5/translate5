@@ -74,7 +74,7 @@ class RolesValidator
                 throw new UserIsNotAuthorisedToAssignRoleException($role);
             }
 
-            if ($user->isAdmin() || $user->isPm() || $user->isClientPm()) {
+            if ($user->isAdmin() || $user->isPm()) {
                 continue;
             }
 

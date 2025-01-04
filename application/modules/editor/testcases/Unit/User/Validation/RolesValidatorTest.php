@@ -124,18 +124,27 @@ class RolesValidatorTest extends TestCase
     {
         yield [true];
         yield [false];
+        yield [null];
     }
 
     /**
      * @dataProvider aclAllowedProvider
      */
-    public function testHasAclPermissionToSetRole(bool $aclAllowed): void
+    public function testHasAclPermissionToSetRole(?bool $aclAllowed): void
     {
-        $this->acl->method('isInAllowedRoles')->willReturn($aclAllowed);
-
         $viewer = new User();
 
-        self::assertSame($aclAllowed, $this->validator->hasAclPermissionToSetRole($viewer, 'role'));
+        if (null !== $aclAllowed) {
+            $this->acl->method('isInAllowedRoles')->willReturn($aclAllowed);
+
+            self::assertSame($aclAllowed, $this->validator->hasAclPermissionToSetRole($viewer, 'role'));
+
+            return;
+        }
+
+        $this->acl->method('isInAllowedRoles')->willThrowException(new \Zend_Acl_Exception());
+
+        self::assertFalse($this->validator->hasAclPermissionToSetRole($viewer, 'role'));
     }
 
     public function assertRolesCanBeSetForUserProvider(): iterable
@@ -223,8 +232,8 @@ class RolesValidatorTest extends TestCase
 
         yield 'user is clientpm' => [
             [Roles::ADMIN],
-            true,
-            null,
+            false,
+            UserIsNotAuthorisedToAssignRoleException::class,
             $clientPmUser,
         ];
 

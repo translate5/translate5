@@ -67,15 +67,11 @@ class CustomerRestrictionAssert implements PermissionAssertInterface
 
     public function supports(BackedEnum $action): bool
     {
-        return true;
+        return $action instanceof DefaultJobAction;
     }
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        if ($object->getUserGuid() === $context->actor->getUserGuid() && DefaultJobAction::Read === $action) {
-            return;
-        }
-
         try {
             $customer = $this->customerRepository->get((int) $object->getCustomerId());
 

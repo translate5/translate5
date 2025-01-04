@@ -28,19 +28,26 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\ActionAssert\Permission\Exception;
+namespace MittagQI\Translate5\Test\Unit\ActionAssert\Permission;
 
-use editor_Models_UserAssocDefault as DefaultUserJob;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\User\Model\User;
+use PHPUnit\Framework\TestCase;
 
-final class ActionNotAllowedException extends NoAccessException implements PermissionExceptionInterface
+class ActionPermissionAssertTest extends TestCase
 {
-    public function __construct(
-        public readonly DefaultJobAction $jobAction,
-        public readonly DefaultUserJob $userJob,
-    ) {
-        parent::__construct();
+    public function testThrowsExceptionIfNoAssertionsMade(): void
+    {
+        $assert = new class ([]) extends ActionPermissionAssert {
+        };
+
+        $this->expectExceptionMessage('No assertion made for action ' . Action::Read->value);
+
+        $user = $this->createMock(User::class);
+        $context = new PermissionAssertContext($user);
+
+        $assert->assertGranted(Action::Read, new \stdClass(), $context);
     }
 }

@@ -60,17 +60,4 @@ class NewDefaultUserJobDto
             $lspJobDto->trackChangesRights,
         );
     }
-
-    public static function fromDefaultLspJobDto(NewDefaultLspJobDto $lspJobDto): self
-    {
-        return new self(
-            $lspJobDto->customerId,
-            $lspJobDto->userGuid,
-            $lspJobDto->sourceLanguageId,
-            $lspJobDto->targetLanguageId,
-            $lspJobDto->workflow,
-            $lspJobDto->deadline,
-            $lspJobDto->trackChangesRights,
-        );
-    }
 }
