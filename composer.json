@@ -165,7 +165,9 @@
     "psr/http-client": "^1.0",
     "phar-io/version": "^3.2",
     "translate5/php-html-parser": "dev-master",
-    "fakerphp/faker": "^1.24"
+    "fakerphp/faker": "^1.24",
+    "php-http/curl-client": "^2.3",
+    "typesense/typesense-php": "^4.9"
   },
   "extra": {
     "merge-plugin": {
