@@ -63,11 +63,13 @@ $find147Version = function (array $serverList, string $serverName = ''): ?string
     return null;
 };
 
+$insideBitbucket = ($_ENV['BITBUCKET_BUILD_NUMBER'] ?? 0);
+
 // find a proper 147 server in the config
-$serverName = $find147Version($okapiConfig?->server?->toArray() ?? [], $okapiConfig?->serverUsed ?? '');
+$serverName = $insideBitbucket ? null : $find147Version($okapiConfig?->server?->toArray() ?? [], $okapiConfig?->serverUsed ?? '');
 
 // not found, the migration has to be aborted !!
-if ($serverName === null) {
+if ($serverName === null && ! $insideBitbucket) {
     // UGLY SPECIAL FOR API-TESTS:
     // When updating the database, updating the test-configs is done AFTER the db-updates have run
     // it can not be done before, as plugin-configs do not exist then
@@ -104,14 +106,16 @@ if ($serverName === null) {
 
 $db = Zend_Db_Table::getDefaultAdapter();
 
-$db->query(
-    'UPDATE `Zf_configuration` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
-    $serverName
-);
-$db->query(
-    'UPDATE `LEK_customer_config` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
-    $serverName
-);
+if ($serverName !== null) {
+    $db->query(
+        'UPDATE `Zf_configuration` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
+        $serverName
+    );
+    $db->query(
+        'UPDATE `LEK_customer_config` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
+        $serverName
+    );
+}
 
 $db->query(
     "DELETE FROM `Zf_configuration` WHERE `name` IN (" .

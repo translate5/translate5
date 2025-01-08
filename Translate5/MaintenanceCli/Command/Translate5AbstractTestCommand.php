@@ -556,8 +556,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     private function recreateTables(array $configs, string $environment): bool
     {
         // we define the configs as a global constant as it may is updated by PHP-database-updates
-        // this is a very ugly HACK, it seems there is no better options to keep tests via the seperate test-db running
-        define('APPLICATION_TEST_CONFIGS', $configs);
+        // this is a very ugly HACK, it seems there is no better options to keep tests via the separate test-db running
+        define('APPLICATION_TEST_CONFIGS', true);
         Zend_Registry::set('test_configs', $configs);
         // Create the tables from scratch
         $updater = new ZfExtended_Models_Installer_DbUpdater();
