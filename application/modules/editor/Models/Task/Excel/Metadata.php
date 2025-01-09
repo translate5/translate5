@@ -88,6 +88,8 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      */
     protected $translate;
 
+    private string $locale = 'en';
+
     /**
      * Create a new, empty excel
      * @return editor_Models_Task_Excel_Metadata
@@ -99,6 +101,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->sheetNameTaskOverview = $this->translate->_('Aufgaben');
         $this->sheetNameMetadata = $this->translate->_('Meta-Daten');
+        $this->locale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
     }
 
     /**
@@ -137,11 +140,9 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
 
         $customFields = Factory::get(Field::class)->loadAllSorted();
 
-        $locale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
-
         foreach ($customFields as $customField) {
             // Get label according to current locale
-            $label = json_decode($customField['label'], true)[$locale];
+            $label = json_decode($customField['label'], true)[$this->locale];
 
             $index = "customField{$customField['id']}";
 
@@ -252,8 +253,6 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
 
                     break;
                 case 'state':
-                    $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($task['taskGuid']);
-
                     try {
                         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($task['taskGuid']);
                     } catch (editor_Workflow_Exception $e) {
@@ -280,20 +279,14 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
 
                     break;
                 default:
-                    $value = $this->taskCustomColumns[$colName]['value'][$task[$colName]] ?? $task[$colName];
+                    /* customField1 value example:
+                    Array ( [en] => first value dropdown
+                            [de] => erster Wert Dropdown ) */
+                    $value = $this->taskCustomColumns[$colName]['value'][$task[$colName]][$this->locale] ?? $task[$colName];
 
                     break;
             }
 
-            // Fix taken from https://bitbucket.org/mittagqi/translate5/pull-requests/1520/diff
-            // According to Marc we don't spend time to fix it correctly
-            /* Fix when customField1 has value:
-            Array ( [en] => first value dropdown
-                    [de] => erster Wert Dropdown )
-            */
-            if (is_array($value)) {
-                continue;
-            }
             $sheet->setCellValue($sheetCol . $this->taskRow, $value);
             $sheetCol++;
         }
@@ -318,16 +311,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
     public function addFilter($filter)
     {
         $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
-        switch (true) {
-            case is_array($filter->value):
-                $value = implode(', ', $filter->value);
-
-                break;
-            default:
-                $value = $filter->value;
-
-                break;
-        }
+        $value = is_array($filter->value) ? implode(', ', $filter->value) : $filter->value;
         $sheet->setCellValue('A' . $this->metadataRow, $filter->property . ' ' . $filter->operator . ' ' . $value);
         $this->metadataRow++;
     }
