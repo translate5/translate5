@@ -483,7 +483,20 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         LanguageResource $languageResource = null,
         ?string $tmName = null,
     ): string {
-        return $this->t5MemoryConnector->getStatus($resource, $languageResource, $tmName);
+        if ($tmName) {
+            return $this->t5MemoryConnector->getStatus($resource, $languageResource, $tmName);
+        }
+
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+        foreach ($memories as ['filename' => $name]) {
+            $status = $this->t5MemoryConnector->getStatus($resource, $languageResource, $name);
+
+            if ($status !== LanguageResourceStatus::AVAILABLE) {
+                return $status;
+            }
+        }
+
+        return LanguageResourceStatus::AVAILABLE;
     }
 
     private function updateSegmentInMemory(
