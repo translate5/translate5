@@ -156,6 +156,10 @@ class DefaultUserJobRepository
     {
         $userGuids = $this->lspUserRepository->getUserGuids($lspId);
 
+        if (empty($userGuids)) {
+            return yield from [];
+        }
+
         $select = $this->db
             ->select()
             ->from(DefaultUserJobTable::TABLE_NAME)
