@@ -25,6 +25,51 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.15.2] - 2025-01-09
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4362](https://jira.translate5.net/browse/TRANSLATE-4362): TM Maintenance - Error message when deleting a segment should be changed** <br>
+Error message when deleting a segment in TM Maintenace changed to be more accurate
+
+**[TRANSLATE-4357](https://jira.translate5.net/browse/TRANSLATE-4357): t5memory - Splitted TMs: Save segments in part with lowest number and still space** <br>
+Add support of block overflow error from t5memory, now memory part stays writable in case block overflow error occurs.
+
+**[TRANSLATE-4349](https://jira.translate5.net/browse/TRANSLATE-4349): t5memory - Add new error code for memory overflow** <br>
+Added new error code that is handled as memory overflow
+
+**[TRANSLATE-4347](https://jira.translate5.net/browse/TRANSLATE-4347): t5memory - Add flushing memory if overflow error occurres** <br>
+Added saving memory to the disk in case overflown error occurs
+
+**[TRANSLATE-4328](https://jira.translate5.net/browse/TRANSLATE-4328): SpellCheck (LanguageTool integration) - Introduce task level config for setting the LanguageTool config value level** <br>
+Introduce a a way to pass additional configuration parameters to SpellCheck Languagetool and added the rule level parameter.
+
+
+### Bugfixes
+**[TRANSLATE-4356](https://jira.translate5.net/browse/TRANSLATE-4356): Editor general - Find next prev segment in workflow calculation was done wrong on server** <br>
+The prev / next segment in workflow calculation was producing wrong results.
+
+**[TRANSLATE-4354](https://jira.translate5.net/browse/TRANSLATE-4354): Export - Transit plugin: error on export because of not matching segment it** <br>
+Fix export problem in transit plugin.
+
+**[TRANSLATE-4350](https://jira.translate5.net/browse/TRANSLATE-4350): t5memory - Wrong data sent to t5memory and sometimes re-import of failed tasks did not work** <br>
+Added migration script for fixing broken segments in t5memory
+
+**[TRANSLATE-4348](https://jira.translate5.net/browse/TRANSLATE-4348): Hotfolder Import - Wrong namespace in Hotfolder plugin.** <br>
+Fix namespaces.
+
+**[TRANSLATE-4331](https://jira.translate5.net/browse/TRANSLATE-4331): Editor general - Wrong workflow rendered in taskGrid** <br>
+translate5 - 7.15.0: Fix workflow column value rendered wrong.
+translate5 - 7.15.2: Wrong data used in renderer.
+
+**[TRANSLATE-4294](https://jira.translate5.net/browse/TRANSLATE-4294): Task Management - Fix custom fields handling on metadata export** <br>
+Fixed custom fields handling on metadata export
+
+
 ## [7.15.1] - 2024-12-31
 
 ### Important Notes:
