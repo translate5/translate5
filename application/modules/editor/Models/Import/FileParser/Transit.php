@@ -178,13 +178,12 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
                 continue;
             }
 
-            $transunitHash = $this->transunitHash->create($this->sourceFileId, $seg->getId());
-
-            $this->setMidWithHash($transunitHash, $segId);
+            $this->setMid($segId);
 
             //segment-id of transit is used as mid and thus used here
             $attributes = $this->createSegmentAttributes($this->_mid);
-            $attributes->transunitHash = $transunitHash;
+            $attributes->transunitHash = $this->transunitHash->create($this->sourceFileId, $seg->getId());
+            ;
             $attributes->transunitId = $segId;
             $attributes->mrkMid = $segId;
 
@@ -255,8 +254,8 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             return $this->contentProtector->protect(
                 $text,
                 $isSource,
-                $this->task->getSourceLang(),
-                $this->task->getTargetLang()
+                (int) $this->task->getSourceLang(),
+                (int) $this->task->getTargetLang()
             );
         });
         if (strpos($segment, '<') === false) {

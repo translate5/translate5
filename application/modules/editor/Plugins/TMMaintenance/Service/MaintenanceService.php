@@ -74,6 +74,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
             'E1333' => 'The queried OpenTM2 server has to many open TMs!',
             'E1306' => 'Could not save segment to TM',
+            'E1688' => 'Could not delete segment',
             'E1377' => 'Memory status: {status}. Please try again in a while.',
             'E1616' => 'T5Memory server version serving the selected memory is not supported',
             'E1611' => 't5memory: Requested segment not found. Probably it was deleted.',
@@ -240,14 +241,14 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
 
         if (! $successful) {
-            $this->logger->error('E1306', 'Failed to delete segment from memory', [
+            $this->logger->error('E1688', 'Failed to delete segment', [
                 'languageResource' => $this->languageResource,
                 'apiError' => $this->api->getError(),
             ]);
 
-            throw new \editor_Services_Connector_Exception('E1306', [
+            throw new \editor_Services_Connector_Exception('E1688', [
                 'languageResource' => $this->languageResource,
-                'error' => 'Failed to delete segment from memory',
+                'error' => 'Failed to delete segment',
             ]);
         }
     }
@@ -483,7 +484,20 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         LanguageResource $languageResource = null,
         ?string $tmName = null,
     ): string {
-        return $this->t5MemoryConnector->getStatus($resource, $languageResource, $tmName);
+        if ($tmName) {
+            return $this->t5MemoryConnector->getStatus($resource, $languageResource, $tmName);
+        }
+
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+        foreach ($memories as ['filename' => $name]) {
+            $status = $this->t5MemoryConnector->getStatus($resource, $languageResource, $name);
+
+            if ($status !== LanguageResourceStatus::AVAILABLE) {
+                return $status;
+            }
+        }
+
+        return LanguageResourceStatus::AVAILABLE;
     }
 
     private function updateSegmentInMemory(
