@@ -234,14 +234,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
 
-        $id = 0;
-        foreach ($memories as &$memory) {
-            $memory['id'] = $id++;
-            $memory['readonly'] = true;
-        }
-
         $memories[] = [
-            'id' => $id,
+            'id' => count($memories) + 1,
             'filename' => $tmName,
             'readonly' => false,
         ];
@@ -250,6 +244,26 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         if (! $isInternalFuzzy) {
             //saving it here makes the TM available even when the TMX import was crashed
+            $languageResource->save();
+        }
+    }
+
+    private function setMemoryReadonly(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $isInternalFuzzy = false
+    ): void {
+        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+
+        foreach ($memories as $key => $memory) {
+            if ($memory['filename'] === $tmName) {
+                $memories[$key]['readonly'] = true;
+            }
+        }
+
+        $languageResource->addSpecificData('memories', $memories);
+
+        if (! $isInternalFuzzy) {
             $languageResource->save();
         }
     }
@@ -499,7 +513,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         editor_Models_Segment $segment,
         bool $recheckOnUpdate
     ): void {
-        $attempts = 0;
         $elapsedTime = 0;
         $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
 
@@ -524,10 +537,22 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
             $apiError = $this->api->getError();
 
-            if ($attempts === 0 && $this->needsReorganizing($apiError, $tmName)) {
+            if ($this->needsReorganizing($apiError, $tmName)) {
                 $this->addReorganizeWarning($segment->getTask());
                 $this->reorganizeTm($tmName);
-            } elseif ($attempts === 0 && $this->isMemoryOverflown($apiError)) {
+            } elseif ($this->isMemoryOverflown($apiError)) {
+                if (! $this->isBlockOverflown($apiError)) {
+                    $this->setMemoryReadonly($this->languageResource, $tmName);
+                }
+
+                $newName = $this->persistenceService->getNextWritableMemory($this->languageResource, $tmName);
+
+                if ($newName) {
+                    $tmName = $newName;
+
+                    continue;
+                }
+
                 $this->addOverflowWarning($segment->getTask());
                 $this->flushMemory($tmName);
                 $newName = $this->generateNextMemoryName($this->languageResource);
@@ -552,7 +577,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 break;
             }
 
-            $attempts++;
             $elapsedTime = $this->getRetryDelaySeconds();
         }
 
@@ -1654,6 +1678,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             ',',
             $this->config->runtimeOptions->LanguageResources->t5memory->memoryOverflowErrorCodes
         );
+        $errorCodes = array_map(fn ($code) => 'rc = ' . $code, $errorCodes);
+
+        return isset($error->error)
+            && str_replace($errorCodes, '', $error->error) !== $error->error;
+    }
+
+    private function isBlockOverflown(?object $error): bool
+    {
+        if (null === $error) {
+            return false;
+        }
+
+        $errorCodes = ['5037'];
         $errorCodes = array_map(fn ($code) => 'rc = ' . $code, $errorCodes);
 
         return isset($error->error)
