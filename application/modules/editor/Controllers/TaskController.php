@@ -316,7 +316,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
         /* @var $kpi editor_Models_KPI */
-        $kpi->setTasks($rows);
+        $kpi->setTasks($rows['rows']);
         $kpiStatistics = $kpi->getStatistics();
 
         // For Front-End:
@@ -331,7 +331,7 @@ class editor_TaskController extends ZfExtended_RestController
         if ($context == 'xlsx') {
             $exportMetaData = ZfExtended_Factory::get('editor_Models_Task_Export_Metadata');
             /* @var $exportMetaData editor_Models_Task_Export_Metadata */
-            $exportMetaData->setTasks($rows);
+            $exportMetaData->setTasks($rows['rows']);
             $exportMetaData->setFilters(json_decode($this->getParam('filter')));
             $exportMetaData->setColumns(json_decode($this->getParam('visibleColumns')));
             $exportMetaData->setKpiStatistics($kpiStatistics);
