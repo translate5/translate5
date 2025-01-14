@@ -26,6 +26,26 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.15.3] - 2025-01-14
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4368](https://jira.translate5.net/browse/TRANSLATE-4368): t5memory - Create a command for manual fixing t5memory issues** <br>
+Added new temporary command for fixing t5memory issues
+
+**[TRANSLATE-4366](https://jira.translate5.net/browse/TRANSLATE-4366): TermTagger integration - Increase TermTagger delayed waiting-time** <br>
+FIX Problem with Delay-Processing: Delays have been erroneously reported as being too long ...
+
+
+### Bugfixes
+**[TRANSLATE-4364](https://jira.translate5.net/browse/TRANSLATE-4364): InstantTranslate - Instant-translate tasks are getting default user assignments** <br>
+Fix for a problem with instant translate tasks and default user assignment.
+
+
 ## [7.15.2] - 2025-01-09
 
 ### Important Notes:
