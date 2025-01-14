@@ -91,4 +91,9 @@ class LanguageResourcesDefaults implements ITaskDefaults
             }
         }
     }
+
+    public function canApplyDefaults(Task $task): bool
+    {
+        return true;
+    }
 }
