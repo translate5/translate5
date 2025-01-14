@@ -85,12 +85,12 @@ if (! in_array($version, ['7.15.0', '7.15.1', '7.16.0'])) {
 }
 #endregion
 
-#resion trigger reimport for tasks where wrong data was sent to t5memory
+#region trigger reimport for tasks where wrong data was sent to t5memory
 
 $query = 'SELECT id FROM LEK_task WHERE taskGuid IN (
             SELECT taskGuid
             FROM LEK_task_log
-            WHERE created > \'2025-01-07 00:00:00\'
+            WHERE created > \'2025-01-07 00:00:00\' AND created < \'2025-01-10 00:00:00\'
             AND domain = \'editor.workflow\'
             AND extra LIKE \'%"newStep":"workflowEnded"%\'
         )';
@@ -108,7 +108,7 @@ foreach ($ids as $id) {
     $maintenanceService = new MaintenanceService();
 
     //clear language resources from broken data
-    foreach ($data[\editor_Services_Manager::SERVICE_OPENTM2] as $languageResourceData) {
+    foreach ($data[\editor_Services_Manager::SERVICE_OPENTM2] ?? [] as $languageResourceData) {
         $languageResource = new \editor_Models_LanguageResources_LanguageResource();
         $languageResource->load($languageResourceData['id']);
 
@@ -150,14 +150,38 @@ foreach ($ids as $id) {
                 $deleteDto = DeleteBatchDTO::fromArray($searchCriteria);
                 $searchDto = SearchDTO::fromArray($searchCriteria);
 
-                $result = $maintenanceService->search('', $field, '', searchDTO: $searchDto);
+                $timeElapsed = 0;
+                while (true) {
+                    if ($timeElapsed >= 3200) {
+                        $logger->error(
+                            'E0000',
+                            'Migration 451-TRANSLATE-4350: Failed to check if memory has broken data',
+                            [
+                                'languageResource' => $languageResource,
+                            ]
+                        );
+
+                        continue 2;
+                    }
+
+                    try {
+                        $result = $maintenanceService->search('', $field, '', searchDTO: $searchDto);
+                    } catch (\editor_Services_Connector_Exception) {
+                        sleep(2);
+                        $timeElapsed += 2;
+
+                        continue;
+                    }
+
+                    break;
+                }
 
                 while (count($result->getResult()) > 0) {
                     try {
                         $maintenanceService->deleteBatch($deleteDto);
                     } catch (\Throwable $e) {
                         $logger->error('E0000', 'Migration 451-TRANSLATE-4350: Failed to delete segments', [
-                            'languageResource' => $languageResource->getResource(),
+                            'languageResource' => $languageResource,
                             'error' => $e->getMessage(),
                         ]);
 
@@ -177,7 +201,19 @@ foreach ($ids as $id) {
                         $timeElapsed += 2;
                     }
 
-                    $result = $maintenanceService->search('', $field, '', searchDTO: $searchDto);
+                    try {
+                        $result = $maintenanceService->search('', $field, '', searchDTO: $searchDto);
+                    } catch (\editor_Services_Connector_Exception) {
+                        $logger->error(
+                            'E0000',
+                            'Migration 451-TRANSLATE-4350: Failed to check if memory has broken data',
+                            [
+                                'languageResource' => $languageResource,
+                            ]
+                        );
+
+                        break;
+                    }
                 }
             }
         }
