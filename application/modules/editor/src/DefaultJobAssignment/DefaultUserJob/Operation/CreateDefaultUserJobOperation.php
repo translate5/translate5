@@ -31,23 +31,23 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation;
 
 use editor_Models_UserAssocDefault as DefaultUserJob;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CustomerDoesNotBelongToCoordinatorGroupException;
+use MittagQI\Translate5\CoordinatorGroup\Validation\CoordinatorGroupCustomerAssociationValidator;
 use MittagQI\Translate5\DefaultJobAssignment\Contract\CreateDefaultUserJobOperationInterface;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Exception\NotLspCustomerException;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Exception\NotCoordinatorGroupCustomerException;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DTO\NewDefaultUserJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultUserJobAlreadyExistsException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
 
 class CreateDefaultUserJobOperation implements CreateDefaultUserJobOperationInterface
 {
     public function __construct(
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
-        private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
+        private readonly CoordinatorGroupCustomerAssociationValidator $coordinatorGroupCustomerAssociationValidator,
     ) {
     }
 
@@ -58,28 +58,28 @@ class CreateDefaultUserJobOperation implements CreateDefaultUserJobOperationInte
     {
         return new self(
             DefaultUserJobRepository::create(),
-            LspUserRepository::create(),
-            LspCustomerAssociationValidator::create(),
+            CoordinatorGroupUserRepository::create(),
+            CoordinatorGroupCustomerAssociationValidator::create(),
         );
     }
 
     /**
      * @throws DefaultUserJobAlreadyExistsException
-     * @throws NotLspCustomerException
-     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
+     * @throws NotCoordinatorGroupCustomerException
+     * @throws OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException
      */
     public function assignJob(NewDefaultUserJobDto $dto): DefaultUserJob
     {
-        $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
+        $groupUser = $this->coordinatorGroupUserRepository->findByUserGuid($dto->userGuid);
 
-        if (null !== $lspUser) {
+        if (null !== $groupUser) {
             try {
-                $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(
-                    (int) $lspUser->lsp->getId(),
+                $this->coordinatorGroupCustomerAssociationValidator->assertCustomersAreSubsetForCoordinatorGroup(
+                    (int) $groupUser->group->getId(),
                     $dto->customerId
                 );
-            } catch (CustomerDoesNotBelongToLspException) {
-                throw new NotLspCustomerException();
+            } catch (CustomerDoesNotBelongToCoordinatorGroupException) {
+                throw new NotCoordinatorGroupCustomerException();
             }
         }
 

@@ -41,7 +41,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
     strings: {
         confirmDeleteTitle: '#UT#Eintrag löschen?',
         confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
-        confirmDeleteLspJob: '#UT#Soll dieser Eintrag wirklich gelöscht werden? Dieser Eintrag ist ein LSP-Job und wird auch in der LSP-Übersicht gelöscht.',
+        confirmDeleteCoordinatorGroupJob: '#UT#userJob.delete.confirmDeleteCoordinatorGroupJob',
         userGuidCol: '#UT#Benutzer',
         typeCol: '#UT#Typ',
         roleCol: '#UT#Rolle',
@@ -97,7 +97,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                     renderer: function (v, meta, rec) {
                         const types = {
                             1: 'Editor',
-                            2: 'LSP',
+                            2: 'Coordinator',
                         };
 
                         return types[v];
@@ -191,8 +191,8 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                                 return;
                             }
 
-                            let confirmDeleteMessage = toDelete[0].get('isLspJob')
-                                ? me.strings.confirmDeleteLspJob
+                            let confirmDeleteMessage = toDelete[0].get('isCoordinatorGroupJob')
+                                ? me.strings.confirmDeleteCoordinatorGroupJob
                                 : me.strings.confirmDelete;
 
                             Ext.Msg.confirm(me.strings.confirmDeleteTitle, confirmDeleteMessage, function (btn) {
@@ -226,7 +226,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
 
         config.viewConfig = {
             getRowClass: function (record, rowIndex, rowParams, store) {
-                return record.get('isLspJob') ? 'lsp-job-row' : '';
+                return record.get('isCoordinatorGroupJob') ? 'coordinator-group-job-row' : '';
             }
         };
 

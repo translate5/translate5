@@ -33,24 +33,24 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Operation;
 use editor_Models_TaskUserAssoc as UserJob;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CantCreateCoordinatorFromUserException;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CoordinatorDontBelongToLCoordinatorGroupException;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Exception\NotFoundCoordinatorGroupJobException;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Model\CoordinatorGroupJob;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\UpdateUserJobOperationInterface;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\AssignedUserCanBeChangedOnlyForCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidWorkflowProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidWorkflowStepProvidedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\WorkflowUpdateProhibitedForLspJobsException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\WorkflowUpdateProhibitedForCoordinatorGroupJobsException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\UpdateUserJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\TrackChangesRightsValidator;
-use MittagQI\Translate5\LSP\Exception\CantCreateCoordinatorFromUserException;
-use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\TaskLockService;
@@ -64,8 +64,8 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
         private readonly TaskRepository $taskRepository,
-        private readonly LspJobRepository $lspJobRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
         private readonly UserJobActionFeasibilityAssert $feasibilityAssert,
         private readonly ZfExtended_Logger $logger,
         private readonly editor_Workflow_Manager $workflowManager,
@@ -83,8 +83,8 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         return new self(
             UserJobRepository::create(),
             TaskRepository::create(),
-            LspJobRepository::create(),
-            LspUserRepository::create(),
+            CoordinatorGroupJobRepository::create(),
+            CoordinatorGroupUserRepository::create(),
             UserJobActionFeasibilityAssert::create(),
             Zend_Registry::get('logger')->cloneMe('userJob.update'),
             new editor_Workflow_Manager(),
@@ -105,7 +105,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         try {
             $this->feasibilityAssert->assertAllowed(Action::Update, $job);
 
-            $lspJob = $this->resolveLspJob($job, $dto);
+            $groupJob = $this->resolveCoordinatorGroupJob($job, $dto);
 
             $oldJob = clone $job;
 
@@ -117,11 +117,11 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
 
             $this->updateWorkflow($job, $dto);
 
-            if (null !== $lspJob) {
-                $job->setLspJobId($lspJob->getId());
+            if (null !== $groupJob) {
+                $job->setCoordinatorGroupJobId($groupJob->getId());
             }
 
-            if (null !== $dto->segmentRange && ! $job->isLspJob()) {
+            if (null !== $dto->segmentRange && ! $job->isCoordinatorGroupJob()) {
                 $job->setSegmentrange($dto->segmentRange);
             }
 
@@ -129,7 +129,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
                 $job->setDeadlineDate($dto->deadlineDate);
             }
 
-            $this->updateTrackChangesRights($job, $lspJob, $dto);
+            $this->updateTrackChangesRights($job, $groupJob, $dto);
 
             $job->validate();
 
@@ -166,7 +166,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
     }
 
     /**
-     * @throws WorkflowUpdateProhibitedForLspJobsException
+     * @throws WorkflowUpdateProhibitedForCoordinatorGroupJobsException
      */
     private function updateWorkflow(UserJob $job, UpdateUserJobDto $dto): void
     {
@@ -182,49 +182,49 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
             return;
         }
 
-        if ($job->isLspJob()) {
-            throw new WorkflowUpdateProhibitedForLspJobsException();
+        if ($job->isCoordinatorGroupJob()) {
+            throw new WorkflowUpdateProhibitedForCoordinatorGroupJobsException();
         }
 
         $job->setRole($dto->workflow->role);
         $job->setWorkflowStepName($dto->workflow->workflowStepName);
     }
 
-    private function resolveLspJob(UserJob $job, UpdateUserJobDto $dto): ?LspJob
+    private function resolveCoordinatorGroupJob(UserJob $job, UpdateUserJobDto $dto): ?CoordinatorGroupJob
     {
-        if (! $job->isLspUserJob()) {
+        if (! $job->isCoordinatorGroupUserJob()) {
             return null;
         }
 
         if (null === $dto->workflow) {
-            return $this->lspJobRepository->get((int) $job->getLspJobId());
+            return $this->coordinatorGroupJobRepository->get((int) $job->getCoordinatorGroupJobId());
         }
 
-        $lspUser = $this->lspUserRepository->getByUserGuid($job->getUserGuid());
+        $groupUser = $this->coordinatorGroupUserRepository->getByUserGuid($job->getUserGuid());
 
         try {
-            return $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
-                (int) $lspUser->lsp->getId(),
+            return $this->coordinatorGroupJobRepository->getByCoordinatorGroupIdTaskGuidAndWorkflow(
+                (int) $groupUser->group->getId(),
                 $job->getTaskGuid(),
                 $dto->workflow->workflow,
                 $dto->workflow->workflowStepName,
             );
-        } catch (NotFoundLspJobException) {
+        } catch (NotFoundCoordinatorGroupJobException) {
             throw new InvalidWorkflowStepProvidedException();
         }
     }
 
     /**
-     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
+     * @throws TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException
      */
-    private function updateTrackChangesRights(UserJob $job, ?LspJob $lspJob, UpdateUserJobDto $dto): void
+    private function updateTrackChangesRights(UserJob $job, ?CoordinatorGroupJob $groupJob, UpdateUserJobDto $dto): void
     {
-        if (null !== $lspJob && ! $job->isLspJob()) {
-            $this->trackChangesRightsValidator->assertTrackChangesRightsAreSubsetOfLspJob(
+        if (null !== $groupJob && ! $job->isCoordinatorGroupJob()) {
+            $this->trackChangesRightsValidator->assertTrackChangesRightsAreSubsetOfCoordinatorGroupJob(
                 $dto->canSeeTrackChangesOfPrevSteps,
                 $dto->canSeeAllTrackChanges,
                 $dto->canAcceptOrRejectTrackChanges,
-                $lspJob,
+                $groupJob,
             );
         }
 
@@ -242,8 +242,8 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
     }
 
     /**
-     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
-     * @throws AssignedUserCanBeChangedOnlyForLspJobException
+     * @throws OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException
+     * @throws AssignedUserCanBeChangedOnlyForCoordinatorGroupJobException
      */
     private function updateAssignedUser(UserJob $job, UpdateUserJobDto $dto): void
     {
@@ -251,22 +251,22 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
             return;
         }
 
-        $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
+        $groupUser = $this->coordinatorGroupUserRepository->findByUserGuid($dto->userGuid);
 
-        if (! $job->isLspJob()) {
-            throw new AssignedUserCanBeChangedOnlyForLspJobException();
+        if (! $job->isCoordinatorGroupJob()) {
+            throw new AssignedUserCanBeChangedOnlyForCoordinatorGroupJobException();
         }
 
         try {
-            JobCoordinator::fromLspUser($lspUser);
+            JobCoordinator::fromCoordinatorGroupUser($groupUser);
         } catch (CantCreateCoordinatorFromUserException) {
-            throw new OnlyCoordinatorCanBeAssignedToLspJobException();
+            throw new OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException();
         }
 
-        $currentCoordinator = $this->lspUserRepository->getByUserGuid($job->getUserGuid());
+        $currentCoordinator = $this->coordinatorGroupUserRepository->getByUserGuid($job->getUserGuid());
 
-        if (! $currentCoordinator->lsp->same($lspUser->lsp)) {
-            throw new CoordinatorDontBelongToLspException();
+        if (! $currentCoordinator->group->same($groupUser->group)) {
+            throw new CoordinatorDontBelongToLCoordinatorGroupException();
         }
 
         $job->setUserGuid($dto->userGuid);

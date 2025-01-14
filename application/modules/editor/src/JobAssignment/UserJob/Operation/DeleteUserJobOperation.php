@@ -78,8 +78,8 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
 
     public function delete(UserJob $job): void
     {
-        if ($job->isLspJob()) {
-            throw new RuntimeException('Use DeleteLspJobAssignmentOperationInterface::delete for LSP jobs');
+        if ($job->isCoordinatorGroupJob()) {
+            throw new RuntimeException('Use DeleteLspJobAssignmentOperationInterface::delete for Coordinator group jobs');
         }
 
         $taskLock = $this->acquireLock($job->getTaskGuid());
@@ -95,8 +95,8 @@ class DeleteUserJobOperation implements DeleteUserJobOperationInterface
 
     public function forceDelete(UserJob $job): void
     {
-        if ($job->isLspJob()) {
-            throw new RuntimeException('Use DeleteLspJobOperationInterface::forceDelete for LSP jobs');
+        if ($job->isCoordinatorGroupJob()) {
+            throw new RuntimeException('Use DeleteLspJobOperationInterface::forceDelete for Coordinator group jobs');
         }
 
         $taskLock = $this->acquireLock($job->getTaskGuid());

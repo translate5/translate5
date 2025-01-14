@@ -31,15 +31,15 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Operations\LspUserCreateOperation;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\CoordinatorGroup\CoordinatorGroupUser;
+use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
+use MittagQI\Translate5\CoordinatorGroup\Operations\CoordinatorGroupUserCreateOperation;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserRolesSetterInterface;
-use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
+use MittagQI\Translate5\User\Exception\CoordinatorGroupMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
@@ -59,13 +59,13 @@ class UserCreateOperationTest extends TestCase
 
     private UserAssignCustomersOperationInterface|MockObject $assignCustomers;
 
-    private LspUserCreateOperation|MockObject $lspUserCreate;
+    private CoordinatorGroupUserCreateOperation|MockObject $coordinatorGroupUserCreateOperation;
 
     private ResetPasswordEmail|MockObject $resetPasswordEmail;
 
-    private LspRepositoryInterface|MockObject $lspRepository;
+    private CoordinatorGroupRepositoryInterface|MockObject $coordinatorGroupRepository;
 
-    private LspUserRepositoryInterface|MockObject $lspUserRepository;
+    private CoordinatorGroupUserRepositoryInterface|MockObject $coordinatorGroupUserRepository;
 
     private UserCreateOperation $operation;
 
@@ -75,26 +75,26 @@ class UserCreateOperationTest extends TestCase
         $this->setRoles = $this->createMock(UserRolesSetterInterface::class);
         $this->setPassword = $this->createMock(UserPasswordSetter::class);
         $this->assignCustomers = $this->createMock(UserAssignCustomersOperationInterface::class);
-        $this->lspUserCreate = $this->createMock(LspUserCreateOperation::class);
+        $this->coordinatorGroupUserCreateOperation = $this->createMock(CoordinatorGroupUserCreateOperation::class);
         $this->resetPasswordEmail = $this->createMock(ResetPasswordEmail::class);
-        $this->lspRepository = $this->createMock(LspRepositoryInterface::class);
-        $this->lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
+        $this->coordinatorGroupRepository = $this->createMock(CoordinatorGroupRepositoryInterface::class);
+        $this->coordinatorGroupUserRepository = $this->createMock(CoordinatorGroupUserRepositoryInterface::class);
 
         $this->operation = new UserCreateOperation(
             $this->userRepository,
             $this->setRoles,
             $this->setPassword,
             $this->assignCustomers,
-            $this->lspUserCreate,
+            $this->coordinatorGroupUserCreateOperation,
             $this->resetPasswordEmail,
-            $this->lspRepository,
-            $this->lspUserRepository,
+            $this->coordinatorGroupRepository,
+            $this->coordinatorGroupUserRepository,
         );
     }
 
-    public function testThrowsExceptionOnCoordinatorCreationIfNoLspProvided(): void
+    public function testThrowsExceptionOnCoordinatorCreationIfNoCoordinatorGroupProvided(): void
     {
-        $this->expectException(LspMustBeProvidedInJobCoordinatorCreationProcessException::class);
+        $this->expectException(CoordinatorGroupMustBeProvidedInJobCoordinatorCreationProcessException::class);
         $dto = new CreateUserDto(
             ZfExtended_Utils::guid(true),
             'test-login',
@@ -130,13 +130,13 @@ class UserCreateOperationTest extends TestCase
             'en',
         );
 
-        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $group = $this->createMock(CoordinatorGroup::class);
 
-        $this->lspRepository->method('get')->willReturn($lsp);
+        $this->coordinatorGroupRepository->method('get')->willReturn($group);
 
-        $this->lspUserCreate
-            ->method('createLspUser')
-            ->willReturn($this->createMock(LspUser::class))
+        $this->coordinatorGroupUserCreateOperation
+            ->method('createCoordinatorGroupUser')
+            ->willReturn($this->createMock(CoordinatorGroupUser::class))
         ;
 
         $this->resetPasswordEmail->expects(self::never())->method('sendTo');
@@ -152,7 +152,7 @@ class UserCreateOperationTest extends TestCase
         self::assertSame($user->getLocale(), $dto->locale);
     }
 
-    public function testLspUserCreated(): void
+    public function testCoordinatorGroupUserCreated(): void
     {
         $dto = new CreateUserDto(
             ZfExtended_Utils::guid(true),
@@ -183,9 +183,9 @@ class UserCreateOperationTest extends TestCase
             ->with(self::isInstanceOf(User::class), $dto->roles)
         ;
 
-        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $group = $this->createMock(CoordinatorGroup::class);
 
-        $this->lspRepository->method('get')->willReturn($lsp);
+        $this->coordinatorGroupRepository->method('get')->willReturn($group);
 
         $this->userRepository
             ->expects(self::exactly(2))
@@ -193,14 +193,14 @@ class UserCreateOperationTest extends TestCase
             ->with(self::isInstanceOf(User::class))
         ;
 
-        $this->lspUserCreate
+        $this->coordinatorGroupUserCreateOperation
             ->expects(self::once())
-            ->method('createLspUser')
+            ->method('createCoordinatorGroupUser')
             ->with(
-                $lsp,
+                $group,
                 self::isInstanceOf(User::class)
             )
-            ->willReturn($this->createMock(LspUser::class))
+            ->willReturn($this->createMock(CoordinatorGroupUser::class))
         ;
 
         $this->assignCustomers
@@ -257,14 +257,14 @@ class UserCreateOperationTest extends TestCase
                 $dto->roles
             );
 
-        $this->lspRepository->expects(self::never())->method('get');
+        $this->coordinatorGroupRepository->expects(self::never())->method('get');
 
         $this->userRepository
             ->expects(self::exactly(2))
             ->method('save')
             ->with(self::isInstanceOf(User::class));
 
-        $this->lspUserCreate->expects(self::never())->method('createLspUser');
+        $this->coordinatorGroupUserCreateOperation->expects(self::never())->method('createCoordinatorGroupUser');
 
         $this->assignCustomers
             ->expects(self::once())
@@ -313,14 +313,14 @@ class UserCreateOperationTest extends TestCase
                 $dto->roles
             );
 
-        $this->lspRepository->expects(self::never())->method('get');
+        $this->coordinatorGroupRepository->expects(self::never())->method('get');
 
         $this->userRepository
             ->expects(self::exactly(2))
             ->method('save')
             ->with(self::isInstanceOf(User::class));
 
-        $this->lspUserCreate->expects(self::never())->method('createLspUser');
+        $this->coordinatorGroupUserCreateOperation->expects(self::never())->method('createCoordinatorGroupUser');
 
         $this->assignCustomers->expects(self::once())->method('assignCustomers');
 
@@ -372,21 +372,21 @@ class UserCreateOperationTest extends TestCase
                 $dto->roles
             );
 
-        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $group = $this->createMock(CoordinatorGroup::class);
 
-        $this->lspRepository->method('get')->willReturn($lsp);
+        $this->coordinatorGroupRepository->method('get')->willReturn($group);
 
         $this->userRepository->method('delete')->with(self::isInstanceOf(User::class));
 
-        $lspUser = $this->createMock(LspUser::class);
+        $groupUser = $this->createMock(CoordinatorGroupUser::class);
 
-        $this->lspUserCreate
+        $this->coordinatorGroupUserCreateOperation
             ->expects(self::once())
-            ->method('createLspUser')
-            ->with($lsp, self::isInstanceOf(User::class))
-            ->willReturn($lspUser);
+            ->method('createCoordinatorGroupUser')
+            ->with($group, self::isInstanceOf(User::class))
+            ->willReturn($groupUser);
 
-        $this->lspUserRepository->expects(self::once())->method('delete')->with($lspUser);
+        $this->coordinatorGroupUserRepository->expects(self::once())->method('delete')->with($groupUser);
 
         $this->assignCustomers
             ->expects(self::once())

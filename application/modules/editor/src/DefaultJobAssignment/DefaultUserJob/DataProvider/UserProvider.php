@@ -32,11 +32,11 @@ namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\DataProvider;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\CoordinatorGroup\Model\Db\CoordinatorGroupCustomerTable;
+use MittagQI\Translate5\CoordinatorGroup\Model\Db\CoordinatorGroupUserTable;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderCustomerTable;
-use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\User\DataProvider\PermissionAwareUserFetcher;
 use MittagQI\Translate5\User\Model\User;
@@ -118,12 +118,12 @@ class UserProvider
             )
             ->joinLeft(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
+                    'groupUser' => CoordinatorGroupUserTable::TABLE_NAME,
                 ],
-                'lspUser.userId = user.id',
-                ['lspUser.lspId']
+                'groupUser.userId = user.id',
+                ['groupUser.groupId']
             )
-            ->where('lspUser.lspId IS NULL')
+            ->where('groupUser.groupId IS NULL')
             ->where('user.login != ?', ZfExtended_Models_User::SYSTEM_LOGIN)
         ;
 
@@ -131,7 +131,7 @@ class UserProvider
     }
 
     /**
-     * It is impossible to create LSP User job for LSP User without LSP job
+     * It is impossible to create CoordinatorGroup User job for CoordinatorGroup User without CoordinatorGroup job
      *
      * @return UserData[]
      */
@@ -147,25 +147,25 @@ class UserProvider
             )
             ->join(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
+                    'groupUser' => CoordinatorGroupUserTable::TABLE_NAME,
                 ],
-                'lspUser.userId = user.id',
+                'groupUser.userId = user.id',
                 []
             )
             ->join(
                 [
-                    'lspCustomer' => LanguageServiceProviderCustomerTable::TABLE_NAME,
+                    'coordinatorGroupCustomer' => CoordinatorGroupCustomerTable::TABLE_NAME,
                 ],
-                'lspCustomer.lspId = lspUser.lspId',
+                'coordinatorGroupCustomer.groupId = groupUser.groupId',
                 []
             )
-            ->where('lspCustomer.customerId = ?', $customerId)
+            ->where('coordinatorGroupCustomer.customerId = ?', $customerId)
         ;
 
         if ($viewer->isCoordinator()) {
             $coordinator = $this->jobCoordinatorRepository->getByUser($viewer);
 
-            $select->where('lspUser.lspId = ?', $coordinator->lsp->getId());
+            $select->where('groupUser.groupId = ?', $coordinator->group->getId());
         }
 
         return $this->permissionAwareUserFetcher->fetchVisible($select, $viewer);

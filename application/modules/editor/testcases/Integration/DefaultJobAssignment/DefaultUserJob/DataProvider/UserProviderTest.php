@@ -31,12 +31,12 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Integration\DefaultJobAssignment\DefaultUserJob\DataProvider;
 
 use editor_Models_Customer_Customer;
+use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
+use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroupCustomer;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\DataProvider\UserProvider;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
+use MittagQI\Translate5\Test\Fixtures\CoordinatorGroup\CoordinatorGroupFixtures;
+use MittagQI\Translate5\Test\Fixtures\CoordinatorGroup\CoordinatorGroupUserFixtures;
 use MittagQI\Translate5\Test\Fixtures\CustomerFixtures;
-use MittagQI\Translate5\Test\Fixtures\LSP\LspFixtures;
-use MittagQI\Translate5\Test\Fixtures\LSP\LspUserFixtures;
 use MittagQI\Translate5\Test\Fixtures\UserFixtures;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
@@ -57,38 +57,38 @@ class UserProviderTest extends TestCase
     /**
      * @var User[]
      */
-    private array $lspUsers;
+    private array $groupUsers;
 
     /**
      * @var User[]
      */
-    private array $lspCoordinators;
+    private array $groupCoordinators;
 
     /**
      * @var User[]
      */
-    private array $subLspUsers;
+    private array $subGroupUsers;
 
     /**
      * @var User[]
      */
-    private array $subLspCoordinators;
+    private array $subGroupCoordinators;
 
     /**
      * @var User[]
      */
-    private array $subSubLspUsers;
+    private array $subSubGroupUsers;
 
     /**
      * @var User[]
      */
-    private array $subSubLspCoordinators;
+    private array $subSubGroupCoordinators;
 
-    private LanguageServiceProvider $lsp;
+    private CoordinatorGroup $group;
 
-    private LanguageServiceProvider $subLsp;
+    private CoordinatorGroup $subGroup;
 
-    private LanguageServiceProvider $subSubLsp;
+    private CoordinatorGroup $subSubGroup;
 
     private User $admin;
 
@@ -108,8 +108,8 @@ class UserProviderTest extends TestCase
     public function setUp(): void
     {
         $this->userFixtures = UserFixtures::create();
-        $lspFixtures = LspFixtures::create();
-        $lspUserFixtures = LspUserFixtures::create();
+        $groupFixtures = CoordinatorGroupFixtures::create();
+        $groupUserFixtures = CoordinatorGroupUserFixtures::create();
 
         $this->customers = CustomerFixtures::create()->createCustomers(3);
 
@@ -121,17 +121,17 @@ class UserProviderTest extends TestCase
             (int) $this->customers[1]->getId(),
         ]);
 
-        $this->lsp = $lspFixtures->createLsps(1)[0];
-        $this->lspUsers = $lspUserFixtures->createLspUsers((int) $this->lsp->getId(), 3);
-        $this->lspCoordinators[] = $lspUserFixtures->createCoordinator((int) $this->lsp->getId());
+        $this->group = $groupFixtures->createCoordinatorGroups(1)[0];
+        $this->groupUsers = $groupUserFixtures->createCoordinatorGroupUsers((int) $this->group->getId(), 3);
+        $this->groupCoordinators[] = $groupUserFixtures->createCoordinator((int) $this->group->getId());
 
-        $this->subLsp = $lspFixtures->createSubLsps((int) $this->lsp->getId(), 1)[0];
-        $this->subLspUsers = LspUserFixtures::create()->createLspUsers((int) $this->subLsp->getId(), 3);
-        $this->subLspCoordinators[] = $lspUserFixtures->createCoordinator((int) $this->subLsp->getId());
+        $this->subGroup = $groupFixtures->createSubCoordinatorGroups((int) $this->group->getId(), 1)[0];
+        $this->subGroupUsers = CoordinatorGroupUserFixtures::create()->createCoordinatorGroupUsers((int) $this->subGroup->getId(), 3);
+        $this->subGroupCoordinators[] = $groupUserFixtures->createCoordinator((int) $this->subGroup->getId());
 
-        $this->subSubLsp = $lspFixtures->createSubLsps((int) $this->subLsp->getId(), 1)[0];
-        $this->subSubLspUsers = LspUserFixtures::create()->createLspUsers((int) $this->subSubLsp->getId(), 3);
-        $this->subSubLspCoordinators[] = $lspUserFixtures->createCoordinator((int) $this->subSubLsp->getId());
+        $this->subSubGroup = $groupFixtures->createSubCoordinatorGroups((int) $this->subGroup->getId(), 1)[0];
+        $this->subSubGroupUsers = CoordinatorGroupUserFixtures::create()->createCoordinatorGroupUsers((int) $this->subSubGroup->getId(), 3);
+        $this->subSubGroupCoordinators[] = $groupUserFixtures->createCoordinator((int) $this->subSubGroup->getId());
 
         foreach ($this->simpleUsers as $key => $user) {
             $user->assignCustomers([
@@ -141,23 +141,23 @@ class UserProviderTest extends TestCase
         }
 
         foreach ($this->customers as $customer) {
-            $lspCustomer = new LanguageServiceProviderCustomer();
-            $lspCustomer->setLspId((int) $this->lsp->getId());
-            $lspCustomer->setCustomerId((int) $customer->getId());
-            $lspCustomer->save();
+            $groupCustomer = new CoordinatorGroupCustomer();
+            $groupCustomer->setGroupId((int) $this->group->getId());
+            $groupCustomer->setCustomerId((int) $customer->getId());
+            $groupCustomer->save();
         }
 
         foreach ([0, 1] as $key) {
-            $lspCustomer = new LanguageServiceProviderCustomer();
-            $lspCustomer->setLspId((int) $this->subLsp->getId());
-            $lspCustomer->setCustomerId((int) $this->customers[$key]->getId());
-            $lspCustomer->save();
+            $groupCustomer = new CoordinatorGroupCustomer();
+            $groupCustomer->setGroupId((int) $this->subGroup->getId());
+            $groupCustomer->setCustomerId((int) $this->customers[$key]->getId());
+            $groupCustomer->save();
         }
 
-        $lspCustomer = new LanguageServiceProviderCustomer();
-        $lspCustomer->setLspId((int) $this->subSubLsp->getId());
-        $lspCustomer->setCustomerId((int) $this->customers[0]->getId());
-        $lspCustomer->save();
+        $groupCustomer = new CoordinatorGroupCustomer();
+        $groupCustomer->setGroupId((int) $this->subSubGroup->getId());
+        $groupCustomer->setCustomerId((int) $this->customers[0]->getId());
+        $groupCustomer->save();
 
         $this->provider = UserProvider::create();
     }
@@ -175,73 +175,73 @@ class UserProviderTest extends TestCase
             $customer->delete();
         }
 
-        foreach ($this->subSubLspUsers as $subSubLspUser) {
-            $subSubLspUser->delete();
+        foreach ($this->subSubGroupUsers as $subSubGroupUser) {
+            $subSubGroupUser->delete();
         }
-        foreach ($this->subSubLspCoordinators as $subSubLspCoordinator) {
-            $subSubLspCoordinator->delete();
+        foreach ($this->subSubGroupCoordinators as $subSubGroupCoordinator) {
+            $subSubGroupCoordinator->delete();
         }
-        $this->subSubLsp->delete();
+        $this->subSubGroup->delete();
 
-        foreach ($this->subLspUsers as $subLspUser) {
-            $subLspUser->delete();
+        foreach ($this->subGroupUsers as $subGroupUser) {
+            $subGroupUser->delete();
         }
-        foreach ($this->subLspCoordinators as $subLspCoordinator) {
-            $subLspCoordinator->delete();
+        foreach ($this->subGroupCoordinators as $subGroupCoordinator) {
+            $subGroupCoordinator->delete();
         }
-        $this->subLsp->delete();
+        $this->subGroup->delete();
 
-        foreach ($this->lspUsers as $lspUser) {
-            $lspUser->delete();
+        foreach ($this->groupUsers as $groupUser) {
+            $groupUser->delete();
         }
-        foreach ($this->lspCoordinators as $lspCoordinator) {
-            $lspCoordinator->delete();
+        foreach ($this->groupCoordinators as $groupCoordinator) {
+            $groupCoordinator->delete();
         }
-        $this->lsp->delete();
+        $this->group->delete();
     }
 
     private function adminDataProvider(): iterable
     {
-        $lspUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->lspUsers);
-        $lspCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->lspCoordinators);
-        $subLspUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->subLspUsers);
-        $subLspCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->subLspCoordinators);
-        $subSubLspUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->subSubLspUsers);
-        $subSubLspCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->subSubLspCoordinators);
+        $groupUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->groupUsers);
+        $groupCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->groupCoordinators);
+        $subGroupUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->subGroupUsers);
+        $subGroupCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->subGroupCoordinators);
+        $subSubGroupUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->subSubGroupUsers);
+        $subSubGroupCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->subSubGroupCoordinators);
 
         yield self::FIRST_CUSTOMER => [
             (int) $this->customers[0]->getId(),
             [
-                'lspUsers' => $lspUsers,
-                'lspCoordinators' => $lspCoordinators,
-                'subLspUsers' => $subLspUsers,
-                'subLspCoordinators' => $subLspCoordinators,
-                'subSubLspUsers' => $subSubLspUsers,
-                'subSubLspCoordinators' => $subSubLspCoordinators,
+                'groupUsers' => $groupUsers,
+                'groupCoordinators' => $groupCoordinators,
+                'subGroupUsers' => $subGroupUsers,
+                'subGroupCoordinators' => $subGroupCoordinators,
+                'subSubGroupUsers' => $subSubGroupUsers,
+                'subSubGroupCoordinators' => $subSubGroupCoordinators,
             ],
         ];
 
         yield self::SECOND_CUSTOMER => [
             (int) $this->customers[1]->getId(),
             [
-                'lspUsers' => $lspUsers,
-                'lspCoordinators' => $lspCoordinators,
-                'subLspUsers' => $subLspUsers,
-                'subLspCoordinators' => $subLspCoordinators,
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => $groupUsers,
+                'groupCoordinators' => $groupCoordinators,
+                'subGroupUsers' => $subGroupUsers,
+                'subGroupCoordinators' => $subGroupCoordinators,
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::THIRD_CUSTOMER => [
             (int) $this->customers[2]->getId(),
             [
-                'lspUsers' => $lspUsers,
-                'lspCoordinators' => $lspCoordinators,
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => $groupUsers,
+                'groupCoordinators' => $groupCoordinators,
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
     }
@@ -249,7 +249,7 @@ class UserProviderTest extends TestCase
     public function testAdminList(): void
     {
         foreach ($this->adminDataProvider() as $case => $data) {
-            $lspUsersData = $data[1];
+            $groupUsersData = $data[1];
             $list = $this->provider->getPossibleUsers($data[0], $this->admin);
 
             self::assertNotEmpty($list, "$case: List is empty");
@@ -280,7 +280,7 @@ class UserProviderTest extends TestCase
                 self::fail($case . ': Client PM not in list');
             }
 
-            $this->validateLspUsers($case, $lspUsersData, $userGuids);
+            $this->validateGroupUsers($case, $groupUsersData, $userGuids);
         }
     }
 
@@ -289,36 +289,36 @@ class UserProviderTest extends TestCase
         yield self::FIRST_CUSTOMER => [
             (int) $this->customers[0]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::SECOND_CUSTOMER => [
             (int) $this->customers[1]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::THIRD_CUSTOMER => [
             (int) $this->customers[2]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
     }
@@ -326,7 +326,7 @@ class UserProviderTest extends TestCase
     public function testPmList(): void
     {
         foreach ($this->pmDataProvider() as $case => $data) {
-            $lspUsersData = $data[1];
+            $groupUsersData = $data[1];
             $list = $this->provider->getPossibleUsers($data[0], $this->pm);
 
             self::assertNotEmpty($list, "$case: List is empty");
@@ -357,7 +357,7 @@ class UserProviderTest extends TestCase
                 self::fail($case . ': Client PM not in list');
             }
 
-            $this->validateLspUsers($case, $lspUsersData, $userGuids);
+            $this->validateGroupUsers($case, $groupUsersData, $userGuids);
         }
     }
 
@@ -366,36 +366,36 @@ class UserProviderTest extends TestCase
         yield self::FIRST_CUSTOMER => [
             (int) $this->customers[0]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::SECOND_CUSTOMER => [
             (int) $this->customers[1]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::THIRD_CUSTOMER => [
             (int) $this->customers[2]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
     }
@@ -403,7 +403,7 @@ class UserProviderTest extends TestCase
     public function testClientPmList(): void
     {
         foreach ($this->clientPmDataProvider() as $case => $data) {
-            $lspUsersData = $data[1];
+            $groupUsersData = $data[1];
             $list = $this->provider->getPossibleUsers($data[0], $this->pm);
 
             self::assertNotEmpty($list, "$case: List is empty");
@@ -434,48 +434,48 @@ class UserProviderTest extends TestCase
                 self::fail($case . ': Client PM not in list');
             }
 
-            $this->validateLspUsers($case, $lspUsersData, $userGuids);
+            $this->validateGroupUsers($case, $groupUsersData, $userGuids);
         }
     }
 
     private function coordinatorDataProvider(): iterable
     {
-        $lspUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->lspUsers);
-        $lspCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->lspCoordinators);
+        $groupUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->groupUsers);
+        $groupCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->groupCoordinators);
 
         yield self::FIRST_CUSTOMER => [
             (int) $this->customers[0]->getId(),
             [
-                'lspUsers' => $lspUsers,
-                'lspCoordinators' => $lspCoordinators,
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => $groupUsers,
+                'groupCoordinators' => $groupCoordinators,
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::SECOND_CUSTOMER => [
             (int) $this->customers[1]->getId(),
             [
-                'lspUsers' => $lspUsers,
-                'lspCoordinators' => $lspCoordinators,
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => $groupUsers,
+                'groupCoordinators' => $groupCoordinators,
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::THIRD_CUSTOMER => [
             (int) $this->customers[2]->getId(),
             [
-                'lspUsers' => $lspUsers,
-                'lspCoordinators' => $lspCoordinators,
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => $groupUsers,
+                'groupCoordinators' => $groupCoordinators,
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
     }
@@ -483,8 +483,8 @@ class UserProviderTest extends TestCase
     public function testCoordinatorList(): void
     {
         foreach ($this->coordinatorDataProvider() as $case => $data) {
-            $lspUsersData = $data[1];
-            $list = $this->provider->getPossibleUsers($data[0], $this->lspCoordinators[0]);
+            $groupUsersData = $data[1];
+            $list = $this->provider->getPossibleUsers($data[0], $this->groupCoordinators[0]);
 
             self::assertNotEmpty($list, "$case: List is empty");
 
@@ -514,57 +514,57 @@ class UserProviderTest extends TestCase
                 self::fail($case . ': Client PM in list');
             }
 
-            $this->validateLspUsers($case, $lspUsersData, $userGuids);
+            $this->validateGroupUsers($case, $groupUsersData, $userGuids);
         }
     }
 
-    private function subLspCoordinatorDataProvider(): iterable
+    private function subGroupCoordinatorDataProvider(): iterable
     {
-        $subLspUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->subLspUsers);
-        $subLspCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->subLspCoordinators);
+        $subGroupUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->subGroupUsers);
+        $subGroupCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->subGroupCoordinators);
 
         yield self::FIRST_CUSTOMER => [
             (int) $this->customers[0]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => $subLspUsers,
-                'subLspCoordinators' => $subLspCoordinators,
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => $subGroupUsers,
+                'subGroupCoordinators' => $subGroupCoordinators,
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::SECOND_CUSTOMER => [
             (int) $this->customers[1]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => $subLspUsers,
-                'subLspCoordinators' => $subLspCoordinators,
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => $subGroupUsers,
+                'subGroupCoordinators' => $subGroupCoordinators,
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::THIRD_CUSTOMER => [
             (int) $this->customers[2]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => $subLspUsers,
-                'subLspCoordinators' => $subLspCoordinators,
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => $subGroupUsers,
+                'subGroupCoordinators' => $subGroupCoordinators,
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
     }
 
-    public function testSubLspCoordinatorList(): void
+    public function testSubGroupCoordinatorList(): void
     {
-        foreach ($this->subLspCoordinatorDataProvider() as $case => $data) {
-            $lspUsersData = $data[1];
-            $list = $this->provider->getPossibleUsers($data[0], $this->subLspCoordinators[0]);
+        foreach ($this->subGroupCoordinatorDataProvider() as $case => $data) {
+            $groupUsersData = $data[1];
+            $list = $this->provider->getPossibleUsers($data[0], $this->subGroupCoordinators[0]);
 
             if (self::THIRD_CUSTOMER === $case) {
                 self::assertEmpty($list, "$case: List is not empty");
@@ -600,57 +600,57 @@ class UserProviderTest extends TestCase
                 self::fail($case . ': Client PM in list');
             }
 
-            $this->validateLspUsers($case, $lspUsersData, $userGuids);
+            $this->validateGroupUsers($case, $groupUsersData, $userGuids);
         }
     }
 
-    private function subSubLspCoordinatorDataProvider(): iterable
+    private function subSubGroupCoordinatorDataProvider(): iterable
     {
-        $subSubLspUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->subSubLspUsers);
-        $subSubLspCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->subSubLspCoordinators);
+        $subSubGroupUsers = array_map(fn (User $user) => $user->getUserGuid(), $this->subSubGroupUsers);
+        $subSubGroupCoordinators = array_map(fn (User $user) => $user->getUserGuid(), $this->subSubGroupCoordinators);
 
         yield self::FIRST_CUSTOMER => [
             (int) $this->customers[0]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => $subSubLspUsers,
-                'subSubLspCoordinators' => $subSubLspCoordinators,
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => $subSubGroupUsers,
+                'subSubGroupCoordinators' => $subSubGroupCoordinators,
             ],
         ];
 
         yield self::SECOND_CUSTOMER => [
             (int) $this->customers[1]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
 
         yield self::THIRD_CUSTOMER => [
             (int) $this->customers[2]->getId(),
             [
-                'lspUsers' => [],
-                'lspCoordinators' => [],
-                'subLspUsers' => [],
-                'subLspCoordinators' => [],
-                'subSubLspUsers' => [],
-                'subSubLspCoordinators' => [],
+                'groupUsers' => [],
+                'groupCoordinators' => [],
+                'subGroupUsers' => [],
+                'subGroupCoordinators' => [],
+                'subSubGroupUsers' => [],
+                'subSubGroupCoordinators' => [],
             ],
         ];
     }
 
-    public function testSubSubLspCoordinatorList(): void
+    public function testSubSubGroupCoordinatorList(): void
     {
-        foreach ($this->subSubLspCoordinatorDataProvider() as $case => $data) {
-            $lspUsersData = $data[1];
-            $list = $this->provider->getPossibleUsers($data[0], $this->subSubLspCoordinators[0]);
+        foreach ($this->subSubGroupCoordinatorDataProvider() as $case => $data) {
+            $groupUsersData = $data[1];
+            $list = $this->provider->getPossibleUsers($data[0], $this->subSubGroupCoordinators[0]);
 
             if (in_array($case, [self::SECOND_CUSTOMER, self::THIRD_CUSTOMER])) {
                 self::assertEmpty($list, "$case: List is not empty");
@@ -686,11 +686,11 @@ class UserProviderTest extends TestCase
                 self::fail($case . ': Client PM in list');
             }
 
-            $this->validateLspUsers($case, $lspUsersData, $userGuids);
+            $this->validateGroupUsers($case, $groupUsersData, $userGuids);
         }
     }
 
-    private function validateLspUsersGroup(string $case, string $groupName, array $guidsToCheck, array $userGuids): void
+    private function validateGroupUsersGroup(string $case, string $groupName, array $guidsToCheck, array $userGuids): void
     {
         $notInList = array_diff($guidsToCheck, $userGuids);
 
@@ -705,17 +705,17 @@ class UserProviderTest extends TestCase
         }
     }
 
-    private function validateLspUsers(string $case, mixed $lspUsersData, array $userGuids): void
+    private function validateGroupUsers(string $case, mixed $groupUsersData, array $userGuids): void
     {
-        $this->validateLspUsersGroup($case, 'LSP users', $lspUsersData['lspUsers'], $userGuids);
-        $this->validateLspUsersGroup($case, 'LSP Coordinators', $lspUsersData['lspCoordinators'], $userGuids);
-        $this->validateLspUsersGroup($case, 'Sub LSP users', $lspUsersData['subLspUsers'], $userGuids);
-        $this->validateLspUsersGroup($case, 'Sub LSP Coordinators', $lspUsersData['subLspCoordinators'], $userGuids);
-        $this->validateLspUsersGroup($case, 'Sub Sub LSP users', $lspUsersData['subSubLspUsers'], $userGuids);
-        $this->validateLspUsersGroup(
+        $this->validateGroupUsersGroup($case, 'Coordinator Group users', $groupUsersData['groupUsers'], $userGuids);
+        $this->validateGroupUsersGroup($case, 'Coordinator Group Coordinators', $groupUsersData['groupCoordinators'], $userGuids);
+        $this->validateGroupUsersGroup($case, 'Sub Coordinator Group users', $groupUsersData['subGroupUsers'], $userGuids);
+        $this->validateGroupUsersGroup($case, 'Sub Coordinator Group Coordinators', $groupUsersData['subGroupCoordinators'], $userGuids);
+        $this->validateGroupUsersGroup($case, 'Sub Sub Coordinator Group users', $groupUsersData['subSubGroupUsers'], $userGuids);
+        $this->validateGroupUsersGroup(
             $case,
-            'Sub Sub LSP Coordinators',
-            $lspUsersData['subSubLspCoordinators'],
+            'Sub Sub Coordinator Group Coordinators',
+            $groupUsersData['subSubGroupCoordinators'],
             $userGuids
         );
     }

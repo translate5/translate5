@@ -41,13 +41,14 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\ActionAssert\Permission\Asserts\CustomerRestrictionAssert;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\User\Model\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CustomerRestrictionAssertTest extends TestCase
 {
-    private ActionPermissionAssertInterface $customerPermissionAssert;
+    private MockObject|ActionPermissionAssertInterface $customerPermissionAssert;
 
-    private  CustomerRepository $customerRepository;
+    private MockObject|CustomerRepository $customerRepository;
 
     private CustomerRestrictionAssert $customerRestrictionAssert;
 

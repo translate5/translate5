@@ -33,13 +33,13 @@ namespace MittagQI\Translate5\DefaultJobAssignment\Contract;
 use editor_Models_UserAssocDefault as DefaultUserJob;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DTO\NewDefaultUserJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultUserJobAlreadyExistsException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException;
 
 interface CreateDefaultUserJobOperationInterface
 {
     /**
      * @throws DefaultUserJobAlreadyExistsException
-     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
+     * @throws OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException
      */
     public function assignJob(NewDefaultUserJobDto $dto): DefaultUserJob;
 }

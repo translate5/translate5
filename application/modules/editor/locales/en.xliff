@@ -10115,29 +10115,17 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Sie können den Kunden "{id}" hier nicht angeben</source>
                 <target>You can't provide customer "{id}" here</target>
             </trans-unit>
-            <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZXIgaXN0IGRlciBsZXR6dGUgSm9iLUtvb3JkaW5hdG9yIGRlcyBMU1AgIntsc3B9Ii4='>
-                <source>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".</source>
-                <target>The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".</target>
+            <trans-unit id='Y2Fubm90LWRlbGV0ZS11c2VyLmxhc3QtY29vcmRpbmF0b3I='>
+                <source>cannot-delete-user.last-coordinator</source>
+                <target>The user can not be deleted, he is last Job Coordinator of Coordinator group "{group}".</target>
             </trans-unit>
-            <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZGEgZXIgSm9iLUtvb3JkaW5hdG9yIHZvbiBlaW5pZ2VuIExTUC1BdWZ0csOkZ2VuIGlzdC4='>
-                <source>Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen LSP-Aufträgen ist.</source>
-                <target>The user can not be deleted, he is Job Coordinator of some LSP jobs.</target>
+            <trans-unit id='Y2Fubm90LWRlbGV0ZS11c2VyLmNvb3JkaW5hdG9yLWhhcy1hc3NpZ25lZC1ncm91cC1qb2Jz'>
+                <source>cannot-delete-user.coordinator-has-assigned-group-jobs</source>
+                <target>The user can not be deleted, he is Job Coordinator of some Coordinator group jobs.</target>
             </trans-unit>
-            <trans-unit id='dXNlci52YWxpZGF0aW9uLmVycm9yLmRlbGV0ZV9ub3RpZmlhYmxlX2Nvb3JkaW5hdG9y'>
-                <source>user.validation.error.delete_notifiable_coordinator</source>
-                <target>The user cannot be deleted because the user is currently configured as a Job Coordinator who will be notified when a new job is assigned to LSP "{lsp}".</target>
-            </trans-unit>
-            <trans-unit id='bHNwLmZvcm0ubm90aWZpYWJsZV9jb29yZGluYXRvcg=='>
-                <source>lsp.form.notifiable_coordinator</source>
-                <target>Notifiable Job Coordinator</target>
-            </trans-unit>
-            <trans-unit id='bHNwLmZvcm0ubm90aWZpYWJsZV9jb29yZGluYXRvci50b29sdGlw'>
-                <source>lsp.form.notifiable_coordinator.tooltip</source>
-                <target>Job Coordinator who will be notified when a new job is assigned to LSP.</target>
-            </trans-unit>
-            <trans-unit id='TFNQ'>
-                <source>LSP</source>
-                <target>LSP</target>
+            <trans-unit id='S29vcmRpbmF0b3JlbmdydXBwZW4='>
+                <source>Koordinatorengruppen</source>
+                <target>Coordinator Group</target>
             </trans-unit>
             <trans-unit id='ZGVmYXVsdF9nbG9zc2FyeV9pZA=='>
                 <source>default_glossary_id</source>
@@ -10167,29 +10155,29 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.</source>
                 <target>Language Service Provider is a mandatory field for the Job Coordinator role.</target>
             </trans-unit>
-            <trans-unit id='RGllIFJvbGxlICJKb2ItS29vcmRpbmF0b3IiIGthbm4gbnVyIGJlaSBkZXIgQmVudXR6ZXJlcnN0ZWxsdW5nIG9kZXIgZsO8ciBMU1AtQmVudXR6ZXIgZGVmaW5pZXJ0IHdlcmRlbi4='>
-                <source>Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung oder für LSP-Benutzer definiert werden.</source>
-                <target>Role "Job Coordinator" can be set only on User creation process or to LSP User.</target>
+            <trans-unit id='dXNlci51cGRhdGUucm9sZXMudW5hYmxlLXRvLWFzc2lnbi1qb2ItY29vcmRpbmF0b3Itcm9sZS10by1leGlzdGluZy11c2Vy'>
+                <source>user.update.roles.unable-to-assign-job-coordinator-role-to-existing-user</source>
+                <target>Role "Job Coordinator" can be set only on User creation process or to Coordinator group User.</target>
             </trans-unit>
             <trans-unit id='R2VnZWJlbmVyIHBhcmVudElkcy1XZXJ0IGthbm4gZsO8ciBrZWluZW4gQmVudXR6ZXIgYXVzZ2V3ZXJ0ZXQgd2VyZGVuIQ=='>
                 <source>Gegebener parentIds-Wert kann für keinen Benutzer ausgewertet werden!</source>
                 <target>Given parentIds value can not be evaluated to any user!</target>
             </trans-unit>
-            <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgTFNQIGV4aXN0aWVydCBuaWNodCAobWVociku'>
-                <source>Der referenzierte LSP existiert nicht (mehr).</source>
-                <target>The referenced LSP does not exist (anymore).</target>
+            <trans-unit id='Y29vcmRpbmF0b3ItZ3JvdXAtbm90LWZvdW5k'>
+                <source>coordinator-group-not-found</source>
+                <target>The referenced Coordinator group does not exist (anymore).</target>
             </trans-unit>
             <trans-unit id='RsO8ciBCZW51dHplciwgZGllIG5pY2h0IGRpZSBSb2xsZSBkZXMgSm9ia29vcmRpbmF0b3JzIGhhYmVuLCB3aXJkIGRlciBTcHJhY2hkaWVuc3RsZWlzdGVyIGF1dG9tYXRpc2NoIGVpbmdlc3RlbGx0Lg=='>
                 <source>Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.</source>
                 <target>Language Service Provider is set automaticaly for non Job Coordinator role users.</target>
             </trans-unit>
-            <trans-unit id='V29sbGVuIFNpZSBkZW4gTFNQIHdpcmtsaWNoIGzDtnNjaGVuPyBEaWVzZSBBa3Rpb24ga2FubiBuaWNodCByw7xja2fDpG5naWcgZ2VtYWNodCB3ZXJkZW4uIEJpdHRlIGJlYWNodGVuIFNpZSwgZGFzcyBtaXQgZGVtIEzDtnNjaGVuIGRlcyBMU1AgYXVjaCBhbGxlIHVudGVyZ2VvcmRuZXRlbiBMU1BzIG1pdCBhbGxlbiB6dWdlaMO2cmlnZW4gSm9iLUtvb3JkaW5hdG9yZW4gdW5kIEJlbnV0emVybiBtaXQgZGVuIGlobmVuIHp1Z2V3aWVzZW5lbiBKb2JzIGdlbMO2c2NodCB3ZXJkZW4u'>
-                <source>Wollen Sie den LSP wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden. Bitte beachten Sie, dass mit dem Löschen des LSP auch alle untergeordneten LSPs mit allen zugehörigen Job-Koordinatoren und Benutzern mit den ihnen zugewiesenen Jobs gelöscht werden.</source>
-                <target>Do you really want to delete LSP "{0}"? This action can not be undone.<br /> Please note that deleting LSP will delete all sub LSPs with all theirs job coordinators and users with their assigned jobs.</target>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jb25maXJtRGVsZXRlVGV4dA=='>
+                <source>coordinatorGroup.confirmDeleteText</source>
+                <target>Do you really want to delete Coordinator group "{0}"? This action can not be undone.<br /> Please note that deleting Coordinator group will delete all sub Groups with all theirs job coordinators and users with their assigned jobs.</target>
             </trans-unit>
-            <trans-unit id='Qml0dGUgZ2ViZW4gU2llIGRlbiBMU1AtTmFtZW4gaW4gZGFzIFRleHRmZWxkIHVudGVuIGVpbiwgdW0gZm9ydHp1ZmFocmVuLg=='>
-                <source>Bitte geben Sie den LSP-Namen in das Textfeld unten ein, um fortzufahren.</source>
-                <target>Please type the LSP name in the text field below to proceed.</target>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5lbnRlckNvb3JkaW5hdG9yR3JvdXBOYW1l'>
+                <source>coordinatorGroup.enterCoordinatorGroupName</source>
+                <target>Please type the Coordinator group name in the text field below to proceed.</target>
             </trans-unit>
             <trans-unit id='RmFsc2NoZXIgTmFtZQ=='>
                 <source>Falscher Name</source>
@@ -10198,14 +10186,6 @@ Synchronization always takes place in one direction: source data -> target
             <trans-unit id='RmFsc2NoZXIgTmFtZQ=='>
                 <source>Der {0} wurde erfolgreich gelöscht.</source>
                 <target>The {0} has been successfully deleted.</target>
-            </trans-unit>
-            <trans-unit id='RGVyIMO8YmVyZ2VvcmRuZXRlIEJlbnV0emVyIGRlcyBKb2ItS29vcmRpbmF0b3JzIGthbm4gbnVyIGRlciBQTSwgQWRtaW4gdW5kIEpvYi1Lb29yZGluYXRvciBkZXMgZWlnZW5lbiBvZGVyIMO8YmVyZ2VvcmRuZXRlbiBMU1Agc2Vpbg=='>
-                <source>Der übergeordnete Benutzer des Job-Koordinators kann nur der PM, Admin und Job-Koordinator des eigenen oder übergeordneten LSP sein</source>
-                <target>The parent user of the Job Coordinator can only be the PM, Admin and Job Coordinator of the own or parent LSP</target>
-            </trans-unit>
-            <trans-unit id='RGVyIMO8YmVyZ2VvcmRuZXRlIEJlbnV0emVyIGVpbmVzIExTUC1CZW51dHplcnMga2FubiBudXIgZGVyIEpvYmtvb3JkaW5hdG9yIGRlcyBlaWdlbmVuIFNwcmFjaGRpZW5zdGxlaXN0ZXJzIChMU1ApIHNlaW4u'>
-                <source>Der übergeordnete Benutzer eines LSP-Benutzers kann nur der Jobkoordinator des eigenen Sprachdienstleisters (LSP) sein.</source>
-                <target>The parent user of LSP user can only be the Job coordinator of the own LSP</target>
             </trans-unit>
             <trans-unit id='S3VuZGUgbmljaHQgYW5nZWdlYmVu'>
                 <source>Kunde nicht angegeben</source>
@@ -10231,9 +10211,9 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Zuweisung des Kunden aufheben</source>
                 <target>Unassign client</target>
             </trans-unit>
-            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIHZvbiBLdW5kZSB7MH0genUgTFNQIHsxfSBhdWZoZWJlbiB3b2xsZW4/IERhZHVyY2ggd2VyZGVuIGF1Y2ggYWxsZSBLdW5kZW4tTFNQIGJlem9nZW5lbiBKb2JzIGdlbMO2c2NodCBpbiBkZXIgZ2VzYW10ZW4gTGllZmVya2V0dGUgKFN1Yi1MU1BzIGV0Yy4pLg=='>
-                <source>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen? Dadurch werden auch alle Kunden-LSP bezogenen Jobs gelöscht in der gesamten Lieferkette (Sub-LSPs etc.).</source>
-                <target>Are you sure you want to unassign client {0} from LSP {1}? This will delete all client-LSP related jobs including all jobs of the whole supply chain (Sub LSPs etc.).</target>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jb25maXJtVW5hc3NpZ25DdXN0b21lcg=='>
+                <source>coordinatorGroup.confirmUnassignCustomer</source>
+                <target>Are you sure you want to unassign client {0} from Coordinator group {1}? This will delete all client-group related jobs including all jobs of the whole supply chain (Sub Groups etc.).</target>
             </trans-unit>
             <trans-unit id='VW5nw7xsdGlnZXIgSm9iIEtvb3JkaW5hdG9y'>
                 <source>Ungültiger Job Koordinator</source>
@@ -10243,13 +10223,9 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Ungültiger Wert bereitgestellt</source>
                 <target>Invalid value provided</target>
             </trans-unit>
-            <trans-unit id='TnVyIGRlciBLb29yZGluYXRvciBrYW5uIGVpbmVtIExTUC1BdWZ0cmFnIHp1Z2V3aWVzZW4gd2VyZGVu'>
-                <source>Nur der Koordinator kann einem LSP-Auftrag zugewiesen werden</source>
-                <target>Only Coordinator can be assigned to LSP job</target>
-            </trans-unit>
-            <trans-unit id='RGVyIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGthbm4gbnVyIGbDvHIgTFNQLUF1ZnRyYWcgZ2XDpG5kZXJ0IHdlcmRlbi4='>
-                <source>Der zugewiesene Benutzer kann nur für LSP-Auftrag geändert werden.</source>
-                <target>The assigned user can only be changed for LSP job</target>
+            <trans-unit id='TnVyIEtvb3JkaW5hdG9yIGthbm4gZGVtIEF1ZnRyYWcgZGVyIEdydXBwZSBLb29yZGluYXRvciB6dWdld2llc2VuIHdlcmRlbg=='>
+                <source>Nur Koordinator kann dem Auftrag der Gruppe Koordinator zugewiesen werden</source>
+                <target>Only Coordinator can be assigned to Coordinator group job</target>
             </trans-unit>
             <trans-unit id='U2llIGvDtm5uZW4gZsO8ciBkaWVzZW4gQmVudXR6ZXIga2VpbmUge3JvbGV9IGZlc3RsZWdlbi4='>
                 <source>Sie können für diesen Benutzer keine {role} festlegen.</source>
@@ -10259,45 +10235,57 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Die Koordinatorenrolle kann dem Benutzer nicht entzogen werden:</source>
                 <target>Can't remove Coordinator role from user: {reason}</target>
             </trans-unit>
-            <trans-unit id='QmVudXR6ZXIgaXN0IGxldHp0ZXIgSm9iLUtvb3JkaW5hdG9yIGRlcyBMU1A='>
-                <source>Benutzer ist letzter Job-Koordinator des LSP</source>
-                <target>The user is last Job Coordinator of LSP</target>
+            <trans-unit id='dXNlci5kZWxldGUubGFzdC1jb29yZGluYXRvci1vZi1ncm91cA=='>
+                <source>user.delete.last-coordinator-of-group</source>
+                <target>The user is last Job Coordinator of Coordinator group</target>
             </trans-unit>
-            <trans-unit id='RGVyIEJlbnV0emVyIGlzdCBKb2ItS29vcmRpbmF0b3IgZsO8ciBlaW5pZ2UgTFNQIEF1ZnRyw6RnZS4='>
-                <source>Der Benutzer ist Job-Koordinator für einige LSP Aufträge.</source>
-                <target>The user is the job coordinator for some LSP jobs.</target>
+            <trans-unit id='dXNlci5kZWxldGUuY29vcmRpbmF0b3ItaGFzLWFzc2lnbmVkLWdyb3VwLWpvYnM='>
+                <source>user.delete.coordinator-has-assigned-group-jobs</source>
+                <target>The user is the job coordinator for some Coordinator group jobs.</target>
             </trans-unit>
-            <trans-unit id='RGVyIEt1bmRlICJ7Y3VzdG9tZXJ9IiBrYW5uIG5pY2h0IGF1cyBkZW0gS29vcmRpbmF0b3IgZW50ZmVybnQgd2VyZGVuLCBkYSBlciBlaW5pZ2UgTFNQLUF1ZnRyw6RnZSBoYXQsIGRpZSB6dSBkaWVzZW0gS3VuZGVuIGdlaMO2cmVuLg=='>
-                <source>Der Kunde "{customer}" kann nicht aus dem Koordinator entfernt werden, da er einige LSP-Aufträge hat, die zu diesem Kunden gehören.</source>
-                <target>The customer “{customer}” cannot be removed from the Coordinator because it has some LSP jobs that belong to the customer.</target>
+            <trans-unit id='dXNlci5jdXN0b21lci51bi1hc3NpZ24ubm90LXBvc3NpYmxlLWFzLWNvb3JkaW5hdG9yLWhhcy1yZWxhdGVkLWNvb3JkaW5hdG9yLWdyb3VwLWpvYnM='>
+                <source>user.customer.un-assign.not-possible-as-coordinator-has-related-coordinator-group-jobs</source>
+                <target>The customer "{customer}" cannot be removed from the Coordinator because it has some Coordinator group jobs that belong to the customer.</target>
             </trans-unit>
-            <trans-unit id='QXVmZ2FiZSBnZWjDtnJ0IG5pY2h0IHp1IGVpbmVtIGRlciBMU1AtS3VuZGVuQXVmZ2FiZSBnZWjDtnJ0IG5pY2h0IHp1IGVpbmVtIGRlciBMU1AtS3VuZGVu'>
-                <source>Aufgabe gehört nicht zu einem der LSP-KundenAufgabe gehört nicht zu einem der LSP-Kunden</source>
-                <target>Task does not belong to one of LSP customers</target>
+            <trans-unit id='dXNlci5jdXN0b21lci51bi1hc3NpZ24ubm90LXBvc3NpYmxlLWFzLWl0LWhhcy1yZWxhdGVkLWpvYnM='>
+                <source>user.customer.un-assign.not-possible-as-it-has-related-jobs</source>
+                <target>The customer "{customer}" cannot be removed from the User because it has some jobs that belong to the customer.</target>
             </trans-unit>
-            <trans-unit id='RGVyIEtvb3JkaW5hdG9yIGdlaMO2cnQgbmljaHQgenVtIExTUA=='>
-                <source>Der Koordinator gehört nicht zum LSP</source>
-                <target>Coordinator does not belong to LSP</target>
+            <trans-unit id='bm90LWNvb3JkaW5hdG9yLWdyb3VwLWN1c3RvbWVyLXRhc2s='>
+                <source>not-coordinator-group-customer-task</source>
+                <target>Task does not belong to one of Coordinator group customers</target>
             </trans-unit>
-            <trans-unit id='TFNQLUJlbnV0emVyIGthbm4gZWluZW0gQXVmdHJhZyBuaWNodCB6dWdld2llc2VuIHdlcmRlbiwgYmV2b3IgZGVyIExTUC1BdWZ0cmFnIGVyc3RlbGx0IHd1cmRl'>
-                <source>LSP-Benutzer kann einem Auftrag nicht zugewiesen werden, bevor der LSP-Auftrag erstellt wurde</source>
-                <target>LSP user cannot be assigned to a job before the LSP job has been created</target>
+            <trans-unit id='Y29vcmRpbmF0b3ItZG9udC1iZWxvbmctdG8tY29vcmRpbmF0b3ItZ3JvdXA='>
+                <source>coordinator-dont-belong-to-coordinator-group</source>
+                <target>Coordinator does not belong to Coordinator group</target>
             </trans-unit>
-            <trans-unit id='RGVyIGVsdGVybGljaGUgTFNQIHZlcmbDvGd0IG5pY2h0IMO8YmVyIGVpbmUgYW5nZW1lc3NlbmUgQXVmZ2FiZW52ZXJ0ZWlsdW5n'>
-                <source>Der elterliche LSP verfügt nicht über eine angemessene Aufgabenverteilung</source>
-                <target>Parent LSP does not have appropriate job assignment</target>
+            <trans-unit id='am9iLWFzc2lnbm1lbnQuY3JlYXRlLmdyb3VwLXVzZXItam9iLWNhbi1ub3QtYmUtY3JlYXRlZC1iZWZvcmUtY29vcmRpbmF0b3ItZ3JvdXAtam9i'>
+                <source>job-assignment.create.group-user-job-can-not-be-created-before-coordinator-group-job</source>
+                <target>Coordinator group user cannot be assigned to a job before the Coordinator group job has been created</target>
             </trans-unit>
-            <trans-unit id='RGllIFJlY2h0ZSBkZXMgTFNQLUJlbnV0emVycyBzb2xsdGVuIGVpbmUgVGVpbG1lbmdlIGRlciBSZWNodGUgZGVzIExTUC0gQXVmdHJhZ3Mgc2Vpbi4='>
-                <source>Die Rechte des LSP-Benutzers sollten eine Teilmenge der Rechte des LSP- Auftrags sein.</source>
-                <target>The permissions of the LSP user should be a subset of the permissions of the LSP job.</target>
+            <trans-unit id='am9iLWFzc2lnbm1lbnQuY3JlYXRlLnBhcmVudC1jb29yZGluYXRvci1ncm91cC1kb2VzLW5vdC1oYXZlLWFwcHJvcHJpYXRlLWpvYg=='>
+                <source>job-assignment.create.parent-coordinator-group-does-not-have-appropriate-job</source>
+                <target>Parent Coordinator group does not have appropriate job assignment</target>
             </trans-unit>
-            <trans-unit id="dXNlckpvYi5kZWxldGUuY29uZmlybURlbGV0ZUxzcEpvYg==">
-                <source>userJob.delete.confirmDeleteLspJob</source>
-                <target>Should this entry really be deleted? This entry is an LSP job and by deleting it all sub LSP jobs as well as related LSP user jobs will be deleted.</target>
+            <trans-unit id='am9iLWFzc2lnbm1lbnQudHJhY2stY2hhbmdlcy1yaWdodHMtYXJlLW5vdC1zdWJzZXQtb2YtY29vcmRpbmF0b3ItZ3JvdXAtam9i'>
+                <source>job-assignment.track-changes-rights-are-not-subset-of-coordinator-group-job</source>
+                <target>The permissions of the Coordinator group user job should be a subset of the permissions of the Coordinator group job.</target>
             </trans-unit>
-            <trans-unit id="TFNQLUF1ZnRyYWcgaGF0IHZlcndhbmR0ZSBBdWZ0csOkZ2UsIGRpZSBuaWNodCBnZWzDtnNjaHQgd2VyZGVuIGvDtm5uZW4u">
-                <source>LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.</source>
-                <target>LSP job has related jobs that cannot be deleted.</target>
+            <trans-unit id="dXNlckpvYi5kZWxldGUuY29uZmlybURlbGV0ZUNvb3JkaW5hdG9yR3JvdXBKb2I=">
+                <source>userJob.delete.confirmDeleteCoordinatorGroupJob</source>
+                <target>Should this entry really be deleted? This entry is an Coordinator group job and by deleting it all sub group jobs as well as related Coordinator group user jobs will be deleted.</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQuZGVsZXRlLnRoZXJlLWlzLXVuLWRlbGV0YWJsZS1ib3VuZC1qb2I=">
+                <source>job-assignment.delete.there-is-un-deletable-bound-job</source>
+                <target>Coordinator group job has related jobs that cannot be deleted.</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQuY3JlYXRlLm9ubHktY29vcmRpbmF0b3ItY2FuLWJlLWFzc2lnbmVkLXRvLWNvb3JkaW5hdG9yLWdyb3VwLWpvYg==">
+                <source>job-assignment.create.only-coordinator-can-be-assigned-to-coordinator-group-job</source>
+                <target>Only Coordinator can be assigned to Coordinator group job</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQudXBkYXRlLmFzc2lnbmVkLXVzZXItY2FuLWJlLWNoYW5nZWQtb25seS1mb3ItY29vcmRpbmF0b3ItZ3JvdXAtam9i">
+                <source>job-assignment.update.assigned-user-can-be-changed-only-for-coordinator-group-job</source>
+                <target>Assigned user can be changed only for Coordinator group job</target>
             </trans-unit>
             <trans-unit id="RWluZSDDhG5kZXJ1bmcgZGVzIEF1ZmdhYmVuLVdvcmtmbG93cyBmw7xocnQgenVyIEzDtnNjaHVuZyBhbGxlciBBdWZ0cmFnc3p1d2Vpc3VuZ2VuLiBNw7ZjaHRlbiBTaWUgZm9ydGZhaHJlbj8=">
                 <source>Eine Änderung des Aufgaben-Workflows führt zur Löschung aller Auftragszuweisungen. Möchten Sie fortfahren?</source>
@@ -10311,9 +10299,9 @@ Synchronization always takes place in one direction: source data -> target
                 <source>Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe</source>
                 <target>Confirmed competitive job assignment already exsists</target>
             </trans-unit>
-            <trans-unit id='RGVyIEtvb3JkaW5hdG9yIGhhdCBkZW4gTFNQLUF1ZnRyYWcgbm9jaCBuaWNodCBiZXN0w6R0aWd0'>
-                <source>Der Koordinator hat den LSP-Auftrag noch nicht bestätigt</source>
-                <target>Coordinator has not yet confirmed the LSP job</target>
+            <trans-unit id='Y29vcmRpbmF0b3ItaGFzLW5vdC15ZXQtY29uZmlybWVkLXRoZS1jb29yZGluYXRvci1ncm91cC1qb2I='>
+                <source>coordinator-has-not-yet-confirmed-the-coordinator-group-job</source>
+                <target>Coordinator has not yet confirmed the Coordinator group job</target>
             </trans-unit>
             <trans-unit id='SWhyZSBadXdlaXN1bmcgenVyIEF1ZmdhYmUgd3VyZGUgZW50ZmVybnQsIGRhaGVyIGvDtm5uZW4gU2llIGRpZXNlIG5pY2h0IG1laHIgenVyIEJlYXJiZWl0dW5nIMO2ZmZuZW4u'>
                 <source>Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.</source>
@@ -10387,25 +10375,25 @@ etc.
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>No property is specified</target>
             </trans-unit>
-            <trans-unit id='RGVyIEtvb3JkaW5hdG9yIGRlcyDDvGJlcmdlb3JkbmV0ZW4gTFNQIGhhdCBkaWUgTFNQLVBvc2l0aW9uIG5vY2ggbmljaHQgYmVzdMOkdGlndA=='>
-                <source>Der Koordinator des übergeordneten LSP hat die LSP-Position noch nicht bestätigt</source>
-                <target>The Coordinator of the higher-level LSP has not yet confirmed the LSP job</target>
+            <trans-unit id='Y29vcmRpbmF0b3Itb2YtcGFyZW50LWdyb3VwLWhhcy1ub3QteWV0LWNvbmZpcm1lZC10aGUtY29vcmRpbmF0b3ItZ3JvdXAtam9i'>
+                <source>coordinator-of-parent-group-has-not-yet-confirmed-the-coordinator-group-job</source>
+                <target>The Coordinator of the higher-level Coordinator group has not yet confirmed the Coordinator group job</target>
             </trans-unit>
             <trans-unit id='RGllIGFuZGVyZW4gQmVudXR6ZXIga8O2bm5lbiBuaWNodCBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQgd2VyZGVuLCBldmVudHVlbGwgd2FyIGVpbiBhbmRlcmVyIEJlbnV0emVyIHNjaG5lbGxlciB1bmQgaGF0IFNpZSBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQu'>
                 <source>Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.</source>
                 <target>The other users cannot be removed from the task, another user may have been quicker and removed you from the task.</target>
             </trans-unit>
             <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZGEgZXIgSm9iLUtvb3JkaW5hdG9yIHZvbiBlaW5pZ2VuIFN0YW5kYXJkIExTUC1BdWZ0csOkZ2VuIGlzdC4='>
-                <source>Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen Standard LSP-Aufträgen ist.</source>
-                <target>The user can not be deleted, he is Job Coordinator of some default LSP jobs.</target>
+                <source>user.delete.coordinator-has-assigned-default-group-jobs</source>
+                <target>Der Benutzer kann nicht gelöscht werden, er ist Job-Koordinator einiger Standard-Aufträge der Koordinatorengruppe.</target>
             </trans-unit>
-            <trans-unit id='RGVyIEJlbnV0emVyIGlzdCBKb2ItS29vcmRpbmF0b3IgZsO8ciBlaW5pZ2UgU3RhbmRhcmQgTFNQIEF1ZnRyw6RnZS4='>
-                <source>Der Benutzer ist Job-Koordinator für einige Standard LSP Aufträge.</source>
-                <target>The user is the job coordinator for some default LSP jobs.</target>
+            <trans-unit id='dXNlci5kZWxldGUuY29vcmRpbmF0b3ItaGFzLWFzc2lnbmVkLWRlZmF1bHQtZ3JvdXAtam9icw=='>
+                <source>user.delete.coordinator-has-assigned-default-group-jobs</source>
+                <target>The user is the Job Coordinator for some default Coordinator group jobs.</target>
             </trans-unit>
-            <trans-unit id='S3VuZGUgaXN0IG5pY2h0IG1pdCBMU1AgZGVzIE51dHplcnMgdmVyYnVuZGVu'>
-                <source>Kunde ist nicht mit LSP des Nutzers verbunden</source>
-                <target>Customer is not connected to LSP of user</target>
+            <trans-unit id='S3VuZGUgaXN0IG5pY2h0IG1pdCBkZXIgQmVudXR6ZXJncnVwcGUgS29vcmRpbmF0b3IgdmVyYnVuZGVu'>
+                <source>Kunde ist nicht mit der Benutzergruppe Koordinator verbunden</source>
+                <target>Customer is not connected to Coordinator group of user</target>
             </trans-unit>
         </body>
     </file>

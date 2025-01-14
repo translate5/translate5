@@ -36,7 +36,7 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\ActionAssert\Permission\DefaultUserJobActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
-use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultCoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use MittagQI\Translate5\User\Model\User;
 
@@ -54,15 +54,15 @@ use MittagQI\Translate5\User\Model\User;
  * trackchangesShowAll: bool,
  * trackchangesAcceptReject: bool,
  * type: int,
- * lspId: int|null,
- * isLspJob: bool,
+ * groupId: int|null,
+ * isCoordinatorGroupJob: bool,
  * }
  */
 class DefaultUserJobViewDataProvider
 {
     public function __construct(
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
-        private readonly DefaultLspJobRepository $defaultLspJobRepository,
+        private readonly DefaultCoordinatorGroupJobRepository $defaultCoordinatorGroupJobRepository,
         private readonly ActionPermissionAssertInterface $defaultUserJobPermissionAssert,
     ) {
     }
@@ -74,13 +74,13 @@ class DefaultUserJobViewDataProvider
     {
         return new self(
             DefaultUserJobRepository::create(),
-            DefaultLspJobRepository::create(),
+            DefaultCoordinatorGroupJobRepository::create(),
             DefaultUserJobActionPermissionAssert::create(),
         );
     }
 
     /**
-     * @param iterable<DefaultJob>|iterable<array> $jobs
+     * @param iterable<DefaultUserJob>|iterable<array> $jobs
      * @return DefaultJob[]
      */
     public function buildViewForList(iterable $jobs, User $viewer): array
@@ -128,8 +128,9 @@ class DefaultUserJobViewDataProvider
      */
     public function buildJobView(DefaultUserJob $job): array
     {
-        $lspJob = $this->defaultLspJobRepository->findDefaultLspJobByDataJobId((int) $job->getId());
-        $type = null !== $lspJob ? TypeEnum::Lsp : TypeEnum::Editor;
+        $groupJob = $this->defaultCoordinatorGroupJobRepository
+            ->findDefaultCoordinatorGroupJobByDataJobId((int) $job->getId());
+        $type = null !== $groupJob ? TypeEnum::Coordinator : TypeEnum::Editor;
 
         return [
             'id' => (int) $job->getId(),
@@ -144,8 +145,8 @@ class DefaultUserJobViewDataProvider
             'trackchangesShowAll' => (bool) $job->getTrackchangesShowAll(),
             'trackchangesAcceptReject' => (bool) $job->getTrackchangesAcceptReject(),
             'type' => $type->value,
-            'lspId' => $lspJob ? (int) $lspJob->getLspId() : null,
-            'isLspJob' => null !== $lspJob,
+            'groupId' => $groupJob ? (int) $groupJob->getGroupId() : null,
+            'isCoordinatorGroupJob' => null !== $groupJob,
         ];
     }
 }

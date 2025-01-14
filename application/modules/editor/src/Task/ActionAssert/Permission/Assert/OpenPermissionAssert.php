@@ -36,7 +36,7 @@ use editor_Workflow_Manager;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\JobAssignmentWasDeletedInTheMeantimeException;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
@@ -55,7 +55,7 @@ class OpenPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
-        private readonly LspJobRepository $lspJobRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
         private readonly ZfExtended_Acl $acl,
         private readonly editor_Workflow_Manager $workflowManager,
         private readonly ZfExtended_Logger $logger,
@@ -66,7 +66,7 @@ class OpenPermissionAssert implements PermissionAssertInterface
     {
         return new self(
             UserJobRepository::create(),
-            LspJobRepository::create(),
+            CoordinatorGroupJobRepository::create(),
             ZfExtended_Acl::getInstance(),
             new editor_Workflow_Manager(),
             Zend_Registry::get('logger')->cloneMe('task.open'),
@@ -84,7 +84,10 @@ class OpenPermissionAssert implements PermissionAssertInterface
 
         $granted = $granted || (
             $context->actor->isCoordinator()
-            && $this->lspOfCoordinatorHasJobForTaskWorkflowStep($context->actor->getUserGuid(), $object->getTaskGuid())
+            && $this->groupOfCoordinatorHasJobForTaskWorkflowStep(
+                $context->actor->getUserGuid(),
+                $object->getTaskGuid()
+            )
         );
 
         $job = $this->userJobRepository->findUserJobInTask(
@@ -140,9 +143,12 @@ class OpenPermissionAssert implements PermissionAssertInterface
         ]);
     }
 
-    private function lspOfCoordinatorHasJobForTaskWorkflowStep(string $coordinatorUserGuid, string $taskGuid): bool
+    private function groupOfCoordinatorHasJobForTaskWorkflowStep(string $coordinatorUserGuid, string $taskGuid): bool
     {
-        return $this->lspJobRepository->lspOfCoordinatorHasJobForTaskWorkflowStep($coordinatorUserGuid, $taskGuid);
+        return $this->coordinatorGroupJobRepository->coordinatorGroupOfCoordinatorHasJobForTaskWorkflowStep(
+            $coordinatorUserGuid,
+            $taskGuid
+        );
     }
 
     private function canLoadAllTasks(User $authUser): bool

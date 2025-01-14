@@ -37,8 +37,8 @@ use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
 use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\Acl\ExpandRolesService;
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
@@ -51,7 +51,7 @@ class RolesValidator
     public function __construct(
         private readonly ZfExtended_Acl $acl,
         private readonly ExpandRolesService $expandRolesService,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
     ) {
     }
 
@@ -63,7 +63,7 @@ class RolesValidator
         return new self(
             ZfExtended_Acl::getInstance(),
             ExpandRolesService::create(),
-            LspUserRepository::create(),
+            CoordinatorGroupUserRepository::create(),
         );
     }
 
@@ -86,14 +86,14 @@ class RolesValidator
 
     public function assertRolesCanBeSetForUser(array $roles, User $user): void
     {
-        $lspUser = $this->lspUserRepository->findByUser($user);
+        $groupUser = $this->coordinatorGroupUserRepository->findByUser($user);
         $providedAdminRoles = array_intersect($roles, Roles::getAdminRoles());
 
-        if ($lspUser !== null && ! empty($providedAdminRoles)) {
+        if ($groupUser !== null && ! empty($providedAdminRoles)) {
             throw new RolesCannotBeSetForUserException($providedAdminRoles);
         }
 
-        if ($lspUser === null && in_array(Roles::JOB_COORDINATOR, $roles, true)) {
+        if ($groupUser === null && in_array(Roles::JOB_COORDINATOR, $roles, true)) {
             throw new RolesCannotBeSetForUserException([Roles::JOB_COORDINATOR]);
         }
     }

@@ -53,8 +53,8 @@ class AssignedCustomerAssertTest extends TestCase
      */
     public function testSupports(CustomerAction $action, bool $expected): void
     {
-        $lspPermissionAuditor = new AssignedCustomerAssert();
-        $this->assertEquals($expected, $lspPermissionAuditor->supports($action));
+        $assert = new AssignedCustomerAssert();
+        $this->assertEquals($expected, $assert->supports($action));
     }
 
     public function testAssertGrantedNotClientRestricted(): void
@@ -69,8 +69,8 @@ class AssignedCustomerAssertTest extends TestCase
         $viewer->expects($this->never())
             ->method('getCustomersArray');
 
-        $lspPermissionAuditor = new AssignedCustomerAssert();
-        $lspPermissionAuditor->assertGranted(CustomerAction::Update, $customer, $context);
+        $groupPermissionAuditor = new AssignedCustomerAssert();
+        $groupPermissionAuditor->assertGranted(CustomerAction::Update, $customer, $context);
     }
 
     public function testAssertGranted(): void
@@ -90,8 +90,8 @@ class AssignedCustomerAssertTest extends TestCase
             ->method('getCustomersArray')
             ->willReturn([2, 3, 4]);
 
-        $lspPermissionAuditor = new AssignedCustomerAssert();
-        $lspPermissionAuditor->assertGranted(CustomerAction::Update, $customer, $context);
+        $groupPermissionAuditor = new AssignedCustomerAssert();
+        $groupPermissionAuditor->assertGranted(CustomerAction::Update, $customer, $context);
     }
 
     public function testAccessNotGranted(): void
@@ -113,8 +113,8 @@ class AssignedCustomerAssertTest extends TestCase
             ->method('getCustomersArray')
             ->willReturn([2, 3, 4]);
 
-        $lspPermissionAuditor = new AssignedCustomerAssert();
+        $groupPermissionAuditor = new AssignedCustomerAssert();
 
-        $lspPermissionAuditor->assertGranted(CustomerAction::Update, $customer, $context);
+        $groupPermissionAuditor->assertGranted(CustomerAction::Update, $customer, $context);
     }
 }

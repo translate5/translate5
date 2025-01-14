@@ -31,19 +31,19 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\Acl\Roles;
-use MittagQI\Translate5\LSP\Operations\LspUserCreateOperation;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\CoordinatorGroup\Operations\CoordinatorGroupUserCreateOperation;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
 use MittagQI\Translate5\User\Contract\UserCreateOperationInterface;
 use MittagQI\Translate5\User\Contract\UserRolesSetterInterface;
+use MittagQI\Translate5\User\Exception\CoordinatorGroupMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Exception\CustomerNotProvidedOnClientRestrictedUserCreationException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
 use MittagQI\Translate5\User\Exception\UserExceptionInterface;
 use MittagQI\Translate5\User\Mail\ResetPasswordEmail;
 use MittagQI\Translate5\User\Model\User;
@@ -60,10 +60,10 @@ final class UserCreateOperation implements UserCreateOperationInterface
         private readonly UserRolesSetterInterface $setRoles,
         private readonly UserPasswordSetter $setPassword,
         private readonly UserAssignCustomersOperationInterface $assignCustomers,
-        private readonly LspUserCreateOperation $lspUserCreate,
+        private readonly CoordinatorGroupUserCreateOperation $coordinatorGroupUserCreateOperation,
         private readonly ResetPasswordEmail $resetPasswordEmail,
-        private readonly LspRepositoryInterface $lspRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly CoordinatorGroupRepositoryInterface $coordinatorGroupRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
     ) {
     }
 
@@ -77,10 +77,10 @@ final class UserCreateOperation implements UserCreateOperationInterface
             UserRolesSetter::create(),
             UserPasswordSetter::create(),
             UserAssignCustomersOperation::create(),
-            LspUserCreateOperation::create(),
+            CoordinatorGroupUserCreateOperation::create(),
             ResetPasswordEmail::create(),
-            LspRepository::create(),
-            LspUserRepository::create(),
+            CoordinatorGroupRepository::create(),
+            CoordinatorGroupUserRepository::create(),
         );
     }
 
@@ -105,22 +105,23 @@ final class UserCreateOperation implements UserCreateOperationInterface
             throw new CustomerNotProvidedOnClientRestrictedUserCreationException();
         }
 
-        if (in_array(Roles::JOB_COORDINATOR, $dto->roles) && null === $dto->lsp) {
-            throw new LspMustBeProvidedInJobCoordinatorCreationProcessException();
+        if (in_array(Roles::JOB_COORDINATOR, $dto->roles) && null === $dto->coordinatorGroup) {
+            throw new CoordinatorGroupMustBeProvidedInJobCoordinatorCreationProcessException();
         }
 
-        $lsp = null;
+        $coordinatorGroup = null;
 
-        if (null !== $dto->lsp) {
-            $lsp = $this->lspRepository->get($dto->lsp);
+        if (null !== $dto->coordinatorGroup) {
+            $coordinatorGroup = $this->coordinatorGroupRepository->get($dto->coordinatorGroup);
         }
 
         $this->userRepository->save($user);
 
-        $lspUser = null;
+        $groupUser = null;
 
-        if (null !== $lsp) {
-            $lspUser = $this->lspUserCreate->createLspUser($lsp, $user);
+        if (null !== $coordinatorGroup) {
+            $groupUser = $this->coordinatorGroupUserCreateOperation
+                ->createCoordinatorGroupUser($coordinatorGroup, $user);
         }
 
         try {
@@ -128,8 +129,8 @@ final class UserCreateOperation implements UserCreateOperationInterface
             $this->userRepository->save($user);
             $this->assignCustomers->assignCustomers($user, ...$dto->customers);
         } catch (Throwable $e) {
-            if ($lspUser) {
-                $this->lspUserRepository->delete($lspUser);
+            if ($groupUser) {
+                $this->coordinatorGroupUserRepository->delete($groupUser);
             }
 
             $this->userRepository->delete($user);

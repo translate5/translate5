@@ -52,7 +52,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method string getTrackchangesShow()
  * @method string getTrackchangesShowAll()
  * @method string getTrackchangesAcceptReject()
- * @method string|null getLspJobId()
+ * @method string|null getCoordinatorGroupJobId()
  *
  * @method void setId(int $id)
  * @method void setTaskGuid(string $taskGuid)
@@ -74,7 +74,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setTrackchangesShow(int $isAllowed)
  * @method void setTrackchangesShowAll(int $isAllowed)
  * @method void setTrackchangesAcceptReject(int $isAllowed)
- * @method void setLspJobId(int|null $id)
+ * @method void setCoordinatorGroupJobId(int|null $id)
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
 {
@@ -92,14 +92,14 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         return TypeEnum::from((int) $this->get('type'));
     }
 
-    public function isLspJob(): bool
+    public function isCoordinatorGroupJob(): bool
     {
-        return TypeEnum::Lsp === $this->getType();
+        return TypeEnum::Coordinator === $this->getType();
     }
 
-    public function isLspUserJob(): bool
+    public function isCoordinatorGroupUserJob(): bool
     {
-        return TypeEnum::Lsp !== $this->getType() && ! empty($this->getLspJobId());
+        return TypeEnum::Coordinator !== $this->getType() && ! empty($this->getCoordinatorGroupJobId());
     }
 
     public function isConfirmed(): bool
@@ -197,10 +197,11 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         }
 
         try {
-            $s = $this->db->select()->where('taskGuid in (?)', $list)->where('type != ?', TypeEnum::Lsp->value);
+            $s = $this->db->select()->where('taskGuid in (?)', $list)->where('type != ?', TypeEnum::Coordinator->value);
 
             return $this->db->fetchAll($s)->toArray();
         } catch (Exception $e) {
+            // @phpstan-ignore-next-line
             $this->notFound('NotFound after other Error', $e);
         }
     }
@@ -310,7 +311,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      */
     public function delete()
     {
-        if ($this->isLspJob()) {
+        if ($this->isCoordinatorGroupJob()) {
             throw new LogicException('LSP Job should be delete using DeleteLspJobAssignmentOperation');
         }
 

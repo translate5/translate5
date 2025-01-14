@@ -32,10 +32,10 @@ namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\CoordinatorGroup\CoordinatorGroupUser;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\JobCoordinatorPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
@@ -45,7 +45,7 @@ use PHPUnit\Framework\TestCase;
 
 class JobCoordinatorPermissionAssertTest extends TestCase
 {
-    private LspUserRepositoryInterface|MockObject $lspUserRepository;
+    private CoordinatorGroupUserRepositoryInterface|MockObject $coordinatorGroupUserRepository;
 
     private JobCoordinatorRepository|MockObject $coordinatorRepository;
 
@@ -53,12 +53,12 @@ class JobCoordinatorPermissionAssertTest extends TestCase
 
     public function setUp(): void
     {
-        $this->lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
+        $this->coordinatorGroupUserRepository = $this->createMock(CoordinatorGroupUserRepositoryInterface::class);
         $this->coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
 
         $this->assert = new JobCoordinatorPermissionAssert(
             $this->coordinatorRepository,
-            $this->lspUserRepository,
+            $this->coordinatorGroupUserRepository,
         );
     }
 
@@ -106,14 +106,14 @@ class JobCoordinatorPermissionAssertTest extends TestCase
 
         $context = new PermissionAssertContext($manager);
 
-        $this->lspUserRepository->expects(self::never())->method('findByUser');
+        $this->coordinatorGroupUserRepository->expects(self::never())->method('findByUser');
 
         $this->coordinatorRepository->method('findByUser')->willReturn(null);
 
         $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
-    public function testAssertNotGrantedWhenAuthUserIsCoordinatorAndUserNotLspUser(): void
+    public function testAssertNotGrantedWhenAuthUserIsCoordinatorAndUserNotCoordinatorGroupUser(): void
     {
         $user = $this->createMock(User::class);
         $user->method('__call')->willReturnMap([
@@ -128,7 +128,7 @@ class JobCoordinatorPermissionAssertTest extends TestCase
 
         $context = new PermissionAssertContext($manager);
 
-        $this->lspUserRepository->method('findByUser')->willReturn(null);
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn(null);
 
         $this->coordinatorRepository->method('findByUser')->willReturn($this->createMock(JobCoordinator::class));
 
@@ -136,7 +136,7 @@ class JobCoordinatorPermissionAssertTest extends TestCase
         $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
-    public function testAssertNotGrantedWhenAuthCoordinatorIsNotSupervisorOfLspUser(): void
+    public function testAssertNotGrantedWhenAuthCoordinatorIsNotSupervisorOfCoordinatorGroupUser(): void
     {
         $user = $this->createMock(User::class);
         $user->method('__call')->willReturnMap([
@@ -151,9 +151,9 @@ class JobCoordinatorPermissionAssertTest extends TestCase
 
         $context = new PermissionAssertContext($manager);
 
-        $lspUser = $this->createMock(LspUser::class);
+        $groupUser = $this->createMock(CoordinatorGroupUser::class);
 
-        $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn($groupUser);
 
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isSupervisorOf')->willReturn(false);

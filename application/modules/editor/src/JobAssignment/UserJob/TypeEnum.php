@@ -34,5 +34,5 @@ enum TypeEnum: int
 {
     case Editor = 1;
 
-    case Lsp = 2;
+    case Coordinator = 2;
 }

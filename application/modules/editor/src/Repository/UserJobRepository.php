@@ -90,7 +90,7 @@ class UserJobRepository
             ->from(UserJobTable::TABLE_NAME, 'COUNT(*)')
             ->where('taskGuid = ?', $taskGuid)
             ->where('userGuid = ?', $userGuid)
-            ->where('type != ?', TypeEnum::Lsp->value)
+            ->where('type != ?', TypeEnum::Coordinator->value)
         ;
 
         return (int) $this->db->fetchOne($select) > 0;
@@ -108,7 +108,7 @@ class UserJobRepository
             ->from(UserJobTable::TABLE_NAME)
             ->where('taskGuid = ?', $taskGuid)
             ->where('workflowStepName = ?', $workflowStepName)
-            ->where('type != ?', TypeEnum::Lsp->value)
+            ->where('type != ?', TypeEnum::Coordinator->value)
         ;
 
         $stmt = $this->db->query($select);
@@ -149,7 +149,7 @@ class UserJobRepository
                 []
             )
             ->where('job.userGuid = ?', $userGuid)
-            ->where('job.type != ?', TypeEnum::Lsp->value)
+            ->where('job.type != ?', TypeEnum::Coordinator->value)
             ->where('task.customerId = ?', $customerId)
         ;
 
@@ -174,14 +174,14 @@ class UserJobRepository
     /**
      * @return iterable<UserJob>
      */
-    public function getUserJobsByLspJob(int $lspJobId): iterable
+    public function getUserJobsByCoordinatorGroupJob(int $coordinatorGroupJobId): iterable
     {
         $job = new UserJob();
         $select = $this->db
             ->select()
             ->from(UserJobTable::TABLE_NAME)
-            ->where('lspJobId = ?', $lspJobId)
-            ->where('type != ?', TypeEnum::Lsp->value)
+            ->where('coordinatorGroupJobId = ?', $coordinatorGroupJobId)
+            ->where('type != ?', TypeEnum::Coordinator->value)
         ;
 
         foreach ($this->db->fetchAll($select) as $jobData) {
@@ -196,7 +196,7 @@ class UserJobRepository
                 )
             );
 
-            if ($job->isLspJob()) {
+            if ($job->isCoordinatorGroupJob()) {
                 continue;
             }
 
@@ -205,16 +205,16 @@ class UserJobRepository
     }
 
     /**
-     * Returns bound UserJob with type LSP of LspJob
+     * Returns bound UserJob with type Coordinator group of LspJob
      */
-    public function getDataJobByLspJob(int $lspJobId): UserJob
+    public function getDataJobByCoordinatorGroupJob(int $coordinatorGroupJobId): UserJob
     {
         $job = new UserJob();
         $select = $this->db
             ->select()
             ->from(UserJobTable::TABLE_NAME)
-            ->where('type = ?', TypeEnum::Lsp->value)
-            ->where('lspJobId = ?', $lspJobId);
+            ->where('type = ?', TypeEnum::Coordinator->value)
+            ->where('coordinatorGroupJobId = ?', $coordinatorGroupJobId);
 
         $job->init(
             new Zend_Db_Table_Row(
@@ -286,7 +286,7 @@ class UserJobRepository
             ->from(UserJobTable::TABLE_NAME)
             ->where('userGuid = ?', $userGuid)
             ->where('taskGuid = ?', $taskGuid)
-            ->where('type != ?', TypeEnum::Lsp->value)
+            ->where('type != ?', TypeEnum::Coordinator->value)
             ->order(new Zend_Db_Expr($order));
 
         $row = $this->db->fetchRow($s);
@@ -382,7 +382,7 @@ class UserJobRepository
             ->select()
             ->from(UserJobTable::TABLE_NAME)
             ->where('taskGuid = ?', $taskGuid)
-            ->where('type != ?', TypeEnum::Lsp->value)
+            ->where('type != ?', TypeEnum::Coordinator->value)
         ;
 
         foreach ($this->db->fetchAll($s) as $jobData) {

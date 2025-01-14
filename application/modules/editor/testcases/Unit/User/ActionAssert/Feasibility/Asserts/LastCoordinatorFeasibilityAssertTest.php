@@ -31,9 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts\LastCoordinatorFeasibilityAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\Model\User;
@@ -54,24 +54,24 @@ class LastCoordinatorFeasibilityAssertTest extends TestCase
      */
     public function testSupports(Action $action, bool $expected): void
     {
-        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($this->createMock(JobCoordinatorRepository::class));
-        $this->assertEquals($expected, $lspPermissionAuditor->supports($action));
+        $feasibilityAssert = new LastCoordinatorFeasibilityAssert($this->createMock(JobCoordinatorRepository::class));
+        $this->assertEquals($expected, $feasibilityAssert->supports($action));
     }
 
     public function testAssertAllowedNotCoordinator(): void
     {
         $user = $this->createMock(User::class);
-        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $group = $this->createMock(CoordinatorGroup::class);
 
-        $coordinator = new JobCoordinator('lsp', $user, $lsp);
+        $coordinator = new JobCoordinator('group', $user, $group);
 
         $coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
         $coordinatorRepository
             ->method('getCoordinatorsCount')
             ->willReturn(2);
 
-        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($coordinatorRepository);
-        $lspPermissionAuditor->assertAllowed($coordinator);
+        $groupPermissionAuditor = new LastCoordinatorFeasibilityAssert($coordinatorRepository);
+        $groupPermissionAuditor->assertAllowed($coordinator);
 
         self::assertTrue(true);
     }
@@ -79,17 +79,17 @@ class LastCoordinatorFeasibilityAssertTest extends TestCase
     public function testAssertAllowedLastCoordinator(): void
     {
         $user = $this->createMock(User::class);
-        $lsp = $this->createMock(LanguageServiceProvider::class);
+        $group = $this->createMock(CoordinatorGroup::class);
 
-        $coordinator = new JobCoordinator('lsp', $user, $lsp);
+        $coordinator = new JobCoordinator('group', $user, $group);
 
         $coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
         $coordinatorRepository
             ->method('getCoordinatorsCount')
             ->willReturn(1);
 
-        $lspPermissionAuditor = new LastCoordinatorFeasibilityAssert($coordinatorRepository);
+        $groupPermissionAuditor = new LastCoordinatorFeasibilityAssert($coordinatorRepository);
         $this->expectException(LastCoordinatorException::class);
-        $lspPermissionAuditor->assertAllowed($coordinator);
+        $groupPermissionAuditor->assertAllowed($coordinator);
     }
 }

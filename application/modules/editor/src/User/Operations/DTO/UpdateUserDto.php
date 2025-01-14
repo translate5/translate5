@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Operations\DTO;
 
-use MittagQI\Translate5\User\Exception\AttemptToChangeLspForUserException;
-use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
+use MittagQI\Translate5\User\Exception\AttemptToChangeCoordinatorGroupForUserException;
+use MittagQI\Translate5\User\Exception\AttemptToSetCoordinatorGroupForNonJobCoordinatorException;
 use REST_Controller_Request_Http as Request;
 use ZfExtended_Models_User;
 
@@ -55,15 +55,15 @@ class UpdateUserDto
     }
 
     /**
-     * @throws AttemptToSetLspForNonJobCoordinatorException
+     * @throws AttemptToSetCoordinatorGroupForNonJobCoordinatorException
      */
     public static function fromRequest(Request $request): UpdateUserDto
     {
         $data = $request->getParam('data');
         $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
 
-        if (isset($data['lsp'])) {
-            throw new AttemptToChangeLspForUserException((int) $request->getParam('id'));
+        if (isset($data['coordinatorGroup'])) {
+            throw new AttemptToChangeCoordinatorGroupForUserException((int) $request->getParam('id'));
         }
 
         $roles = explode(',', trim($data['roles'] ?? '', ' ,'));

@@ -88,7 +88,7 @@ class DeleteDefaultUserJobOperation implements DeleteDefaultUserJobOperationInte
                         $job->getId(),
                         $authUser->getUserGuid(),
                     ),
-                    'lspJobId' => $job->getId(),
+                    'coordinatorGroupJobId' => $job->getId(),
                     'authUserGuid' => $authUser->getUserGuid(),
                 ]
             );
@@ -102,7 +102,7 @@ class DeleteDefaultUserJobOperation implements DeleteDefaultUserJobOperationInte
                         $job->getId(),
                         $authUser->getUserGuid(),
                     ),
-                    'lspJobId' => $job->getId(),
+                    'coordinatorGroupJobId' => $job->getId(),
                     'authUserGuid' => $authUser->getUserGuid(),
                 ]
             );

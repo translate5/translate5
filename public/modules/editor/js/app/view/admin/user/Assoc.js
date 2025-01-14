@@ -119,7 +119,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                         fields: ['name', 'value'],
                                         data: [
                                             {name: 'Editor', value: 1},
-                                            {name: 'LSP', value: 2},
+                                            {name: 'Coordinator', value: 2},
                                         ]
                                     },
                                     listeners: {
@@ -287,13 +287,13 @@ Ext.define('Editor.view.admin.user.Assoc', {
         }
 
         let path = jobId
-            ? `customers/${customerId}/default-lsp-job/${jobId}/combo/coordinators`
-            : `customers/${customerId}/default-lsp-job/combo/coordinators`;
+            ? `customers/${customerId}/default-coordinator-group-job/${jobId}/combo/coordinators`
+            : `customers/${customerId}/default-coordinator-group-job/combo/coordinators`;
 
         if (this.taskGuid) {
             path = jobId
-                ? `task/${this.taskGuid}/lsp-job/${jobId}/combo/coordinators`
-                : `task/${this.taskGuid}/lsp-job/combo/coordinators`;
+                ? `task/${this.taskGuid}/coordinator-group-job/${jobId}/combo/coordinators`
+                : `task/${this.taskGuid}/coordinator-group-job/combo/coordinators`;
         }
 
         Ext.Ajax.request({

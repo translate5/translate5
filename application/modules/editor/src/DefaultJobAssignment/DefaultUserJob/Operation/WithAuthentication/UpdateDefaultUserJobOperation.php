@@ -89,7 +89,7 @@ class UpdateDefaultUserJobOperation implements UpdateDefaultUserJobOperationInte
                         $job->getId(),
                         $authUser->getUserGuid(),
                     ),
-                    'lspJobId' => $job->getId(),
+                    'coordinatorGroupJobId' => $job->getId(),
                     'authUserGuid' => $authUser->getUserGuid(),
                 ]
             );
@@ -103,7 +103,7 @@ class UpdateDefaultUserJobOperation implements UpdateDefaultUserJobOperationInte
                         $job->getId(),
                         $authUser->getUserGuid(),
                     ),
-                    'lspJobId' => $job->getId(),
+                    'coordinatorGroupJobId' => $job->getId(),
                     'authUserGuid' => $authUser->getUserGuid(),
                 ]
             );

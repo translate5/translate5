@@ -112,7 +112,7 @@ Ext.application({
         'admin.UserAssocDefault',
         'admin.WizardTasks',
         'admin.task.CustomField',
-        'admin.LspStore',
+        'admin.CoordinatorGroupStore',
     ],
     requires: [
         'Editor.view.ViewPort',

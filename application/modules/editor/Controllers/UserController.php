@@ -33,30 +33,30 @@ use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CoordinatorGroupNotFoundException;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CustomerCanNotBeUnAssignedFromCoordinatorAsItHasRelatedCoordinatorGroupJobsException;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CustomerCanNotBeUnAssignedFromCoordinatorGroupUserAsItHasRelatedJobsException;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CustomerDoesNotBelongToCoordinatorGroupException;
+use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
 use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
-use MittagQI\Translate5\LSP\Exception\CustomerCanNotBeUnAssignedFromCoordinatorAsItHasRelatedLspJobsException;
-use MittagQI\Translate5\LSP\Exception\CustomerCanNotBeUnAssignedFromLspUserAsItHasRelatedJobsException;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Exception\LspNotFoundException;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHasAssignedDefaultLspJobException;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHasAssignedLspJobException;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHasAssignedCoordinatorGroupJobException;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\CoordinatorHasAssignedDefaultCoordinatorGroupJobException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\PmInTaskException;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\ClientRestrictionException;
-use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleLspUserException;
+use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleCoordinatorGroupUserException;
 use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
-use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
+use MittagQI\Translate5\User\Exception\AttemptToSetCoordinatorGroupForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Exception\CantRemoveCoordinatorRoleFromUserException;
+use MittagQI\Translate5\User\Exception\CoordinatorGroupMustBeProvidedInJobCoordinatorCreationProcessException;
+use MittagQI\Translate5\User\Exception\CoordinatorGroupUserExceptionInterface;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Exception\CustomerNotProvidedOnClientRestrictedUserCreationException;
 use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
 use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
-use MittagQI\Translate5\User\Exception\LspMustBeProvidedInJobCoordinatorCreationProcessException;
-use MittagQI\Translate5\User\Exception\LspUserExceptionInterface;
 use MittagQI\Translate5\User\Exception\UnableToAssignJobCoordinatorRoleToExistingUserException;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
@@ -109,7 +109,7 @@ class Editor_UserController extends ZfExtended_RestController
             'E1630' => 'You can not set role {role} with one of the following roles: {roles}',
             'E1094' => 'User can not be saved: the chosen login does already exist.',
             'E1095' => 'User can not be saved: the chosen userGuid does already exist.',
-            'E1631' => 'Role "Job Coordinator" can be set only on User creation process or to LSP User',
+            'E1631' => 'Role "Job Coordinator" can be set only on User creation process or to Coordinator group User',
             'E1635' => 'You cannot set {roles} for this user.',
             'E1638' => "Can't remove Coordinator role from user: {reason}",
         ], 'editor.user');
@@ -117,11 +117,11 @@ class Editor_UserController extends ZfExtended_RestController
         ZfExtended_Models_Entity_Conflict::addCodes([
             'E2002' => 'No object of type "{0}" was found by key "{1}"',
             'E1048' => 'The user can not be deleted, he is PM in one or more tasks.',
-            'E1626' => 'The user can not be deleted, he is last Job Coordinator of LSP "{lsp}".',
+            'E1626' => 'The user can not be deleted, he is last Job Coordinator of Coordinator group "{group}".',
             'E1627' => 'Attempts to manipulate not accessible user.',
             'E1628' => 'Tried to manipulate a not editable user.',
-            'E1636' => 'The user can not be deleted, he is Job Coordinator of some LSP jobs.',
-            'E1679' => 'The user can not be deleted, he is Job Coordinator of some default LSP jobs.',
+            'E1636' => 'The user can not be deleted, he is Job Coordinator of some Coordinator group jobs.',
+            'E1679' => 'The user can not be deleted, he is Job Coordinator of some default Coordinator group jobs.',
         ], 'editor.user');
     }
 
@@ -149,10 +149,10 @@ class Editor_UserController extends ZfExtended_RestController
             throw $this->transformException($e);
         }
 
-        $lspUserRepo = LspUserRepository::create();
+        $coordinatorGroupUserRepositoryUserRepo = CoordinatorGroupUserRepository::create();
 
         // @phpstan-ignore-next-line
-        $this->view->rows->lsp = $lspUserRepo->findByUser($user)?->lsp->getId();
+        $this->view->rows->group = $coordinatorGroupUserRepositoryUserRepo->findByUser($user)?->group->getId();
 
         $this->credentialCleanup();
     }
@@ -160,8 +160,8 @@ class Editor_UserController extends ZfExtended_RestController
     public function indexAction(): void
     {
         $rows = $this->entity->loadAll();
-        $lspUserRepo = LspUserRepository::create();
-        $userIdToLspIdMap = $lspUserRepo->getUserIdToLspIdMap();
+        $coordinatorGroupUserRepository = CoordinatorGroupUserRepository::create();
+        $userIdToLspIdMap = $coordinatorGroupUserRepository->getUserIdToCoordinatorGroupIdMap();
 
         $userModel = ZfExtended_Factory::get(User::class);
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
@@ -198,7 +198,7 @@ class Editor_UserController extends ZfExtended_RestController
                 $rows[$key]['editable'] = '0';
             }
 
-            $rows[$key]['lsp'] = isset($userIdToLspIdMap[$row['id']]) ? (int) $userIdToLspIdMap[$row['id']] : null;
+            $rows[$key]['group'] = isset($userIdToLspIdMap[$row['id']]) ? (int) $userIdToLspIdMap[$row['id']] : null;
         }
 
         $this->view->rows = array_values($rows);
@@ -342,7 +342,7 @@ class Editor_UserController extends ZfExtended_RestController
             return $this->transformFeasibilityException($e);
         }
 
-        if ($e instanceof LspUserExceptionInterface) {
+        if ($e instanceof CoordinatorGroupUserExceptionInterface) {
             return $this->transformLspUserException($e);
         }
 
@@ -430,7 +430,7 @@ class Editor_UserController extends ZfExtended_RestController
                     'id' => $e->customerId,
                 ]
             ),
-            CustomerDoesNotBelongToLspException::class => UnprocessableEntity::createResponse(
+            CustomerDoesNotBelongToCoordinatorGroupException::class => UnprocessableEntity::createResponse(
                 'E2003',
                 [
                     'customers' => [
@@ -451,16 +451,16 @@ class Editor_UserController extends ZfExtended_RestController
                     'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
                 ],
             ]),
-            LspNotFoundException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+            CoordinatorGroupNotFoundException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E2002',
                 [
-                    'lsp' => [
-                        'Der referenzierte LSP existiert nicht (mehr).',
+                    'group' => [
+                        'coordinator-group-not-found',
                     ],
                 ],
                 [
-                    LanguageServiceProvider::class,
-                    $e->lspId,
+                    CoordinatorGroup::class,
+                    $e->groupId,
                 ]
             ),
             ClientRestrictionException::class => new ZfExtended_NoAccessException(
@@ -478,44 +478,43 @@ class Editor_UserController extends ZfExtended_RestController
         };
     }
 
-    private function transformLspUserException(LspUserExceptionInterface $e): ZfExtended_ErrorCodeException|UnprocessableEntity
+    private function transformLspUserException(CoordinatorGroupUserExceptionInterface $e): ZfExtended_ErrorCodeException|UnprocessableEntity
     {
         return match ($e::class) {
             UnableToAssignJobCoordinatorRoleToExistingUserException::class => UnprocessableEntity::createResponse(
                 'E1631',
                 [
                     'roles' => [
-                        'Die Rolle "Job-Koordinator" kann nur bei der Benutzererstellung '
-                        . 'oder für LSP-Benutzer definiert werden.',
+                        'user.update.roles.unable-to-assign-job-coordinator-role-to-existing-user',
                     ],
                 ],
             ),
-            LspMustBeProvidedInJobCoordinatorCreationProcessException::class => UnprocessableEntity::createResponse(
+            CoordinatorGroupMustBeProvidedInJobCoordinatorCreationProcessException::class => UnprocessableEntity::createResponse(
                 'E2003',
                 [
-                    'lsp' => [
+                    'group' => [
                         'Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.',
                     ],
                 ],
             ),
-            NotAccessibleLspUserException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+            NotAccessibleCoordinatorGroupUserException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1627',
                 [
                     'Versuch, einen nicht erreichbaren Benutzer zu manipulieren.',
                 ],
                 [
-                    'coordinator' => $e->lspUser->guid,
-                    'lsp' => $e->lspUser->lsp->getName(),
-                    'lspId' => $e->lspUser->lsp->getId(),
+                    'coordinator' => $e->coordinatorGroupUser->guid,
+                    'coordinatorGroup' => $e->coordinatorGroupUser->group->getName(),
+                    'coordinatorGroupId' => $e->coordinatorGroupUser->group->getId(),
                     'user' => $this->entity->getUserGuid(),
                     'userLogin' => $this->entity->getLogin(),
                     'userEmail' => $this->entity->getEmail(),
                 ]
             ),
-            AttemptToSetLspForNonJobCoordinatorException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+            AttemptToSetCoordinatorGroupForNonJobCoordinatorException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E2003',
                 [
-                    'lsp' => [
+                    'group' => [
                         'Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.',
                     ],
                 ],
@@ -530,23 +529,23 @@ class Editor_UserController extends ZfExtended_RestController
                 [
                     'reason' => match ($e->getPrevious()::class) {
                         LastCoordinatorException::class => $this->view->translate(
-                            'Benutzer ist letzter Job-Koordinator des LSP'
+                            'user.delete.last-coordinator-of-group'
                         ),
-                        CoordinatorHasAssignedLspJobException::class => $this->view->translate(
-                            'Der Benutzer ist Job-Koordinator für einige LSP Aufträge.'
+                        CoordinatorHasAssignedCoordinatorGroupJobException::class => $this->view->translate(
+                            'user.delete.coordinator-has-assigned-group-jobs'
                         ),
-                        CoordinatorHasAssignedDefaultLspJobException::class => $this->view->translate(
-                            'Der Benutzer ist Job-Koordinator für einige Standard LSP Aufträge.'
+                        CoordinatorHasAssignedDefaultCoordinatorGroupJobException::class => $this->view->translate(
+                            'user.delete.coordinator-has-assigned-default-group-jobs'
                         ),
                         default => $e->getPrevious()->getMessage(),
                     },
                 ],
             ),
-            CustomerCanNotBeUnAssignedFromCoordinatorAsItHasRelatedLspJobsException::class => ZfExtended_UnprocessableEntity::createResponse(
+            CustomerCanNotBeUnAssignedFromCoordinatorAsItHasRelatedCoordinatorGroupJobsException::class => ZfExtended_UnprocessableEntity::createResponse(
                 'E2003',
                 [
                     'customers' => [
-                        'Der Kunde "{customer}" kann nicht aus dem Koordinator entfernt werden, da er einige LSP-Aufträge hat, die zu diesem Kunden gehören.',
+                        'user.customer.un-assign.not-possible-as-coordinator-has-related-coordinator-group-jobs',
                     ],
                 ],
                 [
@@ -554,11 +553,11 @@ class Editor_UserController extends ZfExtended_RestController
                     'user' => $e->userGuid,
                 ]
             ),
-            CustomerCanNotBeUnAssignedFromLspUserAsItHasRelatedJobsException::class => ZfExtended_UnprocessableEntity::createResponse(
+            CustomerCanNotBeUnAssignedFromCoordinatorGroupUserAsItHasRelatedJobsException::class => ZfExtended_UnprocessableEntity::createResponse(
                 'E2003',
                 [
                     'customers' => [
-                        'Der Kunde "{customer}" kann nicht aus dem Koordinator entfernt werden, da er einige LSP-Aufträge hat, die zu diesem Kunden gehören.',
+                        'user.customer.un-assign.not-possible-as-it-has-related-jobs',
                     ],
                 ],
                 [
@@ -588,37 +587,37 @@ class Editor_UserController extends ZfExtended_RestController
             LastCoordinatorException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1626',
                 [
-                    'Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator des LSP "{lsp}".',
+                    'cannot-delete-user.last-coordinator',
                 ],
                 [
-                    'lsp' => $e->coordinator->lsp->getName(),
-                    'lspId' => $e->coordinator->lsp->getId(),
+                    'group' => $e->coordinator->group->getName(),
+                    'coordinatorGroupId' => $e->coordinator->group->getId(),
                     'user' => $this->entity->getUserGuid(),
                     'userLogin' => $this->entity->getLogin(),
                     'userEmail' => $this->entity->getEmail(),
                 ]
             ),
-            CoordinatorHasAssignedLspJobException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+            CoordinatorHasAssignedCoordinatorGroupJobException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1636',
                 [
-                    'Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen LSP-Aufträgen ist.',
+                    'cannot-delete-user.coordinator-has-assigned-group-jobs',
                 ],
                 [
-                    'lsp' => $e->coordinator->lsp->getName(),
-                    'lspId' => $e->coordinator->lsp->getId(),
+                    'coordinatorGroup' => $e->coordinator->group->getName(),
+                    'coordinatorGroupId' => $e->coordinator->group->getId(),
                     'user' => $this->entity->getUserGuid(),
                     'userLogin' => $this->entity->getLogin(),
                     'userEmail' => $this->entity->getEmail(),
                 ]
             ),
-            CoordinatorHasAssignedDefaultLspJobException::class => ZfExtended_Models_Entity_Conflict::createResponse(
+            CoordinatorHasAssignedDefaultCoordinatorGroupJobException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1679',
                 [
-                    'Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen Standard LSP-Aufträgen ist.',
+                    'user.delete.coordinator-has-assigned-default-group-jobs',
                 ],
                 [
-                    'lsp' => $e->coordinator->lsp->getName(),
-                    'lspId' => $e->coordinator->lsp->getId(),
+                    'coordinatorGroup' => $e->coordinator->group->getName(),
+                    'coordinatorGroupId' => $e->coordinator->group->getId(),
                     'user' => $this->entity->getUserGuid(),
                     'userLogin' => $this->entity->getLogin(),
                     'userEmail' => $this->entity->getEmail(),

@@ -30,11 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\Operation;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Contract\DeleteCoordinatorGroupJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\DeleteCoordinatorGroupJobOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\DeleteUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
-use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -42,8 +42,8 @@ class DeleteJobAssignmentOperation
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
-        private readonly LspJobRepository $lspJobRepository,
-        private readonly DeleteLspJobOperationInterface $deleteLspJob,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
+        private readonly DeleteCoordinatorGroupJobOperationInterface $deleteCoordinatorGroupJob,
         private readonly DeleteUserJobOperationInterface $deleteUserJob,
     ) {
     }
@@ -52,8 +52,8 @@ class DeleteJobAssignmentOperation
     {
         return new self(
             UserJobRepository::create(),
-            LspJobRepository::create(),
-            DeleteLspJobOperation::create(),
+            CoordinatorGroupJobRepository::create(),
+            DeleteCoordinatorGroupJobOperation::create(),
             DeleteUserJobOperation::create(),
         );
     }
@@ -66,10 +66,10 @@ class DeleteJobAssignmentOperation
             return;
         }
 
-        if ($job->isLspJob()) {
-            $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
+        if ($job->isCoordinatorGroupJob()) {
+            $groupJob = $this->coordinatorGroupJobRepository->get((int) $job->getCoordinatorGroupJobId());
 
-            $this->deleteLspJob->delete($lspJob);
+            $this->deleteCoordinatorGroupJob->delete($groupJob);
 
             return;
         }
@@ -85,10 +85,10 @@ class DeleteJobAssignmentOperation
             return;
         }
 
-        if ($job->isLspJob()) {
-            $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
+        if ($job->isCoordinatorGroupJob()) {
+            $groupJob = $this->coordinatorGroupJobRepository->get((int) $job->getCoordinatorGroupJobId());
 
-            $this->deleteLspJob->forceDelete($lspJob);
+            $this->deleteCoordinatorGroupJob->forceDelete($groupJob);
 
             return;
         }

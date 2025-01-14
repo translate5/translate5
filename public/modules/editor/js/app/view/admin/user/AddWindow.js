@@ -34,7 +34,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
     titleEdit: '#UT#Benutzer bearbeiten',
     requires: [
         'Editor.view.admin.user.AddWindowViewController',
-        'Editor.store.admin.LspStore'
+        'Editor.store.admin.CoordinatorGroupStore'
     ],
     controller: 'adminUserAddWindow',
     strings: {
@@ -69,10 +69,10 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         saveBtn: '#UT#Benutzer speichern',
         cancelBtn: '#UT#Abbrechen',
         languagesLabel: '#UT#Automatische Zuweisung',
-        sourceLangageLabel: '#UT#Quellsprache(n)',
-        sourceLangageTip: '#UT#Quellsprache(n)',
-        targetLangageLabel: '#UT#Zielsprache(n)',
-        targetLangageTip: '#UT#Zielsprache(n)',
+        sourceLangageLabel: '#UT#QuelcoordinatorGrouprache(n)',
+        sourceLangageTip: '#UT#QuelcoordinatorGrouprache(n)',
+        targetLangageLabel: '#UT#ZiecoordinatorGrouprache(n)',
+        targetLangageTip: '#UT#ZiecoordinatorGrouprache(n)',
         languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.',
         localeLabel: '#UT#Benutzersprache',
         parentUserLabel: '#UT#Übergeordneter Benutzer',
@@ -231,8 +231,8 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                         },
                                         {
                                             xtype: 'Editor.combobox',
-                                            itemId: 'lsp',
-                                            name: 'lsp',
+                                            itemId: 'coordinatorGroup',
+                                            name: 'coordinatorGroup',
                                             allowBlank: true,
                                             forceSelection: false,
                                             hidden: true,
@@ -244,10 +244,10 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             displayField: 'name',
                                             valueField: 'id',
                                             bind: {
-                                                fieldLabel: '{l10n.lsp.title}',
+                                                fieldLabel: '{l10n.coordinatorGroup.title}',
                                             },
                                             listeners: {
-                                                change: (box, newValue) => this.onLspChange(box, newValue),
+                                                change: (box, newValue) => this.onCoordinatorGroupChange(box, newValue),
                                             },
                                         },
                                         {
@@ -494,7 +494,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
 
         form.down('hidden[name="roles"]').setValue(selectedRoles.join(','));
 
-        this.toggleLspField(form, selectedRoles);
+        this.toggleCoordinatorGroupField(form, selectedRoles);
     },
 
     toggleRequirementOfCustomersField: function (form, required) {
@@ -504,22 +504,22 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         customersField.forceSelection = required;
     },
 
-    toggleLspField: function (form, roles) {
-        const lspField = form.down('#lsp');
+    toggleCoordinatorGroupField: function (form, roles) {
+        const coordinatorGroupField = form.down('#coordinatorGroup');
 
         if (roles.includes('jobCoordinator')) {
-            lspField.setHidden(false);
-            lspField.allowBlank = false;
-            lspField.setDisabled(! form.getRecord().phantom);
-            lspField.forceSelection = true;
+            coordinatorGroupField.setHidden(false);
+            coordinatorGroupField.allowBlank = false;
+            coordinatorGroupField.setDisabled(! form.getRecord().phantom);
+            coordinatorGroupField.forceSelection = true;
 
             return;
         }
 
-        lspField.setHidden(true);
-        lspField.allowBlank = true;
-        lspField.setDisabled(true);
-        lspField.forceSelection = false;
+        coordinatorGroupField.setHidden(true);
+        coordinatorGroupField.allowBlank = true;
+        coordinatorGroupField.setDisabled(true);
+        coordinatorGroupField.forceSelection = false;
     },
 
     hasRoleFromGroup: function (selectedRoles, groups) {
@@ -538,20 +538,20 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         return Editor.data.app.groupedRoles[group].some(node => node.role === role);
     },
 
-    onLspChange: function (fld, newValue) {
+    onCoordinatorGroupChange: function (fld, newValue) {
         /**
-         * @type {Editor.model.admin.LspModel}
+         * @type {Editor.model.admin.CoordinatorGroupModel}
          */
-        const lsp = fld.getStore().getById(newValue);
+        const coordinatorGroup = fld.getStore().getById(newValue);
         const form = fld.up('form');
 
-        if (null === lsp) {
+        if (null === coordinatorGroup) {
             this.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
 
             return;
         }
 
-        this.updateCustomerField(form, lsp.get('customers'));
+        this.updateCustomerField(form, coordinatorGroup.get('customers'));
     },
 
     /**
@@ -570,10 +570,10 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 isAdminRole = me.isRoleFromGroup(box.initialConfig.value, 'admins'),
                 isNotRequireClientRole = me.isRoleFromGroup(box.initialConfig.value, 'notRequireClient'),
                 boxInitValue = box.initialConfig.value,
-                hidden = (record.isLspUser() && (isAdminRole || isNotRequireClientRole) && 'jobCoordinator' !== boxInitValue)
-                    // existing user is not LSP user. Can't set jobCoordinator role
-                    || (record.get('userGuid').length !== 0 && ! record.isLspUser() && 'jobCoordinator' === boxInitValue)
-                    || (record.isLspUser() && 'clientpm' === boxInitValue)
+                hidden = (record.isCoordinatorGroupUser() && (isAdminRole || isNotRequireClientRole) && 'jobCoordinator' !== boxInitValue)
+                    // existing user is not Coordinator group user. Can't set jobCoordinator role
+                    || (record.get('userGuid').length !== 0 && ! record.isCoordinatorGroupUser() && 'jobCoordinator' === boxInitValue)
+                    || (record.isCoordinatorGroupUser() && 'clientpm' === boxInitValue)
             ;
 
             box.setValue(roles.includes(boxInitValue));
@@ -582,25 +582,25 @@ Ext.define('Editor.view.admin.user.AddWindow', {
 
         me.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
 
-        const lspField = form.down('#lsp');
-        const lspStore = lspField.getStore();
+        const coordinatorGroupField = form.down('#coordinatorGroup');
+        const coordinatorGroupStore = coordinatorGroupField.getStore();
 
         Ext.Ajax.request({
-            url: Editor.data.restpath + 'lsp',
+            url: Editor.data.restpath + 'coordinatorgroup',
             method: 'GET',
             success: response => {
                 const data = response.responseJson;
-                lspStore.loadData(data.rows);
+                coordinatorGroupStore.loadData(data.rows);
 
-                const lsp = lspStore.getById(record.get('lsp'));
-                lspField.setValue(lsp);
-                lspField.setHidden(! lsp);
+                const coordinatorGroup = coordinatorGroupStore.getById(record.get('coordinatorGroup'));
+                coordinatorGroupField.setValue(coordinatorGroup);
+                coordinatorGroupField.setHidden(! coordinatorGroup);
 
-                if (lsp) {
+                if (coordinatorGroup) {
                     if (Editor.app.authenticatedUser.getRoles().includes('jobCoordinator')) {
                         form.down('customers').hide();
                     } else {
-                        me.updateCustomerField(form, lsp.get('customers'));
+                        me.updateCustomerField(form, coordinatorGroup.get('customers'));
                     }
                 }
             }

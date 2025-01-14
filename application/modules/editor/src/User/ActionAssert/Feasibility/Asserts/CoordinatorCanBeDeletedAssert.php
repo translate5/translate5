@@ -32,11 +32,11 @@ namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts\DefaultLspJobRestrictionAssert;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts\CoordinatorGroupJobRestrictionAssert;
+use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts\DefaultCoordinatorGroupJobRestrictionAssert;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts\LastCoordinatorFeasibilityAssert;
-use MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorAsserts\LspJobRestrictionAssert;
 use MittagQI\Translate5\User\Model\User;
 
 /**
@@ -62,8 +62,8 @@ final class CoordinatorCanBeDeletedAssert implements FeasibilityAssertInterface
             JobCoordinatorRepository::create(),
             [
                 LastCoordinatorFeasibilityAssert::create(),
-                LspJobRestrictionAssert::create(),
-                DefaultLspJobRestrictionAssert::create(),
+                CoordinatorGroupJobRestrictionAssert::create(),
+                DefaultCoordinatorGroupJobRestrictionAssert::create(),
             ],
         );
     }

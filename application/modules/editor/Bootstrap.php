@@ -205,7 +205,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceinstance', 'taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality', 'userassocdefault', 'log', 'collectionattributedatatype', 'token',
                 'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
-                'languageresourcesyncconnection', 'lsp', 'languageresourcecustomerassoc',
+                'languageresourcesyncconnection', 'coordinatorgroup', 'languageresourcecustomerassoc',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -232,12 +232,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
-        $this->front->getRouter()->addRoute('editorLspCustomer', new ZfExtended_Controller_CustomPathRestRoute(
+        $this->front->getRouter()->addRoute('editorCoordinatorGroupCustomer', new ZfExtended_Controller_CustomPathRestRoute(
             $this->front,
-            'editor/lsp/:lspId/customer',
+            'editor/coordinator-group/:groupId/customer',
             [
                 'module' => 'editor',
-                'controller' => 'lspcustomer',
+                'controller' => 'coordinatorgroupcustomer',
                 'action' => '',
             ],
         ));
@@ -254,7 +254,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 
         $this->front->getRouter()->addRoute('editorJobCoordinatorsOnJobUpdate', new ZfExtended_Controller_CustomPathRestRoute(
             $this->front,
-            'editor/task/:taskId/lsp-job/:jobId/combo/coordinators',
+            'editor/task/:taskId/coordinator-group-job/:jobId/combo/coordinators',
             [
                 'module' => 'editor',
                 'controller' => 'taskuserassoc',
@@ -263,7 +263,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ));
 
         $this->front->getRouter()->addRoute('editorCoordinatorsForNewJobInTask', new ZfExtended_Controller_RestLikeRoute(
-            'editor/task/:taskId/lsp-job/combo/coordinators',
+            'editor/task/:taskId/coordinator-group-job/combo/coordinators',
             [
                 'module' => 'editor',
                 'controller' => 'taskuserassoc',
@@ -865,19 +865,19 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ));
 
         $this->front->getRouter()->addRoute('editorCustomerDefaultJobsUpdateComboCoordinators', new ZfExtended_Controller_RestLikeRoute(
-            'editor/customers/:customerId/default-lsp-job/:jobId/combo/coordinators',
+            'editor/customers/:customerId/default-coordinator-group-job/:jobId/combo/coordinators',
             [
                 'module' => 'editor',
-                'controller' => 'defaultlspjob',
+                'controller' => 'defaultcoordinatorgroupjob',
                 'action' => 'coordinatorupdatecombo',
             ]
         ));
 
         $this->front->getRouter()->addRoute('editorCustomerDefaultJobsComboCoordinators', new ZfExtended_Controller_RestLikeRoute(
-            'editor/customers/:customerId/default-lsp-job/combo/coordinators',
+            'editor/customers/:customerId/default-coordinator-group-job/combo/coordinators',
             [
                 'module' => 'editor',
-                'controller' => 'defaultlspjob',
+                'controller' => 'defaultcoordinatorgroupjob',
                 'action' => 'coordinatorscombo',
             ]
         ));

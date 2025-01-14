@@ -9,24 +9,24 @@ use editor_Models_UserAssocDefault as DefaultUserJob;
 use editor_Utils;
 use editor_Workflow_Default;
 use editor_Workflow_Manager;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\DataProvider\HierarchicalDefaultLspJobsProvider;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\DataProvider\HierarchicalDefaultCoordinatorGroupJobsProvider;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Model\DefaultCoordinatorGroupJob;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Contract\CreateCoordinatorGroupJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Exception\NotFoundCoordinatorGroupJobException;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\CreateCoordinatorGroupJobOperation;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\DTO\NewCoordinatorGroupJobDto;
 use MittagQI\Translate5\JobAssignment\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\JobAssignment\DTO\WorkflowDto;
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\CreateLspJobOperationInterface;
-use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\CreateLspJobOperation;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\CreateUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\CreateUserJobOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\LspRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use Throwable;
 use Zend_Registry;
@@ -38,13 +38,13 @@ class JobAssignmentDefaults implements ITaskDefaults
 {
     public function __construct(
         private readonly ZfExtended_EventManager $events,
-        private readonly LspRepositoryInterface $lspRepository,
+        private readonly CoordinatorGroupRepositoryInterface $coordinatorGroupRepository,
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
-        private readonly LspJobRepository $lspJobRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
         private readonly UserJobRepository $userJobRepository,
-        private readonly HierarchicalDefaultLspJobsProvider $hierarchicalDefaultLspJobsProvider,
-        private readonly CreateLspJobOperationInterface $createLspJobOperation,
+        private readonly HierarchicalDefaultCoordinatorGroupJobsProvider $hierarchicalDefaultCoordinatorGroupJobsProvider,
+        private readonly CreateCoordinatorGroupJobOperationInterface $createCoordinatorGroupJobOperation,
         private readonly CreateUserJobOperationInterface $createUserJobOperation,
         private readonly editor_Workflow_Manager $workflowManager,
         private readonly ZfExtended_Logger $logger,
@@ -58,13 +58,13 @@ class JobAssignmentDefaults implements ITaskDefaults
     {
         return new self(
             new ZfExtended_EventManager(self::class),
-            LspRepository::create(),
+            CoordinatorGroupRepository::create(),
             DefaultUserJobRepository::create(),
-            LspUserRepository::create(),
-            LspJobRepository::create(),
+            CoordinatorGroupUserRepository::create(),
+            CoordinatorGroupJobRepository::create(),
             UserJobRepository::create(),
-            HierarchicalDefaultLspJobsProvider::create(),
-            CreateLspJobOperation::create(),
+            HierarchicalDefaultCoordinatorGroupJobsProvider::create(),
+            CreateCoordinatorGroupJobOperation::create(),
             CreateUserJobOperation::create(),
             new editor_Workflow_Manager(),
             Zend_Registry::get('logger')->cloneMe('userJob.default.assign'),
@@ -75,18 +75,18 @@ class JobAssignmentDefaults implements ITaskDefaults
     {
         $taskConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
 
-        foreach ($this->hierarchicalDefaultLspJobsProvider->getHierarchicallyFor($task) as $defaultLspJob) {
+        foreach ($this->hierarchicalDefaultCoordinatorGroupJobsProvider->getHierarchicallyFor($task) as $defaultGroupJob) {
             try {
-                $this->assignLspJob($defaultLspJob, $taskConfig, $task);
+                $this->assignCoordinatorGroupJob($defaultGroupJob, $taskConfig, $task);
             } catch (Throwable $e) {
                 $this->logger->error(
                     'E1677',
                     'Error while assigning default {type} job',
                     [
-                        'type' => 'lsp',
+                        'type' => 'Coordinator group',
                         'exception' => $e::class,
                         'message' => $e->getMessage(),
-                        'defaultLspJob' => $defaultLspJob->getId(),
+                        'defaultCoordinatorGroupJob' => $defaultGroupJob->getId(),
                         'task' => $task->getTaskGuid(),
                         'trace' => $e->getTraceAsString(),
                     ],
@@ -94,7 +94,7 @@ class JobAssignmentDefaults implements ITaskDefaults
             }
         }
 
-        foreach ($this->defaultUserJobRepository->getDefaultLspJobsForTask($task) as $defaultUserJob) {
+        foreach ($this->defaultUserJobRepository->getDefaultCoordinatorGroupJobsForTask($task) as $defaultUserJob) {
             try {
                 $this->assignUserJob($defaultUserJob, $taskConfig, $task);
             } catch (Throwable $e) {
@@ -118,16 +118,19 @@ class JobAssignmentDefaults implements ITaskDefaults
         ]);
     }
 
-    private function assignLspJob(DefaultLspJob $defaultLspJob, ?editor_Models_TaskConfig $taskConfig, Task $task): void
-    {
-        $dataJob = $this->defaultUserJobRepository->get((int) $defaultLspJob->getDataJobId());
+    private function assignCoordinatorGroupJob(
+        DefaultCoordinatorGroupJob $defaultCoordinatorGroupJob,
+        ?editor_Models_TaskConfig $taskConfig,
+        Task $task
+    ): void {
+        $dataJob = $this->defaultUserJobRepository->get((int) $defaultCoordinatorGroupJob->getDataJobId());
 
-        $workflow = $this->workflowManager->getCached($defaultLspJob->getWorkflow());
+        $workflow = $this->workflowManager->getCached($defaultCoordinatorGroupJob->getWorkflow());
 
         $workflowDto = new WorkflowDto(
-            $workflow->getRoleOfStep($defaultLspJob->getWorkflowStepName()),
+            $workflow->getRoleOfStep($defaultCoordinatorGroupJob->getWorkflowStepName()),
             $workflow->getName(),
-            $defaultLspJob->getWorkflowStepName(),
+            $defaultCoordinatorGroupJob->getWorkflowStepName(),
         );
 
         $trackingDto = new TrackChangesRightsDto(
@@ -136,37 +139,37 @@ class JobAssignmentDefaults implements ITaskDefaults
             (bool) $dataJob->getTrackchangesAcceptReject(),
         );
 
-        $lsp = $this->lspRepository->get((int) $defaultLspJob->getLspId());
+        $group = $this->coordinatorGroupRepository->get((int) $defaultCoordinatorGroupJob->getGroupId());
 
-        if (! $lsp->isDirectLsp()) {
+        if (! $group->isTopRankGroup()) {
             try {
-                $lspDataJob = $this->getLspDataJob(
-                    (int) $lsp->getParentId(),
+                $groupDataJob = $this->getCoordinatorGroupDataJob(
+                    (int) $group->getParentId(),
                     $task->getTaskGuid(),
-                    $defaultLspJob->getWorkflow(),
-                    $defaultLspJob->getWorkflowStepName(),
+                    $defaultCoordinatorGroupJob->getWorkflow(),
+                    $defaultCoordinatorGroupJob->getWorkflowStepName(),
                 );
-            } catch (NotFoundLspJobException) {
-                // PM or Coordinator haven't assigned default LSP job for parent of this LSP
+            } catch (NotFoundCoordinatorGroupJobException) {
+                // PM or Coordinator haven't assigned default Coordinator group job for parent of this Coordinator group
                 return;
             }
 
-            // For Sub LSP jobs Track changes permissions should be subset of parent LSP job
-            $trackingDto = $this->computeTrackChangesDto($lspDataJob, $dataJob);
+            // For Sub Coordinator group jobs Track changes permissions should be subset of parent Coordinator group job
+            $trackingDto = $this->computeTrackChangesDto($groupDataJob, $dataJob);
         }
 
         if ((int) $dataJob->getDeadlineDate() > 0) {
             $name = [
                 'runtimeOptions',
                 'workflow',
-                $defaultLspJob->getWorkflow(),
-                $defaultLspJob->getWorkflowStepName(),
+                $defaultCoordinatorGroupJob->getWorkflow(),
+                $defaultCoordinatorGroupJob->getWorkflowStepName(),
                 'defaultDeadlineDate',
             ];
             $taskConfig->updateInsertConfig($task->getTaskGuid(), implode('.', $name), $dataJob->getDeadlineDate());
         }
 
-        $createDto = new NewLspJobDto(
+        $createDto = new NewCoordinatorGroupJobDto(
             $task->getTaskGuid(),
             $dataJob->getUserGuid(),
             $this->getJobState($task),
@@ -177,24 +180,24 @@ class JobAssignmentDefaults implements ITaskDefaults
             $trackingDto,
         );
 
-        $this->createLspJobOperation->assignJob($createDto);
+        $this->createCoordinatorGroupJobOperation->assignJob($createDto);
     }
 
     private function assignUserJob(DefaultUserJob $defaultUserJob, ?editor_Models_TaskConfig $taskConfig, Task $task): void
     {
-        $lspUser = $this->lspUserRepository->findByUserGuid($defaultUserJob->getUserGuid());
-        $lspDataJob = null;
+        $groupUser = $this->coordinatorGroupUserRepository->findByUserGuid($defaultUserJob->getUserGuid());
+        $groupDataJob = null;
 
-        if (null !== $lspUser) {
+        if (null !== $groupUser) {
             try {
-                $lspDataJob = $this->getLspDataJob(
-                    (int) $lspUser->lsp->getId(),
+                $groupDataJob = $this->getCoordinatorGroupDataJob(
+                    (int) $groupUser->group->getId(),
                     $task->getTaskGuid(),
                     $defaultUserJob->getWorkflow(),
                     $defaultUserJob->getWorkflowStepName(),
                 );
-            } catch (NotFoundLspJobException) {
-                // PM haven't assigned default LSP job for this workflow and step
+            } catch (NotFoundCoordinatorGroupJobException) {
+                // PM haven't assigned default Coordinator group job for this workflow and step
                 return;
             }
         }
@@ -222,8 +225,8 @@ class JobAssignmentDefaults implements ITaskDefaults
             );
         }
 
-        // For LSP user jobs Track changes permissions should be subset of LSP job
-        $trackingDto = $this->computeTrackChangesDto($lspDataJob, $defaultUserJob);
+        // For Coordinator group user jobs Track changes permissions should be subset of Coordinator group job
+        $trackingDto = $this->computeTrackChangesDto($groupDataJob, $defaultUserJob);
 
         $createDto = new NewUserJobDto(
             $task->getTaskGuid(),
@@ -240,18 +243,18 @@ class JobAssignmentDefaults implements ITaskDefaults
         $this->createUserJobOperation->assignJob($createDto);
     }
 
-    private function computeTrackChangesDto(?UserJob $lspDataJob, DefaultUserJob $jobToAssign): TrackChangesRightsDto
+    private function computeTrackChangesDto(?UserJob $groupDataJob, DefaultUserJob $jobToAssign): TrackChangesRightsDto
     {
-        $show = $lspDataJob
-            ? $lspDataJob->getTrackchangesShow() && $jobToAssign->getTrackchangesShow()
+        $show = $groupDataJob
+            ? $groupDataJob->getTrackchangesShow() && $jobToAssign->getTrackchangesShow()
             : (bool) $jobToAssign->getTrackchangesShow();
 
-        $showAll = $lspDataJob
-            ? $lspDataJob->getTrackchangesShowAll() && $jobToAssign->getTrackchangesShowAll()
+        $showAll = $groupDataJob
+            ? $groupDataJob->getTrackchangesShowAll() && $jobToAssign->getTrackchangesShowAll()
             : (bool) $jobToAssign->getTrackchangesShowAll();
 
-        $acceptReject = $lspDataJob
-            ? $lspDataJob->getTrackchangesAcceptReject() && $jobToAssign->getTrackchangesAcceptReject()
+        $acceptReject = $groupDataJob
+            ? $groupDataJob->getTrackchangesAcceptReject() && $jobToAssign->getTrackchangesAcceptReject()
             : (bool) $jobToAssign->getTrackchangesAcceptReject();
 
         return new TrackChangesRightsDto($show, $showAll, $acceptReject);
@@ -282,17 +285,21 @@ class JobAssignmentDefaults implements ITaskDefaults
     }
 
     /**
-     * @throws NotFoundLspJobException
+     * @throws NotFoundCoordinatorGroupJobException
      */
-    private function getLspDataJob(int $lspId, string $taskGuid, string $workflow, string $workflowStepName): UserJob
-    {
-        $lspJob = $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
-            $lspId,
+    private function getCoordinatorGroupDataJob(
+        int $groupId,
+        string $taskGuid,
+        string $workflow,
+        string $workflowStepName
+    ): UserJob {
+        $groupJob = $this->coordinatorGroupJobRepository->getByCoordinatorGroupIdTaskGuidAndWorkflow(
+            $groupId,
             $taskGuid,
             $workflow,
             $workflowStepName,
         );
 
-        return $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
+        return $this->userJobRepository->getDataJobByCoordinatorGroupJob((int) $groupJob->getId());
     }
 }

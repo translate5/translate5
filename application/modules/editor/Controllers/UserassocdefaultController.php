@@ -28,14 +28,15 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_UserAssocDefault as DefaultUserJob;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CoordinatorDontBelongToLCoordinatorGroupException;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Exception\NotCoordinatorGroupCustomerException;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Operation\DTO\NewDefaultCoordinatorGroupJobDto;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Operation\WithAuthentication\CreateDefaultCoordinatorGroupJobOperation;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Operation\WithAuthentication\UpdateDefaultCoordinatorGroupJobOperation;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAssignmentViewDataProvider;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Exception\NotLspCustomerException;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DTO\NewDefaultLspJobDto;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\WithAuthentication\CreateDefaultLspJobOperation;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\WithAuthentication\UpdateDefaultLspJobOperation;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\DataProvider\DefaultUserJobViewDataProvider;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\DataProvider\UserProvider;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DTO\NewDefaultUserJobDto;
@@ -46,11 +47,10 @@ use MittagQI\Translate5\DefaultJobAssignment\Factory\NewDefaultJobDtoFactory;
 use MittagQI\Translate5\DefaultJobAssignment\Factory\UpdateDefaultJobDtoFactory;
 use MittagQI\Translate5\DefaultJobAssignment\Operation\WithAuthentication\DeleteDefaultJobAssignmentOperation;
 use MittagQI\Translate5\JobAssignment\Exception\InvalidTypeProvidedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
-use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
 use MittagQI\Translate5\Repository\CustomerRepository;
-use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultCoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
@@ -81,7 +81,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
 
     private CustomerActionPermissionAssert $customerPermissionAssert;
 
-    private DefaultLspJobRepository $defaultLspJobRepository;
+    private DefaultCoordinatorGroupJobRepository $defaultCoordinatorGroupJobRepository;
 
     public function init(): void
     {
@@ -93,7 +93,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
 
         $this->userRepository = new UserRepository();
         $this->defaultUserJobRepository = DefaultUserJobRepository::create();
-        $this->defaultLspJobRepository = DefaultLspJobRepository::create();
+        $this->defaultCoordinatorGroupJobRepository = DefaultCoordinatorGroupJobRepository::create();
         $this->customerRepository = CustomerRepository::create();
         $this->defaultUserJobViewDataProvider = DefaultUserJobViewDataProvider::create();
         $this->customerPermissionAssert = CustomerActionPermissionAssert::create();
@@ -160,11 +160,11 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
         try {
             $dto = NewDefaultJobDtoFactory::create()->fromRequest($this->getRequest());
 
-            if (TypeEnum::Lsp === $dto->type) {
-                $lspJob = CreateDefaultLspJobOperation::create()->assignJob(
-                    NewDefaultLspJobDto::fromDefaultJobDto($dto)
+            if (TypeEnum::Coordinator === $dto->type) {
+                $coordinatorGroupJob = CreateDefaultCoordinatorGroupJobOperation::create()->assignJob(
+                    NewDefaultCoordinatorGroupJobDto::fromDefaultJobDto($dto)
                 );
-                $userJob = $this->defaultUserJobRepository->get((int) $lspJob->getDataJobId());
+                $userJob = $this->defaultUserJobRepository->get((int) $coordinatorGroupJob->getDataJobId());
             } else {
                 $userJob = CreateDefaultUserJobOperation::create()->assignJob(
                     NewDefaultUserJobDto::fromDefaultJobDto($dto)
@@ -196,10 +196,11 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
         try {
             $dto = UpdateDefaultJobDtoFactory::create()->fromRequest($this->getRequest());
 
-            $lspJob = $this->defaultLspJobRepository->findDefaultLspJobByDataJobId((int) $job->getId());
+            $groupJob = $this->defaultCoordinatorGroupJobRepository
+                ->findDefaultCoordinatorGroupJobByDataJobId((int) $job->getId());
 
-            if (null !== $lspJob) {
-                UpdateDefaultLspJobOperation::create()->updateJob($lspJob, $dto);
+            if (null !== $groupJob) {
+                UpdateDefaultCoordinatorGroupJobOperation::create()->updateJob($groupJob, $dto);
             } else {
                 UpdateDefaultUserJobOperation::create()->updateJob($job, $dto);
             }
@@ -288,27 +289,27 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
                     ],
                 ],
             ),
-            OnlyCoordinatorCanBeAssignedToLspJobException::class => UnprocessableEntity::createResponse(
+            OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException::class => UnprocessableEntity::createResponse(
                 'E1682',
                 [
                     'userGuid' => [
-                        'Nur der Koordinator kann einem LSP-Auftrag zugewiesen werden',
+                        'Nur Koordinator kann dem Auftrag der Gruppe Koordinator zugewiesen werden',
                     ],
                 ],
             ),
-            NotLspCustomerException::class => UnprocessableEntity::createResponse(
+            NotCoordinatorGroupCustomerException::class => UnprocessableEntity::createResponse(
                 'E1682',
                 [
                     'userGuid' => [
-                        'Kunde ist nicht mit LSP des Nutzers verbunden',
+                        'Kunde ist nicht mit der Benutzergruppe Koordinator verbunden',
                     ],
                 ],
             ),
-            CoordinatorDontBelongToLspException::class => UnprocessableEntity::createResponse(
+            CoordinatorDontBelongToLCoordinatorGroupException::class => UnprocessableEntity::createResponse(
                 'E1682',
                 [
                     'userGuid' => [
-                        'Der Koordinator gehört nicht zum LSP',
+                        'coordinator-dont-belong-to-coordinator-group',
                     ],
                 ],
             ),

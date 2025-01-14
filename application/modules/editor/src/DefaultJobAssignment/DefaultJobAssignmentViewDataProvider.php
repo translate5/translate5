@@ -32,9 +32,9 @@ namespace MittagQI\Translate5\DefaultJobAssignment;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\ActionAssert\Permission\DefaultLspJobActionPermissionAssert;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\ActionAssert\Permission\DefaultCoordinatorGroupJobActionPermissionAssert;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\DataProvider\DefaultUserJobViewDataProvider;
-use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultCoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use MittagQI\Translate5\User\Model\User;
 
@@ -52,17 +52,17 @@ use MittagQI\Translate5\User\Model\User;
  * trackchangesShowAll: bool,
  * trackchangesAcceptReject: bool,
  * type: int,
- * lspId: int|null,
- * isLspJob: bool,
+ * groupId: int|null,
+ * isCoordinatorGroupJob: bool,
  * }
  */
 class DefaultJobAssignmentViewDataProvider
 {
     public function __construct(
         private readonly DefaultUserJobViewDataProvider $defaultUserJobViewDataProvider,
-        private readonly DefaultLspJobRepository $defaultLspJobRepository,
+        private readonly DefaultCoordinatorGroupJobRepository $defaultCoordinatorGroupJobRepository,
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
-        private readonly ActionPermissionAssertInterface $lspJobActionPermissionAssert,
+        private readonly ActionPermissionAssertInterface $defaultGroupJobActionPermissionAssert,
     ) {
     }
 
@@ -70,9 +70,9 @@ class DefaultJobAssignmentViewDataProvider
     {
         return new self(
             DefaultUserJobViewDataProvider::create(),
-            DefaultLspJobRepository::create(),
+            DefaultCoordinatorGroupJobRepository::create(),
             DefaultUserJobRepository::create(),
-            DefaultLspJobActionPermissionAssert::create(),
+            DefaultCoordinatorGroupJobActionPermissionAssert::create(),
         );
     }
 
@@ -84,11 +84,12 @@ class DefaultJobAssignmentViewDataProvider
         $jobs = [];
         $context = new PermissionAssertContext($viewer);
 
-        $lspJobs = $this->defaultLspJobRepository->getDefaultLspJobsOfForCustomerAndWorkflow($customerId, $workflow);
+        $groupJobs = $this->defaultCoordinatorGroupJobRepository
+            ->getDefaultCoordinatorGroupJobsOfForCustomerAndWorkflow($customerId, $workflow);
 
-        foreach ($lspJobs as $lspJob) {
-            if ($this->lspJobActionPermissionAssert->isGranted(DefaultJobAction::Read, $lspJob, $context)) {
-                $dataJob = $this->defaultUserJobRepository->get((int) $lspJob->getDataJobId());
+        foreach ($groupJobs as $groupJob) {
+            if ($this->defaultGroupJobActionPermissionAssert->isGranted(DefaultJobAction::Read, $groupJob, $context)) {
+                $dataJob = $this->defaultUserJobRepository->get((int) $groupJob->getDataJobId());
 
                 $jobs[] = $this->defaultUserJobViewDataProvider->buildJobView($dataJob);
             }

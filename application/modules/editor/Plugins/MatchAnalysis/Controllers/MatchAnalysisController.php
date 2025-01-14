@@ -26,7 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\ZfExtended\Controller\Response\Header;
 
 class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController
@@ -102,10 +102,12 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $noPricing = $this->entity->getPricing()['noPricing'];
         $pricingPresetId = $meta->getPricingPresetId();
 
-        $lspUserRepository = LspUserRepository::create();
-        $authLspUser = $lspUserRepository->findByUserGuid(ZfExtended_Authentication::getInstance()->getUserGuid());
+        $coordinatorGroupUserRepository = CoordinatorGroupUserRepository::create();
+        $authGroupUser = $coordinatorGroupUserRepository->findByUserGuid(
+            ZfExtended_Authentication::getInstance()->getUserGuid()
+        );
 
-        if ($authLspUser) {
+        if ($authGroupUser) {
             $pricingPresetId = null;
             $currency = null;
             $noPricing = true;

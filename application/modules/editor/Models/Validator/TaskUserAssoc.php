@@ -75,7 +75,7 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
         $this->addValidator('trackchangesShow', 'int');
         $this->addValidator('trackchangesShowAll', 'int');
         $this->addValidator('trackchangesAcceptReject', 'int');
-        $this->addValidator('lspJobId', 'int');
+        $this->addValidator('coordinatorGroupJobId', 'int');
 
         return parent::isValid($data);
     }

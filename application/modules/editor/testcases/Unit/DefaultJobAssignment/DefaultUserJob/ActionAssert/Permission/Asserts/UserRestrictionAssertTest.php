@@ -40,13 +40,14 @@ use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\ActionAssert\Permiss
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
 use MittagQI\Translate5\User\Model\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class UserRestrictionAssertTest extends TestCase
 {
-    private ActionPermissionAssertInterface $userPermissionAssert;
+    private MockObject|ActionPermissionAssertInterface $userPermissionAssert;
 
-    private UserRepository $userRepository;
+    private MockObject|UserRepository $userRepository;
 
     private UserRestrictionAssert $userRestrictionAssert;
 

@@ -32,8 +32,8 @@ namespace MittagQI\Translate5\Test\Unit\User\ActionAssert\Permission\Asserts;
 
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\CoordinatorGroup\CoordinatorGroupUser;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\SeeAllUsersPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
@@ -56,7 +56,7 @@ class SeeAllUsersPermissionAssertTest extends TestCase
     {
         $auditor = new SeeAllUsersPermissionAssert(
             $this->createMock(ZfExtended_Acl::class),
-            $this->createMock(LspUserRepositoryInterface::class)
+            $this->createMock(CoordinatorGroupUserRepositoryInterface::class)
         );
         $this->assertEquals($expected, $auditor->supports($action));
     }
@@ -86,10 +86,10 @@ class SeeAllUsersPermissionAssertTest extends TestCase
             )
             ->willReturn(true);
 
-        $lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
-        $lspUserRepository->method('findByUser')->willReturn(null);
+        $groupUserRepository = $this->createMock(CoordinatorGroupUserRepositoryInterface::class);
+        $groupUserRepository->method('findByUser')->willReturn(null);
 
-        $auditor = new SeeAllUsersPermissionAssert($acl, $lspUserRepository);
+        $auditor = new SeeAllUsersPermissionAssert($acl, $groupUserRepository);
         $auditor->assertGranted(UserAction::Update, $user, $context);
     }
 
@@ -105,14 +105,14 @@ class SeeAllUsersPermissionAssertTest extends TestCase
 
         $acl->expects($this->never())->method('isInAllowedRoles');
 
-        $lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
-        $lspUserRepository->method('findByUser')->willReturn(null);
+        $groupUserRepository = $this->createMock(CoordinatorGroupUserRepositoryInterface::class);
+        $groupUserRepository->method('findByUser')->willReturn(null);
 
-        $auditor = new SeeAllUsersPermissionAssert($acl, $lspUserRepository);
+        $auditor = new SeeAllUsersPermissionAssert($acl, $groupUserRepository);
         $auditor->assertGranted(UserAction::Read, $authUser, $context);
     }
 
-    public function testAssertGrantedOnLspUser(): void
+    public function testAssertGrantedOnCoordinatorGroupUser(): void
     {
         $user = $this->createMock(User::class);
         $manager = $this->createMock(User::class);
@@ -131,10 +131,10 @@ class SeeAllUsersPermissionAssertTest extends TestCase
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
-        $lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
-        $lspUserRepository->method('findByUser')->willReturn($this->createMock(LspUser::class));
+        $groupUserRepository = $this->createMock(CoordinatorGroupUserRepositoryInterface::class);
+        $groupUserRepository->method('findByUser')->willReturn($this->createMock(CoordinatorGroupUser::class));
 
-        $auditor = new SeeAllUsersPermissionAssert($acl, $lspUserRepository);
+        $auditor = new SeeAllUsersPermissionAssert($acl, $groupUserRepository);
         $auditor->assertGranted(UserAction::Update, $user, $context);
     }
 
@@ -157,10 +157,10 @@ class SeeAllUsersPermissionAssertTest extends TestCase
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
-        $lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
-        $lspUserRepository->method('findByUser')->willReturn(null);
+        $groupUserRepository = $this->createMock(CoordinatorGroupUserRepositoryInterface::class);
+        $groupUserRepository->method('findByUser')->willReturn(null);
 
-        $auditor = new SeeAllUsersPermissionAssert($acl, $lspUserRepository);
+        $auditor = new SeeAllUsersPermissionAssert($acl, $groupUserRepository);
         $this->expectException(NoAccessException::class);
         $auditor->assertGranted(UserAction::Update, $user, $context);
     }

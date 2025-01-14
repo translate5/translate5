@@ -32,19 +32,19 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Operation;
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Exception\NotFoundCoordinatorGroupJobException;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Model\CoordinatorGroupJob;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\CreateUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Event\UserJobCreatedEvent;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\CompetitiveJobCreationValidator;
 use MittagQI\Translate5\JobAssignment\UserJob\Validation\TrackChangesRightsValidator;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\TaskLockService;
@@ -57,8 +57,8 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
-        private readonly LspJobRepository $lspJobRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
         private readonly TaskRepository $taskRepository,
         private readonly TrackChangesRightsValidator $trackChangesRightsValidator,
         private readonly CompetitiveJobCreationValidator $competitiveJobCreationValidator,
@@ -75,8 +75,8 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
     {
         return new self(
             UserJobRepository::create(),
-            LspUserRepository::create(),
-            LspJobRepository::create(),
+            CoordinatorGroupUserRepository::create(),
+            CoordinatorGroupJobRepository::create(),
             TaskRepository::create(),
             TrackChangesRightsValidator::create(),
             CompetitiveJobCreationValidator::create(),
@@ -95,20 +95,20 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
         }
 
         try {
-            $lspUser = $this->lspUserRepository->findByUserGuid($dto->userGuid);
-            $lspJob = null;
+            $groupUser = $this->coordinatorGroupUserRepository->findByUserGuid($dto->userGuid);
+            $groupJob = null;
 
-            if (null !== $lspUser) {
-                $lspJob = $this->resolveLspJob((int) $lspUser->lsp->getId(), $dto);
+            if (null !== $groupUser) {
+                $groupJob = $this->resolveCoordinatorGroupJob((int) $groupUser->group->getId(), $dto);
 
-                $this->validateTrackChangesSettings($lspJob, $dto);
+                $this->validateTrackChangesSettings($groupJob, $dto);
             }
 
             $task = $this->taskRepository->getByGuid($dto->taskGuid);
 
             $this->competitiveJobCreationValidator->assertCanCreate(
                 $task,
-                $lspJob ? (int) $lspJob->getId() : null,
+                $groupJob ? (int) $groupJob->getId() : null,
                 $dto->workflow->workflow,
                 $dto->workflow->workflowStepName,
             );
@@ -127,8 +127,8 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             $job->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
             $job->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
 
-            if (null !== $lspJob) {
-                $job->setLspJobId($lspJob->getId());
+            if (null !== $groupJob) {
+                $job->setCoordinatorGroupJobId($groupJob->getId());
             }
 
             if (null !== $dto->segmentRange) {
@@ -155,36 +155,36 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
     }
 
     /**
-     * @throws AttemptToAssignLspUserToAJobBeforeLspJobCreatedException
+     * @throws AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException
      */
-    public function resolveLspJob(int $lspId, NewUserJobDto $dto): LspJob
+    public function resolveCoordinatorGroupJob(int $groupId, NewUserJobDto $dto): CoordinatorGroupJob
     {
         try {
-            return $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
-                $lspId,
+            return $this->coordinatorGroupJobRepository->getByCoordinatorGroupIdTaskGuidAndWorkflow(
+                $groupId,
                 $dto->taskGuid,
                 $dto->workflow->workflow,
                 $dto->workflow->workflowStepName,
             );
-        } catch (NotFoundLspJobException) {
-            throw new AttemptToAssignLspUserToAJobBeforeLspJobCreatedException();
+        } catch (NotFoundCoordinatorGroupJobException) {
+            throw new AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException();
         }
     }
 
     /**
-     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
+     * @throws TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException
      */
-    private function validateTrackChangesSettings(LspJob $lspJob, NewUserJobDto $dto): void
+    private function validateTrackChangesSettings(CoordinatorGroupJob $groupJob, NewUserJobDto $dto): void
     {
-        if (TypeEnum::Lsp === $dto->type) {
+        if (TypeEnum::Coordinator === $dto->type) {
             return;
         }
 
-        $this->trackChangesRightsValidator->assertTrackChangesRightsAreSubsetOfLspJob(
+        $this->trackChangesRightsValidator->assertTrackChangesRightsAreSubsetOfCoordinatorGroupJob(
             $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps,
             $dto->trackChangesRights->canSeeAllTrackChanges,
             $dto->trackChangesRights->canAcceptOrRejectTrackChanges,
-            $lspJob,
+            $groupJob,
         );
     }
 }

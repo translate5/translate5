@@ -120,7 +120,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     renderer: function (v, meta, rec) {
                         const types = {
                             1: 'Editor',
-                            2: 'LSP',
+                            2: 'Coordinator',
                         };
 
                         return types[v];
@@ -183,7 +183,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
 
         config.viewConfig = {
             getRowClass: function (record, rowIndex, rowParams, store) {
-                return record.get('isLspJob') ? 'lsp-job-row' : '';
+                return record.get('isCoordinatorGroupJob') ? 'coordinator-group-job-row' : '';
             }
         };
 

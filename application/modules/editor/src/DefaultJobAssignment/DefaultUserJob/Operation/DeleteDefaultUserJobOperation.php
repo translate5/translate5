@@ -32,14 +32,14 @@ namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation;
 
 use editor_Models_UserAssocDefault as DefaultUserJob;
 use MittagQI\Translate5\DefaultJobAssignment\Contract\DeleteDefaultUserJobOperationInterface;
-use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultCoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use RuntimeException;
 
 class DeleteDefaultUserJobOperation implements DeleteDefaultUserJobOperationInterface
 {
     public function __construct(
-        private readonly DefaultLspJobRepository $defaultLspJobRepository,
+        private readonly DefaultCoordinatorGroupJobRepository $defaultCoordinatorGroupJobRepository,
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
     ) {
     }
@@ -50,17 +50,17 @@ class DeleteDefaultUserJobOperation implements DeleteDefaultUserJobOperationInte
     public static function create(): self
     {
         return new self(
-            DefaultLspJobRepository::create(),
+            DefaultCoordinatorGroupJobRepository::create(),
             DefaultUserJobRepository::create(),
         );
     }
 
     public function delete(DefaultUserJob $job): void
     {
-        $lspJob = $this->defaultLspJobRepository->findDefaultLspJobByDataJobId((int) $job->getId());
+        $groupJob = $this->defaultCoordinatorGroupJobRepository->findDefaultCoordinatorGroupJobByDataJobId((int) $job->getId());
 
-        if (null !== $lspJob) {
-            throw new RuntimeException('Use DeleteDefaultLspJobOperationInterface::delete for LSP jobs');
+        if (null !== $groupJob) {
+            throw new RuntimeException('Use DeleteDefaultCoordinatorGroupJobOperationInterface::delete for CoordinatorGroup jobs');
         }
 
         $this->defaultUserJobRepository->delete((int) $job->getId());

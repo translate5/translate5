@@ -32,8 +32,8 @@ namespace MittagQI\Translate5\User\ActionAssert\Feasibility\Asserts\CoordinatorA
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\LastCoordinatorException;
 
 /**
@@ -64,7 +64,7 @@ final class LastCoordinatorFeasibilityAssert implements FeasibilityAssertInterfa
     public function assertAllowed(object $object): void
     {
         // Nobody can delete the last coordinator of an LSP
-        if ($this->jcRepository->getCoordinatorsCount($object->lsp) <= 1) {
+        if ($this->jcRepository->getCoordinatorsCount($object->group) <= 1) {
             throw new LastCoordinatorException($object);
         }
     }

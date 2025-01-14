@@ -33,15 +33,15 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\LspJob\Exception\NotFoundLspJobException;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Exception\NotFoundCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\UpdateUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidWorkflowStepProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\UpdateUserJobDto;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
@@ -54,7 +54,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
-        private readonly LspJobRepository $lspJobRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
     ) {
     }
 
@@ -69,7 +69,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
             JobCoordinatorRepository::create(),
-            LspJobRepository::create(),
+            CoordinatorGroupJobRepository::create(),
         );
     }
 
@@ -96,13 +96,13 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         PermissionAssertContext $context,
     ): void {
         try {
-            $this->lspJobRepository->getByLspIdTaskGuidAndWorkflow(
-                (int) $coordinator->lsp->getId(),
+            $this->coordinatorGroupJobRepository->getByCoordinatorGroupIdTaskGuidAndWorkflow(
+                (int) $coordinator->group->getId(),
                 $job->getTaskGuid(),
                 $dto->workflow->workflow,
                 $dto->workflow->workflowStepName,
             );
-        } catch (NotFoundLspJobException) {
+        } catch (NotFoundCoordinatorGroupJobException) {
             throw new InvalidWorkflowStepProvidedException();
         }
 

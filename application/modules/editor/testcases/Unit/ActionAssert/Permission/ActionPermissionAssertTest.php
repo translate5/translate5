@@ -40,7 +40,7 @@ class ActionPermissionAssertTest extends TestCase
 {
     public function testThrowsExceptionIfNoAssertionsMade(): void
     {
-        $assert = new class ([]) extends ActionPermissionAssert {
+        $assert = new class([]) extends ActionPermissionAssert {
         };
 
         $this->expectExceptionMessage('No assertion made for action ' . Action::Read->value);

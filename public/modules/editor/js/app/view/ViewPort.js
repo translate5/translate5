@@ -41,7 +41,7 @@ Ext.define('Editor.view.ViewPort', {
         'Editor.view.LanguageResources.TmOverviewPanel',
         'Editor.view.admin.preferences.OverviewPanel',
         'Editor.view.project.ProjectPanel',
-        'Editor.view.admin.lsp.Panel',
+        'Editor.view.admin.coordinatorGroup.Panel',
     ],
     viewModel: {
         type: 'viewport',
@@ -117,8 +117,8 @@ Ext.define('Editor.view.ViewPort', {
             mainSections.push({ xtype: 'customerPanel' });
         }
 
-        if (user.isAllowed('lspAdministration')) {
-            mainSections.push({ xtype: 'lspPanel' });
+        if (user.isAllowed('coordinatorGroupAdministration')) {
+            mainSections.push({ xtype: 'coordinatorGroupPanel' });
         }
 
         //the preferences panel is responsible for itself if it is visible or not!

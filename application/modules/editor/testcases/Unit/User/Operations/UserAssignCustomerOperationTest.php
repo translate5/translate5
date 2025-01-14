@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\User\Operations;
 
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CustomerDoesNotBelongToCoordinatorGroupException;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\UserAssignCustomersOperation;
@@ -59,12 +59,12 @@ class UserAssignCustomerOperationTest extends TestCase
 
     public function testThrowsExceptionOnNotAllowedCustomer(): void
     {
-        $this->expectException(CustomerDoesNotBelongToLspException::class);
+        $this->expectException(CustomerDoesNotBelongToCoordinatorGroupException::class);
 
         $this->userCustomerAssociationValidator
             ->expects(self::once())
             ->method('assertCustomersMayBeAssociatedWithUser')
-            ->willThrowException($this->createMock(CustomerDoesNotBelongToLspException::class));
+            ->willThrowException($this->createMock(CustomerDoesNotBelongToCoordinatorGroupException::class));
 
         $user = $this->createMock(User::class);
 

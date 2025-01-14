@@ -33,20 +33,20 @@ namespace MittagQI\Translate5\User\Validation;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CustomerDoesNotBelongToCoordinatorGroupException;
+use MittagQI\Translate5\CoordinatorGroup\Validation\CoordinatorGroupCustomerAssociationValidator;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\CustomerRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Model\User;
 
 class UserCustomerAssociationValidator
 {
     public function __construct(
-        private readonly LspUserRepository $lspUserRepository,
-        private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
+        private readonly CoordinatorGroupUserRepository $coordinatorGroupUserRepository,
+        private readonly CoordinatorGroupCustomerAssociationValidator $coordinatorGroupCustomerAssociationValidator,
         private readonly CustomerRepository $customerRepository,
         private readonly ActionPermissionAssertInterface $customerPermissionAssert,
     ) {
@@ -58,15 +58,15 @@ class UserCustomerAssociationValidator
     public static function create(): self
     {
         return new self(
-            LspUserRepository::create(),
-            LspCustomerAssociationValidator::create(),
+            CoordinatorGroupUserRepository::create(),
+            CoordinatorGroupCustomerAssociationValidator::create(),
             new CustomerRepository(),
             CustomerActionPermissionAssert::create(),
         );
     }
 
     /**
-     * @throws CustomerDoesNotBelongToLspException
+     * @throws CustomerDoesNotBelongToCoordinatorGroupException
      */
     public function assertCustomersMayBeAssociatedWithUser(User $user, int ...$customerIds): void
     {
@@ -74,11 +74,11 @@ class UserCustomerAssociationValidator
             return;
         }
 
-        $lspUser = $this->lspUserRepository->findByUser($user);
+        $groupUser = $this->coordinatorGroupUserRepository->findByUser($user);
 
-        if (null !== $lspUser) {
-            $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(
-                (int) $lspUser->lsp->getId(),
+        if (null !== $groupUser) {
+            $this->coordinatorGroupCustomerAssociationValidator->assertCustomersAreSubsetForCoordinatorGroup(
+                (int) $groupUser->group->getId(),
                 ...$customerIds
             );
         }

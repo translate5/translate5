@@ -33,11 +33,11 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Contract;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirmedLspJobYetException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyOneUniqueLspJobCanBeAssignedPerTaskException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirmedCoordinatorGroupJobYetException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyOneUniqueCoordinatorGroupJobCanBeAssignedPerTaskException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
@@ -46,16 +46,16 @@ interface CreateUserJobOperationInterface
 {
     /**
      * @throws ConfirmedCompetitiveJobAlreadyExistsException
-     * @throws CoordinatorHasNotConfirmedLspJobYetException
+     * @throws CoordinatorHasNotConfirmedCoordinatorGroupJobYetException
      * @throws InexistentUserException
      * @throws \ZfExtended_NotAuthenticatedException
      * @throws \ZfExtended_NotFoundException
      * @throws PermissionExceptionInterface
-     * @throws AttemptToAssignLspUserToAJobBeforeLspJobCreatedException
+     * @throws AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException
      * @throws InexistentTaskException
-     * @throws OnlyCoordinatorCanBeAssignedToLspJobException
-     * @throws OnlyOneUniqueLspJobCanBeAssignedPerTaskException
-     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
+     * @throws OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException
+     * @throws OnlyOneUniqueCoordinatorGroupJobCanBeAssignedPerTaskException
+     * @throws TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException
      */
     public function assignJob(NewUserJobDto $dto): UserJob;
 }

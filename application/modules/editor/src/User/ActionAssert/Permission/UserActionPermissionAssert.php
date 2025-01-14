@@ -31,9 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\ActionAssert\Permission;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\CoordinatorGroupUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\IsEditableForAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\JobCoordinatorPermissionAssert;
-use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\LspUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\SeeAllUsersPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
@@ -50,7 +50,7 @@ final class UserActionPermissionAssert extends ActionPermissionAssert
     {
         return new self([
             SeeAllUsersPermissionAssert::create(),
-            LspUserAccessPermissionAssert::create(),
+            CoordinatorGroupUserAccessPermissionAssert::create(),
             new IsEditableForAssert(),
             JobCoordinatorPermissionAssert::create(),
         ]);

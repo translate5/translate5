@@ -31,11 +31,11 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\User\Validation;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
-use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
+use MittagQI\Translate5\CoordinatorGroup\CoordinatorGroupUser;
+use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
+use MittagQI\Translate5\CoordinatorGroup\Validation\CoordinatorGroupCustomerAssociationValidator;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\CustomerRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Validation\UserCustomerAssociationValidator;
@@ -44,9 +44,9 @@ use PHPUnit\Framework\TestCase;
 
 class UserCustomerAssociationValidatorTest extends TestCase
 {
-    private LspUserRepository|MockObject $lspUserRepository;
+    private CoordinatorGroupUserRepository|MockObject $coordinatorGroupUserRepository;
 
-    private LspCustomerAssociationValidator|MockObject $lspCustomerAssociationValidator;
+    private CoordinatorGroupCustomerAssociationValidator|MockObject $coordinatorGroupCustomerAssociationValidatorCustomerAssociationValidator;
 
     private CustomerRepository|MockObject $customerRepository;
 
@@ -56,14 +56,16 @@ class UserCustomerAssociationValidatorTest extends TestCase
 
     public function setUp(): void
     {
-        $this->lspUserRepository = $this->createMock(LspUserRepository::class);
-        $this->lspCustomerAssociationValidator = $this->createMock(LspCustomerAssociationValidator::class);
+        $this->coordinatorGroupUserRepository = $this->createMock(CoordinatorGroupUserRepository::class);
+        $this->coordinatorGroupCustomerAssociationValidatorCustomerAssociationValidator = $this->createMock(
+            CoordinatorGroupCustomerAssociationValidator::class
+        );
         $this->customerRepository = $this->createMock(CustomerRepository::class);
         $this->customerPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
 
         $this->validator = new UserCustomerAssociationValidator(
-            $this->lspUserRepository,
-            $this->lspCustomerAssociationValidator,
+            $this->coordinatorGroupUserRepository,
+            $this->coordinatorGroupCustomerAssociationValidatorCustomerAssociationValidator,
             $this->customerRepository,
             $this->customerPermissionAssert
         );
@@ -80,9 +82,9 @@ class UserCustomerAssociationValidatorTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testAssertCustomersMayBeAssociatedWithUserWithNotLspUser(): void
+    public function testAssertCustomersMayBeAssociatedWithUserWithNotCoordinatorGroupUser(): void
     {
-        $this->lspUserRepository->method('findByUser')->willReturn(null);
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn(null);
 
         $user = $this->createMock(User::class);
         $user->method('__call')->willReturnMap([
@@ -93,9 +95,9 @@ class UserCustomerAssociationValidatorTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testAssertCustomersMayBeAssociatedWithUserWithNotLspUserAndEmptyCustomers(): void
+    public function testAssertCustomersMayBeAssociatedWithUserWithNotCoordinatorGroupUserAndEmptyCustomers(): void
     {
-        $this->lspUserRepository->method('findByUser')->willReturn(null);
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn(null);
 
         $user = $this->createMock(User::class);
         $user->method('__call')->willReturnMap([
@@ -113,17 +115,17 @@ class UserCustomerAssociationValidatorTest extends TestCase
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
-        $lspUser = new LspUser(
+        $groupUser = new CoordinatorGroupUser(
             bin2hex(random_bytes(16)),
             $user,
-            $this->createMock(LanguageServiceProvider::class),
+            $this->createMock(CoordinatorGroup::class),
         );
 
-        $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn($groupUser);
 
-        $this->lspCustomerAssociationValidator
+        $this->coordinatorGroupCustomerAssociationValidatorCustomerAssociationValidator
             ->expects(self::once())
-            ->method('assertCustomersAreSubsetForLSP')
+            ->method('assertCustomersAreSubsetForCoordinatorGroup')
             ->willThrowException(new CustomerDoesNotBelongToUserException(1, $user->getUserGuid()));
 
         $this->expectException(CustomerDoesNotBelongToUserException::class);
@@ -138,17 +140,17 @@ class UserCustomerAssociationValidatorTest extends TestCase
             ['getUserGuid', [], bin2hex(random_bytes(16))],
         ]);
 
-        $lspUser = new LspUser(
+        $groupUser = new CoordinatorGroupUser(
             bin2hex(random_bytes(16)),
             $user,
-            $this->createMock(LanguageServiceProvider::class),
+            $this->createMock(CoordinatorGroup::class),
         );
 
-        $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn($groupUser);
 
-        $this->lspCustomerAssociationValidator
+        $this->coordinatorGroupCustomerAssociationValidatorCustomerAssociationValidator
             ->expects(self::once())
-            ->method('assertCustomersAreSubsetForLSP');
+            ->method('assertCustomersAreSubsetForCoordinatorGroup');
 
         $this->validator->assertCustomersMayBeAssociatedWithUser($user, 12);
     }

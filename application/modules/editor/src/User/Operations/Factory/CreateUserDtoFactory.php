@@ -34,14 +34,14 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\LspAction;
-use MittagQI\Translate5\LSP\ActionAssert\Permission\LspActionPermissionAssert;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\CoordinatorGroup\ActionAssert\Permission\CoordinatorGroupAction;
+use MittagQI\Translate5\CoordinatorGroup\ActionAssert\Permission\CoordinatorGroupActionPermissionAssert;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\User\Exception\AttemptToSetLspForNonJobCoordinatorException;
+use MittagQI\Translate5\User\Exception\AttemptToSetCoordinatorGroupForNonJobCoordinatorException;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\User\Operations\DTO\CreateUserDto;
 use REST_Controller_Request_Http as Request;
@@ -55,9 +55,9 @@ class CreateUserDtoFactory
     public function __construct(
         private readonly ZfExtended_AuthenticationInterface $authentication,
         private readonly UserRepository $userRepository,
-        private readonly LspRepositoryInterface $lspRepository,
+        private readonly CoordinatorGroupRepositoryInterface $coordinatorGroupRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
-        private readonly ActionPermissionAssertInterface $lspPermissionAssert,
+        private readonly ActionPermissionAssertInterface $coordinatorGroupPermissionAssert,
     ) {
     }
 
@@ -69,16 +69,16 @@ class CreateUserDtoFactory
         return new self(
             ZfExtended_Authentication::getInstance(),
             new UserRepository(),
-            LspRepository::create(),
+            CoordinatorGroupRepository::create(),
             JobCoordinatorRepository::create(),
-            LspActionPermissionAssert::create(),
+            CoordinatorGroupActionPermissionAssert::create(),
         );
     }
 
     /**
-     * @throws AttemptToSetLspForNonJobCoordinatorException
+     * @throws AttemptToSetCoordinatorGroupForNonJobCoordinatorException
      * @throws PermissionExceptionInterface
-     * @throws \MittagQI\Translate5\LSP\Exception\LspNotFoundException
+     * @throws \MittagQI\Translate5\CoordinatorGroup\Exception\CoordinatorGroupNotFoundException
      */
     public function fromRequest(Request $request): CreateUserDto
     {
@@ -87,8 +87,8 @@ class CreateUserDtoFactory
 
         $roles = explode(',', trim($data['roles'] ?? '', ' ,'));
 
-        if (! in_array(Roles::JOB_COORDINATOR, $roles) && isset($data['lsp'])) {
-            throw new AttemptToSetLspForNonJobCoordinatorException();
+        if (! in_array(Roles::JOB_COORDINATOR, $roles) && isset($data['coordinatorGroup'])) {
+            throw new AttemptToSetCoordinatorGroupForNonJobCoordinatorException();
         }
 
         $customerIds = array_filter(
@@ -100,9 +100,9 @@ class CreateUserDtoFactory
 
         $authUser = $this->userRepository->get($this->authentication->getUserId());
 
-        $lsp = $this->fetchLspForAssignment($data['lsp'] ?? null, $authUser);
+        $coordinatorGroup = $this->fetchCoordinatorGroupForAssignment($data['coordinatorGroup'] ?? null, $authUser);
 
-        $lspId = null === $lsp ? null : (int) $lsp->getId();
+        $coordinatorGroupId = null === $coordinatorGroup ? null : (int) $coordinatorGroup->getId();
 
         $guid = ZfExtended_Utils::guid(true);
 
@@ -115,7 +115,7 @@ class CreateUserDtoFactory
             $data['gender'] ?? ZfExtended_Models_User::GENDER_NONE,
             $roles,
             $customerIds,
-            $lspId,
+            $coordinatorGroupId,
             isset($data['passwd']) ? trim($data['passwd']) : null,
             $data['locale'] ?? null,
         );
@@ -123,24 +123,24 @@ class CreateUserDtoFactory
 
     /**
      * @throws PermissionExceptionInterface
-     * @throws \MittagQI\Translate5\LSP\Exception\LspNotFoundException
+     * @throws \MittagQI\Translate5\CoordinatorGroup\Exception\CoordinatorGroupNotFoundException
      */
-    private function fetchLspForAssignment(?int $lspId, User $authUser): ?LanguageServiceProvider
+    private function fetchCoordinatorGroupForAssignment(?int $groupId, User $authUser): ?CoordinatorGroup
     {
-        if (null !== $lspId) {
-            $lsp = $this->lspRepository->get($lspId);
+        if (null !== $groupId) {
+            $coordinatorGroup = $this->coordinatorGroupRepository->get($groupId);
 
-            $this->lspPermissionAssert->assertGranted(
-                LspAction::Read,
-                $lsp,
+            $this->coordinatorGroupPermissionAssert->assertGranted(
+                CoordinatorGroupAction::Read,
+                $coordinatorGroup,
                 new PermissionAssertContext($authUser)
             );
 
-            return $lsp;
+            return $coordinatorGroup;
         }
 
         $coordinator = $this->coordinatorRepository->findByUser($authUser);
 
-        return $coordinator?->lsp;
+        return $coordinator?->group;
     }
 }

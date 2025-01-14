@@ -34,7 +34,7 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\DeleteUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\ForceUserActionFeasibilityAssert;
@@ -48,7 +48,7 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly LspUserRepository $lspUserRepository,
+        private readonly CoordinatorGroupUserRepository $coordinatorGroupUserRepository,
         private readonly UserJobRepository $userJobRepository,
         private readonly ActionFeasibilityAssertInterface $userFeasibilityAssert,
         private readonly ActionFeasibilityAssertInterface $forceUserFeasibilityAssert,
@@ -64,7 +64,7 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
     {
         return new self(
             new UserRepository(),
-            LspUserRepository::create(),
+            CoordinatorGroupUserRepository::create(),
             UserJobRepository::create(),
             UserActionFeasibilityAssert::create(),
             ForceUserActionFeasibilityAssert::create(),
@@ -93,10 +93,10 @@ final class UserDeleteOperation implements UserDeleteOperationInterface
             $this->deleteUserJobAssignmentOperation->forceDelete($job);
         }
 
-        $lspUser = $this->lspUserRepository->findByUser($user);
+        $groupUser = $this->coordinatorGroupUserRepository->findByUser($user);
 
-        if ($lspUser !== null) {
-            $this->lspUserRepository->delete($lspUser);
+        if ($groupUser !== null) {
+            $this->coordinatorGroupUserRepository->delete($groupUser);
         }
 
         $this->userRepository->delete($user);

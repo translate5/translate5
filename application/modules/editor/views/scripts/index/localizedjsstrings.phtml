@@ -1181,7 +1181,7 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             confirmDeleteTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>',
             confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
-            confirmDeleteLspJob: '<?php echo $this->translate->_('userJob.delete.confirmDeleteLspJob');?>',
+            confirmDeleteCoordinatorGroupJob: '<?php echo $this->translate->_('userJob.delete.confirmDeleteCoordinatorGroupJob');?>',
             userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
             typeCol: '<?php echo $this->translate->_('Typ');?>',
             roleCol: '<?php echo $this->translate->_('Rolle');?>',
@@ -2547,19 +2547,19 @@ etc.')?>'
         emptyTableText: '<?= $this->translate->_('crossLanguageResourceSynchronization.emptyTableText') ?>',
     },
 
-    lsp: {
-        title: '<?= $this->translate->_('LSP') ?>',
+    coordinatorGroup: {
+        title: '<?= $this->translate->_('Coordinator Group') ?>',
         reloadBtnTooltip: '<?= $this->translate->_('Aktualisieren') ?>',
         addNewBtnTooltip: '<?= $this->translate->_('Aktualisieren') ?>',
         confirmDeleteTitle: '<?= $this->translate->_('Löschen') ?>',
-        confirmDeleteText: '<?= $this->translate->_('Wollen Sie den LSP wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden. Bitte beachten Sie, dass mit dem Löschen des LSP auch alle untergeordneten LSPs mit allen zugehörigen Job-Koordinatoren und Benutzern mit den ihnen zugewiesenen Jobs gelöscht werden.') ?>',
-        enterLspName: '<?= $this->translate->_('Bitte geben Sie den LSP-Namen in das Textfeld unten ein, um fortzufahren.') ?>',
+        confirmDeleteText: '<?= $this->translate->_('coordinatorGroup.confirmDeleteText') ?>',
+        enterCoordinatorGroupName: '<?= $this->translate->_('coordinatorGroup.enterCoordinatorGroupName') ?>',
         confirmDeleteWrongName: '<?= $this->translate->_('Falscher Name') ?>',
         editCustomers: '<?= $this->translate->_('Kunden bearbeiten') ?>',
         assignedCustomers: '<?= $this->translate->_('Zugewiesene Kunden') ?>',
         assignCustomer: '<?= $this->translate->_('Kunde zuweisen') ?>',
         unassignCustomer: '<?= $this->translate->_('Zuweisung des Kunden aufheben') ?>',
-        confirmUnassignCustomer: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu LSP {1} aufheben wollen? Dadurch werden auch alle Kunden-LSP bezogenen Jobs gelöscht in der gesamten Lieferkette (Sub-LSPs etc.).') ?>',
+        confirmUnassignCustomer: '<?= $this->translate->_('coordinatorGroup.confirmUnassignCustomer') ?>',
     },
     log: {
         logColumnText: '<?= $this->translate->_('Ereignisse') ?>',

@@ -33,9 +33,9 @@ namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 use BackedEnum;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NoAccessToUserException;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
@@ -47,7 +47,7 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly JobCoordinatorRepository $coordinatorRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
     ) {
     }
 
@@ -58,7 +58,7 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
     {
         return new self(
             JobCoordinatorRepository::create(),
-            LspUserRepository::create(),
+            CoordinatorGroupUserRepository::create(),
         );
     }
 
@@ -68,7 +68,7 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
     }
 
     /**
-     * Coordinator allowed to manage only his LSP users and Coordinators of his sub LSPs
+     * Coordinator allowed to manage only his Coordinator group users and Coordinators of his sub Groups
      *
      * {@inheritDoc}
      */
@@ -84,21 +84,21 @@ final class JobCoordinatorPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        $lspUser = $this->lspUserRepository->findByUser($object);
+        $groupUser = $this->coordinatorGroupUserRepository->findByUser($object);
 
-        if (null === $lspUser) {
+        if (null === $groupUser) {
             throw new NoAccessToUserException($object);
         }
 
-        if ($authCoordinator->isSupervisorOf($lspUser)) {
+        if ($authCoordinator->isSupervisorOf($groupUser)) {
             return;
         }
 
-        if (! $lspUser->isCoordinator()) {
+        if (! $groupUser->isCoordinator()) {
             throw new NoAccessToUserException($object);
         }
 
-        if (! $lspUser->lsp->isSubLspOf($authCoordinator->lsp)) {
+        if (! $groupUser->group->isSubGroupOf($authCoordinator->group)) {
             throw new NoAccessToUserException($object);
         }
     }

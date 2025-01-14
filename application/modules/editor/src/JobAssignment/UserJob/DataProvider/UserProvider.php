@@ -33,10 +33,10 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\DataProvider;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderTable;
-use MittagQI\Translate5\LSP\Model\Db\LanguageServiceProviderUserTable;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\CoordinatorGroup\Model\Db\CoordinatorGroupTable;
+use MittagQI\Translate5\CoordinatorGroup\Model\Db\CoordinatorGroupUserTable;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Model\Db\CoordinatorGroupJobTable;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\User\DataProvider\PermissionAwareUserFetcher;
@@ -79,7 +79,7 @@ class UserProvider
         if ($viewer->isAdmin()) {
             return array_merge(
                 $this->getSimpleUsers($viewer),
-                $this->getLspUsers($task->getTaskGuid(), $viewer)
+                $this->getCoordinatorGroupUsers($task->getTaskGuid(), $viewer)
             );
         }
 
@@ -95,7 +95,7 @@ class UserProvider
             return [];
         }
 
-        return $this->getLspUsers($task->getTaskGuid(), $viewer);
+        return $this->getCoordinatorGroupUsers($task->getTaskGuid(), $viewer);
     }
 
     /**
@@ -112,12 +112,12 @@ class UserProvider
             )
             ->joinLeft(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
+                    'groupUser' => CoordinatorGroupUserTable::TABLE_NAME,
                 ],
-                'lspUser.userId = user.id',
-                ['lspUser.lspId']
+                'groupUser.userId = user.id',
+                ['groupUser.groupId']
             )
-            ->where('lspUser.lspId IS NULL')
+            ->where('groupUser.groupId IS NULL')
             ->where('user.login != ?', ZfExtended_Models_User::SYSTEM_LOGIN)
         ;
 
@@ -131,11 +131,11 @@ class UserProvider
     }
 
     /**
-     * It is impossible to create LSP User job for LSP User without LSP job
+     * It is impossible to create Coordinator group User job for Coordinator group User without Coordinator group job
      *
      * @return UserData[]
      */
-    private function getLspUsers(string $taskGuid, User $viewer): array
+    private function getCoordinatorGroupUsers(string $taskGuid, User $viewer): array
     {
         $select = $this->db
             ->select()
@@ -147,32 +147,32 @@ class UserProvider
             )
             ->join(
                 [
-                    'lspUser' => LanguageServiceProviderUserTable::TABLE_NAME,
+                    'groupUser' => CoordinatorGroupUserTable::TABLE_NAME,
                 ],
-                'lspUser.userId = user.id',
+                'groupUser.userId = user.id',
                 []
             )
             ->join(
                 [
-                    'lsp' => LanguageServiceProviderTable::TABLE_NAME,
+                    'group' => CoordinatorGroupTable::TABLE_NAME,
                 ],
-                'lspUser.lspId = lsp.id',
+                'groupUser.groupId = group.id',
                 []
             )
             ->join(
                 [
-                    'lspJob' => LspJobTable::TABLE_NAME,
+                    'groupJob' => CoordinatorGroupJobTable::TABLE_NAME,
                 ],
-                'lspJob.lspId = lsp.id',
+                'groupJob.groupId = group.id',
                 []
             )
-            ->where('lspJob.taskGuid = ?', $taskGuid)
+            ->where('groupJob.taskGuid = ?', $taskGuid)
         ;
 
         if ($viewer->isCoordinator()) {
             $coordinator = $this->jobCoordinatorRepository->getByUser($viewer);
 
-            $select->where('lsp.id = ?', $coordinator->lsp->getId());
+            $select->where('group.id = ?', $coordinator->group->getId());
         }
 
         return array_map(

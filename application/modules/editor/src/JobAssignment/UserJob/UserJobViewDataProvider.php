@@ -37,7 +37,7 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
-use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -71,9 +71,9 @@ use ZfExtended_Factory;
  * firstName: string,
  * surName: string,
  * longUserName: string,
- * lspId: int|null,
- * isLspJob: bool,
- * isLspUserJob: bool,
+ * groupId: int|null,
+ * isCoordinatorGroupJob: bool,
+ * isCoordinatorGroupUserJob: bool,
  * staticAuthHash?: string,
  * }
  */
@@ -81,7 +81,7 @@ class UserJobViewDataProvider
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
-        private readonly LspJobRepository $lspJobRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
         private readonly ActionPermissionAssertInterface $userJobPermissionAssert,
         private readonly UserRepository $userRepository,
         private readonly TaskRepository $taskRepository,
@@ -96,7 +96,7 @@ class UserJobViewDataProvider
     {
         return new self(
             UserJobRepository::create(),
-            LspJobRepository::create(),
+            CoordinatorGroupJobRepository::create(),
             UserJobActionPermissionAssert::create(),
             new UserRepository(),
             TaskRepository::create(),
@@ -184,10 +184,10 @@ class UserJobViewDataProvider
         Task $task,
         User $viewer,
     ): array {
-        $lspJob = null;
+        $groupJob = null;
 
-        if ($job->isLspJob()) {
-            $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
+        if ($job->isCoordinatorGroupJob()) {
+            $groupJob = $this->coordinatorGroupJobRepository->get((int) $job->getCoordinatorGroupJobId());
         }
 
         $row = [
@@ -215,9 +215,9 @@ class UserJobViewDataProvider
             'firstName' => $assignedUser->getFirstName(),
             'surName' => $assignedUser->getSurName(),
             'longUserName' => $assignedUser->getUsernameLong(),
-            'lspId' => $lspJob ? (int) $lspJob->getLspId() : null,
-            'isLspJob' => $job->isLspJob(),
-            'isLspUserJob' => $job->isLspUserJob(),
+            'groupId' => $groupJob ? (int) $groupJob->getGroupId() : null,
+            'isCoordinatorGroupJob' => $job->isCoordinatorGroupJob(),
+            'isCoordinatorGroupUserJob' => $job->isCoordinatorGroupUserJob(),
         ];
 
         if ($this->acl->isInAllowedRoles($viewer->getRoles(), Rights::ID, Rights::READ_AUTH_HASH)) {

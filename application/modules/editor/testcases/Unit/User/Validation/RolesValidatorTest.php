@@ -35,8 +35,8 @@ use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
 use MittagQI\Translate5\Acl\ExpandRolesService;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\Validation\RolesValidator;
-use MittagQI\Translate5\LSP\LspUser;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\CoordinatorGroup\CoordinatorGroupUser;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
 use MittagQI\Translate5\User\Exception\UserIsNotAuthorisedToAssignRoleException;
 use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -53,18 +53,18 @@ class RolesValidatorTest extends TestCase
 
     private ExpandRolesService|MockObject $expandRolesService;
 
-    private LspUserRepositoryInterface|MockObject $lspUserRepository;
+    private CoordinatorGroupUserRepositoryInterface|MockObject $coordinatorGroupUserRepository;
 
     public function setUp(): void
     {
         $this->acl = $this->createMock(ZfExtended_Acl::class);
         $this->expandRolesService = $this->createMock(ExpandRolesService::class);
-        $this->lspUserRepository = $this->createMock(LspUserRepositoryInterface::class);
+        $this->coordinatorGroupUserRepository = $this->createMock(CoordinatorGroupUserRepositoryInterface::class);
 
         $this->validator = new RolesValidator(
             $this->acl,
             $this->expandRolesService,
-            $this->lspUserRepository,
+            $this->coordinatorGroupUserRepository,
         );
     }
 
@@ -149,27 +149,27 @@ class RolesValidatorTest extends TestCase
 
     public function assertRolesCanBeSetForUserProvider(): iterable
     {
-        $lspUser = $this->createMock(LspUser::class);
+        $groupUser = $this->createMock(CoordinatorGroupUser::class);
 
-        yield 'lsp user + admin role' => [
+        yield 'group user + admin role' => [
             [Roles::ADMIN],
             RolesCannotBeSetForUserException::class,
-            $lspUser,
+            $groupUser,
         ];
 
-        yield 'not lsp user + coordinator role' => [
+        yield 'not group user + coordinator role' => [
             [Roles::JOB_COORDINATOR],
             RolesCannotBeSetForUserException::class,
             null,
         ];
 
-        yield 'lsp user + editor role' => [
+        yield 'group user + editor role' => [
             [Roles::EDITOR],
             null,
-            $lspUser,
+            $groupUser,
         ];
 
-        yield 'not lsp user + admin role' => [
+        yield 'not group user + admin role' => [
             [Roles::ADMIN],
             null,
             null,
@@ -179,10 +179,10 @@ class RolesValidatorTest extends TestCase
     /**
      * @dataProvider assertRolesCanBeSetForUserProvider
      */
-    public function testAssertRolesCanBeSetForUser(array $roles, ?string $expectedException, ?LspUser $lspUser): void
+    public function testAssertRolesCanBeSetForUser(array $roles, ?string $expectedException, ?CoordinatorGroupUser $groupUser): void
     {
-        if ($lspUser) {
-            $this->lspUserRepository->method('findByUser')->willReturn($lspUser);
+        if ($groupUser) {
+            $this->coordinatorGroupUserRepository->method('findByUser')->willReturn($groupUser);
         }
 
         if ($expectedException) {

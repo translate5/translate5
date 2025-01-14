@@ -158,7 +158,7 @@ SQL;
             $sql,
             TaskTable::TABLE_NAME,
             editor_Models_Db_TaskUserAssoc::TABLE_NAME,
-            TypeEnum::Lsp->value,
+            TypeEnum::Coordinator->value,
         );
         $sql = $this->db->quoteInto($sql, $taskGuid, 'string', 2);
 

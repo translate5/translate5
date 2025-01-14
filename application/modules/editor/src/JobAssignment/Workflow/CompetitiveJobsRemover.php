@@ -32,14 +32,14 @@ namespace MittagQI\Translate5\JobAssignment\Workflow;
 
 use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc as UserJob;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Model\CoordinatorGroupJob;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\DeleteCoordinatorGroupJobOperation;
 use MittagQI\Translate5\JobAssignment\Exception\CompetitiveJobAlreadyTakenException;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
 use MittagQI\Translate5\JobAssignment\Notification\DeletedCompetitorsNotification;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\Repository\LspJobRepository;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -53,11 +53,11 @@ class CompetitiveJobsRemover
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly UserJobRepository $userJobRepository,
-        private readonly LspJobRepository $lspJobRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
         private readonly TaskRepository $taskRepository,
-        private readonly LspRepositoryInterface $lspRepository,
+        private readonly CoordinatorGroupRepositoryInterface $coordinatorGroupRepository,
         private readonly DeleteUserJobOperation $deleteUserJobOperation,
-        private readonly DeleteLspJobOperation $deleteLspJobOperation,
+        private readonly DeleteCoordinatorGroupJobOperation $deleteCoordinatorGroupJobOperation,
         private readonly DeletedCompetitorsNotification $notificator,
         private readonly TaskLockService $taskLockService,
     ) {
@@ -68,11 +68,11 @@ class CompetitiveJobsRemover
         return new self(
             new UserRepository(),
             UserJobRepository::create(),
-            LspJobRepository::create(),
+            CoordinatorGroupJobRepository::create(),
             TaskRepository::create(),
-            LspRepository::create(),
+            CoordinatorGroupRepository::create(),
             DeleteUserJobOperation::create(),
-            DeleteLspJobOperation::create(),
+            DeleteCoordinatorGroupJobOperation::create(),
             DeletedCompetitorsNotification::create(),
             TaskLockService::create(),
         );
@@ -106,14 +106,14 @@ class CompetitiveJobsRemover
                 return;
             }
 
-            $lspJob = $this->lspJobRepository->findCurrentLspJobOfCoordinatorInTask(
+            $groupJob = $this->coordinatorGroupJobRepository->findCurrentCoordinatorGroupJobOfCoordinatorInTask(
                 $userGuid,
                 $taskGuid,
                 $workflowStepName,
             );
 
-            if (null !== $lspJob) {
-                $this->removeCompetitorsOfLspJob($lspJob, $task, $responsibleUser, $anonymizeUsers);
+            if (null !== $groupJob) {
+                $this->removeCompetitorsOfCoordinatorGroupJob($groupJob, $task, $responsibleUser, $anonymizeUsers);
 
                 return;
             }
@@ -133,19 +133,19 @@ class CompetitiveJobsRemover
         User $responsibleUser,
         bool $anonymizeUsers,
     ): void {
-        if ($job->isLspUserJob()) {
-            // for now LSP user jobs behave like cooperative jobs
+        if ($job->isCoordinatorGroupUserJob()) {
+            // for now CoordinatorGroup user jobs behave like cooperative jobs
             return;
         }
 
-        $lspJobs = $this->lspJobRepository->getByTaskGuidAndWorkflow(
+        $groupJobs = $this->coordinatorGroupJobRepository->getByTaskGuidAndWorkflow(
             $job->getTaskGuid(),
             $job->getWorkflow(),
             $job->getWorkflowStepName()
         );
 
-        foreach ($lspJobs as $toDelete) {
-            $this->deleteLspJob($toDelete, $task, $responsibleUser, $anonymizeUsers);
+        foreach ($groupJobs as $toDelete) {
+            $this->deleteCoordinatorGroupJob($toDelete, $task, $responsibleUser, $anonymizeUsers);
         }
 
         $userJobs = $this->userJobRepository->getJobsByTaskAndStep($job->getTaskGuid(), $job->getWorkflowStepName());
@@ -160,28 +160,28 @@ class CompetitiveJobsRemover
     /**
      * @throws CompetitiveJobAlreadyTakenException
      */
-    private function removeCompetitorsOfLspJob(
-        LspJob $job,
+    private function removeCompetitorsOfCoordinatorGroupJob(
+        CoordinatorGroupJob $job,
         Task $task,
         User $responsibleUser,
         bool $anonymizeUsers,
     ): void {
-        $lsp = $this->lspRepository->get((int) $job->getLspId());
+        $group = $this->coordinatorGroupRepository->get((int) $job->getGroupId());
 
-        if (! $lsp->isDirectLsp()) {
-            // for now Sub LSP jobs behave like cooperative jobs
+        if (! $group->isTopRankGroup()) {
+            // for now Sub CoordinatorGroup jobs behave like cooperative jobs
             return;
         }
 
-        $lspJobs = $this->lspJobRepository->getByTaskGuidAndWorkflow(
+        $groupJobs = $this->coordinatorGroupJobRepository->getByTaskGuidAndWorkflow(
             $job->getTaskGuid(),
             $job->getWorkflow(),
             $job->getWorkflowStepName()
         );
 
-        foreach ($lspJobs as $toDelete) {
+        foreach ($groupJobs as $toDelete) {
             if ($job->getId() !== $toDelete->getId()) {
-                $this->deleteLspJob($toDelete, $task, $responsibleUser, $anonymizeUsers);
+                $this->deleteCoordinatorGroupJob($toDelete, $task, $responsibleUser, $anonymizeUsers);
             }
         }
 
@@ -192,16 +192,16 @@ class CompetitiveJobsRemover
         }
     }
 
-    private function deleteLspJob(
-        LspJob $toDelete,
+    private function deleteCoordinatorGroupJob(
+        CoordinatorGroupJob $toDelete,
         Task $task,
         User $responsibleUser,
         bool $anonymizeUsers
     ): void {
-        $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $toDelete->getId());
+        $dataJob = $this->userJobRepository->getDataJobByCoordinatorGroupJob((int) $toDelete->getId());
         $deletedJobData = DeletedJobDto::fromUserJob($dataJob);
 
-        $this->deleteLspJobOperation->deleteLspJob($toDelete);
+        $this->deleteCoordinatorGroupJobOperation->deleteCoordinatorGroupJob($toDelete);
 
         $this->notificator->sendNotification($task, $deletedJobData, $responsibleUser, $anonymizeUsers);
     }

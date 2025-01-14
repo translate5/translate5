@@ -33,10 +33,10 @@ namespace MittagQI\Translate5\Repository;
 use editor_Models_Db_UserAssocDefault as DefaultUserJobTable;
 use editor_Models_Task as Task;
 use editor_Models_UserAssocDefault as DefaultUserJob;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\Db\DefaultLspJobTable;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Model\Db\DefaultCoordinatorGroupJobTable;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\DefaultUserJobAlreadyExistsException;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\InexistentDefaultUserJobException;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
 use PDO;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
@@ -48,7 +48,7 @@ class DefaultUserJobRepository
 {
     public function __construct(
         private readonly Zend_Db_Adapter_Abstract $db,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
     ) {
     }
 
@@ -59,7 +59,7 @@ class DefaultUserJobRepository
     {
         return new self(
             Zend_Db_Table::getDefaultAdapter(),
-            LspUserRepository::create(),
+            CoordinatorGroupUserRepository::create(),
         );
     }
 
@@ -121,7 +121,7 @@ class DefaultUserJobRepository
             ])
             ->joinLeft(
                 [
-                    'DefaultLspJob' => DefaultLspJobTable::TABLE_NAME,
+                    'DefaultLspJob' => DefaultCoordinatorGroupJobTable::TABLE_NAME,
                 ],
                 'DefaultUserJob.id = DefaultLspJob.dataJobId',
                 []
@@ -152,9 +152,9 @@ class DefaultUserJobRepository
     /**
      * @return iterable<DefaultUserJob>
      */
-    public function getDefaultJobsOfCustomerForUsersOfLsp(int $customerId, int $lspId): iterable
+    public function getDefaultJobsOfCustomerForUsersOfCoordinatorGroup(int $customerId, int $groupId): iterable
     {
-        $userGuids = $this->lspUserRepository->getUserGuids($lspId);
+        $userGuids = $this->coordinatorGroupUserRepository->getUserGuids($groupId);
 
         if (empty($userGuids)) {
             return yield from [];
@@ -179,7 +179,7 @@ class DefaultUserJobRepository
     /**
      * @return iterable<DefaultUserJob>
      */
-    public function getDefaultLspJobsForTask(Task $task): iterable
+    public function getDefaultCoordinatorGroupJobsForTask(Task $task): iterable
     {
         $select = $this->db
             ->select()
@@ -188,7 +188,7 @@ class DefaultUserJobRepository
             ])
             ->joinLeft(
                 [
-                    'defaultLspJob' => DefaultLspJobTable::TABLE_NAME,
+                    'defaultLspJob' => DefaultCoordinatorGroupJobTable::TABLE_NAME,
                 ],
                 'defaultUserJob.id = defaultLspJob.dataJobId',
                 []

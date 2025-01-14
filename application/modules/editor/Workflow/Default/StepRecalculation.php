@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\JobAssignment\Operation\DeleteJobAssignmentOperation;
-use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 
@@ -45,7 +45,7 @@ class editor_Workflow_Default_StepRecalculation
 
     private readonly DeleteJobAssignmentOperation $deleteJobOperation;
 
-    private readonly LspJobRepository $lspJobRepository;
+    private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository;
 
     private readonly UserJobRepository $userJobRepository;
 
@@ -56,7 +56,7 @@ class editor_Workflow_Default_StepRecalculation
         $this->workflow = $workflow;
         $this->taskRepository = TaskRepository::create();
         $this->deleteJobOperation = DeleteJobAssignmentOperation::create();
-        $this->lspJobRepository = LspJobRepository::create();
+        $this->coordinatorGroupJobRepository = CoordinatorGroupJobRepository::create();
         $this->userJobRepository = UserJobRepository::create();
     }
 
@@ -111,10 +111,10 @@ class editor_Workflow_Default_StepRecalculation
         $matchingSteps = [];
         $jobsData = [];
 
-        foreach ($this->lspJobRepository->getTaskLspJobs($taskGuid) as $lspJob) {
+        foreach ($this->coordinatorGroupJobRepository->getTaskCoordinatorGroupJobs($taskGuid) as $groupJob) {
             $jobsCount++;
 
-            $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
+            $dataJob = $this->userJobRepository->getDataJobByCoordinatorGroupJob((int) $groupJob->getId());
             $jobsData[] = [
                 'state' => $dataJob->getState(),
                 'workflowStepName' => $dataJob->getWorkflowStepName(),

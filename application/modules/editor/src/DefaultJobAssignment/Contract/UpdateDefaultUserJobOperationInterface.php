@@ -31,14 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\DefaultJobAssignment\Contract;
 
 use editor_Models_UserAssocDefault as DefaultUserJob;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Exception\NotLspCustomerException;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Exception\NotCoordinatorGroupCustomerException;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\UpdateDefaultJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\InvalidWorkflowStepProvidedException;
 
 interface UpdateDefaultUserJobOperationInterface
 {
     /**
-     * @throws NotLspCustomerException
+     * @throws NotCoordinatorGroupCustomerException
      * @throws InvalidWorkflowStepProvidedException
      */
     public function updateJob(DefaultUserJob $job, UpdateDefaultJobDto $dto): void;

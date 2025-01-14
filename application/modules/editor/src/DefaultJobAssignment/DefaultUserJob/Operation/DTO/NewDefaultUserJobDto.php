@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DTO;
 
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DTO\NewDefaultLspJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\NewDefaultJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\WorkflowDto;
@@ -48,16 +47,16 @@ class NewDefaultUserJobDto
     ) {
     }
 
-    public static function fromDefaultJobDto(NewDefaultJobDto $lspJobDto): self
+    public static function fromDefaultJobDto(NewDefaultJobDto $jobDto): self
     {
         return new self(
-            $lspJobDto->customerId,
-            $lspJobDto->userGuid,
-            $lspJobDto->sourceLanguageId,
-            $lspJobDto->targetLanguageId,
-            $lspJobDto->workflow,
-            $lspJobDto->deadline,
-            $lspJobDto->trackChangesRights,
+            $jobDto->customerId,
+            $jobDto->userGuid,
+            $jobDto->sourceLanguageId,
+            $jobDto->targetLanguageId,
+            $jobDto->workflow,
+            $jobDto->deadline,
+            $jobDto->trackChangesRights,
         );
     }
 }

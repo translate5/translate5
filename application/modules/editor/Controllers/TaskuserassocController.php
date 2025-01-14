@@ -28,14 +28,15 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CoordinatorDontBelongToLCoordinatorGroupException;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\DataProvider\CoordinatorProvider;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Exception\CoordinatorOfParentGroupHasNotConfirmedCoordinatorGroupJobYetException;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\DTO\NewCoordinatorGroupJobDto;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\WithAuthentication\CreateCoordinatorGroupJobOperation;
 use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\Exception\InvalidTypeProvidedException;
 use MittagQI\Translate5\JobAssignment\JobAssignmentViewDataProvider;
-use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\Exception\ThereIsUnDeletableBoundJobException;
-use MittagQI\Translate5\JobAssignment\LspJob\DataProvider\CoordinatorProvider;
-use MittagQI\Translate5\JobAssignment\LspJob\Exception\CoordinatorOfParentLspHasNotConfirmedLspJobYetException;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\DTO\NewLspJobDto;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\WithAuthentication\CreateLspJobOperation;
 use MittagQI\Translate5\JobAssignment\Operation\WithAuthentication\DeleteJobAssignmentOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobInUseException;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\Exception\AttemptToRemoveJobWhichTaskIsLockedByUserException;
@@ -44,25 +45,24 @@ use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Exception\
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\JobAssignment\UserJob\DataProvider\UserProvider;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\AssignedUserCanBeChangedOnlyForLspJobException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignLspUserToAJobBeforeLspJobCreatedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignSubLspJobBeforeParentJobCreatedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirmedLspJobYetException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\AssignedUserCanBeChangedOnlyForCoordinatorGroupJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignSubCoordinatorGroupJobBeforeParentJobCreatedException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirmedCoordinatorGroupJobYetException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidDeadlineDateStringProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidStateProvidedException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\NotLspCustomerTaskException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToLspJobException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\NotCoordinatorGroupCustomerTaskException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\Factory\NewUserJobDtoFactory;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication\CreateUserJobOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication\UpdateUserJobOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\JobAssignment\UserJob\UserJobViewDataProvider;
-use MittagQI\Translate5\LSP\Exception\CoordinatorDontBelongToLspException;
-use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -101,7 +101,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     private UserJobRepository $userJobRepository;
 
-    private LspJobRepository $lspJobRepository;
+    private CoordinatorGroupJobRepository $coordinatorGroupJobRepository;
 
     private UserJobViewDataProvider $userJobViewDataProvider;
 
@@ -121,7 +121,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->userRepository = new UserRepository();
         $this->taskRepository = TaskRepository::create();
         $this->userJobRepository = UserJobRepository::create();
-        $this->lspJobRepository = LspJobRepository::create();
+        $this->coordinatorGroupJobRepository = CoordinatorGroupJobRepository::create();
         $this->permissionAssert = UserJobActionPermissionAssert::create();
         $this->taskActionPermissionAssert = TaskActionPermissionAssert::create();
 
@@ -256,14 +256,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 new PermissionAssertContext($authUser)
             );
 
-            if (! $job->isLspJob()) {
-                throw new ZfExtended_BadMethodCallException('Only LSP jobs can have coordinators');
+            if (! $job->isCoordinatorGroupJob()) {
+                throw new ZfExtended_BadMethodCallException('Only Coordinator group jobs can have coordinators');
             }
 
-            $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
+            $groupJob = $this->coordinatorGroupJobRepository->get((int) $job->getCoordinatorGroupJobId());
 
             // @phpstan-ignore-next-line
-            $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForLspJobUpdate($lspJob);
+            $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForCoordinatorGroupJobUpdate($groupJob);
         } catch (Throwable $e) {
             $this->log->exception($e);
 
@@ -315,9 +315,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
             $dto = NewUserJobDtoFactory::create()->fromRequest($this->getRequest());
 
-            if (TypeEnum::Lsp === $dto->type) {
-                $lspJob = CreateLspJobOperation::create()->assignJob(NewLspJobDto::fromUserJobDto($dto));
-                $userJob = UserJobRepository::create()->getDataJobByLspJob((int) $lspJob->getId());
+            if (TypeEnum::Coordinator === $dto->type) {
+                $groupJob = CreateCoordinatorGroupJobOperation::create()->assignJob(NewCoordinatorGroupJobDto::fromUserJobDto($dto));
+                $userJob = UserJobRepository::create()->getDataJobByCoordinatorGroupJob((int) $groupJob->getId());
             } else {
                 $userJob = CreateUserJobOperation::create()->assignJob($dto);
             }
@@ -473,59 +473,59 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                     'job' => $e->job,
                 ]
             ),
-            OnlyCoordinatorCanBeAssignedToLspJobException::class => UnprocessableEntity::createResponse(
+            OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException::class => UnprocessableEntity::createResponse(
                 'E1012',
                 [
                     'userGuid' => [
-                        'Nur der Koordinator kann einem LSP-Auftrag zugewiesen werden',
+                        'job-assignment.create.only-coordinator-can-be-assigned-to-coordinator-group-job',
                     ],
                 ],
             ),
-            AssignedUserCanBeChangedOnlyForLspJobException::class => UnprocessableEntity::createResponse(
+            AssignedUserCanBeChangedOnlyForCoordinatorGroupJobException::class => UnprocessableEntity::createResponse(
                 'E1012',
                 [
                     'userGuid' => [
-                        'Ein LSP-Benutzer kann nur LSP-bezogenen Auftrag zugewiesen werden.',
+                        'job-assignment.update.assigned-user-can-be-changed-only-for-coordinator-group-job',
                     ],
                 ],
             ),
-            NotLspCustomerTaskException::class => EntityConflictException::createResponse(
+            NotCoordinatorGroupCustomerTaskException::class => EntityConflictException::createResponse(
                 'E1012',
                 [
                     'id' => [
-                        'Aufgabe gehört nicht zu einem der LSP-KundenAufgabe gehört nicht zu einem der LSP-Kunden',
+                        'not-coordinator-group-customer-task',
                     ],
                 ],
             ),
-            CoordinatorDontBelongToLspException::class => UnprocessableEntity::createResponse(
+            CoordinatorDontBelongToLCoordinatorGroupException::class => UnprocessableEntity::createResponse(
                 'E1012',
                 [
                     'userGuid' => [
-                        'Der Koordinator gehört nicht zum LSP',
+                        'coordinator-dont-belong-to-coordinator-group',
                     ],
                 ],
             ),
-            AttemptToAssignLspUserToAJobBeforeLspJobCreatedException::class => UnprocessableEntity::createResponse(
+            AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException::class => UnprocessableEntity::createResponse(
                 'E1012',
                 [
                     'userGuid' => [
-                        'LSP-Benutzer kann einem Auftrag nicht zugewiesen werden, bevor der LSP-Auftrag erstellt wurde',
+                        'job-assignment.create.group-user-job-can-not-be-created-before-coordinator-group-job',
                     ],
                 ],
             ),
-            AttemptToAssignSubLspJobBeforeParentJobCreatedException::class => UnprocessableEntity::createResponse(
+            AttemptToAssignSubCoordinatorGroupJobBeforeParentJobCreatedException::class => UnprocessableEntity::createResponse(
                 'E1012',
                 [
                     'userGuid' => [
-                        'Der elterliche LSP verfügt nicht über eine angemessene Aufgabenverteilung',
+                        'job-assignment.create.parent-coordinator-group-does-not-have-appropriate-job',
                     ],
                 ],
             ),
-            TrackChangesRightsAreNotSubsetOfLspJobException::class => UnprocessableEntity::createResponse(
+            TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException::class => UnprocessableEntity::createResponse(
                 'E1012',
                 [
                     'permission' => [
-                        'Die Rechte des LSP-Benutzers sollten eine Teilmenge der Rechte des LSP- Auftrags sein.',
+                        'job-assignment.track-changes-rights-are-not-subset-of-coordinator-group-job',
                     ],
                 ],
             ),
@@ -533,7 +533,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                 'E1162',
                 [
                     'id' => [
-                        'LSP-Auftrag hat verwandte Aufträge, die nicht gelöscht werden können.',
+                        'job-assignment.delete.there-is-un-deletable-bound-job',
                     ],
                 ],
             ),
@@ -558,19 +558,19 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
                     ],
                 ],
             ),
-            CoordinatorHasNotConfirmedLspJobYetException::class => UnprocessableEntity::createResponse(
+            CoordinatorHasNotConfirmedCoordinatorGroupJobYetException::class => UnprocessableEntity::createResponse(
                 'E1012',
                 [
                     'id' => [
-                        'Der Koordinator hat den LSP-Auftrag noch nicht bestätigt',
+                        'coordinator-has-not-yet-confirmed-the-coordinator-group-job',
                     ],
                 ],
             ),
-            CoordinatorOfParentLspHasNotConfirmedLspJobYetException::class => UnprocessableEntity::createResponse(
+            CoordinatorOfParentGroupHasNotConfirmedCoordinatorGroupJobYetException::class => UnprocessableEntity::createResponse(
                 'E1012',
                 [
                     'id' => [
-                        'Der Koordinator des übergeordneten LSP hat die LSP-Position noch nicht bestätigt',
+                        'coordinator-of-parent-group-has-not-yet-confirmed-the-coordinator-group-job',
                     ],
                 ],
             ),

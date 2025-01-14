@@ -119,6 +119,18 @@ class TaskViewDataProvider
         ];
     }
 
+    /**
+     * @return string[]
+     */
+    public function getTaskIdList(
+        User $viewer,
+        ?ZfExtended_Models_Filter $filter,
+    ): array {
+        $select = $this->taskQuerySelectFactory->createTaskIdsSelect($viewer, $filter);
+
+        return $this->db->fetchCol($select);
+    }
+
     private function getUserTracking(string $taskGuid, bool $anonymizeUsers, User $viewer): array
     {
         $userTracking = $this->userTrackingRepository->getByTaskGuid($taskGuid);

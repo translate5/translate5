@@ -49,7 +49,7 @@ Ext.define('Editor.model.admin.User', {
     {name: 'locale', type: 'string'},
     {name: 'customers', type: 'string'},
     {name: 'openIdIssuer', type: 'string'},
-    {name: 'lsp', type: 'int', convert: (v, rec) => v > 0 ? v : null},
+    {name: 'coordinatorGroup', type: 'int', convert: (v, rec) => v > 0 ? v : null},
   ],
   idProperty: 'id',
   proxy : {
@@ -224,7 +224,7 @@ Ext.define('Editor.model.admin.User', {
     /**
      * @returns {Boolean}
      */
-    isLspUser: function() {
-        return this.get('lsp') > 0;
+    isCoordinatorGroupUser: function() {
+        return this.get('coordinatorGroup') > 0;
     }
 });

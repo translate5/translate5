@@ -48,8 +48,8 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
       {name: 'trackchangesShow', type: 'bool'},
       {name: 'trackchangesShowAll', type: 'bool'},
       {name: 'trackchangesAcceptReject', type: 'bool'},
-      {name: 'lspId', type: 'int', persist: false},
-      {name: 'isLspJob', type: 'bool', persist: false},
+      {name: 'coordinatorGroupId', type: 'int', persist: false},
+      {name: 'isCoordinatorGroupJob', type: 'bool', persist: false},
     ],
 
     /***

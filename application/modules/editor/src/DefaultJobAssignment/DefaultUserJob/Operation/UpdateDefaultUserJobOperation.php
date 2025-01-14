@@ -32,23 +32,23 @@ namespace MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation;
 
 use editor_Models_UserAssocDefault as DefaultUserJob;
 use editor_Workflow_Manager;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CustomerDoesNotBelongToCoordinatorGroupException;
+use MittagQI\Translate5\CoordinatorGroup\Validation\CoordinatorGroupCustomerAssociationValidator;
 use MittagQI\Translate5\DefaultJobAssignment\Contract\UpdateDefaultUserJobOperationInterface;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Exception\NotLspCustomerException;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Exception\NotCoordinatorGroupCustomerException;
 use MittagQI\Translate5\DefaultJobAssignment\DTO\UpdateDefaultJobDto;
 use MittagQI\Translate5\DefaultJobAssignment\Exception\InvalidWorkflowStepProvidedException;
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
-use MittagQI\Translate5\LSP\Validation\LspCustomerAssociationValidator;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
-use MittagQI\Translate5\Repository\LspUserRepository;
 
 class UpdateDefaultUserJobOperation implements UpdateDefaultUserJobOperationInterface
 {
     public function __construct(
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
         private readonly editor_Workflow_Manager $workflowManager,
-        private readonly LspCustomerAssociationValidator $lspCustomerAssociationValidator,
+        private readonly CoordinatorGroupCustomerAssociationValidator $coordinatorGroupCustomerAssociationValidator,
     ) {
     }
 
@@ -59,26 +59,26 @@ class UpdateDefaultUserJobOperation implements UpdateDefaultUserJobOperationInte
     {
         return new self(
             DefaultUserJobRepository::create(),
-            LspUserRepository::create(),
+            CoordinatorGroupUserRepository::create(),
             new editor_Workflow_Manager(),
-            LspCustomerAssociationValidator::create(),
+            CoordinatorGroupCustomerAssociationValidator::create(),
         );
     }
 
     public function updateJob(DefaultUserJob $job, UpdateDefaultJobDto $dto): void
     {
-        $lspUser = $dto->userGuid
-            ? $this->lspUserRepository->findByUserGuid($dto->userGuid)
+        $groupUser = $dto->userGuid
+            ? $this->coordinatorGroupUserRepository->findByUserGuid($dto->userGuid)
             : null;
 
-        if (null !== $lspUser) {
+        if (null !== $groupUser) {
             try {
-                $this->lspCustomerAssociationValidator->assertCustomersAreSubsetForLSP(
-                    (int) $lspUser->lsp->getId(),
+                $this->coordinatorGroupCustomerAssociationValidator->assertCustomersAreSubsetForCoordinatorGroup(
+                    (int) $groupUser->group->getId(),
                     (int) $job->getCustomerId()
                 );
-            } catch (CustomerDoesNotBelongToLspException) {
-                throw new NotLspCustomerException();
+            } catch (CustomerDoesNotBelongToCoordinatorGroupException) {
+                throw new NotCoordinatorGroupCustomerException();
             }
         }
 

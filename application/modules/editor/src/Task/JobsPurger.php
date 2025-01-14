@@ -30,20 +30,20 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Contract\DeleteLspJobOperationInterface;
-use MittagQI\Translate5\JobAssignment\LspJob\Operation\DeleteLspJobOperation;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Contract\DeleteCoordinatorGroupJobOperationInterface;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\DeleteCoordinatorGroupJobOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\DeleteUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DeleteUserJobOperation;
-use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 
 class JobsPurger
 {
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
-        private readonly LspJobRepository $lspJobRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
         private readonly DeleteUserJobOperationInterface $deleteUserJobAssignmentOperation,
-        private readonly DeleteLspJobOperationInterface $deleteLspJobAssignmentOperation,
+        private readonly DeleteCoordinatorGroupJobOperationInterface $deleteCoordinatorGroupJobOperation,
     ) {
     }
 
@@ -51,17 +51,17 @@ class JobsPurger
     {
         return new self(
             UserJobRepository::create(),
-            LspJobRepository::create(),
+            CoordinatorGroupJobRepository::create(),
             DeleteUserJobOperation::create(),
-            DeleteLspJobOperation::create(),
+            DeleteCoordinatorGroupJobOperation::create(),
         );
     }
 
     public function purgeTaskJobs(string $taskGuid): void
     {
-        // first delete all LSP jobs, that will also delete the lsp user jobs if there are any
-        foreach ($this->lspJobRepository->getTaskDirectLspJobs($taskGuid) as $job) {
-            $this->deleteLspJobAssignmentOperation->forceDelete($job);
+        // first delete all Coordinator group jobs, that will also delete the Coordinator group user jobs if there are any
+        foreach ($this->coordinatorGroupJobRepository->getTaskJobsOfTopRankCoordinatorGroups($taskGuid) as $job) {
+            $this->deleteCoordinatorGroupJobOperation->forceDelete($job);
         }
 
         // now delete simple user jobs

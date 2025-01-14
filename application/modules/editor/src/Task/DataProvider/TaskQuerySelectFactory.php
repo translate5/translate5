@@ -34,9 +34,9 @@ use editor_Models_Db_Task as TaskDb;
 use editor_Models_Db_TaskUserAssoc as UserJobDb;
 use editor_Task_Type;
 use MittagQI\Translate5\Acl\Rights;
-use MittagQI\Translate5\JobAssignment\LspJob\Model\Db\LspJobTable;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Model\Db\CoordinatorGroupJobTable;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\User\Model\User;
 use Zend_Acl_Exception;
 use Zend_Db_Adapter_Abstract;
@@ -50,7 +50,7 @@ class TaskQuerySelectFactory
     public function __construct(
         private readonly Zend_Db_Adapter_Abstract $db,
         private readonly ZfExtended_Acl $acl,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
         private readonly editor_Task_Type $taskType,
     ) {
     }
@@ -63,7 +63,7 @@ class TaskQuerySelectFactory
         return new self(
             Zend_Db_Table::getDefaultAdapter(),
             ZfExtended_Acl::getInstance(),
-            LspUserRepository::create(),
+            CoordinatorGroupUserRepository::create(),
             editor_Task_Type::getInstance(),
         );
     }
@@ -86,6 +86,15 @@ class TaskQuerySelectFactory
         if (0 !== $offset || 0 !== $limit) {
             $select->limit($limit, $offset);
         }
+
+        return $select;
+    }
+
+    public function createTaskIdsSelect(
+        User $viewer,
+        ?ZfExtended_Models_Filter $filter,
+    ): Zend_Db_Select {
+        $select = $this->getBaseTaskSelect($viewer, $filter, TaskDb::TABLE_NAME . '.id');
 
         return $select;
     }
@@ -206,9 +215,9 @@ class TaskQuerySelectFactory
             return;
         }
 
-        $lspUser = $this->lspUserRepository->findByUser($viewer);
+        $groupUser = $this->coordinatorGroupUserRepository->findByUser($viewer);
 
-        if (null === $lspUser) {
+        if (null === $groupUser) {
             $select
                 ->joinLeft(
                     UserJobDb::TABLE_NAME,
@@ -225,12 +234,12 @@ class TaskQuerySelectFactory
         $select
             ->join(
                 [
-                    'lspJob' => LspJobTable::TABLE_NAME,
+                    'groupJob' => CoordinatorGroupJobTable::TABLE_NAME,
                 ],
-                'lspJob.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
+                'groupJob.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
                 []
             )
-            ->where('lspJob.lspId = ?', $lspUser->lsp->getId())
+            ->where('groupJob.groupId = ?', $groupUser->group->getId())
         ;
 
         if ($viewer->isCoordinator()) {

@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\JobAssignment\UserJob\Validation;
 
-use MittagQI\Translate5\JobAssignment\LspJob\Model\LspJob;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfLspJobException;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Model\CoordinatorGroupJob;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException;
 use MittagQI\Translate5\Repository\UserJobRepository;
 
 class TrackChangesRightsValidator
@@ -52,15 +52,15 @@ class TrackChangesRightsValidator
     }
 
     /**
-     * @throws TrackChangesRightsAreNotSubsetOfLspJobException
+     * @throws TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException
      */
-    public function assertTrackChangesRightsAreSubsetOfLspJob(
+    public function assertTrackChangesRightsAreSubsetOfCoordinatorGroupJob(
         ?bool $canSeePrevSteps,
         ?bool $canSeeAll,
         ?bool $canAcceptOrReject,
-        LspJob $lspJob
+        CoordinatorGroupJob $groupJob
     ): void {
-        $dataJob = $this->userJobRepository->getDataJobByLspJob((int) $lspJob->getId());
+        $dataJob = $this->userJobRepository->getDataJobByCoordinatorGroupJob((int) $groupJob->getId());
 
         $rightsAreSubset =
             (null === $canAcceptOrReject || ! $canAcceptOrReject || $dataJob->getTrackchangesAcceptReject())
@@ -69,7 +69,7 @@ class TrackChangesRightsValidator
         ;
 
         if (! $rightsAreSubset) {
-            throw new TrackChangesRightsAreNotSubsetOfLspJobException();
+            throw new TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException();
         }
     }
 }

@@ -33,11 +33,11 @@ namespace MittagQI\Translate5\Customer\ActionAssert\Permission;
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
-use MittagQI\Translate5\Repository\LspRepository;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
 
 /**
  * @implements PermissionAssertInterface<CustomerAction, Customer>
@@ -46,7 +46,7 @@ final class CoordinatorAccessAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly JobCoordinatorRepository $coordinatorRepository,
-        private readonly LspRepositoryInterface $lspRepository,
+        private readonly CoordinatorGroupRepositoryInterface $coordinatorGroupRepository,
     ) {
     }
 
@@ -57,7 +57,7 @@ final class CoordinatorAccessAssert implements PermissionAssertInterface
     {
         return new self(
             JobCoordinatorRepository::create(),
-            LspRepository::create(),
+            CoordinatorGroupRepository::create(),
         );
     }
 
@@ -85,7 +85,7 @@ final class CoordinatorAccessAssert implements PermissionAssertInterface
             throw new NoAccessToCustomerException((int) $object->getId());
         }
 
-        if (! $this->lspRepository->findCustomerConnection((int) $coordinator->lsp->getId(), (int) $object->getId())) {
+        if (! $this->coordinatorGroupRepository->findCustomerConnection((int) $coordinator->group->getId(), (int) $object->getId())) {
             throw new NoAccessToCustomerException((int) $object->getId());
         }
     }

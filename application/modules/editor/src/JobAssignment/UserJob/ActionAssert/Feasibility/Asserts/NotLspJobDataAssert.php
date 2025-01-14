@@ -55,7 +55,7 @@ class NotLspJobDataAssert implements FeasibilityAssertInterface
 
     public function assertAllowed(object $object): void
     {
-        if ($object->isLspJob()) {
+        if ($object->isCoordinatorGroupJob()) {
             throw new AttemptToRemoveJobInUseException($object);
         }
     }

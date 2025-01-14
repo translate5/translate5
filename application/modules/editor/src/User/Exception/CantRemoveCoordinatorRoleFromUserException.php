@@ -32,6 +32,6 @@ namespace MittagQI\Translate5\User\Exception;
 
 use InvalidArgumentException;
 
-class CantRemoveCoordinatorRoleFromUserException extends InvalidArgumentException implements LspUserExceptionInterface
+class CantRemoveCoordinatorRoleFromUserException extends InvalidArgumentException implements CoordinatorGroupUserExceptionInterface
 {
 }

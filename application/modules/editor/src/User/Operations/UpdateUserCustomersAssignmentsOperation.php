@@ -32,10 +32,10 @@ namespace MittagQI\Translate5\User\Operations;
 
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
-use MittagQI\Translate5\LSP\Contract\LspUserUnassignCustomersOperationInterface;
-use MittagQI\Translate5\LSP\Operations\LspUserUnassignCustomersOperation;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\CoordinatorGroup\Contract\CoordinatorGroupUserUnassignCustomersOperationInterface;
+use MittagQI\Translate5\CoordinatorGroup\Operations\CoordinatorGroupUserUnassignCustomersOperation;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\UserActionFeasibilityAssert;
 use MittagQI\Translate5\User\Contract\UpdateUserCustomersAssignmentsOperationInterface;
 use MittagQI\Translate5\User\Contract\UserAssignCustomersOperationInterface;
@@ -47,8 +47,8 @@ final class UpdateUserCustomersAssignmentsOperation implements UpdateUserCustome
     public function __construct(
         private readonly UserAssignCustomersOperationInterface $assignCustomers,
         private readonly UserUnassignCustomersOperationInterface $unassignCustomers,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
-        private readonly LspUserUnassignCustomersOperationInterface $lspUserUnassignCustomers,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
+        private readonly CoordinatorGroupUserUnassignCustomersOperationInterface $groupUserUnassignCustomersOperation,
         private readonly ActionFeasibilityAssertInterface $userActionFeasibilityChecker,
     ) {
     }
@@ -61,8 +61,8 @@ final class UpdateUserCustomersAssignmentsOperation implements UpdateUserCustome
         return new self(
             UserAssignCustomersOperation::create(),
             UserUnassignCustomersOperation::create(),
-            LspUserRepository::create(),
-            LspUserUnassignCustomersOperation::create(),
+            CoordinatorGroupUserRepository::create(),
+            CoordinatorGroupUserUnassignCustomersOperation::create(),
             UserActionFeasibilityAssert::create(),
         );
     }
@@ -79,20 +79,20 @@ final class UpdateUserCustomersAssignmentsOperation implements UpdateUserCustome
             return;
         }
 
-        $lspUser = $this->lspUserRepository->findByUser($user);
+        $groupUser = $this->coordinatorGroupUserRepository->findByUser($user);
 
-        if (null === $lspUser) {
+        if (null === $groupUser) {
             $this->unassignCustomers->unassignCustomers($user, ...$unassignedCustomers);
 
             return;
         }
 
         if ($forceUnassignment) {
-            $this->lspUserUnassignCustomers->forceUnassignCustomers($lspUser, ...$unassignedCustomers);
+            $this->groupUserUnassignCustomersOperation->forceUnassignCustomers($groupUser, ...$unassignedCustomers);
 
             return;
         }
 
-        $this->lspUserUnassignCustomers->unassignCustomers($lspUser, ...$unassignedCustomers);
+        $this->groupUserUnassignCustomersOperation->unassignCustomers($groupUser, ...$unassignedCustomers);
     }
 }

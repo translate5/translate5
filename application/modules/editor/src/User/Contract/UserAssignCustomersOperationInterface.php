@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\Contract;
 
-use MittagQI\Translate5\LSP\Exception\CustomerDoesNotBelongToLspException;
+use MittagQI\Translate5\CoordinatorGroup\Exception\CustomerDoesNotBelongToCoordinatorGroupException;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
 use MittagQI\Translate5\User\Model\User;
 
@@ -38,7 +38,7 @@ interface UserAssignCustomersOperationInterface
 {
     /**
      * @throws CustomerDoesNotBelongToUserException
-     * @throws CustomerDoesNotBelongToLspException
+     * @throws CustomerDoesNotBelongToCoordinatorGroupException
      */
     public function assignCustomers(User $user, int ...$newCustomerIds): void;
 }

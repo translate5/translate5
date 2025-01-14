@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\DefaultJobAssignment\Operation\WithAuthentication;
 
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\WithAuthentication\DeleteDefaultLspJobOperation;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Operation\WithAuthentication\DeleteDefaultCoordinatorGroupJobOperation;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\WithAuthentication\DeleteDefaultUserJobOperation;
-use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultCoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 
 class DeleteDefaultJobAssignmentOperation extends \MittagQI\Translate5\DefaultJobAssignment\Operation\DeleteDefaultJobAssignmentOperation
@@ -41,8 +41,8 @@ class DeleteDefaultJobAssignmentOperation extends \MittagQI\Translate5\DefaultJo
     {
         return new self(
             DefaultUserJobRepository::create(),
-            DefaultLspJobRepository::create(),
-            DeleteDefaultLspJobOperation::create(),
+            DefaultCoordinatorGroupJobRepository::create(),
+            DeleteDefaultCoordinatorGroupJobOperation::create(),
             DeleteDefaultUserJobOperation::create(),
         );
     }

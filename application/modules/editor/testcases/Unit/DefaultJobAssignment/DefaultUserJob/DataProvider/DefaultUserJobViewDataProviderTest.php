@@ -32,34 +32,35 @@ namespace MittagQI\Translate5\Test\Unit\DefaultJobAssignment\DefaultUserJob\Data
 
 use editor_Models_UserAssocDefault as DefaultUserJob;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Model\DefaultCoordinatorGroupJob;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultJobAction;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Model\DefaultLspJob;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\DataProvider\DefaultUserJobViewDataProvider;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
-use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultCoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use MittagQI\Translate5\User\Model\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DefaultUserJobViewDataProviderTest extends TestCase
 {
-    private DefaultUserJobRepository $defaultUserJobRepository;
+    private MockObject|DefaultUserJobRepository $defaultUserJobRepository;
 
-    private DefaultLspJobRepository $defaultLspJobRepository;
+    private MockObject|DefaultCoordinatorGroupJobRepository $defaultCoordinatorGroupJobRepository;
 
-    private ActionPermissionAssertInterface $defaultUserJobPermissionAssert;
+    private MockObject|ActionPermissionAssertInterface $defaultUserJobPermissionAssert;
 
     private DefaultUserJobViewDataProvider $provider;
 
     public function setUp(): void
     {
         $this->defaultUserJobRepository = $this->createMock(DefaultUserJobRepository::class);
-        $this->defaultLspJobRepository = $this->createMock(DefaultLspJobRepository::class);
+        $this->defaultCoordinatorGroupJobRepository = $this->createMock(DefaultCoordinatorGroupJobRepository::class);
         $this->defaultUserJobPermissionAssert = $this->createMock(ActionPermissionAssertInterface::class);
 
         $this->provider = new DefaultUserJobViewDataProvider(
             $this->defaultUserJobRepository,
-            $this->defaultLspJobRepository,
+            $this->defaultCoordinatorGroupJobRepository,
             $this->defaultUserJobPermissionAssert,
         );
     }
@@ -70,15 +71,15 @@ class DefaultUserJobViewDataProviderTest extends TestCase
 
         $jobs = $this->getJobMocks();
 
-        $lspJob = $this->createMock(DefaultLspJob::class);
-        $lspJob->method('__call')->willReturnMap([
+        $groupJobJob = $this->createMock(DefaultCoordinatorGroupJob::class);
+        $groupJobJob->method('__call')->willReturnMap([
             ['getId', [], 12],
-            ['getLspId', [], 13],
+            ['getGroupId', [], 13],
         ]);
-        $this->defaultLspJobRepository
-            ->method('findDefaultLspJobByDataJobId')
+        $this->defaultCoordinatorGroupJobRepository
+            ->method('findDefaultCoordinatorGroupJobByDataJobId')
             ->willReturnCallback(
-                fn (int $id) => (int) $jobs[0]->getId() === $id ? $lspJob : null
+                fn (int $id) => (int) $jobs[0]->getId() === $id ? $groupJobJob : null
             );
 
         $this->defaultUserJobPermissionAssert->method('isGranted')->willReturnCallback(
@@ -88,7 +89,7 @@ class DefaultUserJobViewDataProviderTest extends TestCase
         $list = $this->provider->buildViewForList($jobs, $viewer);
 
         self::assertCount(2, $list);
-        $this->checkRow($list[0], $jobs[0], $lspJob);
+        $this->checkRow($list[0], $jobs[0], $groupJobJob);
         $this->checkRow($list[1], $jobs[2], null);
     }
 
@@ -98,15 +99,15 @@ class DefaultUserJobViewDataProviderTest extends TestCase
 
         $jobs = $this->getJobMocks();
 
-        $lspJob = $this->createMock(DefaultLspJob::class);
-        $lspJob->method('__call')->willReturnMap([
+        $groupJobJob = $this->createMock(DefaultCoordinatorGroupJob::class);
+        $groupJobJob->method('__call')->willReturnMap([
             ['getId', [], 12],
-            ['getLspId', [], 13],
+            ['getGroupId', [], 13],
         ]);
-        $this->defaultLspJobRepository
-            ->method('findDefaultLspJobByDataJobId')
+        $this->defaultCoordinatorGroupJobRepository
+            ->method('findDefaultCoordinatorGroupJobByDataJobId')
             ->willReturnCallback(
-                fn (int $id) => (int) $jobs[2]->getId() === $id ? $lspJob : null
+                fn (int $id) => (int) $jobs[2]->getId() === $id ? $groupJobJob : null
             );
 
         $this->defaultUserJobRepository
@@ -120,39 +121,39 @@ class DefaultUserJobViewDataProviderTest extends TestCase
         $list = $this->provider->getListFor(1, 'default', $viewer);
 
         self::assertCount(1, $list);
-        $this->checkRow($list[0], $jobs[2], $lspJob);
+        $this->checkRow($list[0], $jobs[2], $groupJobJob);
     }
 
     public function testBuildJobView(): void
     {
         $jobs = $this->getJobMocks();
 
-        $lspJob = $this->createMock(DefaultLspJob::class);
-        $lspJob->method('__call')->willReturnMap([
+        $groupJobJob = $this->createMock(DefaultCoordinatorGroupJob::class);
+        $groupJobJob->method('__call')->willReturnMap([
             ['getId', [], 12],
-            ['getLspId', [], 13],
+            ['getGroupId', [], 13],
         ]);
-        $this->defaultLspJobRepository
-            ->method('findDefaultLspJobByDataJobId')
-            ->willReturn($lspJob);
+        $this->defaultCoordinatorGroupJobRepository
+            ->method('findDefaultCoordinatorGroupJobByDataJobId')
+            ->willReturn($groupJobJob);
 
         $row = $this->provider->buildJobView($jobs[1]);
 
-        $this->checkRow($row, $jobs[1], $lspJob);
+        $this->checkRow($row, $jobs[1], $groupJobJob);
     }
 
     public function testBuildJobViewFromArray(): void
     {
         $jobs = $this->getJobMocks();
 
-        $lspJob = $this->createMock(DefaultLspJob::class);
-        $lspJob->method('__call')->willReturnMap([
+        $groupJobJob = $this->createMock(DefaultCoordinatorGroupJob::class);
+        $groupJobJob->method('__call')->willReturnMap([
             ['getId', [], 12],
-            ['getLspId', [], 13],
+            ['getGroupId', [], 13],
         ]);
-        $this->defaultLspJobRepository
-            ->method('findDefaultLspJobByDataJobId')
-            ->willReturn($lspJob);
+        $this->defaultCoordinatorGroupJobRepository
+            ->method('findDefaultCoordinatorGroupJobByDataJobId')
+            ->willReturn($groupJobJob);
 
         $this->defaultUserJobPermissionAssert->method('isGranted')->willReturn(true);
 
@@ -174,17 +175,18 @@ class DefaultUserJobViewDataProviderTest extends TestCase
                     'trackchangesShow' => (bool) $job->getTrackchangesShow(),
                     'trackchangesShowAll' => (bool) $job->getTrackchangesShowAll(),
                     'trackchangesAcceptReject' => (bool) $job->getTrackchangesAcceptReject(),
-                    'type' => TypeEnum::Lsp->value,
-                    'lspId' => $lspJob->getLspId(),
-                    'isLspJob' => true,
-                ]
+                    'type' => TypeEnum::Coordinator->value,
+                    'groupId' => $groupJobJob->getGroupId(),
+                    'isCoordinatorGroupJob' => true,
+                ],
             ],
-            $viewer);
+            $viewer
+        );
 
-        $this->checkRow($row[0], $job, $lspJob);
+        $this->checkRow($row[0], $job, $groupJobJob);
     }
 
-    private function checkRow(array $row, DefaultUserJob $job, ?DefaultLspJob $lspJob): void
+    private function checkRow(array $row, DefaultUserJob $job, ?DefaultCoordinatorGroupJob $groupJob): void
     {
         self::assertEquals(
             [
@@ -199,9 +201,9 @@ class DefaultUserJobViewDataProviderTest extends TestCase
                 'trackchangesShow' => (bool) $job->getTrackchangesShow(),
                 'trackchangesShowAll' => (bool) $job->getTrackchangesShowAll(),
                 'trackchangesAcceptReject' => (bool) $job->getTrackchangesAcceptReject(),
-                'type' => $lspJob ? TypeEnum::Lsp->value : TypeEnum::Editor->value,
-                'lspId' => $lspJob?->getLspId(),
-                'isLspJob' => $lspJob !== null,
+                'type' => $groupJob ? TypeEnum::Coordinator->value : TypeEnum::Editor->value,
+                'groupId' => $groupJob?->getGroupId(),
+                'isCoordinatorGroupJob' => $groupJob !== null,
             ],
             $row
         );

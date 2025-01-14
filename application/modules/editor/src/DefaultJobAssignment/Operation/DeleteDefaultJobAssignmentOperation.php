@@ -30,11 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\DefaultJobAssignment\Operation;
 
-use MittagQI\Translate5\DefaultJobAssignment\Contract\DeleteDefaultLspJobOperationInterface;
+use MittagQI\Translate5\DefaultJobAssignment\Contract\DeleteDefaultCoordinatorGroupJobOperationInterface;
 use MittagQI\Translate5\DefaultJobAssignment\Contract\DeleteDefaultUserJobOperationInterface;
-use MittagQI\Translate5\DefaultJobAssignment\DefaultLspJob\Operation\DeleteDefaultLspJobOperation;
+use MittagQI\Translate5\DefaultJobAssignment\DefaultCoordinatorGroupJob\Operation\DeleteDefaultCoordinatorGroupJobOperation;
 use MittagQI\Translate5\DefaultJobAssignment\DefaultUserJob\Operation\DeleteDefaultUserJobOperation;
-use MittagQI\Translate5\Repository\DefaultLspJobRepository;
+use MittagQI\Translate5\Repository\DefaultCoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -42,8 +42,8 @@ class DeleteDefaultJobAssignmentOperation
 {
     public function __construct(
         private readonly DefaultUserJobRepository $defaultUserJobRepository,
-        private readonly DefaultLspJobRepository $defaultLspJobRepository,
-        private readonly DeleteDefaultLspJobOperationInterface $deleteDefaultLspJobOperation,
+        private readonly DefaultCoordinatorGroupJobRepository $defaultCoordinatorGroupJobRepository,
+        private readonly DeleteDefaultCoordinatorGroupJobOperationInterface $deleteDefaultCoordinatorGroupJobOperation,
         private readonly DeleteDefaultUserJobOperationInterface $deleteDefaultUserJobOperation,
     ) {
     }
@@ -52,8 +52,8 @@ class DeleteDefaultJobAssignmentOperation
     {
         return new self(
             DefaultUserJobRepository::create(),
-            DefaultLspJobRepository::create(),
-            DeleteDefaultLspJobOperation::create(),
+            DefaultCoordinatorGroupJobRepository::create(),
+            DeleteDefaultCoordinatorGroupJobOperation::create(),
             DeleteDefaultUserJobOperation::create(),
         );
     }
@@ -66,10 +66,11 @@ class DeleteDefaultJobAssignmentOperation
             return;
         }
 
-        $defaultLspJob = $this->defaultLspJobRepository->findDefaultLspJobByDataJobId($jobId);
+        $defaultGroupJobByDataJobId = $this->defaultCoordinatorGroupJobRepository
+            ->findDefaultCoordinatorGroupJobByDataJobId($jobId);
 
-        if (null !== $defaultLspJob) {
-            $this->deleteDefaultLspJobOperation->delete($defaultLspJob);
+        if (null !== $defaultGroupJobByDataJobId) {
+            $this->deleteDefaultCoordinatorGroupJobOperation->delete($defaultGroupJobByDataJobId);
 
             return;
         }

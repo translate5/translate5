@@ -1315,7 +1315,7 @@ div.internal-tag.number span.full::after {
     color: #b6b6b6;
 }
 
-.lsp-job-row {
+.coordinator-group-job-row {
     background-color: rgb(181 217 250 / 60%);
 }
 

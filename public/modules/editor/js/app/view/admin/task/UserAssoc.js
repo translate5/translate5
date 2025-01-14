@@ -120,7 +120,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                                         fields: ['name', 'value'],
                                         data: [
                                             { name: 'Editor', value: 1 },
-                                            { name: 'LSP', value: 2 },
+                                            { name: 'Coordinator', value: 2 },
                                         ]
                                     },
                                     listeners: {
@@ -292,7 +292,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
 
         Ext.Ajax.request({
             url: Editor.data.restpath + (
-                jobId ? `task/${taskId}/lsp-job/${jobId}/combo/coordinators` : `task/${taskId}/lsp-job/combo/coordinators`
+                jobId
+                    ? `task/${taskId}/coordinator-group-job/${jobId}/combo/coordinators`
+                    : `task/${taskId}/coordinator-group-job/combo/coordinators`
             ),
             method: 'GET',
             success: function (response) {
@@ -337,22 +339,22 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
         if (edit) {
             form.setTitle(Ext.String.format(me.strings.formTitleEdit, rec.get('longUserName')));
 
-            rec.get('isLspJob') ? me.loadCoordinators() : me.loadUsers();
+            rec.get('isCoordinatorGroupJob') ? me.loadCoordinators() : me.loadUsers();
         } else {
             form.setTitle(me.strings.formTitleAdd);
             me.loadUsers();
         }
 
-        const sameLsp = Editor.app.authenticatedUser.get('lsp') === rec.get('lspId');
+        const sameCoordinatorGroup = Editor.app.authenticatedUser.get('coordinatorGroup') === rec.get('groupId');
 
-        deadlineDate.setDisabled(edit && rec.get('isLspJob') && sameLsp);
-        segmentrange.setDisabled(edit && rec.get('isLspJob'));
+        deadlineDate.setDisabled(edit && rec.get('isCoordinatorGroupJob') && sameCoordinatorGroup);
+        segmentrange.setDisabled(edit && rec.get('isCoordinatorGroupJob'));
 
-        userCombo.setVisible(! edit || rec.get('isLspJob'));
-        userCombo.setDisabled(edit && ! rec.get('isLspJob'));
+        userCombo.setVisible(! edit || rec.get('isCoordinatorGroupJob'));
+        userCombo.setDisabled(edit && ! rec.get('isCoordinatorGroupJob'));
 
-        workflowStepCombo.setVisible(! edit || ! rec.get('isLspJob'));
-        workflowStepCombo.setDisabled(edit && rec.get('isLspJob'));
+        workflowStepCombo.setVisible(! edit || ! rec.get('isCoordinatorGroupJob'));
+        workflowStepCombo.setDisabled(edit && rec.get('isCoordinatorGroupJob'));
 
         typeCombo.setDisabled(edit);
         typeCombo.setVisible(! edit);

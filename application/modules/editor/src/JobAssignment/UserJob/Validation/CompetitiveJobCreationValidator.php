@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\Validation;
 
 use editor_Models_Task as Task;
 use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
-use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirmedLspJobYetException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirmedCoordinatorGroupJobYetException;
 use MittagQI\Translate5\Repository\UserJobRepository;
 
 class CompetitiveJobCreationValidator
@@ -54,11 +54,11 @@ class CompetitiveJobCreationValidator
 
     /**
      * @throws ConfirmedCompetitiveJobAlreadyExistsException
-     * @throws CoordinatorHasNotConfirmedLspJobYetException
+     * @throws CoordinatorHasNotConfirmedCoordinatorGroupJobYetException
      */
     public function assertCanCreate(
         Task $task,
-        ?int $lspJobId,
+        ?int $groupJobId,
         string $workflow,
         string $workflowStepName
     ): void {
@@ -72,18 +72,18 @@ class CompetitiveJobCreationValidator
             $workflowStepName
         );
 
-        if (null === $lspJobId && ! $taskHasConfirmedJob) {
+        if (null === $groupJobId && ! $taskHasConfirmedJob) {
             return;
         }
 
-        if (null === $lspJobId) {
+        if (null === $groupJobId) {
             throw new ConfirmedCompetitiveJobAlreadyExistsException();
         }
 
-        $dataJob = $this->userJobRepository->getDataJobByLspJob($lspJobId);
+        $dataJob = $this->userJobRepository->getDataJobByCoordinatorGroupJob($groupJobId);
 
         if (! $dataJob->isConfirmed()) {
-            throw new CoordinatorHasNotConfirmedLspJobYetException();
+            throw new CoordinatorHasNotConfirmedCoordinatorGroupJobYetException();
         }
     }
 }

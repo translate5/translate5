@@ -33,8 +33,8 @@ namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Repository\Contract\LspUserRepositoryInterface;
-use MittagQI\Translate5\Repository\LspUserRepository;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Acl\SystemResource;
@@ -47,7 +47,7 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly ZfExtended_Acl $acl,
-        private readonly LspUserRepositoryInterface $lspUserRepository,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
     ) {
     }
 
@@ -58,7 +58,7 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
     {
         return new self(
             ZfExtended_Acl::getInstance(),
-            LspUserRepository::create(),
+            CoordinatorGroupUserRepository::create(),
         );
     }
 
@@ -79,9 +79,9 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        $lspUser = $this->lspUserRepository->findByUser($object);
+        $groupUser = $this->coordinatorGroupUserRepository->findByUser($object);
 
-        if (null !== $lspUser) {
+        if (null !== $groupUser) {
             return;
         }
 

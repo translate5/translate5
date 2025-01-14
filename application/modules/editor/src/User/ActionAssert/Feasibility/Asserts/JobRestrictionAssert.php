@@ -35,9 +35,9 @@ use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\JobAssignment\LspJob\ActionAssert\Feasibility\LspJobActionFeasibilityAssert;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\ActionAssert\Feasibility\CoordinatorGroupJobActionFeasibilityAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Feasibility\UserJobActionFeasibilityAssert;
-use MittagQI\Translate5\Repository\LspJobRepository;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\User\ActionAssert\Feasibility\Exception\UserHasUnDeletableJobException;
 use MittagQI\Translate5\User\Model\User;
@@ -53,8 +53,8 @@ class JobRestrictionAssert implements FeasibilityAssertInterface
     public function __construct(
         private readonly UserJobRepository $userJobRepository,
         private readonly ActionFeasibilityAssertInterface $userJobActionFeasibilityAssert,
-        private readonly ActionFeasibilityAssertInterface $lspJobActionFeasibilityAssert,
-        private readonly LspJobRepository $lspJobRepository,
+        private readonly ActionFeasibilityAssertInterface $coordinatorGroupJobActionFeasibilityAssert,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
     ) {
     }
 
@@ -66,8 +66,8 @@ class JobRestrictionAssert implements FeasibilityAssertInterface
         return new self(
             UserJobRepository::create(),
             UserJobActionFeasibilityAssert::create(),
-            LspJobActionFeasibilityAssert::create(),
-            LspJobRepository::create(),
+            CoordinatorGroupJobActionFeasibilityAssert::create(),
+            CoordinatorGroupJobRepository::create(),
         );
     }
 
@@ -79,10 +79,10 @@ class JobRestrictionAssert implements FeasibilityAssertInterface
     public function assertAllowed(object $object): void
     {
         foreach ($this->userJobRepository->getJobsByUserGuid($object->getUserGuid()) as $job) {
-            if ($job->isLspJob()) {
-                $lspJob = $this->lspJobRepository->get((int) $job->getLspJobId());
+            if ($job->isCoordinatorGroupJob()) {
+                $groupJob = $this->coordinatorGroupJobRepository->get((int) $job->getCoordinatorGroupJobId());
 
-                $this->lspJobActionFeasibilityAssert->assertAllowed(Action::Delete, $lspJob);
+                $this->coordinatorGroupJobActionFeasibilityAssert->assertAllowed(Action::Delete, $groupJob);
 
                 continue;
             }

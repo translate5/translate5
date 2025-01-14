@@ -32,33 +32,34 @@ namespace MittagQI\Translate5\Test\Unit\Customer\ActionAssert\Permission;
 
 use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
+use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
+use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroupCustomer;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\Permission\CoordinatorAccessAssert;
 use MittagQI\Translate5\Customer\Exception\NoAccessToCustomerException;
-use MittagQI\Translate5\LSP\JobCoordinator;
-use MittagQI\Translate5\LSP\JobCoordinatorRepository;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProvider;
-use MittagQI\Translate5\LSP\Model\LanguageServiceProviderCustomer;
-use MittagQI\Translate5\Repository\Contract\LspRepositoryInterface;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
 use MittagQI\Translate5\User\Model\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CoordinatorAccessAssertTest extends TestCase
 {
-    private JobCoordinatorRepository $coordinatorRepository;
+    private JobCoordinatorRepository|MockObject $coordinatorRepository;
 
-    private LspRepositoryInterface $lspRepository;
+    private CoordinatorGroupRepositoryInterface|MockObject $coordinatorGroupRepository;
 
     private CoordinatorAccessAssert $assert;
 
     public function setUp(): void
     {
         $this->coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
-        $this->lspRepository = $this->createMock(LspRepositoryInterface::class);
+        $this->coordinatorGroupRepository = $this->createMock(CoordinatorGroupRepositoryInterface::class);
 
         $this->assert = new CoordinatorAccessAssert(
             $this->coordinatorRepository,
-            $this->lspRepository,
+            $this->coordinatorGroupRepository,
         );
     }
 
@@ -136,14 +137,14 @@ class CoordinatorAccessAssertTest extends TestCase
         $context = new PermissionAssertContext($viewer);
 
         $user = $this->createMock(User::class);
-        $lsp = $this->createMock(LanguageServiceProvider::class);
-        $coordinator = new JobCoordinator('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $lsp);
+        $coordinatorGroup = $this->createMock(CoordinatorGroup::class);
+        $coordinator = new JobCoordinator('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $coordinatorGroup);
 
         $this->coordinatorRepository->method('findByUser')->willReturn($coordinator);
 
-        $lrToCustomer = $this->createMock(LanguageServiceProviderCustomer::class);
+        $lrToCustomer = $this->createMock(CoordinatorGroupCustomer::class);
 
-        $this->lspRepository->method('findCustomerConnection')->willReturn($granted ? $lrToCustomer : null);
+        $this->coordinatorGroupRepository->method('findCustomerConnection')->willReturn($granted ? $lrToCustomer : null);
 
         $forbiddenActions = [CustomerAction::Delete, CustomerAction::Update];
 
