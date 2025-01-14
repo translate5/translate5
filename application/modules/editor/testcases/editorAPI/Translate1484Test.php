@@ -50,24 +50,21 @@ class Translate1484Test extends JsonTestAbstract
         $customerId = static::$ownCustomer->id;
         $config
             ->addLanguageResource('zdemomt', null, $customerId, $sourceLangRfc, $targetLangRfc)
-            ->addDefaultCustomerId($customerId)
-            ->setProperty('name', 'API Testing::ZDemoMT_Translate1484Test'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->addDefaultCustomerId($customerId);
         $config
             ->addLanguageResource('opentm2', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
-            ->addDefaultCustomerId($customerId)
-            ->setProperty('name', 'API Testing::OpenTm2Tm_Translate1484Test'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->addDefaultCustomerId($customerId);
         $config
             ->addPretranslation()
             ->setProperty('pretranslateMt', 1);
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
             ->addUploadFile('simple-en-de.xlf')
-            ->setProperty('edit100PercentMatch', false)
-            ->setProperty('taskName', 'API Testing::Translate1484Test'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->setProperty('edit100PercentMatch', false);
     }
 
     /***
-     * Test the excel export.
+     * Test the Excel export.
      */
     public function testExportResourcesLog()
     {
