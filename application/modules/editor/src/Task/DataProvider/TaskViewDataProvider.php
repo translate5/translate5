@@ -122,11 +122,11 @@ class TaskViewDataProvider
     /**
      * @return string[]
      */
-    public function getTaskIdList(
+    public function getProjectIdList(
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): array {
-        $select = $this->taskQuerySelectFactory->createTaskIdsSelect($viewer, $filter);
+        $select = $this->taskQuerySelectFactory->createProjectIdsSelect($viewer, $filter);
 
         return $this->db->fetchCol($select);
     }

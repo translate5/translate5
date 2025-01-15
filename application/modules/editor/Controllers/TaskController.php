@@ -2178,12 +2178,13 @@ class editor_TaskController extends ZfExtended_RestController
         //TODO The optimal way to implement this, is like similar to the segment::positionAction in a general way so that it is usable for all entities.
         $this->addDefaultSort();
         $this->handleProjectRequest();
-        $ids = $this->taskViewDataProvider->getTaskIdList(
+        $ids = $this->taskViewDataProvider->getProjectIdList(
             $this->authenticatedUser,
             $this->entity->getFilter(),
         );
         $id = (int) $this->_getParam('id');
         $index = false;
+
         if (! empty($ids)) {
             $index = array_search($id, $ids);
         }

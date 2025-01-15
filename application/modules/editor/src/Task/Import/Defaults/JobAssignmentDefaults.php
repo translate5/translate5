@@ -6,6 +6,7 @@ use editor_Models_Task as Task;
 use editor_Models_TaskConfig;
 use editor_Models_TaskUserAssoc as UserJob;
 use editor_Models_UserAssocDefault as DefaultUserJob;
+use editor_Plugins_InstantTranslate_TaskType;
 use editor_Utils;
 use editor_Workflow_Default;
 use editor_Workflow_Manager;
@@ -69,6 +70,11 @@ class JobAssignmentDefaults implements ITaskDefaults
             new editor_Workflow_Manager(),
             Zend_Registry::get('logger')->cloneMe('userJob.default.assign'),
         );
+    }
+
+    public function canApplyDefaults(Task $task): bool
+    {
+        return $task->getTaskType()->id() !== editor_Plugins_InstantTranslate_TaskType::ID;
     }
 
     public function applyDefaults(Task $task, bool $importWizardUsed = false): void

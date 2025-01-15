@@ -90,11 +90,11 @@ class TaskQuerySelectFactory
         return $select;
     }
 
-    public function createTaskIdsSelect(
+    public function createProjectIdsSelect(
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        $select = $this->getBaseTaskSelect($viewer, $filter, TaskDb::TABLE_NAME . '.id');
+        $select = $this->getBaseProjectSelect($viewer, $filter, TaskDb::TABLE_NAME . '.id');
 
         return $select;
     }
