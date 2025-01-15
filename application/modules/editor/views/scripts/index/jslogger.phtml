@@ -53,7 +53,7 @@ END LICENSE AND COPYRIGHT
                 logResourceLoadFailures : true,
                 autoStart : true,
                 showNotificationOnError : true,
-                showFeedbackButton : false,
+                showFeedbackButton : <?php echo $this->enableJsLoggerFeedback ? 'true' : 'false'; ?>,
                 data: {
                     controllers: Editor.data.app.controllers
                 },
