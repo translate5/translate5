@@ -307,7 +307,8 @@ Ext.define('Editor.controller.Editor', {
         //reset the store next/prev information if data changed
         segmentsGrid.store.on('filterchange', me.handleSortOrFilter, me);
         segmentsGrid.store.on('sort', me.handleSortOrFilter, me);
-        
+        segmentsGrid.store.on('prefetch', me.prevNextSegment.clearCalculated, me.prevNextSegment);
+
         /**
          * disable the column show / hide menu while editing a segment (EXT6UPD-85)
          */
@@ -341,7 +342,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this,
             plug = me.getEditPlugin();
         
-        me.prevNextSegment.handleSortOrFilter();
+        me.prevNextSegment.clearCalculated();
         if(plug && plug.editor && plug.editor.context) {
             plug.editor.context.reordered = true;
         }

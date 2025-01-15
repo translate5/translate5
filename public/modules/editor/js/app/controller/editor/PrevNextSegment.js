@@ -97,7 +97,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     /**
      * handles the change of the sort filters
      */
-    handleSortOrFilter: function() {
+    clearCalculated: function() {
         this.prev = null;
         this.next = null;
     },

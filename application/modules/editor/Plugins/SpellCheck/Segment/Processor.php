@@ -38,6 +38,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Adapter;
+use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\AdapterConfigDTO;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
 use MittagQI\Translate5\Segment\AbstractProcessor;
 use MittagQI\Translate5\Segment\Db\Processing;
@@ -90,11 +91,23 @@ class Processor extends AbstractProcessor
 
     private string $qualityType;
 
-    public function __construct(editor_Models_Task $task, DockerServiceAbstract $service, string $processingMode, string $serviceUrl = null, bool $isWorkerContext = true)
-    {
+    /**
+     * @throws \ZfExtended_Exception
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws \ReflectionException
+     * @throws \editor_Models_ConfigException
+     */
+    public function __construct(
+        editor_Models_Task $task,
+        DockerServiceAbstract $service,
+        string $processingMode,
+        string $serviceUrl = null,
+        bool $isWorkerContext = true,
+    ) {
         parent::__construct($task, $service, $processingMode, $serviceUrl, $isWorkerContext);
-        $this->adapter = $this->service->getAdapter();
-        $this->language = $this->adapter->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
+        $this->adapter = $this->service->getAdapter(AdapterConfigDTO::create($serviceUrl, $task->getConfig()));
+        $this->language = $this->adapter->getSpellCheckLangByTaskTargetLangId((int) $task->getTargetLang());
         $this->qualityType = editor_Plugins_SpellCheck_QualityProvider::qualityType();
     }
 

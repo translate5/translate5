@@ -27,41 +27,32 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\Import;
+namespace MittagQI\Translate5\Plugins\SpellCheck\LanguageTool;
 
-use editor_Models_Task;
-use MittagQI\Translate5\Repository\LanguageResourceRepository;
-use MittagQI\Translate5\Task\Import\Defaults\ITaskDefaults;
-use MittagQI\Translate5\Task\Import\Defaults\JobAssignmentDefaults;
-use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
-use MittagQI\Translate5\Task\Import\Defaults\PivotResourceDefaults;
+use Zend_Config;
 
-class TaskDefaults
+/**
+ * See https://languagetool.org/http-api/#/check parameter level
+ */
+final class AdapterConfigDTO
 {
     /**
-     * @var ITaskDefaults[]
+     * if omitted, then auto calculated in getAdapter Method
      */
-    private array $defaults;
+    public ?string $serviceUrl = null;
 
-    public function __construct()
-    {
-        $languageResourceRepository = new LanguageResourceRepository();
-        $this->defaults = [
-            new LanguageResourcesDefaults($languageResourceRepository),
-            new PivotResourceDefaults($languageResourceRepository),
-            JobAssignmentDefaults::create(),
-        ];
-    }
+    public LevelProperty $level = LevelProperty::Default;
 
     /**
-     * Sets task defaults for given task (default languageResources, default userAssocs)
+     * @param Zend_Config|null $config if omitted, use defaults
      */
-    public function setTaskDefaults(editor_Models_Task $task, bool $importWizardUsed = false): void
+    public static function create(?string $url = null, ?Zend_Config $config = null): static
     {
-        foreach ($this->defaults as $default) {
-            if ($default->canApplyDefaults($task)) {
-                $default->applyDefaults($task, $importWizardUsed);
-            }
-        }
+        $dto = new static();
+        $dto->serviceUrl = $url;
+        $dto->level = LevelProperty::tryFrom($config->runtimeOptions?->plugins?->SpellCheck?->ruleLevel ?? '')
+            ?? LevelProperty::Default;
+
+        return $dto;
     }
 }

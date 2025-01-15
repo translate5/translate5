@@ -53,6 +53,33 @@ class PersistenceService
         ]);
     }
 
+    public function getNextWritableMemory(LanguageResource $languageResource, string $memoryName): ?string
+    {
+        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+
+        $pattern = '/_next-(\d+)/';
+
+        preg_match($pattern, $memoryName, $matches);
+        $memoryNumber = (int) ($matches[1] ?? 0);
+
+        $matches = [];
+        foreach ($memories as $memory) {
+            if ($memory['readonly']) {
+                continue;
+            }
+
+            if (! preg_match($pattern, $memory['filename'], $matches)) {
+                continue;
+            }
+
+            if ((int) $matches[1] > $memoryNumber) {
+                return $memory['filename'];
+            }
+        }
+
+        return null;
+    }
+
     /**
      * adds the internal TM prefix to the given TM name
      */

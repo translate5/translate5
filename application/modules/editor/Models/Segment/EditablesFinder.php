@@ -26,13 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* * #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
 /**
  * This is the expected SQL, where the result is sorted after matchrate,
  * and the segment to compare has a matchRate of 20 and id 923695
@@ -40,30 +33,24 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Segment_EditablesFinder
 {
-    /**
-     * @var editor_Models_Segment
-     */
-    protected $segment = null;
+    protected ?editor_Models_Segment $segment = null;
 
     /**
      * filter instances used for inner and outer SQL
-     * @var ZfExtended_Models_Filter
      */
-    protected $filterInner;
+    protected ZfExtended_Models_Filter $filterInner;
 
-    protected $filterOuter;
-
-    /**
-     * sort parameters which are added as sort and filter conditions
-     * @var array
-     */
-    protected $sortParameter;
+    protected ZfExtended_Models_Filter $filterOuter;
 
     /**
      * sort parameters which are added as sort and filter conditions
-     * @var array
      */
-    protected $fieldsToSelect;
+    protected array $sortParameter;
+
+    /**
+     * sort parameters which are added as sort and filter conditions
+     */
+    protected array $fieldsToSelect;
 
     public function __construct(editor_Models_Segment $segment)
     {
@@ -87,19 +74,30 @@ class editor_Models_Segment_EditablesFinder
     }
 
     /**
-     * calculcates the next/prev editable segment and return the segment position as integer and null if there is no next/prev segment
-     *
-     * @return null|integer
+     * calculates the next/prev editable segment and return the segment position
+     * as integer and null if there is no next/prev segment
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Db_Table_Exception
      */
-    public function find(bool $next, string $workflowStep = '')
+    public function find(bool $next, string $workflowStep = ''): ?int
     {
         $outerSql = $this->getOuterSql();
         //for the inner sort we have to swap the direction for the prev filter
         if (! $next) {
             $this->filterInner->swapSortDirection();
         }
-        $this->prepareInnerFilter($workflowStep);
+        $this->prepareInnerEditableFilter();
+
+        $findInWorkflow = $workflowStep !== '';
+        if ($findInWorkflow && $this->filterInner->hasFilter('workflowStep')) {
+            $this->filterInner->deleteFilter('workflowStep');
+        }
+
         $innerSql = $this->getInnerSql();
+
+        if ($findInWorkflow) {
+            $innerSql->where('workflowStep != ? or workflowStep is null', $workflowStep);
+        }
 
         foreach ($this->sortParameter as $sort) {
             $isAsc = strtolower($sort->direction) === 'asc';
@@ -129,10 +127,10 @@ class editor_Models_Segment_EditablesFinder
     /**
      * gets the segment position (grid index) to the given segmentId and the configured filters
      * returns null if the segment is not in the filtered list
-     * @param int $segmentId
-     * @return null|number
+     * @throws Zend_Db_Table_Exception
+     * @throws Zend_Db_Statement_Exception
      */
-    public function getIndex($segmentId)
+    public function getIndex($segmentId): ?int
     {
         $outerSql = $this->getOuterSql();
 
@@ -170,7 +168,8 @@ class editor_Models_Segment_EditablesFinder
         $foundInFilter = true; //by default we assume that we found something
         if ($res['cnt'] === null) {
             $stmt = $db->getAdapter()->query($innerSql);
-            $foundInFilter = $stmt->fetch(); //if there was a result, we have to return 0 which is done by the (int) cast at the end
+            //if there was a result, we have to return 0 which is done by the (int) cast at the end
+            $foundInFilter = $stmt->fetch();
         }
 
         //if we got not result at all, or the desired segment was not in the filtered list, we return null
@@ -183,9 +182,8 @@ class editor_Models_Segment_EditablesFinder
 
     /**
      * Adds the watchList defitions to the needed filters
-     * @param string $tablename
      */
-    protected function watchList(ZfExtended_Models_Filter $filter, $tablename)
+    protected function watchList(ZfExtended_Models_Filter $filter, string $tablename): void
     {
         $filter->setDefaultTable($tablename);
         $filter->addTableForField('isWatched', 'sua');
@@ -195,11 +193,10 @@ class editor_Models_Segment_EditablesFinder
      * adds the where statement to the inner SELECT, the SQL differs for the following cases:
         DESC PREV    sortField > currentSortValue || sortField = currentSortValue && idField < currentIdValue
      */
-    protected function addSortInner(Zend_Db_Table_Select $sql, string $prop, bool $next, bool $isAsc)
+    protected function addSortInner(Zend_Db_Select $sql, string $prop, bool $next, bool $isAsc): void
     {
         $value = $this->segment->get($prop);
 
-        $idComparator = $next ? '>' : '<';
         $comparator = ($isAsc xor $next) ? '<' : '>';
         //id comparator depends only on prev/next, since order for id is always ASC!
         $f = $this->segment->db . '.`' . $prop . '` ';
@@ -212,7 +209,7 @@ class editor_Models_Segment_EditablesFinder
      * adds the where statement to the outer select, the SQL differs for the following cases:
                 DESC NEXT/PREV  sortField > innerSortValue || sortField = innerSortValue && idField > innerIdValue
      */
-    protected function addSortOuter(Zend_Db_Table_Select $sql, string $prop, bool $isAsc)
+    protected function addSortOuter(Zend_Db_Select $sql, string $prop, bool $isAsc): void
     {
         //id comparator depends only on prev/next, since order for id is always ASC!
         $comparator = $isAsc ? '<' : '>';
@@ -224,9 +221,8 @@ class editor_Models_Segment_EditablesFinder
 
     /**
      * prepares the outer SQL and returns it
-     * @return Zend_Db_Table_Select
      */
-    protected function getOuterSql()
+    protected function getOuterSql(): Zend_Db_Table_Select
     {
         $outerSql = $this->segment->db->select()
             ->from([
@@ -239,9 +235,9 @@ class editor_Models_Segment_EditablesFinder
 
     /**
      * prepares the inner SQL and returns it
-     * @return Zend_Db_Table_Select
+     * @throws Zend_Db_Table_Exception
      */
-    protected function getInnerSql()
+    protected function getInnerSql(): Zend_Db_Select
     {
         $db = $this->segment->db;
         $tableName = $db->info($db::NAME);
@@ -255,17 +251,10 @@ class editor_Models_Segment_EditablesFinder
     }
 
     /**
-     * prepares the inner filter: adds the filtering condition for only editable and if provided the filter for specific workflowStep
+     * prepares the editable filter condition for the inner filter
      */
-    protected function prepareInnerFilter(string $workflowStep = '')
+    protected function prepareInnerEditableFilter(): void
     {
-        if (! empty($workflowStep)) {
-            $this->filterInner->addFilter((object) [
-                'field' => 'workflowStep',
-                'type' => 'notInList',
-                'value' => [$workflowStep],
-            ]);
-        }
         $editableFilter = null;
         if ($this->filterInner->hasFilter('editable', $editableFilter)) {
             $editableFilter->value = 1;
@@ -281,9 +270,8 @@ class editor_Models_Segment_EditablesFinder
 
     /**
      * prepares and returns the sort property to be used
-     * @return string
      */
-    protected function getSortProperty(stdClass $sort)
+    protected function getSortProperty(stdClass $sort): string
     {
         //mapSort adds also a table, this is not needed here!
         $prop = $this->segment->getFilter()->mapSort($sort->property);
@@ -292,7 +280,7 @@ class editor_Models_Segment_EditablesFinder
         return end($prop);
     }
 
-    protected function debug($outerSql)
+    protected function debug($outerSql): void
     {
         return;
         //debug sql:

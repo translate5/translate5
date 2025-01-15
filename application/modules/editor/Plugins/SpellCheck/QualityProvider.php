@@ -32,7 +32,7 @@
  END LICENSE AND COPYRIGHT
  */
 
-use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\AdapterConfigDTO;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Configuration;
@@ -321,15 +321,16 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     }
 
     /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws ZfExtended_Exception
-     * @throws DownException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
     private function getSpellcheckLanguage(editor_Models_Task $task, string $resourcePool): string|false
     {
         return $this->getLanguagetoolService()
-            ->getAdapter(null, $resourcePool)
-            ->getSpellCheckLangByTaskTargetLangId(
-                (int) $task->getTargetLang()
-            );
+            ->getAdapter(AdapterConfigDTO::create(config: $task->getConfig()), $resourcePool)
+            ->getSpellCheckLangByTaskTargetLangId((int) $task->getTargetLang());
     }
 }
