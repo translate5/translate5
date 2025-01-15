@@ -37,17 +37,19 @@ class CsvReimportSegmentRepository implements ReimportSegmentRepositoryInterface
     public function save(string $runId, UpdateSegmentDTO $dto): void
     {
         $filename = $this->getFileName($runId, $dto->taskGuid);
-        file_put_contents($filename, $this->toCsvString($dto) . PHP_EOL, FILE_APPEND);
+        $file = fopen($filename, 'ab');
+        fputcsv($file, $this->toArray($dto));
+        fclose($file);
     }
 
     public function getByTask(string $runId, string $taskGuid): iterable
     {
         $filename = $this->getFileName($runId, $taskGuid);
 
-        $file = fopen($filename, 'r');
+        $file = fopen($filename, 'rb');
 
-        while (($line = fgets($file)) !== false) {
-            yield $this->fromCsvString($line);
+        while (($line = fgetcsv($file)) !== false) {
+            yield $this->fromArray($line);
         }
 
         fclose($file);
@@ -78,43 +80,31 @@ class CsvReimportSegmentRepository implements ReimportSegmentRepositoryInterface
         return $fileName;
     }
 
-    private function toCsvString(UpdateSegmentDTO $dto): string
+    private function toArray(UpdateSegmentDTO $dto): array
     {
-        return implode(',', [
+        return [
             $dto->taskGuid,
             $dto->segmentId,
-            $this->escape($dto->source),
-            $this->escape($dto->target),
+            $dto->source,
+            $dto->target,
             $dto->fileName,
             $dto->timestamp,
             $dto->userName,
-            $this->escape($dto->context),
-        ]);
+            $dto->context,
+        ];
     }
 
-    private function fromCsvString(string $csvString): UpdateSegmentDTO
+    private function fromArray(array $data): UpdateSegmentDTO
     {
-        $data = str_getcsv($csvString);
-
         return new UpdateSegmentDTO(
             taskGuid: $data[0],
             segmentId: (int) $data[1],
-            source: $this->unescape($data[2]),
-            target: $this->unescape($data[3]),
+            source: $data[2],
+            target: $data[3],
             fileName: $data[4],
             timestamp: $data[5],
             userName: $data[6],
-            context: $this->unescape($data[7]),
+            context: $data[7],
         );
-    }
-
-    private function escape(string $string): string
-    {
-        return str_replace(',', '\,', $string);
-    }
-
-    private function unescape(string $string): string
-    {
-        return str_replace('\,', ',', $string);
     }
 }

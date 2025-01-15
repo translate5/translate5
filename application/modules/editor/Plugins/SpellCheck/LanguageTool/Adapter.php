@@ -34,6 +34,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
+use ReflectionException;
 use Zend_Http_Client;
 use Zend_Http_Client_Exception;
 use Zend_Http_Response;
@@ -71,13 +72,6 @@ final class Adapter
      * @var integer
      */
     public const REQUEST_TIMEOUT_SECONDS = 360;
-
-    /**
-     * Base-URL used for LanguagaTool - use the URL of your installed languageTool (without trailing slash!).
-     * Taken from Zf_configuration (example: "http://yourlanguagetooldomain:8081/v2")
-     * @var string
-     */
-    private $serviceUrl;
 
     /**
      * @var array
@@ -122,23 +116,22 @@ final class Adapter
      */
     protected $lastStatus;
 
-    public function __construct($serviceUrl)
-    {
-        $this->serviceUrl = $serviceUrl;
+    public function __construct(
+        protected readonly AdapterConfigDTO $config,
+    ) {
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'SpellCheckRequests');
     }
 
     /**
      * Create the http object and set the url
      *
-     * @param string $path
-     *
-     * @return Zend_Http_Client
+     * @throws Zend_Http_Client_Exception
+     * @throws ReflectionException
      */
-    private function getHttpClient($path)
+    private function getHttpClient(string $path): Zend_Http_Client
     {
         $http = ZfExtended_Factory::get(Zend_Http_Client::class);
-        $http->setUri($this->serviceUrl . $path);
+        $http->setUri($this->config->serviceUrl . $path);
         $http->setConfig([
             'timeout' => self::REQUEST_TIMEOUT_SECONDS,
         ]);
@@ -157,10 +150,10 @@ final class Adapter
 
     /**
      * Get all languages supported by LanguageTool.
-     * @return array
+     * @throws ReflectionException
      * @throws Zend_Http_Client_Exception
      */
-    public function getLanguages()
+    public function getLanguages(): array
     {
         // Return cached, if already cached
         if (isset(self::$languages['languageTool'])) {
@@ -306,6 +299,7 @@ final class Adapter
             }
         }
         $http->setParameterPost('language', $language);
+        $http->setParameterPost('level', $this->config->level->value);
 
         // Reset $this->lastStatus
         $this->lastStatus = false;
@@ -391,7 +385,7 @@ final class Adapter
         // Get supported languages
         try {
             $supportedLanguages = $this->getLanguages();
-        } catch (ZfExtended_Zendoverwrites_Http_Exception) {
+        } catch (ZfExtended_Zendoverwrites_Http_Exception|Zend_Http_Client_Exception) {
             //the whole error handling is only made for the main segment processing,
             // so we return just false here on connection problems
             return false;

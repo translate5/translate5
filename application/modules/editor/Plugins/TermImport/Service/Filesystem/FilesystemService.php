@@ -98,6 +98,7 @@ class FilesystemService
 
             $contents = $this->mountManager->listContents($path);
             $iterator = $contents instanceof Iterator ? $contents : new IteratorIterator($contents);
+            $iterator->rewind(); //otherwise it might happen that valid is false
 
             return $iterator->valid();
         } catch (FilesystemException) {

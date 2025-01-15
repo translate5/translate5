@@ -257,7 +257,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
             $this->currentId = $seg->getId();
             $this->segmentCache[$segId] = $seg;
         }
-        if ($seg->getMid() != $segId) {
+        if ($seg->meta()->getMrkMid() != $segId) {
             throw new Zend_Exception('segId had been not identical with mid of found segment - which has to be. segId: ' . $segId . ' mid: ' . $seg->getMid());
         }
         //we keep a max of 5 segments, this should be enough

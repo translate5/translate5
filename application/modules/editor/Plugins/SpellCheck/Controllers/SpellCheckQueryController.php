@@ -26,22 +26,30 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
+use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\AdapterConfigDTO;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
  * Controller for the Plugin SpellCheck
  */
 class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_RestController
 {
+    use TaskContextTrait;
+
     /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::init()
-     *
-     * copied the init method, parent can not be used, since no real entity is used here
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws NoAccessException
      */
     public function init()
     {
         $this->initRestControllerSpecific();
+        $this->initCurrentTask();
     }
 
     /**
@@ -55,6 +63,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
 
     /**
      * Get the languages that are supported by the tool we use (currently: LanguageTool).
+     * @throws ZfExtended_Exception
      */
     public function languagesAction()
     {
@@ -62,31 +71,41 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
             $targetLangCode = $this->getParam('targetLangCode');
         }
         if (! $targetLangCode) {
-            $this->view->rows = false;
+            $this->view->rows = [];
 
             return;
         }
-        /* @var Service $service */
         $service = editor_Plugins_SpellCheck_Init::createService('languagetool');
-        $this->view->rows = $service->getAdapter()->getSupportedLanguage($targetLangCode);
+        // no config needed here for adapter
+        $this->view->rows = $service->getAdapter(AdapterConfigDTO::create())->getSupportedLanguage($targetLangCode);
     }
 
     /**
      * The matches that our tool finds (currently: LanguageTool).
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws DownException
+     * @throws RequestException
+     * @throws TimeOutException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws editor_Models_ConfigException
      */
     public function matchesAction()
     {
         $text = $this->getParam('text', '');
         $language = $this->getParam('language', '');
         if (empty($text) || empty($language)) {
-            error_log("NO text or language.");
-            $this->view->rows = "[]";
+            $this->view->rows = [];
 
             return;
         }
-        /* @var Service $service */
         $service = editor_Plugins_SpellCheck_Init::createService('languagetool');
-        $this->view->rows = $service->getAdapter()->getMatches($text, $language);
+
+        $this->view->rows = $service
+            ->getAdapter(AdapterConfigDTO::create(config: $this->getCurrentTask()->getConfig()))
+            ->getMatches($text, $language);
     }
 
     public function getAction()

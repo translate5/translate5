@@ -41,6 +41,8 @@ final class Service extends AbstractPooledService
      */
     public const SERVICE_ID = 'spellcheck';
 
+    private const DEFAULT_URL = 'http://languagetool.:8010/v2';
+
     /**
      * Caches the adapters per service
      * Instantiating an adapter is costly as it fetches the DB for languages
@@ -51,19 +53,19 @@ final class Service extends AbstractPooledService
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.plugins.SpellCheck.languagetool.url.default',
         'type' => 'list',
-        'url' => 'http://languagetool.:8010/v2',
+        'url' => self::DEFAULT_URL,
     ];
 
     protected array $guiConfigurationConfig = [
         'name' => 'runtimeOptions.plugins.SpellCheck.languagetool.url.gui',
         'type' => 'string',
-        'url' => 'http://languagetool.:8010/v2',
+        'url' => self::DEFAULT_URL,
     ];
 
     protected array $importConfigurationConfig = [
         'name' => 'runtimeOptions.plugins.SpellCheck.languagetool.url.import',
         'type' => 'list',
-        'url' => 'http://languagetool.:8010/v2',
+        'url' => self::DEFAULT_URL,
     ];
 
     protected array $testConfigs = [
@@ -81,19 +83,24 @@ final class Service extends AbstractPooledService
     /**
      * Creates an LanguageTool Adapter, either for the passed URL or for a random URL out of the passed pool
      * The adapters will be cached throughout a request
+     * @param string|null $servicePool if provided: URL is calculated then from given pool and overwrite then config
      * @throws ZfExtended_Exception
      */
-    public function getAdapter(string $serviceUrl = null, string $servicePool = 'gui'): Adapter
-    {
-        $url = empty($serviceUrl) ? $this->getPooledServiceUrl($servicePool) : $serviceUrl;
-        if (empty($url)) {
+    public function getAdapter(
+        AdapterConfigDTO $config,
+        ?string $servicePool = null,
+    ): Adapter {
+        if (empty($config->serviceUrl)) {
+            $config->serviceUrl = $this->getPooledServiceUrl($servicePool ?? 'gui');
+        }
+        if (empty($config->serviceUrl)) {
             throw new DownException('E1466');
         }
-        if (! array_key_exists($url, self::$adapters)) {
-            self::$adapters[$url] = new Adapter($url);
+        if (! array_key_exists($config->serviceUrl, self::$adapters)) {
+            self::$adapters[$config->serviceUrl] = new Adapter($config);
         }
 
-        return self::$adapters[$url];
+        return self::$adapters[$config->serviceUrl];
     }
 
     /**
@@ -109,7 +116,7 @@ final class Service extends AbstractPooledService
             'success' => false,
             'version' => null,
         ];
-        $adapter = $this->getAdapter($url);
+        $adapter = $this->getAdapter(AdapterConfigDTO::create($url));
 
         // Try to check a simple phrase
         try {
@@ -123,7 +130,7 @@ final class Service extends AbstractPooledService
         }
         if ($response) {
             $result['success'] = ($adapter->getLastStatus() === 200);
-            $result['version'] = $response?->software?->version ?? null;
+            $result['version'] = $response->software?->version ?? null;
         }
 
         return $result;

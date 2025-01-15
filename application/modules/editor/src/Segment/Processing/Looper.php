@@ -192,7 +192,7 @@ final class Looper
                 // higher indexes will simply finish
                 $until = (defined('APPLICATION_APITEST') && APPLICATION_APITEST) ?
                     \MittagQI\Translate5\Test\Api\Helper::RELOAD_TASK_LIMIT // max-sleep for API-tests is shorter ...
-                    : \ZfExtended_Worker_Abstract::MAX_SINGLE_DELAYS;
+                    : \ZfExtended_Worker_Abstract::MAX_SINGLE_DELAY_LIMIT;
                 if ($this->workerIndex === 0) {
                     sleep(self::BLOCKED_DELAY);
                     $until -= self::BLOCKED_DELAY;
