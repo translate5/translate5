@@ -293,6 +293,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $rop = $this->config->runtimeOptions;
 
         $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
+        $this->view->enableJsLoggerFeedback = (! empty($rop->debug->enableJsLoggerFeedback) && str_contains(
+            ',' . $rop->debug->enableJsLoggerFeedback . ',',
+            ',' . ZfExtended_Authentication::getInstance()->getLogin() . ','
+        ));
+
         // Video-recording: If allowed in general, then it can be set by the user after every login.
         $this->view->Php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
 
