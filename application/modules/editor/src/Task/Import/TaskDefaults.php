@@ -59,7 +59,9 @@ class TaskDefaults
     public function setTaskDefaults(editor_Models_Task $task, bool $importWizardUsed = false): void
     {
         foreach ($this->defaults as $default) {
-            $default->applyDefaults($task, $importWizardUsed);
+            if ($default->canApplyDefaults($task)) {
+                $default->applyDefaults($task, $importWizardUsed);
+            }
         }
     }
 }

@@ -50,4 +50,9 @@ class PivotResourceDefaults extends LanguageResourcesDefaults
         $config = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
         $config->updateInsertConfig($task->getTaskGuid(), 'runtimeOptions.import.autoStartPivotTranslations', false);
     }
+
+    public function canApplyDefaults(Task $task): bool
+    {
+        return true;
+    }
 }
