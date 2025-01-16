@@ -70,7 +70,7 @@ Ext.define('Editor.view.admin.coordinatorGroup.PanelViewController', {
     },
 
     onSaveClick: function (values, record) {
-        let url = '/editor/coordinatorGroup';
+        let url = '/editor/coordinatorgroup';
         let method = 'POST';
 
         if (values.id) {

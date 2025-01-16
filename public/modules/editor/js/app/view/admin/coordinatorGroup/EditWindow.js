@@ -38,7 +38,7 @@ Ext.define('Editor.view.admin.coordinatorGroup.EditWindow', {
     flex: 1,
 
     bind: {
-        title: '{l10n.coordinatorGroup.edit}'
+        title: '{l10n.coordinatorGroup.title}'
     },
 
     items: [
