@@ -74,6 +74,10 @@ final class UserHasJobInTaskPermissionAssert implements PermissionAssertInterfac
      */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
+        if ($object->getPmGuid() === $context->actor->getUserGuid()) {
+            return;
+        }
+
         if ($this->userJobRepository->userHasJobsInTask($context->actor->getUserGuid(), $object->getTaskGuid())) {
             return;
         }
