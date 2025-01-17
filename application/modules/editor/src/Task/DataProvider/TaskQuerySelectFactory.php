@@ -94,9 +94,7 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        $select = $this->getBaseProjectSelect($viewer, $filter, TaskDb::TABLE_NAME . '.id');
-
-        return $select;
+        return $this->getBaseProjectSelect($viewer, $filter, 'project.id');
     }
 
     public function createTotalProjectCountSelect(
@@ -127,6 +125,7 @@ class TaskQuerySelectFactory
         array|string $columns = '*',
         bool $applySort = true,
     ): Zend_Db_Select {
+        $filter->setDefaultTable(TaskDb::TABLE_NAME);
         $select = $this->db
             ->select()
             ->from(
@@ -153,6 +152,7 @@ class TaskQuerySelectFactory
         array|string $columns = '*',
         bool $applySort = true,
     ): Zend_Db_Select {
+        $filter->setDefaultTable('project');
         $select = $this->db
             ->select()
             ->from(
