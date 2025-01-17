@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Customer\ActionAssert\Permission;
 
 use editor_Models_Customer_Customer as Customer;
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
@@ -53,6 +54,14 @@ final class AssignedCustomerAssert implements PermissionAssertInterface
     {
         if (! $context->actor->isClientRestricted()) {
             return;
+        }
+
+        if (
+            CustomerAction::DefaultJob === $action
+            && $context->actor->isClientPm()
+            && ! in_array(Roles::CLIENTPM_CUSTOMERS, $context->actor->getRoles(), true)
+        ) {
+            throw new NoAccessToCustomerException((int) $object->getId());
         }
 
         $allowedCustomerIs = $context->actor->getCustomersArray();

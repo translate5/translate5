@@ -35,6 +35,7 @@ use MittagQI\Translate5\CoordinatorGroup\CoordinatorGroupUser;
 use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
 use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
 use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\CoordinatorGroupUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleCoordinatorGroupUserException;
@@ -49,16 +50,20 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
 
     private JobCoordinatorRepository|MockObject $coordinatorRepository;
 
+    private CoordinatorGroupRepositoryInterface|MockObject $coordinatorGroupRepository;
+
     private CoordinatorGroupUserAccessPermissionAssert $assert;
 
     public function setUp(): void
     {
         $this->coordinatorGroupUserRepository = $this->createMock(CoordinatorGroupUserRepositoryInterface::class);
         $this->coordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
+        $this->coordinatorGroupRepository = $this->createMock(CoordinatorGroupRepositoryInterface::class);
 
         $this->assert = new CoordinatorGroupUserAccessPermissionAssert(
             $this->coordinatorGroupUserRepository,
             $this->coordinatorRepository,
+            $this->coordinatorGroupRepository,
         );
     }
 
@@ -84,13 +89,13 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
             ['getId', [], '16'],
         ]);
 
-        $manager = $this->createMock(User::class);
-        $manager->method('__call')->willReturnMap([
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('isAdmin')->willReturn(true);
+        $actor->method('isAdmin')->willReturn(true);
 
-        $context = new PermissionAssertContext($manager);
+        $context = new PermissionAssertContext($actor);
 
         $this->coordinatorRepository->expects($this->never())->method('findByUser');
 
@@ -104,12 +109,12 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
             ['getId', [], '16'],
         ]);
 
-        $manager = $this->createMock(User::class);
-        $manager->method('__call')->willReturnMap([
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
 
-        $context = new PermissionAssertContext($manager);
+        $context = new PermissionAssertContext($actor);
 
         $groupUser = $this->createMock(CoordinatorGroupUser::class);
 
@@ -129,32 +134,32 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
             ['getId', [], '16'],
         ]);
 
-        $manager = $this->createMock(User::class);
-        $manager->method('__call')->willReturnMap([
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
 
-        $context = new PermissionAssertContext($manager);
+        $context = new PermissionAssertContext($actor);
 
         $this->coordinatorGroupUserRepository->expects(self::once())->method('findByUser')->willReturn(null);
 
         $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
-    public function testAssertGrantedNoAccessForPmToNotDirectCoordinatorGroupUser(): void
+    public function testAssertNoAccessGrantedForPmToNotDirectCoordinatorGroupUser(): void
     {
         $user = $this->createMock(User::class);
         $user->method('__call')->willReturnMap([
             ['getId', [], '16'],
         ]);
 
-        $manager = $this->createMock(User::class);
-        $manager->method('__call')->willReturnMap([
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('isPm')->willReturn(true);
+        $actor->method('isPm')->willReturn(true);
 
-        $context = new PermissionAssertContext($manager);
+        $context = new PermissionAssertContext($actor);
 
         $group = $this->createMock(CoordinatorGroup::class);
         $group->method('isTopRankGroup')->willReturn(false);
@@ -166,7 +171,33 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
         $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
-    public function testAssertGrantedNoAccessForPmToNotDirectCoordinator(): void
+    public function testAssertNoAccessGrantedForClientPmToNotDirectCoordinatorGroupUser(): void
+    {
+        $user = $this->createMock(User::class);
+        $user->method('__call')->willReturnMap([
+            ['getId', [], '16'],
+        ]);
+
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
+            ['getId', [], '17'],
+        ]);
+        $actor->method('isPm')->willReturn(false);
+        $actor->method('isClientPm')->willReturn(true);
+
+        $context = new PermissionAssertContext($actor);
+
+        $group = $this->createMock(CoordinatorGroup::class);
+        $group->method('isTopRankGroup')->willReturn(false);
+        $groupUser = new CoordinatorGroupUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $group);
+
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn($groupUser);
+
+        $this->expectException(NotAccessibleCoordinatorGroupUserException::class);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
+    }
+
+    public function testAssertNoAccessGrantedForPmToNotDirectCoordinator(): void
     {
         $user = $this->createMock(User::class);
         $user->method('__call')->willReturnMap([
@@ -174,15 +205,15 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
         ]);
         $user->method('isCoordinator')->willReturn(true);
 
-        $manager = $this->createMock(User::class);
-        $manager->method('__call')->willReturnMap([
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('isAdmin')->willReturn(false);
-        $manager->method('isCoordinator')->willReturn(false);
-        $manager->method('isPm')->willReturn(true);
+        $actor->method('isAdmin')->willReturn(false);
+        $actor->method('isCoordinator')->willReturn(false);
+        $actor->method('isPm')->willReturn(true);
 
-        $context = new PermissionAssertContext($manager);
+        $context = new PermissionAssertContext($actor);
 
         $group = $this->createMock(CoordinatorGroup::class);
         $group->method('isTopRankGroup')->willReturn(false);
@@ -194,7 +225,36 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
         $this->assert->assertGranted(UserAction::Update, $user, $context);
     }
 
-    public function testAssertGrantedNoAccessForPmToDirectCoordinatorGroupUser(): void
+    public function testAssertNoAccessGrantedForClientPmToNotDirectCoordinator(): void
+    {
+        $user = $this->createMock(User::class);
+        $user->method('__call')->willReturnMap([
+            ['getId', [], '16'],
+        ]);
+        $user->method('isCoordinator')->willReturn(true);
+
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
+            ['getId', [], '17'],
+        ]);
+        $actor->method('isAdmin')->willReturn(false);
+        $actor->method('isCoordinator')->willReturn(false);
+        $actor->method('isPm')->willReturn(false);
+        $actor->method('isClientPm')->willReturn(true);
+
+        $context = new PermissionAssertContext($actor);
+
+        $group = $this->createMock(CoordinatorGroup::class);
+        $group->method('isTopRankGroup')->willReturn(false);
+        $groupUser = new CoordinatorGroupUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $group);
+
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn($groupUser);
+
+        $this->expectException(NotAccessibleCoordinatorGroupUserException::class);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
+    }
+
+    public function testAssertNoAccessGrantedForPmToDirectCoordinatorGroupUser(): void
     {
         $user = $this->createMock(User::class);
         $user->method('__call')->willReturnMap([
@@ -202,13 +262,40 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
             ['getUserGuid', [], 'user-guid'],
         ]);
 
-        $manager = $this->createMock(User::class);
-        $manager->method('__call')->willReturnMap([
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('isPm')->willReturn(true);
+        $actor->method('isPm')->willReturn(true);
 
-        $context = new PermissionAssertContext($manager);
+        $context = new PermissionAssertContext($actor);
+
+        $group = $this->createMock(CoordinatorGroup::class);
+        $group->method('isTopRankGroup')->willReturn(true);
+        $groupUser = new CoordinatorGroupUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $group);
+
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn($groupUser);
+
+        $this->expectException(NotAccessibleCoordinatorGroupUserException::class);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
+    }
+
+    public function testAssertNoAccessGrantedForClientPmToDirectCoordinatorGroupUser(): void
+    {
+        $user = $this->createMock(User::class);
+        $user->method('__call')->willReturnMap([
+            ['getId', [], '16'],
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
+            ['getId', [], '17'],
+        ]);
+        $actor->method('isPm')->willReturn(false);
+        $actor->method('isClientPm')->willReturn(true);
+
+        $context = new PermissionAssertContext($actor);
 
         $group = $this->createMock(CoordinatorGroup::class);
         $group->method('isTopRankGroup')->willReturn(true);
@@ -229,14 +316,14 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
         ]);
         $user->method('isCoordinator')->willReturn(true);
 
-        $manager = $this->createMock(User::class);
-        $manager->method('__call')->willReturnMap([
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
             ['getId', [], '17'],
         ]);
-        $manager->method('isAdmin')->willReturn(false);
-        $manager->method('isPm')->willReturn(true);
+        $actor->method('isAdmin')->willReturn(false);
+        $actor->method('isPm')->willReturn(true);
 
-        $context = new PermissionAssertContext($manager);
+        $context = new PermissionAssertContext($actor);
 
         $group = $this->createMock(CoordinatorGroup::class);
         $group->method('isTopRankGroup')->willReturn(true);
@@ -248,22 +335,86 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
         self::assertTrue(true);
     }
 
+    public function testAssertGrantedForClientPmToDirectCoordinator(): void
+    {
+        $user = $this->createMock(User::class);
+        $user->method('__call')->willReturnMap([
+            ['getId', [], '16'],
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+        $user->method('isCoordinator')->willReturn(true);
+
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
+            ['getId', [], '17'],
+        ]);
+        $actor->method('isAdmin')->willReturn(false);
+        $actor->method('isPm')->willReturn(false);
+        $actor->method('isClientPm')->willReturn(true);
+        $actor->method('getCustomersArray')->willReturn([1, 2, 3]);
+
+        $context = new PermissionAssertContext($actor);
+
+        $group = $this->createMock(CoordinatorGroup::class);
+        $group->method('isTopRankGroup')->willReturn(true);
+        $groupUser = new CoordinatorGroupUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $group);
+
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn($groupUser);
+
+        $this->coordinatorGroupRepository->method('getCustomerIds')->willReturn([3]);
+
+        $this->assert->assertGranted(UserAction::Read, $user, $context);
+        self::assertTrue(true);
+    }
+
+    public function testAssertNoAccessGrantedForClientPmToMutateUserIfNoUserRoleGranted(): void
+    {
+        $user = $this->createMock(User::class);
+        $user->method('__call')->willReturnMap([
+            ['getId', [], '16'],
+            ['getUserGuid', [], 'user-guid'],
+        ]);
+        $user->method('isCoordinator')->willReturn(true);
+
+        $actor = $this->createMock(User::class);
+        $actor->method('__call')->willReturnMap([
+            ['getId', [], '17'],
+        ]);
+        $actor->method('isAdmin')->willReturn(false);
+        $actor->method('isPm')->willReturn(false);
+        $actor->method('isClientPm')->willReturn(true);
+        $actor->method('getCustomersArray')->willReturn([1, 2, 3]);
+
+        $context = new PermissionAssertContext($actor);
+
+        $group = $this->createMock(CoordinatorGroup::class);
+        $group->method('isTopRankGroup')->willReturn(true);
+        $groupUser = new CoordinatorGroupUser('{633a9811-a1f6-4fa8-81f7-2206d7a93ba4}', $user, $group);
+
+        $this->coordinatorGroupUserRepository->method('findByUser')->willReturn($groupUser);
+
+        $this->coordinatorGroupRepository->method('getCustomerIds')->willReturn([3]);
+
+        $this->expectException(NotAccessibleCoordinatorGroupUserException::class);
+        $this->assert->assertGranted(UserAction::Update, $user, $context);
+    }
+
     public function testAssertGrantedNoAccessForCoordinatorToNotSameCoordinatorGroupUser(): void
     {
         $user = $this->createMock(User::class);
-        $manager = $this->createMock(User::class);
-        $context = new PermissionAssertContext($manager);
+        $actor = $this->createMock(User::class);
+        $context = new PermissionAssertContext($actor);
 
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
             ['getId', [], '12'],
         ]);
 
-        $manager->method('__call')->willReturnMap([
+        $actor->method('__call')->willReturnMap([
             ['getUserGuid', [], 'manager-guid'],
             ['getId', [], '14'],
         ]);
-        $manager->method('isCoordinator')->willReturn(true);
+        $actor->method('isCoordinator')->willReturn(true);
 
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isCoordinatorOf')->willReturn(false);
@@ -282,14 +433,14 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
     public function testAssertGrantedForCoordinatorToSameCoordinatorGroupUser(): void
     {
         $user = $this->createMock(User::class);
-        $manager = $this->createMock(User::class);
-        $context = new PermissionAssertContext($manager);
+        $actor = $this->createMock(User::class);
+        $context = new PermissionAssertContext($actor);
 
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
         ]);
 
-        $manager->method('isCoordinator')->willReturn(true);
+        $actor->method('isCoordinator')->willReturn(true);
 
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isSupervisorOf')->willReturn(true);
@@ -308,15 +459,15 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
     public function testAssertGrantedForCoordinatorToSameCoordinatorGroupCoordinator(): void
     {
         $user = $this->createMock(User::class);
-        $manager = $this->createMock(User::class);
-        $context = new PermissionAssertContext($manager);
+        $actor = $this->createMock(User::class);
+        $context = new PermissionAssertContext($actor);
 
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
         ]);
         $user->method('isCoordinator')->willReturn(true);
 
-        $manager->method('isCoordinator')->willReturn(true);
+        $actor->method('isCoordinator')->willReturn(true);
 
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isSupervisorOf')->willReturn(true);
@@ -335,15 +486,15 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
     public function testAssertGrantedForCoordinatorToDirectCoordinator(): void
     {
         $user = $this->createMock(User::class);
-        $manager = $this->createMock(User::class);
-        $context = new PermissionAssertContext($manager);
+        $actor = $this->createMock(User::class);
+        $context = new PermissionAssertContext($actor);
 
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
         ]);
         $user->method('isCoordinator')->willReturn(true);
 
-        $manager->method('isCoordinator')->willReturn(true);
+        $actor->method('isCoordinator')->willReturn(true);
 
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isSupervisorOf')->willReturn(true);
@@ -361,8 +512,8 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
     public function testAssertGrantedNoAccessForCoordinatorToNotDirectCoordinator(): void
     {
         $user = $this->createMock(User::class);
-        $manager = $this->createMock(User::class);
-        $context = new PermissionAssertContext($manager);
+        $actor = $this->createMock(User::class);
+        $context = new PermissionAssertContext($actor);
 
         $user->method('__call')->willReturnMap([
             ['getUserGuid', [], 'user-guid'],
@@ -370,11 +521,11 @@ class CoordinatorGroupUserAccessPermissionAssertTest extends TestCase
         ]);
         $user->method('isCoordinator')->willReturn(true);
 
-        $manager->method('__call')->willReturnMap([
+        $actor->method('__call')->willReturnMap([
             ['getUserGuid', [], 'manager-guid'],
             ['getId', [], '14'],
         ]);
-        $manager->method('isCoordinator')->willReturn(true);
+        $actor->method('isCoordinator')->willReturn(true);
 
         $coordinator = $this->createMock(JobCoordinator::class);
         $coordinator->method('isSupervisorOf')->willReturn(false);

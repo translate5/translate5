@@ -37,11 +37,30 @@ use MittagQI\Translate5\CoordinatorGroup\ActionAssert\Permission\CoordinatorGrou
 use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
 use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
 use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
 use MittagQI\Translate5\User\Model\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class RuleBasedPermissionAssertTest extends TestCase
 {
+    private JobCoordinatorRepository|MockObject $jobCoordinatorRepository;
+
+    private CoordinatorGroupRepositoryInterface|MockObject $coordinatorGroupRepository;
+
+    private RoleBasedPermissionAssert $assert;
+
+    protected function setUp(): void
+    {
+        $this->coordinatorGroupRepository = $this->createMock(CoordinatorGroupRepositoryInterface::class);
+        $this->jobCoordinatorRepository = $this->createMock(JobCoordinatorRepository::class);
+
+        $this->assert = new RoleBasedPermissionAssert(
+            $this->jobCoordinatorRepository,
+            $this->coordinatorGroupRepository,
+        );
+    }
+
     public function provideSupports(): iterable
     {
         yield [CoordinatorGroupAction::Delete, true];
@@ -54,10 +73,7 @@ class RuleBasedPermissionAssertTest extends TestCase
      */
     public function testSupports(CoordinatorGroupAction $action, bool $expected): void
     {
-        $assert = new RoleBasedPermissionAssert(
-            $this->createMock(JobCoordinatorRepository::class)
-        );
-        $this->assertEquals($expected, $assert->supports($action));
+        $this->assertEquals($expected, $this->assert->supports($action));
     }
 
     public function testAssertGrantedAdmin(): void
@@ -68,11 +84,7 @@ class RuleBasedPermissionAssertTest extends TestCase
 
         $manager->method('isAdmin')->willReturn(true);
 
-        $assert = new RoleBasedPermissionAssert(
-            $this->createMock(JobCoordinatorRepository::class)
-        );
-
-        $assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
+        $this->assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
 
         self::assertTrue(true);
     }
@@ -102,10 +114,7 @@ class RuleBasedPermissionAssertTest extends TestCase
             $this->expectException(NoAccessException::class);
         }
 
-        $assert = new RoleBasedPermissionAssert(
-            $this->createMock(JobCoordinatorRepository::class)
-        );
-        $assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
+        $this->assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
     }
 
     public function testAssertNotGrantedIfNotAdminOrPmAndNotCoordinator(): void
@@ -118,12 +127,9 @@ class RuleBasedPermissionAssertTest extends TestCase
         $manager->method('isPm')->willReturn(false);
         $manager->method('isCoordinator')->willReturn(false);
 
-        $jsRepo = $this->createMock(JobCoordinatorRepository::class);
-
         $this->expectException(NoAccessException::class);
 
-        $assert = new RoleBasedPermissionAssert($jsRepo);
-        $assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
+        $this->assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
     }
 
     public function testAssertNotGrantedMutationToCoordinatorGroupOfCoordinator(): void
@@ -144,15 +150,13 @@ class RuleBasedPermissionAssertTest extends TestCase
             $group
         );
 
-        $jsRepo = $this->createMock(JobCoordinatorRepository::class);
-        $jsRepo->expects($this->once())
+        $this->jobCoordinatorRepository->expects($this->once())
             ->method('findByUser')
             ->willReturn($coordinator);
 
         $this->expectException(NoAccessException::class);
 
-        $assert = new RoleBasedPermissionAssert($jsRepo);
-        $assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
+        $this->assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
     }
 
     public function testAssertGrantedReadToCoordinatorGroupOfCoordinator(): void
@@ -173,13 +177,11 @@ class RuleBasedPermissionAssertTest extends TestCase
             $group
         );
 
-        $jsRepo = $this->createMock(JobCoordinatorRepository::class);
-        $jsRepo->expects($this->once())
+        $this->jobCoordinatorRepository->expects($this->once())
             ->method('findByUser')
             ->willReturn($coordinator);
 
-        $assert = new RoleBasedPermissionAssert($jsRepo);
-        $assert->assertGranted(CoordinatorGroupAction::Read, $group, $context);
+        $this->assert->assertGranted(CoordinatorGroupAction::Read, $group, $context);
 
         self::assertTrue(true);
     }
@@ -204,12 +206,10 @@ class RuleBasedPermissionAssertTest extends TestCase
             $coordinatorGroup
         );
 
-        $jsRepo = $this->createMock(JobCoordinatorRepository::class);
-        $jsRepo->expects($this->once())
+        $this->jobCoordinatorRepository->expects($this->once())
             ->method('findByUser')
             ->willReturn($coordinator);
 
-        $assert = new RoleBasedPermissionAssert($jsRepo);
-        $assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
+        $this->assert->assertGranted(CoordinatorGroupAction::Update, $group, $context);
     }
 }

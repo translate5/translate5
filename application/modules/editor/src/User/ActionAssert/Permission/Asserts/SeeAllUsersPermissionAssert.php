@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
@@ -69,21 +70,27 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
 
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $authUser = $context->actor;
+        $actor = $context->actor;
 
-        if ($authUser->getUserGuid() === $object->getUserGuid() && $action === UserAction::Read) {
+        if ($actor->getUserGuid() === $object->getUserGuid() && $action === UserAction::Read) {
             return;
         }
 
-        if ($this->acl->isInAllowedRoles($authUser->getRoles(), SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
+        if ($this->acl->isInAllowedRoles($actor->getRoles(), SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
             return;
         }
 
-        if (
-            $authUser->isClientPm()
-            && ! empty(array_intersect($object->getCustomersArray(), $authUser->getCustomersArray()))
-        ) {
-            return;
+        if ($actor->isClientPm()) {
+            if (
+                in_array($action, [UserAction::Update, UserAction::Delete], true)
+                && ! in_array(Roles::CLIENTPM_USERS, $actor->getRoles(), true)
+            ) {
+                throw new NoAccessException();
+            }
+
+            if (! empty(array_intersect($object->getCustomersArray(), $actor->getCustomersArray()))) {
+                return;
+            }
         }
 
         $groupUser = $this->coordinatorGroupUserRepository->findByUser($object);

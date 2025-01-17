@@ -31,11 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
 use BackedEnum;
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\CoordinatorGroup\CoordinatorGroupUser;
 use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
 use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
 use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\User\ActionAssert\Permission\Exception\NotAccessibleCoordinatorGroupUserException;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
@@ -49,6 +52,7 @@ final class CoordinatorGroupUserAccessPermissionAssert implements PermissionAsse
     public function __construct(
         private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
+        private readonly CoordinatorGroupRepositoryInterface $coordinatorGroupRepository,
     ) {
     }
 
@@ -60,6 +64,7 @@ final class CoordinatorGroupUserAccessPermissionAssert implements PermissionAsse
         return new self(
             CoordinatorGroupUserRepository::create(),
             JobCoordinatorRepository::create(),
+            CoordinatorGroupRepository::create(),
         );
     }
 
@@ -90,6 +95,14 @@ final class CoordinatorGroupUserAccessPermissionAssert implements PermissionAsse
             throw new NotAccessibleCoordinatorGroupUserException($groupUser);
         }
 
+        if ($authUser->isClientPm()) {
+            if ($this->isGrantedForClientPm($action, $groupUser, $authUser)) {
+                return;
+            }
+
+            throw new NotAccessibleCoordinatorGroupUserException($groupUser);
+        }
+
         if ($authUser->getUserGuid() === $object->getUserGuid() && UserAction::Read === $action) {
             return;
         }
@@ -112,5 +125,23 @@ final class CoordinatorGroupUserAccessPermissionAssert implements PermissionAsse
         }
 
         return $groupUser->isCoordinator();
+    }
+
+    private function isGrantedForClientPm(UserAction $action, CoordinatorGroupUser $groupUser, User $actor): bool
+    {
+        if (! $this->isGrantedForPm($groupUser)) {
+            return false;
+        }
+
+        if (
+            in_array($action, [UserAction::Update, UserAction::Delete], true)
+            && ! in_array(Roles::CLIENTPM_USERS, $actor->getRoles(), true)
+        ) {
+            return false;
+        }
+
+        $groupCustomerIds = $this->coordinatorGroupRepository->getCustomerIds((int) $groupUser->group->getId());
+
+        return ! empty(array_intersect($actor->getCustomersArray(), $groupCustomerIds));
     }
 }

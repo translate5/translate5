@@ -37,6 +37,8 @@ use MittagQI\Translate5\CoordinatorGroup\ActionAssert\Permission\CoordinatorGrou
 use MittagQI\Translate5\CoordinatorGroup\ActionAssert\Permission\Exception\NoAccessToCoordinatorGroupException;
 use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
 use MittagQI\Translate5\CoordinatorGroup\Model\CoordinatorGroup;
+use MittagQI\Translate5\Repository\Contract\CoordinatorGroupRepositoryInterface;
+use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
 
 /**
  * @implements PermissionAssertInterface<CoordinatorGroupAction, CoordinatorGroup>
@@ -45,6 +47,7 @@ final class RoleBasedPermissionAssert implements PermissionAssertInterface
 {
     public function __construct(
         private readonly JobCoordinatorRepository $jobCoordinatorRepository,
+        private readonly CoordinatorGroupRepositoryInterface $coordinatorGroupRepository,
     ) {
     }
 
@@ -55,6 +58,7 @@ final class RoleBasedPermissionAssert implements PermissionAssertInterface
     {
         return new self(
             JobCoordinatorRepository::create(),
+            CoordinatorGroupRepository::create(),
         );
     }
 
@@ -83,6 +87,12 @@ final class RoleBasedPermissionAssert implements PermissionAssertInterface
 
         if ($context->actor->isPm()) {
             return $group->isTopRankGroup();
+        }
+
+        if ($context->actor->isClientPm()) {
+            $groupCustomerIds = $this->coordinatorGroupRepository->getCustomerIds((int) $group->getId());
+
+            return ! empty(array_intersect($context->actor->getCustomersArray(), $groupCustomerIds));
         }
 
         if (! $context->actor->isCoordinator()) {
