@@ -2062,7 +2062,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
 
         try {
-            $this->meta->loadBySegmentId($this->getId());
+            $this->meta->loadBySegmentId((int) $this->getId());
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->meta->init([
                 'taskGuid' => $this->getTaskGuid(),
