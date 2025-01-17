@@ -79,6 +79,13 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
             return;
         }
 
+        if (
+            $authUser->isClientPm()
+            && ! empty(array_intersect($object->getRestrictedClientIds(), $authUser->getRestrictedClientIds()))
+        ) {
+            return;
+        }
+
         $groupUser = $this->coordinatorGroupUserRepository->findByUser($object);
 
         if (null !== $groupUser) {
