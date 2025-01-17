@@ -80,6 +80,7 @@ class Translate3054Test extends JsonTestAbstract
 
         // Make sure initial value of segment #1 termtagger-quality's falsePositive flag is 0 and similarQty is 2
         $s1q = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[0]->id);
+        $idx = null;
 
         foreach ($s1q as $idx => $q) {
             if ($q->type == 'term') {
@@ -91,6 +92,7 @@ class Translate3054Test extends JsonTestAbstract
 
         // Make sure initial value of segment #2 termtagger-quality's falsePositive flag is 0 and similarQty is 2 as well
         $s2q = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[1]->id);
+        $idx = null;
         foreach ($s2q as $idx => $q) {
             if ($q->type == 'term') {
                 break;
@@ -104,11 +106,27 @@ class Translate3054Test extends JsonTestAbstract
         $qId = $s2q[$idx]->id;
         static::api()->getJson("/editor/taskid/$taskId/quality/falsepositive?id=$qId&falsePositive=1");
 
-        // Spread that value on all similar qualities in this task
+        // Make sure initial value of segment #2 termtagger-quality's falsePositive flag changed to 1
+        $s2q = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[1]->id);
+        $idx = null;
+        foreach ($s2q as $idx => $q) {
+            if ($q->type == 'term') {
+                static::assertEquals(1, $q->falsePositive, 'quality.falsepositive have unexpected value');
+
+                break;
+            }
+        }
+
+        // Spread falsePositive=X on all qualities in this task that are similar to quality $qId including itself
+        // Note: X - is inverted value of falsePositive-flag for the quality $qId, so if current value
+        // of falsePositive-flag is 1 for the quality $qId, it will become 0 for this quality and all
+        // similar qualities, and vice versa
+        $qId = $s2q[$idx]->id;
         static::api()->getJson("/editor/taskid/$taskId/quality/falsepositivespread?id=$qId");
 
         // Get fresh list of qualities for segment #1
         $s1q = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[0]->id);
+        $idx = null;
         foreach ($s1q as $idx => $q) {
             if ($q->type == 'term') {
                 break;
@@ -116,6 +134,6 @@ class Translate3054Test extends JsonTestAbstract
         }
 
         // Make sure falsePositive-prop of termtagger-quality for segment #1 is now "1"
-        static::assertEquals(1, $s1q[$idx]->falsePositive, 'quality.falsepositive have unexpected value');
+        static::assertEquals(0, $s1q[$idx]->falsePositive, 'quality.falsepositive have unexpected value');
     }
 }

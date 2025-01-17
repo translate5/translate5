@@ -198,7 +198,7 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract
                 SET `falsePositive` = ? 
                 WHERE `taskGuid` = ? AND `id` IN ($in)
             ", [
-                $this->falsePositive,
+                $this->falsePositive ? 0 : 1,
                 $this->taskGuid,
             ]);
         }
