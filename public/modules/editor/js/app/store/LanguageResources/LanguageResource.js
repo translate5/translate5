@@ -35,6 +35,7 @@ Ext.define('Editor.store.LanguageResources.LanguageResource', {
 	  property:'serviceName'
   }],
   groupField: 'serviceName',
+  storeId: 'languageResourceStore',
   //INFO:remote sort is not needed since the pageing is removed
   pageSize: 0,
   statefulFilters: true,

@@ -29,6 +29,7 @@
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetPrices;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetRange;
+use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use ZfExtended_Factory as Factory;
 
 /**
@@ -355,10 +356,6 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         /* @var $taskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $langResTaskAssocs = $taskAssoc->loadByTaskGuids([$analysisData['taskGuid']]);
 
-        // Get meta data containing single sublanguage and penalties for each assoc
-        $meta = $taskAssoc->getAssocTasksWithResources($analysisData['taskGuid']);
-        $meta = array_combine(array_column($meta, 'languageResourceId'), $meta);
-
         $isInternalFuzzy = $analysisData['internalFuzzy'] == '1';
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $fuzzyString = $isInternalFuzzy ? $translate->_("Ja") : $translate->_("Nein");
@@ -401,12 +398,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
         $fuzzyTypes = [];
 
-        // Get task source and target sub languages
-        $subLang['source']['task'] = ZfExtended_Languages::sublangCodeByRfc5646($task->getSourceLanguage()->getRfc5646());
-        $subLang['target']['task'] = ZfExtended_Languages::sublangCodeByRfc5646($task->getTargetLanguage()->getRfc5646());
-
-        /** @var editor_Models_Languages $lang */
-        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
+        /* @var $assocRepo LanguageResourceTaskAssocRepository */
+        $assocRepo = ZfExtended_Factory::get(LanguageResourceTaskAssocRepository::class);
 
         foreach ($langResTaskAssocs as $res) {
             $lr = $this->getLanguageResourceCached($res['languageResourceId']);
@@ -424,28 +417,11 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //init the group
             $initGroups = $initGroups + $initRow($lr->getId(), $lr->getName(), $lr->getColor(), $lr->getResourceType());
 
-            // Setup sublang penalty as 0 until source and/or target sublang mismatch will be detected
-            $penaltySublang = 0;
-
-            // For source and target
-            foreach (['source', 'target'] as $type) {
-                // Load language
-                $lang->load($meta[$lr->getId()][$type . 'Lang']);
-
-                // Get sublanguage
-                $subLang[$type]['langres'] = ZfExtended_Languages::sublangCodeByRfc5646($lang->getRfc5646());
-
-                // If assoc langres sublang is not empty but does not match task sublang
-                if ($subLang[$type]['langres'] && $subLang[$type]['langres'] !== $subLang[$type]['task']) {
-                    // Append sublang penalty, if not yet appended
-                    if (! $penaltySublang) {
-                        $penaltySublang = $res['penaltySublang'];
-                    }
-                }
-            }
+            // Calculate penalties
+            $penalties = $assocRepo->calcPenalties($task->getTaskGuid(), $lr->getId());
 
             // Apply total penalty to assoc langres row in analysis grid
-            $initGroups[$lr->getId()]['penaltyTotal'] = $res['penaltyGeneral'] + $penaltySublang;
+            $initGroups[$lr->getId()]['penaltyTotal'] = $penalties['penaltyGeneral'] + $penalties['penaltySublang'];
         }
 
         if ($isInternalFuzzy) {

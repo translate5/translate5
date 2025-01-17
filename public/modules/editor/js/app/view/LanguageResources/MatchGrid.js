@@ -191,11 +191,11 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
                   var value = "<b style='white-space: pre;'>",
                     pg = record.get('penaltyGeneral') || 0,
                     ps = record.get('penaltySublang') || 0,
-                    om = matchrate,
-                    fm = matchrate - pg - ps;
+                    om = matchrate, // original matchrate
+                    fm = matchrate - pg - ps;  // final matchrate
 
                   // Complete rendering the value
-                  value += fm > 0 ? fm + ' (=' + [om, pg, ps].join('-') + ') [' +  name + ']' : '&nbsp;';
+                  value += fm + ' (=' + [om, pg, ps].join('-') + ') [' +  name + ']';
 	              value += "</b>";
                   return value;
 	          },
