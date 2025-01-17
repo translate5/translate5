@@ -56,6 +56,11 @@ class editor_Models_Segment_RepetitionHash
         $this->metaFieldsToAdd = $task->getConfig()->runtimeOptions->alike->segmentMetaFields->toArray() ?? [];
     }
 
+    public function setSegment(editor_Models_Segment $segment): void
+    {
+        $this->segment = $segment;
+    }
+
     public function setSegmentAttributes(editor_Models_Import_FileParser_SegmentAttributes $attributes)
     {
         $this->attributes = $attributes;
