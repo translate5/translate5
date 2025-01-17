@@ -97,7 +97,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     /**
      * handles the change of the sort filters
      */
-    handleSortOrFilter: function() {
+    clearCalculated: function() {
         this.prev = null;
         this.next = null;
     },
@@ -169,20 +169,25 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         rowMeta.isMoveEditor = prevIndex >= 0 ? me.isMoveEditor(rowMeta.idx, prevIndex) : false;
         return rowMeta;
     },
-    
+
+    getEditedField: function() {
+        let editedField = this.editingPlugin.editor.getEditedField();
+        // TODO FIXME / QUIRK
+        // When the segment editor was opened, this API will return NULL. Presumably due to problems in the initiaization-order
+        // Also, when editing an editable source, this will give "sourceEdit" whereas the prev-next mechanic in Editor.controller.editor.PrevNextSegment will only work with targets
+        if(!editedField || editedField.substring(0, 6) === 'source'){
+            editedField = 'targetEdit';
+        }
+        return editedField;
+    },
+
     /**
      * calculates the prev/next available segments relative to the currently opened segment
      * @param {Object} context current edit context
      */
     calculateRows: function(context) {
         var me = this,
-            editedField =   this.editingPlugin.editor.getEditedField();
-        // TODO FIXME / QUIRK
-        // When the segment editor was opened, this API will return NULL. Presumably due to problems in the initiaization-order
-        // Also, when editing an editable source, this will give "sourceEdit" whereas the prev-next mechanic in Editor.controller.editor.PrevNextSegment will only work with targets
-        if(!editedField || editedField.substr(0, 6) == 'source'){
-            editedField = 'targetEdit';
-        }
+            editedField = me.getEditedField();
         me.context = context;
         me.prev = me.calculateRow(-1, editedField);
         me.next = me.calculateRow(1, editedField);
@@ -342,7 +347,10 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
                 me.isLoading = false;
             },
             success: function(response){
-                var json = Ext.decode(response.responseText), parts;
+                let json = Ext.decode(response.responseText),
+                    parts,
+                    editedField = me.getEditedField();
+
                 me.isLoading = false;
                 //loop over all results and store them as needed
                 Ext.each(fields, function(field) {
@@ -350,7 +358,10 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
                         return;
                     }
                     parts = field.split('_');
-                    var direction = me[parts[0]];
+                    if (! me[parts[0]]) {
+                        me[parts[0]] = me.calculateRow(parts[0] === 'next' ? 1 : -1, editedField);
+                    }
+                    let direction = me[parts[0]];
                     //direction points to me.prev or me.next, for dataField see above rowMeta
                     direction[parts[1] + 'Next'] = {
                         idx: parseInt(json[field])

@@ -29,12 +29,14 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use JsonException;
+use League\Flysystem\DirectoryListing;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 use MittagQI\Translate5\Tools\FilesystemFactoryInterface;
 use MittagQI\Translate5\Tools\FlysystemFactory;
 use ReflectionException;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
@@ -47,6 +49,8 @@ class FilesystemExternalCheckCommand extends Translate5AbstractCommand
     protected static $defaultName = 'filesystem:external:check';
 
     private int $idx = 0;
+    private int $idToListContents;
+    private ?DirectoryListing $toListContents = null;
 
     protected function configure()
     {
@@ -56,11 +60,11 @@ class FilesystemExternalCheckCommand extends Translate5AbstractCommand
                 'List and test all flysystem configurations in the application'
             );
 
-        //        $this->addArgument(
-        //            'id',
-        //            InputArgument::OPTIONAL,
-        //            'The ID of the configuration to be tested.'
-        //        );
+        $this->addArgument(
+            'id',
+            InputArgument::OPTIONAL,
+            'The ID of the configuration to be tested / contents listed'
+        );
     }
 
     /**
@@ -77,7 +81,7 @@ class FilesystemExternalCheckCommand extends Translate5AbstractCommand
 
         $this->writeTitle('List / test / execute task archiving configurations');
 
-        //        $actionId = $input->getArgument('id');
+        $this->idToListContents = (int) $input->getArgument('id');
 
         $actions = \ZfExtended_Factory::get(\editor_Models_Workflow_Action::class);
         $actionEntries = $actions->loadByAction(\editor_Workflow_Actions::class, 'deleteOldEndedTasks');
@@ -122,6 +126,18 @@ class FilesystemExternalCheckCommand extends Translate5AbstractCommand
             $table->render();
         }
 
+        if ($this->toListContents !== null) {
+            $content = $this->toListContents->toArray();
+            $this->io->section('Content found in chosen config: ');
+            if(empty($content)) {
+                $this->io->warning('No content in chosen config');
+            } else {
+                foreach ($content as $dir) {
+                    $this->io->text('#'.$this->idToListContents.'#: '.$dir->path());
+                }
+            }
+        }
+
         return self::SUCCESS;
     }
 
@@ -139,6 +155,11 @@ class FilesystemExternalCheckCommand extends Translate5AbstractCommand
             $config = json_encode($jsonConfig, JSON_PRETTY_PRINT);
             $filesystem = FlysystemFactory::create($jsonConfig->filesystem ?? $jsonConfig->type, $jsonConfig);
             $filesystem->directoryExists('/');
+
+            if (($this->idx - 1) === $this->idToListContents) {
+                $this->toListContents = $filesystem->listContents('/');
+            }
+
         } catch (FilesystemException|FilesystemOperationFailed $e) {
             $result = $e->getMessage();
             while ($e->getPrevious()) {

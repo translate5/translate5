@@ -142,6 +142,9 @@ class editor_TaskController extends ZfExtended_RestController
             'userName' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'userGuid', 'taskGuid', 'taskGuid'),
             ],
+            'userAssocDeadline' => [
+                'date' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid', 'date'),
+            ],
             'segmentFinishCount' => [
                 'numeric' => 'percent',
                 'totalField' => 'segmentEditableCount',
@@ -165,6 +168,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         //set same join for sorting!
         $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
+        $this->_sortColMap['userAssocDeadline'] = $this->_filterTypeMap['userAssocDeadline']['date'];
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E1064' => 'The referenced customer does not exist (anymore).',

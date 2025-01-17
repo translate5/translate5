@@ -6,6 +6,7 @@ use editor_Models_Task as Task;
 use editor_Models_TaskConfig;
 use editor_Models_TaskUserAssoc;
 use editor_Models_UserAssocDefault;
+use editor_Plugins_InstantTranslate_TaskType;
 use editor_Utils;
 use editor_Workflow_Manager;
 use ZfExtended_EventManager;
@@ -80,5 +81,10 @@ class UserAssocDefaults implements ITaskDefaults
             'defaults' => $defaults,
             'task' => $task,
         ]);
+    }
+
+    public function canApplyDefaults(Task $task): bool
+    {
+        return $task->getTaskType()->id() !== editor_Plugins_InstantTranslate_TaskType::ID;
     }
 }

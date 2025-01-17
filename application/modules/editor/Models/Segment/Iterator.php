@@ -78,6 +78,10 @@ class editor_Models_Segment_Iterator implements Iterator
      */
     public function next(): void
     {
+        if (! $this->segment) {
+            return;
+        }
+
         $this->segment = $this->segment->loadNext(
             $this->taskGuid,
             $this->key(),
@@ -105,7 +109,7 @@ class editor_Models_Segment_Iterator implements Iterator
         $this->initSegment();
 
         try {
-            $this->segment->loadFirst($this->taskGuid, $this->fileId,$this->ignoreBlockedSegments);
+            $this->segment->loadFirst($this->taskGuid, $this->fileId, $this->ignoreBlockedSegments);
             $this->isEmpty = false;
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             $this->segment = null;
@@ -133,7 +137,6 @@ class editor_Models_Segment_Iterator implements Iterator
 
     /**
      * Enable blocked segments (autoStateId = editor_Models_Segment_AutoStates::BLOCKED ) to be iterated
-     * @param bool $ignoreBlockedSegments
      */
     public function setIgnoreBlockedSegments(bool $ignoreBlockedSegments): void
     {

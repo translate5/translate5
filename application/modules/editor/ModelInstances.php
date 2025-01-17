@@ -41,6 +41,7 @@ class editor_ModelInstances
 
     /**
      * returns (and loads if needed) the task by id
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public static function task(int $id): editor_Models_Task
     {
