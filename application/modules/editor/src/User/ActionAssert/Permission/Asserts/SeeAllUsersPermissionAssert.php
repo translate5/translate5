@@ -81,7 +81,7 @@ final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
 
         if (
             $authUser->isClientPm()
-            && ! empty(array_intersect($object->getRestrictedClientIds(), $authUser->getRestrictedClientIds()))
+            && ! empty(array_intersect($object->getCustomersArray(), $authUser->getCustomersArray()))
         ) {
             return;
         }
