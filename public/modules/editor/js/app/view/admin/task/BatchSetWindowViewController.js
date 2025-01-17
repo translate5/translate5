@@ -42,11 +42,13 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
                 click: 'onSetForFilteredClick'
             },
             '#setForSelected': {
-                click: function () {
-                    this.handleBatchSet(true);
-                }
+                click: 'onSetForSelectedClick'
             }
         }
+    },
+
+    onSetForSelectedClick: function () {
+        this.handleBatchSet(true);
     },
 
     /**
