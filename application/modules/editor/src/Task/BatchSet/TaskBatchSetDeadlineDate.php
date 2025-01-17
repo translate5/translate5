@@ -110,7 +110,7 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
         }
 
         foreach ($this->prepareAllowedTaskGuids($request) as $taskGuid) {
-            $jobIds = $this->userJobRepository->getAllJobIdsInTask($taskGuid);
+            $jobIds = $this->userJobRepository->getAllJobIdsInTaskWithWorkflow($taskGuid, $workflow, $workflowStep);
 
             $this->userJobDeadlineBatchUpdater->updateDeadlines($jobIds, $deadlineDate);
 

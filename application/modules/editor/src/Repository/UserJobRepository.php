@@ -324,6 +324,21 @@ class UserJobRepository
     }
 
     /**
+     * @return int[]
+     */
+    public function getAllJobIdsInTaskWithWorkflow(string $taskGuid, string $workflow, string $workflowStepName): array
+    {
+        $s = $this->db->select()
+            ->from(UserJobTable::TABLE_NAME, 'id')
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('workflow = ?', $workflow)
+            ->where('workflowStepName = ?', $workflowStepName)
+        ;
+
+        return $this->db->fetchCol($s);
+    }
+
+    /**
      * @return iterable<UserJob>
      */
     public function getAllJobsInTask(string $taskGuid): iterable
