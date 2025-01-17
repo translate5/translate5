@@ -135,7 +135,7 @@ Ext.define('Editor.view.admin.coordinatorGroup.PanelViewController', {
                 Ext.String.htmlEncode(coordinatorGroup.get('name'))
             ),
             (btn) => {
-                if (btn === 'no') {
+                if (btn !== 'yes') {
                     return;
                 }
 
