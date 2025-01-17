@@ -1610,8 +1610,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $penalties = $taskPenaltyDataProvider->getPenalties(
                 $taskGuid,
                 $languageResourceId,
-                $row->sourceLanguageId,
-                $row->targetLanguageId
+                [
+                    'source' => $row->sourceLanguageId,
+                    'target' => $row->targetLanguageId,
+                ]
             );
             $row->penaltyGeneral = $penalties['penaltyGeneral'];
             $row->penaltySublang = $penalties['penaltySublang'];

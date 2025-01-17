@@ -27,9 +27,9 @@
  */
 
 use MittagQI\Translate5\Integration\FileBasedInterface;
+use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetPrices;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetRange;
-use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use ZfExtended_Factory as Factory;
 
 /**
@@ -398,8 +398,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
         $fuzzyTypes = [];
 
-        /* @var $assocRepo LanguageResourceTaskAssocRepository */
-        $assocRepo = ZfExtended_Factory::get(LanguageResourceTaskAssocRepository::class);
+        $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
         foreach ($langResTaskAssocs as $res) {
             $lr = $this->getLanguageResourceCached($res['languageResourceId']);
@@ -418,7 +417,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             $initGroups = $initGroups + $initRow($lr->getId(), $lr->getName(), $lr->getColor(), $lr->getResourceType());
 
             // Calculate penalties
-            $penalties = $assocRepo->calcPenalties($task->getTaskGuid(), $lr->getId());
+            $penalties = $taskPenaltyDataProvider->getPenalties($task->getTaskGuid(), $lr->getId());
 
             // Apply total penalty to assoc langres row in analysis grid
             $initGroups[$lr->getId()]['penaltyTotal'] = $penalties['penaltyGeneral'] + $penalties['penaltySublang'];

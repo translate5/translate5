@@ -30,20 +30,19 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Penalties\DataProvider;
 
-use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\LanguageResource\Provider\LanguageResourceProvider;
 use MittagQI\Translate5\Repository\LanguageRepository;
-use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
-use ZfExtended_Factory as Factory;
 use ZfExtended_Languages as Languages;
 
 class TaskPenaltyDataProvider
 {
+    private array $sublangPenaltyMeta = [];
+
     public function __construct(
         private readonly TaskRepository $taskRepository,
-        private readonly LanguageResourceRepository $languageResourceRepository,
         private readonly LanguageRepository $languageRepository,
-        private readonly LanguageResourceTaskAssocRepository $languageResourceTaskAssocRepository,
+        private readonly LanguageResourceProvider $languageResourceProvider,
     ) {
     }
 
@@ -54,8 +53,8 @@ class TaskPenaltyDataProvider
     {
         return new self(
             TaskRepository::create(),
-            LanguageResourceRepository::create(),
             LanguageRepository::create(),
+            LanguageResourceProvider::create(),
         );
     }
 
@@ -66,19 +65,16 @@ class TaskPenaltyDataProvider
      * @param array|null $langPairOfTheMatch If given - expected to be ['source' => 123, 'target' => 234]
      * @throws \ReflectionException
      * @throws \ZfExtended_Exception
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \ZfExtended_Models_Entity_NotFoundException
      */
-    public function calcPenalties(string $taskGuid, int $langresId, ?array $langPairOfTheMatch = null): array
+    public function getPenalties(string $taskGuid, int $langresId, ?array $langPairOfTheMatch = null): array
     {
-        /** @var Languages $lang */
-        $lang = Factory::get(Languages::class);
-
         // If meta for the given $taskGuid is not cached so far - prepare it and cache
         if ($this->sublangPenaltyMeta[$taskGuid] === null) {
             $task = $this->taskRepository->getByGuid($taskGuid);
 
             // Load meta data containing single sublanguage and penalties for each possible and existing task<=>langres assoc
-            $meta = Factory::get(TaskAssociation::class)->getAssocTasksWithResources($taskGuid);
+            $meta = $this->languageResourceProvider->getAssocTasksWithResources($taskGuid);
             $meta = array_combine(array_column($meta, 'languageResourceId'), $meta);
 
             // Put into cache along with task sublanguages, if any
@@ -100,41 +96,38 @@ class TaskPenaltyDataProvider
         $subLang = $this->sublangPenaltyMeta[$taskGuid]['subLang'];
 
         // If $langresId refers to an assignable resource
-        if (isset($meta[$langresId])) {
-            // For source and target
-            foreach (['source', 'target'] as $type) {
-                // Load language
-                $lang->load($langPairOfTheMatch[$type] ?? $meta[$langresId][$type . 'Lang']);
-
-                // Get sublanguage
-                $subLang[$type]['langres'] = Languages::sublangCodeByRfc5646($lang->getRfc5646());
-
-                // If both task and langres have sublanguages, but they don't match - return sublang penalty
-                if (
-                    $subLang[$type]['task']
-                    && $subLang[$type]['langres']
-                    && $subLang[$type]['langres'] !== $subLang[$type]['task']
-                ) {
-                    return [
-                        'penaltyGeneral' => $meta[$langresId]['penaltyGeneral'],
-                        'penaltySublang' => $meta[$langresId]['penaltySublang'],
-                    ];
-                }
-            }
-
-            // If we reached this line, it means sublanguages mismatch was not detected, so 0-penalty should be applied
-            return [
-                'penaltyGeneral' => $meta[$langresId]['penaltyGeneral'],
-                'penaltySublang' => 0,
-            ];
-
-            // Else if it does not refer to an assignable resoutce,
-            // for example in case of internal fuzzy - return zero penalties
-        } else {
+        if (! isset($meta[$langresId])) {
             return [
                 'penaltyGeneral' => 0,
                 'penaltySublang' => 0,
             ];
         }
+
+        // For source and target
+        foreach (['source', 'target'] as $type) {
+            $languageId = $langPairOfTheMatch[$type] ?? $meta[$langresId][$type . 'Lang'];
+            $lang = $this->languageRepository->get((int) $languageId);
+
+            // Get sublanguage
+            $subLang[$type]['langres'] = Languages::sublangCodeByRfc5646($lang->getRfc5646());
+
+            // If both task and langres have sublanguages, but they don't match - return sublang penalty
+            if (
+                $subLang[$type]['task']
+                && $subLang[$type]['langres']
+                && $subLang[$type]['langres'] !== $subLang[$type]['task']
+            ) {
+                return [
+                    'penaltyGeneral' => $meta[$langresId]['penaltyGeneral'],
+                    'penaltySublang' => $meta[$langresId]['penaltySublang'],
+                ];
+            }
+        }
+
+        // If we reached this line, it means sublanguages mismatch was not detected, so 0-penalty should be applied
+        return [
+            'penaltyGeneral' => $meta[$langresId]['penaltyGeneral'],
+            'penaltySublang' => 0,
+        ];
     }
 }

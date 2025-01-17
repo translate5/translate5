@@ -249,60 +249,6 @@ class TaskAssociation extends AssociationAbstract
     }
 
     /***
-     * Get all available tmms for the language combination as in the provided task.
-     * (Uses loadByAssociatedTaskAndLanguage() which is meant to be called only by rest call!)
-     * @param string $taskGuid
-     * @return array
-     * @throws ZfExtended_Exception
-     * @throws ReflectionException
-     */
-    public function getAssocTasksWithResources($taskGuid)
-    {
-        $serviceManager = Factory::get(editor_Services_Manager::class);
-        $tmConversionService = TmConversionService::create();
-
-        $resources = [];
-
-        $getResource = function (string $serviceType, string $id) use ($resources, $serviceManager) {
-            if (! empty($resources[$id])) {
-                return $resources[$id];
-            }
-            $tmpResource = $serviceManager->getResourceById($serviceType, $id);
-            if ($tmpResource === null) {
-                return null;
-            }
-
-            return $tmpResource;
-        };
-
-        $result = $this->loadByAssociatedTaskAndLanguage($taskGuid);
-
-        $available = [];
-
-        foreach ($result as $languageresource) {
-            $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
-            if (! empty($resource)) {
-                $languageresource = array_merge($languageresource, $resource->getMetaData());
-                $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
-                $languageresource['isTaskTm'] = ($languageresource['isTaskTm'] ?? 0) === '1';
-
-                if (editor_Services_Manager::SERVICE_OPENTM2 === $languageresource['serviceType']) {
-                    $languageresource['tmNeedsConversion'] = ! $tmConversionService->isTmConverted(
-                        $languageresource['languageResourceId']
-                    );
-                    $languageresource['tmConversionInProgress'] = $tmConversionService->isConversionInProgress(
-                        $languageresource['languageResourceId']
-                    );
-                }
-
-                $available[] = $languageresource;
-            }
-        }
-
-        return $available;
-    }
-
-    /***
      * Get all assocs by $taskGuids
      * If no $taskGuids are provided, all assoc will be loaded
      * @param array $taskGuids

@@ -40,7 +40,7 @@ use Zend_Db_Table;
 class LanguageResourceTaskAssocRepository
 {
     public function __construct(
-        private Zend_Db_Adapter_Abstract $db,
+        private readonly Zend_Db_Adapter_Abstract $db,
     ) {
     }
 
