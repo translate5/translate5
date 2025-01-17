@@ -196,7 +196,7 @@ class T5MemoryDuplicateLanguageResourceCommand extends Translate5AbstractCommand
     private function getLanguageResources(Task $task): iterable
     {
         $languageResourceRepository = new LanguageResourceRepository();
-        $languageResourceTaskAssocRepository = new LanguageResourceTaskAssocRepository();
+        $languageResourceTaskAssocRepository = LanguageResourceTaskAssocRepository::create();
         $taskAssociations = $languageResourceTaskAssocRepository->getAllByTaskGuid($task->getTaskGuid());
 
         foreach ($taskAssociations as $taskAssociation) {

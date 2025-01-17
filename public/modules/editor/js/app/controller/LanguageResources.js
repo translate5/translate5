@@ -46,7 +46,8 @@ Ext.define('Editor.controller.LanguageResources', {
       'Editor.view.LanguageResources.services.Default',
       'Editor.view.LanguageResources.services.TermCollection',
       'Editor.view.LanguageResources.services.OpenTM2',
-      'Editor.view.LanguageResources.services.DummyFileTm'
+      'Editor.view.LanguageResources.services.DummyFileTm',
+      'Editor.store.LanguageResources.LanguageResource',
   ],
   refs:[{
       ref: 'matchgrid',
@@ -112,6 +113,9 @@ Ext.define('Editor.controller.LanguageResources', {
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.TermCollection'));
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.OpenTM2'));
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.DummyFileTm'));
+
+      // Create language resource store instance
+      Ext.create('Editor.store.LanguageResources.LanguageResource');
   },
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
@@ -313,7 +317,7 @@ Ext.define('Editor.controller.LanguageResources', {
         var vm = tabPanel.up('[viewModel]').getViewModel();
         var vmStores = vm.storeInfo || {};
         vmStores.customersLanguageResourceStore = {
-            source: 'Editor.store.LanguageResources.LanguageResource',
+            source: 'languageResourceStore',
             storeId: 'customersLanguageResourceStore',
             groupField: 'serviceName',
             filters: [{

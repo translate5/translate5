@@ -10190,6 +10190,18 @@ etc.
                 <source>Eigenschaften ändern</source>
                 <target>Eigenschaften ändern</target>
             </trans-unit>
+            <trans-unit id='w4RuZGVybiBTaWUgZGllIEVpZ2Vuc2NoYWZ0ZW4gbWVocmVyZXIgUHJvamVrdGUgaW4gZWluZXIgTWFzc2Vub3BlcmF0aW9uLiBCZWlzcGllbDogw4RuZGVybiBTaWUgZGllIERlYWRsaW5lIGbDvHIgYWxsZSBKb2JzICLDnGJlcnNldHp1bmciIGFsbGVyIG1hcmtpZXJ0ZW4gUHJvamVrdGUgZ2xlaWNoemVpdGln'>
+                <source>Ändern Sie die Eigenschaften mehrerer Projekte in einer Massenoperation. Beispiel: Ändern Sie die Deadline für alle Jobs "Übersetzung" aller markierten Projekte gleichzeitig</source>
+                <target>Ändern Sie die Eigenschaften mehrerer Projekte in einer Massenoperation. Beispiel: Ändern Sie die Deadline für alle Jobs "Übersetzung" aller markierten Projekte gleichzeitig</target>
+            </trans-unit>
+            <trans-unit id='V8OkaGxlbiBTaWUgUHJvamVrdGUgdW5kIGRpZSBkYXp1Z2Vow7ZyaWdlbiBBdWZnYWJlbiBhdXMsIGluZGVtIFNpZSBhdWYgZGFzIEtvbnRyb2xsa8Okc3RjaGVuIGtsaWNrZW4gKFNpZSBrw7ZubmVuIGF1Y2ggZWluemVsbmUgQXVmZ2FiZW4gYXVzd8OkaGxlbiBiencuIGRpZSBBdXN3YWhsIGF1ZmhlYmVuLCB6LiBCLiBiZWkgUHJvamVrdGVuIG1pdCBtZWhyZXJlbiBBdWZnYWJlbikgb2RlciB3ZW5kZW4gU2llIEZpbHRlciBhdWYgSWhyZSBQcm9qZWt0bGlzdGUgYW4uIFfDpGhsZW4gU2llIGRhbm4gZGllIEVpZ2Vuc2NoYWZ0LCBkaWUgU2llIMOkbmRlcm4gbcO2Y2h0ZW4sIHVuZCBmw7xnZW4gU2llIGRlbiBuZXVlbiBXZXJ0IGhpbnp1'>
+                <source>Wählen Sie Projekte und die dazugehörigen Aufgaben aus, indem Sie auf das Kontrollkästchen klicken (Sie können auch einzelne Aufgaben auswählen bzw. die Auswahl aufheben, z. B. bei Projekten mit mehreren Aufgaben) oder wenden Sie Filter auf Ihre Projektliste an. Wählen Sie dann die Eigenschaft, die Sie ändern möchten, und fügen Sie den neuen Wert hinzu</source>
+                <target>Wählen Sie Projekte und die dazugehörigen Aufgaben aus, indem Sie auf das Kontrollkästchen klicken (Sie können auch einzelne Aufgaben auswählen bzw. die Auswahl aufheben, z. B. bei Projekten mit mehreren Aufgaben) oder wenden Sie Filter auf Ihre Projektliste an. Wählen Sie dann die Eigenschaft, die Sie ändern möchten, und fügen Sie den neuen Wert hinzu</target>
+            </trans-unit>
+            <trans-unit id='S2xpY2tlbiBTaWUgYXVmICJGw7xyIGFsbGUgc2VsZWt0aWVydGVuIMOkbmRlcm4iLCB1bSBkaWUgRWlnZW5zY2hhZnQgZsO8ciA8Yj5hbGxlIG1hcmtpZXJ0ZW48L2I+IEF1ZmdhYmVuIHp1IMOkbmRlcm4sIG9kZXIga2xpY2tlbiBTaWUgYXVmICJGw7xyIGFsbGUgaW4gRmlsdGVydW5nIMOkbmRlcm4iLCB1bSBkaWUgRWlnZW5zY2hhZnQgZsO8ciA8Yj5hbGxlPC9iPiBBdWZnYWJlbiBpbiBkZXIgYWt0dWVsbCBhbmdld2FuZHRlbiBQcm9qZWt0ZmlsdGVydW5nIHp1IMOkbmRlcm4u'>
+                <source>Klicken Sie auf "Für alle selektierten ändern", um die Eigenschaft für <b>alle markierten</b> Aufgaben zu ändern, oder klicken Sie auf "Für alle in Filterung ändern", um die Eigenschaft für <b>alle</b> Aufgaben in der aktuell angewandten Projektfilterung zu ändern.</source>
+                <target>Klicken Sie auf "Für alle selektierten ändern", um die Eigenschaft für <b>alle markierten</b> Aufgaben zu ändern, oder klicken Sie auf "Für alle in Filterung ändern", um die Eigenschaft für <b>alle</b> Aufgaben in der aktuell angewandten Projektfilterung zu ändern.</target>
+            </trans-unit>
             <trans-unit id='RXMgd3VyZGUga2VpbmUgRWlnZW5zY2hhZnQgYW5nZWdlYmVu'>
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>Es wurde keine Eigenschaft angegeben</target>

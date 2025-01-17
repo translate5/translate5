@@ -104,7 +104,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             config = {
                 title: me.title, //see EXT6UPD-9
                 tooltip: Editor.data.l10n.languageResources.tooltip,
-                store: 'Editor.store.LanguageResources.LanguageResource',
+                store: 'languageResourceStore',
                 plugins: ['gridfilters'],
                 viewConfig: {
                     getRowClass: function (record) {

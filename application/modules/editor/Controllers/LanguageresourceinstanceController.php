@@ -44,6 +44,7 @@ use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\T5Memory\ExportMemoryWorker;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;

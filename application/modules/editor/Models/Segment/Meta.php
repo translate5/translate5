@@ -69,6 +69,8 @@ END LICENSE AND COPYRIGHT
  * @method void setMrkMid(string $mrkMid)
  * @method string getSourceFileId()
  * @method void setSourceFileId(string $sourceFileId)
+ * @method string getSegmentDescriptor()
+ * @method void setSegmentDescriptor(string $descriptor)
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract
 {
@@ -105,7 +107,7 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract
             $data->length[$field] = (int) $segment->textLengthByMeta(
                 $value,
                 $this,
-                $segment->getFileId(),
+                (int) $segment->getFileId(),
                 str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
             ) + (int) $this->getAdditionalMrkLength();
         }

@@ -389,11 +389,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             return true;
         }
 
-        //         $queryString = 'Start the <bpt i="1" mid="1" /><ph mid="2"/><ex mid="3" i="1"/> and wait until the LED is continuous green.';
-        //         $queryString = 'Start the <it type="struct"/> and wait until the LED is continuous green.';
-        //         $queryString = 'Start the <x mid="2"/> and wait until the LED is continuous green.';
-        //         $queryString = 'Start the <bx mid="1" rid="1"/><x mid="2"/><ex mid="3" rid="1"/> and wait until the LED is continuous green.';
-
         $json->source = $queryString;
         // In general OpenTM2 can deal with whole paths, not only with filenames.
         // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible,
@@ -401,7 +396,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->documentName = $filename;
 
         $json->markupTable = self::MARKUP_TABLE; //NEEDED otherwise t5memory crashes
-        $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
+        $json->context = $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask();
 
         $http = $this->getHttpWithMemory('POST', $tmName, 'fuzzysearch');
 

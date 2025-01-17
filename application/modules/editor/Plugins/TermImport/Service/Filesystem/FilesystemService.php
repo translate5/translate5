@@ -170,6 +170,16 @@ class FilesystemService
         file_put_contents($temp_ini_path, $this->mountManager->read($item->path()));
         $instructions = parse_ini_file($temp_ini_path, true, INI_SCANNER_TYPED);
 
+        // If some custom top-level section was added to ini-file - move it's properties to the root
+        foreach ($instructions as $sectionOrProperty => $itemsOrValue) {
+            if (! in_array($sectionOrProperty, ['FileMapping', 'CollectionMapping']) && is_array($itemsOrValue)) {
+                foreach ($itemsOrValue as $property => $value) {
+                    $instructions[$property] = $value;
+                }
+                unset($instructions[$sectionOrProperty]);
+            }
+        }
+
         // If unable to parse ini-file - log that and return false
         if (false === $instructions) {
             $this->logger->invalidInstructions($item->path(), ['Invalid INI file']);

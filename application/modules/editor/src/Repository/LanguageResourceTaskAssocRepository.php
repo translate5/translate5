@@ -30,13 +30,28 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Db_LanguageResources_LanguageResource;
+use MittagQI\Translate5\LanguageResource\Db\TaskAssociation as TaskAssociationDb;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
-use MittagQI\Translate5\LanguageResource\TaskTm\TaskTmTaskAssociation;
-use ZfExtended_Factory;
+use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation as TaskTmTaskAssociationDb;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 
 class LanguageResourceTaskAssocRepository
 {
+    public function __construct(
+        private Zend_Db_Adapter_Abstract $db,
+    ) {
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self(Zend_Db_Table::getDefaultAdapter());
+    }
+
     /**
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws \Zend_Db_Statement_Exception
@@ -49,40 +64,36 @@ class LanguageResourceTaskAssocRepository
 
     public function getAllByTaskGuid(string $taskGuid): array
     {
-        $db = ZfExtended_Factory::get(TaskAssociation::class)->db;
-        $languageResource = ZfExtended_Factory::get(LanguageResource::class)->db->info($db::NAME);
-        $taskTmTable = ZfExtended_Factory::get(TaskTmTaskAssociation::class)->db->info($db::NAME);
-
-        $s = $db->select()
+        $s = $this->db->select()
             ->from(
                 [
-                    'taskAssoc' => $db->info($db::NAME),
+                    'taskAssoc' => TaskAssociationDb::TABLE_NAME,
                 ]
             )
             ->setIntegrityCheck(false)
             ->join(
                 [
-                    'languageResource' => $languageResource,
+                    'languageResource' => editor_Models_Db_LanguageResources_LanguageResource::TABLE_NAME,
                 ],
                 'taskAssoc.languageResourceId = ' . 'languageResource.id',
                 []
             )
             ->joinLeft(
                 [
-                    'ttm1' => $taskTmTable,
+                    'ttm1' => TaskTmTaskAssociationDb::TABLE,
                 ],
                 'taskAssoc.languageResourceId = ttm1.languageResourceId',
                 'IF(ISNULL(ttm1.id), 0, 1) AS isTaskTm'
             )
             ->joinLeft(
                 [
-                    'ttm2' => $taskTmTable,
+                    'ttm2' => TaskTmTaskAssociationDb::TABLE,
                 ],
                 'taskAssoc.taskGuid = ttm2.taskGuid AND taskAssoc.languageResourceId = ttm2.languageResourceId',
                 'IF(ISNULL(ttm2.id), 0, 1) AS isOriginalTaskTm'
             )
             ->where('taskAssoc.taskGuid = ?', $taskGuid);
 
-        return $db->fetchAll($s)->toArray();
+        return (array) $this->db->fetchAll($s);
     }
 }

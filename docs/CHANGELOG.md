@@ -27,6 +27,56 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.17.0] - 2025-01-17
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3952](https://jira.translate5.net/browse/TRANSLATE-3952): Import/Export - Use resname from xliff and if not set segment id from xliff in task as context for t5memory** <br>
+XLF: Use resname from trans-unit attributes as segment descriptor and context for t5memory queries
+
+
+### Changed
+**[TRANSLATE-4377](https://jira.translate5.net/browse/TRANSLATE-4377): Import/Export - Placeables: Replaced content is not escaped leading to truncated segments** <br>
+FIX: Placeables detection may leads to truncated segments
+
+**[TRANSLATE-4367](https://jira.translate5.net/browse/TRANSLATE-4367): Editor general - Enable the rootcause feedback button for specific users** <br>
+A feedback button (same system as the error logging in the UI) can be enabled for specific users so that they can send detailed informations about problems in the UI even without real error occurrence.
+
+**[TRANSLATE-4363](https://jira.translate5.net/browse/TRANSLATE-4363): Hotfolder Import - Hotfolder: import not working** <br>
+Hotfolder: Fix import
+
+**[TRANSLATE-4355](https://jira.translate5.net/browse/TRANSLATE-4355): Task Management - Tooltips for "batch set properties"** <br>
+Added tooltip and info panel for the batch set properties feature
+
+**[TRANSLATE-4349](https://jira.translate5.net/browse/TRANSLATE-4349): t5memory - Add new error code for memory overflow** <br>
+Added new error code that is handled as memory overflow
+
+**[TRANSLATE-4340](https://jira.translate5.net/browse/TRANSLATE-4340): Import/Export, MatchAnalysis & Pretranslation - Left overs of "Define penalties for matches"** <br>
+Improved sublanguages mismatch delection logic and fixed Language Resources tab in Clients overview for ClientPM-only users
+
+**[TRANSLATE-4328](https://jira.translate5.net/browse/TRANSLATE-4328): SpellCheck (LanguageTool integration) - Introduce task level config for setting the LanguageTool config value level** <br>
+Introduce a a way to pass additional configuration parameters to SpellCheck Languagetool and added the rule level parameter.
+
+
+### Bugfixes
+**[TRANSLATE-4379](https://jira.translate5.net/browse/TRANSLATE-4379): Hotfolder Import, TBX-Import - Allow empty TBX files and fix in ini structure** <br>
+Merge-related configs in instruction.ini files are now also recognized if they're not in the root but in the custom section within that ini file. Also the import of TBX files with no terms (for example for automated processes) is now allowed.
+
+**[TRANSLATE-4356](https://jira.translate5.net/browse/TRANSLATE-4356): Editor general - Find next prev segment in workflow calculation was done wrong on server** <br>
+translate5 - 7.15.2: The prev / next segment in workflow calculation was producing wrong results.
+translate5 - 7.17.0: Additional UI fixes regarding this problem
+
+**[TRANSLATE-4298](https://jira.translate5.net/browse/TRANSLATE-4298): Auto-QA - AutoQA: Ignoring multiple errors not working** <br>
+FIXED: problem in logic of spreading false positivity flag on similar qualities 
+
+**[TRANSLATE-4294](https://jira.translate5.net/browse/TRANSLATE-4294): Task Management - Fix custom fields handling on metadata export** <br>
+Fixed custom fields handling on metadata export
+
+
 ## [7.15.3] - 2025-01-14
 
 ### Important Notes:

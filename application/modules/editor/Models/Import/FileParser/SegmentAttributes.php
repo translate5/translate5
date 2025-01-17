@@ -178,4 +178,11 @@ class editor_Models_Import_FileParser_SegmentAttributes
      * @var string
      */
     public string $sourceFileId;
+
+    /**
+     * Value that represent translation unit.
+     * For xliff files this is "resname" attribute.
+     * So descriptor that represent content without actual translation.
+     */
+    public ?string $transunitDescriptor = null;
 }

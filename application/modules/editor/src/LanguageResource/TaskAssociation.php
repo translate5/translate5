@@ -29,30 +29,35 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\LanguageResource;
 
 use editor_Models_LanguageResources_CustomerAssoc;
+use editor_Models_Languages as Languages;
 use editor_Models_Segment_MatchRateType;
+use editor_Models_Task as Task;
 use editor_Services_Manager;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use ReflectionException;
+use Zend_Cache_Exception;
 use Zend_Db_Expr;
 use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Exception;
-use ZfExtended_Factory;
+use ZfExtended_Factory as Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 
 /**
  * LanguageResource TaskAssoc Entity Object
  *
- * @method string getId()
+ * @method int getId()
  * @method void setId(int $id)
- * @method string getLanguageResourceId()
+ * @method int getLanguageResourceId()
  * @method void setLanguageResourceId(int $languageResourceid)
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $taskGuid)
- * @method string getSegmentsUpdateable()
+ * @method bool getSegmentsUpdateable()
  * @method void setSegmentsUpdateable(bool $updateable)
- * @method string getAutoCreatedOnImport()
+ * @method int getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport(int $autoCreatedOnImport)
- * @method string getPenaltyGeneral()
+ * @method int getPenaltyGeneral()
  * @method void setPenaltyGeneral(int $penaltyGeneral)
- * @method string getPenaltySublang()
+ * @method int getPenaltySublang()
  * @method void setPenaltySublang(int $penaltySublang)
  */
 class TaskAssociation extends AssociationAbstract
@@ -105,10 +110,11 @@ class TaskAssociation extends AssociationAbstract
      *      the boolean field checked provides the info if the languageResource is associated to the task or not
      *
      * ("The function is meant to be called only by rest call"!)
+     * @throws ZfExtended_Models_Entity_NotFoundException|ReflectionException|Zend_Cache_Exception
      */
     public function loadByAssociatedTaskAndLanguage(string $taskGuid): mixed
     {
-        $task = ZfExtended_Factory::get(\editor_Models_Task::class);
+        $task = Factory::get(Task::class);
         $task->loadByTaskGuid($taskGuid);
 
         if ($task->isProject()) {
@@ -127,8 +133,8 @@ class TaskAssociation extends AssociationAbstract
         $db = $this->db;
         $adapter = $db->getAdapter();
 
-        $languageModel = ZfExtended_Factory::get(\editor_Models_Languages::class);
-        /* @var $languageModel \editor_Models_Languages */
+        /* @var $languageModel Languages */
+        $languageModel = Factory::get(Languages::class);
 
         // Make sure language resource will be offered for assignments for tasks, even if the sub-languages do not match
         $majorLangId = $languageModel->findMajorLanguageById((int) $task->getSourceLang());
@@ -138,8 +144,8 @@ class TaskAssociation extends AssociationAbstract
         $targetLangs = $languageModel->getFuzzyLanguages($majorLangId, 'id', true);
 
         //get all available services
-        $services = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $services editor_Services_Manager */
+        $services = Factory::get('editor_Services_Manager');
         $allservices = $services->getAll();
 
         $this->filter?->addTableForField('taskGuid', 'ta');
@@ -248,10 +254,11 @@ class TaskAssociation extends AssociationAbstract
      * @param string $taskGuid
      * @return array
      * @throws ZfExtended_Exception
+     * @throws ReflectionException
      */
     public function getAssocTasksWithResources($taskGuid)
     {
-        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
+        $serviceManager = Factory::get(editor_Services_Manager::class);
         $tmConversionService = TmConversionService::create();
 
         $resources = [];
@@ -265,7 +272,7 @@ class TaskAssociation extends AssociationAbstract
                 return null;
             }
 
-            return $resources[$id] = $tmpResource;
+            return $tmpResource;
         };
 
         $result = $this->loadByAssociatedTaskAndLanguage($taskGuid);
@@ -341,8 +348,8 @@ class TaskAssociation extends AssociationAbstract
     /**
      * Make sure unmodified penalties - are picked from langres<=>customer assoc
      *
-     * @throws \ReflectionException
-     * @throws \ZfExtended_Models_Entity_NotFoundException
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function onBeforeInsert(): void
     {
@@ -365,13 +372,13 @@ class TaskAssociation extends AssociationAbstract
         }
 
         // Get customer id
-        $task = ZfExtended_Factory::get(\editor_Models_Task::class);
+        $task = Factory::get(Task::class);
         $task->loadByTaskGuid($this->getTaskGuid());
         $customerId = (int) $task->getCustomerId();
 
         // Get langres<=>customer assoc model
-        $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
-        $customerAssoc->loadRowByCustomerIdAndResourceId($customerId, (int) $this->getLanguageResourceId());
+        $customerAssoc = Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
+        $customerAssoc->loadRowByCustomerIdAndResourceId($customerId, $this->getLanguageResourceId());
 
         // Foreach of unmodified defaults
         foreach ($defaults as $penalty => $value) {

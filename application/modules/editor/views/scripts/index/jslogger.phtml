@@ -53,7 +53,7 @@ END LICENSE AND COPYRIGHT
                 logResourceLoadFailures : true,
                 autoStart : true,
                 showNotificationOnError : true,
-                showFeedbackButton : <?php echo $this->enableJsLoggerFeedback ? 'true' : 'false'; ?>,
+                showFeedbackButton : Editor.data.enableJsLoggerFeedback ? {messageFieldPlaceholder:"Please enter your message here. Use a button below to submit or close this form. Otherwise it may interfere with mouse clicks and keyboard shortcuts in T5 UI"} : false,
                 data: {
                     controllers: Editor.data.app.controllers
                 },

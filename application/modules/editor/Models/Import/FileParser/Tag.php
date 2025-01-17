@@ -210,8 +210,9 @@ class editor_Models_Import_FileParser_Tag
             $classes[] = $this->placeable->getCssClass();
             // title will reflect the original tag/content
             $title = htmlspecialchars($text, ENT_COMPAT, null, false);
-            // while content/content-length is only the referenced content by the xpath
-            $text = $this->placeable->getContent();
+            // while content/content-length is only the content referenced by the xpath.
+            // The Placeable content needs to be escaped for being in an attribute - see text-escaping above
+            $text = htmlentities($this->placeable->getContent(), ENT_COMPAT);
             $length = $this->placeable->getContentLength();
         }
 

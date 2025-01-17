@@ -674,7 +674,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
                 throw $e;
             } catch (Throwable $e) {
-                $msg = $e->getMessage() . "\n" . 'In trans-unit ' . print_r($opener['attributes']);
+                $msg = $e->getMessage() . "\n" . 'In trans-unit ' . print_r($opener['attributes'], true);
                 if ($e instanceof ZfExtended_Exception) {
                     $e->setMessage($msg, true);
 
@@ -782,6 +782,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $segmentAttributes = $this->createSegmentAttributes($this->_mid);
 
         $segmentAttributes->transunitId = $transunitId;
+
+        $segmentAttributes->transunitDescriptor = $this->xmlparser->getAttribute($attributes, 'resname', null);
 
         $segmentAttributes->transunitHash = $transunitHash;
 

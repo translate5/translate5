@@ -47,7 +47,7 @@ class SystemVersionCommand extends Translate5AbstractCommand
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Prints the translate5 version.');
+            ->setHelp('Prints the translate5 version. With --porcelain just the version string (also no newline)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -55,7 +55,11 @@ class SystemVersionCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $this->io->success('Translate5 version: ' . ZfExtended_Utils::getAppVersion());
+        if($this->isPorcelain) {
+            $output->write(ZfExtended_Utils::getAppVersion());
+        } else {
+            $this->io->success('Translate5 version: ' . ZfExtended_Utils::getAppVersion());
+        }
 
         return static::SUCCESS;
     }

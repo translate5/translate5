@@ -107,7 +107,7 @@ class CustomerAssocService
 
             $this->associate(
                 $formValues->languageResourceId,
-                $customerId,
+                (int) $customerId,
                 $useAsDefault,
                 $writeAsDefault,
                 $pivotAsDefault,

@@ -97,7 +97,10 @@ class PlaceablesTest extends JsonTestAbstract
                 $inner = [];
                 if (preg_match('~<span[^>]+full[^>]+>(.+)</span>~i', $matches[0], $inner) === 1) {
                     if (count($inner) === 2) {
-                        $placeable = strip_tags($inner[1]);
+                        $rawPlaceable = strip_tags($inner[1]); // content of the full-tag
+                        // must be decoded to represent the placeable's content
+                        // @see editor_Models_Import_FileParser_Tag
+                        $placeable = html_entity_decode($rawPlaceable, ENT_COMPAT);
                         if (array_key_exists($placeable, $found)) {
                             $found[$placeable]++;
                         } else {
