@@ -276,7 +276,8 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         xtype: 'button',
                         itemId: 'batch-set-btn',
                         bind: {
-                            text: '{l10n.projectGrid.strings.batchSetProperties}'
+                            text: '{l10n.projectGrid.strings.batchSetProperties}',
+                            tooltip: '{l10n.projectGrid.strings.batchSetPropertiesTip}'
                         }
                     }]
         		}]

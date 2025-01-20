@@ -802,6 +802,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * loads the Entity by Primary Key Id
      * @param int $id
      * @return Zend_Db_Table_Row
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function load($id)
     {
@@ -2062,7 +2063,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
 
         try {
-            $this->meta->loadBySegmentId($this->getId());
+            $this->meta->loadBySegmentId((int) $this->getId());
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->meta->init([
                 'taskGuid' => $this->getTaskGuid(),

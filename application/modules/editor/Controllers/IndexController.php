@@ -295,6 +295,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
         // Video-recording: If allowed in general, then it can be set by the user after every login.
         $this->view->Php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
+        // Feedback button
+        $this->view->Php2JsVars()->set('enableJsLoggerFeedback', ! empty($rop->debug->enableJsLoggerFeedback) && str_contains(
+            ',' . $rop->debug->enableJsLoggerFeedback . ',',
+            ',' . ZfExtended_Authentication::getInstance()->getLogin() . ','
+        ));
 
         //for initial loading we have to set the restpath to empty string to trigger relative paths in the proxy setups
         $this->view->Php2JsVars()->set('restpath', '');
