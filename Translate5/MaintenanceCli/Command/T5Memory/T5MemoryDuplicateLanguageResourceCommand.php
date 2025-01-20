@@ -158,7 +158,7 @@ class T5MemoryDuplicateLanguageResourceCommand extends Translate5AbstractCommand
 
         $result = $db->fetchAll($query);
 
-        $taskRepository = new TaskRepository();
+        $taskRepository = TaskRepository::create();
 
         foreach ($result as $data) {
             $task = $taskRepository->get((int) $data['id']);
@@ -174,7 +174,7 @@ class T5MemoryDuplicateLanguageResourceCommand extends Translate5AbstractCommand
     private function getTask(): ?Task
     {
         $taskId = (int) $this->input->getArgument(self::ARGUMENT_TASK_ID);
-        $taskRepository = new TaskRepository();
+        $taskRepository = TaskRepository::create();
 
         try {
             $task = $taskRepository->get($taskId);
