@@ -399,7 +399,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             ? $this->api->getDate(strtotime($segment->getTimestamp()))
             : $this->api->getNowDate();
         $userName = $segment->getUserName();
-        $context = $segment->getMid();
+        $context = $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask();
 
         $recheckOnUpdate = $options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false;
         $dataSent = [
@@ -437,7 +437,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             ? $this->api->getDate(strtotime($segment->getTimestamp()))
             : $this->api->getNowDate();
         $userName = $segment->getUserName();
-        $context = $segment->getMid();
+        $context = $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask();
 
         return new UpdateSegmentDTO(
             $segment->getTaskGuid(),
@@ -1108,6 +1108,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return $matchRate;
         }
 
+        $context = $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask();
+
         $isExacExac = false;
         $isContext = false;
         foreach ($metaData as $data) {
@@ -1117,7 +1119,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             }
 
             //context metch
-            if ($data->name == "context" && $data->value == $segment->getMid()) {
+            if ($data->name == "context" && $data->value == $context) {
                 $isContext = true;
             }
         }

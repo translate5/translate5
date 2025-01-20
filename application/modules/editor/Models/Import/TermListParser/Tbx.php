@@ -255,10 +255,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
                 $this->updateCollectionLanguage();
 
-                // If no term entries found - return false
-                // This is for cases when tbx-file is invalid, but not enough invalid for exception to be thrown
                 if ($termEntryCount <= 0) {
-                    return false;
+                    return true;
                 }
             }
         } catch (Throwable $e) {

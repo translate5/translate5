@@ -215,6 +215,14 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                     });
                 }
 
+                // Get quality filter panel
+                var qfp = Ext.ComponentQuery.query('qualityFilterPanel').pop();
+
+                // Reload qualities tree
+                if (qfp) {
+                    qfp.getController().reloadKeepingFilterVal();
+                }
+
                 // Hide floating panel if click came from there
                 button.up('fieldset[floating]')?.hide();
             },

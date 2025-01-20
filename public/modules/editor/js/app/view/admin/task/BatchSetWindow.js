@@ -97,25 +97,39 @@ Ext.define('Editor.view.admin.task.BatchSetWindow', {
                         itemId: 'deadlineDate',
                         format: Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
                         width: 170,
-                        style: 'margin-top:30px'
+                        style: 'margin-top:30px',
+                        enableKeyEvents: true,
+                        listeners: {
+                            keypress : function(fld,e){
+                                if (e.getCharCode() === Ext.EventObject.ENTER) {
+                                    me.getController().onSetForSelectedClick();
+                                }
+                            }
+                        }
                     }]
                 }],
                 dockedItems: [{
+                    xtype: 'panel',
+                    bind: {
+                        html: l10n.infobox
+                    },
+                    cls: 'infobox-panel'
+                }, {
                     xtype: 'toolbar',
                     dock: 'bottom',
                     ui: 'footer',
                     items: [{
                         xtype: 'button',
-                        itemId: 'setForSelected',
-                        text: l10n.setForSelected,
-                        tooltip: l10n.setForSelectedTip
+                        itemId: 'setForFiltered',
+                        text: l10n.setForFiltered,
+                        tooltip: l10n.setForFilteredTip
                     }, {
                         xtype: 'tbfill'
                     }, {
                         xtype: 'button',
-                        itemId: 'setForFiltered',
-                        text: l10n.setForFiltered,
-                        tooltip: l10n.setForFilteredTip
+                        itemId: 'setForSelected',
+                        text: l10n.setForSelected,
+                        tooltip: l10n.setForSelectedTip
                     }]
                 }]
             };

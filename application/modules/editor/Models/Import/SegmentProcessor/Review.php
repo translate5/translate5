@@ -88,7 +88,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
 
         //init word counter
         $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $langModel->load($task->getSourceLang());
+        $langModel->load((int) $task->getSourceLang());
 
         $this->wordCount = ZfExtended_Factory::get(editor_Models_Segment_WordCount::class, [
             $langModel->getRfc5646(),
@@ -122,6 +122,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
 
         $this->segmentNrInTask++;
         $seg->setSegmentNrInTask($this->segmentNrInTask);
+
         $sfm = $parser->getSegmentFieldManager();
         $seg->setFieldContents($sfm, $parser->getFieldContents());
 
@@ -181,7 +182,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
             $meta->setTransunitId($attributes->transunitId);
         } else {
             //transunitId must not be null, so if no info given we use segmentNr to assume that just the single segment is in a transunit
-            $meta->setTransunitId($seg->getSegmentNrInTask());
+            $meta->setTransunitId((int) $seg->getSegmentNrInTask());
         }
 
         if (! empty($attributes->autopropagated)) {
@@ -207,6 +208,8 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
 
         $this->wordCount->setSegment($seg);
         $meta->setSourceWordCount($this->wordCount->getSourceCount());
+
+        $meta->setSegmentDescriptor($attributes->transunitDescriptor ?? $seg->getSegmentNrInTask());
 
         $meta->setSiblingData($seg);
         $meta->save();
