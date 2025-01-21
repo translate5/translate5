@@ -34,7 +34,7 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\ResourceFile;
 use stdClass;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use Zend_Session_Namespace;
+use ZfExtended_Authentication;
 use ZfExtended_Debug;
 use ZfExtended_Dom;
 use ZfExtended_Exception;
@@ -248,8 +248,8 @@ final class Fprm extends ResourceFile
         $guiName = strtolower(Filters::getGuiClass($this->getOkapiType(), false));
         if (! empty($guiName)) {
             // FPRM editor localzation in user's langage if available
-            $userLocale = (new Zend_Session_Namespace('user'))->data?->locale;
-            $userLocaleFile = ($userLocale) ? $translationsDir . $guiName . '.' . $userLocale . '.json' : null;
+            $userLocale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
+            $userLocaleFile = $userLocale ? $translationsDir . $guiName . '.' . $userLocale . '.json' : null;
             // otherwise FPRM editor localzation in source code locale
             $codeLocaleFile = $translationsDir . $guiName . '.' . $translate->getSourceCodeLocale() . '.json';
             // or in the default locale as fallback
