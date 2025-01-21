@@ -31,13 +31,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\HTTP;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use MittagQI\Translate5\HTTP\Log\CommunicationLogger;
 use MittagQI\Translate5\HTTP\Middleware\RewindResponseMiddleware;
 use MittagQI\Translate5\HTTP\Middleware\ThrowExceptionOnErrorMiddleware;
+use Psr\Http\Client\ClientInterface;
 
 class ClientFactory
 {
