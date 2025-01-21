@@ -56,17 +56,17 @@ use PHPUnit\Framework\TestCase;
 class CrossLanguageResourceSynchronizationServiceTest extends TestCase
 {
     private MockObject|editor_Services_Manager $serviceManager;
-    
+
     private MockObject|EventDispatcher $eventDispatcher;
-    
+
     private MockObject|CrossSynchronizationConnectionRepository $connectionRepository;
-    
+
     private MockObject|ConnectionOptionsRepository $connectionOptionsRepository;
-    
+
     private MockObject|LanguageRepository $languageRepository;
-    
+
     private CrossLanguageResourceSynchronizationService $service;
-    
+
     protected function setUp(): void
     {
         $this->serviceManager = $this->createMock(editor_Services_Manager::class);
@@ -74,7 +74,7 @@ class CrossLanguageResourceSynchronizationServiceTest extends TestCase
         $this->connectionRepository = $this->createMock(CrossSynchronizationConnectionRepository::class);
         $this->connectionOptionsRepository = $this->createMock(ConnectionOptionsRepository::class);
         $this->languageRepository = $this->createMock(LanguageRepository::class);
-        
+
         $this->service = new CrossLanguageResourceSynchronizationService(
             $this->serviceManager,
             $this->eventDispatcher,
@@ -83,7 +83,7 @@ class CrossLanguageResourceSynchronizationServiceTest extends TestCase
             $this->languageRepository,
         );
     }
-    
+
     public function testGetConnectedPairsByAssoc(): void
     {
         $this->connectionRepository
