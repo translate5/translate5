@@ -72,4 +72,20 @@ class LanguageRepository
             return null;
         }
     }
+
+    /**
+     * @return array<string, int>
+     */
+    public function getRfc5646ToIdMap(): array
+    {
+        $languages = \ZfExtended_Factory::get(editor_Models_Languages::class);
+        $select = $languages->db->select()->from(\editor_Models_Db_Languages::TABLE_NAME, ['id', 'rfc5646']);
+        $map = [];
+
+        foreach ($languages->db->fetchAll($select) as $language) {
+            $map[$language['rfc5646']] = (int) $language['id'];
+        }
+
+        return $map;
+    }
 }

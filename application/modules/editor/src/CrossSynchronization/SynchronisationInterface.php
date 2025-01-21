@@ -74,4 +74,9 @@ interface SynchronisationInterface
         CrossSynchronizationConnection $connection,
         LanguageResource $languageResource
     ): AdditionalInfoViewData;
+
+    /**
+     * @return LanguagePair[]
+     */
+    public function getSupportedLanguagePairs(LanguageResource $deepl): array;
 }
