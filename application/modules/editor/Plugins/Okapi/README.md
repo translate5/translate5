@@ -95,6 +95,10 @@
 * editable FPRMs are noted in Filters::GUIS
 * if e.g. "okf_xml" is editable, all variants will be editable as well, the editing-capabilities apply to the base-type
 
+### FPRM Quirks
+
+* OpenXML filter has "Maximal attribute size of xml attributes" parameter (maxAttributeSize) which affects ability to import large files.
+* Default value of maxAttributeSize.i was increased from 4MB to 40MB which worked fine for 300MB+ MS Office files   
 
 ### BCONF: Properties based FPRMs
 

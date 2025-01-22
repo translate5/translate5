@@ -1,5 +1,5 @@
 #v1
-maxAttributeSize.i=16777216
+maxAttributeSize.i=41943040
 bPreferenceTranslateDocProperties.b=false
 bPreferenceTranslateComments.b=true
 bPreferenceTranslatePowerpointNotes.b=true

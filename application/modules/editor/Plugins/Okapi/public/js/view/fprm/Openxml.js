@@ -67,7 +67,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     fieldDefinitions: {
         /* General Options */
         'tabGeneralOptions': { type: 'tab', icon: 'fa-cog', children: {
-            'maxAttributeSize.i': { config: { hidden: true, valueDefault: 4194304 }},  // not visible in Rainbow, default value = 4kB as defined in rainbow-code
+            'maxAttributeSize.i': {},  // not visible in Rainbow, default value = 4MB (4194304) is defined in rainbow-code
             'sPreferenceLineSeparatorReplacement': { config: { hidden: true, valueDefault: '\n' }}, // not visible in Rainbow, default value as defined in default-fprm
             'bPreferenceAllowEmptyTargets.b': { config: { hidden: true, valueDefault: false }}, // not visible in Rainbow, default value as defined in default-fprm
             'bPreferenceTranslateDocProperties.b': {},
