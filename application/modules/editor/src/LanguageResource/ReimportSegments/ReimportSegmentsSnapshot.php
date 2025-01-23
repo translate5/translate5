@@ -38,6 +38,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\CsvReimportSegmentRepository;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Segment\FilteredIterator;
 
 class ReimportSegmentsSnapshot
 {
@@ -75,7 +76,12 @@ class ReimportSegmentsSnapshot
             ReimportSegmentsOptions::FILTER_ONLY_EDITED => $onlyEdited,
         ];
 
+        /** @var FilteredIterator $segments */
         $segments = $this->reimportSegmentsProvider->getSegments($task->getTaskGuid(), $filters);
+
+        if (! $segments->valid()) {
+            return;
+        }
 
         $updateOptions = [
             UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP => $useSegmentTimestamp,

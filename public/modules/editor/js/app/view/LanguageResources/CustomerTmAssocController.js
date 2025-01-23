@@ -40,7 +40,7 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
             }
         },
         store: {
-            '#Editor.store.LanguageResources.LanguageResource': {
+            '#languageResourceStore': {
                 load: 'onLanguageResourcesStoreLoad'
             }
         },

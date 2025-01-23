@@ -140,7 +140,7 @@ Ext.define('Editor.controller.TmOverview', {
             }
         },
         store: {
-            '#Editor.store.LanguageResources.LanguageResource': {
+            '#languageResourceStore': {
                 update: 'addRecordToImportCheck'
             }
         },
