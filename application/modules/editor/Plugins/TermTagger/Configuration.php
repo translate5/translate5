@@ -86,6 +86,11 @@ class Configuration
     public const ANALYSIS_LOGGER_DOMAIN = 'editor.terminology.analysis';
 
     /**
+     * The default word-count that marks a segment being too large for term-tagging
+     */
+    public const OVERSIZE_WORD_COUNT = 150;
+
+    /**
      * Defines the logger-domain for all termtagger code
      */
     public static function getLoggerDomain(string $processingType): string
