@@ -94,7 +94,10 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        return $this->getBaseProjectSelect($viewer, $filter, 'project.id');
+        $select = $this->getBaseProjectSelect($viewer, $filter, 'project.id');
+        $select->group('project.id');
+
+        return $select;
     }
 
     public function createTotalProjectCountSelect(
