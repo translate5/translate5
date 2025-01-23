@@ -82,7 +82,7 @@ class ReimportSegmentsActionExecutor
                     $task->getTaskGuid(),
                     (int) $languageResource->getId(),
                     [
-                        ReimportSegmentsOptions::FILTER_ONLY_EDITED => true,
+                        ReimportSegmentsOptions::FILTER_ONLY_EDITED => false,
                         ReimportSegmentsOptions::USE_SEGMENT_TIMESTAMP => true,
                     ]
                 );
