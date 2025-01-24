@@ -9818,9 +9818,9 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Konvertierung starten</source>
                 <target>Start conversion</target>
             </trans-unit>
-            <trans-unit id='V2FybmluZzogQ29udmVyc2lvbiBtYXkgbGVhZCB0byB0aGUgbG9zcyBvZiBUTSBtYXRjaGVz'>
-                <source>Warning: Conversion may lead to the loss of TM matches</source>
-                <target>Warning: Conversion may lead to the loss of TM matches. Please reimport all associated tasks and backup your resources before conversion. Conversion may affect matches in open tasks, please read how to avoid this on the following Confluence page.</target>
+            <trans-unit id='V2FybnVuZzogRGllIEtvbnZlcnRpZXJ1bmcga2FubiBlaW5lIGxhbmdlIFplaXQgaW4gQW5zcHJ1Y2ggbmVobWVuLCBpbiBkZXIga2VpbiBadWdyaWZmIGF1ZiBkYXMgVE0gbcO2Z2xpY2ggaXN0'>
+                <source>Warnung: Die Konvertierung kann eine lange Zeit in Anspruch nehmen, in der kein Zugriff auf das TM möglich ist</source>
+                <target>Warning: Conversion may take a long time in which the TM(s) cannot be accessed. If multiple TMs are converted, access to TM is only blocked for the currently converted one. Conversion may also lead to decreased fuzzy match rates for tasks in progress.</target>
             </trans-unit>
             <trans-unit id="RGllIEF1c2dhYmVyZWdlbCBzb2xsdGUgdm9tIGdsZWljaGVuIFR5cCBzZWluIHdpZSBkaWUgRWluZ2FiZXJlZ2Vs">
                 <source>Die Ausgaberegel sollte vom gleichen Typ sein wie die Eingaberegel</source>
@@ -10175,9 +10175,9 @@ etc.
                 <source>Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte</source>
                 <target>Caution: Will set property for all tasks/projects in the currently set filtering of projects</target>
             </trans-unit>
-            <trans-unit id='U2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGluIGFsbGVuIFByb2pla3RlbiBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZy4gQmVzc2VyIGFiYnJlY2hlbj8='>
-                <source>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?</source>
-                <target>Changes the property in all projects in the current filtering. Better abort?</target>
+            <trans-unit id='U2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGluIGFsbGVuIFByb2pla3RlbiBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZy4gV2lya2xpY2ggYXVzZsO8aHJlbj8='>
+                <source>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Wirklich ausführen?</source>
+                <target>Changes the property in all projects in the current filtering. Continue?</target>
             </trans-unit>
             <trans-unit id='RWlnZW5zY2hhZnRlbiDDpG5kZXJu'>
                 <source>Eigenschaften ändern</source>
@@ -10198,6 +10198,10 @@ etc.
             <trans-unit id='RXMgd3VyZGUga2VpbmUgRWlnZW5zY2hhZnQgYW5nZWdlYmVu'>
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>No property is specified</target>
+            </trans-unit>
+            <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
+                <source>language_resource.status.converting</source>
+                <target>Converting</target>
             </trans-unit>
         </body>
     </file>
