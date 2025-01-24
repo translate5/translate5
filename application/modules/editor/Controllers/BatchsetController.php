@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
+use MittagQI\Translate5\Task\BatchSet\BatchSetTaskGuidsProvider;
+use MittagQI\Translate5\Task\BatchSet\DTO\TaskGuidsQueryDto;
 use MittagQI\Translate5\Task\BatchSet\Exception\InvalidDeadlineDateStringProvidedException;
 use MittagQI\Translate5\Task\BatchSet\Exception\InvalidValueProvidedException;
 use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowProvidedException;
@@ -66,8 +68,10 @@ class Editor_BatchsetController extends ZfExtended_RestController
         $invalidValueProvidedMessage = 'Ungültiger Wert bereitgestellt';
 
         if ($this->getParam('countTasks')) {
-            $this->view->total = 0;
-//            $this->view->total = count($this->getTaskGuidsFromFilteredProjects($this->getRequest()->getRawParam('filter')));
+            $taskGuids = BatchSetTaskGuidsProvider::create()->getAllowedTaskGuids(
+                TaskGuidsQueryDto::fromRequest($this->getRequest())
+            );
+            $this->view->total = count($taskGuids);
 
             return;
         }
