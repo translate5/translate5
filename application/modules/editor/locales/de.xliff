@@ -10022,6 +10022,30 @@ etc.
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>Es wurde keine Eigenschaft angegeben</target>
             </trans-unit>
+            <trans-unit id='QWt0aXZlIEZpbHRlciBzcGVpY2hlcm4='>
+                <source>Aktive Filter speichern</source>
+                <target>Aktive Filter speichern</target>
+            </trans-unit>
+            <trans-unit id='QWt0dWVsbCBhdXNnZXfDpGhsdGVuIEZpbHRlcnNhdHogbMO2c2NoZW4='>
+                <source>Aktuell ausgewählten Filtersatz löschen</source>
+                <target>Aktuell ausgewählten Filtersatz löschen</target>
+            </trans-unit>
+            <trans-unit id='RWlnZW5lIEZpbHRlcnPDpHR6ZQ=='>
+                <source>Eigene Filtersätze</source>
+                <target>Eigene Filtersätze</target>
+            </trans-unit>
+            <trans-unit id='U2luZCBTaWUgc2ljaGVyPw=='>
+                <source>Sind Sie sicher?</source>
+                <target>Sind Sie sicher?</target>
+            </trans-unit>
+            <trans-unit id='S2xpY2tlbiBTaWUgYXVmICJBa3RpdmUgRmlsdGVyIHNwZWljaGVybiIgdW0gZWluZW4gZWlnZW5lbiBGaWx0ZXJzYXR6IGFuenVsZWdlbi4='>
+                <source>Klicken Sie auf "Aktive Filter speichern" um einen eigenen Filtersatz anzulegen.</source>
+                <target>Klicken Sie auf "Aktive Filter speichern" um einen eigenen Filtersatz anzulegen.</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJ0IGRpZSBha3RpdmVuIEZpbHRlciBhbHMgZWlnZW5lbiBGaWx0ZXJzYXR6LiBTaWUgd2VyZGVuIGF1ZmdlZm9yZGVydCwgZWluZW4gZWluZGV1dGlnZW4gTmFtZW4gZWluenVnZWJlbiwgZGVyIGRhbm4gaW4gZGVyIEF1c3dhaGxsaXN0ZSAiRWlnZW5lIEZpbHRlcnPDpHR6ZSIgYXVzZ2V3w6RobHQgd2VyZGVuIGthbm4uIFVtIGVpbmVuIEZpbHRlcnNhdHogenUgbMO2c2NoZW4sIHdlbmRlbiBTaWUgaWhuIGFuIHVuZCBrbGlja2VuIFNpZSBhdWYgIkFrdHVlbGwgYXVzZ2V3w6RobHRlbiBGaWx0ZXJzYXR6IGzDtnNjaGVuIi4='>
+                <source>Speichert die aktiven Filter als eigenen Filtersatz. Sie werden aufgefordert, einen eindeutigen Namen einzugeben, der dann in der Auswahlliste "Eigene Filtersätze" ausgewählt werden kann. Um einen Filtersatz zu löschen, wenden Sie ihn an und klicken Sie auf "Aktuell ausgewählten Filtersatz löschen".</source>
+                <target>Speichert die aktiven Filter als eigenen Filtersatz. Sie werden aufgefordert, einen eindeutigen Namen einzugeben, der dann in der Auswahlliste "Eigene Filtersätze" ausgewählt werden kann. Um einen Filtersatz zu löschen, wenden Sie ihn an und klicken Sie auf "Aktuell ausgewählten Filtersatz löschen".</target>
+            </trans-unit>
             <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
                 <source>language_resource.status.converting</source>
                 <target>Konvertierung läuft</target>

@@ -497,7 +497,7 @@ class editor_Utils
      * @param bool $concatDelim
      * @return array $segment
      */
-    public static function wordBreakUp($segment, $concatDelim = false) : array
+    public static function wordBreakUp($segment, $concatDelim = false): array
     {
         $config = Zend_Registry::get('config');
         $regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
@@ -510,7 +510,6 @@ class editor_Utils
 
             // If delimiters should be concatenated with their left-side chunks
             if ($concatDelim) {
-
                 // Initialize an empty array to hold the result
                 $result = [];
 
@@ -519,7 +518,7 @@ class editor_Utils
                     // If the current part is a non-word character (delimiter), concatenate it with the previous part
                     if (preg_match($regexWordBreak, $split[$j])) {
                         // Append the concatenated result to the result array
-                        if (isset($split[$j-1])) {
+                        if (isset($split[$j - 1])) {
                             $last = array_pop($result);
                             $last .= $split[$j];
                             array_push($result, $last);
@@ -1083,20 +1082,18 @@ class editor_Utils
      * Wrap all urls with <a href="..">
      * Code got from: http://stackoverflow.com/questions/1188129/replace-urls-in-text-with-html-links
      *
-     * Testing text: <<<EOD
-
-    Here are some URLs:
-    stackoverflow.com/questions/1188129/pregreplace-to-detect-html-php
-    Here's the answer: http://www.google.com/search?rls=en&q=42&ie=utf-8&oe=utf-8&hl=en. What was the question?
-    A quick look at http://en.wikipedia.org/wiki/URI_scheme#Generic_syntax is helpful.
-    There is no place like 127.0.0.1! Except maybe http://news.bbc.co.uk/1/hi/england/surrey/8168892.stm?
-    Ports: 192.168.0.1:8080, https://example.net:1234/.
-    Beware of Greeks bringing internationalized top-level domains: xn--hxajbheg2az3al.xn--jxalpdlp.
-    And remember.Nobody is perfect.
-
-    <script>alert('Remember kids: Say no to XSS-attacks! Always HTML escape untrusted input!');</script>
-    EOD;
-
+     * Testing text:
+     *
+     * Here are some URLs:
+     * stackoverflow.com/questions/1188129/pregreplace-to-detect-html-php
+     * Here's the answer: http://www.google.com/search?rls=en&q=42&ie=utf-8&oe=utf-8&hl=en. What was the question?
+     * A quick look at http://en.wikipedia.org/wiki/URI_scheme#Generic_syntax is helpful.
+     * There is no place like 127.0.0.1! Except maybe http://news.bbc.co.uk/1/hi/england/surrey/8168892.stm?
+     * Ports: 192.168.0.1:8080, https://example.net:1234/.
+     * Beware of Greeks bringing internationalized top-level domains: xn--hxajbheg2az3al.xn--jxalpdlp.
+     * And remember.Nobody is perfect.
+     *
+     * <script>alert('Remember kids: Say no to XSS-attacks! Always HTML escape untrusted input!');</script>
      *
      * @param ?string $text
      * @return string
@@ -1104,7 +1101,9 @@ class editor_Utils
     public static function url2a(?string $text)
     {
         // If $text arg is given as null - return empty string
-        if ($text === null) return '';
+        if ($text === null) {
+            return '';
+        }
 
         // Regexps
         $rexProtocol = '(https?://)?';
@@ -1138,7 +1137,7 @@ class editor_Utils
         // Split given $text by urls
         while (preg_match(
             "~$rexProtocol$rexDomain$rexPort$rexPath$rexQuery$rexFragment(?=[?.!,;:\"]?(\s|$))~u",
-            $text ?? '',
+            $text,
             $match,
             PREG_OFFSET_CAPTURE,
             $position
@@ -1175,7 +1174,7 @@ class editor_Utils
         }
 
         // Print the remainder of the text.
-        print(htmlspecialchars(substr($text ?? '', $position)));
+        print(htmlspecialchars(substr($text, $position)));
 
         // Return
         return ob_get_clean();
@@ -1255,11 +1254,8 @@ class editor_Utils
      * Return $then or $else arg depending on whether $if arg is truthy
      *
      * @param mixed $if
-     * @param string $then
-     * @param mixed $else
-     * @return mixed
      */
-    public static function rif($if, $then, mixed $else = '') : mixed
+    public static function rif($if, mixed $then, mixed $else = ''): mixed
     {
         return $if ? str_replace('$1', is_scalar($if) ? $if : '$1', $then) : $else;
     }

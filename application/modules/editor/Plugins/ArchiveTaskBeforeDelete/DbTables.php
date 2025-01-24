@@ -113,6 +113,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_user_changelog_info' => false,
         'LEK_user_config' => false,
         'LEK_user_meta' => false,
+        'LEK_user_filter_preset' => false,
         'LEK_visualreview_annotation' => 'taskGuid',
         'LEK_visualreview_files' => 'taskGuid',
         'LEK_visualreview_segmentmapping' => 'taskGuid',

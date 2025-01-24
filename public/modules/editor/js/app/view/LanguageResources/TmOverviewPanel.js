@@ -41,6 +41,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         'Editor.view.admin.customer.CustomerFilter',
         'Editor.view.LanguageResources.TmOverviewViewController',
         'Editor.view.LanguageResources.TermCollectionExportActionMenu',
+        'Editor.view.admin.TaskGrid',
     ],
     alias: 'widget.tmOverviewPanel',
     controller: 'tmOverviewPanel',
@@ -754,4 +755,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
         return '';
     },
+}, function() {
+    this.borrow(Editor.view.admin.TaskGrid, ['activateGridColumnFilter', 'getColumnFilter']);
 });

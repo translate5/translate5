@@ -774,12 +774,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     tooltip: me.strings.reloadBtnTip
                 }, {
                     xtype: 'button',
-                    itemId: 'addAdvanceFilterBtn',
-                    glyph: 'f0b0@FontAwesome5FreeSolid',
-                    text: me.strings.addFilterText,
-                    tooltip: me.strings.addFilterText
-                }, {
-                    xtype: 'button',
                     glyph: 'f56e@FontAwesome5FreeSolid',
                     hidden: !Editor.app.authenticatedUser.isAllowed('editorTaskKpi'),
                     itemId: 'export-meta-data-btn',
@@ -792,6 +786,12 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     itemId: 'show-kpi-btn',
                     text: me.strings.showKPIBtn,
                     tooltip: me.strings.showKPIBtnTip
+                }, {
+                    xtype: 'button',
+                    itemId: 'addAdvanceFilterBtn',
+                    glyph: 'f0b0@FontAwesome5FreeSolid',
+                    text: me.strings.addFilterText,
+                    tooltip: me.strings.addFilterText
                 }]
             }, {
                 xtype: 'editorAdminTaskFilterAdvancedFilter'
@@ -904,9 +904,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
         }
         // for each filter object in the array
         Ext.each(filters, function (filter) {
-            var value = filter.get('value'),
-                operator = filter.get('operator'),
-                property = filter.get('property'),
+            var value = filter.get ? filter.get('value') : filter.value,
+                operator = filter.get ? filter.get('operator') : filter.operator,
+                property = filter.get ? filter.get('property') : filter.property,
                 gridFilter = me.getColumnFilter(property);
 
             if (!gridFilter) {

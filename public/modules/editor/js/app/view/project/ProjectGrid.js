@@ -32,7 +32,8 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	cls:'projectGrid',
     requires:[
     	'Editor.view.project.ProjectGridViewController',
-        'Editor.view.task.LogInfoColumn'
+        'Editor.view.task.LogInfoColumn',
+        'Editor.view.admin.TaskGrid',
 	],
 	controller:'projectGrid',
 	itemId: 'projectGrid',
@@ -257,13 +258,12 @@ Ext.define('Editor.view.project.ProjectGrid', {
                             tooltip: '{l10n.projectGrid.strings.addProjectTip}'
                         },
         	            hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
-        	        },{
+        	        }, {
                         xtype: 'button',
-                        glyph: 'f068@FontAwesome5FreeSolid',
-                        itemId: 'resetFilterBtn',
+                        itemId: 'batch-set-btn',
                         bind: {
-                            text: '{l10n.projectGrid.strings.resetFilterText}',
-                            tooltip: '{l10n.projectGrid.strings.resetFilterText}'
+                            text: '{l10n.projectGrid.strings.batchSetProperties}',
+                            tooltip: '{l10n.projectGrid.strings.batchSetPropertiesTip}'
                         }
                     }, {
         	            xtype: 'button',
@@ -271,13 +271,6 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         enableToggle: true,
                         bind: {
         	                text: '{l10n.projectGrid.strings.onlyMyProjects}'
-                        }
-                    }, {
-                        xtype: 'button',
-                        itemId: 'batch-set-btn',
-                        bind: {
-                            text: '{l10n.projectGrid.strings.batchSetProperties}',
-                            tooltip: '{l10n.projectGrid.strings.batchSetPropertiesTip}'
                         }
                     }]
         		}]
@@ -355,4 +348,6 @@ Ext.define('Editor.view.project.ProjectGrid', {
     	var me=this;
 	    me.availableActions = ['editorMenuProject'];
     }
+}, function() {
+    this.borrow(Editor.view.admin.TaskGrid, ['activateGridColumnFilter', 'getColumnFilter']);
 });
