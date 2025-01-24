@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Languages;
+use PDO;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -71,5 +72,17 @@ class LanguageRepository
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             return null;
         }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getRfc5646ToIdMap(): array
+    {
+        $languages = \ZfExtended_Factory::get(editor_Models_Languages::class);
+        $db = $languages->db->getAdapter();
+        $select = $db->select()->from(\editor_Models_Db_Languages::TABLE_NAME, ['rfc5646', 'id']);
+
+        return $db->query($select)->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 }
