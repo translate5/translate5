@@ -265,7 +265,9 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         vm.set('loadingRecordNumber', store.getCount());
 
         if (vm.get('loadedQty') === 0) {
+            view.getScrollable().suspendEvent('scrollend');
             view.ensureVisible(store.last());
+            setTimeout(() => view.getScrollable().resumeEvent('scrollend'), 100);
         }
 
         store.load({
@@ -315,10 +317,15 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     },
 
     onContainerScrollEnd: function () {
-        if (!this.getViewModel().get('hasMoreRecords')) {
+        var me = this;
+
+        if (!me.getViewModel().get('hasMoreRecords')) {
             return;
         }
 
-        this.loadPageByChunks(20,1, true, true);
+        clearTimeout(me.loadPageByChunksTimeout);
+        me.loadPageByChunksTimeout = setTimeout(function(){
+            me.loadPageByChunks(20,1, true, true);
+        }, 100);
     },
 });

@@ -64,10 +64,6 @@
       "url": "https://bitbucket.org/mittagqi/restful-zend-framework/"
     },
     {
-      "type": "git",
-      "url": "https://github.com/dream-group/horde-text-diff/"
-    },
-    {
       "_README": "If the pull request https://github.com/technosophos/querypath/pull/208 will go into upstream master we will not need the separate version and URL anymore. version was ~3.0",
       "type": "git",
       "url": "https://github.com/thomaslauria/querypath"
@@ -136,7 +132,6 @@
     "phpoffice/phpspreadsheet": "~1.12",
     "querypath/querypath": "dev-master",
     "google/cloud-translate": "~1.7",
-    "dream-group/horde-text-diff": "dev-master",
     "lesstif/php-jira-rest-client": "~2.4",
     "jquery/jquery-ui": "1.13.0",
     "translate5/instanttranslate-roboto-font": "26",
@@ -159,7 +154,11 @@
     "psr/event-dispatcher": "^1.0",
     "psr/http-client": "^1.0",
     "phar-io/version": "^3.2",
-    "translate5/php-html-parser": "dev-master"
+    "translate5/php-html-parser": "dev-master",
+    "horde/text_diff": "dev-FRAMEWORK_6_0",
+    "horde/exception": "dev-FRAMEWORK_6_0",
+    "horde/util": "dev-FRAMEWORK_6_0",
+    "horde/translation": "dev-FRAMEWORK_6_0"
   },
   "extra": {
     "merge-plugin": {

@@ -50,6 +50,12 @@ class Editor_BatchsetController extends ZfExtended_RestController
 
     public function indexAction(): void
     {
+        if ($this->getParam('countTasks')) {
+            $this->view->total = count($this->getTaskGuidsFromFilteredProjects($this->getRequest()->getRawParam('filter')));
+
+            return;
+        }
+
         $batchSet = new MittagQI\Translate5\Task\BatchSet\Strategy($this->getRequest());
         if (! $batchSet->validate()) {
             return;

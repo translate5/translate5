@@ -323,6 +323,6 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
      */
     private function getOversizeWordCount(Zend_Config $config)
     {
-        return ($config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150);
+        return ($config->runtimeOptions->termTagger->maxSegmentWordCount ?? Configuration::OVERSIZE_WORD_COUNT);
     }
 }
