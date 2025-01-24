@@ -22,12 +22,14 @@ class TmConversionServiceTest extends TestCase
         $sourceLang->method('getMajorRfc5646')->willReturn('de');
         $sourceLang->method('__call')->willReturnMap([
             ['getId', [], 1],
+            ['getRfc5646', [], 'de'],
         ]);
 
         $targetLang = $this->createMock(\editor_Models_Languages::class);
-        $targetLang->method('getMajorRfc5646')->willReturn('de');
+        $targetLang->method('getMajorRfc5646')->willReturn('en');
         $targetLang->method('__call')->willReturnMap([
             ['getId', [], 2],
+            ['getRfc5646', [], 'en'],
         ]);
 
         $languageRepository->method('find')->willReturnMap([

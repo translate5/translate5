@@ -172,7 +172,7 @@ class ReimportSegmentsActionExecutorTest extends TestCase
                     return $languageResourceIds[$loopIndex++] === $languageResourceId;
                 }),
                 [
-                    ReimportSegmentsOptions::FILTER_ONLY_EDITED => true,
+                    ReimportSegmentsOptions::FILTER_ONLY_EDITED => false,
                     ReimportSegmentsOptions::USE_SEGMENT_TIMESTAMP => true,
                 ]
             );

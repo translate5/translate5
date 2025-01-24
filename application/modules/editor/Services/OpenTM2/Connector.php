@@ -923,6 +923,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return LanguageResourceStatus::IMPORT;
         }
 
+        if ($this->languageResource->isConversionInProgress()) {
+            return LanguageResourceStatus::CONVERTING;
+        }
+
         $name = $tmName ?: $this->persistenceService->getWritableMemory($this->languageResource);
 
         if (empty($name)) {
@@ -1866,10 +1870,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         if (empty($memories)) {
             return $this->generateTmFilename($languageResource);
-        }
-
-        if (count($memories) === 1) {
-            return $this->generateTmFilename($languageResource) . '_next-1';
         }
 
         $pattern = '/_next-(\d+)/';

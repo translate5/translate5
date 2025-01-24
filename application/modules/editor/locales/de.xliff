@@ -9644,9 +9644,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Konvertierung starten</source>
                 <target>Konvertierung starten</target>
             </trans-unit>
-            <trans-unit id='V2FybmluZzogQ29udmVyc2lvbiBtYXkgbGVhZCB0byB0aGUgbG9zcyBvZiBUTSBtYXRjaGVz'>
-                <source>Warning: Conversion may lead to the loss of TM matches</source>
-                <target>Achtung: Die Konvertierung kann zum Verlust von TM-Matches führen. Bitte reimportieren Sie vorher alle zugewiesenen Tasks und machen Sie ein Backup der Sprachressource(n). Die Konvertierung beeinflusst die Matches von laufenden Aufgaben. Auf der folgenden Confluence-Seite wird beschrieben, wie Sie dies umgehen können.</target>
+            <trans-unit id='V2FybnVuZzogRGllIEtvbnZlcnRpZXJ1bmcga2FubiBlaW5lIGxhbmdlIFplaXQgaW4gQW5zcHJ1Y2ggbmVobWVuLCBpbiBkZXIga2VpbiBadWdyaWZmIGF1ZiBkYXMgVE0gbcO2Z2xpY2ggaXN0'>
+                <source>Warnung: Die Konvertierung kann eine lange Zeit in Anspruch nehmen, in der kein Zugriff auf das TM möglich ist</source>
+                <target>Warnung: Die Konvertierung kann eine lange Zeit in Anspruch nehmen, in der kein Zugriff auf das TM möglich ist.  Wenn mehrere TM konvertiert werden, wird der Zugriff nur für das aktuell konvertierte TM gesperrt. Die Konvertierung kann außerdem die Fuzzy-Match-Rate laufender Aufgaben verringern.</target>
             </trans-unit>
             <trans-unit id="RGllIEF1c2dhYmVyZWdlbCBzb2xsdGUgdm9tIGdsZWljaGVuIFR5cCBzZWluIHdpZSBkaWUgRWluZ2FiZXJlZ2Vs">
                 <source>Die Ausgaberegel sollte vom gleichen Typ sein wie die Eingaberegel</source>
@@ -9998,9 +9998,9 @@ etc.
                 <source>Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte</source>
                 <target>Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte</target>
             </trans-unit>
-            <trans-unit id='U2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGluIGFsbGVuIFByb2pla3RlbiBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZy4gQmVzc2VyIGFiYnJlY2hlbj8='>
-                <source>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?</source>
-                <target>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?</target>
+            <trans-unit id='U2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGluIGFsbGVuIFByb2pla3RlbiBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZy4gV2lya2xpY2ggYXVzZsO8aHJlbj8='>
+                <source>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Wirklich ausführen?</source>
+                <target>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Wirklich ausführen?</target>
             </trans-unit>
             <trans-unit id='RWlnZW5zY2hhZnRlbiDDpG5kZXJu'>
                 <source>Eigenschaften ändern</source>
@@ -10021,6 +10021,10 @@ etc.
             <trans-unit id='RXMgd3VyZGUga2VpbmUgRWlnZW5zY2hhZnQgYW5nZWdlYmVu'>
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>Es wurde keine Eigenschaft angegeben</target>
+            </trans-unit>
+            <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
+                <source>language_resource.status.converting</source>
+                <target>Konvertierung läuft</target>
             </trans-unit>
         </body>
     </file>
