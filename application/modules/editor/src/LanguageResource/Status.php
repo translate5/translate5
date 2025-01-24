@@ -65,6 +65,8 @@ class Status
 
     public const FAILED_TO_OPEN = 'failedToOpen';
 
+    public const CONVERTING = 'converting';
+
     /**
      * Retrieve the linguistic equivalent of the status values above
      * @throws Zend_Exception
@@ -86,7 +88,8 @@ class Status
             self::WAITING_FOR_LOADING => $translate->_('Wartet auf Laden'),
             self::LOADING => $translate->_('Wird geladen'),
             self::FAILED_TO_OPEN => $translate->_('Ladefehler'),
-            default => $translate->_('unbekannt')
+            self::CONVERTING => $translate->_('language_resource.status.converting'),
+            default => $translate->_('unbekannt'),
         };
     }
 }

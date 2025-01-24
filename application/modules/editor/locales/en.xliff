@@ -10199,6 +10199,10 @@ etc.
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>No property is specified</target>
             </trans-unit>
+            <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
+                <source>language_resource.status.converting</source>
+                <target>Converting</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

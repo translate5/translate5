@@ -676,11 +676,11 @@ class NumberProtector implements ProtectorInterface
 
     private function protectHtmlEntities(string $text): string
     {
-        return preg_replace('/&(\w{2,8});/', '**\1**', $text);
+        return preg_replace('/&(\w{2,8});/', '¿¿¿\1¿¿¿', $text);
     }
 
     private function unprotectHtmlEntities(string $text): string
     {
-        return preg_replace('/\*\*(\w{2,8})\*\*/', '&\1;', $text);
+        return preg_replace('/¿¿¿(\w{2,8})¿¿¿/', '&\1;', $text);
     }
 }
