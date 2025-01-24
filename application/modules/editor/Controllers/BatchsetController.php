@@ -65,6 +65,13 @@ class Editor_BatchsetController extends ZfExtended_RestController
     {
         $invalidValueProvidedMessage = 'Ungültiger Wert bereitgestellt';
 
+        if ($this->getParam('countTasks')) {
+            $this->view->total = 0;
+//            $this->view->total = count($this->getTaskGuidsFromFilteredProjects($this->getRequest()->getRawParam('filter')));
+
+            return;
+        }
+
         try {
             TaskBatchSetter::create()->process($this->getRequest());
         } catch (InvalidValueProvidedException $e) {

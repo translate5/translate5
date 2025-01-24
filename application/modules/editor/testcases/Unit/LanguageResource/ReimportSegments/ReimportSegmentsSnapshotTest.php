@@ -107,9 +107,10 @@ class ReimportSegmentsSnapshotTest extends TestCase
 
         $segmentMock1 = $this->createMock(Segment::class);
         $segmentMock2 = $this->createMock(Segment::class);
+        $segments = new \ArrayIterator([$segmentMock1, $segmentMock2]);
         $this->reimportSegmentsProviderMock->method('getSegments')
             ->with($taskGuid, $filters)
-            ->willReturn([$segmentMock1, $segmentMock2]);
+            ->willReturn($segments);
 
         $updateOptions = [
             UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP => $useSegmentTimestamp,

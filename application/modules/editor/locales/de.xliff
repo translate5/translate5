@@ -10182,9 +10182,9 @@ etc.
                 <source>Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte</source>
                 <target>Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte</target>
             </trans-unit>
-            <trans-unit id='U2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGluIGFsbGVuIFByb2pla3RlbiBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZy4gQmVzc2VyIGFiYnJlY2hlbj8='>
-                <source>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?</source>
-                <target>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Besser abbrechen?</target>
+            <trans-unit id='U2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGluIGFsbGVuIFByb2pla3RlbiBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZy4gV2lya2xpY2ggYXVzZsO8aHJlbj8='>
+                <source>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Wirklich ausführen?</source>
+                <target>Setzt die Eigenschaft in allen Projekten in der aktuellen Filterung. Wirklich ausführen?</target>
             </trans-unit>
             <trans-unit id='RWlnZW5zY2hhZnRlbiDDpG5kZXJu'>
                 <source>Eigenschaften ändern</source>

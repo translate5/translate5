@@ -70,7 +70,7 @@
     },
     {
       "type": "git",
-      "url": "https://github.com/dream-group/horde-text-diff/"
+      "url": "https://bitbucket.org/mittagqi/text_diff/"
     },
     {
       "_README": "If the pull request https://github.com/technosophos/querypath/pull/208 will go into upstream master we will not need the separate version and URL anymore. version was ~3.0",
@@ -141,7 +141,7 @@
     "phpoffice/phpspreadsheet": "~1.12",
     "querypath/querypath": "dev-master",
     "google/cloud-translate": "~1.7",
-    "dream-group/horde-text-diff": "dev-master",
+    "dream-group/horde-text-diff": "dev-main",
     "lesstif/php-jira-rest-client": "~2.4",
     "jquery/jquery-ui": "1.13.0",
     "translate5/instanttranslate-roboto-font": "26",

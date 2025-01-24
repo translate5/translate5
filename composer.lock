@@ -541,11 +541,11 @@
         },
         {
             "name": "dream-group/horde-text-diff",
-            "version": "dev-master",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/dream-group/horde-text-diff/",
-                "reference": "03217ed28e30ca12ddc4ecbb09e1cd0ec91df1cb"
+                "url": "https://bitbucket.org/mittagqi/text_diff/",
+                "reference": "1eafabc219bd6800234b78a962b32d33b3f0cec5"
             },
             "require": {
                 "php": ">=7.3"
@@ -575,7 +575,7 @@
             ],
             "description": "Port of Horde_Text_Diff to avoid the dog-slow PEAR",
             "homepage": "http://pear.horde.org",
-            "time": "2023-01-19T16:50:45+00:00"
+            "time": "2025-01-24T11:17:40+00:00"
         },
         {
             "name": "evenement/evenement",

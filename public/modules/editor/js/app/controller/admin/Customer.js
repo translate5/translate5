@@ -439,7 +439,7 @@ Ext.define('Editor.controller.admin.Customer', {
             case 'admin.Users':
                 return 'customers';
                 break;
-            case 'Editor.store.LanguageResources.LanguageResource':
+            case 'languageResourceStore':
                 return 'customerIds';
                 break;
         }

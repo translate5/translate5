@@ -716,15 +716,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
             return;
         }
         if (empty($this->xmlCache[$segmentHash])) {
-            $xliffConverter = $this->getXliffConverter($currentStep, $config);
-
-            if (! $xliffConverter) {
-                $this->log->warn('E1013', 'Error on xliff converter initialization', [
-                    'task' => $this->config->task,
-                ]);
-
-                return;
-            }
+            $xliffConverter = editor_Models_Converter_SegmentsToXliffFactory::create($currentStep, $config);
 
             try {
                 $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->config->task, $segments);
@@ -792,43 +784,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
         }
     }
 
-    /***
-     * Return the xliff or xliff2 converted depending on the xliff2Active config
-     * @param string $currentStep
-     * @param Zend_Config $config
-     * @return editor_Models_Converter_SegmentsToXliff
-     */
-    private function getXliffConverter($currentStep, $config)
-    {
-        $xliff2Active = (bool) $config->runtimeOptions->editor->notification->xliff2Active;
-
-        //if the config is active, convert segments to xliff2 format
-        if ($xliff2Active) {
-            $xliffConf = [
-                editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_TERMINOLOGY => true,
-                editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF => true,
-                editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM => true,
-            ];
-
-            return ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf, $currentStep]);
-        }
-
-        $xliffConf = [
-            editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => (bool) $config->runtimeOptions->editor->notification->includeDiff,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => true,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => true,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
-        ];
-
-        return ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
-    }
-
-    /***
+    /**
      * Deadline notifier. It will send notification to the configured user assocs days before or after the current day (days +/- can be defined in config default to 1)
      * When the trignotification trigger is periodical, the deadline date select will be between "CRON_PERIODICAL_CALL_FREQUENCY_MIN" minutes period of time
-     * @param string $triggerConfig
-     * @param string $template: template to be used for the mail
-     * @param bool $isApproaching: default will notify daysOffset before deadline
+     * @param string $template  template to be used for the mail
+     * @param bool $isApproaching default will notify daysOffset before deadline
      */
     protected function deadlineNotifier(stdClass $triggerConfig, string $template, bool $isApproaching = false)
     {

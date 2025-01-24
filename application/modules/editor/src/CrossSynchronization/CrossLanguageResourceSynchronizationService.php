@@ -36,26 +36,24 @@ use editor_Models_Languages as Language;
 use editor_Services_Manager;
 use Generator;
 use MittagQI\Translate5\CrossSynchronization\Dto\AvailableForConnectionOption;
+use MittagQI\Translate5\CrossSynchronization\Dto\PotentialConnectionOption;
 use MittagQI\Translate5\CrossSynchronization\Events\ConnectionCreatedEvent;
 use MittagQI\Translate5\CrossSynchronization\Events\ConnectionDeletedEvent;
 use MittagQI\Translate5\CrossSynchronization\Events\CustomerAddedEvent;
 use MittagQI\Translate5\CrossSynchronization\Events\CustomerRemovedEvent;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
 class CrossLanguageResourceSynchronizationService
 {
-    /**
-     * @var array<string, SynchronisationInterface>
-     */
-    private array $cachedSyncIntegration = [];
-
     public function __construct(
         private readonly editor_Services_Manager $serviceManager,
         private readonly EventDispatcher $eventDispatcher,
         private readonly CrossSynchronizationConnectionRepository $connectionRepository,
         private readonly ConnectionOptionsRepository $connectionOptionsRepository,
+        private readonly LanguageRepository $languageRepository,
     ) {
     }
 
@@ -69,6 +67,7 @@ class CrossLanguageResourceSynchronizationService
             EventDispatcher::create(),
             new CrossSynchronizationConnectionRepository(),
             ConnectionOptionsRepository::create(),
+            LanguageRepository::create(),
         );
     }
 
@@ -206,9 +205,20 @@ class CrossLanguageResourceSynchronizationService
             $alreadyConnectedResources[(int) $connection->getTargetLanguageResourceId()] = true;
         }
 
+        /** @var array<string, SynchronisationInterface> $syncIntegrations */
+        $syncIntegrations = [];
+
+        /** @var array<string, LanguagePair[]> $supportedLanguagePairs */
+        $supportedLanguagePairs = [];
+
         foreach ($this->connectionOptionsRepository->getPotentialConnectionOptions($source) as $option) {
             $lr = $option->languageResource;
-            $targetIntegration = $this->getSyncIntegration($lr->getServiceType());
+
+            if (! isset($syncIntegrations[$lr->getServiceType()])) {
+                $syncIntegrations[$lr->getServiceType()] = $this->getSyncIntegration($lr->getServiceType());
+            }
+
+            $targetIntegration = $syncIntegrations[$lr->getServiceType()];
 
             if (null === $targetIntegration) {
                 continue;
@@ -224,6 +234,16 @@ class CrossLanguageResourceSynchronizationService
 
             if (in_array((int) $lr->getId(), $allExistingTargets) && $targetIntegration->isOneToOne()) {
                 // we can't connect to Language Resource with ono-to-one type if it is already have connection
+                continue;
+            }
+
+            if (! isset($supportedLanguagePairs[$lr->getServiceType()])) {
+                $supportedLanguagePairs[$lr->getServiceType()] = $targetIntegration->getSupportedLanguagePairs($lr);
+            }
+
+            $supportedPairs = $supportedLanguagePairs[$lr->getServiceType()];
+
+            if (! $this->optionIsInSupportedLanguagePairs($option, $supportedPairs)) {
                 continue;
             }
 
@@ -254,12 +274,7 @@ class CrossLanguageResourceSynchronizationService
 
     private function getSyncIntegration(string $serviceType): ?SynchronisationInterface
     {
-        if (! isset($this->cachedSyncIntegration[$serviceType])) {
-            $this->cachedSyncIntegration[$serviceType] = $this->serviceManager
-                ->getSynchronisationService($serviceType);
-        }
-
-        return $this->cachedSyncIntegration[$serviceType];
+        return $this->serviceManager->getSynchronisationService($serviceType);
     }
 
     private function hasTargetSyncIntegration(SynchronisationInterface $sourceIntegration): bool
@@ -285,6 +300,39 @@ class CrossLanguageResourceSynchronizationService
     ): bool {
         foreach ($sourceIntegration->syncSourceOf() as $syncType) {
             if (in_array($syncType, $targetIntegration->syncTargetFor())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param LanguagePair[] $supportedPairs
+     */
+    private function optionIsInSupportedLanguagePairs(PotentialConnectionOption $option, array $supportedPairs): bool
+    {
+        foreach ($supportedPairs as $pair) {
+            if (
+                $pair->sourceId === (int) $option->sourceLanguage->getId()
+                && $pair->targetId === (int) $option->targetLanguage->getId()
+            ) {
+                return true;
+            }
+
+            $majorSource = $option->sourceLanguage;
+
+            if ($option->sourceLanguage->getMajorRfc5646() !== $option->sourceLanguage->getRfc5646()) {
+                $majorSource = $this->languageRepository->findByRfc5646($option->sourceLanguage->getMajorRfc5646());
+            }
+
+            $majorTarget = $option->targetLanguage;
+
+            if ($option->targetLanguage->getMajorRfc5646() !== $option->targetLanguage->getRfc5646()) {
+                $majorTarget = $this->languageRepository->findByRfc5646($option->targetLanguage->getMajorRfc5646());
+            }
+
+            if ($pair->sourceId === (int) $majorSource->getId() && $pair->targetId === (int) $majorTarget->getId()) {
                 return true;
             }
         }

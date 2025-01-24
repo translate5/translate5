@@ -113,9 +113,6 @@ Ext.define('Editor.controller.LanguageResources', {
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.TermCollection'));
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.OpenTM2'));
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.DummyFileTm'));
-
-      // Create language resource store instance
-      Ext.create('Editor.store.LanguageResources.LanguageResource');
   },
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
@@ -313,6 +310,9 @@ Ext.define('Editor.controller.LanguageResources', {
         if (! Editor.app.authenticatedUser.isAllowed('customerTmAssoc')) {
             return;
         }
+
+        // Create language resource store instance
+        Ext.create('Editor.store.LanguageResources.LanguageResource');
 
         var vm = tabPanel.up('[viewModel]').getViewModel();
         var vmStores = vm.storeInfo || {};

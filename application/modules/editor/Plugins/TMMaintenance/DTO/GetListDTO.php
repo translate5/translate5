@@ -65,7 +65,7 @@ class GetListDTO
         return new static(
             (int) $data['tm'],
             (int) $request->getParam('limit'),
-            (string) $data['offset'],
+            isset($data['offset']) ? (string) $data['offset'] : '',
             (string) $data['source'],
             (string) $data['sourceMode'],
             (string) $data['target'],
@@ -76,12 +76,12 @@ class GetListDTO
             (string) $data['authorMode'],
             (string) $data['creationDateFrom'],
             (string) $data['creationDateTo'],
-            (string) $data['additionalInfo'],
-            (string) $data['additionalInfoMode'],
+            isset($data['additionalInfo']) ? (string) $data['additionalInfo'] : '',
+            isset($data['additionalInfoMode']) ? (string) $data['additionalInfoMode'] : '',
             (string) $data['document'],
             (string) $data['documentMode'],
-            (string) $data['context'],
-            (string) $data['contextMode'],
+            isset($data['context']) ? (string) $data['context'] : '',
+            isset($data['contextMode']) ? (string) $data['contextMode'] : '',
             (bool) ($data['onlyCount'] ?? false),
         );
     }

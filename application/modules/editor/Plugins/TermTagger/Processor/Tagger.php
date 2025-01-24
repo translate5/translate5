@@ -214,6 +214,9 @@ final class Tagger extends AbstractProcessor
 
     /**
      * Returns an array of terms applicable for particular segment
+     * @throws editor_Plugins_TermTagger_Exception_Abstract
+     * @throws editor_Plugins_TermTagger_Exception_Malfunction
+     * @throws editor_Plugins_TermTagger_Exception_Open
      */
     public function retrieveTermsForSegmentTags(editor_Segment_Tags $segmentsTags): iterable
     {

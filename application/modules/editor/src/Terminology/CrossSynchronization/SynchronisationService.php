@@ -124,4 +124,12 @@ class SynchronisationService implements SynchronisationInterface
     ): AdditionalInfoViewData {
         return new AdditionalInfoViewData();
     }
+
+    /**
+     * @return LanguagePair[]
+     */
+    public function getSupportedLanguagePairs(LanguageResource $deepl): array
+    {
+        return [];
+    }
 }
