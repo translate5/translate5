@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission;
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\CoordinatorGroupDataJobAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\CoordinatorGroupUserJobAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\TaskRestrictionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\UserRestrictionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
@@ -51,6 +52,7 @@ class UserJobActionPermissionAssert extends ActionPermissionAssert
             TaskRestrictionAssert::create(),
             UserRestrictionAssert::create(),
             CoordinatorGroupDataJobAssert::create(),
+            CoordinatorGroupUserJobAssert::create(),
         ]);
     }
 }
