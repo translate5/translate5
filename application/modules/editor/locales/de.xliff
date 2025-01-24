@@ -9644,9 +9644,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Konvertierung starten</source>
                 <target>Konvertierung starten</target>
             </trans-unit>
-            <trans-unit id='V2FybmluZzogQ29udmVyc2lvbiBtYXkgbGVhZCB0byB0aGUgbG9zcyBvZiBUTSBtYXRjaGVz'>
-                <source>Warning: Conversion may lead to the loss of TM matches</source>
-                <target>Achtung: Die Konvertierung kann zum Verlust von TM-Matches führen. Bitte reimportieren Sie vorher alle zugewiesenen Tasks und machen Sie ein Backup der Sprachressource(n). Die Konvertierung beeinflusst die Matches von laufenden Aufgaben. Auf der folgenden Confluence-Seite wird beschrieben, wie Sie dies umgehen können.</target>
+            <trans-unit id='V2FybnVuZzogRGllIEtvbnZlcnRpZXJ1bmcga2FubiBlaW5lIGxhbmdlIFplaXQgaW4gQW5zcHJ1Y2ggbmVobWVuLCBpbiBkZXIga2VpbiBadWdyaWZmIGF1ZiBkYXMgVE0gbcO2Z2xpY2ggaXN0'>
+                <source>Warnung: Die Konvertierung kann eine lange Zeit in Anspruch nehmen, in der kein Zugriff auf das TM möglich ist</source>
+                <target>Warnung: Die Konvertierung kann eine lange Zeit in Anspruch nehmen, in der kein Zugriff auf das TM möglich ist.  Wenn mehrere TM konvertiert werden, wird der Zugriff nur für das aktuell konvertierte TM gesperrt. Die Konvertierung kann außerdem die Fuzzy-Match-Rate laufender Aufgaben verringern.</target>
             </trans-unit>
             <trans-unit id="RGllIEF1c2dhYmVyZWdlbCBzb2xsdGUgdm9tIGdsZWljaGVuIFR5cCBzZWluIHdpZSBkaWUgRWluZ2FiZXJlZ2Vs">
                 <source>Die Ausgaberegel sollte vom gleichen Typ sein wie die Eingaberegel</source>
