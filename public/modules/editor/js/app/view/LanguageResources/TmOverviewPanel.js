@@ -76,6 +76,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             tuninginprogress: '#UT#Wird trainiert',
             reorganize_in_progress: '#UT#Wird reorganisiert',
             reorganize_failed: '#UT#Reorganisation gescheitert',
+            converting: '#UT#language_resource.status.converting',
         },
         customers: '#UT#Kunden',
         useAsDefault: '#UT#Leserechte standardmäßig',

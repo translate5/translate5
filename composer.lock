@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df23cbd25ee9d5be9c0be236d2097429",
+    "content-hash": "7a9e7396f5e9e1a2f9328d9a034144c9",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -538,6 +538,44 @@
                 }
             ],
             "time": "2024-02-05T11:56:58+00:00"
+        },
+        {
+            "name": "dream-group/horde-text-diff",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://bitbucket.org/mittagqi/text_diff/",
+                "reference": "1eafabc219bd6800234b78a962b32d33b3f0cec5"
+            },
+            "require": {
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.0",
+                "symfony/phpunit-bridge": "^5.4 | ^6.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Horde": "lib/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Chuck Hagenbuch",
+                    "email": "chuck@horde.org",
+                    "role": "lead"
+                },
+                {
+                    "name": "Jan Schneider",
+                    "email": "jan@horde.org",
+                    "role": "lead"
+                }
+            ],
+            "description": "Port of Horde_Text_Diff to avoid the dog-slow PEAR",
+            "homepage": "http://pear.horde.org",
+            "time": "2025-01-24T11:17:40+00:00"
         },
         {
             "name": "evenement/evenement",
@@ -1723,250 +1761,6 @@
                 }
             ],
             "time": "2024-07-18T11:15:46+00:00"
-        },
-        {
-            "name": "horde/exception",
-            "version": "dev-FRAMEWORK_6_0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/horde/Exception.git",
-                "reference": "770a157b6f792c6f65a4ea98ba85fed250b30af4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/horde/Exception/zipball/770a157b6f792c6f65a4ea98ba85fed250b30af4",
-                "reference": "770a157b6f792c6f65a4ea98ba85fed250b30af4",
-                "shasum": ""
-            },
-            "require": {
-                "horde/translation": "^3 || dev-FRAMEWORK_6_0",
-                "php": "^7.4 || ^8"
-            },
-            "require-dev": {
-                "horde/test": "^3 || dev-FRAMEWORK_6_0",
-                "pear/console_getopt": "^1.4.4|dev-master",
-                "pear/pear": "*"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Horde_Exception": "lib/"
-                },
-                "psr-4": {
-                    "Horde\\Exception\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-2.1-only"
-            ],
-            "authors": [
-                {
-                    "name": "Jan Schneider",
-                    "email": "jan@horde.org",
-                    "role": "lead"
-                },
-                {
-                    "name": "Chuck Hagenbuch",
-                    "email": "chuck@horde.org",
-                    "role": "lead"
-                },
-                {
-                    "name": "Michael Slusarz",
-                    "email": "slusarz@horde.org",
-                    "role": "developer"
-                }
-            ],
-            "description": "Exception handler library",
-            "homepage": "https://www.horde.org/libraries/Horde_Exception",
-            "support": {
-                "source": "https://github.com/horde/Exception/tree/FRAMEWORK_6_0"
-            },
-            "time": "2022-11-11T00:00:00+00:00"
-        },
-        {
-            "name": "horde/text_diff",
-            "version": "dev-FRAMEWORK_6_0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/horde/Text_Diff.git",
-                "reference": "f7cfbc26a664f40dcda5c94b97cba45db25b0cb6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/horde/Text_Diff/zipball/f7cfbc26a664f40dcda5c94b97cba45db25b0cb6",
-                "reference": "f7cfbc26a664f40dcda5c94b97cba45db25b0cb6",
-                "shasum": ""
-            },
-            "require": {
-                "horde/exception": "^3 || dev-FRAMEWORK_6_0",
-                "horde/util": "^3 || dev-FRAMEWORK_6_0",
-                "php": "^7.4 || ^8"
-            },
-            "require-dev": {
-                "horde/cli": "^3 || dev-FRAMEWORK_6_0",
-                "horde/test": "^3 || dev-FRAMEWORK_6_0"
-            },
-            "suggest": {
-                "ext-xdiff": "*",
-                "horde/cli": "^3 || dev-FRAMEWORK_6_0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Horde_Text_Diff": "lib/"
-                },
-                "psr-4": {
-                    "Horde\\Text\\Diff\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-2.1-only"
-            ],
-            "authors": [
-                {
-                    "name": "Jan Schneider",
-                    "email": "jan@horde.org",
-                    "role": "lead"
-                },
-                {
-                    "name": "Chuck Hagenbuch",
-                    "email": "chuck@horde.org",
-                    "role": "lead"
-                }
-            ],
-            "description": "Text diff generation and rendering library",
-            "homepage": "https://www.horde.org/libraries/Horde_Text_Diff",
-            "support": {
-                "source": "https://github.com/horde/Text_Diff/tree/FRAMEWORK_6_0"
-            },
-            "time": "2022-10-10T00:00:00+00:00"
-        },
-        {
-            "name": "horde/translation",
-            "version": "dev-FRAMEWORK_6_0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/horde/Translation.git",
-                "reference": "7c5e7e462a5213e9d5a13bef8ac19e6004651f93"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/horde/Translation/zipball/7c5e7e462a5213e9d5a13bef8ac19e6004651f93",
-                "reference": "7c5e7e462a5213e9d5a13bef8ac19e6004651f93",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.4 || ^8"
-            },
-            "require-dev": {
-                "horde/test": "^3 || dev-FRAMEWORK_6_0"
-            },
-            "suggest": {
-                "ext-gettext": "*"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Horde_Translation": "lib/"
-                },
-                "psr-4": {
-                    "Horde\\Translation\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-2.1-only"
-            ],
-            "authors": [
-                {
-                    "name": "Jan Schneider",
-                    "email": "jan@horde.org",
-                    "role": "lead"
-                }
-            ],
-            "description": "Translation library",
-            "homepage": "https://www.horde.org/libraries/Horde_Translation",
-            "support": {
-                "source": "https://github.com/horde/Translation/tree/FRAMEWORK_6_0"
-            },
-            "time": "2022-08-19T00:00:00+00:00"
-        },
-        {
-            "name": "horde/util",
-            "version": "dev-FRAMEWORK_6_0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/horde/Util.git",
-                "reference": "a4612b8f9f83d7c87a8c50b3ffe8abce3639afc2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/horde/Util/zipball/a4612b8f9f83d7c87a8c50b3ffe8abce3639afc2",
-                "reference": "a4612b8f9f83d7c87a8c50b3ffe8abce3639afc2",
-                "shasum": ""
-            },
-            "require": {
-                "ext-dom": "*",
-                "php": "^7.4 || ^8"
-            },
-            "require-dev": {
-                "horde/imap_client": "^3 || dev-FRAMEWORK_6_0",
-                "horde/test": "^3 || dev-FRAMEWORK_6_0",
-                "pear/pear": "*"
-            },
-            "suggest": {
-                "ext-ctype": "*",
-                "ext-filter": "*",
-                "ext-iconv": "*",
-                "ext-intl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "ext-xml": "*",
-                "horde/imap_client": "^3 || dev-FRAMEWORK_6_0",
-                "horde/test": "^3 || dev-FRAMEWORK_6_0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Horde\\Util\\": "src/"
-                },
-                "classmap": [
-                    "lib/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-2.1-only"
-            ],
-            "authors": [
-                {
-                    "name": "Jan Schneider",
-                    "email": "jan@horde.org",
-                    "role": "lead"
-                },
-                {
-                    "name": "Chuck Hagenbuch",
-                    "email": "chuck@horde.org",
-                    "role": "lead"
-                },
-                {
-                    "name": "Michael Slusarz",
-                    "email": "slusarz@horde.org",
-                    "role": "developer"
-                }
-            ],
-            "description": "Utility library",
-            "homepage": "https://www.horde.org/libraries/Horde_Util",
-            "support": {
-                "source": "https://github.com/horde/Util/tree/FRAMEWORK_6_0"
-            },
-            "time": "2022-10-08T00:00:00+00:00"
         },
         {
             "name": "http-interop/http-factory-guzzle",
@@ -9526,12 +9320,9 @@
     "stability-flags": {
         "shardj/zf1-future": 20,
         "querypath/querypath": 20,
+        "dream-group/horde-text-diff": 20,
         "translate5/rangy-lib": 20,
         "translate5/php-html-parser": 20,
-        "horde/text_diff": 20,
-        "horde/exception": 20,
-        "horde/util": 20,
-        "horde/translation": 20,
         "translate5/openai-client": 20,
         "mittagqi/restful-zend-framework": 20
     },

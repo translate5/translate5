@@ -140,7 +140,7 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
                 }
                 Ext.MessageBox.confirm(
                     l10n.setForFiltered, question, function (btn) {
-                        if (btn !== 'yes') {
+                        if (btn === 'yes') {
                             me.handleBatchSet(false);
                         }
                     });
