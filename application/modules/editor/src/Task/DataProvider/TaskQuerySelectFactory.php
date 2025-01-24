@@ -138,7 +138,7 @@ class TaskQuerySelectFactory
             ->where(TaskDb::TABLE_NAME . '.taskType in (?)', $this->taskType->getNonInternalTaskTypes())
         ;
 
-        if (! $this->hasRestrictedAccess($viewer)) {
+        if ($this->hasRestrictedAccess($viewer)) {
             $this->restrictSelect($select, $viewer);
         }
 
@@ -172,7 +172,7 @@ class TaskQuerySelectFactory
             ->where('project.taskType in (?)', $this->taskType->getProjectTypes())
         ;
 
-        if (! $this->hasRestrictedAccess($viewer)) {
+        if ($this->hasRestrictedAccess($viewer)) {
             $this->restrictSelect($select, $viewer);
         }
 
@@ -262,13 +262,13 @@ class TaskQuerySelectFactory
     private function hasRestrictedAccess(User $viewer): bool
     {
         if ($viewer->isClientPm() || $viewer->isPmLight()) {
-            return false;
+            return true;
         }
 
         try {
-            return $this->acl->isInAllowedRoles($viewer->getRoles(), Rights::ID, Rights::LOAD_ALL_TASKS);
+            return ! $this->acl->isInAllowedRoles($viewer->getRoles(), Rights::ID, Rights::LOAD_ALL_TASKS);
         } catch (Zend_Acl_Exception) {
-            return false;
+            return true;
         }
     }
 }
