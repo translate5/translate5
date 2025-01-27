@@ -1323,3 +1323,7 @@ div.internal-tag.number span.full::after {
     color: #ccc;
     cursor: not-allowed;
 }
+[id^="combobox-"].x-menu-item-cmp-default {
+    margin-left: 41px !important;
+    left: 0 !important;
+}

@@ -34,7 +34,10 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
 use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Status;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\T5Memory\ExportService;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
 
@@ -46,19 +49,25 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
     private array $memoriesBackup;
 
-    private TmConversionService $tmConversionService;
+    private readonly TmConversionService $tmConversionService;
+
+    private readonly LanguageResourceRepository $languageResourceRepository;
+
+    private readonly ExportService $exportService;
 
     public function __construct()
     {
         parent::__construct();
         $this->log = \Zend_Registry::get('logger')->cloneMe('editor.content-protection.opentm2.conversion');
         $this->tmConversionService = TmConversionService::create();
+        $this->languageResourceRepository = new LanguageResourceRepository();
+        $this->exportService = ExportService::create();
     }
 
     private function restoreLangResourceMemories(): void
     {
         $this->languageResource->addSpecificData('memories', $this->memoriesBackup);
-        $this->languageResource->save();
+        $this->languageResourceRepository->save($this->languageResource);
     }
 
     protected function validateParameters(array $parameters): bool
@@ -69,10 +78,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
         $this->languageResourceId = (int) $parameters['languageResourceId'];
 
-        $this->languageResource = ZfExtended_Factory::get(LanguageResource::class);
-
         try {
-            $this->languageResource->load($this->languageResourceId);
+            $this->languageResource = $this->languageResourceRepository->get($this->languageResourceId);
         } catch (\ZfExtended_Models_Entity_NotFoundException) {
             return false;
         }
@@ -100,7 +107,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             return true;
         }
 
-        if (! $this->tmConversionService->isConversionInProgress($this->languageResourceId)) {
+        if (! $this->languageResource->isConversionInProgress()) {
             return false;
         }
 
@@ -110,65 +117,57 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $targetLang = (int) $this->languageResource->getTargetLang();
 
         $connector->connectTo($this->languageResource, $sourceLang, $targetLang);
-        $status = $connector->getStatus($this->languageResource->getResource(), $this->languageResource);
-
-        if (Status::AVAILABLE !== $status) {
-            $this->log->error(
-                'E1377',
-                'OpenTM2: Unable to use the memory because of the memory status {status}.',
-                [
-                    'languageResource' => $this->languageResource,
-                    'status' => $status,
-                ]
-            );
-            $this->resetConversionStarted();
-
-            return false;
-        }
 
         $mime = $connector->getValidExportTypes()['TMX'];
-        $exportFilename = $connector->export($mime);
 
-        if (null === $exportFilename || ! file_exists($exportFilename)) {
-            $this->log->error(
-                'E1587',
-                'Conversion: TM was not exported. TMX file does not exists: {filename}',
-                [
-                    'filename' => $exportFilename,
-                    'languageResource' => $this->languageResource,
-                ]
+        foreach ($this->memoriesBackup as $memory) {
+            $exportFilename = $this->exportService->export(
+                $this->languageResource,
+                ExportTmFileExtension::TMX,
+                $memory['filename']
             );
 
-            $this->resetConversionStarted();
+            if (null === $exportFilename || ! file_exists($exportFilename)) {
+                $this->log->error(
+                    'E1587',
+                    'Conversion: TM was not exported. TMX file does not exists: {filename}',
+                    [
+                        'filename' => $exportFilename,
+                        'languageResource' => $this->languageResource,
+                    ]
+                );
 
-            return false;
+                $this->resetConversionStarted();
+
+                return false;
+            }
+
+            $fileinfo = [
+                'tmp_name' => $exportFilename,
+                'type' => $mime,
+                'name' => basename($exportFilename),
+            ];
+
+            if (! $connector->addTm($fileinfo, [
+                'createNewMemory' => true,
+            ])) {
+                $this->log->error(
+                    'E1588',
+                    'Conversion: Failed to import file: {filename}',
+                    [
+                        'filename' => $exportFilename,
+                        'languageResource' => $this->languageResource,
+                    ]
+                );
+
+                $this->restoreLangResourceMemories();
+                $this->resetConversionStarted();
+
+                return false;
+            }
+
+            @unlink($exportFilename);
         }
-
-        $fileinfo = [
-            'tmp_name' => $exportFilename,
-            'type' => $mime,
-            'name' => basename($exportFilename),
-        ];
-
-        if (! $connector->addTm($fileinfo, [
-            'createNewMemory' => true,
-        ])) {
-            $this->log->error(
-                'E1588',
-                'Conversion: Failed to import file: {filename}',
-                [
-                    'filename' => $exportFilename,
-                    'languageResource' => $this->languageResource,
-                ]
-            );
-
-            $this->restoreLangResourceMemories();
-            $this->resetConversionStarted();
-
-            return false;
-        }
-
-        unlink($exportFilename);
 
         $onMemoryDeleted = fn ($filename) =>
             fn () => $this->languageResource->addSpecificData(
@@ -206,6 +205,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
     private function resetConversionStarted(): void
     {
         $this->languageResource->addSpecificData(LanguageResource::PROTECTION_CONVERSION_STARTED, null);
-        $this->languageResource->save();
+        // set status to import to block interactions with the language resource
+        $this->languageResource->setStatus(Status::NOTCHECKED);
+        $this->languageResourceRepository->save($this->languageResource);
     }
 }

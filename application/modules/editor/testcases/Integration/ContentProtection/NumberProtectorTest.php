@@ -727,8 +727,8 @@ class NumberProtectorTest extends TestCase
             'useForUnprotectTest' => false,
         ];
         yield [
-            'string' => 'string &Alpha;123456789&quot; string',
-            'expected' => 'string &Alpha;123456789&quot; string',
+            'string' => 'string &Alpha;12345678&quot; string',
+            'expected' => 'string &Alpha;12345678&quot; string',
         ];
         yield [
             'string' => 'string<someTag/>123456789 string',
@@ -782,6 +782,10 @@ class NumberProtectorTest extends TestCase
             'string' => 'some text with date in it: <number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',
             'expected' => 'some text with date in it: <number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',
             'useForUnprotectTest' => false,
+        ];
+        yield [
+            'string' => 'string **12345678** string',
+            'expected' => 'string **12345678** string',
         ];
     }
 

@@ -251,7 +251,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     private function setMemoryReadonly(
         LanguageResource $languageResource,
         string $tmName,
-        bool $isInternalFuzzy = false
+        bool $isInternalFuzzy = false,
     ): void {
         $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
 
@@ -918,12 +918,21 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return $this->api->status(null) ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::ERROR;
         }
 
+        if ($this->languageResource->isConversionInProgress()) {
+            return LanguageResourceStatus::CONVERTING;
+        }
+
         // let's check the internal state before calling API for status as import worker might not have run yet
         if ($this->languageResource->getStatus() === LanguageResourceStatus::IMPORT) {
             return LanguageResourceStatus::IMPORT;
         }
 
-        $name = $tmName ?: $this->persistenceService->getWritableMemory($this->languageResource);
+        return $this->getStatusFromApi($this->languageResource, $tmName);
+    }
+
+    private function getStatusFromApi(LanguageResource $languageResource, ?string $tmName): string
+    {
+        $name = $tmName ?: $this->persistenceService->getWritableMemory($languageResource);
 
         if (empty($name)) {
             $this->lastStatusInfo = 'The internal stored filename is invalid';
@@ -1743,7 +1752,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         // At current point LR is in Import status to prevent race conditions
         // Here we resetting state to fetch the actual status from t5memory
         $this->languageResource->setStatus(LanguageResourceStatus::NOTCHECKED);
-        $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
+        $status = $this->getStatusFromApi($this->languageResource, $tmName);
         $error = $this->api->getError();
 
         // In case we've got memory overflow error we need to create another memory and import further
@@ -1762,7 +1771,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return $this->importTmxIntoMemory($importFilename, $newName, $stripFramingTags);
         }
 
-        return $successful;
+        return $successful && $status !== LanguageResourceStatus::ERROR;
     }
 
     private function cutOffTmx(string $importFilename, int $segmentToStartFrom): void
@@ -1866,10 +1875,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         if (empty($memories)) {
             return $this->generateTmFilename($languageResource);
-        }
-
-        if (count($memories) === 1) {
-            return $this->generateTmFilename($languageResource) . '_next-1';
         }
 
         $pattern = '/_next-(\d+)/';

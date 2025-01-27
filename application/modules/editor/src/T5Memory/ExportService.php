@@ -35,7 +35,6 @@ use editor_Services_Connector_Exception as ConnectorException;
 use Generator;
 use GuzzleHttp\Client;
 use LogicException;
-use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
@@ -49,8 +48,6 @@ use ZipArchive;
 
 class ExportService
 {
-    private const T5N_TAG_FILTER = 'fix-t5n-tag';
-
     private const CHUNKSIZE = 1000;
 
     public function __construct(
@@ -190,8 +187,6 @@ class ExportService
         $writtenElements = 0;
         $atLeastOneFileRead = false;
 
-        stream_filter_register(self::T5N_TAG_FILTER, T5NTagSchemaFixFilter::class);
-
         yield '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
 
         $exceptionWasThrown = false;
@@ -309,12 +304,15 @@ class ExportService
             return null;
         }
 
+        // suppress: namespace error : Namespace prefix t5 on n is not defined
+        $errorLevel = error_reporting();
+        error_reporting($errorLevel & ~E_WARNING);
+
         while ($reader->read()) {
             if ($reader->nodeType === XMLReader::ELEMENT && $reader->name === 'tu') {
                 $writtenElements++;
 
-                // suppress: namespace error : Namespace prefix t5 on n is not defined
-                yield $this->conversionService->convertT5MemoryTagToContent(@$reader->readOuterXML()) . PHP_EOL;
+                yield $this->conversionService->convertT5MemoryTagToContent($reader->readOuterXML()) . PHP_EOL;
             }
 
             if (! $returnHeader) {
@@ -344,6 +342,8 @@ class ExportService
                 yield $openingPart . PHP_EOL;
             }
         }
+
+        error_reporting($errorLevel);
 
         $reader->close();
     }

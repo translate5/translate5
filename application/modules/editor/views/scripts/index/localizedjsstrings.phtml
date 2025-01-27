@@ -1867,7 +1867,8 @@ Ext.define('Editor.controller.Localizer', {
                 novalidlicense: '<?php echo $this->translate->_('Keine gültige Lizenz.');?>',
                 tuninginprogress: '<?php echo $this->translate->_('Wird trainiert');?>',
                 reorganize_in_progress: '<?php echo $this->translate->_('Wird reorganisiert');?>',
-                reorganize_failed: '<?php echo $this->translate->_('Reorganisation gescheitert');?>'
+                reorganize_failed: '<?php echo $this->translate->_('Reorganisation gescheitert');?>',
+                converting: '<?php echo $this->translate->_('language_resource.status.converting');?>',
             },
             taskassocgridcell: '<?php echo $this->translate->_('Aufgaben anzeigen, die diese Sprachressource verwenden');?>',
             customers: '<?php echo $this->translate->_('Kunden');?>',
@@ -2407,7 +2408,19 @@ etc.')?>'
         addEditWindow:{
             notValidPasswordDefaultMessage:'<?php echo $this->translate->_('Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.');?>'
         },
-        user: '<?= $this->translate->_('Benutzername') ?>'
+        user: '<?= $this->translate->_('Benutzername') ?>',
+        filterPreset: {
+            create: {
+                text: '<?= $this->translate->_('Aktive Filter speichern') ?>',
+                tooltip: '<?= $this->translate->_('Speichert die aktiven Filter als eigenen Filtersatz. Sie werden aufgefordert, einen eindeutigen Namen einzugeben, der dann in der Auswahlliste "Eigene Filtersätze" ausgewählt werden kann. Um einen Filtersatz zu löschen, wenden Sie ihn an und klicken Sie auf "Aktuell ausgewählten Filtersatz löschen".') ?>',
+                window: '<?= $this->translate->_('Bitte geben Sie einen Namen für das aktuell angewendete Filterset ein, das Sie für die spätere Verwendung speichern möchten. Dieser Name muss pro Registerkarte eindeutig sein und wird dann in der Auswahlliste "Eigene Filtersätze" angezeigt.') ?>',
+            },
+            delete: '<?= $this->translate->_('Aktuell ausgewählten Filtersatz löschen') ?>',
+            choices: {
+                label: '<?= $this->translate->_('Eigene Filtersätze') ?>',
+                tooltip: '<?= $this->translate->_('Klicken Sie auf "Aktive Filter speichern" um einen eigenen Filtersatz anzulegen.') ?>',
+            }
+        }
     },
     clients: {
         tooltip: '<?= $this->translate->_('Zur Kundenliste wechseln') ?>',

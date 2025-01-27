@@ -116,6 +116,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $this->setResourceType($resource->getType());
     }
 
+    public function isConversionInProgress(): bool
+    {
+        return $this->getSpecificData(self::PROTECTION_CONVERSION_STARTED) !== null;
+    }
+
     // region Repository methods
     /**
      * Load all resources for all available services
@@ -168,7 +173,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         string $type,
         string $name,
         array $data,
-        editor_Models_Task $task
+        editor_Models_Task $task,
     ): array {
         $s = $this->db
             ->select()
@@ -212,7 +217,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         array $types,
         int $sourceLangId,
         int $targetLangId,
-        bool $respectCustomerRestriction = true
+        bool $respectCustomerRestriction = true,
     ): array {
         // first, evaluate the fuzzy languages
         $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
@@ -263,7 +268,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function getByServicenamesAndLanguages(
         array $serviceNames,
         int $sourceLangId,
-        int $targetLangId
+        int $targetLangId,
     ): array {
         $select = $this->createGetByXyzSelect($sourceLangId, $targetLangId);
 
@@ -281,7 +286,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public function getByLanguages(
         int $sourceLangId,
-        int $targetLangId
+        int $targetLangId,
     ): array {
         $select = $this->createGetByXyzSelect($sourceLangId, $targetLangId);
 
@@ -297,7 +302,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     protected function createGetByXyzSelect(
         int $sourceLangId,
-        int $targetLangId
+        int $targetLangId,
     ): Zend_Db_Table_Select {
         // first, evaluate the fuzzy languages
         $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
@@ -364,7 +369,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function getByResourceIdFilteredByLanguageCodes(
         string $resourceId,
         string $sourceLanguageCode,
-        string $targetLanguageCode
+        string $targetLanguageCode,
     ): array {
         $s = $this->db
             ->select()
@@ -469,7 +474,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         array $serviceNames = [],
         array $sourceLang = [],
         array $targetLang = [],
-        array $serviceTypes = []
+        array $serviceTypes = [],
     ): array {
         $customers = ZfExtended_Authentication::getInstance()->getUser()?->getCustomersArray();
 
@@ -624,7 +629,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
 
     /**
-     * loads the language resources to a specific service resource ID (language resource to a specific server (=resource))
+     * loads the language resources to a specific service resource ID (language resource to a specific server
+     * (=resource))
      * @return array
      */
     public function loadByResourceId(string $serviceResourceId)
@@ -635,7 +641,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
 
     /**
-     * loads the language resources to a specific service resource ID (language resource to a specific server (=resource))
+     * loads the language resources to a specific service resource ID (language resource to a specific server
+     * (=resource))
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function loadByUuid(string $uuid): ?Zend_Db_Table_Row_Abstract

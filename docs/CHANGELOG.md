@@ -28,6 +28,98 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [7.18.0] - 2025-01-27
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4404](https://jira.translate5.net/browse/TRANSLATE-4404): Task Management - translate5 Plunet Connector** <br>
+Integrates translate5 with Plunet for project creation, user assignments to tasks, job status, workflow and transfer of files back and forth.
+
+**[TRANSLATE-4321](https://jira.translate5.net/browse/TRANSLATE-4321): openai - Use GPT in Azure Cloud with OpenAI Plug-in** <br>
+OpenAI plugin now supports Azure OpenAI cloud
+
+
+### Changed
+**[TRANSLATE-4375](https://jira.translate5.net/browse/TRANSLATE-4375): Workflows - Remove changes.xlf creation** <br>
+h1. problem
+
+The feature of creating changes.xlf is outdated in code (producing errors sometime, especially the differ). Also the feature is disabled by default.
+h1. solution
+
+The feature will be removed. Removing means: 
+ * removing the configs related to that
+ * removing the Action / Notification code creating the changes.xlf with Xliff1.2
+ * Keep the Xliff2 stuff if TrackChanges based differ is used
+ * Keeping the XlfConverter and the CLI itself
+ * check usage of the related differs, may be removed too
+ * SUMMARY TO ANSWER missing questions above: goal is to remove the non TrackChanges based differs used for above file creation. Changes.xlf in Notifications is probably nowhere used anymore
+
+**[TRANSLATE-4077](https://jira.translate5.net/browse/TRANSLATE-4077): usability language resources, usability task overview - Possibilty to save filter sets** <br>
+Added ability to save filters sets for further reuse
+
+
+### Bugfixes
+**[TRANSLATE-4409](https://jira.translate5.net/browse/TRANSLATE-4409): t5memory - t5memory: On TMX import process if error happens code reacts incorrectly** <br>
+t5memory: fix import error handling
+
+**[TRANSLATE-4324](https://jira.translate5.net/browse/TRANSLATE-4324): Import/Export - Self closing mrk in sdlxliff gets always same tag number** <br>
+Fix for a problem where tag check will complain about duplicate tags in segment with multiple self closing mrks.
+
+
+## [7.17.1] - 2025-01-24
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4407](https://jira.translate5.net/browse/TRANSLATE-4407): TrackChanges - Update text differ** <br>
+Update text differ package
+
+**[TRANSLATE-4393](https://jira.translate5.net/browse/TRANSLATE-4393): usability task overview - Add number of tasks affected in batch set warning** <br>
+Added number of tasks affected for filter-based selection in batch set warning
+
+**[TRANSLATE-4390](https://jira.translate5.net/browse/TRANSLATE-4390): t5memory - Change reimport segments behaviour** <br>
+Automatic task to t5memory reimport now saves all segments, but not only edited by user.
+
+**[TRANSLATE-4105](https://jira.translate5.net/browse/TRANSLATE-4105): VisualReview / VisualTranslation - FIX several smaller quirks** <br>
+IMPROVEMENT Visual: Fix several smaller quirks in the reflow-detection
+
+
+### Bugfixes
+**[TRANSLATE-4396](https://jira.translate5.net/browse/TRANSLATE-4396): LanguageResources - Language resource import status check problem** <br>
+FIXED: un-triggered import status check for added languageresources
+
+**[TRANSLATE-4395](https://jira.translate5.net/browse/TRANSLATE-4395): TM Maintenance - Missing check for field existence in TM Maintenance** <br>
+TM Maintenance: Fix PHP Warning: Undefined array key "additionalInfo"
+
+**[TRANSLATE-4391](https://jira.translate5.net/browse/TRANSLATE-4391): t5memory - Error occures if no segments for reimport** <br>
+Fixed error that was occurring if there were no segments for reimport after task workflow is ended
+
+**[TRANSLATE-4388](https://jira.translate5.net/browse/TRANSLATE-4388): openai - OpenAI: Retrieving Terminology for OpenAI may crashes Termtagger** <br>
+FIX: Retrieving segment terminology in OpenAI pretranslation may crashes termtagger
+
+**[TRANSLATE-4387](https://jira.translate5.net/browse/TRANSLATE-4387): LanguageResources - Rights problem for language resources to customers associations** <br>
+FIXED: whole app contantly reloading for Editor-only users
+
+**[TRANSLATE-4385](https://jira.translate5.net/browse/TRANSLATE-4385): LanguageResources - DeepL plugin: Attempt to use glossary with language pair that not supports them** <br>
+DeepL plugin: validate language pairs to ability to use glossaries
+
+**[TRANSLATE-4384](https://jira.translate5.net/browse/TRANSLATE-4384): Content Protection - wrong warning with TM conversion** <br>
+Content protection: adjust warning message
+
+**[TRANSLATE-4383](https://jira.translate5.net/browse/TRANSLATE-4383): Hotfolder Import - Hotfolder will import projects from wrong folder** <br>
+Hotfolder: download files from Import folder only
+
+**[TRANSLATE-4381](https://jira.translate5.net/browse/TRANSLATE-4381): TM Maintenance - Scrolling problem** <br>
+FIXED: error popping on loading 2nd page of TMMaintenance search results
+
+
 ## [7.17.0] - 2025-01-17
 
 ### Important Notes:

@@ -37,7 +37,9 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use RuntimeException;
 use XMLReader;
 use XMLWriter;
@@ -59,7 +61,8 @@ class TmConversionService implements TmConversionServiceInterface
         private readonly ContentProtectionRepository $contentProtectionRepository,
         private readonly ContentProtector $contentProtector,
         private readonly LanguageRepository $languageRepository,
-        private readonly LanguageRulesHashService $languageRulesHashService
+        private readonly LanguageRulesHashService $languageRulesHashService,
+        private readonly LanguageResourceRepository $languageResourceRepository,
     ) {
         $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
         $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
@@ -76,6 +79,7 @@ class TmConversionService implements TmConversionServiceInterface
             ContentProtector::create($whitespace ?: ZfExtended_Factory::get(Whitespace::class)),
             $languageRepository,
             new LanguageRulesHashService($contentProtectionRepository, $languageRepository),
+            new LanguageResourceRepository(),
         );
     }
 
@@ -140,11 +144,13 @@ class TmConversionService implements TmConversionServiceInterface
 
     public function startConversion(int $languageResourceId): void
     {
-        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
-        $languageResource->load($languageResourceId);
+        $languageResource = $this->languageResourceRepository->get($languageResourceId);
 
         $languageResource->addSpecificData(LanguageResource::PROTECTION_CONVERSION_STARTED, date('Y-m-d H:i:s'));
-        $languageResource->save();
+        // set status to import to block interactions with the language resource
+        $languageResource->setStatus(Status::IMPORT);
+
+        $this->languageResourceRepository->save($languageResource);
 
         $worker = ZfExtended_Factory::get(ConverseMemoryWorker::class);
         if ($worker->init(parameters: [
@@ -269,6 +275,10 @@ class TmConversionService implements TmConversionServiceInterface
         $writtenElements = 0;
         $brokenTus = 0;
 
+        // suppress: namespace error : Namespace prefix t5 on n is not defined
+        $errorLevel = error_reporting();
+        error_reporting($errorLevel & ~E_WARNING);
+
         while ($reader->read()) {
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
                 $writer->writeRaw($reader->readOuterXML());
@@ -305,6 +315,8 @@ class TmConversionService implements TmConversionServiceInterface
             }
         }
 
+        error_reporting($errorLevel);
+
         $reader->close();
 
         $writer->flush();
@@ -334,11 +346,10 @@ class TmConversionService implements TmConversionServiceInterface
         string $transUnit,
         Language $sourceLang,
         Language $targetLang,
-        int &$brokenTus
+        int &$brokenTus,
     ): string {
         $transUnit = $this->convertT5MemoryTagToContent($transUnit);
         $numberTagMap = [];
-        $sourceLangMajor = $sourceLang->getMajorRfc5646();
 
         $sourceSegment = '';
         $targetSegment = '';
@@ -359,7 +370,7 @@ class TmConversionService implements TmConversionServiceInterface
 
             $segment = str_replace(['<seg>', '</seg>'], '', trim($xml->readInnerXml()));
 
-            if (str_contains($lang, $sourceLangMajor)) {
+            if ($this->isSourceTuv($lang, $sourceLang, $targetLang)) {
                 $sourceSegment = $segment;
                 $transUnit = str_replace($tuv, str_replace($sourceSegment, '*source*', $tuv), $transUnit);
             } else {
@@ -407,5 +418,18 @@ class TmConversionService implements TmConversionServiceInterface
             ],
             $transUnit
         );
+    }
+
+    private function isSourceTuv(string $tuvLang, Language $sourceLang, Language $targetLang): bool
+    {
+        if (strtolower($sourceLang->getRfc5646()) === $tuvLang) {
+            return true;
+        }
+
+        if (strtolower($targetLang->getRfc5646()) === $tuvLang) {
+            return false;
+        }
+
+        return str_contains($tuvLang, strtolower($sourceLang->getMajorRfc5646()));
     }
 }

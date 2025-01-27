@@ -289,6 +289,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             ptype: 'gridfilters'
                         }
                     ],
+                    activateGridColumnFilter: Editor.view.admin.TaskGrid.prototype.activateGridColumnFilter,
+                    getColumnFilter: Editor.view.admin.TaskGrid.prototype.getColumnFilter,
                     columns: [
                         {
                             xtype: 'gridcolumn',

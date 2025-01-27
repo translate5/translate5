@@ -41,6 +41,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         'Editor.view.admin.customer.CustomerFilter',
         'Editor.view.LanguageResources.TmOverviewViewController',
         'Editor.view.LanguageResources.TermCollectionExportActionMenu',
+        'Editor.view.admin.TaskGrid',
     ],
     alias: 'widget.tmOverviewPanel',
     controller: 'tmOverviewPanel',
@@ -76,6 +77,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             tuninginprogress: '#UT#Wird trainiert',
             reorganize_in_progress: '#UT#Wird reorganisiert',
             reorganize_failed: '#UT#Reorganisation gescheitert',
+            converting: '#UT#language_resource.status.converting',
         },
         customers: '#UT#Kunden',
         useAsDefault: '#UT#Leserechte standardmäßig',
@@ -753,4 +755,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
         return '';
     },
+}, function() {
+    this.borrow(Editor.view.admin.TaskGrid, ['activateGridColumnFilter', 'getColumnFilter']);
 });

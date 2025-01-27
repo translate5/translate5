@@ -59,7 +59,13 @@ Ext.define('Editor.view.admin.user.GridViewController', {
             }
         }
     },
-    
+    requires: ['Editor.view.mixin.UserFilterPresetable'],
+    mixins: {
+        userFilterPresetable: 'Editor.view.mixin.UserFilterPresetable'
+    },
+    init: function(view) {
+        this.mixins.userFilterPresetable.init(this, view);
+    },
     routes: {
         'user': 'onUserRoute'
     },

@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use editor_Models_Import_FileParser_Sdlxliff_TagMappingConfig as TagMappingConfig;
 use editor_Models_Import_FileParser_Sdlxliff_TransunitParser as TransunitParser;
 
 /**
@@ -63,8 +64,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 
     public const TARGET = 'target';
 
-    public const SINGLE_MARK_ID = 'singleMark';
-
     /**
      * Points to comment location/source. In this case it means that the comment is on transunit level, and it is not
      * segment specific.
@@ -73,67 +72,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 
     public const USERGUID = 'sdlxliff-imported';
 
-    /**
-     * @var array maps all tag references in the header of the sdlxliff file within
-     *      <tag-defs><tag></tag></tag-defs> to the tags in segments of the sdlxliff
-     *      that reference them. The reference is always the first child of tag
-     *      according to the sdlxliff logic.
-     *      Also used to check whether tag names are used in the segments or in the header
-     *      that are not considered by this sdlxliff file parser.
-     */
-    protected $_tagDefMapping = [
-        'bpt' => 'g',
-        'ph' => 'x',
-        'st' => 'x',
-        'mrk' => 'mrk',
-        'pairedTag' => 'pairedTag',
-    ];
+    protected array $_tagDefMapping = TagMappingConfig::TAG_DEF_MAPPING;
 
-    /**
-     * defines the GUI representation of internal used tags
-     * Mapping von tagId zu Name und anzuzeigendem Text fuer den Nutzer
-     *
-     *  - kann in der Klassenvar-Def. bereits Inhalte enthalten, die für spezielle
-     *    Zwecke benötigt werden und nicht dynamisch aus der sdlxliff-Datei kommen.
-     *
-     *    Beispiel bpt:
-     *    [1192]=>
-     *     array(6) {
-     *       ["name"]=>
-     *       string(3) "bpt"
-     *       ["text"]=>
-     *       string(44) "&lt;cf style=&quot;z_AS_disclaimer&quot;&gt;"
-     *       ["eptName"]=>
-     *       string(3) "ept"
-     *       ["eptText"]=>
-     *       string(11) "&lt;/cf&gt;"
-     *       ["imgEptText"]=>
-     *       string(5) "</cf>"
-     *     }
-     *    Beispiel ph:
-     *     [0]=>
-     *      array(3) {
-     *        ["name"]=>
-     *        string(2) "ph"
-     *        ["text"]=>
-     *        string(58) "&lt;format type=&quot;&amp;lt;fullPara/&amp;gt;&quot;/&gt;"
-     *      }
-     *
-     * @var array array('tagId' => array('text' => string '',['eptName' => string '', 'eptText' => string
-     *      '','imgEptText' => string '']),'tagId2' => ...)
-     * /
-     */
-    protected array $_tagMapping = [
-        self::SINGLE_MARK_ID => [
-            'text' => '&lt;InternalReference/&gt;',
-        ],
-        'mrkPaired' => [
-            'text' => '&lt;InternalReference&gt;',
-            'eptName' => 'ept',
-            'eptText' => '&lt;/InternalReference&gt;',
-            'imgEptText' => '</InternalReference>',
-        ],
-    ];
+    protected array $_tagMapping = TagMappingConfig::DEFAULT_TAG_MAPPING;
 
     protected TransunitParser $transunitParser;
 
@@ -789,10 +730,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     {
         if ($tagName == 'mrk') {
             if (preg_match('"<mrk [^>]*[^/]>"', $tag)) {
-                return 'mrkPaired';
+                return TagMappingConfig::TAG_MRK_PAIRED;
             }
 
-            return self::SINGLE_MARK_ID;
+            return TagMappingConfig::TAG_MRK_SINGLE;
         }
 
         return preg_replace('"<.* id=\"([^\"]*)\".*>"', '\\1', $tag);
@@ -1063,8 +1004,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 
         $shortTagIdent = null;
 
-        if (self::SINGLE_MARK_ID === $tagId) {
-            $shortTagIdent = $data->j++;
+        if (TagMappingConfig::TAG_MRK_SINGLE === $tagId) {
+            $shortTagIdent = $data->j;
         } elseif (! isset($this->tagIdShortTagIdentMap[$tagId])) {
             $this->tagIdShortTagIdentMap[$tagId] = $data->j++;
         }

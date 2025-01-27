@@ -70,14 +70,28 @@ trait editor_Controllers_Traits_ControllerTrait
         // Get answer
         $answer = $this->getParam('answer' . $answerIdx);
 
+        // Get translate instance
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+
         // If no answer, flush confirmation prompt
         if (! $answer) {
-            editor_Utils::jconfirm(is_array($msg) ? join('<br>', $msg) : $msg, $buttons);
+            // If $msg arg is not array - convert
+            if (! is_array($msg)) {
+                $msg = [$msg];
+            }
+
+            // Foreach phrase in $msg - translate
+            foreach ($msg as &$phrase) {
+                $phrase = $translate->_($phrase);
+            }
+
+            // Show confirmation prompt
+            editor_Utils::jconfirm(join('<br>', $msg), $buttons);
         }
 
         // If answer is 'cancel' - stop request processing
         elseif ($answer == 'cancel') {
-            $this->jflush(false, $cancelMsg);
+            $this->jflush(false, $translate->_($cancelMsg));
         }
 
         // Return answer

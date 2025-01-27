@@ -217,6 +217,17 @@ Ext.override(Ext.grid.column.Column, {
         this.titleEl.dom.setAttribute('data-qtip', this.tooltip = tooltip);
     }
 });
+Ext.override(Ext.form.field.ComboBox, {
+
+    /**
+     * This method is added for ability to make column's tooltip-config bindable
+     *
+     * @param tooltip
+     */
+    setTooltip: function(tooltip) {
+        this.el.dom.setAttribute('data-qtip', this.tooltip = tooltip);
+    }
+});
 
 /**
  * Overridden to render tooltip as a value of data-qtip attribute
