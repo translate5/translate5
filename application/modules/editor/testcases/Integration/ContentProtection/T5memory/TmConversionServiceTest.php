@@ -7,6 +7,7 @@ use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
 
 class TmConversionServiceTest extends TestCase
@@ -51,12 +52,14 @@ class TmConversionServiceTest extends TestCase
         );
 
         $contentProtector->method('unprotect')->willReturnCallback(fn (string $segment) => $segment);
+        $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
         $service = new TmConversionService(
             $contentProtectionRepository,
             $contentProtector,
             $languageRepository,
-            $languageRulesHashService
+            $languageRulesHashService,
+            $languageResourceRepository
         );
 
         $file = $service->convertTMXForImport(__DIR__ . '/TmConversionServiceTest/small.tmx', 1, 2);

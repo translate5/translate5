@@ -37,7 +37,9 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use RuntimeException;
 use XMLReader;
 use XMLWriter;
@@ -60,6 +62,7 @@ class TmConversionService implements TmConversionServiceInterface
         private readonly ContentProtector $contentProtector,
         private readonly LanguageRepository $languageRepository,
         private readonly LanguageRulesHashService $languageRulesHashService,
+        private readonly LanguageResourceRepository $languageResourceRepository,
     ) {
         $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
         $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
@@ -76,6 +79,7 @@ class TmConversionService implements TmConversionServiceInterface
             ContentProtector::create($whitespace ?: ZfExtended_Factory::get(Whitespace::class)),
             $languageRepository,
             new LanguageRulesHashService($contentProtectionRepository, $languageRepository),
+            new LanguageResourceRepository(),
         );
     }
 
@@ -140,11 +144,13 @@ class TmConversionService implements TmConversionServiceInterface
 
     public function startConversion(int $languageResourceId): void
     {
-        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
-        $languageResource->load($languageResourceId);
+        $languageResource = $this->languageResourceRepository->get($languageResourceId);
 
         $languageResource->addSpecificData(LanguageResource::PROTECTION_CONVERSION_STARTED, date('Y-m-d H:i:s'));
-        $languageResource->save();
+        // set status to import to block interactions with the language resource
+        $languageResource->setStatus(Status::IMPORT);
+
+        $this->languageResourceRepository->save($languageResource);
 
         $worker = ZfExtended_Factory::get(ConverseMemoryWorker::class);
         if ($worker->init(parameters: [
