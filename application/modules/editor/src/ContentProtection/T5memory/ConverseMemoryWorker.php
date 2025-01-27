@@ -35,6 +35,7 @@ use editor_Services_Manager;
 use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
+use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\ExportService;
 use ZfExtended_Factory;
@@ -165,7 +166,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                 return false;
             }
 
-            unlink($exportFilename);
+            @unlink($exportFilename);
         }
 
         $onMemoryDeleted = fn ($filename) =>
@@ -204,6 +205,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
     private function resetConversionStarted(): void
     {
         $this->languageResource->addSpecificData(LanguageResource::PROTECTION_CONVERSION_STARTED, null);
+        // set status to import to block interactions with the language resource
+        $this->languageResource->setStatus(Status::NOTCHECKED);
         $this->languageResourceRepository->save($this->languageResource);
     }
 }

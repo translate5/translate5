@@ -7,6 +7,7 @@ use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
 
 class TmConversionServiceTest extends TestCase
@@ -20,12 +21,14 @@ class TmConversionServiceTest extends TestCase
         $contentProtector = $this->createMock(ContentProtector::class);
         $languageRepository = $this->createMock(LanguageRepository::class);
         $languageRulesHashService = $this->createMock(LanguageRulesHashService::class);
+        $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
         $service = new TmConversionService(
             $contentProtectionRepository,
             $contentProtector,
             $languageRepository,
-            $languageRulesHashService
+            $languageRulesHashService,
+            $languageResourceRepository,
         );
 
         $actual = $service->convertT5MemoryTagToContent($t5memorySegment);
