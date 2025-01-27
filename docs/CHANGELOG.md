@@ -29,6 +29,48 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.18.0] - 2025-01-27
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4404](https://jira.translate5.net/browse/TRANSLATE-4404): Task Management - translate5 Plunet Connector** <br>
+Integrates translate5 with Plunet for project creation, user assignments to tasks, job status, workflow and transfer of files back and forth.
+
+**[TRANSLATE-4321](https://jira.translate5.net/browse/TRANSLATE-4321): openai - Use GPT in Azure Cloud with OpenAI Plug-in** <br>
+OpenAI plugin now supports Azure OpenAI cloud
+
+
+### Changed
+**[TRANSLATE-4375](https://jira.translate5.net/browse/TRANSLATE-4375): Workflows - Remove changes.xlf creation** <br>
+h1. problem
+
+The feature of creating changes.xlf is outdated in code (producing errors sometime, especially the differ). Also the feature is disabled by default.
+h1. solution
+
+The feature will be removed. Removing means: 
+ * removing the configs related to that
+ * removing the Action / Notification code creating the changes.xlf with Xliff1.2
+ * Keep the Xliff2 stuff if TrackChanges based differ is used
+ * Keeping the XlfConverter and the CLI itself
+ * check usage of the related differs, may be removed too
+ * SUMMARY TO ANSWER missing questions above: goal is to remove the non TrackChanges based differs used for above file creation. Changes.xlf in Notifications is probably nowhere used anymore
+
+**[TRANSLATE-4077](https://jira.translate5.net/browse/TRANSLATE-4077): usability language resources, usability task overview - Possibilty to save filter sets** <br>
+Added ability to save filters sets for further reuse
+
+
+### Bugfixes
+**[TRANSLATE-4409](https://jira.translate5.net/browse/TRANSLATE-4409): t5memory - t5memory: On TMX import process if error happens code reacts incorrectly** <br>
+t5memory: fix import error handling
+
+**[TRANSLATE-4324](https://jira.translate5.net/browse/TRANSLATE-4324): Import/Export - Self closing mrk in sdlxliff gets always same tag number** <br>
+Fix for a problem where tag check will complain about duplicate tags in segment with multiple self closing mrks.
+
+
 ## [7.17.1] - 2025-01-24
 
 ### Important Notes:
