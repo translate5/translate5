@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmOverviewPanel',
+    requires: ['Editor.view.mixin.UserFilterPresetable'],
     routes: {
         languageresource: 'onTmOverviewRoute',
     },
@@ -43,6 +44,12 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
                 click: (menuitem) => menuitem.masterComponent.fireEvent('click'),
             },
         },
+    },
+    mixins: {
+        userFilterPresetable: 'Editor.view.mixin.UserFilterPresetable'
+    },
+    init: function(view) {
+        this.mixins.userFilterPresetable.init(this, view);
     },
     onTmOverviewRoute: function () {
         Editor.app.openAdministrationSection(this.getView());

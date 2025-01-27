@@ -29,12 +29,19 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.project.ProjectGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.projectGrid',
+    requires: ['Editor.view.mixin.UserFilterPresetable'],
     strings: {
     	deleteProjectDialogTitle:'#UT#Projekt "{0}" komplett löschen?',
     	deleteProjectDialogMessage:'#UT#Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?',
     	projectDeleteButtonText:'#UT#Projekt löschen',
     	projectCanceltButtonText:'#UT#Nein',
     	projectRemovedMessage:'#UT#Das Projekt "{0}" wurde erfolgreich entfernt!'
+    },
+    mixins: {
+        userFilterPresetable: 'Editor.view.mixin.UserFilterPresetable'
+    },
+    init: function(view) {
+        this.mixins.userFilterPresetable.init(this, view);
     },
     listen: {
         messagebus: {
@@ -43,9 +50,6 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             }
         },
         component:{
-            '#resetFilterBtn':{
-                click:'onResetFilterButtonClick'
-            },
             '#onlyMyProjects': {
                 click: 'onlyMyProjectsClick'
             },
@@ -125,13 +129,6 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         button.setPressed(pressed);
     },
 
-    /***
-     * Reset filter button click handler
-     */
-    onResetFilterButtonClick:function(){
-        this.getView().getPlugin('gridfilters').clearFilters();
-    },
-    
     /***
      * Delete project button handler
      */
@@ -252,5 +249,5 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
      */
     onAddProjectBtnDrop: function (e){
         Editor.app.getController('admin.TaskOverview').openWindowWithFilesDrop(e);
-    }
+    },
 });

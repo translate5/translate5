@@ -36,6 +36,7 @@ use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\NoJobFoundException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\Translate5\User\FilterPreset;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource as BaseRoles;
 use MittagQI\ZfExtended\CsrfProtection;
 
@@ -552,6 +553,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
 
         $userData['roles'] = array_values($userData['roles']);
+
+        // Load filter presets for current user, but grouped by panel
+        $userData['filterPreset'] = ZfExtended_Factory::get(FilterPreset::class)
+            ->loadByUserIdGroupedByPanel($userData['id']);
 
         $php2js->set('app.user', $userData);
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));

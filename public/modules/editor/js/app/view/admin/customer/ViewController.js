@@ -29,12 +29,16 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.customer.ViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.customerPanel',
-
+    requires: ['Editor.view.mixin.UserFilterPresetable'],
     routes: {
         'client': 'onClientRoute'
     },
-
-
+    mixins: {
+        userFilterPresetable: 'Editor.view.mixin.UserFilterPresetable'
+    },
+    init: function(view) {
+        this.mixins.userFilterPresetable.init(this, view);
+    },
     listen:{
         controller: {
             '#Editor.$application': {

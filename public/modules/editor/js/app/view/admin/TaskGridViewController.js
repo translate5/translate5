@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.TaskGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskGrid',
+    requires: ['Editor.view.mixin.UserFilterPresetable'],
     routes: {
         //INFO: this route will filter the task in the task grid
         //add another route for open task for editing
@@ -53,6 +54,12 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
                 click: menuitem => menuitem.masterComponent.fireEvent('click')
             }
         }
+    },
+    mixins: {
+        userFilterPresetable: 'Editor.view.mixin.UserFilterPresetable'
+    },
+    init: function(view) {
+        this.mixins.userFilterPresetable.init(this, view);
     },
 
     onTriggerTaskReload: function(params) {

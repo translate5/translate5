@@ -31,7 +31,8 @@ Ext.define('Editor.view.admin.user.Grid', {
   requires: [
       'Editor.view.CheckColumn',
       'Editor.view.admin.user.GridViewController',
-      'Editor.view.admin.user.AddWindow'
+      'Editor.view.admin.user.AddWindow',
+      'Editor.view.admin.TaskGrid',
   ],
   alias: 'widget.adminUserGrid',
   plugins: ['gridfilters'],
@@ -263,4 +264,6 @@ Ext.define('Editor.view.admin.user.Grid', {
         metaData.tdAttr = 'data-qtip="' +fullLang.join('<br/>')+ '"';
         return label.join(', ');
     }
+}, function() {
+    this.borrow(Editor.view.admin.TaskGrid, ['activateGridColumnFilter', 'getColumnFilter']);
 });
