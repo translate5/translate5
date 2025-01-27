@@ -70,7 +70,7 @@ class TaskPenaltyDataProvider
     public function getPenalties(string $taskGuid, int $langresId, ?array $langPairOfTheMatch = null): array
     {
         // If meta for the given $taskGuid is not cached so far - prepare it and cache
-        if ($this->sublangPenaltyMeta[$taskGuid] === null) {
+        if (! isset($this->sublangPenaltyMeta[$taskGuid])) {
             $task = $this->taskRepository->getByGuid($taskGuid);
 
             // Load meta data containing single sublanguage and penalties for each possible and existing task<=>langres assoc

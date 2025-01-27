@@ -65,6 +65,10 @@ class CoordinatorGroupUserJobAssert implements PermissionAssertInterface
 
     public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
+        if ($object->getUserGuid() === $context->actor->getUserGuid() && UserJobAction::Read === $action) {
+            return;
+        }
+
         if ($object->isCoordinatorGroupJob()) {
             return;
         }
