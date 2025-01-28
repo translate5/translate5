@@ -30,6 +30,18 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.18.1] - 2025-01-28
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4415](https://jira.translate5.net/browse/TRANSLATE-4415): Authentication - fixes for Plugin PlunetConnector** <br>
+Plugin PlunetConnector: Login does not work for users with existing (old) App token
+
+
 ## [7.18.0] - 2025-01-27
 
 ### Important Notes:
