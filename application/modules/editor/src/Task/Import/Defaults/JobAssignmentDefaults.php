@@ -100,7 +100,7 @@ class JobAssignmentDefaults implements ITaskDefaults
             }
         }
 
-        foreach ($this->defaultUserJobRepository->getDefaultCoordinatorGroupJobsForTask($task) as $defaultUserJob) {
+        foreach ($this->defaultUserJobRepository->getDefaultUserJobsForTask($task) as $defaultUserJob) {
             try {
                 $this->assignUserJob($defaultUserJob, $taskConfig, $task);
             } catch (Throwable $e) {

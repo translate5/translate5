@@ -179,7 +179,7 @@ class DefaultUserJobRepository
     /**
      * @return iterable<DefaultUserJob>
      */
-    public function getDefaultCoordinatorGroupJobsForTask(Task $task): iterable
+    public function getDefaultUserJobsForTask(Task $task): iterable
     {
         $select = $this->db
             ->select()
@@ -196,7 +196,6 @@ class DefaultUserJobRepository
             ->where('defaultUserJob.customerId = ?', $task->getCustomerId())
             ->where('defaultUserJob.sourceLang = ?', $task->getSourceLang())
             ->where('defaultUserJob.targetLang = ?', $task->getTargetLang())
-            ->where('defaultUserJob.workflow = ?', $task->getWorkflow())
             ->where('defaultLspJob.dataJobId IS NULL')
         ;
 
