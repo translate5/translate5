@@ -16,10 +16,6 @@
       "Translate5\\MaintenanceCli\\": "Translate5/MaintenanceCli",
       "Translate5\\PHPCodeSniffer\\": "PHPCodeSniffer",
       "MittagQI\\Translate5\\Test\\": "application/modules/editor/testcases"
-    },
-    "psr-0": {
-      "editor": "application/modules/",
-      "ZfExtended": "library/"
     }
   },
   "repositories": [
