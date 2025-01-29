@@ -26,7 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -43,6 +46,8 @@ class Editor_FiletreeController extends ZfExtended_RestController
      */
     protected $entity;
 
+    private TaskActionPermissionAssert $taskActionPermissionAssert;
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
@@ -51,6 +56,8 @@ class Editor_FiletreeController extends ZfExtended_RestController
     public function init()
     {
         parent::init();
+
+        $this->taskActionPermissionAssert = TaskActionPermissionAssert::create();
     }
 
     /**
@@ -97,11 +104,15 @@ class Editor_FiletreeController extends ZfExtended_RestController
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);
 
-        $isPm = $task->getPmGuid() === ZfExtended_Authentication::getInstance()->getUserGuid();
+        $userRepository = new UserRepository();
 
-        $mayLoadAllTasks = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS) || ($isPm);
+        $accessGranted = $this->taskActionPermissionAssert->isGranted(
+            TaskAction::Read,
+            $this->entity,
+            new PermissionAssertContext($userRepository->get(ZfExtended_Authentication::getInstance()->getUserId()))
+        );
 
-        if ($mayLoadAllTasks === false) {
+        if (! $accessGranted) {
             $this->view->rows = [];
 
             return;

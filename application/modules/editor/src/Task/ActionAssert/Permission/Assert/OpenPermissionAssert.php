@@ -96,8 +96,10 @@ class OpenPermissionAssert implements PermissionAssertInterface
             $object->getWorkflowStepName(),
         );
 
+        $noValidJob = null === $job || $job->getIsPmOverride();
+
         // granted is only true, if the current manager has no job assignment directly.
-        $granted = $granted && (null === $job || $job->getIsPmOverride());
+        $granted = $granted && $noValidJob;
 
         if ($granted) {
             return;
@@ -105,7 +107,15 @@ class OpenPermissionAssert implements PermissionAssertInterface
 
         // if now there is no job, that means it was deleted in the meantime.
         // User may not access the task anymore
-        if (null === $job) {
+        if ($noValidJob) {
+            /**
+             * For Client PM and alike roles we have specific assert
+             * @see ClientRestrictedPermissionAssert
+             */
+            if ($context->actor->isClientRestricted()) {
+                return;
+            }
+
             // If task was already in session, we must delete it.
             // If not the user will always receive an error in JS, and would not be able to do anything.
             throw new JobAssignmentWasDeletedInTheMeantimeException($object);

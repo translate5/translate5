@@ -70,7 +70,6 @@ class LanguageResourceTaskAssocRepository
                     'taskAssoc' => TaskAssociationDb::TABLE_NAME,
                 ]
             )
-            ->setIntegrityCheck(false)
             ->join(
                 [
                     'languageResource' => editor_Models_Db_LanguageResources_LanguageResource::TABLE_NAME,

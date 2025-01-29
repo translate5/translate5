@@ -86,7 +86,7 @@ final class UserHasJobInTaskPermissionAssert implements PermissionAssertInterfac
             return;
         }
 
-        if (! $this->canLoadAllTasks($context->actor)) {
+        if (! $this->canLoadAllTasks($context->actor) && ! $context->actor->isClientRestricted()) {
             throw new NoAccessToTaskException($object);
         }
     }

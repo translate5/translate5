@@ -49,7 +49,18 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
 
     public function supports(BackedEnum $action): bool
     {
-        return TaskAction::AssignJob === $action || TaskAction::Update === $action || TaskAction::Delete === $action;
+        return in_array(
+            $action,
+            [
+                TaskAction::Read,
+                TaskAction::AssignJob,
+                TaskAction::Update,
+                TaskAction::Delete,
+                TaskAction::View,
+                TaskAction::Edit,
+            ],
+            true
+        );
     }
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
