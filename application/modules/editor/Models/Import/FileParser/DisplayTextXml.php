@@ -302,7 +302,7 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
 
         $this->xmlparser->registerElement('*', function ($tag) {
             switch ($tag) {
-                //handeld or known:
+                //handled or known (must be all lowercase):
                 case '?xml':
                 case '?xml-stylesheet':
                 case '!doctype':
@@ -313,7 +313,7 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
                 case 'fonts':
                 case 'token':
                 case 'lengths':
-                case 'Len':
+                case 'len':
                 case 'insets':
                 case 'textid':
                 case 'comment':
@@ -324,8 +324,8 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
                 case 'translockdt':
                 case 'string':
                 case 'inset':
-                case 'Remarks1':
-                case 'Remarks2':
+                case 'remarks1':
+                case 'remarks2':
                     return;
             }
             $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.displayTextXml');
@@ -379,8 +379,8 @@ The German and the English Comment tag of the string must be imported as comment
         $segment = $this->contentProtector->protectAndConvert(
             $segment,
             true,
-            $this->task->getSourceLang(),
-            $this->task->getTargetLang(),
+            (int) $this->task->getSourceLang(),
+            (int) $this->task->getTargetLang(),
             $this->shortTagIdent,
             ContentProtector::ENTITY_MODE_OFF
         );
