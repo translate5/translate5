@@ -86,19 +86,11 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
         $data = $request->getParam('data');
         $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
 
-        $taskId = $request->getParam('taskId');
-
-        if (! isset($data['taskGuid']) && null === $taskId) {
-            throw new TaskIdentificatorNotProvidedException();
-        }
-
         if (! isset($data['userGuid'])) {
             throw new UserGuidNotProvidedException();
         }
 
-        $task = null !== $taskId
-            ? $this->taskRepository->get((int) $taskId)
-            : $this->taskRepository->getByGuid($data['taskGuid']);
+        $task = $this->resolveTask($request);
         $user = $this->userRepository->getByGuid($data['userGuid']);
 
         $workflowDto = $this->getWorkflowDto($data, $task);
@@ -168,12 +160,37 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
         return editor_Utils::addBusinessDays($task->getOrderdate(), $configValue);
     }
 
-    private function getTrackChangesRightsDto(mixed $data): TrackChangesRightsDto
+    private function getTrackChangesRightsDto(array $data): ?TrackChangesRightsDto
     {
+        if (! isset($data['trackchangesShow']) && ! isset($data['trackchangesShowAll']) && ! isset($data['trackchangesAcceptReject'])) {
+            return null;
+        }
+
         return new TrackChangesRightsDto(
             (bool) ($data['trackchangesShow'] ?? false),
             (bool) ($data['trackchangesShowAll'] ?? false),
             (bool) ($data['trackchangesAcceptReject'] ?? false),
         );
+    }
+
+    private function resolveTask(Request $request): Task
+    {
+        $taskId = $request->getParam('taskId');
+        $data = $request->getParam('data');
+        $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
+
+        if (! isset($data['taskGuid']) && null === $taskId) {
+            throw new TaskIdentificatorNotProvidedException();
+        }
+
+        $taskIdentifier = $taskId ?: $data['taskGuid'];
+
+        $task = $this->taskRepository->find((int) $taskIdentifier);
+
+        if (null !== $task) {
+            return $task;
+        }
+
+        return $this->taskRepository->getByGuid((string) $taskIdentifier);
     }
 }

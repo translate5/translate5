@@ -71,7 +71,7 @@ class UpdateUserDto
         $customerIds = array_filter(
             array_map(
                 'intval',
-                explode(',', trim($data['customers'] ?? '', ' ,'))
+                explode(',', trim((string) ($data['customers'] ?? ''), ' ,'))
             )
         );
 

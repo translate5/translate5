@@ -51,7 +51,7 @@ class NewUserJobDto
         public readonly ?string $segmentRange,
         public readonly ?string $assignmentDate,
         public readonly ?string $deadlineDate,
-        public readonly TrackChangesRightsDto $trackChangesRights,
+        public readonly ?TrackChangesRightsDto $trackChangesRights,
     ) {
         if (! in_array($state, Workflow::getAllStates())) {
             throw new InvalidStateProvidedException();

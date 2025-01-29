@@ -34,6 +34,7 @@ use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Exception\NotFoundCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Model\CoordinatorGroupJob;
+use MittagQI\Translate5\JobAssignment\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\CreateUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Event\UserJobCreatedEvent;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException;
@@ -98,10 +99,12 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             $groupUser = $this->coordinatorGroupUserRepository->findByUserGuid($dto->userGuid);
             $groupJob = null;
 
+            $trackChangesRights = $dto->trackChangesRights;
+
             if (null !== $groupUser) {
                 $groupJob = $this->resolveCoordinatorGroupJob((int) $groupUser->group->getId(), $dto);
 
-                $this->validateTrackChangesSettings($groupJob, $dto);
+                $trackChangesRights = $this->resolveTrackChangesSettings($groupJob, $dto);
             }
 
             $task = $this->taskRepository->getByGuid($dto->taskGuid);
@@ -123,9 +126,12 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             $job->setType(TypeEnum::Editor);
             $job->setAssignmentDate($dto->assignmentDate);
             $job->setDeadlineDate($dto->deadlineDate);
-            $job->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
-            $job->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
-            $job->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
+
+            if (null !== $trackChangesRights) {
+                $job->setTrackchangesShow((int) $trackChangesRights->canSeeTrackChangesOfPrevSteps);
+                $job->setTrackchangesShowAll((int) $trackChangesRights->canSeeAllTrackChanges);
+                $job->setTrackchangesAcceptReject((int) $trackChangesRights->canAcceptOrRejectTrackChanges);
+            }
 
             if (null !== $groupJob) {
                 $job->setCoordinatorGroupJobId($groupJob->getId());
@@ -174,10 +180,22 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
     /**
      * @throws TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException
      */
-    private function validateTrackChangesSettings(CoordinatorGroupJob $groupJob, NewUserJobDto $dto): void
-    {
+    private function resolveTrackChangesSettings(
+        CoordinatorGroupJob $groupJob,
+        NewUserJobDto $dto
+    ): TrackChangesRightsDto {
         if (TypeEnum::Coordinator === $dto->type) {
-            return;
+            return $dto->trackChangesRights;
+        }
+
+        if (null === $dto->trackChangesRights) {
+            $dataJob = $this->userJobRepository->getDataJobByCoordinatorGroupJob((int) $groupJob->getId());
+
+            return new TrackChangesRightsDto(
+                (bool) $dataJob->getTrackchangesShow(),
+                (bool) $dataJob->getTrackchangesShowAll(),
+                (bool) $dataJob->getTrackchangesAcceptReject(),
+            );
         }
 
         $this->trackChangesRightsValidator->assertTrackChangesRightsAreSubsetOfCoordinatorGroupJob(
@@ -186,5 +204,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             $dto->trackChangesRights->canAcceptOrRejectTrackChanges,
             $groupJob,
         );
+
+        return $dto->trackChangesRights;
     }
 }

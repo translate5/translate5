@@ -179,7 +179,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
             Zend_Registry::get('logger')->warn(
                 'E1680',
-                'Route /editor/taskuserassoc deprecated, use editor/project/:projectId/jobs/:workflow instead',
+                'Route /editor/taskuserassoc/project deprecated, use editor/project/:projectId/jobs/:workflow instead',
             );
         }
 

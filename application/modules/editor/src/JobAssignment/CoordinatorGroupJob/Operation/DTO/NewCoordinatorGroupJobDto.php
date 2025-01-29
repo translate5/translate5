@@ -83,7 +83,7 @@ class NewCoordinatorGroupJobDto
             $userJobDto->segmentRange,
             $userJobDto->assignmentDate,
             $userJobDto->deadlineDate,
-            $userJobDto->trackChangesRights,
+            $userJobDto->trackChangesRights ?: new TrackChangesRightsDto(false, false, false),
         );
     }
 }

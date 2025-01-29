@@ -65,14 +65,14 @@ class ClientPmTest extends ImportTestAbstract
 
         // the pm should see both tasks
         static::api()->login(TestUser::TestManager->value);
-        $tasks = static::api()->getJson('editor/task');
+        $tasks = static::api()->getJson('editor/task?limit=' . (self::$numTasksBefore + 10));
 
         // take number of tasks at the beginning into account
         static::assertCount(2 + self::$numTasksBefore, $tasks);
 
         // ... while the clientpm only can see the one bound to him
         static::api()->login(TestUser::TestClientPm->value);
-        $tasks = static::api()->getJson('editor/task');
+        $tasks = static::api()->getJson('editor/task?limit=' . (self::$numTasksBefore + 10));
         static::assertCount(1, $tasks); // sees only one
         static::assertEquals('2', $tasks[0]->foreignId); // identify the one by foreign-id
 
