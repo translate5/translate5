@@ -95,6 +95,7 @@ class Translate2375Test extends ImportTestAbstract
         $data = array_map(function ($assoc) {
             unset($assoc->id);
             unset($assoc->taskGuid);
+            unset($assoc->staticAuthHash);
 
             return $assoc;
         }, $data);
