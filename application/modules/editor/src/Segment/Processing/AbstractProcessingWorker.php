@@ -123,6 +123,10 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
 
     protected function work(): bool
     {
+        if (static::class === \MittagQI\Translate5\Plugins\SpellCheck\Worker::class) {
+            return true;
+        }
+
         $this->processor = $this->createProcessor();
         if ($this->doDebug) {
             error_log('AbstractProcessingWorker: ' . get_class($this) . '|' . $this->workerModel->getSlot() . ': work for ' . $this->processingMode . ' using slot ' . $this->workerModel->getSlot() . ' with processor ' . get_class($this->processor));

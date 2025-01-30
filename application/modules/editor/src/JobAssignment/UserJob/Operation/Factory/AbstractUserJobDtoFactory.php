@@ -89,7 +89,7 @@ abstract class AbstractUserJobDtoFactory
         ?string $segmentRanges,
         string $taskGuid,
         string $userGuid,
-        mixed $workflowStepName,
+        string $workflowStepName,
     ): ?string {
         if (empty($segmentRanges)) {
             return null;
@@ -109,7 +109,7 @@ abstract class AbstractUserJobDtoFactory
 
     protected function getWorkflowDto(mixed $data, Task $task): WorkflowDto
     {
-        $workflow = $this->getWorkflow($task, $data['workflow']);
+        $workflow = $this->getWorkflow($task, $data['workflow'] ?? null);
 
         [$workflowStepName, $role] = $this->getWorkflowStepNameAndRole($data, $workflow);
 

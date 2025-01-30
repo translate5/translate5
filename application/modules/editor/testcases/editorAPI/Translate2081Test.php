@@ -52,14 +52,21 @@ class Translate2081Test extends JsonTestAbstract
     public function testAutoAssign(): void
     {
         $params = [
-            'customerId' => static::$ownCustomer->id,
+            'customerId' => (int) static::$ownCustomer->id,
             'workflow' => 'default',
             'sourceLang' => static::$sourceLangRfc,
             'targetLang' => static::$targetLangRfc,
             'userGuid' => static::api()->getUserGuid(TestUser::TestTranslator->value),
             'workflowStepName' => 'translation',
         ];
-        $result = static::api()->postJson('editor/userassocdefault', $params);
+        $result = static::api()->postJson(
+            sprintf(
+                'editor/customers/%s/workflow/%s/default-job',
+                static::$ownCustomer->id,
+                $params['workflow']
+            ),
+            $params
+        );
         unset($result->id, $result->customerId);
         if (static::api()->isCapturing()) {
             file_put_contents(static::api()->getFile('assocResult.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
@@ -76,9 +83,7 @@ class Translate2081Test extends JsonTestAbstract
         $config->import($task);
 
         // after the task is created/imported, check if the users are auto assigned.
-        $data = static::api()->getJson('editor/taskuserassoc', [
-            'filter' => '[{"operator":"eq","value":"' . $task->getTaskGuid() . '","property":"taskGuid"}]',
-        ]);
+        $data = static::api()->getJson("editor/task/{$task->getId()}/job");
 
         // TODO FIXME: write a reusable Model for this !
         //filter out the non static data

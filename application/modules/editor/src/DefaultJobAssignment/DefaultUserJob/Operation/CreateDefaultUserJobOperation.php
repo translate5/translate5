@@ -90,10 +90,12 @@ class CreateDefaultUserJobOperation implements CreateDefaultUserJobOperationInte
         $job->setTargetLang($dto->targetLanguageId);
         $job->setWorkflow($dto->workflow->workflow);
         $job->setWorkflowStepName($dto->workflow->workflowStepName);
-        $job->setDeadlineDate($dto->deadline);
         $job->setTrackchangesShow((int) $dto->trackChangesRights->canSeeTrackChangesOfPrevSteps);
         $job->setTrackchangesShowAll((int) $dto->trackChangesRights->canSeeAllTrackChanges);
         $job->setTrackchangesAcceptReject((int) $dto->trackChangesRights->canAcceptOrRejectTrackChanges);
+        if (null !== $dto->deadline) {
+            $job->setDeadlineDate($dto->deadline);
+        }
 
         $job->validate();
 

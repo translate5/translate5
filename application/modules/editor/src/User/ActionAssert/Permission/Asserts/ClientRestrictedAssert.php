@@ -31,66 +31,61 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\ActionAssert\Permission\Asserts;
 
 use BackedEnum;
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\Exception\NoAccessException;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Repository\Contract\CoordinatorGroupUserRepositoryInterface;
-use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
-use MittagQI\ZfExtended\Acl\SystemResource;
-use ZfExtended_Acl;
 
 /**
  * @implements PermissionAssertInterface<UserAction, User>
  */
-final class SeeAllUsersPermissionAssert implements PermissionAssertInterface
+final class ClientRestrictedAssert implements PermissionAssertInterface
 {
-    public function __construct(
-        private readonly ZfExtended_Acl $acl,
-        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
-    ) {
-    }
-
     /**
      * @codeCoverageIgnore
      */
     public static function create(): self
     {
-        return new self(
-            ZfExtended_Acl::getInstance(),
-            CoordinatorGroupUserRepository::create(),
-        );
+        return new self();
     }
 
     public function supports(BackedEnum $action): bool
     {
-        return in_array($action, [UserAction::Update, UserAction::Delete, UserAction::Read], true);
+        return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $actor = $context->actor;
-
-        if ($actor->getUserGuid() === $object->getUserGuid() && $action === UserAction::Read) {
+        if (! $context->actor->isClientRestricted()) {
             return;
         }
 
-        if ($this->acl->isInAllowedRoles($actor->getRoles(), SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
-            return;
+        if (! $this->isAccessGrated($action, $object, $context)) {
+            throw new NoAccessException();
+        }
+    }
+
+    private function isAccessGrated(BackedEnum $action, object $object, PermissionAssertContext $context): bool
+    {
+        $isMutateAction = in_array($action, [UserAction::Update, UserAction::Delete], true);
+
+        if (
+            $context->actor->isClientPm()
+            && $isMutateAction
+            && ! in_array(Roles::CLIENTPM_USERS, $context->actor->getRoles(), true)
+        ) {
+            return false;
         }
 
-        /** @see ClientRestrictedAssert */
-        if ($actor->isClientRestricted()) {
-            return;
+        if (UserAction::Delete === $action) {
+            return empty(array_diff($object->getCustomersArray(), $context->actor->getCustomersArray()));
         }
 
-        $groupUser = $this->coordinatorGroupUserRepository->findByUser($object);
-
-        if (null !== $groupUser) {
-            return;
-        }
-
-        throw new NoAccessException();
+        return ! empty(array_intersect($object->getCustomersArray(), $context->actor->getCustomersArray()));
     }
 }

@@ -141,11 +141,11 @@ class NewDefaultJobDtoFactory
                 $data['workflowStepName'],
             ),
             $type,
-            (float) $data['deadlineDate'],
+            isset($data['deadlineDate']) ? (float) $data['deadlineDate'] : null,
             new TrackChangesRightsDto(
-                (bool) ($data['trackchangesShow'] ?? false),
-                (bool) ($data['trackchangesShowAll'] ?? false),
-                (bool) ($data['trackchangesAcceptReject'] ?? false),
+                (bool) ($data['trackchangesShow'] ?? true),
+                (bool) ($data['trackchangesShowAll'] ?? true),
+                (bool) ($data['trackchangesAcceptReject'] ?? true),
             ),
         );
     }

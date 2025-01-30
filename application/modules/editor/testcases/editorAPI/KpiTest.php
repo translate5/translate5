@@ -92,13 +92,13 @@ class KpiTest extends ImportTestAbstract
      * KPI average processing time: taskUserAssoc-property for startdate
      * @var string
      */
-    private static $taskStartDate = 'assignmentDate';
+    private const taskStartDate = 'assignmentDate';
 
     /**
      * KPI average processing time: taskUserAssoc-property for enddate
      * @var string
      */
-    private static $taskEndDate = 'finishedDate';
+    private const taskEndDate = 'finishedDate';
 
     protected static function setupImport(Config $config): void
     {
@@ -198,6 +198,7 @@ class KpiTest extends ImportTestAbstract
         $search = ["days", "Tage", " "];
         $replace = ["", "", ""];
         $result->{self::KPI_REVIEWER} = str_replace($search, $replace, $result->{self::KPI_REVIEWER});
+
         //test only for reviewer (for all ther roles will be the same)
         $this->assertEquals($result->{self::KPI_REVIEWER}, $statistics[self::KPI_REVIEWER]);
         $this->assertEquals($result->excelExportUsage, $statistics['excelExportUsage']);
@@ -232,10 +233,13 @@ class KpiTest extends ImportTestAbstract
         $startDate = $startDate->format('Y-m-d H:i:s');
         $taskId = self::$taskIds[$taskNameSuffix];
         $assocId = self::$taskUserAssocMap[$taskId];
-        static::api()->putJson('editor/taskuserassoc/' . $assocId, [
-            static::$taskStartDate => $startDate,
-            static::$taskEndDate => $endDate,
-        ]);
+
+        $db = \Zend_Db_Table::getDefaultAdapter();
+
+        $db->update(editor_Models_Db_TaskUserAssoc::TABLE_NAME, [
+            self::taskStartDate => $startDate,
+            self::taskEndDate => $endDate,
+        ], 'id = ' . $assocId);
     }
 
     /**

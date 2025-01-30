@@ -96,13 +96,16 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
             : $this->userRepository->getByGuid($data['userGuid'])->getUserGuid();
 
         $deadlineDate = $data['deadlineDate'] ?? null;
+        $segmentRanges = null;
 
-        $segmentRanges = $this->getSegmentRanges(
-            $data['segmentrange'] ?? null,
-            $job->getTaskGuid(),
-            $job->getUserGuid(),
-            $workflowDto->workflowStepName
-        );
+        if (null !== $workflowDto) {
+            $segmentRanges = $this->getSegmentRanges(
+                $data['segmentrange'] ?? null,
+                $job->getTaskGuid(),
+                $job->getUserGuid(),
+                $workflowDto->workflowStepName
+            );
+        }
 
         return new UpdateUserJobDto(
             $userGuid,

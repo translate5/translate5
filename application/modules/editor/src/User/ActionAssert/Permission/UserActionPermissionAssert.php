@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\User\ActionAssert\Permission;
 
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\ClientRestrictedAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\CoordinatorGroupUserAccessPermissionAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\IsEditableForAssert;
 use MittagQI\Translate5\User\ActionAssert\Permission\Asserts\JobCoordinatorPermissionAssert;
@@ -53,6 +54,7 @@ final class UserActionPermissionAssert extends ActionPermissionAssert
             CoordinatorGroupUserAccessPermissionAssert::create(),
             new IsEditableForAssert(),
             JobCoordinatorPermissionAssert::create(),
+            ClientRestrictedAssert::create(),
         ]);
     }
 }

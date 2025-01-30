@@ -10439,6 +10439,10 @@ etc.
                 <source>language_resource.status.converting</source>
                 <target>Converting</target>
             </trans-unit>
+            <trans-unit id='S2VpbmUgWnVncmlmZnNiZXJlY2h0aWd1bmch'>
+                <source>Keine Zugriffsberechtigung!</source>
+                <target>Not access granted!</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

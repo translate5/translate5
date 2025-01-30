@@ -107,7 +107,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
         if (str_contains($this->getRequest()->getRequestUri(), 'userassocdefault')) {
             Zend_Registry::get('logger')->warn(
                 'E1681',
-                'Route /editor/userassocdefault deprecated, use editor/customer/:customerId/workflow/:workflow/default-job instead',
+                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
             );
 
             $rows = $this->defaultUserJobViewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
@@ -157,6 +157,14 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
 
     public function postAction(): void
     {
+        /** @deprecated App logic should not tolerate requests without customer in scope */
+        if (str_contains($this->getRequest()->getRequestUri(), 'userassocdefault')) {
+            Zend_Registry::get('logger')->warn(
+                'E1681',
+                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
+            );
+        }
+
         try {
             $dto = NewDefaultJobDtoFactory::create()->fromRequest($this->getRequest());
 
@@ -185,7 +193,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
         if (str_contains($this->getRequest()->getRequestUri(), 'userassocdefault')) {
             Zend_Registry::get('logger')->warn(
                 'E1681',
-                'Route /editor/userassocdefault deprecated, use editor/customer/:customerId/workflow/:workflow/default-job instead',
+                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
             );
         }
 
@@ -221,7 +229,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
         if (str_contains($this->getRequest()->getRequestUri(), 'userassocdefault')) {
             Zend_Registry::get('logger')->warn(
                 'E1681',
-                'Route /editor/userassocdefault deprecated, use editor/customer/:customerId/workflow/:workflow/default-job instead',
+                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
             );
         }
 

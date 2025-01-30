@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
@@ -100,15 +101,15 @@ class Editor_FiletreeController extends ZfExtended_RestController
 
             throw new ZfExtended_UnprocessableEntity('E1025');
         }
-        /** @var editor_Models_Task $task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        $task->loadByTaskGuid($taskGuid);
 
         $userRepository = new UserRepository();
+        $taskRepository = TaskRepository::create();
+
+        $task = $taskRepository->getByGuid($taskGuid);
 
         $accessGranted = $this->taskActionPermissionAssert->isGranted(
             TaskAction::Read,
-            $this->entity,
+            $task,
             new PermissionAssertContext($userRepository->get(ZfExtended_Authentication::getInstance()->getUserId()))
         );
 

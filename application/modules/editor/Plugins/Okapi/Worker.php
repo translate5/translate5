@@ -284,6 +284,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
      */
     protected function handleException(Exception $e, SplFileInfo $file, $fileId, bool $import): ?ZfExtended_Logger_Event
     {
+        error_log('Message: ' . $e->getMessage());
+        error_log('Trace: ' . $e->getTraceAsString());
         $event = $this->logger->exception($e, [
             'extra' => [
                 'task' => $this->task,

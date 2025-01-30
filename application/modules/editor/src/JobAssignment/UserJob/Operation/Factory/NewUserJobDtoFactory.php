@@ -103,12 +103,12 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
             throw new InvalidTypeProvidedException();
         }
 
-        $deadlineDate = $this->getDeadlineDate($data['deadlineDate'], $workflowDto->workflowStepName, $task);
+        $deadlineDate = $this->getDeadlineDate($data['deadlineDate'] ?? null, $workflowDto->workflowStepName, $task);
 
         $trackChangesRights = $this->getTrackChangesRightsDto($data);
 
         $segmentRanges = $this->getSegmentRanges(
-            $data['segmentrange'],
+            $data['segmentrange'] ?? null,
             $task->getTaskGuid(),
             $user->getUserGuid(),
             $workflowDto->workflowStepName
@@ -162,7 +162,11 @@ class NewUserJobDtoFactory extends AbstractUserJobDtoFactory
 
     private function getTrackChangesRightsDto(array $data): ?TrackChangesRightsDto
     {
-        if (! isset($data['trackchangesShow']) && ! isset($data['trackchangesShowAll']) && ! isset($data['trackchangesAcceptReject'])) {
+        if (
+            ! isset($data['trackchangesShow'])
+            && ! isset($data['trackchangesShowAll'])
+            && ! isset($data['trackchangesAcceptReject'])
+        ) {
             return null;
         }
 
