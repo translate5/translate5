@@ -10441,7 +10441,7 @@ etc.
             </trans-unit>
             <trans-unit id='S2VpbmUgWnVncmlmZnNiZXJlY2h0aWd1bmch'>
                 <source>Keine Zugriffsberechtigung!</source>
-                <target>Not access granted!</target>
+                <target>No access granted!</target>
             </trans-unit>
         </body>
     </file>

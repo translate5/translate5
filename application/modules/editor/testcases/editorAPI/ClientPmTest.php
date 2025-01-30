@@ -79,7 +79,7 @@ class ClientPmTest extends ImportTestAbstract
         // the clientpm must not see tasks he is not entitled for (being the first imported task)
         $result = static::api()->getJson('editor/task/' . $task0->getId(), [], null, true);
         static::assertEquals(403, $result->status);
-        static::assertStringContainsString('Not access granted!', $result->error);
+        static::assertStringContainsString('No access granted!', $result->error);
     }
 
     /**
@@ -137,7 +137,7 @@ class ClientPmTest extends ImportTestAbstract
             'id' => static::$newUserId,
         ], true);
         static::assertEquals(403, $result->status);
-        static::assertStringContainsString('Not access granted!', $result->error);
+        static::assertStringContainsString('No access granted!', $result->error);
 
         // login as pm
         static::api()->login(TestUser::TestManager->value);
@@ -154,7 +154,7 @@ class ClientPmTest extends ImportTestAbstract
         static::api()->login(TestUser::TestClientPm->value);
         $result = static::api()->getJson('editor/user/' . static::$newUserId, [], null, true);
         static::assertEquals(403, $result->status);
-        static::assertStringContainsString('Not access granted!', $result->error);
+        static::assertStringContainsString('No access granted!', $result->error);
     }
 
     /**

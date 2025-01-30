@@ -73,7 +73,7 @@ class SessionApiTest extends ImportTestAbstract
             'login' => TestUser::WrongUserName->value,
             'passwd' => 'wrongPassword',
         ]);
-        $msg403 = '{"errorCode":null,"httpStatus":403,"errorMessage":"Keine Zugriffsberechtigung!","message":"Forbidden","success":false}';
+        $msg403 = '{"errorCode":null,"httpStatus":403,"errorMessage":"No access granted!","message":"Forbidden","success":false}';
 
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
