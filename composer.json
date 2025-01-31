@@ -14,7 +14,8 @@
       "MittagQI\\Translate5\\": "application/modules/editor/src",
       "MittagQI\\Translate5\\Plugins\\": "application/modules/editor/Plugins",
       "Translate5\\MaintenanceCli\\": "Translate5/MaintenanceCli",
-      "Translate5\\PHPCodeSniffer\\": "PHPCodeSniffer"
+      "Translate5\\PHPCodeSniffer\\": "PHPCodeSniffer",
+      "MittagQI\\Translate5\\Test\\": "application/modules/editor/testcases"
     }
   },
   "repositories": [
@@ -144,7 +145,7 @@
     "league/flysystem-sftp": "^3.0",
     "league/flysystem-ftp": "^3.0",
     "symfony/yaml": "^6.0",
-    "symfony/lock": "^6.0",
+    "symfony/lock": "^6.4",
     "cesargb/php-log-rotation": "^2.7",
     "ifsnop/mysqldump-php": "^v2.9",
     "http-interop/http-factory-guzzle": "^1.2",
@@ -154,7 +155,8 @@
     "psr/event-dispatcher": "^1.0",
     "psr/http-client": "^1.0",
     "phar-io/version": "^3.2",
-    "translate5/php-html-parser": "dev-master"
+    "translate5/php-html-parser": "dev-master",
+    "fakerphp/faker": "^1.24"
   },
   "extra": {
     "merge-plugin": {

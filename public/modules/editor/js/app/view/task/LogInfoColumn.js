@@ -35,6 +35,7 @@ Ext.define('Editor.view.task.LogInfoColumn', {
     tdCls: 'log-info-column',
     dataIndex: 'logInfo',
     stateId: 'logInfo',
+    sortable: false,
     text: Editor.data.l10n.log.logColumnText,
     renderer: function (value, metaData){
         return metaData.column.renderIcons.call(this, value, metaData);
