@@ -301,7 +301,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
             me.tooltip = me.createToolTip();
         });
 
-        me.setVisibleColumns();
     },
 
     initConfig: function (instanceConfig) {
@@ -388,6 +387,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 }, {
                     xtype: 'checkcolumn',
                     dataIndex: 'checked',
+                    stateId: 'checked',
                     sortable: false,
                     hidden: true,
                     bind: {
@@ -816,27 +816,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
             config = me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    },
-
-    /***
-     * Set the configured visible columns
-     */
-    setVisibleColumns: function () {
-        var me = this,
-            cols = me.getColumns(),
-            colIndex = null;
-
-        if (me.visibleColumns.length == 0) {
-            return;
-        }
-
-        Ext.each(cols, function (col) {
-            colIndex = col.dataIndex ? col.dataIndex : col.stateId;
-            if (!colIndex) {
-                return true;
-            }
-            col.setVisible(Ext.Array.contains(me.visibleColumns, colIndex));
-        });
     },
 
     /**

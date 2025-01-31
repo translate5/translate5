@@ -128,6 +128,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     renderer: v => Ext.String.htmlEncode(v)
         		},{
                     xtype: 'taskLogInfoColumn',
+                    hidden: true,
                     renderer: function (value, metaData){
                         return metaData.column.renderIcons.call(this, value);
                     }
