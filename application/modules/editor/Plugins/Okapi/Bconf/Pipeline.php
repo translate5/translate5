@@ -37,7 +37,7 @@ use MittagQI\ZfExtended\MismatchException;
 final class editor_Plugins_Okapi_Bconf_Pipeline extends editor_Plugins_Okapi_Bconf_ResourceFile
 {
     /*
-     * A typical pipline file looks like this:
+     * A typical pipeline file looks like this:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <rainbowPipeline version="1">
@@ -58,7 +58,7 @@ writerOptions.escapeGT.b=false
         </step>
     </rainbowPipeline>
 
-    */
+     */
 
     public const FILE = 'pipeline.pln';
 
@@ -198,8 +198,8 @@ writerOptions.escapeGT.b=false
                     if (! $props->isValid()) {
                         $this->errors[] = 'invalid Segmentation step (' . $props->getErrorString(', ') . ')';
                     } else {
-                        $this->sourceSrxPath = ($props->has('sourceSrxPath')) ? basename($props->get('sourceSrxPath')) : null;
-                        $this->targetSrxPath = ($props->has('targetSrxPath')) ? basename($props->get('targetSrxPath')) : null;
+                        $this->sourceSrxPath = ($props->has('sourceSrxPath')) ? self::basename($props->get('sourceSrxPath')) : null;
+                        $this->targetSrxPath = ($props->has('targetSrxPath')) ? self::basename($props->get('targetSrxPath')) : null;
                     }
                 }
             }
@@ -214,13 +214,20 @@ writerOptions.escapeGT.b=false
             $this->errors[] = 'the pipeline had no or invalid entries for the source or target segmentation srx file';
         } else {
             // we will remove any path from the SRX-Files to normalize the value (it usually contains the rainbow workspace path)
-            // this also is a security-related neccesity since an attack with pathes on the server's file-system could be attempted
-            if (basename($this->sourceSrxPath) != $this->sourceSrxPath) {
-                $this->setSrxFile('source', basename($this->sourceSrxPath));
+            // this also is a security-related necessity since an attack with pathes on the server's file-system could be attempted
+            if (self::basename($this->sourceSrxPath) != $this->sourceSrxPath) {
+                $this->setSrxFile('source', self::basename($this->sourceSrxPath));
             }
-            if (basename($this->targetSrxPath) != $this->targetSrxPath) {
-                $this->setSrxFile('target', basename($this->targetSrxPath));
+            if (self::basename($this->targetSrxPath) != $this->targetSrxPath) {
+                $this->setSrxFile('target', self::basename($this->targetSrxPath));
             }
         }
+    }
+
+    private static function basename(string $filename): string
+    {
+        $filename = str_replace('\\', '/', $filename);
+
+        return basename($filename);
     }
 }
