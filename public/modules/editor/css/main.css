@@ -1323,3 +1323,9 @@ div.internal-tag.number span.full::after {
     margin-left: 41px !important;
     left: 0 !important;
 }
+del.tmMatchGridResultTooltip {
+    text-decoration: none;
+}
+ins.tmMatchGridResultTooltip {
+    text-decoration: line-through;
+}
