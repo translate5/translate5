@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
+use MittagQI\ZfExtended\Tools\Markup;
 
 /**
  * ExcelExandImportTest.php imports a simple task, checks export of excel and reimport then
@@ -72,7 +73,8 @@ class ExcelExandImportTest extends JsonTestAbstract
         $res = $zip->open($tempExcel);
         $this->assertTrue($res, 'Exported Excelfile could not opened for injecting edits');
         $strings = $zip->getFromName('xl/sharedStrings.xml');
-        $zip->addFromString('xl/sharedStrings.xml', str_replace('Testtext', 'Testtext - edited', $strings));
+        $replacementForTesttext = Markup::escapeTaglikePlaceholders('Testtext - edited with < and > and <usertag /> which should be escaped');
+        $zip->addFromString('xl/sharedStrings.xml', str_replace('Testtext', $replacementForTesttext, $strings));
         $zip->close();
     }
 
