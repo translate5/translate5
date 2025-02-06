@@ -90,6 +90,8 @@ final class Service extends AbstractPooledService
         'runtimeOptions.termTagger.url.default' => null,
     ];
 
+    protected bool $persistentConnections = false;
+
     /**
      * contains the HTTP status of the last request
      * @var integer
@@ -173,6 +175,8 @@ final class Service extends AbstractPooledService
             'timeout' => self::CONNECT_TIMEOUT,
             'request_timeout' => self::DEFAULT_TAG_TIMEOUT,
         ]);
+        $this->applyPersistentConnections($httpClient);
+
         $response = $this->sendRequest($httpClient, $httpClient::HEAD);
 
         return ($response && (($tbxHash !== false && $this->wasSuccessfull()) || ($tbxHash === false && $this->getLastStatus() == 404)));
@@ -241,6 +245,7 @@ final class Service extends AbstractPooledService
             'timeout' => self::CONNECT_TIMEOUT,
             'request_timeout' => $requestTimeout,
         ]);
+        $this->applyPersistentConnections($httpClient);
         $httpResponse = $this->sendRequest($httpClient, $httpClient::POST);
         $response = $this->decodeServiceResult($logger, $httpResponse);
         if (! $response) {
@@ -340,5 +345,27 @@ final class Service extends AbstractPooledService
         ]);
 
         return null;
+    }
+
+    public function setPersistentConnections(bool $persistent): void
+    {
+        $this->persistentConnections = $persistent;
+    }
+
+    /**
+     * CRUCIAL: with persistent connections we need DNS Pinning - talk to the concrete IPs
+     *  instead the hostname (providing different IPs) - but this must come from outside!
+     * TODO not tested if we could use all calls with persistent connections - then this should go into getHttpClient
+     * @throws Zend_Http_Client_Exception
+     */
+    private function applyPersistentConnections(Zend_Http_Client $client): void
+    {
+        if ($this->persistentConnections) {
+            $client->setConfig([
+                'keepalive' => true,
+                'persistent' => true,
+            ]);
+            $client->setHeaders('Connection', 'keep-alive');
+        }
     }
 }

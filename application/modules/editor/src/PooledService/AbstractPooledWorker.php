@@ -63,7 +63,7 @@ abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
 
     protected int $maxParallel = -1;
 
-    protected array $slots;
+    protected array $slots = [];
 
     protected bool $isPooled;
 
