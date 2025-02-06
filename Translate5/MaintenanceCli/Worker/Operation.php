@@ -96,7 +96,7 @@ final class Operation
             'editor_Models_Import_Worker_FinalStep',
             'editor_Plugins_VisualReview_HtmlImportWorker',
             'editor_Plugins_VisualReview_PdfToHtmlWorker',
-            'editor_Plugins_VisualReview_WgetHtmlWorker',
+            'editor_Plugins_VisualReview_HeadlessBrowserHtmlWorker',
             'editor_Plugins_VisualReview_ImageOcrWorker',
             'editor_Plugins_VisualReview_VideoHtmlWorker',
             'editor_Plugins_VisualReview_XmlHtmlWorker',

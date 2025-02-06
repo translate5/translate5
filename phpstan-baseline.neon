@@ -12146,34 +12146,39 @@ parameters:
 			path: application/modules/editor/Plugins/VisualReview/Source/Url.php
 
 		-
-			message: "#^Access to an undefined property MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\:\\:\\$doDebug\\.$#"
+			message: "#^Access to an undefined property MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter\\:\\:\\$doDebug\\.$#"
 			count: 1
-			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
 			message: "#^Constant APPLICATION_RUNDIR not found\\.$#"
 			count: 1
-			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
 			message: "#^If condition is always false\\.$#"
 			count: 1
-			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
-			message: "#^Method MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\:\\:transform\\(\\) should return editor_Plugins_VisualReview_Html_Configuration\\|null but returns editor_Plugins_VisualReview_Source_Configuration\\.$#"
+			message: "#^Method MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter\\:\\:transform\\(\\) should return editor_Plugins_VisualReview_Html_Configuration\\|null but returns editor_Plugins_VisualReview_Source_Configuration\\.$#"
 			count: 1
-			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$task$#"
 			count: 1
-			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
 			message: "#^Constant APPLICATION_RUNDIR not found\\.$#"
 			count: 1
-			path: application/modules/editor/Plugins/VisualReview/TextResize/Converter.php
+			path: application/modules/editor/Plugins/VisualReview/TextResize/Converter/TextResizeConverter.php
+
+		-
+        	message: "#^Parameter \\#2 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextResize\\\\Converter\\\\TextResizeConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#",
+        	count: 1
+        	path: application/modules/editor/Plugins/VisualReview/TextResize/Converter/TextResizeConverter.php
 
 		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$format$#"
@@ -12343,12 +12348,12 @@ parameters:
 		-
 			message: "#^Constant APPLICATION_RUNDIR not found\\.$#"
 			count: 1
-			path: application/modules/editor/Plugins/VisualReview/WgetHtmlWorker.php
+			path: application/modules/editor/Plugins/VisualReview/HeadlessBrowserHtmlWorker.php
 
 		-
 			message: "#^Method editor_Plugins_VisualReview_Source_FileEntity\\:\\:getSourceURL\\(\\) invoked with 1 parameter, 0 required\\.$#"
 			count: 1
-			path: application/modules/editor/Plugins/VisualReview/WgetHtmlWorker.php
+			path: application/modules/editor/Plugins/VisualReview/HeadlessBrowserHtmlWorker.php
 
 		-
 			message: "#^Empty array passed to foreach\\.$#"
@@ -15621,34 +15626,44 @@ parameters:
 			path: application/modules/editor/PrivatePlugins/VisualReview/Source/Url.php
 
 		-
-			message: "#^Access to an undefined property MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\:\\:\\$doDebug\\.$#"
+			message: "#^Access to an undefined property MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter\\:\\:\\$doDebug\\.$#"
 			count: 1
-			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
 			message: "#^Constant APPLICATION_RUNDIR not found\\.$#"
 			count: 1
-			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
 			message: "#^If condition is always false\\.$#"
 			count: 1
-			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
-			message: "#^Method MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\:\\:transform\\(\\) should return editor_Plugins_VisualReview_Html_Configuration\\|null but returns editor_Plugins_VisualReview_Source_Configuration\\.$#"
+			message: "#^Method MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter\\:\\:transform\\(\\) should return editor_Plugins_VisualReview_Html_Configuration\\|null but returns editor_Plugins_VisualReview_Source_Configuration\\.$#"
 			count: 1
-			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$task$#"
 			count: 1
-			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php
+			path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
+
+		-
+            message: "#^Parameter \\#2 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#"
+            count: 1
+            path: application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php
 
 		-
 			message: "#^Constant APPLICATION_RUNDIR not found\\.$#"
 			count: 1
-			path: application/modules/editor/PrivatePlugins/VisualReview/TextResize/Converter.php
+			path: application/modules/editor/PrivatePlugins/VisualReview/TextResize/Converter/TextResizeConverter.php
+
+		-
+            message: "#^Parameter \\#2 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextResize\\\\Converter\\\\TextResizeConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#",
+            count: 1
+            path: application/modules/editor/PrivatePlugins/VisualReview/TextResize/Converter/TextResizeConverter.php
 
 		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$format$#"
@@ -15818,12 +15833,12 @@ parameters:
 		-
 			message: "#^Constant APPLICATION_RUNDIR not found\\.$#"
 			count: 1
-			path: application/modules/editor/PrivatePlugins/VisualReview/WgetHtmlWorker.php
+			path: application/modules/editor/PrivatePlugins/VisualReview/HeadlessBrowserHtmlWorker.php
 
 		-
 			message: "#^Method editor_Plugins_VisualReview_Source_FileEntity\\:\\:getSourceURL\\(\\) invoked with 1 parameter, 0 required\\.$#"
 			count: 1
-			path: application/modules/editor/PrivatePlugins/VisualReview/WgetHtmlWorker.php
+			path: application/modules/editor/PrivatePlugins/VisualReview/HeadlessBrowserHtmlWorker.php
 
 		-
 			message: "#^Empty array passed to foreach\\.$#"
@@ -22818,3 +22833,13 @@ parameters:
 			message: "#^Variable \\$this might not be defined\\.$#"
 			count: 3
 			path: application/modules/editor/Plugins/TMMaintenance/public/resources/index.php
+
+		-
+            message: "#^Parameter \\#3 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\UrlFetch\\\\Converter\\\\UrlFetchConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#",
+            count: 1
+            path: application/modules/editor/Plugins/VisualReview/UrlFetch/Converter/UrlFetchConverter.php
+
+        -
+            message: "#^Parameter \\#3 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\UrlFetch\\\\Converter\\\\UrlFetchConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#",
+            count: 1
+            path: application/modules/editor/PrivatePlugins/VisualReview/UrlFetch/Converter/UrlFetchConverter.php

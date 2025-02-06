@@ -11132,34 +11132,39 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Source/Url.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\:\\:\\$doDebug\\.$#',
+	'message' => '#^Access to an undefined property MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter\\:\\:\\$doDebug\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^If condition is always false\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\:\\:transform\\(\\) should return editor_Plugins_VisualReview_Html_Configuration\\|null but returns editor_Plugins_VisualReview_Source_Configuration\\.$#',
+	'message' => '#^Method MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter\\:\\:transform\\(\\) should return editor_Plugins_VisualReview_Html_Configuration\\|null but returns editor_Plugins_VisualReview_Source_Configuration\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$task$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextResize/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextResize/Converter/TextResizeConverter.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Parameter \\#2 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextResize\\\\Converter\\\\TextResizeConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/TextResize/Converter/TextResizeConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$format$#',
@@ -11329,12 +11334,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/WgetHtmlWorker.php',
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/HeadlessBrowserHtmlWorker.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method editor_Plugins_VisualReview_Source_FileEntity\\:\\:getSourceURL\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/WgetHtmlWorker.php',
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/HeadlessBrowserHtmlWorker.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Empty array passed to foreach\\.$#',
@@ -14602,34 +14607,44 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Source/Url.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\:\\:\\$doDebug\\.$#',
+	'message' => '#^Access to an undefined property MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter\\:\\:\\$doDebug\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^If condition is always false\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\:\\:transform\\(\\) should return editor_Plugins_VisualReview_Html_Configuration\\|null but returns editor_Plugins_VisualReview_Source_Configuration\\.$#',
+	'message' => '#^Method MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter\\:\\:transform\\(\\) should return editor_Plugins_VisualReview_Html_Configuration\\|null but returns editor_Plugins_VisualReview_Source_Configuration\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$task$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Parameter \\#2 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextReflow\\\\Converter\\\\TextReflowConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextReflow/Converter/TextReflowConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextResize/Converter.php',
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextResize/Converter/TextResizeConverter.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Parameter \\#2 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\TextResize\\\\Converter\\\\TextResizeConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/TextResize/Converter/TextResizeConverter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$format$#',
@@ -14799,12 +14814,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/WgetHtmlWorker.php',
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/HeadlessBrowserHtmlWorker.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method editor_Plugins_VisualReview_Source_FileEntity\\:\\:getSourceURL\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/WgetHtmlWorker.php',
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/HeadlessBrowserHtmlWorker.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Empty array passed to foreach\\.$#',
@@ -21011,6 +21026,16 @@ $ignoreErrors[] = [
 	'message' => '#^Comparison operation ">" between 0 and 0 is always false.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/TemplateBasedMail',
+];
+$ignoreErrors[] = [
+    'message' => '#^Parameter \\#3 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\UrlFetch\\\\Converter\\\\UrlFetchConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/UrlFetch/Converter/UrlFetchConverter.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Parameter \\#3 \\$service of class MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\UrlFetch\\\\Converter\\\\UrlFetchConverter constructor expects MittagQI\\\\Translate5\\\\Plugins\\\\VisualReview\\\\Service\\\\VisualConverter, MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract given\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/UrlFetch/Converter/UrlFetchConverter.php',
 ];
 
 return ['parameters' => ['ignoreErrors' => $ignoreErrors]];
