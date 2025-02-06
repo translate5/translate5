@@ -6,6 +6,7 @@ useKeyAsName.b=true
 useFullKeyPath.b=false
 useLeadingSlashOnKeyPath.b=true
 escapeForwardSlashes.b=true
+useIdStack.b=false
 useCodeFinder.b=false
 noteRules=
 extractionRules=
@@ -16,3 +17,5 @@ codeFinderRules.rule0=</?([A-Z0-9a-z]*)\b[^>]*>
 codeFinderRules.sample=&name; <tag></at><tag/> <tag attr='val'> </tag="val">
 codeFinderRules.useAllRulesWhenTesting.b=true
 subfilter=
+subfilterRules=
+maxwidthRules=

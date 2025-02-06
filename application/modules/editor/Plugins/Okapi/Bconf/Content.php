@@ -26,11 +26,19 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
+use stdClass;
+use ZfExtended_Debug;
+use ZfExtended_Exception;
+
 /**
  * Class representing the Content/TOC of a bconf
- * This generally is a JSON file that will not be embedded in the bconf but just acts as an inventory for all extracted files of the bconf
+ * This generally is a JSON file that will not be embedded in the bconf
+ * but just acts as an inventory for all extracted files of the bconf
  */
-final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bconf_ResourceFile
+final class Content extends ResourceFile
 {
     /*
     fixed structure of our contents
@@ -141,7 +149,7 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
      */
     public function setSrxFile(string $field, string $file)
     {
-        if (pathinfo($file, PATHINFO_EXTENSION) !== editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION) {
+        if (pathinfo($file, PATHINFO_EXTENSION) !== Srx::EXTENSION) {
             throw new ZfExtended_Exception('A SRX file must have the file-extension "srx": ' . $file);
         }
         if ($field === 'source') {
@@ -156,7 +164,7 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
     /**
      * Adds our steps and updates the content. Does not flush the related file !
      */
-    public function setSteps(array $steps)
+    public function setSteps(array $steps): void
     {
         $this->step = $steps;
     }
@@ -193,27 +201,34 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
     /**
      * @throws ZfExtended_Exception
      */
-    private function parse(string $content)
+    private function parse(string $content): void
     {
         if (empty($content)) {
             throw new ZfExtended_Exception('Invalid JSON content of ' . self::FILE . ': Empty content');
         }
         $json = json_decode($content);
-        if (empty($json) || ! is_object($json) || ! property_exists($json, 'refs') || ! property_exists($json, 'fprm')) {
+        if (empty($json) ||
+            ! is_object($json) ||
+            ! property_exists($json, 'refs') ||
+            ! property_exists($json, 'fprm')
+        ) {
             throw new ZfExtended_Exception('Invalid JSON content of ' . self::FILE . ': Invalid structure');
         }
         if (property_exists($json, 'step')) {
             $this->step = $json->step;
         } else {
             // LEGACY FIX:
-            // in the first revisions of the bconf-management, the steps have not been extracted ... we repair that by extracting them from the pipeline
+            // in the first revisions of the bconf-management, the steps have not been extracted ...
+            // we repair that by extracting them from the pipeline
             $this->step = $this->getLegacySteps();
         }
         if (is_array($json->refs)) {
             // LEGACY FIX:
             // in the first revisions of the bconf-management, the refs have been an array
             if (count($json->refs) < 1) {
-                throw new ZfExtended_Exception('Invalid JSON content of ' . self::FILE . ': Invalid structure, references missing');
+                throw new ZfExtended_Exception(
+                    'Invalid JSON content of ' . self::FILE . ': Invalid structure, references missing'
+                );
             }
             $this->refs = new stdClass();
             $this->refs->sourceSrxPath = $json->refs[0];
@@ -237,11 +252,12 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
     /**
      * Very outdated installations may have no steps parsed into the bconf, we add them here
      * @return string[]
+     * @throws ZfExtended_Exception
      */
     private function getLegacySteps(): array
     {
-        $pipelinePath = dirname($this->getPath()) . '/' . editor_Plugins_Okapi_Bconf_Pipeline::FILE;
-        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline($pipelinePath, null, $this->getBconfId());
+        $pipelinePath = dirname($this->getPath()) . '/' . Pipeline::FILE;
+        $pipeline = new Pipeline($pipelinePath, null, $this->getBconfId());
 
         return $pipeline->getSteps();
     }

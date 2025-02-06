@@ -25,7 +25,8 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-use editor_Plugins_Okapi_Bconf_Segmentation_Srx as Srx;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
 use MittagQI\Translate5\Test\UnitTestAbstract;
 
 /**

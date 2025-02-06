@@ -23,7 +23,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Plugins\Okapi\ConfigMaintenance;
-use MittagQI\Translate5\Plugins\Okapi\Service;
+use MittagQI\Translate5\Plugins\Okapi\OkapiService;
 
 /**
  * Contains the config handler for core types
@@ -39,7 +39,7 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
     }
 
     /**
-     * @throws Zend_Db_Select_Exception
+     * @throws ReflectionException
      */
     public function validateValue(editor_Models_Config $config, &$newvalue, ?string &$errorStr): bool
     {
@@ -62,13 +62,13 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
                 $serverList[$serverKey] = $serverUrl;
             } else {
                 // new entries will be checked. If the version cannot be fetched, the service is not reachable ...
-                $versionString = Service::fetchServerVersion($serverUrl);
+                $versionString = OkapiService::fetchServerVersion($serverUrl);
                 if ($versionString === null) {
                     $errorStr .= ' Url "' . $serverUrl . '" of entry "' . $serverKey . '" is not valid.';
 
                     return false;
                 }
-                $serverList[Service::createServerKey($versionString)] = $serverUrl;
+                $serverList[OkapiService::createServerKey($versionString)] = $serverUrl;
             }
         }
 

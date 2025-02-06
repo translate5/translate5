@@ -140,10 +140,15 @@ class editor_Models_Segment_Whitespace
             'text' => self::LABEL_NBSP,
             'title' => 'No-Break Space (NBSP)',
         ],
+        '/\x{00AD}/u' => [
+            'ts' => 'c2ad',
+            'text' => '[SHY]',
+            'title' => 'Soft Hyphen (SHY)',
+        ],
         '/\x{1680}/u' => [
             'ts' => 'e19a80',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Ogham Space Mark',
+            'text' => '[OGSP]',
+            'title' => 'Ogham Space Mark (OGSP)',
         ],
         '/\x{180E}/u' => [
             'ts' => 'e1a08e',
@@ -152,73 +157,83 @@ class editor_Models_Segment_Whitespace
         ],
         '/\x{2000}/u' => [
             'ts' => 'e28080',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'En Quad',
+            'text' => '[NQSP]',
+            'title' => 'En Quad (NQSP)',
         ],
         '/\x{2001}/u' => [
             'ts' => 'e28081',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Em Quad',
+            'text' => '[MQSP]',
+            'title' => 'Em Quad (MQSP)',
         ],
         '/\x{2002}/u' => [
             'ts' => 'e28082',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'En Space',
+            'text' => '[ENSP]',
+            'title' => 'En Space (ENSP)',
         ],
         '/\x{2003}/u' => [
             'ts' => 'e28083',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Em Space',
+            'text' => '[EMSP]',
+            'title' => 'Em Space (EMSP)',
         ],
         '/\x{2004}/u' => [
             'ts' => 'e28084',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Three-Per-Em Space',
+            'text' => '[3/MSP]',
+            'title' => 'Three-Per-Em Space (3/MSP)',
         ],
         '/\x{2005}/u' => [
             'ts' => 'e28085',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Four-Per-Em Space',
+            'text' => '[4/MSP]',
+            'title' => 'Four-Per-Em Space (4/MSP)',
         ],
         '/\x{2006}/u' => [
             'ts' => 'e28086',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Six-Per-Em Space',
+            'text' => '[6/MSP]',
+            'title' => 'Six-Per-Em Space (6/MSP)',
         ],
         '/\x{2007}/u' => [
             'ts' => 'e28087',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Figure Space',
+            'text' => '[FSP]',
+            'title' => 'Figure Space (FSP)',
         ],
         '/\x{2008}/u' => [
             'ts' => 'e28088',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Punctuation Space',
+            'text' => '[PSP]',
+            'title' => 'Punctuation Space (PSP)',
         ],
         '/\x{2009}/u' => [
             'ts' => 'e28089',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Thin Space',
+            'text' => '[THSP]',
+            'title' => 'Thin Space (THSP)',
         ],
         '/\x{200A}/u' => [
             'ts' => 'e2808a',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Hair Space',
+            'text' => '[HSP]',
+            'title' => 'Hair Space (HSP)',
         ],
         '/\x{200B}/u' => [
             'ts' => 'e2808b',
             'text' => '[ZWSP]',
             'title' => 'Zero Width Space (ZWSP)',
         ],
+        '/\x{200C}/u' => [
+            'ts' => 'e2808c',
+            'text' => '[ZWNJ]',
+            'title' => 'Zero Width Non-Joiner (ZWNJ)',
+        ],
+        '/\x{2011}/u' => [
+            'ts' => 'e28091',
+            'text' => '‑',
+            'title' => 'Non-Breaking Hyphen (‑)',
+        ],
         '/\x{2028}/u' => [
             'ts' => 'e280a8',
             'text' => '[LS]',
-            'title' => 'Line Separator',
+            'title' => 'Line Separator (LS)',
         ],
         '/\x{2029}/u' => [
             'ts' => 'e280a9',
             'text' => '[PS]',
-            'title' => 'Paragraph Separator',
+            'title' => 'Paragraph Separator (PS)',
         ],
         '/\x{202F}/u' => [
             'ts' => 'e280af',
@@ -232,8 +247,8 @@ class editor_Models_Segment_Whitespace
         ],
         '/\x{3000}/u' => [
             'ts' => 'e38080',
-            'text' => self::LABEL_CHARACTER,
-            'title' => 'Ideographic Space',
+            'text' => '[IDSP]',
+            'title' => 'Ideographic Space (IDSP)',
         ],
         '/\x{FEFF}/u' => [
             'ts' => 'efbbbf',
@@ -250,7 +265,7 @@ class editor_Models_Segment_Whitespace
     /**
      * tag map for usage in language resources
      */
-    private array $tagShortcutNumberMap = [];
+    // private array $tagShortcutNumberMap = [];
 
     private array $protectedCharLabels = [];
 

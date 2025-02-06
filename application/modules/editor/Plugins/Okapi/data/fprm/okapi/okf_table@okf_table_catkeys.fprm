@@ -18,6 +18,7 @@ sourceColumns=1
 targetColumns=4
 commentColumns=3
 commentSourceRefs=1
+exposeCommentsAsMetadata.b=false
 recordIdColumn.i=0
 sourceIdSourceRefs=
 sourceIdSuffixes=

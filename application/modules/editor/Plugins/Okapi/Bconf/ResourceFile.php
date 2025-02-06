@@ -26,13 +26,17 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
 use MittagQI\ZfExtended\Controller\Response\Header;
+use ZfExtended_Debug;
+use ZfExtended_Exception;
 
 /**
  * Class representing a UTF-8-text based resource file embedded into a bconf
  * These are usually XML, JSON or plain text files
  */
-abstract class editor_Plugins_Okapi_Bconf_ResourceFile
+abstract class ResourceFile
 {
     /**
      * Little helper to create a unique hash for a resource
@@ -71,10 +75,13 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile
             if (! $this->content || strlen($this->content) < 1) {
                 // DEBUG
                 if ($this->doDebug) {
-                    error_log('RESOURCE FILE can only be instantiated for an existing file (' . $this->path . ') with contents');
+                    error_log('RESOURCE FILE can only be instantiated for an existing file ('
+                        . $this->path . ') with contents');
                 }
 
-                throw new ZfExtended_Exception(get_class($this) . ' can only be instantiated for an existing file (' . $this->path . ') with contents');
+                throw new ZfExtended_Exception(
+                    get_class($this) . ' can only be instantiated for an existing file (' . $this->path . ') with contents'
+                );
             }
         } else {
             $this->content = $content;
@@ -114,7 +121,7 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile
     /**
      * writes our content to our related file
      */
-    public function flush()
+    public function flush(): void
     {
         file_put_contents($this->path, $this->getContent());
     }
@@ -122,7 +129,7 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile
     /**
      * Generates download-headers and echos the contents
      */
-    public function download(string $downloadFilename)
+    public function download(string $downloadFilename): void
     {
         Header::sendDownload(
             $downloadFilename,
@@ -136,7 +143,7 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile
     /**
      * Generates the output for get actions
      */
-    public function output()
+    public function output(): void
     {
         Header::sendDownload(
             null,

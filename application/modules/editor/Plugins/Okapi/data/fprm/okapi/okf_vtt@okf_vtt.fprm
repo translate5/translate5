@@ -1,0 +1,5 @@
+#v1
+timeFormat=HH:mm:ss.SSS
+maxLinesPerCaption.i=2
+maxCharsPerLine.i=47
+cjkCharsPerLine.i=18

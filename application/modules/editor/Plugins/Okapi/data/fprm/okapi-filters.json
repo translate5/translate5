@@ -603,6 +603,15 @@
         "settings": true
     },
     {
+        "id": "okf_ttml",
+        "type": "okf_ttml",
+        "name": "TTML",
+        "description": "TTML Documents",
+        "mime": "application/ttml+xml",
+        "extensions": ["ttml","dfxp","xml"],
+        "settings": true
+    },
+    {
         "id": "okf_ttx",
         "type": "okf_ttx",
         "name": "TTX",
@@ -645,6 +654,15 @@
         "description": "Vignette files without CDATA sections",
         "mime": "text/xml",
         "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_vtt",
+        "type": "okf_vtt",
+        "name": "VTT",
+        "description": "VTT Documents",
+        "mime": "text/vtt",
+        "extensions": ["vtt"],
         "settings": true
     },
     {

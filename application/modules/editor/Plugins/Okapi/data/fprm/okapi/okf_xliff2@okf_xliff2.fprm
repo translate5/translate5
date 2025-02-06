@@ -1,9 +1,13 @@
 #v1
 maxValidation.b=true
-mergeAsParagraph.b=false
 useCodeFinder.b=false
-simplifyTags.b=true
+simplifyTags.b=false
 needsSegmentation.b=false
+forceUniqueIds.b=false
+ignoreTagTypeMatch.b=false
+discardInvalidTargets.b=false
+writeOriginalData.b=true
+subfilterOverwriteTarget.b=false
 codeFinderRules.count.i=1
 codeFinderRules.rule0=</?([A-Z0-9a-z]*)\b[^>]*>
 codeFinderRules.sample=&name; <tag></at><tag/> <tag attr='val'> </tag="val">

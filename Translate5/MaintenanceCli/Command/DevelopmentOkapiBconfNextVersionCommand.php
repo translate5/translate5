@@ -28,11 +28,12 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use editor_Plugins_Okapi_Bconf_ResourceFile;
-use editor_Plugins_Okapi_Bconf_Segmentation_Translate5;
 use editor_Plugins_Okapi_Init;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\ResourceFile;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\T5SrxInventory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Exception;
 
 /**
  * Command to increase the version-index and add FPRM hashes for the BCONF management of the OKAPI plugin
@@ -91,7 +92,7 @@ class DevelopmentOkapiBconfNextVersionCommand extends Translate5AbstractCommand
     {
         $changedHashes = 0;
         $changedVersions = 0;
-        $srxInventory = editor_Plugins_Okapi_Bconf_Segmentation_Translate5::instance();
+        $srxInventory = T5SrxInventory::instance();
         $srxItems = $srxInventory->getInventory();
         foreach ($srxItems as $index => $srxItem) {
             if (! $srxItem->sourceHash || strlen($srxItem->sourceHash) != 32) {
@@ -142,6 +143,6 @@ class DevelopmentOkapiBconfNextVersionCommand extends Translate5AbstractCommand
             throw new Zend_Exception('Okapi Segmentation Inventory translate5-segmentation.json is missing SRX file ' . basename($path));
         }
 
-        return editor_Plugins_Okapi_Bconf_ResourceFile::createHash(file_get_contents($path));
+        return ResourceFile::createHash(file_get_contents($path));
     }
 }

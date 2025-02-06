@@ -26,28 +26,36 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
+
+use editor_Models_ConfigException;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfValidation;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filters;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use ZfExtended_Debug;
+use ZfExtended_Exception;
+use ZfExtended_UnprocessableEntity;
+
 /**
  * This Class is Intended to test a FPRM file edited by the user
  * It tests filter, that are not X-Properties based and that we cannot validate otherwise
  * This class can only be used for already imported bconfs and will temporarily pack this bconf with the new filter
  * The passed FPRM filter must not already be flushed, otherwise the restoration of the original state is impossible
- * After validation, the filter will be flushed and the bconf packed, only toe update of the filter's hash in the DB is left to do. If you do not want this behaviour, use ::validateWithoutPacking
+ * After validation, the filter will be flushed and the bconf packed,
+ * only to update of the filter's hash in the DB is left to do.
+ * If you do not want this behaviour, use ::validateWithoutPacking
  */
-final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plugins_Okapi_Bconf_Validation
+final class FprmValidation extends BconfValidation
 {
     /**
-     * In case a custom filter has no extension mapped to it but we need to temporarily map an extension to it, we use this extension
-     * It is pretty safe to assume, that this extension never occurs in the wild :-)
+     * In case a custom filter has no extension mapped to it, but we need to temporarily map an extension to it,
+     * we use this extension
+     * It is pretty safe to assume, that this tmp extension never occurs in the wild :-)
      */
     public const TMP_MAPPING_EXTENSION = 'gqyzzvq';
 
-    private string $backupFilter;
-
-    private string $backupBconf;
-
-    private string $okapiType;
-
-    private ?string $tmpTestfile = null;
+    private string $type;
 
     /**
      * when we need to manipulate the mapping we have to revert it
@@ -61,45 +69,53 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
      */
     private bool $unlinkTestfile = false;
 
-    private editor_Plugins_Okapi_Bconf_Filter_Fprm $fprm;
+    private Fprm $fprm;
 
-    public function __construct(editor_Plugins_Okapi_Bconf_Entity $bconf, editor_Plugins_Okapi_Bconf_Filter_Fprm $fprm)
+    /**
+     * @throws ZfExtended_Exception
+     */
+    public function __construct(BconfEntity $bconf, Fprm $fprm)
     {
         $this->bconf = $bconf;
         $this->fprm = $fprm;
         $this->type = $fprm->getOkapiType();
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfValidation');
-        if (! array_key_exists($this->type, editor_Plugins_Okapi_Bconf_Filters::GUIS)) {
+        if (! array_key_exists($this->type, Filters::GUIS)) {
             // DEBUG
             if ($this->doDebug) {
-                error_log('FPRM VALIDATION ERROR: Can not validate fprm file ' . $this->fprm->getFile() . ' because for okapi-type "' . $this->type . '" there is no GUI set');
+                error_log('FPRM VALIDATION ERROR: Can not validate fprm file ' . $this->fprm->getFile()
+                    . ' because for okapi-type "' . $this->type . '" there is no GUI set');
             }
 
-            throw new ZfExtended_Exception('Can not validate fprm file ' . $this->fprm->getFile() . ' because for okapi-type "' . $this->type . '" there is no GUI set');
+            throw new ZfExtended_Exception('Can not validate fprm file ' . $this->fprm->getFile()
+                . ' because for okapi-type "' . $this->type . '" there is no GUI set');
         }
-        if (count(editor_Plugins_Okapi_Bconf_Filters::GUIS[$this->type]['extensions']) < 1) {
+        if (count(Filters::GUIS[$this->type]['extensions']) < 1) {
             // DEBUG
             if ($this->doDebug) {
-                error_log('FPRM VALIDATION ERROR: Can not validate fprm file ' . $this->fprm->getFile() . ' because for okapi-type "' . $this->type . '" there are no testfiles in editor_Plugins_Okapi_Bconf_Filters::GUIS set');
+                error_log('FPRM VALIDATION ERROR: Can not validate fprm file ' . $this->fprm->getFile()
+                    . ' because for okapi-type "' . $this->type . '" there are no testfiles in Filters::GUIS set');
             }
 
-            throw new ZfExtended_Exception('Can not validate fprm file ' . $this->fprm->getFile() . ' because for okapi-type "' . $this->type . '" there are no testfiles in editor_Plugins_Okapi_Bconf_Filters::GUIS set');
+            throw new ZfExtended_Exception(
+                'Can not validate fprm file ' . $this->fprm->getFile()
+                . ' because for okapi-type "' . $this->type . '" there are no testfiles in Filters::GUIS set'
+            );
         }
     }
 
     /**
      * Retrieves the file to test against
      * this may creates a temporary file that needs to be removed after validation
-     * @return string|null
      * @throws ZfExtended_Exception
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     protected function getTestFilePath(): string
     {
         $this->unlinkTestfile = false;
         // existance already checked in constructor
-        $testExtensions = editor_Plugins_Okapi_Bconf_Filters::GUIS[$this->type]['extensions'];
+        $testExtensions = Filters::GUIS[$this->type]['extensions'];
         $mappedExtensions = $this->bconf->getExtensionMapping()->findExtensionsForFilter($this->fprm->getIdentifier());
         // the easy case: we have one of the testable extensions mapped
         foreach ($mappedExtensions as $extension) {
@@ -107,42 +123,45 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
                 // bingo, the needed file already exists
                 // DEBUG
                 if ($this->doDebug) {
-                    error_log('FPRM VALIDATION: testfile: ' . editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('test.' . $extension));
+                    error_log('FPRM VALIDATION: testfile: '
+                        . Filters::createTestfilePath('test.' . $extension));
                 }
 
-                return editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('test.' . $extension);
+                return Filters::createTestfilePath('test.' . $extension);
             }
         }
         // create a folder for the temp test-file (can only be in the user space!)
-        $testFolder = editor_Plugins_Okapi_Bconf_Entity::getUserDataDir() . '/tmp';
+        $testFolder = BconfEntity::getUserDataDir() . '/tmp';
         if (! is_dir($testFolder)) {
             mkdir($testFolder, 0777, true);
         }
         if (count($mappedExtensions) < 1) {
-            // the hardest case: there are no extensions set for the edited filter
-            $this->bconf->getExtensionMapping()->addFilter($this->fprm->getIdentifier(), [self::TMP_MAPPING_EXTENSION]); // this flushes the adjusted map !
+            // the hardest case: there are no extensions set for the edited filter - this flushes the adjusted map !
+            $this->bconf->getExtensionMapping()->addFilter($this->fprm->getIdentifier(), [self::TMP_MAPPING_EXTENSION]);
             $this->mappingChanged = true;
-            $this->tmpTestfile = $testFolder . '/fprmtest.' . self::TMP_MAPPING_EXTENSION;
+            $tmpTestfile = $testFolder . '/fprmtest.' . self::TMP_MAPPING_EXTENSION;
         } else {
             // we simply take the first mapped extension and temporarily create a testfile with this extension
-            $this->tmpTestfile = $this->tmpTestfile = $testFolder . '/fprmtest.' . $mappedExtensions[0];
+            $tmpTestfile = $testFolder . '/fprmtest.' . $mappedExtensions[0];
         }
-        $source = editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('test.' . $testExtensions[0]);
-        copy($source, $this->tmpTestfile);
+        $source = Filters::createTestfilePath('test.' . $testExtensions[0]);
+        copy($source, $tmpTestfile);
         $this->unlinkTestfile = true;
         // DEBUG
         if ($this->doDebug) {
-            error_log('FPRM VALIDATION: temporary testfile: ' . $this->tmpTestfile . ($this->mappingChanged ? ', Mapping had to be changed' : ''));
+            error_log('FPRM VALIDATION: temporary testfile: ' . $tmpTestfile
+                . ($this->mappingChanged ? ', Mapping had to be changed' : ''));
         }
 
-        return $this->tmpTestfile;
+        return $tmpTestfile;
     }
 
     /**
      * Validates a FPRM by processing an okapi project with it (in conjunction with the related bconf)
-     * If the validation succeeds, the fprm is already be flushed and the bconf re-packed. Note, that the hash of the database-entry still must be updated !!
+     * If the validation succeeds, the fprm is already be flushed and the bconf re-packed.
+     * Note, that the hash of the database-entry still must be updated !!
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function validate(): bool
     {
@@ -153,7 +172,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
      * Validates a FPRM by processing an okapi project with it (in conjunction with the related bconf)
      * Does keep the bconf & fprm in it's original state
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function validateWithoutPacking(): bool
     {
@@ -164,7 +183,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
      * @throws ZfExtended_Exception
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     private function _validate(bool $keepOriginals): bool
     {
@@ -188,7 +207,8 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
             // restore original bconf
             unlink($bconfPath);
             rename($backupBconfPath, $bconfPath);
-            // restore original fprm. Only, if a valid fprm that was not mapped was sent and packing is wanted, we keep the changed fprm
+            // restore original fprm. Only, if a valid fprm that was not mapped was sent and packing is wanted,
+            // we keep the changed fprm
             if ($this->mappingChanged && $valid && ! $keepOriginals) {
                 unlink($backupFilterPath);
             } else {
@@ -202,8 +222,10 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
         }
         // additional processing for changed mappings
         if ($this->mappingChanged) {
-            $this->bconf->getExtensionMapping()->removeExtensions([self::TMP_MAPPING_EXTENSION]); // this flushes the reverted map !
-            // a valid fprm will require another re-pack (to not have the adjusted mapping parsed in) if not originals shall be restored - which then already was done above
+            // this flushes the reverted map !
+            $this->bconf->getExtensionMapping()->removeExtensions([self::TMP_MAPPING_EXTENSION]);
+            // a valid fprm will require another re-pack (to not have the adjusted mapping parsed in) if not
+            // originals shall be restored - which then already was done above
             if ($valid && ! $keepOriginals) {
                 $this->bconf->pack();
             }
@@ -214,7 +236,8 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
             $okapiMsg = array_pop($parts);
             // DEBUG
             if ($this->doDebug) {
-                error_log('FPRM VALIDATION ERROR: Failed to validate ' . $this->fprm->getFile() . ' [' . $okapiMsg);
+                error_log('FPRM VALIDATION ERROR: Failed to validate ' . $this->fprm->getFile()
+                    . ' [' . $okapiMsg);
             }
             $this->validationError = 'Failed to validate ' . $this->fprm->getFile() . ' [' . $okapiMsg;
 

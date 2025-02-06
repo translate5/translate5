@@ -26,6 +26,13 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FilterEntity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\OkapiFilterInventory;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\T5FilterInventory;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+
 /**
  * REST Endpoint Controller to serve the Default Bconfs Filter List for the Bconf-Management in the Preferences
  * This controller is not bound to an entity
@@ -35,34 +42,41 @@ class editor_Plugins_Okapi_BconfDefaultFilterController extends ZfExtended_RestC
     /**
      * copied the init method, parent can not be used, since no real entity is used here
      */
-    public function init()
+    public function init(): void
     {
         $this->initRestControllerSpecific();
     }
 
     /**
      * sends all default bconf filters as JSON, Translate5 adjusted and okapi defaults
+     *
      * @throws Zend_Db_Table_Exception
      */
-    public function getallAction()
+    public function getallAction(): void
     {
-        $bconf = new editor_Plugins_Okapi_Bconf_Filter_Entity();
+        $bconf = new FilterEntity();
         $startIndex = $bconf->getHighestId() + 1000000;
-        $t5Rows = editor_Plugins_Okapi_Bconf_Filter_Translate5::instance()->getGridRows($startIndex);
-        $this->view->rows = array_merge($t5Rows, editor_Plugins_Okapi_Bconf_Filter_Okapi::instance()->getGridRows(count($t5Rows) + $startIndex));
+        $t5Rows = T5FilterInventory::instance()->getGridRows($startIndex);
+        $this->view->rows = array_merge($t5Rows, OkapiFilterInventory::instance()->getGridRows(count($t5Rows) + $startIndex));
         $this->view->total = count($this->view->rows);
     }
 
     /**
      * Special set the extensions for a non-custom default filter (a filter without database-entry)
+     *
+     * @throws Throwable
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws BconfInvalidException
+     * @throws OkapiException
      */
-    public function setextensionsAction()
+    public function setextensionsAction(): void
     {
         $identifier = $this->getParam('identifier');
         $extensions = explode(',', $this->getParam('extensions', ''));
         $extensions = array_values(array_filter($extensions));
 
-        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $bconf = new BconfEntity();
         $bconf->load($this->getParam('bconfId'));
         $extensionMapping = $bconf->getExtensionMapping();
         if (count($extensions) > 0) {

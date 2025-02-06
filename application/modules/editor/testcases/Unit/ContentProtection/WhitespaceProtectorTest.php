@@ -122,6 +122,10 @@ class WhitespaceProtectorTest extends TestCase
             'text' => "text with [ ] in it",
             'expected' => 'text with [<char ts="c2a0" length="1"/>] in it',
         ];
+        yield 'Soft Hyphen' => [
+            'text' => "text with [­] in it",
+            'expected' => 'text with [<char ts="c2ad" length="1"/>] in it',
+        ];
         yield 'Ogham Space Mark' => [
             'text' => "text with [ ] in it",
             'expected' => 'text with [<char ts="e19a80" length="1"/>] in it',
@@ -177,6 +181,14 @@ class WhitespaceProtectorTest extends TestCase
         yield 'Zero Width Space (ZWSP)' => [
             'text' => "text with [​] in it",
             'expected' => 'text with [<char ts="e2808b" length="1"/>] in it',
+        ];
+        yield 'Zero Width Non-Joiner (ZWNJ) (ZWNJ)' => [
+            'text' => "text with [‌] in it",
+            'expected' => 'text with [<char ts="e2808c" length="1"/>] in it',
+        ];
+        yield 'Non-Breaking Hyphen' => [
+            'text' => "text with [‑] in it",
+            'expected' => 'text with [<char ts="e28091" length="1"/>] in it',
         ];
         yield 'Line Separator' => [
             'text' => "text with [ ] in it",

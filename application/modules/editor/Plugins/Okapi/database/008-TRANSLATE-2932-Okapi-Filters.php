@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
 /**
  * This script imports all fprms extracted to the bconf-data-folders additionally to the DB
  */
+
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
@@ -44,7 +45,7 @@ $SCRIPT_IDENTIFIER = '008-TRANSLATE-2932-Okapi-Filters.php';
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
-$bconf = new editor_Plugins_Okapi_Bconf_Entity();
+$bconf = new \MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity();
 foreach ($bconf->loadAll() as $bconfData) {
     try {
         $bconf->load($bconfData['id']);

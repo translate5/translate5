@@ -74,7 +74,7 @@ class ConfigMaintenance
         $oldValue = null;
         $this->config->loadByName(self::CONFIG_SERVER);
         $servers = $this->fromJson($this->config->getValue());
-        if (!empty($servers[$name])) {
+        if (! empty($servers[$name])) {
             $oldValue = $servers[$name];
         }
         $servers[$name] = $url;
@@ -87,7 +87,6 @@ class ConfigMaintenance
 
     /**
      * Adds all servers behind a Jetty-url (or replaces them if the version exists)
-     * @param string $url: the potential jetty-url
      * @return array: The list of added servers
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
@@ -98,10 +97,10 @@ class ConfigMaintenance
      */
     public function addJettyUrl(string $url): array
     {
-        $service = editor_Plugins_Okapi_Init::createService(Service::ID);
+        $service = editor_Plugins_Okapi_Init::createService(OkapiService::ID);
         $addedServers = $service->findOkapiVersions($url);
 
-        if(!empty($addedServers)){
+        if (! empty($addedServers)) {
             $serverList = array_merge($service->getAllServers(), $addedServers);
             $this->setServerList($serverList);
             $this->cleanUpNotUsed($serverList);
@@ -139,6 +138,16 @@ class ConfigMaintenance
     }
 
     /**
+     * Retrieves the currently configured OKAPI version
+     */
+    public function getServerUsed(): string
+    {
+        $this->config->loadByName(self::CONFIG_SERVER_USED);
+
+        return (string) $this->config->getValue();
+    }
+
+    /**
      * Update server used config defaults when new server is added (runtimeOptions.plugins.Okapi.server)
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
@@ -170,7 +179,6 @@ class ConfigMaintenance
      * Check if the removed config is used from the tasks. If yes, this action is not allowed. We can not remove
      * used config name/server.
      * @param array $serverList plain array of removed servers
-     * @return int
      * @throws ReflectionException
      */
     public function countTaskUsageSum(array $serverList): int
@@ -190,7 +198,6 @@ class ConfigMaintenance
     /**
      * Check if the removed config is used from the tasks. If yes, this action is not allowed. We can not remove
      * used config name/server.
-     * @return array
      * @throws ReflectionException
      */
     public function countTaskUsage(): array
@@ -269,7 +276,6 @@ class ConfigMaintenance
      * Purges the unused okapi config entries. Keeps either the latest one (by version) or the one given by name
      * @param array $summary the current summary of configured Okapi instances
      * @param string|null $nameToKeep if omitted keep the latest one (by version)
-     * @param bool $sortByVersion
      * @return array returns the serverlist to be used after purging
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
@@ -277,12 +283,11 @@ class ConfigMaintenance
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     public function purge(
-        array  $summary,
+        array $summary,
         string $nameToKeep = null,
-        bool   $sortByVersion = false,
-        bool   $keepLast = true,
-    ): array
-    {
+        bool $sortByVersion = false,
+        bool $keepLast = true,
+    ): array {
         if ($sortByVersion) {
             ksort($summary, SORT_NATURAL);
         }
@@ -292,7 +297,7 @@ class ConfigMaintenance
             $nameToKeep = end($keys);
         }
 
-        if (!is_null($nameToKeep) && isset($summary[$nameToKeep])) {
+        if (! is_null($nameToKeep) && isset($summary[$nameToKeep])) {
             //we just set a value here to keep the entry
             $summary[$nameToKeep]['taskUsageCount'] = 1;
         }
@@ -302,7 +307,7 @@ class ConfigMaintenance
                 return $item['url'];
             },
             array_filter($summary, function ($data) {
-                return ($data['taskUsageCount'] ?? 0) > 0 && !empty($data['url']);
+                return ($data['taskUsageCount'] ?? 0) > 0 && ! empty($data['url']);
             })
         );
 
@@ -322,7 +327,7 @@ class ConfigMaintenance
      */
     public function purgeOffline(bool $sortByVersion = false): array
     {
-        $service = editor_Plugins_Okapi_Init::createService(Service::ID);
+        $service = editor_Plugins_Okapi_Init::createService(OkapiService::ID);
         $serverList = $service->getOnlineServers();
 
         if ($sortByVersion) {
@@ -367,7 +372,7 @@ class ConfigMaintenance
 
         $serverList = array_keys($serverList);
 
-        if (!empty($serverList)) {
+        if (! empty($serverList)) {
             $where['value NOT IN (?)'] = $serverList;
         }
         // remove all serverUsed configs with non-existing server values
@@ -376,7 +381,7 @@ class ConfigMaintenance
         $this->config->loadByName(self::CONFIG_SERVER_USED);
 
         // if the current default config on instance level is not in the server list, we reset it to the last one
-        if (!in_array($this->config->getValue(), $serverList)) {
+        if (! in_array($this->config->getValue(), $serverList)) {
             $this->config->setValue(end($serverList));
             $this->config->save();
         }
@@ -389,6 +394,7 @@ class ConfigMaintenance
     {
         /* @var ZfExtended_Plugin_Manager $pluginmanager */
         $pluginmanager = Zend_Registry::get('PluginManager');
+
         return $pluginmanager->isActive('Okapi');
     }
 }
