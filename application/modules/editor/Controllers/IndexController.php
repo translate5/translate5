@@ -463,9 +463,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         // set special characters list into a front-end view variable.
         // This should be removed after this config is moved to lvl 16
+
         $this->view->Php2JsVars()->set(
             'editor.segments.editorSpecialCharacters',
-            $rop->editor->segments?->editorSpecialCharacters ?? ''
+            self::addGlobalSpecialCharactersInsertInfo($rop->editor->segments?->editorSpecialCharacters)
         );
 
         // add the supported file extensions for task reimport as frontend variable
@@ -992,5 +993,31 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             }
         }
         $this->view->Php2JsVars()->set('editor.task.customFields', $allowed);
+    }
+
+    private static function addGlobalSpecialCharactersInsertInfo(?string $specialCharactersJson): string
+    {
+        if (empty($specialCharactersJson)) {
+            return '';
+        }
+
+        $specialCharacters = json_decode($specialCharactersJson, true);
+        if (empty($specialCharacters['all'])) {
+            return $specialCharactersJson;
+        }
+        $isChanged = false;
+        foreach ($specialCharacters['all'] as &$specialCharacter) {
+            $regExp = '/\x{' . substr($specialCharacter['unicode'], 2) . '}/u'; // from "U+200A"
+            $protectedChar = editor_Models_Segment_Whitespace::PROTECTED_CHARACTERS[$regExp] ?? null;
+            if ($protectedChar !== null) {
+                // initial implementation, no alternative in JS ?
+                $cssClass = implode('', unpack('H*', 'char ts="' . $protectedChar['ts'] . '" length="1"/'));
+                $specialCharacter['tagInfo'] = $protectedChar['text'] . '|' . $cssClass;
+                $specialCharacter['visualized'] = $protectedChar['title'];
+                $isChanged = true;
+            }
+        }
+
+        return $isChanged ? json_encode($specialCharacters) : $specialCharactersJson;
     }
 }

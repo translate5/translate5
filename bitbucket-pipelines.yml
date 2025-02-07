@@ -20,7 +20,7 @@ pipelines:
             image: composer:2.7
             script:
               - composer install --ignore-platform-reqs
-              - MODIFIED_FILES=$(git --no-pager diff --diff-filter=d --name-only `git merge-base origin/$BITBUCKET_PR_DESTINATION_BRANCH HEAD` -- "**.php")
+              - MODIFIED_FILES=$(git --no-pager diff --diff-filter=d --name-only `git merge-base origin/$BITBUCKET_PR_DESTINATION_BRANCH HEAD` -- "**.php" ":(exclude).phpstan/*")
               - >
                 if [ -z $MODIFIED_FILES ]; then
                   echo "No PHP files have been modified.";
@@ -40,7 +40,7 @@ pipelines:
               - composer install --ignore-platform-reqs
               - cd library/ZfExtended && git fetch && (git checkout $BITBUCKET_BRANCH || git checkout $BITBUCKET_PR_DESTINATION_BRANCH) && cd ../..
               - cd application/modules/editor/PrivatePlugins && git fetch && (git checkout $BITBUCKET_BRANCH || git checkout $BITBUCKET_PR_DESTINATION_BRANCH) && cd ../../../..
-              - MODIFIED_FILES=$(git --no-pager diff --diff-filter=d --name-only `git merge-base origin/$BITBUCKET_PR_DESTINATION_BRANCH HEAD` -- "**.php")
+              - MODIFIED_FILES=$(git --no-pager diff --diff-filter=d --name-only `git merge-base origin/$BITBUCKET_PR_DESTINATION_BRANCH HEAD` -- "**.php" ":(exclude).phpstan/*")
               - >
                 if [ -z $MODIFIED_FILES ]; then
                   echo "No PHP files have been modified.";
@@ -75,7 +75,7 @@ pipelines:
           size: 2x
           script:
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
-            - cd docker && ./bitbucket/test-script.sh
+            - cd docker && ./bitbucket/test-script-okapi147.sh
           artifacts:
             - translate5/data/**
           after-script:

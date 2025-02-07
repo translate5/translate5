@@ -1,6 +1,6 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/IDML_Filter",
-    "maxAttributeSize": "Maximal attribute size of idml attributes",
+    "maxAttributeSize": "Maximal attribute size",
     "untagXmlStructures": "Untag XML structures",
     "extractNotes": "Extract notes",
     "extractMasterSpreads": "Extract master spreads",
@@ -10,6 +10,10 @@
     "extractBreaksInline": "Extract breaks inline",
     "extractCustomTextVariables": "Extract custom text variables",
     "extractIndexTopics": "Extract index topics",
+    "extractHyperlinkTextSourcesInline": "Extract hyperlink text sources inline",
+    "extractExternalHyperlinks": "Extract external hyperlinks",
+    "specialCharacterPattern": "Protect listed whitespace characters<br>(Important: Do NOT use in translate5 - see tooltip)",
+    "specialCharacterPatternTooltip": "The whitespace needs to be left unprotected in the initial file format conversion from IDML to Xliff. The reason: translate5 needs to be able to protect the whitespace in the translate5 way for correct TM matching, instead in the Okapi way (Okapi is used for conversion from IDML to Xliff under the hood in translate5)",
     "ignoreCharacterKerning": "Ignore character kerning",
     "characterKerningMinIgnoranceThreshold": "Character kerning minimum ignorance threshold",
     "characterKerningMaxIgnoranceThreshold": "Character kerning maximum ignorance threshold",
@@ -21,5 +25,7 @@
     "characterLeadingMaxIgnoranceThreshold": "Character leading maximum ignorance threshold",
     "ignoreCharacterBaselineShift": "Ignore character baseline shift",
     "characterBaselineShiftMinIgnoranceThreshold": "Character baseline shift minimum ignorance threshold",
-    "characterBaselineShiftMaxIgnoranceThreshold": "Character baseline shift maximum ignorance threshold"
+    "characterBaselineShiftMaxIgnoranceThreshold": "Character baseline shift maximum ignorance threshold",
+    "useCodeFinder": "Use codefinder",
+    "codeFinderRules.useAllRulesWhenTesting": "Test using all rules"
 }

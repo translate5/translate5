@@ -379,9 +379,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 },
                 {
                     xtype: 'tbspacer',
-                    flex: 1.6,
-                },
-            ],
+                    flex: 1.6
+                }
+            ]
         }];
         return me.callParent([Ext.apply(config, instanceConfig)]);
     }

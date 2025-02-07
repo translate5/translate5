@@ -124,21 +124,30 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
         matches.push('all');
 
         // To keep track of added values
-        let addedValues = new Set();
+        let addedValues = new Set(), comboData= [];
 
         Ext.Array.each(matches, function(rec) {
             if(decoded[rec] !== undefined){
                 Ext.Array.each(decoded[rec], function(r) {
 
-                    var value = Editor.util.Util.toUnicodeCodePointEscape(r.unicode);
+                    var value = Editor.util.Util.toUnicodeCodePointEscape(r.unicode),
+                    hasTag = r.hasOwnProperty('tagInfo');
 
                     if (!addedValues.has(value)) {
-                        items.push({
-                            xtype:'specialCharactersButton',
-                            text: r.visualized,
-                            value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode),
-                            tooltip: Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode]
-                        });
+
+                        if(hasTag){
+                            comboData.push({
+                                txt: r.visualized,
+                                val: r.tagInfo + '|' + r.visualized,
+                            });
+                        } else {
+                            items.push({
+                                xtype: 'specialCharactersButton',
+                                text: r.visualized,
+                                value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode),
+                                tooltip: Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode]
+                            });
+                        }
 
                         addedValues.add(value);
                     }
@@ -146,5 +155,30 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
             }
         });
 
+        if(comboData.length){
+            if(items.length > this.columns) {
+                const missingCols = this.columns - items.length % this.columns;
+                if(missingCols < this.columns){
+                    // fill missing spaces
+                    items.push({xtype:"container",colspan:missingCols});
+                }
+            }
+            items.push({
+                xtype: 'combo',
+                store: Ext.create('Ext.data.Store', {
+                    fields: ['txt', 'val'],
+                    data: comboData
+                }),
+                colspan: 8,
+                itemId: 'specialCharactersCombo',
+                emptyText: Editor.data.l10n.general.plsSelect,
+                displayField: 'txt',
+                valueField: 'val'
+            });
+            if(items.length > this.columns){
+                // make combobox wider
+                items[items.length-1].width = 230;
+            }
+        }
     }
 });

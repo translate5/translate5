@@ -40,3 +40,6 @@ sdlSegConfValue=Translated
 codeFinderRules.count.i=0
 codeFinderRules.sample=
 codeFinderRules.useAllRulesWhenTesting.b=false
+alwaysAddTargets.b=false
+forceUniqueIds.b=false
+useTranslationTargetState.b=false

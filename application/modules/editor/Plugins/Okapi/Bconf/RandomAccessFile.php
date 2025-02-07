@@ -26,12 +26,18 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use SplFileObject;
+use Throwable;
+use ZfExtended_UnprocessableEntity;
+
 /**
  * Common util class for bconf export and import
  * Java reads/writes/represents in BigEndian
  * Algorithmically a copy of the original JAVA implementation
  */
-class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
+class RandomAccessFile extends SplFileObject
 {
     /**
      * @var int
@@ -50,7 +56,7 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
 
     public function __construct(
         string $filename,
-        string $mode = "r",
+        string $mode = 'r',
         bool $useIncludePath = false,
         ?object $context = null
     ) {
@@ -64,10 +70,10 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
     public function readUTF()
     {
         try {
-            $utflen = unpack("n", $this->fread(2))[1]; // n -> Big Endian unsigned short (Java)
+            $utflen = unpack('n', $this->fread(2))[1]; // n -> Big Endian unsigned short (Java)
 
             // unpack("A"...) strips whitespace!
-            return $utflen > 0 ? unpack("a" . $utflen, $this->fread($utflen))[1] : '';
+            return ($utflen > 0) ? unpack('a' . $utflen, $this->fread($utflen))[1] : '';
         } catch (Throwable $e) {
             throw new ZfExtended_UnprocessableEntity(errorCode: 'E1026', previous: $e);
         }
@@ -78,7 +84,7 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
     public function writeUTF($string, bool $withNullByte = true): void
     {
         $length = strlen($string);
-        $this->fwrite(pack("n", $length));
+        $this->fwrite(pack('n', $length));
         $this->fwrite($string . ($withNullByte ? "\0" : ''));
     }
 
@@ -89,7 +95,7 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
     {
         $length = strlen($string);
 
-        return pack("n", $length) . $string;
+        return pack('n', $length) . $string;
     }
 
     /**
@@ -101,7 +107,7 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
     public function readInt(): mixed
     {
         try {
-            $uint32 = unpack("N", $this->fread(4))[1]; // N -> UInt32.BE but we want Int32
+            $uint32 = unpack('N', $this->fread(4))[1]; // N -> UInt32.BE but we want Int32
 
             return $uint32 <= self::PHP_INT32_MAX ? $uint32 : $uint32 - self::OVERFLOW_SUB;
         } catch (Throwable $e) {
@@ -114,6 +120,6 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
      */
     public function writeInt($intValue): void
     {
-        $this->fwrite(pack("N", $intValue));
+        $this->fwrite(pack('N', $intValue));
     }
 }

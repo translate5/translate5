@@ -1,0 +1,10 @@
+[
+  {
+    "type": "okf_openxml",
+    "properties": {
+      "translatePowerpointComments.b" : "bPreferenceTranslatePowerpointComments.b",
+      "translateExcelCellsCopied.b" : "translateExcelCellsCopied"
+    }
+  }
+]
+

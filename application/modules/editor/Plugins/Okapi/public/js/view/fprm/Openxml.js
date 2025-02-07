@@ -30,12 +30,11 @@
     Note we have 3 different color-formats !
     Also note that the data-name "zzz" applies to 3 controls e,g. "zzz1=2AB" means: second sent value, references selector "2", value "AB". it can hardly become crazier ...
     ...
-    bPreferenceTranslateExcelExcludeColumns.b=true
+    bPreferenceTranslateExcelExcludeColumns.b=true (obsolete)
     ...
     tsComplexFieldDefinitionsToExtract.i=2
     cfd0=FORMTEXT
     tsExcelExcludedColors.i=2
-    tsExcelExcludedColumns.i=6
     tsExcludeWordStyles.i=2
     tsWordHighlightColors.i=2
     tsWordExcludedColors.i=1
@@ -52,12 +51,6 @@
     sln0.i=1
     sln1.i=2
     sln2.i=3
-    zzz0=1AC
-    zzz1=1AD
-    zzz2=2A
-    zzz3=2F
-    zzz4=3B
-    zzz5=3C
 
     see /okapi-ui/swt/filters/openxml-ui/src/main/java/net/sf/okapi/filters/openxml/ui/Editor.java
     see /okapi/filters/openxml/src/main/java/net/sf/okapi/filters/openxml/ConditionalParameters.java
@@ -74,26 +67,32 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     fieldDefinitions: {
         /* General Options */
         'tabGeneralOptions': { type: 'tab', icon: 'fa-cog', children: {
-            'maxAttributeSize.i': { config: { hidden: true, valueDefault: 4194304 }},  // not visible in Rainbow, default value = 4kB as defined in rainbow-code
+            'maxAttributeSize.i': {},  // not visible in Rainbow, default value = 4MB (4194304) is defined in rainbow-code
             'sPreferenceLineSeparatorReplacement': { config: { hidden: true, valueDefault: '\n' }}, // not visible in Rainbow, default value as defined in default-fprm
             'bPreferenceAllowEmptyTargets.b': { config: { hidden: true, valueDefault: false }}, // not visible in Rainbow, default value as defined in default-fprm
             'bPreferenceTranslateDocProperties.b': {},
             'bPreferenceTranslateComments.b': {},
             'bPreferenceAggressiveCleanup.b': {},
             'bPreferenceAddTabAsCharacter.b': {},
-            'bPreferenceAddLineSeparatorAsCharacter.b': {}
-
+            'bPreferenceAddLineSeparatorAsCharacter.b': {},
+            'bExtractExternalHyperlinks.b': {}
+            // new "Font Mappings" grid added
         }},
         /* Word Options */
         'tabWordOptions': { type: 'tab', icon: 'fa-file-word-o', children: {
             'bPreferenceTranslateWordHeadersFooters.b': {},
+            'translateWordNumberingLevelText.b': {},
             'bPreferenceTranslateWordHidden.b': {},
             'bPreferenceTranslateWordExcludeGraphicMetaData.b': {},
             'bPreferenceAutomaticallyAcceptRevisions.b': {},
             'bPreferenceIgnoreSoftHyphenTag.b': {},
             'bPreferenceReplaceNoBreakHyphenTag.b': {},
-            'bExtractExternalHyperlinks.b': {},
+            'allowWordStyleOptimisation.b': {},
             'tsComplexFieldDefinitionsToExtract.i': { type: 'tagfield', identifier: 'cfd', guiData: 'translateableHyperlinkFields' },
+            'ignoreWordFontColors.b': { type: 'boolset', children: {
+                    'wordFontColorsMinIgnoranceThreshold': { config: { ignoreEmpty: true }},
+                    'wordFontColorsMaxIgnoranceThreshold': { config: { ignoreEmpty: true }}
+            }},
             'bInExcludeMode.b': { type: 'radio' },
             'tsExcludeWordStyles.i': { type: 'tagfield', identifier: 'sss', guiData: 'wordStyles' },
             'bInExcludeHighlightMode.b': { type: 'radio' },
@@ -105,26 +104,47 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         'tabExcelOptions': { type: 'tab', icon: 'fa-file-excel-o', children: {
             'bPreferenceTranslateExcelHidden.b': {},
             'bPreferenceTranslateExcelSheetNames.b': {},
+            'translateExcelCellsCopied.b': {},
             'bPreferenceTranslateExcelDiagramData.b': {},
             'bPreferenceTranslateExcelDrawings.b': {},
+            'preserveExcelStylesInTargetColumns.b': {},
             'tsExcelExcludedColors.i': { type: 'tagfield', identifier: 'ccc', guiData: 'colors', dataPrefix: 'FF' },
             'bPreferenceTranslateExcelExcludeColors.b': { config: { hidden: true }},
-            'subfilter': { config: {}},
-            'bPreferenceTranslateExcelExcludeColumns.b': { type: 'boolset', children: { // if not true, tsExcelExcludedColumns, tsExcelExcludedColumnsSheetN will not be processed
+            'subfilter': {}
+            /*'bPreferenceTranslateExcelExcludeColumns.b': { type: 'boolset', children: { // if not true, tsExcelExcludedColumns, tsExcelExcludedColumnsSheetN will not be processed
                 'tsExcelExcludedColumnsSheet1.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '1' }, // this is a "virtual" field that does not show up in the data
                 'tsExcelExcludedColumnsSheet2.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '2' }, // this is a "virtual" field that does not show up in the data
                 'tsExcelExcludedColumnsSheet3.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '3' } // this is a "virtual" field that does not show up in the data
             }},
             'tsExcelExcludedColumns.i': { config: { hidden: true }} // this stores the number of values for the 3 fields in bPreferenceTranslateExcelExcludeColumns.b
-
+            */
+            // the above is commented out as there's no more bPreferenceTranslateExcelExcludeColumns and tsExcelExcludedColumns - "Worksheet configurations" grid instead:
+            /* worksheetConfigurations.number.i=1
+            worksheetConfigurations.0.namePattern=Sheet1
+            worksheetConfigurations.0.sourceColumns=A
+            worksheetConfigurations.0.targetColumns=B
+            worksheetConfigurations.0.excludedRows=1,2
+            worksheetConfigurations.0.excludedColumns=C,D
+            worksheetConfigurations.0.metadataRows=3
+            worksheetConfigurations.0.metadataColumns=E */
         }},
         /* PowerPoint Options */
         'tabPowerpointOptions': { type: 'tab', icon: 'fa-file-powerpoint-o', children: {
             'bPreferenceTranslatePowerpointHidden.b': { config: { hidden: true }},
             'bReorderPowerpointNotesAndComments.b': { config: { hidden: true }}, // not visible in Rainbow
+            'translatePowerpointDocProperties.b': {},
+            'translatePowerpointDiagramData.b': {},
+            'translatePowerpointCharts.b': {},
             'bPreferenceTranslatePowerpointNotes.b': {},
+            'translatePowerpointComments.b': {},
             'bPreferenceTranslatePowerpointMasters.b': {},
             'bPreferenceIgnorePlaceholdersInPowerpointMasters.b': {},
+            'reorderPowerpointDocProperties.b': {},
+            'reorderPowerpointDiagramData.b': {},
+            'reorderPowerpointCharts.b': {},
+            'bPreferenceReorderPowerpointNotes.b': {},
+            'reorderPowerpointComments.b': {},
+            'reorderPowerpointRelationships.b': {},
             'bPreferencePowerpointIncludedSlideNumbersOnly.b': { type: 'boolset', children: {
                 'tsPowerpointIncludedSlideNumbers.i': { type: 'tagfield', identifier: 'sln', guiData: 'numbers' }
             }}
@@ -185,8 +205,8 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
      */
     getTagfieldValue: function(id, identifier, prefix){
         var i, val, numVals, vals = [];
-        // very special coding for the 3 tsExcelExcludedColumnsSheet. they save their data combined as zzz0 ... zzzN
-        if(id.includes('tsExcelExcludedColumnsSheet')){
+        // very special coding for the 3 tsExcelExcludedColumnsSheet. they save their data combined as zzz0 ... zzzN (obsolete)
+        /* if(id.includes('tsExcelExcludedColumnsSheet')){
             numVals = this.getFieldValue('tsExcelExcludedColumns', 0, 'integer', false);
             //  excel excluded columns only when bPreferenceTranslateExcelExcludeColumns.b is true !
             if(numVals > 0 && this.getFieldValue('bPreferenceTranslateExcelExcludeColumns', false, 'boolean', false) === true){
@@ -200,7 +220,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
                     }
                 }
             }
-        } else {
+        } else {*/
             // the "normal" case: collect by identifier
             numVals = this.getFieldValue(id, 0, 'integer', false);
             if(numVals > 0){
@@ -210,7 +230,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
                     }
                 }
             }
-        }
+        //}
         vals.sort();
         return vals;
     },
@@ -253,21 +273,21 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             // init additional values cache
             if(!this.hasOwnProperty('additionalFormVals')){
                 this.additionalFormVals = {};
-                this.additionalFormVals.zzz = [];
+                //this.additionalFormVals.zzz = [];
             }
             var identifier = fieldConfig.fieldDataIdentifier;
             if(value && Array.isArray(value) && value.length > 0){
                 // all 3 tsExcelExcludedColumnsSheetN fields will be sent with the same identifier and need further processing
-                if(name.includes('tsExcelExcludedColumnsSheet')){
+                /*if(name.includes('tsExcelExcludedColumnsSheet')){
                     this.additionalFormVals.zzz = this.additionalFormVals.zzz.concat(value);
-                } else {
+                } else {*/
                     // only the powerpoint-slidenumbers are integers and thus need a type-suffix
                     type = (name === 'tsPowerpointIncludedSlideNumbers') ? '.i' : '';
                     for(var i = 0; i < value.length; i++){
                         this.additionalFormVals[identifier + String(i) + type] = (type === '.i') ? parseInt(value[i]) : value[i];
                     }
                     return value.length;
-                }
+                //}
             }
             return 0;
         }
@@ -282,7 +302,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         // adding the tagfield-contents cached in additionalFormVals the crazy way (especially for "zzz")
         if(this.additionalFormVals){
             for(var name in this.additionalFormVals){
-                if(name === 'zzz'){
+                /*if(name === 'zzz'){ // obsolete
                     if(this.additionalFormVals.zzz.length > 0 && vals['bPreferenceTranslateExcelExcludeColumns.b'] === true){
                         vals['tsExcelExcludedColumns.i'] = this.additionalFormVals.zzz.length; // holds the number of "zzz" values
                         for(var i = 0; i < this.additionalFormVals.zzz.length; i++){
@@ -291,16 +311,16 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
                     } else {
                         vals['tsExcelExcludedColumns.i'] = 0;
                     }
-                } else {
+                } else {*/
                     vals[name] = this.additionalFormVals[name];
-                }
+                //}
             }
             delete this.additionalFormVals;
         }
-        // cleanup virtual fields
-        delete vals['tsExcelExcludedColumnsSheet1.i'];
+        // cleanup virtual fields (obsolete)
+        /*delete vals['tsExcelExcludedColumnsSheet1.i'];
         delete vals['tsExcelExcludedColumnsSheet2.i'];
-        delete vals['tsExcelExcludedColumnsSheet3.i'];
+        delete vals['tsExcelExcludedColumnsSheet3.i'];*/
         // when bPreferencePowerpointIncludedSlideNumbersOnly.b is disabled, this would not be included, but the FPRM-settings expect this value to exist
         if(!vals.hasOwnProperty('tsPowerpointIncludedSlideNumbers.i')){
             vals['tsPowerpointIncludedSlideNumbers.i'] = 0;
@@ -312,11 +332,11 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
      */
     resolveFieldDependencies: function(){
         // if the ckeckbox is not set we need to remove the Column-Choices
-        if(this.form.findField('bPreferenceTranslateExcelExcludeColumns.b').getValue() === false){
+        /*if(this.form.findField('bPreferenceTranslateExcelExcludeColumns.b').getValue() === false){
             this.form.findField('tsExcelExcludedColumnsSheet1.i').setRawValue([]);
             this.form.findField('tsExcelExcludedColumnsSheet2.i').setRawValue([]);
             this.form.findField('tsExcelExcludedColumnsSheet3.i').setRawValue([]);
-        }
+        }*/
         if(this.form.findField('bPreferencePowerpointIncludedSlideNumbersOnly.b').getValue() === false){
             this.form.findField('tsPowerpointIncludedSlideNumbers.i').setRawValue([]);
         }

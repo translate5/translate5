@@ -81,21 +81,24 @@ If no name is given, use the last one from the configured server list.');
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $this->writeTitle('Update Okapi server used by default');
+        $this->writeTitle('Update OKAPI server used by default');
 
         $name = $this->input->getArgument('name');
         $config = new ConfigMaintenance();
         $serverNames = array_keys($config->getServerList());
+        $usedServer = $config->getServerUsed();
         $doSelect = $this->input->getOption('select');
 
-        if ($doSelect){
-            $question ='Please choose one of the following OKAPI versions:';
+        $this->io->writeln('Currently used OKAPI version: <info>' . $usedServer . '</info>');
+
+        if ($doSelect) {
+            $question = 'Please choose one of the following OKAPI versions:';
             $askName = new ChoiceQuestion($question, $serverNames, null);
             $name = $this->io->askQuestion($askName);
-        } else if (empty($name)) {
+        } elseif (empty($name)) {
             $name = end($serverNames);
         } elseif (! in_array($name, $serverNames)) {
-            throw new LogicException('Given okapi server name "' . $name . '" does not exist! ');
+            throw new LogicException('Given OKAPI server name "' . $name . '" does not exist! ');
         }
 
         if ($input->getOption('clean-customers')) {
@@ -108,7 +111,7 @@ If no name is given, use the last one from the configured server list.');
         $config->updateServerUsed($name);
         $config->updateServerUsedDefaults($config->getServerList());
 
-        $this->io->success('Set used okapi config to: ' . $name);
+        $this->io->success('Set used OKAPI config to: ' . $name);
         if ($input->getOption('clean-customers')) {
             $this->io->success('Cleaned customers!');
         }

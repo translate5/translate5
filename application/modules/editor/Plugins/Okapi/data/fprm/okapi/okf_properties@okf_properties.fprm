@@ -18,4 +18,3 @@ codeFinderRules.rule2=\{\d[^\\]*?\}
 codeFinderRules.rule3=\<(/?)\w+[^>]*?>
 codeFinderRules.sample=%s, %d, {1}, \n, \r, \t, etc.
 codeFinderRules.useAllRulesWhenTesting.b=true
-subfilter=

@@ -1,0 +1,20 @@
+{
+  "skinAnalysis_editingControls_label_scoringWrinklesAndRed": "Green: Scoring possible in \"Wrinkles\" and \"Red Areas\"",
+  "captureSetSelector_captureSetButtons_dateTime_am": "AM",
+  "captureSetSelector_captureSetButtons_dateTime_pm": "PM",
+  "skinMaskEditing_editingControls_button_editMasks": "Edit Mask",
+  "skinMaskEditing_editingControlsDescription_label_excludeFromScoring": "Brush to exclude areas from scoring.",
+  "skinMaskEditing_editingControlsDescription_label_excludeFromCalculation": "Brush to {{variable}} exclude areas from calculation.",
+  "measurements_viewSettings_title_advanced": "Advanced",
+  "measurements_viewSettings_checkBox_alternativeFifths": "Use Postaurale\nlandmark",
+  "measurements_viewSettings_checkBox_alternativeLowerThird": "Use Pogonion\nlandmark",
+  "volumeComparison_colorLegend_unitLabel_mm": "mm",
+  "volumeComparison_colorLegend_unitLabel_inch": "inch",
+  "volumeComparison_deltaLandmarks_unitLabel_ml": "ml",
+  "volumeComparison_deltaLandmarks_unitLabel_ounces": "oz",
+  "comparisonFeature_progressPopUp_label_progress100": "Finished",
+  
+  "editingControls_button_resetToDefault": "Reset",
+  "landmarkEditing_editingControls_title_editLandmarks": "Drag the landmarks to the correct position."
+  
+}

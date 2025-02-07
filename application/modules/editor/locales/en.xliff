@@ -10199,6 +10199,10 @@ etc.
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>No property is specified</target>
             </trans-unit>
+            <trans-unit id='Qml0dGUgd8OkaGxlbg=='>
+                <source>Bitte wählen</source>
+                <target>Please select</target>
+            </trans-unit>
             <trans-unit id='QWt0aXZlIEZpbHRlciBzcGVpY2hlcm4='>
                 <source>Aktive Filter speichern</source>
                 <target>Save active filters</target>

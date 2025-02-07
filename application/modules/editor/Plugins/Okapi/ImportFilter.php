@@ -28,8 +28,9 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\Okapi;
 
-use editor_Plugins_Okapi_Bconf_Analysis;
-use editor_Plugins_Okapi_Bconf_Entity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Analysis;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
 use ZfExtended_Exception;
 
 /**
@@ -38,20 +39,29 @@ use ZfExtended_Exception;
  */
 final class ImportFilter
 {
-    private $supportedExtensions = [];
+    private array $supportedExtensions = [];
 
+    /**
+     * @throws BconfInvalidException
+     * @throws ZfExtended_Exception
+     * @throws \Zend_Exception
+     * @throws OkapiException
+     */
     public function __construct(
-        private ?editor_Plugins_Okapi_Bconf_Entity $bconf = null,
+        private ?BconfEntity $bconf = null,
         private ?string $bconfInZip = null
     ) {
         if ($bconfInZip !== null) {
-            $analysis = new editor_Plugins_Okapi_Bconf_Analysis($bconfInZip);
+            $analysis = new Analysis($bconfInZip);
             $this->supportedExtensions = $analysis->getExtensionMapping()->getAllExtensions();
             $this->bconf = null;
         } elseif ($bconf !== null) {
             $this->supportedExtensions = $bconf->getSupportedExtensions();
         } else {
-            throw new ZfExtended_Exception('an OKAPI ImportFilter must be instantiated either with a bconf-entity or the absolute path to an embedded bconf');
+            throw new ZfExtended_Exception(
+                'An OKAPI ImportFilter must be instantiated either with a bconf-entity '
+                . 'or the absolute path to an embedded bconf'
+            );
         }
     }
 
@@ -88,7 +98,7 @@ final class ImportFilter
     }
 
     /**
-     * @return string|null
+     * @throws OkapiException
      */
     public function getBconfPath(): string
     {

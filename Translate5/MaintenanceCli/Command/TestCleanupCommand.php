@@ -28,6 +28,9 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use MittagQI\Translate5\Plugins\Okapi\Db\BconfFilterTable;
+use MittagQI\Translate5\Plugins\Okapi\Db\BconfTable;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -95,9 +98,9 @@ class TestCleanupCommand extends Translate5AbstractTestCommand
         ];
         $taskDb->getAdapter()->update($taskDb->info(\Zend_Db_Table_Abstract::NAME), $cols, '1=1');
         // remove oakapi bconf's without data folders. Note, this does not change task-bconf-assocs
-        $okapiDataDir = rtrim(\editor_Plugins_Okapi_Bconf_Entity::getUserDataDir(), '/') . '/';
-        $okapiDb = new \editor_Plugins_Okapi_Db_Bconf();
-        $okapiFilterDb = new \editor_Plugins_Okapi_Db_BconfFilter();
+        $okapiDataDir = rtrim(BconfEntity::getUserDataDir(), '/') . '/';
+        $okapiDb = new BconfTable();
+        $okapiFilterDb = new BconfFilterTable();
         $count = 0;
         foreach ($okapiDb->fetchAll() as $row) {
             $okapiId = $row->id;

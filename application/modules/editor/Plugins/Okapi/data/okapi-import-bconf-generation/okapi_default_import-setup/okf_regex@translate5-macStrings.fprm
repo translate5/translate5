@@ -21,7 +21,7 @@ rule0.groupNote.i=1
 rule0.preserveWS.b=true
 rule0.useCodeFinder.b=true
 rule0.sample=/* Menu item to make the current document plain text */$0a$"Make Plain Text" = "Make Plain \"Text";$0a$/* Menu item to make the current document rich text */$0a$"Make Rich Text" = "Make Rich Text";$0a$
-rule0.codeFinderRules.count.i=6
+rule0.codeFinderRules.count.i=3
 rule0.codeFinderRules.rule0=<!\[CDATA\[
 rule0.codeFinderRules.rule1=\]\]>
 rule0.codeFinderRules.rule2=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn@]

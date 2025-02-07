@@ -41,7 +41,7 @@
  *  "isCustom": false,
  *  "guiClass": ""
  * }
- * @link editor_Plugins_Okapi_Bconf_Filter_Entity::getGridRowsByBconfId}
+ * @link FilterEntity::getGridRowsByBconfId
  */
 
 Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {

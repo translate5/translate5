@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 2.0
  *
  */
+
 /**
  * Klasse zur Portalinitialisierung
  *

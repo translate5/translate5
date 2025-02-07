@@ -19,4 +19,3 @@ codeFinderRules.rule3=\<(/?)\w+[^>]*?>
 codeFinderRules.sample=%s, %d, {1}, \n, \r, \t, etc.$0a$<a attr="qwerty">text</a>text<img/>$0a$Test &tl; and more.
 codeFinderRules.useAllRulesWhenTesting.b=true
 useLd.b=true
-subfilter=
