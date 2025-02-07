@@ -31,6 +31,60 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.19.0] - 2025-02-07
+
+### Important Notes:
+#### [TRANSLATE-4093](https://jira.translate5.net/browse/TRANSLATE-4093)
+For the OKAPI 1.47 compatibility, all File-Format Settings will be migrated to this version. They cannot be used for older OKAPI-Versions afterwards; The Older Versions are only still in the system to support the export of existing tasks. Older OKAPI versions can only be used for Import with a pre-1.47 BCONFs in the import ZIP. For this Feature to be installed, an OKAPI 1.47 docker container must be running and the endpoint must be configured as service in the installation with the server-key "okapi-longhorn-147". If it is nt present, the update-script will stop and generate an error.
+ 
+
+
+### Added
+**[TRANSLATE-4425](https://jira.translate5.net/browse/TRANSLATE-4425): Editor general - Dummy Pseudo translator: New plugin for testing to be translated files** <br>
+Added new plugin which purpose is to visualize which text can be translated in complext projects (documents etc.) in translate5
+
+
+### Changed
+**[TRANSLATE-4437](https://jira.translate5.net/browse/TRANSLATE-4437): TermTagger integration - Tweaks to use threaded termtagger** <br>
+Improvement: Tweaks for the use of a threaded Termtagger in the cloud
+
+**[TRANSLATE-4419](https://jira.translate5.net/browse/TRANSLATE-4419): textshuttle - Change TextShuttle API URL** <br>
+TextShuttle api URL changed
+
+**[TRANSLATE-4417](https://jira.translate5.net/browse/TRANSLATE-4417): TrackChanges - Add predefined languages to as target-languages deactivating TrackChanges** <br>
+Enhancement: Add predefined target languages deactivating TrackChanges
+
+**[TRANSLATE-4414](https://jira.translate5.net/browse/TRANSLATE-4414): Hotfolder Import - Hotfolder: Don't process project folders recursively** <br>
+Hotfloder: Don't process project folders recursively
+
+**[TRANSLATE-4380](https://jira.translate5.net/browse/TRANSLATE-4380): Editor general - Hide error task and project error columns by default** <br>
+Events column in project and task overview is hidden by default.
+
+**[TRANSLATE-4202](https://jira.translate5.net/browse/TRANSLATE-4202): VisualReview / VisualTranslation - Visual: Download of Websites/Webapps with Headless Browser Instead of WGET** <br>
+Improvement: Websites / Webapps are now downloaded with a Headless Browser and an optional configuration
+
+**[TRANSLATE-4093](https://jira.translate5.net/browse/TRANSLATE-4093): file format settings - OKAPI integration: Compatibility with 1.47, clean up Pipelines** <br>
+File Format Settings: General compatibility with Okapi 1.47, improved Pipeline handling
+
+
+### Bugfixes
+**[TRANSLATE-4436](https://jira.translate5.net/browse/TRANSLATE-4436): openai - OpenAI: Service-Check does not work anymore** <br>
+FIX: Service-Check for OpenAI did not work anymore
+
+**[TRANSLATE-4427](https://jira.translate5.net/browse/TRANSLATE-4427): Import/Export - SDLXLIFF: Export segment draft state** <br>
+SDLXLIFF: fix export of draft state
+
+**[TRANSLATE-4418](https://jira.translate5.net/browse/TRANSLATE-4418): Okapi integration - Windows-based srx path within pipeline step causes error on bconf upload** <br>
+Added proper handling of Windows-based srx paths within uploaded bconfs
+
+**[TRANSLATE-4416](https://jira.translate5.net/browse/TRANSLATE-4416): Editor general, TrackChanges - Switch how differences in fuzzy matches are shown** <br>
+FIXED: misleding styles for differences between segment and match
+
+**[TRANSLATE-4299](https://jira.translate5.net/browse/TRANSLATE-4299): User Management - Client-PM assignment for task as translator does NOT work for job, where he is NOT PM** <br>
+Solved in the frame of job coordinator feature
+
+
 ## [7.18.1] - 2025-01-28
 
 ### Important Notes:
