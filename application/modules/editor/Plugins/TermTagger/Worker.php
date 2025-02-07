@@ -54,12 +54,27 @@ use ZfExtended_Logger;
  */
 class Worker extends AbstractProcessingWorker
 {
+    protected int $threads = 1;
+
+    public function __construct()
+    {
+        try {
+            $this->threads = Zend_Registry::get('config')->runtimeOptions?->termTagger?->threads ?? 1;
+        } catch (Exception) {
+            // use default
+        }
+        parent::__construct();
+    }
+
     /**
      * @throws ZfExtended_Exception
      */
     protected function createService(): Service
     {
-        return editor_Plugins_TermTagger_Bootstrap::createService('termtagger');
+        $service = editor_Plugins_TermTagger_Bootstrap::createService('termtagger');
+        $service->setPersistentConnections($this->isThreaded());
+
+        return $service;
     }
 
     /**
@@ -103,10 +118,13 @@ class Worker extends AbstractProcessingWorker
     protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
     {
         // Malfunction means the termtagger is up, but the send data produces an error in the tagger.
-        // 1. we set the segment satus to reprocess, so each segment is tagged again, segment by segment, not in a bulk manner if they are not yer reprocessed
+        // 1. we set the segment satus to reprocess, so each segment is tagged again, segment by segment,
+        //  not in a bulk manner if they are not yer reprocessed
         // 2. we set the segment to unprocessable when it already was being reprocessed
         // the logging will be done in the finalizeOperation of the quality-provider
-        if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Malfunction || $loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_TimeOut || $loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Request) {
+        if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Malfunction
+            || $loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_TimeOut
+            || $loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Request) {
             // set the failed segments either to reprocess or unprocessable depending if we are already reprocessing
             if ($isReprocessing) {
                 $this->setUnprocessedStates($problematicStates, State::UNPROCESSABLE);
@@ -122,6 +140,19 @@ class Worker extends AbstractProcessingWorker
         // a Down Exception will be created if all services are down to create an import error.
         // If other URLs are still up, we simply end the worker without further notice
         if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Down) {
+            $foundWorkers = $this->workerModel->loadByState(
+                $this->workerModel::STATE_RUNNING,
+                $this->workerModel->getWorker(),
+                $this->workerModel->getTaskGuid(),
+            );
+            foreach ($foundWorkers as $worker) {
+                if ($worker->getId() != $this->workerModel->getId()) {
+                    //if there are other running termtaggers for the same task and this on is using a down IP,
+                    // we just skip this worker. If not (so the last one) we continue as usual below
+                    return 0;
+                }
+            }
+
             // when a TermTagger is down, the behaviour depends on if we are a load-balanced service or not
             $this->onServiceDown($loopedProcessingException);
 
@@ -169,5 +200,51 @@ class Worker extends AbstractProcessingWorker
                 'task' => $this->task,
             ],
         ]);
+    }
+
+    /**
+     * Shall the termtagger used threaded
+     */
+    public function isThreaded(): bool
+    {
+        return $this->threads > 1;
+    }
+
+    public function initSlots(): void
+    {
+        parent::initSlots();
+        $this->maxParallel = 6;
+        if (! $this->isThreaded()) {
+            return;
+        }
+
+        $urls = array_values(array_unique(array_column($this->slots, 'url')));
+        $urlToIpMap = [];
+        foreach ($urls as $url) {
+            $host = parse_url($url, PHP_URL_HOST);
+            if ($host !== false) {
+                $ips = gethostbynamel($host);
+                if ($ips === false) {
+                    continue;
+                }
+                $urlToIpMap[$url] = $ips;
+            }
+        }
+        $urlUsageCounter = [];
+        foreach ($this->slots as $idx => $slot) {
+            if (! array_key_exists($slot['url'], $urlUsageCounter)) {
+                $urlUsageCounter[$slot['url']] = 0;
+            }
+            $urlUsageCounter[$slot['url']]++;
+            $currentUrl = \Zend_Uri_Http::fromString($slot['url']);
+            $ipIndex = $urlUsageCounter[$slot['url']] % count($urlToIpMap[$slot['url']]);
+            $currentUrl->setHost($urlToIpMap[$slot['url']][$ipIndex]);
+            $this->slots[$idx]['url'] = $currentUrl->__toString();
+        }
+    }
+
+    protected function limitMaxParallel(int $calculatedMaxParallel): int
+    {
+        return parent::limitMaxParallel($this->threads * $calculatedMaxParallel);
     }
 }

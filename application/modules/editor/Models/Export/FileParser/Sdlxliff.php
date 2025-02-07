@@ -260,7 +260,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             );
         }
 
-        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system="+"#U', $segPart) === 1) {
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system=".+"#U', $segPart) === 1) {
             //if origin-system attribute is already defined
             $segPart = preg_replace(
                 '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system=)".+"#U',
