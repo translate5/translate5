@@ -136,7 +136,7 @@ class editor_Models_KPI
      * (= percent of the tasks exported at least once).
      * @return string Percentage (0-100%) or '-' if statistics can't be calculated
      */
-    protected function getExcelExportUsage()
+    protected function getExcelExportUsage(): string
     {
         if (! $this->hasStatistics()) {
             return '-';
@@ -152,6 +152,12 @@ class editor_Models_KPI
             if ($excelExport->isExported($taskGuid)) {
                 $nrExported++;
             }
+        }
+
+        $taskCount = count($allTaskGuids);
+
+        if (0 === $taskCount) {
+            return '-';
         }
 
         $percentage = ($nrExported / count($allTaskGuids)) * 100; // after $this->hasStatistics(), count($allTaskGuids) will always be > 0

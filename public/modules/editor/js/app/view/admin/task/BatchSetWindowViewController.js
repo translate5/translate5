@@ -125,17 +125,22 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
     },
 
     onSetForFilteredClick: function () {
-        const me = this, store = Ext.StoreManager.get('project.Project'),
-            proxy = store.getProxy(), params = {countTasks:1};
+        const me = this,
+            store = Ext.StoreManager.get('project.Project'),
+            proxy = store.getProxy(),
+            params = { countTasks: 1 };
+
         params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
+
         Ext.Ajax.request({
             url: Editor.data.restpath + 'taskuserassoc/batchset',
             method: 'POST',
             params: params,
             success: function (response) {
-                let tasksCount = response.responseJson.total, l10n = Editor.data.l10n.batchSetWindow,
+                let tasksCount = response.responseJson.total,
+                    l10n = Editor.data.l10n.batchSetWindow,
                     question = l10n.allFilteredWarning.replace('. ', ' ('+tasksCount+' '+l10n.tasksLabel+'). ');
-                if (tasksCount>50) {
+                if (tasksCount > 50) {
                     question = '<b style="color:red">'+ question + '</b>';
                 }
                 Ext.MessageBox.confirm(

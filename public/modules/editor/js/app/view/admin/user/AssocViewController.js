@@ -169,14 +169,23 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
 
     onReloadAssocBtnClick : function (){
         var me=this;
-        me.getView().down('grid').getStore().load();
+        me.getView().down('grid').getStore().load(),
         me.resetRecord();
     },
 
     onAssocGridSelect: function (grid,record) {
         var me=this,
-            form = me.lookup('assocForm');
+            form = me.lookup('assocForm'),
+            typeCombo = form.down('combo[name="type"]')
+        ;
+
+        form.up('adminUserAssoc').setTaskGuid(record.get('taskGuid'));
+
         form.getForm().loadRecord(record.clone());
+        typeCombo.setValue(null);
+        typeCombo.setValue(record.get('type'));
+        typeCombo.setDisabled(true);
+        typeCombo.setVisible(false);
         form.setDisabled(false);
     },
 
@@ -214,8 +223,8 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
      */
     getConfigDeadlineDate:function (step){
         var me = this,
-            configStore = me.getView().up('#displayTabPanel').down('adminConfigGrid').getStore();
-        return configStore.getConfig('workflow.default.'+step+'.defaultDeadlineDate');
+            configStore = me.getView().up('#displayTabPanel')?.down('adminConfigGrid')?.getStore();
+        return configStore?.getConfig('workflow.default.'+step+'.defaultDeadlineDate');
     },
 
     /***
@@ -271,11 +280,16 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
     resetRecord:function (record){
         var me=this,
             formPanel = me.lookup('assocForm'),
-            form = formPanel.getForm();
-        if(!record){
+            form = formPanel.getForm(),
+            typeCombo = formPanel.down('combo[name="type"]')
+        ;
+
+        if(! record){
             record = me.getView().getDefaultFormRecord();
         }
         me.getView().fireEvent('addnewassoc', record, formPanel);
+        typeCombo.setDisabled(false);
+        typeCombo.setVisible(true);
         form.loadRecord(record);
     }
 });

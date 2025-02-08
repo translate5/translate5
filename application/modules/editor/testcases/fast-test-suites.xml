@@ -1,0 +1,18 @@
+<phpunit bootstrap="bootstrap-unit.php" cacheResult="true" colors="true">
+    <testsuites>
+        <testsuite name="unit">
+            <directory>Unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory>Integration</directory>
+        </testsuite>
+    </testsuites>
+    <coverage>
+        <include>
+            <directory suffix=".php">../</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">./</directory>
+        </exclude>
+    </coverage>
+</phpunit>

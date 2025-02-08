@@ -307,6 +307,9 @@ Ext.define('Editor.controller.LanguageResources', {
   },
 
     addToCustomerPanel: function(tabPanel) {
+        if (! Editor.app.authenticatedUser.isAllowed('customerTmAssoc')) {
+            return;
+        }
 
         // Create language resource store instance
         Ext.create('Editor.store.LanguageResources.LanguageResource');

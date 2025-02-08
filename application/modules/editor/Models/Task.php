@@ -165,13 +165,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
     /**
-     * Tasks must be filtered by role-driven restrictions
-     */
-    protected ?array $clientAccessRestriction = [
-        'field' => 'customerId',
-    ];
-
-    /**
      * @var editor_Models_Task_Meta
      */
     protected $meta;
@@ -207,6 +200,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         $this->createTaskGuidIfNeeded();
     }
 
+    public function isCompetitive(): bool
+    {
+        return self::USAGE_MODE_COMPETITIVE === $this->getUsageMode();
+    }
+
     /**
      * returns the task type instance (can be casted to string)
      */
@@ -217,8 +215,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /***
      * Returns all task specific configs for the current task.
-     * For all configs for which there is no task specific overwrite, overwrite for the task client will be used as a value.
-     * For all configs for which there is no task customer specific overwrite, instance-level config value will be used
+     * For all configs for which there is no task specific overwrite, overwrite for the task client will be used as a
+     * value. For all configs for which there is no task customer specific overwrite, instance-level config value will
+     * be used
      *
      * @param bool $disableCache : disable the config cache. Load always fresh config from the db
      * @return Zend_Config
@@ -283,24 +282,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * loads all Entities out of DB associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
-     * @param bool $loadAll optional, per default false
      * @return array
      */
-    public function loadListByUserAssoc(string $userGuid, $loadAll = false)
+    public function loadListByUserAssoc(string $userGuid)
     {
-        return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid, '*', $loadAll));
-    }
-
-    /**
-     * loads all tasks associated to a specific user as PM
-     * @return array
-     */
-    public function loadListByPmGuid(string $pmGuid)
-    {
-        $s = $this->db->select();
-        $s->where('pmGuid = ?', $pmGuid);
-
-        return parent::loadFilterdCustom($s);
+        return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid));
     }
 
     /**
@@ -369,7 +355,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         if ($loadAll) {
             $s = $this->db->select()->setIntegrityCheck(false);
         } else {
-            $s = $this->getSelectByUserAssocSql($userGuid, '*', $loadAll);
+            $s = $this->getSelectByUserAssocSql($userGuid);
         }
         //apply the frontend task filters
         $this->applyFilterAndSort($s);
@@ -392,14 +378,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
-     * @param bool $loadAll
      * @return int
      */
-    public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false)
+    public function getTotalCountByUserAssoc(string $userGuid)
     {
         $s = $this->getSelectByUserAssocSql($userGuid, [
             'numrows' => 'count(*)',
-        ], $loadAll);
+        ]);
         $this->applyFilterToSelect($s);
 
         return $this->db->fetchRow($s)->numrows;
@@ -407,34 +392,28 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns the SQL to retrieve the tasks of an user oder of all users joined with the users assoc infos
-     * if $loadAll is true, load all tasks, user infos joined only where possible,
-     *   if false only the associated tasks to the user
      * TODO: when state filter is refactored, remove the tasuserassoc object cast here
-     * @param string $cols column definition
-     * @param bool $loadAll
-     * @return Zend_Db_Table_Select
      */
-    protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false)
+    protected function getSelectByUserAssocSql(string $userGuid, string|array $cols = '*'): Zend_Db_Table_Select
     {
-        $s = $this->db->select()
-            ->from('LEK_task', $cols);
+        $select = $this->db->select()->from('LEK_task', $cols);
         $defaultTable = $this->db->info($this->db::NAME);
+
         if (! empty($this->filter)) {
             $this->filter->setDefaultTable($defaultTable);
         }
-        if ($loadAll) {
-            $on = 'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid AND LEK_taskUserAssoc_1.userGuid = ' . $s->getAdapter()->quote($userGuid);
-            $s->joinLeft([
-                'LEK_taskUserAssoc_1' => 'LEK_taskUserAssoc',
-            ], $on, []);
-        } else {
-            $s->joinLeft([
-                'LEK_taskUserAssoc_1' => 'LEK_taskUserAssoc',
-            ], 'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid', [])
-                ->where('LEK_taskUserAssoc_1.userGuid = ? OR LEK_task.pmGuid = ?', $userGuid);
-        }
 
-        return $s;
+        $select
+            ->joinLeft(
+                [
+                    'LEK_taskUserAssoc_1' => 'LEK_taskUserAssoc',
+                ],
+                'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid',
+                []
+            )
+            ->where('LEK_taskUserAssoc_1.userGuid = ? OR LEK_task.pmGuid = ?', $userGuid);
+
+        return $select;
     }
 
     /**
@@ -870,7 +849,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = givenUser) and respects multiuser editing
+     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = givenUser) and
+     * respects multiuser editing
      * @param string|null $taskGuid optional, use the internally loaded taskGuid by default
      * @return boolean false if task had not been locked or does not exist,
      *          true if task has been unlocked successfully
@@ -1277,8 +1257,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * (2) if the currently logged in user does not have the role admin, PM or api.
      * If the $checkUser-param is set to "false", the user-check is omitted (= only the
      * task's anonymizeUsers-config is taken into account).
-     * @param bool $checkUser optional, set to false to check only the config (and do not consider the ACLs behind the currently logged in user or the roles given in $customRoles)
-     * @param bool $customRoles (optional) if checkUser = true the here provided roles are used for ACL check instead the currently logged in user
+     * @param bool $checkUser optional, set to false to check only the config (and do not consider the ACLs behind the
+     *     currently logged in user or the roles given in $customRoles)
+     * @param bool $customRoles (optional) if checkUser = true the here provided roles are used for ACL check instead
+     *     the currently logged in user
      * @return boolean
      */
     public function anonymizeUsers(bool $checkUser = true, array $customRoles = null)
@@ -1309,7 +1291,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * Get info to be further used to count finished segments per current task and per each user associated with that task
+     * Get info to be further used to count finished segments per current task and per each user associated with that
+     * task
      */
     public function getWorkflowEndedOrFinishedAutoStates(): ?array
     {
@@ -1424,19 +1407,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
             'workflow' => 'Workflow',
             'userCount' => 'Zahl zugewiesener Benutzer',
         ];
-    }
-
-    /**
-     * Updates the usercount of a task.
-     * @param string|null $taskGuid Optional, if omitted operate on current task
-     */
-    public function updateTask(string $taskGuid = null)
-    {
-        $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ? and isPmOverride = 0) tua
-            set t.userCount = tua.cnt where t.taskGuid = tua.taskGuid';
-        $db = $this->db->getAdapter();
-        $sql = $db->quoteInto($sql, $taskGuid ?? $this->getTaskGuid(), 'string', 2);
-        $db->query($sql);
     }
 
     /**

@@ -93,6 +93,25 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
         Editor.app.on('adminViewportClosed', me.clearStores, me);
 
+        Ext.on({
+            projectTaskSelectionChange: function (task) {
+                if (! task) {
+                    return;
+                }
+
+                if (task.get('state') === 'import') {
+                    return;
+                }
+
+                let jobStore = this.getUserAssocGrid().getStore();
+
+                this.setJobStoreProxyPath(jobStore, task);
+
+                jobStore.load();
+            },
+            scope: me,
+        })
+
         me.control({
             '#adminTaskUserAssocGrid': {
                 confirmDelete: me.handleDeleteConfirmClick,
@@ -126,18 +145,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     isAllowed: function (right) {
         return Editor.app.authenticatedUser.isAllowed(right);
     },
-    /**
-     * @param {Ext.button.Button} btn
-     */
+
     handleCancel: function () {
         var form = this.getUserAssocForm();
         form.getForm().reset();
         form.hide();
         this.getEditInfo().show();
     },
-    /**
-     * @param {Ext.button.Button} btn
-     */
+
     handleAddUser: function () {
         var me = this,
             assoc = me.getAdminTaskUserAssocsStore(),
@@ -178,7 +193,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         userAssocForm.show();
         userAssocForm.setDisabled(false);
         me.filterStepsCombo(newRec);
-        userAssoc.loadRecord(newRec);
+        userAssoc.loadRecord(newRec, task);
         me.initState(null, step, '');
     },
 
@@ -190,27 +205,26 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     handleAssocSelection: function (grid, selection) {
         var me = this,
             formPanel = me.getUserAssocForm(),
-            emptySel = selection.length === 0,
-            record = !emptySel ? selection[0] : null,
-            userEditable = record && record.get('editable'),
-            userDeletable = record && record.get('deletable'),
-            task = me.getPrefWindow().getCurrentTask();
+            emptySel = selection.length === 0;
 
-        me.getAssocDelBtn().setDisabled(emptySel || !userDeletable);
+        me.getAssocDelBtn().setDisabled(emptySel);
 
         me.getEditInfo().setVisible(emptySel);
 
         formPanel.setVisible(!emptySel);
-
-        formPanel.setDisabled(emptySel || !userEditable);
+        formPanel.setDisabled(emptySel);
 
         me.filterStepsCombo(selection[0]);
 
         if (emptySel) {
             formPanel.getForm().reset();
-        } else {
-            me.getUserAssoc().loadRecord(selection[0]);
+
+            return;
         }
+
+        me.getUserAssoc().loadRecord(selection[0], me.getPrefWindow().getCurrentTask());
+
+        me.getUserAssoc().fireEvent('editassoc', selection[0], formPanel);
     },
 
     /**
@@ -219,37 +233,69 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     handleDeleteConfirmClick: function (grid, toDelete) {
         var me = this,
             userAssocPanel = me.getPrefWindow(),
-            task = userAssocPanel.getCurrentTask(),
-            assoc = me.getAdminTaskUserAssocsStore();
+            task = userAssocPanel.getCurrentTask();
 
         userAssocPanel.setLoading(true);
 
         Ext.Array.each(toDelete, function (toDel) {
-
-            toDel.eraseVersioned(task, {
-
-                success: function (rec, op) {
-
-                    assoc.remove(toDel);
-
-                    me.fireEvent('removeUserAssoc', me, toDel, assoc);
-
-                    //reload only the task, not the whole task prefs, should be OK
-                    task.load({
-                        callback:function (){
-                            Editor.MessageBox.addByOperation(op); //does nothing since content is not provided from server :(
-                            Editor.MessageBox.addSuccess(me.messages.assocDeleted);
-                            userAssocPanel.setLoading(false);
-                        }
-                    });
-                },
-                failure: function () {
-                    me.application.getController('admin.TaskPreferences').handleReload();
-                    userAssocPanel.setLoading(false);
-                }
-            });
+            me.deleteJob(task, toDel);
         });
     },
+
+    deleteJob: function (task, job) {
+        const me = this,
+            l10n = Editor.data.l10n,
+            jobAssignmentPanel = me.getPrefWindow(),
+            jobStore = me.getAdminTaskUserAssocsStore();
+
+        job.eraseVersioned(task, {
+            preventDefaultHandler: true,
+            success: function (rec, op) {
+                me.deleteForceParamFromJobProxy(job);
+
+                jobStore.remove(job);
+
+                me.fireEvent('removeUserAssoc', me, job, jobStore);
+
+                jobAssignmentPanel.setLoading(false);
+                me.reloadTaskUserAssocGrid();
+            },
+            failure: function (rec, result) {
+                me.deleteForceParamFromJobProxy(job);
+
+                const errorCode = result.error.response?.responseJson?.errorCode;
+
+                me.application.getController('admin.TaskPreferences').handleReload();
+                jobAssignmentPanel.setLoading(false);
+                me.reloadTaskUserAssocGrid();
+
+                if (['E1061', 'E1062', 'E1162'].includes(errorCode)) {
+                    const message = result.error.response.responseJson.errorMessage
+                        + '<br/>'
+                        + l10n.general.confirmDelete;
+
+                    Ext.Msg.confirm(l10n.general.confirmDeleteTitle, message, function (btn) {
+                        if (btn === 'yes') {
+                            job.getProxy().setExtraParam('force', true);
+                            me.deleteJob(task, job);
+                        }
+                    });
+
+                    return;
+                }
+
+                Editor.app.getController('ServerException').handleException(result.error.response);
+            }
+        });
+    },
+
+    deleteForceParamFromJobProxy: function (job) {
+        let extraParams = job.getProxy().getExtraParams();
+        delete extraParams.force;
+
+        job.getProxy().setExtraParams(extraParams);
+    },
+
     /**
      * save the user task assoc info.
      */
@@ -306,6 +352,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                 task && task.load();
             }
         });
+    },
+
+    setJobStoreProxyPath: function (store, task) {
+        store.getProxy().setUrl(Editor.data.restpath + 'task/' + task.get('id') + '/job');
     },
 
     onUserSpecialPropertiesBtnClick: function () {

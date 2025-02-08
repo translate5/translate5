@@ -78,7 +78,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
     {
         $config = new editor_Workflow_Actions_Config();
         $config->task = $task;
-        $notifier = new editor_Workflow_Notification();
+        $notifier = editor_Workflow_Notification::create();
         $notifier->init($config);
         $notifier->notifyAutoclosed($this->triggerConfigArgs, $userGuid, $workflowStepName);
     }

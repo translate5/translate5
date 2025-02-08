@@ -91,7 +91,7 @@ abstract class ValidatorWithContext extends ZfExtended_Models_Validator_Abstract
             foreach ($instances as $instance) {
                 $this->addValidatorCustom(
                     $field,
-                    fn ($value, $context) => $instance->isValid($value, $context),
+                    fn ($value, $context) => $instance->isValid($value, $context), // @phpstan-ignore-line
                     true
                 );
             }

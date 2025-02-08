@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\JobAssignment\Exception\CompetitiveJobAlreadyTakenException;
+use MittagQI\Translate5\JobAssignment\Workflow\CompetitiveJobsRemover;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use MittagQI\Translate5\Task\Export\Package\Remover;
 use MittagQI\Translate5\Workflow\ArchiveConfigDTO;
@@ -37,6 +39,18 @@ use MittagQI\Translate5\Workflow\ArchiveTaskActions;
  */
 class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
 {
+    public function __construct(
+        private readonly CompetitiveJobsRemover $competitiveJobsRemover
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            CompetitiveJobsRemover::create(),
+        );
+    }
+
     /**
      * sets all segments to untouched state - if they are untouched by the user
      */
@@ -114,39 +128,30 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
     public function removeCompetitiveUsers(): void
     {
         $task = $this->config->task;
+
         if ($task->getUsageMode() !== $task::USAGE_MODE_COMPETITIVE) {
             return;
         }
 
         $userGuid = $this->currentUser()->getUserGuid();
-        if (empty($this->config->newTua)) {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
-        } else {
-            $tua = $this->config->newTua;
-        }
 
-        $deleted = $tua->deleteOtherUsers($task->getTaskGuid(), $userGuid, $tua->getWorkflowStepName());
-        if ($deleted !== false) {
-            $notifier = ZfExtended_Factory::get('editor_Workflow_Notification');
-            /* @var $notifier editor_Workflow_Notification */
-            $notifier->init($this->config);
-            $notifier->notifyCompetitiveDeleted([
-                'deleted' => $deleted,
-                'currentUser' => $this->currentUser()->getDataObject(),
+        try {
+            $this->competitiveJobsRemover->removeCompetitorsOfJobFor(
+                $userGuid,
+                $task->getTaskGuid(),
+                $task->getWorkflowStepName()
+            );
+        } catch (CompetitiveJobAlreadyTakenException) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1160' => 'The competitive users can not be removed, '
+                    . 'probably some other user was faster and you are not assigned anymore to that task.',
             ]);
 
-            return;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1160', [
+                'noField' => 'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, '
+                    . 'eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.',
+            ]);
         }
-
-        ZfExtended_Models_Entity_Conflict::addCodes([
-            'E1160' => 'The competitive users can not be removed, '
-                . 'probably some other user was faster and you are not assigned anymore to that task.',
-        ]);
-
-        throw ZfExtended_Models_Entity_Conflict::createResponse('E1160', [
-            'noField' => 'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, '
-                . 'eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.',
-        ]);
     }
 
     /***
@@ -160,7 +165,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
         /* @var $task editor_Models_Task */
 
         // check if the order date is set. With empty order data, no deadline date from config is posible
-        if (empty($task->getOrderdate()) || is_null($task->getOrderdate())) {
+        if (empty($task->getOrderdate())) {
             return;
         }
 
@@ -348,14 +353,14 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
         $edit100PercentMatch = (bool) ($this->config->parameters->edit100PercentMatch ?? true);
 
         $applyFullMatchChange = new ApplyEditFullMatchOperation(
-            ZfExtended_Factory::get(editor_Models_Segment_AutoStates::class),
-            ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class),
-            ZfExtended_Factory::get(editor_Models_Segment_Meta::class),
-            ZfExtended_Factory::get(editor_Models_TaskProgress::class),
+            new editor_Models_Segment_AutoStates(),
+            new editor_Models_Segment_InternalTag(),
+            new editor_Models_Segment_Meta(),
+            new editor_Models_TaskProgress(),
         );
         $applyFullMatchChange->updateSegmentsEdit100PercentMatch(
             $this->config->task,
-            ZfExtended_Factory::get(editor_Models_Segment_Iterator::class, [$this->config->task->getTaskGuid()]),
+            new editor_Models_Segment_Iterator($this->config->task->getTaskGuid()),
             $edit100PercentMatch,
         );
 

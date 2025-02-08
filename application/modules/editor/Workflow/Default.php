@@ -29,8 +29,8 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 
 /**
- * Default Workflow Class, contains the workflow definition and workflow state, all handlers/actions etc are in the handler instance
- * Default roles are:
+ * Default Workflow Class, contains the workflow definition and workflow state, all handlers/actions etc are in the
+ * handler instance Default roles are:
  * - translator
  * - reviewer
  * - translatorCheck
@@ -194,6 +194,22 @@ class editor_Workflow_Default
 
         $this->hookin = ZfExtended_Factory::get('editor_Workflow_Default_Hooks', [$this]);
         $this->segmentHandler = ZfExtended_Factory::get('editor_Workflow_Default_SegmentHandler', [$this]);
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getAllStates(): array
+    {
+        return [
+            self::STATE_UNCONFIRMED,
+            self::STATE_WAITING,
+            self::STATE_FINISH,
+            self::STATE_OPEN,
+            self::STATE_EDIT,
+            self::STATE_VIEW,
+            self::STATE_AUTO_FINISH,
+        ];
     }
 
     /**
@@ -395,50 +411,6 @@ class editor_Workflow_Default
     }
 
     /**
-     * Returns next step in stepChain, or STEP_WORKFLOW_ENDED if for nextStep no users are associated
-     * @param mixed $step string or null
-     * @return string $step or null if the step does not exist
-     */
-    public function getNextStep(editor_Models_Task $task, string $step): ?string
-    {
-        /* @var $tua editor_Models_TaskUserAssoc */
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-
-        //get used roles in task:
-        $tuas = $tua->loadByTaskGuidList([$task->getTaskGuid()]);
-
-        $stepChain = array_values($this->getStepChain());
-        $stepCount = count($stepChain);
-
-        $position = array_search($step, $stepChain);
-
-        // if the current step is not found in the chain or
-        // if there are no jobs the workflow should be ended then
-        // (normally we never reach here since to change the workflow at least one job is needed)
-        if ($position === false || empty($tuas)) {
-            return self::STEP_WORKFLOW_ENDED;
-        }
-
-        //get just the associated steps from the jobs
-        $stepsAssociated = array_column($tuas, 'workflowStepName');
-        $stepsAssociated = array_unique($stepsAssociated);
-
-        //we want the position of the next step, not the current one:
-        $position++;
-
-        //loop over all steps after the current one
-        for ($position; $position < $stepCount; $position++) {
-            if (in_array($stepChain[$position], $stepsAssociated)) {
-                //the first one with associated users is returned
-                return $stepChain[$position];
-            }
-        }
-
-        //if no next step is found, it is ended by definition
-        return self::STEP_WORKFLOW_ENDED;
-    }
-
-    /**
      * @param mixed $step string
      * @return string $role OR false if step does not exist
      */
@@ -630,13 +602,14 @@ class editor_Workflow_Default
 
     public function getStepRecalculation(): editor_Workflow_Default_StepRecalculation
     {
-        return ZfExtended_Factory::get('editor_Workflow_Default_StepRecalculation', [$this]);
+        return new editor_Workflow_Default_StepRecalculation($this);
     }
 
     /**
      * checks if the given TaskUserAssoc Instance allows reading of the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise
+     *     TaskUserAssoc field usedState
      * @return boolean
      */
     public function isReadable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false)
@@ -647,7 +620,8 @@ class editor_Workflow_Default
     /**
      * checks if the given TaskUserAssoc Instance allows writing to the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise
+     *     TaskUserAssoc field usedState
      * @return boolean
      */
     public function isWriteable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false)
@@ -689,8 +663,9 @@ class editor_Workflow_Default
     /**
      * returns true if a normal user can change the state of this assoc, false otherwise.
      * false means that the user has finished this task already or the user is still waiting.
-     * $userAssumedStateHeHas: should be the same as $taskUserAssoc->state, but comes in via API and represents the state which the client has.
-     *  This may differ from the state in the TUA out of DB. Basicly this means the user should refresh his data.
+     * $userAssumedStateHeHas: should be the same as $taskUserAssoc->state, but comes in via API and represents the
+     * state which the client has. This may differ from the state in the TUA out of DB. Basicly this means the user
+     * should refresh his data.
      *
      * - does not look for the state of a task, only for state of taskUserAssoc
      *
@@ -728,7 +703,8 @@ class editor_Workflow_Default
     }
 
     /**
-     * return <0 if stepTwo is before stepOne in the stepChain, >0 if stepTwo is after stepOne and 0 if the steps are equal.
+     * return <0 if stepTwo is before stepOne in the stepChain, >0 if stepTwo is after stepOne and 0 if the steps are
+     * equal.
      * @return integer
      */
     public function compareSteps(string $stepOne, string $stepTwo): int

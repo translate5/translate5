@@ -26,50 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
-* @method void setId(int $id)
-* @method string getId()
-* @method void setCustomerId(int $customerId)
-* @method string getCustomerId()
-* @method void setSourceLang(int $sourceLang)
-* @method string getSourceLang()
-* @method void setTargetLang(int $targetLang)
-* @method string getTargetLang()
-* @method void setUserGuid(string $userGuid)
-* @method string getUserGuid()
-* @method void setWorkflowStepName(string $workflowStepName)
-* @method string getWorkflowStepName()
-* @method void setWorkflow(string $workflow)
-* @method string getWorkflow()
-* @method void setDeadlineDate(double $deadlineDate)
-* @method string getDeadlineDate()
-* @method string getTrackchangesShow()
-* @method void setTrackchangesShow(int $isAllowed)
-* @method string getTrackchangesShowAll()
-* @method void setTrackchangesShowAll(int $isAllowed)
-* @method string getTrackchangesAcceptReject()
-* @method void setTrackchangesAcceptReject(int $isAllowed)
-*
-*/
-
+/**
+ * @method void setId(int $id)
+ * @method string getId()
+ * @method void setCustomerId(int $customerId)
+ * @method string getCustomerId()
+ * @method void setSourceLang(int $sourceLang)
+ * @method string getSourceLang()
+ * @method void setTargetLang(int $targetLang)
+ * @method string getTargetLang()
+ * @method void setUserGuid(string $userGuid)
+ * @method string getUserGuid()
+ * @method void setWorkflowStepName(string $workflowStepName)
+ * @method string getWorkflowStepName()
+ * @method void setWorkflow(string $workflow)
+ * @method string getWorkflow()
+ * @method void setDeadlineDate(double $deadlineDate)
+ * @method string getDeadlineDate()
+ * @method string getTrackchangesShow()
+ * @method void setTrackchangesShow(int $isAllowed)
+ * @method string getTrackchangesShowAll()
+ * @method void setTrackchangesShowAll(int $isAllowed)
+ * @method string getTrackchangesAcceptReject()
+ * @method void setTrackchangesAcceptReject(int $isAllowed)
+ */
 class editor_Models_UserAssocDefault extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = editor_Models_Db_UserAssocDefault::class;
 
     protected $validatorInstanceClass = editor_Models_Validator_UserAssocDefault::class;
-
-    /***
-     * Load all default assocs for given task. The rows are filtered for workflow,customerId, sourceLang and targetLang
-     * @param editor_Models_Task $task
-     * @return array|null
-     */
-    public function loadDefaultsForTask(editor_Models_Task $task)
-    {
-        $s = $this->db->select()
-            ->where('customerId = ?', $task->getCustomerId())
-            ->where('sourceLang = ?', $task->getSourceLang())
-            ->where('targetLang = ?', $task->getTargetLang());
-
-        return $this->db->getAdapter()->fetchAll($s);
-    }
 }

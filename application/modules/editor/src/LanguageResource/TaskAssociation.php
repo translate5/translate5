@@ -33,12 +33,10 @@ use editor_Models_Languages as Languages;
 use editor_Models_Segment_MatchRateType;
 use editor_Models_Task as Task;
 use editor_Services_Manager;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use ReflectionException;
 use Zend_Cache_Exception;
 use Zend_Db_Expr;
 use Zend_Db_Table_Row_Abstract;
-use ZfExtended_Exception;
 use ZfExtended_Factory as Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -246,60 +244,6 @@ class TaskAssociation extends AssociationAbstract
         }
 
         return $this->db->fetchAll($s)->toArray();
-    }
-
-    /***
-     * Get all available tmms for the language combination as in the provided task.
-     * (Uses loadByAssociatedTaskAndLanguage() which is meant to be called only by rest call!)
-     * @param string $taskGuid
-     * @return array
-     * @throws ZfExtended_Exception
-     * @throws ReflectionException
-     */
-    public function getAssocTasksWithResources($taskGuid)
-    {
-        $serviceManager = Factory::get(editor_Services_Manager::class);
-        $tmConversionService = TmConversionService::create();
-
-        $resources = [];
-
-        $getResource = function (string $serviceType, string $id) use ($resources, $serviceManager) {
-            if (! empty($resources[$id])) {
-                return $resources[$id];
-            }
-            $tmpResource = $serviceManager->getResourceById($serviceType, $id);
-            if ($tmpResource === null) {
-                return null;
-            }
-
-            return $resources[$id] = $tmpResource;
-        };
-
-        $result = $this->loadByAssociatedTaskAndLanguage($taskGuid);
-
-        $available = [];
-
-        foreach ($result as $languageresource) {
-            $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
-            if (! empty($resource)) {
-                $languageresource = array_merge($languageresource, $resource->getMetaData());
-                $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
-                $languageresource['isTaskTm'] = ($languageresource['isTaskTm'] ?? 0) === '1';
-
-                if (editor_Services_Manager::SERVICE_OPENTM2 === $languageresource['serviceType']) {
-                    $languageresource['tmNeedsConversion'] = ! $tmConversionService->isTmConverted(
-                        $languageresource['languageResourceId']
-                    );
-                    $languageresource['tmConversionInProgress'] = $tmConversionService->isConversionInProgress(
-                        $languageresource['languageResourceId']
-                    );
-                }
-
-                $available[] = $languageresource;
-            }
-        }
-
-        return $available;
     }
 
     /***

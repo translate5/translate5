@@ -38,10 +38,13 @@ class TrackChangesTagFormatter implements SegmentFormatterInterface
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(
-            new TaskUserTrackingRepository(),
+            TaskUserTrackingRepository::create(),
             ZfExtended_Zendoverwrites_Translate::getInstance(),
         );
     }

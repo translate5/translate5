@@ -52,14 +52,16 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
         {name: 'workflow', type: 'string', critical: true},
         {name: 'workflowStepName', type: 'string', critical: true},
         {name: 'segmentrange', type: 'string'},
-        {name: 'deletable', type: 'boolean'},
-        {name: 'editable', type: 'boolean'},
         {name: 'assignmentDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
         {name: 'finishedDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
         {name: 'deadlineDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
-        {name: 'trackchangesShow', type: 'int'},
-        {name: 'trackchangesShowAll', type: 'int'},
-        {name: 'trackchangesAcceptReject', type: 'int'}
+        {name: 'trackchangesShow', type: 'bool'},
+        {name: 'trackchangesShowAll', type: 'bool'},
+        {name: 'trackchangesAcceptReject', type: 'bool'},
+        {name: 'type', type: 'int'},
+        {name: 'coordinatorGroupId', type: 'int', persist: false},
+        {name: 'isCoordinatorGroupJob', type: 'bool', persist: false},
+        {name: 'isCoordinatorGroupUserJob', type: 'bool', persist: false},
     ],
     validators: {
         taskGuid: 'presence',
@@ -82,8 +84,7 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
 
     idProperty: 'id',
     proxy: {
-        type: 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
-        url: Editor.data.restpath + 'taskuserassoc', //same as PHP controller name
+        type: 'rest',
         reader: {
             rootProperty: 'rows',
             type: 'json'

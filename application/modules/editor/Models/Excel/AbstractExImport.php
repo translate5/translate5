@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\TaskLockService;
 
 /**#@+
  * @author Marc Mittag
@@ -45,9 +45,12 @@ abstract class editor_Models_Excel_AbstractExImport
      */
     protected $log;
 
+    private TaskLockService $lock;
+
     public function __construct()
     {
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
+        $this->lock = TaskLockService::create();
     }
 
     /**
@@ -55,7 +58,7 @@ abstract class editor_Models_Excel_AbstractExImport
      */
     public function taskLock(editor_Models_Task $task): bool
     {
-        return Lock::taskLock($task, editor_Models_Task::STATE_EXCELEXPORTED);
+        return $this->lock->lockTask($task, editor_Models_Task::STATE_EXCELEXPORTED);
     }
 
     /**
@@ -63,6 +66,6 @@ abstract class editor_Models_Excel_AbstractExImport
      */
     public function taskUnlock(editor_Models_Task $task): bool
     {
-        return Lock::taskUnlock($task);
+        return $this->lock->unlockTask($task);
     }
 }

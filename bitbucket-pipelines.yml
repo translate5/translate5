@@ -47,6 +47,7 @@ pipelines:
                   exit 0;
                 fi
               - ./vendor/bin/phpstan analyse -c ./phpstan.neon.dist $MODIFIED_FILES
+
   custom:
     test:
 

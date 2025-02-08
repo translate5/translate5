@@ -1,11 +1,14 @@
 {
-    "sourceLang": "4",
-    "targetLang": "5",
     "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
-    "workflowStepName": "translation",
+    "sourceLang": 4,
+    "targetLang": 5,
     "workflow": "default",
-    "deadlineDate": null,
-    "trackchangesShow": "1",
-    "trackchangesShowAll": "1",
-    "trackchangesAcceptReject": "1"
+    "workflowStepName": "translation",
+    "deadlineDate": 0,
+    "trackchangesShow": true,
+    "trackchangesShowAll": true,
+    "trackchangesAcceptReject": true,
+    "type": 1,
+    "groupId": null,
+    "isCoordinatorGroupJob": false
 }

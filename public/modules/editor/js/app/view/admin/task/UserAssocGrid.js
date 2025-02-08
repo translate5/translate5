@@ -41,7 +41,9 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
     strings: {
         confirmDeleteTitle: '#UT#Eintrag löschen?',
         confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
+        confirmDeleteCoordinatorGroupJob: '#UT#userJob.delete.confirmDeleteCoordinatorGroupJob',
         userGuidCol: '#UT#Benutzer',
+        typeCol: '#UT#Typ',
         roleCol: '#UT#Rolle',
         stepCol: '#UT#Workflowschritt',
         segmentrangeCol: '#UT#Segmente',
@@ -88,6 +90,22 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                         type: 'string'
                     },
                     text: me.strings.userGuidCol
+                }, {
+                    xtype: 'gridcolumn',
+                    width: 120,
+                    dataIndex: 'type',
+                    renderer: function (v, meta, rec) {
+                        const types = {
+                            1: 'Editor',
+                            2: 'Coordinator',
+                        };
+
+                        return types[v];
+                    },
+                    filter: {
+                        type: 'string'
+                    },
+                    text: me.strings.typeCol
                 }, {
                     xtype: 'gridcolumn',
                     width: 100,
@@ -167,9 +185,18 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                         disabled: true,
                         itemId: 'remove-user-btn',
                         handler: function () {
-                            Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function (btn) {
-                                var toDelete = me.getSelectionModel().getSelection();
-                                if (btn == 'yes') {
+                            const toDelete = me.getSelectionModel().getSelection();
+
+                            if (toDelete.length === 0) {
+                                return;
+                            }
+
+                            let confirmDeleteMessage = toDelete[0].get('isCoordinatorGroupJob')
+                                ? me.strings.confirmDeleteCoordinatorGroupJob
+                                : me.strings.confirmDelete;
+
+                            Ext.Msg.confirm(me.strings.confirmDeleteTitle, confirmDeleteMessage, function (btn) {
+                                if (btn === 'yes') {
                                     me.fireEvent('confirmDelete', me, toDelete, this);
                                 }
                             });
@@ -196,6 +223,12 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                     }]
                 }]
             };
+
+        config.viewConfig = {
+            getRowClass: function (record, rowIndex, rowParams, store) {
+                return record.get('isCoordinatorGroupJob') ? 'coordinator-group-job-row' : '';
+            }
+        };
 
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

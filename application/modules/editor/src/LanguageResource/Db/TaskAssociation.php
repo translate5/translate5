@@ -41,7 +41,9 @@ use Zend_Db_Table_Abstract;
  */
 class TaskAssociation extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_languageresources_taskassoc';
+    public const TABLE_NAME = 'LEK_languageresources_taskassoc';
+
+    protected $_name = self::TABLE_NAME;
 
     public $_primary = 'id';
 }

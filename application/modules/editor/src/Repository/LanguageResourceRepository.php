@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use editor_Models_Db_LanguageResources_CustomerAssoc;
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
@@ -39,6 +40,14 @@ use ZfExtended_Models_Entity_NotFoundException;
 
 class LanguageResourceRepository
 {
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self();
+    }
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
@@ -64,8 +73,6 @@ class LanguageResourceRepository
         $languageResource = ZfExtended_Factory::get(LanguageResource::class);
         $db = $languageResource->db;
 
-        $lrCustomerTable = ZfExtended_Factory::get(CustomerAssoc::class)->db->info($db::NAME);
-
         $select = $db->select()
             ->setIntegrityCheck(false)
             ->from(
@@ -75,7 +82,7 @@ class LanguageResourceRepository
             )
             ->join(
                 [
-                    'CustomerAssoc' => $lrCustomerTable,
+                    'CustomerAssoc' => editor_Models_Db_LanguageResources_CustomerAssoc::TABLE_NAME,
                 ],
                 'CustomerAssoc.languageResourceId = LanguageResources.id',
                 []
@@ -85,6 +92,25 @@ class LanguageResourceRepository
             ->limit(1);
 
         return ! empty($db->fetchRow($select)?->toArray());
+    }
+
+    public function isAssociatedWithOneOfCustomers(int $lrId, int ...$customerIds): bool
+    {
+        $db = ZfExtended_Factory::get(CustomerAssoc::class)->db;
+        $select = $db->select()
+            ->from(
+                [
+                    'CustomerAssoc' => editor_Models_Db_LanguageResources_CustomerAssoc::TABLE_NAME,
+                ],
+                'COUNT(*) as count'
+            )
+            ->where('CustomerAssoc.languageResourceId = ?', $lrId)
+            ->where('CustomerAssoc.customerId IN (?)', $customerIds)
+        ;
+
+        $row = $db->fetchRow($select);
+
+        return $row ? (int) $row['count'] > 0 : false;
     }
 
     public function findOneByServiceNameAndCustomerId(string $serviceName, int $customerId): ?LanguageResource

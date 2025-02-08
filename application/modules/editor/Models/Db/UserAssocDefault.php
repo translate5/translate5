@@ -28,7 +28,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_Db_UserAssocDefault extends Zend_Db_Table_Abstract
 {
-    protected $_name = "LEK_user_assoc_default";
+    public const TABLE_NAME = 'LEK_user_assoc_default';
+
+    protected $_name = self::TABLE_NAME;
 
     public $_primary = "id";
 }

@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -25,68 +25,139 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use MittagQI\ZfExtended\Acl\Roles;
+use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\User\Exception\GuidAlreadyInUseException;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
+use MittagQI\Translate5\User\Exception\LoginAlreadyInUseException;
+use MittagQI\Translate5\User\Model\User;
 use Zend_Db_Table_Row;
-use ZfExtended_Acl;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
 class UserRepository
 {
-    protected ZfExtended_Acl $acl;
-
-    public function __construct()
+    /**
+     * @return iterable<User>
+     */
+    public function getAll(): iterable
     {
-        $this->acl = ZfExtended_Acl::getInstance();
+        $userModel = new User();
+
+        foreach (ZfExtended_Factory::get(User::class)->loadAll() as $user) {
+            $userModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $userModel->db,
+                        'data' => $user,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield $userModel;
+        }
     }
 
     /**
-     * @throws \ZfExtended_Models_Entity_NotFoundException
+     * @throws InexistentUserException
      */
-    public function get(int $id): ZfExtended_Models_User
-    {
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $userModel->load($id);
-
-        return $userModel;
-    }
-
-    /**
-     * @throws \ZfExtended_Models_Entity_NotFoundException
-     */
-    public function getByGuid(string $guid): ZfExtended_Models_User
-    {
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $userModel->loadByGuid($guid);
-
-        return $userModel;
-    }
-
-    public function findByLogin(string $login): ?ZfExtended_Models_User
+    public function get(int $id): User
     {
         try {
-            $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-            $userModel->loadByLogin($login);
+            $user = new User();
+            $user->load($id);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new InexistentUserException((string) $id);
+        }
 
-            return $userModel;
-        } catch (\ZfExtended_Models_Entity_NotFoundException) {
+        return $user;
+    }
+
+    public function find(int $id): ?User
+    {
+        try {
+            return $this->get($id);
+        } catch (InexistentUserException) {
             return null;
         }
     }
 
     /**
-     * @return iterable<ZfExtended_Models_User>
+     * @throws InexistentUserException
+     */
+    public function getByGuid(string $guid): User
+    {
+        try {
+            $user = new User();
+            $user->loadByGuid($guid);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new InexistentUserException($guid);
+        }
+
+        return $user;
+    }
+
+    public function findByGuid(string $guid): ?User
+    {
+        try {
+            return $this->getByGuid($guid);
+        } catch (InexistentUserException) {
+            return null;
+        }
+    }
+
+    public function findByLogin(string $login): ?User
+    {
+        try {
+            $user = new User();
+            $user->loadByLogin($login);
+
+            return $user;
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
+    }
+
+    /**
+     * @throws GuidAlreadyInUseException
+     * @throws LoginAlreadyInUseException
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function save(ZfExtended_Models_User $user): void
+    {
+        try {
+            $user->save();
+        } catch (\ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+            $field = $e->getExtra('field') ?? '';
+
+            if ($field === 'login') {
+                throw new LoginAlreadyInUseException();
+            }
+
+            if ($field === 'userGuid') {
+                throw new GuidAlreadyInUseException();
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @return iterable<User>
      */
     public function getPmList(array $roles, ?int $customerInContext = null): iterable
     {
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $userModel = new User();
 
-        $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
+        $users = $userModel->loadAllByRole($roles);
 
         foreach ($users as $user) {
             $userModel->init(
@@ -112,5 +183,10 @@ class UserRepository
                 yield clone $userModel;
             }
         }
+    }
+
+    public function delete(ZfExtended_Models_User $user): void
+    {
+        $user->delete();
     }
 }

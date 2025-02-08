@@ -31,7 +31,7 @@ use editor_Plugins_MatchAnalysis_Models_MatchAnalysis as MatchAnalysis;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Status;
-use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
+use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use ZfExtended_Factory as Factory;
 
 /**
@@ -661,8 +661,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             Status::NOT_LOADED,
         ];
 
-        /* @var $assocRepo LanguageResourceTaskAssocRepository */
-        $assocRepo = Factory::get(LanguageResourceTaskAssocRepository::class);
+        $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
         foreach ($languageResourceIds as $languageResourceId) {
             $languageResource = Factory::get(LanguageResource::class);
@@ -679,10 +678,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $this->resources[(int) $languageResource->getId()] = $languageResource;
 
             // Detect penalties to be applied
-            $penalties = $assocRepo->calcPenalties(
-                $this->task->getTaskGuid(),
-                $languageResourceId
-            );
+            $penalties = $taskPenaltyDataProvider->getPenalties($this->task->getTaskGuid(), $languageResourceId);
 
             // Setup general penalty
             $this->penalty['general'][$languageResourceId] = $penalties['penaltyGeneral'];

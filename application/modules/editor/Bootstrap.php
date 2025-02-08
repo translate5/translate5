@@ -31,7 +31,7 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\TaskCustomField;
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
-use MittagQI\Translate5\CrossSynchronization\Events\EventListener;
+use MittagQI\Translate5\CrossSynchronization\Events\EventListener as CrossSyncEventListener;
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
 use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Service\SystemCheck;
@@ -64,7 +64,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         // is currently the main use case for workers
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
 
-        EventListener::create($eventManager)->attachAll();
+        CrossSyncEventListener::create($eventManager)->attachAll();
 
         $cleanUp = function () {
             // first clean up jobs
@@ -136,7 +136,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             $eventHandler->addDefaultPMUsersOnPutAction(DeleteOpenidUsersAction::FALLBACK_PM_CONFIG)
         );
 
-        $taskDeadlineDateEventHandler = new TaskDeadlineEventHandler($eventManager);
+        $taskDeadlineDateEventHandler = TaskDeadlineEventHandler::create();
         $taskDeadlineDateEventHandler->register();
 
         \MittagQI\Translate5\LanguageResource\TaskTm\EventListener::create($eventManager)->atachAll();
@@ -206,6 +206,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'quality', 'userassocdefault', 'log', 'collectionattributedatatype', 'token',
                 'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
                 'languageresourcesyncconnection', 'languageresourcecustomerassoc', 'userfilterpreset',
+                'coordinatorgroup',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -229,6 +230,54 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             [
                 'module' => 'editor',
                 'action' => '',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorCoordinatorGroupCustomer', new ZfExtended_Controller_CustomPathRestRoute(
+            $this->front,
+            'editor/coordinator-group/:groupId/customer',
+            [
+                'module' => 'editor',
+                'controller' => 'coordinatorgroupcustomer',
+                'action' => '',
+            ],
+        ));
+
+        $this->front->getRouter()->addRoute('editorTaskUserJob', new ZfExtended_Controller_CustomPathRestRoute(
+            $this->front,
+            'editor/task/:taskId/job',
+            [
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => '',
+            ],
+        ));
+
+        $this->front->getRouter()->addRoute('editorJobCoordinatorsOnJobUpdate', new ZfExtended_Controller_CustomPathRestRoute(
+            $this->front,
+            'editor/task/:taskId/coordinator-group-job/:jobId/combo/coordinators',
+            [
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => 'coordinatorsforupdate',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorCoordinatorsForNewJobInTask', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:taskId/coordinator-group-job/combo/coordinators',
+            [
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => 'jobcoordinatorsfornewjob',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorTaskUserJobUsersOnCreate', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:taskId/job/combo/users',
+            [
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => 'usersfornewjob',
             ]
         ));
 
@@ -387,12 +436,40 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
+        /** @deprecated  */
         $this->front->getRouter()->addRoute('editorTaskUserAssocProject', new ZfExtended_Controller_RestLikeRoute(
             'editor/taskuserassoc/project',
             [
                 'module' => 'editor',
+                'controller' => 'projectwizard',
+                'action' => 'joblist',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorProjectUserJobs', new ZfExtended_Controller_RestLikeRoute(
+            'editor/project/:projectId/jobs/:workflow',
+            [
+                'module' => 'editor',
                 'controller' => 'taskuserassoc',
                 'action' => 'project',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorProjectWizardJobList', new ZfExtended_Controller_RestLikeRoute(
+            'editor/project/:projectId/wizard/jobs/:workflow',
+            [
+                'module' => 'editor',
+                'controller' => 'projectwizard',
+                'action' => 'joblist',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorProjectWizardTaskList', new ZfExtended_Controller_RestLikeRoute(
+            'editor/project/:projectId/wizard/tasks',
+            [
+                'module' => 'editor',
+                'controller' => 'projectwizard',
+                'action' => 'tasklist',
             ]
         ));
 
@@ -795,6 +872,43 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         );
         $this->front->getRouter()->addRoute('customer_resourceexport', $customerResourceExport);
+
+        $this->front->getRouter()->addRoute('editorTaskDefaultUserJob', new ZfExtended_Controller_CustomPathRestRoute(
+            $this->front,
+            'editor/customers/:customerId/workflow/:workflow/default-job',
+            [
+                'module' => 'editor',
+                'controller' => 'userassocdefault',
+                'action' => '',
+            ],
+        ));
+
+        $this->front->getRouter()->addRoute('editorCustomerDefaultJobsUpdateComboCoordinators', new ZfExtended_Controller_RestLikeRoute(
+            'editor/customers/:customerId/default-coordinator-group-job/:jobId/combo/coordinators',
+            [
+                'module' => 'editor',
+                'controller' => 'defaultcoordinatorgroupjob',
+                'action' => 'coordinatorupdatecombo',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorCustomerDefaultJobsComboCoordinators', new ZfExtended_Controller_RestLikeRoute(
+            'editor/customers/:customerId/default-coordinator-group-job/combo/coordinators',
+            [
+                'module' => 'editor',
+                'controller' => 'defaultcoordinatorgroupjob',
+                'action' => 'coordinatorscombo',
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorCustomerDefaultJobsComboUsers', new ZfExtended_Controller_RestLikeRoute(
+            'editor/customers/:customerId/default-job/combo/users',
+            [
+                'module' => 'editor',
+                'controller' => 'userassocdefault',
+                'action' => 'userscombo',
+            ]
+        ));
 
         $sessionImpersonate = new ZfExtended_Controller_RestLikeRoute(
             'editor/session/impersonate',

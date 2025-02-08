@@ -4,12 +4,8 @@ namespace MittagQI\Translate5\Test\Api;
 
 trait AnalysisTrait
 {
-
     /**
      * Filter out not needed data from the analysis results
-     *
-     * @param array $analysisData
-     * @return array
      */
     private function filterUngroupedAnalysis(array $analysisData): array
     {
@@ -30,8 +26,6 @@ trait AnalysisTrait
 
     /**
      * Filter out not needed data from the task analysis results and sort the returned data by resourceName
-     * @param array $data
-     * @return array
      */
     private function filterTaskAnalysis(array &$data): array
     {

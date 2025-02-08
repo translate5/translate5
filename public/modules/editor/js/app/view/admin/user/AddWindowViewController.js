@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -31,38 +30,42 @@ Ext.define('Editor.view.admin.user.AddWindowViewController', {
     alias: 'controller.adminUserAddWindow',
     strings: {
         userSaved: '#UT#Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.',
-        userAdded: '#UT#Der Benutzer "{0}" wurde erfolgreich erstellt.'
+        userAdded: '#UT#Der Benutzer "{0}" wurde erfolgreich erstellt.',
     },
     listen: {
         component: {
             '#adminUserAddWindow #save-user-btn': {
-                click: 'handleUserSave'
+                click: 'handleUserSave',
             },
             '#adminUserAddWindow #cancel-user-btn': {
-                click: 'handleUserCancel'
-            }
-        }
+                click: 'handleUserCancel',
+            },
+        },
     },
-    handleUserCancel: function() {
-        var win = this.getView();
-        win.down('form').getForm().reset();
+    handleUserCancel: function () {
+        const win = this.getView(),
+            form = win.down('form'),
+            rec = form.getRecord()
+        form.reset();
+        rec.reject();
         win.close();
     },
     /**
      * is called after clicking save user
      */
-    handleUserSave: function() {
+    handleUserSave: function () {
         var me = this,
             win = me.getView(),
             form = win.down('form'),
             basic = form.getForm(),
             rec = form.getRecord();
-        if(!basic.isValid()) {
+
+        if (!basic.isValid()) {
             return;
         }
 
-        //if in first save attempt we got an error from server, 
-        //and we then disable the password in the second save, 
+        //if in first save attempt we got an error from server,
+        //and we then disable the password in the second save,
         //the password will be kept in the model, so reject it here
         rec.reject();
         basic.updateRecord(rec);
@@ -70,20 +73,56 @@ Ext.define('Editor.view.admin.user.AddWindowViewController', {
         rec.save({
             //prevent default ServerException handling
             preventDefaultHandler: true,
-            failure: function(rec, op) {
+            failure: function (rec, op) {
                 win.setLoading(false);
                 var errorHandler = Editor.app.getController('ServerException');
                 errorHandler.handleFormFailure(basic, rec, op);
+
+                const response = Ext.decode(op.error.response.responseText);
+
+                if (! response.hasOwnProperty('errorsTranslated')) {
+                    return;
+                }
+
+                if (response.errorsTranslated && typeof response.errorsTranslated[Symbol.iterator] === 'function') {
+                    for (const error of response.errorsTranslated) {
+                        if (! error.id || basic.findField(error.id).hidden) {
+                            if (error.hasOwnProperty('msg')) {
+                                Editor.MessageBox.addWarning(error.msg);
+
+                                continue;
+                            }
+
+                            if (typeof error[Symbol.iterator] === 'function') {
+                                for (const msg of error) {
+                                    Editor.MessageBox.addWarning(msg);
+                                }
+                            }
+                        }
+                    }
+
+                    return;
+                }
+
+                for (const [key, errors] of Object.entries(response.errorsTranslated)) {
+                    if (!basic.findField(key).hidden) {
+                        continue;
+                    }
+
+                    for (const error of errors) {
+                        Editor.MessageBox.addWarning(error);
+                    }
+                }
             },
-            success: function() {
-                var user = rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')',
+            success: function () {
+                var user = rec.get('surName') + ', ' + rec.get('firstName') + ' (' + rec.get('login') + ')',
                     msg = win.editMode ? me.strings.userSaved : me.strings.userAdded;
                 win.setLoading(false);
                 win.close();
                 //reload the users store
                 rec.store && rec.store.load();
                 Editor.MessageBox.addSuccess(Ext.String.format(msg, user));
-            }
+            },
         });
-    }
+    },
 });

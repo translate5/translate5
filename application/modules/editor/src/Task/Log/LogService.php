@@ -6,11 +6,16 @@ namespace MittagQI\Translate5\Task\Log;
 
 class LogService
 {
-    private LogRepository $logRepository;
+    public function __construct(
+        private readonly LogRepository $logRepository,
+    ) {
+    }
 
-    public function __construct(LogRepository $logRepository)
+    public static function create(): self
     {
-        $this->logRepository = $logRepository;
+        return new self(
+            new LogRepository(),
+        );
     }
 
     public function getProjectLogSummary(int $projectId): array

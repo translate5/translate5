@@ -26,12 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
+use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\CustomerService;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Test\Enums\TestUser;
 
 class Editor_CustomerController extends ZfExtended_RestController
 {
-    protected $entityClass = 'editor_Models_Customer_Customer';
+    protected $entityClass = editor_Models_Customer_Customer::class;
 
     /**
      * @var editor_Models_Customer_Customer
@@ -43,6 +48,8 @@ class Editor_CustomerController extends ZfExtended_RestController
      */
     protected array $_unprotectedActions = ['exportresource'];
 
+    private CustomerActionPermissionAssert $permissionAssert;
+
     public function init()
     {
         parent::init();
@@ -53,15 +60,42 @@ class Editor_CustomerController extends ZfExtended_RestController
                 'Content-Type' => 'application/zip',
             ],
         ])->addActionContext('exportresource', 'resourceLogExport')->initContext();
+
+        $this->permissionAssert = CustomerActionPermissionAssert::create();
     }
 
     public function indexAction()
     {
-        if ($this->entity->getFilter()->hasSort() === false) {
-            // add default alphabetical sort
-            $this->entity->getFilter()->addSort('name');
+        $userRepository = new UserRepository();
+        $authUser = $userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
+
+        $customerModel = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+        $rows = $this->entity->loadAll();
+        $context = new PermissionAssertContext($authUser);
+
+        foreach ($rows as $key => $row) {
+            $customerModel->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $customerModel->db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => true,
+                    ]
+                )
+            );
+
+            try {
+                $this->permissionAssert->assertGranted(CustomerAction::Read, $customerModel, $context);
+            } catch (PermissionExceptionInterface) {
+                unset($rows[$key]);
+
+                continue;
+            }
         }
-        parent::indexAction();
+
+        $this->view->rows = array_values($rows);
+        $this->view->total = count($rows);
     }
 
     public function postAction()

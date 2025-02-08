@@ -61,7 +61,6 @@ class LanguageRulesHashService
         private ContentProtectionRepository $contentProtectionRepository,
         private LanguageRepository $languageRepository
     ) {
-        $this->logger = \Zend_Registry::get('logger')->cloneMe('translate5.content_protection');
     }
 
     /**

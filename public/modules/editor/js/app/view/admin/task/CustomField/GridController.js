@@ -74,8 +74,8 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         // For each role
         Ext.Object.each(Editor.data.app.roles, (key, value) => {
 
-            // Skip unsetable and unapplicable roles
-            if (!value.setable || key.match('term|instantTranslate|editor-only-override')){
+            // Skip unapplicable roles
+            if (key.match('term|instantTranslate|editor-only-override')){
                 return;
             }
 

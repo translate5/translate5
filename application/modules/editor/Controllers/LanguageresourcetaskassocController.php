@@ -30,6 +30,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeType;
+use MittagQI\Translate5\LanguageResource\Provider\LanguageResourceProvider;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 
@@ -77,7 +78,7 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
             return;
         }
 
-        $result = $this->entity->getAssocTasksWithResources($taskGuid->value);
+        $result = LanguageResourceProvider::create()->getAssocTasksWithResources($taskGuid->value);
 
         $this->view->rows = $result;
         $this->view->total = count($result);

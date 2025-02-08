@@ -136,7 +136,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             };
             vm.setStores(vmStores);
             // add the bconf grid to the tabPanel and bind it to the customer
-            tabPanel.insert(2, {
+            tabPanel.insert(3, {
                 xtype: 'okapiBconfGrid',
                 routePrefix: 'client/:clientId/',
                 bind: {

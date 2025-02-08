@@ -37,7 +37,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Db_TaskUserTracking extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_taskUserTracking';
+    public const TABLE_NAME = 'LEK_taskUserTracking';
+
+    protected $_name = self::TABLE_NAME;
 
     public $_primary = 'id';
 }

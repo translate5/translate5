@@ -36,6 +36,7 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
     fields: [
       {name: 'id', type: 'int',persist: false},
       {name: 'customerId', type: 'int'},
+      {name: 'type', type: 'int'},
       {name: 'sourceLang', type: 'int'},
       {name: 'targetLang', type: 'int'},
       {name: 'userGuid', type: 'string'},
@@ -44,9 +45,11 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
       {name: 'workflow', type: 'string'},
       {name: 'segmentrange', type: 'string'},
       {name: 'deadlineDate'},
-      {name: 'trackchangesShow', type: 'int'},
-      {name: 'trackchangesShowAll', type: 'int'},
-      {name: 'trackchangesAcceptReject', type: 'int'}
+      {name: 'trackchangesShow', type: 'bool'},
+      {name: 'trackchangesShowAll', type: 'bool'},
+      {name: 'trackchangesAcceptReject', type: 'bool'},
+      {name: 'coordinatorGroupId', type: 'int', persist: false},
+      {name: 'isCoordinatorGroupJob', type: 'bool', persist: false},
     ],
 
     /***

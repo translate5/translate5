@@ -57,22 +57,10 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
             data: '{stepsData}'
         },
         userAssoc:{
-            model:'Editor.model.admin.TaskUserAssoc',
-            remoteFilter: true,
+            model: 'Editor.model.admin.TaskUserAssoc',
+            remoteFilter: false,
             pageSize: false,
-            setFilters:function(filters){
-                //the binding is also triggered when the value is empty. Ignore the filtering with empty value
-                if(filters && !filters.value){
-                    this.loadData([],false);
-                    return;
-                }
-                this.superclass.superclass.setFilters.apply(this, [filters]);
-            },
-            filters:{
-                property: 'taskGuid',
-                operator:"eq",
-                value:'{projectTaskSelection.taskGuid}'
-            }
+            autoLoad: false,
         }
     },
     formulas: {
@@ -170,5 +158,5 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
             },
             bind:{bindTo:'{currentTask}',deep:true}
         }
-    }
+    },
 });

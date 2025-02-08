@@ -120,7 +120,7 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
     private function reimport(array $taskIdsGrouped, bool $onlyEdited, bool $useSegmentTimestamp): void
     {
         $languageResourceRepository = new LanguageResourceRepository();
-        $taskRepository = new TaskRepository();
+        $taskRepository = TaskRepository::create();
         $reimportSegmentsSnapshot = ReimportSegmentsSnapshot::create();
         $reimportSegments = ReimportSegments::create();
 

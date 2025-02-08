@@ -30,14 +30,16 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Cronjob\CronIpFactory;
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\CustomFields\Field as TaskCustomField;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\NoJobFoundException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\Translate5\User\DataProvider\RolesDataProvider;
 use MittagQI\Translate5\User\FilterPreset;
-use MittagQI\ZfExtended\Acl\SetAclRoleResource as BaseRoles;
 use MittagQI\ZfExtended\CsrfProtection;
 
 /**
@@ -294,6 +296,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $rop = $this->config->runtimeOptions;
 
         $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
+        $this->view->enableJsLoggerFeedback = (! empty($rop->debug->enableJsLoggerFeedback) && str_contains(
+            ',' . $rop->debug->enableJsLoggerFeedback . ',',
+            ',' . ZfExtended_Authentication::getInstance()->getLogin() . ','
+        ));
+
         // Video-recording: If allowed in general, then it can be set by the user after every login.
         $this->view->Php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
         // Feedback button
@@ -541,7 +548,17 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
         $php2js->set('app.company', $this->config->runtimeOptions->companyName);
         $php2js->set('app.name', $this->config->runtimeOptions->appName);
-        $userData = (array) ZfExtended_Authentication::getInstance()->getUserData();
+
+        $auth = ZfExtended_Authentication::getInstance();
+
+        $userData = (array) $auth->getUserData();
+
+        $groupUserRepository = CoordinatorGroupUserRepository::create();
+        $groupUser = $groupUserRepository->findByUserGuid($auth->getUserGuid());
+
+        if (null !== $groupUser) {
+            $userData['coordinatorGroup'] = (int) $groupUser->group->getId();
+        }
 
         // Trim TermPortal-roles if TermPortal plugin is disabled
         if (! $this->pluginManager->isActive('TermPortal')) {
@@ -563,19 +580,24 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
         $php2js->set('app.sessionKey', session_name());
 
-        $roles = [];
-        foreach (Roles::getFrontendRoles() as $role) {
-            //set the setable, if the user is able to set/modify this role
-            $roles[$role] = [
-                'label' => $this->translate->_(ucfirst($role)),
-                //role name is used as right in setaclrole
-                'setable' => $this->isAllowed(BaseRoles::ID, $role),
-            ];
-        }
+        $userRepository = new UserRepository();
+
+        $authUser = $userRepository->get($auth->getUserId());
+        $rolesDataProvider = RolesDataProvider::create();
+
+        $groupedRoles = $rolesDataProvider->getGroupedRoles($authUser);
+
+        $php2js->set('app.groupedRoles', $groupedRoles);
+        $php2js->set('app.conflictingRoles', Roles::CONFLICTING_ROLES);
+
+        $roles = array_merge(...array_values($groupedRoles));
+
+        $roles = array_column($roles, null, 'role');
+
         $php2js->set('app.roles', $roles);
 
         $clientPmSubRoles = [];
-        foreach (Roles::getClientPmSubroles() as $role) {
+        foreach (Roles::getClientPmSubRoles() as $role) {
             $clientPmSubRoles[] = [
                 $role,
                 $this->translate->_($role),

@@ -46,16 +46,10 @@ Ext.define('Editor.model.admin.User', {
     {name: 'roles', type: 'string'},
     {name: 'passwd', type: 'string'},
     {name: 'editable', type: 'boolean', persist: false},
-    {name: 'parentIds', type: 'int', convert: function(v,rec) {
-        if(Ext.isArray(v)) {
-            //return last element of the array or null
-            return (v && v.length) ? v[v.length - 1] : null;
-        }
-        return v;
-    }},
     {name: 'locale', type: 'string'},
     {name: 'customers', type: 'string'},
-    {name: 'openIdIssuer', type: 'string'}
+    {name: 'openIdIssuer', type: 'string'},
+    {name: 'coordinatorGroup', type: 'int', convert: (v, rec) => v > 0 ? v : null},
   ],
   idProperty: 'id',
   proxy : {
@@ -103,32 +97,6 @@ Ext.define('Editor.model.admin.User', {
   getRoles: function() {
       return this.self.getRoles(this);
   },
-    /**
-     * Retrieves the main roles (all but the clientPmSubRoles
-     * @return {Array}
-     */
-    getMainRoles: function() {
-        var roles = [];
-        for (const role of this.self.getRoles(this)) {
-            if(!role.startsWith('clientpm_')){
-                roles.push(role);
-            }
-        }
-        return roles;
-    },
-    /**
-     * Retrieves the clientPM's subroles
-     * @return {Array}
-     */
-    getClientPmSubRoles: function() {
-        var roles = [];
-        for (const role of this.self.getRoles(this)) {
-            if(role.startsWith('clientpm_')){
-                roles.push(role);
-            }
-        }
-        return roles;
-    },
   /**
    * @param role {String}
    * @return {Boolean}
@@ -251,5 +219,12 @@ Ext.define('Editor.model.admin.User', {
      */
     getRestrictedClientIds: function(){
         return Editor.util.Util.integerizeArray(Editor.data.app.user.restrictedClientIds);
+    },
+
+    /**
+     * @returns {Boolean}
+     */
+    isCoordinatorGroupUser: function() {
+        return this.get('coordinatorGroup') > 0;
     }
 });

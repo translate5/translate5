@@ -10,7 +10,7 @@ use ZfExtended_Factory;
  * @method string getId()
  * @method void setId(int $id)
  * @method string getLanguageResourceId()
- * @method void setLanguageResourceId(int $languageResourceid)
+ * @method void setLanguageResourceId(int $languageResourceId)
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $taskGuid)
  * @method string getAutoCreatedOnImport()
@@ -35,7 +35,7 @@ class TaskPivotAssociation extends AssociationAbstract
 
         if ($task->isProject()) {
             //get all project tasks and get the resources for each task
-            $projectGuids = array_column($task->loadProjectTasks($task->getProjectId(), true), 'taskGuid');
+            $projectGuids = array_column($task->loadProjectTasks((int) $task->getProjectId(), true), 'taskGuid');
             $result = [];
             foreach ($projectGuids as $pg) {
                 $result = array_merge($result, $this->loadAllAvailableForTask($pg, $manager));
@@ -54,8 +54,8 @@ class TaskPivotAssociation extends AssociationAbstract
             return [];
         }
         //get source and relais language fuzzy
-        $sourceLangs = $languageModel->getFuzzyLanguages($task->getSourceLang(), 'id', true);
-        $relaisLangs = $languageModel->getFuzzyLanguages($task->getRelaisLang(), 'id', true);
+        $sourceLangs = $languageModel->getFuzzyLanguages((int) $task->getSourceLang(), 'id', true);
+        $relaisLangs = $languageModel->getFuzzyLanguages((int) $task->getRelaisLang(), 'id', true);
 
         if (empty($sourceLangs) || empty($relaisLangs)) {
             return [];
