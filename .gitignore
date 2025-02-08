@@ -4,6 +4,7 @@
 /data/purchaseOrderPdfs*
 /data/tbx-import*
 /data/dummyTm_*
+/data/lock*
 
 # Dirs
 /.idea/
