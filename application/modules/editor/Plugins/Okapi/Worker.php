@@ -313,7 +313,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         int $fileId,
         bool $import,
     ): ?ZfExtended_Logger_Event {
-        $event = $this->logger->exception($e, [
+        $gevent = $this->logger->exception($e, [
             'extra' => [
                 'task' => $this->task,
             ],

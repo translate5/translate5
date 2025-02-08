@@ -41,6 +41,9 @@ class EventDispatcher implements EventDispatcherInterface
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(ZfFactory::get(ZfEventManager::class, [self::class]));

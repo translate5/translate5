@@ -42,16 +42,16 @@ Ext.define('Editor.view.admin.customer.TagField', {
     store: 'customersStore',
     queryMode: 'local',
 
-    // tpl: Ext.create('Ext.XTemplate',
-    //     '<ul class="x-list-plain"><tpl for=".">',
-    //     '<li role="option" class="x-boundlist-item">{[Ext.String.htmlEncode(values.name)]}</li>',
-    //     '</tpl></ul>'
-    // ),
-    //
-    // // Custom template to escape name on render
-    // tagTemplate: new Ext.XTemplate(
-    //     '<tpl for=".">',
-    //     '<span class="x-tagfield-item-text">{[Ext.util.Format.htmlEncode(values.name)]}</span>',
-    //     '</tpl>'
-    // )
+    tpl: Ext.create('Ext.XTemplate',
+        '<ul class="x-list-plain"><tpl for=".">',
+        '<li role="option" class="x-boundlist-item">{[Ext.String.htmlEncode(values.name)]}</li>',
+        '</tpl></ul>'
+    ),
+
+    // Custom template to escape name on render
+    tagTemplate: new Ext.XTemplate(
+        '<tpl for=".">',
+        '<span class="x-tagfield-item-text">{[Ext.util.Format.htmlEncode(values.name)]}</span>',
+        '</tpl>'
+    )
 });

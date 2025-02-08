@@ -32,18 +32,6 @@ END LICENSE AND COPYRIGHT
 class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helper_Abstract
 {
     /**
-     * Cached map of userGuids and taskGuid to userNames
-     * @var array
-     */
-    protected $cachedUserInfo = [];
-
-    /**
-     * Cached UserTracking
-     * @var array
-     */
-    protected $cachedUserTracking = [];
-
-    /**
      * @var editor_Models_SegmentFieldManager
      */
     protected $segmentFieldManager;
@@ -60,24 +48,9 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
     protected $task;
 
     /**
-     * @var editor_Models_TaskUserTracking
-     */
-    protected $userTracking;
-
-    /**
      * @var editor_Workflow_Anonymize
      */
     protected $workflowAnonymize;
-
-    /**
-     * @var array
-     */
-    protected $allAssocInfos = [];
-
-    /**
-     * @var array
-     */
-    protected $userAssocInfos = [];
 
     /**
      * true if currently a task is opened
@@ -87,7 +60,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
     public function init()
     {
         $this->workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-        $this->userTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+        $this->segmentFieldManager = new editor_Models_SegmentFieldManager();
     }
 
     public function initForTask(editor_Workflow_Default $workflow, editor_Models_Task $task, bool $inTaskContext)
@@ -102,49 +75,22 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
      * If the given taskguid is assigned to a client for anonymizing data, the added user-data is anonymized already.
      * @param array $row gets the row to modify as reference
      */
-    public function addUserInfos(array &$row, $isEditAll, $givenUserState = null)
+    public function addUserInfos(array &$row, $isEditAll)
     {
         $taskguid = $row['taskGuid'];
-        //Add actual User Assoc Infos to each Task
-        if (isset($this->userAssocInfos[$taskguid])) {
-            $assoc = $this->userAssocInfos[$taskguid];
-            $row['userRole'] = $assoc['role'];
-            $row['userState'] = $assoc['state'];
-            $row['userStep'] = $assoc['workflowStepName'];
-            // processing some trackchanges properties that can't be parted out to the trackchanges-plugin
-            $row['userTrackchangesShow'] = $assoc['trackchangesShow'];
-            $row['userTrackchangesShowAll'] = $assoc['trackchangesShowAll'];
-            $row['userTrackchangesAcceptReject'] = $assoc['trackchangesAcceptReject'];
-        } elseif ($isEditAll && ! empty($givenUserState)) {
-            $row['userState'] = $givenUserState; //returning the given userState for usage in frontend
-        }
-
-        //Add all User Assoc Infos to each Task
-        if (isset($this->allAssocInfos[$taskguid])) {
-            $reducer = function ($accu, $item) {
-                return $accu || ! empty($item['usedState']);
-            };
-            $row['isUsed'] = array_reduce($this->allAssocInfos[$taskguid], $reducer, false);
-            $row['users'] = $this->allAssocInfos[$taskguid];
-        }
-
-        $row['lockingUsername'] = null;
-
-        if (! empty($row['lockingUser'])) {
-            $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser'], $taskguid));
-        }
 
         $fields = ZfExtended_Factory::get(editor_Models_SegmentField::class);
-
         $userPref = ZfExtended_Factory::get(editor_Models_Workflow_Userpref::class);
 
-        //we load alls fields, if we are in taskOverview and are allowed to edit all
+        // we load alls fields, if we are in taskOverview and are allowed to edit all
         // or we have no userStep to filter / search by.
         // No userStep means indirectly that we do not have a TUA (pmCheck)
         // task in state import means in some point there will be no user pref record in the database
-        if ((! $this->isInTaskContext && $isEditAll) ||
+        if (
+            (! $this->isInTaskContext && $isEditAll) ||
             empty($row['userStep']) ||
-            $row['state'] === editor_Models_Task::STATE_IMPORT) {
+            $row['state'] === editor_Models_Task::STATE_IMPORT
+        ) {
             try {
                 $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
             } catch (ZfExtended_Models_Entity_NotFoundException $exception) {
@@ -169,7 +115,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
                 );
 
                 $row['segmentFields'] = $fields->loadByUserPref($userPref);
-            } catch (ZfExtended_Models_Entity_NotFoundException $throwable) {
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
                 $row['segmentFields'] = [];
             }
         }
@@ -190,170 +136,12 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
             $field['label'] = $translate->_($field['label']);
         }
 
-        if (empty($this->segmentFieldManager)) {
-            $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        }
         //sets the information if this task has default segment field layout or not
         $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(
             array_map(
-                function ($field) {
-                    return $field['name'];
-                },
+                static fn ($field) => $field['name'],
                 $row['segmentFields']
             )
         );
-
-        $this->handleUserTracking($row);
-    }
-
-    /**
-     * Applies the user anonymising rules to the data where it is needed
-     */
-    protected function handleUserTracking(array &$row): void
-    {
-        $taskGuid = $row['taskGuid'];
-
-        if (array_key_exists($taskGuid, $this->cachedUserTracking)) {
-            $row['userTracking'] = $this->cachedUserTracking[$taskGuid];
-        } else {
-            $row['userTracking'] = $this->userTracking->getByTaskGuid($taskGuid);
-        }
-
-        if ($this->task->getTaskGuid() != $taskGuid) {
-            $this->task->init($row);
-        }
-
-        if (! $this->task->anonymizeUsers()) {
-            return;
-        }
-
-        /* @var $workflowAnonymize editor_Workflow_Anonymize */
-        if (! empty($row['lockingUser'])) {
-            $row = $this->workflowAnonymize->anonymizeUserdata(
-                $taskGuid,
-                $row['lockingUser'],
-                $row
-            );
-        }
-        if (! empty($row['userTracking'])) {
-            foreach ($row['userTracking'] as &$rowTrack) {
-                $rowTrack = $this->workflowAnonymize->anonymizeUserdata(
-                    $taskGuid,
-                    $rowTrack['userGuid'] ?? '',
-                    $rowTrack
-                );
-            }
-        }
-        if (! empty($row['users'])) {
-            foreach ($row['users'] as &$rowUser) {
-                $rowUser = $this->workflowAnonymize->anonymizeUserdata(
-                    $taskGuid,
-                    $rowUser['userGuid'],
-                    $rowUser
-                );
-            }
-        }
-    }
-
-    /**
-     * Fetch an array with Task User Assoc Data for the currently logged in User.
-     * Returns an array with an entry for each task, key is the taskGuid
-     * @return array returns the assoc infos to the current user
-     */
-    public function initUserAssocInfos(array $taskRawObjects)
-    {
-        $taskGuids = array_column($taskRawObjects, 'taskGuid');
-        $currentWorkflowSteps = array_column($taskRawObjects, 'workflowStepName', 'taskGuid');
-        $this->userAssocInfos = []; //collects the assoc infos to the current user
-        $userAssoc = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
-        $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
-        $assocs = $userAssoc->loadByTaskGuidList($taskGuids);
-        $this->allAssocInfos = [];
-
-        $this->cachedUserTracking = $this->userTracking->loadGroupedByTaskGuid($taskGuids);
-
-        foreach ($assocs as $assoc) {
-            if (! isset($this->allAssocInfos[$assoc['taskGuid']])) {
-                $this->allAssocInfos[$assoc['taskGuid']] = [];
-            }
-            //since a user can be assigned multiple times to a task,
-            // the role has also to be checked to determine the current user
-            $stepName = $currentWorkflowSteps[$assoc['taskGuid']] ?? '';
-
-            //we need an info about the current user in any case, so we init the userAssocInfos with the first assoc of the current user
-            // but we override the already stored userAssocInfo if a later assoc has the matching role
-            $firstCurrentUserAssoc = empty($this->userAssocInfos[$assoc['taskGuid']]);
-            if ($userGuid == $assoc['userGuid'] && ($firstCurrentUserAssoc || $stepName == $assoc['workflowStepName'])) {
-                $this->userAssocInfos[$assoc['taskGuid']] = $assoc;
-            }
-            $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
-            $assoc['userName'] = $userInfo['surName'] . ', ' . $userInfo['firstName'];
-            $assoc['login'] = $userInfo['login'];
-            //set only not pmOverrides
-            if (empty($assoc['isPmOverride'])) {
-                $this->allAssocInfos[$assoc['taskGuid']][] = $assoc;
-            }
-        }
-        $userSorter = function ($first, $second) {
-            if ($first['userName'] > $second['userName']) {
-                return 1;
-            }
-            if ($first['userName'] < $second['userName']) {
-                return -1;
-            }
-
-            return 0;
-        };
-        foreach ($this->allAssocInfos as $taskGuid => $taskUsers) {
-            usort($taskUsers, $userSorter);
-            $this->allAssocInfos[$taskGuid] = $taskUsers;
-        }
-
-        return $this->userAssocInfos;
-    }
-
-    /**
-     * returns the username for the given userGuid.
-     * Doing this on client side would be possible, but then it must be ensured that UsersStore is always available and loaded before TaskStore.
-     * @param string $userGuid
-     * @param string $taskGuid
-     * @return array
-     */
-    protected function getUserinfo($userGuid, $taskGuid)
-    {
-        $notfound = []; //should not be, but can occur after migration of old data!
-        if (empty($userGuid)) {
-            return $notfound;
-        }
-        if (isset($this->cachedUserInfo[$userGuid])) {
-            // cache for user
-            return $this->cachedUserInfo[$userGuid];
-        }
-        if (empty($this->tmpUserDb)) {
-            $this->tmpUserDb = ZfExtended_Factory::get('ZfExtended_Models_Db_User');
-            /* @var $this->tmpUserDb ZfExtended_Models_Db_User */
-        }
-        $s = $this->tmpUserDb->select()->where('userGuid = ?', $userGuid);
-        $row = $this->tmpUserDb->fetchRow($s);
-        if (! $row) {
-            return $notfound;
-        }
-        $userInfo = $row->toArray();
-
-        $this->cachedUserInfo[$userGuid] = $userInfo;
-
-        return $userInfo;
-    }
-
-    /**
-     * returns the commonly used username: Firstname Lastname (login)
-     */
-    protected function getUsername(array $userinfo)
-    {
-        if (empty($userinfo)) {
-            return '- not found -'; //should not be, but can occur e.g. after migration of old data or for lockingUsername
-        }
-
-        return $userinfo['firstName'] . ' ' . $userinfo['surName'] . ' (' . $userinfo['login'] . ')';
     }
 }

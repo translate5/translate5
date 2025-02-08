@@ -26,18 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
+use editor_Workflow_Default as Workflow;
+use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\ZfExtended\Logger\CustomFileLogger;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
 /**
- * TaskUserAssoc Object Instance as needed in the application
  * @method string getId()
  * @method string getTaskGuid()
  * @method string getUserGuid()
@@ -58,6 +52,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method string getTrackchangesShow()
  * @method string getTrackchangesShowAll()
  * @method string getTrackchangesAcceptReject()
+ * @method string|null getCoordinatorGroupJobId()
  *
  * @method void setId(int $id)
  * @method void setTaskGuid(string $taskGuid)
@@ -79,12 +74,38 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setTrackchangesShow(int $isAllowed)
  * @method void setTrackchangesShowAll(int $isAllowed)
  * @method void setTrackchangesAcceptReject(int $isAllowed)
+ * @method void setCoordinatorGroupJobId(int|null $id)
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = 'editor_Models_Db_TaskUserAssoc';
 
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserAssoc';
+
+    public function setType(TypeEnum $type): void
+    {
+        $this->set('type', $type->value);
+    }
+
+    public function getType(): TypeEnum
+    {
+        return TypeEnum::from((int) $this->get('type'));
+    }
+
+    public function isCoordinatorGroupJob(): bool
+    {
+        return TypeEnum::Coordinator === $this->getType();
+    }
+
+    public function isCoordinatorGroupUserJob(): bool
+    {
+        return TypeEnum::Coordinator !== $this->getType() && ! empty($this->getCoordinatorGroupJobId());
+    }
+
+    public function isConfirmed(): bool
+    {
+        return in_array($this->getState(), [Workflow::STATE_WAITING, Workflow::STATE_OPEN]);
+    }
 
     /***
      * @param string $taskGuid
@@ -169,27 +190,20 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      * loads the assocs regardless isPmOverride is set or not
      * Optionally filtered by Workflow And WorkflowStep
      */
-    public function loadByTaskGuidList(array $list, string $workflow = '', string $workflowStep = ''): array
+    public function loadByTaskGuidList(array $list): array
     {
         if (empty($list)) {
             return [];
         }
 
         try {
-            $s = $this->db->select()->where('taskGuid in (?)', $list);
-            if (! empty($workflow)) {
-                $s = $s->where('workflow = ?', $workflow);
-            }
-            if (! empty($workflowStep)) {
-                $s = $s->where('workflowStepName = ?', $workflowStep);
-            }
+            $s = $this->db->select()->where('taskGuid in (?)', $list)->where('type != ?', TypeEnum::Coordinator->value);
 
             return $this->db->fetchAll($s)->toArray();
         } catch (Exception $e) {
+            // @phpstan-ignore-next-line
             $this->notFound('NotFound after other Error', $e);
         }
-
-        return [];
     }
 
     /**
@@ -213,31 +227,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         }
         if (! $row) {
             $this->notFound(__CLASS__ . '#taskGuid + userGuid + workflowStepName', $taskGuid . ' + ' . $userGuid . ' + ' . $workflowStepName);
-        }
-        //load implies loading one Row, so use only the first row
-        $this->row = $row;
-
-        return $this->row->toArray();
-    }
-
-    /**
-     * Load single task user assoc for the given task#user#role params.
-     * @param string $role | null
-     * @return array
-     */
-    public function loadByRole(string $userGuid, string $taskGuid, string $role)
-    {
-        try {
-            $s = $this->db->select()
-                ->where('userGuid = ?', $userGuid)
-                ->where('taskGuid = ?', $taskGuid)
-                ->where('role = ?', $role);
-            $row = $this->db->fetchRow($s);
-        } catch (Exception $e) {
-            $this->notFound('NotFound after other Error', $e);
-        }
-        if (! $row) {
-            $this->notFound(__CLASS__ . '#taskGuid + userGuid + role', $taskGuid . ' + ' . $userGuid . ' + ' . $role);
         }
         //load implies loading one Row, so use only the first row
         $this->row = $row;
@@ -304,74 +293,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * loads the TaskUserAssoc Content joined with userinfos (currently only login)
-     * loads only assocs where isPmOverride not set
-     * @return array
-     */
-    public function loadAllWithUserInfo()
-    {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        $db = $this->db;
-        $s = $db->select()
-            ->setIntegrityCheck(false)
-            ->from([
-                'tua' => $db->info($db::NAME),
-            ])
-            ->join([
-                'u' => $user->db->info($db::NAME),
-            ], 'tua.userGuid = u.userGuid', ['login', 'surName', 'firstName', 'parentIds'])
-            ->where('tua.isPmOverride = 0');
-        //->where('tua.taskGuid = ?', $this->getTaskGuid()); kommt per filter aktuell!
-
-        //default sort:
-        if (! $this->filter->hasSort()) {
-            $this->filter->addSort('surName');
-            $this->filter->addSort('firstName');
-            $this->filter->addSort('login');
-        }
-
-        return $this->loadFilterdCustom($s);
-    }
-
-    /***
-     * Load all user assoc for all tasks in a project. This will load also the single task projects.
-     *
-     * @param int $projectId
-     * @param string $workflow
-     * @return array
-     * @throws Zend_Db_Table_Exception
-     */
-    public function loadProjectWithUserInfo(int $projectId, string $workflow)
-    {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        $db = $this->db;
-        $s = $db->select()
-            ->setIntegrityCheck(false)
-            ->from([
-                'tua' => $db->info($db::NAME),
-            ])
-            ->join([
-                'u' => $user->db->info($db::NAME),
-            ], 'tua.userGuid = u.userGuid', ['login', 'surName', 'firstName', 'parentIds'])
-            ->join([
-                't' => 'LEK_task',
-            ], 't.taskGuid = tua.taskGuid', ['t.sourceLang', 't.targetLang'])
-            ->where('tua.isPmOverride = 0')
-            ->where('tua.workflow = ?', $workflow)
-            ->where('t.projectId = ?', $projectId)
-            ->where('t.taskType not in(?)', editor_Task_Type::getInstance()->getProjectTypes(true));
-
-        //default sort:
-        if (! $this->filter->hasSort()) {
-            $this->filter->addSort('surName');
-            $this->filter->addSort('firstName');
-            $this->filter->addSort('login');
-        }
-
-        return $db->fetchAll($s)->toArray();
-    }
-
-    /**
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::save()
      */
@@ -390,6 +311,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      */
     public function delete()
     {
+        if ($this->isCoordinatorGroupJob()) {
+            throw new LogicException('LSP Job should be delete using DeleteLspJobAssignmentOperation');
+        }
+
         $taskGuid = $this->get('taskGuid');
         $task = ZfExtended_Factory::get('editor_Models_Task');
 
@@ -436,84 +361,21 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * deletes all other users to a task expect the given one, optionally filtered by role.
-     * Mainly needed for dealing with competitive users
-     * @return boolean|array returns the deleted tuas as array or false if the tua list was modified by other users
-     */
-    public function deleteOtherUsers(string $taskGuid, string $userGuid, string $workflowStepName = null): bool|array
-    {
-        $delete = [
-            'taskGuid = ?' => $taskGuid,
-            'userGuid != ?' => $userGuid,
-            'isPmOverride = ?' => 0,
-        ];
-
-        if (! empty($workflowStepName)) {
-            $delete['workflowStepName = ?'] = $workflowStepName;
-        }
-
-        $s = $this->db->select();
-        foreach ($delete as $sql => $value) {
-            $s->where($sql, $value);
-        }
-
-        $otherTuas = $this->db->fetchAll($s)->toArray();
-        $this->db->getAdapter()->beginTransaction();
-        $deleted = $this->db->delete($delete);
-
-        //something was changed, roll back the delete and return false
-        if (count($otherTuas) !== $deleted) {
-            $this->db->getAdapter()->rollBack();
-
-            return false;
-        }
-
-        $this->db->getAdapter()->commit();
-        $this->updateTask($taskGuid);
-
-        return $otherTuas;
-    }
-
-    /**
-     * deletes all assoc entries for this userGuid, and updates the users counter in the Task Entity
-     * @param string $userGuid
-     */
-    public function deleteByUserguid($userGuid)
-    {
-        $list = $this->loadByUserGuid($userGuid);
-        foreach ($list as $assoc) {
-            $this->init($assoc);
-            $this->delete();
-        }
-    }
-
-    /***
-     * Delete all user association for given taskGuid
-     * @return void
-     */
-    public function deleteByTaskGuid(string $taskGuid)
-    {
-        $this->db->delete([
-            'taskGuid = ?' => $taskGuid,
-        ]);
-        $this->updateTask($taskGuid);
-    }
-
-    /**
      * updates the task table count field
      */
     protected function updateTask($taskGuid)
     {
-        /* @var $task editor_Models_Task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        $task->updateTask($taskGuid);
+        // TODO: REMOVE ME LATER! It is here for not to duplicate code.
+        // TODO: Task update should be done explicitly and not as side effect of a TUA save or delete
+        \MittagQI\Translate5\Repository\TaskRepository::create()->updateTaskUserCount($taskGuid);
     }
 
     /**
      * set all associations of the given taskGuid (or for all tasks if null) to unused where the session is expired
      * sets also the state to open where allowed
      * @param string $taskGuid optional, if omitted cleanup all taskUserAssocs
-     * @param string $forced optional, default false. if true cleanup also taskUserAssocs with validSessionsIds, only usable with given taskGuid!
+     * @param string $forced optional, default false. if true cleanup also taskUserAssocs with validSessionsIds, only
+     *     usable with given taskGuid!
      */
     public function cleanupLocked($taskGuid = null, $forced = false)
     {
@@ -572,7 +434,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         $taskGuids = array_unique(array_column($taskUserAssoc, 'taskGuid'));
         foreach ($taskGuids as $jobTaskGuid) {
             $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($jobTaskGuid);
-            /* @var $workflow editor_Workflow_Default */
+            /* @var $workflow Workflow */
             if (! empty($workflow)) {
                 //updates the workflow state back to open if allowed
                 $where2 = $where;
@@ -658,20 +520,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         return $this->db->fetchAll($s)->toArray();
     }
 
-    /**
-     * Check if the given user is in use in one of the tasks
-     */
-    public function isUserInUse(string $userGuid): array
-    {
-        $this->cleanupLocked();
-        $s = $this->db->select()
-            ->where('userGuid = ?', $userGuid)
-            ->where('usedState IS NOT NULL')
-            ->where('usedInternalSessionUniqId IS NOT NULL');
-
-        return $this->db->fetchAll($s)->toArray();
-    }
-
     /***
      * Load the Key Point Indicators data for the given taskGuids and states
      * @param array $taskGuids
@@ -685,7 +533,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         }
         //if the states are not set uset the default states for kpi
         if (empty($states)) {
-            $states = [editor_Workflow_Default::ROLE_REVIEWER, editor_Workflow_Default::ROLE_TRANSLATOR, editor_Workflow_Default::ROLE_TRANSLATORCHECK];
+            $states = [Workflow::ROLE_REVIEWER, Workflow::ROLE_TRANSLATOR, Workflow::ROLE_TRANSLATORCHECK];
         }
         $s = $this->db->select()
             ->where('taskGuid IN(?)', $taskGuids)
@@ -713,19 +561,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         $stmt = $this->db->getAdapter()->query('select state, role, usedstate, count(*) jobCount from LEK_taskUserAssoc group by state,role, usedstate');
 
         return $stmt->fetchAll();
-    }
-
-    public function updateReviewersFinishDate(string $taskGuid, string $date)
-    {
-        $this->db->update(
-            [
-                'finishedDate' => $date,
-            ],
-            [
-                'taskGuid=?' => $taskGuid,
-                'role=?' => editor_Workflow_Default::ROLE_REVIEWER,
-            ]
-        );
     }
 
     /**

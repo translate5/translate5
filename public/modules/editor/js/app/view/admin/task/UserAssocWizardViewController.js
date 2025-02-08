@@ -57,6 +57,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             }
         }
     },
+    taskList: [],
 
     nextCardClick: function () {
         var me = this;
@@ -89,7 +90,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         });
     },
 
-    /***
+    /**
      * Load the taskuserassoc store for current workflow and projectId
      */
     loadAssocData: function () {
@@ -99,15 +100,12 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             workflowCombo = view.down('#workflowCombo'),
             store = view.down('grid').getStore();
 
-        store.setExtraParams({
-            projectId: project.get('projectId'),
-            workflow: workflowCombo.getValue()
-        });
+        store
+            .getProxy()
+            .setUrl(Editor.data.restpath + 'project/' + project.get('projectId') + '/wizard/jobs/' + workflowCombo.getValue());
         store.load();
     },
 
-    /***
-     */
     onUserAssocWizardActivate: function () {
 
         var me = this,
@@ -117,10 +115,27 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             usersStore = Ext.StoreManager.get('admin.Users'),
             usageMode = view.down('#usageMode');
 
+        const userAssocPanel =  me.getView().up().down('adminUserAssoc');
+        userAssocPanel.setCustomer(project.get('customerId'));
+        userAssocPanel.setTaskGuid(null);
+
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'project/{id}/wizard/tasks'.replace("{id}", project.get('id')),
+            method: 'GET',
+            success: response => userAssocPanel.setTaskList(Ext.decode(response.responseText).rows),
+            failure: function (response) {
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+
         // first set the combo value on panel activate then load the store.
         workflowCombo.setValue(project.get('workflow'));
         // set the usageMode default from the task. The default value is set from the config after the task is created
-        usageMode.setValue(project.get('usageMode') ? project.get('usageMode') : Editor.model.admin.Task.USAGE_MODE_COOPERATIVE);
+        usageMode.setValue(
+            project.get('usageMode')
+                ? project.get('usageMode')
+                : Editor.model.admin.Task.USAGE_MODE_COOPERATIVE
+        );
 
         me.loadAssocData();
 
@@ -178,8 +193,9 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             formPanel = me.lookup('assocForm'),
             form = formPanel.getForm(),
             targetLangField = form.findField('targetLang'),
-            hasProjectTasks = project.hasProjectTasks();
-
+            hasProjectTasks = project.hasProjectTasks(),
+            userAssocPanel =  me.getView().up().down('adminUserAssoc')
+        ;
 
         targetLangField.setVisible(hasProjectTasks);
 
@@ -187,6 +203,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             // it is single task project, set the taskGuid and the target langauge as record values
             newRecord.set('targetLang', project.get('targetLang'));
             newRecord.set('taskGuid', project.get('taskGuid'));
+            userAssocPanel.setTaskGuid(project.get('taskGuid'));
         } else {
             // it is multi-task project, the target language dropdown should contain only the project-tasks target languages
             var targetLangs = [];
@@ -201,6 +218,8 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             targetLangField.suspendEvents();
             targetLangField.setValue(null);
             targetLangField.resumeEvents(true);
+            // reset task guid if it was set by clicking on job row before
+            userAssocPanel.setTaskGuid(null);
         }
 
         // reset the current form and load the new record

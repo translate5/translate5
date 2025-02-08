@@ -41,6 +41,9 @@ class EventEmitter
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]));

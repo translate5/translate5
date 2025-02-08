@@ -263,6 +263,11 @@ Ext.define('Editor.util.TaskActions', {
                 callback(task, app, me.strings, op);
             },
             callback: function(rec, op) {
+                if (op.hasOwnProperty('error') && op.error.hasOwnProperty('response') && op.error.response.responseJson.errorCode === 'E1163') {
+                    app.openAdministration(null);
+                    app.unmask();
+                }
+
                 Editor.MessageBox.addByOperation(op);
             },
             failure: app.unmask

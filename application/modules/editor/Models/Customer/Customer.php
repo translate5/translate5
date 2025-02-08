@@ -80,13 +80,6 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
 
     protected $validatorInstanceClass = 'editor_Models_Validator_Customer';
 
-    /**
-     * Customers must be filtered by role-driven restrictions
-     */
-    protected ?array $clientAccessRestriction = [
-        'field' => 'id',
-    ];
-
     public const DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
 
     protected ?editor_Models_Customer_Meta $meta;

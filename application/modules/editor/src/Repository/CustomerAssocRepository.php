@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use Zend_Db_Table_Row;
-use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class CustomerAssocRepository
@@ -69,7 +68,7 @@ class CustomerAssocRepository
 
     public function findByLanguageResourceAndCustomer(int $languageResourceId, int $customerId): ?CustomerAssoc
     {
-        $customerAssoc = ZfExtended_Factory::get(CustomerAssoc::class);
+        $customerAssoc = new CustomerAssoc();
 
         $select = $customerAssoc->db
             ->select()
@@ -93,7 +92,7 @@ class CustomerAssocRepository
      */
     public function getByLanguageResource(int $languageResourceId): iterable
     {
-        $customerAssoc = ZfExtended_Factory::get(CustomerAssoc::class);
+        $customerAssoc = new CustomerAssoc();
 
         foreach ($customerAssoc->loadByLanguageResourceId($languageResourceId) as $row) {
             $customerAssoc->init(
@@ -116,7 +115,7 @@ class CustomerAssocRepository
      */
     public function getByCustomer(int $customerId): iterable
     {
-        $customerAssoc = ZfExtended_Factory::get(CustomerAssoc::class);
+        $customerAssoc = new CustomerAssoc();
         $s = $customerAssoc->db->select();
         $s->where('customerId = ?', $customerId);
 

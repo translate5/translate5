@@ -68,7 +68,7 @@ class UpdateSegmentOperation
     public static function create(): self
     {
         return new self(
-            new TaskRepository(),
+            TaskRepository::create(),
             new LanguageResourceRepository(),
             new TaskTmRepository(),
             ZfExtended_Factory::get(editor_Services_Manager::class),

@@ -69,12 +69,12 @@ class Translate2375Test extends ImportTestAbstract
         static::api()->reloadTask();
         static::api()->addUser(TestUser::TestTranslator->value, 'waiting', 'translatorCheck', $assocParams);
 
-        $data = static::api()->getJson('editor/taskuserassoc', [
+        $deprecatedData = static::api()->getJson('editor/taskuserassoc', [
             'filter' => '[{"operator":"eq","value":"' . static::api()->getTask()->taskGuid . '","property":"taskGuid"}]',
         ]);
 
         //filter out the non static data
-        $data = array_map(function ($assoc) {
+        $deprecatedData = array_map(function ($assoc) {
             unset($assoc->id);
             unset($assoc->taskGuid);
             unset($assoc->usedInternalSessionUniqId);
@@ -83,9 +83,23 @@ class Translate2375Test extends ImportTestAbstract
             unset($assoc->deletable);
 
             return $assoc;
-        }, $data);
+        }, $deprecatedData);
 
         //file_put_contents(static::api()->getFile('/expected.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
+        $this->assertEquals(static::api()->getFileContent('expected.json'), $deprecatedData, 'The calculate default deadline is are not as expected!');
+
+        $data = static::api()->getJson(
+            sprintf('editor/task/%s/job', static::api()->getTask()->id)
+        );
+
+        $data = array_map(function ($assoc) {
+            unset($assoc->id);
+            unset($assoc->taskGuid);
+            unset($assoc->staticAuthHash);
+
+            return $assoc;
+        }, $data);
+
         $this->assertEquals(static::api()->getFileContent('expected.json'), $data, 'The calculate default deadline is are not as expected!');
     }
 }

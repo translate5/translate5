@@ -1049,6 +1049,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.UserAssoc",
         title: '<?php echo $this->translate->_('Benutzer-Plural');?>',
         strings: {
+            type: '<?php echo $this->translate->_('Typ');?>',
             fieldStep: '<?php echo $this->translate->_('Workflowschritt');?>',
             fieldState: '<?php echo $this->translate->_('Status');?>',
             fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
@@ -1067,6 +1068,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.user.Assoc",
         title: '<?php echo $this->translate->_('Standard-Benutzerzuweisungen');?>',
         strings: {
+            type: '<?php echo $this->translate->_('Typ');?>',
             fieldRole: '<?php echo $this->translate->_('Rolle');?>',
             fieldState: '<?php echo $this->translate->_('Status');?>',
             fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
@@ -1136,7 +1138,8 @@ Ext.define('Editor.controller.Localizer', {
             notifyButtonText: '<?php echo $this->translate->_('Benutzer nach Import benachrichtigen');?>',
             notifyButtonTooltip: '<?php echo $this->translate->_('Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen');?>',
             workflowStepNameCol: '<?php echo $this->translate->_('Workflow-Schritt');?>',
-            fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>'
+            fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>',
+            typeCol: '<?php echo $this->translate->_('Typ');?>'
         }
     });
 
@@ -1178,7 +1181,9 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             confirmDeleteTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>',
             confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
+            confirmDeleteCoordinatorGroupJob: '<?php echo $this->translate->_('userJob.delete.confirmDeleteCoordinatorGroupJob');?>',
             userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
+            typeCol: '<?php echo $this->translate->_('Typ');?>',
             roleCol: '<?php echo $this->translate->_('Rolle');?>',
             stepCol: '<?php echo $this->translate->_('Workflowschritt');?>',
             segmentrangeCol: '<?php echo $this->translate->_('Segmente');?>',
@@ -1516,7 +1521,9 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.admin.task.Preferences.prototype.editInfo = '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>';
 
     Editor.controller.admin.TaskPreferences.prototype.strings = {
+      taskWorkflowChangeConfirm: '<?= $this->translate->_('Bestätigen Sie die Änderung des Workflows') ?>',
       taskWorkflowSaved: '<?php echo $this->translate->_('Änderung des Workflows der Aufgabe gespeichert!');?>',
+      taskWorkflowChangeWarning: '<?= $this->translate->_('Eine Änderung des Aufgaben-Workflows führt zur Löschung aller Auftragszuweisungen. Möchten Sie fortfahren?'); ?>',
       entrySaved: '<?php echo $this->translate->_('Eintrag gespeichert');?>',
       entryDeleted: '<?php echo $this->translate->_('Eintrag gelöscht');?>',
       entrySaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
@@ -2506,7 +2513,19 @@ etc.')?>'
         targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
         sourceLanguageResource: '<?= $this->translate->_('Ausgangssprache Ressource') ?>',
         targetLanguageResource: '<?= $this->translate->_('Zielsprache Ressource') ?>',
+        showAll: '<?= $this->translate->_('Zeige alles') ?>',
+        clients: '<?= $this->translate->_('Kunden') ?>',
+        addNew: '<?= $this->translate->_('Hinzufügen') ?>',
+        reload: '<?= $this->translate->_('Aktualisieren') ?>',
+        delete: '<?= $this->translate->_('Löschen') ?>',
+        edit: '<?= $this->translate->_('Bearbeiten') ?>',
+        save: '<?= $this->translate->_('Speichern') ?>',
+        cancel: '<?= $this->translate->_('Abbrechen') ?>',
+        id: '<?= $this->translate->_('id') ?>',
         additionalInfo: '<?php echo $this->translate->_('Zusätzliche Infos');?>',
+        entryHasBeenDeleted: '<?php echo $this->translate->_('Der {0} wurde erfolgreich gelöscht.');?>',
+        confirmDeleteTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>',
+        confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
         plsSelect: '<?php echo $this->translate->_('Bitte wählen');?>',
     },
     helpButton: {
@@ -2543,6 +2562,48 @@ etc.')?>'
         failedToQueue: '<?= $this->translate->_('Synchronisierung in Warteschlange fehlgeschlagen.') ?>',
         confirmSynchronisation: '<?= $this->translate->_('Bestätigen Sie die Synchronisierung.') ?>',
         emptyTableText: '<?= $this->translate->_('crossLanguageResourceSynchronization.emptyTableText') ?>',
+    },
+
+    coordinatorGroup: {
+        tooltip: '<?= $this->translate->_('Zur Koordinatorengruppen-Übersicht wechseln') ?>',
+        title: '<?= $this->translate->_('Koordinatorengruppen') ?>',
+        reloadBtnTooltip: '<?= $this->translate->_('Aktualisieren') ?>',
+        addNewBtnTooltip: '<?= $this->translate->_('Neue Koordinatorengruppe hinzufügen') ?>',
+        confirmDeleteTitle: '<?= $this->translate->_('Löschen') ?>',
+        confirmDeleteText: '<?= $this->translate->_('coordinatorGroup.confirmDeleteText') ?>',
+        enterCoordinatorGroupName: '<?= $this->translate->_('coordinatorGroup.enterCoordinatorGroupName') ?>',
+        confirmDeleteWrongName: '<?= $this->translate->_('Falscher Name') ?>',
+        assignedCustomers: '<?= $this->translate->_('Zugewiesene Kunden') ?>',
+        iconTooltips: {
+            edit: '<?= $this->translate->_('coordinatorGroup.iconTooltips.edit') ?>',
+            delete: '<?= $this->translate->_('coordinatorGroup.iconTooltips.delete') ?>',
+            assignClient: '<?= $this->translate->_('coordinatorGroup.iconTooltips.assignClient') ?>',
+        },
+        edit: {
+            infobox: '<?= $this->translate->_('coordinatorGroup.edit.infobox') ?>',
+            name: {
+                tooltip: '<?= $this->translate->_('coordinatorGroup.edit.name.tooltip') ?>',
+            },
+            description: {
+                tooltip: '<?= $this->translate->_('coordinatorGroup.edit.description.tooltip') ?>',
+            }
+        },
+        customers: {
+            title: '<?= $this->translate->_('coordinatorGroup.customers.title') ?>',
+            infobox: '<?= $this->translate->_('coordinatorGroup.customers.infobox') ?>',
+            assignButton: '<?= $this->translate->_('coordinatorGroup.customers.assignButton') ?>',
+            iconTooltips: {
+                delete: '<?= $this->translate->_('coordinatorGroup.customers.iconTooltips.delete') ?>',
+            },
+            unassignCustomerWindow: {
+                title: '<?= $this->translate->_('coordinatorGroup.customers.iconTooltips.delete') ?>',
+                confirmUnassignCustomer: '<?= $this->translate->_('coordinatorGroup.confirmUnassignCustomer') ?>',
+                buttons: {
+                    yes: '<?= $this->translate->_('coordinatorGroup.customers.unassignCustomerWindow.buttons.yes') ?>',
+                    no: '<?= $this->translate->_('coordinatorGroup.customers.unassignCustomerWindow.buttons.no') ?>',
+                }
+            }
+        }
     },
     log: {
         logColumnText: '<?= $this->translate->_('Ereignisse') ?>',

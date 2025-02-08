@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -30,19 +30,67 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use editor_Models_Db_Task as TaskTable;
+use editor_Models_Db_TaskUserAssoc;
 use editor_Models_Task as Task;
-use ZfExtended_Factory;
+use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class TaskRepository
 {
+    public function __construct(
+        private readonly Zend_Db_Adapter_Abstract $db,
+    ) {
+    }
+
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self(
+            Zend_Db_Table::getDefaultAdapter(),
+        );
+    }
+
+    public function find(int $id): ?Task
+    {
+        try {
+            return $this->get($id);
+        } catch (InexistentTaskException) {
+            return null;
+        }
+    }
+
+    /**
+     * @throws InexistentTaskException
      */
     public function get(int $id): Task
     {
-        $task = ZfExtended_Factory::get(Task::class);
-        $task->load($id);
+        try {
+            $task = new Task();
+            $task->load($id);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new InexistentTaskException((string) $id);
+        }
+
+        return $task;
+    }
+
+    /**
+     * @throws InexistentTaskException
+     */
+    public function getByGuid(string $guid): Task
+    {
+        try {
+            $task = new Task();
+            $task->loadByTaskGuid($guid);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            throw new InexistentTaskException($guid);
+        }
 
         return $task;
     }
@@ -56,39 +104,64 @@ class TaskRepository
     }
 
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    public function getByGuid(string $guid): Task
-    {
-        $db = ZfExtended_Factory::get(Task::class)->db;
-        $s = $db->select()->where('taskGuid = ?', $guid);
-        $row = $db->fetchRow($s);
-
-        if (null === $row) {
-            throw new ZfExtended_Models_Entity_NotFoundException('Task not found');
-        }
-
-        $task = ZfExtended_Factory::get(Task::class);
-        $task->init($row->toArray());
-
-        return $task;
-    }
-
-    /**
      * @return iterable<Task>
      */
     public function getProjectTaskList(int $projectId): iterable
     {
-        $db = ZfExtended_Factory::get(Task::class)->db;
-        $s = $db->select()->where('projectId = ?', $projectId)->where('id != ?', $projectId);
-        $tasksData = $db->fetchAll($s);
-
-        $task = ZfExtended_Factory::get(Task::class);
+        $s = $this->db->select()
+            ->from(TaskTable::TABLE_NAME)
+            ->where('projectId = ?', $projectId)
+            ->where('id != ?', $projectId)
+        ;
+        $tasksData = $this->db->fetchAll($s);
 
         foreach ($tasksData as $taskData) {
-            $task->init($taskData);
+            // we can't clone task instance because it's not a cloneable object
+            $task = new Task();
+            $task->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $task->db,
+                        'data' => $taskData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
 
-            yield clone $task;
+            yield $task;
         }
+    }
+
+    /**
+     * Return all tasks associated to a specific user as PM
+     *
+     * @return array[]
+     */
+    public function loadListByPmGuid(string $pmGuid): array
+    {
+        $s = $this->db->select()->from(TaskTable::TABLE_NAME)->where('pmGuid = ?', $pmGuid);
+
+        return $this->db->fetchAll($s);
+    }
+
+    public function updateTaskUserCount(string $taskGuid): void
+    {
+        $sql = <<<SQL
+update %s task,
+    (
+        select count(*) cnt from %s where taskGuid = ? and isPmOverride = 0 and type != %d
+    ) job
+set task.userCount = job.cnt where task.taskGuid = ?
+SQL;
+        $sql = sprintf(
+            $sql,
+            TaskTable::TABLE_NAME,
+            editor_Models_Db_TaskUserAssoc::TABLE_NAME,
+            TypeEnum::Coordinator->value,
+        );
+        $sql = $this->db->quoteInto($sql, $taskGuid, 'string', 2);
+
+        $this->db->query($sql);
     }
 }

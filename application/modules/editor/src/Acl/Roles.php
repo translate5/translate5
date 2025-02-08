@@ -28,15 +28,31 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Acl;
 
-use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
-use ZfExtended_Acl;
-
 /**
  * Holds additional roles for translate5
+ *
+ * @codeCoverageIgnore
  */
-final class Roles extends BaseRoles
+final class Roles
 {
-    /* additional roles that exist in T5 */
+    public const SYSTEMADMIN = 'systemadmin';
+
+    public const ADMIN = 'admin';
+
+    public const API = 'api';
+
+    public const PM = 'pm';
+
+    public const CLIENTPM = 'clientpm';
+
+    public const PMLIGHT = 'pmlight';
+
+    public const EDITOR = 'editor';
+
+    public const BASIC = 'basic';
+
+    public const NORIGHTS = 'noRights';
+
     public const EDITOR_ONLY_OVERRIDE = 'editor-only-override';
 
     public const ERP = 'erp';
@@ -61,7 +77,7 @@ final class Roles extends BaseRoles
 
     public const TERMREVIEWER = 'termReviewer';
 
-    /* subroles for the client-pm */
+    // region sub-roles for the client-pm
     public const CLIENTPM_PROJECTS = 'clientpm_projects';
 
     public const CLIENTPM_LANGRESOURCES = 'clientpm_langresources';
@@ -69,12 +85,15 @@ final class Roles extends BaseRoles
     public const CLIENTPM_CUSTOMERS = 'clientpm_customers';
 
     public const CLIENTPM_USERS = 'clientpm_users';
+    // endregion
 
     public const TM_MAINTENANCE = 'TMMaintenance';
 
     public const TM_MAINTENANCE_ALL_CLIENTS = 'TMMaintenance_allClients';
 
-    public static $frontendOrder = [
+    public const JOB_COORDINATOR = 'jobCoordinator';
+
+    private const FRONTEND_ROLES = [
         self::EDITOR,
         self::EDITOR_ONLY_OVERRIDE,
         self::CLIENTPM,
@@ -95,40 +114,67 @@ final class Roles extends BaseRoles
         self::PRODUCTION,
         self::TM_MAINTENANCE,
         self::TM_MAINTENANCE_ALL_CLIENTS,
+        self::JOB_COORDINATOR,
     ];
 
     /**
-     * Retrieves the roles a user can be assigned to in the frontend
-     * @return string[]
+     * @var array<string, string[]>
      */
-    public static function getFrontendRoles(): array
-    {
-        $allRoles = ZfExtended_Acl::getInstance()->getAllRoles();
-        $frontendRoles = [];
-        foreach (static::$frontendOrder as $role) {
-            if (in_array($role, $allRoles)) {
-                $frontendRoles[] = $role;
-            }
-        }
-        // may someone adds new roles and forgets to put them in the order here
-        // Important: clientpm-roles must not be added also not the internal roles "no-rights" and "basic"
-        foreach ($allRoles as $role) {
-            if (! str_starts_with($role, 'clientpm_')
-                && $role != self::BASIC
-                && $role != self::NORIGHTS
-                && ! in_array($role, $frontendRoles)) {
-                $frontendRoles[] = $role;
-            }
-        }
+    public const CONFLICTING_ROLES = [
+        self::JOB_COORDINATOR => [
+            self::API,
+            self::ADMIN,
+            self::SYSTEMADMIN,
+            self::PM,
+            self::CLIENTPM,
+            self::PMLIGHT,
+        ],
+        self::CLIENTPM => [
+            self::API,
+            self::ADMIN,
+            self::SYSTEMADMIN,
+            self::PM,
+            self::PMLIGHT,
+            self::JOB_COORDINATOR,
+        ],
+        self::PMLIGHT => [
+            self::API,
+            self::ADMIN,
+            self::SYSTEMADMIN,
+            self::PM,
+            self::CLIENTPM,
+            self::JOB_COORDINATOR,
+        ],
+        self::TM_MAINTENANCE => [
+            self::TM_MAINTENANCE_ALL_CLIENTS,
+        ],
+        self::TERMPM_ALLCLIENTS => [
+            self::TERMPM,
+        ],
+    ];
 
-        return $frontendRoles;
+    public static function getGeneralRoles(): array
+    {
+        return [
+            self::EDITOR,
+        ];
+    }
+
+    public static function getAdminRoles(): array
+    {
+        return [
+            self::ADMIN,
+            self::SYSTEMADMIN,
+            self::API,
+        ];
     }
 
     /**
-     * retrieves the "Sub-roles" a clientpm can have (steering the visibility of the main editor tabs)
+     * Retrieves the "Sub-roles" a clientpm can have (steering the visibility of the main editor tabs)
+     *
      * @return string[]
      */
-    public static function getClientPmSubroles(): array
+    public static function getClientPmSubRoles(): array
     {
         return [
             self::CLIENTPM_PROJECTS,
@@ -136,5 +182,38 @@ final class Roles extends BaseRoles
             self::CLIENTPM_CUSTOMERS,
             self::CLIENTPM_USERS,
         ];
+    }
+
+    public static function getClientRestrictedRoles(): array
+    {
+        return [
+            self::CLIENTPM,
+        ];
+    }
+
+    public static function getRolesRequireClient(): array
+    {
+        return [
+            self::INSTANTTRANSLATE,
+            self::INSTANTTRANSLATEWRITETM,
+            self::TERMPM,
+            self::TERMSEARCH,
+            self::TERMCUSTOMERSEARCH,
+            self::TERMFINALIZER,
+            self::TERMPROPOSER,
+            self::TERMREVIEWER,
+            self::TM_MAINTENANCE,
+            self::CLIENTPM,
+        ];
+    }
+
+    public static function getRolesNotRequireClient(): array
+    {
+        return array_diff(
+            self::FRONTEND_ROLES,
+            self::getRolesRequireClient(),
+            self::getAdminRoles(),
+            self::getGeneralRoles()
+        );
     }
 }

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\JobsPurger;
+
 /**
  * This Worker is triggered after a task import, regardless if the task was successfully imported or the import did not succeed due errors.
  * Therefore this worker may not be a subclass of the editor_Models_Task_AbstractWorker
@@ -54,9 +56,7 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract
 
         // remove all assigned users if the task is in state error
         if ($task->isErroneous()) {
-            /** @var editor_Models_TaskUserAssoc $assoc */
-            $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            $assoc->deleteByTaskGuid($task->getTaskGuid());
+            JobsPurger::create()->purgeTaskJobs($task->getTaskGuid());
         }
 
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');

@@ -100,15 +100,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         return $this->db->fetchAll($s)->toArray();
     }
 
-    /***
-     * Is the user allowed for attribute proposal
-     * @return boolean
-     */
-    public function isProposableAllowed(): bool
-    {
-        return ZfExtended_Authentication::getInstance()->hasUserRole('termProposer');
-    }
-
     /**
      * Check if given AttrType is for responsable person
      * Info: the responsable person type is saved in with different values in some tbx files

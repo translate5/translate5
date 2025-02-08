@@ -62,10 +62,6 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
             roles = [];
         // base rules
         Ext.Object.each(Editor.data.app.roles, function(key, value) {
-            //if the role is not settable for the user, do not create check box for it
-            if(!value.setable){
-                return;
-            }
             roles.push({
                 boxLabel: value.label,
                 name: 'roles_helper',

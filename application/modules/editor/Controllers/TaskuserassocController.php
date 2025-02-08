@@ -26,13 +26,35 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Acl\Rights;
-use MittagQI\Translate5\Task\TaskService;
-use MittagQI\ZfExtended\Acl\SystemResource;
+use editor_Models_Task as Task;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\DataProvider\CoordinatorProvider;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\DTO\NewCoordinatorGroupJobDto;
+use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\WithAuthentication\CreateCoordinatorGroupJobOperation;
+use MittagQI\Translate5\JobAssignment\JobAssignmentViewDataProvider;
+use MittagQI\Translate5\JobAssignment\JobExceptionTransformer;
+use MittagQI\Translate5\JobAssignment\Operation\WithAuthentication\DeleteJobAssignmentOperation;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
+use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
+use MittagQI\Translate5\JobAssignment\UserJob\DataProvider\UserProvider;
+use MittagQI\Translate5\JobAssignment\UserJob\Operation\Factory\NewUserJobDtoFactory;
+use MittagQI\Translate5\JobAssignment\UserJob\Operation\Factory\UpdateUserJobDtoFactory;
+use MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication\CreateUserJobOperation;
+use MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication\UpdateUserJobOperation;
+use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
+use MittagQI\Translate5\JobAssignment\UserJob\UserJobViewDataProvider;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 
 /**
  * Controller for the User Task Associations
- * Since PMs see all Task and Users, the indexAction has not to be constrained to show a subset of associations for security reasons
+ * Since PMs see all Task and Users, the indexAction has not to be constrained to show a subset of associations for
+ * security reasons
  */
 class Editor_TaskuserassocController extends ZfExtended_RestController
 {
@@ -49,432 +71,280 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
      */
     protected $postBlacklist = ['id'];
 
-    /**
-     *  @var editor_Logger_Workflow
-     */
-    protected $log = false;
+    private UserRepository $userRepository;
 
-    /**
-     * contains if available the task to the current tua
-     * @var editor_Models_Task
-     */
-    protected $task;
+    private TaskRepository $taskRepository;
+
+    private UserJobRepository $userJobRepository;
+
+    private CoordinatorGroupJobRepository $coordinatorGroupJobRepository;
+
+    private UserJobViewDataProvider $userJobViewDataProvider;
+
+    private UserJobActionPermissionAssert $permissionAssert;
+
+    private CoordinatorProvider $coordinatorProvider;
+
+    private UserProvider $userProvider;
+
+    private TaskActionPermissionAssert $taskActionPermissionAssert;
+
+    private JobAssignmentViewDataProvider $jobAssignmentViewDataProvider;
+
+    private JobExceptionTransformer $jobExceptionTransformer;
 
     public function init()
     {
         parent::init();
-        $this->task = ZfExtended_Factory::get('editor_Models_Task');
-        $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->task]);
+        $this->userRepository = new UserRepository();
+        $this->taskRepository = TaskRepository::create();
+        $this->userJobRepository = UserJobRepository::create();
+        $this->coordinatorGroupJobRepository = CoordinatorGroupJobRepository::create();
+        $this->permissionAssert = UserJobActionPermissionAssert::create();
+        $this->taskActionPermissionAssert = TaskActionPermissionAssert::create();
+
+        $this->userJobViewDataProvider = UserJobViewDataProvider::create();
+        $this->jobAssignmentViewDataProvider = JobAssignmentViewDataProvider::create();
+        $this->coordinatorProvider = CoordinatorProvider::create();
+        $this->userProvider = UserProvider::create();
+
+        $this->jobExceptionTransformer = JobExceptionTransformer::create();
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::indexAction()
-     */
-    public function indexAction()
+    public function indexAction(): void
     {
-        $rows = $this->entity->loadAllWithUserInfo();
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (! $this->getRequest()->getParam('taskId')) {
+            Zend_Registry::get('logger')->warn(
+                'E1680',
+                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
+            );
+
+            $rows = $this->userJobViewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
+
+            // @phpstan-ignore-next-line
+            $this->view->rows = $rows;
+            $this->view->total = count($rows);
+
+            return;
+        }
+
+        $task = $this->resolveTask();
+
+        $rows = $this->jobAssignmentViewDataProvider->getListFor($task->getTaskGuid(), $authUser);
+
+        // @phpstan-ignore-next-line
         $this->view->rows = $rows;
-        $this->view->total = $this->entity->getTotalCount();
-        $this->applyEditableAndDeletable();
+        $this->view->total = count($rows);
     }
 
     public function projectAction()
     {
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
+            Zend_Registry::get('logger')->warn(
+                'E1680',
+                'Route /editor/taskuserassoc/project deprecated, use editor/project/:projectId/jobs/:workflow instead',
+            );
+        }
+
         $projectId = $this->getParam('projectId');
         $workflow = $this->getParam('workflow');
+
         if (empty($projectId) || empty($workflow)) {
             return;
         }
-        $this->view->rows = $this->entity->loadProjectWithUserInfo($projectId, $workflow);
+
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+        $jobs = $this->userJobRepository->getProjectJobs((int) $projectId, $workflow);
+
+        $rows = $this->userJobViewDataProvider->buildViewForList($jobs, $authUser);
+
+        // @phpstan-ignore-next-line
+        $this->view->rows = $rows;
+        $this->view->total = count($rows);
     }
 
-    public function postDispatch()
+    public function usersfornewjobAction()
     {
-        if ($this->isAllowed(Rights::ID, Rights::READ_AUTH_HASH)) {
-            parent::postDispatch();
+        try {
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+            $task = $this->resolveTask();
 
-            return;
-        }
-        if (is_array($this->view->rows)) {
-            foreach ($this->view->rows as &$row) {
-                unset($row['staticAuthHash']);
-            }
-        } elseif (is_object($this->view->rows)) {
-            unset($this->view->rows->staticAuthHash);
-        }
-        parent::postDispatch();
-    }
-
-    /**
-     * for post requests we have to check the existence of the desired task first!
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::validate()
-     */
-    protected function validate()
-    {
-        if (! $this->_request->isPost()) {
-            return parent::validate();
-        }
-
-        settype($this->data->taskGuid, 'string');
-        $this->task->loadByTaskGuid($this->data->taskGuid);
-
-        $this->setDefaultAssignmentDate();
-        $this->setDefaultDeadlineDate();
-
-        $this->setLegacyDeadlineDate();
-
-        $valid = parent::validate();
-        //add the login hash AFTER validating, since we don't need any validation for it
-        $this->entity->createstaticAuthHash();
-
-        return $valid;
-    }
-
-    /**
-     * @deprecated TODO: 11.02.2020 remove this function after all customers adopt there api calls, remove also the task meta targetDeliveryDate!
-     */
-    protected function setLegacyDeadlineDate()
-    {
-        $meta = $this->task->meta();
-        if (! $meta->hasField('targetDeliveryDate')) {
-            return;
-        }
-        $tdd = $meta->getTargetDeliveryDate();
-        if (! empty($tdd) && empty($this->data->deadlineDate)) {
-            $this->entity->setDeadlineDate($tdd);
-        }
-    }
-
-    /**
-     * @see ZfExtended_RestController::decodePutData()
-     */
-    protected function decodePutData()
-    {
-        parent::decodePutData();
-
-        $this->data = (object) $this->data;
-
-        //if both is set, we remove role in favour of step
-        if (property_exists($this->data, 'workflowStepName') && property_exists($this->data, 'role')) {
-            unset($this->data->role);
-        }
-
-        //lector deprecated message
-        if (property_exists($this->data, 'role') && $this->data->role == 'lector') {
-            $this->data->role = editor_Workflow_Default::ROLE_REVIEWER;
-            Zend_Registry::get('logger')->warn('E1232', 'Job creation: role "lector" is deprecated, use "reviewer" instead!');
-        }
-
-        //on post the task is not initialized yet
-        if ($this->task->getId() == 0) {
-            $this->task->loadByTaskGuid($this->data->taskGuid);
-        }
-
-        $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $manager editor_Workflow_Manager */
-
-        // if the workflow is defined by the api use it from there, otherwise load it from the task
-        if (property_exists($this->data, 'workflow') && ! empty($this->data->workflow)) {
-            $workflow = $manager->getCached($this->data->workflow);
-        } else {
-            $workflow = $manager->getActiveByTask($this->task);
-            /* @var $workflow editor_Workflow_Default */
-        }
-
-        $this->data->workflow = $workflow->getName();
-
-        //we have to get the role from the workflowStepName
-        if (property_exists($this->data, 'workflowStepName')) {
-            $this->data->role = $workflow->getRoleOfStep($this->data->workflowStepName);
-        }
-        //we have to get the step from the role (the first found step to the role)
-        elseif (property_exists($this->data, 'role')) {
-            $steps = $workflow->getSteps2Roles();
-            $roles = array_flip(array_reverse($steps));
-            $this->data->workflowStepName = $roles[$this->data->role] ?? null;
-            Zend_Registry::get('logger')->warn('E1232', 'Job creation: using role as parameter on job creation is deprecated, use workflowStepName instead');
-        }
-
-        if (! property_exists($this->data, 'state') || empty($this->data->state)) {
-            // set default state. The correct state is calculated later
-            $this->data->state = $workflow::STATE_WAITING;
-        }
-
-        //may not be set from outside!
-        if (property_exists($this->data, 'staticAuthHash')) {
-            unset($this->data->staticAuthHash);
-        }
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::putAction()
-     */
-    public function putAction()
-    {
-        $this->entityLoad();
-        $this->task->loadByTaskGuid($this->entity->getTaskGuid());
-        $this->log->request();
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActiveByTask($this->task);
-        /* @var $workflow editor_Workflow_Default */
-
-        //here checks the isWritable if the tua is already in editing mode... Not as intended.
-        if (! empty($this->entity->getUsedState()) && $workflow->isWriteable($this->entity, true)) {
-            // the following check on preventing changing Jobs which are used, prevents the following problems:
-            // competitive tasks:
-            //   a task can not be confirmed by user A if user A could not get a lock on the task,
-            //   because user B has opened the task for editing (and locked it), before User B was set to unconfirmed.
-            //   This is prevented now, since the PM gets an error when he wants
-            //   to set User B to unconfirmed while B is editing already.
-            //  another prevented problem:
-            //    User B have opened the task for editing, after that his job is set to unconfirmed
-            //    User B does not notice this and edits more segments, although he should be unconfirmed or waiting.
-            //  Throwing the following exception do not kick out the user,
-            //  but the PM knows now that he fucked up the task.
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1161' => "The job can not be modified, since the user has already opened the task for editing."
-                         . " You are to late.",
-            ]);
-
-            throw ZfExtended_Models_Entity_Conflict::createResponse('E1161', [
-                'id' => 'Sie können den Job zur Zeit nicht bearbeiten,'
-                      . ' der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.',
-            ]);
-        }
-        $oldEntity = clone $this->entity;
-        $this->decodePutData();
-        $this->processClientReferenceVersion();
-        $this->setDataInEntity();
-
-        if (isset($this->data->segmentrange)) {
-            $segmentrangeModel = ZfExtended_Factory::get('editor_Models_TaskUserAssoc_Segmentrange');
-            /* @var $segmentrangeModel editor_Models_TaskUserAssoc_Segmentrange */
-            if (! $segmentrangeModel->validateSyntax($this->data->segmentrange)) {
-                ZfExtended_UnprocessableEntity::addCodes([
-                    'E1280' => "The format of the segmentrange that is assigned to the user is not valid.",
-                ]);
-
-                throw ZfExtended_UnprocessableEntity::createResponse('E1280', [
-                    'id' => 'Das Format für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9',
-                ]);
-            }
-
-            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            /* @var $tua editor_Models_TaskUserAssoc */
-
-            //get all usigned segments, but ignore the current assoc.
-            $assignedSegments = $tua->getNotForUserAssignedSegments(
-                $this->entity->getTaskGuid(),
-                $this->entity->getRole(),
-                $this->entity->getUserGuid()
+            $this->taskActionPermissionAssert->assertGranted(
+                TaskAction::Read,
+                $task,
+                new PermissionAssertContext($authUser)
             );
 
-            if (! $segmentrangeModel->validateSemantics($this->data->segmentrange, $assignedSegments)) {
-                ZfExtended_UnprocessableEntity::addCodes([
-                    'E1281' => "The content of the segmentrange that is assigned to the user is not valid.",
-                ]);
-
-                throw ZfExtended_UnprocessableEntity::createResponse('E1280', [
-                    'id' => 'Der Inhalt für die editierbaren Segmente ist nicht valide.'
-                        . ' Die Zahlen müssen in der richtigen Reihenfolge angegeben sein und dürfen nicht überlappen,'
-                        . ' weder innerhalb der Eingabe noch mit anderen Usern von derselben Rolle.',
-                ]);
-            }
+            // @phpstan-ignore-next-line
+            $this->view->rows = $this->userProvider->getPossibleUsersForNewJobInTask($task, $authUser);
+        } catch (Throwable $e) {
+            throw $this->jobExceptionTransformer->transformException($e);
         }
-
-        $this->entity->validate();
-
-        $workflow->hookin()->doWithUserAssoc(
-            $oldEntity,
-            $this->entity,
-            function (?string $state) {
-                if ($state) {
-                    TaskService::validateForTaskFinish($state, $this->entity, $this->task);
-                }
-                $this->entity->save();
-            }
-        );
-
-        $this->view->rows = $this->entity->getDataObject();
-        $this->addUserInfoToResult();
-        if (isset($this->data->state) && $oldEntity->getState() != $this->data->state) {
-            $this->log->info('E1012', 'job status changed from {oldState} to {newState}', [
-                'tua' => $this->entity->getSanitizedEntityForLog(),
-                'oldState' => $oldEntity->getState(),
-                'newState' => $this->data->state,
-            ]);
-        }
-
-        $this->applyEditableAndDeletable();
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::postAction()
-     */
+    public function jobcoordinatorsfornewjobAction()
+    {
+        try {
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+            $task = $this->resolveTask();
+
+            $this->taskActionPermissionAssert->assertGranted(
+                TaskAction::Read,
+                $task,
+                new PermissionAssertContext($authUser)
+            );
+
+            // @phpstan-ignore-next-line
+            $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForNewJobInTask($task, $authUser);
+        } catch (Throwable $e) {
+            throw $this->jobExceptionTransformer->transformException($e);
+        }
+    }
+
+    public function coordinatorsforupdateAction()
+    {
+        try {
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('jobId'));
+
+            $this->assertJobBelongsToTask($job);
+
+            $this->permissionAssert->assertGranted(
+                UserJobAction::Update,
+                $job,
+                new PermissionAssertContext($authUser)
+            );
+
+            if (! $job->isCoordinatorGroupJob()) {
+                throw new ZfExtended_BadMethodCallException('Only Coordinator group jobs can have coordinators');
+            }
+
+            $groupJob = $this->coordinatorGroupJobRepository->get((int) $job->getCoordinatorGroupJobId());
+
+            // @phpstan-ignore-next-line
+            $this->view->rows = $this->coordinatorProvider->getPossibleCoordinatorsForCoordinatorGroupJobUpdate($groupJob);
+        } catch (Throwable $e) {
+            throw $this->jobExceptionTransformer->transformException($e);
+        }
+    }
+
+    public function putAction()
+    {
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
+            Zend_Registry::get('logger')->warn(
+                'E1680',
+                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead'
+            );
+        }
+
+        try {
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
+
+            $this->assertJobBelongsToTask($job);
+
+            $this->processClientReferenceVersion($job);
+
+            $dto = UpdateUserJobDtoFactory::create()->fromRequest($this->getRequest());
+
+            UpdateUserJobOperation::create()->update($job, $dto);
+
+            $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($job, $authUser);
+        } catch (Throwable $e) {
+            throw $this->jobExceptionTransformer->transformException($e);
+        }
+    }
+
     public function postAction()
     {
-        parent::postAction();
-        //if the validation was successful, log the request and apply additional data
-        if ($this->wasValid) {
-            $this->log->request();
-            $this->addUserInfoToResult();
-            $this->log->info('E1012', 'job created', [
-                'tua' => $this->entity->getSanitizedEntityForLog(),
-            ]);
-            $this->applyEditableAndDeletable();
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
+            Zend_Registry::get('logger')->warn(
+                'E1680',
+                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
+            );
+        }
+
+        try {
+            $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+            $dto = NewUserJobDtoFactory::create()->fromRequest($this->getRequest());
+
+            if (TypeEnum::Coordinator === $dto->type) {
+                $groupJob = CreateCoordinatorGroupJobOperation::create()->assignJob(NewCoordinatorGroupJobDto::fromUserJobDto($dto));
+                $userJob = UserJobRepository::create()->getDataJobByCoordinatorGroupJob((int) $groupJob->getId());
+            } else {
+                $userJob = CreateUserJobOperation::create()->assignJob($dto);
+            }
+
+            $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($userJob, $authUser);
+        } catch (Throwable $e) {
+            throw $this->jobExceptionTransformer->transformException($e);
         }
     }
 
     public function deleteAction()
     {
-        $this->entityLoad();
-        $this->task->loadByTaskGuid($this->entity->getTaskGuid());
-        $this->log->request();
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActiveByTask($this->task);
-        /* @var $workflow editor_Workflow_Default */
-        $this->checkAuthenticatedIsParentOfEntity();
-        $this->processClientReferenceVersion();
-        $entity = clone $this->entity;
-        $this->entity->setId(0);
-        //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing
-        $entity->delete();
-        $this->log->info('E1012', 'job deleted', [
-            'tua' => $this->entity->getSanitizedEntityForLog(),
-        ]);
+        /** @deprecated App logic should not tolerate requests without task in scope */
+        if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
+            Zend_Registry::get('logger')->warn(
+                'E1680',
+                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
+            );
+        }
+
+        $workflowManager = new editor_Workflow_Manager();
+
+        try {
+            $job = $this->userJobRepository->get((int) $this->getRequest()->getParam('id'));
+
+            $this->assertJobBelongsToTask($job);
+
+            // TODO: This workflow instantiating here is a workaroung to trigger editor_Workflow_Default_Hooks.
+            //      constructor there has events listeners that should be extracted.
+            $workflowManager->get($job->getWorkflow());
+
+            $this->processClientReferenceVersion($job);
+
+            $deleteJobOperation = DeleteJobAssignmentOperation::create();
+
+            if ($this->getRequest()->has('force')) {
+                $deleteJobOperation->forceDelete((int) $job->getId());
+            } else {
+                $deleteJobOperation->delete((int) $job->getId());
+            }
+        } catch (Throwable $e) {
+            throw $this->jobExceptionTransformer->transformException($e);
+        }
+    }
+
+    private function resolveTask(): Task
+    {
+        $task = $this->taskRepository->find((int) $this->getRequest()->getParam('taskId'));
+
+        if (null !== $task) {
+            return $task;
+        }
+
+        return $this->taskRepository->getByGuid((string) $this->getRequest()->getParam('taskId'));
     }
 
     /**
-     * checks user based access on POST/PUT
-     * {@inheritDoc}
-     * @see ZfExtended_RestController::additionalValidations()
+     * @throws InexistentTaskException
+     * @throws ZfExtended_NotFoundException
      */
-    protected function additionalValidations()
+    public function assertJobBelongsToTask(editor_Models_TaskUserAssoc $job): void
     {
-        $this->checkAuthenticatedIsParentOfEntity();
-    }
+        if ($this->hasParam('taskId')) {
+            $task = $this->taskRepository->getByGuid($job->getTaskGuid());
 
-    /***
-     * Check if the current logged in user is allowed to POST/PUT/DELETE the given TaskUser Assoc entry
-     */
-    protected function checkAuthenticatedIsParentOfEntity()
-    {
-        //if I am allowed to see any user:
-        if ($this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
-            return;
-        }
-
-        //The authenticated user is allowed to see/edit himself
-        if ($this->entity->getUserGuid() === ZfExtended_Authentication::getInstance()->getUserGuid()) {
-            return;
-        }
-
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->loadByGuid($this->entity->getUserGuid());
-
-        //if the authenticated user is no parent, then he is not allowed to proceed
-        if (! $user->hasParent(ZfExtended_Authentication::getInstance()->getUserId())) {
-            throw new ZfExtended_NoAccessException();
-        }
-    }
-
-    /**
-     * adds the extended userinfo to the resultset
-     */
-    protected function addUserInfoToResult()
-    {
-        if ($this->_request->isPost() && ! $this->wasValid) {
-            return;
-        }
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->loadByGuid($this->entity->getUserGuid());
-        $this->view->rows->login = $user->getLogin();
-        $this->view->rows->firstName = $user->getFirstName();
-        $this->view->rows->surName = $user->getSurName();
-        $this->view->rows->parentIds = $user->getParentIds();
-        $this->view->rows->longUserName = $user->getUsernameLong();
-    }
-
-    /***
-     * Add editable/deletable variable calculated for each user in the response rows.
-     */
-    protected function applyEditableAndDeletable()
-    {
-        $authentication = ZfExtended_Authentication::getInstance();
-        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $seeAllUsersAllowed = $this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS);
-
-        if (is_array($this->view->rows)) {
-            foreach ($this->view->rows as &$row) {
-                if ($seeAllUsersAllowed || $row['login'] === $authentication->getLogin()) {
-                    $row['editable'] = true;
-                    $row['deletable'] = true;
-
-                    continue;
-                }
-                //check if the current loged user is a parent for the user in the row
-                $hasParent = $userModel->hasParent($authentication->getUserId(), $row['parentIds']);
-                $row['editable'] = $hasParent;
-                $row['deletable'] = $hasParent;
+            if ((int) $task->getId() !== (int) $this->getRequest()->getParam('taskId')) {
+                throw new ZfExtended_NotFoundException('Job not found');
             }
-        } elseif (is_object($this->view->rows)) {
-            if ($seeAllUsersAllowed || $this->view->rows->login === $authentication->getLogin()) {
-                $this->view->rows->editable = true;
-                $this->view->rows->deletable = true;
-
-                return;
-            }
-            //check if the current loged user is a parent for the user in the row
-            $hasParent = $userModel->hasParent($authentication->getUserId(), $this->view->rows->parentIds);
-            $this->view->rows->editable = $hasParent;
-            $this->view->rows->deletable = $hasParent;
         }
-    }
-
-    /***
-     * Set the assignmentDate with the curent time stamp.
-     * In different mysql versions the current_timestamp depends on mysql system variable (explicit_defaults_for_timestamp)
-     * https://dev.mysql.com/doc/refman/5.6/en/server-system-variables.html#sysvar_explicit_defaults_for_timestamp
-     */
-    protected function setDefaultAssignmentDate()
-    {
-        if ($this->getRequest()->isPost() && ! isset($this->data->assignmentDate) || empty($this->data->assignmentDate)) {
-            $this->data->assignmentDate = NOW_ISO;
-            $this->entity->setAssignmentDate(NOW_ISO);
-        }
-    }
-
-    /***
-     * Set the default deadline date from the config. How many work days the deadlinde date will be from the task
-     * order date can be define in the system configuration.
-     * To use the defaultDeadline date, the deadlineDate field should be set to "default"
-     */
-    protected function setDefaultDeadlineDate()
-    {
-        //check if default deadline date should be set
-        //To set the defaultDeadline date via the api, the deadlineDate field should be set to "default"
-        if (! isset($this->data->deadlineDate) || $this->data->deadlineDate !== "default" || ! isset($this->data->taskGuid)) {
-            return;
-        }
-
-        //check if the order date is set. With empty order data, no deadline date from config is possible
-        if (empty($this->task->getOrderdate()) || is_null($this->task->getOrderdate())) {
-            return;
-        }
-
-        $step = $this->data->workflowStepName;
-        //get the config for the task workflow and the user assoc role workflow step
-        $configValue = $this->task->getConfig()->runtimeOptions->workflow->{$this->task->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;
-        if ($configValue <= 0) {
-            return;
-        }
-
-        // the deadline will be order date + defaultDeadlineDate days config
-        $this->data->deadlineDate = editor_Utils::addBusinessDays($this->task->getOrderdate(), $configValue);
-        $this->entity->setDeadlineDate($this->data->deadlineDate);
     }
 }

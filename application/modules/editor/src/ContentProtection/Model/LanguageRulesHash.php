@@ -80,7 +80,7 @@ class LanguageRulesHash extends ZfExtended_Models_Entity_Abstract
         $s->where('sourceLanguageId = ?', $sourceLanguageId)->where('targetLanguageId = ?', $targetLangId);
 
         $this->row = $this->db->fetchRow($s);
-        if (empty($this->row)) {
+        if (null === $this->row) {
             $this->notFound("#by sourceLanguageId, targetLangId", "{$sourceLanguageId}, {$targetLangId}");
         }
 

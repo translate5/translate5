@@ -32,6 +32,8 @@ use MittagQI\ZfExtended\Acl\AbstractResource;
 
 /**
  * Holds and documents the translate5 ACL rights
+ *
+ * @codeCoverageIgnore
  */
 final class Rights extends AbstractResource
 {

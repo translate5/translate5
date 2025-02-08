@@ -37,6 +37,9 @@ use ZfExtended_Models_Entity_NotFoundException;
 
 class LanguageRepository
 {
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self();

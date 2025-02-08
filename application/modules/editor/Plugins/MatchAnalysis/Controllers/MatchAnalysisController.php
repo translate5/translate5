@@ -26,6 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\ZfExtended\Controller\Response\Header;
 
 class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController
@@ -69,7 +70,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         }
 
         // based on a request parameter, set the analysis calculation unit
-        $this->view->rows = $this->entity->loadByBestMatchRate($taskGuid, unitType: $this->getParam('unitType'));
+        $rows = $this->entity->loadByBestMatchRate($taskGuid, unitType: $this->getParam('unitType'));
 
         $fieldConfig = [[
             'name' => 'id',
@@ -83,6 +84,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
             'name' => 'penalty',
             'type' => 'number',
         ]];
+
         foreach ($this->entity->getFuzzyRanges() as $begin => $end) {
             $fieldConfig[] = [
                 'name' => (string) $begin,
@@ -95,14 +97,36 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         // Get pricingPresetId
         $meta = ZfExtended_Factory::get(editor_Models_Task_Meta::class);
         $meta->loadByTaskGuid($taskGuid);
+
+        $currency = $this->entity->getPricing()['currency'];
+        $noPricing = $this->entity->getPricing()['noPricing'];
         $pricingPresetId = $meta->getPricingPresetId();
+
+        $coordinatorGroupUserRepository = CoordinatorGroupUserRepository::create();
+        $authGroupUser = $coordinatorGroupUserRepository->findByUserGuid(
+            ZfExtended_Authentication::getInstance()->getUserGuid()
+        );
+
+        if ($authGroupUser) {
+            $pricingPresetId = null;
+            $currency = null;
+            $noPricing = true;
+
+            foreach ($rows as $key => $row) {
+                if ('amount' === $row['resourceName']) {
+                    unset($rows[$key]);
+                }
+            }
+        }
+
+        $this->view->rows = $rows;
 
         //the columns information is calculated from the field data in the GUI
         $this->view->metaData = [
-            "fields" => $fieldConfig,
-            "pricingPresetId" => $pricingPresetId,
-            "currency" => $this->entity->getPricing()['currency'],
-            'noPricing' => $this->entity->getPricing()['noPricing'],
+            'fields' => $fieldConfig,
+            'pricingPresetId' => $pricingPresetId,
+            'currency' => $currency,
+            'noPricing' => $noPricing,
         ];
     }
 

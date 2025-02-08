@@ -82,7 +82,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
         selector: 'adminTaskUserAssocGrid'
     }],
     strings: {
+        taskWorkflowChangeConfirm: '#UT#Bestätigen Sie die Änderung des Workflows',
         taskWorkflowSaved: '#UT#Änderung des Workflows der Aufgabe gespeichert!',
+        taskWorkflowChangeWarning: '#UT#Eine Änderung des Aufgaben-Workflows führt zur Löschung aller Auftragszuweisungen. Möchten Sie fortfahren?',
         entrySaved: '#UT#Eintrag gespeichert',
         entryDeleted: '#UT#Eintrag gelöscht',
         entrySaveError: '#UT#Fehler beim Speichern der Änderungen!',
@@ -359,24 +361,36 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
      * @param {String} val
      */
     changeWorkflow: function (combo, val) {
-        var me = this;
-        if (!val) {
+        const me = this;
+
+        if (!val || ! combo.isDirty()) {
             return;
         }
-        me.updatePrefsFilter(val);
-        if (combo.eventsSuspended) {
-            return;
-        }
-        me.getActualTask().set('workflow', val);
-        me.getActualTask().save({
-            success: function (rec, op) {
-                Editor.MessageBox.addInfo(me.strings.taskWorkflowSaved);
-                me.calculateAvailableCombinations();
-                me.handleReload();
-            },
-            failure: function () {
-                me.handleReload();
+
+        Ext.Msg.confirm(me.strings.taskWorkflowChangeConfirm, me.strings.taskWorkflowChangeWarning, function (btn) {
+            if (btn !== 'yes') {
+                combo.reset();
+
+                return;
             }
+
+            me.updatePrefsFilter(val);
+            if (combo.eventsSuspended) {
+                return;
+            }
+            const task = me.getActualTask();
+            task.set('workflow', val);
+            task.save({
+                success: function (rec, op) {
+                    Editor.MessageBox.addInfo(me.strings.taskWorkflowSaved);
+                    me.calculateAvailableCombinations();
+                    me.handleReload();
+                    task.store.reload();
+                },
+                failure: function () {
+                    me.handleReload();
+                }
+            });
         });
     },
 

@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Plugins_IpAuthentication_Models_IpBaseUser as IpBaseUser;
 use MittagQI\Translate5\Plugins\IpAuthentication\AclResource;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\ZfExtended\Acl\ResourceManager as ACLResourceManager;
 
 /**
@@ -151,9 +152,8 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
      */
     protected function deleteTemporaryUser(ZfExtended_Models_User $user): void
     {
-        $taskModel = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $taskModel editor_Models_Task */
-        $tasks = $taskModel->loadListByPmGuid($user->getUserGuid());
+        $taskRepository = TaskRepository::create();
+        $tasks = $taskRepository->loadListByPmGuid($user->getUserGuid());
 
         if (! empty($tasks)) {
             $taskGuids = array_column($tasks, 'taskGuid');

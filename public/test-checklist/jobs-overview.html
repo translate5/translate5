@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSP overview test checklist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/test-checklist/todo.css" rel="stylesheet">
+    <script>
+        const todos = [
+            {
+                "check": "Admin has access to all jobs",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "Admin can update all simple user jobs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Admin can update all LSP jobs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Admin can update all LSP user jobs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Admin can create LSP jobs",
+                        "how_to_check": null,
+                        "subchecks": [
+                            {
+                                "check": "Admin can create LSP job for direct LSP",
+                                "how_to_check": null,
+                            },
+                            {
+                                "check": "Admin can create LSP job for any sub LSP",
+                                "how_to_check": null,
+                            },
+                            {
+                                "check": "Admin can create LSP user job (for user of any LSP)",
+                                "how_to_check": null,
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "check": "PM can see/modify all simple user jobs and only LSP jobs of direct LSPs",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "PM can update simple user jobs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "PM can update LSP jobs of direct LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "PM can NOT see/update jobs of sub LSPs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "PM can NOT see/update jobs of LSP users",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "PM can create LSP jobs",
+                        "how_to_check": null,
+                        "subchecks": [
+                            {
+                                "check": "PM can create LSP job for direct LSP",
+                                "how_to_check": null,
+                            },
+                            {
+                                "check": "PM can NOT create LSP job for any sub LSP",
+                                "how_to_check": null,
+                            },
+                            {
+                                "check": "PM can NOT create LSP user job (for user of any LSP)",
+                                "how_to_check": null,
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "check": "PM Client can see/modify simple user jobs in tasks of his clients",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "PM Client can update simple user jobs",
+                        "how_to_check": null,
+                    },
+                ]
+            },
+            {
+                "check": "PM Client can see task not of his client if he is assigned to job in a task as editor",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "PM Client can open a task",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "PM Client can edit segments",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "PM Client can finish a job",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "Job Coordinator has access to LSP jobs of his LSP and direct sub LSPs",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "Job Coordinator can NOT create LSP jobs of his own LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can NOT create LSP jobs of sub LSP of his sub LSPs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can NOT access LSP jobs of other direct LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can NOT access LSP jobs of sub LSPs of his sub LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can update assigned coordinator in LSP jobs of his LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can update status of LSP jobs of his LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can NOT update deadline of LSP jobs of his LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can update LSP jobs of his sub LSP",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "Job Coordinator has access to LSP user jobs of his LSP",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "Job Coordinator can NOT access LSP user jobs of other direct LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can NOT access LSP user jobs of his sub LSPs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can NOT access LSP user jobs of sub LSPs of his sub LSPs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can NOT update LSP jobs of his LSP",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Job Coordinator can update LSP jobs of his sub LSP",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "Job Coordinator has NO access to simple user jobs",
+                "how_to_check": null,
+            },
+            {
+                "check": "Job Coordinator has NO access to simple LSP user jobs of sub LSPs",
+                "how_to_check": null,
+            },
+            {
+                "check": "Job Coordinator shouldn't be able to assign sub Coordinator as editor",
+                "how_to_check": null,
+            },
+            {
+                "check": "Job Coordinator shouldn't be able to assign Coordinator as editor",
+                "how_to_check": null,
+            },
+            {
+                "check": "On attempt to delete active job or job in use additional confirmation should be asked",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "On OK button job should be deleted",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "On attempt to delete LSP job with blocking LSP user job additional confirmation should be asked",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "First confirmation message warns about cascade deletion of LSP user jobs",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "On OK button job should be deleted",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "LSP job deletes cascade",
+                "how_to_check": null,
+                "subchecks": [
+                    {
+                        "check": "LSP user jobs are deleted",
+                        "how_to_check": null,
+                    },
+                    {
+                        "check": "Sub LSP jobs are deleted",
+                        "how_to_check": null,
+                    }
+                ]
+            },
+            {
+                "check": "It should be impossible to create user job for competitive task after some user approved for particular job",
+                "how_to_check": null,
+            },
+            {
+                "check": "It should be impossible to create direct LSP job for competitive task after some user approved for user job or coordinator for one of LSP jobs",
+                "how_to_check": null,
+            },
+            {
+                "check": "It should be possible to create user job for competitive task ONLY after Coordinator approved for LSP job",
+                "how_to_check": null,
+            },
+            {
+                "check": "It should be possible to create Sub LSP job for competitive task ONLY after Coordinator approved for LSP job",
+                "how_to_check": null,
+            },
+            {
+                "check": "Approval of job for competitive task should remove all other similar jobs in this task",
+                "how_to_check": null,
+            },
+            {
+                "check": "LSP users not asked for additional approval of job for competitive task after Coordinator approved for LSP job",
+                "how_to_check": null,
+            }
+        ];
+    </script>
+</head>
+<body>
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>LSP overview checklist</h2>
+        <div>
+            <a class="btn btn-primary me-2 not-printable" href="/test-checklist/index.html">Back to list</a>
+            <button class="btn btn-info not-printable" onclick="downloadTodoList()">Download Report</button>
+        </div>
+    </div>
+    <div id="todoList" class="list-group"></div>
+</div>
+<script src="/test-checklist/todo.js"></script>
+</body>
+</html>

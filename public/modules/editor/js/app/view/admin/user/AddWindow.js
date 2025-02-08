@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,14 +26,15 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.user.AddWindow', {
-    extend : 'Ext.window.Window',
-    alias : 'widget.adminUserAddWindow',
-    itemId : 'adminUserAddWindow',
-    cls : 'adminUserAddWindow',
-    title : '#UT#Benutzer erstellen',
-    titleEdit : '#UT#Benutzer bearbeiten',
+    extend: 'Ext.window.Window',
+    alias: 'widget.adminUserAddWindow',
+    itemId: 'adminUserAddWindow',
+    cls: 'adminUserAddWindow',
+    title: '#UT#Benutzer erstellen',
+    titleEdit: '#UT#Benutzer bearbeiten',
     requires: [
-        'Editor.view.admin.user.AddWindowViewController'
+        'Editor.view.admin.user.AddWindowViewController',
+        'Editor.store.admin.CoordinatorGroupStore'
     ],
     controller: 'adminUserAddWindow',
     strings: {
@@ -68,30 +68,29 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         addBtn: '#UT#Benutzer hinzufügen',
         saveBtn: '#UT#Benutzer speichern',
         cancelBtn: '#UT#Abbrechen',
-        languagesLabel:'#UT#Automatische Zuweisung',
-        sourceLangageLabel:'#UT#Quellsprache(n)',
-        sourceLangageTip:'#UT#Quellsprache(n)',
-        targetLangageLabel:'#UT#Zielsprache(n)',
-        targetLangageTip:'#UT#Zielsprache(n)',
+        languagesLabel: '#UT#Automatische Zuweisung',
+        sourceLangageLabel: '#UT#QuelcoordinatorGrouprache(n)',
+        sourceLangageTip: '#UT#QuelcoordinatorGrouprache(n)',
+        targetLangageLabel: '#UT#ZiecoordinatorGrouprache(n)',
+        targetLangageTip: '#UT#ZiecoordinatorGrouprache(n)',
         languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.',
-        localeLabel:'#UT#Benutzersprache',
+        localeLabel: '#UT#Benutzersprache',
         parentUserLabel: '#UT#Übergeordneter Benutzer',
         bottomOpenIdNoEditInfo: '#UT# ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.',
         clientPmSubRoles: '#UT#Zugängliche Managementübersichten für Rolle PM',
     },
-    modal : true,
-    layout:'fit',
-    initComponent: function() {
+    modal: true,
+    layout: 'fit',
+    initComponent: function () {
         var me = this;
 
         me.callParent(arguments);
-        me.on('beforeshow', function(){
+        me.on('beforeshow', function () {
             me.down('fieldset#passwords').setDisablePasswords(true);
         });
     },
-    initConfig : function(instanceConfig) {
+    initConfig: function (instanceConfig) {
         var me = this,
-            roles = [],
             config = {},
             defaults = {
                 labelWidth: 160,
@@ -100,364 +99,542 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             bottomInfo = [me.strings.bottomInfo],
             translations = [];
 
-        if(!instanceConfig.editMode) {
+        if (!instanceConfig.editMode) {
             bottomInfo.push(me.strings.bottomPwInfo);
         }
 
-        Ext.Object.each(Editor.data.app.roles, function(key, value) {
-            //if the role is not setable for the user, do not create an check box for it
-            if(!value.setable){
-                return;
-            }
-            roles.push({
-                boxLabel: value.label,
-                name: 'roles_helper',
-                value: key,
-                handler: function(box, checked){
-                    me.roleCheckChange(box, checked);
-                }
-            });
-        });
-        Ext.Object.each(Editor.data.l10n.translations, function(id,value) {
-            translations.push([id,value]);
+        Ext.Object.each(Editor.data.l10n.translations, function (id, value) {
+            translations.push([id, value]);
         });
         config = {
             title: me.title, //see EXT6UPD-9
             height: Math.min(750, parseInt(Ext.getBody().getViewSize().height * 0.9)),
-            width : 900,
-            flex:1,
-            items : [{
-                xtype: 'form',
-                //padding: 5,
-                ui: 'default-frame',
-                scrollable: 'vertical',
-                defaults: defaults,
-                items: [{
-                    layout: {
-                        type: 'hbox',
-                        pack: 'start',
-                        align: 'stretch'
-                    },
-                    xtype:'container',
-                    items:[{
-                        //first column
-                        xtype: 'fieldset',
-                        margin:5,
-                        defaults: defaults,
-                        title: me.strings.userInfo,
-                        flex:1,
-                        items:[{
-                            xtype: 'radiogroup',
-                            fieldLabel: me.strings.genderLabel,
-                            //columns: 1,
-                            items: [
-                                {boxLabel: me.strings.genderFemale, name: 'gender', inputValue: 'f'},
-                                {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'},
-                                {boxLabel: me.strings.genderNeutral, name: 'gender', inputValue: 'n'}
-                            ]
-                        },{
-                            xtype: 'fieldcontainer',
-                            fieldLabel: me.strings.nameLabel,
-                            toolTip: me.strings.nameTip,
-                            layout: 'hbox',
-                            combineErrors: true,
-                            defaultType: 'textfield',
-                            defaults: {
-                                hideLabel: 'true'
-                            },
-                            items: [{
-                                name: 'firstName',
-                                maxLength: 255,
-                                fieldLabel: me.strings.firstNameLabel,
-                                toolTip: me.strings.firstNameTip,
-                                flex: 2,
-                                emptyText: me.strings.firstNameLabel,
-                                allowBlank: false
-                            }, {
-                                name: 'surName',
-                                maxLength: 255,
-                                fieldLabel: me.strings.surNameLabel,
-                                toolTip: me.strings.surNameTip,
-                                flex: 3,
-                                margins: '0 0 0 6',
-                                emptyText: me.strings.surNameLabel,
-                                allowBlank: false
-                            }]
-                        },{
-                            xtype: 'textfield',
-                            name: 'email',
-                            maxLength: 255,
-                            allowBlank: false,
-                            vtype: 'email',
-                            toolTip: me.strings.emailTip,
-                            fieldLabel: me.strings.emailLabel
-                        }]
-                    }]
-                },{
-                    layout: {
-                        type: 'hbox',
-                        pack: 'start',
-                        align: 'stretch'
-                    },
-                    xtype:'container',
-                    items:[
+            width: 900,
+            flex: 1,
+            items: [
+                {
+                    xtype: 'form',
+                    //padding: 5,
+                    ui: 'default-frame',
+                    scrollable: 'vertical',
+                    defaults: defaults,
+                    items: [
                         {
-                            xtype: 'fieldset',
-                            itemId:'loginDetailsFieldset',
-                            margin:5,
-                            flex:1,
-                            defaults: defaults,
-                            title: me.strings.loginInfo,
-                            items:[{
-                                xtype: 'textfield',
-                                name: 'login',
-                                maxLength: 255,
-                                minLength: 6,
-                                allowBlank: false,
-                                toolTip: me.strings.loginTip,
-                                fieldLabel: me.strings.loginLabel
-                            },{
-                                xtype: 'hidden',
-                                name: 'roles'
-                            },{
-                                xtype: 'checkboxgroup',
-                                itemId: 'rolesGroup',
-                                cls: 'x-check-group-alt',
-                                fieldLabel: me.strings.rolesLabel + ' &#8505;',
-                                labelAlign: 'top',
-                                items: roles,
-                                columns: 2,
-                                autoEl: {
-                                    tag: 'div',
-                                    'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
-                                }
-                            },{
-                                xtype: 'Editor.tagfield',
-                                itemId: 'clientPmSubRoles',
-                                fieldLabel: me.strings.clientPmSubRoles,
-                                queryMode: 'local',
-                                dataIndex: 'clientPmSubRoles',
-                                store: Editor.data.app.clientPmSubRoles,
-                                hidden: true,
-                                listeners: {
-                                    change: me.clientPmSubRoleChange
-                                }
-                            },{
-                                xtype: 'combo',
-                                itemId: 'locale',
-                                name:'locale',
-                                width:110,
-                                allowBlank: false,
-                                editable: false,
-                                forceSelection: true,
-                                store: translations,
-                                queryMode: 'local',
-                                fieldLabel: me.strings.localeLabel
-                            },{
-                                xtype: 'combo',
-                                itemId: 'parentIds',
-                                name:'parentIds',
-                                width:110,
-                                allowBlank: true,
-                                typeAhead: true,
-                                anyMatch: true,
-                                forceSelection: true,
-                                displayField: 'longUserName',
-                                valueField: 'id',
-                                store: {
-                                    type: 'store',
-                                    model: 'Editor.model.admin.User',
-                                    autoLoad: true,
-                                    remoteFilter: false,
-                                    pageSize: 0
-                                },
-                                queryMode: 'local',
-                                fieldLabel: me.strings.parentUserLabel
-                            }]
-                            // + item for assigning customers to the user
-                            // (added dynamically by Editor.controller.admin.Customer)
-                        },{
-                            xtype: 'fieldset',
-                            margin:5,
-                            flex:1,
-                            itemId: 'passwords',
-                            defaults: defaults,
-                            defaultType: 'textfield',
-                            title: me.strings.password,
-                            setDisablePasswords: function(disable) {
-                                Ext.Array.forEach(this.query('textfield'), function(field) {
-                                    field.setDisabled(disable);
-                                    if(disable) {
-                                        field.reset();
-                                    }
-                                });
+                            layout: {
+                                type: 'hbox',
+                                pack: 'start',
+                                align: 'stretch'
                             },
-                            items: [{
-                                xtype: 'checkbox',
-                                hideLabel: true,
-                                boxLabel: instanceConfig.editMode ? me.strings.editPassword : me.strings.setPassword,
-                                style: 'margin-bottom:10px',
-                                handler: function(me, checked) {
-                                    var fieldset = me.ownerCt;
-                                    fieldset.setDisablePasswords(!checked);
+                            xtype: 'container',
+                            items: [
+                                {
+                                    //first column
+                                    xtype: 'fieldset',
+                                    margin: 5,
+                                    defaults: defaults,
+                                    title: me.strings.userInfo,
+                                    flex: 1,
+                                    items: [
+                                        {
+                                            xtype: 'radiogroup',
+                                            fieldLabel: me.strings.genderLabel,
+                                            //columns: 1,
+                                            items: [
+                                                {boxLabel: me.strings.genderFemale, name: 'gender', inputValue: 'f'},
+                                                {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'},
+                                                {boxLabel: me.strings.genderNeutral, name: 'gender', inputValue: 'n'}
+                                            ]
+                                        },
+                                        {
+                                            xtype: 'fieldcontainer',
+                                            fieldLabel: me.strings.nameLabel,
+                                            toolTip: me.strings.nameTip,
+                                            layout: 'hbox',
+                                            combineErrors: true,
+                                            defaultType: 'textfield',
+                                            defaults: {
+                                                hideLabel: 'true'
+                                            },
+                                            items: [
+                                                {
+                                                    name: 'firstName',
+                                                    maxLength: 255,
+                                                    fieldLabel: me.strings.firstNameLabel,
+                                                    toolTip: me.strings.firstNameTip,
+                                                    flex: 2,
+                                                    emptyText: me.strings.firstNameLabel,
+                                                    allowBlank: false
+                                                }, {
+                                                    name: 'surName',
+                                                    maxLength: 255,
+                                                    fieldLabel: me.strings.surNameLabel,
+                                                    toolTip: me.strings.surNameTip,
+                                                    flex: 3,
+                                                    margins: '0 0 0 6',
+                                                    emptyText: me.strings.surNameLabel,
+                                                    allowBlank: false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            xtype: 'textfield',
+                                            name: 'email',
+                                            maxLength: 255,
+                                            allowBlank: false,
+                                            vtype: 'email',
+                                            toolTip: me.strings.emailTip,
+                                            fieldLabel: me.strings.emailLabel
+                                        }
+                                    ]
                                 }
-                            },{
-                                inputType: 'password',
-                                name: 'passwd',
-                                itemId:'password',
-                                minLength: 12,
-                                allowBlank: false,
-                                disabled: true,
-                                fieldLabel: me.strings.password
-                            },{
-                                inputType: 'password',
-                                name: 'passwd_check',
-                                itemId:'passwd_check',
-                                minLength: 12,
-                                allowBlank: false,
-                                disabled: true,
-                                validator: function(value) {
-                                    var pwd = this.previousSibling('[name=passwd]');
-                                    return (value === pwd.getValue()) ? true : me.strings.passwordMisMatch;
+                            ]
+                        },
+                        {
+                            layout: {
+                                type: 'hbox',
+                                pack: 'start',
+                                align: 'stretch'
+                            },
+                            xtype: 'container',
+                            items: [
+                                {
+                                    xtype: 'fieldset',
+                                    itemId: 'loginDetailsFieldset',
+                                    margin: 5,
+                                    flex: 1,
+                                    defaults: defaults,
+                                    title: me.strings.loginInfo,
+                                    items: [
+                                        {
+                                            xtype: 'textfield',
+                                            name: 'login',
+                                            maxLength: 255,
+                                            minLength: 6,
+                                            allowBlank: false,
+                                            toolTip: me.strings.loginTip,
+                                            fieldLabel: me.strings.loginLabel
+                                        },
+                                        {
+                                            xtype: 'hidden',
+                                            name: 'roles'
+                                        },
+                                        {
+                                            xtype: 'fieldset',
+                                            itemId: 'rolesGroup',
+                                            margin: 5,
+                                            title: me.strings.rolesLabel + ' &#8505;',
+                                            autoEl: {
+                                                tag: 'div',
+                                                'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
+                                            },
+                                            items: this.getRoleGroupSets(),
+                                        },
+                                        {
+                                            xtype: 'Editor.combobox',
+                                            itemId: 'coordinatorGroup',
+                                            name: 'coordinatorGroup',
+                                            allowBlank: true,
+                                            forceSelection: false,
+                                            hidden: true,
+                                            store: {
+                                                xtype: 'store',
+                                                data: [] // Initially empty, will be set dynamically
+                                            },
+                                            queryMode: 'local',
+                                            displayField: 'name',
+                                            valueField: 'id',
+                                            bind: {
+                                                fieldLabel: '{l10n.coordinatorGroup.title}',
+                                            },
+                                            listeners: {
+                                                change: (box, newValue) => this.onCoordinatorGroupChange(box, newValue),
+                                            },
+                                        },
+                                        {
+                                            xtype: 'combo',
+                                            itemId: 'locale',
+                                            name: 'locale',
+                                            width: 110,
+                                            allowBlank: false,
+                                            editable: false,
+                                            forceSelection: true,
+                                            store: translations,
+                                            queryMode: 'local',
+                                            fieldLabel: me.strings.localeLabel
+                                        },
+                                        {
+                                            xtype: 'customers',
+                                            bind: {
+                                                fieldLabel: '{l10n.general.clients}',
+                                            },
+                                            name: 'customers',
+                                            store: {
+                                                xtype: 'store',
+                                                data: [] // Initially empty, will be set dynamically
+                                            },
+                                            queryMode: 'local',
+                                            displayField: 'name',
+                                            valueField: 'id',
+                                            typeAhead: true,
+                                            anyMatch: true,
+                                            selectOnFocus: true
+                                        }
+                                    ]
                                 },
-                                fieldLabel: me.strings.password_check
-                            }]
+                                {
+                                    xtype: 'fieldset',
+                                    margin: 5,
+                                    flex: 1,
+                                    itemId: 'passwords',
+                                    defaults: defaults,
+                                    defaultType: 'textfield',
+                                    title: me.strings.password,
+                                    setDisablePasswords: function (disable) {
+                                        Ext.Array.forEach(this.query('textfield'), function (field) {
+                                            field.setDisabled(disable);
+
+                                            if (disable) {
+                                                field.reset();
+                                            }
+                                        });
+                                    },
+                                    items: [
+                                        {
+                                            xtype: 'checkbox',
+                                            hideLabel: true,
+                                            boxLabel: instanceConfig.editMode ? me.strings.editPassword : me.strings.setPassword,
+                                            style: 'margin-bottom:10px',
+                                            handler: function (me, checked) {
+                                                var fieldset = me.ownerCt;
+                                                fieldset.setDisablePasswords(!checked);
+                                            }
+                                        },
+                                        {
+                                            inputType: 'password',
+                                            name: 'passwd',
+                                            itemId: 'password',
+                                            minLength: 12,
+                                            allowBlank: false,
+                                            disabled: true,
+                                            fieldLabel: me.strings.password
+                                        },
+                                        {
+                                            inputType: 'password',
+                                            name: 'passwd_check',
+                                            itemId: 'passwd_check',
+                                            minLength: 12,
+                                            allowBlank: false,
+                                            disabled: true,
+                                            validator: function (value) {
+                                                var pwd = this.previousSibling('[name=passwd]');
+
+                                                return (value === pwd.getValue()) ? true : me.strings.passwordMisMatch;
+                                            },
+                                            fieldLabel: me.strings.password_check
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'container',
+                            html: '<p>' + bottomInfo.join('</p><p style="margin-top:5px;margin-left:5px;">') + '</p>',
+                            dock: 'bottom'
                         }
                     ]
-                },{
-                    xtype: 'container',
-                    html: '<p>'+bottomInfo.join('</p><p style="margin-top:5px;margin-left:5px;">')+'</p>',
-                    dock : 'bottom'
-                }]
-            }],
-            dockedItems : [{
-                xtype : 'toolbar',
-                dock : 'bottom',
-                ui: 'footer',
-                layout: {
-                    type: 'hbox',
-                    pack: 'start'
-                },
-                items : [{
-                    xtype: 'button',
-                    hidden: true,
-                    itemId: 'feedbackBtn',
-                    text: me.strings.feedbackText,
-                    tooltip: me.strings.feedbackTip,
-                    iconCls: 'ico-error',
-                    ui: 'default-toolbar'
-                },{
-                    xtype: 'tbfill'
-                },{
-                    xtype : 'button',
-                    glyph:instanceConfig.editMode ?  'f0c7@FontAwesome5FreeSolid' :  'f234@FontAwesome5FreeSolid',
-                    itemId : 'save-user-btn',
-                    text : instanceConfig.editMode ? me.strings.saveBtn : me.strings.addBtn
-                }, {
-                    xtype : 'button',
-                    glyph: 'f00d@FontAwesome5FreeSolid',
-                    itemId : 'cancel-user-btn',
-                    text : me.strings.cancelBtn
-                }]
-            }]
+                }
+            ],
+            dockedItems: [
+                {
+                    xtype: 'toolbar',
+                    dock: 'bottom',
+                    ui: 'footer',
+                    layout: {
+                        type: 'hbox',
+                        pack: 'start'
+                    },
+                    items: [
+                        {
+                            xtype: 'button',
+                            hidden: true,
+                            itemId: 'feedbackBtn',
+                            text: me.strings.feedbackText,
+                            tooltip: me.strings.feedbackTip,
+                            iconCls: 'ico-error',
+                            ui: 'default-toolbar'
+                        },
+                        {
+                            xtype: 'tbfill'
+                        },
+                        {
+                            xtype: 'button',
+                            glyph: instanceConfig.editMode ? 'f0c7@FontAwesome5FreeSolid' : 'f234@FontAwesome5FreeSolid',
+                            itemId: 'save-user-btn',
+                            text: instanceConfig.editMode ? me.strings.saveBtn : me.strings.addBtn
+                        },
+                        {
+                            xtype: 'button',
+                            glyph: 'f00d@FontAwesome5FreeSolid',
+                            itemId: 'cancel-user-btn',
+                            text: me.strings.cancelBtn
+                        }
+                    ]
+                }
+            ]
         };
 
-        if(instanceConfig.editMode) {
+        if (instanceConfig.editMode) {
             config.title = me.titleEdit;
         }
 
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
+
         return me.callParent([config]);
     },
-    /**
-     * merge and save the checked roles into the hidden roles field
-     * @param {Ext.form.field.Checkbox} box
-     * @param {Boolean} checked
-     */
-    roleCheckChange: function(box, checked) {
-        var roles = [],
-            form = box.up('form'),
-            boxes = box.up('#rolesGroup').query('checkbox[checked=true]');
-        Ext.Array.forEach(boxes, function(item){
-            roles.push(item.initialConfig.value);
-        });
-        if(this.isClientPm(roles)){
-            // if the client-pm role is checked, we show the client-pm sub-roles and add their value
-            var tagfield = form.down('#clientPmSubRoles');
-            // if a new user is set the first time to be a clientPm we add all sub-roles for convenience
-            if(!tagfield.isClientPmInited && !Number.isInteger(form.getRecord().get('id'))){
-                var item, allSubRoles = [];
-                for(item of Editor.data.app.clientPmSubRoles){
-                    allSubRoles.push(item[0]);
-                }
-                tagfield.setValue(allSubRoles);
-                // form.getRecord().set('clientPmSubRoles', allSubRoles, { silent: true, commit: false });
-                tagfield.isClientPmInited = true;
-            }
-            roles = roles.concat(tagfield.getValue());
-            tagfield.setHidden(false);
-        } else {
-            form.down('#clientPmSubRoles').setHidden(true);
+
+    getRoleGroupSets: function () {
+        let sets = [];
+        const groupedRoles = Editor.data.app.groupedRoles;
+
+        sets.push(this.createRoleFieldSet('General roles', 'general', groupedRoles.general));
+
+        if (groupedRoles.hasOwnProperty('admins')) {
+            sets.push(this.createRoleFieldSet('Admin roles', 'admins', groupedRoles.admins));
         }
-        form.down('hidden[name="roles"]').setValue(roles.join(','));
+
+        if (groupedRoles.hasOwnProperty('notRequireClient')) {
+            sets.push(this.createRoleFieldSet('Roles don\'t require client', 'notRequireClient', groupedRoles.notRequireClient));
+        }
+
+        sets.push(this.createRoleFieldSet('Roles require client', 'requireClient', groupedRoles.requireClient));
+        sets.push(this.createRoleFieldSet(this.strings.clientPmSubRoles, 'clientPmSubRoles', groupedRoles.clientPmSubRoles, true));
+
+        return sets;
     },
-    /**
-     * merge and save the checked roles AND the client-pm sub-roles into the hidden roles field
-     * @param {Ext.form.field.Tag} tagfield
-     * @param {Array} newValue
-     */
-    clientPmSubRoleChange: function(tagfield, newValue) {
-        var roles = [],
-            form = tagfield.up('form'),
-            boxes = form.down('#rolesGroup').query('checkbox[checked=true]');
-        Ext.Array.forEach(boxes, function(item){
-            roles.push(item.initialConfig.value);
+
+    createRoleFieldSet: function (title, groupType, roles, hidden = false) {
+        const userWindow = this;
+        let items = [];
+
+        roles.forEach(function (node) {
+            items.push({
+                boxLabel: node.label,
+                name: 'roles_helper',
+                value: node.role,
+                listeners: {
+                    change: userWindow.onRoleCheckChange,
+                    scope: userWindow
+                }
+            });
         });
-        roles = roles.concat(newValue);
-        form.down('hidden[name="roles"]').setValue(roles.join(','));
+
+        return {
+            xtype: 'fieldset',
+            title: title,
+            checkboxToggle: false,
+            hidden: hidden || ! items || items.length === 0,
+            items: [
+                {
+                    xtype: 'checkboxgroup',
+                    columns: 2,
+                    items: items
+                }
+            ],
+            reference: groupType + 'FieldSet'
+        };
     },
+
+    getSelectedRoles: function (form) {
+        return form.down('#rolesGroup').query('checkbox[checked=true]').map(box => box.initialConfig.value);
+    },
+
+    toggleEnableForConflictingRoles: function (form) {
+        const checkboxes = form.down('#rolesGroup').query('checkbox'),
+            findCheckbox = (role) => checkboxes.find(box => box.initialConfig.value === role);
+
+        checkboxes.map(box => box.setDisabled(false));
+
+        form.down('#rolesGroup').query('checkbox[checked=true]').map(function (box) {
+            if (Editor.data.app.conflictingRoles.hasOwnProperty(box.initialConfig.value)) {
+                Editor.data.app.conflictingRoles[box.initialConfig.value].forEach(function (role) {
+                    findCheckbox(role)?.setDisabled(true);
+                });
+
+                return;
+            }
+
+            for (let role in Editor.data.app.conflictingRoles) {
+                if (Editor.data.app.conflictingRoles[role].includes(box.initialConfig.value)) {
+                    findCheckbox(role).setDisabled(true);
+                }
+            }
+        });
+    },
+
+    onRoleCheckChange: function (checkbox, checked) {
+        const form = checkbox.up('form'),
+            selectedRoles = this.getSelectedRoles(form),
+            clientPmSubRolesGroup = this.lookupReference('clientPmSubRolesFieldSet');
+
+        this.toggleEnableForConflictingRoles(form);
+
+        if (selectedRoles.includes('clientpm')) {
+            clientPmSubRolesGroup.setHidden(false);
+        } else {
+            clientPmSubRolesGroup.setHidden(true);
+            clientPmSubRolesGroup.down('checkboxgroup').reset();
+        }
+
+        this.toggleRequirementOfCustomersField(
+            form,
+            this.hasRoleFromGroup(selectedRoles, ['requireClient'])
+        );
+
+        form.down('hidden[name="roles"]').setValue(selectedRoles.join(','));
+
+        this.toggleCoordinatorGroupField(form, selectedRoles);
+    },
+
+    toggleRequirementOfCustomersField: function (form, required) {
+        const customersField = form.down('customers');
+
+        customersField.allowBlank = ! required;
+        customersField.forceSelection = required;
+    },
+
+    toggleCoordinatorGroupField: function (form, roles) {
+        const coordinatorGroupField = form.down('#coordinatorGroup');
+
+        if (roles.includes('jobCoordinator')) {
+            coordinatorGroupField.setHidden(false);
+            coordinatorGroupField.allowBlank = false;
+            coordinatorGroupField.setDisabled(! form.getRecord().phantom);
+            coordinatorGroupField.forceSelection = true;
+
+            return;
+        }
+
+        coordinatorGroupField.setHidden(true);
+        coordinatorGroupField.allowBlank = true;
+        coordinatorGroupField.setDisabled(true);
+        coordinatorGroupField.forceSelection = false;
+    },
+
+    hasRoleFromGroup: function (selectedRoles, groups) {
+        return groups.some(
+            group => selectedRoles.some(
+                role => this.isRoleFromGroup(role, group)
+            )
+        );
+    },
+
+    isRoleFromGroup: function (role, group) {
+        if (! Editor.data.app.groupedRoles.hasOwnProperty(group)) {
+            return false;
+        }
+
+        return Editor.data.app.groupedRoles[group].some(node => node.role === role);
+    },
+
+    onCoordinatorGroupChange: function (fld, newValue) {
+        /**
+         * @type {Editor.model.admin.CoordinatorGroupModel}
+         */
+        const coordinatorGroup = fld.getStore().getById(newValue);
+        const form = fld.up('form');
+
+        if (null === coordinatorGroup) {
+            this.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
+
+            return;
+        }
+
+        this.updateCustomerField(form, coordinatorGroup.get('customers'));
+    },
+
     /**
      * loads the record into the form, does set the role checkboxes according to the roles value
-     * @param record
+     * @param {Editor.model.admin.User} record
      */
-    loadRecord: function(record) {
+    loadRecord: function (record) {
         var me = this,
             form = me.down('form'),
-            roles = record.getMainRoles();
-        // we set the subroles just for the lifetime of the form as "real" data-values
-        record.set('clientPmSubRoles', record.getClientPmSubRoles(), { silent: true, commit: false });
+            roles = record.getRoles();
 
         form.loadRecord(record);
 
-        Ext.Array.forEach(me.query('#rolesGroup checkbox'), function(item) {
-            item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
+        me.query('#rolesGroup checkbox').forEach(function (box) {
+            const
+                isAdminRole = me.isRoleFromGroup(box.initialConfig.value, 'admins'),
+                isNotRequireClientRole = me.isRoleFromGroup(box.initialConfig.value, 'notRequireClient'),
+                boxInitValue = box.initialConfig.value,
+                hidden = (record.isCoordinatorGroupUser() && (isAdminRole || isNotRequireClientRole) && 'jobCoordinator' !== boxInitValue)
+                    // existing user is not Coordinator group user. Can't set jobCoordinator role
+                    || (record.get('userGuid').length !== 0 && ! record.isCoordinatorGroupUser() && 'jobCoordinator' === boxInitValue)
+                    || (record.isCoordinatorGroupUser() && 'clientpm' === boxInitValue)
+            ;
+
+            box.setValue(roles.includes(boxInitValue));
+            box.setHidden(hidden);
         });
 
-        if(form.isDisabled() && record.get('openIdIssuer') !== ''){
+        me.updateCustomerField(form, Ext.getStore('customersStore').getData().items);
+
+        const coordinatorGroupField = form.down('#coordinatorGroup');
+        const coordinatorGroupStore = coordinatorGroupField.getStore();
+
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'coordinatorgroup',
+            method: 'GET',
+            success: response => {
+                const data = response.responseJson;
+                coordinatorGroupStore.loadData(data.rows);
+
+                const coordinatorGroup = coordinatorGroupStore.getById(record.get('coordinatorGroup'));
+                coordinatorGroupField.setValue(coordinatorGroup);
+                coordinatorGroupField.setHidden(! coordinatorGroup);
+
+                if (coordinatorGroup) {
+                    if (Editor.app.authenticatedUser.getRoles().includes('jobCoordinator')) {
+                        form.down('customers').hide();
+                    } else {
+                        me.updateCustomerField(form, coordinatorGroup.get('customers'));
+                    }
+                }
+            }
+        });
+
+        if (form.isDisabled() && record.get('openIdIssuer') !== '') {
             form.add({
                 xtype: 'container',
-                html: '<p>'+me.strings.bottomOpenIdNoEditInfo + '</p><p style="margin-top:5px;margin-left:5px;"></p>',
-                dock : 'bottom'
+                html: '<p>' + me.strings.bottomOpenIdNoEditInfo + '</p><p style="margin-top:5px;margin-left:5px;"></p>',
+                dock: 'bottom'
             });
-        }
-        // set the subroles-tagfield visible if the user is a clientPm
-        if(me.isClientPm(roles)){
-            me.down('#clientPmSubRoles').setHidden(false);
-            // when the current user is "only" client-pm, he must not be able to change his own subroles
-            if(me.isClientPm(Editor.data.app.user.roles.split(','))){
-                me.down('#clientPmSubRoles').setDisabled(true);
-            }
         }
     },
 
     /**
-     * Checks wether the users roles represent a clientPm
-     * @param {Array} roles
-     * @returns {boolean}
+     * @param {Ext.form.Panel} form
+     * @param {{id: int, name: string}[]} storeData
      */
-    isClientPm: function(roles) {
-        return !roles.includes('pm') && roles.includes('clientpm');
-    }
+    updateCustomerField: function (form, storeData) {
+        const customersField = form.down('customers');
+        const customersFieldStore = customersField.getStore();
+        /** @type {{id: int, name: string}[]} */
+        const customers = [];
+
+        customersFieldStore.loadData(storeData);
+
+        for (const customerId of form.getRecord().getCustomerIds()) {
+            const customer = customersFieldStore.getById(customerId);
+
+            if (customer) {
+                customers.push(customer);
+            }
+        }
+
+        customersField.setValue(customers.map(c => c.id));
+    },
 });

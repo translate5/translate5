@@ -27,6 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Cronjob\Cronjobs;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\JobAssignment\UserJob\Event\UserJobCreatedEvent;
+use MittagQI\Translate5\JobAssignment\UserJob\Event\UserJobDeletedEvent;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 
 /**
@@ -109,32 +112,38 @@ class editor_Workflow_Default_Hooks
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [__CLASS__]);
         $this->events->addIdentifiers(get_class($workflow));
 
+        // TODO: Extract event handling from here
         $events = Zend_EventManager_StaticEventManager::getInstance();
         $events->attach(
-            Editor_TaskuserassocController::class,
-            'afterPostAction',
-            function (Zend_EventManager_Event $event) {
-                $tua = $event->getParam('entity');
+            EventDispatcher::class,
+            UserJobCreatedEvent::class,
+            function (Zend_EventManager_Event $zendEvent) {
+                /** @var UserJobCreatedEvent $event */
+                $event = $zendEvent->getParam('event');
                 //if entity could not be saved no ID was given, so check for it
-                if ($tua->getId() > 0) {
-                    $this->newTaskUserAssoc = $tua;
+                if ($event->userJob->getId() > 0) {
+                    $this->newTaskUserAssoc = $event->userJob;
+
                     $jobHandler = ZfExtended_Factory::get(editor_Workflow_Default_JobHandler::class);
-                    /* @var $jobHandler editor_Workflow_Default_JobHandler */
                     $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_ADD));
-                    $this->workflow->getStepRecalculation()->recalculateWorkflowStep($tua);
+
+                    $this->workflow->getStepRecalculation()->recalculateWorkflowStep($event->userJob->getTaskGuid());
                 }
             }
         );
 
         $events->attach(
-            Editor_TaskuserassocController::class,
-            'afterDeleteAction',
-            function (Zend_EventManager_Event $event) {
-                $this->newTaskUserAssoc = $event->getParam('entity');
+            EventDispatcher::class,
+            UserJobDeletedEvent::class,
+            function (Zend_EventManager_Event $zendEvent) {
+                /** @var UserJobDeletedEvent $event */
+                $event = $zendEvent->getParam('event');
+                $this->newTaskUserAssoc = $event->userJob;
+
                 $jobHandler = ZfExtended_Factory::get(editor_Workflow_Default_JobHandler::class);
-                /* @var $jobHandler editor_Workflow_Default_JobHandler */
                 $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_DELETE));
-                $this->workflow->getStepRecalculation()->recalculateWorkflowStep($this->newTaskUserAssoc);
+
+                $this->workflow->getStepRecalculation()->recalculateWorkflowStep($event->userJob->getTaskGuid());
             }
         );
 
@@ -377,7 +386,7 @@ class editor_Workflow_Default_Hooks
             //FIXME UGLY: The parameters are changing by reference! Must be removed again, and unified, see below FIXME
             $config->parameters = $this->decodeParameters($config, $action);
             if (empty($instances[$class])) {
-                $instance = ZfExtended_Factory::get($class);
+                $instance = method_exists($class, 'create') ? $class::create() : ZfExtended_Factory::get($class);
                 /* @var $instance editor_Workflow_Actions_Abstract */
                 //FIXME unify this callActions with AbstractHandler::callActions
                 $instance->init($config);

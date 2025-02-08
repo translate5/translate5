@@ -5989,7 +5989,7 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Diese Kundennummer wird bereits verwendet.</source>
                 <target>Diese Kundennummer wird bereits verwendet.</target>
             </trans-unit>
-            <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKQ=='>
+            <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKS4='>
                 <source>Der referenzierte Kunde existiert nicht (mehr).</source>
                 <target>Der referenzierte Kunde existiert nicht (mehr).</target>
             </trans-unit>
@@ -9937,13 +9937,185 @@ Die Sprachressource kann nur mit einer anderen Sprachresource verbunden werden, 
 Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten -> Ziel
                 </target>
             </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gZGVuIEt1bmRlbiAie2lkfSIgaGllciBuaWNodCBhbmdlYmVu'>
+                <source>Sie können den Kunden "{id}" hier nicht angeben</source>
+                <target>Sie können den Kunden "{id}" hier nicht angeben</target>
+            </trans-unit>
+            <trans-unit id='Y2Fubm90LWRlbGV0ZS11c2VyLmxhc3QtY29vcmRpbmF0b3I='>
+                <source>cannot-delete-user.last-coordinator</source>
+                <target>Der Benutzer kann nicht gelöscht werden, er ist der letzte Job-Koordinator der Koordinatorengruppe "{group}".</target>
+            </trans-unit>
+            <trans-unit id='Y2Fubm90LWRlbGV0ZS11c2VyLmNvb3JkaW5hdG9yLWhhcy1hc3NpZ25lZC1ncm91cC1qb2Jz'>
+                <source>cannot-delete-user.coordinator-has-assigned-group-jobs</source>
+                <target>Der Benutzer kann nicht gelöscht werden, er ist Koordinator einiger Aufträge der Koordinatorengruppe.</target>
+            </trans-unit>
+            <trans-unit id='S29vcmRpbmF0b3JlbmdydXBwZW4='>
+                <source>Koordinatorengruppen</source>
+                <target>Koordinatorengruppen</target>
+            </trans-unit>
             <trans-unit id='ZGVmYXVsdF9nbG9zc2FyeV9pZA=='>
                 <source>default_glossary_id</source>
                 <target>Standard-Glossar-ID</target>
             </trans-unit>
+            <trans-unit id='Sm9iQ29vcmRpbmF0b3I='>
+                <source>JobCoordinator</source>
+                <target>Job-Koordinator</target>
+            </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gZGllIFJvbGxlIHtyb2xlfSBuaWNodCBtaXQgZWluZXIgZGVyIGZvbGdlbmRlbiBSb2xsZW4gZmVzdGxlZ2VuOiB7cm9sZXN9'>
+                <source>Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}</source>
+                <target>Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}</target>
+            </trans-unit>
+            <trans-unit id='VmVyc3VjaCwgZWluZW4gbmljaHQgZXJyZWljaGJhcmVuIEJlbnV0emVyIHp1IG1hbmlwdWxpZXJlbi4='>
+                <source>Versuch, einen nicht erreichbaren Benutzer zu manipulieren.</source>
+                <target>Versuch, einen nicht erreichbaren Benutzer zu manipulieren.</target>
+            </trans-unit>
+            <trans-unit id='VmVyc3VjaHQsIGVpbmVuIEJlbnV0emVyIHp1IG1hbmlwdWxpZXJlbiwgZGVyIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuIGthbm4u'>
+                <source>Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.</source>
+                <target>Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.</target>
+            </trans-unit>
+            <trans-unit id='RWluIFdlY2hzZWwgZGVzIFNwcmFjaGRpZW5zdGxlaXN0ZXJzIGlzdCBuaWNodCB6dWzDpHNzaWcu'>
+                <source>Ein Wechsel des Sprachdienstleisters ist nicht zulässig.</source>
+                <target>Ein Wechsel des Sprachdienstleisters ist nicht zulässig.</target>
+            </trans-unit>
+            <trans-unit id='U3ByYWNoZGllbnN0bGVpc3RlciBpc3QgZWluIFBmbGljaHRmZWxkIGbDvHIgZGllIFJvbGxlIGRlcyBKb2Jrb29yZGluYXRvcnMu'>
+                <source>Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.</source>
+                <target>Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.</target>
+            </trans-unit>
+            <trans-unit id='dXNlci51cGRhdGUucm9sZXMudW5hYmxlLXRvLWFzc2lnbi1qb2ItY29vcmRpbmF0b3Itcm9sZS10by1leGlzdGluZy11c2Vy'>
+                <source>user.update.roles.unable-to-assign-job-coordinator-role-to-existing-user</source>
+                <target>Die Rolle "Koordinator" kann nur bei der Erstellung eines Benutzers oder für die Koordinatorengruppe Benutzer festgelegt werden.</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3ItZ3JvdXAtbm90LWZvdW5k'>
+                <source>coordinator-group-not-found</source>
+                <target>Der referenzierte Koordinatorengruppe existiert nicht (mehr).</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBCZW51dHplciwgZGllIG5pY2h0IGRpZSBSb2xsZSBkZXMgSm9ia29vcmRpbmF0b3JzIGhhYmVuLCB3aXJkIGRlciBTcHJhY2hkaWVuc3RsZWlzdGVyIGF1dG9tYXRpc2NoIGVpbmdlc3RlbGx0Lg=='>
+                <source>Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.</source>
+                <target>Language Service Provider is set automaticaly for non Job Coordinator role users.</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jb25maXJtRGVsZXRlVGV4dA=='>
+                <source>coordinatorGroup.confirmDeleteText</source>
+                <target>Möchten Sie die Koordinatorengruppe "{0}"" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.<br /> Bitte beachten Sie, dass mit dem Löschen der Koordinatorengruppe auch alle Untergruppen mit ihren Koordinatoren und Benutzern mit den ihnen zugewiesenen Aufgaben gelöscht werden.</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5lbnRlckNvb3JkaW5hdG9yR3JvdXBOYW1l'>
+                <source>coordinatorGroup.enterCoordinatorGroupName</source>
+                <target>Bitte geben Sie den Namen der Koordinatorengruppe in das untenstehende Textfeld ein, um fortzufahren.</target>
+            </trans-unit>
+            <trans-unit id='RmFsc2NoZXIgTmFtZQ=='>
+                <source>Falscher Name</source>
+                <target>Falscher Name</target>
+            </trans-unit>
+            <trans-unit id='RGVyIHswfSB3dXJkZSBlcmZvbGdyZWljaCBnZWzDtnNjaHQu'>
+                <source>Der {0} wurde erfolgreich gelöscht.</source>
+                <target>Der {0} wurde erfolgreich gelöscht.</target>
+            </trans-unit>
+            <trans-unit id='S3VuZGUgbmljaHQgYW5nZWdlYmVu'>
+                <source>Kunde nicht angegeben</source>
+                <target>Kunde nicht angegeben</target>
+            </trans-unit>
             <trans-unit id='YXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='>
                 <source>automatisch abgeschlossen</source>
                 <target>automatisch abgeschlossen</target>
+            </trans-unit>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVu'>
+                <source>Zugewiesene Kunden</source>
+                <target>Zugewiesene Kunden</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jb25maXJtVW5hc3NpZ25DdXN0b21lcg=='>
+                <source>coordinatorGroup.confirmUnassignCustomer</source>
+                <target>Sind Sie sicher, dass Sie die Zuordnung von Kunde {0} zu Koordinatorengruppe {1} aufheben wollen? Dadurch werden auch alle Kunden-Gruppe bezogenen Jobs gelöscht in der gesamten Lieferkette (Sub-Gruppen etc.).</target>
+            </trans-unit>
+            <trans-unit id='VW5nw7xsdGlnZXIgSm9iIEtvb3JkaW5hdG9y'>
+                <source>Ungültiger Job Koordinator</source>
+                <target>Ungültiger Job Koordinator</target>
+            </trans-unit>
+            <trans-unit id='VW5nw7xsdGlnZXIgV2VydCBiZXJlaXRnZXN0ZWxsdA=='>
+                <source>Ungültiger Wert bereitgestellt</source>
+                <target>Ungültiger Wert bereitgestellt</target>
+            </trans-unit>
+            <trans-unit id='TnVyIEtvb3JkaW5hdG9yIGthbm4gZGVtIEF1ZnRyYWcgZGVyIEdydXBwZSBLb29yZGluYXRvciB6dWdld2llc2VuIHdlcmRlbg=='>
+                <source>Nur Koordinator kann dem Auftrag der Gruppe Koordinator zugewiesen werden</source>
+                <target>Nur Koordinator kann dem Auftrag der Gruppe Koordinator zugewiesen werden</target>
+            </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gZsO8ciBkaWVzZW4gQmVudXR6ZXIga2VpbmUge3JvbGV9IGZlc3RsZWdlbi4='>
+                <source>Sie können für diesen Benutzer keine {role} festlegen.</source>
+                <target>Sie können für diesen Benutzer keine {role} festlegen.</target>
+            </trans-unit>
+            <trans-unit id='RGllIEtvb3JkaW5hdG9yZW5yb2xsZSBrYW5uIGRlbSBCZW51dHplciBuaWNodCBlbnR6b2dlbiB3ZXJkZW46IHtyZWFzb259'>
+                <source>Die Koordinatorenrolle kann dem Benutzer nicht entzogen werden: {reason}</source>
+                <target>Die Koordinatorenrolle kann dem Benutzer nicht entzogen werden: {reason}</target>
+            </trans-unit>
+            <trans-unit id='dXNlci5kZWxldGUubGFzdC1jb29yZGluYXRvci1vZi1ncm91cA=='>
+                <source>user.delete.last-coordinator-of-group</source>
+                <target>Benutzer ist letzter Job-Koordinator des Koordinatorengruppe</target>
+            </trans-unit>
+            <trans-unit id='dXNlci5kZWxldGUuY29vcmRpbmF0b3ItaGFzLWFzc2lnbmVkLWdyb3VwLWpvYnM='>
+                <source>user.delete.coordinator-has-assigned-group-jobs</source>
+                <target>Der Benutzer ist Koordinator für einige Aufgabe der Koordinatorengruppee.</target>
+            </trans-unit>
+            <trans-unit id='dXNlci5jdXN0b21lci51bi1hc3NpZ24ubm90LXBvc3NpYmxlLWFzLWNvb3JkaW5hdG9yLWhhcy1yZWxhdGVkLWNvb3JkaW5hdG9yLWdyb3VwLWpvYnM='>
+                <source>user.customer.un-assign.not-possible-as-coordinator-has-related-coordinator-group-jobs</source>
+                <target>Der Kunde "{customer}" kann nicht aus dem Koordinator entfernt werden, da er einige Aufgabe der Koordinatorengruppee hat, die zu diesem Kunden gehören.</target>
+            </trans-unit>
+            <trans-unit id='dXNlci5jdXN0b21lci51bi1hc3NpZ24ubm90LXBvc3NpYmxlLWFzLWl0LWhhcy1yZWxhdGVkLWpvYnM='>
+                <source>user.customer.un-assign.not-possible-as-it-has-related-jobs</source>
+                <target>Der Kunde "{customer}" kann nicht aus dem Benutzer entfernt werden, da er einige Aufträge hat, die zu diesem Kunden gehören.</target>
+            </trans-unit>
+            <trans-unit id='bm90LWNvb3JkaW5hdG9yLWdyb3VwLWN1c3RvbWVyLXRhc2s='>
+                <source>not-coordinator-group-customer-task</source>
+                <target>Aufgabe gehört nicht zu einem Kunden der Koordinatorengruppe</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3ItZG9udC1iZWxvbmctdG8tY29vcmRpbmF0b3ItZ3JvdXA='>
+                <source>coordinator-dont-belong-to-coordinator-group</source>
+                <target>Koordinator gehört nicht zur Gruppe der Koordinatoren</target>
+            </trans-unit>
+            <trans-unit id='am9iLWFzc2lnbm1lbnQuY3JlYXRlLmdyb3VwLXVzZXItam9iLWNhbi1ub3QtYmUtY3JlYXRlZC1iZWZvcmUtY29vcmRpbmF0b3ItZ3JvdXAtam9i'>
+                <source>job-assignment.create.group-user-job-can-not-be-created-before-coordinator-group-job</source>
+                <target>Der Benutzer der Koordinatorengruppe kann nicht einem Auftrag zugewiesen werden, bevor der Auftrag der Koordinatorengruppe erstellt wurde</target>
+            </trans-unit>
+            <trans-unit id='am9iLWFzc2lnbm1lbnQuY3JlYXRlLnBhcmVudC1jb29yZGluYXRvci1ncm91cC1kb2VzLW5vdC1oYXZlLWFwcHJvcHJpYXRlLWpvYg=='>
+                <source>job-assignment.create.parent-coordinator-group-does-not-have-appropriate-job</source>
+                <target>Die Gruppe der Elternkoordinatoren hat keine angemessene Aufgabenverteilung</target>
+            </trans-unit>
+            <trans-unit id='am9iLWFzc2lnbm1lbnQudHJhY2stY2hhbmdlcy1yaWdodHMtYXJlLW5vdC1zdWJzZXQtb2YtY29vcmRpbmF0b3ItZ3JvdXAtam9i'>
+                <source>job-assignment.track-changes-rights-are-not-subset-of-coordinator-group-job</source>
+                <target>Die Berechtigungen des Benutzerauftrags der Koordinatorengruppe sollten eine Teilmenge der Berechtigungen des Auftrags der Koordinatorengruppe sein.</target>
+            </trans-unit>
+            <trans-unit id="dXNlckpvYi5kZWxldGUuY29uZmlybURlbGV0ZUNvb3JkaW5hdG9yR3JvdXBKb2I=">
+                <source>userJob.delete.confirmDeleteCoordinatorGroupJob</source>
+                <target>Soll dieser Eintrag wirklich gelöscht werden? Bei diesem Eintrag handelt es sich um einen Auftrag der Koordinatorengruppe. Durch das Löschen dieses Eintrags werden alle Aufträge der Untergruppen sowie die damit verbundenen Aufträge der Benutzer der Koordinatorengruppe gelöscht.</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQuZGVsZXRlLnRoZXJlLWlzLXVuLWRlbGV0YWJsZS1ib3VuZC1qb2I=">
+                <source>job-assignment.delete.there-is-un-deletable-bound-job</source>
+                <target>Der Auftrag der Koordinatorengruppe hat verwandte Aufträge, die nicht gelöscht werden können.</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQuY3JlYXRlLm9ubHktY29vcmRpbmF0b3ItY2FuLWJlLWFzc2lnbmVkLXRvLWNvb3JkaW5hdG9yLWdyb3VwLWpvYg==">
+                <source>job-assignment.create.only-coordinator-can-be-assigned-to-coordinator-group-job</source>
+                <target>Nur Koordinator kann dem Job der Gruppe Koordinator zugewiesen werden</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQudXBkYXRlLmFzc2lnbmVkLXVzZXItY2FuLWJlLWNoYW5nZWQtb25seS1mb3ItY29vcmRpbmF0b3ItZ3JvdXAtam9i">
+                <source>job-assignment.update.assigned-user-can-be-changed-only-for-coordinator-group-job</source>
+                <target>Der zugewiesene Benutzer kann nur für den Auftrag der Koordinatorengruppe geändert werden.</target>
+            </trans-unit>
+            <trans-unit id="RWluZSDDhG5kZXJ1bmcgZGVzIEF1ZmdhYmVuLVdvcmtmbG93cyBmw7xocnQgenVyIEzDtnNjaHVuZyBhbGxlciBBdWZ0cmFnc3p1d2Vpc3VuZ2VuLiBNw7ZjaHRlbiBTaWUgZm9ydGZhaHJlbj8=">
+                <source>Eine Änderung des Aufgaben-Workflows führt zur Löschung aller Auftragszuweisungen. Möchten Sie fortfahren?</source>
+                <target>Change of task workflow will result in deletion of all job assignments. Would you like to continue?</target>
+            </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRpZSDDhG5kZXJ1bmcgZGVzIFdvcmtmbG93cw=='>
+                <source>Bestätigen Sie die Änderung des Workflows</source>
+                <target>Bestätigen Sie die Änderung des Workflows</target>
+            </trans-unit>
+            <trans-unit id='RXMgZ2lidCBiZXJlaXRzIGVpbmUgYmVzdMOkdGlndGUga29ua3VycmllcmVuZGUgQXVmdHJhZ3N2ZXJnYWJl'>
+                <source>Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe</source>
+                <target>Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3ItaGFzLW5vdC15ZXQtY29uZmlybWVkLXRoZS1jb29yZGluYXRvci1ncm91cC1qb2I='>
+                <source>coordinator-has-not-yet-confirmed-the-coordinator-group-job</source>
+                <target>Der Koordinator hat den LSP-Auftrag noch nicht bestätigt</target>
+            </trans-unit>
+            <trans-unit id='SWhyZSBadXdlaXN1bmcgenVyIEF1ZmdhYmUgd3VyZGUgZW50ZmVybnQsIGRhaGVyIGvDtm5uZW4gU2llIGRpZXNlIG5pY2h0IG1laHIgenVyIEJlYXJiZWl0dW5nIMO2ZmZuZW4u'>
+                <source>Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.</source>
+                <target>Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.</target>
             </trans-unit>
             <trans-unit id='VmVyd2VuZGJhciBmw7xyIEt1bmRlbg=='>
                 <source>Verwendbar für Kunden</source>
@@ -10022,6 +10194,26 @@ etc.
                 <source>Es wurde keine Eigenschaft angegeben</source>
                 <target>Es wurde keine Eigenschaft angegeben</target>
             </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3Itb2YtcGFyZW50LWdyb3VwLWhhcy1ub3QteWV0LWNvbmZpcm1lZC10aGUtY29vcmRpbmF0b3ItZ3JvdXAtam9i'>
+                <source>coordinator-of-parent-group-has-not-yet-confirmed-the-coordinator-group-job</source>
+                <target>Der Koordinator der übergeordneten Koordinatorengruppe hat die Stelle der Koordinatorengruppe noch nicht bestätigt</target>
+            </trans-unit>
+            <trans-unit id='RGllIGFuZGVyZW4gQmVudXR6ZXIga8O2bm5lbiBuaWNodCBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQgd2VyZGVuLCBldmVudHVlbGwgd2FyIGVpbiBhbmRlcmVyIEJlbnV0emVyIHNjaG5lbGxlciB1bmQgaGF0IFNpZSBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQu'>
+                <source>Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.</source>
+                <target>Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZGEgZXIgSm9iLUtvb3JkaW5hdG9yIHZvbiBlaW5pZ2VuIFN0YW5kYXJkIExTUC1BdWZ0csOkZ2VuIGlzdC4='>
+                <source>user.delete.coordinator-has-assigned-default-group-jobs</source>
+                <target>Der Benutzer kann nicht gelöscht werden, da er Job-Koordinator von einigen Standard LSP-Aufträgen ist.</target>
+            </trans-unit>
+            <trans-unit id='dXNlci5kZWxldGUuY29vcmRpbmF0b3ItaGFzLWFzc2lnbmVkLWRlZmF1bHQtZ3JvdXAtam9icw=='>
+                <source>user.delete.coordinator-has-assigned-default-group-jobs</source>
+                <target>Der Benutzer ist Job-Koordinator für einige Standard Aufgaben der Koordinatorengruppe.</target>
+            </trans-unit>
+            <trans-unit id='S3VuZGUgaXN0IG5pY2h0IG1pdCBkZXIgQmVudXR6ZXJncnVwcGUgS29vcmRpbmF0b3IgdmVyYnVuZGVu'>
+                <source>Kunde ist nicht mit der Benutzergruppe Koordinator verbunden</source>
+                <target>Kunde ist nicht mit der Benutzergruppe Koordinator verbunden</target>
+            </trans-unit>
             <trans-unit id='QWt0aXZlIEZpbHRlciBzcGVpY2hlcm4='>
                 <source>Aktive Filter speichern</source>
                 <target>Aktive Filter speichern</target>
@@ -10049,6 +10241,75 @@ etc.
             <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
                 <source>language_resource.status.converting</source>
                 <target>Konvertierung läuft</target>
+            </trans-unit>
+            <trans-unit id='am9iLWFzc2lnbm1lbnQuY3JlYXRlLmNvb3JkaW5hdG9yLWdyb3VwLWpvYi1hbHJlYWR5LWV4aXN0cw=='>
+                <source>job-assignment.create.coordinator-group-job-already-exists</source>
+                <target>Die Stelle für die aktuelle Koordinatorengruppe und den Workflow-Schritt existiert bereits.</target>
+            </trans-unit>
+            <trans-unit id='WnVyIEtvb3JkaW5hdG9yZW5ncnVwcGVuLcOcYmVyc2ljaHQgd2VjaHNlbG4='>
+                <source>Zur Koordinatorengruppen-Übersicht wechseln</source>
+                <target>Zur Koordinatorengruppen-Übersicht wechseln</target>
+            </trans-unit>
+            <trans-unit id='TmV1ZSBLb29yZGluYXRvcmVuZ3J1cHBlIGhpbnp1ZsO8Z2Vu'>
+                <source>Neue Koordinatorengruppe hinzufügen</source>
+                <target>Neue Koordinatorengruppe hinzufügen</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5lZGl0LmluZm9ib3g='>
+                <source>coordinatorGroup.edit.infobox</source>
+                <target>
+Eine Koordinatorengruppe ist eine Organistaionseinheit in translate5, bestehend aus mind. einem Jobkoordinator, dem Workflowschritte zugewiesen werden können, und ggf. vom Jobkoordinator angelegten Editoren, denen der Jobkoordinator wiederum seine Jobs weitervergeben kann.<br />
+Eine Koordinatorengruppe kann z. B. Ihr externer Sprachdienstleister sein, der Jobkoordinator ist dann Ihr zugehöriger Projektmanager.<br />
+Eine Koordinatorengruppe könnte auch eine Auslandsvertretung Ihrer Organisation sein, die Reviews für Sie ausführt und diese selbst koordinieren soll.<br />
+<br />
+Legen Sie hier eine neue Gruppe an, anschließend können Sie in der Benutzerübersicht den zur Gruppe gehörende Jobkoordinator anlegen.
+                </target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5lZGl0Lm5hbWUudG9vbHRpcA=='>
+                <source>coordinatorGroup.edit.name.tooltip</source>
+                <target>Geben Sie einen Namen für Ihre Koordinatorengruppe ein. Die zugehörigen Jobkoordinatoren können diesen Namen sehen.</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5lZGl0LmRlc2NyaXB0aW9uLnRvb2x0aXA='>
+                <source>coordinatorGroup.edit.description.tooltip</source>
+                <target>Geben Sie eine Beschreibung für Ihre Koordinatorengruppe ein. Die zugehörigen Jobkoordinatoren können diese Beschreibung sehen.</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5pY29uVG9vbHRpcHMuZWRpdA=='>
+                <source>coordinatorGroup.iconTooltips.edit</source>
+                <target>Koordinatorengruppe bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5pY29uVG9vbHRpcHMuZGVsZXRl'>
+                <source>coordinatorGroup.iconTooltips.delete</source>
+                <target>Koordinatorengruppe löschen</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5pY29uVG9vbHRpcHMuYXNzaWduQ2xpZW50'>
+                <source>coordinatorGroup.iconTooltips.assignClient</source>
+                <target>Kunde zuweisen</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMudGl0bGU='>
+                <source>coordinatorGroup.customers.title</source>
+                <target>Gruppen - Kunden Zuweisung</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMuaW5mb2JveA=='>
+                <source>coordinatorGroup.customers.infobox</source>
+                <target>
+Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die entsprechende Koordinatorengruppe und das Projekt demselben Kunden angehören, daher weisen Sie hier die benötigten Kunden zu.<br/>
+<b>Wenn Sie die Zuordnung eines Kunden zu einer Koordinatorengruppe aufheben, werden alle zugehörigen Jobs gelöscht.</b>
+</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMuaWNvblRvb2x0aXBzLmRlbGV0ZQ=='>
+                <source>coordinatorGroup.customers.iconTooltips.delete</source>
+                <target>Kundenzuweisung aufheben</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMuYXNzaWduQnV0dG9u'>
+                <source>coordinatorGroup.customers.assignButton</source>
+                <target>Kunde zuweisen</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMudW5hc3NpZ25DdXN0b21lcldpbmRvdy5idXR0b25zLnllcw=='>
+                <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.yes</source>
+                <target>Kundenzuweisung entfernen und alle zugehörigen Jobs löschen</target>
+            </trans-unit>
+            <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMudW5hc3NpZ25DdXN0b21lcldpbmRvdy5idXR0b25zLm5v'>
+                <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
+                <target>Abbrechen</target>
             </trans-unit>
         </body>
     </file>

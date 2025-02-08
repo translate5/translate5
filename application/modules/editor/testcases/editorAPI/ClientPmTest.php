@@ -65,21 +65,21 @@ class ClientPmTest extends ImportTestAbstract
 
         // the pm should see both tasks
         static::api()->login(TestUser::TestManager->value);
-        $tasks = static::api()->getJson('editor/task');
+        $tasks = static::api()->getJson('editor/task?limit=' . (self::$numTasksBefore + 10));
 
         // take number of tasks at the beginning into account
         static::assertCount(2 + self::$numTasksBefore, $tasks);
 
         // ... while the clientpm only can see the one bound to him
         static::api()->login(TestUser::TestClientPm->value);
-        $tasks = static::api()->getJson('editor/task');
+        $tasks = static::api()->getJson('editor/task?limit=' . (self::$numTasksBefore + 10));
         static::assertCount(1, $tasks); // sees only one
         static::assertEquals('2', $tasks[0]->foreignId); // identify the one by foreign-id
 
         // the clientpm must not see tasks he is not entitled for (being the first imported task)
         $result = static::api()->getJson('editor/task/' . $task0->getId(), [], null, true);
         static::assertEquals(403, $result->status);
-        static::assertStringContainsString('not accessible due to the users client-restriction', $result->error);
+        static::assertStringContainsString('No access granted!', $result->error);
     }
 
     /**
@@ -137,7 +137,7 @@ class ClientPmTest extends ImportTestAbstract
             'id' => static::$newUserId,
         ], true);
         static::assertEquals(403, $result->status);
-        static::assertStringContainsString('not allowed due to client-restriction', $result->error);
+        static::assertStringContainsString('No access granted!', $result->error);
 
         // login as pm
         static::api()->login(TestUser::TestManager->value);
@@ -154,7 +154,7 @@ class ClientPmTest extends ImportTestAbstract
         static::api()->login(TestUser::TestClientPm->value);
         $result = static::api()->getJson('editor/user/' . static::$newUserId, [], null, true);
         static::assertEquals(403, $result->status);
-        static::assertStringContainsString('not accessible due to the users client-restriction', $result->error);
+        static::assertStringContainsString('No access granted!', $result->error);
     }
 
     /**

@@ -32,6 +32,7 @@ use MittagQI\Translate5\LanguageResource\Db\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Operation\DeleteTaskTmOperation;
+use MittagQI\Translate5\Task\JobsPurger;
 
 /**
  * Task Remover - on task deletion several things should happen, this is all encapsulated in this class
@@ -44,6 +45,8 @@ final class editor_Models_Task_Remover
 
     private DeleteTaskTmOperation $deleteTaskTmOperation;
 
+    private readonly JobsPurger $jobsPurger;
+
     /**
      * Sets the task to be removed from system
      */
@@ -52,6 +55,7 @@ final class editor_Models_Task_Remover
         $this->task = $task;
         $this->eventManager = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
         $this->deleteTaskTmOperation = DeleteTaskTmOperation::create();
+        $this->jobsPurger = JobsPurger::create();
     }
 
     /**
@@ -104,6 +108,7 @@ final class editor_Models_Task_Remover
             $this->removeDataDirectory();
         }
         $this->removeRelatedDbData();
+        $this->jobsPurger->purgeTaskJobs($this->task->getTaskGuid());
         $this->task->delete();
 
         // give plugins a chance to clean up task data

@@ -104,7 +104,7 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         //finally set the trigger to edited and call the job changed handler
         $actionConfig->trigger = self::HANDLE_JOB_EDITED;
         $this->handleUserAssociationChanged();
-        $actionConfig->workflow->getStepRecalculation()->recalculateWorkflowStep($actionConfig->newTua);
+        $actionConfig->workflow->getStepRecalculation()->recalculateWorkflowStep($actionConfig->newTua->getTaskGuid());
 
         return $actionConfig->trigger;
     }
@@ -147,7 +147,6 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
             return $prefix . 'Confirm';
         }
 
-        $result = null;
         switch ($newState) {
             case $workflow::STATE_OPEN:
                 $result = $prefix . 'Open';
@@ -174,6 +173,27 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         }
 
         return $result;
+    }
+
+    protected function doOpen()
+    {
+        if (editor_Workflow_Default::STATE_UNCONFIRMED !== $this->config->oldTua->getState()) {
+            return;
+        }
+
+        if (editor_Workflow_Default::STATE_OPEN !== $this->config->newTua->getState()) {
+            return;
+        }
+
+        $task = $this->config->task;
+
+        if (null === $task) {
+            $task = new editor_Models_Task();
+            $task->loadByTaskGuid($this->config->newTua->getTaskGuid());
+        }
+
+        $task->setState(editor_Models_Task::STATE_OPEN);
+        $task->save();
     }
 
     /**
@@ -236,9 +256,9 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
 
     /**
      * Calculates the workflow step confirmation status
-     * Warning: this function may only be called in doConfirm (which is called if there was a state unconfirmed which is now set to edit)
-     *  For all other usages the calculation will not be correct, since we don't know if a state was unconfirmed before,
-     *  we see only that all states are now not unconfirmed.
+     * Warning: this function may only be called in doConfirm (which is called if there was a state unconfirmed which
+     * is now set to edit) For all other usages the calculation will not be correct, since we don't know if a state was
+     * unconfirmed before, we see only that all states are now not unconfirmed.
      */
     protected function calculateConfirm()
     {

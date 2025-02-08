@@ -47,6 +47,9 @@ class SynchronisationService implements SynchronisationInterface
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
         return new self(new TermCollectionRepository());

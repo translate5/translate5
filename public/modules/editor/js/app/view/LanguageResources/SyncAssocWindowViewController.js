@@ -101,12 +101,14 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
         let tipBody = '';
 
         for (let lrName in additionalInfo) {
-            tipBody += lrName + '</br>';
+            tipBody += Ext.String.htmlEncode(lrName) + '</br>';
 
             const rows = additionalInfo[lrName].map(row =>
                 '<tr>' +
                 row.map(value =>
-                    '<td style="border: 1px solid #ccc; padding: 5px;">' + Ext.String.htmlEncode(value) + '</td>'
+                    '<td style="border: 1px solid #ccc; padding: 5px;">'
+                    + Ext.String.htmlEncode(value)
+                    + '</td>'
                 ).join('') +
                 '</tr>'
             );

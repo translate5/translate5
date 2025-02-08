@@ -111,7 +111,8 @@ Ext.application({
         'admin.task.Config',
         'admin.UserAssocDefault',
         'admin.WizardTasks',
-        'admin.task.CustomField'
+        'admin.task.CustomField',
+        'admin.CoordinatorGroupStore',
     ],
     requires: [
         'Editor.view.ViewPort',

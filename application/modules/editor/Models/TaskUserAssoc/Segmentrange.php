@@ -41,7 +41,7 @@ class editor_Models_TaskUserAssoc_Segmentrange
      * - remove whitespace
      * - replace ";" with ","
      */
-    private static function prepare(string $segmentRanges): string
+    public static function prepare(string $segmentRanges): string
     {
         // Example for "1-3;5, 8-9 ":
         // return "1-3,5,8-9"
@@ -54,7 +54,7 @@ class editor_Models_TaskUserAssoc_Segmentrange
     /**
      * Returns the segmentGroups separated according to the prepared $segmentRanges.
      */
-    private static function getAllSegmentGroups(string $segmentRanges): array
+    public static function getAllSegmentGroups(string $segmentRanges): array
     {
         // With the prepared $segmentRanges, the segmentGroups are seperated with ",".
         return explode(",", $segmentRanges);
@@ -133,6 +133,8 @@ class editor_Models_TaskUserAssoc_Segmentrange
     /**
      * Return an array with the numbers of the segments that are set in the given
      * array of tua-rows.
+     *
+     * @return int[]
      */
     public static function getSegmentNumbersFromRows(array $tuaRows): array
     {

@@ -134,6 +134,11 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_queued_export' => false,
         'LEK_cross_language_resource_synchronization_connection_customer' => false,
         'LEK_task_tm_task_association' => false,
+        'LEK_coordinator_group' => false,
+        'LEK_coordinator_group_customer' => false,
+        'LEK_coordinator_group_job' => false,
+        'LEK_coordinator_group_user' => false,
+        'LEK_default_coordinator_group_job' => false,
     ];
 
     /**

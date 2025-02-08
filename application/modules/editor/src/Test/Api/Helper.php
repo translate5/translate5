@@ -535,13 +535,12 @@ final class Helper extends ZfExtended_Test_ApiHelper
         );
         $p = [
             "id" => 0,
-            "taskGuid" => $taskGuid,
             "userGuid" => self::getUsersGuid()[$username],
             "state" => $state,
             "workflowStepName" => $step,
         ];
         $p = array_merge($p, $params);
-        $json = $this->postJson('editor/taskuserassoc', $p);
+        $json = $this->postJson(sprintf('editor/task/%s/job', urlencode($taskGuid)), $p);
         $this->assertResponseStatus($this->getLastResponse(), 'User');
 
         return $json;

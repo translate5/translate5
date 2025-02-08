@@ -28,7 +28,7 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\TaskLockService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -73,7 +73,7 @@ class TaskUnlockCommand extends TaskInfoCommand
 
         $this->writeTask($task);
 
-        Lock::taskUnlock($task);
+        TaskLockService::create()->unlockTask($task);
         // force state to open (recover error state!)
         $task->setState($task::STATE_OPEN);
         $task->save();

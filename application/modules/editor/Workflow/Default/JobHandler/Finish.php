@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Workflow\NextStepCalculator;
+
 /**
  * different hooks for the different finish cases, is called by JobHandler::onFinish
  * WARNING TODO the handlers are named OfARole but basically they are triggered OfAWorkflowStep
@@ -43,6 +45,15 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
     public const HANDLE_JOB_ALLFINISHOFAROLE = 'handleAllFinishOfARole';
 
     public const HANDLE_TASK_SETNEXTSTEP = 'handleSetNextStep';
+
+    private readonly NextStepCalculator $nextStepCalculator;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->nextStepCalculator = NextStepCalculator::create();
+    }
 
     public function execute(editor_Workflow_Actions_Config $actionConfig): ?string
     {
@@ -68,7 +79,8 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
     }
 
     /**
-     * trigger finish calculation after deleting a job (since the task may get finished after deleting the last opened job when all others are already finished)
+     * trigger finish calculation after deleting a job (since the task may get finished after deleting the last opened
+     * job when all others are already finished)
      */
     public function executeOnDeleteJob(editor_Workflow_Actions_Config $actionConfig): ?string
     {
@@ -149,7 +161,11 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
         $oldStep = $task->getWorkflowStepName();
 
         //this remains as default behaviour
-        $nextStep = $this->config->workflow->getNextStep($task, $newTua->getWorkflowStepName());
+        $nextStep = $this->nextStepCalculator->getNextStep(
+            $this->config->workflow,
+            $task->getTaskGuid(),
+            $newTua->getWorkflowStepName()
+        );
         $this->doDebug($this->config->trigger . " Next Step: " . $nextStep . ' to role ' . $newTua->getRole() . ' with step ' . $nextStep . "; Old Step in Task: " . $oldStep);
         if (! empty($nextStep)) {
             //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!

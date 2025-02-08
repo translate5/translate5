@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -41,78 +40,93 @@ Ext.define('Editor.view.ViewPort', {
         'Editor.view.admin.customer.Panel',
         'Editor.view.LanguageResources.TmOverviewPanel',
         'Editor.view.admin.preferences.OverviewPanel',
-        'Editor.view.project.ProjectPanel'
+        'Editor.view.project.ProjectPanel',
+        'Editor.view.admin.coordinatorGroup.Panel',
     ],
     viewModel: {
-        type: 'viewport'
+        type: 'viewport',
     },
     layout: 'border',
-    initComponent: function() {
+    initComponent: function () {
         var me = this,
             user = Editor.app.authenticatedUser,
             mainSections = [],
-            items = [{
-                xtype: 'headPanel',
-                region: 'north'
-            },{
-                region: 'center',
-                xtype: 'tabpanel',
-                itemId: 'adminMainSection',
-                bodyStyle: 'border: 0',
-                /**
-                 * returns the configured default route of the active tab (if any configured)
-                 * @returns {string}
-                 */
-                getActiveTabDefaultRoute: function() {
-                    var tab = this.getActiveTab(),
-                        ctrl = tab.getController(),
-                        conf = ctrl && ctrl.defaultConfig;
-                    if(conf && conf.routes) {
-                        return Object.keys(conf.routes)[0];
-                    }
-                    return '';
+            items = [
+                {
+                    xtype: 'headPanel',
+                    region: 'north'
                 },
-                //ui: 'navigation', → eigene UI benötigt eigenes CSS! Im Beispiel ist das ja SCSS was noch gerendert werden müsste!
-                tabBar: {
-                    // turn off borders for classic theme.  neptune and crisp don't need this
-                    // because they are borderless by default
-                    border: false,
-                    layout: {
-                        overflowHandler: 'menu'
-                    }
-                },
+                {
+                    region: 'center',
+                    xtype: 'tabpanel',
+                    itemId: 'adminMainSection',
+                    bodyStyle: 'border: 0',
+                    /**
+                     * returns the configured default route of the active tab (if any configured)
+                     * @returns {string}
+                     */
+                    getActiveTabDefaultRoute: function () {
+                        var tab = this.getActiveTab(),
+                            ctrl = tab.getController(),
+                            conf = ctrl && ctrl.defaultConfig;
 
-                defaults: {
-                    iconAlign: 'left',
+                        if (conf && conf.routes) {
+                            return Object.keys(conf.routes)[0];
+                        }
+
+                        return '';
+                    },
+                    //ui: 'navigation', → eigene UI benötigt eigenes CSS! Im Beispiel ist das ja SCSS was noch gerendert werden müsste!
+                    tabBar: {
+                        // turn off borders for classic theme.  neptune and crisp don't need this
+                        // because they are borderless by default
+                        border: false,
+                        layout: {
+                            overflowHandler: 'menu'
+                        }
+                    },
+
+                    defaults: {
+                        iconAlign: 'left',
+                    },
+
+                    layout: {
+                        type: 'fit'
+                    },
+                    items: mainSections
                 },
-                
-                layout: {
-                    type: 'fit'
-                },
-                items: mainSections
-            }];
-        
-        if(user.isAllowed('editorProjectTask')) {
-            mainSections.push({xtype: 'projectPanel'});
+            ];
+
+        if (user.isAllowed('editorProjectTask')) {
+            mainSections.push({ xtype: 'projectPanel' });
         }
-        if(user.isAllowed('taskOverviewFrontendController')) {
-            mainSections.push({xtype: 'adminTaskGrid'});
+
+        if (user.isAllowed('taskOverviewFrontendController')) {
+            mainSections.push({ xtype: 'adminTaskGrid' });
         }
-        if(user.isAllowed('languageResourcesOverview')) {
-            mainSections.push({xtype: 'tmOverviewPanel'});
+
+        if (user.isAllowed('languageResourcesOverview')) {
+            mainSections.push({ xtype: 'tmOverviewPanel' });
         }
-        if(user.isAllowed('userAdministration')) {
-            mainSections.push({xtype: 'adminUserGrid'});
+
+        if (user.isAllowed('userAdministration')) {
+            mainSections.push({ xtype: 'adminUserGrid' });
         }
-        if(user.isAllowed('customerAdministration')) {
-            mainSections.push({xtype: 'customerPanel'});
+
+        if (user.isAllowed('customerAdministration')) {
+            mainSections.push({ xtype: 'customerPanel' });
         }
+
+        if (user.isAllowed('coordinatorGroupAdministration')) {
+            mainSections.push({ xtype: 'coordinatorGroupPanel' });
+        }
+
         //the preferences panel is responsible for itself if it is visible or not!
-        mainSections.push({xtype: 'preferencesOverviewPanel'});
+        mainSections.push({ xtype: 'preferencesOverviewPanel' });
 
         Ext.applyIf(me, {
-            items: items
+            items: items,
         });
         me.callParent(arguments);
-    }
-  });
+    },
+});
