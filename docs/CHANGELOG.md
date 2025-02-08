@@ -32,6 +32,21 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.20.0] - 2025-02-08
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3676](https://jira.translate5.net/browse/TRANSLATE-3676): service provider, User Management, Workflows - Introduce service providers and job coordinators** <br>
+Introduce Coordinator Groups.
+Route `/editor/taskuserassoc` deprecated, use `/editor/task/:taskId/job` instead
+Route `/editor/taskuserassoc/project` deprecated, use `editor/project/:projectId/jobs/:workflow` instead
+Route `/editor/userassocdefault` deprecated, use `editor/customer/:customerId/workflow/:workflow/default-job` instead
+
+
 ## [7.19.0] - 2025-02-07
 
 ### Important Notes:
