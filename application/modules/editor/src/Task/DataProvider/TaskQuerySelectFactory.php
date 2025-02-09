@@ -47,16 +47,6 @@ use ZfExtended_Models_Filter;
 
 class TaskQuerySelectFactory
 {
-    private const DO_DEBUG = false;
-
-    public function __construct(
-        private readonly Zend_Db_Adapter_Abstract $db,
-        private readonly ZfExtended_Acl $acl,
-        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
-        private readonly editor_Task_Type $taskType,
-    ) {
-    }
-
     /**
      * @codeCoverageIgnore
      */
@@ -70,13 +60,24 @@ class TaskQuerySelectFactory
         );
     }
 
+    private bool $doDebug = true;
+
+    public function __construct(
+        private readonly Zend_Db_Adapter_Abstract $db,
+        private readonly ZfExtended_Acl $acl,
+        private readonly CoordinatorGroupUserRepositoryInterface $coordinatorGroupUserRepository,
+        private readonly editor_Task_Type $taskType,
+    ) {
+    }
+
     public function createTotalTaskCountSelect(
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        $select = $this->getBaseTaskSelect($viewer, $filter, 'COUNT(distinct(' . TaskDb::TABLE_NAME . '.id)) as count', false);
+        $cols = 'COUNT(distinct(' . TaskDb::TABLE_NAME . '.id)) as count';
+        $select = $this->getBaseTaskSelect($viewer, $filter, $cols, false);
 
-        if (self::DO_DEBUG) {
+        if ($this->doDebug) {
             error_log("TASK QUERY SELECT createTotalTaskCountSelect:\n ---\n" . $select->assemble() . "\n\n");
         }
 
@@ -94,7 +95,7 @@ class TaskQuerySelectFactory
         if (0 !== $offset || 0 !== $limit) {
             $select->limit($limit, $offset);
         }
-        if (self::DO_DEBUG) {
+        if ($this->doDebug) {
             error_log("TASK QUERY SELECT createTaskSelect:\n ---\n" . $select->assemble() . "\n\n");
         }
 
@@ -105,10 +106,10 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        $select = $this->getBaseProjectSelect($viewer, $filter, 'project.id');
-        $select->group('project.id');
+        $select = $this->getBaseProjectSelect($viewer, $filter, TaskDb::TABLE_NAME . '.id');
+        $select->group(TaskDb::TABLE_NAME . '.id');
 
-        if (self::DO_DEBUG) {
+        if ($this->doDebug) {
             error_log("TASK QUERY SELECT createProjectIdsSelect:\n ---\n" . $select->assemble() . "\n\n");
         }
 
@@ -119,9 +120,10 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        $select = $this->getBaseProjectSelect($viewer, $filter, 'COUNT(distinct(project.id)) as count', false);
+        $cols = 'COUNT(distinct(' . TaskDb::TABLE_NAME . '.id)) as count';
+        $select = $this->getBaseProjectSelect($viewer, $filter, $cols, false);
 
-        if (self::DO_DEBUG) {
+        if ($this->doDebug) {
             error_log("TASK QUERY SELECT createTotalProjectCountSelect:\n ---\n" . $select->assemble() . "\n\n");
         }
 
@@ -139,7 +141,7 @@ class TaskQuerySelectFactory
         if (0 !== $offset || 0 !== $limit) {
             $select->limit($limit, $offset);
         }
-        if (self::DO_DEBUG) {
+        if ($this->doDebug) {
             error_log("TASK QUERY SELECT createProjectSelect:\n ---\n" . $select->assemble() . "\n\n");
         }
 
@@ -163,7 +165,7 @@ class TaskQuerySelectFactory
         ;
 
         if ($this->hasRestrictedAccess($viewer)) {
-            $this->restrictSelect($select, $viewer);
+            $this->restrictSelect($select, $viewer, $filter);
         }
 
         if (null !== $filter) {
@@ -179,25 +181,14 @@ class TaskQuerySelectFactory
         array|string $columns = '*',
         bool $applySort = true,
     ): Zend_Db_Select {
-        $filter->setDefaultTable('project');
         $select = $this->db
             ->select()
-            ->from(
-                [
-                    'project' => TaskDb::TABLE_NAME,
-                ],
-                $columns
-            )
-            ->join(
-                TaskDb::TABLE_NAME,
-                TaskDb::TABLE_NAME . '.projectId = project.id',
-                []
-            )
-            ->where('project.taskType in (?)', $this->taskType->getProjectTypes())
+            ->from(TaskDb::TABLE_NAME, $columns)
+            ->where(TaskDb::TABLE_NAME . '.taskType in (?)', $this->taskType->getProjectTypes())
         ;
 
         if ($this->hasRestrictedAccess($viewer)) {
-            $this->restrictSelect($select, $viewer);
+            $this->restrictSelect($select, $viewer, $filter);
         }
 
         if (null !== $filter) {
@@ -207,80 +198,103 @@ class TaskQuerySelectFactory
         return $select;
     }
 
-    private function restrictSelect(Zend_Db_Select $select, User $viewer): void
+    private function restrictSelect(Zend_Db_Select $select, User $viewer, ?ZfExtended_Models_Filter $filter): void
     {
         if ($viewer->isClientPm()) {
             $where = [];
             $where[] = $this->db->quoteInto(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid());
             $where[] = $this->db->quoteInto(TaskDb::TABLE_NAME . '.pmGuid = ?', $viewer->getUserGuid());
             $where[] = $this->db->quoteInto(TaskDb::TABLE_NAME . '.customerId in (?)', $viewer->getCustomersArray());
-            $select
-                ->joinLeft(
-                    UserJobDb::TABLE_NAME,
-                    UserJobDb::TABLE_NAME . '.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
-                    []
-                )
-                ->where(implode(' OR ', $where))
-            ;
+            $this->joinWithFilter(
+                $select,
+                $filter,
+                TaskDb::TABLE_NAME,
+                'taskGuid',
+                UserJobDb::TABLE_NAME,
+                'taskGuid',
+                [],
+                Zend_Db_Select::LEFT_JOIN
+            );
+            $select->where(implode(' OR ', $where));
 
             return;
         }
 
-        if ($viewer->isPmLight()) {
+        $groupUser = $viewer->isPmLight() ? null : $this->coordinatorGroupUserRepository->findByUser($viewer);
+
+        if (null === $groupUser) {
             $where = [];
             $where[] = $this->db->quoteInto(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid());
             $where[] = $this->db->quoteInto(TaskDb::TABLE_NAME . '.pmGuid = ?', $viewer->getUserGuid());
-            $select
-                ->joinLeft(
-                    UserJobDb::TABLE_NAME,
-                    UserJobDb::TABLE_NAME . '.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
-                    []
-                )
-                ->where(implode(' OR ', $where))
-            ;
+            $this->joinWithFilter(
+                $select,
+                $filter,
+                TaskDb::TABLE_NAME,
+                'taskGuid',
+                UserJobDb::TABLE_NAME,
+                'taskGuid',
+                [],
+                Zend_Db_Select::LEFT_JOIN
+            );
+            $select->where(implode(' OR ', $where));
 
             return;
         }
 
-        $groupUser = $this->coordinatorGroupUserRepository->findByUser($viewer);
-
-        if (null === $groupUser) {
-            $select
-                ->joinLeft(
-                    UserJobDb::TABLE_NAME,
-                    UserJobDb::TABLE_NAME . '.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
-                    []
-                )
-                ->where(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid())
-                ->orWhere(TaskDb::TABLE_NAME . '.pmGuid = ?', $viewer->getUserGuid())
-            ;
-
-            return;
-        }
-
-        $select
-            ->join(
-                [
-                    'groupJob' => CoordinatorGroupJobTable::TABLE_NAME,
-                ],
-                'groupJob.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
-                []
-            )
-            ->where('groupJob.groupId = ?', $groupUser->group->getId())
-        ;
+        $this->joinWithFilter(
+            $select,
+            $filter,
+            TaskDb::TABLE_NAME,
+            'taskGuid',
+            CoordinatorGroupJobTable::TABLE_NAME,
+            'taskGuid'
+        );
+        $select->where(CoordinatorGroupJobTable::TABLE_NAME . '.groupId = ?', $groupUser->group->getId());
 
         if ($viewer->isCoordinator()) {
             return;
         }
 
-        $select
-            ->join(
-                UserJobDb::TABLE_NAME,
-                UserJobDb::TABLE_NAME . '.taskGuid = ' . TaskDb::TABLE_NAME . '.taskGuid',
-                []
-            )
-            ->where(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid())
-        ;
+        $this->joinWithFilter(
+            $select,
+            $filter,
+            TaskDb::TABLE_NAME,
+            'taskGuid',
+            UserJobDb::TABLE_NAME,
+            'taskGuid'
+        );
+        $select->where(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid());
+    }
+
+    /**
+     * This function is a very hacky solution, that inner joins encapsulated in the $filter
+     * interfere with joins in the $select (that weill be merged llater on)
+     * We solve it by adding the join to the filter instead to the select if the filter exists
+     * and has the table in question joined already
+     * TODO FIXME: Extend the filter-classes so we can build the select purely out of filters ...
+     */
+    private function joinWithFilter(
+        Zend_Db_Select $select,
+        ?ZfExtended_Models_Filter $filter,
+        string $table,
+        string $tableCol,
+        string $joinedTable,
+        string $joinedTableCol,
+        array $columns = [],
+        string $joinType = Zend_Db_Select::INNER_JOIN
+    ): void {
+        if (empty($filter) || ! $filter->hasJoinedTable($joinedTable)) {
+            $condition = $joinedTable . '.' . $joinedTableCol . ' = ' . $table . '.' . $tableCol;
+            if ($joinType === Zend_Db_Select::LEFT_JOIN) {
+                $select->joinLeft($joinedTable, $condition, $columns);
+            } elseif ($joinType === Zend_Db_Select::RIGHT_JOIN) {
+                $select->joinRight($joinedTable, $condition, $columns);
+            } else {
+                $select->joinInner($joinedTable, $condition, $columns);
+            }
+        } else {
+            $filter->addJoinedTable($joinedTable, $tableCol, $joinedTableCol, $columns);
+        }
     }
 
     private function hasRestrictedAccess(User $viewer): bool
