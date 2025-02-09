@@ -47,6 +47,8 @@ use ZfExtended_Models_Filter;
 
 class TaskQuerySelectFactory
 {
+    private const DO_DEBUG = false;
+
     public function __construct(
         private readonly Zend_Db_Adapter_Abstract $db,
         private readonly ZfExtended_Acl $acl,
@@ -72,7 +74,13 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        return $this->getBaseTaskSelect($viewer, $filter, 'COUNT(distinct(' . TaskDb::TABLE_NAME . '.id)) as count', false);
+        $select = $this->getBaseTaskSelect($viewer, $filter, 'COUNT(distinct(' . TaskDb::TABLE_NAME . '.id)) as count', false);
+
+        if (self::DO_DEBUG) {
+            error_log("TASK QUERY SELECT createTotalTaskCountSelect:\n ---\n" . $select->assemble() . "\n\n");
+        }
+
+        return $select;
     }
 
     public function createTaskSelect(
@@ -86,6 +94,9 @@ class TaskQuerySelectFactory
         if (0 !== $offset || 0 !== $limit) {
             $select->limit($limit, $offset);
         }
+        if (self::DO_DEBUG) {
+            error_log("TASK QUERY SELECT createTaskSelect:\n ---\n" . $select->assemble() . "\n\n");
+        }
 
         return $select;
     }
@@ -97,6 +108,10 @@ class TaskQuerySelectFactory
         $select = $this->getBaseProjectSelect($viewer, $filter, 'project.id');
         $select->group('project.id');
 
+        if (self::DO_DEBUG) {
+            error_log("TASK QUERY SELECT createProjectIdsSelect:\n ---\n" . $select->assemble() . "\n\n");
+        }
+
         return $select;
     }
 
@@ -104,7 +119,13 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        return $this->getBaseProjectSelect($viewer, $filter, 'COUNT(distinct(project.id)) as count', false);
+        $select = $this->getBaseProjectSelect($viewer, $filter, 'COUNT(distinct(project.id)) as count', false);
+
+        if (self::DO_DEBUG) {
+            error_log("TASK QUERY SELECT createTotalProjectCountSelect:\n ---\n" . $select->assemble() . "\n\n");
+        }
+
+        return $select;
     }
 
     public function createProjectSelect(
@@ -117,6 +138,9 @@ class TaskQuerySelectFactory
 
         if (0 !== $offset || 0 !== $limit) {
             $select->limit($limit, $offset);
+        }
+        if (self::DO_DEBUG) {
+            error_log("TASK QUERY SELECT createProjectSelect:\n ---\n" . $select->assemble() . "\n\n");
         }
 
         return $select;
