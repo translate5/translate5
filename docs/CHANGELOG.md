@@ -33,6 +33,21 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.20.1] - 2025-02-10
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4447](https://jira.translate5.net/browse/TRANSLATE-4447): Main back-end mechanisms (Worker, Logging, etc.) - Clean up error message handling** <br>
+Critical server errors won't produce errors in the UI anymore but are shown now. Getting such errors on application load redirects to the status page after some seconds if configured.
+
+**[TRANSLATE-4446](https://jira.translate5.net/browse/TRANSLATE-4446): Task Management - JobCoordinator Task Overview SQL faulty** <br>
+FIX: JobCoordinator Task Overview SQL faulty
+
+
 ## [7.20.0] - 2025-02-08
 
 ### Important Notes:
