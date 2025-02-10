@@ -105,10 +105,10 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
 
         /** @deprecated App logic should not tolerate requests without customer in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'userassocdefault')) {
-            Zend_Registry::get('logger')->warn(
-                'E1681',
-                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
-            );
+//            Zend_Registry::get('logger')->warn(
+//                'E1681',
+//                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
+//            );
 
             $rows = $this->defaultUserJobViewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
 
@@ -159,10 +159,10 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without customer in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'userassocdefault')) {
-            Zend_Registry::get('logger')->warn(
-                'E1681',
-                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
-            );
+//            Zend_Registry::get('logger')->warn(
+//                'E1681',
+//                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
+//            );
         }
 
         try {
@@ -191,10 +191,10 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without customer in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'userassocdefault')) {
-            Zend_Registry::get('logger')->warn(
-                'E1681',
-                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
-            );
+//            Zend_Registry::get('logger')->warn(
+//                'E1681',
+//                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
+//            );
         }
 
         $job = $this->defaultUserJobRepository->get((int) $this->getRequest()->getParam('id'));
@@ -227,10 +227,10 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without customer in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'userassocdefault')) {
-            Zend_Registry::get('logger')->warn(
-                'E1681',
-                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
-            );
+//            Zend_Registry::get('logger')->warn(
+//                'E1681',
+//                'Route /editor/userassocdefault deprecated, use editor/customers/:customerId/workflow/:workflow/default-job instead',
+//            );
         }
 
         $job = $this->defaultUserJobRepository->find((int) $this->getRequest()->getParam('id'));

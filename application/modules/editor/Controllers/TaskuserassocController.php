@@ -117,10 +117,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (! $this->getRequest()->getParam('taskId')) {
-            Zend_Registry::get('logger')->warn(
-                'E1680',
-                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
-            );
+//            Zend_Registry::get('logger')->warn(
+//                'E1680',
+//                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
+//            );
 
             $rows = $this->userJobViewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
 
@@ -144,10 +144,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
-            Zend_Registry::get('logger')->warn(
-                'E1680',
-                'Route /editor/taskuserassoc/project deprecated, use editor/project/:projectId/jobs/:workflow instead',
-            );
+//            Zend_Registry::get('logger')->warn(
+//                'E1680',
+//                'Route /editor/taskuserassoc/project deprecated, use editor/project/:projectId/jobs/:workflow instead',
+//            );
         }
 
         $projectId = $this->getParam('projectId');
@@ -236,10 +236,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
-            Zend_Registry::get('logger')->warn(
-                'E1680',
-                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead'
-            );
+//            Zend_Registry::get('logger')->warn(
+//                'E1680',
+//                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead'
+//            );
         }
 
         try {
@@ -264,10 +264,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
-            Zend_Registry::get('logger')->warn(
-                'E1680',
-                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
-            );
+//            Zend_Registry::get('logger')->warn(
+//                'E1680',
+//                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
+//            );
         }
 
         try {
@@ -291,10 +291,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
-            Zend_Registry::get('logger')->warn(
-                'E1680',
-                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
-            );
+//            Zend_Registry::get('logger')->warn(
+//                'E1680',
+//                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
+//            );
         }
 
         $workflowManager = new editor_Workflow_Manager();
