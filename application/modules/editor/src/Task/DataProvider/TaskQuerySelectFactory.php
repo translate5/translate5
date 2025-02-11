@@ -61,7 +61,7 @@ class TaskQuerySelectFactory
         );
     }
 
-    private bool $doDebug = true;
+    private bool $doDebug = false;
 
     public function __construct(
         private readonly Zend_Db_Adapter_Abstract $db,
