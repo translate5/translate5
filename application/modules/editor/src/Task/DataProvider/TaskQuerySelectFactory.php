@@ -107,8 +107,7 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        $select = $this->getBaseProjectSelect($viewer, $filter, 'project.id');
-        $select->group('project.id');
+        $select = $this->getBaseProjectSelect($viewer, $filter, TaskDb::TABLE_NAME . '.id');
 
         if ($this->doDebug) {
             error_log("TASK QUERY SELECT createProjectIdsSelect:\n ---\n" . $select->assemble() . "\n\n");
@@ -121,7 +120,7 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        $cols = 'COUNT(distinct(project.id)) as count';
+        $cols = 'COUNT(distinct(' . TaskDb::TABLE_NAME . '.id)) as count';
         $select = $this->getBaseProjectSelect($viewer, $filter, $cols, false);
 
         if ($this->doDebug) {
@@ -180,21 +179,13 @@ class TaskQuerySelectFactory
         array|string $columns = '*',
         bool $applySort = true,
     ): Zend_Db_Select {
-        $filter?->setDefaultTable('project');
         $select = $this->db
             ->select()
             ->from(
-                [
-                    'project' => TaskDb::TABLE_NAME,
-                ],
+                TaskDb::TABLE_NAME,
                 $columns
             )
-            ->join(
-                TaskDb::TABLE_NAME,
-                TaskDb::TABLE_NAME . '.projectId = project.id',
-                []
-            )
-            ->where('project.taskType in (?)', $this->taskType->getProjectTypes())
+            ->where(TaskDb::TABLE_NAME . '.taskType in (?)', $this->taskType->getProjectTypes())
         ;
 
         if ($this->hasRestrictedAccess($viewer)) {
