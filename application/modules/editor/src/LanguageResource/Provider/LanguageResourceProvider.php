@@ -5,6 +5,7 @@ namespace MittagQI\Translate5\LanguageResource\Provider;
 use editor_Services_Manager;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use ZfExtended_Models_Filter;
 
 class LanguageResourceProvider
 {
@@ -28,22 +29,16 @@ class LanguageResourceProvider
      * @throws \ZfExtended_Exception
      * @throws \ReflectionException
      */
-    public function getAssocTasksWithResources(string $taskGuid): array
+    public function getAssocTasksWithResources(string $taskGuid, ?ZfExtended_Models_Filter $filter = null): array
     {
         $taskAssoc = new TaskAssociation();
 
-        $resources = [];
+        if (null !== $filter) {
+            $taskAssoc->filterAndSort($filter);
+        }
 
-        $getResource = function (string $serviceType, string $id) use ($resources) {
-            if (! empty($resources[$id])) {
-                return $resources[$id];
-            }
-            $tmpResource = $this->serviceManager->getResourceById($serviceType, $id);
-            if ($tmpResource === null) {
-                return null;
-            }
-
-            return $tmpResource;
+        $getResource = function (string $serviceType, string $id) {
+            return $this->serviceManager->getResourceById($serviceType, $id);
         };
 
         /**
@@ -54,7 +49,11 @@ class LanguageResourceProvider
         $available = [];
 
         foreach ($result as $languageResource) {
-            $resource = $getResource($languageResource['serviceType'], $languageResource['resourceId']);
+            $resource = $this->serviceManager->getResourceById(
+                $languageResource['serviceType'],
+                $languageResource['resourceId']
+            );
+
             if (! empty($resource)) {
                 $languageResource = array_merge($languageResource, $resource->getMetaData());
                 $languageResource['serviceName'] = $this->serviceManager->getUiNameByType($languageResource['serviceType']);

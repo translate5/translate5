@@ -260,7 +260,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
 
         $segmentHash = md5(print_r($segments, 1)); //hash to identify the given segments (for internal caching)
 
-        $nextStep = (string) $this->nextStepCalculator->getNextStep($workflow, $task, $currentStep);
+        $nextStep = (string) $this->nextStepCalculator->getNextStep($workflow, $task->getTaskGuid(), $currentStep);
         $nextRole = $workflow->getRoleOfStep($nextStep);
 
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');

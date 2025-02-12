@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,14 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* @var $this Zend_View */
-$config = Zend_Registry::get('config');
-?>
-  <h2><?php echo $this->translate->_('Anwendungsfehler'); ?></h2>
-  <p><?php echo $this->translate->_('Wir bitten um Entschuldigung für die aufgetretene Störung!'); ?></p>
-  <p><?php echo $this->translate->_('Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.'); ?></p>
-<?php
-if (! headers_sent() && getenv('T5_REDIRECT_ON_ERROR')) {
-    echo '<p><b>You will be redirected automatically to our status page.</b></p>';
-    header('Refresh: 5; url=' . getenv('T5_REDIRECT_ON_ERROR'));
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Task\DataProvider;
+
+class JoinCondition
+{
+    public function __construct(
+        public readonly string $table,
+        public readonly string $localKey,
+        public readonly string $foreignTable,
+        public readonly string $foreignKey,
+        public readonly string $operator = '=',
+    ) {
+    }
+
+    public function __toString(): string
+    {
+        return "{$this->table}.{$this->localKey} {$this->operator} {$this->foreignTable}.{$this->foreignKey}";
+    }
 }

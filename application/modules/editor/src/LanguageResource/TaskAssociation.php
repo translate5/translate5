@@ -117,10 +117,10 @@ class TaskAssociation extends AssociationAbstract
 
         if ($task->isProject()) {
             //get all project tasks and get the resources for each task
-            $projectGuids = array_column($task->loadProjectTasks((int) $task->getProjectId(), true), 'taskGuid');
+            $taskGuids = array_column($task->loadProjectTasks((int) $task->getProjectId(), true), 'taskGuid');
             $result = [];
-            foreach ($projectGuids as $pg) {
-                $result = array_merge($result, $this->loadByAssociatedTaskAndLanguage($pg));
+            foreach ($taskGuids as $tg) {
+                $result = array_merge($result, $this->loadByAssociatedTaskAndLanguage($tg));
             }
 
             return array_filter(array_values($result));
@@ -187,22 +187,25 @@ class TaskAssociation extends AssociationAbstract
         }
 
         $on = $adapter->quoteInto('ta.languageResourceId = languageResource.id AND ta.taskGuid = ?', $taskGuid);
+        //must be a left join since we want ALL LangRes with same language pair and client as the given task
+        // and not just the ones associated with the task. If someone wants only the associated ones, the taskGuid
+        // must be given as filter!
         $s->joinLeft([
             "ta" => "LEK_languageresources_taskassoc",
         ], $on, $checkColumns);
 
-        // By default, we filter out all project TMs that are not associated to the task
+        $s->joinLeft(
+            [
+                'ttm' => 'LEK_task_tm_task_association',
+            ],
+            'languageResource.id = ttm.languageResourceId',
+            'IF(ISNULL(ttm.id), 0, 1) AS isTaskTm'
+        );
         if (
             ! $this->filter?->hasFilter('isTaskTm')
+            // By default, we filter out all project TMs that are not associated to the task
             || (false === (bool) $this->filter->getFilter('isTaskTm')->value)
         ) {
-            $s->joinLeft(
-                [
-                    'ttm' => 'LEK_task_tm_task_association',
-                ],
-                'languageResource.id = ttm.languageResourceId',
-                'IF(ISNULL(ttm.id), 0, 1) AS isTaskTm'
-            );
             $s->where('ISNULL(ttm.id) OR ta.id IS NOT NULL');
         }
         $this->filter?->deleteFilter('isTaskTm');

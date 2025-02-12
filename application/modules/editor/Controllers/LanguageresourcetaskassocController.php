@@ -78,7 +78,7 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
             return;
         }
 
-        $result = LanguageResourceProvider::create()->getAssocTasksWithResources($taskGuid->value);
+        $result = LanguageResourceProvider::create()->getAssocTasksWithResources($taskGuid->value, $filter);
 
         $this->view->rows = $result;
         $this->view->total = count($result);
