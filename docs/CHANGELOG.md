@@ -9,36 +9,7 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## [7.20.1] - 2025-02-10
-
-### Important Notes:
- 
-
 
 ### Bugfixes
 **[TRANSLATE-4447](https://jira.translate5.net/browse/TRANSLATE-4447): Main back-end mechanisms (Worker, Logging, etc.) - Clean up error message handling** <br>
@@ -49,10 +20,6 @@ FIX: JobCoordinator Task Overview SQL faulty
 
 
 ## [7.20.0] - 2025-02-08
-
-### Important Notes:
- 
-
 
 ### Added
 **[TRANSLATE-3676](https://jira.translate5.net/browse/TRANSLATE-3676): service provider, User Management, Workflows - Introduce service providers and job coordinators** <br>
@@ -67,7 +34,6 @@ Route `/editor/userassocdefault` deprecated, use `editor/customer/:customerId/wo
 ### Important Notes:
 #### [TRANSLATE-4093](https://jira.translate5.net/browse/TRANSLATE-4093)
 For the OKAPI 1.47 compatibility, all File-Format Settings will be migrated to this version. They cannot be used for older OKAPI-Versions afterwards; The Older Versions are only still in the system to support the export of existing tasks. Older OKAPI versions can only be used for Import with a pre-1.47 BCONFs in the import ZIP. For this Feature to be installed, an OKAPI 1.47 docker container must be running and the endpoint must be configured as service in the installation with the server-key "okapi-longhorn-147". If it is nt present, the update-script will stop and generate an error.
- 
 
 
 ### Added
@@ -117,20 +83,12 @@ Solved in the frame of job coordinator feature
 
 ## [7.18.1] - 2025-01-28
 
-### Important Notes:
- 
-
-
 ### Changed
 **[TRANSLATE-4415](https://jira.translate5.net/browse/TRANSLATE-4415): Authentication - fixes for Plugin PlunetConnector** <br>
 Plugin PlunetConnector: Login does not work for users with existing (old) App token
 
 
 ## [7.18.0] - 2025-01-27
-
-### Important Notes:
- 
-
 
 ### Added
 **[TRANSLATE-4404](https://jira.translate5.net/browse/TRANSLATE-4404): Task Management - translate5 Plunet Connector** <br>
@@ -169,10 +127,6 @@ Fix for a problem where tag check will complain about duplicate tags in segment 
 
 ## [7.17.1] - 2025-01-24
 
-### Important Notes:
- 
-
-
 ### Changed
 **[TRANSLATE-4407](https://jira.translate5.net/browse/TRANSLATE-4407): TrackChanges - Update text differ** <br>
 Update text differ package
@@ -188,6 +142,9 @@ IMPROVEMENT Visual: Fix several smaller quirks in the reflow-detection
 
 
 ### Bugfixes
+**[TRANSLATE-4394](https://jira.translate5.net/browse/TRANSLATE-4394): Content Protection - Fix TM Conversion** <br>
+Fix html entities preserving on content protection; Suppress warnings for t5memory specific tags; Tune up TM conversion process
+
 **[TRANSLATE-4396](https://jira.translate5.net/browse/TRANSLATE-4396): LanguageResources - Language resource import status check problem** <br>
 FIXED: un-triggered import status check for added languageresources
 
@@ -217,10 +174,6 @@ FIXED: error popping on loading 2nd page of TMMaintenance search results
 
 
 ## [7.17.0] - 2025-01-17
-
-### Important Notes:
- 
-
 
 ### Added
 **[TRANSLATE-3952](https://jira.translate5.net/browse/TRANSLATE-3952): Import/Export - Use resname from xliff and if not set segment id from xliff in task as context for t5memory** <br>
@@ -266,10 +219,6 @@ Fixed custom fields handling on metadata export
 
 
 ## [7.15.3] - 2025-01-14
-
-### Important Notes:
- 
-
 
 ### Changed
 **[TRANSLATE-4368](https://jira.translate5.net/browse/TRANSLATE-4368): t5memory - Create a command for manual fixing t5memory issues** <br>
