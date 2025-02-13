@@ -956,6 +956,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
         //down here the result contained an error, the json was invalid or HTTP Status was not 20X
 
+        // FIXME this is currently not true, because t5memory returns 404 only in case memory does not exist
+        // FIXME If it is not loaded, but exists on the disk the status will be 'available' - MITTAGQI-338
         //Warning: this evaluates to "available" in the GUI, see the following explanation:
         //a 404 response from the status call means:
         // - OpenTM2 is online

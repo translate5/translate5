@@ -36,7 +36,7 @@ use ZfExtended_Factory;
 /**
  * Base class for pause workers
  */
-abstract class PauseWorker extends editor_Models_Task_AbstractWorker
+abstract class AbstractPauseWorker extends editor_Models_Task_AbstractWorker
 {
     public const PROCESSOR = 'processor';
 

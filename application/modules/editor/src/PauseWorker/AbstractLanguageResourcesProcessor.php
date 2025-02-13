@@ -33,7 +33,6 @@ namespace MittagQI\Translate5\PauseWorker;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use editor_Services_Manager as Manager;
-use editor_Services_OpenTM2_Connector as OpenTm2Connector;
 use Exception;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use Throwable;
@@ -48,7 +47,7 @@ abstract class AbstractLanguageResourcesProcessor
         $this->manager = ZfExtended_Factory::get(Manager::class);
     }
 
-    protected function areStillImporting(Task $task, int ...$languageResourceIds): bool
+    protected function shouldWaitByStatus(Task $task, int ...$languageResourceIds): bool
     {
         foreach ($languageResourceIds as $languageResourceId) {
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
@@ -63,7 +62,6 @@ abstract class AbstractLanguageResourcesProcessor
             $resource = $this->manager->getResource($languageResource);
 
             try {
-                /** @var OpenTm2Connector $connector */
                 $connector = $this->manager->getConnector(
                     $languageResource,
                     (int) $task->getSourceLang(),
@@ -71,15 +69,27 @@ abstract class AbstractLanguageResourcesProcessor
                     $task->getConfig(),
                     (int) $task->getCustomerId(),
                 );
+                $status = $connector->getStatus($resource, $languageResource);
 
-                if (LanguageResourceStatus::IMPORT === $connector->getStatus($resource, $languageResource)) {
+                if (in_array($status, $this->getStatusesRequireWaiting(), true)) {
                     return true;
                 }
-            } catch (Exception $exception) {
+            } catch (Exception) {
                 // Do nothing here to make worker decide what to do with such language resource further
             }
         }
 
         return false;
+    }
+
+    private function getStatusesRequireWaiting(): array
+    {
+        return [
+            LanguageResourceStatus::IMPORT,
+            LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
+            LanguageResourceStatus::WAITING_FOR_LOADING,
+            LanguageResourceStatus::LOADING,
+            LanguageResourceStatus::CONVERTING,
+        ];
     }
 }

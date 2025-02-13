@@ -37,10 +37,10 @@ use MittagQI\Translate5\PauseWorker\AbstractLanguageResourcesProcessor;
 use MittagQI\Translate5\PauseWorker\PauseWorkerProcessorInterface;
 use Zend_Config;
 use Zend_Registry;
-use ZfExtended_Factory;
 
 /**
- * Processor that pauses the match analysis while t5memory (or opentm2) is importing a file
+ * Processor that pauses the match analysis while t5memory is doing a long running task which
+ * requires the match analysis to wait for some time until memories are available again
  */
 class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor implements PauseWorkerProcessorInterface
 {
@@ -56,13 +56,15 @@ class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor imp
     public function shouldWait(Task $task): bool
     {
         $languageResourceIds = array_column(
-            ZfExtended_Factory::get(LanguageResource::class)
-                ->loadByAssociatedTaskGuidListAndServiceTypes([$task->getTaskGuid()], [Manager::SERVICE_OPENTM2]),
+            (new LanguageResource())->loadByAssociatedTaskGuidListAndServiceTypes(
+                [$task->getTaskGuid()],
+                [Manager::SERVICE_OPENTM2]
+            ),
             'id'
         );
         $languageResourceIds = array_map('intval', $languageResourceIds);
 
-        return $this->areStillImporting($task, ...$languageResourceIds);
+        return $this->shouldWaitByStatus($task, ...$languageResourceIds);
     }
 
     public function getMaxWaitTimeSeconds(): int
@@ -72,7 +74,6 @@ class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor imp
 
     public function getSleepTimeSeconds(): int
     {
-        // TODO Config?
         return 5;
     }
 }

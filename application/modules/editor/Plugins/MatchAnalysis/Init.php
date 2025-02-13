@@ -30,7 +30,7 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
-use MittagQI\Translate5\PauseWorker\PauseWorker;
+use MittagQI\Translate5\PauseWorker\AbstractPauseWorker;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker;
@@ -637,7 +637,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
         $worker = ZfExtended_Factory::get(PauseMatchAnalysisWorker::class);
         $worker->init($task->getTaskGuid(), [
-            PauseWorker::PROCESSOR => PauseMatchAnalysisProcessor::class,
+            AbstractPauseWorker::PROCESSOR => PauseMatchAnalysisProcessor::class,
         ]);
         $worker->queue($parentWorkerId, $workerState);
 
