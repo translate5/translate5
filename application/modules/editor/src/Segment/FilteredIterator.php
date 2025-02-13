@@ -51,7 +51,6 @@ class FilteredIterator extends editor_Models_Segment_Iterator
         if (! is_null($this->segment)) {
             //segment is already set by constructor, just do additional things here
             $this->segment->filterAndSort($this->filter);
-            $this->segment->setEnableWatchlistJoin();
         }
     }
 }

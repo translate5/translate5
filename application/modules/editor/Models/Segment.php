@@ -26,12 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* * #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 use editor_Models_Segment_AutoStates as AutoStates;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 
@@ -134,9 +128,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public const EMPTY_STRING_HASH = 'd41d8cd98f00b204e9800998ecf8427e';
 
-    protected $dbInstanceClass = 'editor_Models_Db_Segments';
+    protected $dbInstanceClass = editor_Models_Db_Segments::class;
 
-    protected $validatorInstanceClass = 'editor_Models_Validator_Segment';
+    protected $validatorInstanceClass = editor_Models_Validator_Segment::class;
 
     /**
      * @var Zend_Config
@@ -169,12 +163,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @var boolean
      */
     protected $isDataModified = null;
-
-    /**
-     * enables / disables watchlist (enabling makes only sense if called from Rest indexAction)
-     * @var boolean
-     */
-    protected $watchlistFilterEnabled = false;
 
     protected editor_Models_Segment_UtilityBroker $utilityBroker;
 
@@ -223,7 +211,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected function getPixelLength(string $taskGuid)
     {
         if (! isset(self::$pixelLength) || self::$pixelLength->getTaskGuid() != $taskGuid) {
-            self::$pixelLength = ZfExtended_Factory::get('editor_Models_Segment_PixelLength', [$taskGuid]);
+            self::$pixelLength = ZfExtended_Factory::get(editor_Models_Segment_PixelLength::class, [$taskGuid]);
         }
 
         return self::$pixelLength;
@@ -238,8 +226,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function search(array $parameters)
     {
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
-        /* @var $mv editor_Models_Segment_MaterializedView */
+        $mv = ZfExtended_Factory::get(editor_Models_Segment_MaterializedView::class);
         $mv->setTaskGuid($parameters['taskGuid']);
         $viewName = $mv->getName();
 
@@ -351,8 +338,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected function initData($segmentId)
     {
         $this->segmentdata = [];
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
-        /* @var $db editor_Models_Db_SegmentData */
+        $db = ZfExtended_Factory::get(editor_Models_Db_SegmentData::class);
         $s = $db->select()->where('segmentId = ?', $segmentId);
         $datas = $db->fetchAll($s);
         foreach ($datas as $data) {
@@ -364,10 +350,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * sets segment attributes, filters the fluent fields and stores them separatly
+     * TODO FIXME: Why do we have return-values here ?
      * @param string $name
      * @param mixed $value
-     * (non-PHPdoc)
-     * @see ZfExtended_Models_Entity_Abstract::set()
      */
     public function set($name, $value)
     {
@@ -827,8 +812,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function getNewHistoryEntity()
     {
-        $history = ZfExtended_Factory::get('editor_Models_SegmentHistory');
-        /* @var $history editor_Models_SegmentHistory */
+        $history = ZfExtended_Factory::get(editor_Models_SegmentHistory::class);
         $history->setSegmentFieldManager($this->segmentFieldManager);
 
         $history->setSegmentId($this->getId());
@@ -878,8 +862,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function setFieldContents(editor_Models_SegmentFieldManager $sfm, array $segmentData)
     {
         $this->segmentFieldManager = $sfm;
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
-        /* @var $db editor_Models_Db_SegmentData */
+        $db = ZfExtended_Factory::get(editor_Models_Db_SegmentData::class);
         foreach ($segmentData as $name => $data) {
             $row = $db->createRow($data);
             /* @var $row editor_Models_Db_SegmentDataRow */
@@ -945,9 +928,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function addFieldContent(Zend_Db_Table_Row_Abstract $field, $fileId, $mid, array $data)
     {
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
-        /* @var $db editor_Models_Db_SegmentData */
-
+        $db = ZfExtended_Factory::get(editor_Models_Db_SegmentData::class);
         $taskGuid = $this->getTaskGuid();
         $segmentId = $this->getId();
 
@@ -984,8 +965,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     protected function createData($field)
     {
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
-        /* @var $db editor_Models_Db_SegmentData */
+        $db = ZfExtended_Factory::get(editor_Models_Db_SegmentData::class);
         $row = $db->createRow();
         /* @var $row editor_Models_Db_SegmentDataRow */
         $row->taskGuid = $this->get('taskGuid');
@@ -1050,15 +1030,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * merges the segment data into the result set
-     * (non-PHPdoc)
-     * @see ZfExtended_Models_Entity_Abstract::getDataObject()
      */
     public function getDataObject(): stdClass
     {
         $res = parent::getDataObject();
         $this->segmentFieldManager->mergeData($this->segmentdata, $res);
-        /** @var $segmentUserAssoc editor_Models_SegmentUserAssoc */
-        $segmentUserAssoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
+        $segmentUserAssoc = ZfExtended_Factory::get(editor_Models_SegmentUserAssoc::class);
 
         try {
             $assoc = $segmentUserAssoc->loadByParams($res->userGuid, $res->id);
@@ -1225,12 +1202,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * inits and returns the editor_Models_Segment_EditablesFinder
-     * @return editor_Models_Segment_EditablesFinder
      */
-    protected function initSegmentFinder()
+    protected function initSegmentFinder(): editor_Models_Segment_EditablesFinder
     {
         return ZfExtended_Factory::get(
-            'editor_Models_Segment_EditablesFinder',
+            editor_Models_Segment_EditablesFinder::class,
             [$this->reInitForEditablesFinder()]
         );
     }
@@ -1238,9 +1214,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     /**
      * returns the first and the last EDITABLE segment of the actual filtered request
      * @param string $workflowStep where the prev/next page segments are additionally compared to
-     * @return array
      */
-    public function findSurroundingEditables($next, string $workflowStep = '')
+    public function findSurroundingEditables($next, string $workflowStep = ''): ?int
     {
         return $this->initSegmentFinder()->find($next, $workflowStep);
     }
@@ -1283,7 +1258,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * recalculates the isRepeated flag for the given target hashes
-     * @return boolean
      */
     public function updateIsTargetRepeated(string $newHash, string $oldHash)
     {
@@ -1352,7 +1326,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     private function updateSegmentsRepetitionHash(string $taskGuid, string $type): void
     {
         $blockedStates = $this->db->getAdapter()->quote(
-            editor_Models_Segment_AutoStates::$blockedStates,
+            AutoStates::$blockedStates,
             Zend_Db::INT_TYPE
         );
 
@@ -1399,9 +1373,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $this->segmentFieldManager->initFields($taskGuid);
 
         $s = $this->db->select()->from($this->tableName);
-        $this->applyFilterAndSort($s); //respecting filters if set any
-        $s = $this->addWatchlistJoin($s, $this->tableName);
+
+        $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
+
+        $this->applyFilterAndSort($s); //respecting filters if set any
 
         // If only repetitions need to be fetched, make sure first occurrences
         // are excluded unless it's explicitly specified they should be kept
@@ -1418,7 +1394,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         if ($ignoreBlocked) {
             $s->where(
                 $this->tableName . '.autoStateId NOT IN(?)',
-                editor_Models_Segment_AutoStates::$blockedStates
+                AutoStates::$blockedStates
             );
         }
 
@@ -1562,9 +1538,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     {
         $s = $this->db->select();
 
-        if (! empty($this->filter)) {
-            $this->filter->applyToSelect($s, false);
-        }
         $name = $this->db->info(Zend_Db_Table_Abstract::NAME);
         $schema = $this->db->info(Zend_Db_Table_Abstract::SCHEMA);
         $s->from($name, [
@@ -1575,6 +1548,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         // but this is only possible AFTER the from() call so far!
         $s = $this->addWhereTaskGuid($s, $taskGuid);
         $s = $this->addWatchlistJoin($s);
+
+        if (! empty($this->filter)) {
+            $this->filter->applyToSelect($s, false);
+        }
 
         // If only repetitions need to be fetched, make sure first occurrences
         // are excluded unless it's explicitly specified they should be kept
@@ -1594,8 +1571,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     protected function addWhereTaskGuid(Zend_Db_Table_Select $s, $taskGuid)
     {
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', [$taskGuid]);
-        /* @var $mv editor_Models_Segment_MaterializedView */
+        $mv = ZfExtended_Factory::get(editor_Models_Segment_MaterializedView::class, [$taskGuid]);
 
         if ($this->tableName !== $mv->getName()) {
             $s->where($this->tableName . '.taskGuid = ?', $taskGuid);
@@ -1632,8 +1608,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $task->getTaskGuid());
 
-        $autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        /* @var $autoStates editor_Models_Segment_AutoStates */
+        $autoStates = ZfExtended_Factory::get(AutoStates::class);
         //get all required autostate ids
         $autoStates = $autoStates->getForWorkflowStepLoading(in_array($pmChanges, [self::PM_ALL_INCLUDED, self::PM_SAME_STEP_INCLUDED]));
 
@@ -1699,45 +1674,33 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function addWatchlistJoin(Zend_Db_Table_Select $s, $tableName = null)
     {
-        if (! $this->watchlistFilterEnabled) {
-            return $s;
+        // we only add the watchlist-join if we need one by filtering or sorting
+        if ($this->filterHasIsWatched()) {
+            if (empty($tableName)) {
+                $tableName = $this->tableName;
+            }
+            $db_join = ZfExtended_Factory::get(editor_Models_Db_SegmentUserAssoc::class);
+            $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
+            $this->filter->setDefaultTable($tableName);
+            $this->filter->addTableForField('isWatched', 'sua');
+            $on = 'sua.segmentId = ' . $tableName . '.id AND sua.userGuid = \'' . $userGuid . '\'';
+            $s->joinLeft([
+                'sua' => $db_join->info($db_join::NAME),
+            ], $on, ['isWatched', 'id AS segmentUserAssocId']);
+            $s->setIntegrityCheck(false);
         }
-        if (empty($tableName)) {
-            $tableName = $this->tableName;
-        }
-        $db_join = ZfExtended_Factory::get('editor_Models_Db_SegmentUserAssoc');
-        $userGuid = $_SESSION['user']['data']->userGuid;
-        $this->filter->setDefaultTable($tableName);
-        $this->filter->addTableForField('isWatched', 'sua');
-        $on = 'sua.segmentId = ' . $tableName . '.id AND sua.userGuid = \'' . $userGuid . '\'';
-        $s->joinLeft([
-            'sua' => $db_join->info($db_join::NAME),
-        ], $on, ['isWatched', 'id AS segmentUserAssocId']);
-        $s->setIntegrityCheck(false);
 
         return $s;
     }
 
     /**
-     * enables the watchlist filter join, for performance issues only if the user
-     *   really wants to see the watchlist (isWatched is in the filter list)
-     * @param bool $value optional, to force enable/disable watchlist
-     */
-    public function setEnableWatchlistJoin($value = null)
-    {
-        if (is_null($value)) {
-            $value = $this->filter->hasFilter('isWatched') || $this->filter->hasSort('isWatched');
-        }
-        $this->watchlistFilterEnabled = $value;
-    }
-
-    /**
-     * returns if the watchlist join should be enabled or not
+     * returns if the watchlist join needs to be added
      * @return boolean
      */
-    public function getEnableWatchlistJoin()
+    public function filterHasIsWatched(): bool
     {
-        return $this->watchlistFilterEnabled;
+        return $this->filter !== null &&
+            ($this->filter->hasFilter('isWatched') || $this->filter->hasSort('isWatched'));
     }
 
     /**
@@ -1798,7 +1761,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     {
         $infokey = Zend_Db_Table_Abstract::NAME;
         $segmentsTableName = $this->db->info($infokey);
-        $filesTableName = ZfExtended_Factory::get('editor_Models_Db_Files')->info($infokey);
+        $filesTableName = ZfExtended_Factory::get(editor_Models_Db_Files::class)->info($infokey);
         $sql = $this->_syncFilesortSql($segmentsTableName, $filesTableName);
         $this->db->getAdapter()->query($sql, [$taskguid]);
 
@@ -2057,7 +2020,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function meta()
     {
         if (empty($this->meta)) {
-            $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+            $this->meta = ZfExtended_Factory::get(editor_Models_Segment_Meta::class);
         } elseif ($this->getId() == $this->meta->getSegmentId()) {
             return $this->meta;
         }
@@ -2150,7 +2113,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $mv->setTaskGuid($taskGuid);
         $viewName = $mv->getName();
 
-        $blockedStates = $adapter->quote(editor_Models_Segment_AutoStates::$blockedStates, Zend_Db::INT_TYPE);
+        $blockedStates = $adapter->quote(AutoStates::$blockedStates, Zend_Db::INT_TYPE);
         $sql = 'SELECT v1.id,v1.sourceMd5 FROM ' . $viewName . ' v1, (
 	          SELECT sourceMd5, count(sourceMd5) cnt, autoStateId
                FROM ' . $viewName . '
