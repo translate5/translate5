@@ -472,11 +472,11 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => "string 1'234'567.89 string",
-            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal dot" source="1\'234\'567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMapV16w2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/> string',
+            'expected' => 'string <number type="float" name="default with &quot;&#039;&quot; thousand decimal dot" source="1\'234\'567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMapV16w2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/> string',
         ];
         yield [
             'string' => "string 1'234'567,89 string",
-            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal comma" source="1\'234\'567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMapV16w2rNUAcoyBTC0wrROToq2poRGjB9KnoqlZo6EDY4GomhhNTf1SAA=="/> string',
+            'expected' => 'string <number type="float" name="default with &quot;&#039;&quot; thousand decimal comma" source="1\'234\'567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMapV16w2rNUAcoyBTC0wrROToq2poRGjB9KnoqlZo6EDY4GomhhNTf1SAA=="/> string',
         ];
 
         yield [
@@ -485,7 +485,7 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => "string 1.234.567'89 string",
-            'expected' => 'string <number type="float" name="default with &quot;\'&quot; separator" source="1.234.567\'89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMaqN0dOsNqzVAPKMQWwtMEM9JkVbU0MjRg+kU0VTs0ZDB8YCUTUxmpr6pQA="/> string',
+            'expected' => 'string <number type="float" name="default with &quot;&#039;&quot; separator" source="1.234.567\'89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMaqN0dOsNqzVAPKMQWwtMEM9JkVbU0MjRg+kU0VTs0ZDB8YCUTUxmpr6pQA="/> string',
         ];
 
         yield [
@@ -722,6 +722,10 @@ class NumberProtectorTest extends TestCase
     public function trickyCasesProvider(): iterable
     {
         yield [
+            'string' => 'string 3 3 3 string',
+            'expected' => 'string <number type="integer" name="default simple" source="3" iso="3" target="3" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="3" iso="3" target="3" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="3" iso="3" target="3" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
+        ];
+        yield [
             'string' => 'string &lt;goba&gt; string',
             'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;" regex="04+xSc9PSoyx0wcA"/> string',
             'useForUnprotectTest' => false,
@@ -786,6 +790,14 @@ class NumberProtectorTest extends TestCase
         yield [
             'string' => 'string **12345678** string',
             'expected' => 'string **12345678** string',
+        ];
+        yield [
+            'string' => 'string 123456789 mm',
+            'expected' => 'string <number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> mm',
+        ];
+        yield [
+            'string' => "string 123456789 mm \r\n",
+            'expected' => "string <number type=\"integer\" name=\"default simple\" source=\"123456789\" iso=\"123456789\" target=\"123456789\" regex=\"09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA=\"/> mm \r\n",
         ];
     }
 

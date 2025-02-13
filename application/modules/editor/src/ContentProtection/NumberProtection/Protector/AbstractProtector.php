@@ -61,6 +61,8 @@ use MittagQI\Translate5\ContentProtection\NumberProtector;
 
 abstract class AbstractProtector implements NumberProtectorInterface
 {
+    public const HARD_RETURN_PLACEHOLDER = 'HARD_RETURN_PLACEHOLDER';
+
     public function __construct(
         protected ContentProtectionRepository $formatRepository,
     ) {
@@ -102,10 +104,12 @@ abstract class AbstractProtector implements NumberProtectorInterface
         ContentProtectionDto $protectionDto,
         editor_Models_Languages $targetLang,
     ): string {
+        $number = str_replace("\r\n", self::HARD_RETURN_PLACEHOLDER, $number);
+
         return sprintf(
             $this->tagFormat(),
             static::getType(),
-            htmlspecialchars($protectionDto->name),
+            htmlspecialchars($protectionDto->name, ENT_XML1),
             htmlspecialchars($number),
             htmlspecialchars($number),
             htmlspecialchars($number, ENT_XML1),
