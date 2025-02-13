@@ -191,7 +191,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
 
         root.expand();
         view.afterLoad();
-        view.setHidden(!root.firstChild.hasChildNodes());
+        view.setHidden(!root.firstChild || !root.firstChild.hasChildNodes());
         me.delayedChange = new Ext.util.DelayedTask(function(){
             me.delayedChange = null;
             // Here we check whether this.view is not null, as it might be already null when user exited the task

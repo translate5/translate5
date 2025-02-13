@@ -349,13 +349,20 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
                 responseText = response.responseText;
                 break;
         }
-        
+
         if (responseText != "") {
-            json = Ext.JSON.decode(response.responseText);
-            if(json.errorMessage){
-                targetMsg = json.errorMessage;
+            try {
+                json = Ext.JSON.decode(response.responseText);
+            } catch {
+                json = {
+                    errorMessage: 'No proper answer from the server <span style="font-size:9px;display:block;line-height:10px;">' + response?.request?.url + '</span>'
+                };
+                console.log('No proper answer from the server:' + response.responseText);
             }
-            else {
+
+            if (json.errorMessage) {
+                targetMsg = json.errorMessage;
+            } else {
                 targetMsg = response.responseText;
             }
         }

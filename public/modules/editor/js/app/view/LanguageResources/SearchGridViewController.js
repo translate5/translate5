@@ -280,7 +280,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
             errors = [errorEntry];
         //no more loadings in the case of an error
         me.offset.add(languageResourceid, null);
-        switch(response.status){
+        switch (response.status) {
             case -1:
                 errorEntry.source = me.strings.serverErrorMsgDefault;
                 break;
@@ -290,7 +290,15 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
                 break;
             case 500:
             case 502:
-                var json = Ext.JSON.decode(response.responseText);
+                try {
+                    var json = Ext.JSON.decode(response.responseText);
+                } catch {
+                    var json = {
+                        errorMessage: 'No proper answer from the server <span style="font-size:9px;display:block;line-height:10px;">' + response?.request?.url + '</span>'
+                    };
+                    console.log('No proper answer from the server:' + response.responseText);
+                }
+
                 errorEntry.source = me.strings.serverErrorMsg500;
                 errorEntry.target = json.errorMessage;
                 break;

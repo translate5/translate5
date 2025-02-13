@@ -36,13 +36,13 @@ class Editor_SegmentController extends ZfExtended_RestController
 {
     use TaskContextTrait;
 
-    protected $entityClass = 'editor_Models_Segment';
+    protected $entityClass = editor_Models_Segment::class;
 
     /**
      * overriding filter class to ensure lower case filtering for segment content fields
      * @var string
      */
-    protected $filterClass = 'editor_Models_Filter_SegmentSpecific';
+    protected $filterClass = editor_Models_Filter_SegmentSpecific::class;
 
     /**
      * @var editor_Models_Segment
@@ -78,10 +78,9 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         //overwrite sortColMap
         $this->_sortColMap = $sfm->getSortColMap();
-        $this->entity->setEnableWatchlistJoin();
         $filter = $this->entity->getFilter();
-        /* @var $filter editor_Models_Filter_SegmentSpecific */
-        //update sortColMap and filterTypeMap in filter instance
+        /** @var editor_Models_Filter_SegmentSpecific $filter */
+        // update sortColMap and filterTypeMap in filter instance
         $filter->setMappings($this->_sortColMap, $this->_filterTypeMap);
         $filter->setSegmentFields(array_keys($this->_sortColMap));
     }
@@ -140,8 +139,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         // - Anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         $handleAnonymizeUsers = $this->getCurrentTask()->anonymizeUsers();
         if ($handleAnonymizeUsers) {
-            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            $workflowAnonymize = ZfExtended_Factory::get(editor_Workflow_Anonymize::class);
         }
 
         if ($handleSegmentranges || $handleAnonymizeUsers) {
@@ -274,7 +272,7 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     protected function addIsWatchedFlag()
     {
-        if ($this->entity->getEnableWatchlistJoin()) {
+        if ($this->entity->filterHasIsWatched()) {
             return;
         }
         //get all segment IDs to be returned
@@ -282,9 +280,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             return $seg['id'];
         }, $this->view->rows);
 
-        $assoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
-        /* @var $assoc editor_Models_SegmentUserAssoc */
-
+        $assoc = ZfExtended_Factory::get(editor_Models_SegmentUserAssoc::class);
         $watched = $assoc->loadIsWatched($ids, ZfExtended_Authentication::getInstance()->getUserGuid());
         $watchedById = [];
         array_map(function ($assoc) use (&$watchedById) {
@@ -307,15 +303,14 @@ class Editor_SegmentController extends ZfExtended_RestController
         //check if update is allowed
         $this->checkTaskGuidAndEditable();
         $task = $this->checkTaskState();
-        /* @var $task editor_Models_Task */
         $wfh = $this->_helper->workflow;
-        /* @var $wfh Editor_Controller_Helper_Workflow */
+        /** @var Editor_Controller_Helper_Workflow $wfh */
         $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $auth->getUserGuid());
 
         //the history entry must be created before the original entity is modified
         $history = $this->entity->getNewHistoryEntity();
         //update the segment
-        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task, $auth->getUserGuid()]);
+        $updater = ZfExtended_Factory::get(editor_Models_Segment_Updater::class, [$task, $auth->getUserGuid()]);
 
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList(true);
 
@@ -349,8 +344,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         if ($task->anonymizeUsers()) {
-            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            $workflowAnonymize = ZfExtended_Factory::get(editor_Workflow_Anonymize::class);
             $rows = $workflowAnonymize->anonymizeUserdata(
                 $this->entity->getTaskGuid(),
                 $rows['userGuid'],
@@ -430,9 +424,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $parameters = $this->getAllParams();
         $this->validateTaskAccess($parameters['taskGuid']);
 
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($parameters['taskGuid']);
+        $task = editor_ModelInstances::taskByGuid($parameters['taskGuid']);
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */
         if ($task->getUsageMode() == $task::USAGE_MODE_SIMULTANEOUS && $this->isOpenedByMoreThanOneUser($parameters['taskGuid'])) {
@@ -474,12 +466,11 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         $resultsCount = count($results);
         foreach ($results as $idx => $result) {
-            $replace = ZfExtended_Factory::get('editor_Models_SearchAndReplace_ReplaceMatchesSegment', [
+            $replace = ZfExtended_Factory::get(editor_Models_SearchAndReplace_ReplaceMatchesSegment::class, [
                 $result[$searchInField], //text to be replaced
                 $searchInField, //replace target field
                 $result['id'], //segment id
             ]);
-            /* @var $replace editor_Models_SearchAndReplace_ReplaceMatchesSegment */
 
             //if the trackchanges are active, setup some trackchanges parameters
             if (isset($parameters['isActiveTrackChanges']) && $parameters['isActiveTrackChanges']) {
@@ -528,9 +519,7 @@ class Editor_SegmentController extends ZfExtended_RestController
                  * But the problem should be logged, and also the user should be informed in the GUI
                  */
                 unset($results[$idx]); //remove the unchanged segment from result list, so that GUI knows there was going something wrong
-                $task = ZfExtended_Factory::get('editor_Models_Task');
-                /* @var $task editor_Models_Task */
-                $task->loadByTaskGuid($this->entity->getTaskGuid());
+                $task = editor_ModelInstances::taskByGuid($this->entity->getTaskGuid());
                 $this->log->exception($e, [
                     'level' => $this->log::LEVEL_WARN,
                     'extra' => [
@@ -672,15 +661,11 @@ class Editor_SegmentController extends ZfExtended_RestController
 
     /**
      * checks if current task state allows editing
-     * @return editor_Models_Task
      * @throws ZfExtended_Models_Entity_NoAccessException
      */
-    protected function checkTaskState()
+    protected function checkTaskState(): editor_Models_Task
     {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->entity->getTaskGuid());
-
+        $task = editor_ModelInstances::taskByGuid($this->entity->getTaskGuid());
         if ($task->getState() === $task::STATE_UNCONFIRMED) {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException('Task is not confirmed so no segment can be edited! Task: ' . $task->getTaskGuid());
@@ -743,7 +728,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->getAction();
 
         /* @var Operations $operations */
-        $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
+        $operations = ZfExtended_Factory::get(Operations::class, [
             $task->getTaskGuid(),
             $this->entity,
         ]);
@@ -800,7 +785,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->applyQualityFilter();
 
         /* @var Operations $operations */
-        $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
+        $operations = ZfExtended_Factory::get(Operations::class, [
             $task->getTaskGuid(),
             $this->entity,
         ]);
@@ -837,7 +822,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->applyQualityFilter();
 
         /* @var Operations $operations */
-        $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
+        $operations = ZfExtended_Factory::get(Operations::class, [
             $this->getCurrentTask()->getTaskGuid(),
             $this->entity,
         ]);
@@ -1008,8 +993,7 @@ class Editor_SegmentController extends ZfExtended_RestController
     protected function checkAndGetSegmentsRange(editor_Models_Task $task = null)
     {
         if (! isset($task)) {
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
+            $task = ZfExtended_Factory::get(editor_Models_Task::class);
             $task->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
         }
         if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
@@ -1017,7 +1001,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         }
         $authUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($authUserGuid, $task);
-        /* @var $tua editor_Models_TaskUserAssoc */
+        /** @var editor_Models_TaskUserAssoc $tua */
         $step = $tua->getWorkflowStepName();
         $handleSegmentranges = $tua->isSegmentrangedTaskForStep($task, $step);
         if (! $handleSegmentranges) {
@@ -1077,12 +1061,8 @@ class Editor_SegmentController extends ZfExtended_RestController
             return;
         }
 
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-
         //if for the task there are no ranges defined, use first editable(if defined) or 0
-        if (! $tua->isSegmentrangedTaskForStep($task, $tua->getWorkflowStepName())) {
+        if (! $tua->isSegmentrangedTaskForStep(editor_ModelInstances::taskByGuid($taskGuid), $tua->getWorkflowStepName())) {
             $this->view->metaData->jumpToSegmentIndex = $this->view->metaData->firstEditable ?? 0;
 
             return;
