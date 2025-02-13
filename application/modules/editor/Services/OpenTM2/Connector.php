@@ -542,7 +542,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $this->reorganizeTm($tmName);
             } elseif ($this->isMemoryOverflown($apiError)) {
                 if (! $this->isBlockOverflown($apiError)) {
-                    $this->setMemoryReadonly($this->languageResource, $tmName);
+                    $this->setMemoryReadonly($this->languageResource, $tmName, $this->isInternalFuzzy());
                 }
 
                 $newName = $this->persistenceService->getNextWritableMemory($this->languageResource, $tmName);
@@ -567,7 +567,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                     break;
                 }
 
-                $this->addMemoryToLanguageResource($this->languageResource, $newName);
+                $this->addMemoryToLanguageResource($this->languageResource, $newName, $this->isInternalFuzzy());
                 $tmName = $newName;
             } elseif ($this->isLockingTimeoutOccurred($apiError)) {
                 // Wait before retrying
