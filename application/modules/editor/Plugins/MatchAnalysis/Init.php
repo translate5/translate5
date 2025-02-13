@@ -434,7 +434,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             $workerParameters['contentField'] = editor_Models_SegmentField::TYPE_RELAIS;
 
             if (! $batchWorker->init($task->getTaskGuid(), $workerParameters)) {
-                //we log that fact, queue nothing and rely on the normal match analysis processing
+                // we log that fact, queue nothing and rely on the normal match analysis processing
                 $this->addWarn(
                     $task,
                     'MatchAnalysis-Error on batchWorker init().'
@@ -444,10 +444,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 return;
             }
 
-            //we may not trigger the queue here, just add the workers!
-            $workerId = $batchWorker->queue($parentWorkerId, $workerState, false);
+            // we may not trigger the queue here, just add the workers!
+            $batchWorker->queue($parentWorkerId, $workerState, false);
 
-            $this->queueBatchCleanUpWorker($workerId, $task->getTaskGuid(), $workerState);
+            $this->queueBatchCleanUpWorker($parentWorkerId, $task->getTaskGuid(), $workerState);
         }
     }
 
@@ -579,8 +579,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         if ($task->isImporting()) {
             //on import we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
-            //on import state scheduled is ok
-            $workerState = ZfExtended_Models_Worker::STATE_SCHEDULED;
+            $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
 
             $this->doQueueAnalysisWorkers($task, $parentWorkerId, $workerState, $workerParameters);
         } else {
@@ -704,9 +703,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             }
 
             //we may not trigger the queue here, just add the workers!
-            $workerId = $batchWorker->queue($parentWorkerId, $workerState, false);
+            $batchWorker->queue($parentWorkerId, $workerState, false);
 
-            $this->queueBatchCleanUpWorker($workerId, $task->getTaskGuid(), $workerState);
+            $this->queueBatchCleanUpWorker($parentWorkerId, $task->getTaskGuid(), $workerState);
         }
     }
 
