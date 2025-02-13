@@ -65,7 +65,6 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
     {
         parent::preDispatch();
         $this->initCurrentTask();
-        $this->entity->setEnableWatchlistJoin();
     }
 
     /**

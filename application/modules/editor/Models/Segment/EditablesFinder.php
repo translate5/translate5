@@ -143,13 +143,12 @@ class editor_Models_Segment_EditablesFinder
         }
 
         $db = $this->segment->db;
-        $tableName = $db->info($db::NAME);
         $innerSql = $db->select()
             ->from($db, $this->fieldsToSelect)
-            ->where($tableName . '.id = ?', $segmentId);
+            ->where($this->segment->getTableName() . '.id = ?', $segmentId);
 
-        $this->segment->addWatchlistJoin($innerSql, $tableName);
-        $this->watchList($this->filterInner, $tableName);
+        $this->segment->addWatchlistJoin($innerSql);
+        $this->watchList($this->filterInner, $this->segment->getTableName());
         $this->filterInner->applyToSelect($innerSql);
 
         $outerSql->from([
