@@ -9,6 +9,54 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+
+## [7.20.2] - 2025-02-13
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4454](https://jira.translate5.net/browse/TRANSLATE-4454): MatchAnalysis & Pretranslation, t5memory - Add waiting for t5memory to be available before starting match analysis** <br>
+Add waiting for t5memory to become available before match analysis and pretranslation
+
+
+### Bugfixes
+**[TRANSLATE-4461](https://jira.translate5.net/browse/TRANSLATE-4461): job coordinator - Jobcoordinators don't see any tasks** <br>
+Job Coordinator: fix project overview
+
+**[TRANSLATE-4460](https://jira.translate5.net/browse/TRANSLATE-4460): Workflows - PM Light permissions issue** <br>
+PM Light: Fix permissions issue
+
+**[TRANSLATE-4457](https://jira.translate5.net/browse/TRANSLATE-4457): Editor general - Fatal error in TaskViewDataProvider** <br>
+Fixed fatal error in TaskViewDataProvider
+
+**[TRANSLATE-4456](https://jira.translate5.net/browse/TRANSLATE-4456): Editor general - FIX: Unbookmarking watched segments creates invalid SQL** <br>
+FIX: Unbookmarking watched segments creates invalid SQL
+
+**[TRANSLATE-4455](https://jira.translate5.net/browse/TRANSLATE-4455): Editor general, job coordinator - Position action returns different on same request** <br>
+Fix: Fix blinking project overview 
+
+**[TRANSLATE-4453](https://jira.translate5.net/browse/TRANSLATE-4453): Editor general - Filters in language resource assoc panel are not working anymore** <br>
+Fixed filtering in task to language resource association panel
+
+**[TRANSLATE-4451](https://jira.translate5.net/browse/TRANSLATE-4451): t5memory - When memory is overflown during fuzzy its name is overwritten** <br>
+Fixed bug which might cause t5memory language resource to get fuzzy name in case memory is overflown during match analysis
+
+**[TRANSLATE-4449](https://jira.translate5.net/browse/TRANSLATE-4449): API - Revert back incompatible changes** <br>
+Rollback API entries type changes changes
+
+**[TRANSLATE-4434](https://jira.translate5.net/browse/TRANSLATE-4434): InstantTranslate - Instanttranslate: Waiting error on now action** <br>
+Instanttranslate: Fix stalling instant translation tasks
+
+**[TRANSLATE-4433](https://jira.translate5.net/browse/TRANSLATE-4433): MatchAnalysis & Pretranslation - FIX: MatchAnalysis is queued with state "scheduled" for import** <br>
+FIX: MatchAnalysis was queued with wrong state causing stuck imports in rare cases
+
+**[TRANSLATE-4023](https://jira.translate5.net/browse/TRANSLATE-4023): Auto-QA - AutoQA portlet should dissappear with no active checks** <br>
+7.20.2: UI Error caused by the original fix.
+7.7.0: Editor's AutoQA leftside portlet is now hidden if no autoQA enabled for the task
+
+
 ## [7.20.1] - 2025-02-10
 
 ### Bugfixes
