@@ -34,7 +34,7 @@ use editor_Models_Task;
 use editor_Task_Operation;
 use editor_Task_Operation_Exception;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
-use MittagQI\Translate5\PauseWorker\PauseWorker;
+use MittagQI\Translate5\PauseWorker\AbstractPauseWorker;
 use ReflectionException;
 use Throwable;
 use Zend_Exception;
@@ -160,7 +160,7 @@ class PivotQueuer
 
         $worker = ZfExtended_Factory::get(PausePivotWorker::class);
         $worker->init($task->getTaskGuid(), [
-            PauseWorker::PROCESSOR => PausePivotProcessor::class,
+            AbstractPauseWorker::PROCESSOR => PausePivotProcessor::class,
         ]);
         $worker->queue($parentWorkerId, $workerState);
 

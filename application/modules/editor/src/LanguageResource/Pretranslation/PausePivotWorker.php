@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\Pretranslation;
 
-use MittagQI\Translate5\PauseWorker\PauseWorker;
+use MittagQI\Translate5\PauseWorker\AbstractPauseWorker;
 
-class PausePivotWorker extends PauseWorker
+class PausePivotWorker extends AbstractPauseWorker
 {
 }

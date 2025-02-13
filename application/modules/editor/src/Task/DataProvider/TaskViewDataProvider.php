@@ -163,6 +163,10 @@ class TaskViewDataProvider
                 continue;
             }
 
+            if (empty($rowTrack['userGuid'])) {
+                continue;
+            }
+
             $user = $this->userRepository->findByGuid($rowTrack['userGuid']);
 
             if (! $user && $canSeeAllUsers) {

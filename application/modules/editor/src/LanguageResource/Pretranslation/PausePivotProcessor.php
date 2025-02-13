@@ -58,7 +58,7 @@ class PausePivotProcessor extends AbstractLanguageResourcesProcessor implements 
         );
         $languageResourceIds = array_map('intval', $languageResourceIds);
 
-        return $this->areStillImporting($task, ...$languageResourceIds);
+        return $this->shouldWaitByStatus($task, ...$languageResourceIds);
     }
 
     public function getMaxWaitTimeSeconds(): int
