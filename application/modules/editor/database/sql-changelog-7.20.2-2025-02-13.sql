@@ -40,4 +40,5 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
 ('2025-02-13', 'TRANSLATE-4434', 'bugfix', 'InstantTranslate - Instanttranslate: Waiting error on now action', 'Instanttranslate: Fix stalling instant translation tasks', '15'),
 ('2025-02-13', 'TRANSLATE-4433', 'bugfix', 'MatchAnalysis & Pretranslation - FIX: MatchAnalysis is queued with state "scheduled" for import', 'FIX: MatchAnalysis was queued with wrong state causing stuck imports in rare cases', '15'),
 ('2025-02-13', 'TRANSLATE-4023', 'bugfix', 'Auto-QA - AutoQA portlet should dissappear with no active checks', '7.20.2: UI Error caused by the original fix.
-7.7.0: Editor\'s AutoQA leftside portlet is now hidden if no autoQA enabled for the task', '15');
+7.7.0: Editor\'s AutoQA leftside portlet is now hidden if no autoQA enabled for the task', '15'),
+('2025-02-13', 'TRANSLATE-4422', 'bugfix', 'Content Protection: Change protection flow', 'Content Protection: Change flow of protection to allow whitespace handling with protection rules', '15');
