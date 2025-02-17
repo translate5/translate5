@@ -30,6 +30,7 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
+use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
 use MittagQI\Translate5\PauseWorker\AbstractPauseWorker;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
@@ -118,7 +119,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         );
 
         $this->eventManager->attach(
-            'MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuerPivotQueuer',
+            PivotQueuer::class,
             'beforePivotPreTranslationQueue',
             [$this, 'handleBeforePivotPreTranslationQueue']
         );
@@ -138,7 +139,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
         $this->eventManager->attach(
             ImportEventTrigger::class,
-            ImportEventTrigger::IMPORT_WORKER_STARTED,
+            ImportEventTrigger::IMPORT_WORKER_QUEUED,
             [$this, 'handleImportWorkerQueued']
         );
     }

@@ -69,8 +69,6 @@ class ImportEventTrigger
 
     public const AFTER_PROJECT_UPLOAD_PREPARATION = 'afterProjectUploadPreparation';
 
-    public const IMPORT_WORKER_STARTED = 'importWorkerStarted';
-
     public const AFTER_IMPORT = 'afterImport';
 
     public const AFTER_IMPORT_ERROR = 'afterImportError';
@@ -128,13 +126,6 @@ class ImportEventTrigger
         $this->triggerEvent(self::IMPORT_WORKER_QUEUED, [
             'task' => $task,
             'workerId' => $parentId,
-        ]);
-    }
-
-    public function triggerImportWorkerStarted(editor_Models_Task $task): void
-    {
-        $this->triggerEvent(self::IMPORT_WORKER_STARTED, [
-            'task' => $task,
         ]);
     }
 
