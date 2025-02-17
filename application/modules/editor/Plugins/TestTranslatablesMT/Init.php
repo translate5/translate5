@@ -36,6 +36,8 @@ class editor_Plugins_TestTranslatablesMT_Init extends ZfExtended_Plugin_Abstract
 
     protected static bool $activateForTests = true;
 
+    protected static bool $enabledByDefault = true;
+
     public function init(): void
     {
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
