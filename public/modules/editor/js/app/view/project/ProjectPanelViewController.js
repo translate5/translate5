@@ -313,6 +313,13 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 return;
             }
 
+            if(index < 0)
+            {
+                Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+                me.reset();
+                return;
+            }
+
             grid.scrollTo(index,{
                 callback:function(){
                     //no db index is found
@@ -331,13 +338,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                     if(record){
                         me.focusProjectSilent(record);
                         me.selectProjectTaskRecord(taskId);
-                        return;
                     }
-                    grid.getController().reloadProjects(function(){
-                        record=grid.getStore().getById(parseInt(id));
-                        me.focusProjectSilent(record);
-                        me.selectProjectTaskRecord(taskId);
-                    });
                 },
                 notScrollCallback:function(){
                     //reset the task frontend object after no valid index is found
