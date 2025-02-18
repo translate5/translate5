@@ -113,6 +113,7 @@ Ext.application({
         'admin.WizardTasks',
         'admin.task.CustomField',
         'admin.CoordinatorGroupStore',
+        'admin.task.Jobs',
     ],
     requires: [
         'Editor.view.ViewPort',

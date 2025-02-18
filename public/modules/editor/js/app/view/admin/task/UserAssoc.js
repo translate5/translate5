@@ -69,12 +69,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
             items: [
                 {
                     xtype: 'adminTaskUserAssocGrid',
-                    bind: {
-                        //INFO: this will load only the users of the task when projectTaskGrid selection is changed
-                        //override the store binding in the place where the component is used/defined
-                        //the default usage is in the task properties panel
-                        store: '{userAssoc}'
-                    },
+                    store: 'admin.task.Jobs',
                     region: 'center'
                 },
                 {
