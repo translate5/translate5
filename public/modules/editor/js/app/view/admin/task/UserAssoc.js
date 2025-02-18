@@ -110,7 +110,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                                     xtype: 'combo',
                                     allowBlank: false,
                                     editable: false,
-                                    forceSelection: false,
+                                    forceSelection: true,
                                     queryMode: 'local',
                                     name: 'type',
                                     fieldLabel: me.strings.type,
@@ -341,6 +341,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
 
             rec.get('isCoordinatorGroupJob') ? me.loadCoordinators() : me.loadUsers();
         } else {
+            typeCombo.setValue(1);
             form.setTitle(me.strings.formTitleAdd);
             me.loadUsers();
         }

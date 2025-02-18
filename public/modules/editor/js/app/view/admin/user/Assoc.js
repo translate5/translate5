@@ -114,7 +114,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                     xtype: 'combo',
                                     allowBlank: false,
                                     editable: false,
-                                    forceSelection: false,
+                                    forceSelection: true,
                                     queryMode: 'local',
                                     name: 'type',
                                     fieldLabel: me.strings.type,
