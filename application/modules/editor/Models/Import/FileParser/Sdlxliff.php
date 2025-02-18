@@ -790,9 +790,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             return $segment;
         }
         $segment = $this->parseSegmentUnifyInternalTags($segment);
-        $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
+        $data = new editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData();
         $data->segment = preg_split('"(<[^>]*>)"', $segment, flags: PREG_SPLIT_DELIM_CAPTURE);
         $data->segmentCount = count($data->segment);
+
+        if (! $isSource) {
+            $data->j = ! empty($this->tagIdShortTagIdentMap) ? max(array_values($this->tagIdShortTagIdentMap)) + 1 : 1;
+        }
 
         //parse nur die ungeraden Arrayelemente, den dies sind die Rückgaben von PREG_SPLIT_DELIM_CAPTURE
         for ($data->i = 1; $data->i < $data->segmentCount; $data->i++) {
