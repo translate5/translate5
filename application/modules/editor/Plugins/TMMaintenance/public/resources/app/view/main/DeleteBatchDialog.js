@@ -12,17 +12,17 @@ Ext.define('TMMaintenance.view.main.DeleteBatchDialog', {
     buttons: [
         {
             bind: {
-                text: '{l10n.deleteBatch.no}',
-                hidden: '{!l10n.deleteBatch.no}',
-            },
-            handler: () => Ext.ComponentQuery.query('#deleteBatchDialog')[0].hide(),
-        },
-        {
-            bind: {
                 text: '{l10n.deleteBatch.yes}',
                 hidden: '{!l10n.deleteBatch.yes}',
             },
             handler: () => Ext.getCmp('searchform').getController().onDeleteBatch(),
+        },
+        {
+            bind: {
+                text: '{l10n.deleteBatch.no}',
+                hidden: '{!l10n.deleteBatch.no}',
+            },
+            handler: () => Ext.ComponentQuery.query('#deleteBatchDialog')[0].hide(),
         },
     ]
 });

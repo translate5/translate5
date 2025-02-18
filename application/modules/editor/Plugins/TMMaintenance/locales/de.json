@@ -54,7 +54,7 @@
     "search": "Suche",
     "deleteAll": "Alle löschen",
     "deleteAllTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht",
-    "deleteAllDisabledTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht. Diese Funktion ist erst ab 20 Treffern verfügbar, da \"Alle löschen\" eine Re-Organistion des TMs nach sich zieht, die einige Zeit in Anspruch nehmen kann, während der das TM nicht verfügbar ist.",
+    "deleteAllDisabledTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht. <br> Diese Funktion ist erst ab 20 Treffern verfügbar, da \"Alle löschen\" eine Re-Organistion des TMs nach sich zieht, <br> die einige Zeit in Anspruch nehmen kann, während der das TM nicht verfügbar ist.",
     "sourceLanguage": "Quellsprache",
     "targetLanguage": "Zielsprache"
   },
@@ -66,7 +66,7 @@
     "cancel": "Abbrechen"
   },
   "deleteBatch": {
-    "no": "Nein",
+    "no": "Abbrechen",
     "yes": "Alle löschen",
     "warningText": "Alle Segmente der aktuell angezeigten Liste werden gelöscht und das TM anschließend re-organisiert, was einige Zeit in Anspruch nehmen kann. Möchten Sie dennoch alle Segmente löschen?"
   },
