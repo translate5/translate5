@@ -578,11 +578,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         }
 
         if ($task->isImporting()) {
-            //on import we use the import worker as parentId
-            $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
-            $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
+            //on import we use the import worker as parentId and use it's state to evaluate the state we need
+            $importWorker = $this->fetchImportWorker($task->getTaskGuid());
+            $parentId = ($importWorker === null) ? 0 : (int) $importWorker->getId();
+            $state = ($importWorker !== null && $importWorker->getState() === ZfExtended_Models_Worker::STATE_PREPARE) ?
+                ZfExtended_Models_Worker::STATE_PREPARE : ZfExtended_Models_Worker::STATE_SCHEDULED;
 
-            $this->doQueueAnalysisWorkers($task, $parentWorkerId, $workerState, $workerParameters);
+            $this->doQueueAnalysisWorkers($task, $parentId, $state, $workerParameters);
         } else {
             // this creates the operation start/finish workers
             $operation = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
@@ -715,14 +717,21 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      */
     private function fetchImportWorkerId(string $taskGuid): int
     {
-        $parent = new ZfExtended_Models_Worker();
+        $worker = $this->fetchImportWorker($taskGuid);
+
+        return ($worker === null) ? 0 : (int) $worker->getId();
+    }
+
+    private function fetchImportWorker(string $taskGuid): ?ZfExtended_Models_Worker
+    {
+        $worker = new ZfExtended_Models_Worker();
 
         try {
-            $parent->loadFirstOf(editor_Models_Import_Worker::class, $taskGuid);
+            $worker->loadFirstOf(editor_Models_Import_Worker::class, $taskGuid);
 
-            return (int) $parent->getId();
+            return $worker;
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            return 0;
+            return null;
         }
     }
 
