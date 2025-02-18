@@ -10,6 +10,35 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.20.3] - 2025-02-18
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4464](https://jira.translate5.net/browse/TRANSLATE-4464): Editor general - Make Dummy pseudo translator plugin to be activated by default** <br>
+Dummy pseudo translator plugin is now activated by default
+
+
+### Bugfixes
+**[TRANSLATE-4472](https://jira.translate5.net/browse/TRANSLATE-4472): Editor general - UI error: loading jobs rarely reads to an error** <br>
+Fix for UI error where loading of a jobs in project overview can crash the UI.
+
+**[TRANSLATE-4471](https://jira.translate5.net/browse/TRANSLATE-4471): Import/Export - Worker-queue may stuck on import due to MatchAnalysis** <br>
+FIX: Import may stuck due to MatchAnalysis being queued too late
+
+**[TRANSLATE-4470](https://jira.translate5.net/browse/TRANSLATE-4470): Auto-QA - Exception when loading task-tbx leads to blocked task-operation** <br>
+FIX: Exception in TBX-loading for a task may leads to a stuck AutoQA-operation
+
+**[TRANSLATE-4465](https://jira.translate5.net/browse/TRANSLATE-4465): TM Maintenance - Delete all button in TM Maintenance** <br>
+TM Maintenance "Delete all" UI wording changed to be more clear. Fixed behavior of Yes - No buttons in German localization. 
+
+**[TRANSLATE-4421](https://jira.translate5.net/browse/TRANSLATE-4421): Import/Export - Quick insert sdlxliff tags do not get incremented short tag number** <br>
+SDLXLIFF Import: Fix tag duplicating issue for segments with Quick insert tags
+
+
 ## [7.20.2] - 2025-02-13
 
 ### Important Notes:
