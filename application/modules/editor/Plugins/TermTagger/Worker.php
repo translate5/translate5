@@ -114,6 +114,7 @@ class Worker extends AbstractProcessingWorker
 
     /**
      * @param State[] $problematicStates
+     * @throws \MittagQI\ZfExtended\Worker\Exception\SetDelayedException
      */
     protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
     {

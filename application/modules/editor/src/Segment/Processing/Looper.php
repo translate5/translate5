@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\Segment\Processing;
 use editor_Models_Task;
 use Exception;
 use MittagQI\Translate5\Segment\AbstractProcessor;
+use MittagQI\Translate5\Segment\Db\Processing;
 use MittagQI\ZfExtended\Worker\Exception\SetDelayedException;
 
 /**
@@ -145,6 +146,7 @@ final class Looper
     }
 
     /**
+     * Sets all passed states to the given error-state and finishes pocessing / resets global state
      * @param State[] $problematicStates
      */
     public function setUnprocessedStates(array $problematicStates, int $errorState, bool $doDebug = false): void
@@ -153,9 +155,24 @@ final class Looper
             if ($state->getState() != State::PROCESSED) {
                 $state->setState($errorState);
                 if ($doDebug) {
-                    error_log('Looper: set State to ' . $errorState . ' for segment ' . $state->getSegmentId());
+                    error_log('Looper: set State to ' . $errorState . ' and finish processing for segment ' .
+                        $state->getSegmentId());
                 }
             }
+        }
+    }
+
+    /**
+     * Finishes pocessing / resets global state for all passed states
+     * @param State[] $states
+     */
+    public function setProcessingFinished(array $states, bool $doDebug = false): void
+    {
+        $segmentIds = array_map(fn ($item) => $item->getSegmentId(), $states);
+        $table = new Processing();
+        $affected = $table->endProcessingForStates($segmentIds);
+        if ($doDebug && $affected > 0) {
+            error_log('Looper: finished Processing hard for ' . $affected . ' states');
         }
     }
 

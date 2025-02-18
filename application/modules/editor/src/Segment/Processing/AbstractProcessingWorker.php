@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\Segment\Processing;
 use Exception;
 use MittagQI\Translate5\PooledService\AbstractPooledWorker;
 use MittagQI\Translate5\Segment\AbstractProcessor;
+use Throwable;
 use ZfExtended_Logger;
 
 /**
@@ -79,6 +80,7 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
      * - "0" halts the looping/processing and causes the worker to finish without exception
      * - a negative integer leads to the passed exception being thrown ending the processing
      * @param State[] $problematicStates
+     * @throws \MittagQI\ZfExtended\Worker\Exception\SetDelayedException
      */
     protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
     {
@@ -165,11 +167,29 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
                 $isFinished = $this->looper->run($this->processingMode, $this->fromTheTop, $this->doDebug);
             } catch (Exception $processingException) {
                 if ($this->doDebug) {
-                    error_log('AbstractProcessingWorker: ' . get_class($this) . '|' . $this->workerModel->getSlot() . ': Loop exception: ' . $processingException->getMessage());
+                    error_log('AbstractProcessingWorker: ' . get_class($this) . '|' .
+                        $this->workerModel->getSlot() . ': Loop exception: ' . $processingException->getMessage());
                 }
-                $flag = $this->onLooperException($processingException, $this->looper->getProcessedStates(), $this->looper->isReprocessingLoop());
+                $states = $this->looper->getProcessedStates();
+
+                // we must set the global "processing" state back
+                // how ever the inheriting worker reacts on ::onLooperException
+                try {
+                    $flag = $this->onLooperException($processingException, $states, $this->looper->isReprocessingLoop());
+                } catch (Throwable $e) {
+                    // even when onLooperException itself creates an exception
+                    // the global state must be set back, otherwise other workers may be delayed forever
+                    $this->looper->setProcessingFinished($states, $this->doDebug);
+
+                    throw $e;
+                }
+                // this makes sure, global processing is back in case inheriting code "forgets" is
+                // in case it was set back properly already, nothing happens with the states
+                $this->looper->setProcessingFinished($states, $this->doDebug);
+
                 if ($flag > 0) {
-                    // let the loop continue processing the next segments and retrying the failed segment later on (if the exception-handling is correctly implemented)
+                    // let the loop continue processing the next segments and retrying the failed segment later on
+                    // (if the exception-handling is correctly implemented)
                     $isFinished = false;
                 } elseif ($flag === 0) {
                     // this finishes the loop and the whole processing without an exception
