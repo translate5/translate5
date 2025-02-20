@@ -37,7 +37,8 @@ Ext.define('Editor.view.admin.user.Assoc', {
         'Editor.view.admin.user.AssocViewModel',
         'Editor.view.admin.user.AssocGrid',
         'Editor.view.LanguageCombo',
-        'Editor.view.NumberfieldCustom'
+        'Editor.view.NumberfieldCustom',
+        'Editor.view.admin.user.JobTypeCombo'
     ],
 
     itemId: 'adminUserAssoc',
@@ -49,7 +50,6 @@ Ext.define('Editor.view.admin.user.Assoc', {
     glyph: 'xf0c0@FontAwesome5FreeSolid',
     title: '#UT#Standard-Benutzerzuweisungen',
     strings: {
-        type: '#UT#Typ',
         fieldWorkflowStepName: '#UT#Workflow-Schritt',
         fieldWorkflow: '#UT#Workflow',
         fieldState: '#UT#Status',
@@ -110,23 +110,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                             },
                             items: [
                                 {
-                                    anchor: '100%',
-                                    xtype: 'combo',
-                                    allowBlank: false,
-                                    editable: false,
-                                    forceSelection: true,
-                                    queryMode: 'local',
-                                    name: 'type',
-                                    fieldLabel: me.strings.type,
-                                    displayField: 'name',
-                                    valueField: 'value',
-                                    store: {
-                                        fields: ['name', 'value'],
-                                        data: [
-                                            {name: 'Editor', value: 1},
-                                            {name: 'Coordinator', value: 2},
-                                        ]
-                                    },
+                                    xtype: 'adminUserJobTypeCombo',
                                     listeners: {
                                         change: (fld, newValue) => {
                                             if (null === newValue) {

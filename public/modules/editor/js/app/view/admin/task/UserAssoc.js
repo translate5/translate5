@@ -33,12 +33,12 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     requires: [
         'Editor.view.admin.task.UserAssocGrid',
         'Editor.view.admin.task.UserAssocViewModel',
-        'Ext.ux.DateTimeField'
+        'Ext.ux.DateTimeField',
+        'Editor.view.admin.user.JobTypeCombo'
     ],
     alias: 'widget.adminTaskUserAssoc',
     itemId: 'adminTaskUserAssoc',
     strings: {
-        type: '#UT#Typ',
         fieldStep: '#UT#Workflowschritt',
         fieldState: '#UT#Status',
         fieldUser: '#UT#Benutzer',
@@ -106,23 +106,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                             },
                             items: [
                                 {
-                                    anchor: '100%',
-                                    xtype: 'combo',
-                                    allowBlank: false,
-                                    editable: false,
-                                    forceSelection: true,
-                                    queryMode: 'local',
-                                    name: 'type',
-                                    fieldLabel: me.strings.type,
-                                    displayField: 'name',
-                                    valueField: 'value',
-                                    store: {
-                                        fields: ['name', 'value'],
-                                        data: [
-                                            { name: 'Editor', value: 1 },
-                                            { name: 'Coordinator', value: 2 },
-                                        ]
-                                    },
+                                    xtype: 'adminUserJobTypeCombo',
                                     listeners: {
                                         change: (fld, newValue) => {
                                             if (null === newValue) {
