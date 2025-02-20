@@ -161,10 +161,10 @@ Ext.define('Editor.controller.ServerException', {
                     if (operation) {
                         jslogger.addLogEntry({ type : 'info', message : 'Request: ' + operation.getRequest().getMethod() + ' ' + operation.getRequest().getUrl()});
                     }
-                    jslogger.addLogEntry({type: 'info', message: 'status-arg: ' + _status.replaceAll('"', '~')});;
-                    jslogger.addLogEntry({type: 'info', message: 'statusText-arg: ' + statusText.toString().replaceAll('"', '~')});;
-                    jslogger.addLogEntry({type: 'info', message: 'Response headers: ' + JSON.stringify(response.getAllResponseHeaders()).replaceAll('"', '~')});;
-                    jslogger.addLogEntry({type: 'info', message: 'Response text: ' + respText.toString().replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'status-arg: ' + _status.replaceAll('"', '~')});
+                    jslogger.addLogEntry({type: 'info', message: 'statusText-arg: ' + statusText.toString().replaceAll('"', '~')});
+                    jslogger.addLogEntry({type: 'info', message: 'Response headers: ' + JSON.stringify(response.getAllResponseHeaders()).replaceAll('"', '~')});
+                    jslogger.addLogEntry({type: 'info', message: 'Response text: ' + respText.toString().replaceAll('"', '~')});
                     jslogger.addLogEntry({type: 'info', message: 'Request URL: ' + method + ' ' + url});
                     jslogger.addLogEntry({type: 'info', message: 'Request URL Length: ' + url.length});
                 }
