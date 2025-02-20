@@ -168,11 +168,13 @@ final class Looper
      */
     public function setProcessingFinished(array $states, bool $doDebug = false): void
     {
-        $segmentIds = array_map(fn ($item) => $item->getSegmentId(), $states);
-        $table = new Processing();
-        $affected = $table->endProcessingForStates($segmentIds);
-        if ($doDebug && $affected > 0) {
-            error_log('Looper: finished Processing hard for ' . $affected . ' states');
+        if (! empty($states)) {
+            $segmentIds = array_map(fn ($item) => $item->getSegmentId(), $states);
+            $table = new Processing();
+            $affected = $table->endProcessingForStates($segmentIds);
+            if ($doDebug && $affected > 0) {
+                error_log('Looper: finished Processing hard for ' . $affected . ' states');
+            }
         }
     }
 
