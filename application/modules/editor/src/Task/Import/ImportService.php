@@ -200,10 +200,12 @@ class ImportService
                 )
             );
 
-            $this->processUploadedFile($task, $dataProvider, $data, $user);
+            $task->save();
 
             // add task defaults (user associations and language resources)
             $this->defaults->setTaskDefaults($task);
+
+            $this->processUploadedFile($task, $dataProvider, $data, $user);
 
             //update the task usage log for this project-task
             $this->usageLogger->log($task);
