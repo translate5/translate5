@@ -214,7 +214,6 @@ class Worker extends AbstractProcessingWorker
     public function initSlots(): void
     {
         parent::initSlots();
-        $this->maxParallel = 6;
         if (! $this->isThreaded()) {
             return;
         }
