@@ -31,7 +31,6 @@ Ext.define('Editor.view.admin.user.JobTypeCombo', {
     extend: 'Ext.form.field.ComboBox',
     alias: 'widget.adminUserJobTypeCombo',
     anchor: '100%',
-    xtype: 'combo',
     allowBlank: false,
     editable: false,
     forceSelection: true,
