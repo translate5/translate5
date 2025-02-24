@@ -33,8 +33,10 @@ use MittagQI\Translate5\Plugins\Okapi\ImportFilter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use MittagQI\Translate5\Plugins\Okapi\OkapiService;
+use MittagQI\Translate5\Task\FileTranslation\FileTranslation;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
+use MittagQI\ZfExtended\ApiRequestDTO;
 
 /**
  * OKAPI file converter and segmenter plugin
@@ -465,6 +467,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             ImportEventTrigger::INIT_TASK_META,
             [$this, 'handleInitTaskMeta']
         );
+        // adds the bconfId to the file-translation
+        $this->eventManager->attach(
+            FileTranslation::class,
+            'beforeFileTranslation',
+            [$this, 'handleBeforeFileTranslation']
+        );
 
         $this->eventManager->attach(
             editor_Models_Import_Worker_FileTree::class,
@@ -538,20 +546,28 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         $fileTypeSupport = $event->getTarget();
         /* @var editor_Models_Task|null $task */
         $task = $event->getParam('task');
+        /* @var int $customerId */
+        $customerId = $event->getParam('customerId');
 
         if (static::$doDebug) {
             error_log('OKAPI::handleRegisterSupportedFileTypes: task: '
-                . ($task === null ? 'null' : $task->getTaskGuid()));
+                . ($task === null ? 'null' : $task->getTaskGuid())
+                . ', customerId: ' . $customerId);
         }
 
-        if (empty($task)) {
-            // since all tasks are by default generated with the "defaultcustomer" we use this bconf as the system std.
-            // this will also define the correct default for InstantTranslate tasks
-            $importFilter = new ImportFilter(self::getDefaultCustomerBconf(), null);
-        } else {
+        if (! empty($task)) {
             $meta = $task->meta();
             $bconf = (empty($meta->getBconfInZip())) ? self::getImportBconfById($task, $meta->getBconfId()) : null;
             $importFilter = new ImportFilter($bconf, $meta->getBconfInZip());
+        } elseif ($customerId > 0) {
+            // if a customer-id is given (usually by file-translation), we use the customers default bconf
+            $bconf = new BconfEntity();
+            $bconf = $bconf->getDefaultBconf($customerId);
+            $importFilter = new ImportFilter($bconf, null);
+        } else {
+            // since all tasks are by default generated with the "defaultcustomer" we use this bconf as the system std.
+            // this will also define the correct default for InstantTranslate tasks
+            $importFilter = new ImportFilter(self::getDefaultCustomerBconf(), null);
         }
         // we may need the ImportFilter in other functions
         $fileTypeSupport->registerPluginData($importFilter, $this->pluginName);
@@ -633,6 +649,31 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             $bconfId = $bconf->getDefaultBconfId($task->getCustomerId());
         }
         $meta->setBconfId($bconfId);
+    }
+
+    /**
+     * Hook before a file-translation is requested as an internal-api request
+     * We add the bconf-id then as the bconf-id is neccessary to properly evaluate the file-types
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_NoAccessException
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws OkapiException
+     */
+    public function handleBeforeFileTranslation(Zend_EventManager_Event $event)
+    {
+        /* @var ApiRequestDTO $requestDto */
+        $requestDto = $event->getParam('requestDto');
+        /* @var int $customerId */
+        $customerId = $event->getParam('customerId');
+
+        if (! array_key_exists('bconfId', $requestDto->params)) {
+            // get the customer default-id and add it ...
+            $bconf = new BconfEntity();
+            $bconf = $bconf->getDefaultBconf($customerId);
+            $requestDto->params['bconfId'] = $bconf->getId();
+        }
     }
 
     /**

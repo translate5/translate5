@@ -6,7 +6,6 @@ use editor_Models_Task as Task;
 use editor_Models_TaskConfig;
 use editor_Models_TaskUserAssoc as UserJob;
 use editor_Models_UserAssocDefault as DefaultUserJob;
-use editor_Plugins_InstantTranslate_TaskType;
 use editor_Utils;
 use editor_Workflow_Default;
 use editor_Workflow_Manager;
@@ -29,6 +28,7 @@ use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
 use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Task\FileTranslation\FileTranslationType;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_EventManager;
@@ -74,7 +74,7 @@ class JobAssignmentDefaults implements ITaskDefaults
 
     public function canApplyDefaults(Task $task): bool
     {
-        return $task->getTaskType()->id() !== editor_Plugins_InstantTranslate_TaskType::ID;
+        return $task->getTaskType()->id() !== FileTranslationType::ID;
     }
 
     public function applyDefaults(Task $task, bool $importWizardUsed = false): void

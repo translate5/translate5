@@ -26,23 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
-* @method void setId(int $id)
-* @method string getId()
-* @method void setTaskType(string $taskType)
-* @method string getTaskType()
-* @method void setSourceLang(int $sourceLang)
-* @method string getSourceLang()
-* @method void setTargetLang(int $targetLang)
-* @method string getTargetLang()
-* @method void setCustomerId(int $customerId)
-* @method string getCustomerId()
-* @method void setYearAndMonth(string $yearAndMonth)
-* @method string getYearAndMonth()
-* @method void setTaskCount(int $taskCount)
-* @method string getTaskCount()
-*/
-
+/**
+ * @method void setId(int $id)
+ * @method string getId()
+ * @method void setTaskType(string $taskType)
+ * @method string getTaskType()
+ * @method void setSourceLang(int $sourceLang)
+ * @method string getSourceLang()
+ * @method void setTargetLang(int $targetLang)
+ * @method string getTargetLang()
+ * @method void setCustomerId(int $customerId)
+ * @method string getCustomerId()
+ * @method void setYearAndMonth(string $yearAndMonth)
+ * @method string getYearAndMonth()
+ * @method void setTaskCount(int $taskCount)
+ * @method string getTaskCount()
+ */
 class editor_Models_TaskUsageLog extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = editor_Models_Db_TaskUsageLog::class;
