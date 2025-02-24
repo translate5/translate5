@@ -29,6 +29,7 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Task;
+use MittagQI\Translate5\Task\FileTranslation\FileTranslationType;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Zend_Registry;
@@ -48,9 +49,6 @@ class TaskCommand extends Translate5AbstractCommand
 
     public const IDENTIFIER_DESCRIPTION = 'A task-id, task-guid (with/without braces), task-name or a task-name followed by the creation-date (<name> Y-m-d H:i:s)';
 
-    // we would need to use editor_Plugins_InstantTranslate_TaskType::ID here but this is from a private plugin ...
-    public const TASKTYPE_INSTANTTRANSLATE = 'instanttranslate-pre-translate';
-
     /**
      * All task-types that may have task-tada (projects will not have any user-generated data)
      * Note: can NOT be implemented as array because the classes are not found then (???)
@@ -61,7 +59,7 @@ class TaskCommand extends Translate5AbstractCommand
             \editor_Task_Type_Default::ID,
             \editor_Task_Type_ProjectTask::ID,
             \editor_Task_Type_TermTranslationTask::ID,
-            self::TASKTYPE_INSTANTTRANSLATE,
+            FileTranslationType::ID,
         ];
     }
 

@@ -130,7 +130,7 @@ class CoordinatorProvider
             return [];
         }
 
-        if ($viewer->isPm() || $viewer->isClientPm()) {
+        if ($viewer->isPm() || $viewer->isClientPm() || $viewer->isPmLight()) {
             return $this->filterCoordinatorsByCustomer(
                 $this->getDirectCoordinators($viewer),
                 $customerId

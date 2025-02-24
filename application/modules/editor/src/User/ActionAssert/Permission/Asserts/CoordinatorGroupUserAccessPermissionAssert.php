@@ -95,6 +95,14 @@ final class CoordinatorGroupUserAccessPermissionAssert implements PermissionAsse
             throw new NotAccessibleCoordinatorGroupUserException($groupUser);
         }
 
+        if ($authUser->isPmLight()) {
+            if ($this->isGrantedForPm($groupUser) && UserAction::Read === $action) {
+                return;
+            }
+
+            throw new NotAccessibleCoordinatorGroupUserException($groupUser);
+        }
+
         if ($authUser->isClientPm()) {
             if ($this->isGrantedForClientPm($action, $groupUser, $authUser)) {
                 return;

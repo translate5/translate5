@@ -114,6 +114,7 @@ class Worker extends AbstractProcessingWorker
 
     /**
      * @param State[] $problematicStates
+     * @throws \MittagQI\ZfExtended\Worker\Exception\SetDelayedException
      */
     protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
     {
@@ -146,7 +147,7 @@ class Worker extends AbstractProcessingWorker
                 $this->workerModel->getTaskGuid(),
             );
             foreach ($foundWorkers as $worker) {
-                if ($worker->getId() != $this->workerModel->getId()) {
+                if ($worker['id'] != $this->workerModel->getId()) {
                     //if there are other running termtaggers for the same task and this on is using a down IP,
                     // we just skip this worker. If not (so the last one) we continue as usual below
                     return 0;
@@ -213,7 +214,6 @@ class Worker extends AbstractProcessingWorker
     public function initSlots(): void
     {
         parent::initSlots();
-        $this->maxParallel = 6;
         if (! $this->isThreaded()) {
             return;
         }

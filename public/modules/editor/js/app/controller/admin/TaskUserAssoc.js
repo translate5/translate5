@@ -105,12 +105,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
 
                 let jobStore = this.getUserAssocGrid().getStore();
 
-                this.setJobStoreProxyPath(jobStore, task);
-
-                jobStore.load();
+                if(jobStore)
+                {
+                    this.setJobStoreProxyPath(jobStore, task);
+                    jobStore.load();
+                }
             },
             scope: me,
-        })
+        });
 
         me.control({
             '#adminTaskUserAssocGrid': {
@@ -355,7 +357,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     },
 
     setJobStoreProxyPath: function (store, task) {
-        store.getProxy().setUrl(Editor.data.restpath + 'task/' + task.get('id') + '/job');
+        if(store.getProxy){
+            store.getProxy().setUrl(Editor.data.restpath + 'task/' + task.get('id') + '/job');
+        }
     },
 
     onUserSpecialPropertiesBtnClick: function () {

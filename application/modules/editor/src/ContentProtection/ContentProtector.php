@@ -57,6 +57,8 @@ use editor_Models_Segment_Whitespace as Whitespace;
 
 class ContentProtector
 {
+    public const TAG_REGEX = '/(<(\w|[-:])+>|<\w+ .+>|<\/\w+>|<\/(\w|[-:])+>|<\w+\s?.+\/>)/Uu';
+
     /**
      * All entities are restored to their applicable characters (&_szlig; => ß),
      * only the XML relevant &<> are encoded (ready for GUI)
@@ -115,7 +117,6 @@ class ContentProtector
     public static function create(Whitespace $whitespace): self
     {
         return new self([
-            new WhitespaceProtector($whitespace, true),
             NumberProtector::create(),
             new WhitespaceProtector($whitespace),
         ]);
@@ -171,7 +172,7 @@ class ContentProtector
         string $entityHandling = self::ENTITY_MODE_RESTORE,
         string ...$exceptProtectors
     ): string {
-        if (0 === strpos($text, 'translate5-unique-id')) {
+        if (str_starts_with($text, 'translate5-unique-id')) {
             return $text;
         }
 

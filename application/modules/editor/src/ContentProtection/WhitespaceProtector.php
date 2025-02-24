@@ -56,14 +56,19 @@ use editor_Models_Segment_Whitespace as Whitespace;
 
 class WhitespaceProtector implements ProtectorInterface
 {
-    private const TAG_REGEX = '/(<\w+ .+>|<\/\w+>|<\w+\s?.+\/>)/Uu';
+    private const TAG_REGEX = '/(<(\w|[-:])+>|<\w+ .+>|<\/\w+>|<\/(\w|[-:])+>|<\w+\s?.+\/>)/Uu';
 
     private array $numberWhitespaces = ['e28089', 'e280af']; // THSP and NNBSP
 
     public function __construct(
         private Whitespace $whitespace,
-        private bool $withoutNumberWhitespaces = false
+        private bool $withoutNumberWhitespaces = false,
     ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(new Whitespace());
     }
 
     public static function alias(): string
@@ -96,8 +101,12 @@ class WhitespaceProtector implements ProtectorInterface
         // Nothing to do here
     }
 
-    public function protect(string $textNode, bool $isSource, int $sourceLangId, int $targetLangId): string
-    {
+    public function protect(
+        string $textNode,
+        bool $isSource = true,
+        int $sourceLangId = 0,
+        int $targetLangId = 0,
+    ): string {
         $excludedCharacters = $this->withoutNumberWhitespaces ? $this->numberWhitespaces : [];
         if (! preg_match_all(self::TAG_REGEX, $textNode, $matches)) {
             return $this->whitespace->protectWhitespace($textNode, $excludedCharacters);
@@ -141,7 +150,7 @@ class WhitespaceProtector implements ProtectorInterface
         string $segment,
         int &$shortTagIdent,
         bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = []
+        array &$shortcutNumberMap = [],
     ): string {
         $this->whitespace->collectTagNumbers = $collectTagNumbers;
 
@@ -152,7 +161,7 @@ class WhitespaceProtector implements ProtectorInterface
         string $segment,
         int &$shortTagIdent,
         bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = []
+        array &$shortcutNumberMap = [],
     ): array {
         $xmlChunks = [];
         $this->whitespace->collectTagNumbers = $collectTagNumbers;
@@ -164,7 +173,7 @@ class WhitespaceProtector implements ProtectorInterface
     public function convertToInternalTagsWithShortcutNumberMap(
         string $segment,
         int &$shortTagIdent,
-        array $shortcutNumberMap
+        array $shortcutNumberMap,
     ): string {
         return $this->whitespace->convertToInternalTagsFromService($segment, $shortTagIdent, $shortcutNumberMap);
     }

@@ -52,13 +52,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection;
 
-use DOMCharacterData;
-use DOMDocument;
-use DOMElement;
-use DOMNode;
-use DOMText;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
+use LogicException;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
@@ -73,12 +69,13 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceCont
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use Zend_Registry;
-use ZfExtended_Factory;
 use ZfExtended_Logger;
 
 class NumberProtector implements ProtectorInterface
 {
     public const TAG_NAME = 'number';
+
+    private const PLACEHOLDER_FORMAT = '¿¿¿%s¿¿¿';
 
     /**
      * @var array<string, NumberProtectorInterface>
@@ -86,8 +83,6 @@ class NumberProtector implements ProtectorInterface
     private array $protectors;
 
     private array $protectedNumbers = [];
-
-    private DOMDocument $document;
 
     /**
      * @var array<string, true>
@@ -177,7 +172,7 @@ class NumberProtector implements ProtectorInterface
             ],
             $numberRepository,
             new LanguageRepository(),
-            $logger
+            $logger,
         );
     }
 
@@ -237,9 +232,9 @@ class NumberProtector implements ProtectorInterface
         array &$shortcutNumberMap = [],
         array &$xmlChunks = [],
     ): string {
-        $xml = ZfExtended_Factory::get(XmlParser::class, [[
+        $xml = new XmlParser([
             'normalizeTags' => false,
-        ]]);
+        ]);
         $xml->registerElement(
             self::TAG_NAME,
             null,
@@ -284,19 +279,16 @@ class NumberProtector implements ProtectorInterface
         }
 
         // Reset document else it will be compromised between method calls
-        $this->document = new DOMDocument();
         $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
         $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
 
         if (null === $sourceLang || null === $targetLang) {
-            throw new \LogicException("Provided langs are not present in DB: $sourceLangId, $targetLangId");
+            throw new LogicException("Provided langs are not present in DB: $sourceLangId, $targetLangId");
         }
 
         if (! $this->hasEntityToProtect($textNode, $sourceLangId)) {
             return $textNode;
         }
-
-        $this->loadXML("<node>$textNode</node>");
 
         $tries = 0;
 
@@ -304,19 +296,20 @@ class NumberProtector implements ProtectorInterface
             ? $this->numberRepository->getAllForSource($sourceLang, $targetLang)
             : $this->numberRepository->getAllForTarget($sourceLang, $targetLang);
 
+        $placeholders = [];
+
+        $textNode = $this->replaceTagsWithPlaceholders($textNode, $placeholders);
+
         foreach ($dtos as $protectionDto) {
             // if we'll try to protect for example integers in a row like "string 12 45 67 string"
             // then we'll need to do that in a couple of tries because in current case will get result as:
             // string <number ... source="12" ... /> 145 <number ... source="67" ... /> string
             while ($tries < 2) {
-                if (0 === $tries && ! $this->hasProcessableMatches($textNode, $protectionDto)) {
+                if (0 === $tries && ! $this->hasProcessableMatches($textNode, $placeholders, $protectionDto)) {
                     continue 2;
                 }
 
-                $this->processElement($this->document->documentElement, $protectionDto, $sourceLang, $targetLang);
-
-                // reloading document with potential new tags
-                $this->loadXML($this->getCurrentTextNode());
+                $textNode = $this->protectInText($textNode, $placeholders, $protectionDto, $sourceLang, $targetLang);
 
                 if (0 === $tries && $this->fullSegmentMatch($textNode, $protectionDto)) {
                     break 2;
@@ -328,11 +321,7 @@ class NumberProtector implements ProtectorInterface
             $tries = 0;
         }
 
-        $text = $this->getCurrentTextNode();
-
-        preg_match('/<node>((.*(\n|\r\n)*.*)+)<\/node>/m', $text, $matches);
-
-        return preg_replace('/<skip content="(.+)"\/>/U', '$1', $matches[1]);
+        return str_replace(array_keys($placeholders), array_values($placeholders), $textNode);
     }
 
     // In case we got text like: "string &lt;goba&gt;string"
@@ -352,7 +341,7 @@ class NumberProtector implements ProtectorInterface
         $decoded = $this->decodeTextNode($textNode);
 
         if (
-            ! preg_match_all($protectionDto->regex, $this->document->textContent, $matches)
+            ! preg_match_all($protectionDto->regex, $textNode, $matches)
             && ! preg_match_all($protectionDto->regex, $decoded, $matches)
         ) {
             return false;
@@ -366,13 +355,13 @@ class NumberProtector implements ProtectorInterface
         return $textNode === $matches[$protectionDto->matchId][0];
     }
 
-    private function hasProcessableMatches(string $textNode, ContentProtectionDto $protectionDto): bool
+    private function hasProcessableMatches(string $textNode, array $placeholders, ContentProtectionDto $protectionDto): bool
     {
-        $decoded = $this->decodeTextNode($textNode);
+        $textToTest = str_replace(array_keys($placeholders), ' ', $textNode);
 
         if (
-            ! preg_match_all($protectionDto->regex, $this->document->textContent, $matches)
-            && ! preg_match_all($protectionDto->regex, $decoded, $matches)
+            ! preg_match($protectionDto->regex, $textToTest)
+            && ! preg_match($protectionDto->regex, $this->decodeTextNode($textNode))
         ) {
             return false;
         }
@@ -380,18 +369,6 @@ class NumberProtector implements ProtectorInterface
         if ($protectionDto->keepAsIs || ! empty($protectionDto->outputFormat)) {
             return true;
         }
-
-        $this->loadXML(
-            preg_replace_callback(
-                $protectionDto->regex,
-                fn (array $matches) => str_replace(
-                    $matches[$protectionDto->matchId],
-                    sprintf('<skip content="%s"/>', $matches[$protectionDto->matchId]),
-                    $matches[0]
-                ),
-                $this->getCurrentTextNode()
-            )
-        );
 
         if (! isset($this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"])) {
             $this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"] = true;
@@ -547,92 +524,118 @@ class NumberProtector implements ProtectorInterface
         }
     }
 
-    private function processElement(
-        DOMNode $element,
+    private function protectInText(
+        string $text,
+        array &$placeholders,
         ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
-    ): void {
-        // we can't remove them in protectNumbers() because it will break `$element->childNodes` iterator,
-        // so we remove them after and replace original text node with a couple of generated nodes in protectNumbers()
-        $nodesToRemove = [];
-        foreach ($element->childNodes as $child) {
-            if ($child instanceof DOMElement) {
-                $this->processElement($child, $langFormat, $sourceLang, $targetLang);
+    ): string {
+        $textToTest = str_replace(array_keys($placeholders), '', $text);
+
+        if (
+            ! preg_match($langFormat->regex, $textToTest)
+            && ! preg_match($langFormat->regex, $this->decodeTextNode($text))
+        ) {
+            return $text;
+        }
+
+        $result = '';
+
+        foreach ($this->splitTextByProtections($text) as $part => $isProtected) {
+            if ($isProtected) {
+                $result .= $part;
 
                 continue;
             }
 
-            if (
-                $child instanceof DOMCharacterData
-                && $this->protectNumbers($child, $langFormat, $sourceLang, $targetLang)
-            ) {
-                $nodesToRemove[] = $child;
+            foreach ($this->protectTextPart($part, $placeholders, $langFormat, $sourceLang, $targetLang) as $textPart) {
+                $result .= $textPart;
             }
         }
 
-        foreach ($nodesToRemove as $node) {
-            $node->remove();
-        }
+        return $result;
     }
 
-    private function protectNumbers(
-        DOMCharacterData $text,
-        ContentProtectionDto $langFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
-    ): bool {
-        $decoded = $this->decodeTextNode($this->unprotectHtmlEntities($text->textContent));
-
-        if (preg_match_all($langFormat->regex, $text->textContent, $matches)) {
-            $parts = preg_split($langFormat->regex, $text->textContent);
-        } elseif (preg_match_all($langFormat->regex, $decoded, $matches)) {
-            $parts = [];
-
-            foreach (preg_split($langFormat->regex, $decoded) as $part) {
-                $parts[] = htmlentities($part, ENT_XML1);
-            }
-        } else {
-            return false;
-        }
-
-        $wholeMatches = $matches[0];
-
-        if (! isset($matches[$langFormat->matchId])) {
-            return false;
-        }
-
-        $numbers = $matches[$langFormat->matchId];
-
-        $matchCount = count($numbers);
-
-        /** @var DOMNode $parentNode */
-        $parentNode = $text->parentNode;
-
-        for ($i = 0; $i <= $matchCount; $i++) {
-            if (isset($parts[$i]) && '' !== $parts[$i]) {
-                $parentNode->insertBefore(new DOMText($parts[$i]), $text);
-            }
-
-            if (! isset($numbers[$i])) {
-                continue;
-            }
-
-            foreach ($this->protectNumber($numbers[$i], $wholeMatches[$i], $langFormat, $sourceLang, $targetLang) as $value) {
-                $parentNode->insertBefore($value, $text);
-            }
-        }
-
-        return true;
-    }
-
-    private function protectNumber(
-        string $number,
-        string $wholeMatch,
+    private function protectTextPart(
+        string $part,
+        array &$placeholders,
         ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
     ): iterable {
+        preg_match_all($langFormat->regex, $part, $matches);
+
+        if (empty($matches[$langFormat->matchId])) {
+            $part = $this->decodeTextNode($part);
+
+            preg_match_all($langFormat->regex, $part, $matches);
+        }
+
+        if (empty($matches[$langFormat->matchId])) {
+            return yield $part;
+        }
+
+        $parts = preg_split($langFormat->regex, $part);
+
+        $wholeMatches = $matches[0];
+        $numbers = $matches[$langFormat->matchId];
+
+        $count = count($parts);
+
+        for ($i = 0; $i <= $count; $i++) {
+            yield $parts[$i];
+
+            if (! isset($numbers[$i])) {
+                break;
+            }
+
+            $protected = $this->protectNumber(
+                $numbers[$i],
+                $placeholders,
+                $langFormat,
+                $sourceLang,
+                $targetLang
+            );
+
+            yield str_replace($numbers[$i], $protected, $wholeMatches[$i]);
+        }
+    }
+
+    /**
+     * true - for protected text, false - for text to protect
+     *
+     * @return iterable<string, bool>
+     */
+    private function splitTextByProtections(string $text): iterable
+    {
+        preg_match_all('/¿¿¿.+¿¿¿/Uu', $text, $protectedMatches);
+        $protectedMatches = $protectedMatches[0];
+
+        $parts = preg_split('/¿¿¿.+¿¿¿/Uu', $text);
+
+        $partsCount = count($parts);
+
+        for ($p = 0; $p <= $partsCount; $p++) {
+            if (! isset($parts[$p])) {
+                break;
+            }
+
+            yield $parts[$p] => false;
+
+            if (isset($protectedMatches[$p])) {
+                yield $protectedMatches[$p] => true;
+            }
+        }
+    }
+
+    private function protectNumber(
+        string $number,
+        array &$placeholders,
+        ContentProtectionDto $langFormat,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang,
+    ): string {
         if (! isset($this->protectedNumbers[$number])) {
             try {
                 $protectedNumber = $this
@@ -640,47 +643,57 @@ class NumberProtector implements ProtectorInterface
                     ->protect($number, $langFormat, $sourceLang, $targetLang);
             } catch (NumberParsingException) {
                 // if match was not actually a number - return it as is
-                return yield $this->document->importNode(new DOMText($wholeMatch));
+                return $number;
             }
 
-            $dom = new DOMDocument();
-            $dom->loadXML($protectedNumber);
-            $this->protectedNumbers[$number] = $dom->firstChild;
+            $this->protectedNumbers[$number] = $protectedNumber;
         }
 
-        $parts = explode($number, $wholeMatch);
+        $numberPlaceholder = sprintf(self::PLACEHOLDER_FORMAT, base64_encode($this->protectedNumbers[$number]));
 
-        if (! empty($parts[0])) {
-            yield $this->document->importNode(new DOMText($parts[0]));
-        }
+        $placeholders[$numberPlaceholder] = $this->protectedNumbers[$number];
 
-        yield $this->document->importNode($this->protectedNumbers[$number]);
-
-        if (! empty($parts[1])) {
-            yield $this->document->importNode(new DOMText($parts[1]));
-        }
+        return $numberPlaceholder;
     }
 
-    private function loadXML(string $textNode): void
+    /**
+     * @param array<string, string> $placeholders
+     */
+    public function replaceTagsWithPlaceholders(string $textNode, array &$placeholders): string
     {
-        // protect entities
-        $this->document->loadXML($this->protectHtmlEntities($textNode));
-        // loadXML resets encoding so we setting it here at each iteration
-        $this->document->encoding = 'utf-8';
-    }
+        $xml = new XmlParser([
+            'normalizeTags' => false,
+        ]);
+        $xml->registerElement(
+            '*',
+            null,
+            function ($tagName, $key, $opener) use ($xml, &$placeholders) {
+                $openTag = $xml->getChunk($opener['openerKey']);
+                $openTagPlaceholder = sprintf(self::PLACEHOLDER_FORMAT, base64_encode($openTag));
 
-    private function getCurrentTextNode(): string
-    {
-        return $this->unprotectHtmlEntities($this->document->saveXML($this->document->documentElement));
-    }
+                $placeholders[$openTagPlaceholder] = $openTag;
 
-    private function protectHtmlEntities(string $text): string
-    {
-        return preg_replace('/&(\w{2,8});/', '¿¿¿\1¿¿¿', $text);
-    }
+                $xml->replaceChunk(
+                    $opener['openerKey'],
+                    $openTagPlaceholder
+                );
 
-    private function unprotectHtmlEntities(string $text): string
-    {
-        return preg_replace('/¿¿¿(\w{2,8})¿¿¿/', '&\1;', $text);
+                if ($opener['openerKey'] === $key) {
+                    return;
+                }
+
+                $closeTag = $xml->getChunk($key);
+                $closeTagPlaceholder = sprintf(self::PLACEHOLDER_FORMAT, base64_encode($closeTag));
+
+                $placeholders[$closeTagPlaceholder] = $closeTag;
+
+                $xml->replaceChunk(
+                    $key,
+                    $closeTagPlaceholder
+                );
+            }
+        );
+
+        return $xml->parse($textNode, true);
     }
 }

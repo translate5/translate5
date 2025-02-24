@@ -38,11 +38,16 @@ class JoinCondition
         public readonly string $foreignTable,
         public readonly string $foreignKey,
         public readonly string $operator = '=',
+        public readonly ?string $foreignAlias = null,
     ) {
     }
 
     public function __toString(): string
     {
+        if ($this->foreignAlias !== null) {
+            return "{$this->table}.{$this->localKey} {$this->operator} {$this->foreignAlias}.{$this->foreignKey}";
+        }
+
         return "{$this->table}.{$this->localKey} {$this->operator} {$this->foreignTable}.{$this->foreignKey}";
     }
 }

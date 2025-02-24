@@ -30,6 +30,7 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
+use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
 use MittagQI\Translate5\PauseWorker\AbstractPauseWorker;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
@@ -118,7 +119,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         );
 
         $this->eventManager->attach(
-            'MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuerPivotQueuer',
+            PivotQueuer::class,
             'beforePivotPreTranslationQueue',
             [$this, 'handleBeforePivotPreTranslationQueue']
         );
@@ -138,7 +139,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
         $this->eventManager->attach(
             ImportEventTrigger::class,
-            ImportEventTrigger::IMPORT_WORKER_STARTED,
+            ImportEventTrigger::IMPORT_WORKER_QUEUED,
             [$this, 'handleImportWorkerQueued']
         );
     }
@@ -577,11 +578,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         }
 
         if ($task->isImporting()) {
-            //on import we use the import worker as parentId
-            $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
-            $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
+            //on import we use the import worker as parentId and use it's state to evaluate the state we need
+            $importWorker = $this->fetchImportWorker($task->getTaskGuid());
+            $parentId = ($importWorker === null) ? 0 : (int) $importWorker->getId();
+            $state = ($importWorker !== null && $importWorker->getState() === ZfExtended_Models_Worker::STATE_PREPARE) ?
+                ZfExtended_Models_Worker::STATE_PREPARE : ZfExtended_Models_Worker::STATE_SCHEDULED;
 
-            $this->doQueueAnalysisWorkers($task, $parentWorkerId, $workerState, $workerParameters);
+            $this->doQueueAnalysisWorkers($task, $parentId, $state, $workerParameters);
         } else {
             // this creates the operation start/finish workers
             $operation = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
@@ -714,14 +717,21 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      */
     private function fetchImportWorkerId(string $taskGuid): int
     {
-        $parent = new ZfExtended_Models_Worker();
+        $worker = $this->fetchImportWorker($taskGuid);
+
+        return ($worker === null) ? 0 : (int) $worker->getId();
+    }
+
+    private function fetchImportWorker(string $taskGuid): ?ZfExtended_Models_Worker
+    {
+        $worker = new ZfExtended_Models_Worker();
 
         try {
-            $parent->loadFirstOf(editor_Models_Import_Worker::class, $taskGuid);
+            $worker->loadFirstOf(editor_Models_Import_Worker::class, $taskGuid);
 
-            return (int) $parent->getId();
+            return $worker;
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            return 0;
+            return null;
         }
     }
 

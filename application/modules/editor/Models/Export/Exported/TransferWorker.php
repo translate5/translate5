@@ -122,7 +122,7 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
             // Spoof rfc5646-code of source language with target language's one
             $raw = preg_replace('~(<langSet.+?xml:lang=")([^"]+)(".*?>)~', '$1' . $targetLangRfc . '$3', $raw);
 
-            // TODO FIXME: this Code should be abstarcted to an ZfExtended API class, see also editor_Plugins_InstantTranslate_Filetranslationhelper
+            // TODO FIXME: use MittagQI\ZfExtended\ApiRequest
 
             try {
                 $client = new ZfExtended_ApiClient($parameters['url'] . 'languageresourceinstance/' . $m[1] . '/import/', $parameters['cookie']);

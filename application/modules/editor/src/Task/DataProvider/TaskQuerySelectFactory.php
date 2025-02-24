@@ -107,7 +107,7 @@ class TaskQuerySelectFactory
         User $viewer,
         ?ZfExtended_Models_Filter $filter,
     ): Zend_Db_Select {
-        $select = $this->getBaseProjectSelect($viewer, $filter, TaskDb::TABLE_NAME . '.id');
+        $select = $this->getBaseProjectSelect($viewer, $filter, TaskDb::TABLE_NAME . '.*');
 
         if ($this->doDebug) {
             error_log("TASK QUERY SELECT createProjectIdsSelect:\n ---\n" . $select->assemble() . "\n\n");
@@ -258,11 +258,23 @@ class TaskQuerySelectFactory
             return;
         }
 
+        if (! $isTaskSelect) {
+            $groupTaskJoin = new JoinCondition(
+                TaskDb::TABLE_NAME,
+                'id',
+                TaskDb::TABLE_NAME,
+                'projectId',
+                '=',
+                'groupTask'
+            );
+            $this->joinWithFilter($select, $filter, $groupTaskJoin, $applySort);
+        }
+
         $groupJobJoin = new JoinCondition(
-            TaskDb::TABLE_NAME,
+            $isTaskSelect ? TaskDb::TABLE_NAME : 'groupTask',
             'taskGuid',
             CoordinatorGroupJobTable::TABLE_NAME,
-            'taskGuid'
+            'taskGuid',
         );
         $this->joinWithFilter($select, $filter, $groupJobJoin, $applySort);
         $select->where(CoordinatorGroupJobTable::TABLE_NAME . '.groupId = ?', $groupUser->group->getId());
@@ -296,7 +308,7 @@ class TaskQuerySelectFactory
                 $condition->localKey,
                 $condition->foreignKey,
                 $columns,
-                null,
+                $condition->foreignAlias,
                 $joinType
             );
             $filter->overrideJoinedTable($dto);
@@ -304,17 +316,23 @@ class TaskQuerySelectFactory
             return;
         }
 
+        $name = $condition->foreignAlias
+            ? [
+                $condition->foreignAlias => $condition->foreignTable,
+            ]
+            : $condition->foreignTable;
+
         switch ($joinType) {
             case Zend_Db_Select::LEFT_JOIN:
-                $select->joinLeft($condition->foreignTable, (string) $condition, $columns);
+                $select->joinLeft($name, (string) $condition, $columns);
 
                 break;
             case Zend_Db_Select::RIGHT_JOIN:
-                $select->joinRight($condition->foreignTable, (string) $condition, $columns);
+                $select->joinRight($name, (string) $condition, $columns);
 
                 break;
             default:
-                $select->joinInner($condition->foreignTable, (string) $condition, $columns);
+                $select->joinInner($name, (string) $condition, $columns);
 
                 break;
         }

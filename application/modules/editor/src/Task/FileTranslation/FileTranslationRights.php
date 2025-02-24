@@ -1,7 +1,7 @@
 <?php
 /*
 START LICENSE AND COPYRIGHT
- Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2025 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file is part of a paid plug-in for translate5.
@@ -48,77 +48,25 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
+namespace MittagQI\Translate5\Task\FileTranslation;
 
-use editor_Models_Languages;
-use LogicException;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
-use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\ZfExtended\Acl\AbstractResource;
 
-abstract class AbstractProtector implements NumberProtectorInterface
+/**
+ * Holds and documents the FileTranslation ACL rights
+ */
+final class FileTranslationRights extends AbstractResource
 {
-    public const HARD_RETURN_PLACEHOLDER = 'HARD_RETURN_PLACEHOLDER';
-
-    public function __construct(
-        protected ContentProtectionRepository $formatRepository,
-    ) {
-    }
-
-    protected function tagFormat(): string
-    {
-        return str_replace(
-            ':tag',
-            NumberProtector::TAG_NAME,
-            '<:tag type="%s" name="%s" source="%s" iso="%s" target="%s" regex="%s"/>'
-        );
-    }
-
-    public function protect(
-        string $number,
-        ContentProtectionDto $protectionDto,
-        editor_Models_Languages $sourceLang,
-        editor_Models_Languages $targetLang,
-    ): string {
-        if (! $protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
-            throw new LogicException(
-                sprintf(
-                    'Input rule of type "%s" and name "%s" does not have appropriate output rule',
-                    $protectionDto->type,
-                    $protectionDto->name
-                )
-            );
-        }
-
-        return $this->composeNumberTag($number, $protectionDto, $targetLang);
-    }
+    /**
+     * ACL Resource
+     */
+    public const ID = 'instanttranslate';
 
     /**
-     * @throws NumberParsingException
+     * allows the user to see InstantTranslate tasks as ordinary tasks
      */
-    protected function composeNumberTag(
-        string $number,
-        ContentProtectionDto $protectionDto,
-        editor_Models_Languages $targetLang,
-    ): string {
-        $number = str_replace("\r\n", self::HARD_RETURN_PLACEHOLDER, $number);
-
-        return sprintf(
-            $this->tagFormat(),
-            static::getType(),
-            htmlspecialchars($protectionDto->name, ENT_XML1),
-            htmlspecialchars($number),
-            htmlspecialchars($number),
-            htmlspecialchars($number, ENT_XML1),
-            $this->encodeRegex($protectionDto->regex),
-        );
-    }
-
-    protected function encodeRegex(string $regex): string
-    {
-        return base64_encode(gzdeflate($regex));
-    }
+    public const ACCESS_INSTANTTRANSLATE_TASK = 'pluginInstantTranslateAccessTask';
 }

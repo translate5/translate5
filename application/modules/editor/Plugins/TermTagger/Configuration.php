@@ -40,7 +40,7 @@ class Configuration
      * Defines, how much segments can be processed in one processor call
      * @var integer
      */
-    public const OPERATION_BATCH_SIZE = 15;
+    public const OPERATION_BATCH_SIZE = 5;
 
     /**
      * Defines, how much tags can be removed in one processor call

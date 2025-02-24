@@ -65,6 +65,7 @@ use editor_Models_Import_UploadProcessor;
 use editor_Models_Task;
 use SplFileInfo;
 use Zend_Registry as Registry;
+use ZfExtended_Authentication;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -92,9 +93,9 @@ final class FileTypeSupport
             $useCoreCsvParser = Registry::get('config')->runtimeOptions->import->fileparser->csv->active ?? false;
             self::$_instances['DEFAULT'] = new FileTypeSupport($useCoreCsvParser);
             // event to let plugins and other providers register their filetypes
-            self::$events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
-            self::$events->trigger('registerSupportedFileTypes', self::$_instances['DEFAULT'], [
+            self::getEventManager()->trigger('registerSupportedFileTypes', self::$_instances['DEFAULT'], [
                 'task' => null,
+                'customerId' => -1,
             ]);
         }
 
@@ -125,13 +126,48 @@ final class FileTypeSupport
 
             self::$_instances[$taskIdentifier] = new FileTypeSupport($useCoreCsvParser);
             // event to let plugins and other providers register their filetypes
-            self::$events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
-            self::$events->trigger('registerSupportedFileTypes', self::$_instances[$taskIdentifier], [
+            self::getEventManager()->trigger('registerSupportedFileTypes', self::$_instances[$taskIdentifier], [
                 'task' => $task,
+                'customerId' => -1,
             ]);
         }
 
         return self::$_instances[$taskIdentifier];
+    }
+
+    /**
+     * Retrieves the file-type support for file-translations
+     * File-translations are bound to the primary customer of the current user
+     * @throws \ReflectionException
+     * @throws \Zend_Exception
+     */
+    public static function fileTranslationInstance(): FileTypeSupport
+    {
+        if (! array_key_exists('FILETRANSLATION', self::$_instances)) {
+            // usage of internal CSV file-parser is configurable
+            $useCoreCsvParser = Registry::get('config')->runtimeOptions->import->fileparser->csv->active ?? false;
+            self::$_instances['FILETRANSLATION'] = new FileTypeSupport($useCoreCsvParser);
+            // event to let plugins and other providers register their filetypes
+            self::getEventManager()->trigger('registerSupportedFileTypes', self::$_instances['FILETRANSLATION'], [
+                'task' => null,
+                'customerId' => ZfExtended_Authentication::getInstance()->getUser()->getPrimaryCustomerId(),
+            ]);
+        }
+
+        return self::$_instances['FILETRANSLATION'];
+    }
+
+    /**
+     * Helper to create the Event-Manager
+     * @throws \ReflectionException
+     */
+    private static function getEventManager(): ZfExtended_EventManager
+    {
+        if (! isset(self::$events)) {
+            self::$events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
+        }
+
+        return self::$events;
     }
 
     /**

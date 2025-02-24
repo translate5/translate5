@@ -185,7 +185,10 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                                 disabled: '{!hasRecords}',
                                 text: '{l10n.searchForm.deleteAll}',
                                 hidden: '{!l10n.searchForm.deleteAll}',
-                                tooltip: '{l10n.searchForm.deleteAllTooltip}',
+                                tooltip: '{hasRecords ? l10n.searchForm.deleteAllTooltip : l10n.searchForm.deleteAllDisabledTooltip}',
+                            },
+                            style: {
+                                pointerEvents: 'all'
                             },
                         }
                     ]

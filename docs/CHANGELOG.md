@@ -11,34 +11,82 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## [7.20.1] - 2025-02-10
+## [7.20.3] - 2025-02-18
 
 ### Important Notes:
  
 
+
+### Changed
+**[TRANSLATE-4464](https://jira.translate5.net/browse/TRANSLATE-4464): Editor general - Make Dummy pseudo translator plugin to be activated by default** <br>
+Dummy pseudo translator plugin is now activated by default
+
+
+### Bugfixes
+**[TRANSLATE-4472](https://jira.translate5.net/browse/TRANSLATE-4472): Editor general - UI error: loading jobs rarely reads to an error** <br>
+Fix for UI error where loading of a jobs in project overview can crash the UI.
+
+**[TRANSLATE-4471](https://jira.translate5.net/browse/TRANSLATE-4471): Import/Export - Worker-queue may stuck on import due to MatchAnalysis** <br>
+FIX: Import may stuck due to MatchAnalysis being queued too late
+
+**[TRANSLATE-4470](https://jira.translate5.net/browse/TRANSLATE-4470): Auto-QA - Exception when loading task-tbx leads to blocked task-operation** <br>
+FIX: Exception in TBX-loading for a task may leads to a stuck AutoQA-operation
+
+**[TRANSLATE-4465](https://jira.translate5.net/browse/TRANSLATE-4465): TM Maintenance - Delete all button in TM Maintenance** <br>
+TM Maintenance "Delete all" UI wording changed to be more clear. Fixed behavior of Yes - No buttons in German localization. 
+
+**[TRANSLATE-4421](https://jira.translate5.net/browse/TRANSLATE-4421): Import/Export - Quick insert sdlxliff tags do not get incremented short tag number** <br>
+SDLXLIFF Import: Fix tag duplicating issue for segments with Quick insert tags
+
+
+## [7.20.2] - 2025-02-13
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4454](https://jira.translate5.net/browse/TRANSLATE-4454): MatchAnalysis & Pretranslation, t5memory - Add waiting for t5memory to be available before starting match analysis** <br>
+Add waiting for t5memory to become available before match analysis and pretranslation
+
+
+### Bugfixes
+**[TRANSLATE-4461](https://jira.translate5.net/browse/TRANSLATE-4461): job coordinator - Jobcoordinators don't see any tasks** <br>
+Job Coordinator: fix project overview
+
+**[TRANSLATE-4460](https://jira.translate5.net/browse/TRANSLATE-4460): Workflows - PM Light permissions issue** <br>
+PM Light: Fix permissions issue
+
+**[TRANSLATE-4457](https://jira.translate5.net/browse/TRANSLATE-4457): Editor general - Fatal error in TaskViewDataProvider** <br>
+Fixed fatal error in TaskViewDataProvider
+
+**[TRANSLATE-4456](https://jira.translate5.net/browse/TRANSLATE-4456): Editor general - FIX: Unbookmarking watched segments creates invalid SQL** <br>
+FIX: Unbookmarking watched segments creates invalid SQL
+
+**[TRANSLATE-4455](https://jira.translate5.net/browse/TRANSLATE-4455): Editor general, job coordinator - Position action returns different on same request** <br>
+Fix: Fix blinking project overview 
+
+**[TRANSLATE-4453](https://jira.translate5.net/browse/TRANSLATE-4453): Editor general - Filters in language resource assoc panel are not working anymore** <br>
+Fixed filtering in task to language resource association panel
+
+**[TRANSLATE-4451](https://jira.translate5.net/browse/TRANSLATE-4451): t5memory - When memory is overflown during fuzzy its name is overwritten** <br>
+Fixed bug which might cause t5memory language resource to get fuzzy name in case memory is overflown during match analysis
+
+**[TRANSLATE-4449](https://jira.translate5.net/browse/TRANSLATE-4449): API - Revert back incompatible changes** <br>
+Rollback API entries type changes changes
+
+**[TRANSLATE-4434](https://jira.translate5.net/browse/TRANSLATE-4434): InstantTranslate - Instanttranslate: Waiting error on now action** <br>
+Instanttranslate: Fix stalling instant translation tasks
+
+**[TRANSLATE-4433](https://jira.translate5.net/browse/TRANSLATE-4433): MatchAnalysis & Pretranslation - FIX: MatchAnalysis is queued with state "scheduled" for import** <br>
+FIX: MatchAnalysis was queued with wrong state causing stuck imports in rare cases
+
+**[TRANSLATE-4023](https://jira.translate5.net/browse/TRANSLATE-4023): Auto-QA - AutoQA portlet should dissappear with no active checks** <br>
+7.20.2: UI Error caused by the original fix.
+7.7.0: Editor's AutoQA leftside portlet is now hidden if no autoQA enabled for the task
+
+
+## [7.20.1] - 2025-02-10
 
 ### Bugfixes
 **[TRANSLATE-4447](https://jira.translate5.net/browse/TRANSLATE-4447): Main back-end mechanisms (Worker, Logging, etc.) - Clean up error message handling** <br>
@@ -49,10 +97,6 @@ FIX: JobCoordinator Task Overview SQL faulty
 
 
 ## [7.20.0] - 2025-02-08
-
-### Important Notes:
- 
-
 
 ### Added
 **[TRANSLATE-3676](https://jira.translate5.net/browse/TRANSLATE-3676): service provider, User Management, Workflows - Introduce service providers and job coordinators** <br>
@@ -67,7 +111,6 @@ Route `/editor/userassocdefault` deprecated, use `editor/customer/:customerId/wo
 ### Important Notes:
 #### [TRANSLATE-4093](https://jira.translate5.net/browse/TRANSLATE-4093)
 For the OKAPI 1.47 compatibility, all File-Format Settings will be migrated to this version. They cannot be used for older OKAPI-Versions afterwards; The Older Versions are only still in the system to support the export of existing tasks. Older OKAPI versions can only be used for Import with a pre-1.47 BCONFs in the import ZIP. For this Feature to be installed, an OKAPI 1.47 docker container must be running and the endpoint must be configured as service in the installation with the server-key "okapi-longhorn-147". If it is nt present, the update-script will stop and generate an error.
- 
 
 
 ### Added
@@ -117,20 +160,12 @@ Solved in the frame of job coordinator feature
 
 ## [7.18.1] - 2025-01-28
 
-### Important Notes:
- 
-
-
 ### Changed
 **[TRANSLATE-4415](https://jira.translate5.net/browse/TRANSLATE-4415): Authentication - fixes for Plugin PlunetConnector** <br>
 Plugin PlunetConnector: Login does not work for users with existing (old) App token
 
 
 ## [7.18.0] - 2025-01-27
-
-### Important Notes:
- 
-
 
 ### Added
 **[TRANSLATE-4404](https://jira.translate5.net/browse/TRANSLATE-4404): Task Management - translate5 Plunet Connector** <br>
@@ -169,10 +204,6 @@ Fix for a problem where tag check will complain about duplicate tags in segment 
 
 ## [7.17.1] - 2025-01-24
 
-### Important Notes:
- 
-
-
 ### Changed
 **[TRANSLATE-4407](https://jira.translate5.net/browse/TRANSLATE-4407): TrackChanges - Update text differ** <br>
 Update text differ package
@@ -188,6 +219,9 @@ IMPROVEMENT Visual: Fix several smaller quirks in the reflow-detection
 
 
 ### Bugfixes
+**[TRANSLATE-4394](https://jira.translate5.net/browse/TRANSLATE-4394): Content Protection - Fix TM Conversion** <br>
+Fix html entities preserving on content protection; Suppress warnings for t5memory specific tags; Tune up TM conversion process
+
 **[TRANSLATE-4396](https://jira.translate5.net/browse/TRANSLATE-4396): LanguageResources - Language resource import status check problem** <br>
 FIXED: un-triggered import status check for added languageresources
 
@@ -217,10 +251,6 @@ FIXED: error popping on loading 2nd page of TMMaintenance search results
 
 
 ## [7.17.0] - 2025-01-17
-
-### Important Notes:
- 
-
 
 ### Added
 **[TRANSLATE-3952](https://jira.translate5.net/browse/TRANSLATE-3952): Import/Export - Use resname from xliff and if not set segment id from xliff in task as context for t5memory** <br>
@@ -266,10 +296,6 @@ Fixed custom fields handling on metadata export
 
 
 ## [7.15.3] - 2025-01-14
-
-### Important Notes:
- 
-
 
 ### Changed
 **[TRANSLATE-4368](https://jira.translate5.net/browse/TRANSLATE-4368): t5memory - Create a command for manual fixing t5memory issues** <br>

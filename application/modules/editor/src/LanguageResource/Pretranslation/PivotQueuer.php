@@ -62,7 +62,7 @@ class PivotQueuer
     {
         $this->events = ZfExtended_Factory::get(
             ZfExtended_EventManager::class,
-            ['MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuerPivotQueuer']
+            [self::class]
         );
     }
 
@@ -141,7 +141,7 @@ class PivotQueuer
             // trigger event before the pivot pre-translation worker is queued
             $this->events->trigger(
                 'beforePivotPreTranslationQueue',
-                'MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuerPivotQueuer',
+                self::class,
                 [
                     'task' => $task,
                     'pivotAssociations' => $assoc,

@@ -27,7 +27,7 @@
 -- */
 
 -- userGroup calculation: basic: 1; editor: 2; pm: 4; admin: 8
-            
+
 INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2025-02-07', 'TRANSLATE-4425', 'feature', 'Editor general - Dummy Pseudo translator: New plugin for testing to be translated files', 'Added new plugin which purpose is to visualize which text can be translated in complext projects (documents etc.) in translate5', '15'),
 ('2025-02-07', 'TRANSLATE-4437', 'change', 'TermTagger integration - Tweaks to use threaded termtagger', 'Improvement: Tweaks for the use of a threaded Termtagger in the cloud', '15'),
 ('2025-02-07', 'TRANSLATE-4419', 'change', 'textshuttle - Change TextShuttle API URL', 'TextShuttle api URL changed', '15'),
@@ -40,4 +40,14 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
 ('2025-02-07', 'TRANSLATE-4427', 'bugfix', 'Import/Export - SDLXLIFF: Export segment draft state', 'SDLXLIFF: fix export of draft state', '15'),
 ('2025-02-07', 'TRANSLATE-4418', 'bugfix', 'Okapi integration - Windows-based srx path within pipeline step causes error on bconf upload', 'Added proper handling of Windows-based srx paths within uploaded bconfs', '15'),
 ('2025-02-07', 'TRANSLATE-4416', 'bugfix', 'Editor general, TrackChanges - Switch how differences in fuzzy matches are shown', 'FIXED: misleding styles for differences between segment and match', '15'),
-('2025-02-07', 'TRANSLATE-4299', 'bugfix', 'User Management - Client-PM assignment for task as translator does NOT work for job, where he is NOT PM', 'Solved in the frame of job coordinator feature', '15');
+('2025-02-07', 'TRANSLATE-4299', 'bugfix', 'User Management - Client-PM assignment for task as translator does NOT work for job, where he is NOT PM', 'Solved in the frame of job coordinator feature', '15'),
+-- added manually because they were missing in the changelog
+('2025-02-07', 'TRANSLATE-3429', 'change', 'Special white-space chars in IDML are protected as tags in Okapi - no match with whitespace in translate5', 'added possibility to make special white-space chars in IDML not to be protected as tags in Okapi, added tag symbols for the new special whitespace tags in translate5, implemented additional menu in "Special chars" section for a segment to make the new special whitespace tags addable', '15'),
+('2025-02-07', 'TRANSLATE-3644', 'change', 'IDML Filter: make special characters configurable', 'Added GUI to edit "Special character pattern" for IDML filter', '15'),
+('2025-02-07', 'TRANSLATE-4200', 'change', 'Generate Export BCONF from Import BCONF to solve Subfilter-Problem', 'FIX: The Bconfs used for Export/Merging are now derived from the Import-Bconf''s to solve Problems when using customized Subfilters', '15'),
+('2025-02-07', 'TRANSLATE-4305', 'change', 'OKAPI BCONF Pipelines: enable includeNoTranslate', 'FIX: option in Pipeline of BCONF may creates problems on task-export', '15'),
+('2025-02-07', 'TRANSLATE-3202', 'change', 'Adopt File Format Settings for OpenXML to Okapi version 1.4.7', 'Excel Worksheet-Options configuration will not be transferred to the new version. If it used, you should take notes/screenshots of your settings. The new GUI for them will be adopted in a later release', '15'),
+('2025-02-07', 'TRANSLATE-3193', 'change', 'Large MS Office files (190MB) fail on import because of Okpai conversion fails', 'Increased maxAttributeSize value to address large MS Office files fail on import', '15'),
+('2025-02-07', 'TRANSLATE-3645', 'change', 'OpenXML Filter: DOCX: make possible numbering level texts translation', 'Added new config "Translate Numbering Level Text" to OpenXML_Filter', '15'),
+('2025-02-07', 'TRANSLATE-3646', 'change', 'OpenXML Filter: font information has to be available on extraction', 'Added default pipeline settings for okapi to have font information available on extraction (OpenXML filter)', '15');
+

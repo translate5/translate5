@@ -203,6 +203,22 @@ final class Processing extends Zend_Db_Table_Abstract
     }
 
     /**
+     * Ends processing for the given states
+     * @param int[] $segmentIds
+     */
+    public function endProcessingForStates(array $segmentIds): int
+    {
+        return $this->update(
+            [
+                'processing' => 0,
+            ],
+            [
+                'segmentId IN (?)' => $segmentIds,
+            ]
+        );
+    }
+
+    /**
      * Will remove all processing entries for the passed task
      */
     public function finishOperation(string $taskGuid)

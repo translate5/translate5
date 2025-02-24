@@ -62,22 +62,23 @@ class ImportSdlxliffWithQuickInsertsListTagsTest extends UnitTestAbstract
      * @see \editor_Models_Import_FileParser_Sdlxliff::parseSegment
      * @dataProvider expectedSegmentsProvider
      */
-    public function testSuccess(string $expectedTarget): void
+    public function testSuccess(string $file, string $expected, string $field): void
     {
         $segmentFieldManager = \editor_Models_SegmentFieldManager::getForTaskGuid($this->task->getTaskGuid());
 
         $parser = new Sdlxliff(
-            __DIR__ . '/testfiles/ImportSdlxliffWithQuickInsertsListTagsTest/success.sdlxliff',
+            $file,
             'ImportSdlxliffWithQuickInsertsListTags.sdlxliff',
             (int) $this->file->getId(),
             $this->task,
         );
         $parser->setSegmentFieldManager($segmentFieldManager);
 
-        $sp = new class($this->task, $expectedTarget) extends \editor_Models_Import_SegmentProcessor {
+        $sp = new class($this->task, $expected, $field) extends \editor_Models_Import_SegmentProcessor {
             public function __construct(
                 editor_Models_Task $task,
-                private string $expectedTarget,
+                private string $expected,
+                private string $field,
             ) {
                 parent::__construct($task);
             }
@@ -86,7 +87,7 @@ class ImportSdlxliffWithQuickInsertsListTagsTest extends UnitTestAbstract
             {
                 $fields = $parser->getFieldContents();
 
-                ImportSdlxliffWithQuickInsertsListTagsTest::assertSame($this->expectedTarget, $fields['source']['original']);
+                ImportSdlxliffWithQuickInsertsListTagsTest::assertSame($this->expected, $fields[$this->field]['original']);
 
                 return false;
             }
@@ -100,7 +101,15 @@ class ImportSdlxliffWithQuickInsertsListTagsTest extends UnitTestAbstract
     public function expectedSegmentsProvider(): iterable
     {
         yield '2 "Bold" ids + 1 "SmallCaps"' => [
-            '<div class="open 672069643d22426f6c6422 internal-tag ownttip"><span title="Bold" class="short">&lt;1&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div>Source text 1.<div class="close 2f67 internal-tag ownttip"><span title="Bold" class="short">&lt;/1&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div> <div class="open 672069643d22426f6c6422 internal-tag ownttip"><span title="Bold" class="short">&lt;2&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div>Source text 2.<div class="close 2f67 internal-tag ownttip"><span title="Bold" class="short">&lt;/2&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div> <div class="open 672069643d22536d616c6c4361707322 internal-tag ownttip"><span title="SmallCaps" class="short">&lt;3&gt;</span><span data-originalid="SmallCaps" data-length="-1" class="full">SmallCaps</span></div>Source text 3.<div class="close 2f67 internal-tag ownttip"><span title="SmallCaps" class="short">&lt;/3&gt;</span><span data-originalid="SmallCaps" data-length="-1" class="full">SmallCaps</span></div>',
+            'file' => __DIR__ . '/testfiles/ImportSdlxliffWithQuickInsertsListTagsTest/success.sdlxliff',
+            'expected' => '<div class="open 672069643d22426f6c6422 internal-tag ownttip"><span title="Bold" class="short">&lt;1&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div>Source text 1.<div class="close 2f67 internal-tag ownttip"><span title="Bold" class="short">&lt;/1&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div> <div class="open 672069643d22426f6c6422 internal-tag ownttip"><span title="Bold" class="short">&lt;2&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div>Source text 2.<div class="close 2f67 internal-tag ownttip"><span title="Bold" class="short">&lt;/2&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div> <div class="open 672069643d22536d616c6c4361707322 internal-tag ownttip"><span title="SmallCaps" class="short">&lt;3&gt;</span><span data-originalid="SmallCaps" data-length="-1" class="full">SmallCaps</span></div>Source text 3.<div class="close 2f67 internal-tag ownttip"><span title="SmallCaps" class="short">&lt;/3&gt;</span><span data-originalid="SmallCaps" data-length="-1" class="full">SmallCaps</span></div>',
+            'field' => 'source',
+        ];
+
+        yield '' => [
+            'file' => __DIR__ . '/testfiles/ImportSdlxliffWithQuickInsertsListTagsTest/cf-bold-and-id-bold.sdlxliff',
+            'expected' => 'La solución de tambor magnético de secado <div class="open 672069643d22343722 internal-tag ownttip"><span title="&lt;cf bold=True&gt;" class="short">&lt;1&gt;</span><span data-originalid="47" data-length="-1" class="full">&lt;cf bold=True&gt;</span></div>STEINERT WDB-D<div class="close 2f67 internal-tag ownttip"><span title="&lt;/cf&gt;" class="short">&lt;/1&gt;</span><span data-originalid="47" data-length="-1" class="full">&lt;/cf&gt;</span></div> prescinde de estos depósitos de espesado de concentrado, <div class="open 672069643d22426f6c6422 internal-tag ownttip"><span title="Bold" class="short">&lt;3&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div>ahorrando espacio en la mina y las instalaciones del puerto<div class="close 2f67 internal-tag ownttip"><span title="Bold" class="short">&lt;/3&gt;</span><span data-originalid="Bold" data-length="-1" class="full">Bold</span></div>.',
+            'field' => 'target',
         ];
     }
 

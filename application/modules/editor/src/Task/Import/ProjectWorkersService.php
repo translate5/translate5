@@ -97,10 +97,6 @@ class ProjectWorkersService
         $refTreeWorker->init($taskGuid, $params);
         $refTreeWorker->queue($parentId, ZfExtended_Models_Worker::STATE_PREPARE, false);
 
-        // sometimes it is not possbile for additional import workers to be invoked in afterImport,
-        // for that reason this event exists:
-        $this->eventTrigger->triggerImportWorkerQueued($task, $parentId);
-
         $worker = ZfExtended_Factory::get(editor_Models_Import_Worker_SetTaskToOpen::class);
         // queuing this worker when task has errors make no sense, init checks this.
         if ($worker->init($taskGuid, [
@@ -115,6 +111,10 @@ class ProjectWorkersService
         ])) {
             $worker->queue($parentId, ZfExtended_Models_Worker::STATE_PREPARE);
         }
+
+        // sometimes it is not possbile for additional import workers to be invoked in afterImport,
+        // for that reason this event exists:
+        $this->eventTrigger->triggerImportWorkerQueued($task, $parentId);
     }
 
     /**
@@ -166,8 +166,6 @@ class ProjectWorkersService
 
                 //set the prepared worker to scheduled and set them to waiting where possible
                 $workerModel->schedulePrepared();
-
-                $this->eventTrigger->triggerImportWorkerStarted($model);
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 //if there is no worker, nothing can be done
             }

@@ -262,12 +262,7 @@ class editor_Models_Segment_Whitespace
      */
     private int $currentShortTagNumber;
 
-    /**
-     * tag map for usage in language resources
-     */
-    // private array $tagShortcutNumberMap = [];
-
-    private array $protectedCharLabels = [];
+    private array $protectedCharLabels;
 
     /**
      * public flag if tagShortcutNumbers should be collected on usage into $this->tagShortcutNumberMap

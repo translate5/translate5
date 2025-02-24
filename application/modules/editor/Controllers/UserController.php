@@ -308,7 +308,7 @@ class Editor_UserController extends ZfExtended_RestController
         $this->decodePutData();
 
         try {
-            if (! property_exists($this->data->passwd, 'passwd')) {
+            if (! property_exists($this->data, 'passwd')) {
                 return;
             }
 

@@ -76,6 +76,16 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
 {
+    /**
+     * Retrieves the default customer ID
+     */
+    public static function getDefaultCustomerId(): int
+    {
+        $customer = new self();
+
+        return (int) $customer->loadByDefaultCustomer()->getId();
+    }
+
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
 
     protected $validatorInstanceClass = 'editor_Models_Validator_Customer';

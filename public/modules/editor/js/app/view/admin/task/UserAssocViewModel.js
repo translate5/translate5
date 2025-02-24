@@ -55,12 +55,6 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
         },
         steps: {
             data: '{stepsData}'
-        },
-        userAssoc:{
-            model: 'Editor.model.admin.TaskUserAssoc',
-            remoteFilter: false,
-            pageSize: false,
-            autoLoad: false,
         }
     },
     formulas: {
