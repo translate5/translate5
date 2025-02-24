@@ -29,17 +29,19 @@
 namespace MittagQI\Translate5\Plugins\TermTagger;
 
 use editor_Plugins_TermTagger_Bootstrap;
-use editor_Plugins_TermTagger_Exception_Abstract;
-use editor_Plugins_TermTagger_Exception_Down;
-use editor_Plugins_TermTagger_Exception_Malfunction;
-use editor_Plugins_TermTagger_Exception_Open;
-use editor_Plugins_TermTagger_Exception_Request;
-use editor_Plugins_TermTagger_Exception_TimeOut;
 use Exception;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\AbstractException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\DownException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\MalfunctionException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\OpenException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\Remover;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\Tagger;
 use MittagQI\Translate5\Segment\Processing\AbstractProcessingWorker;
 use MittagQI\Translate5\Segment\Processing\State;
+use MittagQI\ZfExtended\Worker\Exception\SetDelayedException;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Exception;
@@ -102,12 +104,12 @@ class Worker extends AbstractProcessingWorker
     }
 
     /**
-     * @throws editor_Plugins_TermTagger_Exception_Down
+     * @throws DownException
      */
     protected function raiseNoAvailableResourceException()
     {
         // E1131 No TermTaggers available, please enable term taggers to import this task.
-        throw new editor_Plugins_TermTagger_Exception_Down('E1131', [
+        throw new DownException('E1131', [
             'task' => $this->task,
         ]);
     }
@@ -123,9 +125,10 @@ class Worker extends AbstractProcessingWorker
         //  not in a bulk manner if they are not yer reprocessed
         // 2. we set the segment to unprocessable when it already was being reprocessed
         // the logging will be done in the finalizeOperation of the quality-provider
-        if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Malfunction
-            || $loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_TimeOut
-            || $loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Request) {
+        if ($loopedProcessingException instanceof MalfunctionException
+            || $loopedProcessingException instanceof TimeOutException
+            || $loopedProcessingException instanceof RequestException
+        ) {
             // set the failed segments either to reprocess or unprocessable depending if we are already reprocessing
             if ($isReprocessing) {
                 $this->setUnprocessedStates($problematicStates, State::UNPROCESSABLE);
@@ -140,7 +143,7 @@ class Worker extends AbstractProcessingWorker
         }
         // a Down Exception will be created if all services are down to create an import error.
         // If other URLs are still up, we simply end the worker without further notice
-        if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Down) {
+        if ($loopedProcessingException instanceof DownException) {
             $foundWorkers = $this->workerModel->loadByState(
                 $this->workerModel::STATE_RUNNING,
                 $this->workerModel->getWorker(),
@@ -160,9 +163,9 @@ class Worker extends AbstractProcessingWorker
             // this will terminate the processing
             return 0;
         }
-        // editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
+        // OpenException Exceptions mean mostly that there is problem with the TBX data
         // so we do not create a new worker entry, that imports the task without terminology markup then
-        if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Open) {
+        if ($loopedProcessingException instanceof OpenException) {
             $this->task->setTerminologie(false);
             $this->task->save();
             $this->logTaskException($loopedProcessingException);
@@ -170,8 +173,22 @@ class Worker extends AbstractProcessingWorker
             // this will terminate the processing
             return 0;
         }
+        // A NoResponse Exception hints at the TermTagger has too many requests
+        // in this case we simply delay for some seconds and try again ...
+        if ($loopedProcessingException instanceof NoResponseException) {
+            // set the remaining states back to "unprocessed"
+            $this->setUnprocessedStates($problematicStates, State::UNPROCESSED);
+
+            // trigger delay
+            throw new SetDelayedException(
+                $this->processor->getServiceId(),
+                get_class($this),
+                Configuration::OVERLOADED_TAGGER_DELAY
+            );
+        }
+
         // all other Termtagger exceptions will be logged according their severity
-        if ($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Abstract) {
+        if ($loopedProcessingException instanceof AbstractException) {
             $this->logTaskException($loopedProcessingException);
 
             // unknown exceptions will terminate the processing

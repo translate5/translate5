@@ -26,10 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Plugins\TermTagger\Exception;
+
 /**
  * Exception Class to get detailed information on TermTagger-Error.
  */
-class editor_Plugins_TermTagger_Exception_Malfunction extends editor_Plugins_TermTagger_Exception_Abstract
+class NoResponseException extends AbstractException
 {
     //localErrorCodes see parent abstract
 }

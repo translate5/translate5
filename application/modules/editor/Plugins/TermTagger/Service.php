@@ -28,11 +28,12 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\TermTagger;
 
-use editor_Plugins_TermTagger_Exception_Down;
-use editor_Plugins_TermTagger_Exception_Open;
-use editor_Plugins_TermTagger_Exception_Request;
-use editor_Plugins_TermTagger_Exception_TimeOut;
 use Exception;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\DownException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\OpenException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
 use MittagQI\Translate5\PooledService\AbstractPooledService;
 use stdClass;
@@ -121,8 +122,8 @@ final class Service extends AbstractPooledService
 
         try {
             $response = $this->sendRequest($httpClient, $httpClient::GET);
-        } catch (editor_Plugins_TermTagger_Exception_TimeOut $e) {
-            $result['success'] = true; // the request URL is probably a termtagger which can not respond due it is processing data
+        } catch (TimeOutException) {
+            $result['success'] = true; // the request URL is probably a termtagger which can not respond due to it is processing data
 
             return $result;
         } catch (Throwable) {
@@ -186,14 +187,14 @@ final class Service extends AbstractPooledService
      * Load a tbx-file $tbxFilePath into the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file
      * @return stdClass|null
      * @throws Zend_Http_Client_Exception
-     * @throws editor_Plugins_TermTagger_Exception_Open
-     * @throws editor_Plugins_TermTagger_Exception_Request
+     * @throws OpenException
+     * @throws RequestException
      */
     public function loadTBX(string $url, string $tbxHash, string $tbxData, ZfExtended_Logger $logger)
     {
         if (empty($tbxHash)) {
             //Could not load TBX into TermTagger: TBX hash is empty.
-            throw new editor_Plugins_TermTagger_Exception_Open('E1116', [
+            throw new OpenException('E1116', [
                 'termTaggerUrl' => $url,
             ]);
         }
@@ -225,13 +226,13 @@ final class Service extends AbstractPooledService
 
         //E1117: Could not load TBX into TermTagger: TermTagger HTTP result was not successful!
         //E1118: Could not load TBX into TermTagger: TermTagger HTTP result could not be decoded!'
-        throw new editor_Plugins_TermTagger_Exception_Open($errorCode, $data);
+        throw new OpenException($errorCode, $data);
     }
 
     /**
      * Requests the termtagger with the given service-url and the passed segment-data (wich has to be be encoded)
      * @throws Zend_Http_Client_Exception
-     * @throws editor_Plugins_TermTagger_Exception_Request
+     * @throws RequestException
      */
     public function tagTerms(string $serviceUrl, ServiceData $serviceData, ZfExtended_Logger $logger, int $requestTimeout): ?stdClass
     {
@@ -250,7 +251,7 @@ final class Service extends AbstractPooledService
         $response = $this->decodeServiceResult($logger, $httpResponse);
         if (! $response) {
             //processing terms from the TermTagger result could not be decoded.
-            throw new editor_Plugins_TermTagger_Exception_Request('E1121', [
+            throw new RequestException('E1121', [
                 'httpStatus' => $this->getLastStatus(),
                 'termTaggerUrl' => $httpClient->getUri(true),
                 'plainServerResponse' => $httpResponse->getBody(),
@@ -263,9 +264,11 @@ final class Service extends AbstractPooledService
 
     /**
      * send request method with unified logging
-     * @param string $method
-     * @throws editor_Plugins_TermTagger_Exception_Request
      * @return Zend_Http_Response
+     * @throws DownException
+     * @throws NoResponseException
+     * @throws RequestException
+     * @throws TimeOutException
      */
     private function sendRequest(Zend_Http_Client $client, $method)
     {
@@ -290,21 +293,20 @@ final class Service extends AbstractPooledService
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $httpException) {
             //if the error is one of the following, we have a request timeout
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Read timed out after 10 seconds
-            throw new editor_Plugins_TermTagger_Exception_TimeOut('E1240', $extraData, $httpException);
+            throw new TimeOutException('E1240', $extraData, $httpException);
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $httpException) {
             //if the error is one of the following, we have a connection problem
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://localhost:8080. Error #111: Connection refused
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://michgibtesdefinitivnichtalsdomain.com:8080. Error #0: php_network_getaddresses: getaddrinfo failed: Name or service not known
-
             //the following IP is not routed, so it trigers a timeout on connection connect, which must result in "Unable to connect" too and not in a request timeout below
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://10.255.255.1:8080. Error #111: Connection refused
-            throw new editor_Plugins_TermTagger_Exception_Down('E1129', $extraData, $httpException);
+            throw new DownException('E1129', $extraData, $httpException);
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $httpException) {
-            //This error points to an crash of the termtagger, so we can log additional data here
-            throw new editor_Plugins_TermTagger_Exception_Request('E1130', $extraData, $httpException);
+            // This error points to the termtagger not responding due to too many requests
+            throw new NoResponseException('E1130', $extraData, $httpException);
         } catch (Exception $httpException) {
             //Error in communication with TermTagger
-            throw new editor_Plugins_TermTagger_Exception_Request('E1119', $extraData, $httpException);
+            throw new RequestException('E1119', $extraData, $httpException);
         }
     }
 

@@ -91,6 +91,11 @@ class Configuration
     public const OVERSIZE_WORD_COUNT = 150;
 
     /**
+     * The duration we wait when a termtagger is overloaded and hope it will work again (sec) ...
+     */
+    public const OVERLOADED_TAGGER_DELAY = 2;
+
+    /**
      * Defines the logger-domain for all termtagger code
      */
     public static function getLoggerDomain(string $processingType): string

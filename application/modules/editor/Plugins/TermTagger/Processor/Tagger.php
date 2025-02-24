@@ -36,13 +36,13 @@ use editor_Models_Segment_TrackChangeTag;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use editor_Models_Term_TbxCreationException;
-use editor_Plugins_TermTagger_Exception_Abstract;
-use editor_Plugins_TermTagger_Exception_Malfunction;
-use editor_Plugins_TermTagger_Exception_Open;
 use editor_Plugins_TermTagger_QualityProvider;
 use editor_Plugins_TermTagger_Tag;
 use editor_Segment_Tags;
 use MittagQI\Translate5\Plugins\TermTagger\Configuration;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\AbstractException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\MalfunctionException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\OpenException;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
 use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
 use MittagQI\Translate5\Segment\AbstractProcessor;
@@ -214,9 +214,9 @@ final class Tagger extends AbstractProcessor
 
     /**
      * Returns an array of terms applicable for particular segment
-     * @throws editor_Plugins_TermTagger_Exception_Abstract
-     * @throws editor_Plugins_TermTagger_Exception_Malfunction
-     * @throws editor_Plugins_TermTagger_Exception_Open
+     * @throws AbstractException
+     * @throws MalfunctionException
+     * @throws OpenException
      */
     public function retrieveTermsForSegmentTags(editor_Segment_Tags $segmentsTags): iterable
     {
@@ -256,7 +256,7 @@ final class Tagger extends AbstractProcessor
      * Applies the result of the termtagging to the sent segment-tags
      * @throws ZfExtended_Exception
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_TermTagger_Exception_Malfunction
+     * @throws MalfunctionException
      */
     private function applyTaggingResult(stdClass $result, array $segmentsTags, bool $saveTags = true)
     {
@@ -278,7 +278,7 @@ final class Tagger extends AbstractProcessor
                     $tags->save();
                 }
             } else {
-                throw new editor_Plugins_TermTagger_Exception_Malfunction('E1120', [
+                throw new MalfunctionException('E1120', [
                     'task' => $this->task,
                     'reason' => 'Response of termtagger did not contain the sent segment with ID ' . $segmentId,
                 ]);
@@ -288,19 +288,19 @@ final class Tagger extends AbstractProcessor
 
     /**
      * Transfers a single termtagger response to the corresponding tags-model
-     * @throws editor_Plugins_TermTagger_Exception_Malfunction
+     * @throws MalfunctionException
      */
     private function applyResponseToTags(array $responseGroup, editor_Segment_Tags $tags)
     {
         // UGLY: this should better be done by adding real tag-objects instead of setting the tags via text
         if (count($responseGroup) < 1) {
-            throw new editor_Plugins_TermTagger_Exception_Malfunction('E1120', [
+            throw new MalfunctionException('E1120', [
                 'task' => $this->task,
                 'reason' => 'Response of termtagger did not contain data for the segment ID ' . $tags->getSegmentId(),
             ]);
         }
         if (! $tags->hasSource()) {
-            throw new editor_Plugins_TermTagger_Exception_Malfunction('E1120', [
+            throw new MalfunctionException('E1120', [
                 'task' => $this->task,
                 'reason' => 'Passed segment tags did not contain a source ' . $tags->getSegmentId(),
             ]);
@@ -309,7 +309,7 @@ final class Tagger extends AbstractProcessor
         $sourceText = null;
         if ($tags->hasOriginalSource()) {
             if (! array_key_exists('SourceOriginal', $responseFields)) {
-                throw new editor_Plugins_TermTagger_Exception_Malfunction('E1120', [
+                throw new MalfunctionException('E1120', [
                     'task' => $this->task,
                     'reason' => 'Response of termtagger did not contain data for the original source for the segment ID ' . $tags->getSegmentId(),
                 ]);
@@ -323,7 +323,7 @@ final class Tagger extends AbstractProcessor
                 $sourceText = $responseFields[$field]->source;
             }
             if (! array_key_exists($field, $responseFields)) {
-                throw new editor_Plugins_TermTagger_Exception_Malfunction('E1120', [
+                throw new MalfunctionException('E1120', [
                     'task' => $this->task,
                     'reason' => 'Response of termtagger did not contain the field "' . $field . '" for the segment ID ' . $tags->getSegmentId(),
                 ]);
@@ -372,7 +372,7 @@ final class Tagger extends AbstractProcessor
         foreach ($segmentsTags as $tags) {
             // should not happen but who knows in which processingMode the tags have been generated
             if (! $tags->hasSource()) {
-                throw new editor_Plugins_TermTagger_Exception_Malfunction('E1120', [
+                throw new MalfunctionException('E1120', [
                     'task' => $this->task,
                     'reason' => 'Passed segment tags did not contain a source ' . $tags->getSegmentId(),
                 ]);
@@ -566,8 +566,8 @@ final class Tagger extends AbstractProcessor
      * Checks if tbx-file with hash $tbxHash is loaded on the TermTagger-server behind $url.
      * If not already loaded, tries to load the tbx-file from the task.
      * Throws Exceptions if TBX could not be loaded!
-     * @throws editor_Plugins_TermTagger_Exception_Abstract
-     * @throws editor_Plugins_TermTagger_Exception_Open
+     * @throws AbstractException
+     * @throws OpenException
      */
     private function checkTermTaggerTbx(string $url, ?string &$tbxHash)
     {
@@ -580,7 +580,7 @@ final class Tagger extends AbstractProcessor
             $tbx = $this->getTbxData();
             $tbxHash = $this->task->meta()->getTbxHash();
             $this->service->loadTBX($url, $tbxHash, $tbx, $this->logger);
-        } catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
+        } catch (AbstractException $e) {
             $e->addExtraData([
                 'task' => $this->task,
                 'termTaggerUrl' => $url,
@@ -592,7 +592,7 @@ final class Tagger extends AbstractProcessor
 
     /**
      * returns the TBX string to be loaded into the termtagger
-     * @throws editor_Plugins_TermTagger_Exception_Open
+     * @throws OpenException
      */
     private function getTbxData(): string
     {
@@ -604,7 +604,7 @@ final class Tagger extends AbstractProcessor
             return $tbxParser->assertTbxExists($this->task, $tbxFileInfo);
         } catch (editor_Models_Term_TbxCreationException $e) {
             // 'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
-            throw new editor_Plugins_TermTagger_Exception_Open('E1116', [], $e);
+            throw new OpenException('E1116', [], $e);
         }
     }
 }

@@ -102,12 +102,18 @@ final class Looper
             // we wrap the processing of a batch in a transaction
             // when the processor leads to an exception, this transaction needs to be closed ...
             // we do that only, if the processing saves back to the tag-state, otherwise we create nested locks in an potentially uncertain order
-            if (count($segmentsTags) === 1) {
+            $amount = count($segmentsTags);
+            if ($amount === 1) {
                 $this->processor->process($segmentsTags[0]);
                 $this->numProcessed++;
-            } else {
+            } elseif ($amount > 1) {
                 $this->processor->processBatch($segmentsTags);
                 $this->numProcessed += count($segmentsTags);
+            } else {
+                // This in theory should not happen, but it seems to happen ...
+                error_log('SEGMENT LOOPER: No segments could be fetched but fetchNext returned true ...');
+
+                continue;
             }
             // report the progress of processed segments
             $this->progressReporter->reportProcessed($this->numProcessed);
@@ -153,7 +159,7 @@ final class Looper
     {
         foreach ($problematicStates as $state) {
             if ($state->getState() != State::PROCESSED) {
-                $state->setState($errorState);
+                $state->saveState($errorState);
                 if ($doDebug) {
                     error_log('Looper: set State to ' . $errorState . ' and finish processing for segment ' .
                         $state->getSegmentId());
@@ -225,6 +231,10 @@ final class Looper
                         if ($until <= 0) {
                             return false;
                         }
+                    }
+                    // it could be, that in the meantime all segments were processed by another Looper
+                    if (count($this->toProcess) === 0) {
+                        return false;
                     }
 
                     return true;

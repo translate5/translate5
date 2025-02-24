@@ -34,6 +34,7 @@ use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Models_Db_DeadLockHandlerTrait;
 
 /**
  * DB Access for Segment Processing
@@ -42,6 +43,8 @@ use ZfExtended_Factory;
  */
 final class Processing extends Zend_Db_Table_Abstract
 {
+    use ZfExtended_Models_Db_DeadLockHandlerTrait;
+
     private const INSERT_BATCH = 1000;
 
     protected $_name = 'LEK_segment_processing';
@@ -208,14 +211,20 @@ final class Processing extends Zend_Db_Table_Abstract
      */
     public function endProcessingForStates(array $segmentIds): int
     {
-        return $this->update(
-            [
-                'processing' => 0,
-            ],
-            [
-                'segmentId IN (?)' => $segmentIds,
-            ]
-        );
+        $this->reduceDeadlocks($this);
+        $affectedRows = $this->retryOnDeadlock(function () use ($segmentIds) {
+            return $this->update(
+                [
+                    'processing' => 0,
+                ],
+                [
+                    'segmentId IN (?)' => $segmentIds,
+                    'processing = ?' => 1,
+                ]
+            );
+        });
+
+        return (int) $affectedRows;
     }
 
     /**
