@@ -53,6 +53,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             }
         },
         component:{
+            '#projectPanel': {
+                render: 'onProjectPanelRender'
+            },
             '#reloadProjectbtn':{
                 click:'onReloadProjectBtnClick'
             }
@@ -68,6 +71,35 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 filterchange: 'onProjectStoreFilterChange'
             }
         }
+    },
+
+    onProjectPanelRender: function (cmp) {
+        let me = this;
+        new Ext.util.KeyMap({
+            target: cmp.getEl(),
+            key: Ext.event.Event.G,
+            ctrl: true,
+            fn: function (key, e) {
+                e.stopEvent();
+                let grid = me.lookup('projectGrid'),
+                    id = grid.selection && grid.selection.get('id'),
+                    prompt = Ext.Msg.prompt('Go to project', 'No.:', function (btn, taskId) {
+                        if (btn === 'ok') {
+                            Editor.model.admin.Task.load(parseInt(taskId), {
+                                preventDefaultHandler: true,
+                                success: function(task) {
+                                    me.redirectFocus(task, true);
+                                },
+                                failure: function(record, op, success) {
+                                    Ext.Msg.alert('Project / task not found', 'No project or task could be found for the given ID!');
+                                }
+                            });
+                        }
+                    }, me, false, id);
+                prompt.down('textfield').selectOnFocus = true;
+                prompt.down('textfield').focus(200);
+            }
+        });
     },
 
     /***
