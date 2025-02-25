@@ -58,7 +58,6 @@ use editor_Models_LanguageResources_LanguageResource;
 use editor_Models_Languages;
 use editor_Models_Task;
 use editor_Models_TaskUsageLog;
-use editor_Plugins_InstantTranslate_Init;
 use editor_Task_Type;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Repository\TaskRepository;
@@ -79,12 +78,12 @@ use ZfExtended_Factory;
  */
 class FileTranslation
 {
-    public static function create(): self
+    public static function create(string $loggerDomain = 'editor.filetranslation'): self
     {
         return new self(
             new UserRepository(),
             TaskRepository::create(),
-            editor_Plugins_InstantTranslate_Init::LOGGER_DOMAIN
+            $loggerDomain
         );
     }
 
