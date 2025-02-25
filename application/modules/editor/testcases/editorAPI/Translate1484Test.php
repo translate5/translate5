@@ -76,7 +76,13 @@ class Translate1484Test extends JsonTestAbstract
         // we need to order the results to avoid tests failing due to runtime-differences
         $this->sortExportResource($actualObject);
         $this->sortExportResource($expectedObject);
-        $this->assertEquals($expectedObject, $actualObject, 'The expected file (exportResults) an the result file does not match.');
+        $this->assertEquals(
+            $expectedObject,
+            $actualObject,
+            'The expected file (exportResults) an the result file does not match.'
+            . PHP_EOL
+            . json_encode($actualObject, JSON_PRETTY_PRINT)
+        );
     }
 
     private function sortExportResource(stdClass $exportResource)

@@ -105,7 +105,6 @@ class Translate2991Test extends JsonTestAbstract
     public function testPricing()
     {
         // Check at least system default pricing preset exists
-        /** @var Zend_Http_Response $resp */
         $json = static::api()->getJson('editor/plugins_matchanalysis_pricingpreset');
         $this->assertIsArray($json, 'Response is not an array');
         $rows = array_column($json, 'id', 'name');
@@ -172,8 +171,8 @@ class Translate2991Test extends JsonTestAbstract
 
         // Make sure ranges for created preset are same as for default preset, as cloned from there
         $this->assertEquals(
-            json_encode($pairs['default']),
-            json_encode($pairs['created']),
+            json_encode($pairs['default'] ?? []),
+            json_encode($pairs['created'] ?? []),
             'Ranges from default preset were not correctly cloned to created preset'
         );
 

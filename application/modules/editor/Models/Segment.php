@@ -77,6 +77,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method void setSource(string $content)
  * @method void setSourceEdit(string $content)
  * @method void setSourceMd5(string $md5hash)
+ * @method string getSourceMd5()
  * @method string getTarget()
  * @method void setTarget(string $content)
  * @method string getTargetEdit()

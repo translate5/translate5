@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<tmx version="1.4">
+    <header creationtoolversion="0.6.66" gitCommit="96744f79 * updated to v0.6.66 * fixed memmove crash in compareputdata" segtype="sentence" adminlang="en-us" srclang="en-GB" o-tmf="t5memory" creationtool="t5memory" datatype="plaintext"/>
+    <body>
+        <tu tuid="1" creationdate="20230202T141425Z">
+            <prop type="tmgr:segNum">1</prop>
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">3-seg-resname.xlf</prop>
+            <prop type="tmgr:context">CONTEXT_1</prop>
+            <tuv xml:lang="en">
+                <seg>My test segment.</seg>
+            </tuv>
+            <tuv xml:lang="de">
+                <seg>Mein Testabschnitt 1. (CONTEXT_1)</seg>
+            </tuv>
+        </tu>
+        <tu tuid="2" creationdate="20230202T141430Z">
+            <prop type="tmgr:segNum">2</prop>
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">3-seg-resname.xlf</prop>
+            <prop type="tmgr:context">CONTEXT_2</prop>
+            <tuv xml:lang="en">
+                <seg>My test segment.</seg>
+            </tuv>
+            <tuv xml:lang="de">
+                <seg>Mein Testabschnitt 2. (CONTEXT_2)</seg>
+            </tuv>
+        </tu>
+    </body>
+</tmx>

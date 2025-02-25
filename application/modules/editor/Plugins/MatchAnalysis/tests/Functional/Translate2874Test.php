@@ -47,7 +47,10 @@ class Translate2874Test extends JsonTestAbstract
         $config
             ->addLanguageResource('zdemomt', null, $customerId, $sourceLangRfc, $targetLangRfc)
             ->addDefaultCustomerId($customerId)
-            ->setProperty('name', 'API Testing::ZDemoMT_Translate2874Test'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->setProperty(
+                'name',
+                'API Testing::ZDemoMT_Translate2874Test'
+            ); // TODO FIXME: we better generate data independent from resource-names ...
         $config
             ->addPretranslation()
             ->setProperty('pretranslateTmAndTerm', 0)
@@ -65,6 +68,11 @@ class Translate2874Test extends JsonTestAbstract
         //test segment list
         $jsonFileName = 'expectedSegments-edited.json';
         $segments = static::api()->getSegments($jsonFileName, 10);
-        $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
+        $this->assertModelsEqualsJsonFile(
+            'Segment',
+            $jsonFileName,
+            $segments,
+            'Imported segments are not as expected!'
+        );
     }
 }

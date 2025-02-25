@@ -32,8 +32,8 @@ use MittagQI\Translate5\Test\Import\LanguageResource;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
- * Testcase for TRANSLATE-2756 - basically a match analysis and pretranslation test regarding repetitions and internal fuzzies
- * For details see the issue.
+ * Testcase for TRANSLATE-2756 - basically a match analysis and pretranslation test regarding repetitions and internal
+ * fuzzies For details see the issue.
  */
 class Translate2756Test extends JsonTestAbstract
 {
@@ -55,9 +55,13 @@ class Translate2756Test extends JsonTestAbstract
         $sourceLangRfc = 'de';
         $targetLangRfc = 'en';
         $customerId = static::getTestCustomerId();
+        // @phpstan-ignore-next-line
         static::$dummyTm = $config
             ->addLanguageResource('dummytm', 'DummyTmxData.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
-            ->setProperty('name', 'Translate2756Test');  // TODO FIXME: we better generate data independent from resource-names ...
+            ->setProperty(
+                'name',
+                'Translate2756Test'
+            );  // TODO FIXME: we better generate data independent from resource-names ...
         $config
             ->addPretranslation()
             ->setProperty('pretranslateMt', 1);
@@ -74,7 +78,13 @@ class Translate2756Test extends JsonTestAbstract
     {
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName, 10);
-        $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
+
+        $this->assertModelsEqualsJsonFile(
+            'Segment',
+            $jsonFileName,
+            $segments,
+            'Imported segments are not as expected!'
+        );
     }
 
     /**
@@ -87,6 +97,7 @@ class Translate2756Test extends JsonTestAbstract
 
         //prepare segment with changed TM data from GUI
         $segToTest = $segments[2];
+        // @phpstan-ignore-next-line
         $tmId = static::$dummyTm->getId() ?? 0;
         $additionalPutData = [
             'target' => '=&gt; contact Translate5 service',
@@ -104,7 +115,12 @@ class Translate2756Test extends JsonTestAbstract
         //check direct PUT result
         $jsonFileName = 'expectedSegments-edited.json';
         $segments = static::api()->getSegments($jsonFileName, 10);
-        $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
+        $this->assertModelsEqualsJsonFile(
+            'Segment',
+            $jsonFileName,
+            $segments,
+            'Imported segments are not as expected!'
+        );
     }
 
     /**
