@@ -1139,7 +1139,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return self::CONTEXT_MATCH_VALUE;
         }
 
-        if ($isExacExac) {
+        // exact match only for case when no res-name is set
+        if ($isExacExac && empty($segment->meta()->getSegmentDescriptor())) {
             return self::EXACT_EXACT_MATCH_VALUE;
         }
 

@@ -209,7 +209,9 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $this->wordCount->setSegment($seg);
         $meta->setSourceWordCount($this->wordCount->getSourceCount());
 
-        $meta->setSegmentDescriptor($attributes->transunitDescriptor ?? $seg->getSegmentNrInTask());
+        if ($attributes->transunitDescriptor) {
+            $meta->setSegmentDescriptor($attributes->transunitDescriptor);
+        }
 
         $meta->setSiblingData($seg);
         $meta->save();

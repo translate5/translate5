@@ -27,6 +27,7 @@
  */
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Segment_MatchRateType as MatchRateType;
 use editor_Plugins_MatchAnalysis_Models_MatchAnalysis as MatchAnalysis;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
@@ -78,15 +79,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
     /**
      * Contains the master segment to a segment source hash
-     * @var array
+     * @var array<string, editor_Models_Segment>
      */
     protected $repetitionMasterSegments = [];
 
     /**
      * Holds the repetition updater
-     * @var editor_Models_Segment_RepetitionUpdater
      */
-    protected $repetitionUpdater;
+    protected ?editor_Models_Segment_RepetitionUpdater $repetitionUpdater = null;
 
     private editor_Services_Manager $manager;
 
@@ -136,9 +136,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $segmentCounter = 0;
 
+        /** @var editor_Models_Segment $segment */
         foreach ($segments as $segment) {
-            /* @var $segment editor_Models_Segment */
-
             $segmentCounter++;
 
             //progress to update
@@ -230,12 +229,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $master = $this->repetitionMasterSegments[$segment->getSourceMd5()] ?? null;
                 $rep = $this->repetitionByHash[$segment->getSourceMd5()] ?? null;
                 $isMaster = $rep && $master && $master->getId() === $segment->getId();
-                $isRepetition = $rep && $master && $master->getId() !== $segment->getId();
+                $isRepetition = $rep
+                    && $master
+                    && $master->getId() !== $segment->getId()
+                    && $bestMatchRateResult->isRepetition
+                ;
+
                 if ($isMaster) {
                     //only update repetitions if the master was updated too, which is here the case
                     // set the updateMe in the shared repetition result for all repetitions
                     $rep->updateMe = true;
                 }
+
                 //update the segment only if, it was no repetition, or the master of the repetition was updated too
                 if (empty($rep) || ($rep->updateMe ?? false)) {
                     $this->updateSegment($segment, $bestMatchRateResult, $isRepetition);
@@ -260,12 +265,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected function calculateMatchrate(editor_Models_Segment $segment): ?stdClass
     {
-        //calculate and set segment hash
-        $segmentHash = $segment->getSourceMd5();
+        // calculate and set segment hash.
+        // If segment has descriptor set - it indicates that the segment had res-name on import
+        // and such segment should be treated as a unique segment in pair with the descriptor
+        $segmentHash = $segment->getSourceMd5() . $segment->meta()->getSegmentDescriptor();
 
         //lazy init, we need only instance, the here given $segment will be overwritten wuth the updateRepetition call
-        if (empty($this->repetitionUpdater)) {
-            $this->repetitionUpdater = Factory::get('editor_Models_Segment_RepetitionUpdater', [$segment, $this->task->getConfig()]);
+        if (null === $this->repetitionUpdater) {
+            $this->repetitionUpdater = new editor_Models_Segment_RepetitionUpdater($segment, $this->task->getConfig());
         }
 
         //check if the segment source hash exist in the repetition array
@@ -273,12 +280,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //segment does not exist in repetition array -> query the tm save the best match rate per tm
         $hasRepetitions = in_array($segment->getId(), $this->segmentIdsWithRepetitions);
         $isRepetition = $hasRepetitions && array_key_exists($segmentHash, $this->repetitionMasterSegments);
+
         if (! $isRepetition) {
-            $bestResult = $this->getBestResult($segment, true);
+            $bestResult = $this->getBestResult($segment);
             if (! $hasRepetitions) {
                 // if the segment has no repetitions at all we just return the found result
                 return $bestResult;
             }
+
             //the first segment of multiple repetitions is always stored as master
             $this->repetitionMasterSegments[$segmentHash] = clone $segment;
 
@@ -291,31 +300,64 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         // for the analysis, a repetition is always counted as 102% match!
         // what is taken over for pre-translation is however defined differently:
         // - if master segment matchrate < configured matchrate for pre-translation:
-        //      then count the repetition as 102 in the analysis but do not touch the repeated segment, so matchrate = 0, no target, no matchtype
+        //      then count the repetition as 102 in the analysis but do not touch the repeated segment,
+        //      so matchrate = 0, no target, no matchtype
         // - if master segment matchrate >= configured matchrate for pre-translation:
-        //      then count the repetition as 102 in the analysis AND set the repeated segment to the matchrate, target content and matchtype of the master segment
-        //      the segment is also marked as pre-translated and it should be editable if a fuzzy match (which is no problem anymore since the fuzzy matchrate is taken over)
+        //      then count the repetition as 102 in the analysis AND set the repeated segment to the matchrate,
+        //      target content and matchtype of the master segment
+        //      the segment is also marked as pre-translated and it should be editable if a fuzzy match
+        //      (which is no problem anymore since the fuzzy matchrate is taken over)
 
-        //get the best match rate for the repetition segment, basically 102%, but:
+        // get the best match rate for the repetition segment, basically 102%, but:
         // it can be context match (103%) which is better as the above defined 102% repetition one
         // or the one stored for the repetition could be from a MT. So recalc here always.
         $bestResult = $this->getBestResult($segment, false);
-        // we take only 102% if the master was lesser
-        $repetitionRate = max(($bestResult->matchrate ?? 0), FileBasedInterface::REPETITION_MATCH_VALUE);
-        //save the repetition analysis with either 102% or 103% matchrate
-        $this->saveAnalysis($segment, $repetitionRate, 0);
+
+        if (null === $bestResult) {
+            if (isset($this->repetitionByHash[$segmentHash])) {
+                // save the repetition analysis with 102% match rate
+                $this->saveAnalysis($segment, FileBasedInterface::REPETITION_MATCH_VALUE, 0);
+
+                return $this->repetitionByHash[$segmentHash];
+            }
+
+            return null;
+        }
+
+        $bestMatch = $bestResult->matchrate ?? 0;
+        $resultMatchRate = max($bestMatch, FileBasedInterface::REPETITION_MATCH_VALUE);
+
+        // for TM result we take repetition match value only if best match was < 103%
+        if (
+            $bestResult->languageResourceType == MatchRateType::TYPE_TM
+            && $bestMatch === FileBasedInterface::CONTEXT_MATCH_VALUE
+            && ! $this->isInternalFuzzy($bestResult->target ?? '')
+        ) {
+            $resultMatchRate = $bestResult->matchrate;
+        }
+
+        $result = clone $bestResult;
+        $result->isRepetition = false;
+
+        if (FileBasedInterface::REPETITION_MATCH_VALUE === $resultMatchRate) {
+            // save the repetition analysis with 102% match rate
+            $this->saveAnalysis($segment, $resultMatchRate, 0);
+            $result->isRepetition = true;
+            $result->matchrate = 0;
+        }
 
         //if there is no match we can not update the target below, this means returning null
         if (! $masterHasResult || $this->isInternalFuzzy($this->repetitionByHash[$segmentHash]->target ?? '')) {
-            return null; //if the master of the repetition had no result, the repetition has no content either
+            // if the master of the repetition had no result, the repetition has no content either
+            return null;
         }
 
         $masterResult = $this->repetitionByHash[$segmentHash];
         $masterHasFullMatch = $masterResult->matchrate >= 100;
 
-        if ($masterHasFullMatch) {
+        if ($masterHasFullMatch && FileBasedInterface::REPETITION_MATCH_VALUE === $resultMatchRate) {
             //bestResult is fallback if tags could not be applied
-            return $this->updateTargetOfRepetition($segment, $masterResult) ?? $bestResult;
+            return $this->updateTargetOfRepetition($segment, $masterResult) ?? $result;
         }
 
         //if the master was a fuzzy or the full match repetition could not be set (above updateTargetOfRepetition) properly, we keep the found matchrate and translation
@@ -326,15 +368,26 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * When taking over a repetition, the content (tags) must be prepared properly before usage
      * returns null if the tags could not be applied
      */
-    protected function updateTargetOfRepetition(editor_Models_Segment $segment, ?stdClass $masterResult, ?int $repetitionRate = null): ?stdClass
-    {
+    protected function updateTargetOfRepetition(
+        editor_Models_Segment $segment,
+        ?stdClass $masterResult,
+        ?int $repetitionRate = null
+    ): ?stdClass {
         $segmentHash = $segment->getSourceMd5();
-        if (! is_null($masterResult) && $this->repetitionUpdater->updateTargetOfRepetition($this->repetitionMasterSegments[$segmentHash], $segment)) {
-            //the returning result must be the one from the first of the repetition group.
+        if (
+            ! is_null($masterResult)
+            && $this->repetitionUpdater->updateTargetOfRepetition(
+                $this->repetitionMasterSegments[$segmentHash],
+                $segment
+            )
+        ) {
+            // the returning result must be the one from the first of the repetition group.
             // to get the correct content for the repetition we get the value from $segment, which was updated by the repetition updater
             // we may not update the repetitionHash, this would interfer with the other repetitions
             $bestRepeatedResult = clone $masterResult;
             $bestRepeatedResult->target = $segment->getTargetEdit();
+            $bestRepeatedResult->isRepetition = true;
+
             if (! is_null($repetitionRate)) {
                 $bestRepeatedResult->matchrate = $repetitionRate; //in the case of masterHasFullMatch we use also that matchrate for the segment
             }
@@ -389,7 +442,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     $match->matchrate -= $match->penaltyGeneral + $match->penaltySublang;
                 }
 
-                $isTermCollection = $match->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
+                $isTermCollection = $match->languageResourceType == MatchRateType::TYPE_TERM_COLLECTION;
                 if ($bestResultCurrentConnector->matchrate > $match->matchrate) {
                     continue;
                 }
@@ -403,7 +456,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 if ($isTermCollection) {
                     // - preferred terms > permitted terms
                     // - if multiple permitted terms: take the first
-                    if (! is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
+                    if (! is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == MatchRateType::TYPE_TERM_COLLECTION) {
                         $bestMatchMetaData = $bestMatchRateResult->metaData;
                         $bestMatchIsPreferredTerm = editor_Models_Terminology_Models_TermModel::isPreferredTerm($bestMatchMetaData['status']);
                         if ($bestMatchIsPreferredTerm) {
@@ -603,13 +656,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
 
         if ($languageResourceid === 0) {
-            $type = editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED;
+            $type = MatchRateType::TYPE_AUTO_PROPAGATED;
         } elseif (array_key_exists($languageResourceid, $this->resources)) {
             $type = $this->resources[$languageResourceid]->getResourceType();
             $matchAnalysis->setPenaltyGeneral($this->penalty['general'][$languageResourceid]);
             $matchAnalysis->setPenaltySublang($this->penalty['sublang'][$languageResourceid]);
         } else {
-            $type = editor_Models_Segment_MatchRateType::TYPE_UNKNOWN;
+            $type = MatchRateType::TYPE_UNKNOWN;
         }
 
         $matchAnalysis->setType($type);

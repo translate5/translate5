@@ -69,6 +69,13 @@
             <file>../Plugins/Translate24/tests/Api/GlossaryApiTest.php</file>
             <file>../Plugins/Translate24/tests/functional/Quality24TranslateTest.php</file>
         </testsuite>
+        <testsuite name="match-analysis">
+            <file>../Plugins/MatchAnalysis/tests/Functional/MatchAnalysisTest.php</file>
+            <file>../Plugins/MatchAnalysis/tests/Functional/TmMatchMorePriorThenRepetitionTest.php</file>
+            <file>../Plugins/MatchAnalysis/tests/Functional/Translate2756Test.php</file>
+            <file>../Plugins/MatchAnalysis/tests/Functional/Translate2874Test.php</file>
+            <file>../Plugins/MatchAnalysis/tests/Functional/Translate2991Test.php</file>
+        </testsuite>
         <testsuite name="auth">
             <file>editorAPI/Translate3108Test.php</file>
             <file>editorAPI/Translate3048Test.php</file>
