@@ -800,6 +800,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1532"></a>E1532 | Plug-In AcrossHotfolder | Plug-In AcrossHotfolder: Project directory processing error                                                         | Error occurred while in attempt to process dir with project files               |
 | <a id="E1533"></a>E1533 | Plug-In AcrossHotfolder | Plug-In AcrossHotfolder: [{project}]: Provided workflow [{workflow}] does not exists                                | Workflow provided in instruction.xml not present in DB                          |
 | <a id="E1534"></a>E1534 | Plug-In AcrossHotfolder | Plug-In AcrossHotfolder: [{project}]: Provided bconf [{bconf}] does not exists                                      | Okapi Bconf name provided in instruction.xml not present in DB                  |
+| <a id="E1695"></a>E1695 | Plug-In AcrossHotfolder | Plug-In AcrossHotfolder: Unsuccessful folder move: {errorMsg}                                                       | On attempt to move folder or file error occurred                                |
 
 #### Plug-In TextShuttle
 | EventCode               | Context              | EventMessage                                                                           | Description/Solution                                                                                                                                                                                                                                                                                           |
