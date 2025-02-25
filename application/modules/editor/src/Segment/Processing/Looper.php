@@ -52,16 +52,14 @@ final class Looper
      */
     public const MIN_DELAY_SEGMENTS = 150;
 
-    private State $state;
-
-    /**
-     * @var State[]
-     */
-    private array $toProcess = [];
-
     private int $batchSize;
 
     private bool $isReprocessing = false;
+
+    /**
+     * Holds the timestamp of the last write on the DB
+     */
+    private int $lastTime = 0;
 
     /**
      * Between processing segments and fetching new ones a pause can be configured to make db-deadlocks less probable
@@ -73,15 +71,25 @@ final class Looper
      */
     private int $numProcessed = 0;
 
+    private Processing $processingTable;
+
+    private State $state;
+
+    /**
+     * @var State[]
+     */
+    private array $toProcess = [];
+
     public function __construct(
         private ProgressInterface $progressReporter,
         private editor_Models_Task $task,
         private AbstractProcessor $processor,
         private int $workerIndex,
     ) {
-        $this->loopingPause = $processor->getLoopingPause();
-        $this->state = new State($processor->getServiceId());
         $this->batchSize = $processor->getBatchSize();
+        $this->loopingPause = $processor->getLoopingPause();
+        $this->processingTable = new Processing();
+        $this->state = new State($processor->getServiceId());
     }
 
     /**
@@ -125,10 +133,6 @@ final class Looper
                     $state->setProcessed();
                 }
             }
-            // if configured, we wait before fetching the next segments
-            if ($this->loopingPause > 0) {
-                usleep($this->loopingPause);
-            }
         }
 
         return true;
@@ -157,13 +161,21 @@ final class Looper
      */
     public function setUnprocessedStates(array $problematicStates, int $errorState, bool $doDebug = false): void
     {
+        $states = [];
         foreach ($problematicStates as $state) {
             if ($state->getState() != State::PROCESSED) {
-                $state->saveState($errorState);
-                if ($doDebug) {
-                    error_log('Looper: set State to ' . $errorState . ' and finish processing for segment ' .
-                        $state->getSegmentId());
-                }
+                $states[] = $state;
+            }
+        }
+        if (! empty($states)) {
+            $this->setDbWriteTime(); // must be called before any write-operation
+            $segmentIds = array_map(fn ($item) => $item->getSegmentId(), $states);
+            $toUpdate = [
+                $states[0]->getColumnName() => $errorState,
+            ];
+            $affected = $this->processingTable->endProcessingForStates($segmentIds, $toUpdate);
+            if ($doDebug && $affected > 0) {
+                error_log('Looper: finished ' . $affected . ' unprocessed states');
             }
         }
     }
@@ -175,9 +187,9 @@ final class Looper
     public function setProcessingFinished(array $states, bool $doDebug = false): void
     {
         if (! empty($states)) {
+            $this->setDbWriteTime(); // must be called before any write-operation
             $segmentIds = array_map(fn ($item) => $item->getSegmentId(), $states);
-            $table = new Processing();
-            $affected = $table->endProcessingForStates($segmentIds);
+            $affected = $this->processingTable->endProcessingForStates($segmentIds);
             if ($doDebug && $affected > 0) {
                 error_log('Looper: finished Processing hard for ' . $affected . ' states');
             }
@@ -267,6 +279,7 @@ final class Looper
      */
     private function fetchNextStates(bool $fromTheTop, string $taskGuid): bool
     {
+        $this->setDbWriteTime(); // must be called before any write-operation
         $this->isReprocessing = false;
         $this->toProcess = $this->state->fetchNextStates(State::UNPROCESSED, $taskGuid, $fromTheTop, $this->batchSize);
         // may we are in     *  the reprocessing phase
@@ -304,5 +317,19 @@ final class Looper
             $this->task->getSegmentCount() <= self::MIN_DELAY_SEGMENTS ||
             (defined('APPLICATION_APITEST') && APPLICATION_APITEST)
         );
+    }
+
+    private function setDbWriteTime(): void
+    {
+        // set current micro-timestamp - initially it is set to "0" - which does not do any harm here
+        $now = (int) (microtime(true) * 1000);
+        $elapsed = ($now - $this->lastTime);
+        // if not enough time is already passed since the last write, we have to wait
+        if ($elapsed < $this->loopingPause) {
+            usleep($this->loopingPause - $elapsed);
+            $this->lastTime = (int) (microtime(true) * 1000);
+        } else {
+            $this->lastTime = $now;
+        }
     }
 }

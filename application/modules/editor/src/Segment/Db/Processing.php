@@ -207,16 +207,16 @@ final class Processing extends Zend_Db_Table_Abstract
 
     /**
      * Ends processing for the given states
+     * Updates other columns for all passed states if $updates is given
      * @param int[] $segmentIds
      */
-    public function endProcessingForStates(array $segmentIds): int
+    public function endProcessingForStates(array $segmentIds, array $updates = []): int
     {
         $this->reduceDeadlocks($this);
-        $affectedRows = $this->retryOnDeadlock(function () use ($segmentIds) {
+        $updates['processing'] = 0; // ends processing
+        $affectedRows = $this->retryOnDeadlock(function () use ($segmentIds, $updates) {
             return $this->update(
-                [
-                    'processing' => 0,
-                ],
+                $updates,
                 [
                     'segmentId IN (?)' => $segmentIds,
                     'processing = ?' => 1,

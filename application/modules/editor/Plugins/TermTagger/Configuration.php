@@ -37,19 +37,6 @@ use editor_Segment_Processing;
 class Configuration
 {
     /**
-     * Defines, how much segments can be processed in one processor call
-     * @var integer
-     */
-    public const OPERATION_BATCH_SIZE = 5;
-
-    /**
-     * Defines, how much tags can be removed in one processor call
-     * Be aware that this may affects the deadlock probability as other workers work on the same table at the same time
-     * @var integer
-     */
-    public const REMOVAL_BATCH_SIZE = 10;
-
-    /**
      * Defines the timeout in seconds how long a termtag call with multiple segments may need
      * @var integer
      */

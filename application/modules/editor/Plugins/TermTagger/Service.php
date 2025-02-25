@@ -280,6 +280,10 @@ final class Service extends AbstractPooledService
                 'httpMethod' => $method,
                 'termTaggerUrl' => $client->getUri(true),
             ];
+
+            // use to trigger a NoResponse Exception to trigger a worker-delay
+            // throw new ZfExtended_Zendoverwrites_Http_Exception_NoResponse('E1130', $extraData);
+
             $result = $client->request($method);
             if (ZfExtended_Debug::hasLevel('plugin', 'TermTagger')) {
                 $rand = rand();

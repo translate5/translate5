@@ -90,16 +90,6 @@ final class State
      */
     public const COLUMN_SUFFIX = 'State';
 
-    /**
-     * In case of an deadlock we retry the operation after sleeping the below amount
-     */
-    public const DEADLOCK_MAXRETRIES = 3;
-
-    /**
-     * In case of an DB-deadlock we wait this amount of time before trying again. Milliseconds
-     */
-    public const DEADLOCK_WAITINGTIME = 350;
-
     private static Processing $table;
 
     /**

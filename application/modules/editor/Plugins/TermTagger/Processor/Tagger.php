@@ -116,12 +116,6 @@ final class Tagger extends AbstractProcessor
         }
     }
 
-    /**
-     * Is used as interval between the batches in the looped processing
-     * This reduces the risk of deadlocks
-     */
-    protected int $loopingPause = 150;
-
     private ServiceData $serviceData;
 
     private RecalcTransFound $recalcTransFound;
@@ -169,12 +163,17 @@ final class Tagger extends AbstractProcessor
         // various outdated tag-helpers - use TagSequence/FieldTags based code instead
         $this->termTagTrackChangeHelper = ZfExtended_Factory::get(editor_Models_Segment_TermTagTrackChange::class);
         $this->generalTrackChangesHelper = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
-        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'TermTaggerReqquests');
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'TermTaggerRequests');
     }
 
     public function getBatchSize(): int
     {
-        return Configuration::OPERATION_BATCH_SIZE;
+        return $this->task->getConfig()->runtimeOptions->termTagger->taggerBatchSize;
+    }
+
+    public function getLoopingPause(): int
+    {
+        return $this->task->getConfig()->runtimeOptions->termTagger->taggerLoopingInterval;
     }
 
     /**

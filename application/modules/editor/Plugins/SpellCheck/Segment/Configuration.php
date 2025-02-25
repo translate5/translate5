@@ -36,13 +36,6 @@ use editor_Segment_Processing;
 class Configuration
 {
     /**
-     * Defines, how much segments can be processed per one worker call
-     *
-     * @var integer
-     */
-    public const OPERATION_BATCH_SIZE = 300;
-
-    /**
      * Defines the timeout in seconds how long a spell-check call with multiple segments may need
      *
      * @var integer
