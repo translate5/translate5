@@ -47,8 +47,7 @@ Ext.define('Editor.view.admin.token.TokenModel', {
     }, {
         name: 'userId',
         type: 'int',
-        allowNull: false,
-        reference: 'Editor.model.admin.User'
+        allowNull: false
     }, {
         name: 'description',
         type: 'string'

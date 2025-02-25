@@ -76,6 +76,8 @@ class FileTranslationType extends editor_Task_Type_Abstract
 
     protected bool $exportUsage = false;
 
+    protected bool $supportsTaskTm = false;
+
     public function __construct()
     {
         $seeTasks = ZfExtended_Authentication::getInstance()

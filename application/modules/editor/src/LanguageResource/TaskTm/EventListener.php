@@ -35,6 +35,8 @@ use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use Zend_EventManager_Event as ZendEvent;
 use Zend_EventManager_SharedEventManager as ZendEventManager;
 
@@ -45,6 +47,7 @@ class EventListener
         private readonly editor_Services_Manager $serviceManager,
         private readonly TaskTmRepository $taskTmRepository,
         private readonly AssociateTaskOperation $associateTaskOperation,
+        private readonly TaskRepository $taskRepository,
     ) {
     }
 
@@ -55,6 +58,7 @@ class EventListener
             new editor_Services_Manager(),
             new TaskTmRepository(),
             AssociateTaskOperation::create(),
+            TaskRepository::create(),
         );
     }
 
@@ -81,6 +85,10 @@ class EventListener
 
             // Nothing to do if resource does not support task TM
             if (null === $taskTmCreateOperation) {
+                return;
+            }
+
+            if (! $this->taskSupportsTaskTm($event->taskGuid)) {
                 return;
             }
 
@@ -112,5 +120,16 @@ class EventListener
     {
         // check if there is a writable tm of the given type
         return $this->taskTmRepository->hasWritableOfType($taskGuid, $serviceType);
+    }
+
+    private function taskSupportsTaskTm(string $taskGuid): bool
+    {
+        try {
+            $task = $this->taskRepository->getByGuid($taskGuid);
+        } catch (InexistentTaskException) {
+            return false;
+        }
+
+        return $task->getTaskType()->supportsTaskTm();
     }
 }

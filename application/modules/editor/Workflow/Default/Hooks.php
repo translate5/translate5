@@ -51,6 +51,8 @@ class editor_Workflow_Default_Hooks
 
     public const HANDLE_PROJECT_CREATED = 'handleProjectCreated';
 
+    public const DIRECT_TRIGGER = 'handleDirect::';
+
     /**
      * @var editor_Workflow_Default
      */
@@ -327,7 +329,7 @@ class editor_Workflow_Default_Hooks
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->newTaskUserAssoc = null;
         }
-        $this->callActions('handleDirect::' . $trigger, $task->getWorkflowStepName());
+        $this->callActions(editor_Workflow_Default_Hooks::DIRECT_TRIGGER . $trigger, $task->getWorkflowStepName());
 
         return true;
     }

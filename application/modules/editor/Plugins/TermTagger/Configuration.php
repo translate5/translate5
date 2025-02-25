@@ -37,19 +37,6 @@ use editor_Segment_Processing;
 class Configuration
 {
     /**
-     * Defines, how much segments can be processed in one processor call
-     * @var integer
-     */
-    public const OPERATION_BATCH_SIZE = 5;
-
-    /**
-     * Defines, how much tags can be removed in one processor call
-     * Be aware that this may affects the deadlock probability as other workers work on the same table at the same time
-     * @var integer
-     */
-    public const REMOVAL_BATCH_SIZE = 10;
-
-    /**
      * Defines the timeout in seconds how long a termtag call with multiple segments may need
      * @var integer
      */
@@ -89,6 +76,11 @@ class Configuration
      * The default word-count that marks a segment being too large for term-tagging
      */
     public const OVERSIZE_WORD_COUNT = 150;
+
+    /**
+     * The duration we wait when a termtagger is overloaded and hope it will work again (sec) ...
+     */
+    public const OVERLOADED_TAGGER_DELAY = 2;
 
     /**
      * Defines the logger-domain for all termtagger code

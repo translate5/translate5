@@ -67,4 +67,9 @@ class editor_Workflow_Actions_Config
      * @var stdClass|null
      */
     public ?stdClass $parameters;
+
+    public function isHandleDirect(): bool
+    {
+        return str_starts_with($this->trigger, editor_Workflow_Default_Hooks::DIRECT_TRIGGER);
+    }
 }

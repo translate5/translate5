@@ -32,7 +32,6 @@ use editor_Models_Db_SegmentQuality;
 use editor_Plugins_TermTagger_Tag;
 use editor_Segment_Processing;
 use editor_Segment_Tags;
-use MittagQI\Translate5\Plugins\TermTagger\Configuration;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
 use MittagQI\Translate5\Segment\AbstractProcessor;
 
@@ -46,12 +45,6 @@ use MittagQI\Translate5\Segment\AbstractProcessor;
 final class Remover extends AbstractProcessor
 {
     /**
-     * Is used as interval between the batches in the looped processing
-     * This reduces the risk of deadlocks
-     */
-    protected int $loopingPause = 330;
-
-    /**
      * Special: The Termtagger-Worker will also be queued for import-workers, actually not having a terminology applied
      * This is because at that point of the import the terminology is not yet set
      * This processor removes the term-tags from the segments if no terminology is set, what is not needed for an import obviously
@@ -64,7 +57,7 @@ final class Remover extends AbstractProcessor
             $table = new editor_Models_Db_SegmentQuality();
             $table->removeByTaskGuidAndType($this->task->getTaskGuid(), editor_Plugins_TermTagger_Tag::TYPE);
 
-            return true;
+            return parent::prepareWorkload($workerIndex);
         }
 
         return false;
@@ -72,7 +65,12 @@ final class Remover extends AbstractProcessor
 
     public function getBatchSize(): int
     {
-        return Configuration::REMOVAL_BATCH_SIZE;
+        return $this->task->getConfig()->runtimeOptions->termTagger->removerBatchSize;
+    }
+
+    public function getLoopingPause(): int
+    {
+        return $this->task->getConfig()->runtimeOptions->termTagger->removerLoopingInterval;
     }
 
     /**

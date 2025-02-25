@@ -26,10 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Plugins\TermTagger\Exception;
+
+use ZfExtended_ErrorCodeException;
+use ZfExtended_Logger;
+
 /**
  * Abstract Exception Class to get more details Information on TermTagger-Error.
  */
-abstract class editor_Plugins_TermTagger_Exception_Abstract extends ZfExtended_ErrorCodeException
+abstract class AbstractException extends ZfExtended_ErrorCodeException
 {
     /**
      * @var string

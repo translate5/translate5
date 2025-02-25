@@ -438,12 +438,16 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
 
-        //the usage of this config is more a workaround,
-        // since this was the easiest but also straight forward way to transport the information "yes notify"
-        // from one task import wizard page to the final startImport action.
-        // Not using the system config would mean to implement an own way to transport such config information.
-        if (! ($task->getConfig()->runtimeOptions->workflow->notifyAllUsersAboutTask ?? false)) {
-            return;
+        // For handle direct calls we do not evaluate the config.
+        // Send the notification directly
+        if ($this->config->isHandleDirect() === false) {
+            //the usage of this config is more a workaround,
+            // since this was the easiest but also straight forward way to transport the information "yes notify"
+            // from one task import wizard page to the final startImport action.
+            // Not using the system config would mean to implement an own way to transport such config information.
+            if (! ($task->getConfig()->runtimeOptions->workflow->notifyAllUsersAboutTask ?? false)) {
+                return;
+            }
         }
 
         $this->tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');

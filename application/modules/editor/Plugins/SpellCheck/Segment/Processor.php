@@ -79,12 +79,6 @@ class Processor extends AbstractProcessor
         }
     }
 
-    /**
-     * Is used as interval between the batches in the looped processing
-     * This reduces the risk of deadlocks
-     */
-    protected int $loopingPause = 150;
-
     private string $language;
 
     private Adapter $adapter;
@@ -124,7 +118,12 @@ class Processor extends AbstractProcessor
      */
     public function getBatchSize(): int
     {
-        return Configuration::OPERATION_BATCH_SIZE;
+        return $this->task->getConfig()->runtimeOptions->SpellCheck->languagetool->processorBatchSize;
+    }
+
+    public function getLoopingPause(): int
+    {
+        return $this->task->getConfig()->runtimeOptions->SpellCheck->languagetool->processorLoopingInterval;
     }
 
     /**

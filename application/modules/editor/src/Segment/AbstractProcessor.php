@@ -39,7 +39,7 @@ abstract class AbstractProcessor
      * This prop can be used to adjust the batched/looped processing. If set, this time is slept between saving the processed segments and fetching unprocessed ones
      * @var int: milliseconds
      */
-    protected int $loopingPause = 0;
+    protected int $loopingPause = 100;
 
     protected editor_Models_Task $task;
 
@@ -121,6 +121,11 @@ abstract class AbstractProcessor
      */
     public function prepareWorkload(int $workerIndex): bool
     {
+        // we dismiss the workload, if there are not enough segments to cover N x the batchsize
+        if ($workerIndex > 0 && (int) $this->task->getSegmentCount() < ($workerIndex + 1) * $this->getBatchSize()) {
+            return false;
+        }
+
         return true;
     }
 }

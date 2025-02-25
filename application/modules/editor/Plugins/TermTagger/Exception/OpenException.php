@@ -26,10 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Plugins\TermTagger\Exception;
+
+use ZfExtended_Logger;
+
 /**
  * Exception Class to get detailed information on TermTagger-Error.
  */
-class editor_Plugins_TermTagger_Exception_Open extends editor_Plugins_TermTagger_Exception_Abstract
+class OpenException extends AbstractException
 {
     /**
      * if a TBX could not be loaded into the termtagger this should be an error

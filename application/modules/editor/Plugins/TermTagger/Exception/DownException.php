@@ -26,48 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Plugins\SpellCheck\Segment;
+declare(strict_types=1);
 
-use editor_Segment_Processing;
+namespace MittagQI\Translate5\Plugins\TermTagger\Exception;
 
 /**
- * Separate holder of certain configurations to accompany the SegmentProcessor & Worker
+ * Exception Class to get detailed information on TermTagger-Error.
  */
-class Configuration
+class DownException extends AbstractException
 {
-    /**
-     * Defines the timeout in seconds how long a spell-check call with multiple segments may need
-     *
-     * @var integer
-     */
-    public const TIMEOUT_REQUEST = 300;
-
-    /**
-     * Logger Domain Import
-     * @var string
-     */
-    public const OPERATION_LOGGER_DOMAIN = 'editor.spellcheck.operation';
-
-    /**
-     * Logger Domain Editing
-     * @var string
-     */
-    public const EDITOR_LOGGER_DOMAIN = 'editor.spellcheck.segmentediting';
-
-    public static function getLoggerDomain(string $processingType): string
-    {
-        if (editor_Segment_Processing::isOperation($processingType)) {
-            return self::OPERATION_LOGGER_DOMAIN;
-        }
-
-        return self::EDITOR_LOGGER_DOMAIN;
-    }
-
-    /**
-     * Retrieves the request timeouts for languagetool-service calls
-     */
-    public static function getRequestTimeout(bool $isWorkerContext): int
-    {
-        return self::TIMEOUT_REQUEST;
-    }
+    //localErrorCodes see parent abstract
 }

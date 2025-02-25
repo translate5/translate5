@@ -26,17 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * A timeout exception is not the same as a DOWN exception.
- * Timout means in the most cases that the termtagger is running but it is tagging and therefore could not respond
- */
-class editor_Plugins_TermTagger_Exception_TimeOut extends editor_Plugins_TermTagger_Exception_Abstract
-{
-    /**
-     * timeouts are just an info
-     * @var integer
-     */
-    protected $level = ZfExtended_Logger::LEVEL_INFO;
+declare(strict_types=1);
 
+namespace MittagQI\Translate5\Plugins\TermTagger\Exception;
+
+/**
+ * Exception Class to get detailed information on TermTagger-Error.
+ */
+class MalfunctionException extends AbstractException
+{
     //localErrorCodes see parent abstract
 }

@@ -90,16 +90,6 @@ final class State
      */
     public const COLUMN_SUFFIX = 'State';
 
-    /**
-     * In case of an deadlock we retry the operation after sleeping the below amount
-     */
-    public const DEADLOCK_MAXRETRIES = 3;
-
-    /**
-     * In case of an DB-deadlock we wait this amount of time before trying again. Milliseconds
-     */
-    public const DEADLOCK_WAITINGTIME = 350;
-
     private static Processing $table;
 
     /**
@@ -160,16 +150,18 @@ final class State
     /**
      * Sets a new state for the entry and saves it
      */
-    public function setState(int $newState): void
+    public function saveState(int $newState): void
     {
         $this->state = $newState;
         if ($this->row !== null) {
-            $column = $this->getColumnName();
-            $this->row->$column = $newState;
-            // this assumes, multiple segments cannot be processed simultaneously
-            // @phpstan-ignore-next-line - why is phpstan not seeing __get(...) ?
-            $this->row->processing = ($newState === self::INPROGRESS) ? 1 : 0;
-            $this->row->save();
+            $this->retryOnDeadlock(function () use ($newState) {
+                $column = $this->getColumnName();
+                $this->row->$column = $newState;
+                // this assumes, multiple segments cannot be processed simultaneously
+                // @phpstan-ignore-next-line - why is phpstan not seeing __get(...) ?
+                $this->row->processing = ($newState === self::INPROGRESS) ? 1 : 0;
+                $this->row->save();
+            });
         }
     }
 
@@ -192,7 +184,7 @@ final class State
      */
     public function setProcessed(): void
     {
-        $this->setState(self::PROCESSED);
+        $this->saveState(self::PROCESSED);
     }
 
     public function getColumnName(): string
