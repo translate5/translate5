@@ -11,6 +11,63 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.20.4] - 2025-02-25
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4486](https://jira.translate5.net/browse/TRANSLATE-4486): TermTagger integration - Further Improvements for TermTagger being overloaded** <br>
+Enhancement: Improve behaviour a TermTagger-Worker/Looper reacts on overloaded Termtaggers
+
+**[TRANSLATE-4468](https://jira.translate5.net/browse/TRANSLATE-4468): MatchAnalysis & Pretranslation - Use TM matches prior to repetitions** <br>
+XLF with given resname information: same segments are only repetitions if the given resname information is the same. If resname is different TM matches are used then.
+
+**[TRANSLATE-4463](https://jira.translate5.net/browse/TRANSLATE-4463): Workflows - set job type "editor" as default in two places** <br>
+Use job type Editor as default in job assignment form
+
+**[TRANSLATE-3963](https://jira.translate5.net/browse/TRANSLATE-3963): Task Management - Implement CTRL-G shortcut for project / task overview** <br>
+The CTRL-g shortcut is now also implemented in the task and projectoverview.
+
+
+### Bugfixes
+**[TRANSLATE-4495](https://jira.translate5.net/browse/TRANSLATE-4495): Hotfolder Import - Hotfolder: Proceed process folders on error in one of them** <br>
+Hotfolder: If error happens on import of one of projects remaining will proceed
+
+**[TRANSLATE-4493](https://jira.translate5.net/browse/TRANSLATE-4493): Authentication - Wrong check for password existence** <br>
+Fix check for password in payload
+
+**[TRANSLATE-4480](https://jira.translate5.net/browse/TRANSLATE-4480): Import/Export - Match analysis worker not queued** <br>
+Fix: Queue Match analysis worker on import
+
+**[TRANSLATE-4471](https://jira.translate5.net/browse/TRANSLATE-4471): Import/Export - Worker-queue may stuck on import due to MatchAnalysis** <br>
+translate5 - 7.20.3: FIX: Import may stuck due to MatchAnalysis being queued too late
+translate5 - 7.20.4: FIX: additional improvements
+
+**[TRANSLATE-4467](https://jira.translate5.net/browse/TRANSLATE-4467): InstantTranslate, t5memory - Task TM is created for instant translate task** <br>
+Skip creating a task TM for instant translate tasks even if there are language resources with checked "Write access by default"
+
+**[TRANSLATE-4466](https://jira.translate5.net/browse/TRANSLATE-4466): TermPortal - Wrong browser tab title in TermPortal** <br>
+FIXED: incorrect browser tab title in TermPortal's attributes management screen
+
+**[TRANSLATE-4448](https://jira.translate5.net/browse/TRANSLATE-4448): VisualReview / VisualTranslation - Headless download does not respect proxy** <br>
+FIX: Visual Download of URLs did not use configurable outboud Proxy anymore
+
+**[TRANSLATE-4423](https://jira.translate5.net/browse/TRANSLATE-4423): InstantTranslate - Copy button in InstantTranslate produces entities** <br>
+Decode html entities on copy clipboard
+
+**[TRANSLATE-4420](https://jira.translate5.net/browse/TRANSLATE-4420): InstantTranslate - InstantTranslate: Default File-Format is not applied for File-translation bound to a certain customer** <br>
+FIX: InstantTranslate file-translations did not use the default File-Format-Settings of the assigned Customer with added file-extensions
+
+**[TRANSLATE-4413](https://jira.translate5.net/browse/TRANSLATE-4413): Okapi integration - Files with file extensions partly or fully in uppercase are not accepted** <br>
+File extensions in uppercase are accepted by InstantTranslate
+
+**[TRANSLATE-4072](https://jira.translate5.net/browse/TRANSLATE-4072): Import/Export, Workflows - notify users not working if previously unchecked in import wizard** <br>
+"Notify users" button is working now if "Notify users after import" was unchecked in import wizard
+
+
 ## [7.20.3] - 2025-02-18
 
 ### Important Notes:
