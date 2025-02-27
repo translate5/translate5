@@ -268,8 +268,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract
             unlink($tbxPath);
         }
         $meta = $task->meta();
-        $meta->setTbxHash("");
-        $meta->save();
+        $meta->resetTbxHash([$taskGuid]);
     }
 
     protected function assertConfig()

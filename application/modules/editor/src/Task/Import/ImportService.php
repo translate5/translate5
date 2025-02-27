@@ -90,8 +90,6 @@ class ImportService
             $request->getParam('taskType', editor_Task_Type_Default::ID)
         );
 
-        $this->eventTrigger->triggerTaskMetaEvent($project, $data);
-
         $user = ZfExtended_Authentication::getInstance()->getUser();
 
         if ($single) {
@@ -102,6 +100,10 @@ class ImportService
                 (bool) $request->getParam('importWizardUsed', false)
             );
         }
+
+        //this triggers the meta event for the project only.
+        // For the tasks this is done in the import|importSingleTask methods
+        $this->eventTrigger->triggerTaskMetaEvent($project, $data);
 
         $upload = editor_Models_Import_UploadProcessor::taskInstance($project);
         $upload->initAndValidate();
@@ -136,12 +138,14 @@ class ImportService
         //was set as array in setDataInEntity
         $task->setTargetLang(reset($data['targetLang']));
 
-        //$this->entity->save(); => is done by the import call!
-        //handling project tasks is also done in processUploadedFile
-        $this->processUploadedFile($task, $dp, $data, $user);
+        $task->save();
 
         // add task defaults (user associations and language resources)
         $this->defaults->setTaskDefaults($task, $importWizardUsed);
+
+        //$this->entity->save(); => is done by the import call!
+        //handling project tasks is also done in processUploadedFile
+        $this->processUploadedFile($task, $dp, $data, $user);
 
         //for internal tasks the usage log requires different handling, so log only non-internal tasks
         if (! $task->getTaskType()->isInternalTask()) {
