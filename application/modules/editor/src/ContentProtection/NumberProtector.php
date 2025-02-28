@@ -566,15 +566,19 @@ class NumberProtector implements ProtectorInterface
     ): iterable {
         preg_match_all($langFormat->regex, $part, $matches);
 
+        $decodedPart = null;
         if (empty($matches[$langFormat->matchId])) {
-            $part = $this->decodeTextNode($part);
+            $decodedPart = $this->decodeTextNode($part);
 
-            preg_match_all($langFormat->regex, $part, $matches);
+            preg_match_all($langFormat->regex, $decodedPart, $matches);
         }
 
         if (empty($matches[$langFormat->matchId])) {
             return yield $part;
         }
+
+        // if we have decoded part - match was found in decoded entity
+        $part = $decodedPart ?? $part;
 
         $parts = preg_split($langFormat->regex, $part);
 

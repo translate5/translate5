@@ -85,6 +85,12 @@
         <testsuite name="unit">
             <directory>Unit</directory>
         </testsuite>
+        <testsuite name="integration">
+            <directory>Integration</directory>
+        </testsuite>
+        <testsuite name="functional">
+            <directory>Functional</directory>
+        </testsuite>
     </testsuites>
     <coverage>
         <include>

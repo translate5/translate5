@@ -184,12 +184,12 @@ class TmConversionService implements TmConversionServiceInterface
 
     private function protectHtmlEntities(string $text): string
     {
-        return preg_replace('/&(\w{2,8});/', '**\1**', $text);
+        return preg_replace('/&(\w{2,8});/', '¿¿¿\1¿¿¿', $text);
     }
 
     private function unprotectHtmlEntities(string $text): string
     {
-        return preg_replace('/\*\*(\w{2,8})\*\*/', '&\1;', $text);
+        return preg_replace('/¿¿¿(\w{2,8})¿¿¿/', '&\1;', $text);
     }
 
     public function convertContentTagToT5MemoryTag(string $queryString, bool $isSource, &$numberTagMap = []): string
@@ -390,22 +390,23 @@ class TmConversionService implements TmConversionServiceInterface
             return '';
         }
 
-        [$source, $target] = $this->contentProtector->filterTags(
-            $this->contentProtector->protect(
-                $sourceSegment,
-                true,
-                (int) $sourceLang->getId(),
-                (int) $targetLang->getId(),
-                ContentProtector::ENTITY_MODE_OFF
-            ),
-            $this->contentProtector->protect(
-                $targetSegment,
-                false,
-                (int) $sourceLang->getId(),
-                (int) $targetLang->getId(),
-                ContentProtector::ENTITY_MODE_OFF
-            )
+        $protectedSource = $this->contentProtector->protect(
+            $sourceSegment,
+            true,
+            (int) $sourceLang->getId(),
+            (int) $targetLang->getId(),
+            ContentProtector::ENTITY_MODE_OFF
         );
+
+        $protectedTarget = $this->contentProtector->protect(
+            $targetSegment,
+            false,
+            (int) $sourceLang->getId(),
+            (int) $targetLang->getId(),
+            ContentProtector::ENTITY_MODE_OFF
+        );
+
+        [$source, $target] = $this->contentProtector->filterTags($protectedSource, $protectedTarget);
 
         return str_replace(
             [

@@ -268,6 +268,12 @@ class ContentProtectorTest extends UnitTestAbstract
             'expected' => '03: <char ts="03" length="1"/>',
             'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
         ];
+
+        yield '&lt; in text' => [
+            'text' => 'string &lt; 123,456.789',
+            'expected' => 'string &lt; <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarV0aw2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/>',
+            'entityHandling' => ContentProtector::ENTITY_MODE_OFF,
+        ];
     }
 
     /**
