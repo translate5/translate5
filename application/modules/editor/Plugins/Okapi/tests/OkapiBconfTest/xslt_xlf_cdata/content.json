@@ -1,0 +1,16 @@
+{
+    "refs": {
+        "sourceSrxPath": "languages-afternumberbefo.srx",
+        "targetSrxPath": "languages-afternumberbefo-target.srx",
+        "xsltPath": "sample.xslt"
+    },
+    "step": [
+        "net.sf.okapi.steps.xsltransform.XSLTransformStep",
+        "net.sf.okapi.steps.common.RawDocumentToFilterEventsStep",
+        "net.sf.okapi.steps.segmentation.SegmentationStep",
+        "net.sf.okapi.steps.rainbowkit.creation.ExtractionStep"
+    ],
+    "fprm": [
+        "okf_xliff@local-t5_xliff_12_with_cdata_-custom"
+    ]
+}

@@ -280,6 +280,22 @@
                 <source>Änderungen zurücksetzen</source>
                 <target>Änderungen zurücksetzen</target>
             </trans-unit>
+            <trans-unit id='RmlsdGVyL0ZQUk0gYXVzIERhdGVpIGhvY2hsYWRlbg=='>
+                <source>Filter/FPRM aus Datei hochladen</source>
+                <target>Filter/FPRM aus Datei hochladen</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyL0ZQUk0gYWxzIERhdGVpIGhlcnVudGVybGFkZW4='>
+                <source>Filter/FPRM als Datei herunterladen</source>
+                <target>Filter/FPRM als Datei herunterladen</target>
+            </trans-unit>
+            <trans-unit id='UGlwZWxpbmUgYXVzIERhdGVpIGhvY2hsYWRlbg=='>
+                <source>Pipeline aus Datei hochladen</source>
+                <target>Pipeline aus Datei hochladen</target>
+            </trans-unit>
+            <trans-unit id='UGlwZWxpbmUgYWxzIERhdGVpIGhlcnVudGVybGFkZW4='>
+                <source>Pipeline als Datei herunterladen</source>
+                <target>Pipeline als Datei herunterladen</target>
+            </trans-unit>
             <trans-unit id='RGFzIE9rYXBpIEZyYW1ld29yayB3aXJkIGF1ZiBkZXIgU2VydmVyc2VpdGUgZsO8ciBEYXRlaWtvbnZlcnRpZXJ1bmdlbiB2ZXJ3ZW5kZXQ='>
                 <source>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet. Daher werden die Filteroptionen in der Okapi-Hilfe erläutert.</source>
                 <target>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet. Daher werden die Filteroptionen in der Okapi-Hilfe erläutert.</target>

@@ -173,6 +173,23 @@ class OkapiBconfFilterTest extends JsonTestAbstract
     }
 
     /**
+     * Test upload of valid and faulty Pipelines
+     * @depends test20_createEntity
+     */
+    public function test55_PipelinesUpload()
+    {
+        $bconfId = self::$bconf->getId();
+
+        static::api()->addFile('pln', static::api()->getFile('pipeline.pln'), 'application/octet-stream');
+        $res = static::api()->post("editor/plugins_okapi_bconf/uploadpipeline?id=$bconfId");
+        self::assertEquals(200, $res->getStatus());
+
+        static::api()->addFile('pln', static::api()->getFile('pipeline_no_extraction_step.pln'), 'application/octet-stream');
+        $res = static::api()->post("editor/plugins_okapi_bconf/uploadpipeline?id=$bconfId");
+        self::assertEquals(500, $res->getStatus());
+    }
+
+    /**
      * Test Pipeline & Content validation
      * @depends test20_createEntity
      */

@@ -41,8 +41,8 @@ END LICENSE AND COPYRIGHT
  * @method void setType(string $type)
  * @method string getFilter()
  * @method void setFilter(string $filterClass)
- * @method string getParameters()
- * @method void setParameters(string $parameters)
+ * @method string|null getParameters()
+ * @method void setParameters(string|null $parameters)
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $taskGuid)
  */

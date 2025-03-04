@@ -206,22 +206,39 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             controller.uploadSRX(bconfId, files[0], actionItem.purpose);
         });
     },
+    showPipelineChooser: function(view, rowIndex, colIndex, actionItem){
+        view.select(rowIndex);
+        var bconfId = view.selection.id, controller = this;
+        Editor.util.Util.chooseFile('.pln').then(function(files){
+            controller.uploadPipeline(bconfId, files[0]);
+        });
+    },
     downloadSRX: function(view, rowIndex, colIndex, /* actionItem */ {purpose}, e, /* record */ {id}){
         view.select(rowIndex);
         Editor.util.Util.download('plugins_okapi_bconf/downloadsrx', {id, purpose});
     },
+    downloadPipeline: function(view, rowIndex, colIndex, actionItem, e, /* record */ {id}){
+        view.select(rowIndex);
+        Editor.util.Util.download('plugins_okapi_bconf/downloadpipeline', {id});
+    },
     uploadSRX: function(id, srx, purpose){
+        this.uploadFile('plugins_okapi_bconf/uploadsrx/?id=' + id, {purpose, srx}, 'SRX', 'E1390');
+    },
+    uploadPipeline: function(id, pln){
+        this.uploadFile('plugins_okapi_bconf/uploadpipeline/?id=' + id, {pln}, 'PLN', 'E1687');
+    },
+    uploadFile: function(url, formData, fileType, errorCode){
         var controller = this,
-            grid = this.getView();
-        var [invalidTitle, invalidMsg, fileUploaded]
-            = [grid.strings.invalidTitle, grid.strings.invalidMsg, grid.strings.fileUploaded].map(x => x.replace('{0}', 'SRX'));
+            grid = this.getView(),
+            [invalidTitle, invalidMsg, fileUploaded]
+            = [grid.strings.invalidTitle, grid.strings.invalidMsg, grid.strings.fileUploaded].map(x => x.replace('{0}', fileType));
         grid.setLoading(true);
-        Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconf/uploadsrx/?id=' + id, {
-            method: 'POST', formData: {purpose, srx}
+        Editor.util.Util.fetchXHRLike(Editor.data.restpath + url, {
+            method: 'POST', formData: formData
         }).then(function(response){
             grid.setLoading(false);
             var { status, responseJson: json = {}} = response;
-            if(json.errorCode === 'E1390'){
+            if(json.errorCode === errorCode){
                 var extraInfo = controller.createInfoSpan(json);
                 Ext.Msg.show({
                     title: invalidTitle,

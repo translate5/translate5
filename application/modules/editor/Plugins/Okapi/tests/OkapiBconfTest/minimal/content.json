@@ -1,10 +1,14 @@
 {
     "refs": {
-        "sourceSrxPath": "s.srx",
-        "targetSrxPath": "t.srx"
+        "sourceSrxPath": "languages-afternumberbefo.srx",
+        "targetSrxPath": "languages-afternumberbefo-target.srx"
     },
     "step": [
-        "net.sf.okapi.steps.segmentation.SegmentationStep"
+        "net.sf.okapi.steps.common.RawDocumentToFilterEventsStep",
+        "net.sf.okapi.steps.segmentation.SegmentationStep",
+        "net.sf.okapi.steps.rainbowkit.creation.ExtractionStep"
     ],
-    "fprm": []
+    "fprm": [
+        "okf_plaintext@txtWordSplit"
+    ]
 }

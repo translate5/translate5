@@ -63,6 +63,15 @@
         "extensions": ["figma"]
     },
     {
+        "id": "translate5-xliff-with-CDATA",
+        "type": "okf_xliff",
+        "replaceId": "",
+        "name": "t5 XLIFF 1.2 with CDATA",
+        "description": "translate5 adjusted filter for XLIFF documents that have CDATA-sections as source and/or target",
+        "mime": "application/x-xliff+xml",
+        "extensions": ["xlf","xliff"]
+    },
+    {
         "id": "translate5-tbx-translate-definitions-setup-ITS",
         "type": "okf_xml",
         "replaceId": "",

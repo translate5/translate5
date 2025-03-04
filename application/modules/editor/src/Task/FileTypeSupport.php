@@ -227,12 +227,16 @@ final class FileTypeSupport
      * Registers the given file type to be handleable by translate5, but without a concrete parser
      * due multiple pre-processing steps, this filetype is probably preprocessed and converted before giving finally to the FileParsers
      */
-    public function register(string $extension, string $scope): void
+    public function register(string $extension, string $scope, bool $skipCoreParser = false): void
     {
-        if (! array_key_exists(strtolower($extension), $this->extensionsSupported)) {
-            $this->extensionsSupported[strtolower($extension)] = [$scope];
-        } elseif (! in_array($scope, $this->extensionsSupported[strtolower($extension)])) {
-            $this->extensionsSupported[strtolower($extension)][] = $scope;
+        $extension = strtolower($extension);
+        if (! array_key_exists($extension, $this->extensionsSupported)) {
+            $this->extensionsSupported[$extension] = [$scope];
+        } elseif (! in_array($scope, $this->extensionsSupported[$extension])) {
+            $this->extensionsSupported[$extension][] = $scope;
+        }
+        if ($skipCoreParser) {
+            unset($this->extensionsWithParser[$extension]);
         }
     }
 
@@ -261,10 +265,11 @@ final class FileTypeSupport
      */
     public function registerFileParser(string $extension, string $importFileParserClass, string $pluginName): void
     {
-        if (! array_key_exists(strtolower($extension), $this->extensionsWithParser)) {
-            $this->extensionsWithParser[strtolower($extension)] = [];
+        $extension = strtolower($extension);
+        if (! array_key_exists($extension, $this->extensionsWithParser)) {
+            $this->extensionsWithParser[$extension] = [];
         }
-        $this->extensionsWithParser[strtolower($extension)][] = [
+        $this->extensionsWithParser[$extension][] = [
             'parser' => $importFileParserClass,
             'scope' => $pluginName,
         ];

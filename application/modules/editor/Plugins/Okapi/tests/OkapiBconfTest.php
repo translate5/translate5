@@ -47,6 +47,8 @@ class OkapiBconfTest extends JsonTestAbstract
 
     private static BconfEntity $bconf;
 
+    private static Bconf $xsltBconf;
+
     /**
      * Just imports a bconf to test with
      */
@@ -58,6 +60,7 @@ class OkapiBconfTest extends JsonTestAbstract
         }
 
         static::$testBconf = $config->addBconf('TestBconfMinimal', 'minimal/batchConfiguration.t5.bconf');
+        self::$xsltBconf = $config->addBconf('TestBconfXsltXlfCdata', 'xslt_xlf_cdata/XsltAndXlfWithCData.bconf');
     }
 
     public function test10_ConfigurationAndApi()
@@ -213,7 +216,7 @@ class OkapiBconfTest extends JsonTestAbstract
      */
     public function test50_OkapiTaskImportWithBconfIdAndMultipleFiles()
     {
-        // cleanup will be atomatically done on teardown
+        // cleanup will be automatically done on teardown
         $config = static::getConfig();
         $config->import(
             $config
@@ -284,5 +287,51 @@ class OkapiBconfTest extends JsonTestAbstract
                 throw $outerEx;
             }
         }
+    }
+
+    /**
+     * Test upload of a task needing a special OKAPI XLIFF processing (CData)
+     */
+    public function test61_XliffWithCdata()
+    {
+        $config = static::getConfig();
+        $bconfId = self::$xsltBconf->getId();
+        $bconf = new BconfEntity();
+        $bconf->load($bconfId);
+
+        $config->import(
+            $config
+                ->addTask('en', 'de')
+                ->setImportBconfId($bconfId)
+                ->addUploadFile('workfiles/cdata.xlf')
+        );
+    }
+
+    /**
+     * Test upload of a BCONF with XSLT
+     */
+    public function test62_XsltBconf()
+    {
+        $config = static::getConfig();
+        $id = self::$xsltBconf->getId();
+        $bconf = new BconfEntity();
+        $bconf->load($id);
+
+        $config->import(
+            $config
+                ->addTask('en', 'de')
+                ->setImportBconfId($id)
+                ->addUploadFile('workfiles/cdata.xlf')
+        );
+
+        // Upload targetSRX
+        static::api()->addFile('srx', static::api()->getFile('srx/idTarget.srx'), 'application/octet-stream');
+        $res = static::api()->post("editor/plugins_okapi_bconf/uploadsrx?id=$id", [
+            'purpose' => 'target',
+        ]);
+        self::assertEquals(200, $res->getStatus());
+
+        $res = static::api()->get("editor/plugins_okapi_bconf/downloadbconf?id=$id");
+        self::assertEquals(200, $res->getStatus());
     }
 }

@@ -85,8 +85,7 @@ class editor_Models_File_FilterManager
     protected function loadFilters(editor_Models_Task $task, string $type): void
     {
         $this->task = $task;
-        $filter = ZfExtended_Factory::get('editor_Models_File_Filter');
-        /* @var $filter editor_Models_File_Filter */
+        $filter = ZfExtended_Factory::get(editor_Models_File_Filter::class);
         $filters = $filter->loadForTask($task->getTaskGuid(), $type);
         $this->filters = [];
         foreach ($filters as $filter) {
@@ -97,6 +96,7 @@ class editor_Models_File_FilterManager
 
     /**
      * returns the filename of the affected file (could be changed by the filters due conversion)
+     * @throws \MittagQI\Translate5\File\Filter\FilterException
      */
     public function applyImportFilters(string $path, int $fileId): string
     {
@@ -108,6 +108,9 @@ class editor_Models_File_FilterManager
         return $this->applyFilters(self::TYPE_EXPORT, $path, $fileId);
     }
 
+    /**
+     * @throws \MittagQI\Translate5\File\Filter\FilterException
+     */
     protected function applyFilters($type, string $path, int $fileId): string
     {
         if (empty($this->filters[$fileId])) {
@@ -116,9 +119,9 @@ class editor_Models_File_FilterManager
         $filters = $this->filters[$fileId];
         foreach ($filters as $filter) {
             $filterInstance = ZfExtended_Factory::get($filter->filter);
-            /* @var $filterInstance editor_Models_File_IFilter */
+            /** @var editor_Models_File_IFilter $filterInstance */
             $filterInstance->initFilter($this, $this->config);
-            if ($type == self::TYPE_EXPORT) {
+            if ($type === self::TYPE_EXPORT) {
                 $path = $filterInstance->applyExportFilter($this->task, $fileId, $path, $filter->parameters);
             } else {
                 //import filters may change the used file path! Dangerous!
@@ -135,16 +138,15 @@ class editor_Models_File_FilterManager
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function addFilter(string $type, string $taskGuid, int $fileId, string $filterClass): void
+    public function addFilter(string $type, string $taskGuid, int $fileId, string $filterClass, string $params = null): void
     {
-        $filter = ZfExtended_Factory::get('editor_Models_File_Filter');
-        /* @var $filter editor_Models_File_Filter */
+        $filter = ZfExtended_Factory::get(editor_Models_File_Filter::class);
         $filter->setFileId($fileId);
         $filter->setTaskGuid($taskGuid);
         $filter->setFilter($filterClass);
         $filter->setType($type);
+        $filter->setParameters($params);
         $filter->save();
-        //$this->setParameters($parameters); FIXME!
     }
 
     /**
@@ -159,8 +161,7 @@ class editor_Models_File_FilterManager
         if (! empty($type)) {
             $checkTypes = [$type];
         }
-        $filter = ZfExtended_Factory::get('editor_Models_File_Filter');
-        /* @var $filter editor_Models_File_Filter */
+        $filter = ZfExtended_Factory::get(editor_Models_File_Filter::class);
         foreach ($checkTypes as $type) {
             $rowset = $filter->loadForFile($fileId, $type);
             if ($rowset->count() > 0) {

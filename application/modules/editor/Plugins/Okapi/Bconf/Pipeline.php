@@ -26,9 +26,10 @@
  END LICENSE AND COPYRIGHT
  */
 
+declare(strict_types=1);
+
 namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
 
-use MittagQI\Translate5\Plugins\Okapi\Bconf\Parser\PropertiesParser;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
 use MittagQI\ZfExtended\MismatchException;
 use SimpleXMLElement;
@@ -39,35 +40,19 @@ use ZfExtended_NotFoundException;
  * Class representing the pipeline of a BCONF
  * This generally is a xml file with x-properties Sections
  * For validation, we analyse the content as XML and properties
- * To manipulate the SRX-pathes, we replace the strings as it is to complicated to imlement a XML/Properties bridge
+ * To manipulate the SRX-paths, we replace the strings as it is too complicated to implement a XML/Properties bridge
+ * A Pipeline will have the Translate5 OKAPI Version Index as Attribute from version 10 on
  */
 final class Pipeline extends ResourceFile
 {
     /*
      * A typical pipeline file looks like this:
-
-    <?xml version="1.0" encoding="UTF-8"?>
-    <rainbowPipeline version="1">
-        <step class="net.sf.okapi.steps.common.RawDocumentToFilterEventsStep"></step>
-        <step class="net.sf.okapi.steps.segmentation.SegmentationStep">#v1
-segmentSource.b=true
-segmentTarget.b=true
-renumberCodes.b=false
-sourceSrxPath=languages.srx
-targetSrxPath=languages.srx
-...
-copySource.b=false</step>
-        <step class="net.sf.okapi.steps.rainbowkit.creation.ExtractionStep">#v1
-writerClass=net.sf.okapi.steps.rainbowkit.xliff.XLIFFPackageWriter
-packageName=pack1
-...
-writerOptions.escapeGT.b=false
-        </step>
     </rainbowPipeline>
-
-    */
+     */
 
     public const FILE = 'pipeline.pln';
+
+    public const BCONF_VERSION_ATTR = 't5bconfVersion';
 
     // a Pipeline is generally a XML variant
     protected string $mime = 'text/xml';
@@ -75,6 +60,10 @@ writerOptions.escapeGT.b=false
     private ?string $sourceSrxPath = null;
 
     private ?string $targetSrxPath = null;
+
+    private ?string $xsltPath = null;
+
+    private int $bconfVersion = 0;
 
     /**
      * @var string[]
@@ -91,6 +80,40 @@ writerOptions.escapeGT.b=false
      */
     private int $bconfId;
 
+    private const IMPORT_STEPS = [
+        'XSLTransformStep' => [
+            'required' => false,
+            'javaClass' => 'net.sf.okapi.steps.xsltransform.XSLTransformStep',
+            'requiredProperties' => [
+                // Format: propertyName => forcedValue (null means any value is ok)
+                'xsltPath' => null,
+            ],
+        ],
+        'RawDocumentToFilterEventsStep' => [
+            'required' => true,
+            'javaClass' => 'net.sf.okapi.steps.common.RawDocumentToFilterEventsStep',
+            'requiredProperties' => [],
+        ],
+        'SegmentationStep' => [
+            'required' => true,
+            'javaClass' => 'net.sf.okapi.steps.segmentation.SegmentationStep',
+            'requiredProperties' => [
+                'doNotSegmentIfHasTarget.b' => false,
+            ],
+        ],
+        'ExtractionStep' => [
+            'required' => true,
+            'javaClass' => 'net.sf.okapi.steps.rainbowkit.creation.ExtractionStep',
+            'requiredProperties' => [
+                'writerOptions.includeNoTranslate.b' => true,
+                'writerOptions.includeIts.b' => true,
+                'writerOptions.includeAltTrans.b' => true,
+                'writerOptions.includeCodeAttrs.b' => true,
+                'writerOptions.escapeGT.b' => true,
+            ],
+        ],
+    ];
+
     /**
      * @throws ZfExtended_Exception
      */
@@ -104,6 +127,11 @@ writerOptions.escapeGT.b=false
     public function getBconfId(): int
     {
         return $this->bconfId;
+    }
+
+    public function getBconfVersion(): int
+    {
+        return $this->bconfVersion;
     }
 
     /**
@@ -134,7 +162,7 @@ writerOptions.escapeGT.b=false
      * Updates a SRX. Does not flush the content
      * @throws ZfExtended_Exception
      */
-    public function setSrxFile(string $field, string $file)
+    public function setSrxFile(string $field, string $file): void
     {
         if (pathinfo($file, PATHINFO_EXTENSION) !== Srx::EXTENSION) {
             throw new ZfExtended_Exception('A SRX file must have the file-extension "srx": ' . $file);
@@ -154,14 +182,30 @@ writerOptions.escapeGT.b=false
         }
     }
 
+    public function getXsltFile(): ?string
+    {
+        return $this->xsltPath;
+    }
+
+    /**
+     * @throws ZfExtended_Exception
+     */
+    public function setXsltFile(string $file): void
+    {
+        if (pathinfo($file, PATHINFO_EXTENSION) !== 'xslt') {
+            throw new ZfExtended_Exception('A XSLT file must have the file-extension "xslt": ' . $file);
+        }
+        $this->content =
+            preg_replace('~xsltPath\s*=\s*' . pathinfo($this->xsltPath, PATHINFO_FILENAME)
+                . '~', 'xsltPath=' . pathinfo($file, PATHINFO_FILENAME), $this->content);
+        $this->xsltPath = $file;
+    }
+
     public function hasIdenticalSourceAndTargetSrx(): bool
     {
         return ($this->sourceSrxPath === $this->targetSrxPath);
     }
 
-    /**
-     * Validates a SRX
-     */
     public function validate(bool $forImport = false): bool
     {
         if (count($this->errors) > 0) {
@@ -185,7 +229,7 @@ writerOptions.escapeGT.b=false
      * @throws ZfExtended_Exception
      * @throws ZfExtended_NotFoundException
      */
-    private function parse(string $content)
+    private function parse(string $content): void
     {
         $pipeline = simplexml_load_string($content);
         if (! $pipeline) {
@@ -199,46 +243,78 @@ writerOptions.escapeGT.b=false
 
             return;
         }
-        $hasSegmentationStep = false;
-        foreach ($pipeline->step as $step) { /* @var SimpleXMLElement $step */
-            $class = (string) $step['class'];
-            if (! empty($class)) {
-                $this->steps[] = $class;
-                $parts = explode('.', $class);
-                $lastPart = array_pop($parts);
-                if ($lastPart === 'SegmentationStep') {
-                    $hasSegmentationStep = true;
-                    $propsContent = $step->__toString();
-                    $props = new PropertiesParser($propsContent);
-                    if (! $props->isValid()) {
-                        $this->errors[] = 'invalid Segmentation step (' . $props->getErrorString(', ') . ')';
+        $this->bconfVersion = (int) $pipeline[self::BCONF_VERSION_ATTR];
+
+        // Used for error message for missing required steps
+        $requiredSteps = array_filter(self::IMPORT_STEPS, function ($v) {
+            return $v['required'];
+        });
+
+        $needsRepair = false;
+        foreach ($pipeline->step as $stepXml) { /* @var SimpleXMLElement $stepXml */
+            $javaClass = (string) $stepXml['class'];
+            if (! empty($javaClass)) {
+                $this->steps[] = $javaClass;
+                $stepClass = substr(strrchr($javaClass, '.'), 1);
+                if (isset(self::IMPORT_STEPS[$stepClass])) {
+                    if ($javaClass !== self::IMPORT_STEPS[$stepClass]['javaClass']) {
+                        $this->errors[] = 'invalid javaClass for step "' . $stepClass . '" : ' . $javaClass;
+
+                        continue;
+                    }
+                    if (isset($requiredSteps[$stepClass])) {
+                        unset($requiredSteps[$stepClass]);
+                    }
+                    $step = new PipelineValidation((string) $stepXml, self::IMPORT_STEPS[$stepClass]['requiredProperties']);
+                    if (! $step->isValid()) {
+                        $this->errors[] = $step->getErrMsg();
                     } else {
-                        $this->sourceSrxPath = $props->has('sourceSrxPath') ? self::basename($props->get('sourceSrxPath')) : null;
-                        $this->targetSrxPath = $props->has('targetSrxPath') ? self::basename($props->get('targetSrxPath')) : null;
+                        if ($step->wasRepaired()) {
+                            $needsRepair = true;
+                            // @phpstan-ignore-next-line
+                            $stepXml[0] = $step->getProperties()->unparse(); // https://github.com/phpstan/phpstan/issues/8236
+                            // dom_import_simplexml($stepXml)->nodeValue = $step->getProperties()->unparse();
+                        }
+                        if ($stepClass === 'SegmentationStep') {
+                            $props = $step->getProperties();
+                            $this->sourceSrxPath = $props->has('sourceSrxPath') ? self::basename($props->get('sourceSrxPath')) : null;
+                            $this->targetSrxPath = $props->has('targetSrxPath') ? self::basename($props->get('targetSrxPath')) : null;
+                        } elseif ($stepClass === 'XSLTransformStep') {
+                            $props = $step->getProperties();
+                            $this->xsltPath = $props->has('xsltPath') ? self::basename($props->get('xsltPath')) : null;
+                        }
                     }
                 }
             }
         }
-        if (count($this->steps) === 0) {
-            $this->errors[] = 'the pipeline has no steps';
-        }
-        if (! $hasSegmentationStep) {
-            $this->errors[] = 'the pipeline has no segmentation step';
+        if (count($requiredSteps) > 0) {
+            $this->errors[] = 'the pipeline has missing steps: ' . implode(', ', array_keys($requiredSteps));
         }
         if (empty($this->sourceSrxPath) || empty($this->targetSrxPath) || pathinfo($this->sourceSrxPath, PATHINFO_EXTENSION) != Srx::EXTENSION || pathinfo($this->targetSrxPath, PATHINFO_EXTENSION) != Srx::EXTENSION) {
             $this->errors[] = 'the pipeline had no or invalid entries for the source or target segmentation srx file';
         } else {
             // we will remove any path from the SRX-Files to normalize the value (it usually contains the rainbow workspace path)
-            // this also is a security-related necessity since an attack with pathes on the server's file-system could be attempted
+            // this also is a security-related necessity since an attack with paths on the server's file-system could be attempted
             if (self::basename($this->sourceSrxPath) != $this->sourceSrxPath) {
                 $this->setSrxFile('source', self::basename($this->sourceSrxPath));
             }
-            if (self::basename($this->targetSrxPath) != $this->targetSrxPath) {
+            if (basename($this->targetSrxPath) != $this->targetSrxPath) {
                 $this->setSrxFile('target', self::basename($this->targetSrxPath));
+            }
+            if ($this->xsltPath !== null && self::basename($this->xsltPath) != $this->xsltPath) {
+                $this->setXsltFile(self::basename($this->xsltPath));
+            }
+            if ($needsRepair) {
+                $pipeline->asXml($this->path);
+                // re-init (to be valid when added to bconf for example)
+                $this->content = file_get_contents($this->path);
             }
         }
     }
 
+    /**
+     * Handles correctly Windows-based paths
+     */
     private static function basename(string $filename): string
     {
         $filename = str_replace('\\', '/', $filename);

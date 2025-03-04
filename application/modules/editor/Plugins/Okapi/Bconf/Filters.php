@@ -102,6 +102,14 @@ class Filters
             'class' => 'Ttx',
             'extensions' => [],
         ],
+        'okf_xliff' => [
+            'class' => 'Xliff',
+            'extensions' => ['xlf', 'xlif', 'xliff', 'mxliff', 'mqxliff'],
+        ],
+        'okf_xliff2' => [
+            'class' => 'Xliff2',
+            'extensions' => ['xlf2', 'xliff2'],
+        ],
         'okf_xml' => [
             'class' => 'Xml',
             'extensions' => ['xml'],
@@ -120,8 +128,8 @@ class Filters
      * TODO: a testfile for "icml" would be great
      */
     public const TESTABLE_EXTENSIONS = [
+        'xml', // "xml" must go first for Bconf validation with Xslt step in pipeline to succeed
         'txt',
-        'xml',
         'strings',
         'csv',
         'htm',
@@ -131,6 +139,7 @@ class Filters
         'odp',
         'ods',
         'odt',
+        'po',
         'pptx',
         'tbx',
         'xlsx',

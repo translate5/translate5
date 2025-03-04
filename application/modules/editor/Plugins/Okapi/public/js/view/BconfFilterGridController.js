@@ -67,11 +67,15 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     },
 
     isEditDisabled: function(view, rowIndex, colIndex, item, record){
-        return !record.get('isCustom') || !record.get('editable') || record.crudState === 'C' || !record.get('guiClass');
+        return !record.get('isCustom') || !record.get('editable') || record.crudState === 'C';
     },
 
     isCloneDisabled: function(view, rowIndex, colIndex, item, record){
-        return !record.get('editable') || record.crudState === 'C' || !record.get('guiClass');
+        return record.crudState === 'C';
+    },
+
+    isWriteDisabled: function(view, rowIndex, colIndex, item, record){
+        return !record.get('isCustom') || record.crudState === 'C';
     },
 
     handleSearch: function(field, searchString){
@@ -195,6 +199,42 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         view.select();
         record.drop(/* cascade */ false);
         store.sync();
+    },
+    showFPRMChooser: function(view, rowIndex, colIndex, actionItem){
+        view.select(rowIndex);
+        const controller = this, fprmId = view.selection.id;
+        Editor.util.Util.chooseFile('.fprm').then(function(files){
+            controller.uploadFPRM(fprmId, files[0]);
+        });
+    },
+    downloadFPRM: function(view, rowIndex, colIndex, actionItem, e, /* record */ {id}){
+        view.select(rowIndex);
+        Editor.util.Util.download('plugins_okapi_bconffilter/downloadfprm', {id});
+    },
+    uploadFPRM: function(id, fprm){
+        const controller = this,
+            grid = this.getView(),
+            [invalidTitle, invalidMsg, fileUploaded]
+            = [grid.strings.invalidTitle, grid.strings.invalidMsg, grid.strings.fileUploaded].map(x => x.replace('{0}', 'FPRM'));
+        grid.setLoading(true);
+        Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconffilter/uploadfprm/?id=' + id, {
+            method: 'POST', formData: {fprm}
+        }).then(function(response){
+            grid.setLoading(false);
+            var { status, responseJson: json = {}} = response;
+            if(json.errorCode === 'E1686'){
+                Ext.Msg.show({
+                    title: invalidTitle,
+                    message: invalidMsg + controller.createInfoSpan(json),
+                    buttons: Ext.MessageBox.OK,
+                    icon: Ext.Msg.WARNING
+                });
+            } else if(status !== 200){
+                Editor.app.getController('ServerException').handleException(response);
+            } else {
+                Editor.MessageBox.addSuccess(fileUploaded);
+            }
+        });
     },
     /**
      * Handles closing the Filter panel

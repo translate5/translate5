@@ -10506,6 +10506,10 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
                 <target>Cancel</target>
             </trans-unit>
+            <trans-unit id='Qml0dGUgd8OkaGxlbg=='>
+                <source>Bitte wählen</source>
+                <target>Please select</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

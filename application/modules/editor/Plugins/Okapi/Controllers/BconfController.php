@@ -28,6 +28,8 @@
 
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Helpers\ResourceFileImport;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Pipeline;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use MittagQI\ZfExtended\Controller\Response\Header;
@@ -58,7 +60,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
     /**
      * The download-actions need to be csrf unprotected!
      */
-    protected array $_unprotectedActions = ['downloadbconf', 'downloadsrx'];
+    protected array $_unprotectedActions = ['downloadbconf', 'downloadsrx', 'downloadpipeline'];
 
     /**
      * sends all bconfs as JSON
@@ -241,6 +243,45 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         $field = $this->getParam('purpose');
         $segmentation = Segmentation::instance();
         $segmentation->processUpload($this->entity, $field, $_FILES['srx']['tmp_name'], basename($_FILES['srx']['name']));
+    }
+
+    /**
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws OkapiException
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     */
+    public function downloadpipelineAction(): void
+    {
+        $this->entityLoadAndRepack();
+        $pipeline = $this->entity->getPipeline();
+        $downloadFilename = editor_Utils::filenameFromUserText($this->entity->getName(), false) . '-' . $pipeline->getFile();
+        $pipeline->download($downloadFilename);
+        exit;
+    }
+
+    /**
+     * @throws OkapiException
+     * @throws ZfExtended_Exception
+     * @throws Throwable
+     */
+    public function uploadpipelineAction(): void
+    {
+        if (empty($_FILES)) {
+            throw new OkapiException('E1212', [
+                'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
+            ]);
+        }
+        $this->entityLoadAndRepack();
+        $pipeline = new Pipeline($this->entity->getPipelinePath(), file_get_contents($_FILES['pln']['tmp_name']));
+        $errMsg = ResourceFileImport::addToBConf($pipeline, $this->entity);
+        if ($errMsg) {
+            throw new OkapiException('E1687', [
+                'details' => $errMsg,
+            ]);
+        }
     }
 
     /**
