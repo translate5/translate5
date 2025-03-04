@@ -56,7 +56,7 @@ class Comments
     private array $comments = [];
 
     public function __construct(
-        private editor_Models_Task $task
+        private editor_Models_Task $task,
     ) {
     }
 
@@ -106,6 +106,16 @@ class Comments
         $comment->setUserGuid(self::NOTE_USERGUID);
         $comment->setUserName($attributes['from'] ?? 'no user');
 
+        $comment->setCreated(NOW_ISO);
+        $comment->setModified(NOW_ISO);
+    }
+
+    public function addResnameComment(string $resname): void
+    {
+        $comment = new editor_Models_Comment();
+        $comment->setComment('resname: ' . $resname);
+        $comment->setUserGuid(self::NOTE_USERGUID);
+        $comment->setUserName('no user');
         $comment->setCreated(NOW_ISO);
         $comment->setModified(NOW_ISO);
     }
