@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
+use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
 
 /**
  * Entity Model for task meta data
@@ -33,15 +34,17 @@ use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
  * @method void setId(int $id)
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $guid)
- * @method string getBconfId()
+ * @method string getTbxHash()
+ * @method void setTbxHash(string $tbxHasj)
+ * @method null|string getMappingType()
+ * @method void setMappingType(string $mappingType)
+ * @method null|string getBconfId()
  * @method void setBconfId(int $bconfId)
- * @method string getBconfInZip()
+ * @method null|string getBconfInZip()
  * @method void setBconfInZip(string $bconfInZip)
  * @method void setPricingPresetId(int $pricingPresetId)
- * @method string getMappingType()
- * @method void setMappingType(string $mappingType)
- * @method string getPerTaskExport()
- * @method void setPerTaskExport(bool $perTaskExport)
+ * @method null|string getPerTaskExport()
+ * @method void setPerTaskExport(bool|int $perTaskExport)
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
 {
@@ -104,7 +107,7 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
     public function getPricingPresetId()
     {
         // If no pricingPresetId defined (this may occur for tasks created before pricing-feature released)
-        if (! $this->row->pricingPresetId) {
+        if (! $this->row->pricingPresetId) { // @phpstan-ignore-line
             // Load task and get it's customerId
             $task = ZfExtended_Factory::get(editor_Models_Task::class);
             $task->loadByTaskGuid($this->getTaskGuid());
@@ -119,6 +122,51 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
         }
 
         // Return pricingPresetId
-        return $this->row->pricingPresetId;
+        return $this->row->pricingPresetId; // @phpstan-ignore-line
+    }
+
+    /**
+     * @throws ZfExtended_Exception
+     */
+    public function toDTO(): TaskMetaDTO
+    {
+        if (empty($this->getTaskGuid())) {
+            throw new ZfExtended_Exception('One can only get a DTO from a properly initialized Task-Meta');
+        }
+
+        return new TaskMetaDTO(
+            $this->getTaskGuid(),
+            $this->row->mappingType, // @phpstan-ignore-line
+            editor_Utils::parseNullableInt($this->row->bconfId), // @phpstan-ignore-line
+            $this->row->bconfInZip, // @phpstan-ignore-line
+            editor_Utils::parseNullableInt($this->row->pricingPresetId), // @phpstan-ignore-line
+            editor_Utils::parseNullableInt($this->row->perTaskExport) // @phpstan-ignore-line
+        );
+    }
+
+    /**
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function setFromDTO(TaskMetaDTO $dto): void
+    {
+        if (empty($this->getTaskGuid())) {
+            throw new ZfExtended_Exception('One can only set DTO-data for a properly initialized Task-Meta');
+        }
+        if ($this->getTaskGuid() !== $dto->taskGuid) {
+            throw new ZfExtended_Exception('taskGuid mismatch when saving DTO to task-meta');
+        }
+        $this->setMappingType($dto->mappingType);
+        $this->setBconfId($dto->bconfId);
+        $this->setBconfInZip($dto->bconfInZip);
+        $this->setPricingPresetId($dto->pricingPresetId);
+        $this->setPerTaskExport($dto->perTaskExport);
+    }
+
+    public function debug(): string
+    {
+        return 'TaskMeta: ' . print_r($this->row->toArray(), true);
     }
 }

@@ -77,6 +77,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected $groupTranslate = [];
 
+    protected ?array $currentGroupAttributes = null;
+
     /**
      * true if the current segment should be processed
      * false if not
@@ -637,6 +639,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->handleGroup($attributes);
         }, function () {
             array_pop($this->groupTranslate);
+            $this->currentGroupAttributes = null;
         });
 
         $this->xmlparser->registerElement('trans-unit', function ($tag, $attributes, $key) {
@@ -733,6 +736,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function handleGroup(array $attributes)
     {
+        $this->currentGroupAttributes = $attributes;
+
         if (empty($attributes['translate'])) {
             //we have to add also the groups without an translate attribute
             // so that array_pop works correct on close node
@@ -783,7 +788,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
         $segmentAttributes->transunitId = $transunitId;
 
-        $segmentAttributes->transunitDescriptor = $this->xmlparser->getAttribute($attributes, 'resname', null);
+        $resname = $this->xmlparser->getAttribute($attributes, 'resname', null);
+
+        if (null === $resname && null !== $this->currentGroupAttributes) {
+            $resname = $this->xmlparser->getAttribute($this->currentGroupAttributes, 'resname', null);
+        }
+
+        $segmentAttributes->transunitDescriptor = $resname;
 
         $segmentAttributes->transunitHash = $transunitHash;
 
@@ -1035,6 +1046,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_TARGET_MRK;
             } elseif ($currentSource == self::MISSING_MRK) {
                 $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_SOURCE_MRK;
+            }
+
+            if (null !== $attributes->transunitDescriptor) {
+                $this->comments->addResnameComment($attributes->transunitDescriptor);
             }
 
             $emptyInitialTarget = empty($targetChunksOriginal);

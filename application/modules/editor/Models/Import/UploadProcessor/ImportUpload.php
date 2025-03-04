@@ -74,7 +74,7 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
 
         $allValidExtensions = $this->task->getFileTypeSupport()->getSupportedExtensions();
 
-        /* @var ZfExtended_Logger $logger */
+        /** @var ZfExtended_Logger $logger */
         $logger = Zend_Registry::get('logger');
 
         $fileIndex = 0;
@@ -90,8 +90,14 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
                 $data = [
                     'ext' => $ext,
                     'filename' => $file,
+                    'supported' => implode(', ', $allValidExtensions),
                 ];
-                $logger->info('E1031', 'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.', $data);
+                $logger->warn(
+                    'E1031',
+                    'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.' .
+                    ' Supported Extensions: {supported}',
+                    $data
+                );
                 $errors[] = editor_Models_Import_UploadProcessor::ERROR_INVALID_FILE;
             }
             $fileIndex++;

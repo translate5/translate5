@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,27 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
+set_time_limit(0);
+
+/* @var $this ZfExtended_Models_Installer_DbUpdater */
+
+//$this->doNotSavePhpForDebugging = false;
+
 /**
- * DB Access for Segment Meta Data
+ * define database credential variables
  */
-class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract
-{
-    public const TABLE_NAME = 'LEK_segments_meta';
+$argc = count($argv);
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+    die("please dont call the script direct! Call it by using DBUpdater!\n\n");
+}
 
-    use ZfExtended_Models_Db_MetaTrait;
+$db = Zend_Db_Table::getDefaultAdapter();
+$conf = $db->getConfig();
+$dbname = $conf['dbname'];
+$res = $db->query('show tables from `' . $dbname . '` like "%LEK_segment_view_%";');
+$tables = $res->fetchAll(Zend_Db::FETCH_NUM);
+if (empty($tables)) {
+    return;
+}
 
-    protected $_name = self::TABLE_NAME;
+foreach ($tables as $table) {
+    $table = $table[0];
+    $sql = 'ALTER TABLE `%s`.`%s` ADD COLUMN `segmentDescriptor` varchar(1024) NULL';
+    $db->query(sprintf($sql, $dbname, $table));
 
-    public $_primary = 'id';
-
-    public function getName(): string
-    {
-        return $this->_name;
-    }
+    echo "Added field 'segmentDescriptor' to table " . $table . " <br />\n";
 }

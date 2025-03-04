@@ -88,7 +88,7 @@ class ImportXlfWithResnameInTransUnitTest extends TestCase
      * @see          \editor_Models_Import_FileParser_Sdlxliff::parseSegment
      * @dataProvider expectedSegmentsProvider
      */
-    public function testUserCases(string $filename, string $descriptor): void
+    public function testUserCases(string $filename, array $descriptor): void
     {
         $segmentFieldManager = \editor_Models_SegmentFieldManager::getForTaskGuid($this->task->getTaskGuid());
 
@@ -101,7 +101,7 @@ class ImportXlfWithResnameInTransUnitTest extends TestCase
         $parser->setSegmentFieldManager($segmentFieldManager);
 
         $sp = new class($this->task) extends \editor_Models_Import_SegmentProcessor {
-            private string $transunitDescriptor;
+            private array $transunitDescriptors = [];
 
             public function __construct(
                 editor_Models_Task $task,
@@ -114,14 +114,14 @@ class ImportXlfWithResnameInTransUnitTest extends TestCase
                 $mid = $parser->getMid();
                 $attributes = $parser->getSegmentAttributes($mid);
 
-                $this->transunitDescriptor = $attributes->transunitDescriptor;
+                $this->transunitDescriptors[] = $attributes->transunitDescriptor;
 
                 return false;
             }
 
-            public function transunitDescriptor(): string
+            public function transunitDescriptors(): array
             {
-                return $this->transunitDescriptor;
+                return $this->transunitDescriptors;
             }
         };
 
@@ -129,14 +129,39 @@ class ImportXlfWithResnameInTransUnitTest extends TestCase
 
         $parser->parseFile();
 
-        TestCase::assertSame($descriptor, $sp->transunitDescriptor());
+        $foundDescriptors = $sp->transunitDescriptors();
+        $generator = (function () use ($foundDescriptors) {
+            yield from $foundDescriptors;
+        })();
+
+        foreach ($descriptor as $expectedDescriptor) {
+            self::assertSame($expectedDescriptor, $generator->current());
+            $generator->next();
+        }
     }
 
     public function expectedSegmentsProvider(): iterable
     {
-        yield 'tags-that-were-wrongly-parsed-as-duplicates' => [
-            '1-seg-resname.xlf',
-            'document.title',
+        yield 'resnames in trans units on;y' => [
+            '2-seg-resname.xlf',
+            [
+                'document.title',
+                'document.second_title',
+            ],
+        ];
+
+        yield 'resnames in groups and transunits' => [
+            'resname-in-group-and-trans-unit.xlf',
+            [
+                'group.one.segment.one',
+                'group.one.segment.two',
+                'group.two',
+                'group.two',
+                'no.group.segment.one',
+                'no.group.segment.two',
+                'group.three',
+                'group.three.segment.two',
+            ],
         ];
     }
 }

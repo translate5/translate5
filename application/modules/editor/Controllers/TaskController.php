@@ -50,7 +50,6 @@ use MittagQI\Translate5\Task\Import\ProjectWorkersService;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\JobsPurger;
-use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Log\LogRepository;
 use MittagQI\Translate5\Task\Log\LogService;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -1039,9 +1038,11 @@ class editor_TaskController extends ZfExtended_RestController
             foreach ($metaData as $field => $value) {
                 $this->data[$field] = $value;
             }
+            // handle the cloned meta
+            $this->importService->prepareMeta($this->entity, $this->data);
 
             try {
-                $this->importService->processUploadedFile(
+                $this->importService->prepareConfigsDefaultsCheckUploadsQueueWorkers(
                     $this->entity,
                     $dataProvider,
                     $this->data,

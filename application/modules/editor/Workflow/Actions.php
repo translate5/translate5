@@ -365,8 +365,17 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
         );
 
         if ($edit100PercentMatch) {
-            //trigger auto QA, since the now editable segments might be without QA information
-            editor_Segment_Quality_Manager::autoqaOperation($this->config->task);
+            try {
+                //trigger auto QA, since the now editable segments might be without QA information
+                editor_Segment_Quality_Manager::autoqaOperation($this->config->task);
+            } catch (Throwable $exception) {
+                $this->log->exception($exception);
+                $this->log->info(
+                    'E1013',
+                    'Auto QA operation failed after edit100PercentMatch change',
+                    $this->config->task->getDataObject(),
+                );
+            }
         }
     }
 }

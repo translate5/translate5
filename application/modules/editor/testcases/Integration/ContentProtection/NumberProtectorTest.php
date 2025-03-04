@@ -61,6 +61,7 @@ use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Factory;
@@ -186,6 +187,38 @@ class NumberProtectorTest extends TestCase
             'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
             $protector->protect('string 20231020 string 20231020 string', true, 5, 6)
         );
+    }
+
+    public function testProtectWithSchmiederNumericRegex(): void
+    {
+        $dto = new ContentProtectionDto(
+            KeepContentProtector::getType(),
+            'default',
+            '/\d+((\s|\.|\,)(\d)+)*/',
+            0,
+            null,
+            true,
+            null,
+            0
+        );
+
+        $repo = $this->createConfiguredMock(
+            ContentProtectionRepository::class,
+            [
+                'getAllForSource' => [$dto],
+                'hasActiveTextRules' => true,
+            ]
+        );
+
+        $protector = NumberProtector::create($repo);
+
+        $segment = 'Temperaturklasse, maximale Oberflächentemperatur &lt; 135 °C; 275 °F';
+
+        self::assertTrue($protector->hasEntityToProtect($segment));
+
+        $expected = 'Temperaturklasse, maximale Oberflächentemperatur &lt; <number type="keep-content" name="default" source="135" iso="135" target="135" regex="049J0dbQiCmuidGridHR1IhJ0dTW1NIHAA=="/> °C; <number type="keep-content" name="default" source="275" iso="275" target="275" regex="049J0dbQiCmuidGridHR1IhJ0dTW1NIHAA=="/> °F';
+
+        self::assertSame($expected, $protector->protect($segment, true, 5, 6));
     }
 
     /**
@@ -798,6 +831,14 @@ class NumberProtectorTest extends TestCase
         yield [
             'string' => "string 123456789 mm \r\n",
             'expected' => "string <number type=\"integer\" name=\"default simple\" source=\"123456789\" iso=\"123456789\" target=\"123456789\" regex=\"09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA=\"/> mm \r\n",
+        ];
+        yield [
+            'string' => 'string < 123456789',
+            'expected' => 'string < <number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/>',
+        ];
+        yield [
+            'string' => 'string &lt; 123456789',
+            'expected' => 'string &lt; <number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/>',
         ];
     }
 

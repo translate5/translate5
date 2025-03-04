@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmx version="1.4">
+    <header creationtoolversion="0.6.66" gitCommit="96744f79 * updated to v0.6.66 * fixed memmove crash in compareputdata" segtype="sentence" adminlang="en-us" srclang="de-DE" o-tmf="t5memory" creationtool="t5memory" datatype="plaintext"/>
+    <body>
+        <tu tuid="1" creationdate="20240628T093631Z" creationid="SABRINA LUWICH">
+            <prop type="tmgr:segId">3</prop>
+            <prop type="t5:InternalKey">7:1</prop>
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de-DE">
+                <seg>Temperaturklasse, maximale Oberflächentemperatur &lt; 135 °C; 275 °F</seg>
+            </tuv>
+            <tuv xml:lang="it-IT">
+                <seg>Classe di temperatura, temperatura superficiale massima &lt; 135 °C; 275 °F</seg>
+            </tuv>
+        </tu>
+        <tu tuid="2" creationdate="20240628T093631Z" creationid="SABRINA LUWICH">
+            <prop type="tmgr:segId">3</prop>
+            <prop type="t5:InternalKey">7:1</prop>
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de-DE">
+                <seg>**hallo** <t5:n id="1" r="04+LSdFWCA12UdEHAA==" n="SOME_TEXT"/></seg>
+            </tuv>
+            <tuv xml:lang="it-IT">
+                <seg>**ola** <t5:n id="1" r="04+LSdFWCA12UdEHAA==" n="OTHER_TEXT"/></seg>
+            </tuv>
+        </tu>
+    </body>
+</tmx>

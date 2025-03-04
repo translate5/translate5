@@ -36,12 +36,14 @@ use MittagQI\Translate5\Plugins\Okapi\OkapiService;
 use MittagQI\Translate5\Task\FileTranslation\FileTranslation;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
+use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
 use MittagQI\ZfExtended\ApiRequestDTO;
 
 /**
  * OKAPI file converter and segmenter plugin
  *
  * There are several debug options for this Plugin:
+ * runtimeOptions.debug.plugin.OkapiInitEvents => Turns general debugging on for the Plugins initialisation/events
  * runtimeOptions.debug.plugin.OkapiBconfPackUnpack => Turns general debugging on for the packing/unpacking of bconfs
  * runtimeOptions.debug.plugin.OkapiBconfProcessing => Turns debugging on for the processing of bconfs
  * runtimeOptions.debug.plugin.OkapiBconfValidation => Turns debugging on for validating bconfs, filters & srx
@@ -90,8 +92,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     protected static bool $activateForTests = true;
 
     protected static bool $enabledByDefault = true;
-
-    private static bool $doDebug = false;
 
     /**
      * Retrieves path to task bconf if it exists (or config-based path to the default export bconf otherwise)
@@ -269,6 +269,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         Rights::PLUGIN_OKAPI_BCONF_CUSTOMER_PREFS => 'Editor.plugins.Okapi.controller.BconfPrefs',
     ];
 
+    private bool $doDebug = false;
+
     #region Plugin Init
 
     /**
@@ -276,6 +278,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      */
     public function init()
     {
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiInitEvents');
         $this->initEvents();
         $this->addController('BconfController');
         $this->addController('BconfFilterController');
@@ -589,30 +592,39 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         /* @var int $customerId */
         $customerId = $event->getParam('customerId');
 
-        if (static::$doDebug) {
-            error_log('OKAPI::handleRegisterSupportedFileTypes: task: '
-                . ($task === null ? 'null' : $task->getTaskGuid())
-                . ', customerId: ' . $customerId);
-        }
-
-        $okapiDataDirExists = false;
-
         if (! empty($task)) {
             $meta = $task->meta();
             $bconf = (empty($meta->getBconfInZip())) ? self::getImportBconfById($task, $meta->getBconfId()) : null;
             $importFilter = new ImportFilter($bconf, $meta->getBconfInZip());
             $okapiDataDir = $task->getAbsoluteTaskDataPath() . '/' . editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR;
             $okapiDataDirExists = is_dir($okapiDataDir);
+
+            if ($this->doDebug) {
+                error_log(
+                    'OKAPI::handleRegisterSupportedFileTypes: ' .
+                    'task: ' . $task->getTaskGuid() .
+                    ', bconfInZip: ' . (empty($meta->getBconfInZip()) ? 'null' : $meta->getBconfInZip()) .
+                    ', bconfId: ' . (empty($meta->getBconfId()) ? 'null' : $meta->getBconfId())
+                );
+            }
         } elseif ($customerId > 0) {
             // if a customer-id is given (usually by file-translation), we use the customers default bconf
             $bconf = new BconfEntity();
             $bconf = $bconf->getDefaultBconf($customerId);
             $importFilter = new ImportFilter($bconf, null);
+
+            if ($this->doDebug) {
+                error_log('OKAPI::handleRegisterSupportedFileTypes: task: null, customerId: ' . $customerId);
+            }
         } else {
             // since all tasks are by default generated with the "defaultcustomer" we use this bconf as the system std.
             // this case normally can not happen
             $bconf = self::getDefaultCustomerBconf();
             $importFilter = new ImportFilter($bconf, null);
+
+            if ($this->doDebug) {
+                error_log('OKAPI::handleRegisterSupportedFileTypes: task: null, using DEFAULT BCONF');
+            }
         }
         // we may need the ImportFilter in other functions
         $fileTypeSupport->registerPluginData($importFilter, $this->pluginName);
@@ -649,7 +661,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      */
     public function handleAfterIndex(Zend_EventManager_Event $event): void
     {
-        if (static::$doDebug) {
+        if ($this->doDebug) {
             error_log('OKAPI::handleAfterIndex');
         }
 
@@ -686,25 +698,25 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      */
     public function handleInitTaskMeta(Zend_EventManager_Event $event)
     {
-        /* @var $task editor_Models_Task */
+        /** @var editor_Models_Task $task */
         $task = $event->getParam('task');
-        /* @var $meta editor_Models_Task_Meta */
-        $meta = $event->getParam('meta');
-        /* @var $requestData array */
+        /** @var TaskMetaDTO $metaDTO */
+        $metaDTO = $event->getParam('metaDTO');
+        /** @var array $requestData */
         $requestData = $event->getParam('data');
         $bconfId = array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : null;
 
-        if (static::$doDebug) {
-            error_log('OKAPI::handleInitTaskMeta: task ' . $task->getTaskGuid() . ', requestBconfId: '
-                . ($bconfId === null ? 'null' : $bconfId));
+        if ($this->doDebug) {
+            error_log('OKAPI::handleInitTaskMeta: task ' . $task->getTaskGuid() .
+                ', requestBconfId: ' . ($bconfId === null ? 'null' : $bconfId));
         }
 
         // empty makes sense here since we only accept an bconf-id > 0
         if (empty($bconfId)) {
             $bconf = new BconfEntity();
-            $bconfId = $bconf->getDefaultBconfId($task->getCustomerId());
+            $bconfId = $bconf->getDefaultBconfId((int) $task->getCustomerId());
         }
-        $meta->setBconfId($bconfId);
+        $metaDTO->bconfId = $bconfId;
     }
 
     /**
@@ -749,17 +761,20 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         $dataProvider = $event->getParam('dataProvider');
         /* @var editor_Models_Task $task */
         $task = $event->getParam('task');
+        /* @var $requestData array */
+        $requestData = $event->getParam('requestData');
 
         $bconfInZip = self::findImportBconfFileinDir($dataProvider->getAbsImportPath());
 
-        if (static::$doDebug) {
-            error_log('OKAPI::handleAfterUploadPreparation: task ' . $task->getTaskGuid() . ', bconfInZip: '
-                . ($bconfInZip === null ? 'null' : basename($bconfInZip)));
+        if ($this->doDebug) {
+            error_log(
+                'OKAPI::handleAfterUploadPreparation: task ' . $task->getTaskGuid()
+                . ', bconfInZip: ' . ($bconfInZip === null ? 'null' : basename($bconfInZip))
+                . ', bconfId: ' . (array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : 'null')
+            );
         }
 
         if ($bconfInZip === null) {
-            /* @var $requestData array */
-            $requestData = $event->getParam('requestData');
             $bconfId = array_key_exists('bconfId', $requestData) ? intval($requestData['bconfId']) : null;
             $orderer = array_key_exists('orderer', $requestData) ? $requestData['orderer'] : null;
             $bconf = self::getImportBconfById($task, $bconfId, true, $orderer);
@@ -806,7 +821,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         /* @var ImportFilter $importFilter */
         $importFilter = $fileTypeSupport->getRegisteredPluginData($this->pluginName);
 
-        if (static::$doDebug) {
+        if ($this->doDebug) {
             error_log('OKAPI::handleAfterDirectoryParsing: task ' . $task->getTaskGuid() . ', bconf: '
                 . $importFilter->getBconfDisplayName());
         }
@@ -850,7 +865,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         $fullpath = $event->getParam('fullPath'); //absolute path to the relais file to be parsed
         $task = editor_ModelInstances::taskByGuid($event->getParam('taskGuid'));
 
-        if (static::$doDebug) {
+        if ($this->doDebug) {
             error_log('OKAPI::handleCustomFileForRelais: task ' . $task->getTaskGuid()
                 . ', fileChild relaisFileStatus ' . $child->relaisFileStatus);
         }
@@ -889,7 +904,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         /* @var $config editor_Models_Import_Configuration */
         $config = $event->getParam('importConfig');
 
-        if (static::$doDebug) {
+        if ($this->doDebug) {
             error_log('OKAPI::handleAfterImport: task ' . $task->getTaskGuid());
         }
 
@@ -914,7 +929,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      */
     public function handleApplicationState(Zend_EventManager_Event $event): void
     {
-        if (static::$doDebug) {
+        if ($this->doDebug) {
             error_log('OKAPI::handleApplicationState');
         }
 
@@ -938,7 +953,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         /* @var $config stdClass */
         $context = $event->getParam('context');
 
-        if (static::$doDebug) {
+        if ($this->doDebug) {
             error_log('OKAPI::handleExportFileparserConfig: task ' . $task->getTaskGuid() . ', file '
                 . $file->getId());
         }
@@ -959,7 +974,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      */
     public function handleAfterConfigIndexAction(Zend_EventManager_Event $event): void
     {
-        if (static::$doDebug) {
+        if ($this->doDebug) {
             error_log('OKAPI::handleAfterConfigIndexAction');
         }
 
@@ -993,7 +1008,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      */
     public function handleCustomerAfterIndex(Zend_EventManager_Event $event)
     {
-        if (static::$doDebug) {
+        if ($this->doDebug) {
             error_log('OKAPI::handleCustomerAfterIndex');
         }
 

@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,27 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Task\Meta;
+
 /**
- * DB Access for Segment Meta Data
+ * A container to ex-change or change fields for a meta-entity
  */
-class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract
+class TaskMetaDTO
 {
-    public const TABLE_NAME = 'LEK_segments_meta';
-
-    use ZfExtended_Models_Db_MetaTrait;
-
-    protected $_name = self::TABLE_NAME;
-
-    public $_primary = 'id';
-
-    public function getName(): string
-    {
-        return $this->_name;
+    public function __construct(
+        public readonly string $taskGuid,
+        public ?string $mappingType = 'source',
+        public ?int $bconfId = null,
+        public ?string $bconfInZip = null,
+        public ?int $pricingPresetId = null,
+        public ?int $perTaskExport = null,
+    ) {
     }
 }

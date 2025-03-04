@@ -118,9 +118,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             TaskEventTrigger::AFTER_SEGMENT_UPDATE,
             function (Zend_EventManager_Event $event) {
                 $worker = ZfExtended_Factory::get(UpdateLanguageResourcesWorker::class);
-                $worker->init(parameters: [
-                    'segmentId' => $event->getParam('segment')->getId(),
-                ]);
+                $worker->init(
+                    $event->getParam('task')->getTaskGuid(),
+                    [
+                        'segmentId' => $event->getParam('segment')->getId(),
+                    ]
+                );
                 $worker->queue();
             }
         );

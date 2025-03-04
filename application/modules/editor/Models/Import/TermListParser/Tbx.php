@@ -283,9 +283,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $tbxData = $this->termModel->exportForTagging($task);
 
         $meta = $task->meta();
-        //ensure existence of the tbxHash field
-        $meta->addMeta('tbxHash', $meta::META_TYPE_STRING, null, 'Contains the MD5 hash of the original imported TBX file before adding IDs', 36);
-
         $hash = md5($tbxData);
         $meta->setTbxHash($hash);
         $meta->save();

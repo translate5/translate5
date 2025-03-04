@@ -26,7 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Test\Import\Bconf;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
@@ -48,23 +47,22 @@ class OkapiExportBconfTest extends JsonTestAbstract
 
     public function test10_BConfsImport()
     {
-        $bconf = new BconfEntity();
-        $bconf->load(self::$bconf1->getId());
         static::assertStringStartsWith(
             'TestBconf',
-            $bconf->getName(),
-            'Imported bconf\'s name is not like ' . 'TestBconf' . ' but ' . $bconf->getName()
+            self::$bconf1->getName(),
+            'Imported bconf\'s name is not like ' . 'TestBconf' . ' but ' . self::$bconf1->getName()
         );
-        $bconf = new BconfEntity();
-        $bconf->load(self::$bconf2->getId());
         static::assertStringStartsWith(
             'JsonBconf',
-            $bconf->getName(),
-            'Imported bconf\'s name is not like ' . 'JsonBconf' . ' but ' . $bconf->getName()
+            self::$bconf2->getName(),
+            'Imported bconf\'s name is not like ' . 'JsonBconf' . ' but ' . self::$bconf2->getName()
         );
     }
 
-    public function test20_OkapiTasksImport()
+    /**
+     * Test imported with a custom JSON Bconf
+     */
+    public function test20_OkapiJsonImport()
     {
         $config = static::getConfig();
         $config->import(
@@ -72,8 +70,19 @@ class OkapiExportBconfTest extends JsonTestAbstract
                 ->addTask('en', 'de')
                 ->setImportBconfId(self::$bconf2->getId())
                 ->addUploadFile('workfiles/unity_en_newly_added_keys1.json')
+                ->setToEditAfterImport()
         );
+        $segments = static::api()->getSegments();
+        $this->assertEquals(17, count($segments));
+        $this->assertEquals('Green:', $segments[0]->source);
+    }
 
+    /**
+     * Test imported with a custom Typo3 Bconf
+     */
+    public function test30_OkapiTypo3Import()
+    {
+        $config = static::getConfig();
         $config->import(
             $config
                 ->addTask('en', 'de')
@@ -87,7 +96,11 @@ class OkapiExportBconfTest extends JsonTestAbstract
         $this->assertEquals('Reference', $segments[0]->source);
     }
 
-    public function test30_OkapiTaskExport()
+    /**
+     * Tests the typo3 export
+     * @depends test30_OkapiTypo3Import
+     */
+    public function test40_OkapiTaskExport()
     {
         static::api()->get('editor/task/export/id/' . static::api()->getTask()->id . '/diff/1');
 

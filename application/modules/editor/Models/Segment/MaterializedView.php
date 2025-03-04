@@ -195,6 +195,7 @@ class editor_Models_Segment_MaterializedView
         };
 
         $addColSql = $sfm->walkFields($walker);
+        $addColSql[] = 'ADD COLUMN `segmentDescriptor` varchar(1024) NULL';
         $addColSql[] = 'ADD COLUMN `metaCache` longtext NOT NULL';
 
         $sql = 'ALTER TABLE `' . $this->viewName . '` ' . join(', ', $addColSql) . ';';
@@ -239,6 +240,7 @@ class editor_Models_Segment_MaterializedView
         //loop over all available segment fields for this task and create SQL for
         $sfm->walkFields($walker);
         $selectSql = join(',', $selectSql) . ', ';
+        $selectSql .= 'm.segmentDescriptor, ';
 
         //build up the segment meta cache query
         $selectSql .= $this->buildMetaCacheSql();

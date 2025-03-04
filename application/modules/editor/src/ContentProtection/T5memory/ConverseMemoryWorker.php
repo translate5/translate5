@@ -160,6 +160,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                     ]
                 );
 
+                $this->deleteNewlyCreatedMemories($connector);
                 $this->restoreLangResourceMemories();
                 $this->resetConversionStarted();
 
@@ -174,7 +175,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                 'memories',
                 array_values(
                     array_filter(
-                        $this->languageResource->getSpecificData('memories', parseAsArray: true),
+                        $this->languageResource->getSpecificData('memories', true),
                         fn ($memory) => $memory['filename'] !== $filename
                     )
                 )
@@ -208,5 +209,19 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         // set status to import to block interactions with the language resource
         $this->languageResource->setStatus(Status::NOTCHECKED);
         $this->languageResourceRepository->save($this->languageResource);
+    }
+
+    /**
+     * delete newly created memories as import failed
+     */
+    private function deleteNewlyCreatedMemories(Connector $connector): void
+    {
+        $backupMemoryNames = array_column($this->memoriesBackup, 'filename');
+
+        foreach ($this->languageResource->getSpecificData('memories', true) as $new) {
+            if (! in_array($new['filename'], $backupMemoryNames, true)) {
+                $connector->deleteMemory($new['filename']);
+            }
+        }
     }
 }

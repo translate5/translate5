@@ -57,7 +57,10 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
             $parameters['source'] = $language->getId();
         }
 
-        if (! is_null($parameters['pivotLanguage']) && ! is_numeric($parameters['pivotLanguage'])) {
+        if (array_key_exists('pivotLanguage', $parameters) &&
+            ! is_null($parameters['pivotLanguage']) &&
+            ! is_numeric($parameters['pivotLanguage'])
+        ) {
             $language->loadByRfc5646($parameters['pivotLanguage']);
             $parameters['pivotLanguage'] = $language->getId();
         }
@@ -84,6 +87,10 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
             'pmName' => $project->getPmName(),
             'targetLang' => $parameters['targets'],
         ];
+        // bconf-id is optional
+        if (array_key_exists('bconfId', $parameters)) {
+            $data['bconfId'] = $parameters['bconfId'];
+        }
 
         $importService->prepareTaskType(
             $project,
@@ -92,7 +99,7 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
         );
 
         $dataprovider = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
-        $importService->import($project, $dataprovider->createFromPath($parameters['path']), $data, $pm);
+        $importService->importProject($project, $dataprovider->createFromPath($parameters['path']), $data, $pm);
         $importService->startWorkers($project);
 
         return true;
