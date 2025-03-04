@@ -592,6 +592,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         /* @var int $customerId */
         $customerId = $event->getParam('customerId');
 
+        $okapiDataDirExists = false;
+
         if (! empty($task)) {
             $meta = $task->meta();
             $bconf = (empty($meta->getBconfInZip())) ? self::getImportBconfById($task, $meta->getBconfId()) : null;
