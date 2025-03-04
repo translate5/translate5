@@ -36,6 +36,7 @@ use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
+use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
 use MittagQI\ZfExtended\Worker\Queue;
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
@@ -155,19 +156,16 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      */
     public function handleInitTaskMeta(Zend_EventManager_Event $event): void
     {
-        /* @var $meta editor_Models_Task_Meta */
-        $meta = $event->getParam('meta');
-
-        /* @var $requestData array */
+        /** @var TaskMetaDTO $metaDTO */
+        $metaDTO = $event->getParam('metaDTO');
+        /** @var array $requestData */
         $requestData = $event->getParam('data');
-
         // Get pricingPresetId: either given within request, or default for the customer, or system default
         $pricingPresetId = $requestData['pricingPresetId']
             ?? ZfExtended_Factory::get(Preset::class)
                 ->getDefaultPresetId($requestData['customerId'] ?? null);
-
-        // Save to meta
-        $meta->setPricingPresetId($pricingPresetId);
+        // Add to meta
+        $metaDTO->pricingPresetId = $pricingPresetId;
     }
 
     /**

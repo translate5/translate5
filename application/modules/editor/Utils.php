@@ -580,6 +580,18 @@ class editor_Utils
     }
 
     /**
+     * Helper to convert a integer-string that can be null to a real int that also can be null
+     */
+    public static function parseNullableInt(int|string|null $value): ?int
+    {
+        if ($value === null) {
+            return $value;
+        }
+
+        return (int) $value;
+    }
+
+    /**
      * Check props, stored in $data arg to match rules, given in $ruleA arg
      * Example usage:
      * $_ = editor_Utils::jcheck([

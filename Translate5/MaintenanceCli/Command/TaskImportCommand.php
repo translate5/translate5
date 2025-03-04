@@ -31,11 +31,13 @@ namespace Translate5\MaintenanceCli\Command;
 use editor_Models_Customer_Customer;
 use editor_Models_Languages;
 use editor_Models_Workflow;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Task\Import\ImportService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
@@ -86,6 +88,12 @@ class TaskImportCommand extends Translate5AbstractCommand
             InputOption::VALUE_OPTIONAL,
             'Workflow name. If none provided - default will be used',
         );
+        $this->addOption(
+            'bconfId',
+            'b',
+            InputOption::VALUE_OPTIONAL,
+            'Bconf ID. If none provided - default BCONF will be used',
+        );
     }
 
     /**
@@ -104,7 +112,7 @@ class TaskImportCommand extends Translate5AbstractCommand
         $taskName = trim($input->getArgument('taskName'));
 
         if (! $taskName) {
-            $this->io->error('Please provide not empty Task name');
+            $this->io->error('Please provide non-empty Task name');
 
             return self::FAILURE;
         }
@@ -112,7 +120,7 @@ class TaskImportCommand extends Translate5AbstractCommand
         $path = $input->getArgument('path');
 
         if (! file_exists($path)) {
-            $this->io->error(sprintf('File "%s" does not exists', $path));
+            $this->io->error(sprintf('File "%s" does not exist', $path));
 
             return self::FAILURE;
         }
@@ -136,19 +144,19 @@ class TaskImportCommand extends Translate5AbstractCommand
             }
             $pmGuid = $pm->getUserGuid();
         } catch (ZfExtended_Models_Entity_NotFoundException) {
-            $this->io->error('Provided PM does not exists');
+            $this->io->error('Provided PM does not exist');
 
             return self::FAILURE;
         }
 
-        $customerNumber = trim($input->getOption('customer'));
+        $customerNumber = trim((string) $input->getOption('customer'));
         $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
 
         if ($customerNumber) {
             try {
                 $customer->loadByNumber($customerNumber);
             } catch (ZfExtended_Models_Entity_NotFoundException) {
-                $this->io->error('Provided Customer does not exists');
+                $this->io->error('Provided Customer does not exist');
 
                 return self::FAILURE;
             }
@@ -167,16 +175,30 @@ class TaskImportCommand extends Translate5AbstractCommand
                 $customer->getConfig()->runtimeOptions->workflow->initialWorkflow
             );
         } catch (ZfExtended_Models_Entity_NotFoundException) {
-            $this->io->error('Provided workflow does not exists');
+            $this->io->error('Provided workflow does not exist');
 
             return self::FAILURE;
         }
 
+        $workerParams = compact('path', 'taskName', 'pmGuid', 'customerNumber', 'source', 'targets', 'description', 'workflow');
+
+        $bconfId = trim($input->getOption('bconfId'));
+        // even if the plugin is not active that's no problem since we
+        if (is_numeric($bconfId)) {
+            $bconf = new BconfEntity();
+
+            try {
+                $bconf->load((int) $bconfId);
+                $workerParams['bconfId'] = (int) $bconf->getId();
+            } catch (Throwable) {
+                $this->io->error('Provided bconfId does not exist');
+
+                return self::FAILURE;
+            }
+        }
+
         $worker = new \editor_Models_Import_CliImportWorker();
-        $worker->init(
-            null,
-            compact('path', 'taskName', 'pmGuid', 'customerNumber', 'source', 'targets', 'description', 'workflow')
-        );
+        $worker->init(null, $workerParams);
         $worker->queue();
 
         $this->io->success('Import queued');

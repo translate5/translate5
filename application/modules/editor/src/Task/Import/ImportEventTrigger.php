@@ -55,6 +55,7 @@ namespace MittagQI\Translate5\Task\Import;
 use editor_Models_Import_Configuration;
 use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Task;
+use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
 
@@ -74,11 +75,6 @@ class ImportEventTrigger
     public const AFTER_IMPORT_ERROR = 'afterImportError';
 
     public const INIT_TASK_META = 'initTaskMeta';
-
-    /**
-     * Cache for preventig tasks-meta events to be called twice for a task per request
-     */
-    private static array $metaTasks = [];
 
     private ZfExtended_EventManager $events;
 
@@ -145,16 +141,13 @@ class ImportEventTrigger
      * Triggers the evaluation of task-meta params,
      * which are used throughout the whole import-process and should be evaluated as early as possible
      */
-    public function triggerTaskMetaEvent(editor_Models_Task $task, array $data): void
+    public function triggerTaskMetaEvent(editor_Models_Task $task, array $data, TaskMetaDTO $metaDTO): void
     {
-        if (! in_array($task->getTaskGuid(), self::$metaTasks)) {
-            self::$metaTasks[] = $task->getTaskGuid();
-            $this->triggerEvent(self::INIT_TASK_META, [
-                'task' => $task,
-                'meta' => $task->meta(),
-                'data' => $data,
-            ]);
-        }
+        $this->triggerEvent(self::INIT_TASK_META, [
+            'task' => $task,
+            'metaDTO' => $metaDTO,
+            'data' => $data,
+        ]);
     }
 
     public function triggerBeforeImport(

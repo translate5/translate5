@@ -1038,9 +1038,11 @@ class editor_TaskController extends ZfExtended_RestController
             foreach ($metaData as $field => $value) {
                 $this->data[$field] = $value;
             }
+            // handle the cloned meta
+            $this->importService->prepareMeta($this->entity, $this->data);
 
             try {
-                $this->importService->processUploadedFile(
+                $this->importService->prepareConfigsDefaultsCheckUploadsQueueWorkers(
                     $this->entity,
                     $dataProvider,
                     $this->data,

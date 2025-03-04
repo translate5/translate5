@@ -224,7 +224,8 @@ class editor_Models_Import_Configuration
     }
 
     /**
-     * Gibt den absoluten Pfad (inkl. Import Root) zum Verzeichnis mit den zu lektorierenden Dateien zurück, berücksichtigt die review bzw. Relaissprachen Config
+     * Gibt den absoluten Pfad (inkl. Import Root) zum Verzeichnis mit den zu lektorierenden Dateien zurück,
+     * berücksichtigt die review bzw. Relaissprachen Config
      * @return string
      */
     public function getWorkfileDir()
@@ -360,17 +361,25 @@ class editor_Models_Import_Configuration
 
     /***
      * Log a warning if the used work files directory is depricated
-     * TODO:(23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
+     * TODO:(23.02.2021 TRANSLATE-1596) remove me after the deprecated support for "proofRead" is removed
      * @param string $importDir
      */
     public function warnImportDirDeprecated(editor_Models_Task $task)
     {
         if ($this->isDeprecatedDirectoryName) {
+            /** @var ZfExtended_Logger $logger */
             $logger = Zend_Registry::get('logger')->cloneMe('editor.import.configuration');
-            /* @var $logger ZfExtended_Logger */
-            $logger->warn('E1338', 'IMPORTANT: The "proofRead" folder in the zip import package is deprecated from now on. In the future please always use the new folder "workfiles" instead. All files that need to be reviewed or translated will have to be placed in the new folder "workfiles" from now on. In some future version of translate5 the support for "proofRead" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.', [
-                'task' => $task,
-            ]);
+            $logger->warn(
+                'E1338',
+                'IMPORTANT: The "proofRead" folder in the zip import package is deprecated from now on. ' .
+                'In the future please always use the new folder "workfiles" instead. All files that need to be ' .
+                'reviewed or translated will have to be placed in the new folder "workfiles" from now on. ' .
+                'In some future version of translate5 the support for "proofRead" folder will be completely removed. ' .
+                'Currently it still is supported, but will write a "deprecated" message to the php error-log.',
+                [
+                    'task' => $task,
+                ]
+            );
         }
     }
 }
