@@ -255,6 +255,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             UpdateUserJobOperation::create()->update($job, $dto);
 
             $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($job, $authUser);
+
+            // @phpstan-ignore-next-line
+            $this->entity = $job; // for the afterPutAction
         } catch (Throwable $e) {
             throw $this->jobExceptionTransformer->transformException($e);
         }
@@ -282,6 +285,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
             }
 
             $this->view->rows = (object) $this->userJobViewDataProvider->buildJobView($userJob, $authUser);
+
+            // @phpstan-ignore-next-line
+            $this->entity = $userJob; // for the afterPostAction
         } catch (Throwable $e) {
             throw $this->jobExceptionTransformer->transformException($e);
         }

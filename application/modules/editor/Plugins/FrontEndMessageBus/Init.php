@@ -181,11 +181,10 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
     {
         //1. load the desired job
         $id = $event->getParam('params')['id'] ?? 0;
-        $job = clone $event->getParam('entity');
+        $jobRepository = \MittagQI\Translate5\Repository\UserJobRepository::create();
 
-        /* @var $job editor_Models_TaskUserAssoc */
         try {
-            $job->load($id); //empty id evaluates above to 0 which triggers not found then
+            $job = $jobRepository->get((int) $id); //empty id evaluates above to 0 which triggers not found then
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             return;
         }
