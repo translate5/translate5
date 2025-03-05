@@ -199,6 +199,8 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         }
         // we report any defect segments we found during processing
         Tagger::reportDefectSegments($task, $processingMode);
+        // might cleanup task-TBXs in the tagger after Import/AutoQA
+        Tagger::finishTaggingForTask($task);
     }
 
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags

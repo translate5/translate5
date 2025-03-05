@@ -36,13 +36,16 @@ use editor_Models_Segment_TrackChangeTag;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use editor_Models_Term_TbxCreationException;
+use editor_Plugins_TermTagger_Bootstrap;
 use editor_Plugins_TermTagger_QualityProvider;
 use editor_Plugins_TermTagger_Tag;
 use editor_Segment_Tags;
 use MittagQI\Translate5\Plugins\TermTagger\Configuration;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\AbstractException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\CheckTbxTimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\OpenException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
 use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
 use MittagQI\Translate5\Segment\AbstractProcessor;
@@ -51,6 +54,7 @@ use MittagQI\Translate5\Segment\Processing\State;
 use MittagQI\Translate5\Service\DockerServiceAbstract;
 use SplFileInfo;
 use stdClass;
+use Throwable;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Debug;
@@ -87,7 +91,7 @@ final class Tagger extends AbstractProcessor
      * Reports the too-long & defect segments that occurred during term-tagging
      * @throws Zend_Exception
      */
-    public static function reportDefectSegments(editor_Models_Task $task, string $processingMode)
+    public static function reportDefectSegments(editor_Models_Task $task, string $processingMode): void
     {
         $processingState = new Processing();
         $defectSegmentIds = $processingState->getSegmentsForState($task->getTaskGuid(), Service::SERVICE_ID, State::UNPROCESSABLE);
@@ -113,6 +117,31 @@ final class Tagger extends AbstractProcessor
                 'task' => $task,
                 'untaggableSegments' => $segmentsToLog,
             ]);
+        }
+    }
+
+    /**
+     * Unloads now unneccesary TBX files in the used Termagger's
+     */
+    public static function finishTaggingForTask(editor_Models_Task $task): void
+    {
+        try {
+            // this applies to threaded termtagger's only
+            $threads = Zend_Registry::get('config')->runtimeOptions?->termTagger?->threads ?? 1;
+            if ($threads > 1) {
+                $tbxHash = $task->meta()->getTbxHash();
+                if (! empty($tbxHash)) {
+                    $service = editor_Plugins_TermTagger_Bootstrap::createService(Service::SERVICE_ID);
+                    // the worker uses "import" and "default" as fallback
+                    foreach ($service->getLoadBalancedIps(['import', 'default']) as $ip) {
+                        $service->unloadTBX('http://' . $ip, $tbxHash);
+                    }
+                }
+            }
+        } catch (Throwable $e) {
+            // we must not interrupt the finishing of a successful tagging operation
+            // so a php-log is sufficient here
+            error_log($e->getMessage());
         }
     }
 
@@ -179,6 +208,16 @@ final class Tagger extends AbstractProcessor
     /**
      * Processes a batch of segments
      * @param editor_Segment_Tags[] $segmentsTags
+     * @throws AbstractException
+     * @throws CheckTbxTimeOutException
+     * @throws MalfunctionException
+     * @throws OpenException
+     * @throws ZfExtended_Exception
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\DownException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException
+     * @throws \Zend_Http_Client_Exception
+     * @throws editor_Models_ConfigException
      */
     public function processBatch(array $segmentsTags)
     {
@@ -197,6 +236,16 @@ final class Tagger extends AbstractProcessor
 
     /**
      * Processes a single segment
+     * @throws AbstractException
+     * @throws CheckTbxTimeOutException
+     * @throws MalfunctionException
+     * @throws OpenException
+     * @throws ZfExtended_Exception
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\DownException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException
+     * @throws \Zend_Http_Client_Exception
+     * @throws editor_Models_ConfigException
      */
     public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true)
     {
@@ -214,8 +263,13 @@ final class Tagger extends AbstractProcessor
     /**
      * Returns an array of terms applicable for particular segment
      * @throws AbstractException
+     * @throws CheckTbxTimeOutException
      * @throws MalfunctionException
      * @throws OpenException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\DownException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException
+     * @throws \Zend_Http_Client_Exception
      */
     public function retrieveTermsForSegmentTags(editor_Segment_Tags $segmentsTags): iterable
     {
@@ -567,6 +621,11 @@ final class Tagger extends AbstractProcessor
      * Throws Exceptions if TBX could not be loaded!
      * @throws AbstractException
      * @throws OpenException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\DownException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException
+     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException
+     * @throws CheckTbxTimeOutException
+     * @throws \Zend_Http_Client_Exception
      */
     private function checkTermTaggerTbx(string $url, ?string &$tbxHash)
     {
@@ -579,6 +638,14 @@ final class Tagger extends AbstractProcessor
             $tbx = $this->getTbxData();
             $tbxHash = $this->task->meta()->getTbxHash();
             $this->service->loadTBX($url, $tbxHash, $tbx, $this->logger);
+        } catch (TimeOutException $e) {
+            // a TimeOutException will be "casted" to a CheckTbxTimeOutException
+            // this is neccessary to distinguish Timeouts when Pinging or Loading TBX
+            $extraData = $e->getErrors();
+            $extraData['task'] = $this->task;
+            $extraData['termTaggerUrl'] = $url;
+
+            throw new CheckTbxTimeOutException($e->getErrorCode(), $extraData);
         } catch (AbstractException $e) {
             $e->addExtraData([
                 'task' => $this->task,

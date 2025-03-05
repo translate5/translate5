@@ -141,21 +141,40 @@ abstract class AbstractHttpService extends ServiceAbstract
      */
     public function getNumIpsForUrl(string $serviceUrl): int
     {
-        $host = rtrim(parse_url($serviceUrl, PHP_URL_HOST), '.') . '.';
-        // we cache the result for reduceing requests
-        if (array_key_exists($host, $this->hostsByHost)) {
-            $hosts = $this->hostsByHost;
-        } else {
-            $hosts = gethostbynamel($host);
-            $this->hostsByHost[$host] = $hosts;
-
-            if (static::doDebug()) {
-                error_log(static::class . '::getNumIpsForUrl: ' . $host . ': ' . print_r($hosts, true));
-            }
-        }
+        $hosts = $this->getIpsForUrl($serviceUrl);
 
         // QUIRK: for now, we return 1 if gethostbynamel() does not detect anything ... TODO FIXME: Throw Exception ?
         return (empty($hosts)) ? 1 : count($hosts);
+    }
+
+    /**
+     * Retrieves the IPs with Port that are behind a potentially load-balanced URL
+     * The result is cached for the lifetime for the service-instance
+     * @return string[]
+     */
+    public function getIpsForUrl(string $serviceUrl): array
+    {
+        $host = rtrim(parse_url($serviceUrl, PHP_URL_HOST), '.') . '.';
+        $port = empty(parse_url($serviceUrl, PHP_URL_PORT)) ?
+            '' : ':' . parse_url($serviceUrl, PHP_URL_PORT);
+        // we cache the result for reducing requests
+        if (array_key_exists($host, $this->hostsByHost)) {
+            $hosts = $this->hostsByHost[$host];
+        } else {
+            $hosts = gethostbynamel($host);
+            if (static::doDebug()) {
+                error_log(static::class . '::getNumIpsForUrl: ' . $host . ': ' . print_r($hosts, true));
+            }
+            if ($hosts === false) {
+                $hosts = [];
+            }
+            foreach ($hosts as &$host) {
+                $host .= $port;
+            }
+            $this->hostsByHost[$host] = $hosts;
+        }
+
+        return $hosts;
     }
 
     /**
