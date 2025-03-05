@@ -300,14 +300,21 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                 vm.set('lastOffset', offset);
                 vm.set('hasMoreRecords', null !== offset);
 
+                if (typeof vm.get('totalAmount') === 'number' && store.getCount() === vm.get('totalAmount')) {
+                    vm.set('hasMoreRecords', false);
+                }
+
                 if (store.getCount() === pageSize) {
                     vm.set('hasRecords', records.length > 0);
                     vm.set('loadingTotalAmount', true);
                     me.readTotalAmount();
                 } else {
                     me.getViewModel().set('loadingTotalAmount', false);
+                    if (store.getCount() < pageSize && vm.get('hasMoreRecords') === false) {
+                        vm.set('totalAmount', store.getCount());
+                    }
                 }
-                if (null !== offset && vm.get('loadedQty') < pageSize) {
+                if (vm.get('hasMoreRecords') && vm.get('loadedQty') < pageSize) {
                     me.loadPageByChunks(pageSize, 1,true);
                 } else {
                     vm.set('loadingRecordNumber', false);
@@ -317,9 +324,16 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     },
 
     onContainerScrollEnd: function () {
-        var me = this;
+        var me = this,
+            vm = me.getViewModel(),
+            total = vm.get('totalAmount'),
+            store = Ext.getCmp('mainlist').getStore();
 
-        if (!me.getViewModel().get('hasMoreRecords')) {
+        if (typeof total === 'number' && total === store.getCount()) {
+            vm.set('hasMoreRecords', false);
+        }
+
+        if (!vm.get('hasMoreRecords')) {
             return;
         }
 

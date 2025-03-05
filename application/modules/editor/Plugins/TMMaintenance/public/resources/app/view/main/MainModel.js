@@ -42,7 +42,7 @@ Ext.define('TMMaintenance.view.main.MainModel', {
             }
 
             if (chunk === false && get('lastOffset') === null) {
-                title = get('l10n.list.totalAmount') + get('loadedQty');
+                title = get('l10n.list.totalAmount') + total;
             }
             return  title;
         }
