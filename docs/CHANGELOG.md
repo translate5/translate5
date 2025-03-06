@@ -12,6 +12,57 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.20.5] - 2025-03-06
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4525](https://jira.translate5.net/browse/TRANSLATE-4525): ModelFront - Disable default usage of ModelFront plug-in and mark as deprecated** <br>
+Modelfront API did change, so therefore the plugin is not working anymore and is disabled now.
+
+**[TRANSLATE-4502](https://jira.translate5.net/browse/TRANSLATE-4502): Import/Export - Xliff Import: Use resname from group tag as segment description** <br>
+Xliff Import: Use resname grom group tag as sement descriptot
+
+**[TRANSLATE-4501](https://jira.translate5.net/browse/TRANSLATE-4501): Hotfolder Import - Hotfolder: Add import folder info to error mail** <br>
+Hotfolder: Add import folder info to error mail
+
+**[TRANSLATE-4462](https://jira.translate5.net/browse/TRANSLATE-4462): LanguageResources, t5memory - Add writing taskGuid to UpdateLanguageResourcesWorker** <br>
+Added task GUID to UpdateLanguageResourcesWorker scheduling, so now if task is deleted dependent UpdateLanguageResourcesWorker are also deleted
+
+
+### Bugfixes
+**[TRANSLATE-4526](https://jira.translate5.net/browse/TRANSLATE-4526): LanguageResources - Auto language detection in resource creation** <br>
+Fix a problem when uploading tm/tmx file containing language shortcuts.
+
+**[TRANSLATE-4517](https://jira.translate5.net/browse/TRANSLATE-4517): TM Maintenance - TM Maintenance TU count incorrect + error message** <br>
+FIXED: wrong total count was shown in various states
+
+**[TRANSLATE-4507](https://jira.translate5.net/browse/TRANSLATE-4507): TM Maintenance - Typo and column menu unneeded items** <br>
+typo fixed and made sorting and grouping unused column menu items to be hidden
+
+**[TRANSLATE-4505](https://jira.translate5.net/browse/TRANSLATE-4505): API - Job controller events are not hydrated correctly** <br>
+Fix: hydrate user job controller events with entity
+
+**[TRANSLATE-4504](https://jira.translate5.net/browse/TRANSLATE-4504): Import/Export - Task defaults are evaluated at the wrong place in import process** <br>
+FIX: Event-Handling on import may leads to import-options not being processed or being processed to late
+
+**[TRANSLATE-4503](https://jira.translate5.net/browse/TRANSLATE-4503): Workflows - Workflow: Next job in workflow has invalid status** <br>
+Workflow: Add logging of meta info for edge case of workflow set next job
+
+**[TRANSLATE-4500](https://jira.translate5.net/browse/TRANSLATE-4500): Editor general - Repetition editor: res-name is not used to look for repetitions** <br>
+Repetition editor: Use res-name to look for repetitions
+
+**[TRANSLATE-4498](https://jira.translate5.net/browse/TRANSLATE-4498): Content Protection - Conversion of TMs produces corrupt xml where html entities are present in segments** <br>
+Content protection: Fix html entity handling
+
+**[TRANSLATE-4480](https://jira.translate5.net/browse/TRANSLATE-4480): Import/Export - Match analysis worker not queued** <br>
+ translate5 - 7.20.4: Fix: Queue Match analysis worker on import
+ translate5 - 7.20.5: Changed another place with the same problem, and fixes needed in Terminologie handling due a follow up error.
+
+
 ## [7.20.4] - 2025-02-25
 
 ### Important Notes:
