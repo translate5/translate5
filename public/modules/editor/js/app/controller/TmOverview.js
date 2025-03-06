@@ -129,9 +129,6 @@ Ext.define('Editor.controller.TmOverview', {
             'addTmWindow combo[name="resourceId"]': {
                 select: 'handleResourceChanged'
             },
-            'addTmWindow filefield[name="tmUpload"]': {
-                change: 'handleChangeImportFile'
-            },
             '#termCollectionExportActionMenu': {
                 click: 'onTermCollectionExportActionMenuClick'
             },
@@ -662,30 +659,6 @@ Ext.define('Editor.controller.TmOverview', {
         form.findField('color').setValue(record.get('defaultColor'));
         filefield.setDisabled(disableUpload);
         filefield.setReadOnly(disableUpload);
-    },
-    handleChangeImportFile: function (field, val) {
-        var name = this.getAddTmForm().down('textfield[name=name]'),
-            srcLang = this.getAddTmForm().down('combo[name=sourceLang]'),
-            targetLang = this.getAddTmForm().down('combo[name=targetLang]'),
-            langs = val.match(/-([a-zA-Z]{2,3})-([a-zA-Z]{2,3})\.[^.]+$/);
-
-        if (name.getValue() == '') {
-            name.setValue(val.replace(/\.[^.]+$/, ''));
-        }
-        //simple algorithmus to get the language from the filenam
-        if (langs && langs.length == 3) {
-            var srcStore = srcLang.store,
-                targetStore = targetLang.store,
-                srcIdx = srcStore.find('label', '(' + langs[1] + ')', 0, true, true),
-                targetIdx = targetStore.find('label', '(' + langs[2] + ')', 0, true, true);
-
-            if (srcIdx >= 0) {
-                srcLang.setValue(srcStore.getAt(srcIdx).get('id'));
-            }
-            if (targetIdx >= 0) {
-                targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
-            }
-        }
     },
 
     /**
