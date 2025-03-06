@@ -283,16 +283,23 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         if (! $isRepetition) {
             $bestResult = $this->getBestResult($segment);
+            $calculatedResult = $bestResult ? clone $bestResult : null;
+
+            if ($calculatedResult) {
+                $calculatedResult->isRepetition = false;
+            }
+
             if (! $hasRepetitions) {
                 // if the segment has no repetitions at all we just return the found result
-                return $bestResult;
+                return $calculatedResult;
             }
 
             //the first segment of multiple repetitions is always stored as master
             $this->repetitionMasterSegments[$segmentHash] = clone $segment;
+            //store the found match for repetition re-usage
+            $this->repetitionByHash[$segmentHash] = $bestResult;
 
-            //store the found match for repetition reusage
-            return $this->repetitionByHash[$segmentHash] = $bestResult;
+            return $calculatedResult;
         }
         $masterHasResult = ! empty($this->repetitionByHash[$segmentHash]);
 
@@ -373,14 +380,20 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         ?stdClass $masterResult,
         ?int $repetitionRate = null
     ): ?stdClass {
-        $segmentHash = $segment->getSourceMd5();
-        if (
-            ! is_null($masterResult)
-            && $this->repetitionUpdater->updateTargetOfRepetition(
-                $this->repetitionMasterSegments[$segmentHash],
-                $segment
-            )
-        ) {
+        if (null === $masterResult) {
+            return null;
+        }
+
+        $segmentHash = $segment->getSourceMd5() . $segment->meta()->getSegmentDescriptor();
+        $master = $this->repetitionMasterSegments[$segment->getSourceMd5()] // repetition from MT
+            ?? $this->repetitionMasterSegments[$segmentHash] // repetition from TM
+            ?? null; // no repetition found
+
+        if (null === $master) {
+            return null;
+        }
+
+        if ($this->repetitionUpdater->updateTargetOfRepetition($master, $segment)) {
             // the returning result must be the one from the first of the repetition group.
             // to get the correct content for the repetition we get the value from $segment, which was updated by the repetition updater
             // we may not update the repetitionHash, this would interfer with the other repetitions
