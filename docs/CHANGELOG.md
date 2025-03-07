@@ -13,6 +13,19 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.20.6] - 2025-03-07
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4504](https://jira.translate5.net/browse/TRANSLATE-4504): Import/Export - Task defaults are evaluated at the wrong place in import process** <br>
+translate5 - 7.20.5: FIX: Event-Handling on import may leads to import-options not being processed or being processed to late
+translate5 - 7.20.6: Fix for problem when plugin is not active
+
+
 ## [7.20.5] - 2025-03-06
 
 ### Important Notes:
