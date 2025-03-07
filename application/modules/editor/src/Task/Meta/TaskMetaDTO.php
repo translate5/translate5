@@ -41,7 +41,7 @@ class TaskMetaDTO
         public ?int $bconfId = null,
         public ?string $bconfInZip = null,
         public ?int $pricingPresetId = null,
-        public ?int $perTaskExport = null,
+        public bool $perTaskExport = false,
     ) {
     }
 }
