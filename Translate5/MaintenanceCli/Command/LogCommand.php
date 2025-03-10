@@ -28,6 +28,7 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use JsonException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -150,6 +151,13 @@ the format is:
             InputOption::VALUE_NONE,
             'Warning: purges the logs found be the given filters. Is asking for confirmation of not used with -q|--quiet or -n|--no-interaction.'
         );
+
+        $this->addOption(
+            'list-origin',
+            null,
+            InputOption::VALUE_NONE,
+            'Loads a distinct list of log origins from the log file.'
+        );
     }
 
     /**
@@ -161,6 +169,27 @@ the format is:
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
+
+        if ($input->getOption('list-origin')) {
+            $log = new \ZfExtended_Models_Log();
+            $s = $log->db->select()->from($log->db, ['domain', 'count(*) as cnt'])->group('domain');
+            $origins = $log->db->fetchAll($s)->toArray();
+            if (empty($origins)) {
+                $this->io->error("No log origins to get origins from found.");
+
+                return self::FAILURE;
+            }
+            $origins = array_column($origins, 'cnt', 'domain');
+            ksort($origins);
+            $table = $this->io->createTable();
+            $table->setHeaders(['Domain', 'Count']);
+            foreach ($origins as $domain => $count) {
+                $table->addRow([$domain, $count]);
+            }
+            $table->render();
+
+            return self::SUCCESS;
+        }
 
         $this->withSummary = ! $input->getOption('no-summary');
         if ($this->withSummary) {
@@ -526,7 +555,11 @@ the format is:
      */
     protected function prepareExtra(string $extra): string
     {
-        $extra = json_decode($extra, true);
+        try {
+            $extra = json_decode($extra, associative: true, flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            return OutputFormatter::escape('Could not parse extra data: ' . $e->getMessage());
+        }
 
         if (! empty($extra['task']) && ! empty($extra['task']['taskGuid']) && ! empty($extra['task']['taskName'])) {
             settype($extra['task']['taskNr'], 'string');
