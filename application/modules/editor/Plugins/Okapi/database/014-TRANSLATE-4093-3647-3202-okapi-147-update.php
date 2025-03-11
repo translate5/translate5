@@ -45,7 +45,7 @@ $db = Zend_Db_Table::getDefaultAdapter();
 $bconfUpgradeNeeded = $db->fetchOne('SELECT id FROM LEK_okapi_bconf WHERE versionIdx < 10 LIMIT 1');
 
 if ($bconfUpgradeNeeded) {
-    $find147Version = function (array $serverList, string $serverName = ''): ?string {
+    $find147VersionPlus = function (array $serverList, string $serverName = ''): ?string {
         // test configured version
         if (array_key_exists($serverName, $serverList)) {
             $version = OkapiService::fetchServerVersion($serverList[$serverName]);
@@ -55,7 +55,7 @@ if ($bconfUpgradeNeeded) {
         }
         // test other servers
         foreach ($serverList as $otherName => $serverUrl) {
-            if (str_contains($otherName, '147') && $otherName !== $serverName) {
+            if (preg_match('/(14[7-9]|1[5-9]\d|[2-9]\d\d)/', $otherName) && $otherName !== $serverName) {
                 $version = OkapiService::fetchServerVersion($serverList[$otherName]);
                 if ($version !== null && version_compare($version, '1.47') >= 0) {
                     return $otherName;
@@ -70,7 +70,7 @@ if ($bconfUpgradeNeeded) {
     $okapiConfig = $config->runtimeOptions->plugins->Okapi;
 
     // find a proper 147 server in the config
-    $serverName = $insideBitbucket ? null : $find147Version(
+    $serverName = $insideBitbucket ? null : $find147VersionPlus(
         $okapiConfig?->server?->toArray() ?? [],
         $okapiConfig?->serverUsed ?? ''
     );
@@ -87,7 +87,7 @@ if ($bconfUpgradeNeeded) {
             $serverList = json_decode($testConfigs['runtimeOptions.plugins.Okapi.server'], true) ?? [];
             $serverUsed = $testConfigs['runtimeOptions.plugins.Okapi.serverUsed'] ?? '';
 
-            $serverName = $find147Version($serverList, $serverUsed);
+            $serverName = $find147VersionPlus($serverList, $serverUsed);
 
             if ($serverName === null) {
                 // to ensure the file is not marked as processed
