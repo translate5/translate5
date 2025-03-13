@@ -76,7 +76,7 @@
                 <refObject id="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">
                     <item type="fn">Project Manager</item>
                     <item type="email">noreply@translate5.net</item>
-                    <item type="role">admin,editor,pm,systemadmin,termCustomerSearch,termFinalizer,termPM,termPM_allClients,termProposer,termReviewer,TMMaintenance,TMMaintenance_allClients</item>
+                    <item type="role">admin,editor,pm,systemadmin,termCustomerSearch,termFinalizer,termPM_allClients,termProposer,termReviewer,TMMaintenance_allClients</item>
                 </refObject>
             </refObjectList>
             <refObjectList type="binaryData">
