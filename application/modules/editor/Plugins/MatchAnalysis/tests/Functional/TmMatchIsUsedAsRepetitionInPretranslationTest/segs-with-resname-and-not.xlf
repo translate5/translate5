@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="/var/lib/tomcat9/work/Okapi-Longhorn-Files/1/input/original-255.odt/content.xml" source-language="en" target-language="de" datatype="x-undefined">
+<body>
+<trans-unit id="1" restype="x-text:h" resname="CONTEXT_1">
+    <source xml:lang="en">My test segment.</source>
+    <seg-source><mrk mid="0" mtype="seg">My test segment.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="0"/></target>
+</trans-unit>
+<trans-unit id="2" restype="x-text:h" resname="CONTEXT_2">
+    <source xml:lang="en">My test segment.</source>
+    <seg-source><mrk mid="1" mtype="seg">My test segment.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="1"/></target>
+</trans-unit>
+<trans-unit id="3" restype="x-text:h" resname="CONTEXT_3">
+    <source xml:lang="en">My test segment.</source>
+    <seg-source><mrk mid="2" mtype="seg">My test segment.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="2"/></target>
+</trans-unit>
+<trans-unit id="4" restype="x-text:h">
+    <source xml:lang="en">My test segment.</source>
+    <seg-source><mrk mid="3" mtype="seg">My test segment.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="3"/></target>
+</trans-unit>
+<trans-unit id="5" restype="x-text:h">
+    <source xml:lang="en">My test segment.</source>
+    <seg-source><mrk mid="4" mtype="seg">My test segment.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="4"/></target>
+</trans-unit>
+<trans-unit id="6" restype="x-text:h">
+    <source xml:lang="en">My test segment.</source>
+    <seg-source><mrk mid="5" mtype="seg">My test segment.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="5"/></target>
+</trans-unit>
+<trans-unit id="7" restype="x-text:h">
+    <source xml:lang="en">My test segment #2.</source>
+    <seg-source><mrk mid="6" mtype="seg">My test segment #2.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="6"/></target>
+</trans-unit>
+<trans-unit id="8" restype="x-text:h">
+    <source xml:lang="en">My test segment #2.</source>
+    <seg-source><mrk mid="7" mtype="seg">My test segment #2.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="7"/></target>
+</trans-unit>
+<trans-unit id="9" restype="x-text:h">
+    <source xml:lang="en">My test segment #2.</source>
+    <seg-source><mrk mid="8" mtype="seg">My test segment #2.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="8"/></target>
+</trans-unit>
+<trans-unit id="10" restype="x-text:h">
+    <source xml:lang="en">My test segment #2.</source>
+    <seg-source><mrk mid="9" mtype="seg">My test segment #2.</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="9"/></target>
+</trans-unit>
+</body>
+</file>
+</xliff>

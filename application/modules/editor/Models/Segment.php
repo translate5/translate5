@@ -72,7 +72,8 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method string getWorkflowStep()
  * @method void setWorkflowStep(string $name)
  *
- * this are just some helper for the always existing segment fields, similar named methods exists for all segment fields:
+ * this are just some helper for the always existing segment fields, similar named methods exists for all segment
+ *     fields:
  * @method string getSource()
  * @method void setSource(string $content)
  * @method void setSourceEdit(string $content)
@@ -204,6 +205,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $this->trackChangesTagHelper = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
 
         parent::__construct();
+    }
+
+    public function getRepetitionHash(bool $tmTranslation = true): string
+    {
+        if (! $tmTranslation) {
+            return $this->getSourceMd5();
+        }
+
+        return $this->getSourceMd5() . $this->meta()->getSegmentDescriptor();
     }
 
     /**
