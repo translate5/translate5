@@ -161,7 +161,7 @@ class Editor_UserController extends ZfExtended_RestController
     {
         $rows = $this->entity->loadAll();
         $coordinatorGroupUserRepository = CoordinatorGroupUserRepository::create();
-        $userIdToLspIdMap = $coordinatorGroupUserRepository->getUserIdToCoordinatorGroupIdMap();
+        $userIdToCoordinatorGroupIdMap = $coordinatorGroupUserRepository->getUserIdToCoordinatorGroupIdMap();
 
         $userModel = ZfExtended_Factory::get(User::class);
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
@@ -198,7 +198,9 @@ class Editor_UserController extends ZfExtended_RestController
                 $rows[$key]['editable'] = '0';
             }
 
-            $rows[$key]['group'] = isset($userIdToLspIdMap[$row['id']]) ? (int) $userIdToLspIdMap[$row['id']] : null;
+            $rows[$key]['coordinatorGroup'] = isset($userIdToCoordinatorGroupIdMap[$row['id']])
+                ? (int) $userIdToCoordinatorGroupIdMap[$row['id']]
+                : null;
         }
 
         $this->view->rows = array_values($rows);
