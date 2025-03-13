@@ -14,6 +14,43 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.20.7] - 2025-03-13
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4531](https://jira.translate5.net/browse/TRANSLATE-4531): Export, Translate5 CLI - Implement a CLI task export command** <br>
+A CLI task:export command was added.
+
+
+### Bugfixes
+**[TRANSLATE-4534](https://jira.translate5.net/browse/TRANSLATE-4534): User Management - New admin users are not editable due wrong role combination** <br>
+New admin users are created with a invalid role combination and are not editable therefore.
+
+**[TRANSLATE-4533](https://jira.translate5.net/browse/TRANSLATE-4533): job coordinator - coordinator goup dropdown and job coordinator role checkbox will dissapear after creation of job coordinator** <br>
+User update: Fix roles render in User edit window
+
+**[TRANSLATE-4532](https://jira.translate5.net/browse/TRANSLATE-4532): job coordinator - coordinator group users with additional roles will not be editable for job coordinators** <br>
+User edit: Fix Coordinator permissions to edit users with additional roles provided by admin
+
+**[TRANSLATE-4529](https://jira.translate5.net/browse/TRANSLATE-4529): LanguageResources - Language resource is not exported if it contains special characters** <br>
+Fixed bug which may caused language resource assigned to a task to be not exported if its name contains some special characters
+
+**[TRANSLATE-4527](https://jira.translate5.net/browse/TRANSLATE-4527): Task Management - Tasks overview API end point returns duplicates for tasks** <br>
+Task overview: fix duplicates in task list
+
+**[TRANSLATE-4520](https://jira.translate5.net/browse/TRANSLATE-4520): Import/Export - Type error in repetition update** <br>
+Fix: Type error in repetition update fixed
+
+**[TRANSLATE-4471](https://jira.translate5.net/browse/TRANSLATE-4471): Import/Export - Worker-queue may stuck on import due to MatchAnalysis** <br>
+translate5 - 7.20.7: FIX: Import stuck was still possible with lesser probability, fixed now
+translate5 - 7.20.4: FIX: additional improvements
+translate5 - 7.20.3: FIX: Import may stuck due to MatchAnalysis being queued too late
+
+
 ## [7.20.6] - 2025-03-07
 
 ### Important Notes:
