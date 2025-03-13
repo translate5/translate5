@@ -114,7 +114,11 @@ class UserUpdateOperation implements UserUpdateOperationInterface
                     'user' => $user->getLogin(),
                     'authUser' => $authUser->getLogin(),
                     'authUserGuid' => $authUser->getUserGuid(),
-                    'reason' => $e::class,
+                    'reason' => [
+                        'assert' => $e::class,
+                        'message' => $e->getMessage(),
+                    ],
+                    'trace' => $e->getTraceAsString(),
                 ]
             );
 

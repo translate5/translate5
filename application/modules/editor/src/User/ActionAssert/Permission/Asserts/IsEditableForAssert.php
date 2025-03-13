@@ -60,6 +60,10 @@ final class IsEditableForAssert implements PermissionAssertInterface
             return;
         }
 
-        throw new NoAccessException();
+        if ($context->actor->isCoordinator()) {
+            return;
+        }
+
+        throw new NoAccessException('User is not editable for the current user');
     }
 }
