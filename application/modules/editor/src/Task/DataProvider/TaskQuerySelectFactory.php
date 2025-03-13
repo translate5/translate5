@@ -164,6 +164,14 @@ class TaskQuerySelectFactory
             ->where(TaskDb::TABLE_NAME . '.taskType in (?)', $this->taskType->getNonInternalTaskTypes())
         ;
 
+        // we need to group by id to avoid duplicates in the result
+        // currently we only group by id if we select all columns
+        // reason to do so is that we currently have 2 calls to this function and one of them already has distinct
+        // when 3rd call is added we should re-think this
+        if ('*' === $columns) {
+            $select->group(TaskDb::TABLE_NAME . '.id');
+        }
+
         if ($this->hasRestrictedAccess($viewer)) {
             $this->restrictSelect($select, $viewer, $filter, $applySort);
         }
