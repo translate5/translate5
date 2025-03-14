@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,20 +28,13 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\Meta;
+namespace MittagQI\Translate5\Plugins\TermTagger\Exception;
 
 /**
- * A container to ex-change or change fields for a meta-entity
+ * A timeout exception is not the same as a DOWN exception.
+ * Timout means in the most cases that the termtagger is running but it is tagging and therefore could not respond
+ * This is a special Variant of the Timeout that happened when checking or loading a TBX
  */
-class TaskMetaDTO
+class CheckTbxTimeOutException extends TimeOutException
 {
-    public function __construct(
-        public readonly string $taskGuid,
-        public ?string $mappingType = 'source',
-        public ?int $bconfId = null,
-        public ?string $bconfInZip = null,
-        public ?int $pricingPresetId = null,
-        public bool $perTaskExport = false,
-    ) {
-    }
 }

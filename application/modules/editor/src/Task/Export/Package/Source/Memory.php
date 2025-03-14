@@ -59,7 +59,7 @@ class Memory extends Base
 
             $connector = $serviceManager->getConnector($languageResource);
 
-            $fullPath = $this->getFolderPath() . DIRECTORY_SEPARATOR . $languageResource->getName();
+            $fullPath = $this->getFolderPath() . DIRECTORY_SEPARATOR . $this->fixFilename($languageResource->getName());
             $file = $connector->export($connector->getValidExportTypes()['TMX']);
 
             if (null === $file) {
@@ -70,5 +70,11 @@ class Memory extends Base
             $fullPath .= '.' . $extension;
             rename($file, $fullPath);
         }
+    }
+
+    private function fixFilename(string $filename): string
+    {
+        // Remove all special characters from the filename to prevent errors when copying it to a destination directory
+        return preg_replace('/[^\pL0-9_\-\+\(\)\s]/u', '_', $filename);
     }
 }

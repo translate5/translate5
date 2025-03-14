@@ -31,7 +31,6 @@ use MittagQI\Translate5\Acl\Exception\RoleConflictWithRoleThatPopulatedToRoleset
 use MittagQI\Translate5\Acl\Exception\RolesCannotBeSetForUserException;
 use MittagQI\Translate5\Acl\Exception\RolesetHasConflictingRolesException;
 use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
-use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\CoordinatorGroup\Exception\CoordinatorGroupNotFoundException;
 use MittagQI\Translate5\CoordinatorGroup\Exception\CustomerCanNotBeUnAssignedFromCoordinatorAsItHasRelatedCoordinatorGroupJobsException;
@@ -161,9 +160,9 @@ class Editor_UserController extends ZfExtended_RestController
     {
         $rows = $this->entity->loadAll();
         $coordinatorGroupUserRepository = CoordinatorGroupUserRepository::create();
-        $userIdToLspIdMap = $coordinatorGroupUserRepository->getUserIdToCoordinatorGroupIdMap();
+        $userIdToCoordinatorGroupIdMap = $coordinatorGroupUserRepository->getUserIdToCoordinatorGroupIdMap();
 
-        $userModel = ZfExtended_Factory::get(User::class);
+        $userModel = new User();
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
         $editableRoles = $authUser->getSetableRoles();
         $context = new PermissionAssertContext($authUser);
@@ -180,9 +179,7 @@ class Editor_UserController extends ZfExtended_RestController
                 )
             );
 
-            try {
-                $this->permissionAssert->assertGranted(UserAction::Read, $userModel, $context);
-            } catch (PermissionExceptionInterface) {
+            if (! $this->permissionAssert->isGranted(UserAction::Read, $userModel, $context)) {
                 unset($rows[$key]);
 
                 continue;
@@ -192,13 +189,17 @@ class Editor_UserController extends ZfExtended_RestController
                 && $row['editable'] === '1'
                 && ! empty($row['roles'])
                 && $row['roles'] !== ','
-                && ! empty(array_diff(explode(',', $row['roles']), $editableRoles));
+                && ! empty(array_diff(explode(',', $row['roles']), $editableRoles))
+                && ! $authUser->isCoordinator()
+            ;
 
             if ($notEditableUser) {
                 $rows[$key]['editable'] = '0';
             }
 
-            $rows[$key]['group'] = isset($userIdToLspIdMap[$row['id']]) ? (int) $userIdToLspIdMap[$row['id']] : null;
+            $rows[$key]['coordinatorGroup'] = isset($userIdToCoordinatorGroupIdMap[$row['id']])
+                ? (int) $userIdToCoordinatorGroupIdMap[$row['id']]
+                : null;
         }
 
         $this->view->rows = array_values($rows);
@@ -208,6 +209,7 @@ class Editor_UserController extends ZfExtended_RestController
     public function putAction(): void
     {
         $user = $this->userRepository->get($this->getParam('id'));
+        $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
 
         $data = $this->getRequest()->getParam('data');
         $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
@@ -226,7 +228,7 @@ class Editor_UserController extends ZfExtended_RestController
             : null;
 
         try {
-            if (null !== $customers) {
+            if (null !== $customers && ! $authUser->isCoordinator()) {
                 $operation = UpdateUserCustomersAssignmentsOperation::create();
                 $operation->updateCustomers($user, $customers, $this->getRequest()->getParam('force', false));
             }

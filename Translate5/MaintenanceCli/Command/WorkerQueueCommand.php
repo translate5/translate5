@@ -104,14 +104,14 @@ class WorkerQueueCommand extends Translate5AbstractCommand
             return self::SUCCESS;
         }
 
-        sleep(4);
+        sleep(2);
 
         $worker = new ZfExtended_Models_Worker();
-        $allWorker = $worker->loadByState($worker::STATE_PREPARE);
+        $allWorker = $worker->loadByState($worker::STATE_RUNNING);
         if (empty($allWorker)) {
-            $this->io->info('No worker set to running.');
+            $this->io->info('No worker set to running or they are already done.');
 
-            return 0;
+            return self::SUCCESS;
         }
 
         $headlines = [
@@ -133,6 +133,6 @@ class WorkerQueueCommand extends Translate5AbstractCommand
 
         $this->io->table($headlines, $rows);
 
-        return 0;
+        return self::SUCCESS;
     }
 }

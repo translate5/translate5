@@ -829,13 +829,15 @@ class Models_Installer_Standalone
             //since passwords are encrypted, we have to do that for the demo users too
             editor_Utils::initDemoAndTestUserPasswords();
         } else {
-            Zend_Registry::get('logger')->info(
-                'E1598',
-                'Translate5 update to version {version}',
-                [
-                    'version' => $version,
-                ]
-            );
+            Zend_Registry::get('logger')
+                ->cloneMe('system.update')
+                ->info(
+                    'E1598',
+                    'Translate5 update to version {version}',
+                    [
+                        'version' => $version,
+                    ]
+                );
         }
 
         $this->log("\nTranslate5 installation / update to version $version done.\n");

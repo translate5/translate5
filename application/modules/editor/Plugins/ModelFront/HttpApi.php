@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * @deprecated Integration is deprecated since API did change
+ */
 class editor_Plugins_ModelFront_HttpApi
 {
     public const PREDICT_RISK_ROUTE = 'predict';

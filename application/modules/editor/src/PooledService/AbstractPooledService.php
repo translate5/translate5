@@ -93,17 +93,33 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
     {
         $urls = $this->getPoolUrls($pool);
         if (count($urls) === 1) {
-            $url = $urls[0];
-            $state = Services::getServiceState($this->getServiceId());
-            if (! array_key_exists($url, $state)) {
-                // when there is no cached key we evaluate & cache it
-                $state = $this->saveServiceState();
-            }
-
-            return ((int) $state[$url]) > 1;
+            return $this->getLoadBalancingState($urls[0]) > 1;
         }
 
         return false;
+    }
+
+    /**
+     * Retrieves the IPs that are behind the sum of url's of the given pools
+     * This will be evaluated on-the-fly and is not cached
+     * @return string[]
+     * @throws ZfExtended_Exception
+     */
+    public function getLoadBalancedIps(array $pools): array
+    {
+        $ips = [];
+        $urlList = [];
+        foreach ($pools as $pool) {
+            $urls = $this->getPoolUrls($pool);
+            // only single url pools can be load-balanced
+            if (count($urls) === 1 && ! array_key_exists($urls[0], $urlList)) {
+                $urlList[] = $urls[0];
+                $poolIps = $this->getIpsForUrl($urls[0]);
+                $ips = array_merge($ips, $poolIps);
+            }
+        }
+
+        return array_values(array_unique($ips));
     }
 
     /**
@@ -119,9 +135,38 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
     }
 
     /**
+     * Retrieves the number of IPs for the given URL from the services memcache
+     */
+    private function getLoadBalancingState(string $url): int
+    {
+        $state = Services::getServiceState($this->getServiceId());
+        if (count($state) === 0 || ($url !== null && ! array_key_exists($url, $state))) {
+            $state = $this->saveLoadBalancingState();
+        }
+        if (array_key_exists($url, $state)) {
+            return $state[$url];
+        }
+
+        return 0;
+    }
+
+    /**
+     * Retrieves the number of IPs by URL from the services memcache
+     */
+    private function getLoadBalancingStates(): array
+    {
+        $state = Services::getServiceState($this->getServiceId());
+        if (count($state) === 0) {
+            $state = $this->saveLoadBalancingState();
+        }
+
+        return $state;
+    }
+
+    /**
      * Saves our load-balancing state to the services-memcache
      */
-    private function saveServiceState(): array
+    private function saveLoadBalancingState(): array
     {
         $state = [];
         $pools = [
@@ -132,7 +177,7 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
         foreach ($pools as $urls) {
             // only single url pools can be load-balanced
             if (count($urls) === 1 && ! array_key_exists($urls[0], $state)) {
-                $state[$urls[0]] = $this->getNumIpsForUrl($urls[0]);
+                $state[$urls[0]] = count($this->getIpsForUrl($urls[0]));
             }
         }
         Services::saveServiceState($this->getServiceId(), $state);
@@ -236,8 +281,8 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
         // we add the load-balancing state to our output if there are load-balanced pools
         if ($this->hasLoadBalancedPool()) {
             // we fetched the state with ::hasLoadBalancedPool
-            foreach (Services::getServiceState($this->getServiceId()) as $url => $numIps) {
-                if (((int) $numIps) > 1) {
+            foreach ($this->getLoadBalancingStates() as $url => $numIps) {
+                if ($numIps > 1) {
                     $this->checkedInfos[] = 'Url "' . $url . '" is load-balanced with ' . $numIps . ' ips!';
                 }
             }

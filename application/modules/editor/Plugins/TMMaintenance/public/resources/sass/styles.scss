@@ -17,5 +17,9 @@
   }
 }
 
-
-.short-tag div.internal-tag.nbsp span.shor
+.x-disabled[data-componentid^="ext-gridsort"], .x-disabled[data-componentid^="ext-gridshowingroup"] {
+  display: none;
+}
+.x-menuseparator {
+  display: none;
+}

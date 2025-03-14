@@ -28,14 +28,16 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Info: the ModelFront plugin depends on the MatchAnalysis plugin (MatchAnalysis plugin must be active when ModelFront plugin is active).
+ *
+ * @deprecated Integration is deprecated since API did change
  */
 class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract
 {
-    protected static string $description = 'Provides the risk prediction functionality, as offered by ModelFront.';
+    protected static string $description = 'DEPRECATED - SERVICE API CHANGED: Provides the risk prediction functionality, as offered by ModelFront.';
 
-    protected static bool $enabledByDefault = true;
+    protected static bool $enabledByDefault = false;
 
-    protected static bool $activateForTests = true;
+    protected static bool $activateForTests = false;
 
     /***
      * @var ZfExtended_Logger

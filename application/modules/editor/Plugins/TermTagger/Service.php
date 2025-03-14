@@ -123,7 +123,7 @@ final class Service extends AbstractPooledService
         try {
             $response = $this->sendRequest($httpClient, $httpClient::GET);
         } catch (TimeOutException) {
-            $result['success'] = true; // the request URL is probably a termtagger which can not respond due to it is processing data
+            $result['success'] = true; // the request URL is probably a termtagger which can not respond because it is processing data
 
             return $result;
         } catch (Throwable) {
@@ -166,8 +166,12 @@ final class Service extends AbstractPooledService
      *
      * @param string $url url of the TermTagger-Server
      * @param string tbxHash unique id for a tbx-file
-     *
-     * @return boolean True if ping was succesfull
+     * @return bool True if ping was succesfull
+     * @throws DownException
+     * @throws NoResponseException
+     * @throws RequestException
+     * @throws TimeOutException
+     * @throws Zend_Http_Client_Exception
      */
     public function ping(string $url, $tbxHash = false)
     {
@@ -187,8 +191,12 @@ final class Service extends AbstractPooledService
      * Load a tbx-file $tbxFilePath into the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file
      * @return stdClass|null
      * @throws Zend_Http_Client_Exception
+     * @throws DownException
+     * @throws NoResponseException
      * @throws OpenException
      * @throws RequestException
+     * @throws TimeOutException
+     * @throws Zend_Http_Client_Exception
      */
     public function loadTBX(string $url, string $tbxHash, string $tbxData, ZfExtended_Logger $logger)
     {
@@ -230,9 +238,37 @@ final class Service extends AbstractPooledService
     }
 
     /**
+     * Unloads (Deletes) a TBX in the Termtagger
+     * This is useful, to free up memory & lowers the probability, the Termtagger runs into memory-leaks
+     * @throws DownException
+     * @throws NoResponseException
+     * @throws RequestException
+     * @throws TimeOutException
+     * @throws Zend_Http_Client_Exception
+     */
+    public function unloadTBX(string $url, string $tbxHash): void
+    {
+        if (empty($tbxHash)) {
+            return;
+        }
+        $httpClient = $this->getHttpClient($url . '/termTagger/tbxFile/' . $tbxHash);
+        $httpClient->setConfig([
+            'timeout' => self::CONNECT_TIMEOUT,
+            'request_timeout' => self::DEFAULT_TAG_TIMEOUT,
+        ]);
+        $this->applyPersistentConnections($httpClient);
+
+        $this->sendRequest($httpClient, $httpClient::DELETE);
+    }
+
+    /**
      * Requests the termtagger with the given service-url and the passed segment-data (wich has to be be encoded)
      * @throws Zend_Http_Client_Exception
+     * @throws DownException
+     * @throws NoResponseException
      * @throws RequestException
+     * @throws TimeOutException
+     * @throws Zend_Http_Client_Exception
      */
     public function tagTerms(string $serviceUrl, ServiceData $serviceData, ZfExtended_Logger $logger, int $requestTimeout): ?stdClass
     {

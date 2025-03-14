@@ -43,14 +43,24 @@ use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
  * @method null|string getBconfInZip()
  * @method void setBconfInZip(string $bconfInZip)
  * @method void setPricingPresetId(int $pricingPresetId)
- * @method null|string getPerTaskExport()
- * @method void setPerTaskExport(bool|int $perTaskExport)
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
 {
     protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
 
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskMeta';
+
+    public function getPerTaskExport(): bool
+    {
+        return $this->hasField('perTaskExport') && $this->get('perTaskExport');
+    }
+
+    public function setPerTaskExport(bool $perTaskExport): void
+    {
+        if ($this->hasField('perTaskExport')) {
+            $this->set('perTaskExport', $perTaskExport);
+        }
+    }
 
     /**
      * @return Zend_Db_Table_Row_Abstract
@@ -140,7 +150,7 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
             editor_Utils::parseNullableInt($this->row->bconfId), // @phpstan-ignore-line
             $this->row->bconfInZip, // @phpstan-ignore-line
             editor_Utils::parseNullableInt($this->row->pricingPresetId), // @phpstan-ignore-line
-            editor_Utils::parseNullableInt($this->row->perTaskExport) // @phpstan-ignore-line
+            $this->getPerTaskExport()
         );
     }
 

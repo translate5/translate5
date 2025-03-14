@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\Plugins\TermTagger;
 use editor_Plugins_TermTagger_Bootstrap;
 use Exception;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\AbstractException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\CheckTbxTimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\DownException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException;
@@ -74,7 +75,8 @@ class Worker extends AbstractProcessingWorker
     protected function createService(): Service
     {
         $service = editor_Plugins_TermTagger_Bootstrap::createService('termtagger');
-        $service->setPersistentConnections($this->isThreaded());
+        // Persistent Connections currently create Problems in the Termtagger leading taggers not responding
+        // $service->setPersistentConnections($this->isThreaded());
 
         return $service;
     }
@@ -120,6 +122,23 @@ class Worker extends AbstractProcessingWorker
      */
     protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
     {
+        // A NoResponse Exception hints at the TermTagger has too many requests
+        // also a CheckTbxTimeOutException that happened when checking/loading the TBX
+        // which happends before each term-tagging request points at this
+        // in this case we simply delay for some seconds and try again ...
+        if ($loopedProcessingException instanceof NoResponseException
+            || $loopedProcessingException instanceof CheckTbxTimeOutException
+        ) {
+            // set the remaining states back to "unprocessed"
+            $this->setUnprocessedStates($problematicStates, State::UNPROCESSED);
+
+            // trigger delay
+            throw new SetDelayedException(
+                $this->processor->getServiceId(),
+                get_class($this),
+                Configuration::OVERLOADED_TAGGER_DELAY
+            );
+        }
         // Malfunction means the termtagger is up, but the send data produces an error in the tagger.
         // 1. we set the segment satus to reprocess, so each segment is tagged again, segment by segment,
         //  not in a bulk manner if they are not yer reprocessed
@@ -173,20 +192,6 @@ class Worker extends AbstractProcessingWorker
             // this will terminate the processing
             return 0;
         }
-        // A NoResponse Exception hints at the TermTagger has too many requests
-        // in this case we simply delay for some seconds and try again ...
-        if ($loopedProcessingException instanceof NoResponseException) {
-            // set the remaining states back to "unprocessed"
-            $this->setUnprocessedStates($problematicStates, State::UNPROCESSED);
-
-            // trigger delay
-            throw new SetDelayedException(
-                $this->processor->getServiceId(),
-                get_class($this),
-                Configuration::OVERLOADED_TAGGER_DELAY
-            );
-        }
-
         // all other Termtagger exceptions will be logged according their severity
         if ($loopedProcessingException instanceof AbstractException) {
             $this->logTaskException($loopedProcessingException);

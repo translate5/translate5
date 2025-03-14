@@ -559,11 +559,18 @@ Ext.define('Editor.view.admin.user.AddWindow', {
      * @param {Editor.model.admin.User} record
      */
     loadRecord: function (record) {
-        var me = this,
+        let me = this,
             form = me.down('form'),
-            roles = record.getRoles();
+            roles = record.getRoles(),
+            adminRolesGroup = this.lookupReference('adminsFieldSet'),
+            notRequireClientRolesGroup = this.lookupReference('notRequireClientFieldSet');
 
         form.loadRecord(record);
+
+        if (record.isCoordinatorGroupUser() && ! Editor.app.authenticatedUser.getRoles().includes('jobCoordinator')) {
+            adminRolesGroup.setHidden(true);
+            notRequireClientRolesGroup.setHidden(true);
+        }
 
         me.query('#rolesGroup checkbox').forEach(function (box) {
             const

@@ -57,20 +57,23 @@ class IsEditableForAssertTest extends TestCase
 
     public function provideAssertAllowed(): iterable
     {
-        yield [true, false];
-        yield [false, true];
+        yield [true, true, false];
+        yield [true, false, false];
+        yield [false, false, true];
+        yield [false, true, true];
     }
 
     /**
      * @dataProvider provideAssertAllowed
      */
-    public function testAssertGrantedEditableUser(bool $isEditable, bool $expectException): void
+    public function testAssertGrantedEditableUser(bool $isEditable, bool $isCoordinator, bool $expectException): void
     {
         $user = $this->createMock(User::class);
         $manager = $this->createMock(User::class);
         $context = new PermissionAssertContext($manager);
 
-        $user->expects($this->once())->method('isEditableFor')->willReturn($isEditable);
+        $user->expects(self::once())->method('isEditableFor')->willReturn($isEditable);
+        $user->method('isCoordinator')->willReturn($isCoordinator);
 
         if ($expectException) {
             $this->expectException(NoAccessException::class);

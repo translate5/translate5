@@ -80,16 +80,22 @@ class editor_Models_Export
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
      */
-    public function export(string $exportRootFolder, int $workerId, string $context = self::EXPORT_DEFAULT)
-    {
-        umask(0); // needed for samba access
-        if (is_dir($exportRootFolder)) {
-            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Recursivedircleaner'
-            );
-            $recursivedircleaner->delete($exportRootFolder);
+    public function export(
+        string $exportRootFolder,
+        int $workerId,
+        string $context = self::EXPORT_DEFAULT,
+        array $fileIdFilter = [],
+        bool $cleanTarget = true,
+    ) {
+        if ($cleanTarget) {
+            umask(0); // needed for samba access
+            if (is_dir($exportRootFolder)) {
+                $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                    'Recursivedircleaner'
+                );
+                $recursivedircleaner->delete($exportRootFolder);
+            }
         }
-
         if (! file_exists($exportRootFolder) && ! mkdir($exportRootFolder, 0777, true) && ! is_dir($exportRootFolder)) {
             throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRootFolder));
         }
@@ -119,6 +125,9 @@ class editor_Models_Export
         $checkSegmentTags = editor_Segment_Quality_Manager::instance()->isFullyCheckedType(editor_Segment_Tag::TYPE_INTERNAL, $this->task->getConfig()) === false;
 
         foreach ($filePaths as $fileId => $relPath) {
+            if (! empty($fileIdFilter) && ! in_array($fileId, $fileIdFilter)) {
+                continue;
+            }
             $path = $localEncoded->encode($relPath);
             $path = $exportRootFolder . DIRECTORY_SEPARATOR . $path;
             $parser = $this->getFileParser((int) $fileId, $path, $checkSegmentTags, $context);

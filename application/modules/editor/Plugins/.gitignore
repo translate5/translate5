@@ -1,6 +1,7 @@
 # exclude private plugin symlinks from beeing comitted (obfuscated here by wildcard)
 /Translate*
 /MittagQI
+/PlunetConnector
 /PrivateTests
 /ConnectWorldserver
 /AcrossHotfolder

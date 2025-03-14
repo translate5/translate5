@@ -119,7 +119,8 @@ Ext.define('TMMaintenance.view.main.MainController', {
      * @param {Ext.dataview.Location} gridLocation
      */
     onDeletePress: function (grid, gridLocation) {
-        const l10n = this.getViewModel().data.l10n;
+        const vm = this.getViewModel(),
+            l10n = vm.data.l10n;
 
         Ext.Msg.confirm(
             l10n.deleteSegment.title,
@@ -129,10 +130,12 @@ Ext.define('TMMaintenance.view.main.MainController', {
                     return;
                 }
 
-                gridLocation.record.set({tm: this.getViewModel().get('selectedTm')});
+                gridLocation.record.set({tm: vm.get('selectedTm')});
                 gridLocation.record.erase({
                     success: () => {
-                        // TODO what to do here?
+                        if (vm.get('loadingRecordNumber') === false) {
+                            vm.set('totalAmount', vm.get('totalAmount') - 1);
+                        }
                     },
                     failure: (record, operation) => {
                         this.showServerError(operation.getError());

@@ -579,8 +579,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             //on import we use the import worker as parentId and use it's state to evaluate the state we need
             $importWorker = $this->fetchImportWorker($task->getTaskGuid());
             $parentId = ($importWorker === null) ? 0 : (int) $importWorker->getId();
-            $state = ($importWorker !== null && $importWorker->getState() === ZfExtended_Models_Worker::STATE_PREPARE) ?
-                ZfExtended_Models_Worker::STATE_PREPARE : ZfExtended_Models_Worker::STATE_SCHEDULED;
+            $state = ($importWorker === null) ? ZfExtended_Models_Worker::STATE_SCHEDULED : ZfExtended_Models_Worker::STATE_PREPARE;
 
             $this->doQueueAnalysisWorkers($task, $parentId, $state, $workerParameters);
         } else {
@@ -650,8 +649,15 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
         $worker->queue($parentWorkerId, $workerState, false);
 
-        // if we are not importing we need to add the quality workers (which also include the termtagger)
-        if (! $task->isImporting()) {
+        if ($task->isImporting()) {
+            // on import, it might happen due different timings of start import and matchanalysis queuing that
+            // workers remain in status prepare, what is cleaned here
+            if ($workerState === ZfExtended_Models_Worker::STATE_PREPARE && $parentWorkerId > 0) {
+                $workerModel = new ZfExtended_Models_Worker();
+                $workerModel->scheduleDanglingPreparedChildren($parentWorkerId);
+            }
+        } else {
+            // if we are not importing we need to add the quality workers (which also include the termtagger)
             editor_Segment_Quality_Manager::instance()->queueOperation(
                 editor_Segment_Processing::ANALYSIS,
                 $task,
