@@ -31,6 +31,7 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FilterEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\Fprm;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FprmValidation;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\PropertiesValidation;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Helpers\ResourceFileImport;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 
@@ -253,9 +254,22 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             ]);
         }
         $this->entityLoad();
-        $fprm = new Fprm($this->entity->getPath(), file_get_contents($_FILES['fprm']['tmp_name']));
+        $errMsg = '';
+        $fprmFile = $this->entity->getPath();
+        $fprm = new Fprm($fprmFile, file_get_contents($_FILES['fprm']['tmp_name']));
+        if ($fprm->getType() === Fprm::TYPE_XPROPERTIES) {
+            $validation = new PropertiesValidation($fprmFile, $fprm->getContent());
+            $validation->upgrade();
+            if ($validation->validate()) {
+                $validation->flush();
+            } else {
+                $errMsg = 'The uploaded FPRM "' . basename($fprmFile) . '" seems to be invalid';
+            }
+        }
 
-        $errMsg = ResourceFileImport::addToBConf($fprm, $this->entity->getRelatedBconf());
+        if (empty($errMsg)) {
+            $errMsg = ResourceFileImport::addToBConf($fprm, $this->entity->getRelatedBconf());
+        }
         if ($errMsg) {
             throw new OkapiException('E1686', [
                 'details' => $errMsg,
