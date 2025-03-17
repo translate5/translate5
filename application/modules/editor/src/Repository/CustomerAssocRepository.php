@@ -46,6 +46,15 @@ class CustomerAssocRepository
         $assoc->save();
     }
 
+    public function deleteByLanguageResource(int $languageResourceId): int
+    {
+        $customerAssoc = new CustomerAssoc();
+
+        return $customerAssoc->db->delete([
+            'languageResourceId = ?' => $languageResourceId,
+        ]);
+    }
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
