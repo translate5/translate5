@@ -126,6 +126,8 @@ class Translate3905Test extends JsonTestAbstract
 
     public function testTranslateFileByPostNow()
     {
+        // we achieve ~6.67s response min, ~7.8s max this test
+        $maxResponseTimeSeconds = 8;
         $params = [
             'source' => self::SOURCE_LANG,
             'target' => self::TARGET_LANG,
@@ -133,8 +135,12 @@ class Translate3905Test extends JsonTestAbstract
             'fileData' => static::api()->getFileContentRaw('testdata.xlf'),
         ];
 
+        $timeStart = hrtime(true);
         static::api()->post('editor/instanttranslateapi/filepretranslatenow', $params);
         $responseBody = json_decode(static::api()->getLastResponse()->getBody());
+
+        $this->assertTrue((hrtime(true) - $timeStart) / 1e+9 < $maxResponseTimeSeconds, 'Endpoint response time exceeds ' . $maxResponseTimeSeconds . ' seconds.');
+
         $this->assertEquals(
             '200',
             static::api()->getLastResponse()->getStatus(),
