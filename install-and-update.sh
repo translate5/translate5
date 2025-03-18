@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 CMD_PHP="${CMD_PHP:-/usr/bin/php}"
+if [ ! -f "$CMD_PHP" ]; then
+    if [ -f "/usr/bin/php" ]; then
+        CMD_PHP="/usr/bin/php"
+    elif [ -f "/usr/local/bin/php" ]; then
+        CMD_PHP="/usr/local/bin/php"
+    fi
+fi
 
 # make sure PHP and MySQL binary exist; else die with an error message
 type -p $CMD_PHP &>/dev/null || { echo "$CMD_PHP not found. Set CMD_PHP as environment variable!"; exit 1; }
