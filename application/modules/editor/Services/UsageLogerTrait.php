@@ -64,8 +64,8 @@ trait editor_Services_UsageLogerTrait
         /* @var $logger editor_Models_LanguageResources_UsageLogger */
 
         $logger->setLanguageResourceId($this->getLanguageResource()->getId());
-        $logger->setSourceLang($this->sourceLang);
-        $logger->setTargetLang($this->targetLang);
+        $logger->setSourceLang($this->getLanguageResource()->getSourceLang());
+        $logger->setTargetLang($this->getLanguageResource()->getTargetLang());
 
         $logQueryString = $this->toLogQueryString($querySource);
 
