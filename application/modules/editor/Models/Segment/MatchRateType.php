@@ -359,7 +359,7 @@ class editor_Models_Segment_MatchRateType
         return (count(array_intersect($types, self::RESOURCE_TYPES)) > 0);
     }
 
-    public static function getLangResourceType(string $type): ?string
+    public static function getLangResourceType(string $type): string
     {
         if (preg_match(
             '/;(' . implode('|', self::RESOURCE_TYPES) . ')(?:;|$)/i',
@@ -369,7 +369,7 @@ class editor_Models_Segment_MatchRateType
             return strtolower($matches[1]);
         }
 
-        return null;
+        return '';
     }
 
     /**

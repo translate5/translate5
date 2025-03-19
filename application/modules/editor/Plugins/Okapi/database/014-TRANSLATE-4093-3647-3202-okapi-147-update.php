@@ -40,86 +40,92 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7 || ! isset($config)) 
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$okapiConfig = $config->runtimeOptions->plugins->Okapi;
+$db = Zend_Db_Table::getDefaultAdapter();
 
-$find147VersionPlus = function (array $serverList, string $serverName = ''): ?string {
-    // test configured version
-    if (array_key_exists($serverName, $serverList)) {
-        $version = OkapiService::fetchServerVersion($serverList[$serverName]);
-        if ($version !== null && version_compare($version, '1.47') >= 0) {
-            return $serverName;
-        }
-    }
-    // test other servers
-    foreach ($serverList as $otherName => $serverUrl) {
-        if (preg_match('/(14[7-9]|1[5-9]\d|[2-9]\d\d)/', $otherName) && $otherName !== $serverName) {
-            $version = OkapiService::fetchServerVersion($serverList[$otherName]);
+$bconfUpgradeNeeded = $db->fetchOne('SELECT id FROM LEK_okapi_bconf WHERE versionIdx < 10 LIMIT 1');
+
+if ($bconfUpgradeNeeded) {
+    $find147VersionPlus = function (array $serverList, string $serverName = ''): ?string {
+        // test configured version
+        if (array_key_exists($serverName, $serverList)) {
+            $version = OkapiService::fetchServerVersion($serverList[$serverName]);
             if ($version !== null && version_compare($version, '1.47') >= 0) {
-                return $otherName;
+                return $serverName;
             }
         }
-    }
-
-    return null;
-};
-
-$insideBitbucket = ($_ENV['BITBUCKET_BUILD_NUMBER'] ?? 0);
-
-// find a proper 147 server in the config
-$serverName = $insideBitbucket ? null : $find147VersionPlus($okapiConfig?->server?->toArray() ?? [], $okapiConfig?->serverUsed ?? '');
-
-// not found, the migration has to be aborted !!
-if ($serverName === null && ! $insideBitbucket) {
-    // UGLY SPECIAL FOR API-TESTS:
-    // When updating the database, updating the test-configs is done AFTER the db-updates have run
-    // it can not be done before, as plugin-configs do not exist then
-    // so we have to read the test-config updates and manipulate them
-    // these are stored in a global define for that purpose
-    if (defined('APPLICATION_TEST_CONFIGS') && Zend_Registry::isRegistered('test_configs')) {
-        $testConfigs = Zend_Registry::get('test_configs');
-        $serverList = json_decode($testConfigs['runtimeOptions.plugins.Okapi.server'], true) ?? [];
-        $serverUsed = $testConfigs['runtimeOptions.plugins.Okapi.serverUsed'] ?? '';
-
-        $serverName = $find147VersionPlus($serverList, $serverUsed);
-
-        if ($serverName === null) {
-            // to ensure the file is not marked as processed
-            $this->doNotSavePhpForDebugging = false;
-
-            error_log(__FILE__ . ': searching for Okapi 1.47 in the test-configuration FAILED - stop migration script.' .
-                ' You need to add a proper OKAPI 1.47 container and config to your application.');
-
-            return;
-        } else {
-            // crucial: we must manipulate the registered configs so the tests can run with 1.47 ...
-            $testConfigs['runtimeOptions.plugins.Okapi.serverUsed'] = $serverName;
-            Zend_Registry::set('test_configs', $testConfigs);
+        // test other servers
+        foreach ($serverList as $otherName => $serverUrl) {
+            if (preg_match('/(14[7-9]|1[5-9]\d|[2-9]\d\d)/', $otherName) && $otherName !== $serverName) {
+                $version = OkapiService::fetchServerVersion($serverList[$otherName]);
+                if ($version !== null && version_compare($version, '1.47') >= 0) {
+                    return $otherName;
+                }
+            }
         }
-    } else {
-        throw new ZfExtended_Exception(
-            __FILE__ . ': searching for Okapi 1.47 in config FAILED - stop migration script'
+
+        return null;
+    };
+
+    $insideBitbucket = ($_ENV['BITBUCKET_BUILD_NUMBER'] ?? 0);
+    $okapiConfig = $config->runtimeOptions->plugins->Okapi;
+
+    // find a proper 147 server in the config
+    $serverName = $insideBitbucket ? null : $find147VersionPlus(
+        $okapiConfig?->server?->toArray() ?? [],
+            $okapiConfig?->serverUsed ?? ''
+    );
+
+    // not found, the migration has to be aborted !!
+    if ($serverName === null && ! $insideBitbucket) {
+        // UGLY SPECIAL FOR API-TESTS:
+        // When updating the database, updating the test-configs is done AFTER the db-updates have run
+        // it can not be done before, as plugin-configs do not exist then
+        // so we have to read the test-config updates and manipulate them
+        // these are stored in a global define for that purpose
+        if (defined('APPLICATION_TEST_CONFIGS') && Zend_Registry::isRegistered('test_configs')) {
+            $testConfigs = Zend_Registry::get('test_configs');
+            $serverList = json_decode($testConfigs['runtimeOptions.plugins.Okapi.server'], true) ?? [];
+            $serverUsed = $testConfigs['runtimeOptions.plugins.Okapi.serverUsed'] ?? '';
+
+            $serverName = $find147VersionPlus($serverList, $serverUsed);
+
+            if ($serverName === null) {
+                // to ensure the file is not marked as processed
+                $this->doNotSavePhpForDebugging = false;
+
+                error_log(__FILE__ . ': searching for Okapi 1.47 in the test-configuration FAILED - stop migration script.' .
+                    ' You need to add a proper OKAPI 1.47 container and config to your application.');
+
+                return;
+            } else {
+                // crucial: we must manipulate the registered configs so the tests can run with 1.47 ...
+                $testConfigs['runtimeOptions.plugins.Okapi.serverUsed'] = $serverName;
+                Zend_Registry::set('test_configs', $testConfigs);
+            }
+        } else {
+            throw new ZfExtended_Exception(
+                __FILE__ . ': searching for Okapi 1.47 in config FAILED - stop migration script'
+            );
+        }
+    }
+    // update okapi's serverUsed for the general config & all customer configs, adjust the 147-snapshot task-configs
+
+    if ($serverName !== null) {
+        $db->query(
+            'UPDATE `Zf_configuration` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
+            $serverName
+        );
+        $db->query(
+            'UPDATE `LEK_customer_config` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
+            $serverName
+        );
+        $db->query(
+            'UPDATE `LEK_task_config` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed" AND `value` LIKE "%147-snapshot"',
+            $serverName
         );
     }
 }
 
-// update okapi's serverUsed for the general config & all customer configs, adjust the 147-snapshot task-configs
-
-$db = Zend_Db_Table::getDefaultAdapter();
-
-if ($serverName !== null) {
-    $db->query(
-        'UPDATE `Zf_configuration` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
-        $serverName
-    );
-    $db->query(
-        'UPDATE `LEK_customer_config` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"',
-        $serverName
-    );
-    $db->query(
-        'UPDATE `LEK_task_config` SET `value` = ? WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed" AND `value` LIKE "%147-snapshot"',
-        $serverName
-    );
-}
 
 $db->query(
     "DELETE FROM `Zf_configuration` WHERE `name` IN (" .
@@ -131,7 +137,9 @@ $db->query(
 // update description of serverUsed in config
 
 $okapiInfo147 = 'No version below 1.47 can be used with t5 file-format-settings, only "bconf-in-zip" works with older versions';
-$descr = $db->fetchOne('SELECT `description` FROM `Zf_configuration` WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"');
+$descr = $db->fetchOne(
+    'SELECT `description` FROM `Zf_configuration` WHERE `name` = "runtimeOptions.plugins.Okapi.serverUsed"'
+);
 
 if (! str_contains($descr, $okapiInfo147)) {
     $db->query(
@@ -273,26 +281,30 @@ if (! empty($charsToAdd)) {
     );
 }
 
-// update Bconfs
+if ($bconfUpgradeNeeded) {
+    // update Bconfs
 
-$bconf = new BconfEntity();
-$bconfAll = $bconf->loadAll();
+    $bconf = new BconfEntity();
+    $bconfAll = $bconf->loadAll();
 
-foreach ($bconfAll as $bconfData) {
-    try {
-        $bconf = new BconfEntity();
-        $bconf->load($bconfData['id']);
-        $bconfDir = $bconf->getDataDirectory();
+    foreach ($bconfAll as $bconfData) {
+        try {
+            $bconf = new BconfEntity();
+            $bconf->load($bconfData['id']);
+            $bconfDir = $bconf->getDataDirectory();
 
-        UpgraderTo147::upgradePipeline($bconfDir);
-        UpgraderTo147::upgradeFprms($bconfDir, $bconf->getId(), $bconf->getName());
+            UpgraderTo147::upgradePipeline($bconfDir);
+            UpgraderTo147::upgradeFprms($bconfDir, $bconf->getId(), $bconf->getName());
 
-        $extensionMapping = $bconf->getExtensionMapping();
-        $extensionMapping->rescanFilters();
-        $bconf->repackIfOutdated(true);
-    } catch (Exception $e) {
-        $msg = 'ERROR rescanning filters for bconf ' . $bconf->getId() . ', "' . $bconf->getName(
-        ) . '": ' . $e->getMessage();
-        error_log($msg);
+            $extensionMapping = $bconf->getExtensionMapping();
+            $extensionMapping->rescanFilters();
+            $bconf->repackIfOutdated(true);
+        } catch (Exception $e) {
+            $msg = 'ERROR rescanning filters for bconf ' . $bconf->getId() . ', "' . $bconf->getName(
+            ) . '": ' . $e->getMessage();
+            error_log($msg);
+        }
     }
+
+    $db->query('UPDATE LEK_okapi_bconf SET versionIdx=' . editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
 }

@@ -1170,8 +1170,8 @@ Ext.override(Ext.data.Model, {
                         if (role.cls) {
                         	assocStore=record[role.getterName]();
                         	// update the assocStore if exist
-                        	if(assocStore && assocStore.isStore){
-                        		//update the assoc store too                            
+                        	if(assocStore && assocStore.isStore && role.reader){
+                        		//update the assoc store too
                         		assocStore.loadRawData(role.reader.getRoot(record.data));
                         		delete record.data[role.role];
                         	}

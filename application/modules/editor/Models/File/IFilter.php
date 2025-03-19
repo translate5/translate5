@@ -34,18 +34,13 @@ interface editor_Models_File_IFilter
     public function initFilter(editor_Models_File_FilterManager $manager, editor_Models_File_FilterConfig $config);
 
     /**
-     * @param int $fileId
-     * @param string $filePath
-     * @param array $parameters
      * @return string the filename of the file (can be changed internally for further processing)
+     * @throws \MittagQI\Translate5\File\Filter\FilterException
      */
-    public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters): string;
+    public function applyImportFilter(editor_Models_Task $task, int $fileId, string $filePath, ?string $parameters): string;
 
     /**
-     * @param int $fileId
-     * @param string $filePath
-     * @param array $parameters
      * @return string the filename of the file (can be changed internally for further processing)
      */
-    public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters): string;
+    public function applyExportFilter(editor_Models_Task $task, int $fileId, string $filePath, ?string $parameters): string;
 }

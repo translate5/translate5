@@ -287,19 +287,28 @@ class ConfigMaintenance
         string $nameToKeep = null,
         bool $sortByVersion = false,
         bool $keepLast = true,
+        string $nameToDelete = null,
     ): array {
         if ($sortByVersion) {
             ksort($summary, SORT_NATURAL);
         }
 
-        if ($keepLast && empty($nameToKeep)) {
-            $keys = array_keys($summary);
-            $nameToKeep = end($keys);
-        }
+        if (! empty($nameToDelete)) {
+            foreach (array_keys($summary) as $name) {
+                if ($name !== $nameToDelete) {
+                    $summary[$name]['taskUsageCount'] = 1;
+                }
+            }
+        } else {
+            if ($keepLast && empty($nameToKeep)) {
+                $keys = array_keys($summary);
+                $nameToKeep = end($keys);
+            }
 
-        if (! is_null($nameToKeep) && isset($summary[$nameToKeep])) {
-            //we just set a value here to keep the entry
-            $summary[$nameToKeep]['taskUsageCount'] = 1;
+            if (! is_null($nameToKeep) && isset($summary[$nameToKeep])) {
+                //we just set a value here to keep the entry
+                $summary[$nameToKeep]['taskUsageCount'] = 1;
+            }
         }
 
         $serverList = array_map(

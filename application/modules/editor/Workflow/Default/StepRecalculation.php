@@ -99,6 +99,13 @@ class editor_Workflow_Default_StepRecalculation
         $this->workflow->getLogger($task)->info('E1013', 'recalculate workflow to step {step} ', [
             'step' => $step,
         ]);
+
+        $events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [get_class($this)]);
+        $events->trigger('onRecalculate', $this, [
+            'task' => $task,
+            'step' => $step,
+        ]);
+
         $task->updateWorkflowStep($step, false);
         //set $step as new workflow step if different to before!
         $this->sendFrontEndNotice($step);

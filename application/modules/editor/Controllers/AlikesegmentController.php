@@ -330,8 +330,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
     protected function isValidSegment(editor_Models_Segment $entity, $editedSegmentId)
     {
         //without a hasher instance no hashes changes, so we don't have to load the history
-        $historyData = ZfExtended_Factory::get('editor_Models_SegmentHistoryData');
-        /* @var $historyData editor_Models_SegmentHistoryData */
+        $historyData = new MittagQI\Translate5\Repository\SegmentHistoryDataRepository();
         //load first target hardcoded only, since repetitions may not work with multiple alternatives
         $historyEntries = $historyData->loadBySegmentId($editedSegmentId, editor_Models_SegmentField::TYPE_TARGET, 3);
         $validTargetMd5 = array_column($historyEntries, 'originalMd5');

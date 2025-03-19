@@ -80,6 +80,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         uploadBconf: '#UT#Bconf hochladen',
         fileSuffix: '#UT#-Datei',
         srx: '#UT#SRX-Datei',
+        pipelineUpTooltip: '#UT#Pipeline aus Datei hochladen',
+        pipelineDownTooltip: '#UT#Pipeline als Datei herunterladen',
         pipeline: '#UT#Pipeline'
     },
     strings: {
@@ -278,7 +280,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         isDisabled: 'isEditDisabled',
                         purpose: 'source',
                         tooltip: me.text_cols.sourceSrxUpTooltip,
-                        handler: 'showSRXChooser',
+                        handler: 'showSRXChooser'
                     },
                     {
                         isAllowedFor: 'bconfDelete',
@@ -303,7 +305,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         isDisabled: 'isEditDisabled',
                         purpose: 'target',
                         tooltip: me.text_cols.targetSrxUpTooltip,
-                        handler: 'showSRXChooser',
+                        handler: 'showSRXChooser'
                     },
                     {
                         isAllowedFor: 'bconfDelete',
@@ -311,6 +313,28 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         purpose: 'target',
                         tooltip: me.text_cols.targetSrxDownTooltip,
                         handler: 'downloadSRX'
+                    }
+                ]
+            },{
+                xtype: 'actioncolumn',
+                align: 'center',
+                text: me.text_cols.pipeline,
+                menuText: me.text_cols.pipeline,
+                width: 90,
+                menuDisabled: true,
+                items: [
+                    {
+                        isAllowedFor: 'bconfEdit',
+                        glyph: 'f093@FontAwesome5FreeSolid',
+                        isDisabled: 'isEditDisabled',
+                        tooltip: me.text_cols.pipelineUpTooltip,
+                        handler: 'showPipelineChooser'
+                    },
+                    {
+                        isAllowedFor: 'bconfDelete',
+                        glyph: 'f019@FontAwesome5FreeSolid',
+                        tooltip: me.text_cols.pipelineDownTooltip,
+                        handler: 'downloadPipeline'
                     }
                 ]
             }

@@ -32,6 +32,7 @@ use MittagQI\Translate5\LanguageResource\Db\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Operation\DeleteTaskTmOperation;
+use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Task\JobsPurger;
 
 /**
@@ -42,6 +43,8 @@ final class editor_Models_Task_Remover
     private editor_Models_Task $task;
 
     private ZfExtended_EventManager $eventManager;
+
+    private SegmentHistoryAggregation $aggregator;
 
     private DeleteTaskTmOperation $deleteTaskTmOperation;
 
@@ -54,6 +57,7 @@ final class editor_Models_Task_Remover
     {
         $this->task = $task;
         $this->eventManager = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
+        $this->aggregator = SegmentHistoryAggregation::create();
         $this->deleteTaskTmOperation = DeleteTaskTmOperation::create();
         $this->jobsPurger = JobsPurger::create();
     }
@@ -203,7 +207,7 @@ final class editor_Models_Task_Remover
      * drops the tasks Materialized View and deletes several data (segments, terms, file entries)
      * All mentioned data has foreign keys to the task, to reduce locks while deletion this
      * data is deleted directly instead of relying on referential integrity.
-     * Also removes the task related term collection
+     * Also removes the task related term collection and aggregated history data
      */
     private function removeRelatedDbData()
     {
@@ -225,6 +229,7 @@ final class editor_Models_Task_Remover
         // where field "autoCreatedOnImport" is set to 1 will be removed
         $this->removeAutocreatedOnImportLanguageResources();
         $this->deleteTaskTmOperation->removeTaskTmsForTask($taskGuid);
+        $this->aggregator->removeTaskData($taskGuid);
     }
 
     /**

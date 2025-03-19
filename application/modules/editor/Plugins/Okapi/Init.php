@@ -63,7 +63,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      * This must be increased each time, a git-based fprm or srx is changed
      * @var int
      */
-    public const BCONF_VERSION_INDEX = 9;
+    public const BCONF_VERSION_INDEX = 10;
 
     /**
      * The filename of the system default import bconf
@@ -104,7 +104,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     public static function getExportBconfPath(editor_Models_Task $task): string
     {
         $meta = $task->meta(true); // copied with this note from getImportBconf(): TODO FIXME: why reinit ?
-        if ($meta->getBconfInZip()) {
+        if (! empty($meta->getBconfInZip())) {
             return self::getDataDir() . 'okapi_default_export.bconf';
         }
 
@@ -341,6 +341,26 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             ]
         );
         $r->addRoute('plugins_okapi_bconf_downloadsrx', $route);
+        // post route to upload pipeline file
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/uploadpipeline',
+            [
+                'module' => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action' => 'uploadpipeline',
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconf_uploadpipeline', $route);
+        // route to download pipeline file
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/downloadpipeline',
+            [
+                'module' => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action' => 'downloadpipeline',
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconf_downloadpipeline', $route);
         // clone bconf
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/clone',
@@ -399,6 +419,26 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             ]
         );
         $r->addRoute('plugins_okapi_bconffilter_savefprm', $route);
+
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconffilter/downloadfprm',
+            [
+                'module' => 'editor',
+                'controller' => 'plugins_okapi_bconffilter',
+                'action' => 'downloadfprm',
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconffilter_downloadfprm', $route);
+
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconffilter/uploadfprm',
+            [
+                'module' => 'editor',
+                'controller' => 'plugins_okapi_bconffilter',
+                'action' => 'uploadfprm',
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconffilter_uploadfprm', $route);
 
         // routes for default bconf filters
         $route = new Zend_Rest_Route($f, [], [
@@ -552,10 +592,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         /* @var int $customerId */
         $customerId = $event->getParam('customerId');
 
+        $okapiDataDirExists = false;
+
         if (! empty($task)) {
             $meta = $task->meta();
             $bconf = (empty($meta->getBconfInZip())) ? self::getImportBconfById($task, $meta->getBconfId()) : null;
             $importFilter = new ImportFilter($bconf, $meta->getBconfInZip());
+            $okapiDataDir = $task->getAbsoluteTaskDataPath() . '/' . editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR;
+            $okapiDataDirExists = is_dir($okapiDataDir);
 
             if ($this->doDebug) {
                 error_log(
@@ -576,8 +620,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             }
         } else {
             // since all tasks are by default generated with the "defaultcustomer" we use this bconf as the system std.
-            // this will also define the correct default for InstantTranslate tasks
-            $importFilter = new ImportFilter(self::getDefaultCustomerBconf(), null);
+            // this case normally can not happen
+            $bconf = self::getDefaultCustomerBconf();
+            $importFilter = new ImportFilter($bconf, null);
 
             if ($this->doDebug) {
                 error_log('OKAPI::handleRegisterSupportedFileTypes: task: null, using DEFAULT BCONF');
@@ -586,11 +631,22 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         // we may need the ImportFilter in other functions
         $fileTypeSupport->registerPluginData($importFilter, $this->pluginName);
 
-        // This sets the supported file-extension for the requested task (if given) or the system default bconf
+        $skipCoreParserSet = [];
+        // we support XLIFF-via-OKAPI only with BCONFs from Version 10 on to enable full compatibility with older task-archives
+        if (! $okapiDataDirExists && $bconf !== null && $bconf->getPipeline()->getBconfVersion() >= 10) {
+            $extensionMapping = $bconf->getExtensionMapping();
+            foreach (editor_Models_Import_FileParser_Xlf::getFileExtensions() as $extension) {
+                if ($extensionMapping->hasExtension($extension)) {
+                    $skipCoreParserSet[$extension] = 1;
+                }
+            }
+        }
+
+        // This sets the supported file-extension for the requested task (if given) or the used default bconf
         // These are e.g. used to filter the supported file-types for the import wizard in the frontend
         // and filter the workfile-imports
         foreach ($importFilter->getSupportedExtensions() as $extension) {
-            $fileTypeSupport->register($extension, $this->pluginName);
+            $fileTypeSupport->register($extension, $this->pluginName, isset($skipCoreParserSet[$extension]));
         }
     }
 

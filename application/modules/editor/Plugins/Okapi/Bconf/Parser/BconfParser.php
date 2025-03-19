@@ -41,6 +41,7 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation;
 use Throwable;
 use Zend_Exception;
 use ZfExtended_Exception;
+use ZfExtended_Logger;
 
 /**
  * Unpacks/Disassembles a bconf
@@ -138,7 +139,7 @@ abstract class BconfParser
                 }
             }
 
-            //=== Section 2: Read contained reference files
+            //=== Section 2: Read contained reference files of the pipeline's parameters
 
             $refMap = []; // numeric indices are read from the bconf, starting with 1
 
@@ -183,7 +184,7 @@ abstract class BconfParser
                 if (! $pipeline->validate(true)) {
                     throw new BconfInvalidException('Invalid Pipeline: ' . $pipeline->getValidationError());
                 } else {
-                    // the piplene is only valid if the contained SRX files have been saved to disk
+                    // the pipeline is only valid if the contained SRX files have been saved to disk
                     if (! in_array($pipeline->getSrxFile('source'), $referencedFiles)) {
                         throw new BconfInvalidException(
                             'Invalid Pipeline: The given source-srx file was not embedded in the bconf.'
@@ -192,6 +193,11 @@ abstract class BconfParser
                     if (! in_array($pipeline->getSrxFile('target'), $referencedFiles)) {
                         throw new BconfInvalidException(
                             'Invalid Pipeline: The given target-srx file was not embedded in the bconf.'
+                        );
+                    }
+                    if (($xsltFile = $pipeline->getXsltFile()) && ! in_array($xsltFile, $referencedFiles)) {
+                        throw new BconfInvalidException(
+                            'Invalid Pipeline: the given xslt file was not embedded in the bconf.'
                         );
                     }
                 }
@@ -205,6 +211,9 @@ abstract class BconfParser
                 $content->setSteps($pipeline->getSteps());
                 $content->setSrxFile('source', $pipeline->getSrxFile('source'));
                 $content->setSrxFile('target', $pipeline->getSrxFile('target'));
+                if ($xsltFile = $pipeline->getXsltFile()) {
+                    $content->setXsltFile($xsltFile);
+                }
 
                 $pipelineSrc = editor_Plugins_Okapi_Init::getDataDir() . 'pipeline/translate5-merging.pln';
                 $pipelineDest = $this->bconf->getDataDirectory() . '/export-pipeline.pln';
@@ -301,7 +310,7 @@ abstract class BconfParser
         } catch (Throwable $e) {
             $this->raf = null;
 
-            throw $e;
+            throw new BconfInvalidException($e->getMessage(), ZfExtended_Logger::LEVEL_ERROR);
         }
     }
 

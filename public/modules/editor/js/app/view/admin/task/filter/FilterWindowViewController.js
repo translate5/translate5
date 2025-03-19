@@ -59,10 +59,9 @@ Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
             });
         });
 
-        var wfStepCmp = Ext.ComponentQuery.query('#workflowStep')[0],
-            store = new Ext.data.Store();
+        var store = new Ext.data.Store();
         store.loadData(allSteps, false);
-        wfStepCmp.setStore(store);
+        this.getView().down('#workflowStep').setStore(store);
     },
 
     applyFilters: function () {

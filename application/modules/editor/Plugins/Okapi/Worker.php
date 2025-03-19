@@ -188,15 +188,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             copy($convertedFile, $file . $api::OUTPUT_FILE_EXTENSION);
 
             //add okapi export file filter for that file
-            $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
-            $fileFilter->addFilter(
-                $fileFilter::TYPE_IMPORT,
+            $filterManager = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+            $filterManager->addFilter(
+                $filterManager::TYPE_IMPORT,
                 $this->taskGuid,
                 $fileId,
                 editor_Plugins_Okapi_FileFilter::class
             );
-            $fileFilter->addFilter(
-                $fileFilter::TYPE_EXPORT,
+            $filterManager->addFilter(
+                $filterManager::TYPE_EXPORT,
                 $this->taskGuid,
                 $fileId,
                 editor_Plugins_Okapi_FileFilter::class
@@ -261,15 +261,14 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
                     $this->saveIntermediateWorkFile($workFile, $fileId);
                 }
             }
-
             $api->executeTask($sourceLang, $targetLang);
+
             //the exported work file (containing xlf) must be renamed so that
             // the merged file can be saved under the original file name
             if ($taskConfig->runtimeOptions->plugins->Okapi->preserveGeneratedXlfFiles) {
                 rename($workFile, $workFile . $api::OUTPUT_FILE_EXTENSION);
             }
             $api->downloadMergedFile($originalFile, $workFile);
-
             //TRANSLATE-2002: Currently Okapi can not reconvert PDF files,
             // therefore it provides a txt file, so we have to rename the file though
             if (strtolower($workFile->getExtension()) === 'pdf'
@@ -286,12 +285,11 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
                 //we add the XLF file suffix, since the workfile is now still a XLF file.
                 rename($workFile, $workFile . $api::OUTPUT_FILE_EXTENSION);
             }
-            //add an export-error file, pointing into the right direction
+            // add an export-error file to notify users
             file_put_contents(
                 dirname($workFile) . '/export-error.txt',
-                basename($workFile) .
-                    ': could not be exported due errors in Okapi. See task event log for more details.' .
-                    "\n\n" . (is_null($event) ? $e->getMessage() : $event->oneLine()),
+                'The file "' . basename($workFile) . '" could not be exported due to errors in Okapi:' .
+                    "\n " . (is_null($event) ? $e->getMessage() : $event->oneLine()),
                 FILE_APPEND
             );
         } finally {
@@ -313,35 +311,41 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         int $fileId,
         bool $import,
     ): ?ZfExtended_Logger_Event {
-        $gevent = $this->logger->exception($e, [
+        $event = $this->logger->exception($e, [
             'extra' => [
                 'task' => $this->task,
             ],
             'level' => ZfExtended_Logger::LEVEL_DEBUG,
         ]);
 
-        $absFile = $file->__toString();
         if ($import) {
-            $tmpImport = editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT;
-            $relFile = mb_strpos($absFile, $tmpImport);
-            $relFile = mb_substr($absFile, $relFile + strlen($tmpImport));
-            $code = 'E1058';
-            $msg = 'Okapi Plug-In: Error in converting file {file} on import. See log details for more information.';
+            $params = [
+                'errorCode' => 'E1058',
+                'errorMsg' => 'Okapi Plug-In: Error in converting file "{file}" on import: {message}',
+                'errorExtra' => [
+                    'message' => $e->getMessage(),
+                    'fileId' => $fileId,
+                    'file' => basename($file->__toString()),
+                ],
+            ];
+            // this will trigger an exception when the filter is resolved in the main application on import/export finish
+            $filterManager = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+            $filterManager->addFilter(
+                $filterManager::TYPE_IMPORT,
+                $this->taskGuid,
+                $fileId,
+                editor_Plugins_Okapi_FileFilter::class,
+                json_encode($params, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            );
         } else {
-            $relFile = mb_strpos($absFile, $this->task->getTaskGuid());
-            $relFile = mb_substr($absFile, $relFile + strlen($this->task->getTaskGuid()));
-            $code = 'E1151';
-            $msg = 'Okapi Plug-In: Error in converting file {file} on export. See log details for more information.';
+            // this will create an error in the task-events
+            $this->logger->error('E1151', 'Okapi Plug-In: Error in converting file "{file}" on export: {message}', [
+                'task' => $this->task,
+                'message' => $e->getMessage(),
+                'fileId' => $fileId,
+                'file' => basename($file->__toString()),
+            ]);
         }
-
-        // in case of an exception we just ignore that file, log it, and proceed with the import/export
-        $this->logger->warn($code, $msg, [
-            'task' => $this->task,
-            'message' => get_class($e) . ': ' . $e->getMessage(),
-            'fileId' => $fileId,
-            'file' => $relFile,
-            'filePath' => $absFile,
-        ]);
 
         return $event;
     }
@@ -479,8 +483,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         if ($this->hadEmptyTargets) {
             $this->logger->warn(
                 'E1150',
-                'Okapi Plug-In: The exported XLIFF {file} contains empty targets,'
-                . ' the Okapi process probably failed due that.',
+                'Okapi Plug-In: The exported XLIFF "{file}" contains empty targets,' .
+                    ' the Okapi process will probably fail then.',
                 [
                     'task' => $this->task,
                     'fileId' => $fileId,

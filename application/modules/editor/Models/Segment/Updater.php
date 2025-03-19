@@ -30,6 +30,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
+use MittagQI\Translate5\Segment\UpdateSegmentStatistics;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 
 /**
@@ -67,6 +68,8 @@ class editor_Models_Segment_Updater
 
     protected ContentProtector $contentProtector;
 
+    private UpdateSegmentStatistics $updateStatistics;
+
     public function __construct(
         editor_Models_Task $task,
         private string $userGuid
@@ -75,6 +78,7 @@ class editor_Models_Segment_Updater
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [get_class($this)]);
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
+        $this->updateStatistics = UpdateSegmentStatistics::create();
     }
 
     /**
@@ -126,7 +130,7 @@ class editor_Models_Segment_Updater
             $this->task,
             (int) $this->segment->getAutoStateId(),
             $history->getAutoStateId(),
-            $this->segment->getId()
+            (int) $this->segment->getId()
         );
 
         $this->qaAfterSegmentSaveOnSegmentUpdate();
@@ -155,7 +159,7 @@ class editor_Models_Segment_Updater
             $this->task,
             (int) $this->segment->getAutoStateId(),
             $history->getAutoStateId(),
-            $this->segment->getId()
+            (int) $this->segment->getId()
         );
 
         $this->qaAfterSegmentSaveOnSegmentUpdate();
@@ -180,6 +184,13 @@ class editor_Models_Segment_Updater
         //saving history directly before normal saving,
         // so no exception between can lead to history entries without changing the master segment
         $history->save();
+
+        $this->updateStatistics->updateFor(
+            $this->segment,
+            $this->task->getWorkflow(),
+            (int) $this->task->getWorkflowStep(),
+            true
+        );
 
         $this->setTimestampOnSegmentUpdate();
     }

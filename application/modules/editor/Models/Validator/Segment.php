@@ -126,6 +126,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         $this->addValidator('autoStateId', 'inArray', [$states->getStates()]);
+        $this->addValidator('levenshteinOriginal', 'int');
+        $this->addValidator('levenshteinPrevious', 'int');
     }
 
     /**

@@ -492,8 +492,17 @@ Ext.define('Editor.controller.Localizer', {
             taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>',
             averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
             excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>',
+            sekunden: '<?php echo $this->translate->_('Sekunden');?>',
             averageProcessingTimeTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Übersetzer');?>',
             averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit zweiter Lektor');?>',
+            posteditingTimeLabel:'<?php echo $this->translate->_('Ø Nachbearbeitungszeit innerhalb eines Workflowschritts');?>',
+            levenshteinDistanceLabel:'<?php echo $this->translate->_('Ø Levenshtein-Abstand innerhalb eines Workflowschritts');?>',
+            posteditingTimeTotalLabel:'<?php echo $this->translate->_('Ø Nachbearbeitungszeit ab Beginn des Workflows');?>',
+            posteditingTimeStartLabel:'<?php echo $this->translate->_('Ø Nachbearbeitungszeit vor Beginn des Workflows');?>',
+            posteditingTimeEndLabel:'<?php echo $this->translate->_('Ø Nachbearbeitungszeit nach Ende des Workflows');?>',
+            levenshteinDistanceOriginalLabel:'<?php echo $this->translate->_('Ø Levenshtein-Abstand ab Beginn des Workflows');?>',
+            levenshteinDistanceStartLabel:'<?php echo $this->translate->_('Ø Levenshtein-Distanz vor Beginn des Workflows');?>',
+            levenshteinDistanceEndLabel:'<?php echo $this->translate->_('Ø Levenshtein-Distanz nach Ende des Workflows');?>',
             taskDeleted: '<?php echo $this->translate->_('Aufgabe "{0}" gelöscht');?>'
         },
         confirmStrings: {
@@ -590,19 +599,17 @@ Ext.define('Editor.controller.Localizer', {
             userJobDeadline: '<?php echo $this->translate->_('Meine Deadline');?>',
             assignmentDate:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum');?>',
             finishedDate:'<?php echo $this->translate->_('Benutzer-Abschlussdatum');?>',
-            deadlineDate:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
+            deadlineDate:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>',
+            langResource:'<?php echo $this->translate->_('Sprachressourcen');?>',
+            langResourceType:'<?php echo $this->translate->_('Typ der Ressource');?>',
+            matchRateMin:'<?php echo $this->translate->_('Matchrate');?> (<?php echo $this->translate->_('min');?>)',
+            matchRateMax:'<?php echo $this->translate->_('Matchrate');?> (<?php echo $this->translate->_('max');?>)'
         }
     });
 
     Ext.define("Editor.locale.de.view.admin.task.KpiWindow", {
         override: "Editor.view.admin.task.KpiWindow",
-        title: '<?php echo $this->translate->_('Key Performance Indicators');?>',
-        strings: {
-            closeBtn: '<?php echo $this->translate->_('Fenster schließen');?>',
-            averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
-            excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>',
-            filterInfoLabel: '<?php echo $this->translate->_('Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.');?>'
-        }
+        title: '<?php echo $this->translate->_('Key Performance Indicators');?>'
     });
 
     Ext.define("Editor.locale.de.view.admin.task.LogWindow", {
@@ -636,17 +643,22 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.filter.FilterWindow",
         strings:{
             workflowLabel: '<?php echo $this->translate->_('Workflow');?>',
-            workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status');?>',
-            workflowUserRoleLabel: '<?php echo $this->translate->_('Workflowschritt-Typ');?>',
+        	workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status');?>',
+        	workflowUserRoleLabel: '<?php echo $this->translate->_('Workflowschritt-Typ');?>',
             workflowUserRoleTip: '<?php echo $this->translate->_('Filtert alle Aufgaben, denen ein Job mit einem Workflow-Schritt des gewählten Typs zugewiesen ist');?>',
             workflowStepLabel: '<?php echo $this->translate->_('Workflow-Schritt');?>',
             workflowStepTip: '<?php echo $this->translate->_('Filtert alle Aufgaben, denen ein Job mit dem gewählten Workflow-Schritt zugewiesen ist');?>',
-            userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer');?>',
-            applyBtn: '<?php echo $this->translate->_('Anwenden');?>',
-            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
-            title:'<?php echo $this->translate->_('Erweiterte Filter');?>',
+        	userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer');?>',
+        	applyBtn: '<?php echo $this->translate->_('Anwenden');?>',
+        	cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+        	title:'<?php echo $this->translate->_('Erweiterte Filter');?>',
+            min: '<?php echo $this->translate->_('min');?>',
+            max: '<?php echo $this->translate->_('max');?>',
+            matchRate: '<?php echo $this->translate->_('Matchrate');?>',
+            resourceType: '<?php echo $this->translate->_('Typ der Ressource');?>',
+            langResources: '<?php echo $this->translate->_('Sprachressourcen');?>',
             anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar');?>',
-            gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>',
+        	gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>',
             assignmentDateText:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum');?>',
             finishedDateText:'<?php echo $this->translate->_('Benutzer-Abschlussdatum');?>',
             deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>',
@@ -1996,6 +2008,47 @@ Editor.data.l10n = {
         taskTm: '<?php echo $this->translate->_('Aufgaben-TM');?>',
         showTaskTm: '<?php echo $this->translate->_('Aufgaben-TM anzeigen');?>',
         hideTaskTm: '<?php echo $this->translate->_('Aufgaben-TM ausblenden');?>',
+    },
+    taskKpiWindow: {
+        title: '<?php echo $this->translate->_('Key Performance Indicators');?>',
+        closeBtn: '<?php echo $this->translate->_('Fenster schließen');?>',
+        averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
+        excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>',
+        filterInfoLabel: '<?php echo $this->translate->_('Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.');?>',
+        processingTimeToolTip: '<h2><?php echo $this->translate->_('Überblick');?></h2><?php echo $this->translate->_('Die Nachbearbeitungszeit innerhalb eines Workflowschritts ist die Zeit, die Benutzer benötigen, um ein Segment innerhalb eines Workflow-Schrittes zu bearbeiten.');?>'+
+    '<h2><?php echo $this->translate->_('Filter-Spezialitäten');?></h2><?php echo $this->translate->_('Wenn in der Aufgabenübersicht kein Benutzerfilter gesetzt ist, wird die Nachbearbeitungszeit eines Segments berechnet, indem alle Bearbeitungszeiten aller Benutzer innerhalb dieses Workflow-Schritts einschließlich der PM-Bearbeitungen addiert werden.');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn ein Benutzerfilter gesetzt ist, werden nur die Bearbeitungen dieser Benutzer gezählt.');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn einer oder mehrere der Filter „Trefferrate“, „Typ der Resource“ oder „Sprachresourcen“ verwendet werden, werden nur Segmente berücksichtigt, die gemäß dieser Filterung entsprechen.');?>'+
+    '<h2><?php echo $this->translate->_('Basiseinheit');?></h2><?php echo $this->translate->_('Das Ergebnis des oben beschriebenen ist die Nachbearbeitungszeit für das Segment innerhalb eines Workflow-Schrittes.');?>'+
+    '<br/><?php echo $this->translate->_('Es werden nur Segmente berücksichtigt, die aktuell bearbeitbar sind.<br/>Dies ist die Basiseinheit für die Berechnung.');?>'+
+    '<h2><?php echo $this->translate->_('Durchschnitt');?></h2><?php echo $this->translate->_('Der Durchschnitt wird dann als Durchschnitt aller Basiseinheiten für die Berechnung innerhalb der aktuellen Aufgabenfilterung berechnet.');?>'+
+    '<h2><?php echo $this->translate->_('Nicht bearbeitete Segmente innerhalb eines Arbeitsablaufschritts');?></h2><?php echo $this->translate->_('Für Segmente, die nicht innerhalb eines Workflow-Schrittes bearbeitet wurden, wird die Nachbearbeitungszeit für diesen Schritt nicht berücksichtigt.');?>',
+        processingTimeTotalToolTip: '<h2><?php echo $this->translate->_('Überblick');?></h2><?php echo $this->translate->_('Die Nachbearbeitungszeit ab dem Start des Workflows ist die Zeit, die für die Bearbeitung eines Segments für alle Bearbeitungen ab dem Start des Workflows benötigt wird.');?>'+
+    '<h2><?php echo $this->translate->_('Filter-Spezialitäten');?></h2><?php echo $this->translate->_('Wenn in der Aufgabenübersicht kein Benutzerfilter gesetzt ist, wird die Nachbearbeitungszeit eines Segments durch die Addition aller Bearbeitungszeiten aller Benutzer einschließlich der PM-Bearbeitungen berechnet.');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn ein Benutzerfilter gesetzt ist, werden nur die Bearbeitungen dieser Benutzer gezählt.');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn für den/die Workflow-Schritt(e) eine Filterung festgelegt wurde, werden nur die Nachbearbeitungszeiten innerhalb des/der gefilterten Workflow-Schritt(e) berücksichtigt (werden aber trotzdem für alle Workflow-Schritte addiert).');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn einer oder mehrere der Filter „Trefferrate“, „Typ der Resource“ oder „Sprachresourcen“ verwendet werden, werden nur Segmente berücksichtigt, die gemäß dieser Filterung entsprechen.');?>'+
+    '<h2><?php echo $this->translate->_('Basiseinheit');?></h2><?php echo $this->translate->_('Das Ergebnis des oben beschriebenen ist die Nachbearbeitungszeit für das Segment innerhalb eines Workflow-Schrittes.');?>'+
+    '<br/><?php echo $this->translate->_('Es werden nur Segmente berücksichtigt, die aktuell bearbeitbar sind.<br/>Dies ist die Basiseinheit für die Berechnung.');?>'+
+    '<h2><?php echo $this->translate->_('Durchschnitt');?></h2><?php echo $this->translate->_('Der Durchschnitt wird dann als Durchschnitt aller Basiseinheiten für die Berechnung innerhalb der aktuellen Aufgabenfilterung berechnet.');?>'+
+    '<h2><?php echo $this->translate->_('Nicht bearbeitete Segmente innerhalb eines Arbeitsablaufschritts');?></h2><?php echo $this->translate->_('Für Segmente, die nicht innerhalb eines Workflow-Schrittes bearbeitet wurden, wird die Nachbearbeitungszeit für diesen Schritt nicht berücksichtigt.');?>',
+        levenshteinDistanceToolTip: '<h2><?php echo $this->translate->_('Überblick');?></h2><?php echo $this->translate->_('Der Levenshtein-Abstand innerhalb eines Workflow-Schrittes für ein Segment wird zwischen der Version des Segments vor der Bearbeitung innerhalb eines Workflow-Schrittes und der letzten Bearbeitung innerhalb des Workflow-Schrittes berechnet.');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn das Segment vorübersetzt wurde, gilt die Vorübersetzung als erste Version und der Übersetzungsschritt wird bei der Berechnung berücksichtigt.<br/>Wenn das Segment ursprünglich manuell übersetzt wurde (keine Vorübersetzung), wird der Workflow-Schritt „Übersetzung“ für die Levenshtein-Berechnung vernachlässigt und die manuelle Übersetzung wird als erste Version betrachtet.');?>'+
+    '<h2><?php echo $this->translate->_('Filter-Spezialitäten');?></h2><?php echo $this->translate->_('Die Berechnung ist unabhängig davon, wer das Segment innerhalb des Workflow-Schrittes bearbeitet hat und wann.');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn ein Benutzerfilter gesetzt ist, werden nur diese Segmente und Levenshtein-Distanzen berücksichtigt, bei welchen der/die betreffende(n) Nutzer/in die letzte Bearbeitung eines Segments vorgenommen hat.');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn einer oder mehrere der Filter „Trefferrate“, „Typ der Resource“ oder „Sprachresourcen“ verwendet werden, werden nur Segmente berücksichtigt, die gemäß dieser Filterung entsprechen.');?>'+
+    '<h2><?php echo $this->translate->_('Basiseinheit');?></h2><?php echo $this->translate->_('Das Ergebnis des oben beschriebenen ist der Levenshtein-Abstand für das Segment innerhalb eines Workflow-Schrittes.');?>'+
+    '<br/><?php echo $this->translate->_('Es werden nur Segmente berücksichtigt, die aktuell bearbeitbar sind.<br/>Dies ist die Basiseinheit für die Berechnung.');?>'+
+    '<h2><?php echo $this->translate->_('Durchschnitt');?></h2><?php echo $this->translate->_('Der Durchschnitt wird dann als Durchschnitt aller Basiseinheiten für die Berechnung innerhalb der aktuellen Aufgabenfilterung berechnet.');?>'+
+    '<h2><?php echo $this->translate->_('Nicht bearbeitete Segmente innerhalb eines Arbeitsablaufschritts');?></h2><?php echo $this->translate->_('Für Segmente, die nicht innerhalb eines Workflow-Schrittes bearbeitet wurden, wird der Levenshtein-Abstand für diesen Schritt als 0 gespeichert, sobald der letzte Benutzer eines Workflow-Schrittes seine Arbeit beendet hat.');?>',
+        levenshteinDistanceOriginalToolTip: '<h2><?php echo $this->translate->_('Überblick');?></h2><?php echo $this->translate->_('Der Levenshtein-Abstand vom Beginn des Workflows für ein Segment wird zwischen der Version des Segments zu Beginn des Workflows und seiner letzten vorhandenen Bearbeitung berechnet.');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn das Segment vorübersetzt wurde, gilt die Vorübersetzung als erste Version und der Übersetzungsschritt wird bei der Berechnung berücksichtigt.<br/>Wenn das Segment ursprünglich manuell übersetzt wurde (keine Vorübersetzung), wird der Workflow-Schritt „Übersetzung“ für die Levenshtein-Berechnung vernachlässigt und die manuelle Übersetzung wird als erste Version betrachtet.');?>'+
+    '<h2><?php echo $this->translate->_('Filter-Spezialitäten');?></h2><?php echo $this->translate->_('Wenn der Workflow-Schritt oder der Benutzer gefiltert wird, hat dies keinen Einfluss auf die Berechnung.');?>'+
+    '<br/><br/><?php echo $this->translate->_('Wenn einer oder mehrere der Filter „Trefferrate“, „Typ der Resource“ oder „Sprachresourcen“ verwendet werden, werden nur Segmente berücksichtigt, die gemäß dieser Filterung entsprechen.');?>'+
+    '<h2><?php echo $this->translate->_('Basiseinheit');?></h2><?php echo $this->translate->_('Das Ergebnis des oben beschriebenen ist der Levenshtein-Abstand für das Segment vom Beginn des Workflows.');?>'+
+    '<br/><?php echo $this->translate->_('Es werden nur Segmente berücksichtigt, die aktuell bearbeitbar sind.<br/>Dies ist die Basiseinheit für die Berechnung.');?>'+
+    '<h2><?php echo $this->translate->_('Durchschnitt');?></h2><?php echo $this->translate->_('Der Durchschnitt wird dann als Durchschnitt aller Basiseinheiten für die Berechnung innerhalb der aktuellen Aufgabenfilterung berechnet.');?>'+
+    '<h2><?php echo $this->translate->_('Nicht bearbeitete Segmente innerhalb eines Arbeitsablaufschritts');?></h2><?php echo $this->translate->_('Für Segmente, die nicht innerhalb eines Workflow-Schrittes bearbeitet wurden, wird der Levenshtein-Abstand für diesen Schritt als 0 gespeichert, sobald der letzte Benutzer eines Workflow-Schrittes seine Arbeit beendet hat.');?>',
     },
     segmentGrid: {
         batchOperations: {

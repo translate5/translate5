@@ -522,6 +522,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
                 break;
         }
 
+        if ($tag == 'xml-cdata') {
+            throw new editor_Models_Import_FileParser_Xlf_Exception('E1689', [
+                'file' => $this->filename,
+                'task' => $this->task,
+            ]);
+        }
+
         // The file "{file}" contains "{tag}" tags, which are currently not supported! Stop Import.
         throw new editor_Models_Import_FileParser_Xlf_Exception('E1194', [
             'file' => $this->filename,

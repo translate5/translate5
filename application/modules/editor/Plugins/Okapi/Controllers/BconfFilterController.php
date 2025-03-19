@@ -31,6 +31,8 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FilterEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\Fprm;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FprmValidation;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\PropertiesValidation;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Helpers\ResourceFileImport;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 
 /**
@@ -41,6 +43,11 @@ use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestController
 {
     protected $entityClass = FilterEntity::class;
+
+    /**
+     * The download-actions need to be csrf unprotected!
+     */
+    protected array $_unprotectedActions = ['downloadfprm'];
 
     /**
      * This also transfers the Extension-Mapping and the default Extensions to the frontend via metaData
@@ -64,8 +71,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         $this->view->total = count($this->view->rows);
 
         // the extension mapping is sent as meta-data
-        // @phpstan-ignore-next-line
-        if (! $this->view?->metaData) {
+        if (empty($this->view->metaData)) {
             $this->view->metaData = new stdClass();
         }
         $this->view->metaData->extensionMapping = $bconf->getExtensionMapping()->getIdentifierMap();
@@ -217,6 +223,57 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             $this->view->error = $validationError;
         } else {
             $this->view->success = true;
+        }
+    }
+
+    /**
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function downloadfprmAction()
+    {
+        $this->entityLoad();
+        $fprm = new Fprm($this->entity->getPath());
+        $downloadFilename = editor_Utils::filenameFromUserText($this->entity->getName(), false) . '-' . $fprm->getFile();
+        $fprm->download($downloadFilename);
+        exit;
+    }
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws OkapiException
+     * @throws ZfExtended_Exception
+     * @throws Throwable
+     */
+    public function uploadfprmAction()
+    {
+        if (empty($_FILES)) {
+            throw new OkapiException('E1212', [
+                'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
+            ]);
+        }
+        $this->entityLoad();
+        $errMsg = '';
+        $fprmFile = $this->entity->getPath();
+        $fprm = new Fprm($fprmFile, file_get_contents($_FILES['fprm']['tmp_name']));
+        if ($fprm->getType() === Fprm::TYPE_XPROPERTIES) {
+            $validation = new PropertiesValidation($fprmFile, $fprm->getContent());
+            $validation->upgrade();
+            if ($validation->validate()) {
+                $validation->flush();
+            } else {
+                $errMsg = 'The uploaded FPRM "' . basename($fprmFile) . '" seems to be invalid';
+            }
+        }
+
+        if (empty($errMsg)) {
+            $errMsg = ResourceFileImport::addToBConf($fprm, $this->entity->getRelatedBconf());
+        }
+        if ($errMsg) {
+            throw new OkapiException('E1686', [
+                'details' => $errMsg,
+            ]);
         }
     }
 

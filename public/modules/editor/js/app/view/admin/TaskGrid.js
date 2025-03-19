@@ -78,9 +78,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
         emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
         lockLocked: '#UT#Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
         enableSourceEditing: '#UT#Quellsprache bearbeitbar',
-        workflowState: '#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
-        workflowUserRole: '#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
-        userName: '#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+        workflowState: '#UT#Workflow-Status',//Not a task grid column header, used only for advanced filter label in the tag field
+        workflowUserRole: '#UT#Benutzer-Rolle',//The same as above
+        userName: '#UT#Benutzer',//The same as above
         segmentCount: '#UT#Segmentanzahl',
         segmentFinishCount: '#UT#% abgeschlossen',
         id: '#UT#Id',
@@ -94,6 +94,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
         assignmentDateHeader: '#UT#Zuweisungsdatum',
         finishedDateHeader: '#UT#Abschlussdatum',
         deadlineDateHeader: '#UT#Deadline Datum',
+        //Active filter labels below
+        langResource: '#UT#Sprachressourcen',
+        langResourceType: '#UT#Typ der Ressource',
+        matchRateMin: '#UT#Matchrate',
+        matchRateMax: '#UT#Matchrate'
     },
     strings: {
         noRelaisLang: '#UT#- Ohne Relaissprache -',

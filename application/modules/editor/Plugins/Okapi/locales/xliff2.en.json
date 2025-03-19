@@ -1,0 +1,12 @@
+{
+    "helpLink": "http://okapiframework.org/wiki/index.php/XLIFF-2_Filter",
+    "maxValidation": "Perform maximum validation when parsing",
+    "forceUniqueIds": "Ensure tag IDs are unique within units",
+    "ignoreTagTypeMatch": "Ignore tag type mismatch between source and target",
+    "discardInvalidTargets": "Discard invalid targets rather than rejecting the file",
+    "writeOriginalData": "Output includes original data when available",
+    "subfilter": "Subfilter",
+    "subfilterTooltip": "Name of the subfilter to use for embedded content",
+    "subfilterOverwriteTarget": "Subfilter: Always Overwrite Target?",
+    "subfilterOverwriteTargetTooltip": "Should the writer always overwrite an existing target even if state is final?"
+}

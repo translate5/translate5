@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions"
+       xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+    <file original="/var/lib/tomcat9/work/Okapi-Longhorn-Files/2/input/original-15923.odt/styles.xml" source-language="de" target-language="en" datatype="x-undefined"><body></body></file>
+    <file original="/var/lib/tomcat9/work/Okapi-Longhorn-Files/2/input/original-15923.odt/meta.xml" source-language="de" target-language="en" datatype="x-undefined"><body></body></file>
+    <file original="/var/lib/tomcat9/work/Okapi-Longhorn-Files/2/input/original-15923.odt/content.xml" source-language="de" target-language="en" datatype="x-undefined">
+        <body>
+            <trans-unit id="1" restype="x-text:h">
+                <source xml:lang="de">Spätere Überführung des Produktes</source>
+                <seg-source><mrk mid="0" mtype="seg">Spätere Überführung des Produktes</mrk></seg-source>
+            </trans-unit>
+            <trans-unit id="2" restype="x-text:h">
+                <source xml:lang="de">in den NEBV-Baukasten</source>
+                <seg-source><mrk mid="0" mtype="seg">in den NEBV-Baukasten</mrk></seg-source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

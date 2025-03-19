@@ -30,7 +30,7 @@ namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
 
 use SplFileObject;
 use Throwable;
-use ZfExtended_UnprocessableEntity;
+use ZfExtended_Exception;
 
 /**
  * Common util class for bconf export and import
@@ -65,21 +65,51 @@ class RandomAccessFile extends SplFileObject
 
     /**
      * Read next UTF-8 value
-     * @throws ZfExtended_UnprocessableEntity
+     * @throws ZfExtended_Exception
      */
     public function readUTF()
     {
         try {
-            $utflen = unpack('n', $this->fread(2))[1]; // n -> Big Endian unsigned short (Java)
+            $length = $this->fread(2);
+            if ($length === false) {
+                $this->throwOnReadUTF('fread: could not read length of following UTF-8 string', error_get_last());
+            }
+            $unpacked = unpack('n', $length);
+            if ($unpacked === false) {
+                $this->throwOnReadUTF('unpack: Type a: not enough input', error_get_last());
+            }
+            $utflen = $unpacked[1]; // n -> Big Endian unsigned short (Java)
+            if ($utflen > 0) {
+                $length = $this->fread($utflen);
+                if ($length === false) {
+                    $this->throwOnReadUTF('fread: could not read length of following UTF-8 string', error_get_last());
+                }
+                $unpacked = unpack('a' . $utflen, $length);
+                if ($unpacked === false) {
+                    $this->throwOnReadUTF('unpack: invalid format-string "a' . $utflen . '"', error_get_last());
+                }
 
-            // unpack("A"...) strips whitespace!
-            return ($utflen > 0) ? unpack('a' . $utflen, $this->fread($utflen))[1] : '';
+                return $unpacked[1];
+            } else {
+                return '';
+            }
         } catch (Throwable $e) {
-            throw new ZfExtended_UnprocessableEntity(errorCode: 'E1026', previous: $e);
+            throw new ZfExtended_Exception($e->getMessage());
         }
     }
 
-    /** Write the UTF-8 value in bconf
+    /**
+     * @throws ZfExtended_Exception
+     */
+    private function throwOnReadUTF(string $msg, ?array $lastError): void
+    {
+        $message = (is_array($lastError) && array_key_exists('message', $lastError)) ? $lastError['message'] : $msg;
+
+        throw new ZfExtended_Exception($message);
+    }
+
+    /**
+     * Write the UTF-8 value in bconf
      */
     public function writeUTF($string, bool $withNullByte = true): void
     {
@@ -102,7 +132,7 @@ class RandomAccessFile extends SplFileObject
      * Read the Integer value in bconf
      * QUIRK: PHP unpack has no option for signed 32bit Integer, so we have to convert after reading
      * @return int|mixed
-     * @throws ZfExtended_UnprocessableEntity
+     * @throws ZfExtended_Exception
      */
     public function readInt(): mixed
     {
@@ -111,7 +141,7 @@ class RandomAccessFile extends SplFileObject
 
             return $uint32 <= self::PHP_INT32_MAX ? $uint32 : $uint32 - self::OVERFLOW_SUB;
         } catch (Throwable $e) {
-            throw new ZfExtended_UnprocessableEntity(errorCode: 'E1026', previous: $e);
+            throw new ZfExtended_Exception($e->getMessage());
         }
     }
 

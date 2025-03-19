@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Statistics\Helpers\AggregateUnmodifiedSegments;
 use MittagQI\Translate5\Workflow\NextStepCalculator;
 
 /**
@@ -176,6 +177,9 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
 
         //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger
         $this->callActions($this->config, $oldStep, $newTua->getRole(), $newTua->getState());
+
+        // TODO: move into an event binding
+        AggregateUnmodifiedSegments::aggregate($task, $oldStep, $newTua->getUserGuid());
     }
 
     /**

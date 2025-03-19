@@ -71,7 +71,7 @@ abstract class ResourceFile
         $this->path = $path;
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfValidation');
         if ($content === null) {
-            $this->content = @file_get_contents($this->getPath());
+            $this->content = @file_get_contents($this->path);
             if (! $this->content || strlen($this->content) < 1) {
                 // DEBUG
                 if ($this->doDebug) {

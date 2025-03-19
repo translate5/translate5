@@ -31,28 +31,31 @@
 * there can be system-bconfs & client/customer-bconfs, on each level a "default" can be set (that is preselected in the import-wizard & is used in e.g. InstantTranslate)
 * the used file-format settings & the used OKAPI-version are logged to the task's event-log
 * each bconf has a "content.json" created on unpacking which is an inventory of all relevant parts: the linked SRX files, the pipeline-steps and the customized FPRMs
-
-
-### BCONF: Individual Export BCONFs (TODO)
-
-* to enable linked subfilters, the export-bconf has to match the used import-bconf in terms of FPRMs and Extension-Mapping
-* therefore a second "merging-<id>.bconf" should be added to each bconf.
+* Packer::createMerging creates the export-bconf & saves it to the bconf-directory
 * It consists of the extension-mapping, the FPRMs and a merging-pipeline always copied from translate5/application/modules/editor/Plugins/Okapi/data/pipeline/translate5-merging.pln
-* implement Packer::createMerging to create the export-bconf & save it to the bconf-directory
-* add/implement API to bconf-entity: getExportPath(), use it in worker's export API
-* adjust the existing hooks for bconf creation to also process the merging/export bconf always in parallel: repackIfOutdated / pack / delete
-* implement rollout-script that generates a merging-bconf for each existing BCONF-entry
+* merging/export bconf is always processed in parallel with import/extraction bconf: repackIfOutdated / pack / delete
+* to enable linked subfilters, the export-bconf matches the used import-bconf in terms of FPRMs and Extension-Mapping
+
+
+### BCONF: Individual Export BCONFs
+
+* For exporting a task, a seperate Export-Bconf is used
+* The Export-BCONF is a copy of the import-BCONF with a different Pipeline but without SRX (no Segmentation Step)
+* The Export-BCONF is always generated alongside the import BCONF and is stored alongside the import-BCONF with the name "bconf-export"
+* When a task is imported with a BCONF in the ZIP, a fixed Export-Bconf stored in .../Plugins/Okapi/data/okapi_default_export.bconf is used
 
 
 ### BCONF: Pipeline
 
 - Currently: not editable, but unpacked to the data-folder
-- TODO: add proper base validation for extraction/import pipeline (basic steps are existing just like in `translate5/application/modules/editor/Plugins/Okapi/data/pipeline/translate5-extraction.pln`)
-- TODO: add validation for each step (based on our properties-validation) and the steps defined in `translate5/application/modules/editor/Plugins/Okapi/data/pipeline/step/`. Note, that srx-pathes are irrelevant, only the filename is imortant
-- TODO: add (validated) upload functionality (only for import/extraction pipeline!)
-- TODO: add download functionality (only for import/extraction pipeline!)
+- proper base validation exists for extraction/import pipeline (basic steps are existing just like in `translate5/application/modules/editor/Plugins/Okapi/data/pipeline/translate5-extraction.pln`)
+- each step is validated based on our properties-validation and the steps defined in `translate5/application/modules/editor/Plugins/Okapi/data/pipeline/step/`. Note, that srx-pathes are irrelevant, only the filename is important
+- optional internal XSLT pipeline step is supported (XSLT file is added to the content.json and is part of BCONF after import)
+- import/extraction pipeline can be downloaded/uploaded (validation is triggered on pipeline upload)
+- editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX since version 10 is added as attribute within import/extraction pipeline: <rainbowPipeline .. bconfVersion="10">
 - TODO: add full pipeline validation on BCONF import
 - TODO: add version-update of the 3 base-steps in case of a internal version update
+- TODO: in the Pipeline-Editor a XSLT step is addable in conjunction with uploading a XSLT file
 
 
 ### BCONF: Extension-Mapping
@@ -99,12 +102,14 @@
 
 * OpenXML filter has "Maximal attribute size of xml attributes" parameter (maxAttributeSize) which affects ability to import large files.
 * Default value of maxAttributeSize.i was increased from 4MB to 40MB which worked fine for 300MB+ MS Office files   
+* T5 uses native parsing for XLIFF files by default, which fails if xliff file contains CDATA blocks
+* To import XLIFF with CDATA you can map the file format template “xliff 1.2 with cdata” to xlf/xliff file extension in the file format settings of T5 (and adapt the template further if necessary)
 
 ### BCONF: Properties based FPRMs
 
 * custom properties FPRMs will be validated against the okapi-default ones after editing
 * the translate5-adjusted FPRMs are not validated against the defaults but it is expected they are complete
-* generally properties -based FPRMs have only 3 types of data: boolean (suffixed `.b`), integer (suffixed `.i`) and string (no suffix)
+* generally properties-based FPRMs have only 3 types of data: boolean (suffixed `.b`), integer (suffixed `.i`) and string (no suffix)
 * the frontend for "properties" files is complex as lists and collections of complex items are deserialized by index:
 * lists example:
 ```

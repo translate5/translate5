@@ -106,13 +106,25 @@ final class Packer
             } else {
                 $content = $this->bconf->getContent();
                 $pipeline = $this->bconf->getPipeline();
-                $this->harvestReferencedFile(1, $content->getSrxFile('source'), $isOutdatedRepack);
-                $this->harvestReferencedFile(2, $content->getSrxFile('target'), $isOutdatedRepack);
+                $refId = 0;
+                if ($xsltFile = $content->getXsltFile()) {
+                    $this->harvestReferencedFile(++$refId, $xsltFile, $isOutdatedRepack);
+                }
+                $this->harvestReferencedFile(++$refId, $content->getSrxFile('source'), $isOutdatedRepack);
+                $this->harvestReferencedFile(++$refId, $content->getSrxFile('target'), $isOutdatedRepack);
             }
             // Last ID=-1 to mark no more references
             $this->raf->writeInt(-1);
             $this->raf->writeInt(1);
-            $this->raf->writeUTF($pipeline->getContent(), false);
+            $pipelineContent = $pipeline->getContent();
+            if (! $isExport && str_contains($pipelineContent, '<rainbowPipeline version="1">')) {
+                $pipelineContent = str_replace(
+                    '<rainbowPipeline version="1">',
+                    '<rainbowPipeline version="1" ' . Pipeline::BCONF_VERSION_ATTR . '="' . editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX . '">',
+                    $pipelineContent
+                );
+            }
+            $this->raf->writeUTF($pipelineContent, false);
             // process filters & extension mapping
             $customIdentifiers = [];
             foreach ($this->bconf->getCustomFilterData() as $filterData) {
@@ -206,22 +218,23 @@ final class Packer
         if ($isOutdatedRepack && pathinfo($fileName, PATHINFO_EXTENSION) === Srx::EXTENSION) {
             Segmentation::instance()->onRepack($this->folder . '/' . $fileName);
         }
-        //Open the file and read the content
-        $resource = fopen($this->folder . '/' . $fileName, 'rb');
-        // can not really happen in normal operation but who knows
-        if ($resource === false) {
+        $fileSize = filesize($this->folder . '/' . $fileName);
+        if ($fileSize === false) {
             throw new BconfInvalidException('Unable to open file ' . $fileName);
         }
-        $fileSize = filesize($this->folder . '/' . $fileName);
-        $fileContent = fread($resource, $fileSize);
         // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf.
         // En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we write 2 32bit Ints here
         // (limiting the encodable size to 4GB...)
         $this->raf->writeInt(0);
         $this->raf->writeInt($fileSize);
         if ($fileSize > 0) {
-            $this->raf->fwrite($fileContent);
+            $resource = fopen($this->folder . '/' . $fileName, 'rb');
+            // can not really happen in normal operation but who knows
+            if ($resource === false) {
+                throw new BconfInvalidException('Unable to open file ' . $fileName);
+            }
+            $this->raf->fwrite(fread($resource, $fileSize));
+            fclose($resource);
         }
-        fclose($resource);
     }
 }

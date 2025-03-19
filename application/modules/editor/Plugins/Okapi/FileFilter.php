@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\File\Filter\FilterException;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 
 /**
@@ -46,25 +47,21 @@ class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter
         $this->manager = $manager;
     }
 
-    /**
-     * @see editor_Models_File_IFilter::applyImportFilter()
-     */
-    public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters): string
+    public function applyImportFilter(editor_Models_Task $task, int $fileId, string $filePath, ?string $parameters): string
     {
+        // the parameters-field may contain data from the conversion done by the worker hinting at an exception ...
+        $this->checkParameters($task, $fileId, $parameters);
+
         //renames the original file to original.xlf so that our fileparsers can import them, valid for all contexts!
         return $filePath . OkapiAdapter::OUTPUT_FILE_EXTENSION;
     }
 
-    /**
-     * @see editor_Models_File_IFilter::applyExportFilter()
-     */
-    public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters): string
+    public function applyExportFilter(editor_Models_Task $task, int $fileId, string $filePath, ?string $parameters): string
     {
         if ($this->config->context === editor_Models_Export::EXPORT_PACKAGE) {
             //we do not re-export with okapi package export but return the filename with XLF extension
             return $this->applyImportFilter($task, $fileId, $filePath, $parameters);
         }
-
         $worker = ZfExtended_Factory::get(editor_Plugins_Okapi_Worker::class);
         $params = [
             'type' => editor_Plugins_Okapi_Worker::TYPE_EXPORT,
@@ -79,5 +76,19 @@ class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter
         $worker->queue($this->config->parentWorkerId ?? 0);
 
         return $filePath;
+    }
+
+    private function checkParameters(editor_Models_Task $task, int $fileId, ?string $params): void
+    {
+        if (! empty($params)) {
+            $data = json_decode($params, true);
+            if ($data && array_key_exists('errorCode', $data) && array_key_exists('errorMsg', $data)) {
+                $extra = array_key_exists('errorExtra', $data) ? $data['errorExtra'] : [];
+                $extra['task'] = $task;
+                $extra['fileId'] = $fileId;
+
+                throw new FilterException($data['errorCode'], $data['errorMsg'], $extra, 'plugin.okapi');
+            }
+        }
     }
 }

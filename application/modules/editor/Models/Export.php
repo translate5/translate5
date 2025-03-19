@@ -63,7 +63,7 @@ class editor_Models_Export
 
     public function __construct()
     {
-        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [__CLASS__]);
+        $this->events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [__CLASS__]);
     }
 
     public function setTaskToExport(editor_Models_Task $task, bool $diff)
@@ -100,8 +100,7 @@ class editor_Models_Export
             throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRootFolder));
         }
 
-        $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
-        /* @var $treeDb editor_Models_Foldertree */
+        $treeDb = ZfExtended_Factory::get(editor_Models_Foldertree::class);
         $treeDb->setPathPrefix('');
         $dirPaths = $treeDb->getPaths($this->taskGuid, 'dir');
         $filePaths = $treeDb->getPaths($this->taskGuid, 'file');
@@ -132,7 +131,7 @@ class editor_Models_Export
             $path = $localEncoded->encode($relPath);
             $path = $exportRootFolder . DIRECTORY_SEPARATOR . $path;
             $parser = $this->getFileParser((int) $fileId, $path, $checkSegmentTags, $context);
-            /* @var $parser editor_Models_Export_FileParser */
+            /** @var ?editor_Models_Export_FileParser $parser */
             if (empty($parser)) {
                 $log = Zend_Registry::get('logger')->cloneMe('editor.export');
                 $log->warn('E1157', 'Export: the file "{file}" could not be exported, since it had possibly already errors on import.', [
@@ -147,6 +146,7 @@ class editor_Models_Export
             if (count($faults) > 0) {
                 $faultySegments = array_merge($faultySegments, $faults);
             }
+
             $pathAfterFilter = $fileFilter->applyExportFilters($path, $fileId);
             if ($pathAfterFilter !== $path) {
                 //apply the modified filename
@@ -184,8 +184,7 @@ class editor_Models_Export
         bool $checkFaultySegmentTags,
         string $context
     ): ?editor_Models_Export_FileParser {
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        /* @var $file editor_Models_File */
+        $file = ZfExtended_Factory::get(editor_Models_File::class);
         $file->load($fileId);
 
         /* @var editor_Models_Import_FileParser $importFileParser */

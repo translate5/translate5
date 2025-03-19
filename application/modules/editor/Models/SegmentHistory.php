@@ -59,41 +59,6 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     ];
 
     /**
-     * loads the history entries to one segment, DESC sorted by id (creation), can be limited with $limit parameter
-     * @param int $id
-     * @param number $limit
-     * @return array
-     */
-    public function loadBySegmentId($id, $limit = 0)
-    {
-        $s = $this->db->select();
-        $s->where('segmentId = ?', $id)
-            ->order('id DESC');
-        if ($limit > 0) {
-            $s->limit($limit);
-        }
-
-        return $this->db->fetchAll($s)->toArray();
-    }
-
-    /**
-     * load the latest history entry data as array to a segment,
-     *  optionally filtered by the given filter parameters, passing key and values directly to a where command
-     */
-    public function loadLatestForSegment(int $id, array $filter = []): array
-    {
-        $s = $this->db->select();
-        $s->where('segmentId = ?', $id)
-            ->order('id DESC')->limit(1);
-        foreach ($filter as $field => $value) {
-            $s->where($field, $value);
-        }
-        $row = $this->db->fetchRow($s);
-
-        return $row ? $row->toArray() : [];
-    }
-
-    /**
      * sets the field manager
      */
     public function setSegmentFieldManager(editor_Models_SegmentFieldManager $sfm)
@@ -200,7 +165,6 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
      */
     public function setTimeTrackData(array $durations)
     {
-        $sfm = $this->segmentFieldManager;
         foreach ($durations as $field => $duration) {
             if (isset($this->historydata[$field])) {
                 $this->historydata[$field]->duration = $duration;

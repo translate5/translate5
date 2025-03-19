@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\Repository\SegmentHistoryRepository;
 
 /**
  * Segment Auto States Helper Class
@@ -178,7 +179,7 @@ class editor_Models_Segment_AutoStates
      */
     public static $nonEditableStates = [
         self::BLOCKED,
-        self::LOCKED
+        self::LOCKED,
     ];
 
     /**
@@ -190,11 +191,11 @@ class editor_Models_Segment_AutoStates
         self::BLOCKED,
     ];
 
-    private editor_Models_SegmentHistory $segmentHistory;
+    private readonly SegmentHistoryRepository $segmentHistory;
 
     public function __construct()
     {
-        $this->segmentHistory = ZfExtended_Factory::get('editor_Models_SegmentHistory');
+        $this->segmentHistory = new SegmentHistoryRepository();
     }
 
     #region Getters
@@ -391,7 +392,7 @@ class editor_Models_Segment_AutoStates
     public function recalculateUnLockedState(editor_Models_Segment $segment): int
     {
         // LOCKED → to all previous non locked and non untranslated states possible from history
-        $latest = $this->segmentHistory->loadLatestForSegment($segment->getId(), [
+        $latest = $this->segmentHistory->loadLatestForSegment((int) $segment->getId(), [
             'editable != ?' => 0,
             'autoStateId != ?' => self::LOCKED,
             'autoStateId != ?' => self::BLOCKED,

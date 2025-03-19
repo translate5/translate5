@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<srx xmlns="http://www.lisa.org/srx20" xmlns:okpsrx="http://okapi.sf.net/srx-extensions" version="2.0">
+<header segmentsubflows="yes" cascade="no">
+<formathandle type="start" include="no"></formathandle>
+<formathandle type="end" include="yes"></formathandle>
+<formathandle type="isolated" include="no"></formathandle>
+<okpsrx:options oneSegmentIncludesAll="no" trimLeadingWhitespaces="no" trimTrailingWhitespaces="no" useJavaRegex="yes" useIcu4JBreakRules="no" treatIsolatedCodesAsWhitespace="no"></okpsrx:options>
+<okpsrx:sample language="en" useMappedRules="yes">A1B2C3</okpsrx:sample>
+<okpsrx:rangeRule></okpsrx:rangeRule>
+</header>
+<body>
+<languagerules>
+<languagerule languagerulename="German">
+<!--After Number Before Letter-->
+<rule break="yes">
+<beforebreak>([0-9])</beforebreak>
+<afterbreak>([A-Z])</afterbreak>
+</rule>
+</languagerule>
+<languagerule languagerulename="default">
+<!--After Number Before Letter-->
+<rule break="yes">
+<beforebreak>([0-9])</beforebreak>
+<afterbreak>([A-Z])</afterbreak>
+</rule>
+</languagerule>
+</languagerules>
+<maprules>
+<languagemap languagepattern=".*" languagerulename="default"></languagemap>
+</maprules>
+</body>
+</srx>

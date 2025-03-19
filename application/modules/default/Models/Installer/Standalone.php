@@ -86,6 +86,14 @@ class Models_Installer_Standalone
         'port' => '3306',
     ];
 
+    protected array $clickhouseCredentials = [
+        'host' => 'localhost',
+        'username' => 'default',
+        'password' => '',
+        'dbname' => '',
+        'port' => '8123',
+    ];
+
     protected string $hostname;
 
     protected bool $isInstallation = false;
@@ -654,6 +662,14 @@ class Models_Installer_Standalone
         $content[] = 'resources.db.params.dbname = "' . $this->dbCredentials['dbname'] . '"';
         $content[] = 'resources.db.params.port = "' . $this->dbCredentials['port'] . '"';
         $content[] = '';
+        if (! empty($this->clickhouseCredentials['dbname'])) {
+            $content[] = 'resources.db.clickhouse.params.host = "' . $this->clickhouseCredentials['host'] . '"';
+            $content[] = 'resources.db.clickhouse.params.username = "' . $this->clickhouseCredentials['username'] . '"';
+            $content[] = 'resources.db.clickhouse.params.password = "' . $this->clickhouseCredentials['password'] . '"';
+            $content[] = 'resources.db.clickhouse.params.dbname = "' . $this->clickhouseCredentials['dbname'] . '"';
+            $content[] = 'resources.db.clickhouse.params.port = "' . $this->clickhouseCredentials['port'] . '"';
+            $content[] = '';
+        }
         $content[] = '; secret for encryption of the user passwords';
         $content[] = '; WHEN YOU CHANGE THAT ALL PASSWORDS WILL BE INVALID!';
         $content[] = 'runtimeOptions.authentication.secret = ' . bin2hex(random_bytes(32));
@@ -928,6 +944,14 @@ class Models_Installer_Standalone
             $this->dbCredentials['password'] = $o['db::password'];
             $this->dbCredentials['dbname'] = $o['db::database'];
             $this->dbCredentials['port'] = $o['db::port'];
+        }
+
+        if (! empty($o['clickhouse::database'])) {
+            $this->clickhouseCredentials['host'] = $o['clickhouse::host'];
+            $this->clickhouseCredentials['username'] = $o['clickhouse::username'];
+            $this->clickhouseCredentials['password'] = $o['clickhouse::password'];
+            $this->clickhouseCredentials['dbname'] = $o['clickhouse::database'];
+            $this->clickhouseCredentials['port'] = $o['clickhouse::port'];
         }
 
         if (empty($o['timezone'])) {

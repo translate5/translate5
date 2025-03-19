@@ -159,7 +159,7 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         $toProcess = [];
         if (! empty($newFiles)) {
             $this->io->section('New files (can be imported automatically with "-i")');
-            $this->io->table(['orgin', 'file', 'hash'], array_map(function ($file) use (&$toProcess) {
+            $this->io->table(['origin', 'file', 'hash'], array_map(function ($file) use (&$toProcess) {
                 $toProcess[$file['entryHash']] = 1;
 
                 return [$file['origin'], $file['relativeToOrigin'], $file['entryHash']];
@@ -169,7 +169,7 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         $modified = $dbupdater->getModifiedFiles();
         if (! empty($modified)) {
             $this->io->section('Modified files (can NOT be imported automatically - "-i" marks them as imported!)');
-            $this->io->table(['orgin', 'file', 'hash'], array_map(function ($file) use (&$toProcess) {
+            $this->io->table(['origin', 'file', 'hash'], array_map(function ($file) use (&$toProcess) {
                 $toProcess[$file['entryHash']] = 1;
 
                 return [$file['origin'], $file['relativeToOrigin'], $file['entryHash']];

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd">
+<file original="simple-en-de.sdlxliff" source-language="de" target-language="en" xml:space="preserve" datatype="x-translate5">
+<body>
+    <trans-unit id="1" translate="yes">
+        <source>Hallo Welt</source>
+        <target>Hello world</target>
+    </trans-unit>
+    <trans-unit id="2" translate="yes">
+        <source>dies ist nur ein Test.</source>
+        <target>this is only a test.</target>
+    </trans-unit>
+    <trans-unit id="3" translate="yes">
+        <source>SBE</source>
+        <target>SBE</target>
+    </trans-unit>
+    <trans-unit id="4" translate="no">
+        <source>gesperrtes Segment.</source>
+        <target>locked segment.</target>
+    </trans-unit>
+    <trans-unit id="5" translate="yes">
+        <source>Segment 5</source>
+        <target>segment 5</target>
+    </trans-unit>
+    <trans-unit id="6" translate="yes">
+        <source>Segment 6</source>
+        <target>segment 6</target>
+    </trans-unit>
+    <trans-unit id="7" translate="yes">
+        <source>Segment 7</source>
+        <target>segment 7</target>
+    </trans-unit>
+</body>
+</file>
+</xliff>

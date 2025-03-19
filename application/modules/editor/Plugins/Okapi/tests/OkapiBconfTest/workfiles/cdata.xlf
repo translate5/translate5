@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"
+    xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its"
+    xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+    <file original="original-700.pim" source-language="en" target-language="is" datatype="xml">
+        <body>
+            <trans-unit id="2">
+                <source>First sentence.Second sentence.</source>
+                <seg-source>
+                    <mrk mtype="seg" mid="1"><![CDATA[First sentence.]]></mrk>
+                    <mrk mtype="seg" mid="2">Second sentence.</mrk>
+                </seg-source>
+                <target>
+                    <mrk mtype="seg" mid="1">1 translated.</mrk>
+                    <mrk mtype="seg" mid="2">2 translated.</mrk>
+                </target>
+                <alt-trans mid="1" match-quality="90%" match-type="mt">
+                    <source><![CDATA[First sentence.]]></source>
+                    <target>1 translated.</target>
+                </alt-trans>
+                <alt-trans mid="2" match-quality="75%" match-type="tm" match-source = "Samson Agro SASU">
+                    <source>Second sentence.</source>
+                    <target>2 translated.</target>
+                </alt-trans>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

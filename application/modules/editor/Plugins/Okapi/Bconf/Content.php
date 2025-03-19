@@ -161,6 +161,16 @@ final class Content extends ResourceFile
         }
     }
 
+    public function setXsltFile(string $file): void
+    {
+        $this->refs->xsltPath = $file;
+    }
+
+    public function getXsltFile(): string
+    {
+        return $this->refs->xsltPath ?? '';
+    }
+
     /**
      * Adds our steps and updates the content. Does not flush the related file !
      */

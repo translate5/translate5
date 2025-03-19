@@ -82,7 +82,7 @@ class editor_Plugins_MatchAnalysis_MatchrateAnalysis
     {
         $matchAnalysis = new editor_Plugins_MatchAnalysis_Models_MatchAnalysis();
 
-        $matchAnalysis->setSegmentId($segment->getId());
+        $matchAnalysis->setSegmentId((int) $segment->getId());
         $matchAnalysis->setSegmentNrInTask((int) $segment->getSegmentNrInTask());
         $matchAnalysis->setTaskGuid($taskGuid);
         $matchAnalysis->setAnalysisId($analysisId);
@@ -100,6 +100,6 @@ class editor_Plugins_MatchAnalysis_MatchrateAnalysis
     {
         $lrType = editor_Models_Segment_MatchRateType::getLangResourceType($matchRateType);
 
-        return null === $lrType ? editor_Models_Segment_MatchRateType::TYPE_TM : $lrType;
+        return '' === $lrType ? editor_Models_Segment_MatchRateType::TYPE_TM : $lrType;
     }
 }

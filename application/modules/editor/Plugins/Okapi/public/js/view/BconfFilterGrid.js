@@ -77,9 +77,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         editTexts: '#UT#Filternamen, zugehörige Dateierweiterungen, MIME-Typ und Beschreibung bearbeiten',
         editTextsRowTip: '#UT#Doppelklicken, um Filternamen, zugehörige Dateierweiterungen, MIME-Typ und Beschreibung zu bearbeiten',
         clone: '#UT#Filter klonen',
+        download: '#UT#Filter/FPRM als Datei herunterladen',
         refresh: '#UT#Aktualisieren',
         remove: '#UT#Löschen',
         emptySearch: '#UT#Filter suchen',
+        fileUploaded: '#UT#{0}-Datei erfolgreich hochgeladen.',
+        invalidMsg: '#UT#Die hochgeladene Datei ist keine gültige {0}-Datei.',
+        invalidTitle: '#UT#Ungültige {0}-Datei',
+        upload: '#UT#Filter/FPRM aus Datei hochladen',
         uniqueName: '#UT#Eindeutiger Name'
     },
     store: {
@@ -231,7 +236,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                 }, {
                     xtype: 'actioncolumn',
                     cellFocusable: false, // prevent actionItemCLick from entering RowEditMode
-                    width: 120,
+                    width: 180,
                     stateId: 'okapiGridActionColumn',
                     align: 'center',
                     text: me.text_cols.actions,
@@ -248,7 +253,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     }, {
                         tooltip: me.strings.editTexts,
                         isAllowedFor: 'bconfEdit',
-                        isDisabled: 'isEditDisabled',
+                        isDisabled: 'isWriteDisabled',
                         glyph: 'f303@FontAwesome5FreeSolid',
                         handler: 'editTexts'
                     }, {
@@ -258,13 +263,27 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         glyph: 'f24d@FontAwesome5FreeSolid',
                         handler: 'cloneFilter'
                     }, {
+                        tooltip: me.strings.upload,
+                        isAllowedFor: 'bconfEdit',
+                        glyph: 'f093@FontAwesome5FreeSolid',
+                        isDisabled: 'isWriteDisabled',
+                        handler: 'showFPRMChooser'
+                    },
+                    {
+                        tooltip: me.strings.download,
+                        isAllowedFor: 'bconfDelete',
+                        glyph: 'f019@FontAwesome5FreeSolid',
+                        isDisabled: 'isDeleteDisabled',
+                        handler: 'downloadFPRM'
+                    },
+                    {
                         tooltip: me.strings.remove,
                         isAllowedFor: 'bconfDelete',
                         isDisabled: 'isDeleteDisabled',
                         glyph: 'f2ed@FontAwesome5FreeSolid',
                         handler: 'deleteFilter'
                     }], itemFilter)
-                }],
+                }]
             };
         return me.callParent([Ext.apply(config, instanceConfig)]);
     },

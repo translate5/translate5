@@ -41,9 +41,10 @@ class OkapiException extends ZfExtended_ErrorCodeException
         'E1055' => 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
         'E1056' => 'Okapi Plug-In: tikal fallback can not be used, workfile does not contain the XLF suffix: {workfile}',
         'E1057' => 'Okapi Plug-In: Data dir not writeable: {okapiDataDir}',
-        'E1058' => 'Okapi Plug-In: Error in converting a file: "{message}" on converting file {file}',
+        'E1058' => 'Okapi Plug-In: Error in converting file "{file}" on import: {message}',
         'E1059' => 'Okapi Plug-In: Configuration error - no Okapi server URL is configured!',
-        'E1150' => 'Okapi Plug-In: The exported XLIFF {file} contains empty targets, the Okapi process will probably fail then.',
+        'E1150' => 'Okapi Plug-In: The exported XLIFF "{file}" contains empty targets, the Okapi process will probably fail then.',
+        'E1151' => 'Okapi Plug-In: Error in converting file "{file}" on export: {message}',
         'E1387' => 'Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated',
         'E1390' => 'Okapi Plug-In: The uploaded SRX file is not valid ({details})',
         'E1404' => 'Okapi Plug-In: The filter/fprm "{filter}" from the imported bconf "{bconf}" is not valid',
@@ -52,12 +53,14 @@ class OkapiException extends ZfExtended_ErrorCodeException
         'E1407' => 'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed',
         'E1408' => 'Okapi Plug-In: The bconf "{bconf}" to import is not valid ({details})',
         'E1409' => 'Okapi Plug-In: The edited filter file "{filterfile}" is not valid ({details})',
-        'E1414' => 'Okapi Plug-In: The fprm file "{file}" is not valid ({details})',
+        'E1414' => 'Okapi Plug-In: The fprm file "{file}" is not valid ({details})', // used nowhere ?
         'E1415' => 'Okapi Plug-In: Error unpacking the bconf {bconf} ({details})',
         'E1416' => 'Okapi Plug-In: Error packing the bconf {bconf} ({details})',
         'E1410' => 'Okapi Plug-In: No configuration found for okapi server(s)',
         'E1411' => 'Okapi Plug-In: No configuration found for okapi server used',
         'E1412' => 'Okapi Plug-In: The server used can not be found in all available configured servers',
         'E1474' => 'Okapi Plug-In: The Okapi plug-in is disabled so no export into the original import format can be done at the moment',
+        'E1686' => 'Okapi Plug-In: The uploaded filter/fprm file is not valid ({details})',
+        'E1687' => 'Okapi Plug-In: The uploaded pipeline file is not valid ({details})',
     ];
 }
