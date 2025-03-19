@@ -33,10 +33,12 @@ use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
+use MittagQI\Translate5\Repository\SegmentHistoryAggregationRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Statistics\Dto\AggregationFilter;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\JobAssignmentWasDeletedInTheMeantimeException;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserJobIsNotEditableException;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
@@ -64,6 +66,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Exception;
 class editor_TaskController extends ZfExtended_RestController
 {
     use TaskContextTrait;
+
+    private const EXTRA_FILTERS = ['matchRateMin', 'matchRateMax', 'langResource', 'langResourceType'];
 
     protected $entityClass = 'editor_Models_Task';
 
@@ -139,6 +143,11 @@ class editor_TaskController extends ZfExtended_RestController
     private TaskViewDataProvider $taskViewDataProvider;
 
     private TaskActionPermissionAssert $taskActionPermissionAssert;
+
+    /**
+     * @var AggregationFilter[]
+     */
+    private array $extraFilters = [];
 
     public function init(): void
     {
@@ -310,17 +319,17 @@ class editor_TaskController extends ZfExtended_RestController
     {
         //set default sort
         $this->addDefaultSort();
+        $this->removeExtraFiltersFromRequest();
         $rows = $this->taskViewDataProvider->getTaskList(
             $this->authenticatedUser,
-            $this->entity->getFilter(),
+            $this->adjustFilter($this->entity->getFilter()),
             (int) $this->getParam('start', 0),
             (int) $this->getParam('limit', 0),
         );
 
-        $kpi = ZfExtended_Factory::get('editor_Models_KPI');
-        /* @var $kpi editor_Models_KPI */
+        $kpi = new editor_Models_KPI(SegmentHistoryAggregationRepository::create());
         $kpi->setTasks($rows['rows']);
-        $kpiStatistics = $kpi->getStatistics();
+        $kpiStatistics = $kpi->getStatistics($this->getAggregationFilters());
 
         // For Front-End:
         $this->view->{$kpi::KPI_TRANSLATOR} = $kpiStatistics[$kpi::KPI_TRANSLATOR];
@@ -328,6 +337,9 @@ class editor_TaskController extends ZfExtended_RestController
         $this->view->{$kpi::KPI_TRANSLATOR_CHECK} = $kpiStatistics[$kpi::KPI_TRANSLATOR_CHECK];
 
         $this->view->excelExportUsage = $kpiStatistics['excelExportUsage'];
+        foreach (editor_Models_KPI::getAggregateMetrics() as $key) {
+            $this->view->{$key} = $kpiStatistics[$key];
+        }
 
         // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
@@ -350,6 +362,7 @@ class editor_TaskController extends ZfExtended_RestController
     {
         //set default sort
         $this->addDefaultSort();
+        $this->removeExtraFiltersFromRequest();
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
         $this->view->rows = $this->entity->loadUserList($this->authenticatedUser->getUserGuid());
@@ -420,9 +433,11 @@ class editor_TaskController extends ZfExtended_RestController
     {
         $limit = (int) $this->getParam('limit', 0);
 
+        $this->removeExtraFiltersFromRequest();
+
         $taskDataList = $this->taskViewDataProvider->getTaskList(
             $this->authenticatedUser,
-            $this->entity->getFilter(),
+            $this->adjustFilter($this->entity->getFilter()),
             (int) $this->getParam('start', 0),
             $limit,
         );
@@ -2462,5 +2477,78 @@ class editor_TaskController extends ZfExtended_RestController
     protected function shouldSkipAdditionalDataLoading(): bool
     {
         return $this->getParam('limit', 0) === 0 && ! $this->getParam('filter', false);
+    }
+
+    private function removeExtraFiltersFromRequest(): void
+    {
+        $f = $this->entity->getFilter();
+        $this->extraFilters = [];
+        foreach ($f->getFilters() as $filter) {
+            if (in_array($filter->field, self::EXTRA_FILTERS)) {
+                $this->extraFilters[] = new AggregationFilter($filter->field, $filter->value);
+                $f->deleteFilter($filter->field);
+            }
+        }
+    }
+
+    private function getAggregationFilters(): array
+    {
+        /**
+         * @var AggregationFilter[] $filters
+         */
+        $filters = $this->extraFilters;
+        $nativeFilters = $this->getParam('filter');
+        if (! empty($nativeFilters)) {
+            $nativeFilters = json_decode($nativeFilters);
+            if (is_array($nativeFilters)) {
+                foreach ($nativeFilters as $filter) {
+                    $filters[] = AggregationFilter::fromNativeFilter($filter);
+                }
+            }
+        }
+
+        return $filters;
+    }
+
+    private function adjustFilter(?ZfExtended_Models_Filter $filter): ?ZfExtended_Models_Filter
+    {
+        if (empty($this->extraFilters)) {
+            return $filter;
+        }
+
+        // get all matching tasks before filtering out non-relevant ones
+        $taskDataList = $this->taskViewDataProvider->getTaskList($this->authenticatedUser, $filter);
+
+        if (! empty($taskDataList['rows'])) { // tasks re-filtering may be needed
+            $taskGuids = array_column($taskDataList['rows'], 'taskGuid');
+            $aggregate = SegmentHistoryAggregationRepository::create();
+            $taskGuidsFiltered = $aggregate->getFilteredTaskIds($taskGuids, $this->extraFilters);
+            if ($filter === null) {
+                $filter = ZfExtended_Factory::get(ZfExtended_Models_Filter_ExtJs::class, [
+                    $this->entity,
+                ]);
+            }
+            if (empty($taskGuidsFiltered)) {
+                // make filter return nothing, maybe there is a better way ?
+                $filter->addFilter(
+                    (object) [
+                        'field' => 'id',
+                        'type' => 'list',
+                        'value' => [0],
+                    ]
+                );
+            } elseif (count($taskGuidsFiltered) != count($taskGuids)) {
+                // to re-filter tasks
+                $filter->addFilter(
+                    (object) [
+                        'field' => 'taskGuid',
+                        'type' => 'list',
+                        'value' => $taskGuidsFiltered,
+                    ]
+                );
+            }
+        }
+
+        return $filter;
     }
 }

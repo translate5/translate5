@@ -5150,6 +5150,38 @@ another user took responsibility for the task
                 <source>Ø Bearbeitungszeit zweiter Lektor</source>
                 <target>Ø Processing time Second Reviewer</target>
             </trans-unit>
+            <trans-unit id='w5ggTmFjaGJlYXJiZWl0dW5nc3plaXQgaW5uZXJoYWxiIGVpbmVzIFdvcmtmbG93c2Nocml0dHM='>
+                <source>Ø Nachbearbeitungszeit innerhalb eines Workflowschritts</source>
+                <target>Ø Post-editing time within 1 workflow step</target>
+            </trans-unit>
+            <trans-unit id='w5ggTGV2ZW5zaHRlaW4tQWJzdGFuZCBpbm5lcmhhbGIgZWluZXMgV29ya2Zsb3dzY2hyaXR0cw=='>
+                <source>Ø Levenshtein-Abstand innerhalb eines Workflowschritts</source>
+                <target>Ø Levensthein distance within 1 workflow step</target>
+            </trans-unit>
+            <trans-unit id='w5ggTmFjaGJlYXJiZWl0dW5nc3plaXQgYWIgQmVnaW5uIGRlcyBXb3JrZmxvd3M='>
+                <source>Ø Nachbearbeitungszeit ab Beginn des Workflows</source>
+                <target>Ø Post-editing time from the start of workflow</target>
+            </trans-unit>
+            <trans-unit id='w5ggTGV2ZW5zaHRlaW4tQWJzdGFuZCBhYiBCZWdpbm4gZGVzIFdvcmtmbG93cw=='>
+                <source>Ø Levenshtein-Abstand ab Beginn des Workflows</source>
+                <target>Ø Levensthein distance from the start of workflow</target>
+            </trans-unit>
+            <trans-unit id='w5ggTGV2ZW5zaHRlaW4tRGlzdGFueiB2b3IgQmVnaW5uIGRlcyBXb3JrZmxvd3M='>
+                <source>Ø Levenshtein-Distanz vor Beginn des Workflows</source>
+                <target>Ø Levenshtein distance before the start of workflow</target>
+            </trans-unit>
+            <trans-unit id='w5ggTGV2ZW5zaHRlaW4tRGlzdGFueiBuYWNoIEVuZGUgZGVzIFdvcmtmbG93cw=='>
+                <source>Ø Levenshtein-Distanz nach Ende des Workflows</source>
+                <target>Ø Levenshtein distance after the end of workflow</target>
+            </trans-unit>
+            <trans-unit id='w5ggTmFjaGJlYXJiZWl0dW5nc3plaXQgdm9yIEJlZ2lubiBkZXMgV29ya2Zsb3dz'>
+                <source>Ø Nachbearbeitungszeit vor Beginn des Workflows</source>
+                <target>Ø Post-editing time before the start of workflow</target>
+            </trans-unit>
+            <trans-unit id='w5ggTmFjaGJlYXJiZWl0dW5nc3plaXQgbmFjaCBFbmRlIGRlcyBXb3JrZmxvd3M='>
+                <source>Ø Nachbearbeitungszeit nach Ende des Workflows</source>
+                <target>Ø Post-editing time after the end of workflow</target>
+            </trans-unit>
             <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdGVuIGJlemllaGVuIHNpY2ggYXVmIGRpZSBaZWl0ZW4gaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcu'>
                 <source>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</source>
                 <target>Average times refer to all times in the current filter set.</target>
@@ -10505,6 +10537,119 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
             <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMudW5hc3NpZ25DdXN0b21lcldpbmRvdy5idXR0b25zLm5v'>
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
                 <target>Cancel</target>
+            </trans-unit>
+            <trans-unit id='U2VrdW5kZW4='>
+                <source>Sekunden</source>
+                <target>seconds</target>
+            </trans-unit>
+	    <trans-unit id='RGF0ZW4gbmljaHQgdmVyZsO8Z2Jhcg=='>
+                <source>Daten nicht verfügbar</source>
+                <target>Data unavailable</target>
+            </trans-unit>
+            <trans-unit id='w5xiZXJibGljaw=='>
+                <source>Überblick</source>
+                <target>Overview</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyLVNwZXppYWxpdMOkdGVu'>
+                <source>Filter-Spezialitäten</source>
+                <target>Workflow step and user filter specialties</target>
+            </trans-unit>
+            <trans-unit id='QmFzaXNlaW5oZWl0'>
+                <source>Basiseinheit</source>
+                <target>Base unit</target>
+            </trans-unit>
+            <trans-unit id='RHVyY2hzY2huaXR0'>
+                <source>Durchschnitt</source>
+                <target>Average</target>
+            </trans-unit>
+            <trans-unit id='TmljaHQgYmVhcmJlaXRldGUgU2VnbWVudGUgaW5uZXJoYWxiIGVpbmVzIEFyYmVpdHNhYmxhdWZzY2hyaXR0cw=='>
+                <source>Nicht bearbeitete Segmente innerhalb eines Arbeitsablaufschritts</source>
+                <target>Segments not edited within a workflow step</target>
+            </trans-unit>
+            <trans-unit id='RGllIE5hY2hiZWFyYmVpdHVuZ3N6ZWl0IGlubmVyaGFsYiBlaW5lcyBXb3JrZmxvd3NjaHJpdHRzIGlzdCBkaWUgWmVpdCwgZGllIEJlbnV0emVyIGJlbsO2dGlnZW4sIHVtIGVpbiBTZWdtZW50IGlubmVyaGFsYiBlaW5lcyBXb3JrZmxvdy1TY2hyaXR0ZXMgenUgYmVhcmJlaXRlbi4='>
+                <source>Die Nachbearbeitungszeit innerhalb eines Workflowschritts ist die Zeit, die Benutzer benötigen, um ein Segment innerhalb eines Workflow-Schrittes zu bearbeiten.</source>
+                <target>The post-editing time within 1 workflow step is the time it takes users to edit a segment within one workflow step.</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBpbiBkZXIgQXVmZ2FiZW7DvGJlcnNpY2h0IGtlaW4gQmVudXR6ZXJmaWx0ZXIgZ2VzZXR6dCBpc3QsIHdpcmQgZGllIE5hY2hiZWFyYmVpdHVuZ3N6ZWl0IGVpbmVzIFNlZ21lbnRzIGJlcmVjaG5ldCwgaW5kZW0gYWxsZSBCZWFyYmVpdHVuZ3N6ZWl0ZW4gYWxsZXIgQmVudXR6ZXIgaW5uZXJoYWxiIGRpZXNlcyBXb3JrZmxvdy1TY2hyaXR0cyBlaW5zY2hsaWXDn2xpY2ggZGVyIFBNLUJlYXJiZWl0dW5nZW4gYWRkaWVydCB3ZXJkZW4u'>
+                <source>Wenn in der Aufgabenübersicht kein Benutzerfilter gesetzt ist, wird die Nachbearbeitungszeit eines Segments berechnet, indem alle Bearbeitungszeiten aller Benutzer innerhalb dieses Workflow-Schritts einschließlich der PM-Bearbeitungen addiert werden.</source>
+                <target>If no user filter is set in the task overview, the post-editing time of a segment is calculated by adding all editing times of all users within that workflow step including PM edits.</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBlaW4gQmVudXR6ZXJmaWx0ZXIgZ2VzZXR6dCBpc3QsIHdlcmRlbiBudXIgZGllIEJlYXJiZWl0dW5nZW4gZGllc2VyIEJlbnV0emVyIGdlesOkaGx0Lg=='>
+                <source>Wenn ein Benutzerfilter gesetzt ist, werden nur die Bearbeitungen dieser Benutzer gezählt.</source>
+                <target>If a user filter is set, only the edits of those users are counted.</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBlaW5lciBvZGVyIG1laHJlcmUgZGVyIEZpbHRlciDigJ5UcmVmZmVycmF0ZeKAnCwg4oCeVHlwIGRlciBSZXNvdXJjZeKAnCBvZGVyIOKAnlNwcmFjaHJlc291cmNlbuKAnCB2ZXJ3ZW5kZXQgd2VyZGVuLCB3ZXJkZW4gbnVyIFNlZ21lbnRlIGJlcsO8Y2tzaWNodGlndCwgZGllIGdlbcOkw58gZGllc2VyIEZpbHRlcnVuZyBlbnRzcHJlY2hlbi4='>
+                <source>Wenn einer oder mehrere der Filter „Trefferrate“, „Typ der Resource“ oder „Sprachresourcen“ verwendet werden, werden nur Segmente berücksichtigt, die gemäß dieser Filterung entsprechen.</source>
+                <target>If one or more of the filters “Match rate”, “Resource type” or “Language resources” are used, only segments that match these filters are taken into account.</target>
+            </trans-unit>
+            <trans-unit id='RGFzIEVyZ2VibmlzIGRlcyBvYmVuIGJlc2NocmllYmVuZW4gaXN0IGRpZSBOYWNoYmVhcmJlaXR1bmdzemVpdCBmw7xyIGRhcyBTZWdtZW50IGlubmVyaGFsYiBlaW5lcyBXb3JrZmxvdy1TY2hyaXR0ZXMu'>
+                <source>Das Ergebnis des oben beschriebenen ist die Nachbearbeitungszeit für das Segment innerhalb eines Workflow-Schrittes.</source>
+                <target>The result of what is described above is the post-editing time for the segment within a workflow step.</target>
+            </trans-unit>
+            <trans-unit id='RXMgd2VyZGVuIG51ciBTZWdtZW50ZSBiZXLDvGNrc2ljaHRpZ3QsIGRpZSBha3R1ZWxsIGJlYXJiZWl0YmFyIHNpbmQuPGJyLz5EaWVzIGlzdCBkaWUgQmFzaXNlaW5oZWl0IGbDvHIgZGllIEJlcmVjaG51bmcu'>
+                <source>Es werden nur Segmente berücksichtigt, die aktuell bearbeitbar sind.<br/>Dies ist die Basiseinheit für die Berechnung.</source>
+                <target>Only segments which are currently editable are considered.<br/>This is the base unit for the calculation.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIER1cmNoc2Nobml0dCB3aXJkIGRhbm4gYWxzIER1cmNoc2Nobml0dCBhbGxlciBCYXNpc2VpbmhlaXRlbiBmw7xyIGRpZSBCZXJlY2hudW5nIGlubmVyaGFsYiBkZXIgYWt0dWVsbGVuIEF1ZmdhYmVuZmlsdGVydW5nIGJlcmVjaG5ldC4='>
+                <source>Der Durchschnitt wird dann als Durchschnitt aller Basiseinheiten für die Berechnung innerhalb der aktuellen Aufgabenfilterung berechnet.</source>
+                <target>The average is then calculated as the average of all calculation base units within the current scope of current task filtering.</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBTZWdtZW50ZSwgZGllIG5pY2h0IGlubmVyaGFsYiBlaW5lcyBXb3JrZmxvdy1TY2hyaXR0ZXMgYmVhcmJlaXRldCB3dXJkZW4sIHdpcmQgZGllIE5hY2hiZWFyYmVpdHVuZ3N6ZWl0IGbDvHIgZGllc2VuIFNjaHJpdHQgbmljaHQgYmVyw7xja3NpY2h0aWd0Lg=='>
+                <source>Für Segmente, die nicht innerhalb eines Workflow-Schrittes bearbeitet wurden, wird die Nachbearbeitungszeit für diesen Schritt nicht berücksichtigt.</source>
+                <target>For segments, that have not been edited within a workflow step the post-editing time for this step is not taken into account.</target>
+            </trans-unit>
+            <trans-unit id='RGllIE5hY2hiZWFyYmVpdHVuZ3N6ZWl0IGFiIGRlbSBTdGFydCBkZXMgV29ya2Zsb3dzIGlzdCBkaWUgWmVpdCwgZGllIGbDvHIgZGllIEJlYXJiZWl0dW5nIGVpbmVzIFNlZ21lbnRzIGbDvHIgYWxsZSBCZWFyYmVpdHVuZ2VuIGFiIGRlbSBTdGFydCBkZXMgV29ya2Zsb3dzIGJlbsO2dGlndCB3aXJkLg=='>
+                <source>Die Nachbearbeitungszeit ab dem Start des Workflows ist die Zeit, die für die Bearbeitung eines Segments für alle Bearbeitungen ab dem Start des Workflows benötigt wird.</source>
+                <target>The post-editing time from the start of the workflow is the time it takes to edit a segment for all edits from the start of the workflow.</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBpbiBkZXIgQXVmZ2FiZW7DvGJlcnNpY2h0IGtlaW4gQmVudXR6ZXJmaWx0ZXIgZ2VzZXR6dCBpc3QsIHdpcmQgZGllIE5hY2hiZWFyYmVpdHVuZ3N6ZWl0IGVpbmVzIFNlZ21lbnRzIGR1cmNoIGRpZSBBZGRpdGlvbiBhbGxlciBCZWFyYmVpdHVuZ3N6ZWl0ZW4gYWxsZXIgQmVudXR6ZXIgZWluc2NobGllw59saWNoIGRlciBQTS1CZWFyYmVpdHVuZ2VuIGJlcmVjaG5ldC4='>
+                <source>Wenn in der Aufgabenübersicht kein Benutzerfilter gesetzt ist, wird die Nachbearbeitungszeit eines Segments durch die Addition aller Bearbeitungszeiten aller Benutzer einschließlich der PM-Bearbeitungen berechnet.</source>
+                <target>If no user filter is set in the task overview, the post-editing time of a segment is calculated by adding all editing times of all users including PM edits. If a user filter is set, only the edits of those users are counted.</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBmw7xyIGRlbi9kaWUgV29ya2Zsb3ctU2Nocml0dChlKSBlaW5lIEZpbHRlcnVuZyBmZXN0Z2VsZWd0IHd1cmRlLCB3ZXJkZW4gbnVyIGRpZSBOYWNoYmVhcmJlaXR1bmdzemVpdGVuIGlubmVyaGFsYiBkZXMvZGVyIGdlZmlsdGVydGVuIFdvcmtmbG93LVNjaHJpdHQoZSkgYmVyw7xja3NpY2h0aWd0ICh3ZXJkZW4gYWJlciB0cm90emRlbSBmw7xyIGFsbGUgV29ya2Zsb3ctU2Nocml0dGUgYWRkaWVydCku'>
+                <source>Wenn für den/die Workflow-Schritt(e) eine Filterung festgelegt wurde, werden nur die Nachbearbeitungszeiten innerhalb des/der gefilterten Workflow-Schritt(e) berücksichtigt (werden aber trotzdem für alle Workflow-Schritte addiert).</source>
+                <target>If there is a filtering set on the workflow step(s), only the post-editing times within the filtered workflow step(s) are taken into account
+            (but still are added up for all filtered workflow steps).</target>
+            </trans-unit>
+            <trans-unit id='RGFzIEVyZ2VibmlzIGRlcyBvYmVuIGJlc2NocmllYmVuZW4gaXN0IGRpZSBOYWNoYmVhcmJlaXR1bmdzemVpdCBmw7xyIGRhcyBTZWdtZW50IGlubmVyaGFsYiBlaW5lcyBXb3JrZmxvdy1TY2hyaXR0ZXMu'>
+                <source>Das Ergebnis des oben beschriebenen ist die Nachbearbeitungszeit für das Segment innerhalb eines Workflow-Schrittes.</source>
+                <target>The result of what is described above is the post-editing time for the segment within the workflow.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIExldmVuc2h0ZWluLUFic3RhbmQgaW5uZXJoYWxiIGVpbmVzIFdvcmtmbG93LVNjaHJpdHRlcyBmw7xyIGVpbiBTZWdtZW50IHdpcmQgendpc2NoZW4gZGVyIFZlcnNpb24gZGVzIFNlZ21lbnRzIHZvciBkZXIgQmVhcmJlaXR1bmcgaW5uZXJoYWxiIGVpbmVzIFdvcmtmbG93LVNjaHJpdHRlcyB1bmQgZGVyIGxldHp0ZW4gQmVhcmJlaXR1bmcgaW5uZXJoYWxiIGRlcyBXb3JrZmxvdy1TY2hyaXR0ZXMgYmVyZWNobmV0Lg=='>
+                <source>Der Levenshtein-Abstand innerhalb eines Workflow-Schrittes für ein Segment wird zwischen der Version des Segments vor der Bearbeitung innerhalb eines Workflow-Schrittes und der letzten Bearbeitung innerhalb des Workflow-Schrittes berechnet.</source>
+                <target>The levenshtein distance within one workflow step for a segment is calculated between the version of the Segment before it was edited within a workflow step and its last edit within the workflow step.</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBkYXMgU2VnbWVudCB2b3LDvGJlcnNldHp0IHd1cmRlLCBnaWx0IGRpZSBWb3LDvGJlcnNldHp1bmcgYWxzIGVyc3RlIFZlcnNpb24gdW5kIGRlciDDnGJlcnNldHp1bmdzc2Nocml0dCB3aXJkIGJlaSBkZXIgQmVyZWNobnVuZyBiZXLDvGNrc2ljaHRpZ3QuPGJyLz5XZW5uIGRhcyBTZWdtZW50IHVyc3Byw7xuZ2xpY2ggbWFudWVsbCDDvGJlcnNldHp0IHd1cmRlIChrZWluZSBWb3LDvGJlcnNldHp1bmcpLCB3aXJkIGRlciBXb3JrZmxvdy1TY2hyaXR0IOKAnsOcYmVyc2V0enVuZ+KAnCBmw7xyIGRpZSBMZXZlbnNodGVpbi1CZXJlY2hudW5nIHZlcm5hY2hsw6Rzc2lndCB1bmQgZGllIG1hbnVlbGxlIMOcYmVyc2V0enVuZyB3aXJkIGFscyBlcnN0ZSBWZXJzaW9uIGJldHJhY2h0ZXQu'>
+                <source>Wenn das Segment vorübersetzt wurde, gilt die Vorübersetzung als erste Version und der Übersetzungsschritt wird bei der Berechnung berücksichtigt.<br/>Wenn das Segment ursprünglich manuell übersetzt wurde (keine Vorübersetzung), wird der Workflow-Schritt „Übersetzung“ für die Levenshtein-Berechnung vernachlässigt und die manuelle Übersetzung wird als erste Version betrachtet.</source>
+                <target>If the segment had been pre-translated, the pre-translation is seen as the first version and the translation step is taken into account for calculation.<br/>If the segment was initially manually translated (no pre-translation), the translation workflow step is neglected for levenshtein calculation and the manual translation is seen as first version.</target>
+            </trans-unit>
+            <trans-unit id='RGllIEJlcmVjaG51bmcgaXN0IHVuYWJow6RuZ2lnIGRhdm9uLCB3ZXIgZGFzIFNlZ21lbnQgaW5uZXJoYWxiIGRlcyBXb3JrZmxvdy1TY2hyaXR0ZXMgYmVhcmJlaXRldCBoYXQgdW5kIHdhbm4u'>
+                <source>Die Berechnung ist unabhängig davon, wer das Segment innerhalb des Workflow-Schrittes bearbeitet hat und wann.</source>
+                <target>This calculation is independent of who edited the segment within the workflow step and when.</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBlaW4gQmVudXR6ZXJmaWx0ZXIgZ2VzZXR6dCBpc3QsIHdlcmRlbiBudXIgZGllc2UgU2VnbWVudGUgdW5kIExldmVuc2h0ZWluLURpc3RhbnplbiBiZXLDvGNrc2ljaHRpZ3QsIGJlaSB3ZWxjaGVuIGRlci9kaWUgYmV0cmVmZmVuZGUobikgTnV0emVyL2luIGRpZSBsZXR6dGUgQmVhcmJlaXR1bmcgZWluZXMgU2VnbWVudHMgdm9yZ2Vub21tZW4gaGF0Lg=='>
+                <source>Wenn ein Benutzerfilter gesetzt ist, werden nur diese Segmente und Levenshtein-Distanzen berücksichtigt, bei welchen der/die betreffende(n) Nutzer/in die letzte Bearbeitung eines Segments vorgenommen hat.</source>
+                <target>If a user filter is set, only those segments and levenshtein distances are taken into account, where the user(s) in question made the last edit to a segment.</target>
+            </trans-unit>
+            <trans-unit id='RGFzIEVyZ2VibmlzIGRlcyBvYmVuIGJlc2NocmllYmVuZW4gaXN0IGRlciBMZXZlbnNodGVpbi1BYnN0YW5kIGbDvHIgZGFzIFNlZ21lbnQgaW5uZXJoYWxiIGVpbmVzIFdvcmtmbG93LVNjaHJpdHRlcy4='>
+                <source>Das Ergebnis des oben beschriebenen ist der Levenshtein-Abstand für das Segment innerhalb eines Workflow-Schrittes.</source>
+                <target>The result of what is described above is the levenshtein distance for the segment within a workflow step.</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBTZWdtZW50ZSwgZGllIG5pY2h0IGlubmVyaGFsYiBlaW5lcyBXb3JrZmxvdy1TY2hyaXR0ZXMgYmVhcmJlaXRldCB3dXJkZW4sIHdpcmQgZGVyIExldmVuc2h0ZWluLUFic3RhbmQgZsO8ciBkaWVzZW4gU2Nocml0dCBhbHMgMCBnZXNwZWljaGVydCwgc29iYWxkIGRlciBsZXR6dGUgQmVudXR6ZXIgZWluZXMgV29ya2Zsb3ctU2Nocml0dGVzIHNlaW5lIEFyYmVpdCBiZWVuZGV0IGhhdC4='>
+                <source>Für Segmente, die nicht innerhalb eines Workflow-Schrittes bearbeitet wurden, wird der Levenshtein-Abstand für diesen Schritt als 0 gespeichert, sobald der letzte Benutzer eines Workflow-Schrittes seine Arbeit beendet hat.</source>
+                <target>For segments, that have not been edited within a workflow step, the levenshtein distance is saved as 0 for this step, when the last user of a workflow step finishes his job.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIExldmVuc2h0ZWluLUFic3RhbmQgdm9tIEJlZ2lubiBkZXMgV29ya2Zsb3dzIGbDvHIgZWluIFNlZ21lbnQgd2lyZCB6d2lzY2hlbiBkZXIgVmVyc2lvbiBkZXMgU2VnbWVudHMgenUgQmVnaW5uIGRlcyBXb3JrZmxvd3MgdW5kIHNlaW5lciBsZXR6dGVuIHZvcmhhbmRlbmVuIEJlYXJiZWl0dW5nIGJlcmVjaG5ldC4='>
+                <source>Der Levenshtein-Abstand vom Beginn des Workflows für ein Segment wird zwischen der Version des Segments zu Beginn des Workflows und seiner letzten vorhandenen Bearbeitung berechnet.</source>
+                <target>The levenshtein distance from the start of the workflow for a segment is calculated between the version of the segment at the start of the workflow and its last existing edit.</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBkZXIgV29ya2Zsb3ctU2Nocml0dCBvZGVyIGRlciBCZW51dHplciBnZWZpbHRlcnQgd2lyZCwgaGF0IGRpZXMga2VpbmVuIEVpbmZsdXNzIGF1ZiBkaWUgQmVyZWNobnVuZy4='>
+                <source>Wenn der Workflow-Schritt oder der Benutzer gefiltert wird, hat dies keinen Einfluss auf die Berechnung.</source>
+                <target>If there is filtering on the workflow step or user, this has no effect on the calculation.</target>
+            </trans-unit>
+            <trans-unit id='RGFzIEVyZ2VibmlzIGRlcyBvYmVuIGJlc2NocmllYmVuZW4gaXN0IGRlciBMZXZlbnNodGVpbi1BYnN0YW5kIGbDvHIgZGFzIFNlZ21lbnQgdm9tIEJlZ2lubiBkZXMgV29ya2Zsb3dzLg=='>
+                <source>Das Ergebnis des oben beschriebenen ist der Levenshtein-Abstand für das Segment vom Beginn des Workflows.</source>
+                <target>The result of what is described above is the levenshtein distance for the segment from the start of the workflow.</target>
             </trans-unit>
             <trans-unit id='Qml0dGUgd8OkaGxlbg=='>
                 <source>Bitte wählen</source>

@@ -31,10 +31,13 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Acl\TaskCustomField;
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
+use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\CrossSynchronization\Events\EventListener as CrossSyncEventListener;
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
 use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Service\SystemCheck;
+use MittagQI\Translate5\Statistics\Helpers\SyncEditable;
+use MittagQI\Translate5\Statistics\Helpers\UnmodifiedSegmentsEventHandler;
 use MittagQI\Translate5\Task\Deadline\TaskDeadlineEventHandler;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
 use MittagQI\Translate5\Task\TaskEventTrigger;
@@ -83,6 +86,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager->attach(editor_SessionController::class, 'afterDeleteAction', $cleanUp);
         $eventManager->attach(ZfExtended_Session::class, 'afterSessionCleanForUser', $cleanUp);
         $eventManager->attach(ZfExtended_Debug::class, 'applicationState', [$this, 'handleApplicationState']);
+        $eventManager->attach(CronEventTrigger::class, CronEventTrigger::PERIODICAL, [SyncEditable::class, 'sync']);
 
         // Binding the quality Worker queuing to the "afterDirectoryParsing" event of the filetree worker.
         // some qualities have workers that depend on the imported files (e.g. TBX import).
@@ -141,6 +145,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 
         $taskDeadlineDateEventHandler = TaskDeadlineEventHandler::create();
         $taskDeadlineDateEventHandler->register();
+
+        $config = \Zend_Registry::get('config');
+        $statClassName = $config->resources->db->statistics?->engine;
+        if (empty($statClassName) || ! in_array($statClassName, ['SQLite', 'ClickHouseDB'])) {
+            $statClassName = 'MariaDB';
+        }
+        \Zend_Registry::set('statistics', call_user_func(['MittagQI\\Translate5\\Statistics\\' . $statClassName, 'create']));
+        // $db = \Zend_Registry::get('statistics'); // keep to find in IDE
+        /* @var $db MittagQI\Translate5\Statistics\AbstractStatisticsDB */
+
+        $unmodifiedSegmentsEventHandler = new UnmodifiedSegmentsEventHandler($eventManager);
+        $unmodifiedSegmentsEventHandler->register();
 
         \MittagQI\Translate5\LanguageResource\TaskTm\EventListener::create($eventManager)->atachAll();
     }

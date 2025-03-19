@@ -88,6 +88,15 @@ class editor_Models_Task_Export_Metadata
         $this->kpiTypeLocales[editor_Models_KPI::KPI_REVIEWER] = $this->translate->_('Ø Bearbeitungszeit Lektor');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR] = $this->translate->_('Ø Bearbeitungszeit Übersetzer');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR_CHECK] = $this->translate->_('Ø Bearbeitungszeit zweiter Lektor');
+
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_START] = $this->translate->_('Ø Levenshtein-Distanz vor Beginn des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_START] = $this->translate->_('Ø Nachbearbeitungszeit vor Beginn des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION] = $this->translate->_('Ø Nachbearbeitungszeit innerhalb eines Workflowschritts');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_PREVIOUS] = $this->translate->_('Ø Levenshtein-Abstand innerhalb eines Workflowschritts');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_TOTAL] = $this->translate->_('Ø Nachbearbeitungszeit ab Beginn des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_ORIGINAL] = $this->translate->_('Ø Levenshtein-Abstand ab Beginn des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_END] = $this->translate->_('Ø Levenshtein-Distanz nach Ende des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_END] = $this->translate->_('Ø Nachbearbeitungszeit nach Ende des Workflows');
     }
 
     /**
@@ -228,6 +237,10 @@ class editor_Models_Task_Export_Metadata
         $this->excelMetadata->addKPI($this->renderKpiData(editor_Models_KPI::KPI_REVIEWER));
         $this->excelMetadata->addKPI($this->renderKpiData(editor_Models_KPI::KPI_TRANSLATOR_CHECK));
         $this->excelMetadata->addKPI($this->renderKpiExcelExportUsage());
+
+        foreach (editor_Models_KPI::getAggregateMetrics() as $kpiMetrics) {
+            $this->excelMetadata->addKPI($this->renderKpiData($kpiMetrics));
+        }
 
         // add data: tasks
         foreach ($this->tasks as $task) {

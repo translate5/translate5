@@ -31,52 +31,137 @@ Ext.define('Editor.view.admin.task.KpiWindow', {
     alias: 'widget.adminTaskKpiWindow',
     itemId: 'kpiWindow',
     cls: 'kpiWindow',
-    minHeight : 200,
-    width : 450,
-    height:300,
+    minHeight:200,
+    width:510,
+    height: Editor.data.statistics.enabled ? 460 : 300,
     autoHeight: true,
     autoScroll: true,
     modal : true,
     bodyPadding:10,
     layout:'fit',
-    strings: {
-        closeBtn: '#UT#Fenster schließen',
-        averageProcessingTimeToolTip: '#UT#Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.',
-        excelExportUsageToolTip: '#UT#Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.',
-        filterInfoLabel:'#UT#Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.'
-    },
     
     initConfig: function(instanceConfig) {
         var me = this,
-            config;
+        l10n = Editor.data.l10n.taskKpiWindow,
         config = {
             items: [{
             	
                 xtype: 'panel',
                 dock: 'top',
+                margin: '0 0 0 5px',
                 border:false,
                 items: [{
                     xtype: 'displayfield',
-                    value:me.strings.filterInfoLabel
+                    value: l10n.filterInfoLabel
                 },{
                     xtype: 'displayfield',
                     itemId: 'kpi-average-processing-time-display',
-                    margin: 5,
                     cls:'displayFieldInfoIcon',
                     autoEl: {
                         tag: 'div',
-                        'data-qtip': me.strings.averageProcessingTimeToolTip
+                        'data-qtip': l10n.averageProcessingTimeToolTip
                     }
                 },{
                     xtype: 'displayfield',
                     itemId: 'kpi-excel-export-usage-display',
-                    margin: 5,
                     cls:'displayFieldInfoIcon',
                     autoEl: {
                         tag: 'div',
-                        'data-qtip': me.strings.excelExportUsageToolTip
+                        'data-qtip': l10n.excelExportUsageToolTip
                     }
-                }],
+                },{
+                    xtype: 'displayfield',
+                    itemId: 'kpi-levenshtein-distance-start-display',
+                    hidden: !Editor.data.statistics.enabled
+                },{
+                    xtype: 'displayfield',
+                    itemId: 'kpi-postediting-time-start-display',
+                    hidden: !Editor.data.statistics.enabled
+                },{
+                    xtype: 'container',
+                    hidden: !Editor.data.statistics.enabled,
+                    layout: {
+                        type: 'hbox'
+                    },
+                    items: [{
+                        xtype: 'displayfield',
+                        itemId: 'kpi-postediting-time-display'
+                    }, {
+                        xtype: 'displayfield',
+                        cls: 'displayFieldInfoIcon',
+                        margin: '0 0 -16px 0',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': l10n.processingTimeToolTip,
+                            'data-hide': false
+                        }
+                    }]
+                },{
+                    xtype: 'container',
+                    hidden: !Editor.data.statistics.enabled,
+                    layout: {
+                        type: 'hbox'
+                    },
+                    items: [{
+                        xtype: 'displayfield',
+                        itemId: 'kpi-levenshtein-distance-display'
+                    }, {
+                        xtype: 'displayfield',
+                        cls: 'displayFieldInfoIcon',
+                        margin: '0 0 -16px 0',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': l10n.levenshteinDistanceToolTip,
+                            'data-hide': false
+                        }
+                    }]
+                },{
+                    xtype: 'container',
+                    hidden: !Editor.data.statistics.enabled,
+                    layout: {
+                        type: 'hbox'
+                    },
+                    items: [{
+                        xtype: 'displayfield',
+                        itemId: 'kpi-postediting-time-total-display'
+                    }, {
+                        xtype: 'displayfield',
+                        cls: 'displayFieldInfoIcon',
+                        margin: '0 0 -16px 0',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': l10n.processingTimeTotalToolTip,
+                            'data-hide': false
+                        }
+                    }]
+                },{
+                    xtype: 'container',
+                    hidden: !Editor.data.statistics.enabled,
+                    layout: {
+                        type: 'hbox'
+                    },
+                    items: [{
+                        xtype: 'displayfield',
+                        itemId: 'kpi-levenshtein-distance-original-display'
+                    }, {
+                        xtype: 'displayfield',
+                        cls: 'displayFieldInfoIcon',
+                        margin: '0 0 -16px 0',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': l10n.levenshteinDistanceOriginalToolTip,
+                            'data-hide': false
+                        }
+                    }]
+                },{
+                    xtype: 'displayfield',
+                    itemId: 'kpi-levenshtein-distance-end-display',
+                    hidden: !Editor.data.statistics.enabled
+                },{
+                    xtype: 'displayfield',
+                    itemId: 'kpi-postediting-time-end-display',
+                    hidden: !Editor.data.statistics.enabled
+                }]
               }],
               dockedItems: [{
                   xtype: 'toolbar',
@@ -87,7 +172,7 @@ Ext.define('Editor.view.admin.task.KpiWindow', {
                   },{
                       xtype: 'button',
                       glyph: 'f00d@FontAwesome5FreeSolid',
-                      text: me.strings.closeBtn,
+                      text: l10n.closeBtn,
                       listeners:{
                           click:function(){
                              this.up('window').close();

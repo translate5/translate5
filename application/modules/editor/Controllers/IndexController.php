@@ -337,8 +337,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $manualStates = $rop->segments->stateFlags->toArray();
         $manualStates[0] = $this->translate->_('Nicht gesetzt');
         $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
-        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        /* @var $states editor_Models_Segment_AutoStates */
+        $states = new editor_Models_Segment_AutoStates();
+
         $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
         $this->view->Php2JsVars()->set('segments.autoStates', $states->getStateMap());
         $this->view->Php2JsVars()->set('segments.roleAutoStateMap', $states->getRoleToStateMap());
@@ -481,6 +481,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'editor.task.reimport.supportedExtensions',
             FileparserRegistry::getInstance()->getSupportedFileTypes()
         );
+
+        $this->view->Php2JsVars()->set('statistics.enabled', (bool) $this->config->resources->db->statistics?->enabled);
+
         $this->setupAllowedCustomFields();
 
         $this->setJsAppData();

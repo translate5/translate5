@@ -183,12 +183,10 @@ class editor_Models_Export_TaskHistoryExcel
 
     protected function getTargetsByStep(editor_Models_Segment $segment): array
     {
-        $history = ZfExtended_Factory::get('editor_Models_SegmentHistory');
-        /* @var $history editor_Models_SegmentHistory */
-        $historyEntries = array_reverse($history->loadBySegmentId($segment->getId()));
-        $historyData = ZfExtended_Factory::get('editor_Models_SegmentHistoryData');
-        /* @var $historyData editor_Models_SegmentHistoryData */
-        $historyDataEntries = $historyData->loadBySegmentId($segment->getId(), editor_Models_SegmentField::TYPE_TARGET);
+        $history = new MittagQI\Translate5\Repository\SegmentHistoryRepository();
+        $historyEntries = array_reverse($history->loadBySegmentId((int) $segment->getId()));
+        $historyData = new MittagQI\Translate5\Repository\SegmentHistoryDataRepository();
+        $historyDataEntries = $historyData->loadBySegmentId((int) $segment->getId(), editor_Models_SegmentField::TYPE_TARGET);
 
         $ids = array_column($historyDataEntries, 'segmentHistoryId');
         $historyDataEntries = array_combine($ids, $historyDataEntries);

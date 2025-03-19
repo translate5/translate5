@@ -33,8 +33,7 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{
-    AuthTokenCommand,
+use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     AuthTokenDeleteCommand,
     AuthTokenListCommand,
     CachePurgeCommand,
@@ -94,6 +93,8 @@ use Translate5\MaintenanceCli\Command\{
     ServicePingCommand,
     SessionImpersonateCommand,
     SessionSupportCommand,
+    StatisticsAggregateCommand,
+    StatisticsLevenshteinCommand,
     StatusCommand,
     SystemCheckCommand,
     SystemMailtestCommand,
@@ -139,8 +140,7 @@ use Translate5\MaintenanceCli\Command\{
     WorkerRunCommand,
     WorkflowCloneCommand,
     WorkflowListCommand,
-    WorkflowStepCommand
-};
+    WorkflowStepCommand};
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
@@ -193,6 +193,8 @@ $commands = [
     new ServicePingCommand(),
     new SessionImpersonateCommand(),
     new SessionSupportCommand(),
+    new StatisticsAggregateCommand(),
+    new StatisticsLevenshteinCommand(),
     new StatusCommand(),
     new SystemCheckCommand(),
     new SystemMailtestCommand(),

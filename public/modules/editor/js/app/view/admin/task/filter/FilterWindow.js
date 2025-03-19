@@ -8,15 +8,15 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -55,16 +55,21 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
         translatorStep: '#UT#Übersetzung',
         reviewerStep: '#UT#Lektorat',
         translatorCheckStep: '#UT#Finales Lektorat',
-        visitorStep: '#UT#Nur lesen'
+        visitorStep: '#UT#Nur lesen',
+        min:'#UT#min',
+        max:'#UT#max',
+        matchRate:'#UT#Matchrate',
+        resourceType:'#UT#Typ der Ressource',
+        langResources:'#UT#Sprachressourcen'
     },
-    listeners: {
-        render: 'onFilterWindowRender'
+    listeners:{
+        render:'onFilterWindowRender'
     },
     bodyPadding: 20,
     layout: 'hbox',
-    border: false,
-    width: 800,
-    height: 500,
+    border:false,
+    width:800,
+    height: Editor.data.statistics.enabled ? 600 : 500,
     bodyStyle: {
         borderWidth: 0
     },
@@ -82,7 +87,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                 },
                 items: [{
                     items: [{
-                        xtype: 'Editor.tagfield',
+                        xtype: 'tagfield',
                         name: 'userName',
                         itemId: 'userName',
                         typeAhead: true,
@@ -123,6 +128,46 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                         filterProperty: 'assignmentDate',
                         itemId: 'assignmentDate',
                         title: me.strings.assignmentDateText
+                    }, {
+                        xtype: 'fieldcontainer',
+                        fieldLabel: me.strings.matchRate,
+                        labelAlign: 'top',
+                        labelWidth:'100%',
+                        layout: 'vbox',
+                        combineErrors: true,
+                        hidden: !Editor.data.statistics.enabled,
+                        defaults: {
+                            hideLabel: true,
+                            xtype: 'numberfield',
+                            flex: 1,
+                            minValue: 0,
+                            allowBlank: true
+                        },
+                        items: [
+                            {
+                                name: 'matchRateMin',
+                                itemId:'matchRateMin',
+                                fieldLabel: me.strings.min,
+                                margin: '0 5 0 0',
+                                emptyText: me.strings.min,
+                                filter:{
+                                    operator: 'gteq',
+                                    property: 'matchRateMin',
+                                    type: 'number'
+                                }
+                            },
+                            {
+                                name: 'matchRateMax',
+                                itemId:'matchRateMax',
+                                fieldLabel: me.strings.max,
+                                emptyText: me.strings.max,
+                                filter:{
+                                    operator: 'lteq',
+                                    property: 'matchRateMax',
+                                    type: 'number'
+                                }
+                            }
+                        ]
                     }]
                 }, {
                     items: [{
@@ -172,6 +217,32 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                         filterProperty: 'finishedDate',
                         itemId: 'finishedDate',
                         title: me.strings.finishedDateText
+                    }, {
+                        xtype: 'tagfield',
+                        name:'langResourceType',
+                        itemId:'langResourceType',
+                        typeAhead: true,
+                        queryMode: 'local',
+                        displayField: 'id',
+                        valueField: 'id',
+                        fieldLabel: me.strings.resourceType,
+                        labelAlign:'top',
+                        labelWidth:'100%',
+                        hidden: !Editor.data.statistics.enabled,
+                        listeners: {
+                            beforerender: function (cmp) {
+                                const resTypes = [], store = new Ext.data.Store();
+                                ['MT', 'TM', 'TermCollection'].forEach((key) => resTypes.push({id: key}));
+                                store.loadData(resTypes, false);
+                                me.down('#langResourceType').setStore(store);
+                            }
+                        },
+                        filter:{
+                            operator: 'in',
+                            property: 'langResourceType',
+                            type:'list',
+                            textLabel:me.strings.resourceType
+                        }
                     }]
                 }, {
                     items: [{
@@ -214,6 +285,25 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                         itemId: 'deadlineDate',
                         title: me.strings.deadlineDateText,
                         style: 'margin-top:80px'
+                    }, {
+                        xtype: 'tagfield',
+                        name:'langResource',
+                        itemId:'langResource',
+                        typeAhead: true,
+                        queryMode: 'local',
+                        displayField: 'name',
+                        valueField: 'id',
+                        fieldLabel: me.strings.langResources,
+                        labelAlign:'top',
+                        labelWidth:'100%',
+                        store:'languageResourceStore',
+                        hidden: !Editor.data.statistics.enabled,
+                        filter:{
+                            operator: 'in',
+                            property: 'langResource',
+                            type:'list',
+                            textLabel:me.strings.langResources,
+                        }
                     }]
                 }],
                 dockedItems: [{

@@ -70,6 +70,30 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         ref: 'averageProcessingTimeDisplay',
         selector: '#kpiWindow #kpi-average-processing-time-display'
     }, {
+        ref: 'posteditingTimeDisplay',
+        selector: '#kpiWindow #kpi-postediting-time-display'
+    }, {
+        ref: 'posteditingTimeTotalDisplay',
+        selector: '#kpiWindow #kpi-postediting-time-total-display'
+    }, {
+        ref: 'posteditingTimeStartDisplay',
+        selector: '#kpiWindow #kpi-postediting-time-start-display'
+    }, {
+        ref: 'posteditingTimeEndDisplay',
+        selector: '#kpiWindow #kpi-postediting-time-end-display'
+    }, {
+        ref: 'levenshteinDistanceDisplay',
+        selector: '#kpiWindow #kpi-levenshtein-distance-display'
+    }, {
+        ref: 'levenshteinDistanceOriginalDisplay',
+        selector: '#kpiWindow #kpi-levenshtein-distance-original-display'
+    }, {
+        ref: 'levenshteinDistanceStartDisplay',
+        selector: '#kpiWindow #kpi-levenshtein-distance-start-display'
+    }, {
+        ref: 'levenshteinDistanceEndDisplay',
+        selector: '#kpiWindow #kpi-levenshtein-distance-end-display'
+    }, {
         ref: 'excelExportUsageDisplay',
         selector: '#kpiWindow #kpi-excel-export-usage-display'
     }, {
@@ -179,8 +203,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         taskDeleteButtonText: '#UT#Aufgabe löschen',
         averageProcessingTimeLabel: '#UT#Ø Bearbeitungszeit Lektor',
         excelExportUsageLabel: '#UT#Excel-Export Nutzung',
+        sekunden: '#UT#Sekunden',
         averageProcessingTimeTranslatorLabel: '#UT#Ø Bearbeitungszeit Übersetzer',
-        averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit zweiter Lektor'
+        averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit zweiter Lektor',
+        posteditingTimeLabel: '#UT#Ø Nachbearbeitungszeit innerhalb eines Workflowschritts',
+        posteditingTimeTotalLabel: '#UT#Ø Nachbearbeitungszeit ab Beginn des Workflows',
+        posteditingTimeStartLabel: '#UT#Ø Nachbearbeitungszeit vor Beginn des Workflows',
+        posteditingTimeEndLabel: '#UT#Ø Nachbearbeitungszeit nach Ende des Workflows',
+        levenshteinDistanceLabel: '#UT#Ø Levenshtein-Abstand innerhalb eines Workflowschritts',
+        levenshteinDistanceStartLabel: '#UT#Ø Levenshtein-Distanz vor Beginn des Workflows',
+        levenshteinDistanceEndLabel: '#UT#Ø Levenshtein-Distanz nach Ende des Workflows',
+        levenshteinDistanceOriginalLabel: '#UT#Ø Levenshtein-Abstand ab Beginn des Workflows'
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
@@ -600,19 +633,36 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             params: params,
             success: function (response) {
                 var resp = Ext.util.JSON.decode(response.responseText),
-                    averageProcessingTimeMessage = [],
-                    excelExportUsageMessage;
+                    averageProcessingTimeMessage = [];
 
                 // KPI: averageProcessingTime
                 averageProcessingTimeMessage.push(me.strings.averageProcessingTimeTranslatorLabel + ': ' + resp.averageProcessingTimeTranslator);
                 averageProcessingTimeMessage.push(me.strings.averageProcessingTimeLabel + ': ' + resp.averageProcessingTimeReviewer);
-                averageProcessingTimeMessage.push(me.strings.averageProcessingTimeSecondTranslatorLabel + ': ' + resp.averageProcessingTimeSecondTranslator)
+                averageProcessingTimeMessage.push(me.strings.averageProcessingTimeSecondTranslatorLabel + ': ' + resp.averageProcessingTimeSecondTranslator);
 
-                // KPI: excelExportUsage
-                excelExportUsageMessage = resp.excelExportUsage + ' ' + me.strings.excelExportUsageLabel;
+                // format decimals
+                ['posteditingTime','posteditingTimeTotal','posteditingTimeStart','posteditingTimeEnd'].forEach(function (key) {
+                    if(resp[key] !== '-'){
+                        resp[key] = Ext.util.Format.number(resp[key], '0.00')+' '+me.strings.sekunden;
+                    }
+                });
+                ['levenshteinPrevious','levenshteinOriginal','levenshteinStart','levenshteinEnd'].forEach(function (key) {
+                    if(resp[key] !== '-'){
+                        resp[key] = Ext.util.Format.number(resp[key], '0.00000');
+                    }
+                });
+
                 // update fields and stop loading-icon
                 me.getAverageProcessingTimeDisplay().update(averageProcessingTimeMessage.join('</br>'));
-                me.getExcelExportUsageDisplay().update(excelExportUsageMessage);
+                me.getPosteditingTimeDisplay().update(me.strings.posteditingTimeLabel + ': ' + resp.posteditingTime);
+                me.getPosteditingTimeTotalDisplay().update(me.strings.posteditingTimeTotalLabel + ': ' + resp.posteditingTimeTotal);
+                me.getPosteditingTimeStartDisplay().update(me.strings.posteditingTimeStartLabel + ': ' + resp.posteditingTimeStart);
+                me.getPosteditingTimeEndDisplay().update(me.strings.posteditingTimeEndLabel + ': ' + resp.posteditingTimeEnd);
+                me.getLevenshteinDistanceDisplay().update(me.strings.levenshteinDistanceLabel + ': ' + resp.levenshteinPrevious);
+                me.getLevenshteinDistanceOriginalDisplay().update(me.strings.levenshteinDistanceOriginalLabel + ': ' + resp.levenshteinOriginal);
+                me.getLevenshteinDistanceStartDisplay().update(me.strings.levenshteinDistanceStartLabel + ': ' + resp.levenshteinStart);
+                me.getLevenshteinDistanceEndDisplay().update(me.strings.levenshteinDistanceEndLabel + ': ' + resp.levenshteinEnd);
+                me.getExcelExportUsageDisplay().update(resp.excelExportUsage + ' ' + me.strings.excelExportUsageLabel);
                 win.setLoading(false);
             },
             failure: function () {

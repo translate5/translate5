@@ -32,7 +32,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 /**
  * Segment Entity Object
  *
- * @method int getId()
+ * @method string getId()
  * @method void setId(int $id)
  * @method string getSegmentNrInTask()
  * @method void setSegmentNrInTask(int $nr)
@@ -61,7 +61,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method string getMatchRateType()
  * @method string|null getStateId()
  * @method void setStateId(int|null $id)
- * @method string getAutoStateId()
+ * @method int getAutoStateId()
  * @method void setAutoStateId(int $id)
  * @method string getFileOrder()
  * @method void setFileOrder(int $order)
@@ -71,6 +71,12 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method void setWorkflowStepNr(int $stepNr)
  * @method string getWorkflowStep()
  * @method void setWorkflowStep(string $name)
+ * @method string getLevenshteinOriginal()
+ * @method void setLevenshteinOriginal(int $distance)
+ * @method string getLevenshteinPrevious()
+ * @method void setLevenshteinPrevious(int $distance)
+ * @method string getEditedInStep()
+ * @method void setEditedInStep(string $name)
  *
  * this are just some helper for the always existing segment fields, similar named methods exists for all segment
  *     fields:
@@ -83,6 +89,8 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method void setTarget(string $content)
  * @method string getTargetEdit()
  * @method void setTargetEdit(string $content)
+ * @method string getTargetToSort()
+ * @method string getTargetEditToSort()
  * @method void setTargetMd5(string $md5hash)
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
@@ -832,6 +840,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         //TRANSLATE-885
         $fields[] = 'targetMd5';
         $fields[] = 'target';
+        //TRANSLATE-3535
+        $fields[] = 'levenshteinOriginal';
+        $fields[] = 'levenshteinPrevious';
+        $fields[] = 'editedInStep';
         $fields = array_merge($fields, $this->segmentFieldManager->getEditableDataIndexList());
 
         foreach ($fields as $field) {
@@ -1091,6 +1103,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
 
         return $this->segmentdata[$field]->edited;
+    }
+
+    public function getDuration($field): int
+    {
+        if (empty($this->segmentdata[$field])) {
+            return 0;
+        }
+
+        return $this->segmentdata[$field]->duration;
     }
 
     /**

@@ -215,6 +215,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
             );
 
             if ($currentState === $stateToWaitFor) {
+                // @phpstan-ignore-next-line
                 if (isset($this->task) && is_object($this->task) && (int) $this->task->id === $taskId) {
                     $this->task = $taskResult;
                 }
@@ -407,6 +408,26 @@ final class Helper extends ZfExtended_Test_ApiHelper
     }
 
     /**
+     * Sets the passed or current task to end
+     * @param int $taskId : if given, this task is taken, otherwise the current task
+     * @return array|stdClass
+     */
+    public function endTask(int $taskId = -1)
+    {
+        if ($taskId < 1 && $this->task) {
+            $taskId = $this->task->id;
+        }
+        if ($taskId > 0) {
+            return $this->putJson('editor/task/' . $taskId, [
+                'state' => 'end',
+                'id' => $taskId,
+            ]);
+        }
+
+        return $this->createResponseResult(null, 'No Task to set state for');
+    }
+
+    /**
      * @param int $taskId : if given, this task is taken, otherwise the current task
      * @return array|stdClass
      */
@@ -475,6 +496,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
         string $loginNameToOpen = null,
         bool $isProjectTask = false,
     ) {
+        // @phpstan-ignore-next-line
         if ($taskId < 1 && $this->task) {
             $taskId = $this->task->id;
             $isProjectTask = ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT);
@@ -564,7 +586,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
     /******************************************************* CUSTOMER API *******************************************************/
 
     /**
-     * Retrieves a ustomer by it's number
+     * Retrieves a customer by its number
      */
     public function getCustomerByNumber(string $customerNumber): ?stdClass
     {

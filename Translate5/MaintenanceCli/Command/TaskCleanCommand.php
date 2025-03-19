@@ -28,6 +28,8 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\Translate5\Repository\SegmentHistoryAggregationRepository;
+use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -80,6 +82,12 @@ class TaskCleanCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'deletes all orphaned data folders'
         );
+        $this->addOption(
+            'delete-agg-data',
+            'a',
+            InputOption::VALUE_NONE,
+            'deletes all orphaned aggregated data records'
+        );
     }
 
     /**
@@ -113,6 +121,7 @@ class TaskCleanCommand extends Translate5AbstractCommand
         $this->handleErrorTasks($stateError);
         $this->handleImportTasks($stateImport);
         $this->handleOrphanedTaskData($availableDataDirs);
+        $this->handleOrphanedAggregations($allTasks);
         $this->handleSetToError();
         $this->io->section('Use the following option parameters to delete the listed tasks:');
         $this->io->text([
@@ -120,6 +129,7 @@ class TaskCleanCommand extends Translate5AbstractCommand
             '--delete-import ID   - deletes one task in state import',
             '--set-to-error ID    - sets a task to status error (for example to gain access to clone/delete/download of a hanging import task)',
             '--delete-data        - deletes all orphaned data folders',
+            '--delete-statistics-data  - deletes all orphaned aggregated task history data records',
         ]);
 
         return 0;
@@ -208,6 +218,42 @@ class TaskCleanCommand extends Translate5AbstractCommand
         $this->output->writeln(['', '']);
 
         $this->io->success($msg);
+    }
+
+    protected function handleOrphanedAggregations(array $allTasks): void
+    {
+        if (empty($allTasks)) {
+            return;
+        }
+
+        $aggregate = SegmentHistoryAggregation::create();
+        $aggregateRepository = SegmentHistoryAggregationRepository::create();
+
+        $orphanedTaskIds = $aggregateRepository->getOrphanedTaskIds(array_column($allTasks, 'taskGuid'));
+
+        $delete = $this->input->getOption('delete-agg-data');
+
+        $table = new Table($this->output);
+        $table->setHeaders(['taskGuid']);
+        $hasAtLeastOneOrphaned = false;
+
+        foreach ($orphanedTaskIds as $taskId) {
+            $hasAtLeastOneOrphaned = true;
+            $table->addRow([$taskId]);
+            if ($delete) {
+                $aggregate->removeTaskData($taskId);
+            }
+        }
+        $this->io->section('Aggregated task history data records without a task:');
+        if ($hasAtLeastOneOrphaned) {
+            $table->render();
+            $this->output->writeln(['']);
+            if ($delete) {
+                $this->io->success('The above listed aggregated task history data records were successfully deleted !');
+            }
+        } else {
+            $this->io->text('<info>No orphaned aggregated task history data records found!</>');
+        }
     }
 
     /**
