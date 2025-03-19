@@ -35,36 +35,44 @@ use MittagQI\Translate5\Test\ImportTestAbstract;
  */
 class TaskFilterTest extends ImportTestAbstract
 {
+    const DATE = "Y-m-d 00:00:00";
     protected static bool $termtaggerRequired = true;
 
+    /**
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
     protected static function setupImport(Config $config): void
     {
         $config
             ->addTask('en', 'de', -1, 'simple-en-de.zip')
             ->setUsageMode('simultaneous')
             ->addUser(TestUser::TestLector->value, 'open', 'reviewing', [
-                'deadlineDate' => date("Y-m-d 00:00:00", strtotime("+1 day")),
+                'deadlineDate' => date("" . self::DATE . "", strtotime("now")),
             ])
             ->addUser(TestUser::TestTranslator->value, 'waiting', 'translation', [
-                'deadlineDate' => date("Y-m-d 00:00:00", strtotime("+2 day")),
+                'deadlineDate' => date(self::DATE, strtotime("+1 day")),
             ])
-            ->setProperty('taskName', static::NAME_PREFIX . 'TaskFilterTest'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->setProperty('taskName', static::NAME_PREFIX . 'TaskFilterTest');
     }
 
     /**
      * Test if the task user assoc filters are working
+     * @throws Zend_Http_Client_Exception
      */
     public function testTaskUserAssocFilters()
     {
         //test the assigment date of the task
         $return = static::api()->getJson('editor/task', [
-            'filter' => '[{"operator":"eq","value":"' . date("Y-m-d 00:00:00", strtotime("now")) . '","property":"assignmentDate"},{"operator":"eq","value":' . static::api()->getTask()->id . ',"property":"id"}]',
+            'filter' => '[{"operator":"eq","value":"' . date(self::DATE, strtotime("now"))
+                . '","property":"deadlineDate"},{"operator":"eq","value":'
+                . static::api()->getTask()->id . ',"property":"id"}]',
         ]);
-        $this->assertCount(2, $return);
+        $this->assertCount(1, $return);
 
         //test the finish count filter
         $return = static::api()->getJson('editor/task', [
-            'filter' => '[{"operator":"eq","value":0,"property":"segmentFinishCount"},{"operator":"eq","value":' . static::api()->getTask()->id . ',"property":"id"}]',
+            'filter' => '[{"operator":"eq","value":0,"property":"segmentFinishCount"},{"operator":"eq","value":'
+                . static::api()->getTask()->id . ',"property":"id"}]',
         ]);
         $this->assertCount(1, $return);
         $this->assertEquals(0, $return[0]->segmentFinishCount);
