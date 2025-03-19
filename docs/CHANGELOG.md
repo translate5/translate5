@@ -9,10 +9,36 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+## [7.20.8] - 2025-03-19
+
+### Important Notes:
 
 
+### Changed
+**[TRANSLATE-4536](https://jira.translate5.net/browse/TRANSLATE-4536): Import/Export - Plugin PlunetConnector JS Injection after Update to Plunet 10** <br>
+TRANSLATE-4536: Plugin PlunetConnector JS Injection after Update to Plunet 10
+- added header "Cross-Origin-Resource-Policy" and "Referrer-Policy" for JS injection;
+- new JS selector for T5-icon clone-original;
+- improved logging;
+- update T5 import-worker trigger;
+
+**[TRANSLATE-4093](https://jira.translate5.net/browse/TRANSLATE-4093): file format settings - OKAPI integration: Compatibility with 1.47, clean up Pipelines** <br>
+7.20.8: Fix loosing of Json codefinder rules on Fprm upgrade
+7.19.0: File Format Settings: General compatibility with Okapi 1.47, improved Pipeline handling
 
 
+### Bugfixes
+**[TRANSLATE-4555](https://jira.translate5.net/browse/TRANSLATE-4555): MatchAnalysis & Pretranslation - Segment can not be saved due TM usage log errors** <br>
+The usage of TMs with penalties led to non savable segments in some circumstances.
+
+**[TRANSLATE-4551](https://jira.translate5.net/browse/TRANSLATE-4551): t5memory - Segments are saved to not writable task tms** <br>
+Now segments are saved only to task TMs associated to a task with writable checkbox enabled
+
+**[TRANSLATE-4546](https://jira.translate5.net/browse/TRANSLATE-4546): GroupShare integration - GroupShare TMs can not by synchronized** <br>
+GroupShare synchronisation was not working any more if some TMs have to be deleted.
+
+**[TRANSLATE-4537](https://jira.translate5.net/browse/TRANSLATE-4537): InstantTranslate - Misleading error message when opening file translation** <br>
+Choosing detect language in InstantTranslate text translation tab, then changing to file translation shows an unnecessary and misleading error message.
 
 
 ## [7.20.7] - 2025-03-13
