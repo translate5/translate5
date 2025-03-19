@@ -51,6 +51,12 @@ class OkapiPurgeCommand extends Translate5AbstractCommand
             'The server name to be kept also if unused - if given the last one might be removed if unused'
         );
 
+        $this->addArgument(
+            'server-name',
+            InputArgument::OPTIONAL,
+            'The server name to be deleted (if unused)'
+        );
+
         $this->addOption(
             name: 'no-keep',
             mode: InputOption::VALUE_NONE,
@@ -84,6 +90,7 @@ class OkapiPurgeCommand extends Translate5AbstractCommand
         $this->writeTitle('Purge Okapi servers');
 
         $keep = $this->input->getArgument('keep');
+        $serverToDelete = $this->input->getArgument('server-name');
         $keepLast = ! $this->input->getOption('no-keep');
         $sort = $this->input->getOption('sort');
         $onlyOffline = $this->input->getOption('only-offline');
@@ -92,7 +99,7 @@ class OkapiPurgeCommand extends Translate5AbstractCommand
         $summary = $config->getSummary();
         $serverList = $onlyOffline ?
             $config->purgeOffline($sort) :
-            $config->purge($summary, $keep, $sort, $keepLast);
+            $config->purge($summary, $keep, $sort, $keepLast, $serverToDelete);
 
         foreach ($summary as $name => $data) {
             if (empty($serverList[$name])) {
