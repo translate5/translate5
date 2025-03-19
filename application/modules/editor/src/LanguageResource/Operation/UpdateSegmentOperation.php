@@ -111,7 +111,8 @@ class UpdateSegmentOperation
 
         $taskTmLanguageResources = $this->taskTmRepository->getOfTypeAssociatedToTask(
             $segment->getTaskGuid(),
-            $serviceType
+            $serviceType,
+            true,
         );
 
         $atLeastOneUpdated = false;
@@ -130,7 +131,7 @@ class UpdateSegmentOperation
         }
 
         if (! $atLeastOneUpdated) {
-            $this->logger->error('E1629', 'Task doesn\'t have assigned task TM', [
+            $this->logger->error('E1629', 'Task doesn\'t have assigned writable task TM', [
                 'segment' => $segment,
                 'serviceType' => $serviceType,
             ]);
