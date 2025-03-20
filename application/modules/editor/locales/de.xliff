@@ -444,7 +444,7 @@
             </trans-unit>
             <trans-unit id='TWF0Y2hyYXRl'>
                 <source>Matchrate</source>
-                <target>Trefferrate</target>
+                <target>Matchrate</target>
             </trans-unit>
             <trans-unit id='WmllbHRleHQgw7xiZXJhcmJlaXRldA=='>
                 <source>Zieltext überarbeitet</source>
@@ -6669,9 +6669,9 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
                 <source>Key Performance Indicators</source>
                 <target>Key Performance Indicators</target>
             </trans-unit>
-            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='>
-                <source>Ø Bearbeitungszeit Lektor</source>
-                <target>Ø Bearbeitungszeit Lektor</target>
+            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdA=='>
+                <source>Ø Bearbeitungszeit</source>
+                <target>Ø Bearbeitungszeit</target>
             </trans-unit>
             <trans-unit id='VGFnZQ=='>
                 <source>Tage</source>
@@ -6951,14 +6951,6 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
             <trans-unit id='QmVudXR6ZXItRGVhZGxpbmUvcw=='>
                 <source>Benutzer-Deadline/s</source>
                 <target>Benutzer-Deadline/s</target>
-            </trans-unit>
-            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnNldHplcg=='>
-                <source>Ø Bearbeitungszeit Übersetzer</source>
-                <target>Ø Bearbeitungszeit Übersetzer</target>
-            </trans-unit>
-            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCB6d2VpdGVyIExla3Rvcg=='>
-                <source>Ø Bearbeitungszeit zweiter Lektor</source>
-                <target>Ø Bearbeitungszeit zweiter Lektor</target>
             </trans-unit>
             <trans-unit id='w5ggTmFjaGJlYXJiZWl0dW5nc3plaXQgaW5uZXJoYWxiIGVpbmVzIFdvcmtmbG93c2Nocml0dHM='>
                 <source>Ø Nachbearbeitungszeit innerhalb eines Workflowschritts</source>

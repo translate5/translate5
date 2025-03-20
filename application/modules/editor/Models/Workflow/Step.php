@@ -72,4 +72,16 @@ class editor_Models_Workflow_Step extends ZfExtended_Models_Entity_Abstract
 
         return $v[0] ?? [];
     }
+
+    public function getAllLabels(): array
+    {
+        $s = $this->db->select()->from($this->db, ['name', 'label']);
+        $res = [];
+        $rows = $this->db->fetchAll($s)->toArray();
+        foreach ($rows as $row) {
+            $res[$row['name']] = $row['label'];
+        }
+
+        return $res;
+    }
 }

@@ -201,9 +201,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
 
             return $this->db->fetchAll($s)->toArray();
         } catch (Exception $e) {
-            // @phpstan-ignore-next-line
             $this->notFound('NotFound after other Error', $e);
         }
+
+        return [];
     }
 
     /**
@@ -521,25 +522,32 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
     }
 
     /***
-     * Load the Key Point Indicators data for the given taskGuids and states
-     * @param array $taskGuids
-     * @param array $states
-     * @return array
+     * Load the Key Point Indicators data for the given taskGuids and roles/steps
+     * If 'workflowSteps' filter is specified, it has priority over 'roles'
      */
-    public function loadKpiData(array $taskGuids, array $states = [])
+    public function loadKpiData(array $taskGuids, array $roles = [], array $workflowSteps = []): array
     {
         if (empty($taskGuids)) {
             return [];
         }
-        //if the states are not set uset the default states for kpi
-        if (empty($states)) {
-            $states = [Workflow::ROLE_REVIEWER, Workflow::ROLE_TRANSLATOR, Workflow::ROLE_TRANSLATORCHECK];
-        }
+
+        $col = ! empty($workflowSteps) ? 'workflowStepName' : 'role';
         $s = $this->db->select()
+            ->from($this->db, [$col . ' AS timeBy', new Zend_Db_Expr('SUM(DATEDIFF(finishedDate, assignmentDate))/COUNT(*) AS time')])
             ->where('taskGuid IN(?)', $taskGuids)
-            ->where('role IN (?)', $states)
             ->where('assignmentDate IS NOT NULL')
             ->where('finishedDate IS NOT NULL');
+
+        if ($col === 'workflowStepName') {
+            $s = $s->where('workflowStepName IN (?)', $workflowSteps);
+        } else {
+            //if the roles are not set, use the default roles for kpi
+            if (empty($roles)) {
+                $roles = [Workflow::ROLE_REVIEWER, Workflow::ROLE_TRANSLATOR, Workflow::ROLE_TRANSLATORCHECK];
+            }
+            $s = $s->where('role IN (?)', $roles);
+        }
+        $s = $s->group($col);
 
         return $this->db->fetchAll($s)->toArray();
     }

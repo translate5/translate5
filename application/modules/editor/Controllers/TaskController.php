@@ -292,14 +292,13 @@ class editor_TaskController extends ZfExtended_RestController
 
         $kpi = new editor_Models_KPI(SegmentHistoryAggregationRepository::create());
         $kpi->setTasks($rows['rows']);
-        $kpiStatistics = $kpi->getStatistics($this->getAggregationFilters());
+        $kpiStatistics = $kpi->getStatistics(json_decode($this->getParam('filter')), $this->getAggregationFilters());
 
         // For Front-End:
-        $this->view->{$kpi::KPI_TRANSLATOR} = $kpiStatistics[$kpi::KPI_TRANSLATOR];
-        $this->view->{$kpi::KPI_REVIEWER} = $kpiStatistics[$kpi::KPI_REVIEWER];
-        $this->view->{$kpi::KPI_TRANSLATOR_CHECK} = $kpiStatistics[$kpi::KPI_TRANSLATOR_CHECK];
+        foreach (array_keys($kpiStatistics) as $key) {
+            $this->view->{$key} = $kpiStatistics[$key];
+        }
 
-        $this->view->excelExportUsage = $kpiStatistics['excelExportUsage'];
         foreach (editor_Models_KPI::getAggregateMetrics() as $key) {
             $this->view->{$key} = $kpiStatistics[$key];
         }
