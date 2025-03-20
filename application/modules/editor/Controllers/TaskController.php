@@ -47,6 +47,7 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\DataProvider\TaskViewDataProvider;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
+use MittagQI\Translate5\Task\Filtering\TaskQueryFilterAndSort;
 use MittagQI\Translate5\Task\Import\ImportService;
 use MittagQI\Translate5\Task\Import\ProjectWorkersService;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
@@ -151,49 +152,11 @@ class editor_TaskController extends ZfExtended_RestController
 
     public function init(): void
     {
-        $this->_filterTypeMap = [
-            'customerId' => [
-                'string' => new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId'),
-            ],
-            'workflowState' => [
-                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid'),
-            ],
-            'workflowStep' => [
-                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'workflowStepName', 'taskGuid', 'taskGuid'),
-            ],
-            'workflowUserRole' => [
-                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'role', 'taskGuid', 'taskGuid'),
-            ],
-            'userName' => [
-                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'userGuid', 'taskGuid', 'taskGuid'),
-            ],
-            'userAssocDeadline' => [
-                'date' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid', 'date'),
-            ],
-            'segmentFinishCount' => [
-                'numeric' => 'percent',
-                'totalField' => 'segmentEditableCount',
-            ],
-            'userState' => [
-                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid'),
-            ],
-            'orderdate' => [
-                'numeric' => 'date',
-            ],
-            'assignmentDate' => [
-                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'assignmentDate', 'taskGuid', 'taskGuid', 'date'),
-            ],
-            'finishedDate' => [
-                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'finishedDate', 'taskGuid', 'taskGuid', 'date'),
-            ],
-            'deadlineDate' => [
-                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid', 'date'),
-            ],
-        ];
+        $taskQueryFilterAndSort = new TaskQueryFilterAndSort();
+        $this->_filterTypeMap = $taskQueryFilterAndSort->getFilterTypeMap();
 
         //set same join for sorting!
-        $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
-        $this->_sortColMap['userAssocDeadline'] = $this->_filterTypeMap['userAssocDeadline']['date'];
+        $this->_sortColMap = $taskQueryFilterAndSort->getSortColMap();
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E1064' => 'The referenced customer does not exist (anymore).',

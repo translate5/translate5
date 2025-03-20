@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\BatchSet\BatchSetTaskGuidsProvider;
 use MittagQI\Translate5\Task\BatchSet\DTO\TaskGuidsQueryDto;
 use MittagQI\Translate5\Task\BatchSet\Exception\InvalidDeadlineDateStringProvidedException;
@@ -68,10 +69,29 @@ class Editor_BatchsetController extends ZfExtended_RestController
         $invalidValueProvidedMessage = 'Ungültiger Wert bereitgestellt';
 
         if ($this->getParam('countTasks')) {
+            $request = $this->getRequest();
+
+            foreach (['batchWorkflow', 'batchWorkflowStep'] as $param) {
+                if ($this->getParam($param) === null) {
+                    throw ZfExtended_UnprocessableEntity::createResponse(
+                        'E1678',
+                        [
+                            $param => [
+                                $invalidValueProvidedMessage,
+                            ],
+                        ],
+                    );
+                }
+            }
+
             $taskGuids = BatchSetTaskGuidsProvider::create()->getAllowedTaskGuids(
-                TaskGuidsQueryDto::fromRequest($this->getRequest())
+                TaskGuidsQueryDto::fromRequest($request)
             );
-            $this->view->total = count($taskGuids);
+            $this->view->total = ! empty($taskGuids) ? UserJobRepository::create()->getJobsCountWithinWorkflowStep(
+                $taskGuids,
+                $request->getParam('batchWorkflow'),
+                $request->getParam('batchWorkflowStep')
+            ) : 0;
 
             return;
         }

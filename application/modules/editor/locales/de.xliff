@@ -10455,6 +10455,10 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>Das Ergebnis des oben beschriebenen ist der Levenshtein-Abstand für das Segment vom Beginn des Workflows.</source>
                 <target>Das Ergebnis des oben beschriebenen ist der Levenshtein-Distanz für das Segment vom Beginn des Workflows.</target>
             </trans-unit>
+            <trans-unit id="Sm9icw==">
+                <source>Jobs</source>
+                <target>Jobs</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

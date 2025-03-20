@@ -10655,6 +10655,10 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Bitte wählen</source>
                 <target>Please select</target>
             </trans-unit>
+            <trans-unit id="Sm9icw==">
+                <source>Jobs</source>
+                <target>jobs</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
