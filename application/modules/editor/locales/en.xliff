@@ -10538,6 +10538,14 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
                 <target>Cancel</target>
             </trans-unit>
+            <trans-unit id="TnVyIFNlZ21lbnRlIG1pdCBLb21tZW50YXIgYW56ZWlnZW4=">
+              <source>Nur Segmente mit Kommentar anzeigen</source>
+              <target>Show only commented segments</target>
+            </trans-unit>
+            <trans-unit id="U2VnbWVudCBQcm96ZXNzc3RhdHVz">
+              <source>Segment Prozessstatus</source>
+              <target>Segment Processing Status</target>
+            </trans-unit>
             <trans-unit id='U2VrdW5kZW4='>
                 <source>Sekunden</source>
                 <target>seconds</target>
