@@ -13,3 +13,5 @@ parameters:
 		- application
 		- library
 		- Translate5
+        excludePaths:
+                - application/modules/editor/Plugins/TMMaintenance/public/resources/ext
