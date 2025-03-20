@@ -39,6 +39,7 @@ use Zend_Exception;
 use Zend_Registry;
 use Zend_View;
 use Zend_View_Exception;
+use ZfExtended_Zendoverwrites_Translate;
 
 class ExportService
 {
@@ -55,6 +56,7 @@ class ExportService
         private readonly MqmTagFormatter $mqmTagFormatter,
         private readonly TrackChangesTagFormatter $trackChangesTagFormatter,
         private readonly Zend_View $view,
+        private readonly ZfExtended_Zendoverwrites_Translate $translate,
     ) {
         $this->assetsDirectory = APPLICATION_ROOT . '/public/modules/editor';
         $this->viewsDirectory = APPLICATION_PATH . '/modules/' . Zend_Registry::get('module') . '/views';
@@ -62,11 +64,16 @@ class ExportService
 
     /**
      * @codeCoverageIgnore
+     * @throws Zend_Exception
+     * @throws \Zend_Log_Exception
+     * @throws \Zend_Translate_Exception
      */
-    public static function create(): self
+    public static function create(string $locale): self
     {
+        $translate = new ZfExtended_Zendoverwrites_Translate($locale);
+
         return new self(
-            SegmentDataProviderFactory::create(),
+            SegmentDataProviderFactory::create($translate),
             TaskRepository::create(),
             Zend_Registry::get('config'),
             new ReplaceInternalTagWithSpanFormatter(),
@@ -74,6 +81,7 @@ class ExportService
             MqmTagFormatter::create(),
             TrackChangesTagFormatter::create(),
             new Zend_View(),
+            $translate,
         );
     }
 
@@ -131,6 +139,8 @@ class ExportService
      */
     private function viewConfigure(editor_Models_Task $task, SegmentDataTable $segmentDataTable): void
     {
+        $this->view->getHelper('translate')->setTranslator($this->translate);
+
         $this->view->addScriptPath($this->viewsDirectory . '/scripts/task/');
 
         $protocol = $this->config->runtimeOptions->server->protocol;

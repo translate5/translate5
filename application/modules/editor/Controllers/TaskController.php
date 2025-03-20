@@ -1875,7 +1875,8 @@ class editor_TaskController extends ZfExtended_RestController
                 $token = ZfExtended_Utils::uuid();
                 $workerId = HtmlWorker::queueExportWorker(
                     $this->entity,
-                    $exportService->composeExportDir($token)
+                    $exportService->composeExportDir($token),
+                    ZfExtended_Authentication::getInstance()->getUser()->getLocale(),
                 );
 
                 $exportService->makeQueueRecord($token, $workerId, "{$this->entity->getTaskName()}.html");

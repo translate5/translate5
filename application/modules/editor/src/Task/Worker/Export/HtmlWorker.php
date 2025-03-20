@@ -43,13 +43,14 @@ use ZfExtended_Worker_Abstract;
  */
 class HtmlWorker extends ZfExtended_Worker_Abstract
 {
-    public static function queueExportWorker(Task $task, string $exportFolder): int
+    public static function queueExportWorker(Task $task, string $exportFolder, string $locale): int
     {
         $worker = ZfExtended_Factory::get(self::class);
 
         if ($worker->init(parameters: [
             'taskId' => $task->getId(),
             'exportFolder' => $exportFolder,
+            'locale' => $locale,
         ])) {
             return $worker->queue();
         }
@@ -60,6 +61,8 @@ class HtmlWorker extends ZfExtended_Worker_Abstract
     private int $taskId;
 
     private string $exportFolder;
+
+    private string $locale;
 
     public function __construct()
     {
@@ -80,6 +83,12 @@ class HtmlWorker extends ZfExtended_Worker_Abstract
         }
 
         $this->taskId = (int) $parameters['taskId'];
+
+        if (! array_key_exists('locale', $parameters)) {
+            return false;
+        }
+
+        $this->locale = (string) $parameters['locale'];
 
         return true;
     }
@@ -104,7 +113,7 @@ class HtmlWorker extends ZfExtended_Worker_Abstract
             throw new Exception('Export failed: No queue model found');
         }
 
-        $exportService = ExportService::create();
+        $exportService = ExportService::create($this->locale);
 
         mkdir($this->exportFolder, 0777, true);
 

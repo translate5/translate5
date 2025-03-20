@@ -59,37 +59,26 @@ use MittagQI\Translate5\Task\Overview\SegmentDataHeader;
             </tr>
             </thead>
             <tbody>
-            <?php
-            foreach ($this->segmentDataTable->getRows() as $row): ?>
-                <tr>
-                    <?php
-                    foreach ($this->segmentDataTable->header->getFields() as $field): ?>
-                        <?php
-                        if (in_array($field->id, [SegmentDataHeader::FIELD_MANUAL_QS, SegmentDataHeader::FIELD_STATUS]
-                        )) {
-                            continue;
-                        }
-                        ?>
-                        <?php
-                        if ($field->id === SegmentDataHeader::FIELD_MANUAL_QS): ?>
-                            <td><?= implode('<br />', $row[$field]) ?></td>
-                            <?php
-                            continue;
-                        endif;
-                        ?>
-                        <?php
-                        if ($field->id === SegmentDataHeader::FIELD_COMMENTS): ?>
-                            <td><?= $this->taskCommentsEscape($row[$field]) ?></td>
-                            <?php
-                            continue;
-                        endif;
-                        ?>
-                        <td><?= $row[$field] ?></td>
-                    <?php
-                    endforeach; ?>
-                </tr>
-            <?php
-            endforeach; ?>
+<?php
+            foreach ($this->segmentDataTable->getRows() as $row) {
+                echo '<tr>';
+                foreach ($this->segmentDataTable->header->getFields() as $field) {
+                    if (in_array($field->id, [SegmentDataHeader::FIELD_MANUAL_QS, SegmentDataHeader::FIELD_STATUS])) {
+                        continue;
+                    }
+                    if ($field->id === SegmentDataHeader::FIELD_MANUAL_QS) {
+                        echo '<td>' . implode('<br />', $row[$field]) . '</td>';
+                        continue;
+                    }
+                    if ($field->id === SegmentDataHeader::FIELD_COMMENTS) {
+                        echo '<td>' . $this->taskCommentsEscape($row[$field]) . '</td>';
+                        continue;
+                    }
+                    echo '<td>' . $row[$field] . '</td>';
+                }
+                echo '</tr>'."\n";
+            }
+?>
             </tbody>
         </table>
     </div>
