@@ -9,6 +9,71 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+
+## [7.21.0] - 2025-03-20
+
+### Important Notes:
+#### [TRANSLATE-3535](https://jira.translate5.net/browse/TRANSLATE-3535)
+This feature is deactivated by default until we have experiences in production with some selected clients. Please contact us in case you would like to do this together with us.
+In our hosting we will enable it successive the next days / one - two weeks.
+
+If postediting time and levenshtein distance KPIs are needed for legacy data then the following commands should be triggered:
+t5 statistics:levenshtein (to calculate missing levenshtein values in segments history)
+t5 statistics:aggregate (to aggregate segments history data into statistics DB)
+ 
+
+
+### Added
+**[TRANSLATE-4369](https://jira.translate5.net/browse/TRANSLATE-4369): openai - OpenAI GPT Training Improvements** <br>
+OpenAI Plugin: Improve the UI & introduce prompt management
+
+**[TRANSLATE-4361](https://jira.translate5.net/browse/TRANSLATE-4361): Import/Export - Add filters to html-report** <br>
+Task HTML Export: JS UI filters implemented
+
+**[TRANSLATE-3647](https://jira.translate5.net/browse/TRANSLATE-3647): Okapi integration - Okapi integration: Enable down- and upload of fprm and pln files and pre-parsing of xliff by Okapi** <br>
+Added down- and upload of any FPRM and Pipeline files. Added optional pre-parsing of xliff with OKAPI. The pre-parsing will be only possible with file-format-settings created from the date of the release on. With this release, the translate5-default settings do not have XLIFF-extensions mapped anymore and if such extension-mapping is added to a file-format, the pre-parsing of XLIFF will be active.
+
+**[TRANSLATE-3535](https://jira.translate5.net/browse/TRANSLATE-3535): Task Management - Evaluate postediting time and levenshtein distance** <br>
+Added segments editing history data aggregation to calculate and display KPIs related to levenshtein distances and post-editing time
+
+**[TRANSLATE-2971](https://jira.translate5.net/browse/TRANSLATE-2971): Task Management, Workflows - Set job deadlines for multiple projects or tasks at the same time** <br>
+7.21.0: Fix: no task selected alert if tasks are selected
+7.15.0: Added ability to set job deadlines for multiple projects or tasks at the same time
+
+
+### Changed
+**[TRANSLATE-4492](https://jira.translate5.net/browse/TRANSLATE-4492): InstantTranslate - Speed test for synchronous file translation end-point** <br>
+Optimized synchronous file translation end-point response time and added speed test for it
+
+**[TRANSLATE-4459](https://jira.translate5.net/browse/TRANSLATE-4459): Client management - Improve okapi commands (and others) for single instances and for the cloud** <br>
+7.21.0: CLI t5 okapi:purge command got option --server-name
+Improve Client management Commands for Okapi and cloud instances
+
+**[TRANSLATE-4010](https://jira.translate5.net/browse/TRANSLATE-4010): Okapi integration - BCONF: Add XSLT step to pipeline** <br>
+Make Okapi integration more resilient regarding the usage of not supported features in the bconf
+
+
+### Bugfixes
+**[TRANSLATE-4545](https://jira.translate5.net/browse/TRANSLATE-4545): TM Maintenance - Scrolling problem** <br>
+FIXED: new segments weren't shown into grid despite loaded
+
+**[TRANSLATE-4544](https://jira.translate5.net/browse/TRANSLATE-4544): InstantTranslate - Tooltip over source and target language remains hanging after language change** <br>
+When changing the source or target language the tooltip did remain over the select and the textfields below till the user clicks somewhere else.
+
+**[TRANSLATE-4516](https://jira.translate5.net/browse/TRANSLATE-4516): Import/Export - Okapi CLI repair tool** <br>
+Added "t5 patch:okapi146whitespace" CLI command to detect and add back missing whitespace characters caused by Okapi 1.46 segmenting issue
+
+**[TRANSLATE-4488](https://jira.translate5.net/browse/TRANSLATE-4488): Workflows - Batch set properties - date is applied also to unselected workflow steps** <br>
+Batch set properties - fix incorrect behavior when filtering by customer is applied
+
+**[TRANSLATE-4286](https://jira.translate5.net/browse/TRANSLATE-4286): Task Management - Average processing time KPIs - add calculation for workflow steps** <br>
+Average processing time KPIs: corrected UI texts and added calculation for workflow steps taking into account filters selected
+
+**[TRANSLATE-4230](https://jira.translate5.net/browse/TRANSLATE-4230): Export - tag-check broken for excel re-import** <br>
+Excel Re-Import:
+- escaping fixed for unwanted < and > brackets
+
+
 ## [7.20.8] - 2025-03-19
 
 ### Important Notes:
