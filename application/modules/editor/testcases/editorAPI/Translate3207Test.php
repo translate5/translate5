@@ -93,6 +93,7 @@ class Translate3207Test extends JsonTestAbstract
 
     private function sanitizeContent(string $tbx): string
     {
+        $tbx = preg_replace('/(<item type="email">)(.*?)(<\/item>)/', '$1noreply@translate5.net$3', $tbx);
         $tbx = preg_replace('/(<item type="role">)(.*?)(<\/item>)/', '$1ROLES NOT TESTABLE$3', $tbx);
         return preg_replace('#(<p>[^<]+ at) http[^>]+ (by [^<]+</p>)#', '$1 HTTP_URL $2', $tbx) ?? '';
     }
