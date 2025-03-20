@@ -234,7 +234,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             store = view.getStore(),
             values = Ext.ComponentQuery.query('searchform').pop().getValues(),
             offset = me.getViewModel().get('lastOffset'),
-            loadingId = 'TM-offset-' + offset;
+            loadingId = 'TM-offset-' + offset,
+            scrollable = view.getScrollable();
 
         if (abortPrev || !append) {
             vm.set('loadedQty', 0);
@@ -264,11 +265,9 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         //
         vm.set('loadingRecordNumber', store.getCount());
 
-        if (vm.get('loadedQty') === 0) {
-            view.getScrollable().suspendEvent('scrollend');
-            view.ensureVisible(store.last());
-            setTimeout(() => view.getScrollable().resumeEvent('scrollend'), 100);
-        }
+        scrollable.suspendEvent('scrollend');
+        view.ensureVisible(store.last());
+        setTimeout(() => scrollable.resumeEvent('scrollend'), 100);
 
         store.load({
             params: {data: JSON.stringify({...values, offset: offset})},
@@ -318,6 +317,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                     me.loadPageByChunks(pageSize, 1,true);
                 } else {
                     vm.set('loadingRecordNumber', false);
+                    scrollable.scrollBy(0, -10);
                 }
             },
         });

@@ -18,7 +18,7 @@ Ext.define('TMMaintenance.view.main.List', {
     store: {
         type: 'segment',
     },
-
+    //infinite: false,
     plugins: {
         cellediting: {
             triggerEvent: 'tap'
@@ -263,13 +263,15 @@ Ext.define('TMMaintenance.view.main.List', {
     scrollable: {
         y: true,
         listeners: {
+            scrollstart: function() {
+                this.wasY = this.getPosition().y;
+            },
             scrollend: function () {
                 let maxPosition = this.getMaxPosition().y;
-                let threshold = Math.ceil(maxPosition * 0.1);
-
-                if (this.getPosition().y + threshold >= maxPosition) {
-                    const controller = Ext.ComponentQuery.query('searchform')[0].getController();
-                    controller.onContainerScrollEnd(arguments);
+                let threshold = Math.ceil(this.getClientSize().y * 0.1);
+                let nowY = this.getPosition().y;
+                if (nowY > this.wasY && nowY + threshold >= maxPosition) {
+                    Ext.ComponentQuery.query('searchform')[0].getController().onContainerScrollEnd(arguments);
                 }
             },
         },
