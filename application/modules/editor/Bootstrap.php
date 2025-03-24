@@ -59,6 +59,9 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 {
     protected $front;
 
+    /**
+     * @throws Zend_Exception
+     */
     public function __construct($application)
     {
         parent::__construct($application);
@@ -146,14 +149,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $taskDeadlineDateEventHandler = TaskDeadlineEventHandler::create();
         $taskDeadlineDateEventHandler->register();
 
-        $config = \Zend_Registry::get('config');
-        $statClassName = $config->resources->db->statistics?->engine;
-        if (empty($statClassName) || ! in_array($statClassName, ['SQLite', 'ClickHouseDB'])) {
-            $statClassName = 'MariaDB';
-        }
-        \Zend_Registry::set('statistics', call_user_func(['MittagQI\\Translate5\\Statistics\\' . $statClassName, 'create']));
+        \Zend_Registry::set('statistics', \MittagQI\Translate5\Statistics\Factory::createDb());
         // $db = \Zend_Registry::get('statistics'); // keep to find in IDE
-        /* @var $db MittagQI\Translate5\Statistics\AbstractStatisticsDB */
 
         $unmodifiedSegmentsEventHandler = new UnmodifiedSegmentsEventHandler($eventManager);
         $unmodifiedSegmentsEventHandler->register();
