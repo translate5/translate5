@@ -201,11 +201,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         deleteTaskDialogTitle: '#UT#Aufgabe löschen',
         taskImportButtonText: '#UT#Aufgabe importieren',
         taskDeleteButtonText: '#UT#Aufgabe löschen',
-        averageProcessingTimeLabel: '#UT#Ø Bearbeitungszeit Lektor',
+        averageProcessingTimeLabel: '#UT#Ø Bearbeitungszeit',
         excelExportUsageLabel: '#UT#Excel-Export Nutzung',
+        workflowStep: '#UT#Workflow Schritt',
+        type: '#UT#Typ',
+        translatorStep: '#UT#Übersetzung',
+        reviewerStep: '#UT#Lektorat',
+        translatorCheckStep: '#UT#Finales Lektorat',
         sekunden: '#UT#Sekunden',
-        averageProcessingTimeTranslatorLabel: '#UT#Ø Bearbeitungszeit Übersetzer',
-        averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit zweiter Lektor',
         posteditingTimeLabel: '#UT#Ø Nachbearbeitungszeit innerhalb eines Workflowschritts',
         posteditingTimeTotalLabel: '#UT#Ø Nachbearbeitungszeit ab Beginn des Workflows',
         posteditingTimeStartLabel: '#UT#Ø Nachbearbeitungszeit vor Beginn des Workflows',
@@ -619,26 +622,58 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             taskStore = Ext.StoreManager.get('admin.Tasks'),
             proxy = taskStore.getProxy(),
             url = Editor.data.restpath + 'task/kpi',
-            method = 'POST',
-            params = {};
+            params = {},
+            filterItems = taskStore.getFilters().items;
 
         win.show();
         win.setLoading(true);
 
-        params[proxy.getFilterParam()] = proxy.encodeFilters(taskStore.getFilters().items);
+        params[proxy.getFilterParam()] = proxy.encodeFilters(filterItems);
 
         Ext.Ajax.request({
             url: url,
-            method: method,
+            method: 'POST',
             params: params,
             success: function (response) {
                 var resp = Ext.util.JSON.decode(response.responseText),
-                    averageProcessingTimeMessage = [];
+                    averageProcessingTimeMessage = [],
+                    workflowSteps = null, workflowStepTypes = null,
+                    processingTimeLbl = me.strings.averageProcessingTimeLabel;
+
+                filterItems.forEach(function (filter) {
+                    if(filter.config.property === 'workflowUserRole'){
+                        workflowStepTypes = filter.config.value;
+                    } else if(filter.config.property === 'workflowStep'){
+                        workflowSteps = filter.config.value;
+                    }
+                });
 
                 // KPI: averageProcessingTime
-                averageProcessingTimeMessage.push(me.strings.averageProcessingTimeTranslatorLabel + ': ' + resp.averageProcessingTimeTranslator);
-                averageProcessingTimeMessage.push(me.strings.averageProcessingTimeLabel + ': ' + resp.averageProcessingTimeReviewer);
-                averageProcessingTimeMessage.push(me.strings.averageProcessingTimeSecondTranslatorLabel + ': ' + resp.averageProcessingTimeSecondTranslator);
+                if(typeof resp['byWorkflowSteps'] === 'undefined') {
+                    const stepTypeToKey = {
+                        'translator': 'Translator',
+                        'reviewer': 'Reviewer',
+                        'translatorCheck': 'SecondTranslator'
+                    };
+                    processingTimeLbl += ' / ' + me.strings.type + ' ';
+                    Object.keys(stepTypeToKey).forEach(function (stepType) {
+                        if (workflowStepTypes === null || workflowStepTypes.includes(stepType)) {
+                            averageProcessingTimeMessage.push(processingTimeLbl + me.strings[stepType + 'Step'] + ': ' +
+                                resp['averageProcessingTime' + stepTypeToKey[stepType]]);
+                        }
+                    });
+                } else {
+
+                    let stepLabels = {};
+                    Ext.Object.each(Editor.data.app.workflows, function (key, workflow) {
+                        stepLabels = {...stepLabels, ...workflow.steps};
+                    });
+                    // build KPIs by workflow steps
+                    processingTimeLbl += ' / ' + me.strings.workflowStep + ' ';
+                    resp['byWorkflowSteps'].split(',').forEach(function (workflowStep) {
+                        averageProcessingTimeMessage.push(processingTimeLbl + stepLabels[workflowStep] + ': ' + resp[workflowStep]);
+                    });
+                }
 
                 // format decimals
                 ['posteditingTime','posteditingTimeTotal','posteditingTimeStart','posteditingTimeEnd'].forEach(function (key) {

@@ -72,7 +72,7 @@ if ($bconfUpgradeNeeded) {
     // find a proper 147 server in the config
     $serverName = $insideBitbucket ? null : $find147VersionPlus(
         $okapiConfig?->server?->toArray() ?? [],
-        $okapiConfig?->serverUsed ?? ''
+            $okapiConfig?->serverUsed ?? ''
     );
 
     // not found, the migration has to be aborted !!
@@ -93,10 +93,8 @@ if ($bconfUpgradeNeeded) {
                 // to ensure the file is not marked as processed
                 $this->doNotSavePhpForDebugging = false;
 
-                error_log(
-                    __FILE__ . ': searching for Okapi 1.47 in the test-configuration FAILED - stop migration script.' .
-                    ' You need to add a proper OKAPI 1.47 container and config to your application.'
-                );
+                error_log(__FILE__ . ': searching for Okapi 1.47 in the test-configuration FAILED - stop migration script.' .
+                    ' You need to add a proper OKAPI 1.47 container and config to your application.');
 
                 return;
             } else {
@@ -110,7 +108,6 @@ if ($bconfUpgradeNeeded) {
             );
         }
     }
-
     // update okapi's serverUsed for the general config & all customer configs, adjust the 147-snapshot task-configs
 
     if ($serverName !== null) {
@@ -128,6 +125,7 @@ if ($bconfUpgradeNeeded) {
         );
     }
 }
+
 
 $db->query(
     "DELETE FROM `Zf_configuration` WHERE `name` IN (" .

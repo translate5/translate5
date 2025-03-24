@@ -100,6 +100,11 @@ class KpiTest extends ImportTestAbstract
      */
     private const taskEndDate = 'finishedDate';
 
+    /**
+     * Tasks workflow step name
+     */
+    private const workflowStepName = 'reviewing';
+
     protected static function setupImport(Config $config): void
     {
         // If any task exists already, filtering will be wrong!
@@ -115,7 +120,7 @@ class KpiTest extends ImportTestAbstract
                     ->setProperty('taskName', static::$taskNameBase . '_' . $taskNameSuffix)
                     ->addUser(TestUser::TestLector->value, params: [
                         'workflow' => 'default',
-                        'workflowStepName' => 'reviewing',
+                        'workflowStepName' => self::workflowStepName,
                     ]);
             }
         }
@@ -135,11 +140,11 @@ class KpiTest extends ImportTestAbstract
 
     /**
      * Renders the filter for filtering our tasks in the taskGrid.
-     * @return string
      */
-    private static function renderTaskGridFilter()
+    private static function renderTaskGridFilter(string $extraFilters = ''): string
     {
-        return '[{"operator":"like","value":"' . static::$taskNameBase . '","property":"taskName"}]';
+        return '[{"operator":"like","value":"' . static::$taskNameBase . '","property":"taskName"}' .
+            (empty($extraFilters) ? '' : ',' . $extraFilters) . ']';
     }
 
     /**
@@ -193,15 +198,43 @@ class KpiTest extends ImportTestAbstract
 
         $statistics = $this->getExpectedKpiStatistics();
 
+        $result->{self::KPI_REVIEWER} = self::stripDaysText($result->{self::KPI_REVIEWER});
+
+        //test only for reviewer (for all other roles will be the same)
+        $this->assertEquals($result->{self::KPI_REVIEWER}, $statistics[self::KPI_REVIEWER]);
+        $this->assertEquals($result->excelExportUsage, $statistics['excelExportUsage']);
+
+        $result = static::api()->postJson('editor/task/kpi', [
+            'filter' => self::renderTaskGridFilter('{"operator":"in","value":["reviewer"],"property":"workflowUserRole"}'),
+        ], null, false);
+        $result->{self::KPI_REVIEWER} = self::stripDaysText($result->{self::KPI_REVIEWER});
+        // the same result when filtered by reviewer role/stepType
+        $this->assertEquals($statistics[self::KPI_REVIEWER], $result->{self::KPI_REVIEWER});
+
+        $result = static::api()->postJson('editor/task/kpi', [
+            'filter' => self::renderTaskGridFilter('{"operator":"in","value":["translator"],"property":"workflowUserRole"}'),
+        ], null, false);
+        $result->{self::KPI_REVIEWER} = self::stripDaysText($result->{self::KPI_REVIEWER});
+        // '-' result when filtered out by another role/stepType (e.g. translator)
+        $this->assertEquals('-', $result->{self::KPI_REVIEWER});
+
+        $result = static::api()->postJson('editor/task/kpi', [
+            'filter' => self::renderTaskGridFilter('{"operator":"in","value":["' . self::workflowStepName . '"],"property":"workflowStep"}'),
+        ], null, false);
+        $result->{self::workflowStepName} = self::stripDaysText($result->{self::workflowStepName});
+        // the same result when filtering by reviewing step
+        $this->assertEquals($statistics[self::KPI_REVIEWER], $result->{self::workflowStepName});
+        $this->assertEquals(self::workflowStepName, $result->byWorkflowSteps);
+    }
+
+    private static function stripDaysText(string $s): string
+    {
         // averageProcessingTime from API comes with translated unit (e.g. "2 days", "14 Tage"),
         // but these translations are not available here (are they?)
         $search = ["days", "Tage", " "];
         $replace = ["", "", ""];
-        $result->{self::KPI_REVIEWER} = str_replace($search, $replace, $result->{self::KPI_REVIEWER});
 
-        //test only for reviewer (for all ther roles will be the same)
-        $this->assertEquals($result->{self::KPI_REVIEWER}, $statistics[self::KPI_REVIEWER]);
-        $this->assertEquals($result->excelExportUsage, $statistics['excelExportUsage']);
+        return str_replace($search, $replace, $s);
     }
 
     /**

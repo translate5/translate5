@@ -35,7 +35,9 @@ use SQLite3Result;
 
 class SQLite extends AbstractStatisticsDB
 {
-    protected static string $logDomain = 'sqlite';
+    public const NAME = 'sqlite';
+
+    protected static string $logDomain = self::NAME;
 
     protected string $sqlTruncate = 'DELETE FROM %s';
 

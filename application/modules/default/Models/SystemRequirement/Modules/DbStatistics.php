@@ -37,15 +37,21 @@ declare(strict_types=1);
 
 use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Statistics\AbstractStatisticsDB;
+use MittagQI\Translate5\Statistics\Factory;
 
 class Models_SystemRequirement_Modules_DbStatistics extends ZfExtended_Models_SystemRequirement_Modules_Abstract
 {
     /**
+     * @throws Zend_Exception
      * @see ZfExtended_Models_SystemRequirement_Modules_Abstract::validate()
      */
     public function validate(): ZfExtended_Models_SystemRequirement_Result
     {
-        $db = Zend_Registry::get('statistics');
+        if (Zend_Registry::isRegistered('statistics')) {
+            $db = Zend_Registry::get('statistics');
+        } else {
+            $db = Factory::createDb();
+        }
 
         $this->result->id = 'statisticsdb';
         $this->result->name = 'Statistics ' . (str_ends_with(get_class($db), 'MariaDB') ? 'Tables' : 'Database');

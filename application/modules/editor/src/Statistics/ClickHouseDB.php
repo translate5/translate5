@@ -35,6 +35,8 @@ use Throwable;
 
 class ClickHouseDB extends AbstractStatisticsDB
 {
+    public const NAME = 'clickhousedb';
+
     protected static string $logDomain = 'clickhouse';
 
     private const connectTimeout = 1; // seconds

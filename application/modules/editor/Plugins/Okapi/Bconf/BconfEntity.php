@@ -280,7 +280,7 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
         // when exceptions occur during unpacking/packing this flag ensures, the entity is removed from DB
         $this->isNew = true;
         // unpacks the imported file & saves the parts to filesys/DB
-        $this->unpack($tmpPath);
+        $this->unpack($tmpPath, true);
         // packs a bconf from it that can be used for okapi-projects from now on
         $this->pack();
 
@@ -890,16 +890,17 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Disassembles an uploaded bconf into it's parts & flushes the parts into the file-system & DB
+     * If $doUpgrade is set, embedded FPRMs will be upgraded to the revision currently supported by T5
      * @throws BconfInvalidException
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      * @throws OkapiException
      */
-    public function unpack(string $pathToParse): void
+    public function unpack(string $pathToParse, bool $doUpgrade = false): void
     {
         try {
             $unpacker = new Unpacker($this);
-            $unpacker->process($pathToParse);
+            $unpacker->process($pathToParse, $doUpgrade);
         } catch (BconfInvalidException $e) {
             // in case of a BconfInvalidException, the exception came from the Unpacker
             $name = $this->getName();

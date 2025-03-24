@@ -4887,9 +4887,9 @@ another user took responsibility for the task
                 <source>Key Performance Indicators</source>
                 <target>Key Performance Indicators</target>
             </trans-unit>
-            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='>
-                <source>Ø Bearbeitungszeit Lektor</source>
-                <target>Ø Processing time Reviewer</target>
+            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdA=='>
+                <source>Ø Bearbeitungszeit</source>
+                <target>Ø Processing time</target>
             </trans-unit>
             <trans-unit id='VGFnZQ=='>
                 <source>Tage</source>
@@ -5141,14 +5141,6 @@ another user took responsibility for the task
             <trans-unit id='QmVudXR6ZXItRGVhZGxpbmUvcw=='>
                 <source>Benutzer-Deadline/s</source>
                 <target>Deadline of user/s</target>
-            </trans-unit>
-            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnNldHplcg=='>
-                <source>Ø Bearbeitungszeit Übersetzer</source>
-                <target>Ø Processing time Translator</target>
-            </trans-unit>
-            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCB6d2VpdGVyIExla3Rvcg=='>
-                <source>Ø Bearbeitungszeit zweiter Lektor</source>
-                <target>Ø Processing time Second Reviewer</target>
             </trans-unit>
             <trans-unit id='w5ggTmFjaGJlYXJiZWl0dW5nc3plaXQgaW5uZXJoYWxiIGVpbmVzIFdvcmtmbG93c2Nocml0dHM='>
                 <source>Ø Nachbearbeitungszeit innerhalb eines Workflowschritts</source>
@@ -10538,6 +10530,14 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
                 <target>Cancel</target>
             </trans-unit>
+            <trans-unit id="TnVyIFNlZ21lbnRlIG1pdCBLb21tZW50YXIgYW56ZWlnZW4=">
+              <source>Nur Segmente mit Kommentar anzeigen</source>
+              <target>Show only commented segments</target>
+            </trans-unit>
+            <trans-unit id="U2VnbWVudCBQcm96ZXNzc3RhdHVz">
+              <source>Segment Prozessstatus</source>
+              <target>Segment Processing Status</target>
+            </trans-unit>
             <trans-unit id='U2VrdW5kZW4='>
                 <source>Sekunden</source>
                 <target>seconds</target>
@@ -10654,6 +10654,10 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
             <trans-unit id='Qml0dGUgd8OkaGxlbg=='>
                 <source>Bitte wählen</source>
                 <target>Please select</target>
+            </trans-unit>
+            <trans-unit id="Sm9icw==">
+                <source>Jobs</source>
+                <target>jobs</target>
             </trans-unit>
         </body>
     </file>

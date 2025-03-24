@@ -128,8 +128,13 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
         const me = this,
             store = Ext.StoreManager.get('project.Project'),
             proxy = store.getProxy(),
-            params = { countTasks: 1 };
+            params = this.initBatchParams(['batchWorkflow', 'batchWorkflowStep']);
 
+        if(params === null) {
+            return this.showWarning(Editor.data.l10n.batchSetWindow.noPropertySet);
+        }
+
+        params.countTasks = 1;
         params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
 
         Ext.Ajax.request({
@@ -137,10 +142,10 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
             method: 'POST',
             params: params,
             success: function (response) {
-                let tasksCount = response.responseJson.total,
+                let jobsCount = response.responseJson.total,
                     l10n = Editor.data.l10n.batchSetWindow,
-                    question = l10n.allFilteredWarning.replace('. ', ' ('+tasksCount+' '+l10n.tasksLabel+'). ');
-                if (tasksCount > 50) {
+                    question = l10n.allFilteredWarning.replace('. ', ' ('+jobsCount+' '+l10n.jobsLabel+'). ');
+                if (jobsCount > 50) {
                     question = '<b style="color:red">'+ question + '</b>';
                 }
                 Ext.MessageBox.confirm(

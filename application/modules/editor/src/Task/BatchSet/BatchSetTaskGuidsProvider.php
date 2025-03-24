@@ -30,11 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\BatchSet;
 
-use editor_Models_Filter_TaskSpecific;
-use editor_Models_Task as Task;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\BatchSet\DTO\TaskGuidsQueryDto;
 use MittagQI\Translate5\Task\DataProvider\TaskQuerySelectFactory;
+use MittagQI\Translate5\Task\Filtering\TaskQueryFilterAndSort;
 use Zend_Db_Table;
 use ZfExtended_Authentication;
 
@@ -45,6 +44,7 @@ class BatchSetTaskGuidsProvider
         private readonly UserRepository $userRepository,
         private readonly \ZfExtended_AuthenticationInterface $authentication,
         private readonly \Zend_Db_Adapter_Abstract $db,
+        private readonly TaskQueryFilterAndSort $taskQueryFilterAndSort,
     ) {
     }
 
@@ -55,6 +55,7 @@ class BatchSetTaskGuidsProvider
             new UserRepository(),
             ZfExtended_Authentication::getInstance(),
             Zend_Db_Table::getDefaultAdapter(),
+            new TaskQueryFilterAndSort(),
         );
     }
 
@@ -67,11 +68,11 @@ class BatchSetTaskGuidsProvider
         return $this->getTaskGuidsFromFilteredProjects($query->filter);
     }
 
+    /* To be used carefully as for example the following filter is ignored (it returns all possible tasks)
+    $jsonFilter = [{"operator":"in","value":[],"property":"projectId"}] */
     private function fetchAllowedTaskGuids(string $jsonFilter): array
     {
-        $task = new Task();
-
-        $filter = new editor_Models_Filter_TaskSpecific($task, $jsonFilter);
+        $filter = $this->taskQueryFilterAndSort->getTaskFilter($jsonFilter);
 
         $viewer = $this->userRepository->get($this->authentication->getUserId());
 
@@ -84,19 +85,22 @@ class BatchSetTaskGuidsProvider
 
     private function getTaskGuidsFromFilteredProjects(string $jsonFilter): array
     {
-        $task = new Task();
-
-        $filter = new editor_Models_Filter_TaskSpecific($task, $jsonFilter);
+        $filter = $this->taskQueryFilterAndSort->getTaskFilter($jsonFilter);
 
         $viewer = $this->userRepository->get($this->authentication->getUserId());
 
         $taskSelect = $this->taskQuerySelectFactory->createProjectSelect($viewer, $filter);
 
+        $results = $this->db->fetchAll($taskSelect);
+        if (empty($results)) {
+            return [];
+        }
+
         return $this->fetchAllowedTaskGuids(
             json_encode([
                 [
                     'operator' => 'in',
-                    'value' => array_column($this->db->fetchAll($taskSelect), 'id'),
+                    'value' => array_column($results, 'id'),
                     'property' => 'projectId',
                 ],
             ])
@@ -105,7 +109,7 @@ class BatchSetTaskGuidsProvider
 
     private function getTaskGuidsFromProjectsAndTasks(array $taskAndProjectIds): array
     {
-        $taskGuids = $this->fetchAllowedTaskGuids(
+        $taskGuids = empty($taskAndProjectIds) ? [] : $this->fetchAllowedTaskGuids(
             json_encode([
                 [
                     'operator' => 'in',

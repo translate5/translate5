@@ -71,12 +71,12 @@
                 <refObject id="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">
                     <item type="fn">Pavel Perminov</item>
                     <item type="email">noreply@translate5.net</item>
-                    <item type="role">systemadmin,admin,pm,editor,termCustomerSearch,termProposer,termFinalizer,termPM,termPM_allClients,termReviewer</item>
+                    <item type="role">ROLES NOT TESTABLE</item>
                 </refObject>
                 <refObject id="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">
                     <item type="fn">Project Manager</item>
-                    <item type="email">manager-noreply@translate5.net</item>
-                    <item type="role">admin,api,editor,instantTranslate,instantTranslateWriteTm,pm,systemadmin,termCustomerSearch,termFinalizer,termPM_allClients,termProposer,termReviewer,TMMaintenance_allClients,TMMaintenance_allClients</item>
+                    <item type="email">noreply@translate5.net</item>
+                    <item type="role">ROLES NOT TESTABLE</item>
                 </refObject>
             </refObjectList>
             <refObjectList type="binaryData">

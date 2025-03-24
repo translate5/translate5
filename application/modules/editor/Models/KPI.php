@@ -55,6 +55,12 @@ class editor_Models_KPI
 
     public const KPI_LEVENSHTEIN_END = 'levenshteinEnd';
 
+    public const ROLE_TO_KPI_KEY = [
+        editor_Workflow_Default::ROLE_TRANSLATOR => self::KPI_TRANSLATOR,
+        editor_Workflow_Default::ROLE_REVIEWER => self::KPI_REVIEWER,
+        editor_Workflow_Default::ROLE_TRANSLATORCHECK => self::KPI_TRANSLATOR_CHECK,
+    ];
+
     /**
      * Tasks the KPI are to be calculated for.
      * @var array
@@ -106,9 +112,9 @@ class editor_Models_KPI
     /**
      * Get the KPI-statistics.
      */
-    public function getStatistics(array $aggregationFilters): array
+    public function getStatistics(array $filters, array $aggregationFilters): array
     {
-        $statistics = $this->getAverageProcessingTime();
+        $statistics = $this->getAverageProcessingTime($filters);
         $statistics['excelExportUsage'] = $this->getExcelExportUsage();
 
         return array_merge($statistics, $this->getAggregateStats($aggregationFilters));
@@ -118,47 +124,67 @@ class editor_Models_KPI
      * Calculate and return the average processing time for the tasks by role.
      * return array of strings or '-' if statistics can't be calculated
      */
-    protected function getAverageProcessingTime(): array
+    protected function getAverageProcessingTime(array $filters): array
     {
         $results = [];
-        $results[self::KPI_REVIEWER] = '-';
-        $results[self::KPI_TRANSLATOR] = '-';
-        $results[self::KPI_TRANSLATOR_CHECK] = '-';
+        foreach (self::ROLE_TO_KPI_KEY as $label) {
+            $results[$label] = '-';
+        }
         if (! $this->hasStatistics()) {
             return $results;
         }
         $taskGuids = array_column($this->tasks, 'taskGuid');
 
-        //load all task assocs for the filtered tasks
-        //only reviewer,translator and translatorCheck roles are loaded
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc  */
-        $assocs = $tua->loadKpiData($taskGuids, [editor_Workflow_Default::ROLE_REVIEWER, editor_Workflow_Default::ROLE_TRANSLATOR, editor_Workflow_Default::ROLE_TRANSLATORCHECK]);
-
-        $collections = [];
-        $collections[editor_Workflow_Default::ROLE_REVIEWER] = [];
-        $collections[editor_Workflow_Default::ROLE_TRANSLATOR] = [];
-        $collections[editor_Workflow_Default::ROLE_TRANSLATORCHECK] = [];
-
-        foreach ($assocs as $assoc) {
-            $startDate = new DateTime($assoc['assignmentDate']);
-            $endDate = new DateTime($assoc['finishedDate']);
-            $processingTime = $endDate->diff($startDate);
-            $collections[$assoc['role']][] = $processingTime->format('%a');
+        $workflowSteps = [];
+        $workflowStepTypes = array_keys(self::ROLE_TO_KPI_KEY);
+        foreach ($filters as $filter) {
+            if ($filter->property === 'workflowStep') {
+                $workflowSteps = $filter->value;
+            } elseif ($filter->property === 'workflowUserRole') {
+                $workflowStepTypes = $filter->value;
+            }
         }
 
-        $getAverage = function ($role) use ($collections) {
-            $average = 0;
-            if (! empty($collections[$role])) {
-                $average = array_sum($collections[$role]) / count($collections[$role]);
+        //load all task assocs for the filtered tasks
+        //only reviewer,translator and translatorCheck roles are loaded
+        $tua = new editor_Models_TaskUserAssoc();
+        $timeResult = $tua->loadKpiData($taskGuids, $workflowStepTypes, $workflowSteps);
+        $time = [];
+        foreach ($timeResult as $row) {
+            $time[$row['timeBy']] = $row['time'];
+        }
+
+        if (empty($workflowSteps)) {
+            $timeToResultKey = self::ROLE_TO_KPI_KEY;
+        } else {
+            // limited to 3 by current KPI window height
+            $kpiLimit = 3;
+            $workflowStepsWithData = array_slice(array_keys($time), 0, $kpiLimit);
+            if (count($workflowStepsWithData) >= $kpiLimit) {
+                $workflowSteps = array_slice($workflowStepsWithData, 0, $kpiLimit);
+            } else {
+                $stepsWithoutData = array_diff($workflowSteps, $workflowStepsWithData);
+                if (! empty($stepsWithoutData)) {
+                    $workflowSteps = array_merge(
+                        $workflowStepsWithData,
+                        array_slice($stepsWithoutData, 0, $kpiLimit - count($workflowStepsWithData))
+                    );
+                }
             }
+            $timeToResultKey = [];
+            foreach ($workflowSteps as $workflowStep) {
+                $timeToResultKey[$workflowStep] = $workflowStep;
+            }
+            $results = [];
+            $results['byWorkflowSteps'] = implode(',', $workflowSteps);
+        }
 
-            return round($average, 0) . ' ' . $this->translate->_('Tage');
-        };
-
-        $results[self::KPI_REVIEWER] = $getAverage(editor_Workflow_Default::ROLE_REVIEWER);
-        $results[self::KPI_TRANSLATOR] = $getAverage(editor_Workflow_Default::ROLE_TRANSLATOR);
-        $results[self::KPI_TRANSLATOR_CHECK] = $getAverage(editor_Workflow_Default::ROLE_TRANSLATORCHECK);
+        foreach ($timeToResultKey as $timeBy => $key) {
+            $results[$key] = (isset($time[$timeBy]) ? round(
+                $time[$timeBy],
+                0
+            ) : 0) . ' ' . $this->translate->_('Tage');
+        }
 
         return $results;
     }

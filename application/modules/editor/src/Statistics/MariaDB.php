@@ -36,6 +36,8 @@ use Zend_Db_Table;
 
 class MariaDB extends AbstractStatisticsDB
 {
+    public const NAME = 'mariadb';
+
     private ?Zend_Db_Adapter_Abstract $client = null;
 
     public function isAlive(): bool

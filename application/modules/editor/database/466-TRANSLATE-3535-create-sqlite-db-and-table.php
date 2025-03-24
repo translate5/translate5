@@ -29,6 +29,9 @@ END LICENSE AND COPYRIGHT
 /* @var $config Zend_Config */
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
+//FIXME convert me to CLI script!
+return;
+
 use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Statistics\SQLite;
 

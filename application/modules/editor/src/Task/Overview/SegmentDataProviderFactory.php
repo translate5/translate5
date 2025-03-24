@@ -46,11 +46,11 @@ class SegmentDataProviderFactory
     /**
      * @codeCoverageIgnore
      */
-    public static function create(): self
+    public static function create(?ZfExtended_Zendoverwrites_Translate $translate = null): self
     {
         return new self(
             new SegmentFieldManagerFactory(),
-            ZfExtended_Zendoverwrites_Translate::getInstance(),
+            $translate ?? ZfExtended_Zendoverwrites_Translate::getInstance(),
             new SegmentRepository(Zend_Db_Table::getDefaultAdapter()),
             new editor_Models_Segment_AutoStates(),
             new editor_Models_Segment_Utility(),

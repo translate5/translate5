@@ -141,8 +141,11 @@ class TaskTmRepository
     /**
      * @return iterable<LanguageResource>
      */
-    public function getOfTypeAssociatedToTask(string $taskGuid, string $serviceType): iterable
-    {
+    public function getOfTypeAssociatedToTask(
+        string $taskGuid,
+        string $serviceType,
+        bool $onlyWritable = false
+    ): iterable {
         $db = ZfExtended_Factory::get(LanguageResource::class)->db;
         $s = $db->select()
             ->from(
@@ -168,6 +171,10 @@ class TaskTmRepository
             ->where('lr.serviceType = ?', $serviceType)
             ->where('ttmt.id IS NOT NULL')
         ;
+
+        if ($onlyWritable) {
+            $s->where('ta.segmentsUpdateable = ?', 1);
+        }
 
         $rows = $db->fetchAll($s);
 

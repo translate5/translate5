@@ -85,9 +85,16 @@ class editor_Models_Task_Export_Metadata
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.task.excel.metadata');
 
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_REVIEWER] = $this->translate->_('Ø Bearbeitungszeit Lektor');
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR] = $this->translate->_('Ø Bearbeitungszeit Übersetzer');
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR_CHECK] = $this->translate->_('Ø Bearbeitungszeit zweiter Lektor');
+        $this->kpiTypeLocales['processingTime'] = $this->translate->_('Ø Bearbeitungszeit') . ' / ';
+        $this->kpiTypeLocales['workflowStep'] = $this->translate->_('Workflow Schritt');
+        $type = $this->translate->_('Typ');
+        foreach ([
+            editor_Models_KPI::KPI_REVIEWER => 'Lektorat',
+            editor_Models_KPI::KPI_TRANSLATOR => 'Übersetzung',
+            editor_Models_KPI::KPI_TRANSLATOR_CHECK => 'Finales Lektorat',
+        ] as $key => $workflowStepTypeName) {
+            $this->kpiTypeLocales[$key] = $type . ' ' . $this->translate->_($workflowStepTypeName);
+        }
 
         $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_START] = $this->translate->_('Ø Levenshtein-Distanz vor Beginn des Workflows');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_START] = $this->translate->_('Ø Nachbearbeitungszeit vor Beginn des Workflows');
@@ -213,34 +220,54 @@ class editor_Models_Task_Export_Metadata
         $filter = ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6');
         /* @var $filter ZfExtended_Models_Filter_ExtJs6 */
         $operatorTranslated = $filter->getTranslatedOperators();
+        $workflowStepTypes = null;
         foreach ($this->filters as $filter) {
             //translate the filter operators
             if (isset($operatorTranslated[$filter->operator])) {
                 $filter->operator = $operatorTranslated[$filter->operator];
             }
 
-            if ($isDate($filter->value)) {
+            if ($filter->property == 'userName') {
+                $convertUserName($filter);
+            } elseif ($filter->property == 'workflowUserRole') {
+                $workflowStepTypes = $filter->value;
+            } elseif ($isDate($filter->value)) {
                 $date = new DateTime($filter->value);
                 $filter->value = $date->format('Y-m-d');
             }
 
-            if ($filter->property == 'userName') {
-                $convertUserName($filter);
-            }
             $this->excelMetadata->addFilter($filter);
         }
 
         // add data: KPI
         $this->excelMetadata->addMetadataHeadline($this->translate->_('KPI'));
 
-        $this->excelMetadata->addKPI($this->renderKpiData(editor_Models_KPI::KPI_TRANSLATOR));
-        $this->excelMetadata->addKPI($this->renderKpiData(editor_Models_KPI::KPI_REVIEWER));
-        $this->excelMetadata->addKPI($this->renderKpiData(editor_Models_KPI::KPI_TRANSLATOR_CHECK));
-        $this->excelMetadata->addKPI($this->renderKpiExcelExportUsage());
-
-        foreach (editor_Models_KPI::getAggregateMetrics() as $kpiMetrics) {
-            $this->excelMetadata->addKPI($this->renderKpiData($kpiMetrics));
+        if (isset($this->kpiStatistics['byWorkflowSteps'])) {
+            $workflowSteps = explode(',', $this->kpiStatistics['byWorkflowSteps']);
+            $stepModel = new editor_Models_Workflow_Step();
+            $stepLabels = $stepModel->getAllLabels();
+            foreach ($workflowSteps as $workflowStep) {
+                $this->excelMetadata->addKPI(
+                    $this->kpiTypeLocales['processingTime'] . $this->kpiTypeLocales['workflowStep'] . ' ' .
+                    $this->translate->_($stepLabels[$workflowStep]) . ': ' . $this->kpiStatistics[$workflowStep]
+                );
+            }
+        } else {
+            foreach (editor_Models_KPI::ROLE_TO_KPI_KEY as $role => $key) {
+                if ($workflowStepTypes === null || in_array($role, $workflowStepTypes)) {
+                    $this->excelMetadata->addKPI(
+                        $this->kpiTypeLocales['processingTime'] . ($this->kpiTypeLocales[$key] ?? '') . ': ' .
+                        $this->kpiStatistics[$key]
+                    );
+                }
+            }
         }
+
+        foreach (editor_Models_KPI::getAggregateMetrics() as $key) {
+            $this->excelMetadata->addKPI($this->kpiTypeLocales[$key] . ': ' . $this->kpiStatistics[$key]);
+        }
+
+        $this->excelMetadata->addKPI($this->kpiStatistics['excelExportUsage'] . ' ' . $this->translate->_('Excel-Export Nutzung'));
 
         // add data: tasks
         foreach ($this->tasks as $task) {
@@ -254,29 +281,6 @@ class editor_Models_Task_Export_Metadata
         // .. then send the excel
         $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excelMetadata->getSpreadsheet());
         $writer->save($fileName);
-    }
-
-    /***
-     * Render the kpi data by given type
-     * @param string $type
-     * @return string
-     */
-    protected function renderKpiData(string $type)
-    {
-        $average = $this->getKpiValueByName($type);
-        $text = $this->kpiTypeLocales[$type] ?? '';
-
-        return $text . ': ' . $average;
-    }
-
-    /**
-     * KPI: Render translated version of the Excel Export Usage.
-     */
-    protected function renderKpiExcelExportUsage(): string
-    {
-        $percentage = $this->getKpiValueByName('excelExportUsage');
-
-        return $percentage . ' ' . $this->translate->_('Excel-Export Nutzung');
     }
 
     /**

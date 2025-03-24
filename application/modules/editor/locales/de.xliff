@@ -444,7 +444,7 @@
             </trans-unit>
             <trans-unit id='TWF0Y2hyYXRl'>
                 <source>Matchrate</source>
-                <target>Trefferrate</target>
+                <target>Matchrate</target>
             </trans-unit>
             <trans-unit id='WmllbHRleHQgw7xiZXJhcmJlaXRldA=='>
                 <source>Zieltext überarbeitet</source>
@@ -6669,9 +6669,9 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
                 <source>Key Performance Indicators</source>
                 <target>Key Performance Indicators</target>
             </trans-unit>
-            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='>
-                <source>Ø Bearbeitungszeit Lektor</source>
-                <target>Ø Bearbeitungszeit Lektor</target>
+            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdA=='>
+                <source>Ø Bearbeitungszeit</source>
+                <target>Ø Bearbeitungszeit</target>
             </trans-unit>
             <trans-unit id='VGFnZQ=='>
                 <source>Tage</source>
@@ -6951,14 +6951,6 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
             <trans-unit id='QmVudXR6ZXItRGVhZGxpbmUvcw=='>
                 <source>Benutzer-Deadline/s</source>
                 <target>Benutzer-Deadline/s</target>
-            </trans-unit>
-            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnNldHplcg=='>
-                <source>Ø Bearbeitungszeit Übersetzer</source>
-                <target>Ø Bearbeitungszeit Übersetzer</target>
-            </trans-unit>
-            <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCB6d2VpdGVyIExla3Rvcg=='>
-                <source>Ø Bearbeitungszeit zweiter Lektor</source>
-                <target>Ø Bearbeitungszeit zweiter Lektor</target>
             </trans-unit>
             <trans-unit id='w5ggTmFjaGJlYXJiZWl0dW5nc3plaXQgaW5uZXJoYWxiIGVpbmVzIFdvcmtmbG93c2Nocml0dHM='>
                 <source>Ø Nachbearbeitungszeit innerhalb eines Workflowschritts</source>
@@ -10343,6 +10335,14 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
                 <target>Abbrechen</target>
             </trans-unit>
+            <trans-unit id="TnVyIFNlZ21lbnRlIG1pdCBLb21tZW50YXIgYW56ZWlnZW4=">
+              <source>Nur Segmente mit Kommentar anzeigen</source>
+              <target>Nur Segmente mit Kommentar anzeigen</target>
+            </trans-unit>
+            <trans-unit id="U2VnbWVudCBQcm96ZXNzc3RhdHVz">
+              <source>Segment Prozessstatus</source>
+              <target>Segment Prozessstatus</target>
+            </trans-unit>
             <trans-unit id='U2VrdW5kZW4='>
                 <source>Sekunden</source>
                 <target>Sekunden</target>
@@ -10454,6 +10454,10 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
             <trans-unit id='RGFzIEVyZ2VibmlzIGRlcyBvYmVuIGJlc2NocmllYmVuZW4gaXN0IGRlciBMZXZlbnNodGVpbi1BYnN0YW5kIGbDvHIgZGFzIFNlZ21lbnQgdm9tIEJlZ2lubiBkZXMgV29ya2Zsb3dzLg=='>
                 <source>Das Ergebnis des oben beschriebenen ist der Levenshtein-Abstand für das Segment vom Beginn des Workflows.</source>
                 <target>Das Ergebnis des oben beschriebenen ist der Levenshtein-Distanz für das Segment vom Beginn des Workflows.</target>
+            </trans-unit>
+            <trans-unit id="Sm9icw==">
+                <source>Jobs</source>
+                <target>Jobs</target>
             </trans-unit>
         </body>
     </file>

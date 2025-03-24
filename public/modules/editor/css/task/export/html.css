@@ -1,0 +1,182 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header img {
+    height: 50px;
+}
+
+.task-info {
+    text-align: center;
+    flex-grow: 1;
+}
+
+.task-link {
+    font-size: larger;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.task-link:hover {
+    text-decoration: underline;
+}
+
+.container {
+    margin-top: 3rem;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-collapse: collapse;
+}
+
+.table-bordered {
+    border: 1px solid #dee2e6;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.thead-light th {
+    color: #495057;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.table th,
+.table td {
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+    border-left: 1px solid #dee2e6;
+}
+
+.table th:last-child,
+.table td:last-child {
+    border-right: 1px solid #dee2e6;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+ins {
+    background-color: #d4edda;
+    text-decoration: none;
+    border-bottom: 1px dotted #155724;
+}
+
+del {
+    background-color: #f8d7da;
+    text-decoration: line-through;
+    border-bottom: 1px dotted #721c24;
+}
+
+ins[data-message], del[data-message], span[data-message] {
+    position: relative;
+}
+
+span[data-message]:hover:after,
+ins[data-message]:hover:after,
+del[data-message]:hover:after {
+    content: attr(data-message);
+    position: absolute;
+    background-color: rgba(51, 51, 51, 0.7);
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+    z-index: 1000;
+    left: 0;
+    top: -100%; /* Adjust tooltip positioning */
+    transform: translateY(-5px); /* Move tooltip above the element */
+    word-wrap: break-word;
+}
+
+span[data-message]:hover:before,
+ins[data-message]:hover:before,
+del[data-message]:hover:before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(51, 51, 51, 0.7) transparent transparent transparent;
+    z-index: 1000;
+}
+
+span[data-message]:hover:after,
+ins[data-message]:hover:after,
+del[data-message]:hover:after {
+    top: auto;
+    bottom: 100%;
+}
+
+.comment {
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.comment:last-child {
+    margin-bottom: 0;
+}
+
+.content {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.author, .modified {
+    display: inline-block;
+    font-size: 13px;
+    color: #555;
+}
+
+.modified {
+    margin-left: 20px;
+    font-size: 12px;
+    color: #888;
+}
+
+.comment:hover {
+    background-color: #f1f1f1;
+    border-color: #ccc;
+}
+
+#filter-container {
+    margin-bottom: 16px;
+    padding: 16px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    background-color: #f9f9f9;
+}
+
+#filter-container .filter-item {
+    margin-bottom: 16px;
+}
+
+#filter-container .filter-item label {
+    margin-right: 4px;
+    font-weight: bold;
+    color: #495057;
+}
+
+#filter-container .filter-item .delimiter {
+    margin: 0 4px;
+}

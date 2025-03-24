@@ -338,6 +338,18 @@ class UserJobRepository
         return $this->db->fetchCol($s);
     }
 
+    public function getJobsCountWithinWorkflowStep(array $taskGuids, string $workflow, string $workflowStepName): int
+    {
+        $s = $this->db->select()
+            ->from(UserJobTable::TABLE_NAME, 'COUNT(*)')
+            ->where('taskGuid IN (?)', $taskGuids)
+            ->where('workflow = ?', $workflow)
+            ->where('workflowStepName = ?', $workflowStepName)
+        ;
+
+        return (int) $this->db->fetchOne($s);
+    }
+
     /**
      * @return iterable<UserJob>
      */

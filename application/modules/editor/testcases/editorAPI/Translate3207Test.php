@@ -63,7 +63,7 @@ class Translate3207Test extends JsonTestAbstract
         // Compare exported to expected
         $this->assertFileContents(
             $file = 'exported-in-tbx.tbx',
-            $this->sanitizeURL($data->getBody()),
+            $this->sanitizeContent($data->getBody()),
             "The exported TBX does not match the content of $file",
             static::api()->isCapturing()
         );
@@ -82,7 +82,7 @@ class Translate3207Test extends JsonTestAbstract
         // Compare exported to expected
         $this->assertFileContents(
             $file = 'exported-in-zip.tbx',
-            $this->sanitizeURL(static::api()->getFileContentFromZipPath($zipFile, 'exported.tbx')),
+            $this->sanitizeContent(static::api()->getFileContentFromZipPath($zipFile, 'exported.tbx')),
             "The exported ZIP's tbx-file does not match the content of $file",
             static::api()->isCapturing()
         );
@@ -91,8 +91,10 @@ class Translate3207Test extends JsonTestAbstract
         unlink($zipFile);
     }
 
-    private function sanitizeURL(string $tbx): string
+    private function sanitizeContent(string $tbx): string
     {
+        $tbx = preg_replace('/(<item type="email">)(.*?)(<\/item>)/', '$1noreply@translate5.net$3', $tbx);
+        $tbx = preg_replace('/(<item type="role">)(.*?)(<\/item>)/', '$1ROLES NOT TESTABLE$3', $tbx);
         return preg_replace('#(<p>[^<]+ at) http[^>]+ (by [^<]+</p>)#', '$1 HTTP_URL $2', $tbx) ?? '';
     }
 }

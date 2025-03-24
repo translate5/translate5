@@ -33,6 +33,8 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Content;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\ExtensionMapping;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\Fprm;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\PropertiesValidation;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Pipeline;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\RandomAccessFile;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation;
@@ -85,12 +87,13 @@ abstract class BconfParser
      * 3) pipeline
      * 4) filter configurations
      * 5) extensions -> filter configuration id mapping
+     * If $doUpgrade is set, the Property-based FPRMS are automatically upgraded
      *
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      * @throws BconfInvalidException
      */
-    public function process($bconfPath): void
+    public function process(string $bconfPath, bool $doUpgrade = false): void
     {
         // we must catch all exceptions of the RandomAccessFile to be able to release the file-pointer properly!
         try {
@@ -184,12 +187,12 @@ abstract class BconfParser
                     // the pipeline is only valid if the contained SRX files have been saved to disk
                     if (! in_array($pipeline->getSrxFile('source'), $referencedFiles)) {
                         throw new BconfInvalidException(
-                            'Invalid Pipeline: the given source-srx file was not embedded in the bconf.'
+                            'Invalid Pipeline: The given source-srx file was not embedded in the bconf.'
                         );
                     }
                     if (! in_array($pipeline->getSrxFile('target'), $referencedFiles)) {
                         throw new BconfInvalidException(
-                            'Invalid Pipeline: the given target-srx file was not embedded in the bconf.'
+                            'Invalid Pipeline: The given target-srx file was not embedded in the bconf.'
                         );
                     }
                     if (($xsltFile = $pipeline->getXsltFile()) && ! in_array($xsltFile, $referencedFiles)) {
@@ -239,6 +242,25 @@ abstract class BconfParser
                     try {
                         if (ExtensionMapping::processUnpackedFilter($this->bconf, $identifier, $data, $replacementMap, $customFilters)) {
                             $content->addFilter($identifier);
+                            // if wanted, we upgrade the the FPRMs (currently only properties-based ones)
+                            if ($doUpgrade) {
+                                $fprmFile = $this->folder . '/' . $identifier . '.fprm';
+                                $fprm = new Fprm($fprmFile);
+                                if ($fprm->getType() === Fprm::TYPE_XPROPERTIES) {
+                                    $validation = new PropertiesValidation($fprmFile, $fprm->getContent());
+                                    $validation->upgrade();
+                                    if ($validation->validate()) {
+                                        $validation->flush();
+                                        if ($this->doDebug) {
+                                            error_log('UPGRADED FPRM: ' . basename($fprmFile));
+                                        }
+                                    } else {
+                                        throw new BconfInvalidException(
+                                            'Invalid FPRM: The embedded FPRM "' . basename($fprmFile) . '" seems invalid.'
+                                        );
+                                    }
+                                }
+                            }
                         }
                     } catch (Throwable $e) {
                         throw new BconfInvalidException($e->getMessage());
