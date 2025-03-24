@@ -596,7 +596,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
 
         if (! empty($task)) {
             $meta = $task->meta();
-            $bconf = (empty($meta->getBconfInZip())) ? self::getImportBconfById($task, $meta->getBconfId()) : null;
+            $bconf = empty($meta->getBconfInZip()) ? self::getImportBconfById($task, $meta->getBconfId()) : null;
             $importFilter = new ImportFilter($bconf, $meta->getBconfInZip());
             $okapiDataDir = $task->getAbsoluteTaskDataPath() . '/' . editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR;
             $okapiDataDirExists = is_dir($okapiDataDir);
@@ -631,16 +631,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         // we may need the ImportFilter in other functions
         $fileTypeSupport->registerPluginData($importFilter, $this->pluginName);
 
-        $skipCoreParserSet = [];
-        // we support XLIFF-via-OKAPI only with BCONFs from Version 10 on to enable full compatibility with older task-archives
-        if (! $okapiDataDirExists && $bconf !== null && $bconf->getPipeline()->getBconfVersion() >= 10) {
-            $extensionMapping = $bconf->getExtensionMapping();
-            foreach (editor_Models_Import_FileParser_Xlf::getFileExtensions() as $extension) {
-                if ($extensionMapping->hasExtension($extension)) {
-                    $skipCoreParserSet[$extension] = 1;
-                }
-            }
-        }
+        $skipCoreParserSet = (empty($task) || $okapiDataDirExists) ? [] : self::getSkipCoreParserSet(
+            $importFilter,
+            $bconf,
+            $task->meta()->getBconfInZip(),
+        );
 
         // This sets the supported file-extension for the requested task (if given) or the used default bconf
         // These are e.g. used to filter the supported file-types for the import wizard in the frontend
@@ -648,6 +643,26 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         foreach ($importFilter->getSupportedExtensions() as $extension) {
             $fileTypeSupport->register($extension, $this->pluginName, isset($skipCoreParserSet[$extension]));
         }
+    }
+
+    private static function getSkipCoreParserSet(ImportFilter $importFilter, ?BconfEntity $bconf, ?string $bconfInZip): array
+    {
+        // we support XLIFF-via-OKAPI only with BCONFs from Version 10 on to enable full compatibility with older task-archives
+        $bconfVersion10Plus = $bconf !== null ? $bconf->getPipeline()->getBconfVersion() >= 10 : str_contains(
+            file_get_contents($bconfInZip),
+            ' t5bconfVersion="' // as the flag was added since v10
+        );
+        if (! $bconfVersion10Plus) {
+            return [];
+        }
+        $skipCoreParserSet = [];
+        foreach (editor_Models_Import_FileParser_Xlf::getFileExtensions() as $extension) {
+            if ($importFilter->isExtensionSupported($extension)) {
+                $skipCoreParserSet[$extension] = 1;
+            }
+        }
+
+        return $skipCoreParserSet;
     }
 
     /**
