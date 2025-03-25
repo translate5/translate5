@@ -226,5 +226,12 @@ Ext.define('Editor.model.admin.User', {
      */
     isCoordinatorGroupUser: function() {
         return this.get('coordinatorGroup') > 0;
+    },
+
+    /**
+     * @returns {Boolean}
+     */
+    isCoordinator: function() {
+        return this.hasRole('jobCoordinator');
     }
 });
