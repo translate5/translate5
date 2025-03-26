@@ -73,7 +73,7 @@ class LogCommand extends Translate5AbstractCommand
     {
         $this
         // the short description shown while running "php bin/console list"
-            ->setDescription('Query the translate5 log')
+            ->setDescription('Query the translate5 log. Short cut logx shows todays errors and warnings only')
 
         // the full command description shown when running the command with
         // the "--help" option
@@ -85,6 +85,8 @@ list output example:
 the format is:
   log timestamp       level ecode (#ID)  app.domain → message'
             );
+
+        $this->setAliases(['logx']);
 
         $this->addArgument('filter', InputArgument::OPTIONAL, 'Provide keywords to filter output. EXXXX is recognized as ecodes, text.text.text as domains and all other is searched in message. If keyword is only one Number, it is assumed that is a log ID an only that entry is shown.');
 
@@ -169,6 +171,11 @@ the format is:
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
+
+        if ($input->getFirstArgument() === 'logx') {
+            $input->setOption('since', 'today');
+            $input->setOption('level', 7);
+        }
 
         if ($input->getOption('list-origin')) {
             $log = new \ZfExtended_Models_Log();
