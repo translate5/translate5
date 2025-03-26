@@ -49,7 +49,7 @@ class Factory
     public static function createDb(): AbstractStatisticsDB
     {
         $config = Zend_Registry::get('config');
-        $statClassName = $config->resources->db->statistics?->engine;
+        $statClassName = strtolower((string) $config->resources->db->statistics?->engine);
 
         if (! array_key_exists($statClassName, self::$engines)) {
             $statClassName = self::DEFAULT;

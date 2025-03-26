@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2025 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -25,77 +25,3 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-/* @var $config Zend_Config */
-/* @var $this ZfExtended_Models_Installer_DbUpdater */
-
-//FIXME convert me to CLI script!
-return;
-
-use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
-use MittagQI\Translate5\Statistics\SQLite;
-
-$argc = count($argv);
-if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
-    die("please dont call the script direct! Call it by using DBUpdater!\n\n");
-}
-
-if (! isset($config) || empty($config->resources->db->statistics?->sqliteDbname)) {
-    throw new ZfExtended_Exception(
-        __FILE__ . ': searching for SQLite DB filename in config FAILED - stop migration script.'
-    );
-}
-
-$dbFileName = trim($config->resources?->db?->statistics?->sqliteDbname);
-mkdir(dirname($dbFileName), recursive: true);
-touch($dbFileName);
-chmod($dbFileName, 0666);
-
-$this->output('Created writeable SQLite DB File: ' . $dbFileName);
-
-$db = SQLite::create();
-
-$tableSql = [
-    SegmentHistoryAggregation::TABLE_NAME => 'CREATE TABLE %s (
-taskGuid TEXT,
-userGuid TEXT,
-workflowName TEXT,
-workflowStepName TEXT,
-segmentId INTEGER,
-editable INTEGER,
-duration INTEGER,
-matchRate INTEGER,
-langResType TEXT,
-langResId INTEGER,
-PRIMARY KEY (taskGuid,segmentId,workflowStepName,userGuid)
-)',
-    SegmentHistoryAggregation::TABLE_NAME_LEV => 'CREATE TABLE %s (
-taskGuid TEXT,
-userGuid TEXT,
-workflowName TEXT,
-workflowStepName TEXT,
-segmentId INTEGER,
-editable INTEGER,
-lastEdit INTEGER,
-levenshteinOriginal INTEGER,
-levenshteinPrevious INTEGER,
-matchRate INTEGER,
-langResType TEXT,
-langResId INTEGER,
-PRIMARY KEY (taskGuid,segmentId,workflowStepName)
-)',
-];
-
-foreach ($tableSql as $tableName => $sql) {
-    if (! $db->tableExists($tableName)) {
-        $db->query(sprintf($sql, $tableName));
-    }
-
-    if ($db->tableExists($tableName)) {
-        $this->output('SQLite table created successfully: ' . $tableName);
-    } else {
-        throw new ZfExtended_Exception(
-            __FILE__ . ': create SQLite table ' . $tableName . ' FAILED - stop migration script.'
-        );
-    }
-}

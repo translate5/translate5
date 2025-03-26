@@ -177,8 +177,9 @@ class SQLite extends AbstractStatisticsDB
 
     private function logLastError(): void
     {
+        $defaultError = extension_loaded('sqlite3') ? 'unknown error' : 'missing "sqlite3" PHP extension';
         $this->logger->error('E1633', 'Statistics DB error: {msg}', [
-            'msg' => $this->client->lastErrorMsg(),
+            'msg' => $this->client ? $this->client->lastErrorMsg() : $defaultError,
         ]);
     }
 
@@ -216,7 +217,7 @@ class SQLite extends AbstractStatisticsDB
             } catch (\Throwable $e) {
                 $this->connectFailed = true;
                 $this->logger->error('E1632', 'Connection to Statistics DB failed: {msg}', [
-                    'msg' => $e->getMessage(),
+                    'msg' => is_file($dbFile) ? $e->getMessage() : 'run "t5 statistics:sqlite:init" command',
                 ]);
 
                 return null;

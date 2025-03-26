@@ -48,11 +48,11 @@ class StatisticsLevenshteinCommand extends Translate5AbstractCommand
     {
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('Calculate missing levenshtein values for segments/segment_history tables.')
+            ->setDescription('Calculate missing levenshtein values in segment history.')
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Calculate missing levenshtein values in segment history.');
+            ->setHelp('Calculate missing levenshtein values for segments/segment_history tables.');
 
         $this->addOption(
             'since',
