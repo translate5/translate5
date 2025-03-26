@@ -11,8 +11,8 @@ use MittagQI\Translate5\Task\Overview\SegmentDataHeader;
     <script type="text/javascript">
         window.exportService = window.exportService || {
             defaultFilters: {
-                onlyHasComments: <?= json_encode($this->defaultFilters->onlyHasComments) ?>,
-                translatedStatus: <?= json_encode($this->defaultFilters->translatedStatus) ?>
+                onlyHasComments: <?= json_encode($this->onlyHasComments) ?>,
+                translatedStatus: <?= json_encode($this->defaultProcessingState) ?>
             },
             localizedStrings: {
                 filtersLabels: {

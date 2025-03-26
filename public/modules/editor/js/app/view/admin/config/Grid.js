@@ -33,7 +33,8 @@ Ext.define('Editor.view.admin.config.Grid', {
         'Editor.view.admin.config.GridViewController',
         'Editor.view.admin.config.type.SimpleMap',
         'Editor.view.admin.config.type.FixedMap',
-        'Editor.view.admin.config.type.JsonEditor'
+        'Editor.view.admin.config.type.JsonEditor',
+        'Editor.view.admin.config.type.TaskHtmlExport'
     ],
     controller: 'adminConfigGrid',
     viewModel:{

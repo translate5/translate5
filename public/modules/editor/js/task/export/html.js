@@ -163,6 +163,8 @@ class AbstractSelectFilter extends TableFilter {
         defaultOption.textContent = this.getAllOptionLabel();
         select.appendChild(defaultOption);
 
+        let selectedAnOption = false;
+
         // Add other options
         this.getOptions().forEach(option => {
             const optionElement = document.createElement('option');
@@ -170,7 +172,12 @@ class AbstractSelectFilter extends TableFilter {
             optionElement.textContent = option.label;
             optionElement.selected = option.value === this.selectedValue;
             select.appendChild(optionElement);
+            selectedAnOption = selectedAnOption || optionElement.selected;
         });
+
+        if(!selectedAnOption) {
+            this.selectedValue = '';
+        }
 
         select.addEventListener('change', (e) => {
             this.selectedValue = e.target.value;

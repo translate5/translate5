@@ -46,6 +46,7 @@ use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\DataProvider\TaskViewDataProvider;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
+use MittagQI\Translate5\Task\Export\Html\Worker;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Filtering\TaskQueryFilterAndSort;
 use MittagQI\Translate5\Task\Import\ImportService;
@@ -58,7 +59,6 @@ use MittagQI\Translate5\Task\Log\LogService;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\Translate5\Task\Validator\BeforeFinishStateTaskValidator;
-use MittagQI\Translate5\Task\Worker\Export\HtmlWorker;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
@@ -1873,7 +1873,7 @@ class editor_TaskController extends ZfExtended_RestController
 
                 $exportService = QueuedExportService::create();
                 $token = ZfExtended_Utils::uuid();
-                $workerId = HtmlWorker::queueExportWorker(
+                $workerId = Worker::queueExportWorker(
                     $this->entity,
                     $exportService->composeExportDir($token),
                     ZfExtended_Authentication::getInstance()->getUser()->getLocale(),

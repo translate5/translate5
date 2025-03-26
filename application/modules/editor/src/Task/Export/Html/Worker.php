@@ -28,12 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\Worker\Export;
+namespace MittagQI\Translate5\Task\Export\Html;
 
 use editor_Models_Task as Task;
 use Exception;
 use MittagQI\Translate5\Repository\QueuedExportRepository;
-use MittagQI\Translate5\Task\Export\ExportService;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
 
@@ -41,7 +40,7 @@ use ZfExtended_Worker_Abstract;
  * Contains the Import Worker (the scheduling parts)
  * The import process itself is encapsulated in editor_Models_Import_Worker_Import
  */
-class HtmlWorker extends ZfExtended_Worker_Abstract
+class Worker extends ZfExtended_Worker_Abstract
 {
     public static function queueExportWorker(Task $task, string $exportFolder, string $locale): int
     {

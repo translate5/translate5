@@ -102,13 +102,13 @@ class SegmentDataProvider
             $segments = $this->segmentRepository->getSegmentsViewData($task);
         }
 
-        $stateMap = $this->segmentAutoStates->getLabelMap();
+        $stateMap = $this->segmentAutoStates->getLabelMap($this->translate);
         $segmentDataTable = new SegmentDataTable($header);
 
         /** @var SegmentView $segment */
         foreach ($segments as $segment) {
             $row = new SegmentDataRow();
-            $state = $stateMap[$segment->getValue('autoStateId')] ?? '- not found -'; //else tree should not be so untranslated
+            $state = $stateMap[$segment->getValue('autoStateId')] ?? '- not found -';
 
             foreach ($header->getFields() as $field) {
                 $row[$field] = match ($field->id) {
@@ -117,7 +117,7 @@ class SegmentDataProvider
                         $this->segmentUtility->convertStateId($segment->getValue('stateId'))
                     ),
                     SegmentDataHeader::FIELD_MANUAL_QS => $segment->getValue('qualities') ?? [],
-                    SegmentDataHeader::FIELD_EDIT_STATUS => $this->translate->_($state),
+                    SegmentDataHeader::FIELD_EDIT_STATUS => $state,
                     SegmentDataHeader::FIELD_MATCH_RATE => $segment->getValue('matchRate'),
                     SegmentDataHeader::FIELD_COMMENTS => $segment->getValue('comments'),
 
