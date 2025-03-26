@@ -582,10 +582,10 @@ the format is:
 
     protected function linkIDE(string $text, ?string $file, ?int $line): string
     {
-        if (! \ZfExtended_Utils::isDevelopment() || ! str_starts_with($file, APPLICATION_ROOT)) {
+        if (is_null($file) && is_null($line)) {
             return $text;
         }
-        if (is_null($file) && is_null($line)) {
+        if (! \ZfExtended_Utils::isDevelopment() || ! str_starts_with($file, APPLICATION_ROOT)) {
             return $text;
         }
         $file = urlencode(str_replace(APPLICATION_ROOT, '', $file));

@@ -34,6 +34,9 @@ use ZfExtended_Factory;
 
 abstract class AlignmentAbstract
 {
+    /**
+     * @var Error[]
+     */
     private array $errors = [];
 
     private editor_Models_Segment $segment;
@@ -45,16 +48,18 @@ abstract class AlignmentAbstract
 
     abstract public function findSegment(editor_Models_Import_FileParser $parser): ?editor_Models_Segment;
 
+    /**
+     * Combines errors of same event code by merging extra data. Please use only scalar extra values,
+     * unspecific exceptions must still be logged separately!
+     */
     public function addError(Error $error): void
     {
-        if (! isset($this->errors[$error->getCode()])) {
-            $this->errors[$error->getCode()] = new Error(
-                $error->getCode(),
-                $error->getMessage(),
-                []
-            );
+        if (isset($this->errors[$error->getCode()])) {
+            $this->errors[$error->getCode()]->incrementCounter();
+            $this->errors[$error->getCode()]->addExtra($error->getExtra());
+        } else {
+            $this->errors[$error->getCode()] = $error;
         }
-        $this->errors[$error->getCode()]->addExtra($error->getExtra());
     }
 
     /***

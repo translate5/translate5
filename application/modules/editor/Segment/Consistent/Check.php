@@ -101,6 +101,9 @@ class editor_Segment_Consistent_Check
         // Get materialized view
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         $mv->setTaskGuid($task->getTaskGuid());
+        if (! $mv->exists()) {
+            $mv->create();
+        }
 
         // Set materialized view name
         $this->mvName = $mv->getName();

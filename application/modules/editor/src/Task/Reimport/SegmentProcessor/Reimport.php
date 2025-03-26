@@ -40,10 +40,12 @@ use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use MittagQI\Translate5\Task\Reimport\Exception;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\ContentDefault;
+use ReflectionException;
 use Throwable;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
+use ZfExtended_Logger as Logger;
 use ZfExtended_Models_User;
 use ZfExtended_Utils;
 
@@ -82,14 +84,21 @@ class Reimport extends editor_Models_Import_SegmentProcessor
 
     protected FileDto $fileDto;
 
+    private Logger $logger;
+
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     */
     public function __construct(
         editor_Models_Task $task,
-        private ZfExtended_Models_User $user
+        private readonly ZfExtended_Models_User $user
     ) {
         parent::__construct($task);
         $this->segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
 
         $this->alignment = $this->getAlignment($task);
+        $this->logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
     }
 
     /**
@@ -114,18 +123,26 @@ class Reimport extends editor_Models_Import_SegmentProcessor
                 $this->updatedSegments[] = $segment->getSegmentNrInTask();
             }
 
-            return $segment->getId();
+            return (int) $segment->getId();
         } catch (Throwable $e) {
             // collect the errors in case the segment can not be saved
 
             /* @var ReimportSegmentErrors $reimportError */
             $this->alignment->addError(new Error(
                 'E1435',
-                'Reimport Segment processor: Unable to save the segment:' . $segment->getSegmentNrInTask(),
+                'Reimport Segment processor: Unable to save {count} segments. See system log for details.',
                 [
-                    $e->getMessage(),
+                    'Segment Nr: ' . $segment->getSegmentNrInTask(),
                 ]
             ));
+            $this->logger->exception($e, [
+                'extra' => [
+                    'segmentId' => $segment->getId(),
+                    //_task → don't save this exception directly to the task to prevent confusing task eventlog!
+                    '_task' => $segment->getTaskGuid(),
+                    'segmentNr' => $segment->getSegmentNrInTask(),
+                ],
+            ]);
 
             return false;
         }
@@ -169,11 +186,9 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     private function logFileInfo(int $fileId): void
     {
-        $logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
-
         $errors = $this->alignment->getErrors();
 
-        $logger->info(
+        $this->logger->info(
             'E1440',
             'Reimport for the file "{fileName}" is finished. Total updated segments: {updateCount}.',
             [
@@ -188,11 +203,12 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         foreach ($errors as $error) {
             /* @var Error $error */
 
-            $logger->warn($error->getCode(), $error->getMessage(), [
+            $this->logger->warn($error->getCode(), $error->getMessage(), [
                 'task' => $this->task,
                 'fileId' => $fileId,
                 'fileName' => $this->fileDto->filteredFilePath,
-                'extra' => implode(', ', $error->getExtra()),
+                'count' => $error->getCounter(),
+                'segments' => implode(', ', $error->getExtra()),
             ]);
         }
     }
