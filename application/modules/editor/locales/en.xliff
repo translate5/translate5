@@ -3750,6 +3750,10 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.</source>
                 <target>103% is a 100% match that originally came from a file with the same name (like a 101% match). In addition to the 101% match, the segment ID is still the same or equal to the segment ID in the current file.</target>
             </trans-unit>
+            <trans-unit id='RGllIGFuZ2V6ZWlndGUgTWF0Y2hyYXRlIGthbm4gc2ljaCBkdXJjaCBBYnrDvGdlIGF1ZiBkYXMgVE0gd2llIGZvbGd0IGVyZ2ViZW46PGJyLz5FcnN0ZXIgV2VydCBpbiBLbGFtbWVybiA9IHVyc3Byw7xuZ2xpY2hlIE1hdGNocmF0ZTxici8+WndlaXRlciBXZXJ0ID0gZWluZ2VzdGVsbHRlciBTdHJhZmFienVnPGJyLz5Ecml0dGVyIFdlcnQgPSBlaW5nZXN0ZWxsdGVyIFN1YnNwcmFjaGVuYWJ6dWc='>
+                <source>Die angezeigte Matchrate kann sich durch Abzüge auf das TM wie folgt ergeben:<br/>Erster Wert in Klammern = ursprüngliche Matchrate<br/>Zweiter Wert = eingestellter Strafabzug<br/>Dritter Wert = eingestellter Subsprachenabzug</source>
+                <target>The displayed match rate can result from penalties to the TM as follows:<br/>First value in brackets = original match rate<br/>Second value = set penalty deduction<br/>Third value = set sublanguage penalty</target>
+            </trans-unit>
             <trans-unit id='MTA0JSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIGF1cyBlaW5lciBUZXJtY29sbGVjdGlvbiBrb21tdC4='>
                 <source>104% ist ein 100% Treffer, der aus einer Termcollection kommt.</source>
                 <target>104% is a 100% match coming from a term collection.</target>

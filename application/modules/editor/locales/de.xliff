@@ -3447,6 +3447,10 @@
                 <source>103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.</source>
                 <target>103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.</target>
             </trans-unit>
+            <trans-unit id='RGllIGFuZ2V6ZWlndGUgTWF0Y2hyYXRlIGthbm4gc2ljaCBkdXJjaCBBYnrDvGdlIGF1ZiBkYXMgVE0gd2llIGZvbGd0IGVyZ2ViZW46PGJyLz5FcnN0ZXIgV2VydCBpbiBLbGFtbWVybiA9IHVyc3Byw7xuZ2xpY2hlIE1hdGNocmF0ZTxici8+WndlaXRlciBXZXJ0ID0gZWluZ2VzdGVsbHRlciBTdHJhZmFienVnPGJyLz5Ecml0dGVyIFdlcnQgPSBlaW5nZXN0ZWxsdGVyIFN1YnNwcmFjaGVuYWJ6dWc='>
+                <source>Die angezeigte Matchrate kann sich durch Abzüge auf das TM wie folgt ergeben:<br/>Erster Wert in Klammern = ursprüngliche Matchrate<br/>Zweiter Wert = eingestellter Strafabzug<br/>Dritter Wert = eingestellter Subsprachenabzug</source>
+                <target>Die angezeigte Matchrate kann sich durch Abzüge auf das TM wie folgt ergeben:<br/>Erster Wert in Klammern = ursprüngliche Matchrate<br/>Zweiter Wert = eingestellter Strafabzug<br/>Dritter Wert = eingestellter Subsprachenabzug</target>
+            </trans-unit>
             <trans-unit id='MTA0JSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIGF1cyBlaW5lciBUZXJtY29sbGVjdGlvbiBrb21tdC4='>
                 <source>104% ist ein 100% Treffer, der aus einer Termcollection kommt.</source>
                 <target>104% ist ein 100% Treffer, der aus einer Termcollection kommt.</target>

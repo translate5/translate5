@@ -192,10 +192,11 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
                     pg = record.get('penaltyGeneral') || 0,
                     ps = record.get('penaltySublang') || 0,
                     om = matchrate, // original matchrate
-                    fm = matchrate - pg - ps;  // final matchrate
+                    fm = matchrate - pg - ps,  // final matchrate
+                    rb = ' (=' + [om, pg, ps].join('-') + ')' // round brackets
 
                   // Complete rendering the value
-                  value += fm + ' (=' + [om, pg, ps].join('-') + ') [' +  name + ']';
+                  value += fm + (fm === om ? '' : rb) + ' [' +  name + ']';
 	              value += "</b>";
                   return value;
 	          },
