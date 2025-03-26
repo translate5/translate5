@@ -56,6 +56,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private const VERSION_0_6 = '0.6';
 
+    public const NEXT_SUFFIX = '_next-';
+
     /**
      * Connector
      * @var editor_Services_OpenTM2_HttpApi
@@ -1872,18 +1874,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
     }
 
-    private function generateNextMemoryName(LanguageResource $languageResource): string
+    private function generateNextMemoryName(LanguageResource $languageResource, bool $forceNextSuffix = false): string
     {
         $memories = $languageResource->getSpecificData('memories', parseAsArray: true);
 
-        if (empty($memories)) {
+        if (empty($memories) && ! $forceNextSuffix) {
             return $this->generateTmFilename($languageResource);
         }
 
-        $pattern = '/_next-(\d+)/';
+        $pattern = sprintf('/%s(\d+)/', self::NEXT_SUFFIX);
 
         $currentMax = 0;
-        foreach ($memories as $memory) {
+        foreach ($memories ?: [] as $memory) {
             if (! preg_match($pattern, $memory['filename'], $matches)) {
                 continue;
             }
@@ -1891,7 +1893,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $currentMax = $currentMax > $matches[1] ? $currentMax : (int) $matches[1];
         }
 
-        return $this->generateTmFilename($languageResource) . '_next-' . ($currentMax + 1);
+        return $this->generateTmFilename($languageResource) . self::NEXT_SUFFIX . ($currentMax + 1);
     }
 
     public function export(string $mime): ?string
@@ -2061,18 +2063,24 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 break;
             }
 
+            $apiError = $this->api->getError();
+
             $this->logger->warn(
                 'E1305',
                 't5memory: Could not create empty memory - waiting for {elapsedTime} seconds.',
                 [
                     'languageResource' => $this->languageResource,
-                    'apiError' => $this->api->getError(),
+                    'apiError' => $apiError,
                     'elapsedTime' => $elapsedTime,
                 ]
             );
 
             sleep($this->getRetryDelaySeconds());
             $elapsedTime += $this->getRetryDelaySeconds();
+
+            if (isset($apiError->error) && strpos($apiError->error, 'ERROR_MEM_NAME_EXISTS')) {
+                $name = $this->generateNextMemoryName($this->languageResource, forceNextSuffix: true);
+            }
         }
 
         return $t5memoryName;
