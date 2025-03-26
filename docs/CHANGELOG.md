@@ -10,6 +10,50 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.21.1] - 2025-03-26
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4361](https://jira.translate5.net/browse/TRANSLATE-4361): Import/Export - Add filters to html-report** <br>
+7.21.1: Making the default configurations work
+7.21.0: Task HTML Export: JS UI filters implemented
+
+
+### Changed
+**[TRANSLATE-4567](https://jira.translate5.net/browse/TRANSLATE-4567): LanguageResources - add tooltipp for penalties in fuzzy match panel** <br>
+Improved tooltip for matchrate in editors' matches panel 
+
+
+### Bugfixes
+**[TRANSLATE-4571](https://jira.translate5.net/browse/TRANSLATE-4571): Package Ex and Re-Import - Translator package can not be re-imported on older tasks** <br>
+Translator package could sometimes not be re-imported in older tasks.
+
+**[TRANSLATE-4570](https://jira.translate5.net/browse/TRANSLATE-4570): openai - Prevent OpenAI-specific CSS styles from affecting event log** <br>
+FIXED: OpenAI-specific styles are not affecting other parts of application anymore
+
+**[TRANSLATE-4566](https://jira.translate5.net/browse/TRANSLATE-4566): Authentication, Task Management - Opening tasks via URL as read-only user produces an error** <br>
+Opening read-only tasks via URL leads to a no access exception.
+
+**[TRANSLATE-4563](https://jira.translate5.net/browse/TRANSLATE-4563): job coordinator - job coordinator cannot open (in edit mode) job assigned to job coordinator colleage** <br>
+Job Coordinator: allow not assigned coordinator enter a task for edit
+
+**[TRANSLATE-4562](https://jira.translate5.net/browse/TRANSLATE-4562): job coordinator - not all available Job Coordinators selectable in Job assignment dropdown** <br>
+Job assignments: Fix Coordinator list in existing job
+
+**[TRANSLATE-4559](https://jira.translate5.net/browse/TRANSLATE-4559): Editor general - Create CLI command for optional sqlite initialisation** <br>
+Change how optional sqlite DB is initialised in order to prevent problems.
+
+**[TRANSLATE-4556](https://jira.translate5.net/browse/TRANSLATE-4556): t5memory - TM-Maintenance serverside issue: Total of found segments higher than actually displayed number of segments** <br>
+Fix loading segments in TM Mainteenance for split memories
+
+**[TRANSLATE-4541](https://jira.translate5.net/browse/TRANSLATE-4541): t5memory - t5memory: create next memory if getting error that current filename already exists** <br>
+t5memory: create next memory if getting error that current filename already exists
+
+
 ## [7.21.0] - 2025-03-20
 
 ### Important Notes:
