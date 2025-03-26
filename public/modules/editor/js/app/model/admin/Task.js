@@ -368,11 +368,7 @@ Ext.define('Editor.model.admin.Task', {
      * @returns {string}
      */
     getInitUserState: function () {
-        var me = this;
-        if (me.isUnconfirmed() || me.isWaiting() || me.isFinished() || me.isAutoFinish()) {
-            return me.USER_STATE_VIEW;
-        }
-        return me.USER_STATE_EDIT;
+        return this.isReadOnly(false) ? this.USER_STATE_VIEW : this.USER_STATE_EDIT;
     },
 
     /**
