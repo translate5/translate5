@@ -114,7 +114,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     {
         return new UpdateSegmentDTO(
             '',
-            $segment->getId(),
+            (int) $segment->getId(),
             $segment->getSource(),
             $segment->getTarget(),
             '',
@@ -343,6 +343,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
         usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
+        $ids = array_column($memories, 'id');
 
         foreach ($memories as ['filename' => $tmName, 'id' => $id]) {
             // check if current memory was searched through in prev request
@@ -389,6 +390,9 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $result = $this->api->getResult();
 
             if (empty($result) || empty($result->results)) {
+                // Reset the TM offset to start from the beginning of the next TM
+                $tmOffset = null;
+
                 continue;
             }
 
@@ -402,7 +406,16 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             );
             $results[] = $data;
             $resultsCount += count($result->results);
-            $resultList->setNextOffset($result->NewSearchPosition ? ($id . ':' . $result->NewSearchPosition) : null);
+            $nextOffset = $result->NewSearchPosition ? ($id . ':' . $result->NewSearchPosition) : null;
+
+            // If there is no search position in the result, and there is next memory
+            // we need to set the next offset to the next memory
+            if (! $nextOffset && $id < max($ids)) {
+                $filtered = array_filter($ids, static fn ($num) => $num > $id);
+                $nextOffset = reset($filtered) . ':1:1';
+            }
+
+            $resultList->setNextOffset($nextOffset);
 
             // if we get enough results then response them
             /** @var int $resultsCount */
