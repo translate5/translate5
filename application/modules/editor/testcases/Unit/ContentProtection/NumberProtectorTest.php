@@ -79,45 +79,66 @@ class NumberProtectorTest extends TestCase
     public function filterTagsProvider(): iterable
     {
         yield [
-            'source' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
-            'target' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
-            'sourceExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
-            'targetExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+            'source' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'target' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'sourceExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'targetExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
         ];
 
         yield [
-            'source' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
-            'target' => 'string <number type="date" name="default Y.m.d" source="2023.10.20" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Y*m*d" source="2023*10*20" iso="2023-10-20" target="2023-10-20"/> string',
-            'sourceExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
-            'targetExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+            'source' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'target' => 'string <number type="date" name="default Y.m.d" source="2023.10.20" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Y*m*d" source="2023*10*20" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'sourceExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'targetExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
         ];
 
         yield [
-            'source' => 'string <number type="date" name="default Ymd" source="20231022" iso="2023-10-22" target="2023-10-22"/> string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
-            'target' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
-            'sourceExpected' => 'string 20231022 string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
-            'targetExpected' => 'string 20231020 string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
+            'source' => 'string <number type="date" name="default Ymd" source="20231022" iso="2023-10-22" target="2023-10-22" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'target' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'sourceExpected' => 'string 20231022 string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'targetExpected' => 'string 20231020 string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
         ];
 
         yield [
-            'source' => 'string <number type="date" name="default Y*m*d" source="2023*10*21" iso="2023-10-21" target="2023-10-21"/> string',
-            'target' => 'string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
-            'sourceExpected' => 'string <number type="date" name="default Y*m*d" source="2023*10*21" iso="2023-10-21" target="2023-10-21"/> string',
-            'targetExpected' => 'string <number type="date" name="default Y*m*d" source="2023*10*21" iso="2023-10-21" target="2023-10-21"/> string',
+            'source' => 'string <number type="date" name="default Y*m*d" source="2023*10*21" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'target' => 'string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'sourceExpected' => 'string <number type="date" name="default Y*m*d" source="2023*10*21" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
+            'targetExpected' => 'string <number type="date" name="default Y*m*d" source="2023*10*21" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
         ];
 
         yield [
             'source' => 'string 2023-10-21 string',
-            'target' => 'string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
+            'target' => 'string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
             'sourceExpected' => 'string 2023-10-21 string',
             'targetExpected' => 'string 20231021 string',
         ];
 
         yield [
-            'source' => 'string <number type="date" name="default Y-m-d" source="2023-10-21" iso="2023-10-21" target="2023-10-21"/> string',
+            'source' => 'string <number type="date" name="default Y-m-d" source="2023-10-21" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
             'target' => 'string 20231021 string',
             'sourceExpected' => 'string 2023-10-21 string',
             'targetExpected' => 'string 20231021 string',
+        ];
+
+        yield [
+            'source' => '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Temperaturklasse <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple (with units)" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA"/>V',
+            'target' => '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Classe di temperatura <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple (with units)" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA"/>V',
+            'sourceExpected' => '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Temperaturklasse <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple (with units)" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA"/>V',
+            'targetExpected' => '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Classe di temperatura <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple (with units)" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA"/>V',
+        ];
+
+        yield [
+            'source' => '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Temperaturklasse <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple (with units)" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA"/>mA',
+            'target' => '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Classe di temperatura <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple (with units)" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> mA',
+            'sourceExpected' => '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Temperaturklasse <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple (with units)" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA"/>mA',
+            'targetExpected' => '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Classe di temperatura <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple (with units)" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA"/> mA',
+        ];
+
+        yield 'same date with different rule pairs' => [
+            'source' => 'string <number type="date" name="default Y*m*d" source="2023*10*22" iso="2023-10-22" target="2023-10-22" regex="rule_with_*"/> string <number type="date" name="default Ymd" source="20231022" iso="2023-10-22" target="2023.10.22" regex="other_rule"/> string',
+            'target' => 'string <number type="date" name="default Ymd" source="20231022" iso="2023-10-22" target="2023.10.22" regex="other_rule"/> string <number type="date" name="default Y*m*d" source="2023*10*22" iso="2023-10-22" target="2023-10-22" regex="rule_with_*"/> string',
+            'sourceExpected' => 'string <number type="date" name="default Y*m*d" source="2023*10*22" iso="2023-10-22" target="2023-10-22" regex="rule_with_*"/> string <number type="date" name="default Ymd" source="20231022" iso="2023-10-22" target="2023.10.22" regex="other_rule"/> string',
+            'targetExpected' => 'string <number type="date" name="default Ymd" source="20231022" iso="2023-10-22" target="2023.10.22" regex="other_rule"/> string <number type="date" name="default Y*m*d" source="2023*10*22" iso="2023-10-22" target="2023-10-22" regex="rule_with_*"/> string',
         ];
     }
 
@@ -263,6 +284,14 @@ class NumberProtectorTest extends TestCase
         self::assertSame($converted, $protector->convertToInternalTags($segment, $shortTagIdent, xmlChunks: $xmlChunks));
         self::assertSame($finalTagIdent, $shortTagIdent);
         self::assertCount($xmlChunksCount, $xmlChunks);
+
+        $shortTagIdent = 1;
+        $xmlChunks = [];
+        $s = '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Temperaturklasse <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... 10mA';
+
+        $r = $protector->convertToInternalTags($s, $shortTagIdent, xmlChunks: $xmlChunks);
+
+        dump($r);
     }
 
     public function internalTagsProvider(): iterable

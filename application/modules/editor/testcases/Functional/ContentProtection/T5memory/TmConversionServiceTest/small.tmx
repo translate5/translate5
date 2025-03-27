@@ -26,5 +26,29 @@
                 <seg>**ola** <t5:n id="1" r="04+LSdFWCA12UdEHAA==" n="OTHER_TEXT"/></seg>
             </tuv>
         </tu>
+        <tu tuid="541" creationdate="20240529T144601Z" creationid="[AMPLEXOR]">
+            <prop type="tmgr:segId">1541</prop>
+            <prop type="t5:InternalKey">1460:1</prop>
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de-DE">
+                <seg>1 ... 10 Temperaturklasse 4 ... 20mA</seg>
+            </tuv>
+            <tuv xml:lang="bg-BG">
+                <seg>1 ... 10 Classe di temperatura 4 ... 20 mA</seg>
+            </tuv>
+        </tu>
+        <tu tuid="551" creationdate="20240529T144559Z" creationid="[AMPLEXOR]">
+            <prop type="tmgr:segId">1551</prop>
+            <prop type="t5:InternalKey">1466:1</prop>
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de-DE">
+                <seg>1 ... 10 Temperaturklasse 1 ... 10V</seg>
+            </tuv>
+            <tuv xml:lang="bg-BG">
+                <seg>1 ... 10 Classe di temperatura 1 ... 10V</seg>
+            </tuv>
+        </tu>
     </body>
 </tmx>

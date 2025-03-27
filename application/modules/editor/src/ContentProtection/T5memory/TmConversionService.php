@@ -49,8 +49,6 @@ use ZfExtended_Logger;
 
 class TmConversionService implements TmConversionServiceInterface
 {
-    public const T5MEMORY_NUMBER_TAG = 't5:n';
-
     private array $languageRulesHashMap;
 
     private array $languageResourceRulesHashMap;
@@ -92,11 +90,6 @@ class TmConversionService implements TmConversionServiceInterface
             $languageRulesHash->getHash()
         );
         $languageResource->save();
-    }
-
-    public static function fullTagRegex(): string
-    {
-        return sprintf('/<%s id="(\d+)" r="(.+)" n="(.+)"\s?\/>/Uu', self::T5MEMORY_NUMBER_TAG);
     }
 
     public function isTmConverted(int $languageResourceId): bool
@@ -162,7 +155,7 @@ class TmConversionService implements TmConversionServiceInterface
 
     public function convertT5MemoryTagToContent(string $string): string
     {
-        preg_match_all(self::fullTagRegex(), $string, $tags, PREG_SET_ORDER);
+        preg_match_all(T5NTag::fullTagRegex(), $string, $tags, PREG_SET_ORDER);
 
         if (empty($tags)) {
             return $string;
@@ -170,11 +163,8 @@ class TmConversionService implements TmConversionServiceInterface
 
         foreach ($tags as $tagWithProps) {
             $tag = $tagWithProps[0];
-            $protectedContent = html_entity_decode($tagWithProps[3], ENT_XML1);
-            // return < and > from special chars that was used to avoid error in t5memory
-            $protectedContent = str_replace(['*≺*', '*≻*'], ['<', '>'], $protectedContent);
             // make sure not escape already escaped HTML entities
-            $protectedContent = $this->protectHtmlEntities($protectedContent);
+            $protectedContent = $this->protectHtmlEntities(T5NTag::fromMatch($tagWithProps)->content);
 
             $string = str_replace($tag, htmlentities($protectedContent, ENT_XML1), $string);
         }
@@ -194,55 +184,50 @@ class TmConversionService implements TmConversionServiceInterface
 
     public function convertContentTagToT5MemoryTag(string $queryString, bool $isSource, &$numberTagMap = []): string
     {
-        $queryString = $this->contentProtector->unprotect($queryString, false, NumberProtector::alias());
+        $queryString = $this->contentProtector->unprotect($queryString, $isSource, NumberProtector::alias());
         $regex = NumberProtector::fullTagRegex();
 
-        if (! preg_match_all($regex, $queryString, $tags, PREG_SET_ORDER)) {
+        if (! preg_match($regex, $queryString)) {
             return $queryString;
         }
 
         $currentId = 1;
-        foreach ($tags as $tagProps) {
-            $tag = array_shift($tagProps);
+        $queryString = preg_replace_callback(
+            $regex,
+            function (array $tagProps) use (&$currentId, &$numberTagMap, $isSource) {
+                $tag = array_shift($tagProps);
 
-            if (count($tagProps) < 7) {
-                $this->logger->warn(
-                    'E1625',
-                    "Protection Tag doesn't has required meta info. Fuzzy searches may return worse match rate"
-                );
-                $tagProps = array_pad($tagProps, 7, '');
-            }
+                if (count($tagProps) < 7) {
+                    $this->logger->warn(
+                        'E1625',
+                        "Protection Tag doesn't has required meta info. Fuzzy searches may return worse match rate"
+                    );
+                    $tagProps = array_pad($tagProps, 7, '');
+                }
 
-            unset($tagProps[5]);
+                unset($tagProps[5]);
 
-            $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target', 'regex'], $tagProps);
+                $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target', 'regex'], $tagProps);
 
-            if (empty($tagProps['regex'])) {
-                // for BC reasons, we use the name as regex
-                $tagProps['regex'] = base64_encode($tagProps['name']);
-            }
+                if (empty($tagProps['regex'])) {
+                    // for BC reasons, we use the name as regex
+                    $tagProps['regex'] = base64_encode($tagProps['name']);
+                }
 
-            $protectedContent = $isSource ? $tagProps['source'] : $tagProps['target'];
+                $protectedContent = $isSource ? $tagProps['source'] : $tagProps['target'];
 
-            $protectedContent = html_entity_decode($protectedContent);
-            // replace < and > with special chars to avoid error in t5memory
-            // simple htmlentities or rawurlencode would not work
-            $protectedContent = str_replace(['<', '>'], ['*≺*', '*≻*'], $protectedContent);
-            $protectedContent = htmlentities($protectedContent, ENT_XML1);
+                $protectedContent = html_entity_decode($protectedContent);
 
-            $t5nTag = sprintf(
-                '<%s id="%s" r="%s" n="%s"/>',
-                self::T5MEMORY_NUMBER_TAG,
-                $currentId,
-                $tagProps['regex'],
-                $protectedContent
-            );
+                $t5nTag = new T5NTag($currentId, $tagProps['regex'], $protectedContent);
 
-            $numberTagMap[$tagProps['regex']][] = $tag;
+                $numberTagMap[$tagProps['regex']][$currentId] = $tag;
 
-            $queryString = str_replace($tag, $t5nTag, $queryString);
-            $currentId++;
-        }
+                $currentId++;
+
+                return $t5nTag->toString();
+            },
+            $queryString
+        );
 
         return $queryString;
     }
@@ -349,7 +334,6 @@ class TmConversionService implements TmConversionServiceInterface
         int &$brokenTus,
     ): string {
         $transUnit = $this->convertT5MemoryTagToContent($transUnit);
-        $numberTagMap = [];
 
         $sourceSegment = '';
         $targetSegment = '';
@@ -414,8 +398,8 @@ class TmConversionService implements TmConversionServiceInterface
                 '*target*',
             ],
             [
-                $this->convertContentTagToT5MemoryTag($source, true, $numberTagMap),
-                $this->convertContentTagToT5MemoryTag($target, false, $numberTagMap),
+                $this->convertContentTagToT5MemoryTag($source, true),
+                $this->convertContentTagToT5MemoryTag($target, false),
             ],
             $transUnit
         );

@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\T5memory\T5NTag;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 
 class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff
@@ -37,6 +38,9 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
 
     private TmConversionService $conversionService;
 
+    /**
+     * @var array<string, string[]>
+     */
     private array $numberTagMap = [];
 
     public function __construct(array $options = [])
@@ -57,7 +61,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
 
     public function restoreInResult(string $resultString, bool $isSource = true): ?string
     {
-        $t5nTagRegex = TmConversionService::fullTagRegex();
+        $t5nTagRegex = T5NTag::fullTagRegex();
 
         if (preg_match_all($t5nTagRegex, $resultString, $matches, PREG_SET_ORDER)) {
             $numberTags = [];
@@ -69,14 +73,30 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                 ];
             }
 
-            foreach ($numberTags as $regex => $tags) {
+            foreach ($numberTags as $rule => $tags) {
                 // sort tags by their ids
                 ksort($tags);
+                // get rid of the keys
+                $tags = array_values($tags);
 
-                if (isset($this->numberTagMap[$regex])) {
-                    $resultString = str_replace(array_column($tags, 'tag'), $this->numberTagMap[$regex], $resultString);
+                if (isset($this->numberTagMap[$rule])) {
+                    $taskSegmentTags = $this->numberTagMap[$rule];
+                    ksort($taskSegmentTags);
+                    $taskSegmentTags = array_values($taskSegmentTags);
 
-                    continue;
+                    foreach ($taskSegmentTags as $id => $segmentTag) {
+                        if (! isset($tags[$id])) {
+                            break;
+                        }
+
+                        $resultString = str_replace($tags[$id]['tag'], $segmentTag, $resultString);
+
+                        unset($tags[$id]);
+                    }
+
+                    if (empty($tags)) {
+                        continue;
+                    }
                 }
 
                 foreach ($tags as ['number' => $number, 'tag' => $tag]) {
@@ -104,7 +124,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         return $this->utilities->internalTag->toXliff(
             $queryString,
             replaceMap: $this->map,
-            dontRemoveTags: ['<' . TmConversionService::T5MEMORY_NUMBER_TAG . '>']
+            dontRemoveTags: ['<' . T5NTag::TAG . '>']
         );
     }
 }

@@ -224,7 +224,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     private function addMemoryToLanguageResource(
         LanguageResource $languageResource,
         string $tmName,
-        bool $isInternalFuzzy = false
+        bool $isInternalFuzzy = false,
     ): void {
         $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
         if (! empty($prefix)) {
@@ -513,7 +513,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         bool $saveToDisk,
         array $dataSent,
         editor_Models_Segment $segment,
-        bool $recheckOnUpdate
+        bool $recheckOnUpdate,
     ): void {
         $elapsedTime = 0;
         $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
@@ -930,6 +930,38 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         return $this->getStatusFromApi($this->languageResource, $tmName);
+    }
+
+    public function isEmpty(): bool
+    {
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+
+        if (count($memories) === 0) {
+            return true;
+        }
+
+        if (count($memories) !== 1) {
+            return false;
+        }
+
+        // load the memory of the language resource
+        $this->translate('');
+
+        $name = $memories[0]['filename'];
+
+        if ($this->api->status($name)) {
+            $result = $this->api->getResult();
+
+            if (! is_object($result)) {
+                return false;
+            }
+
+            $status = $result->status ?? '';
+
+            return 'open' === $status && 0 === $result->segmentIndex;
+        }
+
+        return false;
     }
 
     private function getStatusFromApi(LanguageResource $languageResource, ?string $tmName): string
