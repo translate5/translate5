@@ -469,8 +469,12 @@ class NumberProtector implements ProtectorInterface
         }
 
         foreach ($sourceMatches as $sourceMatch) {
+            // needle = type + iso + target
+            $sourceNeedle = $sourceMatch[1] . ':' . $sourceMatch[4] . ':' . $sourceMatch[5];
             foreach ($targetMatches as $key => $targetMatch) {
-                if ($sourceMatch[4] === $targetMatch[4]) {
+                $targetNeedle = $targetMatch[1] . ':' . $targetMatch[4] . ':' . $targetMatch[5];
+
+                if ($sourceNeedle === $targetNeedle) {
                     $target = str_replace($targetMatch[0], $sourceMatch[0], $target);
                     unset($targetMatches[$key]);
 
@@ -587,6 +591,8 @@ class NumberProtector implements ProtectorInterface
 
         $count = count($parts);
 
+        $partHash = md5($part);
+
         for ($i = 0; $i <= $count; $i++) {
             yield $parts[$i];
 
@@ -596,6 +602,7 @@ class NumberProtector implements ProtectorInterface
 
             $protected = $this->protectNumber(
                 $numbers[$i],
+                $partHash,
                 $placeholders,
                 $langFormat,
                 $sourceLang,
@@ -635,12 +642,14 @@ class NumberProtector implements ProtectorInterface
 
     private function protectNumber(
         string $number,
+        string $partHash,
         array &$placeholders,
         ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
     ): string {
-        if (! isset($this->protectedNumbers[$number])) {
+        $numberKey = $number . $partHash;
+        if (! isset($this->protectedNumbers[$numberKey])) {
             try {
                 $protectedNumber = $this
                     ->protectors[$langFormat->type]
@@ -650,12 +659,12 @@ class NumberProtector implements ProtectorInterface
                 return $number;
             }
 
-            $this->protectedNumbers[$number] = $protectedNumber;
+            $this->protectedNumbers[$numberKey] = $protectedNumber;
         }
 
-        $numberPlaceholder = sprintf(self::PLACEHOLDER_FORMAT, base64_encode($this->protectedNumbers[$number]));
+        $numberPlaceholder = sprintf(self::PLACEHOLDER_FORMAT, base64_encode($this->protectedNumbers[$numberKey]));
 
-        $placeholders[$numberPlaceholder] = $this->protectedNumbers[$number];
+        $placeholders[$numberPlaceholder] = $this->protectedNumbers[$numberKey];
 
         return $numberPlaceholder;
     }

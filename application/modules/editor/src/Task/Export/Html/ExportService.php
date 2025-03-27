@@ -24,8 +24,9 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\Export;
+namespace MittagQI\Translate5\Task\Export\Html;
 
+use editor_Models_Segment_AutoStates;
 use editor_Models_Task;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Task\Overview\SegmentDataProviderFactory;
@@ -57,6 +58,7 @@ class ExportService
         private readonly TrackChangesTagFormatter $trackChangesTagFormatter,
         private readonly Zend_View $view,
         private readonly ZfExtended_Zendoverwrites_Translate $translate,
+        private readonly editor_Models_Segment_AutoStates $segmentAutoStates,
     ) {
         $this->assetsDirectory = APPLICATION_ROOT . '/public/modules/editor';
         $this->viewsDirectory = APPLICATION_PATH . '/modules/' . Zend_Registry::get('module') . '/views';
@@ -82,6 +84,7 @@ class ExportService
             TrackChangesTagFormatter::create(),
             new Zend_View(),
             $translate,
+            new editor_Models_Segment_AutoStates(),
         );
     }
 
@@ -143,15 +146,27 @@ class ExportService
 
         $this->view->addScriptPath($this->viewsDirectory . '/scripts/task/');
 
-        $protocol = $this->config->runtimeOptions->server->protocol;
+        $conf = $this->config->runtimeOptions;
+        $protocol = $conf->server->protocol;
         $this->addAssets($protocol);
         $this->view->assign(
             'taskUrl',
-            $protocol . $this->config->runtimeOptions->server->name . '/editor/taskid/' . $task->getId()
+            $protocol . $conf->server->name . '/editor/taskid/' . $task->getId()
         );
         $this->view->assign('taskName', $task->getTaskName());
         $this->view->assign('segmentDataTable', $segmentDataTable);
-        $this->view->assign('defaultFilters', $this->config->runtimeOptions->exportService->defaultFilters);
+        $this->view->assign('onlyHasComments', $conf->export->html->defaultFilters->onlyHasComments);
+
+        //since filter operates on finally translated texts, we have to translate the default too!
+        $processingStatesLabeled = $this->segmentAutoStates->getLabelMap($this->translate);
+        if (array_key_exists($conf->export->html->defaultFilters->translatedStatus, $processingStatesLabeled)) {
+            $defaultProcessingState = $this->translate->_(
+                $processingStatesLabeled[$conf->export->html->defaultFilters->translatedStatus]
+            );
+        } else {
+            $defaultProcessingState = '';
+        }
+        $this->view->assign('defaultProcessingState', $defaultProcessingState);
         $this->view->addHelperPath($this->viewsDirectory . '/helpers/Task', 'View_Helper_');
     }
 }

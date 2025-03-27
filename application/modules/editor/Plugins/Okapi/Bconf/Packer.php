@@ -123,6 +123,7 @@ final class Packer
                     '<rainbowPipeline version="1" ' . Pipeline::BCONF_VERSION_ATTR . '="' . editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX . '">',
                     $pipelineContent
                 );
+                file_put_contents($pipeline->getPath(), $pipelineContent);
             }
             $this->raf->writeUTF($pipelineContent, false);
             // process filters & extension mapping

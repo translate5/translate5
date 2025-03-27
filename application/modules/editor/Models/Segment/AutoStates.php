@@ -202,12 +202,12 @@ class editor_Models_Segment_AutoStates
 
     /**
      * returns a map with state as index and translated text as value
-     * @return array
      */
-    public function getLabelMap()
+    public function getLabelMap(ZfExtended_Zendoverwrites_Translate $translate = null): array
     {
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        if ($translate === null) {
+            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        }
         //no json_encode because later on passed to php2js, which does json-encoding
         $states = $this->states;
 

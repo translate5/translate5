@@ -45,6 +45,11 @@ class TmConversionServiceTest extends TestCase
 
     private editor_Models_Languages $targetLang;
 
+    /**
+     * @var ContentRecognition[]
+     */
+    private array $rules = [];
+
     protected function setUp(): void
     {
         $inputMapping = new InputMapping();
@@ -65,26 +70,45 @@ class TmConversionServiceTest extends TestCase
         $this->targetLang = $languageRepository->findByRfc5646('it-it') ?? new editor_Models_Languages();
 
         $keep1 = new ContentRecognition();
-        $keep1->setName('Keep numerals as is');
+        $keep1->setName('default simple');
         $keep1->setType(KeepContentProtector::getType());
         $keep1->setEnabled(true);
         $keep1->setKeepAsIs(true);
-        $keep1->setRegex('/\d+((\s|\.|\,)(\d)+)*/');
-        $keep1->setMatchId(0);
+        $keep1->setRegex('/(\s|^|\()([-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u');
+        $keep1->setMatchId(2);
         $keep1->save();
+
+        $this->rules[] = $keep1;
+
+        $keep2 = new ContentRecognition();
+        $keep2->setName('default simple (with units)');
+        $keep2->setType(KeepContentProtector::getType());
+        $keep2->setEnabled(true);
+        $keep2->setKeepAsIs(true);
+        $keep2->setRegex('/(\s|^|\()([-+]?([1-9]\d+|\d))(%|°|V|mm|kbit|s|psi|bar|MPa|mA)(([\.,:;?!](\s|$))|\s|$|\))/u');
+        $keep2->setMatchId(2);
+        $keep2->save();
+
+        $this->rules[] = $keep2;
 
         $inputMapping = new InputMapping();
         $inputMapping->setLanguageId((int) $this->sourceLang->getId());
         $inputMapping->setContentRecognitionId($keep1->getId());
         $inputMapping->setPriority(4);
         $inputMapping->save();
+
+        $inputMapping = new InputMapping();
+        $inputMapping->setLanguageId((int) $this->sourceLang->getId());
+        $inputMapping->setContentRecognitionId($keep2->getId());
+        $inputMapping->setPriority(5);
+        $inputMapping->save();
     }
 
     protected function tearDown(): void
     {
-        $keep1 = new ContentRecognition();
-        $keep1->loadBy(KeepContentProtector::getType(), 'Keep numerals as is');
-        $keep1->delete();
+        foreach ($this->rules as $rule) {
+            $rule->delete();
+        }
 
         $inputMapping = new InputMapping();
         foreach ($inputMapping->loadAll() as $item) {

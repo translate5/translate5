@@ -5,10 +5,10 @@
             <prop type="tmgr:markup">OTMXUXLF</prop>
             <prop type="tmgr:docname">none</prop>
             <tuv xml:lang="de-DE">
-                <seg>Temperaturklasse, maximale Oberflächentemperatur &lt; <t5:n id="1" r="049J0dbQiCmuidGridHR1IhJ0dTW1NIHAA==" n="135"/> °C; <t5:n id="2" r="049J0dbQiCmuidGridHR1IhJ0dTW1NIHAA==" n="275"/> °F</seg>
+                <seg>Temperaturklasse, maximale Oberflächentemperatur &lt; <t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="135"/> °C; <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="275"/> °F</seg>
             </tuv>
             <tuv xml:lang="it-IT">
-                <seg>Classe di temperatura, temperatura superficiale massima &lt; <t5:n id="1" r="049J0dbQiCmuidGridHR1IhJ0dTW1NIHAA==" n="135"/> °C; <t5:n id="2" r="049J0dbQiCmuidGridHR1IhJ0dTW1NIHAA==" n="275"/> °F</seg>
+                <seg>Classe di temperatura, temperatura superficiale massima &lt; <t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="135"/> °C; <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="275"/> °F</seg>
             </tuv>
         </tu><tu tuid="2" creationdate="20240628T093631Z" creationid="SABRINA LUWICH">
             <prop type="tmgr:segId">3</prop>
@@ -20,6 +20,28 @@
             </tuv>
             <tuv xml:lang="it-IT">
                 <seg>**ola** OTHER_TEXT</seg>
+            </tuv>
+        </tu><tu tuid="541" creationdate="20240529T144601Z" creationid="[AMPLEXOR]">
+            <prop type="tmgr:segId">1541</prop>
+            <prop type="t5:InternalKey">1460:1</prop>
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de-DE">
+                <seg><t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="1"/> ... <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/> Temperaturklasse <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="4"/> ... <t5:n id="4" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="20"/>mA</seg>
+            </tuv>
+            <tuv xml:lang="bg-BG">
+                <seg><t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="1"/> ... <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/> Classe di temperatura <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="4"/> ... <t5:n id="4" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="20"/> mA</seg>
+            </tuv>
+        </tu><tu tuid="551" creationdate="20240529T144559Z" creationid="[AMPLEXOR]">
+            <prop type="tmgr:segId">1551</prop>
+            <prop type="t5:InternalKey">1466:1</prop>
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de-DE">
+                <seg><t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="1"/> ... <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/> Temperaturklasse <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="1"/> ... <t5:n id="4" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="10"/>V</seg>
+            </tuv>
+            <tuv xml:lang="bg-BG">
+                <seg><t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="1"/> ... <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/> Classe di temperatura <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="1"/> ... <t5:n id="4" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="10"/>V</seg>
             </tuv>
         </tu>
 </body>

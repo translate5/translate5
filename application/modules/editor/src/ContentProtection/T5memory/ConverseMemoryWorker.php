@@ -38,7 +38,6 @@ use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\ExportService;
-use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
 
 class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
@@ -118,7 +117,15 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
         $connector->connectTo($this->languageResource, $sourceLang, $targetLang);
 
+        if ($connector->isEmpty()) {
+            $this->finaliseConversion($sourceLang, $targetLang);
+
+            return true;
+        }
+
         $mime = $connector->getValidExportTypes()['TMX'];
+
+        $memoriesBuffer = $this->memoriesBackup;
 
         foreach ($this->memoriesBackup as $memory) {
             $exportFilename = $this->exportService->export(
@@ -142,6 +149,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                 return false;
             }
 
+            $tuCountBefore = $this->countTusInMemory($exportFilename);
+
             $fileinfo = [
                 'tmp_name' => $exportFilename,
                 'type' => $mime,
@@ -160,12 +169,43 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                     ]
                 );
 
-                $this->deleteNewlyCreatedMemories($connector);
-                $this->restoreLangResourceMemories();
-                $this->resetConversionStarted();
+                $this->rollback($connector);
 
                 return false;
             }
+
+            $memoriesNow = $this->languageResource->getSpecificData('memories', true);
+
+            $newMemory = $this->findNewMemory($memoriesBuffer, $memoriesNow);
+
+            $exportFilenameAfter = $this->exportService->export(
+                $this->languageResource,
+                ExportTmFileExtension::TMX,
+                $newMemory
+            );
+
+            $tuCountAfter = $this->countTusInMemory($exportFilenameAfter);
+
+            @unlink($exportFilenameAfter);
+
+            if ($tuCountBefore !== $tuCountAfter) {
+                $this->log->error(
+                    'E1590',
+                    'Conversion: Memory [{filename}] was not imported correctly. TU count before: {before}, after: {after}. Changes are rolled back.',
+                    [
+                        'filename' => $newMemory,
+                        'before' => $tuCountBefore,
+                        'after' => $tuCountAfter,
+                        'languageResource' => $this->languageResource,
+                    ]
+                );
+
+                $this->rollback($connector);
+
+                return false;
+            }
+
+            $memoriesBuffer = $memoriesNow;
 
             @unlink($exportFilename);
         }
@@ -193,14 +233,59 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             }
         }
 
-        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
+        $this->finaliseConversion($sourceLang, $targetLang);
+
+        return true;
+    }
+
+    private function rollback(Connector $connector): void
+    {
+        $this->deleteNewlyCreatedMemories($connector);
+        $this->restoreLangResourceMemories();
+        $this->resetConversionStarted();
+    }
+
+    private function findNewMemory(array $was, array $now): string
+    {
+        $wasNames = array_column($was, 'filename');
+        $nowNames = array_column($now, 'filename');
+
+        return array_values(array_diff($nowNames, $wasNames))[0];
+    }
+
+    private function countTusInMemory(string $file): int
+    {
+        $reader = new \XMLReader();
+
+        $reader->open($file);
+
+        // suppress: namespace error : Namespace prefix t5 on n is not defined
+        $errorLevel = error_reporting();
+        error_reporting($errorLevel & ~E_WARNING);
+
+        $count = 0;
+
+        while ($reader->read()) {
+            if ($reader->nodeType === \XMLReader::ELEMENT && $reader->name === 'tu') {
+                $count++;
+            }
+        }
+
+        $reader->close();
+
+        error_reporting($errorLevel);
+
+        return $count;
+    }
+
+    private function finaliseConversion(int $sourceLang, int $targetLang): void
+    {
+        $languageRulesHash = new LanguageRulesHash();
         $languageRulesHash->loadByLanguages($sourceLang, $targetLang);
 
         $this->languageResource->addSpecificData(LanguageResource::PROTECTION_HASH, $languageRulesHash->getHash());
 
         $this->resetConversionStarted();
-
-        return true;
     }
 
     private function resetConversionStarted(): void

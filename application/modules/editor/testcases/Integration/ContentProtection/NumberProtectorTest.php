@@ -755,6 +755,10 @@ class NumberProtectorTest extends TestCase
     public function trickyCasesProvider(): iterable
     {
         yield [
+            'string' => '1 ... 10 Temperaturklasse 0 ... 10V',
+            'expected' => '<number type="integer" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> ... <number type="integer" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> Temperaturklasse <number type="integer" name="default simple" source="0" iso="0" target="0" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> ... <number type="integer" name="default simple (with units)" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA"/>V',
+        ];
+        yield [
             'string' => 'string 3 3 3 string',
             'expected' => 'string <number type="integer" name="default simple" source="3" iso="3" target="3" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="3" iso="3" target="3" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> <number type="integer" name="default simple" source="3" iso="3" target="3" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCI0QMpUNHUrNHQgbFAVE2MpqZ+KQA="/> string',
         ];
@@ -959,6 +963,17 @@ class NumberProtectorTest extends TestCase
             null,
             true,
             null,
+            0
+        );
+
+        yield new ContentProtectionDto(
+            'integer',
+            'default simple (with units)',
+            '/(\s|^|\()([-+]?([1-9]\d+|\d))(%|°|V|mm|kbit|s|psi|bar|MPa|mA)(([\.,:;?!](\s|$))|\s|$|\))/u',
+            2,
+            '#',
+            false,
+            '#',
             0
         );
     }

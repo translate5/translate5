@@ -30,10 +30,12 @@ namespace MittagQI\Translate5\Task\Import\Alignment;
 
 class Error
 {
+    private int $counter = 1;
+
     public function __construct(
-        private string $code,
-        private string $message,
-        private array $extra
+        private readonly string $code,
+        private readonly string $message,
+        private array $extra,
     ) {
     }
 
@@ -50,6 +52,16 @@ class Error
     public function getExtra(): array
     {
         return $this->extra;
+    }
+
+    public function incrementCounter(): void
+    {
+        $this->counter++;
+    }
+
+    public function getCounter(): int
+    {
+        return $this->counter;
     }
 
     /***

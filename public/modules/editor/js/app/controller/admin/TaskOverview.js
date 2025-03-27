@@ -336,6 +336,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 
         var startImport = (task) => {
             me.fireEvent('wizardCardImportDefaults',task);
+            //VERY UGLY: in wizardCardImportDefaults some calls are done to the server
+            // the start import is also done as a request to server, but we have no control if the previous request
+            // did succeed, so this produces race conditions! Must be handled on Server Side then see TRANSLATE-4471
             me.startImport(task);
         }
 

@@ -44,7 +44,14 @@ interface TmConversionServiceInterface
 
     public function convertT5MemoryTagToContent(string $string): string;
 
-    public function convertContentTagToT5MemoryTag(string $queryString, bool $isSource, &$numberTagMap = []): string;
+    /**
+     * @param array<string, string[]> $numberTagMap
+     */
+    public function convertContentTagToT5MemoryTag(
+        string $queryString,
+        bool $isSource,
+        array &$numberTagMap = []
+    ): string;
 
     public function convertTMXForImport(string $filenameWithPath, int $sourceLangId, int $targetLangId): string;
 }

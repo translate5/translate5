@@ -29,6 +29,7 @@
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Pipeline;
 use MittagQI\Translate5\Plugins\Okapi\ImportFilter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
@@ -650,7 +651,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         // we support XLIFF-via-OKAPI only with BCONFs from Version 10 on to enable full compatibility with older task-archives
         $bconfVersion10Plus = $bconf !== null ? $bconf->getPipeline()->getBconfVersion() >= 10 : str_contains(
             file_get_contents($bconfInZip),
-            ' t5bconfVersion="' // as the flag was added since v10
+            ' ' . Pipeline::BCONF_VERSION_ATTR . '="' // as the flag was added since v10
         );
         if (! $bconfVersion10Plus) {
             return [];
