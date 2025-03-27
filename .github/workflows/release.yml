@@ -22,10 +22,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          body: "The translate5.zip contains the deployed version of translate5 to be installed as described in
-https://confluence.translate5.net/display/CON/Installation+and+update
-
-The other files are automatically created by github and contain \"just\" the source code of the main translate5 repository. They will not be able to serve as basis for installations."
+          body: "The translate5.zip contains the deployed version of translate5 to be installed as described in\nhttps://confluence.translate5.net/display/CON/Installation+and+update\n\nThe other files are automatically created by github and contain \"just\" the source code of the main translate5 repository. They will not be able to serve as basis for installations."
           files: translate5.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
