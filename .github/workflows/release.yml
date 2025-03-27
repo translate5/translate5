@@ -15,7 +15,7 @@ jobs:
 
       - name: Download Asset
         run: |
-          curl -L -o translate5.zip "https://downloads.translate5.net/translate5.zip"
+          curl -L -o translate5.zip "https://release.dev.translate5.net/translate5.zip"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
