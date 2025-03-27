@@ -1,0 +1,31 @@
+name: Create automatic translate5 release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Asset
+        run: |
+          curl -L -o translate5.zip "https://downloads.translate5.net/translate5.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: "The translate5.zip contains the deployed version of translate5 to be installed as described in
+https://confluence.translate5.net/display/CON/Installation+and+update
+
+The other files are automatically created by github and contain \"just\" the source code of the main translate5 repository. They will not be able to serve as basis for installations."
+          files: translate5.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
