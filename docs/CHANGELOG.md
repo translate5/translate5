@@ -11,6 +11,35 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.21.2] - 2025-03-28
+
+### Important Notes:
+#### [TRANSLATE-3535](https://jira.translate5.net/browse/TRANSLATE-3535)
+This feature is deactivated by default until we have experiences in production with some selected clients. Please contact us in case you would like to do this together with us.
+In our hosting we will enable it successive the next days / one - two weeks.
+
+If postediting time and levenshtein distance KPIs are needed for legacy data then the following commands should be triggered:
+t5 statistics:levenshtein (to calculate missing levenshtein values in segments history)
+t5 statistics:aggregate (to aggregate segments history data into statistics DB)
+ 
+
+
+### Added
+**[TRANSLATE-3535](https://jira.translate5.net/browse/TRANSLATE-3535): Task Management - Evaluate postediting time and levenshtein distance** <br>
+translate5 - 7.21.0: Added segments editing history data aggregation to calculate and display KPIs related to levenshtein distances and post-editing time
+translate5 - 7.21.2: Automated test fixes
+
+
+### Changed
+**[TRANSLATE-4575](https://jira.translate5.net/browse/TRANSLATE-4575): openai - Training window broken in certain cases** <br>
+FIXED: training window UI broken if at least one unsuccesful training present
+
+
+**[TRANSLATE-4309](https://jira.translate5.net/browse/TRANSLATE-4309): file format settings - Add proper Pipeline management & Validation** <br>
+Pipeline validation & management by steps and step-properties
+
+
 ## [7.21.1] - 2025-03-26
 
 ### Important Notes:

@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
 
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Parser\PropertiesParser;
 
-class PipelineValidation
+class StepValidation
 {
     protected string $errMsg = '';
 

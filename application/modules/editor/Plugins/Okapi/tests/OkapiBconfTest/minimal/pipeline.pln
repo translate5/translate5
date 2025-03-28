@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rainbowPipeline version="1" bconfVersion="10"><step class="net.sf.okapi.steps.common.RawDocumentToFilterEventsStep"/>
+<rainbowPipeline version="1" t5bconfVersion="10"><step class="net.sf.okapi.steps.common.RawDocumentToFilterEventsStep"/>
 <step class="net.sf.okapi.steps.segmentation.SegmentationStep">#v1
 segmentSource.b=true
 segmentTarget.b=true

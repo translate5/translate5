@@ -52,12 +52,6 @@ class StatisticsAggregateTest extends JsonTestAbstract
 
     private bool $testRecreatingFromHistory = false;
 
-    /*protected static bool $skipIfOptionsMissing = true;
-
-    protected static array $requiredRuntimeOptions = [
-        'resources.db.statistics.enabled' => 1,
-    ];*/
-
     protected static function setupImport(Config $config): void
     {
         self::$aggregation = SegmentHistoryAggregationRepository::create();
@@ -79,9 +73,10 @@ class StatisticsAggregateTest extends JsonTestAbstract
 
     public function testLevenshteinDistanceChanges(): void
     {
-        /*if (!(int)static::api()->getConfig('resources.db.statistics.enabled')) {
-            self::markTestSkipped('runs only if resources.db.statistics.enabled = 1');
-        }*/
+        $config = \Zend_Registry::get('config');
+        if (! (bool) $config->resources->db->statistics?->enabled) {
+            self::markTestSkipped('Runs only with resources.db.statistics.enabled = 1');
+        }
         $this->testRecreatingFromHistory = true;
         $taskIdx = 0;
         $this->runTest_01(static::getTaskAt($taskIdx), 3);

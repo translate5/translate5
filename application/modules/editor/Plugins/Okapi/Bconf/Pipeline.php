@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
 
+use editor_Plugins_Okapi_Init;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
 use MittagQI\ZfExtended\MismatchException;
 use SimpleXMLElement;
@@ -63,7 +64,7 @@ final class Pipeline extends ResourceFile
 
     private ?string $xsltPath = null;
 
-    private int $bconfVersion = 0;
+    private int $bconfVersion = -1;
 
     /**
      * @var string[]
@@ -79,6 +80,10 @@ final class Pipeline extends ResourceFile
      * Marker for the bconf-entity for proper caching
      */
     private int $bconfId;
+
+    private bool $needsRepair = false;
+
+    private string $repairedContent;
 
     private const IMPORT_STEPS = [
         'XSLTransformStep' => [
@@ -129,6 +134,10 @@ final class Pipeline extends ResourceFile
         return $this->bconfId;
     }
 
+    /**
+     * Retrieves the BCONF Version-index, that is saved in the Pipeline XML from version 10 on
+     * For BCONFs without version, this returns -1
+     */
     public function getBconfVersion(): int
     {
         return $this->bconfVersion;
@@ -231,27 +240,37 @@ final class Pipeline extends ResourceFile
      */
     private function parse(string $content): void
     {
-        $pipeline = simplexml_load_string($content);
-        if (! $pipeline) {
+        $this->needsRepair = false;
+        $this->errors = [];
+        $xml = simplexml_load_string($content);
+        if (! $xml) {
             $this->errors[] = 'invalid XML content in ' . self::FILE;
 
             return;
         }
-        $version = (int) $pipeline['version'];
+        $version = isset($xml['version']) ? (int) $xml['version'] : -1;
         if ($version !== 1) {
             $this->errors[] = 'invalid Version of pipeline "' . $version . '"';
 
             return;
         }
-        $this->bconfVersion = (int) $pipeline[self::BCONF_VERSION_ATTR];
-
+        // T5 bconf version index
+        if (isset($xml[self::BCONF_VERSION_ATTR])) {
+            $this->bconfVersion = (int) $xml[self::BCONF_VERSION_ATTR];
+            if ($this->bconfVersion !== editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX) {
+                $xml[self::BCONF_VERSION_ATTR] = (string) editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX;
+                $this->needsRepair = true;
+            }
+        } else {
+            $xml->addAttribute(self::BCONF_VERSION_ATTR, (string) editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
+            $this->needsRepair = true;
+        }
         // Used for error message for missing required steps
         $requiredSteps = array_filter(self::IMPORT_STEPS, function ($v) {
             return $v['required'];
         });
 
-        $needsRepair = false;
-        foreach ($pipeline->step as $stepXml) { /* @var SimpleXMLElement $stepXml */
+        foreach ($xml->step as $stepXml) { /** @var SimpleXMLElement $stepXml */
             $javaClass = (string) $stepXml['class'];
             if (! empty($javaClass)) {
                 $this->steps[] = $javaClass;
@@ -265,23 +284,26 @@ final class Pipeline extends ResourceFile
                     if (isset($requiredSteps[$stepClass])) {
                         unset($requiredSteps[$stepClass]);
                     }
-                    $step = new PipelineValidation((string) $stepXml, self::IMPORT_STEPS[$stepClass]['requiredProperties']);
+                    $step = new StepValidation((string) $stepXml, self::IMPORT_STEPS[$stepClass]['requiredProperties']);
                     if (! $step->isValid()) {
                         $this->errors[] = $step->getErrMsg();
                     } else {
                         if ($step->wasRepaired()) {
-                            $needsRepair = true;
+                            $this->needsRepair = true;
                             // @phpstan-ignore-next-line
                             $stepXml[0] = $step->getProperties()->unparse(); // https://github.com/phpstan/phpstan/issues/8236
                             // dom_import_simplexml($stepXml)->nodeValue = $step->getProperties()->unparse();
                         }
                         if ($stepClass === 'SegmentationStep') {
                             $props = $step->getProperties();
-                            $this->sourceSrxPath = $props->has('sourceSrxPath') ? self::basename($props->get('sourceSrxPath')) : null;
-                            $this->targetSrxPath = $props->has('targetSrxPath') ? self::basename($props->get('targetSrxPath')) : null;
+                            $this->sourceSrxPath = $props->has('sourceSrxPath') ?
+                                self::basename($props->get('sourceSrxPath')) : null;
+                            $this->targetSrxPath = $props->has('targetSrxPath') ?
+                                self::basename($props->get('targetSrxPath')) : null;
                         } elseif ($stepClass === 'XSLTransformStep') {
                             $props = $step->getProperties();
-                            $this->xsltPath = $props->has('xsltPath') ? self::basename($props->get('xsltPath')) : null;
+                            $this->xsltPath = $props->has('xsltPath') ?
+                                self::basename($props->get('xsltPath')) : null;
                         }
                     }
                 }
@@ -290,7 +312,11 @@ final class Pipeline extends ResourceFile
         if (count($requiredSteps) > 0) {
             $this->errors[] = 'the pipeline has missing steps: ' . implode(', ', array_keys($requiredSteps));
         }
-        if (empty($this->sourceSrxPath) || empty($this->targetSrxPath) || pathinfo($this->sourceSrxPath, PATHINFO_EXTENSION) != Srx::EXTENSION || pathinfo($this->targetSrxPath, PATHINFO_EXTENSION) != Srx::EXTENSION) {
+        if (empty($this->sourceSrxPath) ||
+            empty($this->targetSrxPath) ||
+            pathinfo($this->sourceSrxPath, PATHINFO_EXTENSION) != Srx::EXTENSION ||
+            pathinfo($this->targetSrxPath, PATHINFO_EXTENSION) != Srx::EXTENSION
+        ) {
             $this->errors[] = 'the pipeline had no or invalid entries for the source or target segmentation srx file';
         } else {
             // we will remove any path from the SRX-Files to normalize the value (it usually contains the rainbow workspace path)
@@ -304,11 +330,38 @@ final class Pipeline extends ResourceFile
             if ($this->xsltPath !== null && self::basename($this->xsltPath) != $this->xsltPath) {
                 $this->setXsltFile(self::basename($this->xsltPath));
             }
-            if ($needsRepair) {
-                $pipeline->asXml($this->path);
-                // re-init (to be valid when added to bconf for example)
-                $this->content = file_get_contents($this->path);
+        }
+        if ($this->needsRepair) {
+            if ($xml->asXml()) {
+                $this->repairedContent = $xml->asXml();
+            } else {
+                $this->errors[] = 'Error parsing the XML - probably invalid';
+                $this->needsRepair = false;
             }
+        }
+        // we do not want to debug the default-merging pipeline / the export-bconf
+        if ($this->doDebug && $this->needsRepair && $this->getFile() !== 'translate5-merging.pln') {
+            error_log('PIPELINE for bconf ' . $this->bconfId . ' needs repair!');
+        }
+    }
+
+    public function hasToBeRepaired(): bool
+    {
+        return $this->needsRepair;
+    }
+
+    public function repair(): void
+    {
+        if ($this->needsRepair) {
+            $this->content = $this->repairedContent;
+            $this->repairedContent = '';
+            $this->needsRepair = false;
+
+            if ($this->doDebug) {
+                error_log('PIPELINE: Repaired for bconf ' . $this->bconfId . ', version ' . $this->bconfVersion);
+            }
+
+            $this->bconfVersion = editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX;
         }
     }
 

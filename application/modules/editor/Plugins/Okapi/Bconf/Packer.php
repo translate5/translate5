@@ -106,6 +106,11 @@ final class Packer
             } else {
                 $content = $this->bconf->getContent();
                 $pipeline = $this->bconf->getPipeline();
+                if ($pipeline->hasToBeRepaired()) {
+                    $pipeline->repair();
+                    error_log('UNEXPECTED PROBLEM: Bconf "' . $this->bconf->getName() .
+                        '": Pipeline needed to be repaired!');
+                }
                 $refId = 0;
                 if ($xsltFile = $content->getXsltFile()) {
                     $this->harvestReferencedFile(++$refId, $xsltFile, $isOutdatedRepack);
@@ -117,14 +122,6 @@ final class Packer
             $this->raf->writeInt(-1);
             $this->raf->writeInt(1);
             $pipelineContent = $pipeline->getContent();
-            if (! $isExport && str_contains($pipelineContent, '<rainbowPipeline version="1">')) {
-                $pipelineContent = str_replace(
-                    '<rainbowPipeline version="1">',
-                    '<rainbowPipeline version="1" ' . Pipeline::BCONF_VERSION_ATTR . '="' . editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX . '">',
-                    $pipelineContent
-                );
-                file_put_contents($pipeline->getPath(), $pipelineContent);
-            }
             $this->raf->writeUTF($pipelineContent, false);
             // process filters & extension mapping
             $customIdentifiers = [];

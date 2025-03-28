@@ -276,6 +276,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         }
         $this->entityLoadAndRepack();
         $pipeline = new Pipeline($this->entity->getPipelinePath(), file_get_contents($_FILES['pln']['tmp_name']));
+        if ($pipeline->hasToBeRepaired()) {
+            $pipeline->repair();
+        }
         $errMsg = ResourceFileImport::addToBConf($pipeline, $this->entity);
         if ($errMsg) {
             throw new OkapiException('E1687', [
