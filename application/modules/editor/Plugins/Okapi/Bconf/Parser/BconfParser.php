@@ -201,6 +201,11 @@ abstract class BconfParser
                         );
                     }
                 }
+                // on parsing, we upgrade/fix pipelines with problems
+                // this will also set/update to the latest version-index
+                if ($doUpgrade && $pipeline->hasToBeRepaired()) {
+                    $pipeline->repair();
+                }
                 // if the embedded SRX files are outdated T5 default SRX files
                 // this will trigger updating them to current revisions
                 Segmentation::instance()->onUnpack($pipeline, $this->folder);

@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2025 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -40,6 +40,12 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7 || ! isset($config)) 
 
 // $this->doNotSavePhpForDebugging = true;
 $xlfExtensions = editor_Models_Import_FileParser_Xlf::getFileExtensions();
+$db = Zend_Db_Table::getDefaultAdapter();
+$updateTime = (int) $db->fetchOne('SELECT UNIX_TIMESTAMP(created) FROM Zf_dbversion WHERE filename="015-TRANSLATE-3647-okapi-integration-enable-upload-of-fprm-and-pln-files.php" ORDER BY id DESC');
+if (! $updateTime) {
+    return;
+}
+$updateTime += 7200; // add 2h
 
 $bconf = new BconfEntity();
 $bconfAll = $bconf->loadAll();
@@ -48,6 +54,12 @@ foreach ($bconfAll as $bconfData) {
     try {
         $bconf = new BconfEntity();
         $bconf->load($bconfData['id']);
+
+        $updatedMapping = filemtime($bconf->getDataDirectory() . '/extensions-mapping.txt');
+        if ($updatedMapping > $updateTime) {
+            // We do not remove xlf/xliff, if the file-date of the extension.mapping is newer than 2h after the time, the upgrade was run
+            continue;
+        }
 
         $extensionMapping = $bconf->getExtensionMapping();
         $extensionMapping->removeExtensions($xlfExtensions);

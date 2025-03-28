@@ -69,7 +69,7 @@
         "name": "t5 XLIFF 1.2 with CDATA",
         "description": "translate5 adjusted filter for XLIFF documents that have CDATA-sections as source and/or target",
         "mime": "application/x-xliff+xml",
-        "extensions": ["xlf","xliff"]
+        "extensions": []
     },
     {
         "id": "translate5-tbx-translate-definitions-setup-ITS",
