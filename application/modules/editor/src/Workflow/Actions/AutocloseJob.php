@@ -31,12 +31,14 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
         if (! $this->itsAboutTime()) {
             return;
         }
-        $jobs = $this->findJobs();
+        $this->triggerConfigArgs = func_get_args();
+
+        $useTaskDeadlineDateAsReference = $this->triggerConfigArgs[0]?->useTaskDeadlineDateAsReference ?? false;
+
+        $jobs = $this->findJobs($useTaskDeadlineDateAsReference);
         if (empty($jobs)) {
             return;
         }
-
-        $this->triggerConfigArgs = func_get_args();
 
         $idsToAutoClose = [];
         foreach ($jobs as $tuaData) {
@@ -56,8 +58,9 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
                 error_log('AutocloseJob: cannot find task ' . $tuaData['taskGuid']);
             }
         }
-        // set the found overtimed tuas to auto-close
-        if (count($idsToAutoClose) > 0) {
+
+        // set the found overtime tuas to auto-close
+        if (! empty($idsToAutoClose)) {
             $tua = ZfExtended_Factory::get(editor_Models_Db_TaskUserAssoc::class);
             $updated = $tua->update([
                 'state' => editor_Workflow_Default::STATE_AUTO_FINISH,
@@ -84,7 +87,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
         $notifier->notifyAutoclosed($this->triggerConfigArgs, $userGuid, $workflowStepName);
     }
 
-    private function findJobs(): array
+    private function findJobs(bool $useTaskDeadlineDateAsReference = false): array
     {
         $tua = ZfExtended_Factory::get(editor_Models_Db_TaskUserAssoc::class);
         $select = $tua->select()
@@ -101,8 +104,13 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
             ->where('tua.state NOT IN (?)', [
                 editor_Workflow_Default::STATE_AUTO_FINISH,
                 editor_Workflow_Default::STATE_FINISH,
-            ])
-            ->where('tua.deadlineDate < NOW()');
+            ]);
+
+        if ($useTaskDeadlineDateAsReference) {
+            $select->where('t.deadlineDate < NOW()');
+        } else {
+            $select->where('tua.deadlineDate < NOW()');
+        }
 
         return $tua->fetchAll($select)->toArray();
     }
