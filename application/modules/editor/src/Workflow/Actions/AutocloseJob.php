@@ -11,10 +11,11 @@ use editor_Workflow_Actions_Config;
 use editor_Workflow_Default;
 use editor_Workflow_Notification;
 use Throwable;
+use Zend_Registry;
 use ZfExtended_Factory;
 
 /**
- * Each night at 21:00 this action will try to find all relevant jobs for auto-close.
+ * Each day at runtimeOptions.workflow.autoCloseJobsTriggerTime configured time, this action will try to find all relevant jobs for auto-close.
  * User job will be automatically closed if:
  * - The job deadline date passed
  * - The job is not already closed
@@ -111,9 +112,15 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
      */
     private function itsAboutTime(): bool
     {
-        $now = new DateTime();
-        $now->setTime(21, 0, 0);
+        $config = Zend_Registry::get('config');
+        $triggerTime = $config->runtimeOptions->workflow->autoCloseJobsTriggerTime ?? '21:00';
 
-        return new DateTime() > $now;
+        $triggerTime = DateTime::createFromFormat('H:i', $triggerTime);
+
+        if (! $triggerTime) {
+            return false;
+        }
+
+        return new DateTime() > $triggerTime;
     }
 }
