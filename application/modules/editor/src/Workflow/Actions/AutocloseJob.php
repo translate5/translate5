@@ -11,10 +11,11 @@ use editor_Workflow_Actions_Config;
 use editor_Workflow_Default;
 use editor_Workflow_Notification;
 use Throwable;
+use Zend_Registry;
 use ZfExtended_Factory;
 
 /**
- * Each night at 21:00 this action will try to find all relevant jobs for auto-close.
+ * Each day at runtimeOptions.workflow.autoCloseJobsTriggerTime configured time, this action will try to find all relevant jobs for auto-close.
  * User job will be automatically closed if:
  * - The job deadline date passed
  * - The job is not already closed
@@ -30,12 +31,14 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
         if (! $this->itsAboutTime()) {
             return;
         }
-        $jobs = $this->findJobs();
+        $this->triggerConfigArgs = func_get_args();
+
+        $useTaskDeadlineDateAsReference = $this->triggerConfigArgs[0]?->useTaskDeadlineDateAsReference ?? false;
+
+        $jobs = $this->findJobs($useTaskDeadlineDateAsReference);
         if (empty($jobs)) {
             return;
         }
-
-        $this->triggerConfigArgs = func_get_args();
 
         $idsToAutoClose = [];
         foreach ($jobs as $tuaData) {
@@ -55,8 +58,9 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
                 error_log('AutocloseJob: cannot find task ' . $tuaData['taskGuid']);
             }
         }
-        // set the found overtimed tuas to auto-close
-        if (count($idsToAutoClose) > 0) {
+
+        // set the found overtime tuas to auto-close
+        if (! empty($idsToAutoClose)) {
             $tua = ZfExtended_Factory::get(editor_Models_Db_TaskUserAssoc::class);
             $updated = $tua->update([
                 'state' => editor_Workflow_Default::STATE_AUTO_FINISH,
@@ -83,7 +87,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
         $notifier->notifyAutoclosed($this->triggerConfigArgs, $userGuid, $workflowStepName);
     }
 
-    private function findJobs(): array
+    private function findJobs(bool $useTaskDeadlineDateAsReference = false): array
     {
         $tua = ZfExtended_Factory::get(editor_Models_Db_TaskUserAssoc::class);
         $select = $tua->select()
@@ -100,8 +104,13 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
             ->where('tua.state NOT IN (?)', [
                 editor_Workflow_Default::STATE_AUTO_FINISH,
                 editor_Workflow_Default::STATE_FINISH,
-            ])
-            ->where('tua.deadlineDate < NOW()');
+            ]);
+
+        if ($useTaskDeadlineDateAsReference) {
+            $select->where('t.deadlineDate < NOW()');
+        } else {
+            $select->where('tua.deadlineDate < NOW()');
+        }
 
         return $tua->fetchAll($select)->toArray();
     }
@@ -111,9 +120,15 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
      */
     private function itsAboutTime(): bool
     {
-        $now = new DateTime();
-        $now->setTime(21, 0, 0);
+        $config = Zend_Registry::get('config');
+        $triggerTime = $config->runtimeOptions->workflow->autoCloseJobsTriggerTime ?? '21:00';
 
-        return new DateTime() > $now;
+        $triggerTime = DateTime::createFromFormat('H:i', $triggerTime);
+
+        if (! $triggerTime) {
+            return false;
+        }
+
+        return new DateTime() > $triggerTime;
     }
 }
