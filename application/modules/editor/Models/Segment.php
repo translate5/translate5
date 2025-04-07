@@ -85,6 +85,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method void setSourceEdit(string $content)
  * @method void setSourceMd5(string $md5hash)
  * @method string getSourceMd5()
+ * @method string getTargetMd5()
  * @method string getTarget()
  * @method void setTarget(string $content)
  * @method string getTargetEdit()
@@ -1855,13 +1856,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             self::EMPTY_STRING_HASH,
             $this->getTargetMd5(),
             self::EMPTY_STRING_HASH,
+            $taskGuid,
         ];
 
         if ($this->meta()->getSegmentDescriptor()) {
             $binds[] = $this->meta()->getSegmentDescriptor();
         }
-
-        $binds[] = $taskGuid;
 
         //since alikes are only usable with segment field default layout we can use the following hardcoded methods
         $stmt = $this->db->getAdapter()->query($sql, $binds);
