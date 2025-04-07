@@ -118,6 +118,8 @@ class Comments
         $comment->setUserName('no user');
         $comment->setCreated(NOW_ISO);
         $comment->setModified(NOW_ISO);
+
+        $this->comments[] = $comment;
     }
 
     private function addCommentMeta(array $attributes, string $commentText): string

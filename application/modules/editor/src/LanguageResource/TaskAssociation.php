@@ -131,15 +131,18 @@ class TaskAssociation extends AssociationAbstract
         $db = $this->db;
         $adapter = $db->getAdapter();
 
-        /* @var $languageModel Languages */
         $languageModel = Factory::get(Languages::class);
 
         // Make sure language resource will be offered for assignments for tasks, even if the sub-languages do not match
         $majorLangId = $languageModel->findMajorLanguageById((int) $task->getSourceLang());
-        $sourceLangs = $languageModel->getFuzzyLanguages($majorLangId, 'id', true);
+        $sourceLangs = empty($majorLangId) ?
+            [$task->getSourceLang()] :
+            $languageModel->getFuzzyLanguages($majorLangId, 'id', true);
 
         $majorLangId = $languageModel->findMajorLanguageById((int) $task->getTargetLang());
-        $targetLangs = $languageModel->getFuzzyLanguages($majorLangId, 'id', true);
+        $targetLangs = empty($majorLangId)
+            ? [$task->getTargetLang()] :
+            $languageModel->getFuzzyLanguages($majorLangId, 'id', true);
 
         //get all available services
         /* @var $services editor_Services_Manager */

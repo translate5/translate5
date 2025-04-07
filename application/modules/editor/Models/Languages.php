@@ -98,7 +98,12 @@ class editor_Models_Languages extends ZfExtended_Languages
         // Load language by id
         $this->load($languageId);
 
-        // Get major language id for that language
-        return (int) $this->findMajorLanguage($this->getMajorRfc5646())['id'];
+        $majorLang = $this->findMajorLanguage($this->getMajorRfc5646());
+        if (! empty($majorLang)) {
+            // Get major language id for that language
+            return $majorLang['id'];
+        }
+
+        return 0;
     }
 }
