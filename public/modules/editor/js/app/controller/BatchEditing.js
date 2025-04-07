@@ -102,9 +102,8 @@ Ext.define('Editor.controller.BatchEditing', {
     projectTaskGridCheckColumnCheckChange: function (cmp, rowIndex, checked, record) {
         if (checked) {
             this.batchTaskIds.set(record.get('id'), record.get('projectId')); // map taskId to projectId
-            if(!this.selectCurrentProjectIfAllTasksSelected()){
-                this.batchProjectIds.set(record.get('projectId'), 'C'); // Custom (tasks selection)
-            }
+            // All or Custom (tasks selection)
+            this.batchProjectIds.set(record.get('projectId'), this.selectCurrentProjectIfAllTasksSelected() ? 'A' : 'C');
         } else {
             this.batchTaskIds.delete(record.get('id'));
             if (this.deselectCurrentProjectIfNoTasksSelected()) {
