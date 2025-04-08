@@ -45,7 +45,7 @@ interface TmConversionServiceInterface
     public function convertT5MemoryTagToContent(string $string): string;
 
     /**
-     * @param array<string, string[]> $numberTagMap
+     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
      */
     public function convertContentTagToT5MemoryTag(
         string $queryString,
