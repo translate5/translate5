@@ -48,6 +48,8 @@ class WorkerRunCommand extends Translate5AbstractCommand
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'worker:run';
 
+    private bool $doDebug = false;
+
     protected function configure()
     {
         $this
@@ -113,14 +115,19 @@ class WorkerRunCommand extends Translate5AbstractCommand
             $this->initTranslate5AppOrTest();
         }
 
+        $this->doDebug = \ZfExtended_Debug::hasLevel('core', 'Workers');
+
         //if maintenance is near, we disallow starting workers
         if (ZfExtended_Models_Installer_Maintenance::isLoginLock()) {
             throw new ZfExtended_Models_MaintenanceException();
         }
 
+        $workerId = $input->getArgument('id');
+
         try {
             $workerModel = new ZfExtended_Models_Worker();
-            $workerModel->load($input->getArgument('id'));
+            $workerModel->load($workerId);
+            $this->debug($workerId, 'LOADED');
 
             $this->changeProcessTitle($workerModel);
 
@@ -133,9 +140,12 @@ class WorkerRunCommand extends Translate5AbstractCommand
             if ($workerModel->getState() == $workerModel::STATE_WAITING) {
                 $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
                 if (! $worker || ! $worker->runQueued()) {
+                    $this->debug($workerId, ! $worker ? 'No Model' : 'Not running');
+
                     return self::FAILURE;
                 }
             } elseif ($workerModel->getState() == $workerModel::STATE_DELAYED && ! $this->isPorcelain) {
+                $this->debug($workerId, 'delayed');
                 $this->io->warning([
                     'Worker is delayed! ',
                     'To run explicitly a delayed worker please use --force-delayed option.',
@@ -143,12 +153,17 @@ class WorkerRunCommand extends Translate5AbstractCommand
             }
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             // if a worker was gone before we don't log that
+            $this->debug($workerId, 'worker gone');
+
             return self::FAILURE;
         } catch (Throwable $e) {
+            $this->debug($workerId, 'worker exception');
             Zend_Registry::get('logger')->exception($e);
 
             return self::FAILURE;
         }
+
+        $this->debug($workerId, 'DONE ' . ($workerModel->getState()));
 
         return self::SUCCESS;
     }
@@ -175,5 +190,12 @@ class WorkerRunCommand extends Translate5AbstractCommand
                 $additionalInfos,
             )
         );
+    }
+
+    private function debug(string $id, string $message): void
+    {
+        if ($this->doDebug) {
+            error_log('WORKER RUN #' . $id . ' ' . $message);
+        }
     }
 }
