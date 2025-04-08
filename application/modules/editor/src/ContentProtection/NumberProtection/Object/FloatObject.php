@@ -99,7 +99,10 @@ class FloatObject
         $formater->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $this->fractionDigits);
         $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $this->fractionDigits);
 
-        return $this->sign . $formater->format($this->number);
+        $firstChar = mb_substr($format, 0, 1);
+        $signOfFormat = in_array($firstChar, ['-', '+']) ? $firstChar : '';
+
+        return ($signOfFormat ? '' : $this->sign) . $formater->format($this->number);
     }
 
     private function setFormat(string $format, NumberFormatter $formater): void
