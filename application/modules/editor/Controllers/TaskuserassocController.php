@@ -33,6 +33,7 @@ use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\DTO\NewCoord
 use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Operation\WithAuthentication\CreateCoordinatorGroupJobOperation;
 use MittagQI\Translate5\JobAssignment\JobAssignmentViewDataProvider;
 use MittagQI\Translate5\JobAssignment\JobExceptionTransformer;
+use MittagQI\Translate5\JobAssignment\JobSorterService;
 use MittagQI\Translate5\JobAssignment\Operation\WithAuthentication\DeleteJobAssignmentOperation;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
@@ -93,6 +94,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
     private JobExceptionTransformer $jobExceptionTransformer;
 
+    private JobSorterService $jobSorterService;
+
     public function init()
     {
         parent::init();
@@ -109,6 +112,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $this->userProvider = UserProvider::create();
 
         $this->jobExceptionTransformer = JobExceptionTransformer::create();
+        $this->jobSorterService = JobSorterService::create();
     }
 
     public function indexAction(): void
@@ -117,10 +121,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
 
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (! $this->getRequest()->getParam('taskId')) {
-//            Zend_Registry::get('logger')->warn(
-//                'E1680',
-//                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
-//            );
+            //            Zend_Registry::get('logger')->warn(
+            //                'E1680',
+            //                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
+            //            );
 
             $rows = $this->userJobViewDataProvider->buildViewForList($this->entity->loadAll(), $authUser);
 
@@ -136,7 +140,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         $rows = $this->jobAssignmentViewDataProvider->getListFor($task->getTaskGuid(), $authUser);
 
         // @phpstan-ignore-next-line
-        $this->view->rows = $rows;
+        $this->view->rows = $this->jobSorterService->sortJobsByWorkflowPosition(
+            $rows,
+            $task->getTaskActiveWorkflow()
+        );
         $this->view->total = count($rows);
     }
 
@@ -144,10 +151,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
-//            Zend_Registry::get('logger')->warn(
-//                'E1680',
-//                'Route /editor/taskuserassoc/project deprecated, use editor/project/:projectId/jobs/:workflow instead',
-//            );
+            //            Zend_Registry::get('logger')->warn(
+            //                'E1680',
+            //                'Route /editor/taskuserassoc/project deprecated, use editor/project/:projectId/jobs/:workflow instead',
+            //            );
         }
 
         $projectId = $this->getParam('projectId');
@@ -236,10 +243,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
-//            Zend_Registry::get('logger')->warn(
-//                'E1680',
-//                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead'
-//            );
+            //            Zend_Registry::get('logger')->warn(
+            //                'E1680',
+            //                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead'
+            //            );
         }
 
         try {
@@ -267,10 +274,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
-//            Zend_Registry::get('logger')->warn(
-//                'E1680',
-//                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
-//            );
+            //            Zend_Registry::get('logger')->warn(
+            //                'E1680',
+            //                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
+            //            );
         }
 
         try {
@@ -297,10 +304,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
     {
         /** @deprecated App logic should not tolerate requests without task in scope */
         if (str_contains($this->getRequest()->getRequestUri(), 'taskuserassoc')) {
-//            Zend_Registry::get('logger')->warn(
-//                'E1680',
-//                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
-//            );
+            //            Zend_Registry::get('logger')->warn(
+            //                'E1680',
+            //                'Route /editor/taskuserassoc deprecated, use /editor/task/:taskId/job instead',
+            //            );
         }
 
         $workflowManager = new editor_Workflow_Manager();
