@@ -112,7 +112,7 @@ class MissingMrkSegmentsFixer
         );
     }
 
-    public function hasMissingMrkSegments(string $data): bool
+    public function hasMissingSpaces(string $data): bool
     {
         $this->hasFixedData = false;
         $this->mrkSourceCount = $this->mrkTargetCount = 0;

@@ -36,6 +36,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\FixScript\MissingMrkSegmentsFixer;
+use Translate5\MaintenanceCli\FixScript\MissingMrkSpacesFixer;
 use Zend_Db_Table;
 
 class PatchOkapi146WhitespaceCommand extends Translate5AbstractCommand
@@ -60,6 +61,13 @@ class PatchOkapi146WhitespaceCommand extends Translate5AbstractCommand
         );
 
         $this->addOption(
+            'trailing-spaces',
+            null,
+            InputOption::VALUE_NONE,
+            'Add missing trailing spaces within existing MRK segments (add missing MRK segments otherwise)'
+        );
+
+        $this->addOption(
             'taskId',
             't',
             InputOption::VALUE_OPTIONAL,
@@ -73,6 +81,7 @@ class PatchOkapi146WhitespaceCommand extends Translate5AbstractCommand
         $this->initTranslate5();
 
         $fixIt = (bool) $this->input->getOption('fix');
+        $trailingSpacesMode = (bool) $this->input->getOption('trailing-spaces');
         $taskId = (int) $input->getOption('taskId');
 
         $this->io->warning(
@@ -103,7 +112,7 @@ class PatchOkapi146WhitespaceCommand extends Translate5AbstractCommand
         );
 
         $progressBar = new ProgressBar($output, count($allTasks));
-        $mrkFinder = new MissingMrkSegmentsFixer($fixIt);
+        $spacesFinder = $trailingSpacesMode ? new MissingMrkSpacesFixer($fixIt) : new MissingMrkSegmentsFixer($fixIt);
 
         $stats = [
             'taskGuids' => [],
@@ -111,6 +120,17 @@ class PatchOkapi146WhitespaceCommand extends Translate5AbstractCommand
         ];
 
         foreach ($allTasks as $taskGuid) {
+            if ($trailingSpacesMode) {
+                $okapiServer146 = $db->fetchOne('SELECT `value` FROM LEK_task_config WHERE taskGuid="' . $taskGuid .
+                    '" AND name="runtimeOptions.plugins.Okapi.serverUsed" AND value LIKE "%146%"');
+
+                if (! $okapiServer146) {
+                    $progressBar->advance();
+
+                    continue;
+                }
+            }
+
             $taskFiles = $db->fetchCol('SELECT id FROM LEK_files WHERE taskGuid="' . $taskGuid . '"');
             $task = new editor_Models_Task();
             $task->loadByTaskGuid($taskGuid);
@@ -118,7 +138,7 @@ class PatchOkapi146WhitespaceCommand extends Translate5AbstractCommand
                 $zlibPath = $task->getAbsoluteTaskDataPath() . sprintf(SkeletonFile::SKELETON_PATH, $fileId);
                 if (is_file($zlibPath)) {
                     try {
-                        $found = $mrkFinder->hasMissingMrkSegments(gzuncompress(file_get_contents($zlibPath)));
+                        $found = $spacesFinder->hasMissingSpaces(gzuncompress(file_get_contents($zlibPath)));
                     } catch (\editor_Models_Import_FileParser_InvalidXMLException $e) {
                         $this->io->warning('Invalid XML in task ' . $taskGuid . ' file: ' . $zlibPath);
 
@@ -132,7 +152,7 @@ class PatchOkapi146WhitespaceCommand extends Translate5AbstractCommand
                             $stats['taskGuids'][$taskGuid] = 1;
                         }
                     } elseif ($fixIt) {
-                        $fixedData = $mrkFinder->getFixedData();
+                        $fixedData = $spacesFinder->getFixedData();
                         if (! empty($fixedData)) {
                             $tempFile = $zlibPath . '.tmp';
                             if (file_put_contents($tempFile, gzcompress($fixedData)) === false) {

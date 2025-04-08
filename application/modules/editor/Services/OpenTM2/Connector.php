@@ -59,6 +59,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     public const NEXT_SUFFIX = '_next-';
 
+    private const SEGMENT_NR_CONTEXT_PREFIX = 'SegmentNr: ';
+
     /**
      * Connector
      * @var editor_Services_OpenTM2_HttpApi
@@ -400,7 +402,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             ? $this->api->getDate(strtotime($segment->getTimestamp()))
             : $this->api->getNowDate();
         $userName = $segment->getUserName();
-        $context = $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask();
+        $context = $this->getSegmentContext($segment);
 
         $recheckOnUpdate = $options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false;
         $dataSent = [
@@ -438,7 +440,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             ? $this->api->getDate(strtotime($segment->getTimestamp()))
             : $this->api->getNowDate();
         $userName = $segment->getUserName();
-        $context = $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask();
+        $context = $this->getSegmentContext($segment);
 
         return new UpdateSegmentDTO(
             $segment->getTaskGuid(),
@@ -1152,7 +1154,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return $matchRate;
         }
 
-        $context = $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask();
+        $context = $this->getSegmentContext($segment);
 
         $isExacExac = false;
         $isContext = false;
@@ -2129,5 +2131,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         return $t5memoryName;
+    }
+
+    private function getSegmentContext(editor_Models_Segment $segment): string
+    {
+        return $segment->meta()->getSegmentDescriptor()
+            ?: self::SEGMENT_NR_CONTEXT_PREFIX . $segment->getSegmentNrInTask();
     }
 }
