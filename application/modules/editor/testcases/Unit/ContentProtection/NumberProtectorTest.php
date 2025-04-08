@@ -284,14 +284,6 @@ class NumberProtectorTest extends TestCase
         self::assertSame($converted, $protector->convertToInternalTags($segment, $shortTagIdent, xmlChunks: $xmlChunks));
         self::assertSame($finalTagIdent, $shortTagIdent);
         self::assertCount($xmlChunksCount, $xmlChunks);
-
-        $shortTagIdent = 1;
-        $xmlChunks = [];
-        $s = '<number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... <number type="keep-content" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> Temperaturklasse <number type="keep-content" name="default simple" source="1" iso="1" target="1" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/> ... 10mA';
-
-        $r = $protector->convertToInternalTags($s, $shortTagIdent, xmlChunks: $xmlChunks);
-
-        dump($r);
     }
 
     public function internalTagsProvider(): iterable

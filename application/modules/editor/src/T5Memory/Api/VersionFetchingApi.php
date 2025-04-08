@@ -12,17 +12,28 @@ use Psr\Http\Client\ClientInterface;
 
 class VersionFetchingApi implements HasVersionInterface
 {
+    /**
+     * @var string[]
+     */
+    private array $versions = [];
+
     public function __construct(
-        private ClientInterface $client
+        private ClientInterface $client,
     ) {
     }
 
     public function version(string $baseUrl, bool $suppressExceptions = true): string
     {
+        if (isset($this->versions[$baseUrl])) {
+            return $this->versions[$baseUrl];
+        }
+
         $response = $this->client->sendRequest(new ResourcesRequest($baseUrl));
 
         try {
-            return ResourcesResponse::fromResponse($response)->version;
+            $this->versions[$baseUrl] = ResourcesResponse::fromResponse($response)->version;
+
+            return $this->versions[$baseUrl];
         } catch (ResponseExceptionInterface $exception) {
             if ($suppressExceptions) {
                 return self::FALLBACK_VERSION;
