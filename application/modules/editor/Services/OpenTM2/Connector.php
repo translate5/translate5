@@ -966,7 +966,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private function getStatusFromApi(LanguageResource $languageResource, ?string $tmName): string
     {
-        $name = $tmName ?: $this->persistenceService->getWritableMemory($languageResource);
+        $name = $tmName ?: $this->persistenceService->getLastWritableMemory($languageResource);
 
         if (empty($name)) {
             $this->lastStatusInfo = 'The internal stored filename is invalid';

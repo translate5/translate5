@@ -53,6 +53,25 @@ class PersistenceService
         ]);
     }
 
+    public function getLastWritableMemory(LanguageResource $languageResource): string
+    {
+        $memories = [];
+
+        foreach ($languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
+            if (! $memory['readonly']) {
+                $memories[] = $memory['filename'];
+            }
+        }
+
+        if (empty($memories)) {
+            throw new \editor_Services_Connector_Exception('E1564', [
+                'name' => $languageResource->getName(),
+            ]);
+        }
+
+        return array_pop($memories);
+    }
+
     public function getNextWritableMemory(LanguageResource $languageResource, string $memoryName): ?string
     {
         $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
