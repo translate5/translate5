@@ -38,6 +38,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\T5Memory\Api\RetryClient;
 use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
@@ -90,8 +91,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private ExportService $exportService;
 
-    private Client $httpClient;
-
     public function __construct()
     {
         editor_Services_Connector_Exception::addCodes([
@@ -105,13 +104,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $this->conversionService = TmConversionService::create();
         $this->persistenceService = new PersistenceService($this->config);
-        $this->httpClient = new Client();
-        $this->versionService = new VersionService(new VersionFetchingApi($this->httpClient));
+        $httpClient = new RetryClient(new Client());
+        $this->versionService = new VersionService(new VersionFetchingApi($httpClient));
         $this->exportService = new ExportService(
             $this->logger,
             $this->versionService,
             $this->conversionService,
-            new VersionedApiFactory($this->httpClient),
+            new VersionedApiFactory($httpClient),
             $this->persistenceService
         );
     }

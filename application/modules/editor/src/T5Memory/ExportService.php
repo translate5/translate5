@@ -37,6 +37,7 @@ use GuzzleHttp\Client;
 use LogicException;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
+use MittagQI\Translate5\T5Memory\Api\RetryClient;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use MittagQI\Translate5\T5Memory\Exception\ExportException;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -64,7 +65,7 @@ class ExportService
      */
     public static function create(): self
     {
-        $httpClient = new Client();
+        $httpClient = new RetryClient(new Client());
         $config = \Zend_Registry::get('config');
 
         return new self(
