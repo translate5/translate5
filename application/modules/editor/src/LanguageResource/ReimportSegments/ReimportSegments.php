@@ -37,7 +37,7 @@ use editor_Services_Connector;
 use editor_Services_Manager;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\CsvReimportSegmentRepository;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimportSegmentsRepository;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 
@@ -55,7 +55,7 @@ class ReimportSegments
     public static function create(): self
     {
         return new self(
-            new CsvReimportSegmentRepository(),
+            new JsonlReimportSegmentsRepository(),
             new LanguageResourceRepository(),
             new editor_Services_Manager(),
             new ReimportSegmentsLoggerProvider(),

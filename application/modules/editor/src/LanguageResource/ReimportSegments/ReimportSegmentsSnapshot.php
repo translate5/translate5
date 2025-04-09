@@ -35,7 +35,7 @@ use editor_Models_Segment as Segment;
 use editor_Models_Task as Task;
 use editor_Services_Manager;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\CsvReimportSegmentRepository;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimportSegmentsRepository;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Segment\FilteredIterator;
@@ -55,7 +55,7 @@ class ReimportSegmentsSnapshot
     {
         return new self(
             new editor_Services_Manager(),
-            new CsvReimportSegmentRepository(),
+            new JsonlReimportSegmentsRepository(),
             new LanguageResourceRepository(),
             new ReimportSegmentsProvider(new Segment()),
             ReApplyProtectionRules::create(),
