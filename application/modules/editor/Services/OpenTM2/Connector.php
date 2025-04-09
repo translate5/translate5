@@ -38,6 +38,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\T5Memory\Api\RetryClient;
 use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
@@ -92,8 +93,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private ExportService $exportService;
 
-    private Client $httpClient;
-
     public function __construct()
     {
         editor_Services_Connector_Exception::addCodes([
@@ -107,13 +106,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $this->conversionService = TmConversionService::create();
         $this->persistenceService = new PersistenceService($this->config);
-        $this->httpClient = new Client();
-        $this->versionService = new VersionService(new VersionFetchingApi($this->httpClient));
+        $httpClient = new RetryClient(new Client());
+        $this->versionService = new VersionService(new VersionFetchingApi($httpClient));
         $this->exportService = new ExportService(
             $this->logger,
             $this->versionService,
             $this->conversionService,
-            new VersionedApiFactory($this->httpClient),
+            new VersionedApiFactory($httpClient),
             $this->persistenceService
         );
     }
@@ -968,7 +967,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private function getStatusFromApi(LanguageResource $languageResource, ?string $tmName): string
     {
-        $name = $tmName ?: $this->persistenceService->getWritableMemory($languageResource);
+        $name = $tmName ?: $this->persistenceService->getLastWritableMemory($languageResource);
 
         if (empty($name)) {
             $this->lastStatusInfo = 'The internal stored filename is invalid';
@@ -1792,6 +1791,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         // Here we resetting state to fetch the actual status from t5memory
         $this->languageResource->setStatus(LanguageResourceStatus::NOTCHECKED);
         $status = $this->getStatusFromApi($this->languageResource, $tmName);
+        $statusResponse = $this->api->getResult();
         $error = $this->api->getError();
 
         // In case we've got memory overflow error we need to create another memory and import further
@@ -1804,7 +1804,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->addMemoryToLanguageResource($this->languageResource, $newName);
 
             // Filter TMX data from already imported segments
-            $this->cutOffTmx($importFilename, $this->getOverflowSegmentNumber($error->error));
+            $this->cutOffTmx(
+                $importFilename,
+                $this->getOverflowSegmentNumberFromStatus($statusResponse, $error->error)
+            );
 
             // Import further
             return $this->importTmxIntoMemory($importFilename, $newName, $stripFramingTags);
@@ -1815,6 +1818,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private function cutOffTmx(string $importFilename, int $segmentToStartFrom): void
     {
+        // suppress: namespace error : Namespace prefix t5 on n is not defined
+        $errorLevel = error_reporting();
+        error_reporting($errorLevel & ~E_WARNING);
+
         $doc = new DOMDocument();
         $doc->load($importFilename);
 
@@ -1841,20 +1848,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         $doc->save($importFilename);
+
+        error_reporting($errorLevel);
     }
 
-    private function getOverflowSegmentNumber(string $error): int
+    private function getOverflowSegmentNumberFromStatus(stdClass $statusResponse, string $error): int
     {
-        preg_match('/rc = \d+; aciveSegment = (\d+)/', $error, $matches);
-
-        if (! isset($matches[1])) {
+        if (! isset($statusResponse->tmxSegmentCount) || 0 === (int) $statusResponse->tmxSegmentCount) {
             $this->logger->error(
                 'E1313',
                 't5memory responded with memory overflow error, ' .
                 'but we were unable to distinguish the segment number for reimport',
                 [
                     'languageResource' => $this->languageResource,
-                    'apiError' => $error,
                 ]
             );
 
@@ -1863,7 +1869,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             ]);
         }
 
-        return (int) ($matches[1]);
+        return (int) $statusResponse->tmxSegmentCount;
     }
 
     private function waitForImportFinish(string $tmName): void
@@ -1908,15 +1914,22 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
     }
 
-    private function generateNextMemoryName(LanguageResource $languageResource, bool $forceNextSuffix = false): string
-    {
+    private function generateNextMemoryName(
+        LanguageResource $languageResource,
+        string $usedName = null,
+        bool $forceNextSuffix = false,
+    ): string {
+        $pattern = sprintf('/%s(\d+)$/', self::NEXT_SUFFIX);
+
+        if (null !== $usedName && preg_match($pattern, $usedName, $matches)) {
+            return $this->generateTmFilename($languageResource) . self::NEXT_SUFFIX . ((int) $matches[1] + 1);
+        }
+
         $memories = $languageResource->getSpecificData('memories', parseAsArray: true);
 
         if (empty($memories) && ! $forceNextSuffix) {
             return $this->generateTmFilename($languageResource);
         }
-
-        $pattern = sprintf('/%s(\d+)/', self::NEXT_SUFFIX);
 
         $currentMax = 0;
         foreach ($memories ?: [] as $memory) {
@@ -2113,7 +2126,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $elapsedTime += $this->getRetryDelaySeconds();
 
             if (isset($apiError->error) && strpos($apiError->error, 'ERROR_MEM_NAME_EXISTS')) {
-                $name = $this->generateNextMemoryName($this->languageResource, forceNextSuffix: true);
+                $name = $this->generateNextMemoryName($this->languageResource, $name, true);
             }
         }
 

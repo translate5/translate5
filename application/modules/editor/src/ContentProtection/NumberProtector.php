@@ -590,8 +590,7 @@ class NumberProtector implements ProtectorInterface
         $numbers = $matches[$langFormat->matchId];
 
         $count = count($parts);
-
-        $partHash = md5($part);
+        $ruleHash = md5($langFormat->regex);
 
         for ($i = 0; $i <= $count; $i++) {
             yield $parts[$i];
@@ -602,7 +601,7 @@ class NumberProtector implements ProtectorInterface
 
             $protected = $this->protectNumber(
                 $numbers[$i],
-                $partHash,
+                $ruleHash,
                 $placeholders,
                 $langFormat,
                 $sourceLang,
@@ -642,13 +641,13 @@ class NumberProtector implements ProtectorInterface
 
     private function protectNumber(
         string $number,
-        string $partHash,
+        string $wholePartHash,
         array &$placeholders,
         ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
     ): string {
-        $numberKey = $number . $partHash;
+        $numberKey = $number . ':' . $wholePartHash;
         if (! isset($this->protectedNumbers[$numberKey])) {
             try {
                 $protectedNumber = $this

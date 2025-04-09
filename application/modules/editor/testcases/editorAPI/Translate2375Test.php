@@ -85,8 +85,8 @@ class Translate2375Test extends ImportTestAbstract
             return $assoc;
         }, $deprecatedData);
 
-        //file_put_contents(static::api()->getFile('/expected.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
-        $this->assertEquals(static::api()->getFileContent('expected.json'), $deprecatedData, 'The calculate default deadline is are not as expected!');
+        //file_put_contents(static::api()->getFile('/expected_deprecated.json', null, false), json_encode($deprecatedData, JSON_PRETTY_PRINT));
+        $this->assertEquals(static::api()->getFileContent('expected_deprecated.json'), $deprecatedData, 'The calculate default deadline is are not as expected!');
 
         $data = static::api()->getJson(
             sprintf('editor/task/%s/job', static::api()->getTask()->id)
@@ -99,7 +99,7 @@ class Translate2375Test extends ImportTestAbstract
 
             return $assoc;
         }, $data);
-
+        //file_put_contents(static::api()->getFile('/expected.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
         $this->assertEquals(static::api()->getFileContent('expected.json'), $data, 'The calculate default deadline is are not as expected!');
     }
 }

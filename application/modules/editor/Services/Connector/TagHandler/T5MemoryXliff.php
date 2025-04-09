@@ -39,7 +39,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
     private TmConversionService $conversionService;
 
     /**
-     * @var array<string, string[]>
+     * @var array<string, array<string, \SplQueue<int>>>
      */
     private array $numberTagMap = [];
 
@@ -80,7 +80,14 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                 $tags = array_values($tags);
 
                 if (isset($this->numberTagMap[$rule])) {
-                    $taskSegmentTags = $this->numberTagMap[$rule];
+                    $taskSegmentTags = [];
+
+                    foreach ($this->numberTagMap[$rule] as $tag => $ids) {
+                        foreach ($ids as $id) {
+                            $taskSegmentTags[$id] = $tag;
+                        }
+                    }
+
                     ksort($taskSegmentTags);
                     $taskSegmentTags = array_values($taskSegmentTags);
 

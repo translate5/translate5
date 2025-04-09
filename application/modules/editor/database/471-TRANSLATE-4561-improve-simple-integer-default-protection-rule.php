@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,32 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-declare(strict_types=1);
+set_time_limit(0);
 
-namespace MittagQI\Translate5\ContentProtection\T5memory;
+/* @var $this ZfExtended_Models_Installer_DbUpdater */
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+//$this->doNotSavePhpForDebugging = false;
 
-interface TmConversionServiceInterface
-{
-    public function setRulesHash(LanguageResource $languageResource, int $sourceLanguageId, int $targetLangId): void;
-
-    public function isTmConverted(int $languageResourceId): bool;
-
-    public function isConversionInProgress(int $languageResourceId): bool;
-
-    public function startConversion(int $languageResourceId): void;
-
-    public function convertT5MemoryTagToContent(string $string): string;
-
-    /**
-     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
-     */
-    public function convertContentTagToT5MemoryTag(
-        string $queryString,
-        bool $isSource,
-        array &$numberTagMap = []
-    ): string;
-
-    public function convertTMXForImport(string $filenameWithPath, int $sourceLangId, int $targetLangId): string;
+/**
+ * define database credential variables
+ */
+$argc = count($argv);
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+    die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
+
+$db = Zend_Db_Table::getDefaultAdapter();
+
+$db->query(
+    <<<SQL
+UPDATE `LEK_content_protection_content_recognition` SET `regex` = '/(\\\s|^|\\\()([-+]?([1-9]\\\d+|\\\d))(([\\\.,;:?!](\\\s|$))|\\\s|$|\\\))/u'
+WHERE type = 'integer' and name = 'default simple';
+SQL
+)->execute();
+
+$ruleId = $db->fetchOne('SELECT id FROM `LEK_content_protection_content_recognition` WHERE type = "integer" and name = "default simple"');
+
+$worker = new \MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker();
+$worker->init(parameters: [
+    'recognitionId' => (int) $ruleId,
+]);
+$worker->queue();

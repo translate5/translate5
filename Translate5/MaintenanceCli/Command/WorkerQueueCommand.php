@@ -66,6 +66,13 @@ class WorkerQueueCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Use the test-database to run a worker during API-tests.'
         );
+
+        $this->addOption(
+            'daemon',
+            null,
+            InputOption::VALUE_NONE,
+            'Keep the worker running until all scheduled workers are started'
+        );
     }
 
     /**
@@ -95,10 +102,15 @@ class WorkerQueueCommand extends Translate5AbstractCommand
 
         $this->writeTitle('trigger worker queue');
 
-        // trigger the queue if possible
-        Queue::processQueueMutexed();
-
-        $this->io->text('scheduling workers...');
+        if ($this->input->getOption('daemon')) {
+            // runs the queue loop if possible
+            $this->io->text('run permanent worker queue');
+            Queue::processQueueMutexed(true);
+        } else {
+            // triggers the queue loop asynchronously
+            $this->io->text('scheduling workers asynchronously');
+            Queue::processQueueMutexed();
+        }
 
         if ($this->isPorcelain) {
             return self::SUCCESS;

@@ -50,82 +50,46 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\NumberProtection\Object;
+namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
-use NumberFormatter;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 
-class FloatObject
+class ReApplyProtectionRules
 {
     public function __construct(
-        private readonly float $number,
-        private readonly int $fractionDigits,
-        private readonly string $sign = ''
+        private readonly TmConversionService $tmConversionService,
     ) {
     }
 
-    public static function parse(string $float): self
+    public static function create(): self
     {
-        $formater = numfmt_create('en', NumberFormatter::DECIMAL);
-        $symbols = array_filter(preg_split('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $float));
-        $decimalSeparator = end($symbols);
-
-        if (false === $decimalSeparator) {
-            $decimalSeparator = '.';
-        }
-
-        $firstChar = mb_substr($float, 0, 1);
-        $sign = in_array($firstChar, ['-', '+']) ? $firstChar : '';
-        $decimalPart = explode($decimalSeparator, $float)[1];
-        // if format at the end has currency for example
-        if (! preg_match('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $decimalPart)) {
-            array_pop($symbols);
-            $decimalSeparator = end($symbols);
-        }
-
-        $regSymbol = '.' === $decimalSeparator ? '\\' . $decimalSeparator : $decimalSeparator;
-        $number = preg_replace("/[^\d$regSymbol]/u", '', $float);
-        $number = str_replace($decimalSeparator, '.', $number);
-
-        return new self($formater->parse($number), mb_strlen(explode('.', $number)[1]), $sign);
+        return new self(
+            TmConversionService::create(),
+        );
     }
 
-    public function format(string $format, ?string $locale = null): string
+    public function reApplyRules(UpdateSegmentDTO $dto, int $sourceLang, int $targetLang): UpdateSegmentDTO
     {
-        $formater = numfmt_create($locale ?: 'en', NumberFormatter::DECIMAL);
-        if (! empty($format)) {
-            $this->setFormat($format, $formater);
-        }
+        $source = $this->tmConversionService->convertT5MemoryTagToContent($dto->source);
+        $target = $this->tmConversionService->convertT5MemoryTagToContent($dto->target);
 
-        $formater->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $this->fractionDigits);
-        $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $this->fractionDigits);
+        [$source, $target] = $this->tmConversionService->convertPair(
+            $source,
+            $target,
+            $sourceLang,
+            $targetLang
+        );
 
-        $firstChar = mb_substr($format, 0, 1);
-        $signOfFormat = in_array($firstChar, ['-', '+']) ? $firstChar : '';
-
-        return ($signOfFormat ? '' : $this->sign) . $formater->format($this->number);
-    }
-
-    private function setFormat(string $format, NumberFormatter $formater): void
-    {
-        $formater->setPattern($format);
-        preg_match('/#+0*([^#0])((#+\1)*#*0*([^#0]))?#*0*/u', $format, $symbols);
-
-        if (empty($symbols)) {
-            return;
-        }
-
-        // Symbols are predefined by locale, so we have to enforce our desired ones
-        $formater->setSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, $symbols[4] ?? $symbols[1]);
-
-        if (! isset($symbols[4])) {
-            $formater->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, '');
-
-            return;
-        }
-
-        // replace non-standard symbols in patter with standard
-        $format = str_replace([$symbols[1], $symbols[4]], ['COMMA', 'DOT'], $format);
-        $formater->setPattern(str_replace(['COMMA', 'DOT'], [',', '.'], $format));
-        $formater->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, $symbols[1]);
+        return new UpdateSegmentDTO(
+            $dto->taskGuid,
+            $dto->segmentId,
+            $source,
+            $target,
+            $dto->fileName,
+            $dto->timestamp,
+            $dto->userName,
+            $dto->context,
+        );
     }
 }

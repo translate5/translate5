@@ -218,9 +218,17 @@ class TmConversionService implements TmConversionServiceInterface
 
                 $protectedContent = html_entity_decode($protectedContent);
 
-                $t5nTag = new T5NTag($currentId, $tagProps['regex'], $protectedContent);
+                if ($isSource) {
+                    if (! isset($numberTagMap[$tagProps['regex']][$tag])) {
+                        $numberTagMap[$tagProps['regex']][$tag] = new \SplQueue();
+                    }
+                    $numberTagMap[$tagProps['regex']][$tag]->enqueue($currentId);
+                } else {
+                    $ids = $numberTagMap[$tagProps['regex']][$tag] ?? null;
+                    $currentId = $ids?->dequeue() ?: $currentId;
+                }
 
-                $numberTagMap[$tagProps['regex']][$currentId] = $tag;
+                $t5nTag = new T5NTag($currentId, $tagProps['regex'], $protectedContent);
 
                 $currentId++;
 
@@ -327,6 +335,34 @@ class TmConversionService implements TmConversionServiceInterface
         return $resultFilename;
     }
 
+    public function convertPair(string $source, string $target, int $sourceLang, int $targetLang): array
+    {
+        $protectedSource = $this->contentProtector->protect(
+            $source,
+            true,
+            $sourceLang,
+            $targetLang,
+            ContentProtector::ENTITY_MODE_OFF
+        );
+
+        $protectedTarget = $this->contentProtector->protect(
+            $target,
+            false,
+            $sourceLang,
+            $targetLang,
+            ContentProtector::ENTITY_MODE_OFF
+        );
+
+        [$source, $target] = $this->contentProtector->filterTags($protectedSource, $protectedTarget);
+
+        $tagMap = [];
+
+        return [
+            $this->convertContentTagToT5MemoryTag($source, true, $tagMap),
+            $this->convertContentTagToT5MemoryTag($target, false, $tagMap),
+        ];
+    }
+
     private function convertTransUnit(
         string $transUnit,
         Language $sourceLang,
@@ -374,33 +410,17 @@ class TmConversionService implements TmConversionServiceInterface
             return '';
         }
 
-        $protectedSource = $this->contentProtector->protect(
-            $sourceSegment,
-            true,
-            (int) $sourceLang->getId(),
-            (int) $targetLang->getId(),
-            ContentProtector::ENTITY_MODE_OFF
-        );
-
-        $protectedTarget = $this->contentProtector->protect(
-            $targetSegment,
-            false,
-            (int) $sourceLang->getId(),
-            (int) $targetLang->getId(),
-            ContentProtector::ENTITY_MODE_OFF
-        );
-
-        [$source, $target] = $this->contentProtector->filterTags($protectedSource, $protectedTarget);
-
         return str_replace(
             [
                 '*source*',
                 '*target*',
             ],
-            [
-                $this->convertContentTagToT5MemoryTag($source, true),
-                $this->convertContentTagToT5MemoryTag($target, false),
-            ],
+            $this->convertPair(
+                $sourceSegment,
+                $targetSegment,
+                (int) $sourceLang->getId(),
+                (int) $targetLang->getId()
+            ),
             $transUnit
         );
     }

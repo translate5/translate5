@@ -94,7 +94,7 @@ class ImportXlfWithResnameInTransUnitTest extends TestCase
 
         $parser = new Xlf(
             __DIR__ . '/testfiles/ImportXlfWithResnameInTransUnitTest/' . $filename,
-            'ImportXlfWithResnameInTransUnitTest.xlf',
+            $filename,
             (int) $this->file->getId(),
             $this->task,
         );
@@ -142,6 +142,15 @@ class ImportXlfWithResnameInTransUnitTest extends TestCase
 
     public function expectedSegmentsProvider(): iterable
     {
+        // Default extensions where ignored: xls,xlsx,ods
+        yield 'ignore resnames' => [
+            '2-seg-resname.xls.xlf',
+            [
+                null,
+                null,
+            ],
+        ];
+
         yield 'resnames in trans units on;y' => [
             '2-seg-resname.xlf',
             [

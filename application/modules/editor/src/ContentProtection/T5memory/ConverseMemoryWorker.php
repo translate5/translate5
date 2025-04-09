@@ -125,8 +125,6 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
         $mime = $connector->getValidExportTypes()['TMX'];
 
-        $memoriesBuffer = $this->memoriesBackup;
-
         foreach ($this->memoriesBackup as $memory) {
             $exportFilename = $this->exportService->export(
                 $this->languageResource,
@@ -149,8 +147,6 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                 return false;
             }
 
-            $tuCountBefore = $this->countTusInMemory($exportFilename);
-
             $fileinfo = [
                 'tmp_name' => $exportFilename,
                 'type' => $mime,
@@ -171,41 +167,10 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
                 $this->rollback($connector);
 
-                return false;
-            }
-
-            $memoriesNow = $this->languageResource->getSpecificData('memories', true);
-
-            $newMemory = $this->findNewMemory($memoriesBuffer, $memoriesNow);
-
-            $exportFilenameAfter = $this->exportService->export(
-                $this->languageResource,
-                ExportTmFileExtension::TMX,
-                $newMemory
-            );
-
-            $tuCountAfter = $this->countTusInMemory($exportFilenameAfter);
-
-            @unlink($exportFilenameAfter);
-
-            if ($tuCountBefore !== $tuCountAfter) {
-                $this->log->error(
-                    'E1590',
-                    'Conversion: Memory [{filename}] was not imported correctly. TU count before: {before}, after: {after}. Changes are rolled back.',
-                    [
-                        'filename' => $newMemory,
-                        'before' => $tuCountBefore,
-                        'after' => $tuCountAfter,
-                        'languageResource' => $this->languageResource,
-                    ]
-                );
-
-                $this->rollback($connector);
+                @unlink($exportFilename);
 
                 return false;
             }
-
-            $memoriesBuffer = $memoriesNow;
 
             @unlink($exportFilename);
         }
@@ -243,39 +208,6 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $this->deleteNewlyCreatedMemories($connector);
         $this->restoreLangResourceMemories();
         $this->resetConversionStarted();
-    }
-
-    private function findNewMemory(array $was, array $now): string
-    {
-        $wasNames = array_column($was, 'filename');
-        $nowNames = array_column($now, 'filename');
-
-        return array_values(array_diff($nowNames, $wasNames))[0];
-    }
-
-    private function countTusInMemory(string $file): int
-    {
-        $reader = new \XMLReader();
-
-        $reader->open($file);
-
-        // suppress: namespace error : Namespace prefix t5 on n is not defined
-        $errorLevel = error_reporting();
-        error_reporting($errorLevel & ~E_WARNING);
-
-        $count = 0;
-
-        while ($reader->read()) {
-            if ($reader->nodeType === \XMLReader::ELEMENT && $reader->name === 'tu') {
-                $count++;
-            }
-        }
-
-        $reader->close();
-
-        error_reporting($errorLevel);
-
-        return $count;
     }
 
     private function finaliseConversion(int $sourceLang, int $targetLang): void

@@ -57,8 +57,6 @@ use editor_Models_Segment_Whitespace as Whitespace;
 
 class ContentProtector
 {
-    public const TAG_REGEX = '/(<(\w|[-:])+>|<\w+ .+>|<\/\w+>|<\/(\w|[-:])+>|<\w+\s?.+\/>)/Uu';
-
     /**
      * All entities are restored to their applicable characters (&_szlig; => ß),
      * only the XML relevant &<> are encoded (ready for GUI)
@@ -114,8 +112,10 @@ class ContentProtector
         return $numberProtector->getFormatedExample($type, $format);
     }
 
-    public static function create(Whitespace $whitespace): self
+    public static function create(?Whitespace $whitespace = null): self
     {
+        $whitespace ??= new Whitespace();
+
         return new self([
             NumberProtector::create(),
             new WhitespaceProtector($whitespace),

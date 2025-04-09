@@ -30,8 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Fixtures;
 
-use editor_Models_Customer_Customer;
 use editor_Models_Task;
+use editor_Task_Type_Project;
 use editor_Task_Type_ProjectTask;
 use Faker\Factory;
 use Faker\Generator;
@@ -54,16 +54,14 @@ class TaskFixtures
         );
     }
 
-    /**
-     * @return editor_Models_Customer_Customer[]
-     */
     public function createTask(
         int $customerId,
         string $workflow,
         string $workflowStepName,
         int $sourceLang,
         int $targetLang,
-        ?string $state = null
+        ?string $state = null,
+        ?int $projectId = null,
     ): editor_Models_Task {
         $task = new editor_Models_Task();
         $task->setTaskGuid(ZfExtended_Utils::guid());
@@ -73,9 +71,31 @@ class TaskFixtures
         $task->setTaskName($this->faker->sentence());
         $task->setTaskType(editor_Task_Type_ProjectTask::ID);
         $task->setWorkflow($workflow);
-        $task->setWorkflowStep($workflowStepName);
         $task->setSourceLang($sourceLang);
         $task->setTargetLang($targetLang);
+        if ($projectId !== null) {
+            $task->setProjectId($projectId);
+        }
+        $task->save();
+        if (! empty($workflowStepName)) {
+            $task->updateWorkflowStep($workflowStepName);
+        }
+
+        return $task;
+    }
+
+    public function createProject(
+        int $customerId,
+        string $pmGuid
+    ): editor_Models_Task {
+        $task = new editor_Models_Task();
+        $task->setTaskGuid(ZfExtended_Utils::guid());
+        //$task->setTaskNr('1');
+        $task->setCustomerId($customerId);
+        $task->setPmGuid($pmGuid);
+        $task->setState(editor_Models_Task::STATE_PROJECT);
+        $task->setTaskName($this->faker->sentence());
+        $task->setTaskType(editor_Task_Type_Project::ID);
         $task->save();
 
         return $task;

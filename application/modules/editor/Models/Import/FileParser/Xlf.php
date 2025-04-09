@@ -175,6 +175,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
     protected AbstractSurroundingTagRemover $surroundingTags;
 
+    private bool $useResnames = true;
+
     private Comments $comments;
 
     /**
@@ -211,6 +213,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->otherContent = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_OtherContent', [
             $this->contentConverter, $this->segmentBareInstance, $this->task, $fileId,
         ]);
+
+        $extensionsNoResnames = preg_split(
+            '/\s*,\s*/',
+            preg_quote(trim($this->config->runtimeOptions->import->xlf->skipResnamesForExtensions)),
+            -1,
+            PREG_SPLIT_NO_EMPTY
+        );
+        if (! empty($extensionsNoResnames) && preg_match(
+            '/\.(?:' . implode('|', $extensionsNoResnames) . ')\.xlf$/i',
+            $fileName
+        )) {
+            $this->useResnames = false;
+        }
     }
 
     /**
@@ -788,13 +803,15 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
         $segmentAttributes->transunitId = $transunitId;
 
-        $resname = $this->xmlparser->getAttribute($attributes, 'resname', null);
+        if ($this->useResnames) {
+            $resname = $this->xmlparser->getAttribute($attributes, 'resname', null);
 
-        if (null === $resname && null !== $this->currentGroupAttributes) {
-            $resname = $this->xmlparser->getAttribute($this->currentGroupAttributes, 'resname', null);
+            if (null === $resname && null !== $this->currentGroupAttributes) {
+                $resname = $this->xmlparser->getAttribute($this->currentGroupAttributes, 'resname', null);
+            }
+
+            $segmentAttributes->transunitDescriptor = $resname;
         }
-
-        $segmentAttributes->transunitDescriptor = $resname;
 
         $segmentAttributes->transunitHash = $transunitHash;
 
