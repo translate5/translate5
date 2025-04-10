@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
 use MittagQI\ZfExtended\Tools\Markup;
@@ -430,7 +431,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
                 $this->handleIsInSourceScope,
                 (int) $this->task->getSourceLang(),
                 (int) $this->task->getTargetLang(),
-                ContentProtector::ENTITY_MODE_OFF
+                EntityHandlingMode::Off
             );
         } else {
             $text = $this->contentProtector->protect(

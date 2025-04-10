@@ -54,29 +54,10 @@ namespace MittagQI\Translate5\ContentProtection;
 
 use editor_Models_Segment_Utility as SegmentUtility;
 use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 
 class ContentProtector
 {
-    /**
-     * All entities are restored to their applicable characters (&_szlig; => ß),
-     * only the XML relevant &<> are encoded (ready for GUI)
-     * @var string
-     */
-    public const ENTITY_MODE_RESTORE = 'restore';
-
-    /**
-     * Nothing is restored, but encoded (&_szlig; => &_amp;szlig;),
-     * only the XML relevant &<> are encoded (ready for GUI)
-     * @var string
-     */
-    public const ENTITY_MODE_KEEP = 'keep';
-
-    /**
-     * Entity handling is disabled, entities must be handled elsewhere!
-     * @var string
-     */
-    public const ENTITY_MODE_OFF = 'off';
-
     private array $shortcutNumberMap = [];
 
     private bool $collectShortcutMap = false;
@@ -169,16 +150,14 @@ class ContentProtector
         bool $isSource,
         int $sourceLang,
         int $targetLang,
-        string $entityHandling = self::ENTITY_MODE_RESTORE,
+        EntityHandlingMode $entityHandling = EntityHandlingMode::Restore,
         string ...$exceptProtectors
     ): string {
         if (str_starts_with($text, 'translate5-unique-id')) {
             return $text;
         }
 
-        if ($entityHandling !== self::ENTITY_MODE_OFF) {
-            $text = SegmentUtility::entityCleanup($text, $entityHandling === self::ENTITY_MODE_RESTORE);
-        }
+        $text = SegmentUtility::entityCleanup($text, $entityHandling);
 
         foreach ($this->protectors as $protector) {
             if (in_array($protector::alias(), $exceptProtectors, true)) {
@@ -186,7 +165,7 @@ class ContentProtector
             }
 
             if ($protector->hasEntityToProtect($text, $sourceLang)) {
-                $text = $protector->protect($text, $isSource, $sourceLang, $targetLang);
+                $text = $protector->protect($text, $isSource, $sourceLang, $targetLang, $entityHandling);
             }
         }
 
@@ -280,7 +259,7 @@ class ContentProtector
         int $sourceLang,
         int $targetLang,
         int &$shortTagIdent,
-        string $entityHandling = self::ENTITY_MODE_RESTORE
+        EntityHandlingMode $entityHandling = EntityHandlingMode::Restore
     ): string {
         return $this->convertToInternalTags(
             $this->protect($text, $isSource, $sourceLang, $targetLang, $entityHandling),

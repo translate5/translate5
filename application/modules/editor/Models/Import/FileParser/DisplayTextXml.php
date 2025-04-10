@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 
 /**
  * Fileparsing for import of customer specific XML
@@ -382,7 +382,7 @@ The German and the English Comment tag of the string must be imported as comment
             (int) $this->task->getSourceLang(),
             (int) $this->task->getTargetLang(),
             $this->shortTagIdent,
-            ContentProtector::ENTITY_MODE_OFF
+            EntityHandlingMode::Off
         );
 
         $segment = $this->utilities->internalTag->unprotect($segment);

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\EntityHandlingMode;
+
 /**
  * Helper Class which encapsulates segment whitespace handling
  */
@@ -297,8 +299,11 @@ class editor_Models_Segment_Whitespace
      */
     public function protectWhitespace(
         string $textNode,
-        array $excludedCharacters = []
+        array $excludedCharacters = [],
+        EntityHandlingMode $entityHandling = EntityHandlingMode::Restore,
     ): string {
+        $textNode = $this->replaceEntities($textNode, $entityHandling);
+
         //replace only on real text
         $textNode = str_replace($this->protectedWhitespaceMap['search'], $this->protectedWhitespaceMap['replace'], $textNode);
 
@@ -315,18 +320,6 @@ class editor_Models_Segment_Whitespace
 
             //tab(s) are completely replaced with a tag
             return $this->maskSpecialContent('tab', $match[2], strlen($match[2]));
-        }, $textNode);
-
-        //in XML based import formats we have to extend the list about some HTML entities representing some none printable characters in UTF8
-        //see https://stackoverflow.com/questions/9587751/decoding-numeric-html-entities-via-php
-        // and https://caves.org.uk/charset_test.html  Section: Another Problem with PHP's htmlentities()
-        //since entityCleanup was called aready, we have to begin the regex with &amp; instead &
-        // 2022 additional Info - the here escaped characters 128 - 159 are non printable
-        // control characters (C1 Controls) - therefore we escape them.
-        // Attention caveat: copying the character &#128; into the browser vonverts it to € - assuming that not UTF8 but wincp was used!
-        $textNode = preg_replace_callback('/&amp;#(128|129|1[3-5][0-9]);/', function ($match) {
-            //always one single character is masked, so length = 1
-            return $this->maskSpecialContent('char', '&#' . $match[1] . ';', 1);
         }, $textNode);
 
         return preg_replace_callback($this->getProtectedCharactersRegexes($excludedCharacters), function ($match) {
@@ -650,5 +643,34 @@ class editor_Models_Segment_Whitespace
             'text' => $text,
             'title' => $title,
         ];
+    }
+
+    /**
+     * Depending on the import format (defined by $entityHandling) XML numbered entities are not completely restored
+     * into their proper character but remain as entity. Reason is that either the numbered entity is not valid in XML
+     * see https://www.w3.org/TR/xml/#charsets or since we use ENT_HTML5 (ENT_XML1 does not restore named entities,
+     * and we anyway show the output as HTML) the entity is not allowed in HTML5 (vertical tab and carriage return),
+     * see https://html.spec.whatwg.org/multipage/parsing.html#numeric-character-reference-end-state
+     *
+     * Therefore, all remaining numbered entities (already with encoded &) has to be finally replaced either
+     * as char placeholder or for CR and VT as plain space character.
+     *
+     * Additional caveat: copying the character &#128; into the browser converts it to € -
+     * assuming that not UTF8 but wincp was used!
+     */
+    private function replaceEntities(string $textNode, EntityHandlingMode $entityHandling): string
+    {
+        if ($entityHandling !== EntityHandlingMode::Restore) {
+            return $textNode;
+        }
+
+        //replace carriage return and vertical tab as plain character for later tag replacement
+        $textNode = str_replace(['&amp;#11;', '&amp;#13;'], [chr(11), "\r"], $textNode);
+
+        //all other remaining numbered entities are protected as char tag
+        return (string) preg_replace_callback('/&amp;#([\d]+);/', function ($match) {
+            //always one single character is masked, so length = 1
+            return $this->maskSpecialContent('char', '&#' . $match[1] . ';', 1);
+        }, $textNode);
     }
 }

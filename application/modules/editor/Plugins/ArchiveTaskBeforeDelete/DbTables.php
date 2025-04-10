@@ -59,7 +59,6 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_file_filter' => 'taskGuid',
         'LEK_foldertree' => 'taskGuid',
         'LEK_key_value_data' => false,
-        'LEK_language_number_format' => false,
         'LEK_languages' => false,
         // languageresources tables disabled for archiving, since task data is not depending from them, and existence of languageresources does not depend on the existence of the task
         'LEK_languageresources_customerassoc' => false,
@@ -103,7 +102,6 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_taskUserAssoc' => 'taskGuid',
         'LEK_taskUserTracking' => 'taskGuid',
         'LEK_task_log' => 'taskGuid',
-        'LEK_task_log_count' => false,
         'LEK_task_meta' => 'taskGuid',
         'LEK_task_migration' => 'taskGuid',
         'LEK_task_usage_log' => false,
@@ -190,7 +188,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
      */
     public static function runTest(): array
     {
-        $instance = ZfExtended_Factory::get(__CLASS__);
+        $instance = ZfExtended_Factory::get(self::class);
 
         return $instance->checkMissingInList();
     }

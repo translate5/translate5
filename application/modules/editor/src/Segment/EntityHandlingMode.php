@@ -50,58 +50,24 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection;
+namespace MittagQI\Translate5\Segment;
 
-use MittagQI\Translate5\Segment\EntityHandlingMode;
-
-interface ProtectorInterface
+enum EntityHandlingMode
 {
-    public static function alias(): string;
-
-    public function hasEntityToProtect(string $textNode, int $sourceLang = null): bool;
-
-    public function hasTagsToConvert(string $textNode): bool;
-
-    public function filterTags(string &$source, string &$target): void;
-
-    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void;
-
-    public function protect(
-        string $textNode,
-        bool $isSource,
-        int $sourceLangId,
-        int $targetLangId,
-        EntityHandlingMode $entityHandling = EntityHandlingMode::Restore,
-    ): string;
-
-    public function unprotect(string $content, bool $isSource): string;
-
-    public function convertForSorting(string $content, bool $isSource): string;
-
-    public function priority(): int;
+    /**
+     * All entities are restored to their applicable characters (&_szlig; => ß),
+     * only the XML relevant &<> are encoded (ready for GUI)
+     */
+    case Restore;
 
     /**
-     * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <number> etc) with an internal tag
+     * Nothing is restored, but encoded (&_szlig; => &_amp;szlig;),
+     * only the XML relevant &<> are encoded (ready for GUI)
      */
-    public function convertToInternalTags(
-        string $segment,
-        int &$shortTagIdent,
-        bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = []
-    ): string;
+    case Keep;
 
-    public function convertToInternalTagsInChunks(
-        string $segment,
-        int &$shortTagIdent,
-        bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = []
-    ): array;
-
-    public function convertToInternalTagsWithShortcutNumberMap(
-        string $segment,
-        int &$shortTagIdent,
-        array $shortcutNumberMap
-    ): string;
-
-    public function tagList(): array;
+    /**
+     * Entity handling is disabled, entities must be handled elsewhere!
+     */
+    case Off;
 }

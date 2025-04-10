@@ -68,6 +68,7 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProte
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 use Zend_Registry;
 use ZfExtended_Logger;
 
@@ -272,8 +273,13 @@ class NumberProtector implements ProtectorInterface
         return $this->convertToInternalTags($segment, $shortTagIdent, shortcutNumberMap: $shortcutNumberMap);
     }
 
-    public function protect(string $textNode, bool $isSource, int $sourceLangId, int $targetLangId): string
-    {
+    public function protect(
+        string $textNode,
+        bool $isSource,
+        int $sourceLangId,
+        int $targetLangId,
+        EntityHandlingMode $entityHandling = EntityHandlingMode::Restore,
+    ): string {
         if (empty($textNode)) {
             return $textNode;
         }

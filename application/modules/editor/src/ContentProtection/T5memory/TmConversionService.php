@@ -40,6 +40,7 @@ use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 use RuntimeException;
 use XMLReader;
 use XMLWriter;
@@ -342,7 +343,7 @@ class TmConversionService implements TmConversionServiceInterface
             true,
             $sourceLang,
             $targetLang,
-            ContentProtector::ENTITY_MODE_OFF
+            EntityHandlingMode::Off
         );
 
         $protectedTarget = $this->contentProtector->protect(
@@ -350,7 +351,7 @@ class TmConversionService implements TmConversionServiceInterface
             false,
             $sourceLang,
             $targetLang,
-            ContentProtector::ENTITY_MODE_OFF
+            EntityHandlingMode::Off
         );
 
         [$source, $target] = $this->contentProtector->filterTags($protectedSource, $protectedTarget);

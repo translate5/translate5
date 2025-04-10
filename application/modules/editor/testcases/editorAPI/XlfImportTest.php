@@ -126,6 +126,17 @@ class XlfImportTest extends JsonTestAbstract
         );
     }
 
+    public function testHtmlEntities()
+    {
+        $jsonFileName = 'expectedSegmentsHtmlEntities.json';
+        $segments = static::api()->getSegments($jsonFileName, 8, 147);
+        $this->assertSegmentsEqualsJsonFile(
+            'expectedSegmentsHtmlEntities.json',
+            $segments,
+            'Imported segments are not as expected!'
+        );
+    }
+
     /**
      * @depends testSegmentValuesAfterImport
      * @depends testPreserveWhitespace
@@ -328,6 +339,17 @@ class XlfImportTest extends JsonTestAbstract
             rtrim($expectedResult),
             rtrim($exportedFile),
             'Exported result does not equal to ' . $fileToCompare
+        );
+    }
+
+    public function testHtmlEntitiesExport()
+    {
+        $task = static::api()->getTask();
+        $this->checkExport(
+            $task,
+            'editor/task/export/id/' . $task->id,
+            '12-html-entities.xlf',
+            'export-html-entities.xlf'
         );
     }
 

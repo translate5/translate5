@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Segment_InternalTag as InternalTag;
 use editor_Models_Segment_TagProtection as TagProtection;
 use editor_Models_SegmentField as SegmentField;
-use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 
 /**
  * Fileparsing for Csv-files
@@ -401,7 +401,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $isSource,
                 (int) $this->task->getSourceLang(),
                 (int) $this->task->getTargetLang(),
-                ContentProtector::ENTITY_MODE_KEEP
+                EntityHandlingMode::Keep
             )
         );
     }
