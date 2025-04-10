@@ -100,6 +100,16 @@ class editor_Models_LanguageResources_UsageExporter
      */
     protected $zipName;
 
+    /**
+     * Xls folder location
+     */
+    protected string $xlsFolder;
+
+    /**
+     * Xls file name
+     */
+    protected string $xlsName;
+
     /***
      *
      * @var integer
@@ -142,7 +152,7 @@ class editor_Models_LanguageResources_UsageExporter
      */
     protected function initExcelExport()
     {
-        $this->excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        $this->excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExportSpout');
 
         //set the spredsheet labels and translate the cell headers
         foreach ($this->labels as $label => $text) {
@@ -219,6 +229,8 @@ class editor_Models_LanguageResources_UsageExporter
         //if the export is splited in multiple excels, setup the export zip directory
         if ($hasChunks = count($chunks) > 1) {
             $this->setupZip();
+        } else {
+            $this->setupXls();
         }
 
         foreach ($chunks as $chunk) {
@@ -237,23 +249,26 @@ class editor_Models_LanguageResources_UsageExporter
             // set property for export-filename
             //add the timestump to the export file
             $this->excel->setProperty('filename', $this->name);
+            if ($hasChunks) {
+                $this->excel->writer->openToFile($this->zipFolder . $this->name . '.xlsx');
+            } else {
+                $this->excel->writer->openToBrowser($this->xlsFolder . $this->xlsName);
+            }
 
+            // Add sheets
             $this->usageByMonth($data[self::MONTHLY_SUMMARY_BY_RESOURCE], $customerId);
             $this->usageLog($chunk, $customerId);
             $this->usageInDocuments($data[self::DOCUMENT_USAGE], $customerId);
 
-            $sp = $this->excel->getSpreadsheet();
+            // Set the first sheet as active on file open
+            $this->excel->setCurrentSheetByIndex(0);
 
-            //this will adjust the cell size to fit the text
-            $this->excel->autosizeColumns($sp);
+            // Finish creating xlsx file
+            $this->excel->writer->close();
 
-            //set the first sheet as active on file open
-            $sp->setActiveSheetIndex(0);
-            //
-            if ($hasChunks) {
-                $this->excel->saveToDisc($this->zipFolder . $this->name . '.xlsx');
-            } else {
-                $this->excel->sendDownload();
+            // If no zip - just exit, because xlsx file is flushed into php://output by $this->excel->writer
+            if (!$hasChunks) {
+                exit;
             }
             $this->worksheetIndex = 0;
 
@@ -358,9 +373,9 @@ class editor_Models_LanguageResources_UsageExporter
         }
 
         if ($this->worksheetIndex == 0) {
-            //Get the first autocreated worksheet and rename it.
-            //The sheet contains the total sums per customer and month
-            $this->excel->getWorksheetByName('Worksheet')->setTitle($name);
+            // Get the first autocreated worksheet and rename it.
+            // The sheet contains the total sums per customer and month
+            $this->excel->getWorksheetByName('Sheet1')->setName($name);
         } else {
             $this->excel->addWorksheet($name, $this->worksheetIndex);
         }
@@ -375,10 +390,26 @@ class editor_Models_LanguageResources_UsageExporter
     protected function setupZip()
     {
         //generate unique zip name
-        $this->zipName = $this->name . '_' . NOW_ISO . '.zip';
+        $this->zipName = $this->name . '_' . str_replace(':', '.', NOW_ISO) . '.zip';
         //create the directory where the excel chunks will be saved
         $this->zipFolder = APPLICATION_PATH . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . $this->zipName . DIRECTORY_SEPARATOR;
         is_dir($this->zipFolder) || mkdir($this->zipFolder);
+    }
+
+    /**
+     * Setup xls folder for export.
+     * This will also set the xlsName and xlsFolder properties
+     */
+    protected function setupXls()
+    {
+        // Generate unique xls name
+        $this->xlsName = $this->name . '_' . str_replace(':', '.', NOW_ISO) . '.xlsx';
+
+        // General the directory name where the excel file will be saved
+        $this->xlsFolder = join(DIRECTORY_SEPARATOR, [APPLICATION_PATH, '..', 'data', 'tmp', '']);
+
+        // Create that directory if it does not exist
+        is_dir($this->xlsFolder) || mkdir($this->xlsFolder);
     }
 
     /***
