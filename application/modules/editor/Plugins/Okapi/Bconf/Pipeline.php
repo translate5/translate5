@@ -36,6 +36,7 @@ use MittagQI\ZfExtended\MismatchException;
 use SimpleXMLElement;
 use ZfExtended_Exception;
 use ZfExtended_NotFoundException;
+use ZfExtended_SecurityException;
 
 /**
  * Class representing the pipeline of a BCONF
@@ -272,39 +273,43 @@ final class Pipeline extends ResourceFile
 
         foreach ($xml->step as $stepXml) { /** @var SimpleXMLElement $stepXml */
             $javaClass = (string) $stepXml['class'];
-            if (! empty($javaClass)) {
-                $this->steps[] = $javaClass;
-                $stepClass = substr(strrchr($javaClass, '.'), 1);
-                if (isset(self::IMPORT_STEPS[$stepClass])) {
-                    if ($javaClass !== self::IMPORT_STEPS[$stepClass]['javaClass']) {
-                        $this->errors[] = 'invalid javaClass for step "' . $stepClass . '" : ' . $javaClass;
+            if (empty($javaClass)) {
+                continue;
+            }
+            if (stripos($javaClass, 'externalcommand') !== false) {
+                throw new ZfExtended_SecurityException('Step not allowed: ' . $javaClass);
+            }
+            $this->steps[] = $javaClass;
+            $stepClass = substr(strrchr($javaClass, '.'), 1);
+            if (isset(self::IMPORT_STEPS[$stepClass])) {
+                if ($javaClass !== self::IMPORT_STEPS[$stepClass]['javaClass']) {
+                    $this->errors[] = 'invalid javaClass for step "' . $stepClass . '" : ' . $javaClass;
 
-                        continue;
+                    continue;
+                }
+                if (isset($requiredSteps[$stepClass])) {
+                    unset($requiredSteps[$stepClass]);
+                }
+                $step = new StepValidation((string) $stepXml, self::IMPORT_STEPS[$stepClass]['requiredProperties']);
+                if (! $step->isValid()) {
+                    $this->errors[] = $step->getErrMsg();
+                } else {
+                    if ($step->wasRepaired()) {
+                        $this->needsRepair = true;
+                        // @phpstan-ignore-next-line
+                        $stepXml[0] = $step->getProperties()->unparse(); // https://github.com/phpstan/phpstan/issues/8236
+                        // dom_import_simplexml($stepXml)->nodeValue = $step->getProperties()->unparse();
                     }
-                    if (isset($requiredSteps[$stepClass])) {
-                        unset($requiredSteps[$stepClass]);
-                    }
-                    $step = new StepValidation((string) $stepXml, self::IMPORT_STEPS[$stepClass]['requiredProperties']);
-                    if (! $step->isValid()) {
-                        $this->errors[] = $step->getErrMsg();
-                    } else {
-                        if ($step->wasRepaired()) {
-                            $this->needsRepair = true;
-                            // @phpstan-ignore-next-line
-                            $stepXml[0] = $step->getProperties()->unparse(); // https://github.com/phpstan/phpstan/issues/8236
-                            // dom_import_simplexml($stepXml)->nodeValue = $step->getProperties()->unparse();
-                        }
-                        if ($stepClass === 'SegmentationStep') {
-                            $props = $step->getProperties();
-                            $this->sourceSrxPath = $props->has('sourceSrxPath') ?
-                                self::basename($props->get('sourceSrxPath')) : null;
-                            $this->targetSrxPath = $props->has('targetSrxPath') ?
-                                self::basename($props->get('targetSrxPath')) : null;
-                        } elseif ($stepClass === 'XSLTransformStep') {
-                            $props = $step->getProperties();
-                            $this->xsltPath = $props->has('xsltPath') ?
-                                self::basename($props->get('xsltPath')) : null;
-                        }
+                    if ($stepClass === 'SegmentationStep') {
+                        $props = $step->getProperties();
+                        $this->sourceSrxPath = $props->has('sourceSrxPath') ?
+                            self::basename($props->get('sourceSrxPath')) : null;
+                        $this->targetSrxPath = $props->has('targetSrxPath') ?
+                            self::basename($props->get('targetSrxPath')) : null;
+                    } elseif ($stepClass === 'XSLTransformStep') {
+                        $props = $step->getProperties();
+                        $this->xsltPath = $props->has('xsltPath') ?
+                            self::basename($props->get('xsltPath')) : null;
                     }
                 }
             }

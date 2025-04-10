@@ -32,52 +32,33 @@ namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Repository;
 
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 
-class CsvReimportSegmentRepository implements ReimportSegmentRepositoryInterface
+class JsonlReimportSegmentsRepository implements ReimportSegmentRepositoryInterface
 {
+    public const DIRECTORY = 'ReimportSegments';
+
     public function save(string $runId, UpdateSegmentDTO $dto): void
     {
         $filename = $this->getFileName($runId, $dto->taskGuid);
-        $file = fopen($filename, 'ab');
-        fputcsv($file, $this->toArray($dto));
-        fclose($file);
+        file_put_contents(
+            $filename,
+            json_encode($this->toArray($dto), JSON_THROW_ON_ERROR) . PHP_EOL,
+            FILE_APPEND
+        );
     }
 
     public function getByTask(string $runId, string $taskGuid): iterable
     {
         $filename = $this->getFileName($runId, $taskGuid);
 
-        $file = fopen($filename, 'rb');
-
-        while (($line = fgetcsv($file)) !== false) {
-            yield $this->fromArray($line);
+        foreach (file($filename) as $line) {
+            yield $this->fromArray(json_decode($line, true, 512, JSON_THROW_ON_ERROR));
         }
-
-        fclose($file);
     }
 
     public function cleanByTask(string $runId, string $taskGuid): void
     {
         $filename = $this->getFileName($runId, $taskGuid);
         unlink($filename);
-    }
-
-    private function getFileName(string $runId, string $taskGuid): string
-    {
-        $dir = APPLICATION_DATA . '/ReimportSegments/';
-
-        if (! is_dir($dir)) {
-            $oldMask = umask(0);
-            mkdir($dir, recursive: true);
-            umask($oldMask);
-        }
-
-        $fileName = $dir . $runId . '_' . trim($taskGuid, '{}') . '.csv';
-
-        if (! file_exists($fileName)) {
-            touch($fileName);
-        }
-
-        return $fileName;
     }
 
     private function toArray(UpdateSegmentDTO $dto): array
@@ -106,5 +87,38 @@ class CsvReimportSegmentRepository implements ReimportSegmentRepositoryInterface
             userName: $data[6],
             context: $data[7],
         );
+    }
+
+    private function getFileName(string $runId, string $taskGuid)
+    {
+        $dir = $this->getDirectory();
+
+        if (! is_dir($dir)) {
+            $oldMask = umask(0);
+
+            if (! mkdir($dir, recursive: true) && ! is_dir($dir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
+            }
+
+            umask($oldMask);
+        }
+
+        $fileName = $this->generateFileName($dir, $runId, $taskGuid, '.jsonl');
+
+        if (! file_exists($fileName)) {
+            touch($fileName);
+        }
+
+        return $fileName;
+    }
+
+    private function getDirectory(): string
+    {
+        return APPLICATION_DATA . '/' . self::DIRECTORY . '/';
+    }
+
+    private function generateFileName(string $dir, string $runId, string $taskGuid, string $extension): string
+    {
+        return $dir . $runId . '_' . trim($taskGuid, '{}') . $extension;
     }
 }
