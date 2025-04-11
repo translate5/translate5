@@ -12,6 +12,107 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.21.3] - 2025-04-10
+
+### Important Notes:
+#### [TRANSLATE-3202](https://jira.translate5.net/browse/TRANSLATE-3202)
+Excel Worksheet-Options configuration will not be transferred to the new version. If it used, you should take notes/screenshots of your settings. The new GUI for them will be adopted in a later release
+ 
+
+
+### Added
+**[TRANSLATE-3647](https://jira.translate5.net/browse/TRANSLATE-3647): Okapi integration - Okapi integration: Enable down- and upload of fprm and pln files and pre-parsing of xliff by Okapi** <br>
+translate5 - 7.21.0: Added down- and upload of any FPRM and Pipeline files. Added optional pre-parsing of xliff with OKAPI. The pre-parsing will be only possible with file-format-settings created from the date of the release on. With this release, the translate5-default settings do not have XLIFF-extensions mapped anymore and if such extension-mapping is added to a file-format, the pre-parsing of XLIFF will be active.
+translate5 - 7.21.3: Add versioning to pipeline files
+
+**[TRANSLATE-2971](https://jira.translate5.net/browse/TRANSLATE-2971): Task Management, Workflows - Set job deadlines for multiple projects or tasks at the same time** <br>
+7.21.3: Fix: not working when all tasks selected manually
+7.21.0: Fix: no task selected alert if tasks are selected
+7.15.0: Added ability to set job deadlines for multiple projects or tasks at the same time
+
+
+### Changed
+**[TRANSLATE-4582](https://jira.translate5.net/browse/TRANSLATE-4582): Workflows - Auto-close jobs with task deadline date as reference** <br>
+New option added: detect potential auto-close jobs from task deadline date as reference. Can be configured only as workflow action parameter.
+
+**[TRANSLATE-4561](https://jira.translate5.net/browse/TRANSLATE-4561): Content Protection - Content Protection: improve "default simple" regex** <br>
+Improve "default simple" regex.
+This update will also set language resources that use "default simple" integer rule for protection as un-converted and one need to manually start conversion of such language resources
+
+**[TRANSLATE-4558](https://jira.translate5.net/browse/TRANSLATE-4558): Workflows - Tests for batch set properties** <br>
+Covered batch set properties with tests
+
+**[TRANSLATE-4553](https://jira.translate5.net/browse/TRANSLATE-4553): t5memory - Add prefix to segmentNr when request t5memory to distinguish segmentNr and numeral resname** <br>
+t5memory: Add prefix to segmentNr when request t5memory to distinguish segmentNr and numeral resname
+
+**[TRANSLATE-4521](https://jira.translate5.net/browse/TRANSLATE-4521): Task Management - Introduce config for time of daily auto-close check** <br>
+Enables time config at which time of the day the auto-close jobs will be checked and closed.
+
+**[TRANSLATE-4501](https://jira.translate5.net/browse/TRANSLATE-4501): Hotfolder Import - Hotfolder: Add import folder info to error mail** <br>
+7.21.3: Fix: better formatting of errors in e-mail
+7.20.5: Hotfolder: Add import folder info to error mail
+
+**[TRANSLATE-4426](https://jira.translate5.net/browse/TRANSLATE-4426): Task Management - change sorting of user tab grid** <br>
+Jobs are now sorted by workflow position in the task user association panel.
+
+**[TRANSLATE-3202](https://jira.translate5.net/browse/TRANSLATE-3202): file format settings - Adopt File Format Settings for OpenXML to Okapi version 1.4.7** <br>
+translate5 - 7.19.0: Adopted changes in FPRM structure for Okapi version 1.4.7
+translate5 - 7.21.3: Fix okapi version fetching
+
+
+
+### Bugfixes
+**[TRANSLATE-4603](https://jira.translate5.net/browse/TRANSLATE-4603): Configuration - PMs are set as possible values for random config values if filter applied** <br>
+Fix possible values for configs
+
+**[TRANSLATE-4599](https://jira.translate5.net/browse/TRANSLATE-4599): Okapi integration - Disallow okapi pipeline step "External command"** <br>
+Disallow okapi pipeline step "External command" as part of uploaded bconfs/pipelines
+
+**[TRANSLATE-4597](https://jira.translate5.net/browse/TRANSLATE-4597): Okapi integration - Test latest Okapi 1.48-snapshot build and update translate5 with next release** <br>
+Added latest Okapi 1.48-snapshot support
+
+**[TRANSLATE-4593](https://jira.translate5.net/browse/TRANSLATE-4593): t5memory - t5memory: Check Language resource status based on last writable TM** <br>
+Check Language resource status based on last writable TM
+
+**[TRANSLATE-4588](https://jira.translate5.net/browse/TRANSLATE-4588): Import/Export - HTML number entities are not properly imported** <br>
+Whitespace encoded as XML numbered entities is not properly decoded and recognized as whitespace
+
+**[TRANSLATE-4585](https://jira.translate5.net/browse/TRANSLATE-4585): LanguageResources - Reimport task doesn't work for properly with special characters** <br>
+Fixed bug which may prevent task reimport to TM if task contains segments with \ (back slash) symbol at the end of the segment.
+
+**[TRANSLATE-4584](https://jira.translate5.net/browse/TRANSLATE-4584): file format settings - make usage of resname selectable in file format settings** <br>
+Make usage of resname selectable in file format settings
+
+**[TRANSLATE-4583](https://jira.translate5.net/browse/TRANSLATE-4583): Repetition editor - repetitions editor not working** <br>
+Fix fetch of alike segment. Fix resname comment saving (activate xliff comment import)
+
+**[TRANSLATE-4580](https://jira.translate5.net/browse/TRANSLATE-4580): Content Protection - Bug in format applying on number protection** <br>
+Fix symbol duplication on number format applying
+
+**[TRANSLATE-4579](https://jira.translate5.net/browse/TRANSLATE-4579): Main back-end mechanisms (Worker, Logging, etc.) - Worker queue is called frequently and chained** <br>
+Performance improvement for the workers, prevention of system overload when scheduling thousands of workers.
+
+**[TRANSLATE-4578](https://jira.translate5.net/browse/TRANSLATE-4578): Editor general, LanguageResources, Task Management - Missing mayor language leads to errors on resources-task association detection** <br>
+Fix for error when detecting language alias for task-resources associations
+
+**[TRANSLATE-4568](https://jira.translate5.net/browse/TRANSLATE-4568): Content Protection - apply current content protection rules on saving task to Master TM** <br>
+On saving task into master TM re-apply current protection rules to segments of task
+
+**[TRANSLATE-4547](https://jira.translate5.net/browse/TRANSLATE-4547): t5memory - Make processes with t5memory resistant for t5memory restart** <br>
+Make processes with t5memory resistant for t5memory restart
+
+**[TRANSLATE-4539](https://jira.translate5.net/browse/TRANSLATE-4539): Content Protection - Content Protection: Protection look alike rules and t5memory response formatter is faulty** <br>
+Fix converted tags ids, fix representation of matches in UI, don't process language resources with empty memories
+
+
+**[TRANSLATE-4522](https://jira.translate5.net/browse/TRANSLATE-4522): Configuration - description of runtimeOptions.import.projectDeadline.jobDeadlineFraction misleading** <br>
+Update config description
+
+**[TRANSLATE-4494](https://jira.translate5.net/browse/TRANSLATE-4494): Client management, Export, LanguageResources - Resource log export leads to out of memory** <br>
+Resource log export re-implemented to be memory-efficient
+
+
 ## [7.21.2] - 2025-03-28
 
 ### Important Notes:

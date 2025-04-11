@@ -138,6 +138,17 @@
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
+
+<trans-unit id="14" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source>html entities which should remain &amp;szlig; &amp;#128; &amp;#11; &amp;#13; &amp;mdash; &amp;shy;</source>
+<target state="translated" dx:match-quality="0.0">html entities sollen bleiben &amp;szlig;    &amp;mdash; &amp;shy; - edited</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
+<target xml:lang="de">html entities sollen bleiben &amp;szlig; &amp;#128; &amp;#11; &amp;#13; &amp;mdash; &amp;shy;</target></alt-trans>
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
+<target xml:lang="de">html entities sollen bleiben &amp;szlig; <mrk mtype="x-sdl-deleted" sdl:revid="replaced-for-testing">&amp;#128;</mrk> <mrk mtype="x-sdl-deleted" sdl:revid="replaced-for-testing">&amp;#11;</mrk> <mrk mtype="x-sdl-deleted" sdl:revid="replaced-for-testing">&amp;#13;</mrk> &amp;mdash; &amp;shy;<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
+<state stateid="0"></state>
+<dx:qa-hits></dx:qa-hits>
+</trans-unit>
 </body>
 </file>
 </xliff>

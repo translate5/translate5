@@ -64,6 +64,7 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtec
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Test\UnitTestAbstract;
 use ZfExtended_Factory;
 
@@ -196,7 +197,7 @@ class ContentProtectorTest extends UnitTestAbstract
     /**
      * @dataProvider casesProvider
      */
-    public function testProtect(string $node, string $expected, string $entityHandling): void
+    public function testProtect(string $node, string $expected, EntityHandlingMode $entityHandling): void
     {
         $contentProtector = ContentProtector::create(new Whitespace());
 
@@ -230,50 +231,66 @@ class ContentProtectorTest extends UnitTestAbstract
         yield 'whitespace right after number' => [
             'text' => 'string 123,456.789 mm',
             'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarV0aw2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/><char ts="c2a0" length="1"/>mm',
-            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
+            'entityHandling' => EntityHandlingMode::Restore,
         ];
 
         yield 'tag like entity <goba>' => [
             'text' => 'string <goba> string',
             'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;" regex="U46xSc9PSoyxUwYA"/> string',
-            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
+            'entityHandling' => EntityHandlingMode::Restore,
         ];
 
         yield 'int without output format' => [
             'text' => 'Übersetzungsbüro 123·456·789 24translate',
             'expected' => 'Übersetzungsbüro 123·456·789 24translate',
-            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
+            'entityHandling' => EntityHandlingMode::Restore,
         ];
 
         yield '&#128; is protected as char' => [
             'text' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [&#128;] TRANSLATE',
             'expected' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [<char ts="26233132383b" length="1"/>] TRANSLATE',
-            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
+            'entityHandling' => EntityHandlingMode::Restore,
         ];
 
         yield 'float in the beginning' => [
             'text' => '123,456.789 Übersetzungsbüro [ ] 24translate 2023-09-15 and 2024-10-19',
             'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarV0aw2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B"/>',
-            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
+            'entityHandling' => EntityHandlingMode::Restore,
         ];
 
         yield 'zero between tags' => [
             'text' => 'Text mit <protectedTag data-type="open" data-id="1" data-content="3c623e"/>0<protectedTag data-type="close" data-id="1" data-content="3c2f623e"/> in tags gab Probleme.',
             'expected' => 'Text mit <protectedTag data-type="open" data-id="1" data-content="3c623e"/>0<protectedTag data-type="close" data-id="1" data-content="3c2f623e"/> in tags gab Probleme.',
-            'entityHandling' => ContentProtector::ENTITY_MODE_OFF,
+            'entityHandling' => EntityHandlingMode::Off,
         ];
 
         yield 'end of text character' => [
             'text' => "03: ",
             'expected' => '03: <char ts="03" length="1"/>',
-            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
+            'entityHandling' => EntityHandlingMode::Restore,
         ];
 
         yield '&lt; in text' => [
             'text' => 'string &lt; 123,456.789',
             'expected' => 'string &lt; <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1JqTbQMarV0aw2rNUAcoyBTC0wHaMXk6KtqaERowfSqKKpWaOhA2OBqJoYTU39UgA="/>',
-            'entityHandling' => ContentProtector::ENTITY_MODE_OFF,
+            'entityHandling' => EntityHandlingMode::Off,
         ];
+    }
+
+    public function testSpecialCharacterHandlingOnProtectWithEntityHandlingModeKeep(): void
+    {
+        $contentProtector = ContentProtector::create(new Whitespace());
+
+        self::assertSame(
+            'Special characters: &amp;szlig; &amp;#128; &amp;#11; &amp;#13; &amp;mdash; &amp;shy;',
+            $contentProtector->protect(
+                'Special characters: &szlig; &#128; &#11; &#13; &mdash; &shy;',
+                true,
+                5,
+                6,
+                EntityHandlingMode::Keep,
+            )
+        );
     }
 
     /**
@@ -286,7 +303,7 @@ class ContentProtectorTest extends UnitTestAbstract
 
         self::assertSame(
             $converted,
-            $contentProtector->protectAndConvert($segment, true, 5, 6, $shortTagIdent, ContentProtector::ENTITY_MODE_OFF)
+            $contentProtector->protectAndConvert($segment, true, 5, 6, $shortTagIdent, EntityHandlingMode::Off)
         );
         self::assertSame($finalTagIdent, $shortTagIdent);
     }

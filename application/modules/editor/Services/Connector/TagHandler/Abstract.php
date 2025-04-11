@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 
 /**
  * Abstract Tag Handler for internal tags in text to be send to language resources
@@ -111,7 +112,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
                     $this->handleIsInSourceScope,
                     $this->sourceLang,
                     $this->targetLang,
-                    ContentProtector::ENTITY_MODE_RESTORE,
+                    EntityHandlingMode::Restore,
                     NumberProtector::alias()
                 ),
                 $this->shortTagIdent,

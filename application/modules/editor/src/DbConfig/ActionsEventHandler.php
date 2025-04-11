@@ -96,6 +96,10 @@ class ActionsEventHandler
             // Config index
             $index = array_search($configName, array_column($rows, 'name'));
 
+            if (false === $index) {
+                return;
+            }
+
             $event->getParam('view')->rows[$index]['defaults'] = $this->getPmUsers(
                 $includeRoles,
                 $this->getCustomerIdFromEvent($event)

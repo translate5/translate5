@@ -33,6 +33,7 @@ use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 
 /**
@@ -297,7 +298,7 @@ class editor_Services_Connector implements ExportAdapterInterface
             $this->adapter->getSourceLang(),
             $this->adapter->getTargetLang(),
             $shortTagIdent,
-            ContentProtector::ENTITY_MODE_OFF
+            EntityHandlingMode::Off
         );
     }
 

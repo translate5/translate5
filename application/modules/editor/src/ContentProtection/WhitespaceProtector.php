@@ -53,6 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection;
 
 use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 
 class WhitespaceProtector implements ProtectorInterface
 {
@@ -106,10 +107,11 @@ class WhitespaceProtector implements ProtectorInterface
         bool $isSource = true,
         int $sourceLangId = 0,
         int $targetLangId = 0,
+        EntityHandlingMode $entityHandling = EntityHandlingMode::Restore,
     ): string {
         $excludedCharacters = $this->withoutNumberWhitespaces ? $this->numberWhitespaces : [];
         if (! preg_match_all(self::TAG_REGEX, $textNode, $matches)) {
-            return $this->whitespace->protectWhitespace($textNode, $excludedCharacters);
+            return $this->whitespace->protectWhitespace($textNode, $excludedCharacters, $entityHandling);
         }
 
         $tags = $matches[0];
@@ -122,7 +124,8 @@ class WhitespaceProtector implements ProtectorInterface
             if (isset($parts[$i]) && '' !== $parts[$i]) {
                 $protected .= $this->whitespace->protectWhitespace(
                     $parts[$i],
-                    $excludedCharacters
+                    $excludedCharacters,
+                    $entityHandling
                 );
             }
 

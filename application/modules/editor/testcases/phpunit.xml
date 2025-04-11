@@ -77,6 +77,12 @@
             <file>../Plugins/MatchAnalysis/tests/Functional/Translate2991Test.php</file>
             <file>../Plugins/MatchAnalysis/tests/Functional/TmMatchIsUsedAsRepetitionInPretranslationTest.php</file>
         </testsuite>
+        <testsuite name="importencoding">
+            <file>editorAPI/XlfImportTest.php</file>
+            <file>editorAPI/CsvEncodingTest.php</file>
+            <file>Unit/Segment/ImportWhitespaceProtectionTest.php</file>
+            <file>Integration/ContentProtection/ContentProtectorTest.php</file>
+        </testsuite>
         <testsuite name="auth">
             <file>editorAPI/Translate3108Test.php</file>
             <file>editorAPI/Translate3048Test.php</file>

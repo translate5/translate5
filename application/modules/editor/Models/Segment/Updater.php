@@ -30,6 +30,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Segment\UpdateSegmentStatistics;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 
@@ -338,7 +339,7 @@ class editor_Models_Segment_Updater
                         ! $isEditingTargetInFront,
                         (int) $this->task->getSourceLang(),
                         (int) $this->task->getTargetLang(),
-                        ContentProtector::ENTITY_MODE_RESTORE,
+                        EntityHandlingMode::Restore,
                         $isEditingTargetInFront ? NumberProtector::alias() : '',
                     )
                 );

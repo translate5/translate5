@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "16c9857b75443676d39b945fa95dabdd",
+    "content-hash": "51479f0c7d504c9db75056ea18c0f3dc",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -9105,17 +9105,11 @@
         },
         {
             "name": "wilsonglasser/spout",
-            "version": "v3.0.14",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/wilsonglasser/spout.git",
-                "reference": "3f5935842c6f366aa6f96a4f0ecc1545d820c6fa"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wilsonglasser/spout/zipball/3f5935842c6f366aa6f96a4f0ecc1545d820c6fa",
-                "reference": "3f5935842c6f366aa6f96a4f0ecc1545d820c6fa",
-                "shasum": ""
+                "url": "https://github.com/translate5/spout.git",
+                "reference": "6c125346036f9851504de4f4e2c6d8cb2bc6df54"
             },
             "require": {
                 "ext-xmlreader": "*",
@@ -9130,6 +9124,7 @@
                 "ext-iconv": "To handle non UTF-8 CSV files (if \"php-intl\" is not already installed or is too limited)",
                 "ext-intl": "To handle non UTF-8 CSV files (if \"iconv\" is not already installed)"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -9141,7 +9136,6 @@
                     "WilsonGlasser\\Spout\\": "src/Spout"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "Apache-2.0"
             ],
@@ -9158,13 +9152,13 @@
             "description": "PHP Library to read and write spreadsheet files (CSV, XLSX and ODS), in a fast and scalable way",
             "homepage": "https://www.github.com/box/spout",
             "keywords": [
-                "OOXML",
                 "csv",
                 "excel",
                 "memory",
                 "odf",
                 "ods",
                 "office",
+                "ooxml",
                 "open",
                 "php",
                 "read",
@@ -9174,10 +9168,7 @@
                 "write",
                 "xlsx"
             ],
-            "support": {
-                "source": "https://github.com/wilsonglasser/spout/tree/v3.0.14"
-            },
-            "time": "2021-11-17T19:45:07+00:00"
+            "time": "2025-04-10T09:00:46+00:00"
         }
     ],
     "packages-dev": [
@@ -9522,6 +9513,7 @@
         "dream-group/horde-text-diff": 20,
         "translate5/rangy-lib": 20,
         "translate5/php-html-parser": 20,
+        "wilsonglasser/spout": 20,
         "mittagqi/restful-zend-framework": 20
     },
     "prefer-stable": false,
@@ -9556,5 +9548,5 @@
     "platform-overrides": {
         "php": "8.1.23"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }

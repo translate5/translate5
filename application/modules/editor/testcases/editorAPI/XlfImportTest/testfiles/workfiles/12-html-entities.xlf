@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="Test1" datatype="x-testdata" xml:space="preserve" source-language="de" target-language="zen">
+      <header><![CDATA[This data text must be ignored by the parser! Also contained <source> tags should not make any problem.
+Also linebreaks 
+should make any problem!]]></header>
+    <body>
+      <trans-unit id="32344336" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304" xml:space="preserve">
+        <source><ph id="1" ax:element-id="0">testtag</ph>html entities outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
+            <seg-source>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">testtag</ph>whitespace html entities outside from mrk test should be treated as whitespace</mrk>
+                &#13; &nbsp;&#10;
+                <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+                <mrk mtype="seg" mid="3">&szlig; should be ß</mrk>
+                <mrk mtype="seg" mid="3">&#228; should be ä</mrk>
+                <mrk mtype="seg" mid="4">&#128; should be a char tag</mrk>
+                <mrk mtype="seg" mid="5">See https://infra.spec.whatwg.org/#ascii-whitespace</mrk>
+                <mrk mtype="seg" mid="6">&#13; carriage return is explicitly excluded as HTML numbered entity, in translate5 its converted to the proper internal tag then</mrk>
+                <mrk mtype="seg" mid="7">&#11; vertical tab is no ASCII whitespace, in translate5 its encoded to an internal tag then</mrk>
+                <mrk mtype="seg" mid="8">&shy; should not occur in XML, but should still converted to a char tag</mrk>
+        </seg-source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
