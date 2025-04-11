@@ -44,7 +44,7 @@ use MittagQI\Translate5\Segment\TransUnitHash;
 abstract class editor_Models_Import_FileParser
 {
     /**
-     * @var string
+     * @var string|null
      */
     protected $_origFile = null;
 
@@ -62,7 +62,7 @@ abstract class editor_Models_Import_FileParser
 
     /**
      * array containing all segment data parsed
-     * @var [array] 2D array, first level has keys which map to the segment field names. Second Level array must be compliant to editor_Models_Db_SegmentDataRow
+     * @var array 2D array, first level has keys which map to the segment field names. Second Level array must be compliant to editor_Models_Db_SegmentDataRow
      */
     protected $segmentData = [];
 
@@ -73,7 +73,7 @@ abstract class editor_Models_Import_FileParser
 
     /**
      * contains a SegmentAttributes object (value) per mid (key)
-     * @var [editor_Models_Import_FileParser_SegmentAttributes]
+     * @var editor_Models_Import_FileParser_SegmentAttributes[]
      */
     protected $segmentAttributes = [];
 
