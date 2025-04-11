@@ -13,6 +13,18 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.21.4] - 2025-04-11
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4604](https://jira.translate5.net/browse/TRANSLATE-4604): Editor general - Patch code in plugins core** <br>
+Fix some internal references 
+
+
 ## [7.21.3] - 2025-04-10
 
 ### Important Notes:
