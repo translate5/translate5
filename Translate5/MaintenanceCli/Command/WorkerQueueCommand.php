@@ -34,10 +34,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
+use Zend_Registry;
 use ZfExtended_Models_Worker;
 
 class WorkerQueueCommand extends Translate5AbstractCommand
 {
+    private const CMD_TITLE = 'translate5 worker-dispatcher %s';
+
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'worker:queue';
 
@@ -105,10 +108,12 @@ class WorkerQueueCommand extends Translate5AbstractCommand
         if ($this->input->getOption('daemon')) {
             // runs the queue loop if possible
             $this->io->text('run permanent worker queue');
+            $this->changeProcessTitle('--daemon');
             Queue::processQueueMutexed(true);
         } else {
             // triggers the queue loop asynchronously
             $this->io->text('scheduling workers asynchronously');
+            $this->changeProcessTitle('');
             Queue::processQueueMutexed();
         }
 
@@ -146,5 +151,20 @@ class WorkerQueueCommand extends Translate5AbstractCommand
         $this->io->table($headlines, $rows);
 
         return self::SUCCESS;
+    }
+
+    private function changeProcessTitle(string $additionalInfos): void
+    {
+        $dbName = Zend_Registry::get('config')->resources->db->params->dbname;
+        if ($dbName != 'translate5') { //we ignore default tables in debugging
+            $additionalInfos .= ' instance: ' . $dbName;
+        }
+
+        cli_set_process_title(
+            sprintf(
+                self::CMD_TITLE,
+                $additionalInfos,
+            )
+        );
     }
 }
