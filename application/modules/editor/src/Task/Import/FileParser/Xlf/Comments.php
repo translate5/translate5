@@ -55,6 +55,11 @@ class Comments
      */
     private array $comments = [];
 
+    /**
+     * @var editor_Models_Comment[]
+     */
+    private array $resnameComments = [];
+
     public function __construct(
         private editor_Models_Task $task,
     ) {
@@ -70,6 +75,12 @@ class Comments
      */
     public function importComments(int $segmentId): void
     {
+        foreach ($this->resnameComments as $comment) {
+            $comment->setTaskGuid($this->task->getTaskGuid());
+            $comment->setSegmentId($segmentId);
+            $comment->save();
+        }
+
         $config = $this->task->getConfig();
         if (! $config->runtimeOptions->import->xliff->importComments || empty($this->comments)) {
             return;
@@ -119,7 +130,7 @@ class Comments
         $comment->setCreated(NOW_ISO);
         $comment->setModified(NOW_ISO);
 
-        $this->comments[] = $comment;
+        $this->resnameComments[] = $comment;
     }
 
     private function addCommentMeta(array $attributes, string $commentText): string

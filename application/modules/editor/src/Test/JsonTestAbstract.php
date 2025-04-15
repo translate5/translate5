@@ -116,11 +116,11 @@ abstract class JsonTestAbstract extends ImportTestAbstract
                     $this->assertSegmentEqualsObject($expectations[$i], $segments[$i], $msg, $keepComments, $useOkapiHtmlSanitization);
                 } catch (ExpectationFailedException $e) {
                     $lastException = $e;
+                    // collect faulty segments
+                    $errorDiffs[] = '[Segment ' . ($i + 1) . "]\n" . $e->getComparisonFailure()->getDiff();
                     if ($stopOnFirstFailedDiff) {
                         break;
                     }
-                    // collect faulty segments
-                    $errorDiffs[] = '[Segment ' . ($i + 1) . "]\n" . $e->getComparisonFailure()->getDiff();
                 }
             }
             // report all faulty segments at once

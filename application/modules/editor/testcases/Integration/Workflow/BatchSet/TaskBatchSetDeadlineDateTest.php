@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\Test\Integration\Workflow\BatchSet;
 use editor_Models_Customer_Customer;
 use editor_Models_Db_TaskUserAssoc;
 use editor_Models_Task;
+use editor_Models_Task_Remover;
 use MittagQI\Translate5\JobAssignment\UserJob\BatchUpdate\UserJobDeadlineBatchUpdater;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\BatchSet\BatchSetTaskGuidsProvider;
@@ -41,11 +42,13 @@ use MittagQI\Translate5\Test\Fixtures\CustomerFixtures;
 use MittagQI\Translate5\Test\Fixtures\JobFixtures;
 use MittagQI\Translate5\Test\Fixtures\TaskFixtures;
 use MittagQI\Translate5\Test\Fixtures\UserFixtures;
+use MittagQI\Translate5\User\Model\User;
 use PHPUnit\Framework\TestCase;
 use REST_Controller_Request_Http as Request;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 use ZfExtended_Authentication;
+use ZfExtended_Factory;
 use ZfExtended_Logger;
 
 class TaskBatchSetDeadlineDateTest extends TestCase
@@ -79,9 +82,64 @@ class TaskBatchSetDeadlineDateTest extends TestCase
     private static array $tasks = [];
 
     /**
+     * @var User[]
+     */
+    private static array $users = [];
+
+    /**
      * @var editor_Models_Customer_Customer[]
      */
     private static array $customers = [];
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$users = UserFixtures::create()->createUsers(1);
+        $userGuid = self::$users[0]->getUserGuid();
+        (ZfExtended_Authentication::getInstance())->authenticateByLogin(self::$users[0]->getLogin());
+
+        $taskFixtures = TaskFixtures::create();
+        $jobFixtures = JobFixtures::create();
+        self::$customers = CustomerFixtures::create()->createCustomers(2);
+
+        for ($projectIdx = 0; $projectIdx < self::projectsCount; $projectIdx++) {
+            $customerId = (int) self::$customers[$projectIdx === 0 ? 0 : 1]->getId();
+            self::$projects[$projectIdx] = $taskFixtures->createProject($customerId, $userGuid);
+            $projectId = (int) self::$projects[$projectIdx]->getId();
+
+            for ($taskIdx = 0; $taskIdx < self::tasksPerProject; $taskIdx++) {
+                $task = $taskFixtures->createTask(
+                    $customerId,
+                    self::workflow,
+                    self::workflowStepName,
+                    0,
+                    0,
+                    editor_Models_Task::STATE_OPEN,
+                    $projectId
+                );
+
+                $jobFixtures->createJob($task->getTaskGuid(), $userGuid, self::workflowStepName);
+
+                self::$tasks[$projectIdx][$taskIdx] = $task;
+            }
+        }
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        for ($projectIdx = 0; $projectIdx < self::projectsCount; $projectIdx++) {
+            $projectId = (int) self::$projects[$projectIdx]->getId();
+            $entity = new editor_Models_Task();
+            $entity->load($projectId);
+            $remover = ZfExtended_Factory::get(editor_Models_Task_Remover::class, [$entity]);
+            $remover->remove(true);
+        }
+        foreach (self::$users as $user) {
+            $user->delete();
+        }
+        foreach (self::$customers as $customer) {
+            $customer->delete();
+        }
+    }
 
     protected function setUp(): void
     {
@@ -96,11 +154,8 @@ class TaskBatchSetDeadlineDateTest extends TestCase
             $userJobDeadlineBatchUpdater,
             $taskGuidsProvider
         );
-        if (empty(self::$projects)) {
-            $this->createTasks();
-        } else {
-            $this->resetJobs();
-        }
+
+        $this->resetJobs();
         $this->request = self::getRequest();
     }
 
@@ -149,7 +204,8 @@ class TaskBatchSetDeadlineDateTest extends TestCase
     public function testUpdateJobsByProjectsFilter(): void
     {
         $projectsLimit = self::projectsCount - 1;
-        $this->request->setParam('filter', '[{"operator":"lt","value":' . ($projectsLimit * (self::tasksPerProject + 1) + 1) . ',"property":"id"}]');
+        $minProjectId = (int) self::$projects[0]->getId();
+        $this->request->setParam('filter', '[{"operator":"lt","value":' . ($projectsLimit * (self::tasksPerProject + 1) + $minProjectId) . ',"property":"id"}]');
         $this->assertJobsUpdate($projectsLimit * self::tasksPerProject);
     }
 
@@ -186,39 +242,6 @@ class TaskBatchSetDeadlineDateTest extends TestCase
             'SELECT COUNT(*) FROM ' . editor_Models_Db_TaskUserAssoc::TABLE_NAME . ' WHERE deadlineDate = "' . self::deadlineDateDb . '"'
         );
         self::assertEquals($expectedUpdatedCount, $updatedCount);
-    }
-
-    private function createTasks(): void
-    {
-        $user = UserFixtures::create()->createUsers(1)[0];
-        $userGuid = $user->getUserGuid();
-        (ZfExtended_Authentication::getInstance())->authenticateByLogin($user->getLogin());
-
-        $taskFixtures = TaskFixtures::create();
-        $jobFixtures = JobFixtures::create();
-        self::$customers = CustomerFixtures::create()->createCustomers(2);
-
-        for ($projectIdx = 0; $projectIdx < self::projectsCount; $projectIdx++) {
-            $customerId = (int) self::$customers[$projectIdx === 0 ? 0 : 1]->getId();
-            self::$projects[$projectIdx] = $taskFixtures->createProject($customerId, $userGuid);
-            $projectId = (int) self::$projects[$projectIdx]->getId();
-
-            for ($taskIdx = 0; $taskIdx < self::tasksPerProject; $taskIdx++) {
-                $task = $taskFixtures->createTask(
-                    $customerId,
-                    self::workflow,
-                    self::workflowStepName,
-                    0,
-                    0,
-                    editor_Models_Task::STATE_OPEN,
-                    $projectId
-                );
-
-                $jobFixtures->createJob($task->getTaskGuid(), $userGuid, self::workflowStepName);
-
-                self::$tasks[$projectIdx][$taskIdx] = $task;
-            }
-        }
     }
 
     private static function getRequest(): Request
