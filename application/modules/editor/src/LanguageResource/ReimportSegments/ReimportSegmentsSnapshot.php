@@ -47,7 +47,6 @@ class ReimportSegmentsSnapshot
         private readonly ReimportSegmentRepositoryInterface $segmentsRepository,
         private readonly LanguageResourceRepository $languageResourceRepository,
         private readonly ReimportSegmentsProvider $reimportSegmentsProvider,
-        private readonly ReApplyProtectionRules $reApplyProtectionRules,
     ) {
     }
 
@@ -58,7 +57,6 @@ class ReimportSegmentsSnapshot
             new JsonlReimportSegmentsRepository(),
             new LanguageResourceRepository(),
             new ReimportSegmentsProvider(new Segment()),
-            ReApplyProtectionRules::create(),
         );
     }
 
@@ -91,11 +89,6 @@ class ReimportSegmentsSnapshot
 
         foreach ($segments as $segment) {
             $updateDTO = $connector->getUpdateDTO($segment, $updateOptions);
-            $updateDTO = $this->reApplyProtectionRules->reApplyRules(
-                $updateDTO,
-                (int) $task->getSourceLang(),
-                (int) $task->getTargetLang(),
-            );
 
             $this->segmentsRepository->save($runId, $updateDTO);
         }

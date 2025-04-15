@@ -31,15 +31,17 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_Segment as Segment;
 use editor_Models_Task as Task;
 use editor_Services_Connector;
 use editor_Services_Manager;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimportSegmentsRepository;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\SegmentRepository;
 
 class ReimportSegments
 {
@@ -48,7 +50,8 @@ class ReimportSegments
         private readonly LanguageResourceRepository $languageResourceRepository,
         private readonly editor_Services_Manager $serviceManager,
         private readonly ReimportSegmentsLoggerProvider $loggerProvider,
-        private readonly Segment $segment,
+        private readonly SegmentRepository $segmentRepository,
+        private readonly TmConversionService $tmConversionService,
     ) {
     }
 
@@ -59,7 +62,8 @@ class ReimportSegments
             new LanguageResourceRepository(),
             new editor_Services_Manager(),
             new ReimportSegmentsLoggerProvider(),
-            new Segment(),
+            SegmentRepository::create(),
+            TmConversionService::create(),
         );
     }
 
@@ -72,6 +76,9 @@ class ReimportSegments
         $this->reimportSegmentRepository->cleanByTask($runId, $task->getTaskGuid());
     }
 
+    /**
+     * @param iterable<UpdateSegmentDTO> $updateDTOs
+     */
     private function updateSegments(
         LanguageResource $languageResource,
         Task $task,
@@ -89,7 +96,7 @@ class ReimportSegments
         ];
 
         foreach ($updateDTOs as $updateDTO) {
-            $this->segment->load($updateDTO->segmentId);
+            $segment = $this->segmentRepository->get($updateDTO->segmentId);
 
             if ($updateDTO->source === '' || $updateDTO->target === '') {
                 $emptySegmentsAmount++;
@@ -98,9 +105,27 @@ class ReimportSegments
             }
 
             try {
-                $connector->updateWithDTO($updateDTO, $options, $this->segment);
+                [$source, $target] = $this->tmConversionService->convertPair(
+                    $updateDTO->source,
+                    $updateDTO->target,
+                    (int) $task->getSourceLang(),
+                    (int) $task->getTargetLang(),
+                );
+
+                $updateDTO = new UpdateSegmentDTO(
+                    $updateDTO->taskGuid,
+                    $updateDTO->segmentId,
+                    $source,
+                    $target,
+                    $updateDTO->fileName,
+                    $updateDTO->timestamp,
+                    $updateDTO->userName,
+                    $updateDTO->context,
+                );
+
+                $connector->updateWithDTO($updateDTO, $options, $segment);
             } catch (SegmentUpdateException) {
-                $failedSegmentsIds[] = (int) $updateDTO->segmentId;
+                $failedSegmentsIds[] = $updateDTO->segmentId;
 
                 continue;
             }
@@ -109,10 +134,10 @@ class ReimportSegments
 
             if (null === $lastSegment) {
                 // Check the first segment if update was successful
-                $connector->checkUpdatedSegment($this->segment);
+                $connector->checkUpdatedSegment($segment);
             }
 
-            $lastSegment = $this->segment;
+            $lastSegment = $segment;
         }
 
         if ($lastSegment) {

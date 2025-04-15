@@ -36,6 +36,7 @@ use editor_Models_Segment as Segment;
 use editor_Models_Task as Task;
 use editor_Services_Manager;
 use editor_Services_OpenTM2_Connector as Connector;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
@@ -43,6 +44,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLoggerProvider;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\SegmentRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zend_Config;
@@ -60,7 +62,9 @@ class ReimportSegmentsTest extends TestCase
 
     private ReimportSegments $reimportSegments;
 
-    private Segment|MockObject $segmentMock;
+    private SegmentRepository|MockObject $segmentRepositoryMock;
+
+    private TmConversionService|MockObject $tmConversionServiceMock;
 
     protected function setUp(): void
     {
@@ -68,14 +72,16 @@ class ReimportSegmentsTest extends TestCase
         $this->languageResourceRepositoryMock = $this->createMock(LanguageResourceRepository::class);
         $this->serviceManagerMock = $this->createMock(editor_Services_Manager::class);
         $this->loggerProviderMock = $this->createMock(ReimportSegmentsLoggerProvider::class);
-        $this->segmentMock = $this->createMock(Segment::class);
+        $this->segmentRepositoryMock = $this->createMock(SegmentRepository::class);
+        $this->tmConversionServiceMock = $this->createMock(TmConversionService::class);
 
         $this->reimportSegments = new ReimportSegments(
             reimportSegmentRepository: $this->reimportSegmentRepositoryMock,
             languageResourceRepository: $this->languageResourceRepositoryMock,
             serviceManager: $this->serviceManagerMock,
             loggerProvider: $this->loggerProviderMock,
-            segment: $this->segmentMock
+            segmentRepository: $this->segmentRepositoryMock,
+            tmConversionService: $this->tmConversionServiceMock,
         );
     }
 
@@ -108,6 +114,11 @@ class ReimportSegmentsTest extends TestCase
         $taskId = random_int(1, 100);
 
         $taskMock = $this->getTaskMock($taskId, $taskGuid);
+        $taskMock->method('__call')
+            ->willReturnMap([
+                ['getSourceLang', [], 4],
+                ['getTargetLang', [], 5],
+            ]);
 
         $languageResourceMock = $this->createMock(LanguageResource::class);
         $languageResourceMock->method('__call')
@@ -133,6 +144,16 @@ class ReimportSegmentsTest extends TestCase
         $this->serviceManagerMock
             ->method('getConnector')
             ->willReturn($connectorMock);
+
+        $this->tmConversionServiceMock->method('convertPair')
+            ->willReturnCallback(
+                static function (string $source, string $target) {
+                    return [
+                        $source,
+                        $target,
+                    ];
+                }
+            );
 
         $connectorMock->expects(self::exactly(count($segments)))
             ->method('updateWithDTO')
@@ -302,6 +323,16 @@ class ReimportSegmentsTest extends TestCase
                         'failedSegments' => [1, 2],
                     ],
                 ]
+            );
+
+        $this->tmConversionServiceMock->method('convertPair')
+            ->willReturnCallback(
+                static function (string $source, string $target) {
+                    return [
+                        $source,
+                        $target,
+                    ];
+                }
             );
 
         $this->reimportSegments->reimport(task: $taskMock, runId: $runId, languageResourceId: $languageResourceId);
