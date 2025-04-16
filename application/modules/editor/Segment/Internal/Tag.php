@@ -645,8 +645,8 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         }
     }
 
-    public function debugProps(): string
+    public function debugTag(): string
     {
-        return parent::debugProps() . ' <' . ($this->isClosing() ? '/' : '') . $this->getTagIndex() . ($this->isSingle() ? '/' : '') . '>';
+        return '<' . ($this->isClosing() ? '/' : '') . $this->getTagIndex() . ($this->isSingle() ? '/' : '') . '>';
     }
 }

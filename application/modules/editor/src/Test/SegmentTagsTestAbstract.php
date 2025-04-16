@@ -41,6 +41,26 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
 {
     /* abstract helper-classs to easily create tests for segment tags */
 
+    /**
+     * Some Internal Tags to create Tests with
+     */
+    protected array $testTags = [
+        '<1>' => '<div class="open 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '</1>' => '<div class="close 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;/2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '<2>' => '<div class="open 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '</2>' => '<div class="close 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;/3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '<3/>' => '<div class="single 313930 number internal-tag ownttip"><span class="short" title="&amp;lt;1/&amp;gt;: Number">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="3" data-source="190" data-target="190"></span></div>',
+        '<4/>' => '<div class="single 3c63686172206e616d653d22496e64656e74222f3e internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;6/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>',
+        '<ins1>' => '<ins class="trackchanges ownttip" data-usertrackingid="12477" data-usercssnr="usernr1" data-workflowstep="review1ndlanguage1" data-timestamp="2025-03-11T11:13:07+02:00">',
+        '<ins2>' => '<ins class="trackchanges ownttip" data-usertrackingid="35288" data-usercssnr="usernr3" data-workflowstep="review2ndlanguage1" data-timestamp="2025-03-13T09:45:48+02:00">',
+        '<ins3>' => '<ins class="trackchanges ownttip" data-usertrackingid="2345" data-usercssnr="usernr2" data-workflowstep="no workflow1" data-timestamp="2024-11-03T12:33:09+02:00">',
+        '<del1>' => '<del class="trackchanges ownttip deleted" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00" data-historylist="1625486496000" data-action_history_1625486496000="INS" data-usertrackingid_history_1625486496000="4269">',
+        '<del2>' => '<del class="trackchanges ownttip deleted" data-usertrackingid="4987" data-usercssnr="usernr4" data-workflowstep="review1sttechnical2" data-timestamp="2021-08-05T14:14:44+02:00" data-historylist="5412486496000" data-action_history_4534486496000="INS" data-usertrackingid_history_4534486496000="7635">',
+        '<term1>' => '<div class="term preferredTerm exact" title="" data-tbxid="71a5458c-c4b3-49e9-af3b-c8222b91275a">',
+        '<term2>' => '<div class="term deprecatedTerm" title="" data-tbxid="81a5458c-c4b3-49e9-af3b-c6222b91275a">',
+        '<term3>' => '<div class="term standardizedTerm" title="" data-tbxid="91a5458c-c4b3-49e9-af3b-c4222b91275a">',
+    ];
+
     protected function createTags(): editor_Segment_FieldTags
     {
         $segmentId = 1234567;
@@ -49,7 +69,7 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         return new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $segmentText, 'target', 'targetEdit');
     }
 
-    protected function createTagsTest(editor_Segment_FieldTags $tags, string $expectedMarkup)
+    protected function createTagsTest(editor_Segment_FieldTags $tags, string $expectedMarkup): void
     {
         // compare rendered Markup
         $this->assertEquals($expectedMarkup, $tags->render());
@@ -64,10 +84,9 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
     }
 
     /**
-     * @param int $segmentId
-     * @param string $markup
+     * @throws \Exception
      */
-    protected function createDataTest($segmentId, $markup)
+    protected function createDataTest(int $segmentId, string $markup): void
     {
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
@@ -81,13 +100,18 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
     }
 
     /**
-     * @param int $segmentId
-     * @param string $original
-     * @param string $markup
-     * @param string $replacedLabeled
+     * @param string $original The Markup to compare against
+     * @param string $markup The Markup to test
+     * @param string|null $replacedLabeled If given, the labeled-rendering of the sequenced markup is compared
+     * against this. "labeled" rendering replaces internal (whiotespace) tags with placeholders like
+     * @throws \ZfExtended_Exception
      */
-    protected function createOriginalDataTest($segmentId, $original, $markup, $replacedLabeled = null)
-    {
+    protected function createOriginalDataTest(
+        int $segmentId,
+        string $original,
+        string $markup,
+        string $replacedLabeled = null,
+    ): void {
         $originalTags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $original, 'target', 'targetEdit');
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
@@ -108,12 +132,7 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         }
     }
 
-    /**
-     * @param int $segmentId
-     * @param string $markup
-     * @param string $compare
-     */
-    protected function createMqmDataTest($segmentId, $markup, $compare = null)
+    protected function createMqmDataTest(int $segmentId, string $markup, string $compare = null): void
     {
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
@@ -145,5 +164,36 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         }
 
         return $text;
+    }
+
+    /**
+     * Replaces short tags with real internal tags
+     */
+    protected function shortToFull(string $markup): string
+    {
+        foreach ($this->testTags as $short => $full) {
+            $markup = str_replace($short, $full, $markup);
+        }
+        // end-tags
+        $markup = preg_replace('~</ins[0-3]?>~', '</ins>', $markup);
+        $markup = preg_replace('~</del[0-2]?>~', '</del>', $markup);
+        $markup = preg_replace('~</term[0-3]?>~', '</div>', $markup);
+
+        return $markup;
+    }
+
+    /**
+     * Replaces full internal tags back to their short versions
+     * This will and can not replace end-tags back, please keep that in mind!
+     */
+    protected function fullToShort(string $markup): string
+    {
+        foreach ($this->testTags as $short => $full) {
+            $markup = str_replace($full, $short, $markup);
+        }
+        // revert </div> from terminology
+        $markup = str_replace('</div>', '</term>', $markup);
+
+        return $markup;
     }
 }

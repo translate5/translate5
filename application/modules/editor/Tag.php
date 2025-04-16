@@ -912,9 +912,9 @@ class editor_Tag
             return false;
         }
         foreach ($this->attribs as $key => $val) {
-            if (($withDataAttribs || substr($key, 0, 5) != 'data-') && (! $tag->hasAttribute(
-                $key
-            ) || $tag->getUnescapedAttribute($key) != $val)) {
+            if (($withDataAttribs || substr($key, 0, 5) != 'data-') &&
+                (! $tag->hasAttribute($key) || $tag->getUnescapedAttribute($key) != $val)
+            ) {
                 return false;
             }
         }

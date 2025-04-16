@@ -217,6 +217,11 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     public array $cuts = [];
 
     /**
+     * Only needed in the consolidation phase of the unparsing
+     */
+    public bool $removed = false;
+
+    /**
      * The category of tag we have, a further specification of type
      * might not be used by all internal tags
      */
@@ -587,9 +592,10 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     {
         if (! $this->isSingular()) {
             if ($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex) {
-                // when tag are aligned with our boundries it is unclear if they are inside or outside, so let's decide by the parentship on creation
-                if (($tag->endIndex == $this->startIndex || $tag->startIndex == $this->endIndex)) {
-                    return ($tag->parentOrder == $this->order);
+                // when tag are aligned with our boundries it is unclear if they are inside or outside,
+                // so let's decide by the parentship on creation
+                if (($tag->endIndex === $this->startIndex || $tag->startIndex === $this->endIndex)) {
+                    return ($tag->parentOrder === $this->order);
                 }
 
                 return true;
@@ -731,6 +737,13 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
 
     public function debugProps(): string
     {
-        return '[' . $this->startIndex . '|' . $this->endIndex . '|' . $this->order . '|' . $this->parentOrder . ']';
+        return $this->debugTag() . ' [ start:' . $this->startIndex . ' | end:' . $this->endIndex . '| order:' .
+            $this->order . ' | parentOrder:' . $this->parentOrder . ' | ' .
+            ($this->isSplitable() ? 'splitable' : 'not splitable') . ' ]';
+    }
+
+    public function debugTag(): string
+    {
+        return '<' . $this->getType() . '>';
     }
 }

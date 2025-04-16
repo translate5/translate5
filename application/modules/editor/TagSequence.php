@@ -67,10 +67,10 @@ use PHPHtmlParser\Dom\Node\HtmlNode;
 abstract class editor_TagSequence implements JsonSerializable
 {
     /**
-     * Can be used to validate the unparsing-process. Use only for Development !!
+     * Can be used to debug and validate the unparsing-process. Use only for Development !!
      * @var boolean
      */
-    public const VALIDATION_MODE = false;
+    public const DO_DEBUG = true;
 
     /**
      * Mode for the replaced rendering: Strips all Markup & internal tags
@@ -102,8 +102,14 @@ abstract class editor_TagSequence implements JsonSerializable
     {
         if ($a->startIndex === $b->startIndex) {
             // only tags at the exact same position that do not contain each other will need the order-property evaluated when sorting !
-            if ($b->endIndex == $a->endIndex && $a->order > -1 && $b->order > -1 && $a->parentOrder != $b->order && $a->order != $b->parentOrder) {
-                return $a->order - $b->order;
+            if ($b->endIndex === $a->endIndex) {
+                if ($a->order > -1 && $b->order > -1) {
+                    return $a->order - $b->order; // both have an order: compare it
+                } elseif ($a->order === -1) {
+                    return -1; // the not-nested always comes first
+                } else {
+                    return 1; // the not-nested always comes first
+                }
             }
             // crucial: we must make sure, that a "normal" tag may contain a single tag at the same index (no text-content). Thus, the normal tags always must weight less / come first
             if ($a->isSingular() && ! $b->isSingular()) {
@@ -184,7 +190,7 @@ abstract class editor_TagSequence implements JsonSerializable
             $this->originalMarkup = $text;
             $this->unparse($text);
             // This debug can be used to evaluate the quality of the DOM parsing
-            if (static::VALIDATION_MODE && $this->text != editor_Segment_Tag::strip($text)) {
+            if (static::DO_DEBUG && $this->text != editor_Segment_Tag::strip($text)) {
                 error_log('=================== PARSED FIELD TEXT DID NOT MATCH PASSED HTML ====================' . "\n");
                 error_log('RAW TEXT: ' . editor_Segment_Tag::strip($text) . "\n");
                 error_log('FIELD TEXT: ' . $this->text . "\n");
@@ -196,6 +202,14 @@ abstract class editor_TagSequence implements JsonSerializable
         } elseif ($text !== null) {
             $this->setText($text);
         }
+    }
+
+    /**
+     * Returns the original Markup set via _setMarkup
+     */
+    protected function getOriginalMarkup(): string
+    {
+        return $this->originalMarkup ?? '';
     }
 
     /**
@@ -455,14 +469,19 @@ abstract class editor_TagSequence implements JsonSerializable
                 $nearest = $container->getNearestContainer($tag); // this is the "normal" way of nesting the sorted cloned tags
             }
             // Will log rendering problems
-            if (static::VALIDATION_MODE && $nearest === null) {
+            if (static::DO_DEBUG && $nearest === null) {
+                error_log("\nERROR RENDERING TAG-SEQUENCE: Nearest Container not found");
                 error_log("\n============== HOLDER =============\n");
                 error_log($holder->toJson());
                 error_log("\n============== CONTAINER =============\n");
                 error_log($container->toJson());
                 error_log("\n============== TAG =============\n");
                 error_log($tag->toJson());
-                error_log("\n========================================\n");
+                if ($this->originalMarkup !== null) {
+                    error_log("\n============== ORIGINAL MARKUP =============\n");
+                    error_log($this->originalMarkup);
+                }
+                error_log(htmlspecialchars($this->debugStructure($clones)));
             }
             // TS-1337: This error happend "in the wild". It can only happen with malformed Markup. We need more data for a proper investigation
             if ($nearest === null) {
@@ -499,7 +518,7 @@ abstract class editor_TagSequence implements JsonSerializable
     {
         if ($tag->parentOrder > -1) {
             foreach ($holders as $holder) {
-                if ($tag->parentOrder == $holder->order && $holder->canContain($tag)) {
+                if (! $holder->removed && $tag->parentOrder === $holder->order && $holder->canContain($tag)) {
                     return $holder;
                 }
             }
@@ -520,7 +539,7 @@ abstract class editor_TagSequence implements JsonSerializable
         $wrapper = $this->unparseHtml($html);
         // set our field text
         $this->setText($wrapper->getText());
-        if (static::VALIDATION_MODE) {
+        if (static::DO_DEBUG) {
             if ($wrapper->getTextLength() != $this->getTextLength()) {
                 error_log("\n##### WRAPPER TEXT LENGTH " . $wrapper->getTextLength() . " DOES NOT MATCH FIELD TEXT LENGTH: " . $this->getTextLength() . " #####\n");
             }
@@ -530,7 +549,7 @@ abstract class editor_TagSequence implements JsonSerializable
         }
         // sequence the nested tags as our children
         $wrapper->sequenceChildren($this);
-        if (static::VALIDATION_MODE) {
+        if (static::DO_DEBUG) {
             $this->sort();
             $length = $this->getTextLength();
             foreach ($this->tags as $tag) {
@@ -544,6 +563,7 @@ abstract class editor_TagSequence implements JsonSerializable
         $this->consolidate();
         // Crucial: set the tag-props, also gives inheriting APIs the chance to add more logic to the unparsing
         $this->finalizeUnparse();
+        $this->sort();
     }
 
     /**
@@ -562,7 +582,7 @@ abstract class editor_TagSequence implements JsonSerializable
             $dom = new ZfExtended_Dom();
             // to make things easier we add a wrapper to hold all tags and only use it's children
             $element = $dom->loadUnicodeElement('<div>' . $html . '</div>');
-            if (static::VALIDATION_MODE && mb_substr($dom->saveXML($element), 5, -6) != $html) {
+            if (static::DO_DEBUG && mb_substr($dom->saveXML($element), 5, -6) != $html) {
                 error_log("\n============== UNPARSED PHP DOM DOES NOT MATCH =============\n");
                 error_log(mb_substr($dom->saveXML($element), 5, -6));
                 error_log("\n========================================\n");
@@ -582,15 +602,17 @@ abstract class editor_TagSequence implements JsonSerializable
             if ($dom->countChildren() != 1) {
                 throw new Exception('Could not unparse Internal Tags from Markup ' . $html);
             }
-            if (static::VALIDATION_MODE && $dom->firstChild()->innerHtml() != $html) {
+            if (static::DO_DEBUG && $dom->firstChild()->innerHtml() != $html) {
                 error_log("\n============== UNPARSED HTML DOM DOES NOT MATCH =============\n");
                 error_log($dom->firstChild()->innerHtml());
                 error_log("\n========================================\n");
                 error_log($html);
                 error_log("\n========================================\n");
             }
+            // we do know the first child is a HTML-Node as it is the '<div>' added on loadStr
+            $firstChild = $dom->firstChild(); /** @var HtmlNode $firstChild */
 
-            return $this->fromHtmlNode($dom->firstChild(), 0);
+            return $this->fromHtmlNode($firstChild, 0);
         }
     }
 
@@ -622,11 +644,11 @@ abstract class editor_TagSequence implements JsonSerializable
                     if ($tag->addText($childNode->text())) {
                         $startIndex += $tag->getLastChildsTextLength();
                     }
-                } elseif (is_a($childNode, 'PHPHtmlParser\Dom\Node\HtmlNode')) {
+                } elseif (is_a($childNode, HtmlNode::class)) {
                     if ($tag->addChild($this->fromHtmlNode($childNode, $startIndex))) {
                         $startIndex += $tag->getLastChildsTextLength();
                     }
-                } elseif (static::VALIDATION_MODE) {
+                } elseif (static::DO_DEBUG) {
                     error_log("\n##### FROM HTML NODE ADDS UNKNOWN NODE TYPE '" . get_class($childNode) . "' #####\n");
                 }
             }
@@ -658,7 +680,7 @@ abstract class editor_TagSequence implements JsonSerializable
                     if ($tag->addChild($this->fromDomElement($child, $startIndex))) {
                         $startIndex += $tag->getLastChildsTextLength();
                     }
-                } elseif (static::VALIDATION_MODE) {
+                } elseif (static::DO_DEBUG) {
                     error_log("\n##### FROM DOM ELEMENT ADDS UNWANTED ELEMENT TYPE '" . $child->nodeType . "' #####\n");
                 }
             }
@@ -684,8 +706,10 @@ abstract class editor_TagSequence implements JsonSerializable
             $last = $this->tags[0];
             $last->resetChildren();
             $tags[] = $last;
+            // 1) remove paired closers
             for ($i = 1; $i < $numTags; $i++) {
                 // when a tag is a paired opener we try to find it's counterpart and remove it from the chain
+                // paired opener/closer tags do not create problems with nesting as they are ony virtually paired
                 if ($last->isPairedOpener()) {
                     for ($j = $i; $j < $numTags; $j++) {
                         // if we found the counterpart (the opener could pair it) this closer will be removed from our chain
@@ -699,24 +723,68 @@ abstract class editor_TagSequence implements JsonSerializable
                 }
                 // we may already removed the current element, so check
                 if ($i < $numTags) {
-                    $tag = $this->tags[$i];
+                    $last = $this->tags[$i];
+                    $last->resetChildren();
+                    $tags[] = $last;
+                }
+            }
+            // 2) join mergable tags
+            $numTags = count($tags);
+            for ($i = 0; $i < $numTags - 1; $i++) {
+                $last = $tags[$i];
+                for ($j = $i + 1; $j < $numTags; $j++) {
+                    $tag = $tags[$j];
                     // we join only tags that are splitable of course ...
-                    if ($last->isSplitable() && $tag->isSplitable() && $tag->isEqual($last) && $last->endIndex == $tag->startIndex) {
+                    if ($tag->isSplitable() && $tag->isEqual($last) && $last->endIndex === $tag->startIndex) {
+                        // we need to care for any holders of the tag, which may cannot contain it anymore
+                        $lastHolder = $this->findHolderByOrder($tags, $last);
+                        $tagHolder = $this->findHolderByOrder($tags, $tag);
                         $last->endIndex = $tag->endIndex;
-                    } else {
-                        $last = $tag;
-                        $last->resetChildren();
-                        $tags[] = $last;
+                        // all nested tags of the second part now belong to the merged first tag
+                        $this->changeParentOrder($tag->order, $last->order);
+                        // correct potential holders if they still can contain the composition
+                        if ($lastHolder !== null && $lastHolder->canContain($last)) {
+                            $last->parentOrder = $lastHolder->order;
+                        } elseif ($tagHolder !== null && $tagHolder->canContain($last)) {
+                            $last->parentOrder = $tagHolder->order;
+                        }
+                        // check, if the composition now can hold the former holders - and do so
+                        if ($lastHolder !== null && $last->canContain($lastHolder)) {
+                            // we may need to change the order, as containing tags usually come first
+                            if ($lastHolder->order < $last->order) {
+                                $this->swapOrder($lastHolder, $last, 'order');
+                            }
+                            $lastHolder->parentOrder = $last->order;
+                            $last->parentOrder = -1; // we are now containing our ex-parent !
+                        }
+                        if ($tagHolder !== null && $last->canContain($tagHolder)) {
+                            // we may need to change the order, as containing tags usually come first
+                            if ($tagHolder->order < $last->order) {
+                                $this->swapOrder($tagHolder, $last, 'order');
+                            }
+                            $tagHolder->parentOrder = $last->order;
+                        }
+                        // the now changed tag may has an invalid parent-order - because the parent is too small now
+                        // we again use the find-holder API - which only returns holders that can contain the tag
+                        if ($last->parentOrder > -1 && $this->findHolderByOrder($tags, $last) === null) {
+                            $last->parentOrder = -1;
+                        }
+                        $tag->removed = true;
+                    } elseif ($tag->startIndex > $last->endIndex) {
+                        // since the tags are ordered by start-index we can finish as soon we are "behind" the last-tag
+                        break;
                     }
                 }
             }
-            // last step: remove obsolete tags and paired closers that found no counterpart
+            // 3) last step: remove obsolete tags and paired closers that found no counterpart
             $this->tags = [];
             foreach ($tags as $tag) {
-                if ($tag->isObsolete() || $tag->isPairedCloser()) {
-                    $tag->onConsolidationRemoval();
-                } else {
-                    $this->tags[] = $tag;
+                if (! $tag->removed) {
+                    if ($tag->isObsolete() || $tag->isPairedCloser()) {
+                        $tag->onConsolidationRemoval();
+                    } else {
+                        $this->tags[] = $tag;
+                    }
                 }
             }
             // the tags that were singular but now are real tags (paired tags) may have a improper nesting. We have to correct that
@@ -754,10 +822,12 @@ abstract class editor_TagSequence implements JsonSerializable
         $tag1->$propName = $tag2->$propName;
         $tag2->$propName = $cache;
         // the order must be adjusted in all other tags that may are nested into to the swapped tags
-        if ($propName == 'order') {
+        if ($propName === 'order') {
             foreach ($this->tags as $tag) {
-                if ($tag->order != $tag1->order && $tag->order != $tag2->order && ($tag->parentOrder == $tag1->order || $tag->parentOrder == $tag2->order)) {
-                    $tag->parentOrder = ($tag->parentOrder == $tag1->order) ? $tag2->order : $tag1->order;
+                if (! $tag->removed && $tag->order !== $tag1->order && $tag->order !== $tag2->order &&
+                    ($tag->parentOrder === $tag1->order || $tag->parentOrder === $tag2->order)
+                ) {
+                    $tag->parentOrder = ($tag->parentOrder === $tag1->order) ? $tag2->order : $tag1->order;
                 }
             }
         }
@@ -769,8 +839,8 @@ abstract class editor_TagSequence implements JsonSerializable
     protected function setContainedTagsProp(int $start, int $end, int $order, string $propName): void
     {
         foreach ($this->tags as $tag) {
-            if ($tag->startIndex >= $start && $tag->endIndex <= $end && $tag->getType() != editor_Segment_Tag::TYPE_TRACKCHANGES) {
-                if (! ($tag->endIndex == $start || $tag->startIndex == $end) || $tag->parentOrder == $order) {
+            if ($tag->startIndex >= $start && $tag->endIndex <= $end && $tag->getType() !== editor_Segment_Tag::TYPE_TRACKCHANGES) {
+                if (! ($tag->endIndex === $start || $tag->startIndex === $end) || $tag->parentOrder === $order) {
                     $tag->$propName = true;
                 }
             }
@@ -789,6 +859,18 @@ abstract class editor_TagSequence implements JsonSerializable
         foreach ($this->tags as $tag) {
             if (! in_array($tag->parentOrder, $orders)) {
                 $tag->parentOrder = -1;
+            }
+        }
+    }
+
+    /**
+     * Changes the parent-order of tags in case of tag-merging
+     */
+    protected function changeParentOrder(int $from, int $to): void
+    {
+        foreach ($this->tags as $tag) {
+            if ($tag->parentOrder === $from) {
+                $tag->parentOrder = $to;
             }
         }
     }
@@ -844,5 +926,20 @@ abstract class editor_TagSequence implements JsonSerializable
         }
 
         return $debug;
+    }
+
+    /**
+     * Debug rendering relevant props
+     * @param editor_Segment_Tag[]|null $segmentTags
+     */
+    public function debugStructure(array $segmentTags = null): string
+    {
+        $tags = ($segmentTags === null) ? $this->tags : $segmentTags;
+        $debug = "\n============== TAG STRUCTURE: " . count($tags) . " Tags  ==============\n";
+        for ($i = 0; $i < count($tags); $i++) {
+            $debug .= ($tags[$i]->debugProps() . "\n");
+        }
+
+        return $debug . "\n";
     }
 }

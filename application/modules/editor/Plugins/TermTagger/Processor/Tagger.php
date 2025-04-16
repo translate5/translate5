@@ -369,6 +369,7 @@ final class Tagger extends AbstractProcessor
             }
             $source = $tags->getOriginalSource();
             $source->setTagsByText($responseFields[$source->getTermtaggerName()]->source);
+            $source->fixTermTaggerTags(); // we may have invalid nesting to fix
         }
         foreach ($tags->getTargets() as $target) {
             $field = $target->getTermtaggerName();
@@ -382,9 +383,11 @@ final class Tagger extends AbstractProcessor
                 ]);
             }
             $target->setTagsByText($responseFields[$field]->target);
+            $target->fixTermTaggerTags(); // we may have invalid nesting to fix
         }
         $source = $tags->getSource();
         $source->setTagsByText($sourceText);
+        $source->fixTermTaggerTags(); // we may have invalid nesting to fix
     }
 
     /**

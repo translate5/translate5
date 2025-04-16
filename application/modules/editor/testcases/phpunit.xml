@@ -6,10 +6,12 @@
     <testsuites>
         <testsuite name="segment-tags">
             <file>Unit/Segment/SegmentTagsTest.php</file>
+            <file>Unit/Segment/SegmentTagsMergeTest.php</file>
             <file>Unit/Segment/SegmentTagsCloneTest.php</file>
             <file>Unit/Segment/SegmentTagsComparisionTest.php</file>
             <file>Unit/Segment/SegmentTagsOverlapTest.php</file>
             <file>Unit/Segment/SegmentTagsRepairTest.php</file>
+            <file>Unit/Segment/SegmentTermTagsRepairTest.php</file>
             <file>Unit/Segment/TagsRepairTest.php</file>
             <file>Unit/Tools/MarkupTest.php</file>
         </testsuite>
