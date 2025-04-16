@@ -91,9 +91,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
         assignmentDate: '#UT#Benutzer-Zuweisungsdatum',
         finishedDate: '#UT#Benutzer-Abschlussdatum',
         deadlineDate: '#UT#Benutzer-Deadline/s',
-        assignmentDateHeader: '#UT#Zuweisungsdatum',
-        finishedDateHeader: '#UT#Abschlussdatum',
-        deadlineDateHeader: '#UT#Deadline Datum',
         //Active filter labels below
         langResource: '#UT#Sprachressourcen',
         langResourceType: '#UT#Typ der Ressource',
@@ -101,6 +98,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
         matchRateMax: '#UT#Matchrate'
     },
     strings: {
+        deadlineDateHeader: '#UT#Deadline Datum',
+        assignmentDateHeader: '#UT#Zuweisungsdatum',
+        finishedDateHeader: '#UT#Abschlussdatum',
         noRelaisLang: '#UT#- Ohne Relaissprache -',
         ended: '#UT#beendet',
         noUsers: '#UT#Keine Benutzer zugeordnet!',
@@ -482,6 +482,18 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     stateId: 'userAssocDeadline',
                     text: me.text_cols.userJobDeadline,
                     renderer: me.userJobDeadlineRenderer
+                },{
+                    xtype: 'datecolumn',
+                    width: 100,
+                    dataIndex: 'deadlineDate',
+                    stateId: 'deadlineDate',
+                    filter: {
+                        type: 'date',
+                        dateFormat: Editor.DATE_ISO_FORMAT
+                    },
+                    format: Editor.DATE_TIME_LOCALIZED_FORMAT,
+                    text: me.strings.deadlineDateHeader,
+                    hidden: true
                 }, {
                     xtype: 'gridcolumn',
                     width: 135,
