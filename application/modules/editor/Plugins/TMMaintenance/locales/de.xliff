@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<xliff version='1.1' xmlns='urn:oasis:names:tc:xliff:document:1.1'>
+ <file original='php-sourcecode' source-language='ha' target-language='de' datatype='php'>
+  <body>
+    <trans-unit id='U3BlaWNoZXJzdGF0dXM6IHtzdGF0dXN9LiBCaXR0ZSB2ZXJzdWNoZW4gU2llIGVzIGluIEvDvHJ6ZSBlcm5ldXQu'>
+        <source>Speicherstatus: {status}. Bitte versuchen Sie es in Kürze erneut.</source>
+        <target>Speicherstatus: {status}. Bitte versuchen Sie es in Kürze erneut.</target>
+    </trans-unit>
+    <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGltIFRNIGdlc3BlaWNoZXJ0IHdlcmRlbi4gQml0dGUgdmVyc3VjaGVuIFNpZSBlcyBlcm5ldXQu'>
+        <source>Das Segment konnte nicht im TM gespeichert werden. Bitte versuchen Sie es erneut.</source>
+        <target>Das Segment konnte nicht im TM gespeichert werden.<br />
+            Bitte versuchen Sie es später noch einmal.<br />
+            Wenn diese Meldung weiterhin besteht, aktualisieren Sie bitte Ihre Suche.<br />
+            Wenn diese Meldung dann weiterhin besteht, benachrichtigen Sie bitte den Systemsupport.</target>
+    </trans-unit>
+    <trans-unit id='RGllIGdlZnVuZGVuZSBTZWdtZW50LUlEIHdlaWNodCB2b24gZGVyIGdlc3VjaHRlbiBhYiwgd2FocnNjaGVpbmxpY2ggd3VyZGUgc2llIGluendpc2NoZW4gZ2Vsw7ZzY2h0IG9kZXIgYmVhcmJlaXRldC4gU2llIG3DvHNzZW4gSWhyZSBTdWNoZSBha3R1YWxpc2llcmVuLg=='>
+        <source>Die gefundene Segment-ID weicht von der gesuchten ab, wahrscheinlich wurde sie inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.</source>
+        <target>Segment kann nicht gespeichert werden.<br />
+            Versuchen Sie, Ihre Suche zu aktualisieren.<br />
+            Die auf dem Server gefundene Segment-ID weicht von der angeforderten ab.<br />
+            Wahrscheinlich hat sich der Segmentindex auf dem Server aufgrund anderer Vorgänge geändert.</target>
+    </trans-unit>
+    <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIHdhaHJzY2hlaW5saWNoIHd1cmRlIGVzIGluendpc2NoZW4gZ2Vsw7ZzY2h0IG9kZXIgYmVhcmJlaXRldC4gU2llIG3DvHNzZW4gSWhyZSBTdWNoZSBha3R1YWxpc2llcmVuLg=='>
+        <source>Das Segment konnte nicht gelöscht werden, wahrscheinlich wurde es inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.</source>
+        <target> Segment konnte nicht gelöscht werden.<br />
+            Bitte aktualisieren Sie Ihre Suche und versuchen Sie es erneut.<br />
+            Die gefundene Segment-ID weicht von der angeforderten ab.<br />
+            Wahrscheinlich hat sich der Segmentindex auf dem Server aufgrund anderer Vorgänge geändert.</target>
+    </trans-unit>
+    <trans-unit id='QW5nZWZvcmRlcnRlcyBTZWdtZW50IG5pY2h0IGdlZnVuZGVuLiBXYWhyc2NoZWlubGljaCB3dXJkZSBlcyBnZWzDtnNjaHQu'>
+        <source>Angefordertes Segment nicht gefunden. Wahrscheinlich wurde es gelöscht.</source>
+        <target>Das Segment, dass Sie speichern möchten, wurde bereits durch anderen Prozess gelöscht.</target>
+    </trans-unit>
+  </body>
+ </file>
+</xliff>
