@@ -34,7 +34,7 @@ Ext.define('TMMaintenance.view.main.List', {
         {
             xtype: 'rownumberer',
             text: '#',
-            width: 40
+            width: 55
         },
         {
             dataIndex: 'id',

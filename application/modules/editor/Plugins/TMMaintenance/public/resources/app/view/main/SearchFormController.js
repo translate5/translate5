@@ -244,6 +244,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         if (abortPrev) {
             store.getProxy().abortByPurpose = true;
             store.getProxy().abort();
+            scrollable.resumeEvent('scrollend');
         }
 
         // Add dummy loading entry
@@ -267,7 +268,6 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
         scrollable.suspendEvent('scrollend');
         view.ensureVisible(store.last());
-        setTimeout(() => scrollable.resumeEvent('scrollend'), 100);
 
         store.load({
             params: {data: JSON.stringify({...values, offset: offset})},
@@ -280,6 +280,10 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                 if (loaderRec) {
                     store.remove(loaderRec, false, false);
                 }
+
+                // It's important to resume scrollend-event AFTER the dummy record
+                // removal, because removal also leads to firing of scrollend event
+                scrollable.resumeEvent('scrollend');
 
                 if (!success) {
 
@@ -337,9 +341,6 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             return;
         }
 
-        clearTimeout(me.loadPageByChunksTimeout);
-        me.loadPageByChunksTimeout = setTimeout(function(){
-            me.loadPageByChunks(20,1, true, true);
-        }, 100);
+        me.loadPageByChunks(20,1, true, true);
     },
 });
