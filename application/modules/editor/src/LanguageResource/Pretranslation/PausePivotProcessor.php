@@ -34,6 +34,7 @@ use editor_Models_Task as Task;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\PauseWorker\AbstractLanguageResourcesProcessor;
 use MittagQI\Translate5\PauseWorker\PauseWorkerProcessorInterface;
+use MittagQI\Translate5\PauseWorker\WaitingStrategy;
 use Zend_Config;
 use Zend_Registry;
 use ZfExtended_Factory;
@@ -49,7 +50,7 @@ class PausePivotProcessor extends AbstractLanguageResourcesProcessor implements 
         $this->config = Zend_Registry::get('config');
     }
 
-    public function shouldWait(Task $task): bool
+    public function getWaitingStrategy(Task $task): WaitingStrategy
     {
         $taskPivotAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
         $languageResourceIds = array_column(
@@ -58,7 +59,7 @@ class PausePivotProcessor extends AbstractLanguageResourcesProcessor implements 
         );
         $languageResourceIds = array_map('intval', $languageResourceIds);
 
-        return $this->shouldWaitByStatus($task, ...$languageResourceIds);
+        return $this->getWaitingStrategyByStatus($task, ...$languageResourceIds);
     }
 
     public function getMaxWaitTimeSeconds(): int

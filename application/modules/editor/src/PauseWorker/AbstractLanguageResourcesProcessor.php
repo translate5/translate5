@@ -47,7 +47,7 @@ abstract class AbstractLanguageResourcesProcessor
         $this->manager = ZfExtended_Factory::get(Manager::class);
     }
 
-    protected function shouldWaitByStatus(Task $task, int ...$languageResourceIds): bool
+    protected function getWaitingStrategyByStatus(Task $task, int ...$languageResourceIds): WaitingStrategy
     {
         foreach ($languageResourceIds as $languageResourceId) {
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
@@ -72,14 +72,16 @@ abstract class AbstractLanguageResourcesProcessor
                 $status = $connector->getStatus($resource, $languageResource);
 
                 if (in_array($status, $this->getStatusesRequireWaiting(), true)) {
-                    return true;
+                    return in_array($status, $this->getStatusesForWaitWithoutTimeout(), true)
+                        ? WaitingStrategy::WaitWithoutTimeout
+                        : WaitingStrategy::WaitWithTimeout;
                 }
             } catch (Exception) {
                 // Do nothing here to make worker decide what to do with such language resource further
             }
         }
 
-        return false;
+        return WaitingStrategy::DontWait;
     }
 
     private function getStatusesRequireWaiting(): array
@@ -89,6 +91,13 @@ abstract class AbstractLanguageResourcesProcessor
             LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
             LanguageResourceStatus::WAITING_FOR_LOADING,
             LanguageResourceStatus::LOADING,
+            LanguageResourceStatus::CONVERTING,
+        ];
+    }
+
+    private function getStatusesForWaitWithoutTimeout(): array
+    {
+        return [
             LanguageResourceStatus::CONVERTING,
         ];
     }

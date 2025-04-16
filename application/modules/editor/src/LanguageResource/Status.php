@@ -65,6 +65,8 @@ class Status
 
     public const FAILED_TO_OPEN = 'failedToOpen';
 
+    public const CONVERSION_SCHEDULED = 'conversionScheduled';
+
     public const CONVERTING = 'converting';
 
     /**
@@ -88,6 +90,7 @@ class Status
             self::WAITING_FOR_LOADING => $translate->_('Wartet auf Laden'),
             self::LOADING => $translate->_('Wird geladen'),
             self::FAILED_TO_OPEN => $translate->_('Ladefehler'),
+            self::CONVERSION_SCHEDULED => $translate->_('language_resource.status.conversion_scheduled'),
             self::CONVERTING => $translate->_('language_resource.status.converting'),
             default => $translate->_('unbekannt'),
         };

@@ -31,6 +31,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Db_LanguageResources_LanguageResource;
+use editor_Models_Db_Task;
+use editor_Models_Task;
 use MittagQI\Translate5\LanguageResource\Db\TaskAssociation as TaskAssociationDb;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation as TaskTmTaskAssociationDb;
@@ -39,6 +41,8 @@ use Zend_Db_Table;
 
 class LanguageResourceTaskAssocRepository
 {
+    private const MATCH_ANALYSIS_STATUS = 'matchanalysis';
+
     public function __construct(
         private readonly Zend_Db_Adapter_Abstract $db,
     ) {
@@ -94,5 +98,55 @@ class LanguageResourceTaskAssocRepository
             ->where('taskAssoc.taskGuid = ?', $taskGuid);
 
         return (array) $this->db->fetchAll($s);
+    }
+
+    public function hasImportingAssociatedTasks(int $languageResourceId): bool
+    {
+        $s = $this->db->select()
+            ->from(
+                [
+                    'assocs' => TaskAssociationDb::TABLE_NAME,
+                ],
+                [
+                    'COUNT(*)',
+                ]
+            )
+            ->join(
+                [
+                    'task' => editor_Models_Db_Task::TABLE_NAME,
+                ],
+                'assocs.taskGuid = task.taskGuid',
+                []
+            )
+            ->where('assocs.languageResourceId = ?', $languageResourceId)
+            ->where('task.state = ?', editor_Models_Task::STATE_IMPORT)
+            ->group('assocs.id');
+
+        return (int) $this->db->fetchOne($s) > 0;
+    }
+
+    public function hasAssociatedTasksInMatchAnalysisState(int $languageResourceId): bool
+    {
+        $s = $this->db->select()
+            ->from(
+                [
+                    'assocs' => TaskAssociationDb::TABLE_NAME,
+                ],
+                [
+                    'COUNT(*)',
+                ]
+            )
+            ->join(
+                [
+                    'task' => editor_Models_Db_Task::TABLE_NAME,
+                ],
+                'assocs.taskGuid = task.taskGuid',
+                []
+            )
+            ->where('assocs.languageResourceId = ?', $languageResourceId)
+            ->where('task.state = ?', self::MATCH_ANALYSIS_STATUS)
+            ->group('assocs.id');
+
+        return (int) $this->db->fetchOne($s) > 0;
     }
 }

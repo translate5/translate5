@@ -126,12 +126,17 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 				  let className = '';
 				  let tooltip = '';
 
-				  if (record.get('tmNeedsConversion')) {
+				  if ('not-converted' === record.get('tmConversionState')) {
 					  className = 'ico-tm-converseTm';
 					  tooltip = Editor.data.l10n.contentProtection.tm_not_converted;
 				  }
 
-				  if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
+                  if ('conversion-scheduled' === record.get('tmConversionState')) {
+                      className = 'ico-tm-converseTm-scheduled';
+                      tooltip = Editor.data.l10n.contentProtection.tm_conversion_scheduled;
+                  }
+
+				  if ('conversion-started' === record.get('tmConversionState')) {
 					  className = 'ico-tm-converseTm-inProgress';
 					  tooltip = Editor.data.l10n.contentProtection.tm_conversion_in_progress;
 				  }
@@ -150,7 +155,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 				  meta.tdCls  = meta.tdCls  + ' info-icon-shown';
 
 				  return meta.rowIndex + 1 + (
-					  record.get('tmNeedsConversion')
+					  record.get('tmConversionState') && 'converted' !== record.get('tmConversionState')
 						  ? '<div style="' + style + '" class="' + className + '"></div>'
 						  : ''
 				  );

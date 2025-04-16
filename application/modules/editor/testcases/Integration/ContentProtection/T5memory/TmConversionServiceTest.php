@@ -140,13 +140,15 @@ class TmConversionServiceTest extends TestCase
 
         $contentProtector->method('unprotect')->willReturnCallback(fn (string $segment) => $segment);
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
+        $logger = $this->createMock(\ZfExtended_Logger::class);
 
         $service = new TmConversionService(
             $contentProtectionRepository,
             $contentProtector,
             $languageRepository,
             $languageRulesHashService,
-            $languageResourceRepository
+            $languageResourceRepository,
+            $logger,
         );
 
         $file = $service->convertTMXForImport(__DIR__ . '/TmConversionServiceTest/small.tmx', 1, 2);

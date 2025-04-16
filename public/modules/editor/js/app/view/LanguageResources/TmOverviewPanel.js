@@ -184,7 +184,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                                 getClass: (v, meta, rec) => service(rec).getConversionIconClass(rec),
                                 hidden: true,
                                 isDisabled: (view, rowIndex, colIndex, item, record) =>
-                                    (item.hidden = !record.get('tmNeedsConversion')),
+                                    (item.hidden = ! record.get('tmConversionState') || 'converted' === record.get('tmConversionState')),
                             },
                             {
                                 tooltip: Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
@@ -243,7 +243,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                                     return service(r).getAddTooltip(r);
                                 },
                                 isDisabled: function (view, rowIndex, colIndex, item, record) {
-                                    return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
+                                    return [record.STATUS_IMPORT, record.STATUS_LOADING, record.STATUS_CONVERTING].includes(record.get('status'));
                                 },
                             },
                             {
@@ -255,7 +255,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                                     return service(r).getDownloadTooltip(r);
                                 },
                                 isDisabled: function (view, rowIndex, colIndex, item, record) {
-                                    return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
+                                    return [record.STATUS_IMPORT, record.STATUS_LOADING, record.STATUS_CONVERTING].includes(record.get('status'));
                                 },
                             },
                             {
@@ -267,7 +267,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                                     return service(r).getExportTooltip(r);
                                 },
                                 isDisabled: function (view, rowIndex, colIndex, item, record) {
-                                    return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
+                                    return [record.STATUS_IMPORT, record.STATUS_LOADING, record.STATUS_CONVERTING].includes(record.get('status'));
                                 },
                             },
                             {

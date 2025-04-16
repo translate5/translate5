@@ -22,6 +22,7 @@ class TmConversionServiceTest extends TestCase
         $languageRepository = $this->createMock(LanguageRepository::class);
         $languageRulesHashService = $this->createMock(LanguageRulesHashService::class);
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
+        $logger = $this->createMock(\ZfExtended_Logger::class);
 
         $service = new TmConversionService(
             $contentProtectionRepository,
@@ -29,6 +30,7 @@ class TmConversionServiceTest extends TestCase
             $languageRepository,
             $languageRulesHashService,
             $languageResourceRepository,
+            $logger,
         );
 
         $actual = $service->convertT5MemoryTagToContent($t5memorySegment);

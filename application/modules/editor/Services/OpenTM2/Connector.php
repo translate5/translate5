@@ -386,6 +386,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             }
 
             throw new editor_Services_Connector_Exception('E1512', [
+                'status' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
                 'service' => $this->getResource()->getName(),
                 'languageResource' => $this->languageResource,
             ]);
@@ -464,6 +465,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             }
 
             throw new editor_Services_Connector_Exception('E1512', [
+                'status' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
                 'service' => $this->getResource()->getName(),
                 'languageResource' => $this->languageResource,
             ]);
@@ -516,6 +518,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         editor_Models_Segment $segment,
         bool $recheckOnUpdate,
     ): void {
+        if ($this->languageResource->isConversionStarted()) {
+            throw new editor_Services_Connector_Exception('E1512', [
+                'status' => LanguageResourceStatus::CONVERTING,
+                'service' => $this->getResource()->getName(),
+                'languageResource' => $this->languageResource,
+            ]);
+        }
+
         $elapsedTime = 0;
         $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
 
@@ -634,7 +644,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     {
         $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
-        $resultList = $this->queryTm($queryString, $segment, $fileName);
+        $resultList = $this->queryTms($queryString, $segment, $fileName);
 
         if (empty($resultList->getResult())) {
             return $resultList;
@@ -717,6 +727,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
+
+        if ($this->languageResource->isConversionStarted()) {
+            return $resultList;
+        }
 
         $results = [];
         $resultsCount = 0;
@@ -810,7 +824,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $dummySegment = ZfExtended_Factory::get(editor_Models_Segment::class);
         $dummySegment->init();
 
-        return $this->queryTm($searchString, $dummySegment, 'source');
+        return $this->queryTms($searchString, $dummySegment, 'source');
     }
 
     public function delete(): void
@@ -921,8 +935,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return $this->api->status(null) ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::ERROR;
         }
 
-        if ($this->languageResource->isConversionInProgress()) {
+        if ($this->languageResource->isConversionStarted()) {
             return LanguageResourceStatus::CONVERTING;
+        }
+
+        if ($this->languageResource->isConversionScheduled()) {
+            return LanguageResourceStatus::CONVERSION_SCHEDULED;
         }
 
         // let's check the internal state before calling API for status as import worker might not have run yet
@@ -1611,7 +1629,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $this->api;
     }
 
-    private function queryTm(
+    private function queryTms(
         string $queryString,
         editor_Models_Segment $segment,
         string $fileName,
@@ -1621,6 +1639,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
         if (empty($queryString) && $queryString !== '0') {
+            return $resultList;
+        }
+
+        if ($this->languageResource->isConversionStarted()) {
             return $resultList;
         }
 

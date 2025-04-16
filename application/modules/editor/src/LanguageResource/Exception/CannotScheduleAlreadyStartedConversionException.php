@@ -28,31 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\T5memory;
+namespace MittagQI\Translate5\LanguageResource\Exception;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\ContentProtection\ConversionState;
-
-interface TmConversionServiceInterface
+class CannotScheduleAlreadyStartedConversionException extends \Exception
 {
-    public function setRulesHash(LanguageResource $languageResource, int $sourceLanguageId, int $targetLangId): void;
-
-    public function isTmConverted(int $languageResourceId): bool;
-
-    public function getConversionState(int $languageResourceId): ConversionState;
-
-    public function scheduleConversion(int $languageResourceId): void;
-
-    public function convertT5MemoryTagToContent(string $string): string;
-
-    /**
-     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
-     */
-    public function convertContentTagToT5MemoryTag(
-        string $queryString,
-        bool $isSource,
-        array &$numberTagMap = []
-    ): string;
-
-    public function convertTMXForImport(string $filenameWithPath, int $sourceLangId, int $targetLangId): string;
+    public function __construct(
+        public readonly int $languageResourceId,
+    ) {
+        parent::__construct(
+            sprintf(
+                'Cannot schedule conversion for language resource %d, because it is already started.',
+                $languageResourceId
+            )
+        );
+    }
 }

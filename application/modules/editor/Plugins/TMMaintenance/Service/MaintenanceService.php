@@ -502,6 +502,10 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         LanguageResource $languageResource = null,
         ?string $tmName = null,
     ): string {
+        if ($this->languageResource->isConversionStarted()) {
+            return LanguageResourceStatus::CONVERTING;
+        }
+
         if ($tmName) {
             return $this->t5MemoryConnector->getStatus($resource, $languageResource, $tmName);
         }
@@ -999,7 +1003,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     {
         $status = $this->getStatus($this->resource, $this->languageResource, $memoryName);
 
-        if ($status !== LanguageResourceStatus::AVAILABLE) {
+        if (! in_array($status, [LanguageResourceStatus::AVAILABLE, LanguageResourceStatus::CONVERSION_SCHEDULED], true)) {
             throw new \editor_Services_Connector_Exception('E1377', [
                 'languageResource' => $this->languageResource,
                 'status' => $status,

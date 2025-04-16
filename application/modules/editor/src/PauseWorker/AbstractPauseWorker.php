@@ -59,11 +59,15 @@ abstract class AbstractPauseWorker extends editor_Models_Task_AbstractWorker
         $elapsedTime = 0;
 
         while ($elapsedTime < $maxTime) {
-            if (! $processor->shouldWait($this->task)) {
+            $waitingStrategy = $processor->getWaitingStrategy($this->task);
+            if (WaitingStrategy::DontWait === $waitingStrategy) {
                 break;
             }
 
-            $elapsedTime += $sleepTime;
+            if (WaitingStrategy::WaitWithTimeout === $waitingStrategy) {
+                $elapsedTime += $sleepTime;
+            }
+
             sleep($sleepTime);
         }
 

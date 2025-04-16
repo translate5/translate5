@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Status;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Test\ApiTestAbstract;
 use MittagQI\Translate5\Test\Enums\TestUser;
 
@@ -34,14 +36,14 @@ class Translate3013Test extends ApiTestAbstract
     /***
      * First collection ID
      *
-     * @var integer
+     * @var int
      */
     protected static $collection1Id;
 
     /***
      * Second collection ID
      *
-     * @var integer
+     * @var int
      */
     protected static $collection2Id;
 
@@ -81,6 +83,14 @@ class Translate3013Test extends ApiTestAbstract
         // 2.Get number of datatype-records we have in database
         $dataTypeA = (array) static::api()->getJson('editor/attributedatatype');
 
+        $languageResourceRepository = LanguageResourceRepository::create();
+        $lr1 = $languageResourceRepository->get(self::$collection1Id);
+
+        while ($lr1->getStatus() === Status::IMPORT) {
+            sleep(1);
+            $lr1->refresh();
+        }
+
         // 3.TermCollection1: importing tbx with 0 new datatype-record
         static::api()->reimportResource(self::$collection1Id, 'testfiles/TermCollection1.tbx', [
             'deleteTermsOlderThanCurrentImport' => 'on',
@@ -103,6 +113,13 @@ class Translate3013Test extends ApiTestAbstract
         $this->assertTrue(is_object($termCollection2), 'Unable to create a TermCollection2');
         $this->assertEquals('TermCollection2', $termCollection2->name);
         self::$collection2Id = $termCollection2->id;
+
+        $lr2 = $languageResourceRepository->get(self::$collection2Id);
+
+        while ($lr2->getStatus() === Status::IMPORT) {
+            sleep(1);
+            $lr2->refresh();
+        }
 
         // 6.TermCollection2: import tbx-file having 2 attribute-records of a 1 NEW datatype-record (each is on term-level for 2 different terms)
         static::api()->reimportResource(self::$collection2Id, 'testfiles/TermCollection2.tbx', [

@@ -31,13 +31,15 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection\T5memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_LanguageResources_Languages;
 use editor_Models_Languages as Language;
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\ConversionState;
+use MittagQI\Translate5\ContentProtection\DTO\RulesHashDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
-use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
@@ -52,9 +54,10 @@ class TmConversionService implements TmConversionServiceInterface
 {
     private array $languageRulesHashMap;
 
+    /**
+     * @var array<int, RulesHashDto>
+     */
     private array $languageResourceRulesHashMap;
-
-    private ZfExtended_Logger $logger;
 
     public function __construct(
         private readonly ContentProtectionRepository $contentProtectionRepository,
@@ -62,10 +65,10 @@ class TmConversionService implements TmConversionServiceInterface
         private readonly LanguageRepository $languageRepository,
         private readonly LanguageRulesHashService $languageRulesHashService,
         private readonly LanguageResourceRepository $languageResourceRepository,
+        private readonly ZfExtended_Logger $logger,
     ) {
         $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
         $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
-        $this->logger = Zend_Registry::get('logger')->cloneMe('translate5.content_protection');
     }
 
     public static function create(?Whitespace $whitespace = null)
@@ -79,6 +82,7 @@ class TmConversionService implements TmConversionServiceInterface
             $languageRepository,
             new LanguageRulesHashService($contentProtectionRepository, $languageRepository),
             new LanguageResourceRepository(),
+            Zend_Registry::get('logger')->cloneMe('editor.content_protection'),
         );
     }
 
@@ -99,10 +103,12 @@ class TmConversionService implements TmConversionServiceInterface
             return false;
         }
 
-        ['languages' => $languages, 'hash' => $hash] = $this->languageResourceRulesHashMap[$languageResourceId];
+        $hashDto = $this->languageResourceRulesHashMap[$languageResourceId];
+        $languages = $hashDto->languages;
+        $hash = $hashDto->hash;
 
         if (! isset($this->languageRulesHashMap[$languages['source']][$languages['target']])) {
-            $lrLanguage = ZfExtended_Factory::get(\editor_Models_LanguageResources_Languages::class);
+            $lrLanguage = new editor_Models_LanguageResources_Languages();
 
             foreach ($lrLanguage->loadByLanguageResourceId($languageResourceId) as $languagePair) {
                 $sourceLang = $this->languageRepository->find((int) $languagePair['sourceLang']);
@@ -123,26 +129,39 @@ class TmConversionService implements TmConversionServiceInterface
         return $this->languageRulesHashMap[$languages['source']][$languages['target']] === $hash;
     }
 
-    public function isConversionInProgress(int $languageResourceId): bool
+    public function getConversionState(int $languageResourceId): ConversionState
+    {
+        return match (true) {
+            $this->isConversionStarted($languageResourceId) => ConversionState::ConversionStarted,
+            $this->isConversionScheduled($languageResourceId) => ConversionState::ConversionScheduled,
+            $this->isTmConverted($languageResourceId) => ConversionState::Converted,
+            default => ConversionState::NotConverted,
+        };
+    }
+
+    private function isConversionStarted(int $languageResourceId): bool
     {
         if (! isset($this->languageResourceRulesHashMap[$languageResourceId])) {
             return false;
         }
 
-        if (! empty($this->languageResourceRulesHashMap[$languageResourceId]['conversionStarted'])) {
-            return true;
-        }
-
-        return false;
+        return $this->languageResourceRulesHashMap[$languageResourceId]->conversionStarted;
     }
 
-    public function startConversion(int $languageResourceId): void
+    private function isConversionScheduled(int $languageResourceId): bool
+    {
+        if (! isset($this->languageResourceRulesHashMap[$languageResourceId])) {
+            return false;
+        }
+
+        return $this->languageResourceRulesHashMap[$languageResourceId]->conversionScheduled;
+    }
+
+    public function scheduleConversion(int $languageResourceId): void
     {
         $languageResource = $this->languageResourceRepository->get($languageResourceId);
 
-        $languageResource->addSpecificData(LanguageResource::PROTECTION_CONVERSION_STARTED, date('Y-m-d H:i:s'));
-        // set status to import to block interactions with the language resource
-        $languageResource->setStatus(Status::IMPORT);
+        $languageResource->markScheduledConversion();
 
         $this->languageResourceRepository->save($languageResource);
 
