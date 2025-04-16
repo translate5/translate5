@@ -35,6 +35,7 @@ use editor_Models_Task as Task;
 use editor_Services_Manager as Manager;
 use MittagQI\Translate5\PauseWorker\AbstractLanguageResourcesProcessor;
 use MittagQI\Translate5\PauseWorker\PauseWorkerProcessorInterface;
+use MittagQI\Translate5\PauseWorker\WaitingStrategy;
 use Zend_Config;
 use Zend_Registry;
 
@@ -53,7 +54,7 @@ class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor imp
         $this->config = Zend_Registry::get('config');
     }
 
-    public function shouldWait(Task $task): bool
+    public function getWaitingStrategy(Task $task): WaitingStrategy
     {
         $languageResourceIds = array_column(
             (new LanguageResource())->loadByAssociatedTaskGuidListAndServiceTypes(
@@ -64,7 +65,7 @@ class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor imp
         );
         $languageResourceIds = array_map('intval', $languageResourceIds);
 
-        return $this->shouldWaitByStatus($task, ...$languageResourceIds);
+        return $this->getWaitingStrategyByStatus($task, ...$languageResourceIds);
     }
 
     public function getMaxWaitTimeSeconds(): int

@@ -196,24 +196,12 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $successful = $this->api->getEntry($memoryName, $segmentRecordKey, $segmentTargetKey);
 
         if (! $successful) {
-            $this->logger->error('E1611', 'Requested segment not found', [
-                'languageResource' => $this->languageResource,
-            ]);
-
             throw new \editor_Services_Connector_Exception('E1611');
         }
 
         $result = $this->api->getResult();
 
         if ($segmentId !== $result->segmentId) {
-            $this->logger->error(
-                'E1612',
-                'Found segment id differs from the requested one, probably it was deleted meanwhile',
-                [
-                    'languageResource' => $this->languageResource,
-                ]
-            );
-
             throw new \editor_Services_Connector_Exception('E1612');
         }
 
@@ -246,14 +234,9 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
 
         if (! $successful) {
-            $this->logger->error('E1688', 'Failed to delete segment', [
-                'languageResource' => $this->languageResource,
-                'apiError' => $this->api->getError(),
-            ]);
-
             throw new \editor_Services_Connector_Exception('E1688', [
                 'languageResource' => $this->languageResource,
-                'error' => 'Failed to delete segment',
+                'error' => $this->api->getError(),
             ]);
         }
     }
@@ -502,6 +485,10 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         LanguageResource $languageResource = null,
         ?string $tmName = null,
     ): string {
+        if ($this->languageResource->isConversionStarted()) {
+            return LanguageResourceStatus::CONVERTING;
+        }
+
         if ($tmName) {
             return $this->t5MemoryConnector->getStatus($resource, $languageResource, $tmName);
         }
@@ -999,7 +986,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     {
         $status = $this->getStatus($this->resource, $this->languageResource, $memoryName);
 
-        if ($status !== LanguageResourceStatus::AVAILABLE) {
+        if (! in_array($status, [LanguageResourceStatus::AVAILABLE, LanguageResourceStatus::CONVERSION_SCHEDULED], true)) {
             throw new \editor_Services_Connector_Exception('E1377', [
                 'languageResource' => $this->languageResource,
                 'status' => $status,

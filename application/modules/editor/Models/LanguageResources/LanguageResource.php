@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAttributeDataType;
+use MittagQI\Translate5\LanguageResource\Exception\CannotScheduleAlreadyStartedConversionException;
 use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation;
 
 /**
@@ -63,6 +64,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     use editor_Models_Entity_SpecificDataTrait;
 
     public const PROTECTION_HASH = 'protection_hash';
+
+    public const PROTECTION_CONVERSION_SCHEDULED = 'conversionScheduled';
 
     public const PROTECTION_CONVERSION_STARTED = 'conversionStarted';
 
@@ -116,10 +119,43 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $this->setResourceType($resource->getType());
     }
 
-    public function isConversionInProgress(): bool
+    #region Conversion
+
+    public function isConversionScheduled(): bool
+    {
+        return $this->getSpecificData(self::PROTECTION_CONVERSION_SCHEDULED) !== null;
+    }
+
+    public function isConversionStarted(): bool
     {
         return $this->getSpecificData(self::PROTECTION_CONVERSION_STARTED) !== null;
     }
+
+    /**
+     * @throws CannotScheduleAlreadyStartedConversionException
+     */
+    public function markScheduledConversion(): void
+    {
+        if ($this->isConversionStarted()) {
+            throw new CannotScheduleAlreadyStartedConversionException((int) $this->getId());
+        }
+
+        $this->addSpecificData(self::PROTECTION_CONVERSION_SCHEDULED, date('Y-m-d H:i:s'));
+    }
+
+    public function markConversionStart(): void
+    {
+        $this->addSpecificData(self::PROTECTION_CONVERSION_SCHEDULED, null);
+        $this->addSpecificData(self::PROTECTION_CONVERSION_STARTED, date('Y-m-d H:i:s'));
+    }
+
+    public function resetConversionMarks(): void
+    {
+        $this->addSpecificData(self::PROTECTION_CONVERSION_SCHEDULED, null);
+        $this->addSpecificData(self::PROTECTION_CONVERSION_STARTED, null);
+    }
+
+    #endregion
 
     // region Repository methods
     /**

@@ -80,23 +80,31 @@ Ext.define('Editor.view.LanguageResources.services.OpenTM2', {
     	return this.download;
     },
     getConversionIconClass: (record) => {
-        if (!record.get('tmNeedsConversion')) {
+        if (! record.get('tmConversionState') || 'converted' === record.get('tmConversionState')) {
             return 'x-hidden-display';
         }
 
-        if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
+        if ('conversion-started' === record.get('tmConversionState')) {
             return 'ico-tm-converseTm-inProgress';
+        }
+
+        if ('conversion-scheduled' === record.get('tmConversionState')) {
+            return 'ico-tm-converseTm-scheduled';
         }
 
         return 'ico-tm-converseTm';
     },
     getConversionIconTip: (record) => {
-        if (!record.get('tmNeedsConversion')) {
+        if (! record.get('tmConversionState') || 'converted' === record.get('tmConversionState')) {
             return null;
         }
 
-        if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
+        if ('conversion-started' === record.get('tmConversionState')) {
             return Editor.data.l10n.contentProtection.tm_conversion_in_progress;
+        }
+
+        if ('conversion-scheduled' === record.get('tmConversionState')) {
+            return Editor.data.l10n.contentProtection.tm_conversion_scheduled;
         }
 
         return Editor.data.l10n.contentProtection.tm_not_converted;

@@ -135,12 +135,17 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                     let className = '';
                                     let tooltip = '';
 
-                                    if (record.get('tmNeedsConversion')) {
+                                    if ('not-converted' === record.get('tmConversionState')) {
                                         className = 'ico-tm-converseTm';
                                         tooltip = Editor.data.l10n.contentProtection.tm_not_converted;
                                     }
 
-                                    if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
+                                    if ('conversion-scheduled' === record.get('tmConversionState')) {
+                                        className = 'ico-tm-converseTm-scheduled';
+                                        tooltip = Editor.data.l10n.contentProtection.tm_conversion_scheduled;
+                                    }
+
+                                    if ('conversion-started' === record.get('tmConversionState')) {
                                         className = 'ico-tm-converseTm-inProgress';
                                         tooltip = Editor.data.l10n.contentProtection.tm_conversion_in_progress;
                                     }
@@ -151,15 +156,11 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                         ' border: 1px solid rgba(0, 0, 0, .2);background: #' +
                                         record.get('color') +
                                         ';"></div>' +
-                                        (record.get('tmNeedsConversion')
-                                            ? '<div style="' +
-                                              style +
-                                              '" class="' +
-                                              className +
-                                              '" data-qtip="' +
-                                              tooltip +
-                                              '"></div>'
-                                            : '') +
+                                        (
+                                            record.get('tmConversionState') && 'converted' !== record.get('tmConversionState')
+                                                ? `<div style="${style}" class="${className}" data-qtip="${tooltip}"></div>`
+                                                : ''
+                                        ) +
                                         Ext.String.htmlEncode(value)
                                     );
                                 },

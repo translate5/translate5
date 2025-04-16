@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ContentProtection\ConversionState;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceAction;
@@ -43,6 +44,7 @@ use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\T5Memory\ExportMemoryWorker;
 use MittagQI\Translate5\Task\Current\NoAccessException;
@@ -147,8 +149,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $resources = [];
         $synchronizableServiceTypes = $serviceManager->getSynchronizableServiceTypes();
 
-        $getResource = function (string $serviceType, string $id) use ($resources, $serviceManager) {
-            if (! empty($resources[$id])) {
+        $getResource = function (string $serviceType, string $id) use (&$resources, $serviceManager) {
+            if (isset($resources[$id])) {
                 return $resources[$id];
             }
             $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
@@ -213,15 +215,19 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
             $lrData['synchronizableService'] = in_array($lrData['serviceType'], $synchronizableServiceTypes, true);
 
-            $lrData['tmNeedsConversion'] = false;
-            $lrData['tmConversionInProgress'] = false;
+            $lrData['tmConversionState'] = null;
 
             if (editor_Services_Manager::SERVICE_OPENTM2 === $lrData['serviceType']) {
-                $lrData['tmNeedsConversion'] = ! $tmConversionService->isTmConverted($id);
-                $lrData['tmConversionInProgress'] = $tmConversionService->isConversionInProgress($id);
+                $lrData['tmConversionState'] = $tmConversionService->getConversionState($id)->value;
             }
 
-            if ($filterTmNeedsConversion && ! $lrData['tmNeedsConversion']) {
+            if (
+                $filterTmNeedsConversion
+                && (
+                    null === $lrData['tmConversionState']
+                    || ConversionState::Converted === $lrData['tmConversionState']
+                )
+            ) {
                 unset($rows[$rowId]);
 
                 continue;
@@ -310,14 +316,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $this->view->success = true;
 
-        if (
-            $tmConversionService->isTmConverted($postData['id'])
-            || $tmConversionService->isConversionInProgress($postData['id'])
-        ) {
+        if (ConversionState::NotConverted !== $tmConversionService->getConversionState($postData['id'])) {
             return;
         }
 
-        $tmConversionService->startConversion($postData['id']);
+        $tmConversionService->scheduleConversion($postData['id']);
     }
 
     public function synchronizetmbatchAction(): void
@@ -328,14 +331,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->success = true;
 
         foreach ($postData['data'] as $resource) {
-            if (
-                $tmConversionService->isTmConverted((int) $resource)
-                || $tmConversionService->isConversionInProgress((int) $resource)
-            ) {
+            if (ConversionState::NotConverted !== $tmConversionService->getConversionState((int) $postData)) {
                 continue;
             }
 
-            $tmConversionService->startConversion((int) $resource);
+            $tmConversionService->scheduleConversion((int) $resource);
         }
     }
 
@@ -1048,7 +1048,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw new ZfExtended_ValidateException('Requested languageResource is not filebased!');
         }
 
-        if ($this->hasImportingAssociatedTasks((int) $this->entity->getId())) {
+        $taskAssocRepository = LanguageResourceTaskAssocRepository::create();
+
+        if ($taskAssocRepository->hasImportingAssociatedTasks((int) $this->entity->getId())) {
             throw new ZfExtended_ValidateException('Language resource has associated task that is currently importing');
         }
 
@@ -1314,6 +1316,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected function handleAdditionalFileUpload()
     {
         $connector = $this->getConnector();
+
+        $status = $connector->getStatus($this->entity->getResource());
+
+        if (in_array($status, [LanguageResourceStatus::IMPORT, LanguageResourceStatus::CONVERTING], true)) {
+            throw new ZfExtended_ValidateException('Language resource status is not valid for import');
+        }
+
         $importInfo = $this->handleFileUpload($connector);
 
         if (empty($importInfo)) {
@@ -1601,7 +1610,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
         $this->view->languageResourceId = $this->entity->getId();
         $this->view->resourceType = $this->entity->getResourceType();
-        $this->view->rows = $result->getResult();
+        $this->view->rows = array_values($result->getResult());
 
         $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
@@ -1620,12 +1629,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         unset($row);
 
         if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
-            $this->view->tmNeedsConversion = ! $tmConversionService->isTmConverted($languageResourceId);
-            $this->view->tmConversionInProgress = $tmConversionService->isConversionInProgress($languageResourceId);
+            $this->view->tmConversionState = $tmConversionService->getConversionState($languageResourceId)->value;
 
             foreach ($this->view->rows as &$row) {
-                $row->tmNeedsConversion = $this->view->tmNeedsConversion;
-                $row->tmConversionInProgress = $this->view->tmConversionInProgress;
+                $row->tmConversionState = $this->view->tmConversionState;
             }
         }
         $this->view->total = count($this->view->rows);
@@ -1890,26 +1897,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     {
         $assocClean = ZfExtended_Factory::get(Customer::class, [$this->entity->getId(), $customerIds]);
         $clean ? $assocClean->cleanAssociation() : $assocClean->check();
-    }
-
-    private function hasImportingAssociatedTasks(int $languageResourceId): bool
-    {
-        $taskAssociation = ZfExtended_Factory::get(TaskAssociation::class);
-
-        $tasksInfos = $taskAssociation->getTaskInfoForLanguageResources([$languageResourceId]);
-
-        if (count($tasksInfos) === 0) {
-            return false;
-        }
-
-        $importingTasks = array_filter(
-            $tasksInfos,
-            static function (array $taskInfo) {
-                return $taskInfo['state'] === editor_Models_Task::STATE_IMPORT;
-            }
-        );
-
-        return count($importingTasks) > 0;
     }
 
     // additional API needed to process client-restricted usage of the controller

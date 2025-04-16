@@ -189,7 +189,7 @@ class NumberProtectorTest extends TestCase
         );
     }
 
-    public function testProtectWithSchmiederNumericRegex(): void
+    public function testProtectWithNumericRegex(): void
     {
         $dto = new ContentProtectionDto(
             KeepContentProtector::getType(),
@@ -219,6 +219,57 @@ class NumberProtectorTest extends TestCase
         $expected = 'Temperaturklasse, maximale Oberflächentemperatur &lt; <number type="keep-content" name="default" source="135" iso="135" target="135" regex="049J0dbQiCmuidGridHR1IhJ0dTW1NIHAA=="/> °C; <number type="keep-content" name="default" source="275" iso="275" target="275" regex="049J0dbQiCmuidGridHR1IhJ0dTW1NIHAA=="/> °F';
 
         self::assertSame($expected, $protector->protect($segment, true, 5, 6));
+    }
+
+    public function testProtectWholeSegmentRegex(): void
+    {
+        $dto1 = new ContentProtectionDto(
+            KeepContentProtector::getType(),
+            'default',
+            '/text/',
+            0,
+            null,
+            true,
+            null,
+            0
+        );
+
+        $dto2 = new ContentProtectionDto(
+            KeepContentProtector::getType(),
+            'default',
+            '/^((([0-9]\/[0-9])|([0-9])|([0-9][\s ][0-9]\/[0-9]))(,[\s ])?)+$/',
+            0,
+            null,
+            true,
+            null,
+            0
+        );
+
+        $repo = $this->createConfiguredMock(
+            ContentProtectionRepository::class,
+            [
+                'getAllForSource' => [
+                    $dto1,
+                    $dto2,
+                ],
+                'hasActiveTextRules' => true,
+            ]
+        );
+
+        $protector = NumberProtector::create($repo);
+
+        $segment = '12';
+
+        self::assertTrue($protector->hasEntityToProtect($segment));
+
+        $expected = '<number type="keep-content" name="default" source="12" iso="12" target="12" regex="04/T0NCINtC1jI3RB1OaNRoodHRMsUIsigJNDR2woKa9praKPgA="/>';
+
+        self::assertSame($expected, $protector->protect($segment, true, 5, 6));
+
+        $segmentWithText = 'text12';
+        $expectedWithText = '<number type="keep-content" name="default" source="text" iso="text" target="text" regex="0y9JrSjRBwA="/>12';
+
+        self::assertSame($expectedWithText, $protector->protect($segmentWithText, true, 5, 6));
     }
 
     /**

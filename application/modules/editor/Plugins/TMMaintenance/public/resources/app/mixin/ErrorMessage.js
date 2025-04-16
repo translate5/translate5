@@ -22,17 +22,21 @@ Ext.define('TMMaintenance.mixin.ErrorMessage', {
         let errorMessage;
         let errorCode = null;
 
-        if (error.hasOwnProperty('errorMessage')) {
+        if (
+            error?.response?.responseJson?.errorsTranslated &&
+            error?.response?.responseJson?.errorsTranslated.length > 0
+        ) {
+            errorMessage = error?.response?.responseJson?.errorsTranslated.join('<br>');
+        } else if (error.hasOwnProperty('errorMessage')) {
             errorMessage = error.errorMessage;
         } else {
             errorMessage = error?.response?.responseJson?.errorMessage;
-            errorCode = error?.response?.responseJson?.errorCode;
         }
 
         const l10n = this.getViewModel().data.l10n;
-        errorMessage = (errorMessage ? (l10n.error.responseFromServer + errorMessage) : '');
 
-        if (!this.isInfo(errorCode)) {
+        if (!this.isInfo(error)) {
+            errorMessage = (errorMessage ? (l10n.error.responseFromServer + ': ' + errorMessage) : '');
             errorMessage = l10n.error.couldNotProcessRequest + '<br>' + errorMessage;
         }
 
@@ -47,12 +51,11 @@ Ext.define('TMMaintenance.mixin.ErrorMessage', {
 
     getDialogTitle: function (error) {
         const l10n = this.getViewModel().data.l10n;
-        let errorCode = error?.response?.responseJson?.errorCode;
 
-        return this.isInfo(errorCode) ? l10n.error.infoTitle : l10n.error.title;
+        return this.isInfo(error) ? l10n.error.messageFromServer : l10n.error.title;
     },
 
-    isInfo: function (errorCode) {
-        return errorCode === 'E1377';
+    isInfo: function (error) {
+        return error.hasOwnProperty('status') && error.status === 422;
     }
 });

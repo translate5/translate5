@@ -33,15 +33,21 @@ namespace MittagQI\Translate5\ContentProtection\T5memory;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
 use editor_Services_OpenTM2_Connector as Connector;
+use MittagQI\Translate5\ContentProtection\ConversionState;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\T5Memory\ExportService;
 use ZfExtended_Worker_Abstract;
 
 class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 {
+    private const SLEEP_TIME = 30;
+
+    private const MAX_SLEEP_TIME = 3600;
+
     private int $languageResourceId;
 
     private LanguageResource $languageResource;
@@ -54,6 +60,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
     private readonly ExportService $exportService;
 
+    private readonly LanguageResourceTaskAssocRepository $taskAssocRepository;
+
     public function __construct()
     {
         parent::__construct();
@@ -61,6 +69,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $this->tmConversionService = TmConversionService::create();
         $this->languageResourceRepository = new LanguageResourceRepository();
         $this->exportService = ExportService::create();
+        $this->taskAssocRepository = LanguageResourceTaskAssocRepository::create();
     }
 
     private function restoreLangResourceMemories(): void
@@ -102,11 +111,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
     protected function work(): bool
     {
-        if ($this->tmConversionService->isTmConverted($this->languageResourceId)) {
-            return true;
-        }
-
-        if (! $this->languageResource->isConversionInProgress()) {
+        if (ConversionState::ConversionScheduled !== $this->tmConversionService->getConversionState($this->languageResourceId)) {
             return false;
         }
 
@@ -122,6 +127,30 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
             return true;
         }
+
+        $elapsedTime = 0;
+
+        while ($this->shouldWait($connector)) {
+            sleep(30);
+            $elapsedTime += self::SLEEP_TIME;
+
+            if ($elapsedTime >= self::MAX_SLEEP_TIME) {
+                $this->log->error(
+                    'E1590',
+                    'Conversion: Timeout while waiting for available Language resource. Elapsed time: {elapsedTime} seconds',
+                    [
+                        'elapsedTime' => $elapsedTime,
+                        'languageResource' => $this->languageResource,
+                    ]
+                );
+
+                return false;
+            }
+        }
+
+        $this->languageResource->markConversionStart();
+
+        $this->languageResource->save();
 
         $mime = $connector->getValidExportTypes()['TMX'];
 
@@ -167,8 +196,6 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
                 $this->rollback($connector);
 
-                @unlink($exportFilename);
-
                 return false;
             }
 
@@ -203,6 +230,26 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         return true;
     }
 
+    private function shouldWait(Connector $connector): bool
+    {
+        $waitStatuses = [
+            Status::IMPORT,
+            Status::REORGANIZE_IN_PROGRESS,
+        ];
+
+        // Refresh the language resource to get the latest status
+        $this->languageResource->refresh();
+
+        $status = $connector->getStatus($this->languageResource->getResource());
+
+        if (in_array($status, $waitStatuses, true)) {
+            return true;
+        }
+
+        return $this->taskAssocRepository->hasImportingAssociatedTasks($this->languageResourceId)
+            || $this->taskAssocRepository->hasAssociatedTasksInMatchAnalysisState($this->languageResourceId);
+    }
+
     private function rollback(Connector $connector): void
     {
         $this->deleteNewlyCreatedMemories($connector);
@@ -222,8 +269,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
     private function resetConversionStarted(): void
     {
-        $this->languageResource->addSpecificData(LanguageResource::PROTECTION_CONVERSION_STARTED, null);
-        // set status to import to block interactions with the language resource
+        $this->languageResource->resetConversionMarks();
         $this->languageResource->setStatus(Status::NOTCHECKED);
         $this->languageResourceRepository->save($this->languageResource);
     }

@@ -28,7 +28,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_Db_LanguageResources_Languages extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_languageresources_languages';
+    public const TABLE_NAME = 'LEK_languageresources_languages';
+
+    protected $_name = self::TABLE_NAME;
 
     public $_primary = 'id';
 }

@@ -34,6 +34,7 @@ use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
+use MittagQI\Translate5\Plugins\TMMaintenance\Exception\ErrorException;
 use MittagQI\Translate5\Plugins\TMMaintenance\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Plugins\TMMaintenance\Service\SegmentProcessor;
 
@@ -97,17 +98,32 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     public function indexAction(): void
     {
-        $this->assignView($this->getSegmentsProcessor()->getList(GetListDTO::fromRequest($this->getRequest())));
+        try {
+            $this->assignView(
+                $this->getSegmentsProcessor()->getList(GetListDTO::fromRequest($this->getRequest()))
+            );
+        } catch (editor_Services_Connector_Exception $exception) {
+            $this->transformException($exception);
+        }
     }
 
     public function postAction(): void
     {
-        $this->getSegmentsProcessor()->create(CreateDTO::fromRequest($this->getRequest()));
+        try {
+            $this->getSegmentsProcessor()->create(CreateDTO::fromRequest($this->getRequest()));
+        } catch (editor_Services_Connector_Exception $exception) {
+            $this->transformException($exception);
+        }
     }
 
     public function putAction(): void
     {
-        $this->getSegmentsProcessor()->update(UpdateDTO::fromRequest($this->getRequest()));
+        try {
+            $this->getSegmentsProcessor()->update(UpdateDTO::fromRequest($this->getRequest()));
+        } catch (editor_Services_Connector_Exception $exception) {
+            $this->transformException($exception);
+        }
+
         $this->assignView([
             json_decode($this->getRequest()->getParam('data'), true, flags: JSON_THROW_ON_ERROR),
         ]);
@@ -116,21 +132,36 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     public function deleteAction(): void
     {
         $dto = DeleteDTO::fromRequest($this->getRequest());
-        $this->getSegmentsProcessor()->delete($dto);
+
+        try {
+            $this->getSegmentsProcessor()->delete($dto);
+        } catch (editor_Services_Connector_Exception $exception) {
+            $this->transformException($exception);
+        }
     }
 
     public function deletebatchAction(): void
     {
         $dto = DeleteBatchDTO::fromRequest($this->getRequest());
-        $this->getSegmentsProcessor()->deleteBatch($dto);
+
+        try {
+            $this->getSegmentsProcessor()->deleteBatch($dto);
+        } catch (editor_Services_Connector_Exception $exception) {
+            $this->transformException($exception);
+        }
     }
 
     public function readamountAction()
     {
         $dto = GetListDTO::fromRequest($this->getRequest());
-        echo json_encode([
-            'totalAmount' => $this->getSegmentsProcessor()->countResults($dto),
-        ], JSON_THROW_ON_ERROR);
+
+        try {
+            echo json_encode([
+                'totalAmount' => $this->getSegmentsProcessor()->countResults($dto),
+            ], JSON_THROW_ON_ERROR);
+        } catch (editor_Services_Connector_Exception $exception) {
+            $this->transformException($exception);
+        }
     }
 
     #endregion Actions
@@ -178,5 +209,51 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     private function assignView(array $data): void
     {
         $this->view->assign($data);
+    }
+
+    /**
+     * @throws editor_Services_Connector_Exception
+     */
+    private function transformException(editor_Services_Connector_Exception $exception): void
+    {
+        $errorCode = $exception->getErrorCode();
+
+        throw match ($errorCode) {
+            'E1377' => ErrorException::createResponse(
+                $errorCode,
+                [
+                    'Speicherstatus: {status}. Bitte versuchen Sie es in Kürze erneut.',
+                ],
+                [
+                    'status' => $exception->getExtra('status'),
+                ]
+            ),
+            'E1611' => ErrorException::createResponse(
+                $errorCode,
+                [
+                    'Angefordertes Segment nicht gefunden. Wahrscheinlich wurde es gelöscht.',
+                ],
+            ),
+            'E1612' => ErrorException::createResponse(
+                $errorCode,
+                [
+                    'Die gefundene Segment-ID weicht von der gesuchten ab, wahrscheinlich wurde sie ' .
+                        'inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.',
+                ],
+            ),
+            'E1688' => ErrorException::createResponse(
+                $errorCode,
+                [
+                    'Das Segment konnte nicht gelöscht werden, wahrscheinlich wurde es inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.',
+                ],
+            ),
+            'E1306' => ErrorException::createResponse(
+                $errorCode,
+                [
+                    'Das Segment konnte nicht im TM gespeichert werden. Bitte versuchen Sie es erneut.',
+                ],
+            ),
+            default => $exception,
+        };
     }
 }

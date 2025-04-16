@@ -39,6 +39,8 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
 
     protected static bool $enabledByDefault = true;
 
+    protected $localePath = 'locales';
+
     protected $frontendControllers = [
         AclResource::PLUGIN_TM_MAINTENANCE => 'Editor.plugins.TMMaintenance.app.controller.TMMaintenance',
     ];

@@ -105,7 +105,8 @@
     "infoTitle": "Info",
     "couldNotProcessRequest": "Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!",
     "close": "Schließen",
-    "responseFromServer": "Meldung vom Server: ",
+    "responseFromServer": "Meldung vom Server",
+    "messageFromServer": "Nachricht vom Server",
     "wrongTagsOrdering": "Some of the tags used in the segment are in the wrong order (closing tag before opening tag or missing corresponding tag). Please correct the segment and try again."
   },
   "deleteSegment": {

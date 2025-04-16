@@ -126,6 +126,8 @@ if(!empty($this->task)) {
     $customer=ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
     $customer->load($this->task->getCustomerId());
 
+    $taskData['customerName'] = $customer->getName();
+
     //if the customer domain is set, use this domain as portal url and link
     if (empty($customer->getDomain())) {
         $data['portalLink'] = '<a href="' . $portal . $urlPart . '">' . $portal . $urlPart . '</a>';

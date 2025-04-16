@@ -52,52 +52,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection;
 
-use MittagQI\Translate5\Segment\EntityHandlingMode;
-
-interface ProtectorInterface
+interface ProtectionTagsFilterInterface
 {
-    public static function alias(): string;
+    public function filterTags(string &$source, string &$target): void;
 
-    public function hasEntityToProtect(string $textNode, int $sourceLang = null): bool;
-
-    public function hasTagsToConvert(string $textNode): bool;
-
-    public function protect(
-        string $textNode,
-        bool $isSource,
-        int $sourceLangId,
-        int $targetLangId,
-        EntityHandlingMode $entityHandling = EntityHandlingMode::Restore,
-    ): string;
-
-    public function unprotect(string $content, bool $isSource): string;
-
-    public function convertForSorting(string $content, bool $isSource): string;
-
-    public function priority(): int;
-
-    /**
-     * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <number> etc) with an internal tag
-     */
-    public function convertToInternalTags(
-        string $segment,
-        int &$shortTagIdent,
-        bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = []
-    ): string;
-
-    public function convertToInternalTagsInChunks(
-        string $segment,
-        int &$shortTagIdent,
-        bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = []
-    ): array;
-
-    public function convertToInternalTagsWithShortcutNumberMap(
-        string $segment,
-        int &$shortTagIdent,
-        array $shortcutNumberMap
-    ): string;
-
-    public function tagList(): array;
+    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void;
 }

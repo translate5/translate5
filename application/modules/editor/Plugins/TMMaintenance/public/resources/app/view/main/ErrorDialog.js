@@ -5,7 +5,7 @@ Ext.define('TMMaintenance.view.main.ErrorDialog', {
     bodyPadding: 20,
     centered: true,
     maximizable: false,
-    width: 300,
+    width: 500,
     bind: {
         title: '{l10n.error.title}',
         html: '{l10n.error.couldNotProcessRequest}',

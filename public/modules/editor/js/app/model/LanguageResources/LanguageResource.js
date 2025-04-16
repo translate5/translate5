@@ -48,6 +48,7 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
     STATUS_NOTLOADED: 'notloaded',
     STATUS_NOVALIDLICENSE: 'novalidlicense',
     STATUS_TUNINGINPROGRESS: 'tuninginprogress',
+    STATUS_CONVERTING: 'converting',
 
     fields: [
         {name: 'id', type: 'int'},
@@ -67,8 +68,7 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         {name: 'deletable', type: 'boolean'},
         {name: 'writeSource', type: 'boolean'},
         {name: 'useAsGlossarySource', critical: true},
-        {name: 'tmNeedsConversion', type: 'boolean'},
-        {name: 'tmConversionInProgress', type: 'boolean'},
+        {name: 'tmConversionState', type: 'string'},
 
         {
             name: 'hasClientAssoc',

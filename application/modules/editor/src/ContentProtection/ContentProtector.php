@@ -68,10 +68,17 @@ class ContentProtector
     private array $protectors;
 
     /**
+     * @var ProtectionTagsFilterInterface[]
+     */
+    private array $tagFilters;
+
+    /**
      * @param  ProtectorInterface[] $protectors
      */
-    public function __construct(array $protectors)
+    public function __construct(array $protectors, array $tagFilters)
     {
+        $this->tagFilters = $tagFilters;
+
         foreach ($protectors as $protector) {
             $this->protectors[$protector::alias()] = $protector;
         }
@@ -97,10 +104,15 @@ class ContentProtector
     {
         $whitespace ??= new Whitespace();
 
-        return new self([
-            NumberProtector::create(),
-            new WhitespaceProtector($whitespace),
-        ]);
+        return new self(
+            [
+                NumberProtector::create(),
+                new WhitespaceProtector($whitespace),
+            ],
+            [
+                ProtectionTagsFilter::create(),
+            ]
+        );
     }
 
     public function resetShortcutMap(): void
@@ -123,8 +135,8 @@ class ContentProtector
             return [$source, $target];
         }
 
-        foreach ($this->protectors as $protector) {
-            $protector->filterTags($source, $target);
+        foreach ($this->tagFilters as $filter) {
+            $filter->filterTags($source, $target);
         }
 
         return [$source, $target];
@@ -140,8 +152,8 @@ class ContentProtector
             return;
         }
 
-        foreach ($this->protectors as $protector) {
-            $protector->filterTagsInChunks($sourceChunks, $targetChunks);
+        foreach ($this->tagFilters as $filter) {
+            $filter->filterTagsInChunks($sourceChunks, $targetChunks);
         }
     }
 

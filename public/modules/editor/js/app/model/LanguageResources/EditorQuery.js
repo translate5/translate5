@@ -46,8 +46,7 @@ Ext.define('Editor.model.LanguageResources.EditorQuery', {
     {name: 'segmentId', type: 'string'},
     {name: 'state', type: 'string'},
     {name: 'metadata'},
-    {name: 'tmNeedsConversion', type: 'bool'},
-    {name: 'tmConversionInProgress', type: 'bool'}
+    {name: 'tmConversionState', type: 'string'}
   ],
   SERVER_STATUS_LOADED:'loaded',
   SERVER_STATUS_LOADING: 'loading',
