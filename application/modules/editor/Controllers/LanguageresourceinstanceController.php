@@ -1601,7 +1601,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
         $this->view->languageResourceId = $this->entity->getId();
         $this->view->resourceType = $this->entity->getResourceType();
-        $this->view->rows = $result->getResult();
+        $this->view->rows = array_values($result->getResult());
 
         $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
