@@ -338,6 +338,9 @@ class TmConversionService implements TmConversionServiceInterface
 
     public function convertPair(string $source, string $target, int $sourceLang, int $targetLang): array
     {
+        $source = $this->convertT5MemoryTagToContent($source);
+        $target = $this->convertT5MemoryTagToContent($target);
+
         $protectedSource = $this->contentProtector->protect(
             $source,
             true,
@@ -370,8 +373,6 @@ class TmConversionService implements TmConversionServiceInterface
         Language $targetLang,
         int &$brokenTus,
     ): string {
-        $transUnit = $this->convertT5MemoryTagToContent($transUnit);
-
         $sourceSegment = '';
         $targetSegment = '';
 

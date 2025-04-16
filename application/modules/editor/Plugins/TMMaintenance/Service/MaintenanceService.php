@@ -34,6 +34,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as SegmentModel;
 use editor_Models_Task as Task;
 use editor_Services_OpenTM2_Connector as T5MemoryConnector;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
@@ -68,6 +69,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     private T5MemoryConnector $t5MemoryConnector;
 
+    private readonly TmConversionService $tmConversionService;
+
     public function __construct()
     {
         \editor_Services_Connector_Exception::addCodes([
@@ -84,6 +87,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
         \ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
         $this->t5MemoryConnector = new T5MemoryConnector();
+        $this->tmConversionService = TmConversionService::create();
+
         parent::__construct();
     }
 
@@ -522,6 +527,13 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         string $fileName,
         string $memoryName,
     ): void {
+        [$source, $target] = $this->tmConversionService->convertPair(
+            $source,
+            $target,
+            (int) $this->languageResource->getSourceLang(),
+            (int) $this->languageResource->getTargetLang(),
+        );
+
         $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
 
         if ($successful) {

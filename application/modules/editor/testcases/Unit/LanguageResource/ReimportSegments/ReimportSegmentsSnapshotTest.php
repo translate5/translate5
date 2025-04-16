@@ -37,7 +37,6 @@ use editor_Models_Task as Task;
 use editor_Services_Manager;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReApplyProtectionRules;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsProvider;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsSnapshot;
@@ -57,8 +56,6 @@ class ReimportSegmentsSnapshotTest extends TestCase
 
     private ReimportSegmentsProvider|MockObject $reimportSegmentsProviderMock;
 
-    private ReApplyProtectionRules|MockObject $reApplyProtectionRulesMock;
-
     private ReimportSegmentsSnapshot $snapshot;
 
     protected function setUp(): void
@@ -67,14 +64,12 @@ class ReimportSegmentsSnapshotTest extends TestCase
         $this->segmentsRepositoryMock = $this->createMock(ReimportSegmentRepositoryInterface::class);
         $this->languageResourceRepositoryMock = $this->createMock(LanguageResourceRepository::class);
         $this->reimportSegmentsProviderMock = $this->createMock(ReimportSegmentsProvider::class);
-        $this->reApplyProtectionRulesMock = $this->createMock(ReApplyProtectionRules::class);
 
         $this->snapshot = new ReimportSegmentsSnapshot(
             $this->serviceManagerMock,
             $this->segmentsRepositoryMock,
             $this->languageResourceRepositoryMock,
             $this->reimportSegmentsProviderMock,
-            $this->reApplyProtectionRulesMock,
         );
     }
 
@@ -135,10 +130,6 @@ class ReimportSegmentsSnapshotTest extends TestCase
                     return $segmentMock === $segmentMock1 ? $updateDTOMock1 : $updateDTOMock2;
                 }
             );
-
-        $this->reApplyProtectionRulesMock->method('reApplyRules')->willReturnCallback(
-            static fn (UpdateSegmentDTO $updateDTO) => $updateDTO
-        );
 
         $i = 0;
         $this->segmentsRepositoryMock->expects(self::exactly(2))

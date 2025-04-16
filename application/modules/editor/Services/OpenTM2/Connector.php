@@ -1148,7 +1148,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      *
      * @return integer
      */
-    private function calculateMatchRate($matchRate, $metaData, $segment, $filename)
+    protected function calculateMatchRate($matchRate, $metaData, $segment, $filename)
     {
         if ($matchRate < 100) {
             return $matchRate;
@@ -2133,7 +2133,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $t5memoryName;
     }
 
-    private function getSegmentContext(editor_Models_Segment $segment): string
+    protected function getSegmentContext(editor_Models_Segment $segment): string
     {
         return $segment->meta()->getSegmentDescriptor()
             ?: self::SEGMENT_NR_CONTEXT_PREFIX . $segment->getSegmentNrInTask();
