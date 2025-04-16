@@ -237,8 +237,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
 
+        $lastMemoryId = 0;
+
+        if (! empty($memories)) {
+            $lastMemoryId = end($memories)['id'];
+        }
+
         $memories[] = [
-            'id' => count($memories) + 1,
+            'id' => $lastMemoryId + 1,
             'filename' => $tmName,
             'readonly' => false,
         ];
@@ -325,6 +331,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                     'Conversion: Error in process of TMX file conversion',
                     [
                         'reason' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
                         'languageResource' => $this->languageResource,
                     ]
                 );

@@ -196,8 +196,6 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
                 $this->rollback($connector);
 
-                @unlink($exportFilename);
-
                 return false;
             }
 

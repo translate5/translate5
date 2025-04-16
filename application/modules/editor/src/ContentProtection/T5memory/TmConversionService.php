@@ -245,7 +245,8 @@ class TmConversionService implements TmConversionServiceInterface
                     $numberTagMap[$tagProps['regex']][$tag]->enqueue($currentId);
                 } else {
                     $ids = $numberTagMap[$tagProps['regex']][$tag] ?? null;
-                    $currentId = $ids?->dequeue() ?: $currentId;
+
+                    $currentId = null !== $ids && ! $ids->isEmpty() ? $ids->dequeue() : $currentId;
                 }
 
                 $t5nTag = new T5NTag($currentId, $tagProps['regex'], $protectedContent);
