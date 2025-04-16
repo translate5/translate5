@@ -44,6 +44,6 @@ class DeleteDTO
     {
         $data = json_decode($request->getParam('data'), true, flags: JSON_THROW_ON_ERROR);
 
-        return new self($data['id'], $data['internalKey']);
+        return new self($data['metaData']['segmentId'], $data['internalKey']);
     }
 }
