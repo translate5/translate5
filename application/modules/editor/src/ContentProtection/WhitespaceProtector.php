@@ -92,16 +92,6 @@ class WhitespaceProtector implements ProtectorInterface
         return (bool) preg_match(sprintf("/<(%s)\s?/", implode('|', $this->whitespace->validTags())), $textNode);
     }
 
-    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void
-    {
-        // Nothing to do here
-    }
-
-    public function filterTags(string &$source, string &$target): void
-    {
-        // Nothing to do here
-    }
-
     public function protect(
         string $textNode,
         bool $isSource = true,

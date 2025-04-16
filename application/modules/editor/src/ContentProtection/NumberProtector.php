@@ -100,9 +100,9 @@ class NumberProtector implements ProtectorInterface
      */
     public function __construct(
         array $protectors,
-        private ContentProtectionRepository $numberRepository,
-        private LanguageRepository $languageRepository,
-        private ZfExtended_Logger $logger,
+        private readonly ContentProtectionRepository $numberRepository,
+        private readonly LanguageRepository $languageRepository,
+        private readonly ZfExtended_Logger $logger,
     ) {
         foreach ($protectors as $protector) {
             $this->protectors[$protector::getType()] = $protector;
@@ -447,91 +447,6 @@ class NumberProtector implements ProtectorInterface
         $tagObj->renderTag(title: '&lt;' . $shortTagNumber . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
 
         return $tagObj;
-    }
-
-    public function filterTags(string &$source, string &$target): void
-    {
-        if ('' === $target || '' === $source) {
-            return;
-        }
-
-        preg_match_all(self::fullTagRegex(), $source, $sourceMatches, PREG_SET_ORDER);
-        preg_match_all(self::fullTagRegex(), $target, $targetMatches, PREG_SET_ORDER);
-
-        if (! empty($sourceMatches) && empty($targetMatches)) {
-            $source = $this->unprotect($source, true);
-
-            return;
-        }
-
-        if (empty($sourceMatches) && ! empty($targetMatches)) {
-            $target = $this->unprotect($target, true);
-
-            return;
-        }
-
-        if (empty($sourceMatches) && empty($targetMatches)) {
-            return;
-        }
-
-        foreach ($sourceMatches as $sourceMatch) {
-            // needle = type + iso + target
-            $sourceNeedle = $sourceMatch[1] . ':' . $sourceMatch[4] . ':' . $sourceMatch[5];
-            foreach ($targetMatches as $key => $targetMatch) {
-                $targetNeedle = $targetMatch[1] . ':' . $targetMatch[4] . ':' . $targetMatch[5];
-
-                if ($sourceNeedle === $targetNeedle) {
-                    $target = str_replace($targetMatch[0], $sourceMatch[0], $target);
-                    unset($targetMatches[$key]);
-
-                    continue 2;
-                }
-            }
-
-            $source = str_replace($sourceMatch[0], $sourceMatch[3], $source);
-        }
-
-        foreach ($targetMatches as $targetMatch) {
-            $target = str_replace($targetMatch[0], $targetMatch[3], $target);
-        }
-    }
-
-    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void
-    {
-        if (empty($sourceChunks) || empty($targetChunks)) {
-            return;
-        }
-
-        $sourceTags = $targetTags = [];
-
-        foreach ($sourceChunks as $key => $sourceChunk) {
-            if ($sourceChunk instanceof NumberTag) {
-                $sourceTags[$key] = $sourceChunk;
-            }
-        }
-
-        foreach ($targetChunks as $key => $targetChunk) {
-            if ($targetChunk instanceof NumberTag) {
-                $targetTags[$key] = $targetChunk;
-            }
-        }
-
-        foreach ($sourceTags as $sourceKey => $sourceTag) {
-            foreach ($targetTags as $targetKey => $targetTag) {
-                if ($sourceTag->equals($targetTag)) {
-                    $targetChunks[$targetKey] = clone $sourceTag;
-                    unset($targetTags[$targetKey]);
-
-                    continue 2;
-                }
-            }
-
-            $sourceChunks[$sourceKey] = $sourceTag->source;
-        }
-
-        foreach ($targetTags as $targetKey => $targetTag) {
-            $targetChunks[$targetKey] = $targetTag->source;
-        }
     }
 
     private function protectInText(

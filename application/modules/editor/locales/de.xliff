@@ -9704,6 +9704,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Konvertierung läuft</source>
                 <target>Konvertierung läuft</target>
             </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBnZXBsYW50'>
+                <source>Konvertierung geplant</source>
+                <target>Konvertierung geplant</target>
+            </trans-unit>
             <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRlbiBBdWZnYWJlbmltcG9ydA=='>
                 <source>Bestätigen Sie den Aufgabenimport</source>
                 <target>Bestätigen Sie den Aufgabenimport</target>
@@ -10462,6 +10466,10 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
             <trans-unit id="Sm9icw==">
                 <source>Jobs</source>
                 <target>Jobs</target>
+            </trans-unit>
+            <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
+                <source>language_resource.status.conversion_scheduled</source>
+                <target>Umwandlung geplant</target>
             </trans-unit>
         </body>
     </file>

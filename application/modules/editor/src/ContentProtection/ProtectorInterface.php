@@ -62,10 +62,6 @@ interface ProtectorInterface
 
     public function hasTagsToConvert(string $textNode): bool;
 
-    public function filterTags(string &$source, string &$target): void;
-
-    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void;
-
     public function protect(
         string $textNode,
         bool $isSource,

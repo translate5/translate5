@@ -9878,6 +9878,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Konvertierung läuft</source>
                 <target>Conversion in progress</target>
             </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBnZXBsYW50'>
+                <source>Konvertierung geplant</source>
+                <target>Conversion scheduled</target>
+            </trans-unit>
             <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRlbiBBdWZnYWJlbmltcG9ydA=='>
                 <source>Bestätigen Sie den Aufgabenimport</source>
                 <target>Confirm task import</target>
@@ -10662,6 +10666,10 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
             <trans-unit id="Sm9icw==">
                 <source>Jobs</source>
                 <target>jobs</target>
+            </trans-unit>
+            <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
+                <source>language_resource.status.conversion_scheduled</source>
+                <target>Conversion scheduled</target>
             </trans-unit>
         </body>
     </file>

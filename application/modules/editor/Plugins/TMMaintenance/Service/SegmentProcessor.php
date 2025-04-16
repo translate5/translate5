@@ -41,6 +41,7 @@ use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
 use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO as T5DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO as T5SearchDTO;
 use ZfExtended_Factory;
+use ZfExtended_Utils;
 
 final class SegmentProcessor
 {
@@ -71,7 +72,7 @@ final class SegmentProcessor
 
             $data = array_map(static function (array $item) use ($getListDto) {
                 $item['internalKey'] = $getListDto->tmId . ':' . $item['metaData']['internalKey'];
-                $item['id'] = $item['metaData']['segmentId'];
+                $item['id'] = ZfExtended_Utils::uuid();
 
                 return $item;
             }, $data);

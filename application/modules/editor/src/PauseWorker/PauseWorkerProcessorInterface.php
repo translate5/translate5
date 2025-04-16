@@ -41,7 +41,7 @@ interface PauseWorkerProcessorInterface
      * Shows if the worker should wait and then check again
      * If false - the pause worker should be finished
      */
-    public function shouldWait(Task $task): bool;
+    public function getWaitingStrategy(Task $task): WaitingStrategy;
 
     /**
      * Shows maximum amount of time the worker should wait until finished

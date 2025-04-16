@@ -50,46 +50,11 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
+namespace MittagQI\Translate5\ContentProtection;
 
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
-
-class ReApplyProtectionRules
+interface ProtectionTagsFilterInterface
 {
-    public function __construct(
-        private readonly TmConversionService $tmConversionService,
-    ) {
-    }
+    public function filterTags(string &$source, string &$target): void;
 
-    public static function create(): self
-    {
-        return new self(
-            TmConversionService::create(),
-        );
-    }
-
-    public function reApplyRules(UpdateSegmentDTO $dto, int $sourceLang, int $targetLang): UpdateSegmentDTO
-    {
-        $source = $this->tmConversionService->convertT5MemoryTagToContent($dto->source);
-        $target = $this->tmConversionService->convertT5MemoryTagToContent($dto->target);
-
-        [$source, $target] = $this->tmConversionService->convertPair(
-            $source,
-            $target,
-            $sourceLang,
-            $targetLang
-        );
-
-        return new UpdateSegmentDTO(
-            $dto->taskGuid,
-            $dto->segmentId,
-            $source,
-            $target,
-            $dto->fileName,
-            $dto->timestamp,
-            $dto->userName,
-            $dto->context,
-        );
-    }
+    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void;
 }

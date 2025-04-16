@@ -69,9 +69,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
      * @param string $role the affected workflow role string
      * @param string $template the template name
      */
-    protected function getMailTemplate(string $role, string $template)
+    protected function getMailTemplate(string $role, string $template, string $customPart = ''): string
     {
-        return 'workflow/' . $role . '/' . $template . '.phtml';
+        return 'workflow/' . $role . '/' . (! empty($customPart) ? ($customPart . '/') : '') . $template . '.phtml';
     }
 
     /**
@@ -108,12 +108,20 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
 
     /**
      * creates the Notification and stores it internally
+     * @throws Zend_Exception|ReflectionException
      */
-    protected function createNotification(string $role, string $template, array $parameters)
+    protected function createNotification(string $role, string $template, array $parameters): void
     {
         $this->mailer = ZfExtended_Factory::get('ZfExtended_TemplateBasedMail');
         $this->mailer->setParameters($parameters);
-        $this->mailer->setTemplate($this->getMailTemplate($role, $template));
+
+        $defaultTemplate = $this->getMailTemplate($role, $template);
+        $customerBasedTemplate = $this->getMailTemplate($role, $template, $this->config->task?->getCustomerId());
+        if ($this->mailer->hasCustomTemplate($customerBasedTemplate)) {
+            $defaultTemplate = $customerBasedTemplate;
+        }
+        $this->mailer->setTemplate($defaultTemplate);
+
         $pm = $this->getTaskPmUsers();
         $pm = array_shift($pm);
         // Add reply-to with project-manager mail to all automated workflow-mails
@@ -394,6 +402,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
     /**
      * Sends a notification to users which are attached newly to a task with status open
      * The User to be notified is gathered from the current active TaskUserAssociation
+     * @throws Zend_Exception
      */
     public function notifyNewTaskAssigned()
     {
@@ -408,8 +417,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
             return;
         }
 
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         $pm = clone $user;
         $pm->loadByGuid($this->config->task->getPmGuid());
         $user->loadByGuid($tua->getUserGuid());

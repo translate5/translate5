@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,22 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Plugins\TMMaintenance\DTO;
+namespace MittagQI\Translate5\LanguageResource\Exception;
 
-use Zend_Controller_Request_Abstract as Request;
-
-class DeleteDTO
+class CannotScheduleAlreadyStartedConversionException extends \Exception
 {
     public function __construct(
-        public readonly int $id,
-        public readonly string $internalKey
+        public readonly int $languageResourceId,
     ) {
-    }
-
-    public static function fromRequest(Request $request): self
-    {
-        $data = json_decode($request->getParam('data'), true, flags: JSON_THROW_ON_ERROR);
-
-        return new self($data['metaData']['segmentId'], $data['internalKey']);
+        parent::__construct(
+            sprintf(
+                'Cannot schedule conversion for language resource %d, because it is already started.',
+                $languageResourceId
+            )
+        );
     }
 }

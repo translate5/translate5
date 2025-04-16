@@ -12,7 +12,6 @@
         "timestamp": "TEST_TIMESTAMP",
         "penaltyGeneral": 0,
         "penaltySublang": 0,
-        "tmNeedsConversion": false,
-        "tmConversionInProgress": false
+        "tmConversionState": "converted"
     }
 ]

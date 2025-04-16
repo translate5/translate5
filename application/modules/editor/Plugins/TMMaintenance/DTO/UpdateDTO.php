@@ -50,7 +50,7 @@ class UpdateDTO
         $data = json_decode($request->getParam('data'), true, flags: JSON_THROW_ON_ERROR);
 
         return new self(
-            (int) $data['id'],
+            (int) $data['metaData']['segmentId'],
             $data['internalKey'],
             (int) $data['languageResourceid'],
             $data['source'],

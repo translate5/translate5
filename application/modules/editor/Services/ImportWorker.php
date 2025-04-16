@@ -73,19 +73,17 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract
 
     public function work(): bool
     {
-        return $this->doImport();
-    }
-
-    /**
-     * Import languaeg resources file from the upload file
-     */
-    protected function doImport(): bool
-    {
         $params = $this->workerModel->getParameters();
 
         $this->languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
         $this->languageResource->load($params['languageResourceId']);
+
+        while ($this->languageResource->isConversionStarted()) {
+            sleep(30);
+            // Refresh the language resource to get the latest status
+            $this->languageResource->refresh();
+        }
 
         $connector = $this->getConnector($this->languageResource);
 

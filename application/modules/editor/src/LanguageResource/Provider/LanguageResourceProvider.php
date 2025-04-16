@@ -37,10 +37,6 @@ class LanguageResourceProvider
             $taskAssoc->filterAndSort($filter);
         }
 
-        $getResource = function (string $serviceType, string $id) {
-            return $this->serviceManager->getResourceById($serviceType, $id);
-        };
-
         /**
          * TODO: Extract method @see TaskAssociation::loadByAssociatedTaskAndLanguage() into a separate class
          */
@@ -60,12 +56,8 @@ class LanguageResourceProvider
                 $languageResource['isTaskTm'] = ($languageResource['isTaskTm'] ?? 0) === '1';
 
                 if (editor_Services_Manager::SERVICE_OPENTM2 === $languageResource['serviceType']) {
-                    $languageResource['tmNeedsConversion'] = ! $this->tmConversionService->isTmConverted(
-                        $languageResource['languageResourceId']
-                    );
-                    $languageResource['tmConversionInProgress'] = $this->tmConversionService->isConversionInProgress(
-                        $languageResource['languageResourceId']
-                    );
+                    $lrId = (int) $languageResource['languageResourceId'];
+                    $languageResource['tmConversionState'] = $this->tmConversionService->getConversionState($lrId)->value;
                 }
 
                 $available[] = $languageResource;

@@ -52,19 +52,24 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\Model;
 
+use editor_Models_Db_LanguageResources_LanguageResource;
+use editor_Models_Db_LanguageResources_Languages;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_LanguageResources_Languages as LRLanguages;
 use editor_Models_Languages as Languages;
 use editor_Services_Manager;
+use MittagQI\Translate5\ContentProtection\DTO\RulesHashDto;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceContentProtector;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 use Zend_Db_Table_Select;
 use ZfExtended_Factory;
 
 class ContentProtectionRepository
 {
     public function __construct(
+        private readonly Zend_Db_Adapter_Abstract $db,
         private readonly LanguageRepository $languageRepository,
     ) {
     }
@@ -75,6 +80,7 @@ class ContentProtectionRepository
     public static function create(): self
     {
         return new self(
+            Zend_Db_Table::getDefaultAdapter(),
             LanguageRepository::create(),
         );
     }
@@ -382,32 +388,16 @@ class ContentProtectionRepository
     }
 
     /**
-     * @return array<int, array{languages: array{source: int, target: int}, hash: string|null}>
+     * @return array<int, RulesHashDto>
      */
     public function getLanguageResourceRulesHashMap(): array
     {
-        $db = ZfExtended_Factory::get(LanguageResource::class)->db;
-        $dbLRLanguages = ZfExtended_Factory::get(LRLanguages::class)->db;
-        $lrLanguagesTable = $dbLRLanguages->info($dbLRLanguages::NAME);
-
-        $select = $db->select()
-            ->setIntegrityCheck(false)
-            ->from([
-                'LanguageResource' => $db->info($db::NAME),
-            ], ['id', 'specificData'])
-            ->join(
-                [
-                    'LRLanguages' => $lrLanguagesTable,
-                ],
-                'LRLanguages.languageResourceId = LanguageResource.id',
-                ['LRLanguages.sourceLang', 'LRLanguages.targetLang']
-            )
-            ->where('LanguageResource.serviceType = ?', editor_Services_Manager::SERVICE_OPENTM2);
+        $select = $this->getBaseRuleHashSelect();
 
         $hashes = [];
 
         /** @var array{id: int, specificData: string, sourceLang: string, targetLang: string} $row */
-        foreach ($db->fetchAll($select) as $row) {
+        foreach ($this->db->fetchAll($select) as $row) {
             $id = $row['id'];
             if (! isset($hashes[$id])) {
                 $hashes[$id] = [];
@@ -415,12 +405,16 @@ class ContentProtectionRepository
 
             $specificData = $row['specificData'] ? json_decode($row['specificData'], true) : [];
 
-            $hashes[$id]['languages'] = [
-                'source' => (int) $row['sourceLang'],
-                'target' => (int) $row['targetLang'],
-            ];
-            $hashes[$id]['hash'] = $specificData[LanguageResource::PROTECTION_HASH] ?? null;
-            $hashes[$id]['conversionStarted'] = $specificData[LanguageResource::PROTECTION_CONVERSION_STARTED] ?? null;
+            $hashes[$id] = new RulesHashDto(
+                (int) $id,
+                [
+                    'source' => (int) $row['sourceLang'],
+                    'target' => (int) $row['targetLang'],
+                ],
+                $specificData[LanguageResource::PROTECTION_HASH] ?? null,
+                (bool) ($specificData[LanguageResource::PROTECTION_CONVERSION_SCHEDULED] ?? null),
+                (bool) ($specificData[LanguageResource::PROTECTION_CONVERSION_STARTED] ?? null),
+            );
         }
 
         return $hashes;
@@ -448,5 +442,22 @@ class ContentProtectionRepository
             ->where('recognition.enabled = true')
             ->where('recognition.keepAsIs = true')
             ->order('priority desc');
+    }
+
+    private function getBaseRuleHashSelect(): \Zend_Db_Select
+    {
+        return $this->db
+            ->select()
+            ->from([
+                'LanguageResource' => editor_Models_Db_LanguageResources_LanguageResource::TABLE_NAME,
+            ], ['id', 'specificData'])
+            ->join(
+                [
+                    'LRLanguages' => editor_Models_Db_LanguageResources_Languages::TABLE_NAME,
+                ],
+                'LRLanguages.languageResourceId = LanguageResource.id',
+                ['LRLanguages.sourceLang', 'LRLanguages.targetLang']
+            )
+            ->where('LanguageResource.serviceType = ?', editor_Services_Manager::SERVICE_OPENTM2);
     }
 }

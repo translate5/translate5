@@ -28,22 +28,25 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Plugins\TMMaintenance\DTO;
+namespace MittagQI\Translate5\Plugins\TMMaintenance\Exception;
 
-use Zend_Controller_Request_Abstract as Request;
+use ZfExtended_ErrorCodeException;
 
-class DeleteDTO
+class ErrorException extends ZfExtended_ErrorCodeException
 {
-    public function __construct(
-        public readonly int $id,
-        public readonly string $internalKey
-    ) {
-    }
+    use \ZfExtended_ResponseExceptionTrait;
 
-    public static function fromRequest(Request $request): self
-    {
-        $data = json_decode($request->getParam('data'), true, flags: JSON_THROW_ON_ERROR);
+    protected static $localErrorCodes = [
+        'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
+        'E1333' => 'The queried OpenTM2 server has to many open TMs!',
+        'E1306' => 'Could not save segment to TM',
+        'E1688' => 'Could not delete segment',
+        'E1377' => 'Memory status: {status}. Please try again in a while.',
+        'E1616' => 'T5Memory server version serving the selected memory is not supported',
+        'E1611' => 't5memory: Requested segment not found. Probably it was deleted.',
+        'E1612' => 't5memory: Found segment id differs from the requested one, ' .
+            'probably it was deleted or edited meanwhile. Try to refresh your search.',
+    ];
 
-        return new self($data['metaData']['segmentId'], $data['internalKey']);
-    }
+    protected $httpReturnCode = 422;
 }

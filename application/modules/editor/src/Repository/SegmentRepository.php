@@ -76,6 +76,14 @@ class SegmentRepository
         return new self(Zend_Db_Table::getDefaultAdapter());
     }
 
+    public function get(int $id): \editor_Models_Segment
+    {
+        $segment = new \editor_Models_Segment();
+        $segment->load($id);
+
+        return $segment;
+    }
+
     /**
      * @return iterable<SegmentView>
      */

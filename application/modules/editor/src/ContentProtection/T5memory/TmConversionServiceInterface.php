@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection\T5memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\ContentProtection\ConversionState;
 
 interface TmConversionServiceInterface
 {
@@ -38,9 +39,9 @@ interface TmConversionServiceInterface
 
     public function isTmConverted(int $languageResourceId): bool;
 
-    public function isConversionInProgress(int $languageResourceId): bool;
+    public function getConversionState(int $languageResourceId): ConversionState;
 
-    public function startConversion(int $languageResourceId): void;
+    public function scheduleConversion(int $languageResourceId): void;
 
     public function convertT5MemoryTagToContent(string $string): string;
 
