@@ -62,6 +62,8 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setLockingUser(string $guid)
  * @method string getPmGuid()
  * @method void setPmGuid(string $guid)
+ * @method string getCreatedByUserGuid()
+ * @method void setCreatedByUserGuid(string $guid)
  * @method string getPmName()
  * @method void setPmName(string $guid)
  * @method string getState()

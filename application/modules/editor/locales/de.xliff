@@ -3285,6 +3285,24 @@
                     <br />
                 </target>
             </trans-unit>
+            <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZWluIG5ldWVzIHtwcm9qZWN0VHlwZX0gZXJzdGVsbHQuPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBJRDo8L3N0cm9uZz4ge3Byb2plY3RJZH0gPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBOYW1lOjwvc3Ryb25nPiB7cHJvamVjdE5hbWV9'>
+                <source>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName}
+                </source>
+                <target>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName} <br />
+                </target>
+            </trans-unit>
+            <trans-unit id='ZGllIG1lbnNjaGxpY2hlIFJldmlzaW9uIGRlciBEYXRlaSB7ZmlsZU5hbWV9IHd1cmRlIGJlZW5kZXQgdW5kIHN0ZWh0IHVudGVyIHt1cmx9IGFscyBEb3dubG9hZCB6dXIgVmVyZsO8Z3VuZy4='>
+                <source>die menschliche Revision der Datei {fileName} wurde beendet und steht unter {url} als Download zur Verfügung.</source>
+                <target>die menschliche Revision der Datei "{fileName}" wurde beendet und steht unter {url} als Download zur Verfügung.</target>
+            </trans-unit>
+            <trans-unit id='VHJhbnNsYXRlNSAtIFByb2pla3QgZXJzdGVsbHQ='>
+                <source>Translate5 - Projekt erstellt</source>
+                <target>Translate5 - Projekt erstellt</target>
+            </trans-unit>
             <trans-unit id='QWxsZSBCZW51dHplciBkZXIgYWt0dWVsbGVuIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+Ogp7Y3VycmVudFVzZXJzfTxici8+Cg=='>
                 <source>Alle Benutzer der aktuellen Rolle 
                     <i>{currentRole}</i>:
@@ -8939,6 +8957,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='SW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0'>
                 <source>InstantTranslateWriteTm</source>
                 <target>Instant-Translate TM schreiben(nur API)</target>
+            </trans-unit>
+            <trans-unit id='SW5zdGFudFRyYW5zbGF0ZUh1bWFuUmV2aXNpb25BbGxvd2Vk'>
+                <source>InstantTranslateHumanRevisionAllowed</source>
+                <target>InstantTranslate (menschliche Revision erlaubt)</target>
             </trans-unit>
             <trans-unit id='UmVmZXJlbnotRGF0ZWkoZW4p'>
                 <source>Referenz-Datei(en)</source>

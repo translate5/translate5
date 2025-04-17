@@ -653,6 +653,8 @@ class editor_TaskController extends ZfExtended_RestController
             $this->data['autoStartImport'] = true;
         }
 
+        $this->data['createdByUserGuid'] = $this->authenticatedUser->getUserGuid();
+
         if (empty($this->data['pmGuid']) || ! $this->isAllowed(Rights::ID, 'editorEditTaskPm')) {
             $this->data['pmGuid'] = $this->authenticatedUser->getUserGuid();
             $this->data['pmName'] = $this->authenticatedUser->getUsernameLong();

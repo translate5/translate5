@@ -94,6 +94,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
         $this->addValidator('projectId', 'int');
         $this->addValidator('diffExportUsable', 'int');
         $this->addValidator('reimportable', 'int');
+        $this->addValidator('createdByUserGuid', 'guid');
         $this->addValidatorsForCustomFields();
     }
 

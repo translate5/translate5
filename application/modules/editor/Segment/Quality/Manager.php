@@ -50,7 +50,7 @@ final class editor_Segment_Quality_Manager
      * This Operation usually tag's terms and spellchecks and may needs a while
      * @throws editor_Task_Operation_Exception
      */
-    public static function autoqaOperation(editor_Models_Task $task)
+    public static function autoqaOperation(editor_Models_Task $task): int
     {
         // check if the current tsak state allows operations
         $task->checkStateAllowsActions();
@@ -78,6 +78,8 @@ final class editor_Segment_Quality_Manager
 
             throw $e;
         }
+
+        return $operation->getWorkerId();
     }
 
     /**
