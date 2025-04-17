@@ -105,10 +105,18 @@ class editor_Workflow_Default_Hooks
 
     protected $validDirectTrigger = [
         'notifyAllUsersAboutTaskAssociation',
+        'finishPrintApprovalJobs1',
+        'finishWaitingPdfJob1',
     ];
 
     public function __construct(editor_Workflow_Default $workflow)
     {
+        for ($i = 2; $i <= 10; $i++) {
+            $this->validDirectTrigger[] = 'nextPdfReviewIteration' . $i;
+            $this->validDirectTrigger[] = 'finishPrintApprovalJobs' . $i;
+            $this->validDirectTrigger[] = 'finishWaitingPdfJob' . $i;
+        }
+
         $this->workflow = $workflow;
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [__CLASS__]);

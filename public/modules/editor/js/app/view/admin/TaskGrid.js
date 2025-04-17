@@ -829,6 +829,41 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }]
         };
 
+        if(Editor.app.authenticatedUser.isAllowed('showForeignFields')) {
+            config.columns.items.unshift(... [{
+                xtype: 'gridcolumn',
+                width: 110,
+                dataIndex: 'foreignId',
+                stateId: 'foreignId',
+                text: 'Foreign ID',
+                hidden: true,
+                filter: {
+                    type: 'string'
+                }
+            },
+            {
+                xtype: 'gridcolumn',
+                width: 110,
+                dataIndex: 'foreignName',
+                stateId: 'foreignName',
+                text: 'Foreign Name',
+                hidden: true,
+                filter: {
+                    type: 'string'
+                }
+            },{
+                xtype: 'gridcolumn',
+                width: 110,
+                dataIndex: 'foreignState',
+                stateId: 'foreignState',
+                text: 'Foreign State',
+                hidden: true,
+                filter: {
+                    type: 'string'
+                }
+            }]);
+        }
+
         if (instanceConfig) {
             config = me.self.getConfigurator().merge(me, config, instanceConfig);
         }

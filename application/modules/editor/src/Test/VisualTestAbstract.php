@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Test;
 
 use editor_Plugins_VisualReview_Init;
-use editor_Plugins_VisualReview_Source_Files;
+use MittagQI\Translate5\Plugins\VisualReview\Source\SourceFiles;
 use stdClass;
 
 /**
@@ -48,9 +48,9 @@ abstract class VisualTestAbstract extends JsonTestAbstract
      */
     protected function getVisualFilesJson(string $jsonFileName)
     {
-        $taskGuid = static::getTask()->getTaskGuid();
+        $taskId = static::getTask()->getId();
 
-        return static::api()->getJson('/editor/plugins_visualreview_visualreview/files?taskGuid=' . urlencode($taskGuid), [], $jsonFileName);
+        return static::api()->getJson('/editor/plugins_visualreview_sourcefile/?taskId=' . $taskId, [], $jsonFileName);
     }
 
     /**
@@ -63,7 +63,7 @@ abstract class VisualTestAbstract extends JsonTestAbstract
     protected function getVisualHtmlFile(bool $isSplitFile = false, int $index = 0)
     {
         $fileName = static::getTask()->getDataDirectory()
-            . editor_Plugins_VisualReview_Source_Files::FOLDER_REVIEW_DEPRICATED
+            . SourceFiles::FOLDER_REVIEW_DEPRECATED
             . '/' . $this->getVisualHtmlFileName($isSplitFile, $index);
         $this->assertFileExists($fileName);
 
@@ -143,7 +143,7 @@ abstract class VisualTestAbstract extends JsonTestAbstract
     protected function assertVisualResourceExists(string $subPath, string $message = '')
     {
         $filePath = static::getTask()->getDataDirectory()
-            . editor_Plugins_VisualReview_Source_Files::FOLDER_REVIEW_DEPRICATED
+            . SourceFiles::FOLDER_REVIEW_DEPRECATED
             . '/' . ltrim($subPath, '/');
         $this->assertFileExists($filePath, $message);
     }

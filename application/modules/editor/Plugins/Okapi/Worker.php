@@ -403,7 +403,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
 
         $realFile = $params['file'];
         $refFolder = $params['importFolder'] . '/' . editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
-        $workfilesDirectory = $params['importFolder'] . '/' . $importConfig->getFilesDirectory();
+        $workfilesDirectory = $params['importFolder'] . '/' . $importConfig->getWorkfilesDirName();
 
         //cut off review folder from realfile:
         $relRealFile = str_replace('#' . realpath($workfilesDirectory), '', '#' . realpath($realFile));

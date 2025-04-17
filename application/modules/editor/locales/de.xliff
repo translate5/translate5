@@ -3339,6 +3339,10 @@
                 <source>visitor</source>
                 <target>Besucher</target>
             </trans-unit>
+            <trans-unit id='dmlzdWFsQXBwcm92ZXI='>
+                <source>visualApprover</source>
+                <target>Visual Approver</target>
+            </trans-unit>
             <trans-unit id='RS1NYWlsIEFkcmVzc2U='>
                 <source>E-Mail Adresse</source>
                 <target>E-Mail Adresse</target>
@@ -3870,6 +3874,14 @@
             <trans-unit id='V29ya2Zsb3cgYWJnZXNjaGxvc3Nlbg=='>
                 <source>Workflow abgeschlossen</source>
                 <target>Workflow abgeschlossen</target>
+            </trans-unit>
+            <trans-unit id='TGVrdG9yYXQ='>
+                <source>Lektorat</source>
+                <target>Lektorat</target>
+            </trans-unit>
+            <trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='>
+                <source>Zweites Lektorat</source>
+                <target>Zweites Lektorat</target>
             </trans-unit>
             <trans-unit id='w5xiZXJzZXR6dW5n'>
                 <source>Übersetzung</source>
@@ -5452,6 +5464,10 @@ Im Projektportal {portalLink} wurde die Aufgabe
             <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='>
                 <source>Keine Aufgaben zugewiesen.</source>
                 <target>Keine Aufgaben zugewiesen.</target>
+            </trans-unit>
+            <trans-unit id='S2VpbmUgQXVmZ2FiZW4gYXVzZ2V3w6RobHQ='>
+                <source>Keine Aufgaben ausgewählt</source>
+                <target>Keine Aufgaben ausgewählt</target>
             </trans-unit>
             <trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNocmVzc291cmNlbg=='>
                 <source>Zugewiesene Sprachressourcen</source>
@@ -10466,6 +10482,10 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
             <trans-unit id="Sm9icw==">
                 <source>Jobs</source>
                 <target>Jobs</target>
+            </trans-unit>
+            <trans-unit id='QmF0Y2gtT3BlcmF0aW9uZW4='>
+                <source>Batch-Operationen</source>
+                <target>Batch-Operationen</target>
             </trans-unit>
             <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
                 <source>language_resource.status.conversion_scheduled</source>

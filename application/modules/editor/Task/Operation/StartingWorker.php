@@ -51,16 +51,24 @@ class editor_Task_Operation_StartingWorker extends editor_Models_Task_AbstractWo
 
     protected function work(): bool
     {
+        $this->setTaskOperationState();
+        $this->triggerOperationStarted();
+
+        return true;
+    }
+
+    protected function setTaskOperationState(): void
+    {
         $this->task->setState($this->operationType);
         $this->task->save();
+    }
 
-        $events = ZfExtended_Factory::get('ZfExtended_EventManager', [get_class($this)]);
-        /* @var $events ZfExtended_EventManager */
+    protected function triggerOperationStarted(): void
+    {
+        $events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [get_class($this)]);
         $events->trigger("operationStarted", $this, [
             'operationType' => $this->operationType,
             'task' => $this->task,
         ]);
-
-        return true;
     }
 }

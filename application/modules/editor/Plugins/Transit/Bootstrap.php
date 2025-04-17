@@ -100,7 +100,7 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract
         $importConfig = $params['config'];
 
         $this->importFolder = $importConfig->importFolder;
-        $this->reviewDirName = $importConfig->getFilesDirectory();
+        $this->reviewDirName = $importConfig->getWorkfilesDirName();
 
         $this->initTransitConfig($worker->getTask());
     }
@@ -115,7 +115,7 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract
         $this->importFolder = $event->getParam('importFolder');
         /* @var editor_Models_Import_Configuration $importConfig */
         $importConfig = $event->getParam('importConfig');
-        $this->reviewDirName = $importConfig->getFilesDirectory();
+        $this->reviewDirName = $importConfig->getWorkfilesDirName();
         if ($this->initTransitConfig($task)) {
             $this->renameTargetFiles('preparation');
         }
@@ -145,7 +145,7 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract
         $importConfig = $params['importConfig'];
         /* @var $importConfig editor_Models_Import_Configuration */
         $this->importFolder = $importConfig->importFolder;
-        $this->reviewDirName = $importConfig->getFilesDirectory();
+        $this->reviewDirName = $importConfig->getWorkfilesDirName();
         $this->renameTargetFiles('cleanup');
     }
 

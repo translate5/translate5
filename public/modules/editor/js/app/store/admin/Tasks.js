@@ -32,12 +32,13 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Store
  */
 Ext.define('Editor.store.admin.Tasks', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.admin.Task',
-  remoteSort: true,
-  remoteFilter: true,
-  autoLoad: false,
-  pageSize: 20,
-  statefulFilters: true,
-  trackStateChanges: true
+    extend : 'Ext.data.Store',
+    model: 'Editor.model.admin.Task',
+    alias: 'store.tasksStore',
+    remoteSort: true,
+    remoteFilter: true,
+    autoLoad: false,
+    pageSize: 20,
+    statefulFilters: true,
+    trackStateChanges: true
 });

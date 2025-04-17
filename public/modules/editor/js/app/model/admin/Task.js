@@ -37,28 +37,41 @@ Ext.define('Editor.model.admin.Task', {
         'Editor.model.admin.TaskUserTracking',
         'Editor.model.TaskConfig'
     ],
-    //currently we have 3 places to define userStates: IndexController for translation, JS Task Model and PHP TaskUserAssoc Model for programmatic usage
-    USER_STATE_OPEN: 'open',
-    USER_STATE_EDIT: 'edit',
-    USER_STATE_VIEW: 'view',
-    USER_STATE_WAITING: 'waiting',
-    USER_STATE_FINISH: 'finished',
-    USER_STATE_AUTO_FINISH: 'auto-finish',
-    USER_STATE_UNCONFIRMED: 'unconfirmed',
 
     statics: {
-        USAGE_MODE_COMPETITIVE: 'competitive',
-        USAGE_MODE_COOPERATIVE: 'cooperative',
-        USAGE_MODE_SIMULTANEOUS: 'simultaneous',
+        states: {
+            ERROR: 'error',
+            IMPORT: 'import',
+            UNCONFIRMED: 'unconfirmed',
+            OPEN: 'open',
+            END: 'end'
+        },
+        operations: {
+            AUTOQA: 'autoqa',
+            IMPORT: 'import',
+            MATCHANALYSIS: 'matchanalysis',
+            PIVOTPRETRANSLATION: 'pivotpretranslation',
+            TAGTERMS: 'tagterms',
+            VISUALEXCHANGE: 'visualexchange'
+        },
+        usageModes: {
+            COMPETITIVE: 'competitive',
+            COOPERATIVE: 'cooperative',
+            SIMULTANEOUS: 'simultaneous'
+        },
+        // currently we have 3 places to define userStates:
+        // IndexController for translation, JS Task Model and PHP TaskUserAssoc Model for programmatic usage
+        userStates: {
+            OPEN: 'open',
+            EDIT: 'edit',
+            VIEW: 'view',
+            WAITING: 'waiting',
+            FINISH: 'finished',
+            AUTO_FINISH: 'auto-finish',
+            UNCONFIRMED: 'unconfirmed',
+        }
     },
 
-    states: {
-        ERROR: 'error',
-        IMPORT: 'import',
-        UNCONFIRMED: 'unconfirmed',
-        OPEN: 'open',
-        END: 'end'
-    },
     fields: [
         {name: 'id', type: 'int'},
         {name: 'taskGuid', type: 'string'},
@@ -209,6 +222,7 @@ Ext.define('Editor.model.admin.Task', {
         }
         return !this.isLocked();
     },
+
     /**
      * returns if task is locked (either by a user or by system)
      * With simultaneous editing the task is also locked, but user should be able to edit, therefore is the isEditable.
@@ -222,6 +236,7 @@ Ext.define('Editor.model.admin.Task', {
         //    (2) add this check either for this.get('locked') or do it extra at all places where needed
         return !!this.get('locked') && this.get('lockingUser') !== Editor.app.authenticatedUser.get('userGuid');
     },
+
     /**
      * returns if task is not in a known state, known are: open, end, import
      * unknown state means in general something is happening with the task, the state itself gives info what this is.
@@ -229,20 +244,23 @@ Ext.define('Editor.model.admin.Task', {
      * @return {Boolean}
      */
     isCustomState: function () {
-        var knownStates = Ext.Object.getValues(this.states);
-        return !Ext.Array.contains(knownStates, this.get('state'));
+        return !Ext.Array.contains(
+            Ext.Object.getValues(Editor.model.admin.Task.states),
+            this.get('state')
+        );
     },
+
     /**
      * must consider also the old value (temporary set to open / edit)
      * @returns {Boolean}
      */
     isFinished: function () {
-        var me = this, finish = me.USER_STATE_FINISH;
+        var me = this, finish = Editor.model.admin.Task.userStates.FINISH;
         return me.modified && me.modified.userState === finish || me.get('userState') === finish;
     },
 
     isAutoFinish: function () {
-        var me = this, autoFinish = me.USER_STATE_AUTO_FINISH;
+        var me = this, autoFinish = Editor.model.admin.Task.userStates.AUTO_FINISH;
         return (me.modified && me.modified.userState === autoFinish) || me.get('userState') === autoFinish;
     },
 
@@ -251,7 +269,7 @@ Ext.define('Editor.model.admin.Task', {
      * @returns {Boolean}
      */
     isWaiting: function () {
-        var me = this, wait = me.USER_STATE_WAITING;
+        var me = this, wait = Editor.model.admin.Task.userStates.WAITING;
         return me.modified && me.modified.userState === wait || me.get('userState') === wait;
     },
     /**
@@ -264,22 +282,23 @@ Ext.define('Editor.model.admin.Task', {
     isPending: function () {
         var me = this,
             state = me.get('userState');
-        return state === me.USER_STATE_VIEW || state === me.USER_STATE_EDIT;
+        return state === Editor.model.admin.Task.userStates.VIEW || state === Editor.model.admin.Task.userStates.EDIT;
     },
     /**
      * returns if task is still in import state
      * @returns {Boolean}
      */
     isImporting: function () {
-        return this.get('state') === this.states.IMPORT;
+        return this.get('state') === Editor.model.admin.Task.states.IMPORT;
     },
     /**
      * returns if task is unconfirmed for the current user
      * @returns {Boolean}
      */
     isUnconfirmed: function () {
-        var me = this, unconfirmed = me.USER_STATE_UNCONFIRMED;
-        if (this.get('state') === this.states.UNCONFIRMED) {
+        var me = this,
+            unconfirmed = Editor.model.admin.Task.userStates.UNCONFIRMED;
+        if (this.get('state') === Editor.model.admin.Task.states.UNCONFIRMED) {
             return true;
         }
         return me.modified && me.modified.userState === unconfirmed || me.get('userState') === unconfirmed;
@@ -292,49 +311,58 @@ Ext.define('Editor.model.admin.Task', {
      * @returns {Boolean}
      */
     isErroneous: function () {
-        return this.get('state') === this.states.ERROR;
+        return this.get('state') === Editor.model.admin.Task.states.ERROR;
     },
     /***
      * Is the task state matchanalysis
      * @returns {boolean}
      */
     isAnalysis: function () {
-        return (this.get('state') === 'matchanalysis');
+        return (this.get('state') === Editor.model.admin.Task.operations.MATCHANALYSIS);
     },
-    /***
-     * Is the task state autoqa (which also applies for being match analysis since the match analysis incorporates an auto qa
+
+    /**
+     * Is the task state autoqa - which also applies for being match analysis since the match analysis
+     * incorporates an auto-qa
      * @returns {boolean}
      */
     isAutoqa: function () {
-        return (this.get('state') === 'autoqa' || this.get('state') === 'matchanalysis');
+        return (this.get('state') === Editor.model.admin.Task.operations.AUTOQA ||
+            this.get('state') === Editor.model.admin.Task.operations.MATCHANALYSIS);
     },
+
     /**
      * Is the task in an operation state, a operation is running
      * @returns {boolean}
      */
     isOperation: function () {
-        return (this.get('state') === 'autoqa' || this.get('state') === 'matchanalysis');
+        return Ext.Array.contains(
+            Ext.Object.getValues(Editor.model.admin.Task.operations),
+            this.get('state')
+        );
     },
 
-    /***
+    /**
      * Is the task state pivotpretranslation
      */
     isPivotPreTranslation: function () {
-        return this.get('state') === 'pivotpretranslation';
+        return this.get('state') === Editor.model.admin.Task.operations.PIVOTPRETRANSLATION;
     },
+
     /**
      * Is the current task state open
      * @returns {Boolean}
      */
     isOpen: function () {
-        return this.get('state') === this.states.OPEN;
+        return this.get('state') === Editor.model.admin.Task.states.OPEN;
     },
+
     /**
      * returns if task is openable
      * @returns {Boolean}
      */
     isOpenable: function () {
-        if (this.get('state') === this.states.IMPORT) {
+        if (this.isOperation()) {
             return false;
         }
         //a user with editorEditAllTasks (normally PMs) can always open the task or if the current loged user is a pm to that project
@@ -356,7 +384,7 @@ Ext.define('Editor.model.admin.Task', {
     isReadOnly: function (ignoreUnconfirmed) {
         var me = this,
             isUnconfirmed = !ignoreUnconfirmed && me.isUnconfirmed();//ingore the unconfirmed state as readonly
-        if (me.get('userRole') === 'visitor' || me.get('userState') === me.USER_STATE_VIEW) {
+        if (me.get('userRole') === 'visitor' || me.get('userState') === Editor.model.admin.Task.userStates.VIEW) {
             return true;
         }
         return !me.isEditable() || me.isFinished() || me.isWaiting() || me.isEnded() || isUnconfirmed || me.isAutoFinish();
@@ -368,7 +396,8 @@ Ext.define('Editor.model.admin.Task', {
      * @returns {string}
      */
     getInitUserState: function () {
-        return this.isReadOnly(false) ? this.USER_STATE_VIEW : this.USER_STATE_EDIT;
+        return this.isReadOnly(false) ?
+            Editor.model.admin.Task.userStates.VIEW : Editor.model.admin.Task.userStates.EDIT;
     },
 
     /**
@@ -376,7 +405,7 @@ Ext.define('Editor.model.admin.Task', {
      * @returns {Boolean}
      */
     isEnded: function () {
-        return this.get('state') === this.states.END;
+        return this.get('state') === Editor.model.admin.Task.states.END;
     },
     /***
      * Is the task not in importing,pending or custom state

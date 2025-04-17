@@ -29,10 +29,10 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Task;
-use editor_Plugins_VisualReview_Init;
-use editor_Plugins_VisualReview_Source_FileEntity;
-use editor_Plugins_VisualReview_Source_Files;
-use stringEncode\Exception;
+use Exception;
+use MittagQI\Translate5\Plugins\VisualReview\Source\SourceFileEntity;
+use MittagQI\Translate5\Plugins\VisualReview\Source\SourceFiles;
+use MittagQI\Translate5\Plugins\VisualReview\Source\SourceType;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -91,7 +91,7 @@ class VisualImplantReflownWysiwyg extends Translate5AbstractCommand
     /**
      * Execute the command
      * {@inheritDoc}
-     * @throws Zend_Exception
+     * @throws \Zend_Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -178,17 +178,17 @@ class VisualImplantReflownWysiwyg extends Translate5AbstractCommand
      * @throws Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    private function fetchFirstVisualSourceFile(int $taskId, string $sourcePdf = null, bool $overwriteWysiwyg = false): editor_Plugins_VisualReview_Source_FileEntity
+    private function fetchFirstVisualSourceFile(int $taskId, string $sourcePdf = null, bool $overwriteWysiwyg = false): SourceFileEntity
     {
         $task = new editor_Models_Task();
         $task->load($taskId);
-        $sourceFiles = editor_Plugins_VisualReview_Source_Files::instance($task);
+        $sourceFiles = SourceFiles::instance($task);
         $sourceFile = $sourceFiles->getFirstFile();
         if (empty($sourceFile)) {
             throw new Exception('No first source file found for task ' . $taskId);
         }
         $sourceFileId = $sourceFile->getId();
-        if ($sourceFile->getSourceType() != editor_Plugins_VisualReview_Init::SOURCETYPE_PDF) {
+        if ($sourceFile->getSourceType() !== SourceType::PDF) {
             throw new Exception('Task ' . $taskId . ', visual file ' . $sourceFileId . ', has no visual source-file of type "PDF"');
         }
         if ($sourcePdf === null) {

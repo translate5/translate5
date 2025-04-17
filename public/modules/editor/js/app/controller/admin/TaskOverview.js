@@ -47,7 +47,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         'admin.WorkflowSteps',
         'admin.Workflow'
     ],
-    views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow', 'admin.task.BatchSetWindow', 'StatefulWindow'],
+    views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow',
+        'admin.task.batchSet.BatchSetDeadlineWindow', 'StatefulWindow'],
     refs: [{
         ref: 'taskAddForm',
         selector: '#adminTaskAddWindow form'
@@ -589,7 +590,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     batchSetPropsShow: function () {
-        Ext.widget('adminTaskBatchSetWindow').show();
+        Ext.widget('adminTaskBatchSetDeadlineWindow').show();
     },
 
     /***
@@ -995,7 +996,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     editorFinishTask: function (task) {
         var me = this;
         Editor.app.mask(me.strings.taskFinishing, task.getTaskName());
-        task.set('userState', task.USER_STATE_FINISH);
+        task.set('userState', Editor.model.admin.Task.userStates.FINISH);
         task.save(me.getTaskMaskBindings());
     },
 
@@ -1006,7 +1007,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     editorUnfinishTask: function (task) {
         var me = this;
         Editor.app.mask(me.strings.taskUnFinishing, task.getTaskName());
-        task.set('userState', task.USER_STATE_OPEN);
+        task.set('userState', Editor.model.admin.Task.userStates.OPEN);
         task.save(me.getTaskMaskBindings());
     },
 

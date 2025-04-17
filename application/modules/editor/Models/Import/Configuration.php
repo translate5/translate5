@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Import\DirectoryLayoutInterface;
+
 /**#@+
  * @author Marc Mittag
  * @package editor
@@ -37,7 +39,7 @@ END LICENSE AND COPYRIGHT
  * Since this class is serialized for the worker table,
  *  it must not contain complex data!
  */
-class editor_Models_Import_Configuration
+class editor_Models_Import_Configuration implements DirectoryLayoutInterface
 {
     /***
      * Constant for the import directory folder name
@@ -163,8 +165,7 @@ class editor_Models_Import_Configuration
         ];
 
         foreach ($langFields as $key => $lang) {
-            $langInst = ZfExtended_Factory::get('editor_Models_Languages');
-            /* @var $langInst editor_Models_Languages */
+            $langInst = ZfExtended_Factory::get(editor_Models_Languages::class);
             if (empty($lang) || ! $langInst->loadLang($lang, $type)) {
                 //null setzen wenn Sprache nicht gefunden. Das triggert einen Fehler in der validateParams dieser Klasse
                 $langInst = null;
@@ -200,13 +201,12 @@ class editor_Models_Import_Configuration
         $this->validateImportFolders();
     }
 
-    /***
-     * Get the required import files directory name.
+    /**
+     * Retrieves the required import files directory name.
      * If isDeprecatedDirectoryName is set to true, the depricated name will be used.
      * If isDeprecatedDirectoryNameLowercase, the depricate name will be used with lowercase.
-     * @return string
      */
-    public function getFilesDirectory()
+    public function getWorkfilesDirName(): string
     {
         /***
          * Remove this check after no longer proofRead support. This should return workfiles only.
@@ -224,29 +224,33 @@ class editor_Models_Import_Configuration
     }
 
     /**
-     * Gibt den absoluten Pfad (inkl. Import Root) zum Verzeichnis mit den zu lektorierenden Dateien zurück,
-     * berücksichtigt die review bzw. Relaissprachen Config
-     * @return string
+     * Retrieves the absolute path to the workfiles-dir in the import-folder
      */
-    public function getWorkfileDir()
+    public function getWorkfilesDir(): string
     {
         $prefix = $this->importFolder;
-        $reviewDir = $this->getFilesDirectory();
+        $workfilesDir = $this->getWorkfilesDirName();
 
-        return $reviewDir == '' ? $prefix : $prefix . DIRECTORY_SEPARATOR . $reviewDir;
+        return ($workfilesDir === '') ? $prefix : $prefix . DIRECTORY_SEPARATOR . $workfilesDir;
     }
 
     /**
      * returns the absolute path (incl. import root) to the reference files
-     * @return string
      */
-    public function getReferenceFilesDir()
+    public function getReferenceFilesDir(): string
     {
-        $config = Zend_Registry::get('config');
         $prefix = $this->importFolder;
         $refDir = editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
 
-        return $refDir == '' ? $prefix : $prefix . DIRECTORY_SEPARATOR . $refDir;
+        return ($refDir === '') ? $prefix : $prefix . DIRECTORY_SEPARATOR . $refDir;
+    }
+
+    /**
+     * Retrieves the base directory of the files to import
+     */
+    public function getImportDir(): string
+    {
+        return $this->importFolder;
     }
 
     /**
@@ -303,7 +307,7 @@ class editor_Models_Import_Configuration
             ]);
         }
         //use the workfiles as review directory
-        $reviewDir = $this->getWorkfileDir();
+        $reviewDir = $this->getWorkfilesDir();
         $data = [
             'review' => basename($reviewDir),
         ];
@@ -317,7 +321,7 @@ class editor_Models_Import_Configuration
             //workfiles is not valid directory, try the deprecated proofRead
             $this->isDeprecatedDirectoryName = true;
 
-            $reviewDir = $this->getWorkfileDir();
+            $reviewDir = $this->getWorkfilesDir();
             $data = [
                 'review' => basename($reviewDir),
             ];
@@ -331,7 +335,7 @@ class editor_Models_Import_Configuration
 
             //The imported package did not contain a valid review folder.
             throw new editor_Models_Import_ConfigurationException('E1039', [
-                'review' => basename($this->getWorkfileDir()),
+                'review' => basename($this->getWorkfilesDir()),
             ]);
         }
         if (empty(glob($reviewDir . '/*'))) {

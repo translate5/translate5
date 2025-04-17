@@ -374,6 +374,12 @@ final class Rights extends AbstractResource
     public const SYSTEM_STATUS = 'systemStatus';
 
     /**
+     * allows the user to see the foreignId and foreignState fields
+     * @group Preferences
+     */
+    public const SHOW_FOREIGN_FIELDS = 'showForeignFields';
+
+    /**
      * enables the users personal preferences page (change password / layout / language)
      * @group Preferences
      */

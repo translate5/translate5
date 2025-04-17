@@ -98,6 +98,7 @@ class Editor_BatchsetController extends ZfExtended_RestController
 
         try {
             TaskBatchSetter::create()->process($this->getRequest());
+            $this->view->success = true;
         } catch (InvalidValueProvidedException $e) {
             $param = match ($e::class) {
                 InvalidDeadlineDateStringProvidedException::class => 'deadlineDate',

@@ -76,12 +76,6 @@ use ZfExtended_Factory as Factory;
 class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Models_Entity_Abstract
 {
     /***
-     * Custom task state when matchanalysis are running
-     * @var string
-     */
-    public const TASK_STATE_ANALYSIS = 'matchanalysis';
-
-    /***
      * Database field name when counting analysis on character based
      */
     public const UNIT_COUNT_CHARACTER = 'characterCount';

@@ -74,13 +74,12 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
     onUpdateProgress: function(params) {
         var me = this,
             task = me.getTaskRecordFromParams(params);
-
         if(!task){
             return;
         }
         task.set('importProgress', params.progress);
         if(params.progress >= 100){
-            me.fireEvent('taskImportFinished', task);
+            me.fireEvent('taskProgressFinished', task, params.operationType);
         }
     },
 

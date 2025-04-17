@@ -384,7 +384,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
      */
     public function setTaskToOpen(int $taskId = -1)
     {
-        return $this->setTaskState($taskId, 'open');
+        return $this->setTaskUserState($taskId, 'open');
     }
 
     /**
@@ -394,7 +394,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
      */
     public function setTaskToEdit(int $taskId = -1)
     {
-        return $this->setTaskState($taskId, 'edit');
+        return $this->setTaskUserState($taskId, 'edit');
     }
 
     /**
@@ -404,7 +404,12 @@ final class Helper extends ZfExtended_Test_ApiHelper
      */
     public function setTaskToFinished(int $taskId = -1)
     {
-        return $this->setTaskState($taskId, 'finished');
+        return $this->setTaskUserState($taskId, 'finished');
+    }
+
+    public function setTaskToError(int $taskId = -1)
+    {
+        return $this->setTaskState($taskId, \editor_Models_Task::STATE_ERROR);
     }
 
     /**
@@ -414,24 +419,14 @@ final class Helper extends ZfExtended_Test_ApiHelper
      */
     public function endTask(int $taskId = -1)
     {
-        if ($taskId < 1 && $this->task) {
-            $taskId = $this->task->id;
-        }
-        if ($taskId > 0) {
-            return $this->putJson('editor/task/' . $taskId, [
-                'state' => 'end',
-                'id' => $taskId,
-            ]);
-        }
-
-        return $this->createResponseResult(null, 'No Task to set state for');
+        return $this->setTaskState($taskId, \editor_Models_Task::STATE_END);
     }
 
     /**
      * @param int $taskId : if given, this task is taken, otherwise the current task
      * @return array|stdClass
      */
-    private function setTaskState(int $taskId, string $userState)
+    private function setTaskUserState(int $taskId, string $userState)
     {
         if ($taskId < 1 && $this->task) {
             $taskId = $this->task->id;
@@ -439,6 +434,21 @@ final class Helper extends ZfExtended_Test_ApiHelper
         if ($taskId > 0) {
             return $this->putJson('editor/task/' . $taskId, [
                 'userState' => $userState,
+                'id' => $taskId,
+            ]);
+        }
+
+        return $this->createResponseResult(null, 'No Task to set state for');
+    }
+
+    private function setTaskState(int $taskId, string $state): stdClass
+    {
+        if ($taskId < 1 && $this->task) {
+            $taskId = $this->task->id;
+        }
+        if ($taskId > 0) {
+            return $this->putJson('editor/task/' . $taskId, [
+                'state' => $state,
                 'id' => $taskId,
             ]);
         }
@@ -579,6 +589,67 @@ final class Helper extends ZfExtended_Test_ApiHelper
         }
 
         throw new Exception('User \'' . $login . '\' is no valid test user.');
+    }
+
+    //endregion
+    //region Customer API
+    /******************************************************* TASK USER ASSOC API *******************************************************/
+
+    /**
+     * Retrieves all TUAs for a task
+     * @return stdClass[]
+     * @throws Zend_Http_Client_Exception
+     */
+    public function getTaskUserAssocs(int $taskId): array
+    {
+        return $this->getJson('editor/taskuserassoc?taskId=' . $taskId);
+    }
+
+    /**
+     * Retrieves a TUA for a task & user. The user-name can only be from the TestUser-enum
+     * @throws Zend_Http_Client_Exception
+     */
+    public function getTaskUserAssoc(int $taskId, string $userName): ?stdClass
+    {
+        $userGuid = $this->getUserGuid($userName);
+        $tuas = $this->getTaskUserAssocs($taskId);
+        if (! empty($tuas)) {
+            foreach ($tuas as $tua) {
+                if ($tua->userGuid === $userGuid) {
+                    return $tua;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Saves the TUA if one of the params is given saide the TUAs id
+     */
+    public function saveTaskUserAssoc(
+        int $tuaId,
+        string $state = null,
+        string $role = null,
+        string $workflowStepName = null,
+    ): array|stdClass|null {
+        $data = [
+            'id' => $tuaId,
+        ];
+        if (! empty($state)) {
+            $data['state'] = $state;
+        }
+        if (! empty($role)) {
+            $data['role'] = $role;
+        }
+        if (! empty($workflowStepName)) {
+            $data['workflowStepName'] = $workflowStepName;
+        }
+        if (count($data) > 1) {
+            return $this->putJson('/editor/taskuserassoc/' . $tuaId, $data);
+        }
+
+        return null;
     }
 
     //endregion

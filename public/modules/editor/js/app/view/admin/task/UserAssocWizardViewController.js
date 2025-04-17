@@ -134,7 +134,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         usageMode.setValue(
             project.get('usageMode')
                 ? project.get('usageMode')
-                : Editor.model.admin.Task.USAGE_MODE_COOPERATIVE
+                : Editor.model.admin.Task.usageModes.COOPERATIVE
         );
 
         me.loadAssocData();
@@ -284,7 +284,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
      */
     onUsageModeBeforeSelect: function (combo, record) {
         // for simultaneous usage state the message bus must be active
-        if (record && record.get('id') === Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS && !Editor.plugins.FrontEndMessageBus) {
+        if (record && record.get('id') === Editor.model.admin.Task.usageModes.SIMULTANEOUS && !Editor.plugins.FrontEndMessageBus) {
             Editor.MessageBox.addError('In order to use that mode the FrontEndMessageBus plug-in must be active!');
             return false;
         }

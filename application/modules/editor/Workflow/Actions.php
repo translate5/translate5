@@ -26,8 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\JobAssignment\DTO\TrackChangesRightsDto;
+use MittagQI\Translate5\JobAssignment\DTO\WorkflowDto;
 use MittagQI\Translate5\JobAssignment\Exception\CompetitiveJobAlreadyTakenException;
+use MittagQI\Translate5\JobAssignment\UserJob\Operation\CreateUserJobOperation;
+use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
+use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
 use MittagQI\Translate5\JobAssignment\Workflow\CompetitiveJobsRemover;
+use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use MittagQI\Translate5\Task\Export\Package\Remover;
 use MittagQI\Translate5\Workflow\ArchiveConfigDTO;
@@ -221,6 +228,40 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
         $log->debug('E1013', 'finish overdued task via workflow action');
     }
 
+    /***
+     * Automatically finished non-finished jobs within a workflow step
+     */
+    public function finishJobs()
+    {
+        $workflow = $this->config->workflow;
+        $task = $this->config->task;
+
+        $db = Zend_Registry::get('db');
+        /* @var $db Zend_Db_Table */
+
+        $s = $db->select()
+            ->from('LEK_taskUserAssoc', ['id'])
+            ->where('workflowStepName = ?', $this->config->parameters->workflowStep)
+            ->where('state != ?', $workflow::STATE_FINISH)
+            ->where('taskGuid = ?', $task->getTaskGuid());
+        $jobRows = $db->fetchAll($s);
+
+        $tua = new editor_Models_TaskUserAssoc();
+        foreach ($jobRows as $row) {
+            //its much easier to load the entity as setting it (INSERT instead UPDATE issue on save, because of internal zend things on initing rows)
+            $tua->load($row['id']);
+            $workflow->hookin()->doWithTask($task, $task); //nothing changed on task directly, but call is needed
+            $tuaNew = clone $tua;
+            $tuaNew->setState($workflow::STATE_FINISH);
+            $tuaNew->validate();
+            $workflow->hookin()->doWithUserAssoc($tua, $tuaNew, function () use ($tuaNew) {
+                $tuaNew->save();
+            });
+        }
+        $log = ZfExtended_Factory::get('editor_Logger_Workflow', [$task]);
+        $log->debug('E1013', 'finish jobs via workflow action: ' . count($jobRows) . ' job(s)');
+    }
+
     /**
      * Delete all tasks where the task status is 'end',
      * and the last modified date for this task is older than x days (where x is zf_config variable)
@@ -375,6 +416,115 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
                     'Auto QA operation failed after edit100PercentMatch change',
                     $this->config->task->getDataObject(),
                 );
+            }
+        }
+    }
+
+    /**
+     * @throws ZfExtended_Exception
+     * @throws Throwable
+     */
+    public function autocreateJobs(): void
+    {
+        $task = $this->config->task;
+        if (empty($task->getPmGuid())) {
+            throw new ZfExtended_Exception('No PM is assigned to the task: ' . print_r($task->getDataObject(), true));
+        }
+
+        $workflow = (new editor_Workflow_Manager())->getCached($task->getWorkflow());
+        $trackingDto = new TrackChangesRightsDto(true, true, true);
+        $createUserJobOperation = null;
+
+        foreach ($this->config->parameters->steps as $step) {
+            $workflowStepName = $step->step;
+            $jobState = $step->state;
+            $deadlineDate = null;
+            if (! empty($step->deadlineDate)) {
+                $deadlineDate = strtotime($step->deadlineDate);
+                if ($deadlineDate === false) {
+                    $task->logger()->error('E1706', 'Invalid deadline date: {deadlineDate}', [
+                        'deadlineDate' => $step->deadlineDate,
+                        'step' => $step,
+                    ]);
+
+                    continue;
+                }
+                $deadlineDate = date('Y-m-d H:i:s', $deadlineDate);
+            }
+
+            switch ($step->user->type) {
+                case 'taskPm':
+                    $userGuids = [$task->getPmGuid()];
+
+                    break;
+                case 'login':
+                    $user = (new UserRepository())->findByLogin($step->user->login);
+                    if ($user === null) {
+                        $task->logger()->error('E1705', 'Invalid user login: {login}', [
+                            'login' => $step->user->login,
+                            'step' => $step,
+                        ]);
+
+                        continue 2;
+                    }
+                    $userGuids = [$user->getUserGuid()];
+
+                    break;
+                case 'existingWorkflowStep':
+                    $userJobRepository = UserJobRepository::create();
+                    $jobs = $userJobRepository->getJobsByTaskAndStep($task->getTaskGuid(), $step->user->workflowStep);
+                    $userGuids = [];
+                    foreach ($jobs as $job) {
+                        $userGuids[] = $job->getUserGuid();
+                    }
+
+                    if (empty($userGuids)) {
+                        $task->logger()->warn('E1704', 'No jobs within workflow step: {workflowStep}', [
+                            'workflowStep' => $step->user->workflowStep,
+                            'step' => $step,
+                        ]);
+
+                        continue 2;
+                    }
+
+                    break;
+                default:
+                    $task->logger()->error('E1703', 'Invalid user type parameter', [
+                        'step' => $step,
+                    ]);
+
+                    continue 2;
+            }
+
+            $workflowDto = new WorkflowDto(
+                $workflow->getRoleOfStep($workflowStepName),
+                $workflow->getName(),
+                $workflowStepName,
+            );
+
+            if ($createUserJobOperation === null) {
+                $createUserJobOperation = CreateUserJobOperation::create();
+            }
+
+            foreach ($userGuids as $userGuid) {
+                $createDto = new NewUserJobDto(
+                    $task->getTaskGuid(),
+                    $userGuid,
+                    $jobState,
+                    $workflowDto,
+                    TypeEnum::Editor,
+                    null,
+                    null,
+                    $deadlineDate,
+                    $trackingDto,
+                );
+
+                try {
+                    $createUserJobOperation->assignJob($createDto);
+                } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
+                    //for t5connect this is bound to the direct trigger, and therefore it could be
+                    // executed multiple times, so just do nothing on duplications
+                }
             }
         }
     }

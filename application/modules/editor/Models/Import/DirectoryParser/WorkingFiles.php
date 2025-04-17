@@ -31,6 +31,21 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_DirectoryParser_WorkingFiles
 {
+    public static function createFileNode(string $filename, string $relativePath): stdClass
+    {
+        $node = new stdClass();
+        $node->id = 0; // from save to DB
+        $node->parentId = 0; //from first sync to files call
+        $node->cls = 'file';
+        $node->isFile = true;
+        $node->filename = $filename;
+        $node->segmentid = 0;
+        $node->segmentgridindex = 0;
+        $node->path = rtrim($relativePath, '/') . '/';
+
+        return $node;
+    }
+
     /**
      * collection of ignored files
      * @var array
@@ -75,7 +90,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles
     /**
      * parses the given directory and returns a Object tree ready for output as JSON
      * @param string $directoryPath
-     * @return object Directory Object Tree
+     * @return array Directory Object Tree
      */
     public function parse($directoryPath)
     {
@@ -191,15 +206,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles
      */
     protected function getFileNode($filename, $filepath)
     {
-        $node = new stdClass();
-        $node->id = 0; // from save to DB
-        $node->parentId = 0; //from first sync to files call
-        $node->cls = 'file';
-        $node->isFile = true;
-        $node->filename = $filename;
-        $node->segmentid = 0;
-        $node->segmentgridindex = 0;
-        $node->path = $this->rootNode->path . $this->rootNode->filename . '/';
+        $node = self::createFileNode((string) $filename, $this->rootNode->path . $this->rootNode->filename);
 
         //fire event, before the filenode is created/saved to the database
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', [__CLASS__]);

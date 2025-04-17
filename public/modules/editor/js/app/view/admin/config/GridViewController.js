@@ -45,7 +45,7 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         },
         controller: {
             'taskGrid': {
-                taskImportFinished: 'onTaskImportFinished'
+                taskProgressFinished: 'onTaskProgressFinished'
             }
         },
         store: {
@@ -213,7 +213,7 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     /**
      * Handles the task import finish (triggered implicitly by the messagabus ...)
      */
-    onTaskImportFinished: function(task){
+    onTaskProgressFinished: function(task){
         this.getView().refreshForTask(task.get('taskGuid'));
     },
     /**

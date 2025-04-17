@@ -61,7 +61,13 @@ final class editor_Segment_Quality_Manager
             // this triggers a refresh of the task's TBX cache
             $task->meta()->resetTbxHash([$task->getTaskGuid()]);
             // queues the operation workers
-            self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $operation->getWorkerId(), ZfExtended_Models_Worker::STATE_PREPARE);
+            self::instance()->queueOperation(
+                editor_Segment_Processing::RETAG,
+                editor_Task_Operation::AUTOQA,
+                $task,
+                $operation->getWorkerId(),
+                ZfExtended_Models_Worker::STATE_PREPARE
+            );
             // start the operation
             $operation->start();
             // triggers the worker-queue
@@ -92,7 +98,13 @@ final class editor_Segment_Quality_Manager
 
         try {
             // queues the operation workers
-            self::instance()->queueOperation(editor_Segment_Processing::TAGTERMS, $task, $operation->getWorkerId(), ZfExtended_Models_Worker::STATE_PREPARE);
+            self::instance()->queueOperation(
+                editor_Segment_Processing::TAGTERMS,
+                editor_Task_Operation::TAGTERMS,
+                $task,
+                $operation->getWorkerId(),
+                ZfExtended_Models_Worker::STATE_PREPARE
+            );
             // start the operation
             $operation->start();
             // trigger the workers to work
@@ -209,19 +221,24 @@ final class editor_Segment_Quality_Manager
         if ($this->isProcessingSkipped(editor_Segment_Processing::IMPORT, $task, true)) {
             return;
         }
-        // add starting worker
+        // add starting worker - with the mandatory params
         $workerParams = [
             'processingMode' => editor_Segment_Processing::IMPORT,
-        ]; // mandatory for any quality processing
+            'operationType' => editor_Task_Operation::IMPORT,
+        ];
         $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationWorker::class);
         if ($worker->init($task->getTaskGuid(), $workerParams)) {
-            $qualityParentId = $worker->queue($workerParentId, null, false);
+            $workerId = $worker->queue($workerParentId, null, false);
+            if ($workerParentId === 0) {
+                // in case there was no parent worker the Quality-Operation will be the parent ...
+                $workerParentId = $workerId;
+            }
             // add the workers of our providers
             $this->queueProviderWorkers(editor_Segment_Processing::IMPORT, $task, $workerParentId, []);
             // add finishing worker
             $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationFinishingWorker::class);
             if ($worker->init($task->getTaskGuid(), $workerParams)) {
-                $worker->queue($qualityParentId, null, false);
+                $worker->queue($workerParentId, null, false);
             }
         }
     }
@@ -230,25 +247,35 @@ final class editor_Segment_Quality_Manager
      * Adds the neccessary workers for an operation
      * @throws ReflectionException
      */
-    public function queueOperation(string $processingMode, editor_Models_Task $task, int $workerParentId, string $workerState = null)
-    {
+    public function queueOperation(
+        string $processingMode,
+        string $operationType,
+        editor_Models_Task $task,
+        int $workerParentId,
+        string $workerState = null,
+    ): void {
         if ($this->isProcessingSkipped($processingMode, $task, true)) {
             return;
         }
         // add starting worker
         $workerParams = [
             'processingMode' => $processingMode,
+            'operationType' => $operationType,
         ];
         // mandatory for any quality processing
         $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationWorker::class);
         if ($worker->init($task->getTaskGuid(), $workerParams)) {
-            $qualityParentId = $worker->queue($workerParentId, $workerState, false);
+            $workerId = $worker->queue($workerParentId, $workerState, false);
+            if ($workerParentId === 0) {
+                // in case there was no parent worker the Quality-Operation will be the parent ...
+                $workerParentId = $workerId;
+            }
             // add the workers of our providers
-            $this->queueProviderWorkers($processingMode, $task, $qualityParentId, []);
+            $this->queueProviderWorkers($processingMode, $task, $workerParentId, []);
             // add finishing worker
             $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationFinishingWorker::class);
             if ($worker->init($task->getTaskGuid(), $workerParams)) {
-                $worker->queue($qualityParentId, null, false);
+                $worker->queue($workerParentId, null, false);
             }
         }
     }
