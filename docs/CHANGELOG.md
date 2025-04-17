@@ -14,6 +14,47 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.21.5] - 2025-04-17
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4587](https://jira.translate5.net/browse/TRANSLATE-4587): Main back-end mechanisms (Worker, Logging, etc.) - Define customer specific templates** <br>
+Enable customer based templates(requires creation of separate template per client).
+
+**[TRANSLATE-4452](https://jira.translate5.net/browse/TRANSLATE-4452): t5memory, TM Maintenance - Improve user experience in TM Maintenance** <br>
+Rework error messages in TM Maintenance to be more clear for the end user.
+
+
+### Bugfixes
+**[TRANSLATE-4613](https://jira.translate5.net/browse/TRANSLATE-4613): Editor general - Deprecation error** <br>
+FIXED: deprecation error flooding the php log
+
+**[TRANSLATE-4610](https://jira.translate5.net/browse/TRANSLATE-4610): LanguageResources - Results for match table are not rendered** <br>
+Fix match table rendering
+
+**[TRANSLATE-4609](https://jira.translate5.net/browse/TRANSLATE-4609): TM Maintenance - Uncaught Error: Top-most item should be ...** <br>
+FIXED: problems with distinction between automatic and user scrolling
+
+**[TRANSLATE-4608](https://jira.translate5.net/browse/TRANSLATE-4608): t5memory, TM Maintenance - Amount of segments calculated and in the grid are different** <br>
+Fixed bug which might prevent all segments to load into the list in TMMaintenance panel after search
+
+**[TRANSLATE-4606](https://jira.translate5.net/browse/TRANSLATE-4606): Content Protection - Content protection: Not same tag count in source and target after conversion** <br>
+Fix tag filtering in TM conversion process
+
+**[TRANSLATE-4596](https://jira.translate5.net/browse/TRANSLATE-4596): Import/Export - Save resname comments** <br>
+Fix resname comments saving
+
+**[TRANSLATE-4595](https://jira.translate5.net/browse/TRANSLATE-4595): Content Protection - Content protection: Apply current rules for updated segments in TM Maintenance** <br>
+Apply current rules for updated segments in TM Maintenance
+
+**[TRANSLATE-4540](https://jira.translate5.net/browse/TRANSLATE-4540): Content Protection - Content Protection: Change logic of LR availability on TM Conversion** <br>
+Content Protection: Language resource will be available for fuzzy searches when it is only scheduled for conversion and completely locked when conversion in progress
+
+
 ## [7.21.4] - 2025-04-11
 
 ### Important Notes:
