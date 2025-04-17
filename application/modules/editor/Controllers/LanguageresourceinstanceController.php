@@ -961,6 +961,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->entity->save();
         }
 
+        try {
+            $manager->getConnector($this->entity)->processAfterCreation();
+        } catch (ZfExtended_Exception $e) {
+            DeleteLanguageResourceOperation::create()->delete(
+                $this->entity,
+                forced: true,
+            );
+
+            throw $e;
+        }
+
         $manager->getTmConversionService($resource->getServiceType())?->setRulesHash(
             $this->entity,
             $sourceLangId,

@@ -49,12 +49,35 @@ trait TaskContextTrait
 
     /**
      * This trait is only usable in controllers and in plugins
-     * @throws Current\Exception
+     * @throws \ZfExtended_Exception
      */
     protected function _restrictUsage()
     {
-        if (! is_a($this, '\Zend_Controller_Action')) {
-            throw new Current\Exception('E1234');
+        if (! is_a($this, \Zend_Controller_Action::class)) {
+            throw new \ZfExtended_Exception('Using TaskContextTrait outside a controller in ' . get_class($this));
+        }
+    }
+
+    /**
+     * Loads the current context task by it's id
+     * @param bool $loadJob true to load the current users opened job
+     * @throws NoJobFoundException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \ReflectionException
+     * @throws \ZfExtended_Exception
+     */
+    protected function initCurrentTaskById(int $taskId, bool $loadJob = false): void
+    {
+        $this->_restrictUsage();
+        if (empty($taskId)) {
+            $this->initCurrentTask();
+
+            return;
+        }
+        $this->_currentTask = ZfExtended_Factory::get(editor_Models_Task::class);
+        $this->_currentTask->load($taskId);
+        if ($loadJob) {
+            $this->loadCurrentJob();
         }
     }
 
@@ -63,18 +86,20 @@ trait TaskContextTrait
      * @param bool $loadJob false to not load the current users opened job
      * @throws Current\Exception
      * @throws NoAccessException
+     * @throws NoJobFoundException
      * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \ReflectionException
+     * @throws \ZfExtended_Exception
      */
-    protected function initCurrentTaskByGuid(?string $taskGuid, bool $loadJob = true)
+    protected function initCurrentTaskByGuid(?string $taskGuid, bool $loadJob = true): void
     {
+        $this->_restrictUsage();
         if (empty($taskGuid)) {
             $this->initCurrentTask();
 
             return;
         }
-        $this->_restrictUsage();
-        /** @var editor_Models_Task $task */
-        $this->_currentTask = ZfExtended_Factory::get('editor_Models_Task');
+        $this->_currentTask = ZfExtended_Factory::get(editor_Models_Task::class);
         $this->_currentTask->loadByTaskGuid($taskGuid);
         if ($loadJob) {
             $this->loadCurrentJob();
@@ -90,14 +115,15 @@ trait TaskContextTrait
      * Loads the current context task from task ID given via URL - to be used in either controller init or preDispatch function
      * If this function is used in task editing context, loadJob must always be set to true.
      * @throws Current\Exception
-     * @throws NoAccessException
+     * @throws NoJobFoundException
      * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \ReflectionException
+     * @throws \ZfExtended_Exception
      */
     protected function initCurrentTask(bool $loadJob = true): void
     {
         $this->_restrictUsage();
-        /** @var editor_Models_Task $task */
-        $this->_currentTask = ZfExtended_Factory::get('editor_Models_Task');
+        $this->_currentTask = ZfExtended_Factory::get(editor_Models_Task::class);
 
         $taskId = editor_Controllers_Plugins_LoadCurrentTask::getTaskId();
         if (is_null($taskId)) {

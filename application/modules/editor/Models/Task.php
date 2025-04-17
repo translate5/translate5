@@ -39,12 +39,14 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setTaskGuid(string $guid)
  * @method string getTaskNr()
  * @method void setTaskNr(string $nr)
- * @method string getForeignId()
- * @method void setForeignId(string $id)
  * @method string getTaskName()
  * @method void setTaskName(string $name)
+ * @method string getForeignId()
+ * @method void setForeignId(string $id)
  * @method string getForeignName()
  * @method void setForeignName(string $name)
+ * @method string getForeignState()
+ * @method void setForeignState(string $name)
  * @method string getDescription()
  * @method void setDescription(string $description)
  * @method string getSourceLang()
@@ -60,6 +62,8 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setLockingUser(string $guid)
  * @method string getPmGuid()
  * @method void setPmGuid(string $guid)
+ * @method string getCreatedByUserGuid()
+ * @method void setCreatedByUserGuid(string $guid)
  * @method string getPmName()
  * @method void setPmName(string $guid)
  * @method string getState()
@@ -160,9 +164,63 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     protected static $customerCache = [];
 
-    protected $dbInstanceClass = 'editor_Models_Db_Task';
+    /**
+     * Get all possible task-states that are actually saved in the DB
+     * TODO FIXME: these states are used to validate requests and therefore must include the pseudo task-states
+     *             e.g. operations. Currently, these cannot be set from the frontend and therefore e.g. in tests
+     *            "waitForState" fails.These must be changed but easily can have unexpected consequences
+     * @return string[]
+     */
+    public static function getAllStates(): array
+    {
+        return [
+            self::STATE_OPEN,
+            self::STATE_END,
+            self::STATE_UNCONFIRMED,
+            self::STATE_ERROR, //to cancel import only, validated on usage
+        ];
+    }
 
-    protected $validatorInstanceClass = 'editor_Models_Validator_Task';
+    /**
+     * Returns the matching of col-names as set in Editor.view.admin.TaskGrid.
+     * @return array
+     */
+    public static function getTaskGridTextCols()
+    {
+        return [
+            // A-Z
+            'customerId' => 'Endkunde',
+            'edit100PercentMatch' => '100%-Treffer editierbar',
+            'emptyTargets' => 'Übersetzungsaufgabe (kein Review)',
+            'enableSourceEditing' => 'Quellsprache bearbeitbar',
+            'fileCount' => 'Dateien',
+            'fullMatchEdit' => 'Unveränderte 100% TM Matches sind editierbar',
+            'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
+            'orderdate' => 'Bestelldatum',
+            'enddate' => 'Enddatum',
+            'pmGuid' => 'Projektmanager',
+            'pmName' => 'Projektmanager',
+            'referenceFiles' => 'Referenzdateien',
+            'relaisLang' => 'Relaissprache',
+            'sourceLang' => 'Quellsprache',
+            'state' => 'Status',
+            'targetLang' => 'Zielsprache',
+            'taskActions' => 'Aktionen',
+            'taskassocs' => 'Anzahl zugewiesene Sprachressourcen',
+            'taskName' => 'Aufgabenname',
+            'taskNr' => 'Auftragsnr.',
+            'terminologie' => 'Terminologie',
+            'users' => 'Benutzer',
+            'wordCount' => 'Wörter',
+            'wordCountTT' => 'Anzahl Wörter',
+            'workflow' => 'Workflow',
+            'userCount' => 'Zahl zugewiesener Benutzer',
+        ];
+    }
+
+    protected $dbInstanceClass = editor_Models_Db_Task::class;
+
+    protected $validatorInstanceClass = editor_Models_Validator_Task::class;
 
     /**
      * @var editor_Models_Task_Meta
@@ -773,7 +831,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * sets a locked-timestamp in LEK_task for the task, if locked column is null
      *
      * @param string $lockId String to distinguish different lock types
-     * @return boolean
      */
     public function lock(string $datetime, string $lockId = ''): bool
     {
@@ -924,6 +981,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     public function isImporting()
     {
         return in_array($this->getState(), [self::STATE_IMPORT, self::STATE_PREPARATION]);
+    }
+
+    public function isOperating()
+    {
+        return $this->isImporting() || in_array($this->getState(), editor_Task_Operation::getAllOperations());
     }
 
     /**
@@ -1370,43 +1432,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         $s->where('projectId=?', $projectId);
 
         return $this->db->fetchAll($s)->toArray();
-    }
-
-    /**
-     * Returns the matching of col-names as set in Editor.view.admin.TaskGrid.
-     * @return array
-     */
-    public static function getTaskGridTextCols()
-    {
-        return [
-            // A-Z
-            'customerId' => 'Endkunde',
-            'edit100PercentMatch' => '100%-Treffer editierbar',
-            'emptyTargets' => 'Übersetzungsaufgabe (kein Review)',
-            'enableSourceEditing' => 'Quellsprache bearbeitbar',
-            'fileCount' => 'Dateien',
-            'fullMatchEdit' => 'Unveränderte 100% TM Matches sind editierbar',
-            'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
-            'orderdate' => 'Bestelldatum',
-            'enddate' => 'Enddatum',
-            'pmGuid' => 'Projektmanager',
-            'pmName' => 'Projektmanager',
-            'referenceFiles' => 'Referenzdateien',
-            'relaisLang' => 'Relaissprache',
-            'sourceLang' => 'Quellsprache',
-            'state' => 'Status',
-            'targetLang' => 'Zielsprache',
-            'taskActions' => 'Aktionen',
-            'taskassocs' => 'Anzahl zugewiesene Sprachressourcen',
-            'taskName' => 'Aufgabenname',
-            'taskNr' => 'Auftragsnr.',
-            'terminologie' => 'Terminologie',
-            'users' => 'Benutzer',
-            'wordCount' => 'Wörter',
-            'wordCountTT' => 'Anzahl Wörter',
-            'workflow' => 'Workflow',
-            'userCount' => 'Zahl zugewiesener Benutzer',
-        ];
     }
 
     /**

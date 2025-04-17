@@ -88,6 +88,18 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
         }
     }
 
+    public static function createFileNode(string $filename, string $relativePath): stdClass
+    {
+        $node = editor_Models_Import_DirectoryParser_WorkingFiles::createFileNode($filename, $relativePath);
+        if ($node->isFile) {
+            $node->href = $node->path . $node->filename;
+            $node->hrefTarget = '_blank';
+        }
+        unset($node->id); //@see class head comment
+
+        return $node;
+    }
+
     public function __construct(editor_Models_Task $task)
     {
         $this->task = $task;

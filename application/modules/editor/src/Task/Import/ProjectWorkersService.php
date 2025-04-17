@@ -38,6 +38,7 @@ use editor_Models_Import_Worker_ReferenceFileTree;
 use editor_Models_Import_Worker_SetTaskToOpen;
 use editor_Models_Task;
 use editor_Models_TaskConfig;
+use editor_Task_Operation;
 use editor_Workflow_Manager;
 use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
 use ReflectionException;
@@ -81,6 +82,7 @@ class ProjectWorkersService
         $importWorker = ZfExtended_Factory::get(editor_Models_Import_Worker::class);
         $importWorker->init($taskGuid, array_merge($params, [
             'dataProvider' => $dataProvider,
+            'operationType' => editor_Task_Operation::IMPORT, // important for frontend-callbacks / message-bus !
         ]));
         //prevent the importWorker to be started here.
         $parentId = $importWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);

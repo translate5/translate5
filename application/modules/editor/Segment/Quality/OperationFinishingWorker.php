@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\Segment\Quality\Event\AutoQaFinishedEvent;
+
 /**
  * Finishes Operations regarding the Quality processing
  */
@@ -58,6 +61,8 @@ class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task
         if ($this->processingMode != editor_Segment_Processing::IMPORT && $this->task->isLocked($this->task->getTaskGuid())) {
             $this->task->unlock();
         }
+
+        EventDispatcher::create()->dispatch(new AutoQaFinishedEvent($this->task));
 
         return true;
     }

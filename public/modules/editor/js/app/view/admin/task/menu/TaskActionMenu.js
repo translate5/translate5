@@ -242,10 +242,10 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
 
         //workaround for fire-event (the component is not created yet so fake the event)
         me.hasListeners = {};
-        me.hasListeners['itemsinitialized'] = true;
+        me.hasListeners.itemsinitialized = true;
 
         //fire the event, so another action columns can be added from outside
-        me.fireEvent('itemsinitialized', config.items);
+        me.fireEvent('itemsinitialized', config.items, task);
 
         config.items = Ext.Array.sort(config.items, function (a, b) {
             return a.sortIndex - b.sortIndex;

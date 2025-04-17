@@ -38,74 +38,62 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
  */
 class SegmentTagsOverlapTest extends SegmentTagsTestAbstract
 {
-    // tags 1 - 3 are mqm tags, 4 - 7 term tags, 8 - 9 internal tags
-    private $open1 = '<img class="open critical qmflag ownttip qmflag-1" data-t5qid="111" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-left.png" />';
+    /**
+     * Some Internal Tags to create Tests with
+     * tags 1 - 3 are mqm tags, 4 - 7 term tags, 8 - 9 internal tags
+     */
+    protected array $testTags = [
+        '<1>' => '<img class="open critical qmflag ownttip qmflag-1" data-t5qid="111" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-left.png" />',
+        '</1>' => '<img class="close critical qmflag ownttip qmflag-1" data-t5qid="111" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-right.png" />',
+        '<2>' => '<img class="open critical qmflag ownttip qmflag-2" data-t5qid="222" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />',
+        '</2>' => '<img class="close critical qmflag ownttip qmflag-2" data-t5qid="222" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" />',
+        '<3>' => '<img class="open critical qmflag ownttip qmflag-3" data-t5qid="333" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />',
+        '</3>' => '<img class="close critical qmflag ownttip qmflag-3" data-t5qid="333" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" />',
+        '<4>' => '<div class="term preferredTerm transNotDefined exact" data-tbxid="term_444" title="">',
+        '</4>' => '</div>',
+        '<5>' => '<div class="term admittedTerm transFound" data-tbxid="term_555" title="">',
+        '</5>' => '</div>',
+        '<6>' => '<div class="term legalTerm transFound exact" data-tbxid="term_666" title="">',
+        '</6>' => '</div>',
+        '<7>' => '<div class="term supersededTerm transNotFound" data-tbxid="term_777" title="">',
+        '</7>' => '</div>',
+        '<8>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;8&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>',
+        '</8>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/8&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>',
+        '<9/>' => '<div class="single tab internal-tag ownttip"><span class="short" title="&lt;9/&gt;: 1 tab character">&lt;9/&gt;</span><span class="full" data-originalid="tab" data-length="1">→</span></div>',
+        '<10/>' => '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;10/&gt;: Newline">&lt;10/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>',
+    ];
 
-    private $close1 = '<img class="close critical qmflag ownttip qmflag-1" data-t5qid="111" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-right.png" />';
-
-    private $open2 = '<img class="open critical qmflag ownttip qmflag-2" data-t5qid="222" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />';
-
-    private $close2 = '<img class="close critical qmflag ownttip qmflag-2" data-t5qid="222" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" />';
-
-    private $open3 = '<img class="open critical qmflag ownttip qmflag-3" data-t5qid="333" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />';
-
-    private $close3 = '<img class="close critical qmflag ownttip qmflag-3" data-t5qid="333" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" />';
-
-    private $open4 = '<div class="term preferredTerm transNotDefined exact" data-tbxid="term_444" title="">';
-
-    private $close4 = '</div>';
-
-    private $open5 = '<div class="term admittedTerm transFound" data-tbxid="term_555" title="">';
-
-    private $close5 = '</div>';
-
-    private $open6 = '<div class="term legalTerm transFound exact" data-tbxid="term_666" title="">';
-
-    private $close6 = '</div>';
-
-    private $open7 = '<div class="term supersededTerm transNotFound" data-tbxid="term_777" title="">';
-
-    private $close7 = '</div>';
-
-    private $open8 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;8&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>';
-
-    private $close8 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/8&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>';
-
-    private $single9 = '<div class="single tab internal-tag ownttip"><span class="short" title="&lt;9/&gt;: 1 tab character">&lt;9/&gt;</span><span class="full" data-originalid="tab" data-length="1">→</span></div>';
-
-    private $single10 = '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;10/&gt;: Newline">&lt;10/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>';
-
-    public function testOverlappingTags1()
+    public function testOverlappingTags1(): void
     {
         $markup = '<8>Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<9/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<10/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.</8>';
         $this->createReplacedTest(12345, $markup);
     }
 
-    public function testOverlappingTags2()
+    public function testOverlappingTags2(): void
     {
         $markup = '<8>Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing</2><9/> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<10/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.</8>';
         $this->createReplacedTest(12345, $markup);
     }
 
-    public function testOverlappingTags3()
+    public function testOverlappingTags3(): void
     {
         $markup = '<1>Lorem ipsum dolor sit amet, <2>consetetur sadipscing elitr</1>, sed diam nonumy eirmod tempor <3>invidunt ut labore et dolore magna aliquyam erat,</2> sed diam voluptua.</3>';
         $this->createReplacedTest(12345, $markup);
     }
 
-    public function testOverlappingTags4()
+    public function testOverlappingTags4(): void
     {
         $markup = '<1>Lorem ipsum dolor <9/>sit amet, <2>consetetur sadipscing elitr</1>, sed <4>diam nonumy</4> eirmod tempor <3>invidunt ut labore et dolore <5>magna</5> aliquyam erat,</2> sed diam voluptua.</3>';
         $this->createReplacedTest(12345, $markup);
     }
 
-    public function testOverlappingTags5()
+    public function testOverlappingTags5(): void
     {
         $markup = '<1>Lorem ipsum dolor <9/>sit amet, <2>consetetur sadipscing elitr</1>, sed <4>diam <3>nonumy</4> eirmod tempor invidunt ut labore et dolore <5>magna</5> aliquyam erat,</2> sed diam voluptua.</3>';
         $this->createReplacedTest(12345, $markup);
     }
 
-    public function testNonOverlappingTermTags()
+    public function testNonOverlappingTermTags(): void
     {
         $tags = $this->createTags();
         $tags->addTag(editor_Plugins_TermTagger_Tag::createNew(0, 80)->addClass('not_found_in_target')->setTbxId('123'), 0);
@@ -124,7 +112,7 @@ class SegmentTagsOverlapTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testOverlappingTermTags1()
+    public function testOverlappingTermTags1(): void
     {
         $tags = $this->createTags();
         $tags->addTag(editor_Plugins_TermTagger_Tag::createNew(6, 80)->addClass('not_found_in_target')->setTbxId('123'), 0);
@@ -144,7 +132,7 @@ class SegmentTagsOverlapTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testOverlappingTermTags2()
+    public function testOverlappingTermTags2(): void
     {
         $tags = $this->createTags();
         $tags->addTag(editor_Plugins_TermTagger_Tag::createNew(6, 80)->addClass('not_found_in_target')->setTbxId('123'), 0);
@@ -166,14 +154,9 @@ class SegmentTagsOverlapTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    /**
-     * @param int $segmentId
-     * @param string $markup
-     * @param string $expected
-     */
-    private function createReplacedTest($segmentId, $markup, $expected = null)
+    private function createReplacedTest(int $segmentId, string $markup, string $expected = null): void
     {
-        $replacedMarkup = $this->replaceTags($markup);
+        $replacedMarkup = $this->shortToFull($markup);
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $replacedMarkup, 'target', 'targetEdit');
         // compare unparsed markup
         if ($expected == null) {
@@ -187,33 +170,5 @@ class SegmentTagsOverlapTest extends SegmentTagsTestAbstract
         $expectedJSON = $tags->toJson();
         $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
         $this->assertEquals($expectedJSON, $jsonTags->toJson());
-    }
-
-    /**
-     * @param string $markup
-     * @return string
-     */
-    private function replaceTags($markup)
-    {
-        $markup = str_replace('<1>', $this->open1, $markup);
-        $markup = str_replace('</1>', $this->close1, $markup);
-        $markup = str_replace('<2>', $this->open2, $markup);
-        $markup = str_replace('</2>', $this->close2, $markup);
-        $markup = str_replace('<3>', $this->open3, $markup);
-        $markup = str_replace('</3>', $this->close3, $markup);
-        $markup = str_replace('<4>', $this->open4, $markup);
-        $markup = str_replace('</4>', $this->close4, $markup);
-        $markup = str_replace('<5>', $this->open5, $markup);
-        $markup = str_replace('</5>', $this->close5, $markup);
-        $markup = str_replace('<6>', $this->open6, $markup);
-        $markup = str_replace('</6>', $this->close6, $markup);
-        $markup = str_replace('<7>', $this->open7, $markup);
-        $markup = str_replace('</7>', $this->close7, $markup);
-        $markup = str_replace('<8>', $this->open8, $markup);
-        $markup = str_replace('</8>', $this->close8, $markup);
-        $markup = str_replace('<9/>', $this->single9, $markup);
-        $markup = str_replace('<10/>', $this->single10, $markup);
-
-        return $markup;
     }
 }

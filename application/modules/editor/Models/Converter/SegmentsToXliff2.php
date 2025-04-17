@@ -281,7 +281,10 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 
         $tmpUser = [];
         foreach ($assocUsers as $user) {
-            if (! $user['role'] || $user['role'] === editor_Workflow_Default::ROLE_VISITOR || $user['role'] === '') {
+            if (! $user['role'] || in_array(
+                $user['role'],
+                [editor_Workflow_Default::ROLE_VISITOR, editor_Workflow_Default::ROLE_VISUALAPPROVER, '']
+            )) {
                 continue;
             }
             $this->data['assocUsers'][$user['role']][] = $user;
@@ -324,8 +327,8 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 
         $languagesModel = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
-        $sourceLang = $languagesModel->loadLangRfc5646($this->task->getSourceLang());
-        $targetLang = $languagesModel->loadLangRfc5646($this->task->getTargetLang());
+        $sourceLang = $languagesModel->loadLangRfc5646((int) $this->task->getSourceLang());
+        $targetLang = $languagesModel->loadLangRfc5646((int) $this->task->getTargetLang());
         $headParams[] = 'srcLang="' . $this->escape($sourceLang) . '"';
         $headParams[] = 'trgLang="' . $this->escape($targetLang) . '"';
 

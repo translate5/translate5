@@ -157,7 +157,7 @@ Ext.define('Editor.util.messageBus.MessageBus', {
             var data;
             try {
                 data = Ext.JSON.decode(evt.data);
-            }catch(e) {
+            } catch(e) {
                 Ext.Logger.warn('MessageBus: could not decode message JSON.');
                 return;
             }
@@ -166,13 +166,13 @@ Ext.define('Editor.util.messageBus.MessageBus', {
                 console.log('↓ ', data.command, data.error);
                 me.setReconnect(false);
                 me.currentChannel = null; //needed in order to let the events come from the bus instance
-                me.fireEvent('error', me, event, data.error);
+                me.fireEvent('error', me, evt, data.error);
                 return;
             }
             
             me.currentChannel = data.channel;
+            console.log('↓ ', data.channel, data.command, data.payload);
             me.fireEvent(data.command, data.payload);
-console.log('↓ ', data.channel, data.command, data.payload);
         };
         
         /**

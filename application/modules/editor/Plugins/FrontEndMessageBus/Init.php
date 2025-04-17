@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Plugins\VisualReview\Annotation\AnnotationEntity;
+
 class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
 {
     public const CHANNEL_TASK = 'task';
@@ -352,14 +354,13 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
             return;
         }
         $context = $event->getParam('context');
-
-        $taskProcess = ZfExtended_Factory::get('editor_Models_Task_WorkerProgress');
-        /** @var editor_Models_Task_WorkerProgress $taskProcess */
-        $progress = $taskProcess->calculateProgress($taskGuid, $context);
+        $taskProgress = ZfExtended_Factory::get(editor_Models_Task_WorkerProgress::class);
+        $progress = $taskProgress->calculateProgress($taskGuid, $context);
 
         $this->bus->notify(self::CHANNEL_TASK, 'updateProgress', [
             'taskGuid' => $taskGuid,
             'progress' => $progress['progress'],
+            'operationType' => $progress['operationType'],
         ]);
     }
 
@@ -457,7 +458,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
     public function handleAnnotation(Zend_EventManager_Event $event)
     {
         $entity = $event->getParam('entity');
-        /* @var $entity editor_Plugins_VisualReview_Annotation_Entity */
+        /* @var $entity AnnotationEntity */
         $taskGuid = $entity->getTaskGuid();
         $annotation = $entity->toArray();
 
@@ -474,7 +475,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
 
     public function handleDelete(Zend_EventManager_Event $event)
     {
-        /* @var $ent editor_Plugins_VisualReview_Annotation_Entity|editor_Models_Comment */
+        /* @var $ent AnnotationEntity|editor_Models_Comment */
         $ent = $event->getParam('entity');
 
         $controller = $event->getParam('controller');

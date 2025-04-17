@@ -37,10 +37,7 @@ use ZfExtended_Utils;
  */
 abstract class MockedTaskTestAbstract extends UnitTestAbstract
 {
-    /**
-     * @var editor_Models_Task
-     */
-    protected static $testTask = null;
+    protected static ?editor_Models_Task $testTask = null;
 
     /**
      * Retrieves a test-tak to init field-tags with

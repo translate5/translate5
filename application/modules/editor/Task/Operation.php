@@ -27,12 +27,19 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * A simple Overview class that holds the identifiers for all operations and creates the start/finishing worker to wrap an operation
+ * A simple Overview class that holds the identifiers for all operations and creates the start/finishing worker
+ * to wrap a task-operation
  */
 class editor_Task_Operation
 {
     // Every operation (also from Plugins) should define their type here to have an overview about the possible operations
     // these keys presumably also be used to find code related to the operation, so please keep them pretty unique !
+
+    /**
+     * @var string
+     */
+    public const IMPORT = 'import';
+
     /**
      * @var string
      */
@@ -54,10 +61,20 @@ class editor_Task_Operation
     public const PIVOT_PRE_TRANSLATION = 'pivotpretranslation';
 
     /**
+     * @var string
+     */
+    public const VISUAL_EXCHANGE = 'visualexchange';
+
+    /**
      * Creates a Task-Operation which is the wrapper for any operation performed for tasks albeit the Import
      */
-    public static function create(string $operationType, editor_Models_Task $task): editor_Task_Operation
-    {
+    public static function create(
+        string $operationType,
+        editor_Models_Task $task,
+        string $startingWorkerClass = editor_Task_Operation_StartingWorker::class,
+        string $finishingWorkerClass = editor_Task_Operation_FinishingWorker::class,
+        array $workerParams = []
+    ): editor_Task_Operation {
         $taskState = $task->getState();
         // Only one operation is allowed to run at a time !
         if (in_array($taskState, self::getAllOperations())) {
@@ -73,7 +90,7 @@ class editor_Task_Operation
             ]);
         }
 
-        return new self($operationType, $task);
+        return new self($operationType, $task, $startingWorkerClass, $finishingWorkerClass, $workerParams);
     }
 
     /**
@@ -82,38 +99,52 @@ class editor_Task_Operation
      */
     public static function getAllOperations(): array
     {
-        return [self::AUTOQA, self::MATCHANALYSIS, self::PIVOT_PRE_TRANSLATION];
+        return [self::AUTOQA, self::MATCHANALYSIS, self::PIVOT_PRE_TRANSLATION, self::TAGTERMS, self::VISUAL_EXCHANGE];
     }
-
-    private int $workerId;
 
     private string $taskGuid;
 
-    private editor_Task_Operation_StartingWorker $worker;
+    private editor_Task_Operation_StartingWorker $startingWorker;
 
+    private int $startingWorkerId;
+
+    /**
+     * Queues an operation (the starting & finishing workr). The operation must be started via ::start()
+     * @param editor_Models_Task $task The task the operation is bound to.
+     *                                 The task's state will be set to the $operationType
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
     private function __construct(
-        private string $operationType,
-        editor_Models_Task $task
+        string $operationType,
+        editor_Models_Task $task,
+        string $startingWorkerClass,
+        string $finishingWorkerClass,
+        array $workerParams
     ) {
         $this->taskGuid = $task->getTaskGuid();
-        $this->worker = ZfExtended_Factory::get(editor_Task_Operation_StartingWorker::class);
-        if ($this->worker->init($this->taskGuid, [
-            'operationType' => $operationType,
-        ])) {
-            $this->workerId = $this->worker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
+        $this->startingWorker = ZfExtended_Factory::get($startingWorkerClass);
+        $workerParams['operationType'] = $operationType; // important for frontend-callbacks / message-bus !
+        if ($this->startingWorker->init($this->taskGuid, $workerParams)) {
+            $this->startingWorkerId = $this->startingWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
             // add finishing worker
-            $worker = ZfExtended_Factory::get(editor_Task_Operation_FinishingWorker::class);
-            if ($worker->init($this->taskGuid, [
-                'operationType' => $operationType,
-                'taskInitialState' => $task->getState(),
-            ])) {
-                $worker->queue($this->workerId, ZfExtended_Models_Worker::STATE_PREPARE, false);
+            $worker = ZfExtended_Factory::get($finishingWorkerClass);
+            $workerParams['taskInitialState'] = $task->getState();
+            if ($worker->init($this->taskGuid, $workerParams)) {
+                $worker->queue($this->startingWorkerId, ZfExtended_Models_Worker::STATE_PREPARE, false);
 
                 return;
             }
         }
 
-        throw new ZfExtended_Exception('Operation could not be started, the operation workers could not be initialized.');
+        throw new ZfExtended_Exception(
+            'Operation "' . $operationType . '" could not be started, the operation workers could not be initialized.'
+        );
     }
 
     /**
@@ -121,7 +152,7 @@ class editor_Task_Operation
      */
     public function getWorkerId(): int
     {
-        return $this->workerId;
+        return $this->startingWorkerId;
     }
 
     /**
@@ -129,7 +160,7 @@ class editor_Task_Operation
      */
     public function start(): void
     {
-        $this->worker->schedulePrepared();
+        $this->startingWorker->schedulePrepared();
     }
 
     /**
@@ -137,6 +168,6 @@ class editor_Task_Operation
      */
     public function onQueueingError(): void
     {
-        $this->worker->getModel()->cleanForTask($this->taskGuid);
+        $this->startingWorker->getModel()->cleanForTask($this->taskGuid);
     }
 }

@@ -896,7 +896,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             $importConfig = $event->getParam('importConfig');
 
             $config = Zend_Registry::get('config');
-            $workfiles = '/' . trim($importConfig->getFilesDirectory(), '/') . '/';
+            $workfiles = '/' . trim($importConfig->getWorkfilesDirName(), '/') . '/';
             $relaisDirectory = '/' . trim($config->runtimeOptions->import->relaisDirectory, '/') . '/';
             $fullpath = $fullpath . $suffix;
             $bilingualSourceFile = str_replace($relaisDirectory, $workfiles, $fullpath);

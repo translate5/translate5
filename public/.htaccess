@@ -5,6 +5,8 @@ RewriteEngine On
 
 # current open task: remove the current opened task from URL (and place it in currentTaskId), so that resources (JS, CSS) are loaded properly
 RewriteRule ^editor/taskid/([0-9]+)/(.*)$ $2?currentTaskId=$1 [NC,L,QSA]
+# current open visual: remove the visual source-file-id and redirect to the Alias visual. This is intended to being able to version visuals
+RewriteRule ^editor/visualid/[0-9]+/(.*)$ visual/$1 [NC,L,QSA]
 
 # Windows only. This is a workaround for the problem of very slow app loading
 # due to slow php when application root is mapped as a volume to Windows-host

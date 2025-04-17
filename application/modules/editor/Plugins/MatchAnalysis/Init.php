@@ -512,7 +512,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $task->loadByTaskGuid($taskGuid);
 
         // lock the task dedicated for analysis
-        if ($task->lock(NOW_ISO, editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS)) {
+        if ($task->lock(NOW_ISO, editor_Task_Operation::MATCHANALYSIS)) {
             // else check if we are in import, then no separate lock is needed.
             // Therefor if we are not in import this is an error
         } elseif ($task->getState() != editor_Models_Task::STATE_IMPORT) {
@@ -581,7 +581,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             $parentId = ($importWorker === null) ? 0 : (int) $importWorker->getId();
             $state = ($importWorker === null) ? ZfExtended_Models_Worker::STATE_SCHEDULED : ZfExtended_Models_Worker::STATE_PREPARE;
 
-            $this->doQueueAnalysisWorkers($task, $parentId, $state, $workerParameters);
+            $this->doQueueAnalysisWorkers(
+                $task,
+                $parentId,
+                $state,
+                $workerParameters,
+                editor_Task_Operation::IMPORT
+            );
         } else {
             // this creates the operation start/finish workers
             $operation = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
@@ -593,7 +599,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 // add a different behaviour for the workers when performing an operation
                 $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
 
-                $this->doQueueAnalysisWorkers($task, $parentWorkerId, $workerState, $workerParameters);
+                $this->doQueueAnalysisWorkers(
+                    $task,
+                    $parentWorkerId,
+                    $workerState,
+                    $workerParameters,
+                    editor_Task_Operation::MATCHANALYSIS
+                );
                 // and start operation
                 $operation->start();
             } catch (Throwable $e) {
@@ -617,7 +629,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         editor_Models_Task $task,
         int $parentWorkerId,
         ?string $workerState,
-        array $workerParameters = []
+        array $workerParameters,
+        string $operationType
     ) {
         $workerParameters['userGuid'] = ZfExtended_Models_User::SYSTEM_GUID;
         $workerParameters['userName'] = ZfExtended_Models_User::SYSTEM_LOGIN;
@@ -660,6 +673,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             // if we are not importing we need to add the quality workers (which also include the termtagger)
             editor_Segment_Quality_Manager::instance()->queueOperation(
                 editor_Segment_Processing::ANALYSIS,
+                $operationType,
                 $task,
                 $parentWorkerId,
                 ZfExtended_Models_Worker::STATE_PREPARE

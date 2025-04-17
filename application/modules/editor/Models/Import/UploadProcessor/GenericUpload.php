@@ -58,10 +58,11 @@ class editor_Models_Import_UploadProcessor_GenericUpload
     /**
      * @param string $targetDirectory optional, the targetDirectory in the importRoot where the files should be moved, defaults to null which means placing the file in the import root directly
      */
-    public function __construct(string $fieldName, string $targetDirectory = null)
+    public function __construct(string $fieldName, string $targetDirectory = null, bool $optional = true)
     {
         $this->fieldName = $fieldName;
         $this->targetDirectory = $targetDirectory;
+        $this->optional = $optional;
     }
 
     /**

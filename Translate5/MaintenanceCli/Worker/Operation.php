@@ -40,6 +40,7 @@ final class Operation
         'taskPackageExport',
         'taskPackageReimport',
         'languageResourceImport',
+        'visualExchange',
         'UNKNOWN',
     ];
 
@@ -88,21 +89,17 @@ final class Operation
         return 0;
     }
 
+    /**
+     * This defies, which worker may be part of which operation
+     * This needs to be updated when workers are added, otherwise a proper tree can not be built
+     */
     private static function findOperation(string $worker): array
     {
         return match ($worker) {
             'editor_Models_Import_Worker_FileTree',
             'editor_Models_Import_Worker_ReferenceFileTree',
             'editor_Models_Import_Worker_FinalStep',
-            'editor_Plugins_VisualReview_HtmlImportWorker',
-            'editor_Plugins_VisualReview_PdfToHtmlWorker',
-            'editor_Plugins_VisualReview_HeadlessBrowserHtmlWorker',
-            'editor_Plugins_VisualReview_ImageOcrWorker',
-            'editor_Plugins_VisualReview_VideoHtmlWorker',
-            'editor_Plugins_VisualReview_XmlHtmlWorker',
-            'editor_Plugins_VisualReview_XmlXsltToHtmlWorker',
-            'editor_Plugins_VisualReview_SegmentationWorker',
-            'editor_Plugins_VisualReview_ImageHtmlWorker' => ['taskImport'],
+            'editor_Models_Import_Worker_SetTaskToOpen', => ['taskImport'],
             'editor_Models_Export_Worker' => ['taskExport'],
             'MittagQI\Translate5\Task\Export\Package\Worker' => ['taskPackageExport'],
             'MittagQI\Translate5\Task\Reimport\Worker' => ['taskPackageReimport'],
@@ -122,6 +119,18 @@ final class Operation
             'editor_Plugins_ModelFront_Worker',
             'editor_Plugins_MatchAnalysis_BatchWorker' => ['taskImport', 'taskOperation'],
             'editor_Services_ImportWorker' => ['languageResourceImport'],
+            'editor_Plugins_VisualReview_HtmlImportWorker',
+            'editor_Plugins_VisualReview_PdfToHtmlWorker',
+            'editor_Plugins_VisualReview_HeadlessBrowserHtmlWorker',
+            'editor_Plugins_VisualReview_ImageOcrWorker',
+            'editor_Plugins_VisualReview_VideoHtmlWorker',
+            'editor_Plugins_VisualReview_XmlHtmlWorker',
+            'editor_Plugins_VisualReview_XmlXsltToHtmlWorker',
+            'editor_Plugins_VisualReview_SegmentationWorker',
+            'editor_Plugins_VisualReview_ImageHtmlWorker' => ['taskImport', 'visualExchange'],
+            'MittagQI\Translate5\Plugins\VisualReview\Worker\VisualExchangeStartingWorker',
+            'MittagQI\Translate5\Plugins\VisualReview\Worker\VisualExchangeFinishingWorker' => ['visualExchange'],
+
             default => ['UNKNOWN'],
         };
     }

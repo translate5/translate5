@@ -66,7 +66,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
         },
         disableRanges:{
             get: function (task) {
-                return task && task.get('usageMode') !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS;
+                return task && task.get('usageMode') !== Editor.model.admin.Task.usageModes.SIMULTANEOUS;
             },
             bind:{bindTo:'{currentTask}',deep:true}
         },
@@ -119,7 +119,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                 	states = [],
                 	metaData = task ? task.getWorkflowMetaData() : [];
 	            Ext.Object.each(metaData.states, function(key, state) {
-	                states.push({id: key, text: state, disabled: key === task.USER_STATE_AUTO_FINISH});
+	                states.push({id: key, text: state, disabled: key === Editor.model.admin.Task.userStates.AUTO_FINISH});
 	            });
                 return states;
             }

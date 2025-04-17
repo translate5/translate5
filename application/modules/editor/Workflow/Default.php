@@ -79,6 +79,8 @@ class editor_Workflow_Default
 
     public const ROLE_VISITOR = 'visitor';
 
+    public const ROLE_VISUALAPPROVER = 'visualApprover';
+
     /*
      ** The following hard coded steps are always needed / or are out of workflow:
      */
@@ -87,6 +89,10 @@ class editor_Workflow_Default
     public const STEP_PM_CHECK = 'pmCheck';
 
     public const STEP_WORKFLOW_ENDED = 'workflowEnded';
+
+    public const STEP_REVIEWING = 'reviewing';
+
+    public const STEP_TRANSLATORCHECK = 'translatorCheck';
 
     public const CACHE_KEY = 'workflow_definitions_';
 
@@ -106,6 +112,7 @@ class editor_Workflow_Default
      */
     protected $readableRoles = [
         self::ROLE_VISITOR,
+        self::ROLE_VISUALAPPROVER,
         self::ROLE_REVIEWER,
         self::ROLE_TRANSLATOR,
         self::ROLE_TRANSLATORCHECK,
@@ -117,6 +124,7 @@ class editor_Workflow_Default
      */
     protected $writeableRoles = [
         self::ROLE_REVIEWER,
+        self::ROLE_VISUALAPPROVER,
         self::ROLE_TRANSLATOR,
         self::ROLE_TRANSLATORCHECK,
     ];
@@ -726,11 +734,16 @@ class editor_Workflow_Default
         ksort($usedLabels);
         ksort($data);
         if (count($data) !== count($usedLabels)) {
-            // {className}::$labels has to much / or missing labels!',
+            // {className}::$labels has too much / or missing labels!'
+            // be aware, that usually one needs to add translations for newly added 'ROLE_', 'STEP_', 'STATE_' constants
+            $diff = array_diff($data, $usedLabels);
+            error_log('ERROR: Workflow Labels Missing in ' . get_class($this) . ':  ' . print_r($diff, true));
+
             throw new editor_Workflow_Exception('E1253', [
                 'data' => $data,
                 'usedLabels' => $usedLabels,
                 'workflowId' => $this->definition->name,
+                'diff' => $diff,
             ]);
         }
 

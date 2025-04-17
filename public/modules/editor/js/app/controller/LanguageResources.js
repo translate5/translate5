@@ -267,7 +267,7 @@ Ext.define('Editor.controller.LanguageResources', {
                   panel.setHeight(height);
               }
           },
-          height:Editor.data.task.get('visualReviewFiles') ? '25%' : '30%',
+          height: Editor.data.task.get('visualFiles') ? '25%' : '30%',
           // min height remains also for manual resizing
           minHeight: 150,
           //collapsing is independent of resizing

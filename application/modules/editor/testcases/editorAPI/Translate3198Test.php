@@ -147,7 +147,7 @@ class Translate3198Test extends ImportTestAbstract
             'pretranslateMatchrate' => 100,
         ]);
 
-        // todo: make this work: static::api()->waitForTaskState($taskId, editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS);
+        // todo: make this work: static::api()->waitForTaskState($taskId, editor_Task_Operation::MATCHANALYSIS);
         sleep(20);
 
         // [8] Get analysis results

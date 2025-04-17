@@ -59,6 +59,16 @@ class BatchSetTaskGuidsProvider
         );
     }
 
+    /**
+     * @return int[]
+     */
+    public function getAllowedTaskIds(TaskGuidsQueryDto $query): array
+    {
+        $taskGuids = $this->getAllowedTaskGuids($query);
+
+        return array_keys($taskGuids);
+    }
+
     public function getAllowedTaskGuids(TaskGuidsQueryDto $query): array
     {
         if (null !== $query->projectAndTaskIds) {
@@ -68,7 +78,8 @@ class BatchSetTaskGuidsProvider
         return $this->getTaskGuidsFromFilteredProjects($query->filter);
     }
 
-    /* To be used carefully as for example the following filter is ignored (it returns all possible tasks)
+    /* Returns: taskId => taskGuid array
+    Warning: Use carefully, for example the following filter is ignored (it returns all possible tasks)
     $jsonFilter = [{"operator":"in","value":[],"property":"projectId"}] */
     private function fetchAllowedTaskGuids(string $jsonFilter): array
     {
@@ -80,7 +91,7 @@ class BatchSetTaskGuidsProvider
 
         $rows = $this->db->fetchAll($taskSelect);
 
-        return array_column($rows, 'taskGuid');
+        return array_column($rows, 'taskGuid', 'id');
     }
 
     private function getTaskGuidsFromFilteredProjects(string $jsonFilter): array
@@ -119,8 +130,8 @@ class BatchSetTaskGuidsProvider
             ])
         );
 
-        return array_merge(
-            $taskGuids,
+        // Use "+" to preserve array indexes, taskId => taskGuid array is needed
+        return $taskGuids +
             $this->getTaskGuidsFromFilteredProjects(
                 json_encode([
                     [
@@ -129,7 +140,6 @@ class BatchSetTaskGuidsProvider
                         'property' => 'id',
                     ],
                 ])
-            )
-        );
+            );
     }
 }

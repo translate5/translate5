@@ -147,6 +147,8 @@ Ext.define('Editor.controller.Localizer', {
             closeBtn: '<?php echo $this->translate->_('Anwendung verlassen');?>',
             showDesc: '<?php echo $this->translate->_('Projektbeschr. anzeigen');?>',
             hideDesc: '<?php echo $this->translate->_('Projektbeschr. ausblenden');?>',
+            isTaskApproved: '<?php echo $this->translate->_('Ist die Aufgabe genehmigt?');?>',
+            addCommentToReject: '<?php echo $this->translate->_('Wenn Sie auf "Nein" klicken möchten, schließen Sie bitte dieses Popup und fügen Sie einen Kommentar hinzu, warum');?>',
             leaveTaskWindowMessage: '<?php echo $this->translate->_('Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?');?>',
             leaveTaskWindowFinishBtn: '<?php echo $this->translate->_('Alles fertig - Aufgabe abschließen');?>',
             leaveTaskWindowCancelBtn: '<?php echo $this->translate->_('Aufgabe später weiterbearbeiten');?>'
@@ -2162,9 +2164,8 @@ Editor.data.l10n = {
             reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren');?>',
             notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
             resetFilterText: '<?php echo $this->translate->_('Filter zurücksetzen');?>',
-            batchSetProperties: '<?php echo $this->translate->_('Massenänderungen');?>',
-            batchSetPropertiesTip: '<?php echo $this->translate->_('Ändern Sie die Eigenschaften mehrerer Projekte in einer Massenoperation. Beispiel: Ändern Sie die Deadline für alle Jobs "Übersetzung" aller markierten Projekte gleichzeitig');?>',
             batchSetTooltip: '<?php echo $this->translate->_('Eigenschaften ändern');?>',
+            batchOperations: '<?php echo $this->translate->_('Batch-Operationen');?>',
             onlyMyProjects: '<?php echo $this->translate->_('Nur meine Projekte');?>'
         },
         text_cols: {
@@ -2179,7 +2180,11 @@ Editor.data.l10n = {
             pmGuid: '<?php echo $this->translate->_('Projektmanager');?>'
         }
     },
-    tasksGrid:{
+    taskBatchActionMenu: {
+        batchSetProperties: '<?php echo $this->translate->_('Massenänderungen');?>',
+        batchSetPropertiesTip: '<?php echo $this->translate->_('Ändern Sie die Eigenschaften mehrerer Projekte in einer Massenoperation. Beispiel: Ändern Sie die Deadline für alle Jobs "Übersetzung" aller markierten Projekte gleichzeitig');?>',
+    },
+    tasksGrid: {
         tooltip: '<?php echo $this->translate->_('Zur Aufgabenliste wechseln');?>',
         actionColumn: {
             projectOverview: '<?php echo $this->translate->_('Zum Projekt springen – wechselt in die Projektliste');?>',
@@ -2188,7 +2193,7 @@ Editor.data.l10n = {
             projectActionMenu: '<?php echo $this->translate->_('Projektmenü anzeigen');?>',
             actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>'
         },
-        exportMenu:{
+        exportMenu: {
             packageExportItem: '<?php echo $this->translate->_('Übersetzerpaket herunterladen');?>'
         },
         progress: {
@@ -2602,7 +2607,7 @@ etc.')?>'
         warning: '<?php echo $this->translate->_('Warnung');?>',
         infobox: '<?php echo $this->translate->_('Wählen Sie Projekte und die dazugehörigen Aufgaben aus, indem Sie auf das Kontrollkästchen klicken (Sie können auch einzelne Aufgaben auswählen bzw. die Auswahl aufheben, z. B. bei Projekten mit mehreren Aufgaben) oder wenden Sie Filter auf Ihre Projektliste an. Wählen Sie dann die Eigenschaft, die Sie ändern möchten, und fügen Sie den neuen Wert hinzu').'.<br>'.$this->translate->_('Klicken Sie auf "Für alle selektierten ändern", um die Eigenschaft für <b>alle markierten</b> Aufgaben zu ändern, oder klicken Sie auf "Für alle in Filterung ändern", um die Eigenschaft für <b>alle</b> Aufgaben in der aktuell angewandten Projektfilterung zu ändern.');?>',
         noPropertySet:'<?php echo $this->translate->_('Es wurde keine Eigenschaft angegeben');?>',
-        noTasksSelected:'<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>'
+        noTasksSelected:'<?php echo $this->translate->_('Keine Aufgaben ausgewählt');?>'
     },
     crossLanguageResourceSynchronization: {
         windowTitle: '<?= $this->translate->_('Verwalten von Verbindungen') ?>',

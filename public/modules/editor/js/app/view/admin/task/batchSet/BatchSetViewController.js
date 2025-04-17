@@ -25,19 +25,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
+Ext.define('Editor.view.admin.task.batchSet.BatchSetViewController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.adminTaskBatchSetWindow',
+
+    childParamField: '',
+    batchFields: [],
+    withFileUpload: false,
 
     listen: {
         component: {
-            '#batchWorkflow': {
-                afterrender: function (cmp) {
-                    // pre-select 1st workflow or cmp.fireEvent('change', cmp);
-                    cmp.setValue(cmp.getStore().getAt(0).get('id'));
-                },
-                change: 'onWorkflowFieldChange'
-            },
             '#setForFiltered': {
                 click: 'onSetForFilteredClick'
             },
@@ -57,12 +53,12 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
      */
     handleBatchSet: function (selectedTasksOnly) {
         const batchParams = {},
-            deadLineParams = this.initBatchParams(['batchWorkflow', 'batchWorkflowStep', 'deadlineDate']);
-        if (deadLineParams) {
-            batchParams['deadlineDate'] = deadLineParams;
+            childParams = this.initBatchParams();
+        if (childParams) {
+            batchParams[this.childParamField] = childParams;
         }
         if(Object.keys(batchParams).length < 1) {
-            return this.showWarning(Editor.data.l10n.batchSetWindow.noPropertySet);
+            return this.showWarningNoProperty();
         }
 
         const store = Ext.StoreManager.get('project.Project'),
@@ -79,14 +75,40 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
             }
             // unselect checkboxes
             dataController.clearData();
-            tasksData['projectsAndTasks'] = projectsAndTasks.join(',');
+            tasksData.projectsAndTasks = projectsAndTasks.join(',');
         } else {
             tasksData[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
         }
 
+        this.submitBatchParams(tasksData, batchParams);
+    },
+
+    submitBatchParams: function (tasksData, batchParams) {
         for (const [updateType, params] of Object.entries(batchParams)) {
 
-            params['updateType'] = updateType;
+            params.updateType = updateType;
+
+            if(this.withFileUpload) {
+                const view = this.getView(), form = view.down('form');
+
+                params.format = 'jsontext';
+
+                view.setLoading(true);
+                form.submit({
+                    params: {...params, ...tasksData},
+                    url: Editor.data.restpath + 'taskuserassoc/batchset',
+                    success: function(frm, submit) {
+                        Editor.MessageBox.addSuccess('Success');
+                        view.setLoading(false);
+                        view.close();
+                    },
+                    failure: function(frm, submit) {
+                        Editor.app.getController('ServerException').handleException(submit.response);
+                        view.setLoading(false);
+                    }
+                });
+                return;
+            }
 
             Ext.Ajax.request({
                 url: Editor.data.restpath + 'taskuserassoc/batchset',
@@ -103,13 +125,12 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
     },
 
     /**
-     * Init parameters for batch set; returns null unless all fields are set
-     * @param {String[]} fieldIds
+     * Init parameters for batch set; returns null unless all required fields are set
      * @return {Object|null}
      */
-    initBatchParams: function (fieldIds) {
+    initBatchParams: function () {
         const me = this.getView(), params = {};
-        fieldIds.every(function (fieldId) {
+        this.batchFields.every(function (fieldId) {
             const field = me.down('#' + fieldId);
             if (!field.value) {
                 return false;
@@ -117,21 +138,25 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
             params[fieldId] = field.value;
             return true;
         });
-        return Object.keys(params).length === fieldIds.length ? params : null;
+        return Object.keys(params).length === this.batchFields.length ? params : null;
     },
 
     showWarning: function (msg) {
         Ext.Msg.alert(Editor.data.l10n.batchSetWindow.warning, msg);
     },
 
+    showWarningNoProperty: function (msg) {
+        this.showWarning(Editor.data.l10n.batchSetWindow.noPropertySet);
+    },
+
     onSetForFilteredClick: function () {
         const me = this,
             store = Ext.StoreManager.get('project.Project'),
             proxy = store.getProxy(),
-            params = this.initBatchParams(['batchWorkflow', 'batchWorkflowStep']);
+            params = this.initBatchParams();
 
         if(params === null) {
-            return this.showWarning(Editor.data.l10n.batchSetWindow.noPropertySet);
+            return this.showWarningNoProperty();
         }
 
         params.countTasks = 1;
@@ -159,30 +184,6 @@ Ext.define('Editor.view.admin.task.BatchSetWindowViewController', {
                 Editor.app.getController('ServerException').handleException(response);
             }
         });
-    },
-
-    onWorkflowFieldChange: function (fld, workflowIds) {
-        var allSteps = [];
-
-        Ext.Object.each(Editor.data.app.workflows, function (key, workflow) {
-            Ext.Object.each(workflow.steps, function (stepId, stepText) {
-                if (workflowIds.length > 0 && !workflowIds.includes(workflow.id)) {
-                    return;
-                }
-                if (!["no workflow", "pmCheck", "workflowEnded"].includes(stepId)) {
-                    allSteps.push({
-                        id: stepId,
-                        text: stepText,
-                        group: workflow.label
-                    });
-                }
-            });
-        });
-
-        const wfStepCmp = Ext.ComponentQuery.query('#batchWorkflowStep')[0],
-            store = new Ext.data.Store();
-        store.loadData(allSteps, false);
-        wfStepCmp.setStore(store);
     }
 
 });

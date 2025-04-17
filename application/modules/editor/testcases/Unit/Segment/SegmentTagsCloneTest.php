@@ -42,44 +42,34 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
     /**
      * Some Internal Tags to create Tests with
      */
-    private $open1 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>';
+    protected array $testTags = [
+        '<1>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>',
+        '</1>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>',
+        '<2>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '</2>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '<3>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '</3>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '<4>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>',
+        '</4>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>',
+        '<5/>' => '<div class="single tab internal-tag ownttip"><span class="short" title="&lt;5/&gt;: 1 tab character">&lt;5/&gt;</span><span class="full" data-originalid="tab" data-length="1">→</span></div>',
+        '<6/>' => '<div class="single internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;6/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>',
+        '<7/>' => '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;7/&gt;: Newline">&lt;7/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>',
+        '<8/>' => '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;8/&gt;: Newline">&lt;8/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>',
+        '<9/>' => '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;9/&gt;: Newline">&lt;9/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>',
+    ];
 
-    private $close1 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>';
+    private string $insX = '<ins class="trackchanges ownttip" data-usertrackingid="1868" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-05-27T20:04:17+02:00">';
 
-    private $open2 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>';
+    private string $delX = '<del class="trackchanges ownttip deleted" data-usertrackingid="1868" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-05-27T22:51:24+02:00">';
 
-    private $close2 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>';
-
-    private $open3 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>';
-
-    private $close3 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>';
-
-    private $open4 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>';
-
-    private $close4 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>';
-
-    private $single5 = '<div class="single tab internal-tag ownttip"><span class="short" title="&lt;5/&gt;: 1 tab character">&lt;5/&gt;</span><span class="full" data-originalid="tab" data-length="1">→</span></div>';
-
-    private $single6 = '<div class="single internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;6/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>';
-
-    private $single7 = '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;7/&gt;: Newline">&lt;7/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>';
-
-    private $single8 = '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;8/&gt;: Newline">&lt;8/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>';
-
-    private $single9 = '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;9/&gt;: Newline">&lt;9/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>';
-
-    private $insX = '<ins class="trackchanges ownttip" data-usertrackingid="1868" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-05-27T20:04:17+02:00">';
-
-    private $delX = '<del class="trackchanges ownttip deleted" data-usertrackingid="1868" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-05-27T22:51:24+02:00">';
-
-    public function testEmptyMarkup()
+    public function testEmptyMarkup(): void
     {
         $markup = '';
         $expected = '';
         $this->createTrackChangesCloneTest($expected, $markup);
     }
 
-    public function testSimpleMarkup1()
+    public function testSimpleMarkup1(): void
     {
         // testing srings without any tags
         $markup = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.';
@@ -87,7 +77,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesCloneTest($expected, $markup);
     }
 
-    public function testSimpleMarkup2()
+    public function testSimpleMarkup2(): void
     {
         // testing srings without any tags
         $markup = '<del>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</del> Sed diam nonumy eirmod tempor invidunt ut labore et<ins> dolore magna aliquyam erat</ins>, sed <del>diam</del> voluptua.';
@@ -95,7 +85,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesCloneTest($expected, $markup);
     }
 
-    public function testSimpleMarkup3()
+    public function testSimpleMarkup3(): void
     {
         // testing srings without any tags
         $markup = '<del>Lorem ipsum dolor <del>sit amet, consetetur</del> sadipscing elitr. </del>Sed diam nonumy eirmod tempor invidunt ut labore et<ins> dolore magna aliquyam erat</ins>, sed diam voluptua.';
@@ -104,7 +94,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesCloneTest($expected, $markup, false);
     }
 
-    public function testSimpleMarkup4()
+    public function testSimpleMarkup4(): void
     {
         // testing srings without any tags
         $markup = '<del>Lorem ipsum dolor sit amet, consetetur sadipscing elitr. </del>Sed diam nonumy eirmod tempor invidunt ut labore et<ins> dolore magna aliquyam erat</ins>, sed<del> diam voluptua</del>.';
@@ -112,7 +102,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesCloneTest($expected, $markup);
     }
 
-    public function testSimpleMarkup5()
+    public function testSimpleMarkup5(): void
     {
         // testing srings without any tags
         $markup = 'Lorem ipsum dolor sit <ins>amet</ins>, consetetur <ins>sadipscing</ins> elitr, sed diam nonumy eirmod tempor invi<del>dunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</del>';
@@ -120,7 +110,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesCloneTest($expected, $markup);
     }
 
-    public function testMarkup1()
+    public function testMarkup1(): void
     {
         // testing content without ins/del
         $markup = 'Lorem <1>ipsum dolor</1> sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
@@ -130,7 +120,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
-    public function testMarkup2()
+    public function testMarkup2(): void
     {
         $markup = 'Lorem <1>ipsum</1> dolor sit amet, <del><2>consetetur sadipscing<5/></2></del> elitr, sed diam <ins>nonumy eirmod tempor</ins> <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $expected = 'Lorem <1>ipsum</1> dolor sit amet, elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
@@ -139,7 +129,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
-    public function testMarkup3()
+    public function testMarkup3(): void
     {
         $markup = 'Lorem <1>ipsum <del>dolor</del></1> <del>sit</del> amet, <2><del>consetetur sadipscing<5/></del></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> <del>labore et <4>dolore magna</4> aliquyam erat</del></3>, sed diam voluptua.';
         $expected = 'Lorem <1>ipsum </1> amet, <2></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> </3>, sed diam voluptua.';
@@ -148,7 +138,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
-    public function testMarkup4()
+    public function testMarkup4(): void
     {
         // testing content without ins/del
         $markup = 'Lorem <del><1>ipsum dolor</1></del> sit amet, <2>consetetur sadipscing<del><5/></del></2> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><6/> labore et <ins><4>dolore magna</4></ins> aliquyam erat</3><del>,</del> sed diam voluptua.';
@@ -158,7 +148,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
-    public function testMarkup5()
+    public function testMarkup5(): void
     {
         // testing content without ins/del
         $markup = '<del><1>Lorem ipsum dolor</1> sit amet, </del><2>consetetur sadipscing<del><5/></del></2> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><6/> labore et <ins><4>dolore magna</4></ins> aliquyam erat</3><del>,</del> sed diam voluptua.';
@@ -168,7 +158,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
-    public function testMarkup6()
+    public function testMarkup6(): void
     {
         // testing content without ins/del
         $markup = 'Lorem <del><1>ipsum dolor</1></del> sit amet, <2>consetetur sadipscing<del><5/></del></2> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><6/> labore et <ins><4>dolore magna</4></ins> aliquyam erat</3><del>, sed diam voluptua.</del><7/>';
@@ -178,7 +168,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
-    public function testMarkup7()
+    public function testMarkup7(): void
     {
         // testing content without ins/del
         $markup = 'Lorem <del><1>ipsum dolor</1></del> sit amet, <2>consetetur sadipscing<del><5/></del></2> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><6/> labore et <ins><4>dolore magna</4></ins> aliquyam erat</3><del>, sed diam voluptua.<7/></del>';
@@ -188,7 +178,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
-    public function testMarkup8()
+    public function testMarkup8(): void
     {
         // testing content without ins/del
         $markup = 'Lorem <del><1>ipsum dolor</1></del> sit amet, <del><2>consetetur sadipscing<5/></2></del> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><6/> labore et <ins><4>dolore magna</4></ins> aliquyam erat</3><del>, sed</del> diam voluptua.';
@@ -198,7 +188,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
-    public function testMarkupMultipleBlanks()
+    public function testMarkupMultipleBlanks(): void
     {
         // testing content without ins/del
         $markup = 'Lorem  <del><1>ipsum dolor</1></del> sit amet,    <del><2>consetetur sadipscing<5/></2></del>    elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins>   <del>ut</del><6/> labore et <ins><4>dolore magna</4></ins> aliquyam erat</3><del>, sed</del> diam voluptua.';
@@ -208,7 +198,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
-    public function testLines1()
+    public function testLines1(): void
     {
         // testing content without ins/del
         $markup = 'Lorem <del><1>ipsum dolor</1></del> sit amet, <del><2>consetetur sadipscing<5/></2></del> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><6/> labore et <ins><8/>dolore magna</ins> aliquyam erat</3><del>, sed</del> diam<9/> voluptua.';
@@ -218,7 +208,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createMarkupLinesTest($expected, $markup);
     }
 
-    public function testLines2()
+    public function testLines2(): void
     {
         // testing content without ins/del
         $markup = 'Lorem <del><1>ipsum dolor</1></del> sit amet, <2>consetetur<8/> sadipscing<del><5/></del></2> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><9/><6/> labore et <ins><4>dolore magna</4></ins> aliquyam erat</3><del>, sed diam voluptua.<7/></del>';
@@ -228,7 +218,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $this->createMarkupLinesTest($expected, $markup);
     }
 
-    public function testLines3()
+    public function testLines3(): void
     {
         // testing content without ins/del
         $markup = 'Lorem  <del><1>ipsum dolor</1></del> sit amet,    <del><2>consetetur sadipscing<5/></2></del>    elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins>   <del>ut</del><6/> labore et <ins><8/>dolore magna</ins> aliquyam erat</3><del>, <9/>sed</del> diam voluptua.<7/>';
@@ -240,10 +230,8 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
 
     /**
      * Creates a test for the tags cloning. The passed markup will have the following short-tags replaced with "real" internal tags
-     * @param string $expected
-     * @param string $markup
      */
-    private function createTrackChangesCloneTest($expected, $markup, $testAgainstRegEx = true)
+    private function createTrackChangesCloneTest(string $expected, string $markup, bool $testAgainstRegEx = true): void
     {
         $markupConverted = $this->replaceTags($markup);
         $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $markupConverted, 'target', 'targetEdit');
@@ -279,10 +267,8 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
     /**
      * Creates a test for the tags cloning with filtering for internal tags only
      * The passed markup will have the following short-tags replaced with "real" internal tags
-     * @param string $expected
-     * @param string $markup
      */
-    private function createTrackChangesFilterCloneTest($expected, $markup)
+    private function createTrackChangesFilterCloneTest(string $expected, string $markup): void
     {
         // we filter for internal tags only
         $filter = [editor_Segment_Tag::TYPE_INTERNAL];
@@ -307,10 +293,8 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
     /**
      * Creates a test for the tags cloning with filtering for MQM tags only, what will effectively remove all tags as we only have internal tags
      * The passed markup will have the following short-tags replaced with "real" internal tags
-     * @param string $expected
-     * @param string $markup
      */
-    private function createTrackChangesMqmFilterCloneTest($expected, $markup)
+    private function createTrackChangesMqmFilterCloneTest(string $expected, string $markup): void
     {
         // we filter for internal tags only
         $filter = [editor_Segment_Tag::TYPE_MQM];
@@ -332,10 +316,8 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
 
     /**
      * Test the ::getFieldTextLines API of the Fieldtags (which uses the clone-API internally)
-     * @param string $expected
-     * @param string $markup
      */
-    private function createMarkupLinesTest($expected, $markup)
+    private function createMarkupLinesTest(string $expected, string $markup): void
     {
         $markupConverted = $this->replaceTags($markup);
         $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $markupConverted, 'target', 'targetEdit');
@@ -345,45 +327,31 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
 
     /**
      * Removes the order / parentOrder props in the json-data as they are not sequenced (but valid!) in the cloned tags
-     * @param string $json
-     * @return string
      */
-    private function cleanOrderInJSON($json)
+    private function cleanOrderInJSON(string $json): string
     {
         $json = preg_replace('/"parentOrder":[0-9]+,/', '"parentOrder":-1,', $json);
 
         return preg_replace('/"order":[0-9]+,/', '"order":-1,', $json);
     }
 
-    /**
-     * @param string $markup
-     * @return string
-     */
-    private function replaceTags($markup)
+    private function replaceTags(string $markup): string
     {
-        $markup = $this->replaceInternalTags($markup);
+        $markup = $this->shortToFull($markup);
         $markup = $this->replaceInsDelTags($markup);
 
         return $markup;
     }
 
-    /**
-     * @param string $markup
-     * @return string
-     */
-    private function revertTags($markup)
+    private function revertTags(string $markup): string
     {
-        $markup = $this->revertInternalTags($markup);
+        $markup = $this->fullToShort($markup);
         $markup = $this->revertInsDelTags($markup);
 
         return $markup;
     }
 
-    /**
-     * @param string $markup
-     * @return string
-     */
-    private function replaceInsDelTags($markup)
+    private function replaceInsDelTags(string $markup): string
     {
         $markup = $this->replaceMultipleTags($markup, '<ins>', $this->insX);
         $markup = $this->replaceMultipleTags($markup, '<del>', $this->delX);
@@ -393,12 +361,8 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
 
     /**
      * Replaces multiple ins/del tags and fills them with correct numberings
-     * @param string $markup
-     * @param string $search
-     * @param string $replace
-     * @return string
      */
-    private function replaceMultipleTags($markup, $search, $replace)
+    private function replaceMultipleTags(string $markup, string $search, string $replace): string
     {
         $count = -1;
         $result = preg_replace_callback('~' . $search . '~', function ($matches) use ($count, $replace) {
@@ -410,11 +374,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         return $result;
     }
 
-    /**
-     * @param string $markup
-     * @return string
-     */
-    private function revertInsDelTags($markup)
+    private function revertInsDelTags(string $markup): string
     {
         $markup = preg_replace('~<ins[^>]+>~', '<ins>', $markup);
         $markup = preg_replace('~<del[^>]+>~', '<del>', $markup);
@@ -423,59 +383,9 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
     }
 
     /**
-     * Replaces short tags with real internal tags
-     * @param string $markup
-     * @return string
-     */
-    private function replaceInternalTags($markup)
-    {
-        $markup = str_replace('<1>', $this->open1, $markup);
-        $markup = str_replace('</1>', $this->close1, $markup);
-        $markup = str_replace('<2>', $this->open2, $markup);
-        $markup = str_replace('</2>', $this->close2, $markup);
-        $markup = str_replace('<3>', $this->open3, $markup);
-        $markup = str_replace('</3>', $this->close3, $markup);
-        $markup = str_replace('<4>', $this->open4, $markup);
-        $markup = str_replace('</4>', $this->close4, $markup);
-        $markup = str_replace('<5/>', $this->single5, $markup);
-        $markup = str_replace('<6/>', $this->single6, $markup);
-        $markup = str_replace('<7/>', $this->single7, $markup);
-        $markup = str_replace('<8/>', $this->single8, $markup);
-        $markup = str_replace('<9/>', $this->single9, $markup);
-
-        return $markup;
-    }
-
-    /**
-     * Reverts the replacing of tgas
-     * @param string $markup
-     * @return mixed
-     */
-    private function revertInternalTags($markup)
-    {
-        $markup = str_replace($this->open1, '<1>', $markup);
-        $markup = str_replace($this->close1, '</1>', $markup);
-        $markup = str_replace($this->open2, '<2>', $markup);
-        $markup = str_replace($this->close2, '</2>', $markup);
-        $markup = str_replace($this->open3, '<3>', $markup);
-        $markup = str_replace($this->close3, '</3>', $markup);
-        $markup = str_replace($this->open4, '<4>', $markup);
-        $markup = str_replace($this->close4, '</4>', $markup);
-        $markup = str_replace($this->single5, '<5/>', $markup);
-        $markup = str_replace($this->single6, '<6/>', $markup);
-        $markup = str_replace($this->single7, '<7/>', $markup);
-        $markup = str_replace($this->single8, '<8/>', $markup);
-        $markup = str_replace($this->single9, '<9/>', $markup);
-
-        return $markup;
-    }
-
-    /**
      * Replaces all Internal Linebreak tags with Linebreaks, removes all other tags
-     * @param string $markup
-     * @return string
      */
-    private function replaceNewlineTags($markup)
+    private function replaceNewlineTags(string $markup): string
     {
         $markup = str_replace('<7/>', editor_Segment_NewlineTag::RENDERED, $markup);
         $markup = str_replace('<8/>', editor_Segment_NewlineTag::RENDERED, $markup);

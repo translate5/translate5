@@ -39,7 +39,7 @@ use ZfExtended_Dom;
  */
 class SegmentTagsTest extends SegmentTagsTestAbstract
 {
-    public function testUnicodeTag()
+    public function testUnicodeTag(): void
     {
         $expected = '<div><p>イリノイ州シカゴにて、アイルランド系の家庭に、</p></div>';
         $dom = new ZfExtended_Dom();
@@ -48,7 +48,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($result, $expected);
     }
 
-    public function testUnicodeWhitespaceTag()
+    public function testUnicodeWhitespaceTag(): void
     {
         $expected = '<div><p>イリノイ州シカゴにて、アイルランド系の家庭に、</p></div>';
         $dom = new ZfExtended_Dom();
@@ -57,7 +57,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
-    public function testMultipleUnicodeWhitespaceTag()
+    public function testMultipleUnicodeWhitespaceTag(): void
     {
         $expected = ' ÜüÖöÄäß? Japanisch: <div>イリノイ州シカゴにて、</div><p>アイルランド系の家庭に、</p> additional Textnode :-)';
         $dom = new ZfExtended_Dom();
@@ -69,7 +69,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
-    public function testNonStrictEncodedTag()
+    public function testNonStrictEncodedTag(): void
     {
         $markup = '<span class="short" title="&lt;ph name=&quot;ParagraphNumber&quot;/>" data-smth="&lt;ph name=&quot;ParagraphNumber&quot;/>"> Some & thing</span>';
         $expected = '<span class="short" title="&lt;ph name=&quot;ParagraphNumber&quot;/&gt;" data-smth="&lt;ph name=&quot;ParagraphNumber&quot;/&gt;"> Some &amp; thing</span>';
@@ -79,7 +79,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
-    public function testSingleEncodedTag()
+    public function testSingleEncodedTag(): void
     {
         $expected = '<span class="short" title="&lt;ph name=&quot;ParagraphNumber&quot;/&gt;" data-smth="&lt;ph name=&quot;ParagraphNumber&quot;/&gt;"> Some &amp; thing</span>';
         $dom = new ZfExtended_Dom();
@@ -88,7 +88,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
-    public function testDoubleEncodedTag()
+    public function testDoubleEncodedTag(): void
     {
         $expected = '<span class="short" title="&lt;ph name=&amp;quot;ParagraphNumber&amp;quot;/&gt;" data-smth="&lt;ph name=&amp;quot;ParagraphNumber&amp;quot;/&gt;"> Some &amp;amp; thing</span>';
         $dom = new ZfExtended_Dom();
@@ -97,7 +97,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
-    public function testSimpleTag()
+    public function testSimpleTag(): void
     {
         $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="upfront link-img" src="/some/icon.svg" /></a>';
         $tag = editor_Tag::unparse($expected);
@@ -105,7 +105,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
-    public function testTagWithAttributes()
+    public function testTagWithAttributes(): void
     {
         $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="upfront link-img" src="/some/icon.svg" /></a>';
         $tag = editor_Tag::unparse($expected);
@@ -113,7 +113,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
-    public function testClassOrder()
+    public function testClassOrder(): void
     {
         $expected = '<div class="zzz 12wer www aaa sss">Some Content</div>';
         $tag = editor_Tag::unparse($expected);
@@ -123,7 +123,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertTrue($tag2->isEqual($tag));
     }
 
-    public function testTagWithUnescapedChars()
+    public function testTagWithUnescapedChars(): void
     {
         $expected = '<a href="http://www.google.de" target="blank" data-test="42">"Something" is &lt; "Something" else</a>';
         $tag = editor_Tag::unparse($expected);
@@ -131,7 +131,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
-    public function testTagJSON()
+    public function testTagJSON(): void
     {
         $segmentTag = new editor_Segment_AnyTag(6, 11, 'test', 'div');
         $segmentTag
@@ -145,7 +145,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
-    public function testTagStripping()
+    public function testTagStripping(): void
     {
         $markup = '<div class="open 6270742069643d2231223e266c743b7370616e207374796c653d22666f6e742d7765696768743a3635303b223e3c2f627074 internal-tag ownttip"><span class="short" title="&lt;span style=&quot;font-weight:650;&quot;&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;span style="font-weight:650;"></span></div>HOSTED<div class="close 6570742069643d2231223e266c743b2f7370616e3e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/span&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/span></span></div><div class="single 70682069643d2232223e266c743b62723e3c2f7068 internal-tag ownttip"><span class="short" title="&lt;br&gt;">&lt;2/&gt;</span><span class="full" data-originalid="97fc34569f6c6899fd64ece1dd7d3c62" data-length="-1">&lt;br></span></div><div class="open 6270742069643d2233223e5b232464703138345d3c2f627074 internal-tag ownttip"><span class="short" title="[#$dp184]">&lt;3&gt;</span><span class="full" data-originalid="3" data-length="-1">[#$dp184]</span></div>Team Basic<div class="close 6570742069643d2233223e266c743b2f613e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/a&gt;">&lt;/3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;/a></span></div><div class="single 70682069643d2234223e266c743b62723e3c2f7068 internal-tag ownttip"><span class="short" title="&lt;br&gt;">&lt;4/&gt;</span><span class="full" data-originalid="9e401d2dc35e658e375584f4603b571a" data-length="-1">&lt;br></span></div><div class="open 6270742069643d2235223e5b232464703138355d3c2f627074 internal-tag ownttip"><span class="short" title="[#$dp185]">&lt;5&gt;</span><span class="full" data-originalid="5" data-length="-1">[#$dp185]</span></div>Team Visual<div class="close 6570742069643d2235223e266c743b2f613e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/a&gt;">&lt;/5&gt;</span><span class="full" data-originalid="5" data-length="-1">&lt;/a></span></div><div class="single 70682069643d2236223e266c743b62723e3c2f7068 internal-tag ownttip"><span class="short" title="&lt;br&gt;">&lt;6/&gt;</span><span class="full" data-originalid="f030e73f6576c27a0b91b2ca6531f204" data-length="-1">&lt;br></span></div><div class="open 6270742069643d2237223e5b232464703138365d3c2f627074 internal-tag ownttip"><span class="short" title="[#$dp186]">&lt;7&gt;</span><span class="full" data-originalid="7" data-length="-1">[#$dp186]</span></div>Community Member<div class="close 6570742069643d2237223e266c743b2f613e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/a&gt;">&lt;/7&gt;</span><span class="full" data-originalid="7" data-length="-1">&lt;/a></span></div> <div class="single 70682069643d2238223e266c743b62723e3c2f7068 internal-tag ownttip"><span class="short" title="&lt;br&gt;">&lt;8/&gt;</span><span class="full" data-originalid="91f73f45f868038dcf6e6e9331ae2395" data-length="-1">&lt;br></span></div><div class="open 6270742069643d2239223e266c743b7370616e207374796c653d22666f6e742d7765696768743a3635303b223e3c2f627074 internal-tag ownttip"><span class="short" title="&lt;span style=&quot;font-weight:650;&quot;&gt;">&lt;9&gt;</span><span class="full" data-originalid="9" data-length="-1">&lt;span style="font-weight:650;"></span></div>ON PREMISE<div class="close 6570742069643d2239223e266c743b2f7370616e3e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/span&gt;">&lt;/9&gt;</span><span class="full" data-originalid="9" data-length="-1">&lt;/span></span></div><div class="single 70682069643d223130223e266c743b62723e3c2f7068 internal-tag ownttip"><span class="short" title="&lt;br&gt;">&lt;10/&gt;</span><span class="full" data-originalid="4313c506b79673e96be8a180ae5c013b" data-length="-1">&lt;br></span></div><div class="open 6270742069643d223131223e5b232464703138375d3c2f627074 internal-tag ownttip"><span class="short" title="[#$dp187]">&lt;11&gt;</span><span class="full" data-originalid="11" data-length="-1">[#$dp187]</span></div>Free<div class="close 6570742069643d223131223e266c743b2f613e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/a&gt;">&lt;/11&gt;</span><span class="full" data-originalid="11" data-length="-1">&lt;/a></span></div><div class="single 70682069643d223132223e266c743b62723e3c2f7068 internal-tag ownttip"><span class="short" title="&lt;br&gt;">&lt;12/&gt;</span><span class="full" data-originalid="a26f1e58f9df9a4dccd3147e2b35aa8a" data-length="-1">&lt;br></span></div><div class="open 6270742069643d223133223e5b232464703138385d3c2f627074 internal-tag ownttip"><span class="short" title="[#$dp188]">&lt;13&gt;</span><span class="full" data-originalid="13" data-length="-1">[#$dp188]</span></div>Community Member Basic<div class="close 6570742069643d223133223e266c743b2f613e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/a&gt;">&lt;/13&gt;</span><span class="full" data-originalid="13" data-length="-1">&lt;/a></span></div><div class="single 70682069643d223134223e266c743b62723e3c2f7068 internal-tag ownttip"><span class="short" title="&lt;br&gt;">&lt;14/&gt;</span><span class="full" data-originalid="ec2124fa59c0b8410f4ee9a00eb3ee27" data-length="-1">&lt;br></span></div><div class="open 6270742069643d223135223e5b232464703138395d3c2f627074 internal-tag ownttip"><span class="short" title="[#$dp189]">&lt;15&gt;</span><span class="full" data-originalid="15" data-length="-1">[#$dp189]</span></div>Community Member Visual<div class="close 6570742069643d223135223e266c743b2f613e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/a&gt;">&lt;/15&gt;</span><span class="full" data-originalid="15" data-length="-1">&lt;/a></span></div>';
         // test stripping/replacing all tags
@@ -164,7 +164,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expectedReplaceSingle, $replaced);
     }
 
-    public function testSingleTags()
+    public function testSingleTags(): void
     {
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(6, 11, 'test', 'a'));
@@ -172,7 +172,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testMultipleTags()
+    public function testMultipleTags(): void
     {
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(6, 26, 'test', 'a'));
@@ -181,7 +181,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testOverlappingTags()
+    public function testOverlappingTags(): void
     {
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(6, 26, 'test', 'a'));
@@ -191,7 +191,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testOverlappingNestedTags()
+    public function testOverlappingNestedTags(): void
     {
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(6, 26, 'test', 'a'));
@@ -202,7 +202,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testOverlappingNestedFulllengthTags()
+    public function testOverlappingNestedFulllengthTags(): void
     {
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(0, 80, 'test', 'a'));
@@ -214,7 +214,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testSingularNestedTags()
+    public function testSingularNestedTags(): void
     {
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'div'), 0);
@@ -225,7 +225,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testSingularUnNestedTags1()
+    public function testSingularUnNestedTags1(): void
     {
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'div'));
@@ -236,31 +236,31 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testSingularUnNestedTags2()
+    public function testSingularUnNestedTags2(): void
     {
         $markup = 'Lorem<div><img /></div> ipsum dolor sit amet, consetetur sadipscing <div><img /></div>elitr, sed diam nonumy eirmod.';
         $this->createDataTest(1234, $markup);
     }
 
-    public function testSingularUnNestedTags3()
+    public function testSingularUnNestedTags3(): void
     {
         $markup = 'Lorem<img /><div></div> ipsum dolor sit amet, consetetur sadipscing <div></div><img />elitr, sed diam nonumy eirmod.';
         $this->createDataTest(1234, $markup);
     }
 
-    public function testSingularUnNestedTags4()
+    public function testSingularUnNestedTags4(): void
     {
         $markup = '<img /><div></div> ipsum dolor sit amet, consetetur sadipscing <div></div><img />';
         $this->createDataTest(1234, $markup);
     }
 
-    public function testSingularUnNestedTags5()
+    public function testSingularUnNestedTags5(): void
     {
         $markup = '<div></div><img /><img /> ipsum dolor sit amet, consetetur sadipscing <img /><div></div><img />';
         $this->createDataTest(1234, $markup);
     }
 
-    public function testSingularNestedFulllengthTags1()
+    public function testSingularNestedFulllengthTags1(): void
     {
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(0, 80, 'test', 'a'), 0);
@@ -273,13 +273,13 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createTagsTest($tags, $markup);
     }
 
-    public function testSingularNestedFulllengthTags2()
+    public function testSingularNestedFulllengthTags2(): void
     {
         $markup = '<a><b>Lorem<div><img /></div> ipsum dolor sit amet, consetetur sadipscing <div><img /></div>elitr, sed diam nonumy eirmod.</b></a>';
         $this->createDataTest(1234, $markup);
     }
 
-    public function testUnescapedChars()
+    public function testUnescapedChars(): void
     {
         // testing "real" segment content
         $segmentId = 677867;
@@ -287,7 +287,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createDataTest($segmentId, $markup);
     }
 
-    public function testWhitespaceChars()
+    public function testWhitespaceChars(): void
     {
         // testing "real" segment content
         $segmentId = 677867;
@@ -295,7 +295,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createDataTest($segmentId, $markup);
     }
 
-    public function testRealDataTags1()
+    public function testRealDataTags1(): void
     {
         // testing "real" segment content. keep in mind when doing this, that rendered attributes in tags may have a different order so the input needs to be ordered when comparing rendered stuff
         $segmentId = 677867;
@@ -305,7 +305,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createOriginalDataTest($segmentId, $original, $markup, $replacedLabeled);
     }
 
-    public function testRealDataTags2()
+    public function testRealDataTags2(): void
     {
         // testing "real" segment content. keep in mind when doing this, that rendered attributes in tags may have a different order so the input needs to be ordered when comparing rendered stuff
         $segmentId = 677836;
@@ -315,7 +315,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createOriginalDataTest($segmentId, $original, $markup, $replacedLabeled);
     }
 
-    public function testRealDataTags3()
+    public function testRealDataTags3(): void
     {
         // testing "real" segment content. keep in mind when doing this, that rendered attributes in tags may have a different order so the input needs to be ordered when comparing rendered stuff
         $segmentId = 677867;
@@ -325,7 +325,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createOriginalDataTest($segmentId, $original, $markup, $replacedLabeled);
     }
 
-    public function testRealDataTags4()
+    public function testRealDataTags4(): void
     {
         // testing "real" segment content. keep in mind when doing this, that rendered attributes in tags may have a different order so the input needs to be ordered when comparing rendered stuff
         $segmentId = 677867;
@@ -335,7 +335,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createOriginalDataTest($segmentId, $original, $markup, $replacedLabeled);
     }
 
-    public function testRealDataTags5()
+    public function testRealDataTags5(): void
     {
         // testing "real" segment content. keep in mind when doing this, that rendered attributes in tags may have a different order so the input needs to be ordered when comparing rendered stuff
         $segmentId = 677867;
@@ -345,7 +345,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createOriginalDataTest($segmentId, $original, $markup, $replacedLabeled);
     }
 
-    public function testRealDataTags6()
+    public function testRealDataTags6(): void
     {
         // testing "real" segment content
         $segmentId = 677867;
@@ -353,7 +353,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createDataTest($segmentId, $markup);
     }
 
-    public function testRealDataTags7()
+    public function testRealDataTags7(): void
     {
         // testing "real" segment content
         $segmentId = 688499;
@@ -361,7 +361,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createDataTest($segmentId, $markup);
     }
 
-    public function testRealDataTags8()
+    public function testRealDataTags8(): void
     {
         // testing "real" segment content
         $segmentId = 688498;
@@ -371,10 +371,10 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createOriginalDataTest($segmentId, $original, $markup, $replacedLabeled);
     }
 
-    public function testRealDataTags9()
+    public function testRealDataTags9(): void
     {
         // testing "real" segment content
-        // NOTE: when editor_Segment_FieldTags is in VALIDATION_MODE the duplicatesavecheck tag will throw a warning that the UNPARSED HTML DOM DOES NOT MATCH
+        // NOTE: when editor_TagSequence is in DEBUG-mode the duplicatesavecheck tag will throw a warning that the UNPARSED HTML DOM DOES NOT MATCH. This is due to the missing "/" in the self-closing duplicatesavecheck-img"
         $segmentId = 688445;
         $original = '<del class="trackchanges ownttip deleted" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00" data-historylist="1625486496000" data-action_history_1625486496000="INS" data-usertrackingid_history_1625486496000="4269">F</del><ins class="trackchanges ownttip" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00">f</ins><ins class="trackchanges ownttip" data-usertrackingid="4269" data-usercssnr="usernr2" data-workflowstep="review1stlanguage3" data-timestamp="2021-07-05T14:01:36+02:00">ür Industriekunden</ins><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="duplicatesavecheck" data-segmentid="4395852" data-fieldname="targetEdit">';
         $markup = '<del class="trackchanges ownttip deleted" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00" data-historylist="1625486496000" data-action_history_1625486496000="INS" data-usertrackingid_history_1625486496000="4269">F</del><ins class="trackchanges ownttip" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00">f</ins><ins class="trackchanges ownttip" data-usertrackingid="4269" data-usercssnr="usernr2" data-workflowstep="review1stlanguage3" data-timestamp="2021-07-05T14:01:36+02:00">ür Industriekunden</ins><img class="duplicatesavecheck" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-segmentid="4395852" data-fieldname="targetEdit" />';
@@ -382,7 +382,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createOriginalDataTest($segmentId, $original, $markup, $replacedLabeled);
     }
 
-    public function testRealDataTags10()
+    public function testRealDataTags10(): void
     {
         // testing "real" segment content
         $segmentId = 688447;
@@ -390,7 +390,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createDataTest($segmentId, $markup);
     }
 
-    public function testMqmTags1()
+    public function testMqmTags1(): void
     {
         // testing "real" segment content
         $segmentId = 688501;
@@ -398,7 +398,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createMqmDataTest($segmentId, $markup);
     }
 
-    public function testMqmTags2()
+    public function testMqmTags2(): void
     {
         // testing "real" segment content
         $segmentId = 688501;
@@ -406,7 +406,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createMqmDataTest($segmentId, $markup);
     }
 
-    public function testMqmTags3()
+    public function testMqmTags3(): void
     {
         // testing "real" segment content
         $segmentId = 688501;
@@ -414,7 +414,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createMqmDataTest($segmentId, $markup);
     }
 
-    public function testMqmTags4()
+    public function testMqmTags4(): void
     {
         // testing "real" segment content
         $segmentId = 688501;
@@ -423,7 +423,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createMqmDataTest($segmentId, $markup, $compare);
     }
 
-    public function testMqmTags5()
+    public function testMqmTags5(): void
     {
         // testing "real" segment content
         $segmentId = 688501;
@@ -432,7 +432,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->createMqmDataTest($segmentId, $markup, $compare);
     }
 
-    public function testMqmTags6()
+    public function testMqmTags6(): void
     {
         // testing "real" segment content
         $segmentId = 688501;

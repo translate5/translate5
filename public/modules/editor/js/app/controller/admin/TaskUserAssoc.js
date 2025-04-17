@@ -173,8 +173,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         }
 
         //in competitive mode instead OPEN / UNCONFIRMED is used
-        if (usageMode === Editor.model.admin.Task.USAGE_MODE_COMPETITIVE && state === task.USER_STATE_OPEN) {
-            state = task.USER_STATE_UNCONFIRMED;
+        if (usageMode === Editor.model.admin.Task.usageModes.COMPETITIVE &&
+            state === Editor.model.admin.Task.userStates.OPEN
+        ) {
+            state = Editor.model.admin.Task.userStates.UNCONFIRMED;
         }
         //set the default step to the first translation step when the task is translation task and
         //the workflow name is no workflow
@@ -385,8 +387,8 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             form = me.getUserAssocForm(),
             task = me.getPrefWindow().getCurrentTask(),
             stateCombo = form.down('combo[name="state"]'),
-            isCompetitive = task.get('usageMode') === Editor.model.admin.Task.USAGE_MODE_COMPETITIVE,
-            newState = task.USER_STATE_OPEN,
+            isCompetitive = task.get('usageMode') === Editor.model.admin.Task.usageModes.COMPETITIVE,
+            newState = Editor.model.admin.Task.userStates.OPEN,
             rec = form.getRecord(),
             isChanged = stateCombo.getValue() && stateCombo.getValue() !== rec.get('state'),
             meta = task.getWorkflowMetaData(),
@@ -403,14 +405,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         //on new job entries only non-finished states are allowed.
         // Everything else would make no sense and bypass workflow
         stateCombo.store.addFilter(function (item) {
-            return item.get('id') !== Editor.model.admin.Task.prototype.USER_STATE_FINISH &&
-                   item.get('id') !== Editor.model.admin.Task.prototype.USER_STATE_AUTO_FINISH;
+            return item.get('id') !== Editor.model.admin.Task.userStates.FINISH &&
+                   item.get('id') !== Editor.model.admin.Task.userStates.AUTO_FINISH;
         });
         if (initialStates && initialStates[step]) {
             newState = initialStates[step];
         }
-        if (isCompetitive && newState === task.USER_STATE_OPEN) {
-            newState = task.USER_STATE_UNCONFIRMED;
+        if (isCompetitive && newState === Editor.model.admin.Task.userStates.OPEN) {
+            newState = Editor.model.admin.Task.userStates.UNCONFIRMED;
         }
         rec.set('state', newState);
         stateCombo.setValue(newState);

@@ -56,7 +56,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },{
         ref: 'analysisRerunMsg',
         selector: '#analysisNeedRerun'
-    }, {
+    },{
         ref:'languageResourceTaskAssocPanel',
         selector:'languageResourceTaskAssocPanel'
     },{
@@ -72,7 +72,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         ref: 'taskAddWindow',
         selector: '#adminTaskAddWindow'
     }],
-    TASK_STATE_ANALYSIS: 'matchanalysis',
     strings:{
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
@@ -438,7 +437,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      *
      * @param {int} taskId
      * @param {string} operation
-     * @param {bool} importDefaults: run analysis with defaults
+     * @param {bool} importDefaults run analysis with defaults
      */
     startOperation: function(taskId, operation, importDefaults){
         var params = {

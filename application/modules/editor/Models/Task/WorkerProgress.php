@@ -42,7 +42,7 @@ class editor_Models_Task_WorkerProgress
         //fire event if progress was called (must be called on new event instance with abstract class as ID)
         /** @var ZfExtended_EventManager $events */
         $events = ZfExtended_Factory::get('ZfExtended_EventManager', [__CLASS__]);
-        $events->trigger("updateProgress", __CLASS__, [
+        $events->trigger('updateProgress', __CLASS__, [
             'taskGuid' => $task->getTaskGuid(),
             'progress' => $progress,
             'context' => $parentId,
@@ -56,21 +56,23 @@ class editor_Models_Task_WorkerProgress
      * @param string $taskGuid
      * @param int|null $context : parentId or id of a worker with $taskGuid as taskGuid.
      * Use id only when there is no parentId for the current worker (the current worker is parent of all other queues. ex: editor_Models_Import_Worker)
-     * @return array
+     * @return array{progress: int, workersDone: int, workersTotal: int, workerRunning: string, operationType: string}
      */
     public function calculateProgress(string $taskGuid, int $context = null): array
     {
         $worker = new ZfExtended_Models_Worker();
+        $operationType = 'unknown'; // might not be known for all progress-calculations
 
         //if the context is not provided, try to calculate one base on the workers state
-        if ($context == null) {
-            //get the context from the current running worker for the task
-            //the context is the current running worker parentId or id(when the running worker is master worker like editor_Models_Import_Worker)
-            $context = $worker->findWorkerContext($taskGuid);
-            if (empty($context)) {
+        if ($context === null) {
+            // get the context from the current running worker for the task
+            // the context is the topmost worker from the running/scheduled/waiting workers hierarchy
+            $topmost = $worker->findWorkerContext($taskGuid);
+            if (empty($topmost)) {
                 return [];
             }
-            $context = $context['parentId'] ?: $context['id'];
+            // the topmost calculation might not work, therefore check ...
+            $context = ((int) $topmost['parentId'] > 0) ? $topmost['parentId'] : $topmost['id'];
         }
 
         $foundWorkers = $worker->loadByTaskAndContext($taskGuid, $context);
@@ -79,35 +81,42 @@ class editor_Models_Task_WorkerProgress
         }
         //set the worker weight as internal variable and filter out non task progress affecting workers
         $result = [];
+        $totalWeight = 0;
         foreach ($foundWorkers as $foundWorker) {
             // ignore if worker does not implement WorkerProgressInterface
-            if (! is_subclass_of((string) $foundWorker['worker'], 'editor_Models_Task_WorkerProgressInterface')) {
+            if (! is_subclass_of((string) $foundWorker['worker'], editor_Models_Task_WorkerProgressInterface::class)) {
                 continue;
+            }
+            // unserialize params to get operationType - only neccessary while it is unknown
+            if ($operationType === 'unknown') {
+                $params = empty($foundWorker['parameters']) ? false : unserialize($foundWorker['parameters']);
+                $params = (is_object($params) || is_array($params)) ? (array) $params : [];
+                if (array_key_exists('operationType', $params)) {
+                    $operationType = $params['operationType'];
+                }
             }
             /** @var editor_Models_Task_WorkerProgressInterface $w */
             $w = ZfExtended_Factory::get($foundWorker['worker']);
             $foundWorker['weight'] = $w->getWeight();
+            $totalWeight += $foundWorker['weight'];
             $result[] = $foundWorker;
         }
-
         $resultArray = [];
         $resultArray['progress'] = 1;
         $resultArray['workersDone'] = 0;
         $resultArray['workersTotal'] = count($result);
         $resultArray['taskGuid'] = $taskGuid;
         $resultArray['workerRunning'] = '';
-
-        $totalWeight = array_sum(array_column($result, 'weight'));
+        $resultArray['operationType'] = $operationType;
 
         foreach ($result as &$single) {
-            //adjust the worker weight, base od the current queue list
+            //adjust the worker weight, based on the current queue list
             $single['weight'] = ($single['weight'] / $totalWeight) * 100;
             if ($single['state'] == $worker::STATE_DONE) {
                 //collect the finished progress
                 $resultArray['progress'] += $single['weight'];
                 $resultArray['workersDone']++;
-            }
-            if ($single['state'] == $worker::STATE_RUNNING) {
+            } elseif ($single['state'] == $worker::STATE_RUNNING) {
                 //calculate the running progress
                 //ex: worker weight is 60% of the total import time
                 //    the current worker job progress is 50%

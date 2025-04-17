@@ -3285,6 +3285,24 @@
                     <br />
                 </target>
             </trans-unit>
+            <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZWluIG5ldWVzIHtwcm9qZWN0VHlwZX0gZXJzdGVsbHQuPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBJRDo8L3N0cm9uZz4ge3Byb2plY3RJZH0gPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBOYW1lOjwvc3Ryb25nPiB7cHJvamVjdE5hbWV9'>
+                <source>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName}
+                </source>
+                <target>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName} <br />
+                </target>
+            </trans-unit>
+            <trans-unit id='ZGllIG1lbnNjaGxpY2hlIFJldmlzaW9uIGRlciBEYXRlaSB7ZmlsZU5hbWV9IHd1cmRlIGJlZW5kZXQgdW5kIHN0ZWh0IHVudGVyIHt1cmx9IGFscyBEb3dubG9hZCB6dXIgVmVyZsO8Z3VuZy4='>
+                <source>die menschliche Revision der Datei {fileName} wurde beendet und steht unter {url} als Download zur Verfügung.</source>
+                <target>die menschliche Revision der Datei "{fileName}" wurde beendet und steht unter {url} als Download zur Verfügung.</target>
+            </trans-unit>
+            <trans-unit id='VHJhbnNsYXRlNSAtIFByb2pla3QgZXJzdGVsbHQ='>
+                <source>Translate5 - Projekt erstellt</source>
+                <target>Translate5 - Projekt erstellt</target>
+            </trans-unit>
             <trans-unit id='QWxsZSBCZW51dHplciBkZXIgYWt0dWVsbGVuIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+Ogp7Y3VycmVudFVzZXJzfTxici8+Cg=='>
                 <source>Alle Benutzer der aktuellen Rolle 
                     <i>{currentRole}</i>:
@@ -3338,6 +3356,10 @@
             <trans-unit id='dmlzaXRvcg=='>
                 <source>visitor</source>
                 <target>Besucher</target>
+            </trans-unit>
+            <trans-unit id='dmlzdWFsQXBwcm92ZXI='>
+                <source>visualApprover</source>
+                <target>Visual Approver</target>
             </trans-unit>
             <trans-unit id='RS1NYWlsIEFkcmVzc2U='>
                 <source>E-Mail Adresse</source>
@@ -3870,6 +3892,14 @@
             <trans-unit id='V29ya2Zsb3cgYWJnZXNjaGxvc3Nlbg=='>
                 <source>Workflow abgeschlossen</source>
                 <target>Workflow abgeschlossen</target>
+            </trans-unit>
+            <trans-unit id='TGVrdG9yYXQ='>
+                <source>Lektorat</source>
+                <target>Lektorat</target>
+            </trans-unit>
+            <trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='>
+                <source>Zweites Lektorat</source>
+                <target>Zweites Lektorat</target>
             </trans-unit>
             <trans-unit id='w5xiZXJzZXR6dW5n'>
                 <source>Übersetzung</source>
@@ -5452,6 +5482,10 @@ Im Projektportal {portalLink} wurde die Aufgabe
             <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='>
                 <source>Keine Aufgaben zugewiesen.</source>
                 <target>Keine Aufgaben zugewiesen.</target>
+            </trans-unit>
+            <trans-unit id='S2VpbmUgQXVmZ2FiZW4gYXVzZ2V3w6RobHQ='>
+                <source>Keine Aufgaben ausgewählt</source>
+                <target>Keine Aufgaben ausgewählt</target>
             </trans-unit>
             <trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNocmVzc291cmNlbg=='>
                 <source>Zugewiesene Sprachressourcen</source>
@@ -8924,6 +8958,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>InstantTranslateWriteTm</source>
                 <target>Instant-Translate TM schreiben(nur API)</target>
             </trans-unit>
+            <trans-unit id='SW5zdGFudFRyYW5zbGF0ZUh1bWFuUmV2aXNpb25BbGxvd2Vk'>
+                <source>InstantTranslateHumanRevisionAllowed</source>
+                <target>InstantTranslate (menschliche Revision erlaubt)</target>
+            </trans-unit>
             <trans-unit id='UmVmZXJlbnotRGF0ZWkoZW4p'>
                 <source>Referenz-Datei(en)</source>
                 <target>Referenz-Datei(en)</target>
@@ -10466,6 +10504,10 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
             <trans-unit id="Sm9icw==">
                 <source>Jobs</source>
                 <target>Jobs</target>
+            </trans-unit>
+            <trans-unit id='QmF0Y2gtT3BlcmF0aW9uZW4='>
+                <source>Batch-Operationen</source>
+                <target>Batch-Operationen</target>
             </trans-unit>
             <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
                 <source>language_resource.status.conversion_scheduled</source>
