@@ -1442,7 +1442,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     public function hasThirdPartyTermTagging(): bool
     {
-        return ! ! json_decode($this->getForeignId())?->glossaryClientId;
+        $json = $this->getForeignId();
+
+        if (is_numeric($json) || is_null($json)) {
+            return false;
+        }
+
+        try {
+            return (bool) json_decode(json: $this->getForeignId(), flags: JSON_THROW_ON_ERROR)?->glossaryClientId;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     /**
