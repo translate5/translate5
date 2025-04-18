@@ -278,6 +278,7 @@ final class Service extends AbstractPooledService
         //$serviceUrl = 'http://localhost:8080'; // this is the nc dummy URL then.
         $httpClient = $this->getHttpClient($serviceUrl . '/termTagger/termTag/');
         $httpClient->setRawData(json_encode($serviceData), 'application/json');
+        $httpClient->setHeaders('x-tbxid', $serviceData->tbxFile);
         $httpClient->setConfig([
             'timeout' => self::CONNECT_TIMEOUT,
             'request_timeout' => $requestTimeout,

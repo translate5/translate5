@@ -41,35 +41,27 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
     /**
      * Some Internal Tags to create Tests with
      */
-    private $open1 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>';
+    protected array $testTags = [
+        '<1>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>',
+        '</1>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>',
+        '<2>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '</2>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '<3>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '</3>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '<4>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>',
+        '</4>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>',
+        '<5/>' => '<div class="single tab internal-tag ownttip"><span class="short" title="&lt;5/&gt;: 1 tab character">&lt;5/&gt;</span><span class="full" data-originalid="tab" data-length="1">→</span></div>',
+        '<6/>' => '<div class="single internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;6/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>',
+        '<7/>' => '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;7/&gt;: Newline">&lt;7/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>',
+    ];
 
-    private $close1 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>';
-
-    private $open2 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>';
-
-    private $close2 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>';
-
-    private $open3 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>';
-
-    private $close3 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>';
-
-    private $open4 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>';
-
-    private $close4 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>';
-
-    private $single5 = '<div class="single tab internal-tag ownttip"><span class="short" title="&lt;5/&gt;: 1 tab character">&lt;5/&gt;</span><span class="full" data-originalid="tab" data-length="1">→</span></div>';
-
-    private $single6 = '<div class="single internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;6/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>';
-
-    private $single7 = '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;7/&gt;: Newline">&lt;7/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>';
-
-    public function testTagRepair0()
+    public function testTagRepair0(): void
     {
         $fixed = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing</2><5/> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $this->createRepairTest($fixed, $fixed, []);
     }
 
-    public function testTagRepair1()
+    public function testTagRepair1(): void
     {
         $broken = 'Lorem <1>ipsum</1> dolor sit amet, </2>consetetur sadipscing<5/><2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $fixed = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
@@ -77,7 +69,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
     }
 
-    public function testTagRepair2()
+    public function testTagRepair2(): void
     {
         $broken = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</3> aliquyam erat</4>, sed diam voluptua.<7/>';
         $fixed = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt</3> ut<6/> labore et <4>dolore</4> magna aliquyam erat, sed diam voluptua.<7/>';
@@ -85,7 +77,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
     }
 
-    public function testTagRepair3()
+    public function testTagRepair3(): void
     {
         $broken = 'Lorem <1>ipsum<6/> dolor sit amet, <4>consetetur sadipscing</2><5/> elitr, sed diam nonumy eirmod tempor </1>invidunt ut<3> labore et <2>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $fixed = 'Lorem <1>ipsum<6/></1> dolor sit amet, <4>consetetur</4> sadipscing<2><5/> elitr, sed diam nonumy eirmod tempor invidunt ut<3> labore</3> et </2>dolore magna aliquyam erat, sed diam voluptua.';
@@ -101,26 +93,26 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
     }
 
-    public function testTagRepair5()
+    public function testTagRepair5(): void
     {
         $fixed = '<div class="open 6270742069643d2231223e266c743b72756e313e3c2f627074 internal-tag ownttip"><span class="short" title="&lt;run1&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;run1&gt;</span></div>T<div class="close 6570742069643d2231223e266c743b2f72756e313e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/run1&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/run1&gt;</span></div>ranslation Management System';
         $broken = '<div class="open 6270742069643d2231223e266c743b72756e313e3c2f627074 internal-tag ownttip"><span title="<run1>" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;run1&gt;</span></div>T<div class="close 6570742069643d2231223e266c743b2f72756e313e3c2f657074 internal-tag ownttip"><span title="</run1>" class="short" id="ext-element-243">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;/run1&gt;</span></div><div class="open 6270742069643d2232223e266c743b72756e323e3c2f627074 internal-tag ownttip"><span title="<run2>" class="short">&lt;2&gt;</span><span data-originalid="2" data-length="-1" class="full">&lt;run2&gt;</span></div>ranslation Management System<div class="close 6570742069643d2233223e266c743b2f72756e333e3c2f657074 internal-tag ownttip"><span title="</run3>" class="short">&lt;/3&gt;</span><span data-originalid="3" data-length="-1" class="full">&lt;/run3&gt;</span></div>';
         // test based on real data from the AutoQA approval
-        $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty', 'internal_tags_added'], true);
+        $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty', 'internal_tags_added'], false);
     }
 
-    public function testTagRepair6()
+    public function testTagRepair6(): void
     {
         $fixed = '<div class="open 6270742069643d2231223e266c743b72756e313e3c2f627074 internal-tag ownttip"><span class="short" title="&lt;run1&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;run1&gt;</span></div>T<div class="close 6570742069643d2231223e266c743b2f72756e313e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/run1&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/run1&gt;</span></div><div class="open 6270742069643d2232223e266c743b72756e323e3c2f627074 internal-tag ownttip"><span class="short" title="&lt;run2&gt;">&lt;2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;run2&gt;</span></div>ranslation <div class="open 6270742069643d2233223e266c743b72756e333e3c2f627074 internal-tag ownttip"><span class="short" title="&lt;run3&gt;">&lt;3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;run3&gt;</span></div>M<div class="close 6570742069643d2233223e266c743b2f72756e333e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/run3&gt;">&lt;/3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;/run3&gt;</span></div>anagement System<div class="close 6570742069643d2232223e266c743b2f72756e323e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/run2&gt;">&lt;/2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;/run2&gt;</span></div>';
         $broken = '<div class="open 6270742069643d2231223e266c743b72756e313e3c2f627074 internal-tag ownttip"><span class="short" title="<run1>" id="ext-element-241">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;run1&gt;</span></div>T<div class="close 6570742069643d2231223e266c743b2f72756e313e3c2f657074 internal-tag ownttip"><span class="short" title="</run1>">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/run1&gt;</span></div><div class="open 6270742069643d2232223e266c743b72756e323e3c2f627074 internal-tag ownttip"><span class="short" title="<run2>">&lt;2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;run2&gt;</span></div>ranslation <div class="open 6270742069643d2233223e266c743b72756e333e3c2f627074 internal-tag ownttip"><span class="short" title="<run3>">&lt;3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;run3&gt;</span></div>M<div class="close 6570742069643d2233223e266c743b2f72756e333e3c2f657074 internal-tag ownttip"><span class="short" title="</run3>">&lt;/3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;/run3&gt;</span></div>anagement <div class="close 6270742069643d2234223e266c743b72756e343e3c2f627074 internal-tag ownttip"><span class="short" title="<run4>">&lt;4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;run4&gt;</span></div>S<div class="close 6570742069643d2234223e266c743b2f72756e343e3c2f657074 internal-tag ownttip"><span class="short" title="</run4>">&lt;/4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;/run4&gt;</span></div>ystem<div class="close 6570742069643d2232223e266c743b2f72756e323e3c2f657074 internal-tag ownttip"><span class="short" title="</run2>">&lt;/2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;/run2&gt;</span></div>';
         // test based on real data from the AutoQA approval
-        $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty', 'internal_tags_added'], true);
+        $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty', 'internal_tags_added'], false);
     }
 
     /**
      * Tests repair of sequences of tags with overlaps/interleaves
      */
-    public function testTagRepair7()
+    public function testTagRepair7(): void
     {
         $fixed = 'Lorem ipsum<1><2><5/></2></1> dolor<3><6/></3> sit amet';
         $broken = 'Lorem ipsum<1><2><5/></1></2> dolor<3><6/></3> sit amet';
@@ -130,7 +122,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testTagRepair8()
+    public function testTagRepair8(): void
     {
         $fixed = 'Lorem ipsum<7/><1><2><3></3></2><4></4></1><5/> dolor<3><6/></3> sit amet';
         $broken = 'Lorem ipsum<7/><1><2><3></2></3></4><4></1><5/> dolor<3><6/></3> sit amet';
@@ -140,7 +132,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testTagRepair9()
+    public function testTagRepair9(): void
     {
         $fixed = 'Lorem ipsum<1><2></2><5/><3><4></4></3></1> dolor<3><6/></3> sit amet';
         $broken = 'Lorem ipsum<1><2></2><5/><3><4></3></4></1> dolor<3><6/></3> sit amet';
@@ -150,7 +142,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testTagRepair10()
+    public function testTagRepair10(): void
     {
         $fixed = 'Lorem ipsum<1><2><3><5/></3><6/></2><7/></1> dolor sit amet';
         $broken = 'Lorem ipsum<1><2><3><5/></1><6/></2><7/></3> dolor sit amet';
@@ -160,7 +152,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testTagRepair11()
+    public function testTagRepair11(): void
     {
         $fixed = 'Lorem ipsum<1><2><5/></2></1><6/><4><3><7/></3></4> dolor sit amet';
         $broken = 'Lorem ipsum<1><2><5/></1></2><6/><4><3><7/></4></3> dolor sit amet';
@@ -170,31 +162,26 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testTagRepair12()
+    public function testTagRepair12(): void
     {
         $fixed = 'Lorem ipsum<1><2><5/><4><3><6/></3></4><7/></2></1> dolor sit amet';
         $broken = 'Lorem ipsum<1><2><5/><4></2><6/><3></1><7/></3></4> dolor sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
     }
 
-    public function testTagRepair13()
+    public function testTagRepair13(): void
     {
         $fixed = 'Lorem ipsum<1><2></2><5/><4> dolor</4><6/><3></3><7/></1> sit amet';
         $broken = 'Lorem ipsum<1><2><5/><4></2> dolor<6/><3></1><7/></3></4> sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
     }
 
-    /**
-     * Creates a test for the internal tag comparision. The passed markup will have the following markup replaced with internal tags
-     * Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>
-     * @param string $fixed
-     * @param string $broken
-     * @param array|string $expectedState
-     */
-    private function createRepairTest($fixed, $broken, $expectedState, $doNotConvert = false)
+    private function createRepairTest(string $fixed, string $broken, array|string $expectedState, bool $replaceShortToFull = true): void
     {
-        $fixedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceInternalTags($fixed), 'target', 'targetEdit');
-        $brokenTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceInternalTags($broken), 'target', 'targetEdit');
+        $fixedMarkup = $replaceShortToFull ? $this->shortToFull($fixed) : $fixed;
+        $brokenMarkup = $replaceShortToFull ? $this->shortToFull($broken) : $broken;
+        $fixedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $fixedMarkup, 'target', 'targetEdit');
+        $brokenTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $brokenMarkup, 'target', 'targetEdit');
         // first, compare to find errors
         $tagComparision = new editor_Segment_Internal_TagComparision($brokenTags, $fixedTags);
         $this->assertEquals($expectedState, $tagComparision->getStati());
@@ -203,7 +190,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $tagRepair = new editor_Segment_Internal_TagRepair($brokenTags, null);
         $this->assertEquals($hasFaults, $tagRepair->hadErrors());
 
-        $fixedTags = ($doNotConvert) ? $brokenTags->render() : $this->revertInternalTags($brokenTags->render());
+        $fixedTags = ($replaceShortToFull) ? $this->fullToShort($brokenTags->render()) : $brokenTags->render();
         if ($hasFaults) {
             $this->assertEquals($fixed, $fixedTags);
             // echo "\n========== HAD ERRORS ===========\n".$broken."\n".$fixedTags."\n============\n";
@@ -214,48 +201,5 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         // make sure the fixed tags would be detected as correct
         $tagComparision = new editor_Segment_Internal_TagComparision($brokenTags, null);
         $this->assertEquals([], $tagComparision->getStati());
-    }
-
-    /**
-     * Replaces short tags with real internal tags
-     * @param string $markup
-     * @return string
-     */
-    private function replaceInternalTags($markup)
-    {
-        $markup = str_replace('<1>', $this->open1, $markup);
-        $markup = str_replace('</1>', $this->close1, $markup);
-        $markup = str_replace('<2>', $this->open2, $markup);
-        $markup = str_replace('</2>', $this->close2, $markup);
-        $markup = str_replace('<3>', $this->open3, $markup);
-        $markup = str_replace('</3>', $this->close3, $markup);
-        $markup = str_replace('<4>', $this->open4, $markup);
-        $markup = str_replace('</4>', $this->close4, $markup);
-        $markup = str_replace('<5/>', $this->single5, $markup);
-        $markup = str_replace('<6/>', $this->single6, $markup);
-        $markup = str_replace('<7/>', $this->single7, $markup);
-
-        return $markup;
-    }
-
-    /**
-     * @param string $markup
-     * @return string
-     */
-    private function revertInternalTags($markup)
-    {
-        $markup = str_replace($this->open1, '<1>', $markup);
-        $markup = str_replace($this->close1, '</1>', $markup);
-        $markup = str_replace($this->open2, '<2>', $markup);
-        $markup = str_replace($this->close2, '</2>', $markup);
-        $markup = str_replace($this->open3, '<3>', $markup);
-        $markup = str_replace($this->close3, '</3>', $markup);
-        $markup = str_replace($this->open4, '<4>', $markup);
-        $markup = str_replace($this->close4, '</4>', $markup);
-        $markup = str_replace($this->single5, '<5/>', $markup);
-        $markup = str_replace($this->single6, '<6/>', $markup);
-        $markup = str_replace($this->single7, '<7/>', $markup);
-
-        return $markup;
     }
 }

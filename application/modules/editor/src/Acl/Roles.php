@@ -61,6 +61,8 @@ final class Roles
 
     public const INSTANTTRANSLATEWRITETM = 'instantTranslateWriteTm';
 
+    public const INSTANT_TRANSLATE_HUMAN_REVISION_ALLOWED = 'instantTranslateHumanRevisionAllowed';
+
     public const PRODUCTION = 'production';
 
     public const TERMPM_ALLCLIENTS = 'termPM_allClients';
@@ -104,6 +106,7 @@ final class Roles
         self::SYSTEMADMIN,
         self::INSTANTTRANSLATE,
         self::INSTANTTRANSLATEWRITETM,
+        self::INSTANT_TRANSLATE_HUMAN_REVISION_ALLOWED,
         self::TERMPM,
         self::TERMPM_ALLCLIENTS,
         self::TERMPROPOSER,
@@ -196,6 +199,7 @@ final class Roles
         return [
             self::INSTANTTRANSLATE,
             self::INSTANTTRANSLATEWRITETM,
+            self::INSTANT_TRANSLATE_HUMAN_REVISION_ALLOWED,
             self::TERMPM,
             self::TERMSEARCH,
             self::TERMCUSTOMERSEARCH,

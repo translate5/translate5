@@ -60,9 +60,12 @@ class editor_Workflow_CachableDefinition
         'ROLE_REVIEWER' => 'Lektor',
         'ROLE_TRANSLATORCHECK' => 'Zweiter Lektor',
         'ROLE_VISITOR' => 'Besucher',
+        'ROLE_VISUALAPPROVER' => 'Visual Approver',
         'STEP_NO_WORKFLOW' => 'Kein Workflow',
         'STEP_PM_CHECK' => 'PM Prüfung',
         'STEP_WORKFLOW_ENDED' => 'Workflow abgeschlossen',
+        'STEP_REVIEWING' => 'Lektorat',
+        'STEP_TRANSLATORCHECK' => 'Zweites Lektorat',
     ];
 
     /**

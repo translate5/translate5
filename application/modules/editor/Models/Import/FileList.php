@@ -80,7 +80,7 @@ class editor_Models_Import_FileList
             $this->importConfig->checkFileType,
             $this->importConfig->ignoredUncheckedExtensions,
         ]);
-        $tree = $parser->parse($this->importConfig->getWorkfileDir());
+        $tree = $parser->parse($this->importConfig->getWorkfilesDir());
         $notImportedFiles = $parser->getNotImportedFiles();
         if (! empty($notImportedFiles)) {
             $logger = Zend_Registry::get('logger');
@@ -89,10 +89,9 @@ class editor_Models_Import_FileList
                 'files' => $notImportedFiles,
             ]);
         }
-
-        $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
-        /* @var $treeDb editor_Models_Foldertree */
-        $this->treeDb->setPathPrefix($this->importConfig->getFilesDirectory()); //TODO: (23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
+        $this->treeDb = ZfExtended_Factory::get(editor_Models_Foldertree::class);
+        //TODO: (23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
+        $this->treeDb->setPathPrefix($this->importConfig->getWorkfilesDirName());
         $this->treeDb->setTree($tree);
         $this->treeDb->setTaskGuid($this->task->getTaskGuid());
         $this->saveAndSyncFileTree();
@@ -108,7 +107,7 @@ class editor_Models_Import_FileList
         if (! $this->hasReferenceFiles()) {
             return;
         }
-        $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
+        $this->treeDb = ZfExtended_Factory::get(editor_Models_Foldertree::class);
         $this->treeDb->loadByTaskGuid($this->task->getTaskGuid());
         $this->treeDb->setReferenceFileTree($this->getReferenceFileTree());
         $this->treeDb->save();
@@ -121,7 +120,7 @@ class editor_Models_Import_FileList
     {
         $config = $this->importConfig;
         $params = [$this->treeDb, $config->getLanguageId('source'), $config->getLanguageId('target'), $config->getLanguageId('relais')];
-        $sync = ZfExtended_Factory::get('editor_Models_Foldertree_SyncToFiles', $params);
+        $sync = ZfExtended_Factory::get(editor_Models_Foldertree_SyncToFiles::class, $params);
         /* @var $sync editor_Models_Foldertree_SyncToFiles */
         $sync->recursiveSync();
         $this->treeDb->save();
@@ -130,7 +129,7 @@ class editor_Models_Import_FileList
     /**
      * Saves the reference files, and generates a file tree out of the reference files folder
      * returns the Tree as JSON string
-     * @return string
+     * @return array
      */
     protected function getReferenceFileTree()
     {
@@ -145,7 +144,7 @@ class editor_Models_Import_FileList
 
     public function processRelaisFiles()
     {
-        $this->relaisFolderTree = ZfExtended_Factory::get('editor_Models_RelaisFoldertree');
+        $this->relaisFolderTree = ZfExtended_Factory::get(editor_Models_RelaisFoldertree::class);
         $this->relaisFolderTree->setImportConfig($this->importConfig);
         $this->relaisFolderTree->getPaths($this->task->getTaskGuid(), 'file'); //Aufruf nötig, er initialisiert den Baum
 
@@ -163,7 +162,7 @@ class editor_Models_Import_FileList
     public function hasReferenceFiles()
     {
         //If no review directory is set, the reference files must be ignored
-        $workfilesDirectory = $this->importConfig->getFilesDirectory();
+        $workfilesDirectory = $this->importConfig->getWorkfilesDirName();
         $refDir = editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
 
         return ! empty($workfilesDirectory) && is_dir($this->importConfig->importFolder . DIRECTORY_SEPARATOR . $refDir);

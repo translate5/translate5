@@ -54,7 +54,11 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
                 click: 'onlyMyProjectsClick'
             },
             '#projectToolbar menuitem': {
-                click: menuitem => menuitem.masterComponent.fireEvent('click')
+                click: function (menuitem) {
+                    if(menuitem.masterComponent){
+                        menuitem.masterComponent.fireEvent('click');
+                    }
+                }
             },
             'projectGrid': {
                 filterchange: 'onProjectGridFilterChange'

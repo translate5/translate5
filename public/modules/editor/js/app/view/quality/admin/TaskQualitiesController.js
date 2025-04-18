@@ -36,7 +36,7 @@ Ext.define('Editor.view.quality.admin.TaskQualitiesController', {
     listen: {
         controller: {
             'taskGrid': {
-                taskImportFinished: 'onTaskImportFinished'
+                taskProgressFinished: 'onTaskProgressFinished'
             }
         },
         store: {
@@ -48,8 +48,11 @@ Ext.define('Editor.view.quality.admin.TaskQualitiesController', {
     /**
      * After an import is finished (and the AutoQA workers worked) we need to show the new state
      */
-    onTaskImportFinished: function(task){
-        this.getView().refreshStore(task.get('taskGuid'));
+    onTaskProgressFinished: function(task,  operationType){
+        // no need and unwanted to reload qualities when visual is exchanged
+        if (!operationType || operationType !== Editor.model.admin.Task.operations.VISUALEXCHANGE) {
+            this.getView().refreshStore(task.get('taskGuid'));
+        }
     },
 
     /**

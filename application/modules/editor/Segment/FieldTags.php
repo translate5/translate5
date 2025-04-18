@@ -287,6 +287,25 @@ class editor_Segment_FieldTags extends editor_TagSequence
     }
 
     /**
+     * TermTagging may introduces errors with wrong nesting of tags
+     * This API is meant to fix that
+     */
+    public function fixTermTaggerTags(): void
+    {
+        $fixer = new \MittagQI\Translate5\Segment\TagRepair\TermTaggerTagsFixer($this);
+        if ($fixer->needsFix()) {
+            $this->tags = $fixer->getFixedTags();
+            $errorData = [
+                'task' => $this->task,
+                'text' => $this->getText(),
+                'details' => $fixer->getErrorDetails(),
+                'originalMarkup' => $this->getOriginalMarkup(),
+            ];
+            $this->createLogger()->warn('E1696', 'Termtagger created invalid markup: {details}', $errorData);
+        }
+    }
+
+    /**
      * Checks if a internal tag of a certain type and class is present
      */
     public function hasTypeAndClass(string $type, string $className, bool $includeDeleted = false): bool
@@ -531,7 +550,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
                         $tag->endIndex -= $dist;
                     } else {
                         // this can only happen, if non-trackchanges tags overlap with trackchanges tags. TODO: generate an error here ?
-                        if ($tag->getType() != editor_Segment_Tag::TYPE_TRACKCHANGES && ! $tag->wasDeleted && static::VALIDATION_MODE) {
+                        if ($tag->getType() != editor_Segment_Tag::TYPE_TRACKCHANGES && ! $tag->wasDeleted && static::DO_DEBUG) {
                             error_log("\n##### TRACKCHANGES CLONING: FOUND TAG THAT HAS TO BE REMOVED ALTHOUGH NOT MARKED AS DELETED ($start|$end) " . $tag->debugProps() . " #####\n");
                         }
                         $tag->startIndex = $tag->endIndex = 0;
@@ -594,7 +613,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
         $tags = [];
         foreach ($this->tags as $tag) {
             // the tag is only affected if not completely  before the hole
-            if ($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL && $tag->isNewline()) {
+            if ($tag->getType() === editor_Segment_Tag::TYPE_INTERNAL && $tag->isNewline()) {
                 $tags[] = editor_Segment_NewlineTag::createNew($tag->startIndex, $tag->endIndex);
             }
         }
@@ -609,7 +628,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
     private function evaluateDeletedInserted(): void
     {
         foreach ($this->tags as $tag) {
-            if ($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES) {
+            if ($tag->getType() === editor_Segment_Tag::TYPE_TRACKCHANGES) {
                 $propName = ($tag->isDeleteTag()) ? 'wasDeleted' : 'wasInserted';
                 $this->setContainedTagsProp($tag->startIndex, $tag->endIndex, $tag->order, $propName);
             }

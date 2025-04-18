@@ -254,7 +254,8 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                         valueField: 'id',
                         displayField: 'label',
                         store: Ext.create('Ext.data.ChainedStore', {
-                            source: 'admin.WorkflowUserRoles'
+                            source: 'admin.WorkflowUserRoles',
+                            filters: [ (item) => item.id !== 'visualApprover' ]
                         }),
                         fieldLabel: me.strings.workflowUserRoleLabel,
                         afterLabelTextTpl: ' <img src="/modules/editor/images/information.png" class="info_image" data-qtip="' +

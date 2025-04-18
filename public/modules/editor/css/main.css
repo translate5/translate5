@@ -931,9 +931,8 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 .gridColumnInfoIconTooltipLeft {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:left center;}
 .gridColumnInfoIconTooltipCenter {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:center center;}
 .gridColumnInfoIconTooltipLeft .x-column-header-text-inner {padding-left: 10px;}
-.redTextColumn{
-	color:#ff0000;
-}
+.redTextColumn { color:#ff0000; }
+.redRow .x-grid-cell { color:#ff0000 !important; }
 .disabled-row .x-grid-cell {
 	color: #acacac !important;
 }

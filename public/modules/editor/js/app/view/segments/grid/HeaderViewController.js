@@ -143,13 +143,16 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
         }
         
         if (button === "yes") {
+            // give plugins the chance to intercept ...
+            if (! this.getView().fireEvent('finishTask', Editor.data.task)) {
+                return false;
+            }
             Editor.util.TaskActions.finish(function (task, app, strings) {
                 app.openAdministration(task);
                 app.unmask();
                 Editor.MessageBox.addSuccess(strings.taskFinished);
             });
-        }
-        else {
+        } else {
             Editor.util.TaskActions.close(function (task, app, strings) {
                 app.openAdministration(task);
                 app.unmask();

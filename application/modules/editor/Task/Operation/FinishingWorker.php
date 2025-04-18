@@ -59,16 +59,24 @@ class editor_Task_Operation_FinishingWorker extends editor_Models_Task_AbstractW
 
     protected function work(): bool
     {
-        $events = ZfExtended_Factory::get('ZfExtended_EventManager', [get_class($this)]);
-        /* @var $events ZfExtended_EventManager */
-        $events->trigger("operationFinished", $this, [
+        $this->triggerOperationFinished();
+        $this->resetTaskOperationState();
+
+        return true;
+    }
+
+    protected function resetTaskOperationState(): void
+    {
+        $this->task->setState($this->taskInitialState);
+        $this->task->save();
+    }
+
+    protected function triggerOperationFinished(): void
+    {
+        $events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [get_class($this)]);
+        $events->trigger('operationFinished', $this, [
             'operationType' => $this->operationType,
             'task' => $this->task,
         ]);
-
-        $this->task->setState($this->taskInitialState);
-        $this->task->save();
-
-        return true;
     }
 }

@@ -34,6 +34,7 @@ use editor_Models_Workflow_Step;
 use ReflectionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Db_Statement;
 use Zend_Db_Statement_Exception;
@@ -63,6 +64,18 @@ class WorkflowCloneCommand extends Translate5AbstractCommand
             InputArgument::REQUIRED,
             'Workflow name to be cloned',
         );
+
+        $this->addOption(
+            'newName',
+            mode: InputOption::VALUE_REQUIRED,
+            description: 'The technical name of the new workflow, asked if omitted',
+        );
+
+        $this->addOption(
+            'newLabel',
+            mode: InputOption::VALUE_REQUIRED,
+            description: 'The speakable label of the new workflow, asked if omitted',
+        );
     }
 
     /**
@@ -81,15 +94,24 @@ class WorkflowCloneCommand extends Translate5AbstractCommand
 
         $this->writeTitle('Clone Workflow');
 
-        //TODO: make also available as optional switch
-        $newWorkflowLabel = $this->io->ask('Please provide the UI label of the target workflow:');
+        if (! $newWorkflowLabel = $input->getOption('newLabel')) {
+            $newWorkflowLabel = $this->io->ask('Please provide the UI label of the target workflow:');
+        }
 
-        $newWorkflowName = '';
-        while (! preg_match('/^[a-z_0-9\-]+$/i', $newWorkflowName)) {
-            if (! empty($newWorkflowName)) {
-                $this->io->warning('The entered name is invalid, please use only [a-zA-Z0-9_-]');
+        if (! $newWorkflowName = $input->getOption('newName')) {
+            $newWorkflowName = '';
+            while (! preg_match('/^[a-z_0-9\-]+$/i', $newWorkflowName)) {
+                if (! empty($newWorkflowName)) {
+                    $this->io->warning('The entered name is invalid, please use only [a-zA-Z0-9_-]');
+                }
+                $newWorkflowName = $this->io->ask('Please provide the technical name of the target workflow:');
             }
-            $newWorkflowName = $this->io->ask('Please provide the technical name of the target workflow:');
+        }
+
+        if (strlen($newWorkflowName) === 0 || strlen($newWorkflowLabel) === 0) {
+            $this->io->error('Please provide a valid workflow name and label');
+
+            return self::FAILURE;
         }
 
         $workflow = ZfExtended_Factory::get(editor_Models_Workflow::class);

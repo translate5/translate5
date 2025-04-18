@@ -14,6 +14,114 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [7.22.0] - 2025-04-17
+
+### Important Notes:
+#### [TRANSLATE-3785](https://jira.translate5.net/browse/TRANSLATE-3785)
+For this feature to work properly, the following docker-containers need to be on the "latest" release:
+* frontendmessagebus
+* visualconverter
+* visualbrowser
+ 
+
+
+### Added
+**[TRANSLATE-4506](https://jira.translate5.net/browse/TRANSLATE-4506): Workflows - Workflow action to create Workflow Jobs** <br>
+Introduction of a in workflow triggerable action to create additional jobs for tasks.
+
+**[TRANSLATE-4489](https://jira.translate5.net/browse/TRANSLATE-4489): Task Management - show task deadline in task overview** <br>
+Added new column "Task deadline" in the task overview
+
+**[TRANSLATE-3785](https://jira.translate5.net/browse/TRANSLATE-3785): VisualReview / VisualTranslation - Exchange Visual PDF in ongoing project** <br>
+Visual: Added Capabilities to exchange the visual or to import it, after the task was imported. The visual can be provided as individual files or with a ZIP having the exact same file-layout as used in task-import. A video-visual or a XML/XSLT based visual can not be exchanged or imported at a later point.
+
+**[TRANSLATE-3565](https://jira.translate5.net/browse/TRANSLATE-3565): InstantTranslate - Send to human revision button for instant translate** <br>
+New functionality in InstantTranslate - Send to human revision button. By pressing the button a task is created out of file translation for revision by translators, reviewrs etc. 
+
+
+### Changed
+**[TRANSLATE-4601](https://jira.translate5.net/browse/TRANSLATE-4601): VisualReview / VisualTranslation - Improve Batch PDF Exchange Frontend** <br>
+Improve Frontend of PDF batch-exchange
+
+**[TRANSLATE-4538](https://jira.translate5.net/browse/TRANSLATE-4538): AI, openai - Make fine tuning in Azure cloud work** <br>
+OpenAI model are now tunable in Azure cloud
+In case Azure cloud is used in OpenAI plugin need to add more configs. Please read the corresponding doc page for details https://confluence.translate5.net/display/BUS/Azure
+
+**[TRANSLATE-4518](https://jira.translate5.net/browse/TRANSLATE-4518): VisualReview / VisualTranslation - Visual Webpage Download: Get rid of browserless** <br>
+Visual: Get rid of browserless in the visual container to be able to catch JS-Errors
+
+**[TRANSLATE-4513](https://jira.translate5.net/browse/TRANSLATE-4513): TermTagger integration - Send TBX ID as part of the URL to the termTagger** <br>
+TBX ID is sent as part of the request/header to the termTagger
+
+**[TRANSLATE-4511](https://jira.translate5.net/browse/TRANSLATE-4511): Workflows - Add custom dialogs on task finishing** <br>
+For customized workflows the possibility to add custom actions on workflow finish was added
+
+**[TRANSLATE-4510](https://jira.translate5.net/browse/TRANSLATE-4510): VisualReview / VisualTranslation - Implement a review visual view** <br>
+For visual related workflow a new view mode review visual only is introduce, focusing the user on the visual window only.
+
+**[TRANSLATE-4509](https://jira.translate5.net/browse/TRANSLATE-4509): VisualReview / VisualTranslation - Make PDF exchange batchable** <br>
+Added Exchange Visual Review PDF interface
+
+**[TRANSLATE-4508](https://jira.translate5.net/browse/TRANSLATE-4508): VisualReview / VisualTranslation, Workflows - Interact with workflow on dedicated events triggered by visual review** <br>
+Added some new workflow interactions to modify the tasks workflow on events produced by visual review.
+
+**[TRANSLATE-4482](https://jira.translate5.net/browse/TRANSLATE-4482): Import/Export - Add own Endpoint for t5-connect, add API-test for t5-connect Endpoint** <br>
+Add API-test & own endpoints for t5connect
+
+**[TRANSLATE-4203](https://jira.translate5.net/browse/TRANSLATE-4203): LanguageResources - DeepL: Switch tag-handling to be able to send tags as xliff tags** <br>
+Switch deepl tag handler to xliff.
+
+
+### Bugfixes
+**[TRANSLATE-4592](https://jira.translate5.net/browse/TRANSLATE-4592): TM Maintenance - search for (f) shows multiple segments but results in only 2** <br>
+duplicate
+
+**[TRANSLATE-4543](https://jira.translate5.net/browse/TRANSLATE-4543): TermTagger integration - BUG: TermTagger produces Invalid Markup (ins/del in term-tags)** <br>
+FIX: TermTagger may created invalid Markup in conjunction with TrackChanges
+
+
+## [7.21.5] - 2025-04-17
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4587](https://jira.translate5.net/browse/TRANSLATE-4587): Main back-end mechanisms (Worker, Logging, etc.) - Define customer specific templates** <br>
+Enable customer based templates(requires creation of separate template per client).
+
+**[TRANSLATE-4452](https://jira.translate5.net/browse/TRANSLATE-4452): t5memory, TM Maintenance - Improve user experience in TM Maintenance** <br>
+Rework error messages in TM Maintenance to be more clear for the end user.
+
+
+### Bugfixes
+**[TRANSLATE-4613](https://jira.translate5.net/browse/TRANSLATE-4613): Editor general - Deprecation error** <br>
+FIXED: deprecation error flooding the php log
+
+**[TRANSLATE-4610](https://jira.translate5.net/browse/TRANSLATE-4610): LanguageResources - Results for match table are not rendered** <br>
+Fix match table rendering
+
+**[TRANSLATE-4609](https://jira.translate5.net/browse/TRANSLATE-4609): TM Maintenance - Uncaught Error: Top-most item should be ...** <br>
+FIXED: problems with distinction between automatic and user scrolling
+
+**[TRANSLATE-4608](https://jira.translate5.net/browse/TRANSLATE-4608): t5memory, TM Maintenance - Amount of segments calculated and in the grid are different** <br>
+Fixed bug which might prevent all segments to load into the list in TMMaintenance panel after search
+
+**[TRANSLATE-4606](https://jira.translate5.net/browse/TRANSLATE-4606): Content Protection - Content protection: Not same tag count in source and target after conversion** <br>
+Fix tag filtering in TM conversion process
+
+**[TRANSLATE-4596](https://jira.translate5.net/browse/TRANSLATE-4596): Import/Export - Save resname comments** <br>
+Fix resname comments saving
+
+**[TRANSLATE-4595](https://jira.translate5.net/browse/TRANSLATE-4595): Content Protection - Content protection: Apply current rules for updated segments in TM Maintenance** <br>
+Apply current rules for updated segments in TM Maintenance
+
+**[TRANSLATE-4540](https://jira.translate5.net/browse/TRANSLATE-4540): Content Protection - Content Protection: Change logic of LR availability on TM Conversion** <br>
+Content Protection: Language resource will be available for fuzzy searches when it is only scheduled for conversion and completely locked when conversion in progress
+
+
 ## [7.21.4] - 2025-04-11
 
 ### Important Notes:

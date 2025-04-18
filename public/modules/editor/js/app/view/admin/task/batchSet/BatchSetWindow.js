@@ -25,29 +25,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.BatchSetWindow', {
+Ext.define('Editor.view.admin.task.batchSet.BatchSetWindow', {
     extend: 'Ext.window.Window',
-    alias: 'widget.adminTaskBatchSetWindow',
-    requires: [
-        'Editor.view.admin.task.BatchSetWindowViewController',
-        'Editor.view.form.field.TagGroup'
-    ],
-    controller: 'adminTaskBatchSetWindow',
-    itemId: 'adminTaskBatchSetWindow',
     bodyPadding: 20,
-    layout: 'hbox',
     border: false,
     width: 800,
     height: 500,
     bodyStyle: {
         borderWidth: 0
     },
+    title: Editor.data.l10n.batchSetWindow.title,
 
     initConfig: function (instanceConfig) {
         var me = this,
             l10n = Editor.data.l10n.batchSetWindow,
             config = {
-                title: l10n.title,
                 scrollable: true,
                 defaults: {
                     xtype: 'container',
@@ -55,59 +47,7 @@ Ext.define('Editor.view.admin.task.BatchSetWindow', {
                     margin: '0 5 0 0',
                     autoSize: true
                 },
-                items: [{
-                    items: [{
-                        xtype: 'displayfield',
-                        style: 'margin-top:30px',
-                        value: l10n.deadlineDateText
-                    }]
-                }, {
-                    items: [{
-                        xtype: 'combobox',
-                        name: 'batchWorkflow',
-                        itemId: 'batchWorkflow',
-                        queryMode: 'local',
-                        valueField: 'id',
-                        displayField: 'label',
-                        store: 'admin.Workflow',
-                        forceSelection: true,
-                        allowBlank: false,
-                        fieldLabel: l10n.workflowLabel,
-                        labelAlign: 'top',
-                        labelWidth: '100%'
-                    }]
-                }, {
-                    items: [{
-                        xtype: 'combobox',
-                        name: 'batchWorkflowStep',
-                        itemId: 'batchWorkflowStep',
-                        forceSelection: true,
-                        allowBlank: false,
-                        queryMode: 'local',
-                        valueField: 'id',
-                        displayField: 'text',
-                        fieldLabel: l10n.workflowStepLabel,
-                        labelAlign: 'top',
-                        labelWidth: ' 100%'
-                    }]
-                }, {
-                    items: [{
-                        xtype: 'datetimefield',
-                        name: 'deadlineDate',
-                        itemId: 'deadlineDate',
-                        format: Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
-                        width: 170,
-                        style: 'margin-top:30px',
-                        enableKeyEvents: true,
-                        listeners: {
-                            keypress : function(fld,e){
-                                if (e.getCharCode() === Ext.EventObject.ENTER) {
-                                    me.getController().onSetForSelectedClick();
-                                }
-                            }
-                        }
-                    }]
-                }],
+                items: this.getInnerItems(),
                 dockedItems: [{
                     xtype: 'panel',
                     bind: {

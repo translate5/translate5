@@ -80,6 +80,11 @@ class TaskRepository
         return $task;
     }
 
+    public function save(Task $task): void
+    {
+        $task->save();
+    }
+
     /**
      * @throws InexistentTaskException
      */
@@ -141,6 +146,17 @@ class TaskRepository
     public function loadListByPmGuid(string $pmGuid): array
     {
         $s = $this->db->select()->from(TaskTable::TABLE_NAME)->where('pmGuid = ?', $pmGuid);
+
+        return $this->db->fetchAll($s);
+    }
+
+    public function getUserTasksOfTypes(string $userGuid, string ...$types): array
+    {
+        $s = $this->db->select()
+            ->from(TaskTable::TABLE_NAME)
+            ->where('pmGuid = ? OR createdByUserGuid = ?', $userGuid)
+            ->where('taskType IN (?)', $types)
+        ;
 
         return $this->db->fetchAll($s);
     }

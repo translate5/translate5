@@ -80,7 +80,11 @@ class OpenPermissionAssert implements PermissionAssertInterface
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $granted = $context->actor->getUserGuid() === $object->getPmGuid() || $this->canLoadAllTasks($context->actor);
+        $actorGuid = $context->actor->getUserGuid();
+        $granted =
+            $actorGuid === $object->getPmGuid()
+            || $actorGuid === $object->getCreatedByUserGuid()
+            || $this->canLoadAllTasks($context->actor);
 
         $granted = $granted || (
             $context->actor->isCoordinator()

@@ -41,29 +41,21 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Some Internal Tags to create Tests with
      */
-    private $open1 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>';
+    protected array $testTags = [
+        '<1>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>',
+        '</1>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>',
+        '<2>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '</2>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '<3>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '</3>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '<4>' => '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>',
+        '</4>' => '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>',
+        '<5/>' => '<div class="single tab internal-tag ownttip"><span class="short" title="&lt;5/&gt;: 1 tab character">&lt;5/&gt;</span><span class="full" data-originalid="tab" data-length="1">→</span></div>',
+        '<6/>' => '<div class="single internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;6/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>',
+        '<7/>' => '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;7/&gt;: Newline">&lt;7/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>',
+    ];
 
-    private $close1 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>';
-
-    private $open2 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>';
-
-    private $close2 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>';
-
-    private $open3 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>';
-
-    private $close3 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>';
-
-    private $open4 = '<div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>';
-
-    private $close4 = '<div class="close internal-tag ownttip"><span class="short" title="TEST">&lt;/4&gt;</span><span class="full" data-originalid="126" data-length="-1">TEST</span></div>';
-
-    private $single5 = '<div class="single tab internal-tag ownttip"><span class="short" title="&lt;5/&gt;: 1 tab character">&lt;5/&gt;</span><span class="full" data-originalid="tab" data-length="1">→</span></div>';
-
-    private $single6 = '<div class="single internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;6/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>';
-
-    private $single7 = '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;7/&gt;: Newline">&lt;7/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>';
-
-    public function testInternalTags1()
+    public function testInternalTags1(): void
     {
         // testing "real" segment content
         $segmentId = 688499;
@@ -71,7 +63,7 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
         $this->createComparisionTest($segmentId, $markup);
     }
 
-    public function testInternalTags2()
+    public function testInternalTags2(): void
     {
         // testing "real" segment content
         $segmentId = 688500;
@@ -79,7 +71,7 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
         $this->createComparisionTest($segmentId, $markup);
     }
 
-    public function testInternalTags3()
+    public function testInternalTags3(): void
     {
         // testing "real" segment content
         $segmentId = 688501;
@@ -87,102 +79,102 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
         $this->createComparisionTest($segmentId, $markup);
     }
 
-    public function testTagComparision1()
+    public function testTagComparision1(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // simple: if input = output we must get no errors
-        $this->createPlaceholderComparisionTest($original, $original, []);
+        $this->createReplacedComparisionTest($original, $original, []);
     }
 
-    public function testTagComparision2()
+    public function testTagComparision2(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $edited = 'Lorem <2>ipsum</2> dolor sit amet, <1>consetetur sadipscing<5/></1> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // changed structure should not change validity
-        $this->createPlaceholderComparisionTest($original, $edited, []);
+        $this->createReplacedComparisionTest($original, $edited, []);
     }
 
-    public function testTagComparision3()
+    public function testTagComparision3(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing</2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // missing tag
-        $this->createPlaceholderComparisionTest($original, $edited, ['whitespace_tags_missing']);
+        $this->createReplacedComparisionTest($original, $edited, ['whitespace_tags_missing']);
     }
 
-    public function testTagComparision4()
+    public function testTagComparision4(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et dolore magna aliquyam erat</3>, sed diam voluptua.<7/>';
         // missing tag
-        $this->createPlaceholderComparisionTest($original, $edited, ['internal_tags_missing']);
+        $this->createReplacedComparisionTest($original, $edited, ['internal_tags_missing']);
     }
 
-    public function testTagComparision5()
+    public function testTagComparision5(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $edited = 'Lorem <1>ipsum</1> dolor sit amet, </2>consetetur sadipscing<5/><2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // wrong order open/close
-        $this->createPlaceholderComparisionTest($original, $edited, ['internal_tag_structure_faulty']);
+        $this->createReplacedComparisionTest($original, $edited, ['internal_tag_structure_faulty']);
     }
 
-    public function testTagComparision6()
+    public function testTagComparision6(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</3> aliquyam erat</4>, sed diam voluptua.<7/>';
         // overlapping tags
-        $this->createPlaceholderComparisionTest($original, $edited, ['internal_tag_structure_faulty']);
+        $this->createReplacedComparisionTest($original, $edited, ['internal_tag_structure_faulty']);
     }
 
-    public function testTagComparision7()
+    public function testTagComparision7(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam <6/>nonumy eirmod tempor <3>invidunt ut labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // additional tag
-        $this->createPlaceholderComparisionTest($original, $edited, ['internal_tags_added']);
+        $this->createReplacedComparisionTest($original, $edited, ['internal_tags_added']);
     }
 
-    public function testTagComparision8()
+    public function testTagComparision8(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<7/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         // additional & missing tag
-        $this->createPlaceholderComparisionTest($original, $edited, ['whitespace_tags_added', 'internal_tags_missing']);
+        $this->createReplacedComparisionTest($original, $edited, ['whitespace_tags_added', 'internal_tags_missing']);
     }
 
-    public function testTagComparision9()
+    public function testTagComparision9(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $edited = 'Lorem <1>ipsum<6/> dolor sit amet, <2>consetetur sadipscing</2><5/> elitr, sed diam nonumy eirmod tempor </1>invidunt ut<3> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         // changed structure
-        $this->createPlaceholderComparisionTest($original, $edited, []);
+        $this->createReplacedComparisionTest($original, $edited, []);
     }
 
-    public function testTagComparision10()
+    public function testTagComparision10(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $edited = 'Lorem <1>ipsum<6/> dolor sit amet, <4>consetetur sadipscing</2><5/> elitr, sed diam nonumy eirmod tempor </1>invidunt ut<3> labore et <2>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         // faulty structure
-        $this->createPlaceholderComparisionTest($original, $edited, ['internal_tag_structure_faulty']);
+        $this->createReplacedComparisionTest($original, $edited, ['internal_tag_structure_faulty']);
     }
 
-    public function testTagComparision11()
+    public function testTagComparision11(): void
     {
         $original = '<7/>Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $edited = 'Lorem <1>ipsum<2> dolor sit amet, <3>consetetur sadipscing<4> elitr, sed diam nonumy eirmod tempor </4>invidunt ut<6/><5/> labore et </3>dolore magna</2> aliquyam erat</1>, sed diam voluptua.<7/>';
         // changed structure
-        $this->createPlaceholderComparisionTest($original, $edited, []);
+        $this->createReplacedComparisionTest($original, $edited, []);
     }
 
-    public function testTagComparision12()
+    public function testTagComparision12(): void
     {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam <6/>nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // additional tag that is a carbon-copy will lead to a faulty structure
-        $this->createPlaceholderComparisionTest($original, $edited, ['internal_tag_structure_faulty']);
+        $this->createReplacedComparisionTest($original, $edited, ['internal_tag_structure_faulty']);
     }
 
-    public function testRealDataComparision1()
+    public function testRealDataComparision1(): void
     {
         // test based on real data from the AutoQA approval
         $source = '<div class="open 6270742069643d2231223e266c743b72756e313e3c2f627074 internal-tag ownttip"><span class="short" title="<run1>" id="ext-element-241">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;run1&gt;</span></div>T<div class="close 6570742069643d2231223e266c743b2f72756e313e3c2f657074 internal-tag ownttip"><span class="short" title="</run1>">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/run1&gt;</span></div><div class="open 6270742069643d2232223e266c743b72756e323e3c2f627074 internal-tag ownttip"><span class="short" title="<run2>">&lt;2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;run2&gt;</span></div>ranslation <div class="open 6270742069643d2233223e266c743b72756e333e3c2f627074 internal-tag ownttip"><span class="short" title="<run3>">&lt;3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;run3&gt;</span></div>M<div class="close 6570742069643d2233223e266c743b2f72756e333e3c2f657074 internal-tag ownttip"><span class="short" title="</run3>">&lt;/3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;/run3&gt;</span></div>anagement <div class="open 6270742069643d2234223e266c743b72756e343e3c2f627074 internal-tag ownttip"><span class="short" title="<run4>">&lt;4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;run4&gt;</span></div>S<div class="close 6570742069643d2234223e266c743b2f72756e343e3c2f657074 internal-tag ownttip"><span class="short" title="</run4>">&lt;/4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;/run4&gt;</span></div>ystem<div class="close 6570742069643d2232223e266c743b2f72756e323e3c2f657074 internal-tag ownttip"><span class="short" title="</run2>">&lt;/2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;/run2&gt;</span></div>';
@@ -206,7 +198,7 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testSequenceComparision0()
+    public function testSequenceComparision0(): void
     {
         $markup = 'Lorem ipsum<1><2><5/></1></2> dolor<3><6/></3> sit amet';
         $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
@@ -215,7 +207,7 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testSequenceComparision1()
+    public function testSequenceComparision1(): void
     {
         $markup = 'Lorem ipsum<1><2><5/></2></1> dolor<3><6/></3> sit amet';
         $this->createStructuralTest($markup, []);
@@ -224,7 +216,7 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testSequenceComparision2()
+    public function testSequenceComparision2(): void
     {
         $markup = 'Lorem ipsum<1><2><5/></2></1> dolor<6/></3><3> sit amet';
         $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
@@ -233,7 +225,7 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testSequenceComparision3()
+    public function testSequenceComparision3(): void
     {
         $markup = 'Lorem ipsum<7/><1><2></2><3></3><4></4></1><5/> dolor<3><6/></3> sit amet';
         $this->createStructuralTest($markup, []);
@@ -242,7 +234,7 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testSequenceComparision4()
+    public function testSequenceComparision4(): void
     {
         $markup = 'Lorem ipsum<7/><1><2></2><3><4></3></4></1><5/> dolor<3><6/></3> sit amet';
         $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
@@ -251,7 +243,7 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testSequenceComparision5()
+    public function testSequenceComparision5(): void
     {
         $markup = 'Lorem ipsum<1><2><3><5/></1><6/></2><7/></3>  dolor sit amet';
         $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
@@ -260,7 +252,7 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Tests sequences of tags with overlaps/interleaves
      */
-    public function testSequenceComparision6()
+    public function testSequenceComparision6(): void
     {
         $markup = 'Lorem ipsum<1><2><5/></1></2><6/><4><3><7/></4></3>  dolor sit amet';
         $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
@@ -269,19 +261,15 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Creates a test only to check the structure of the given markup
      */
-    private function createStructuralTest(string $markup, array|string $expectedState)
+    private function createStructuralTest(string $markup, array|string $expectedState): void
     {
-        $markup = $this->replaceInternalComparisionTags($markup);
+        $markup = $this->shortToFull($markup);
         $tags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $markup, 'target', 'targetEdit');
         $tagComparision = new editor_Segment_Internal_TagComparision($tags, null);
         $this->assertEquals($expectedState, $tagComparision->getStati());
     }
 
-    /**
-     * @param int $segmentId
-     * @param string $markup
-     */
-    private function createComparisionTest($segmentId, $markup)
+    private function createComparisionTest(int $segmentId, string $markup): void
     {
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
@@ -299,11 +287,8 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
 
     /**
      * Creates a test for the internal tag comparision.
-     * @param string $original
-     * @param string $edited
-     * @param array|string $expectedState
      */
-    private function createEditedComparisionTest($original, $edited, $expectedState)
+    private function createEditedComparisionTest(string $original, string $edited, array|string $expectedState): void
     {
         if (! is_array($expectedState)) {
             $expectedState = [$expectedState];
@@ -317,40 +302,15 @@ class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
     /**
      * Creates a test for the internal tag comparision. The passed markup will have the following markup replaced with internal tags
      * Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>
-     * @param string $original
-     * @param string $edited
-     * @param array|string $expectedState
      */
-    private function createPlaceholderComparisionTest($original, $edited, $expectedState)
+    private function createReplacedComparisionTest(string $original, string $edited, array|string $expectedState): void
     {
         if (! is_array($expectedState)) {
             $expectedState = [$expectedState];
         }
-        $originalTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceInternalComparisionTags($original), 'target', 'targetEdit');
-        $editedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceInternalComparisionTags($edited), 'target', 'targetEdit');
+        $originalTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->shortToFull($original), 'target', 'targetEdit');
+        $editedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->shortToFull($edited), 'target', 'targetEdit');
         $tagComparision = new editor_Segment_Internal_TagComparision($editedTags, $originalTags);
         $this->assertEquals($expectedState, $tagComparision->getStati());
-    }
-
-    /**
-     * Replaces short tags with real internal tags
-     * @param string $markup
-     * @return string
-     */
-    private function replaceInternalComparisionTags($markup)
-    {
-        $markup = str_replace('<1>', $this->open1, $markup);
-        $markup = str_replace('</1>', $this->close1, $markup);
-        $markup = str_replace('<2>', $this->open2, $markup);
-        $markup = str_replace('</2>', $this->close2, $markup);
-        $markup = str_replace('<3>', $this->open3, $markup);
-        $markup = str_replace('</3>', $this->close3, $markup);
-        $markup = str_replace('<4>', $this->open4, $markup);
-        $markup = str_replace('</4>', $this->close4, $markup);
-        $markup = str_replace('<5/>', $this->single5, $markup);
-        $markup = str_replace('<6/>', $this->single6, $markup);
-        $markup = str_replace('<7/>', $this->single7, $markup);
-
-        return $markup;
     }
 }

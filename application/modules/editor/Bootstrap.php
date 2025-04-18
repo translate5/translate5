@@ -222,7 +222,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'quality', 'userassocdefault', 'log', 'collectionattributedatatype', 'token',
                 'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
                 'languageresourcesyncconnection', 'languageresourcecustomerassoc', 'userfilterpreset',
-                'coordinatorgroup',
+                'coordinatorgroup', 't5connect',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -1082,6 +1082,57 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 ]
             )
         );
+
+        // Endpoints for the T5Connect controller
+        $this->front->getRouter()->addRoute('editorConnectFailed', new ZfExtended_Controller_RestLikeRoute(
+            'editor/t5connect/failed',
+            [
+                'module' => 'editor',
+                'controller' => 't5connect',
+                'action' => 'failed',
+            ]
+        ));
+        $this->front->getRouter()->addRoute('editorConnectImported', new ZfExtended_Controller_RestLikeRoute(
+            'editor/t5connect/imported',
+            [
+                'module' => 'editor',
+                'controller' => 't5connect',
+                'action' => 'imported',
+            ]
+        ));
+        $this->front->getRouter()->addRoute('editorConnectConfirmed', new ZfExtended_Controller_RestLikeRoute(
+            'editor/t5connect/confirmed',
+            [
+                'module' => 'editor',
+                'controller' => 't5connect',
+                'action' => 'confirmed',
+            ]
+        ));
+        $this->front->getRouter()->addRoute('editorConnectFinished', new ZfExtended_Controller_RestLikeRoute(
+            'editor/t5connect/finished',
+            [
+                'module' => 'editor',
+                'controller' => 't5connect',
+                'action' => 'finished',
+            ]
+        ));
+        $this->front->getRouter()->addRoute('editorConnectByforeignid', new ZfExtended_Controller_RestLikeRoute(
+            'editor/t5connect/byforeignid',
+            [
+                'module' => 'editor',
+                'controller' => 't5connect',
+                'action' => 'byforeignid',
+            ]
+        ));
+        $this->front->getRouter()->addRoute('editorConnectSetforeignstate', new ZfExtended_Controller_RestLikeRoute(
+            'editor/t5connect/setforeignstate',
+            [
+                'module' => 'editor',
+                'controller' => 't5connect',
+                'action' => 'setforeignstate',
+            ]
+        ));
+
         // special endpoint to provide configs for API-Tests. Must only be added when serving API-tests
         if (defined('APPLICATION_APITEST') && APPLICATION_APITEST) {
             $this->front->getRouter()->addRoute('editorConfigApiTest', new ZfExtended_Controller_RestLikeRoute(

@@ -89,7 +89,10 @@ class ClientFactory
     {
         return Middleware::log(
             $this->logger,
+            // Comment next line and uncomment the line below to log the request headers
+            // useful for debugging, please do not commit logging headers as there might be sensitive information
             new MessageFormatter("REQUEST: {method} {uri} HTTP/{version}:\n {req_body}")
+            // new MessageFormatter("REQUEST: {method} {uri} HTTP/{version}:\n{req_headers}\n{req_body}")
         );
     }
 

@@ -325,7 +325,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         if ($this->getQualityId() == null || $tag->getQualityId() != $this->getQualityId()) {
             return false;
         }
-        if (editor_TagSequence::VALIDATION_MODE && $this->endIndex != $this->startIndex || $tag->endIndex != $tag->startIndex) {
+        if (editor_TagSequence::DO_DEBUG && $this->endIndex != $this->startIndex || $tag->endIndex != $tag->startIndex) { // @phpstan-ignore-line
             error_log("\n##### MQM TAG: INVALID INDEXES FOUND [open: (" . $this->startIndex . "|" . $this->endIndex . ") close: (" . $tag->startIndex . "|" . $tag->endIndex . ")] #####\n");
         }
         $this->paired = true;

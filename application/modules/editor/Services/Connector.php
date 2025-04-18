@@ -485,4 +485,14 @@ class editor_Services_Connector implements ExportAdapterInterface
 
         return $filename;
     }
+
+    /**
+     * @throws ZfExtended_Exception
+     */
+    public function processAfterCreation(): void
+    {
+        if (method_exists($this->adapter, 'processAfterCreation')) {
+            $this->adapter->processAfterCreation();
+        }
+    }
 }

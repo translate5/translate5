@@ -499,7 +499,7 @@ class Tags extends editor_TagSequence
         $wrapper = $this->unparseHtml($html);
         // set our field text
         $this->setText($wrapper->getText());
-        if (static::VALIDATION_MODE) {
+        if (static::DO_DEBUG) {
             if ($wrapper->getTextLength() != $this->getTextLength()) {
                 error_log("\n##### WRAPPER TEXT LENGTH " . $wrapper->getTextLength() . " DOES NOT MATCH FIELD TEXT LENGTH: " . $this->getTextLength() . " #####\n");
             }
@@ -544,7 +544,7 @@ class Tags extends editor_TagSequence
     /* Creation API */
 
     /**
-     * @throws \stringEncode\Exception
+     * @throws Exception
      */
     protected function createFromHtmlNode(HtmlNode $node, int $startIndex, array $children = null): \editor_Segment_Tag
     {

@@ -34,6 +34,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
     	'Editor.view.project.ProjectGridViewController',
         'Editor.view.task.LogInfoColumn',
         'Editor.view.admin.TaskGrid',
+        'Editor.view.admin.task.menu.TaskBatchActionMenu'
 	],
 	controller:'projectGrid',
 	itemId: 'projectGrid',
@@ -261,10 +262,11 @@ Ext.define('Editor.view.project.ProjectGrid', {
         	            hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
         	        }, {
                         xtype: 'button',
-                        itemId: 'batch-set-btn',
+                        menu: {
+                            xtype: 'taskBatchActionMenu'
+                        },
                         bind: {
-                            text: '{l10n.projectGrid.strings.batchSetProperties}',
-                            tooltip: '{l10n.projectGrid.strings.batchSetPropertiesTip}'
+                            text: '{l10n.projectGrid.strings.batchOperations}'
                         }
                     }, {
         	            xtype: 'button',

@@ -2129,6 +2129,24 @@
                     <br />
                 </target>
             </trans-unit>
+            <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZWluIG5ldWVzIHtwcm9qZWN0VHlwZX0gZXJzdGVsbHQuPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBJRDo8L3N0cm9uZz4ge3Byb2plY3RJZH0gPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBOYW1lOjwvc3Ryb25nPiB7cHJvamVjdE5hbWV9'>
+                <source>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName}
+                </source>
+                <target>A new {projectType} project has been assigned to you at {portalLink}.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project name:</strong> {projectName} <br />
+                </target>
+            </trans-unit>
+            <trans-unit id='ZGllIG1lbnNjaGxpY2hlIFJldmlzaW9uIGRlciBEYXRlaSB7ZmlsZU5hbWV9IHd1cmRlIGJlZW5kZXQgdW5kIHN0ZWh0IHVudGVyIHt1cmx9IGFscyBEb3dubG9hZCB6dXIgVmVyZsO8Z3VuZy4='>
+                <source>die menschliche Revision der Datei {fileName} wurde beendet und steht unter {url} als Download zur Verfügung.</source>
+                <target>Human revision of the file "{fileName}" has been finished and you can download it here {url}.</target>
+            </trans-unit>
+            <trans-unit id='VHJhbnNsYXRlNSAtIFByb2pla3QgZXJzdGVsbHQ='>
+                <source>Translate5 - Projekt erstellt</source>
+                <target>Translate5 - Project created</target>
+            </trans-unit>
             <trans-unit id='QWxsZSBCZW51dHplciBkZXIgYWt0dWVsbGVuIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+Ogp7Y3VycmVudFVzZXJzfTxici8+Cg=='>
                 <source>Alle Benutzer der aktuellen Rolle 
                     <i>{currentRole}</i>:
@@ -2186,6 +2204,14 @@
             <trans-unit id='V29ya2Zsb3cgYWJnZXNjaGxvc3Nlbg=='>
                 <source>Workflow abgeschlossen</source>
                 <target>Workflow finished</target>
+            </trans-unit>
+            <trans-unit id='TGVrdG9yYXQ='>
+                <source>Lektorat</source>
+                <target>Review</target>
+            </trans-unit>
+            <trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='>
+                <source>Zweites Lektorat</source>
+                <target>Second review</target>
             </trans-unit>
             <trans-unit id='w5xiZXJzZXR6dW5n'>
                 <source>Übersetzung</source>
@@ -3958,6 +3984,10 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Keine Aufgaben zugewiesen.</source>
                 <target>No tasks associated.</target>
             </trans-unit>
+            <trans-unit id='S2VpbmUgQXVmZ2FiZW4gYXVzZ2V3w6RobHQ='>
+                <source>Keine Aufgaben ausgewählt</source>
+                <target>No tasks selected</target>
+            </trans-unit>
             <trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNocmVzc291cmNlbg=='>
                 <source>Zugewiesene Sprachressourcen</source>
                 <target>Associated language resources</target>
@@ -5211,6 +5241,10 @@ This email is a reminder that the "Deadline"
             <trans-unit id='dmlzaXRvcg=='>
                 <source>visitor</source>
                 <target>visitor</target>
+            </trans-unit>
+            <trans-unit id='dmlzdWFsQXBwcm92ZXI='>
+                <source>visualApprover</source>
+                <target>Visual Approver</target>
             </trans-unit>
             <trans-unit id='Sm9iLVN0YXR1cw=='>
                 <source>Job-Status</source>
@@ -7085,6 +7119,10 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='SW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0'>
                 <source>InstantTranslateWriteTm</source>
                 <target>Instant-Translate write TM(API only)</target>
+            </trans-unit>
+            <trans-unit id='SW5zdGFudFRyYW5zbGF0ZUh1bWFuUmV2aXNpb25BbGxvd2Vk'>
+                <source>InstantTranslateHumanRevisionAllowed</source>
+                <target>InstantTranslate (human revision allowed)</target>
             </trans-unit>
             <trans-unit id='UmVmZXJlbnotRGF0ZWkoZW4p'>
                 <source>Referenz-Datei(en)</source>
@@ -10666,6 +10704,10 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
             <trans-unit id="Sm9icw==">
                 <source>Jobs</source>
                 <target>jobs</target>
+            </trans-unit>
+            <trans-unit id='QmF0Y2gtT3BlcmF0aW9uZW4='>
+                <source>Batch-Operationen</source>
+                <target>Batch operations</target>
             </trans-unit>
             <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc='>
                 <source>language_resource.status.conversion_scheduled</source>

@@ -278,7 +278,9 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
                 // Remove dummy loading entry
                 if (loaderRec) {
+                    scrollable.suspendEvent('scrollend');
                     store.remove(loaderRec, false, false);
+                    scrollable.resumeEvent('scrollend');
                 }
 
                 // It's important to resume scrollend-event AFTER the dummy record

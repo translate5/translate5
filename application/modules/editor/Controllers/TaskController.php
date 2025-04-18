@@ -653,6 +653,8 @@ class editor_TaskController extends ZfExtended_RestController
             $this->data['autoStartImport'] = true;
         }
 
+        $this->data['createdByUserGuid'] = $this->authenticatedUser->getUserGuid();
+
         if (empty($this->data['pmGuid']) || ! $this->isAllowed(Rights::ID, 'editorEditTaskPm')) {
             $this->data['pmGuid'] = $this->authenticatedUser->getUserGuid();
             $this->data['pmName'] = $this->authenticatedUser->getUsernameLong();
@@ -2188,18 +2190,8 @@ class editor_TaskController extends ZfExtended_RestController
         if (empty($taskGuid)) {
             throw new editor_Models_Task_Exception('E1339');
         }
-        $this->view->progress = $this->getTaskImportProgress($taskGuid);
-    }
-
-    /**
-     * Get/calculate the taskImport progress for given taskGuid
-     */
-    protected function getTaskImportProgress(string $taskGuid): array
-    {
-        /** @var editor_Models_Task_WorkerProgress $progress */
-        $progress = ZfExtended_Factory::get('editor_Models_Task_WorkerProgress');
-
-        return $progress->calculateProgress($taskGuid);
+        $progress = ZfExtended_Factory::get(editor_Models_Task_WorkerProgress::class);
+        $this->view->progress = $progress->calculateProgress($taskGuid);
     }
 
     /**
