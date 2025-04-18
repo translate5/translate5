@@ -15,7 +15,8 @@ Ext.define('TMMaintenance.view.main.MainModel', {
         totalAmount: false,
         loadingTotalAmount: false,
         loadingRecordNumber: null,
-        loadedQty: 0
+        loadedQty: 0,
+        totalLoadedQty: 0
     },
     formulas: {
         listTitle: function(get) {
@@ -43,6 +44,10 @@ Ext.define('TMMaintenance.view.main.MainModel', {
 
             if (chunk === false && get('lastOffset') === null) {
                 title = get('l10n.list.totalAmount') + total;
+            }
+
+            if (title.length === 0) {
+                title = Ext.String.format(get('l10n.list.loadedSoFar'), get('totalLoadedQty'));
             }
             return  title;
         }

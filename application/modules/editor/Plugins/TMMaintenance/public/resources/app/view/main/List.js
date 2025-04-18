@@ -261,6 +261,7 @@ Ext.define('TMMaintenance.view.main.List', {
     },
 
     scrollable: {
+        suspendScrollend: 0,
         y: true,
         listeners: {
             scrollstart: function() {
@@ -270,8 +271,15 @@ Ext.define('TMMaintenance.view.main.List', {
                 let maxPosition = this.getMaxPosition().y;
                 let threshold = Math.ceil(this.getClientSize().y * 0.1);
                 let nowY = this.getPosition().y;
-                if (nowY > this.wasY && nowY + threshold >= maxPosition) {
-                    Ext.ComponentQuery.query('searchform')[0].getController().onContainerScrollEnd(arguments);
+                let ctrl = this.component.down('^ app-main searchform').getController();
+                if (nowY < this.wasY) {
+                    if (nowY + threshold / 2 < maxPosition) {
+                        ctrl.onContainerScrollUpEnd();
+                    }
+                } else if (nowY > this.wasY) {
+                    if (nowY + threshold >= maxPosition && this.suspendScrollend <= 0) {
+                        ctrl.onContainerScrollDownEnd();
+                    }
                 }
             },
         },
