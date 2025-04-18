@@ -53,6 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection;
 
 use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\ContentProtection\DTO\ConversionToInternalTagResult;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 
 class WhitespaceProtector implements ProtectorInterface
@@ -142,33 +143,38 @@ class WhitespaceProtector implements ProtectorInterface
     public function convertToInternalTags(
         string $segment,
         int &$shortTagIdent,
-        bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = [],
     ): string {
-        $this->whitespace->collectTagNumbers = $collectTagNumbers;
+        $shortcutNumberMap = [];
 
         return $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $shortcutNumberMap);
     }
 
-    public function convertToInternalTagsInChunks(
+    public function convertToInternalTagsWithShortcutNumberMapCollecting(
         string $segment,
-        int &$shortTagIdent,
-        bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = [],
-    ): array {
-        $xmlChunks = [];
-        $this->whitespace->collectTagNumbers = $collectTagNumbers;
-        $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $shortcutNumberMap, $xmlChunks);
+        int $shortTagIdent,
+    ): ConversionToInternalTagResult {
+        $shortcutNumberMap = [];
+        $this->whitespace->collectTagNumbers = true;
 
-        return $xmlChunks;
+        return new ConversionToInternalTagResult(
+            $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $shortcutNumberMap),
+            $shortTagIdent,
+            $shortcutNumberMap,
+        );
     }
 
     public function convertToInternalTagsWithShortcutNumberMap(
         string $segment,
-        int &$shortTagIdent,
+        int $shortTagIdent,
         array $shortcutNumberMap,
-    ): string {
-        return $this->whitespace->convertToInternalTagsFromService($segment, $shortTagIdent, $shortcutNumberMap);
+    ): ConversionToInternalTagResult {
+        $this->whitespace->collectTagNumbers = false;
+
+        return new ConversionToInternalTagResult(
+            $this->whitespace->convertToInternalTagsFromService($segment, $shortTagIdent, $shortcutNumberMap),
+            $shortTagIdent,
+            $shortcutNumberMap,
+        );
     }
 
     public function tagList(): array

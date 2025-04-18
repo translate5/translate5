@@ -216,10 +216,22 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $sourceName = $this->segmentFieldManager->getFirstSourceName();
         $targetName = $this->segmentFieldManager->getFirstTargetName();
 
-        [$parsedSource, $parsedTarget] = $this->contentProtector->filterTags(
+        $this->shortTagIdent = 1;
+
+        $sourceConverted = $this->contentProtector->convertToInternalTagsWithShortcutNumberMapCollecting(
             $this->parseSegment($transUnit['source'], true),
-            $this->parseSegment($transUnit['target'], false)
+            $this->shortTagIdent
         );
+        $target = $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
+            $this->parseSegment($transUnit['target'], false),
+            $sourceConverted->shortTagIdent,
+            $sourceConverted->shortcutNumberMap,
+        );
+
+        $this->checkForUndefinedTags($sourceConverted->segment);
+        $this->checkForUndefinedTags($target);
+
+        [$parsedSource, $parsedTarget] = $this->contentProtector->filterTags($sourceConverted->segment, $target);
 
         $this->segmentData[$sourceName] = [
             'original' => $parsedSource,
@@ -262,12 +274,8 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             return $segment;
         }
         $this->endTags = [];
-        $this->shortTagIdent = 1;
 
         $segment = $this->parseTags($segment);
-
-        $segment = $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
-        $this->checkForUndefinedTags($segment);
 
         return $segment;
     }

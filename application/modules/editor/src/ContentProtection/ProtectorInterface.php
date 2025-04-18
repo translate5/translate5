@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection;
 
+use MittagQI\Translate5\ContentProtection\DTO\ConversionToInternalTagResult;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 
 interface ProtectorInterface
@@ -82,22 +83,18 @@ interface ProtectorInterface
     public function convertToInternalTags(
         string $segment,
         int &$shortTagIdent,
-        bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = []
     ): string;
 
-    public function convertToInternalTagsInChunks(
+    public function convertToInternalTagsWithShortcutNumberMapCollecting(
         string $segment,
-        int &$shortTagIdent,
-        bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = []
-    ): array;
+        int $shortTagIdent,
+    ): ConversionToInternalTagResult;
 
     public function convertToInternalTagsWithShortcutNumberMap(
         string $segment,
-        int &$shortTagIdent,
+        int $shortTagIdent,
         array $shortcutNumberMap
-    ): string;
+    ): ConversionToInternalTagResult;
 
     public function tagList(): array;
 }

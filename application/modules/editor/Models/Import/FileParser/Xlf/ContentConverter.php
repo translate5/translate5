@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
@@ -101,19 +102,19 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
      */
-    public function __construct(XlfNamespaces $namespaces, editor_Models_Task $task, string $filename)
-    {
+    public function __construct(
+        XlfNamespaces $namespaces,
+        editor_Models_Task $task,
+        editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers,
+        string $filename,
+    ) {
         $this->namespaces = $namespaces;
         $this->task = $task;
         $this->filename = $filename;
 
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
-        $this->utilities->whitespace->collectTagNumbers = true;
-
-        $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
-
-        $this->shortTagNumbers = ZfExtended_Factory::get(editor_Models_Import_FileParser_Xlf_ShortTagNumbers::class);
-
+        $this->contentProtector = ContentProtector::create();
+        $this->shortTagNumbers = $shortTagNumbers;
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
 
         $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
@@ -340,12 +341,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         $this->shortTagNumbers->init($source);
         $this->handleIsInSourceScope = $source;
 
-        if ($source) {
-            $this->contentProtector->resetShortcutMap();
-        }
-        //on source we collect the tag numbers, on target we use them:
-        $this->contentProtector->switchShortcutMapCollection($source);
-
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content
         $this->preserveWhitespace = $preserveWhitespace;
         if (is_array($chunks)) {
@@ -415,12 +410,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
                 ]);
             }
         }
-        //we have to decode entities here, otherwise our generated XLF wont be valid
+        //we have to decode entities here, otherwise our generated XLF won't be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
         if ($this->protectTags) {
-            //since we are in a XML file format, plain tags in the content are encoded, which we have to undo first
-            //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
+            //since we are in XML file format, plain tags in the content are encoded, which we have to undo first
+            //$text example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
             $text = html_entity_decode($text);
             //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
 
@@ -431,23 +426,21 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
                 $this->handleIsInSourceScope,
                 (int) $this->task->getSourceLang(),
                 (int) $this->task->getTargetLang(),
-                EntityHandlingMode::Off
+                EntityHandlingMode::Off,
+                NumberProtector::alias()
             );
         } else {
             $text = $this->contentProtector->protect(
                 $text,
                 $this->handleIsInSourceScope,
                 (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang()
+                (int) $this->task->getTargetLang(),
+                exceptProtectors: NumberProtector::alias()
             );
         }
 
-        $xmlChunks = $this->contentProtector->convertToInternalTagsInChunks(
-            $text,
-            $this->shortTagNumbers->shortTagIdent
-        );
-        //to keep the generated tag objects we have to use the chunklist instead of the returned string
-        array_push($this->result, ...$xmlChunks);
+        //to keep the generated tag objects we have to use the chunk-list instead of the returned string
+        array_push($this->result, $text);
     }
 
     /**
