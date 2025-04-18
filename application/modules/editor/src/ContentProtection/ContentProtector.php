@@ -59,10 +59,6 @@ use MittagQI\Translate5\Segment\EntityHandlingMode;
 
 class ContentProtector
 {
-    private array $shortcutNumberMap = [];
-
-    private bool $collectShortcutMap = false;
-
     /**
      * @var array<string, ProtectorInterface>
      */
@@ -114,16 +110,6 @@ class ContentProtector
                 ProtectionTagsFilter::create(),
             ]
         );
-    }
-
-    public function resetShortcutMap(): void
-    {
-        $this->shortcutNumberMap = [];
-    }
-
-    public function switchShortcutMapCollection(bool $collect): void
-    {
-        $this->collectShortcutMap = $collect;
     }
 
     /**
