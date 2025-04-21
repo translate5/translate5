@@ -57,6 +57,7 @@ use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use PHPUnit\Framework\TestCase;
@@ -224,6 +225,53 @@ class NumberProtectorTest extends TestCase
         yield [
             'segment' => "string $tag1 string $tag2 string",
             'converted' => "string $converted1 string $converted2 string",
+            'finalTagIdent' => 3,
+        ];
+    }
+
+    /**
+     * @dataProvider internalTagsInChunksProvider
+     */
+    public function testConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
+    {
+        $number = NumberProtector::create();
+        $shortTagIdent = 1;
+        self::assertEquals($xmlChunks, $number->convertToInternalTagsInChunks($segment, $shortTagIdent));
+        self::assertSame($finalTagIdent, $shortTagIdent);
+    }
+
+    public function internalTagsInChunksProvider(): iterable
+    {
+        $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $parsedTag1 = new NumberTag();
+        $parsedTag1->originalContent = $tag1;
+        $parsedTag1->tagNr = 1;
+        $parsedTag1->id = 'number';
+        $parsedTag1->tag = 'number';
+        $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
+        $parsedTag1->iso = '2023-10-20';
+        $parsedTag1->source = '20231020';
+        $parsedTag1->renderedTag = $converted1;
+        yield [
+            'segment' => "string $tag1 string",
+            'xmlChunks' => ['string ', $parsedTag1, ' string'],
+            'finalTagIdent' => 2,
+        ];
+        $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target=""/>';
+        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="" class="full"></span></div>';
+        $parsedTag2 = new NumberTag();
+        $parsedTag2->originalContent = $tag2;
+        $parsedTag2->tagNr = 2;
+        $parsedTag2->id = 'number';
+        $parsedTag2->tag = 'number';
+        $parsedTag2->text = '{"source":"1234","target":""}';
+        $parsedTag2->iso = '1234';
+        $parsedTag2->source = '1234';
+        $parsedTag2->renderedTag = $converted2;
+        yield [
+            'segment' => "string $tag1 string $tag2 string",
+            'xmlChunks' => ['string ', $parsedTag1, ' string ', $parsedTag2, ' string'],
             'finalTagIdent' => 3,
         ];
     }
