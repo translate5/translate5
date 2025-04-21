@@ -405,6 +405,7 @@ class ContentProtectorTest extends UnitTestAbstract
     {
         $shortTagIdent = 1;
         $contentProtector = ContentProtector::create(new Whitespace());
+
         self::assertEquals($xmlChunks, $contentProtector->convertToInternalTagsInChunks($segment, $shortTagIdent));
         self::assertSame($finalTagIdent, $shortTagIdent);
     }
@@ -413,6 +414,7 @@ class ContentProtectorTest extends UnitTestAbstract
     {
         $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
         $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+
         $parsedTag1 = new NumberTag();
         $parsedTag1->originalContent = $tag1;
         $parsedTag1->tagNr = 1;
@@ -437,6 +439,7 @@ class ContentProtectorTest extends UnitTestAbstract
 
         $tag2 = '<hardReturn/>';
         $converted2 = '<div class="single 6861726452657475726e2f newline internal-tag ownttip"><span title="&lt;2/&gt;: Newline" class="short">&lt;2/&gt;</span><span data-originalid="hardReturn" data-length="1" class="full">↵</span></div>';
+
         $parsedTag2 = new editor_Models_Import_FileParser_WhitespaceTag();
         $parsedTag2->originalContent = $tag2;
         $parsedTag2->rawContent = "\r\n";
@@ -454,6 +457,7 @@ class ContentProtectorTest extends UnitTestAbstract
 
         $tagNBSP = '<char ts="c2a0" length="1"/>';
         $convertedNBSP = '<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span title="&lt;2/&gt;: No-Break Space (NBSP)" class="short">&lt;2/&gt;</span><span data-originalid="char" data-length="1" class="full">⎵</span></div>';
+
         $parsedNBSP = new editor_Models_Import_FileParser_WhitespaceTag();
         $parsedNBSP->originalContent = $tagNBSP;
         $parsedNBSP->rawContent = " ";
@@ -477,6 +481,7 @@ class ContentProtectorTest extends UnitTestAbstract
         $bTag->tag = 'protectedTag';
         $bTag->text = '&lt;b&gt;';
         $bTag->renderedTag = '<div class="open 62 internal-tag ownttip"><span title="&lt;b&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;b&gt;</span></div>';
+
         $bCloseTag = new Tag(Tag::TYPE_CLOSE);
         $bCloseTag->originalContent = '</b>';
         $bCloseTag->rid = '1';
