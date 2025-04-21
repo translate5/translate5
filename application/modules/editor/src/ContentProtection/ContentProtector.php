@@ -306,10 +306,12 @@ class ContentProtector
                         $shortTagIdent,
                         $shortcutNumberMap,
                     );
+
                     continue 2;
                 }
             }
         }
+
         return array_values(array_filter(array_merge(...$chunkStorage), fn ($v) => '' !== $v));
     }
 }
