@@ -85,6 +85,12 @@ interface ProtectorInterface
         int &$shortTagIdent,
     ): string;
 
+    public function convertToInternalTagsInChunks(
+        string $segment,
+        int &$shortTagIdent,
+        array &$shortcutNumberMap = [],
+    ): array;
+
     public function convertToInternalTagsWithShortcutNumberMapCollecting(
         string $segment,
         int $shortTagIdent,

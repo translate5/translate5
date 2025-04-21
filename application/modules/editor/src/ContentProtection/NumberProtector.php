@@ -244,6 +244,27 @@ class NumberProtector implements ProtectorInterface
         bool $collectTagNumbers = false,
         array &$shortcutNumberMap = [],
     ): string {
+        $xml = $this->getXmlParser($shortTagIdent, $collectTagNumbers, $shortcutNumberMap);
+
+        return $xml->parse($segment, true, [self::TAG_NAME]);
+    }
+
+    public function convertToInternalTagsInChunks(
+        string $segment,
+        int &$shortTagIdent,
+        array &$shortcutNumberMap = [],
+    ): array {
+        $xml = $this->getXmlParser($shortTagIdent, false, $shortcutNumberMap);
+        $xml->parse($segment, true, [self::TAG_NAME]);
+
+        return $xml->getAllChunks();
+    }
+
+    private function getXmlParser(
+        int &$shortTagIdent,
+        bool $collectTagNumbers = false,
+        array &$shortcutNumberMap = [],
+    ): XmlParser {
         $xml = new XmlParser([
             'normalizeTags' => false,
         ]);
@@ -258,9 +279,7 @@ class NumberProtector implements ProtectorInterface
             }
         );
 
-        $result = $xml->parse($segment, true, [self::TAG_NAME]);
-
-        return $result;
+        return $xml;
     }
 
     public function convertToInternalTagsWithShortcutNumberMap(

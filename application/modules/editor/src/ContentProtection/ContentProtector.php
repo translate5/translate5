@@ -274,4 +274,42 @@ class ContentProtector
             $shortTagIdent
         );
     }
+
+    /**
+     * @return string[]|\editor_Models_Import_FileParser_Tag[]
+     */
+    public function convertToInternalTagsInChunks(
+        string $segment,
+        int &$shortTagIdent,
+        array &$shortcutNumberMap = [],
+    ): array {
+        $tagsPattern = '/<.+\/>/U';
+        // we assume that tags that we interested in are all single tags
+        if (! preg_match_all($tagsPattern, $segment, $matches)) {
+            return [$segment];
+        }
+        $strings = preg_split($tagsPattern, $segment);
+        $tags = $matches[0];
+        $chunkStorage = [];
+        $matchCount = count($tags);
+        for ($i = 0; $i <= $matchCount; $i++) {
+            if (isset($strings[$i]) && '' !== $strings[$i]) {
+                $chunkStorage[] = [$strings[$i]];
+            }
+            if (! isset($tags[$i])) {
+                continue;
+            }
+            foreach ($this->protectors as $protector) {
+                if ($protector->hasTagsToConvert($tags[$i])) {
+                    $chunkStorage[] = $protector->convertToInternalTagsInChunks(
+                        $tags[$i],
+                        $shortTagIdent,
+                        $shortcutNumberMap,
+                    );
+                    continue 2;
+                }
+            }
+        }
+        return array_values(array_filter(array_merge(...$chunkStorage), fn ($v) => '' !== $v));
+    }
 }

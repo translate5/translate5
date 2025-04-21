@@ -52,6 +52,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Integration\ContentProtection;
 
+use editor_Models_Import_FileParser_Tag as Tag;
+use editor_Models_Import_FileParser_WhitespaceTag;
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
@@ -61,6 +63,7 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtect
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Test\UnitTestAbstract;
 use ZfExtended_Factory;
@@ -392,6 +395,101 @@ class ContentProtectorTest extends UnitTestAbstract
             'segment' => "string $tagNBSP string $tag2 string",
             'converted' => "string $convertedNBSP string $converted2 string",
             'finalTagIdent' => 3,
+        ];
+    }
+
+    /**
+     * @dataProvider internalTagsInChunksProvider
+     */
+    public function testConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
+    {
+        $shortTagIdent = 1;
+        $contentProtector = ContentProtector::create(new Whitespace());
+        self::assertEquals($xmlChunks, $contentProtector->convertToInternalTagsInChunks($segment, $shortTagIdent));
+        self::assertSame($finalTagIdent, $shortTagIdent);
+    }
+
+    public function internalTagsInChunksProvider(): iterable
+    {
+        $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $parsedTag1 = new NumberTag();
+        $parsedTag1->originalContent = $tag1;
+        $parsedTag1->tagNr = 1;
+        $parsedTag1->id = 'number';
+        $parsedTag1->tag = 'number';
+        $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
+        $parsedTag1->renderedTag = $converted1;
+        $parsedTag1->iso = '2023-10-20';
+        $parsedTag1->source = '20231020';
+
+        yield [
+            'segment' => "string $tag1 string",
+            'xmlChunks' => ['string ', $parsedTag1, ' string'],
+            'finalTagIdent' => 2,
+        ];
+
+        yield [
+            'segment' => "$tag1 string",
+            'xmlChunks' => [$parsedTag1, ' string'],
+            'finalTagIdent' => 2,
+        ];
+
+        $tag2 = '<hardReturn/>';
+        $converted2 = '<div class="single 6861726452657475726e2f newline internal-tag ownttip"><span title="&lt;2/&gt;: Newline" class="short">&lt;2/&gt;</span><span data-originalid="hardReturn" data-length="1" class="full">↵</span></div>';
+        $parsedTag2 = new editor_Models_Import_FileParser_WhitespaceTag();
+        $parsedTag2->originalContent = $tag2;
+        $parsedTag2->rawContent = "\r\n";
+        $parsedTag2->tagNr = 2;
+        $parsedTag2->id = 'hardReturn';
+        $parsedTag2->tag = 'hardReturn';
+        $parsedTag2->text = '↵';
+        $parsedTag2->renderedTag = $converted2;
+
+        yield [
+            'segment' => "string $tag1 string $tag2 string",
+            'xmlChunks' => ['string ', $parsedTag1, ' string ', $parsedTag2, ' string'],
+            'finalTagIdent' => 3,
+        ];
+
+        $tagNBSP = '<char ts="c2a0" length="1"/>';
+        $convertedNBSP = '<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span title="&lt;2/&gt;: No-Break Space (NBSP)" class="short">&lt;2/&gt;</span><span data-originalid="char" data-length="1" class="full">⎵</span></div>';
+        $parsedNBSP = new editor_Models_Import_FileParser_WhitespaceTag();
+        $parsedNBSP->originalContent = $tagNBSP;
+        $parsedNBSP->rawContent = " ";
+        $parsedNBSP->tagNr = 2;
+        $parsedNBSP->id = 'char';
+        $parsedNBSP->tag = 'char';
+        $parsedNBSP->text = '⎵';
+        $parsedNBSP->renderedTag = $convertedNBSP;
+
+        yield [
+            'segment' => "string $tag1 string [$tagNBSP] string",
+            'xmlChunks' => ['string ', $parsedTag1, ' string [', $parsedNBSP, '] string'],
+            'finalTagIdent' => 3,
+        ];
+
+        $bTag = new Tag(Tag::TYPE_OPEN);
+        $bTag->originalContent = '<b>';
+        $bTag->rid = '1';
+        $bTag->tagNr = 1;
+        $bTag->id = '1';
+        $bTag->tag = 'protectedTag';
+        $bTag->text = '&lt;b&gt;';
+        $bTag->renderedTag = '<div class="open 62 internal-tag ownttip"><span title="&lt;b&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;b&gt;</span></div>';
+        $bCloseTag = new Tag(Tag::TYPE_CLOSE);
+        $bCloseTag->originalContent = '</b>';
+        $bCloseTag->rid = '1';
+        $bCloseTag->tagNr = 1;
+        $bCloseTag->id = '1';
+        $bCloseTag->tag = 'protectedTag';
+        $bCloseTag->text = '&lt;/b&gt;';
+        $bCloseTag->renderedTag = '<div class="close 2f62 internal-tag ownttip"><span title="&lt;/b&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;/b&gt;</span></div>';
+
+        yield 'zero between tags' => [
+            'segment' => 'Text mit <protectedTag data-type="open" data-id="1" data-content="3c623e"/>0<protectedTag data-type="close" data-id="1" data-content="3c2f623e"/> in tags gab Probleme.',
+            'xmlChunks' => ['Text mit ', $bTag, '0', $bCloseTag, ' in tags gab Probleme.'],
+            'finalTagIdent' => 2,
         ];
     }
 }

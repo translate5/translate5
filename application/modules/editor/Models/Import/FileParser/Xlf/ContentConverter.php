@@ -439,8 +439,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             );
         }
 
+        $xmlChunks = $this->contentProtector->convertToInternalTagsInChunks(
+            $text,
+            $this->shortTagNumbers->shortTagIdent
+        );
+
         //to keep the generated tag objects we have to use the chunk-list instead of the returned string
-        array_push($this->result, $text);
+        array_push($this->result, ...$xmlChunks);
     }
 
     /**
