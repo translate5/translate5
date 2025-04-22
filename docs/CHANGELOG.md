@@ -275,7 +275,10 @@ Pipeline validation & management by steps and step-properties
 
 ### Changed
 **[TRANSLATE-4567](https://jira.translate5.net/browse/TRANSLATE-4567): LanguageResources - add tooltipp for penalties in fuzzy match panel** <br>
-Improved tooltip for matchrate in editors' matches panel 
+Improved tooltip for matchrate in editors' matches panel
+
+**[TRANSLATE-4535](https://jira.translate5.net/browse/TRANSLATE-4535): Visual: Add WGET as Fallback for Headless Download** <br>
+Add WGET as fallback for the Headless website-download, add configuration to always use WGET optionally
 
 
 ### Bugfixes
