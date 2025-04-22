@@ -67,7 +67,7 @@ class T5connectTest extends JsonTestAbstract
             ->addUser(TestUser::TestLector->value, editor_Workflow_Default::STATE_UNCONFIRMED, 'translatorCheck');
         // Create a temporary app-token for the test
         self::$authTokenEntity = ZfExtended_Factory::get('ZfExtended_Auth_Token_Entity');
-        self::$appToken = self::$authTokenEntity->create(TestUser::TestManager->value);
+        self::$appToken = self::$authTokenEntity->create(TestUser::TestApiUser->value);
     }
 
     /**
