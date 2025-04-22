@@ -81,7 +81,7 @@ if (empty($server148_sp2)) {
 
                 break;
             }
-        } elseif (empty($server147_148) && preg_match('/-14[78]-/', $serverUrl)) {
+        } elseif (empty($server147_148) && str_starts_with($serverUrl, 'http') && preg_match('/-14[78]/', $serverUrl)) {
             $version = OkapiService::fetchServerVersion($serverUrl);
             if (version_compare($version, '1.47') >= 0 && version_compare($version, '1.49') < 0) {
                 $server147_148 = $serverName;
@@ -97,7 +97,7 @@ if (empty($server148_sp2) && ! empty($server147_148)) {
         $server148_sp2 = 'okapi-longhorn-148-snapshot-2';
         if (! empty($okapiList[$server148_sp2])) {
             // extra safety, should rarely happen if ever
-            $this->errors[] = 'Url for '.$server148_sp2.' needs updating from ' . $okapiList[$server148_sp2] . ' to ' . $server148_2Url;
+            $this->errors[] = 'Url for ' . $server148_sp2 . ' needs updating from ' . $okapiList[$server148_sp2] . ' to ' . $server148_2Url;
 
             return;
         }
