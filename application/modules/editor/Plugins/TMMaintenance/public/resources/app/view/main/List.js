@@ -267,7 +267,12 @@ Ext.define('TMMaintenance.view.main.List', {
             scrollstart: function() {
                 this.wasY = this.getPosition().y;
             },
-            scrollend: function () {
+            scrollend: function() {
+                if (this.getPosition().y === 0) {
+                    this.scrollBy(0, 1);
+                }
+            },
+            scroll: function () {
                 let maxPosition = this.getMaxPosition().y;
                 let threshold = Math.ceil(this.getClientSize().y * 0.1);
                 let nowY = this.getPosition().y;
