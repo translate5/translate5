@@ -946,10 +946,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return LanguageResourceStatus::CONVERTING;
         }
 
-        if ($this->languageResource->isConversionScheduled()) {
-            return LanguageResourceStatus::CONVERSION_SCHEDULED;
-        }
-
         // let's check the internal state before calling API for status as import worker might not have run yet
         if ($this->languageResource->getStatus() === LanguageResourceStatus::IMPORT) {
             return LanguageResourceStatus::IMPORT;
