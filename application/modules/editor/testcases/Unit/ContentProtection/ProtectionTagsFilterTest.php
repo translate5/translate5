@@ -52,7 +52,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\ContentProtection;
 
-use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\ContentProtection\ProtectionTagsFilter;
 use PHPUnit\Framework\TestCase;
 
@@ -63,7 +62,7 @@ class ProtectionTagsFilterTest extends TestCase
      */
     public function testFilterTags(string $source, string $target, string $sourceExpected, string $targetExpected): void
     {
-        ProtectionTagsFilter::create()->filterTags($source, $target);
+        [$source, $target] = ProtectionTagsFilter::create()->filterTags($source, $target);
 
         self::assertSame($sourceExpected, $source);
         self::assertSame($targetExpected, $target);
@@ -146,93 +145,6 @@ class ProtectionTagsFilterTest extends TestCase
             'target' => 'string <number type="date" name="default Y-m-d" source="2023-10-21" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
             'sourceExpected' => 'string <number type="date" name="default Y-m-d" source="2023-10-21" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string 2023-10-21 string',
             'targetExpected' => 'string <number type="date" name="default Y-m-d" source="2023-10-21" iso="2023-10-21" target="2023-10-21" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
-        ];
-    }
-
-    /**
-     * @dataProvider filterTagsChunksProvider
-     */
-    public function testFilterTagsInChunks(array $source, array $target, array $sourceExpected, array $targetExpected): void
-    {
-        ProtectionTagsFilter::create()->filterTagsInChunks($source, $target);
-
-        self::assertEquals($sourceExpected, $source);
-        self::assertEquals($targetExpected, $target);
-    }
-
-    public function filterTagsChunksProvider(): iterable
-    {
-        $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
-
-        $parsedTag1 = new NumberTag();
-        $parsedTag1->originalContent = $tag1;
-        $parsedTag1->tagNr = 1;
-        $parsedTag1->id = 'number';
-        $parsedTag1->tag = 'number';
-        $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
-        $parsedTag1->iso = '2023-10-20';
-        $parsedTag1->source = '20231020';
-        $parsedTag1->renderedTag = $converted1;
-
-        $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target=""/>';
-        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="1234" class="full"></span></div>';
-
-        $parsedTag2 = new NumberTag();
-        $parsedTag2->originalContent = $tag2;
-        $parsedTag2->tagNr = 2;
-        $parsedTag2->id = 'number';
-        $parsedTag2->tag = 'number';
-        $parsedTag2->text = '{"source":"1234","target":"1234"}';
-        $parsedTag2->iso = '1234';
-        $parsedTag2->source = '1234';
-        $parsedTag2->renderedTag = $converted2;
-
-        yield [
-            'source' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
-            'target' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
-            'sourceExpected' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
-            'targetExpected' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
-        ];
-
-        $parsedTag3 = clone $parsedTag1;
-        $parsedTag3->iso = '2023-10-20';
-        $parsedTag3->source = '2023.10.20';
-
-        $parsedTag4 = clone $parsedTag2;
-        $parsedTag4->iso = '1234';
-        $parsedTag4->source = '1.234';
-
-        yield [
-            'source' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
-            'target' => ['string', $parsedTag3, ' string ', $parsedTag4, 'string'],
-            'sourceExpected' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
-            'targetExpected' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
-        ];
-
-        $parsedTag5 = clone $parsedTag1;
-        $parsedTag5->iso = '2023-10-22';
-        $parsedTag5->source = '2023.10.22';
-
-        yield [
-            'source' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
-            'target' => ['string', $parsedTag5, ' string ', $parsedTag4, 'string'],
-            'sourceExpected' => ['string', '20231020', ' string ', $parsedTag2, 'string'],
-            'targetExpected' => ['string', '2023.10.22', ' string ', $parsedTag2, 'string'],
-        ];
-
-        yield [
-            'source' => ['string', '20231020', 'string'],
-            'target' => ['string', $parsedTag5, 'string'],
-            'sourceExpected' => ['string', '20231020', 'string'],
-            'targetExpected' => ['string', '2023.10.22', 'string'],
-        ];
-
-        yield [
-            'source' => ['string', $parsedTag5, 'string'],
-            'target' => ['string', '20231020', 'string'],
-            'sourceExpected' => ['string', '2023.10.22', 'string'],
-            'targetExpected' => ['string', '20231020', 'string'],
         ];
     }
 }

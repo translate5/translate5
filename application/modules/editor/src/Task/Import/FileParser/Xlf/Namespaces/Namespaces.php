@@ -30,6 +30,7 @@ namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 
 use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 use editor_Models_Import_FileParser_Xlf_ContentConverter as ContentConverter;
+use editor_Models_Import_FileParser_Xlf_ShortTagNumbers;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Task;
 use LogicException;
@@ -116,10 +117,14 @@ class Namespaces extends AbstractNamespace
         return $this->call(__FUNCTION__, func_get_args());
     }
 
-    public function getContentConverter(editor_Models_Task $task, string $filename): ContentConverter
-    {
+    public function getContentConverter(
+        editor_Models_Task $task,
+        editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers,
+        string $filename
+    ): ContentConverter {
         //return the contentconverter given by namespace, or if none the default one
-        return $this->call(__FUNCTION__, func_get_args()) ?? parent::getContentConverter($task, $filename);
+        return $this->call(__FUNCTION__, func_get_args())
+            ?? parent::getContentConverter($task, $shortTagNumbers, $filename);
     }
 
     public function preProcessFile(string $xml): string
