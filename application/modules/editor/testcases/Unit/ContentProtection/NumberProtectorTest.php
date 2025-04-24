@@ -198,15 +198,14 @@ class NumberProtectorTest extends TestCase
         string $segment,
         string $converted,
         int $finalTagIdent,
-        int $xmlChunksCount
     ): void {
         $protector = NumberProtector::create();
         $shortTagIdent = 1;
-        $xmlChunks = [];
 
-        self::assertSame($converted, $protector->convertToInternalTags($segment, $shortTagIdent, xmlChunks: $xmlChunks));
-        self::assertSame($finalTagIdent, $shortTagIdent);
-        self::assertCount($xmlChunksCount, $xmlChunks);
+        $result = $protector->convertToInternalTagsWithShortcutNumberMapCollecting($segment, $shortTagIdent);
+
+        self::assertSame($converted, $result->segment);
+        self::assertSame($finalTagIdent, $result->shortTagIdent);
     }
 
     public function internalTagsProvider(): iterable
@@ -218,7 +217,6 @@ class NumberProtectorTest extends TestCase
             'segment' => "string $tag1 string",
             'converted' => "string $converted1 string",
             'finalTagIdent' => 2,
-            'xmlChunksCount' => 3,
         ];
 
         $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target=""/>';
@@ -228,7 +226,6 @@ class NumberProtectorTest extends TestCase
             'segment' => "string $tag1 string $tag2 string",
             'converted' => "string $converted1 string $converted2 string",
             'finalTagIdent' => 3,
-            'xmlChunksCount' => 5,
         ];
     }
 

@@ -58,7 +58,7 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
     /**
      * protects the internal tags for language resource processing as defined in the class
      */
-    public function restoreInResult(string $resultString): string
+    public function restoreInResult(string $resultString, bool $isSource = true): string
     {
         return $this->importWhitespaceFromTagLessQuery($resultString);
     }

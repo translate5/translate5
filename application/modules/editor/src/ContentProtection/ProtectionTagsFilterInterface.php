@@ -54,7 +54,8 @@ namespace MittagQI\Translate5\ContentProtection;
 
 interface ProtectionTagsFilterInterface
 {
-    public function filterTags(string &$source, string &$target): void;
-
-    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void;
+    /**
+     * @return array{string, string}
+     */
+    public function filterTags(string $source, string $target): array;
 }

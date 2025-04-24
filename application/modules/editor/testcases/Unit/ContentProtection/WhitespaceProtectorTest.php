@@ -220,8 +220,10 @@ class WhitespaceProtectorTest extends TestCase
         $shortTagIdent = 1;
         $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
 
-        self::assertSame($converted, $whitespace->convertToInternalTags($segment, $shortTagIdent));
-        self::assertSame($finalTagIdent, $shortTagIdent);
+        $result = $whitespace->convertToInternalTagsWithShortcutNumberMapCollecting($segment, $shortTagIdent);
+
+        self::assertSame($converted, $result->segment);
+        self::assertSame($finalTagIdent, $result->shortTagIdent);
     }
 
     public function internalTagsProvider(): iterable

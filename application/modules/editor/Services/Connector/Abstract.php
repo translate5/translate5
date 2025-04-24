@@ -32,12 +32,18 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use editor_Services_Connector_TagHandler_Abstract as TagHandler;
+use MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing\TagHandlerFactory;
+
 /**
  * Abstract Base Connector
  */
 abstract class editor_Services_Connector_Abstract
 {
     use editor_Services_UsageLogerTrait;
+
+    protected const TAG_HANDLER_CONFIG_PART = 'default';
 
     /**
      * @deprecated Moved to MittagQI\Translate5\LanguageResource\Status
@@ -127,12 +133,7 @@ abstract class editor_Services_Connector_Abstract
      */
     protected $resource;
 
-    /**
-     * Using Remover Tag Handler class as default. If needed other, set the class here in the concrete implementation
-     * class
-     * @var string
-     */
-    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Remover';
+    private TagHandlerFactory $tagHandlerFactory;
 
     /**
      * Tag Handler instance as needed by the concrete Connector
@@ -186,9 +187,10 @@ abstract class editor_Services_Connector_Abstract
     {
         //init the default logger, is changed in connectTo
         $this->logger = Zend_Registry::get('logger');
-        $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
-        $this->tagHandler = ZfExtended_Factory::get($this->tagHandlerClass);
         $this->config = Zend_Registry::get('config');
+        $this->tagHandlerFactory = new TagHandlerFactory($this->config);
+        $this->tagHandler = $this->createTagHandler();
+        $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
     }
 
     /**
@@ -219,6 +221,7 @@ abstract class editor_Services_Connector_Abstract
         editor_Models_LanguageResources_LanguageResource $languageResource,
         $sourceLang,
         $targetLang,
+        $config = null
     ) {
         $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
@@ -229,6 +232,14 @@ abstract class editor_Services_Connector_Abstract
             $this->languageResource->sourceLangCode = $this->languageResource->getSourceLangCode();
             $this->languageResource->targetLangCode = $this->languageResource->getTargetLangCode();
         }
+
+        if (! is_null($config)) {
+            $this->config = $config;
+        }
+        $this->tagHandlerFactory = new TagHandlerFactory($this->config);
+        $this->tagHandler = $this->createTagHandler([
+            TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $this->isSendingWhitespaceAsTagEnabled(),
+        ]);
 
         $this->tagHandler->setLanguages(
             (int) ($sourceLang ?: $languageResource->getSourceLang()),
@@ -639,5 +650,25 @@ abstract class editor_Services_Connector_Abstract
     protected function getResourceName(): string
     {
         return $this->getResource()->getName();
+    }
+
+    protected function createTagHandler(array $params = []): editor_Services_Connector_TagHandler_Abstract
+    {
+        $params[TagHandler::OPTION_KEEP_WHITESPACE_TAGS] =
+            $params[TagHandler::OPTION_KEEP_WHITESPACE_TAGS] ?? $this->isSendingWhitespaceAsTagEnabled();
+
+        // This is for backwards compatibility of the tag handler configuration inside the connector class
+        if (! empty($this->tagHandlerClass)) {
+            return ZfExtended_Factory::get($this->tagHandlerClass, [$params]);
+        }
+
+        return $this->tagHandlerFactory->createTagHandler(static::TAG_HANDLER_CONFIG_PART, $params);
+    }
+
+    protected function isSendingWhitespaceAsTagEnabled(): bool
+    {
+        $config = $this->config->runtimeOptions->LanguageResources->{static::TAG_HANDLER_CONFIG_PART};
+
+        return $config && $config->sendWhitespaceAsTag;
     }
 }

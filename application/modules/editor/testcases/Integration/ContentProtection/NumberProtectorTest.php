@@ -895,6 +895,10 @@ class NumberProtectorTest extends TestCase
             'string' => 'string &lt; 123456789',
             'expected' => 'string &lt; <number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/>',
         ];
+        yield [
+            'string' => 'Busprotokoll und Geräteprofil <div class="close 6570742069643d2234223e266c743b2f74726164656d61726b2e7265662667743b3c2f657074 internal-tag ownttip"><span title="&lt;/trademark.ref&gt;" class="short">&lt;/4&gt;</span><span data-originalid="4" data-length="-1" class="full">&lt;/trademark.ref&gt;</span></div>4042',
+            'expected' => 'Busprotokoll und Geräteprofil <div class="close 6570742069643d2234223e266c743b2f74726164656d61726b2e7265662667743b3c2f657074 internal-tag ownttip"><span title="&lt;/trademark.ref&gt;" class="short">&lt;/4&gt;</span><span data-originalid="4" data-length="-1" class="full">&lt;/trademark.ref&gt;</span></div><number type="integer" name="default simple" source="4042" iso="4042" target="4042" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA="/>',
+        ];
     }
 
     private function getNumberFormatRepository(): ContentProtectionRepository

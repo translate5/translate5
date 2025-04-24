@@ -30,6 +30,8 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
 {
     use editor_Services_Connector_BatchTrait;
 
+    protected const TAG_HANDLER_CONFIG_PART = 'microsoft';
+
     /***
      * Every string lower than this value will be translated using the dictonary lookup api.
      * This is only the case when using the translate call
@@ -41,18 +43,6 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @var editor_Services_Microsoft_HttpApi
      */
     protected $api;
-
-    /**
-     * Using Xliff based tag handler here
-     * @var string
-     */
-    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Xliff';
-
-    /**
-     * Just overwrite the class var hint here
-     * @var editor_Services_Connector_TagHandler_Xliff
-     */
-    protected $tagHandler;
 
     /**
      * @see editor_Services_Connector_Abstract::__construct()
@@ -72,16 +62,12 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         ZfExtended_Logger::addDuplicatesByMessage('E1345', 'E1346');
     }
 
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang)
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang, $config = null)
     {
-        parent::connectTo($languageResource, $sourceLang, $targetLang);
+        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
         $this->api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi', [$languageResource->getResource()]);
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_Abstract::query()
-     */
     public function query(editor_Models_Segment $segment)
     {
         $queryString = $this->getQueryStringAndSetAsDefault($segment);
@@ -89,6 +75,8 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         if (empty($queryString) && $queryString !== "0") {
             return $this->resultList;
         }
+
+        $this->tagHandler->setCurrentSegment($segment);
 
         if ($this->queryApi($this->tagHandler->prepareQuery($queryString))) {
             $results = $this->api->getResult();

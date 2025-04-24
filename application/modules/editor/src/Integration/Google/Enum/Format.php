@@ -26,24 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Test\Model;
+namespace MittagQI\Translate5\Integration\Google\Enum;
 
-/**
- * defines the compared & sanitized data for a visual source file entity
- */
-class VisualSourceFile extends AbstractModel
+enum Format: string
 {
-    protected array $whitelist = [
-        'import',
-        'fileName',
-        'splitFileName',
-        'fileOrder',
-        'source',
-        'sourceType',
-        'sourceAligned',
-        'generator',
-        'scroller',
-    ];
-
-    protected string $messageField = 'source';
+    case Html = 'html';
+    case Text = 'text';
 }

@@ -54,18 +54,15 @@ namespace MittagQI\Translate5\ContentProtection;
 
 use editor_Models_Segment_Utility as SegmentUtility;
 use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\ContentProtection\DTO\ConversionToInternalTagResult;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 
 class ContentProtector
 {
-    private array $shortcutNumberMap = [];
-
-    private bool $collectShortcutMap = false;
-
     /**
      * @var array<string, ProtectorInterface>
      */
-    private array $protectors;
+    private array $protectors = [];
 
     /**
      * @var ProtectionTagsFilterInterface[]
@@ -115,19 +112,9 @@ class ContentProtector
         );
     }
 
-    public function resetShortcutMap(): void
-    {
-        $this->shortcutNumberMap = [];
-    }
-
-    public function switchShortcutMapCollection(bool $collect): void
-    {
-        $this->collectShortcutMap = $collect;
-    }
-
     /**
      * Checks content protection tags in source and target
-     * Unprotect those that don't have pair
+     * Unprotect those that don't have a pair
      */
     public function filterTags(string $source, string $target): array
     {
@@ -136,25 +123,10 @@ class ContentProtector
         }
 
         foreach ($this->tagFilters as $filter) {
-            $filter->filterTags($source, $target);
+            [$source, $target] = $filter->filterTags($source, $target);
         }
 
         return [$source, $target];
-    }
-
-    /**
-     * Checks content protection tags in source and target
-     * Unprotect those that don't have pair
-     */
-    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void
-    {
-        if (empty($sourceChunks) || empty($targetChunks)) {
-            return;
-        }
-
-        foreach ($this->tagFilters as $filter) {
-            $filter->filterTagsInChunks($sourceChunks, $targetChunks);
-        }
     }
 
     public function protect(
@@ -238,8 +210,6 @@ class ContentProtector
                 $segment = $protector->convertToInternalTags(
                     $segment,
                     $shortTagIdent,
-                    $this->collectShortcutMap,
-                    $this->shortcutNumberMap
                 );
             }
         }
@@ -247,18 +217,44 @@ class ContentProtector
         return $segment;
     }
 
+    public function convertToInternalTagsWithShortcutNumberMapCollecting(
+        string $segment,
+        int $shortTagIdent,
+    ): ConversionToInternalTagResult {
+        $shortcutNumberMap = [];
+
+        foreach ($this->protectors as $protector) {
+            if ($protector->hasTagsToConvert($segment)) {
+                $dto = $protector->convertToInternalTagsWithShortcutNumberMapCollecting(
+                    $segment,
+                    $shortTagIdent,
+                );
+                $segment = $dto->segment;
+                $shortTagIdent = $dto->shortTagIdent;
+                $shortcutNumberMap[] = $dto->shortcutNumberMap;
+            }
+        }
+
+        return new ConversionToInternalTagResult(
+            $segment,
+            $shortTagIdent,
+            array_merge(...$shortcutNumberMap),
+        );
+    }
+
     public function convertToInternalTagsWithShortcutNumberMap(
         string $segment,
-        int &$shortTagIdent,
+        int $shortTagIdent,
         array $shortcutNumberMap
     ): string {
         foreach ($this->protectors as $protector) {
             if ($protector->hasTagsToConvert($segment)) {
-                $segment = $protector->convertToInternalTagsWithShortcutNumberMap(
+                $dto = $protector->convertToInternalTagsWithShortcutNumberMap(
                     $segment,
                     $shortTagIdent,
                     $shortcutNumberMap
                 );
+                $segment = $dto->segment;
             }
         }
 
@@ -282,37 +278,33 @@ class ContentProtector
     /**
      * @return string[]|\editor_Models_Import_FileParser_Tag[]
      */
-    public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array
-    {
+    public function convertToInternalTagsInChunks(
+        string $segment,
+        int &$shortTagIdent,
+        array &$shortcutNumberMap = [],
+    ): array {
         $tagsPattern = '/<.+\/>/U';
         // we assume that tags that we interested in are all single tags
         if (! preg_match_all($tagsPattern, $segment, $matches)) {
             return [$segment];
         }
-
         $strings = preg_split($tagsPattern, $segment);
         $tags = $matches[0];
-
         $chunkStorage = [];
-
         $matchCount = count($tags);
-
         for ($i = 0; $i <= $matchCount; $i++) {
             if (isset($strings[$i]) && '' !== $strings[$i]) {
                 $chunkStorage[] = [$strings[$i]];
             }
-
             if (! isset($tags[$i])) {
                 continue;
             }
-
             foreach ($this->protectors as $protector) {
                 if ($protector->hasTagsToConvert($tags[$i])) {
                     $chunkStorage[] = $protector->convertToInternalTagsInChunks(
                         $tags[$i],
                         $shortTagIdent,
-                        $this->collectShortcutMap,
-                        $this->shortcutNumberMap
+                        $shortcutNumberMap,
                     );
 
                     continue 2;

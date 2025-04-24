@@ -170,7 +170,7 @@ final class Config
     }
 
     /**
-     * @param string $type : see LanguageResource::XXX
+     * @param string $type : see LanguageResource::XXX or a fully qualified classname
      * @throws Exception
      */
     public function addLanguageResource(
@@ -234,7 +234,7 @@ final class Config
     }
 
     /**
-     * Queues a Pivot batch-Pretranslation for the task
+     * Queues a Pivot Batch-Pretranslation for the task
      * Will overwrite any already queued Operation
      */
     public function addPivotBatchPretranslation(): PivotBatchPretranslation
@@ -242,6 +242,27 @@ final class Config
         $this->taskOperation = new PivotBatchPretranslation($this->testClass, 0);
 
         return $this->taskOperation;
+    }
+
+    /**
+     * Adds an Operation.
+     * This resource must inherit from MittagQI\Translate5\Test\Import\Operation
+     * It will only be created, nor requested
+     */
+    public function addTaskOperation(Task $task, string $className, array $params = []): Operation
+    {
+        $operation = new $className($this->testClass, 0, ...$params);
+        $operation->setTask($task);
+
+        return $operation;
+    }
+
+    /**
+     * Requests the task-operation that was added with ::addTaskOperation
+     */
+    public function requestOperation(Operation $operation): void
+    {
+        $operation->import($this->api, $this);
     }
 
     public function addBconf(string $name, string $bconfFileName, int $customerId = -1): Bconf
@@ -332,6 +353,10 @@ final class Config
      */
     private function createLanguageResource(string $type, int $nextIndex): LanguageResource
     {
+        // Private Plugins may provide a class-name as type
+        if (str_contains($type, 'MittagQI\\')) {
+            return new $type($type, $nextIndex);
+        }
         switch (strtolower($type)) {
             case LanguageResource::OPEN_TM2:
                 return new OpenTm2($this->testClass, $nextIndex);
@@ -355,14 +380,6 @@ final class Config
 
             case LanguageResource::GOOGLE_TRANSLATE:
                 return new GoogleTranslate($this->testClass, $nextIndex);
-
-            case LanguageResource::OPEN_AI:
-                // TODO FIXME / UGLY: Using classes from Private Plugins ... how to solve ?
-                return new \MittagQI\Translate5\Plugins\OpenAI\Test\Import\OpenAI($this->testClass, $nextIndex);
-
-            case LanguageResource::TILDE_MT:
-                // TODO FIXME / UGLY: Using classes from Private Plugins ... how to solve ?
-                return new \MittagQI\Translate5\Plugins\TildeMT\Test\Import\TildeMt($this->testClass, $nextIndex);
 
             default:
                 throw new Exception('Unknown language-resource type "' . $type . '"');
