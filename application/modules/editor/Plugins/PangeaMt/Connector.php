@@ -26,29 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * TODO: most of the following code is the same for each language-resource...
- */
 class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstract
 {
     use editor_Services_Connector_BatchTrait;
+
+    public const TAG_HANDLER_CONFIG_PART = 'pangeamt';
 
     /**
      * @var editor_Plugins_PangeaMt_HttpApi
      */
     protected $api;
-
-    /**
-     * Using Xliff based tag handler here
-     * @var string
-     */
-    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Xliff';
-
-    /**
-     * Just overwrite the class var hint here
-     * @var editor_Services_Connector_TagHandler_Xliff
-     */
-    protected $tagHandler;
 
     /**
      * @see editor_Services_Connector_Abstract::__construct()

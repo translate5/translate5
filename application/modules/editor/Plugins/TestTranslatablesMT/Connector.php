@@ -34,8 +34,6 @@ class editor_Plugins_TestTranslatablesMT_Connector extends editor_Services_Conne
 {
     protected $tagHandlerClass = editor_Services_Connector_TagHandler_Xliff::class;
 
-    protected $tagHandler;
-
     public function __construct()
     {
         parent::__construct();

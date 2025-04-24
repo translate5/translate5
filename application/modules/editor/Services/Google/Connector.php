@@ -26,26 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Integration\Google\Enum\Format;
+
 class editor_Services_Google_Connector extends editor_Services_Connector_Abstract
 {
     use editor_Services_Connector_BatchTrait;
 
-    /**
-     * @var editor_Services_Google_ApiWrapper
-     */
-    protected $api;
+    protected const TAG_HANDLER_CONFIG_PART = 'google';
 
-    /**
-     * Using Xliff based tag handler here
-     * @var string
-     */
-    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Xliff';
-
-    /**
-     * Just overwrite the class var hint here
-     * @var editor_Services_Connector_TagHandler_Xliff
-     */
-    protected $tagHandler;
+    protected editor_Services_Google_ApiWrapper $api;
 
     /**
      * @see editor_Services_Connector_Abstract::__construct()
@@ -64,9 +53,13 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         ZfExtended_Logger::addDuplicatesByMessage('E1319', 'E1320');
     }
 
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang)
-    {
-        parent::connectTo($languageResource, $sourceLang, $targetLang);
+    public function connectTo(
+        editor_Models_LanguageResources_LanguageResource $languageResource,
+        $sourceLang,
+        $targetLang,
+        $config = null
+    ) {
+        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
         $this->api = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$languageResource->getResource()]);
     }
 
@@ -77,22 +70,34 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     public function query(editor_Models_Segment $segment)
     {
         $queryString = $this->getQueryStringAndSetAsDefault($segment);
-        $success = $this->api->translate($this->tagHandler->prepareQuery($queryString), $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode());
+        $success = $this->api->translate(
+            $this->tagHandler->prepareQuery($queryString),
+            $this->languageResource->getSourceLangCode(),
+            $this->languageResource->getTargetLangCode(),
+            $this->getFormat()
+        );
+
         if ($success === false) {
             throw $this->createConnectorException();
         }
+
         $result = $this->api->getResult();
+
         if (empty($result)) {
             return $this->resultList;
         }
-        $this->resultList->addResult($this->tagHandler->restoreInResult($result['text'] ?? ""), $this->defaultMatchRate);
+
+        $this->resultList->addResult(
+            $this->tagHandler->restoreInResult($result['text'] ?? ""),
+            $this->defaultMatchRate
+        );
 
         return $this->resultList;
     }
 
-    /***
-     * Search the resource for available translation. Where the source text is in resource source language and the received results
-     * are in the resource target language
+    /**
+     * Search the resource for available translation. Where the source text is in resource source language and the
+     * received results are in the resource target language
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::translate()
      */
@@ -102,11 +107,19 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
             return $this->resultList;
         }
 
-        $success = $this->api->translate($searchString, $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode());
+        $success = $this->api->translate(
+            $searchString,
+            $this->languageResource->getSourceLangCode(),
+            $this->languageResource->getTargetLangCode(),
+            $this->getFormat()
+        );
+
         if ($success === false) {
             throw $this->createConnectorException();
         }
+
         $result = $this->api->getResult();
+
         if (empty($result)) {
             return $this->resultList;
         }
@@ -116,10 +129,6 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         return $this->resultList;
     }
 
-    /***
-     * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::languages()
-     */
     public function languages(): array
     {
         //if empty api wrapper
@@ -135,7 +144,8 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     protected function batchSearch(array $queryStrings, string $sourceLang, string $targetLang): bool
     {
-        $success = $this->api->translateBatch($queryStrings, $sourceLang, $targetLang);
+        $success = $this->api->translateBatch($queryStrings, $sourceLang, $targetLang, $this->getFormat());
+
         if ($success === false) {
             throw $this->createConnectorException();
         }
@@ -162,8 +172,10 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     /**
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null): string
-    {
+    public function getStatus(
+        editor_Models_LanguageResources_Resource $resource,
+        editor_Models_LanguageResources_LanguageResource $languageResource = null,
+    ): string {
         $this->lastStatusInfo = '';
         $languages = $this->languages();
         if (empty($languages)) {
@@ -217,5 +229,12 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     protected function getResourceName(): string
     {
         return 'Google Translate';
+    }
+
+    protected function getFormat(): Format
+    {
+        $format = (string) $this->config->runtimeOptions->LanguageResources->google->format;
+
+        return Format::tryFrom($format) ?? Format::Html;
     }
 }

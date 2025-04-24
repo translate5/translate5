@@ -27,21 +27,11 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * TODO: most of the following code is the same for each language-resource...
+ * @property editor_Services_Connector_TagHandler_Xliff $tagHandler
  */
 class editor_Plugins_ZDemoMT_Connector extends editor_Services_Connector_Abstract
 {
-    /**
-     * Using Xliff based tag handler here
-     * @var string
-     */
-    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Xliff';
-
-    /**
-     * Just overwrite the class var hint here
-     * @var editor_Services_Connector_TagHandler_Xliff
-     */
-    protected $tagHandler;
+    protected string $tagHandlerClass = editor_Services_Connector_TagHandler_Xliff::class;
 
     /**
      * @see editor_Services_Connector_Abstract::__construct()

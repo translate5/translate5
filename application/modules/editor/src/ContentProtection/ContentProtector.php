@@ -62,7 +62,7 @@ class ContentProtector
     /**
      * @var array<string, ProtectorInterface>
      */
-    private array $protectors;
+    private array $protectors = [];
 
     /**
      * @var ProtectionTagsFilterInterface[]
