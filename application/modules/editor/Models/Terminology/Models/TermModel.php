@@ -1337,8 +1337,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         //get source and target language fuzzies
         $langs = [
-            $languageModel->getFuzzyLanguages((int) $task->getSourceLang(), includeMajor: true),
-            $languageModel->getFuzzyLanguages((int) $task->getTargetLang(), includeMajor: true),
+            $languageModel->getFuzzyLanguages($task->getSourceLang(), includeMajor: true),
+            $languageModel->getFuzzyLanguages($task->getTargetLang(), includeMajor: true),
         ];
         if ($task->getRelaisLang() > 0) {
             $langs[] = $languageModel->getFuzzyLanguages((int) $task->getRelaisLang(), includeMajor: true);

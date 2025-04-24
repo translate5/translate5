@@ -101,7 +101,7 @@ class Processor extends AbstractProcessor
     ) {
         parent::__construct($task, $service, $processingMode, $serviceUrl, $isWorkerContext);
         $this->adapter = $this->service->getAdapter(AdapterConfigDTO::create($serviceUrl, $task->getConfig()));
-        $this->language = $this->adapter->getSpellCheckLangByTaskTargetLangId((int) $task->getTargetLang());
+        $this->language = $this->adapter->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
         $this->qualityType = editor_Plugins_SpellCheck_QualityProvider::qualityType();
     }
 

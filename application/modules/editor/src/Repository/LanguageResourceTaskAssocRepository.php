@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Db_LanguageResources_LanguageResource;
 use editor_Models_Db_Task;
-use editor_Models_Task;
+use editor_Models_Task as Task;
 use MittagQI\Translate5\LanguageResource\Db\TaskAssociation as TaskAssociationDb;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation as TaskTmTaskAssociationDb;
@@ -119,7 +119,7 @@ class LanguageResourceTaskAssocRepository
                 []
             )
             ->where('assocs.languageResourceId = ?', $languageResourceId)
-            ->where('task.state = ?', editor_Models_Task::STATE_IMPORT)
+            ->where('task.state = ?', Task::STATE_IMPORT)
             ->group('assocs.id');
 
         return (int) $this->db->fetchOne($s) > 0;

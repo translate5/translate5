@@ -425,8 +425,8 @@ class TermportletData
     private function initializeLanguages(): void
     {
         $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $this->sourceLangs = $languages->getFuzzyLanguages((int) $this->task->getSourceLang(), includeMajor: true);
-        $this->targetLangs = $languages->getFuzzyLanguages((int) $this->task->getTargetLang(), includeMajor: true);
+        $this->sourceLangs = $languages->getFuzzyLanguages($this->task->getSourceLang(), includeMajor: true);
+        $this->targetLangs = $languages->getFuzzyLanguages($this->task->getTargetLang(), includeMajor: true);
 
         //combine all used languages from task
         $this->allUsedLanguageIds = array_unique(array_merge($this->sourceLangs, $this->targetLangs));

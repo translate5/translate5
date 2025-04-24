@@ -424,8 +424,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             $text = $this->contentProtector->protect(
                 $text,
                 $this->handleIsInSourceScope,
-                (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang(),
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
                 EntityHandlingMode::Off,
                 NumberProtector::alias()
             );
@@ -433,8 +433,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             $text = $this->contentProtector->protect(
                 $text,
                 $this->handleIsInSourceScope,
-                (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang(),
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
                 exceptProtectors: NumberProtector::alias()
             );
         }

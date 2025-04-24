@@ -100,6 +100,7 @@ class TaskPenaltyDataProvider
             return [
                 'penaltyGeneral' => 0,
                 'penaltySublang' => 0,
+                'sublangMismatch' => false,
             ];
         }
 
@@ -120,6 +121,7 @@ class TaskPenaltyDataProvider
                 return [
                     'penaltyGeneral' => $meta[$langresId]['penaltyGeneral'],
                     'penaltySublang' => $meta[$langresId]['penaltySublang'],
+                    'sublangMismatch' => true,
                 ];
             }
         }
@@ -128,6 +130,7 @@ class TaskPenaltyDataProvider
         return [
             'penaltyGeneral' => $meta[$langresId]['penaltyGeneral'],
             'penaltySublang' => 0,
+            'sublangMismatch' => false,
         ];
     }
 }

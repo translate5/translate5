@@ -194,9 +194,9 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
 
         /** @var editor_Models_Languages $language */
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $language->load((int) $this->task->getSourceLang());
+        $language->load($this->task->getSourceLang());
         $json->sourceLangRfc5646 = $language->getRfc5646();
-        $language->load((int) $this->task->getTargetLang());
+        $language->load($this->task->getTargetLang());
         $json->targetLangRfc5646 = $language->getRfc5646();
 
         /** @var editor_Models_Customer_Customer $customer */

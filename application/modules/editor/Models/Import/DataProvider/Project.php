@@ -252,7 +252,7 @@ class editor_Models_Import_DataProvider_Project extends editor_Models_Import_Dat
     protected function isWorkfileFileMatch(int $arrayIndex): bool
     {
         return (
-            $this->isWorkFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getTargetLang()
+            $this->isWorkFile($arrayIndex) && (int) $this->fileLanguages[$arrayIndex] === $this->task->getTargetLang()
         )
             ||
             empty($this->fileLanguages[$arrayIndex]);

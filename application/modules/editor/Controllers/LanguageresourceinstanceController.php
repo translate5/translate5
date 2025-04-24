@@ -1722,8 +1722,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         return $manager->getConnector(
             $this->entity,
-            (int) $task->getSourceLang(),
-            (int) $task->getTargetLang(),
+            $task->getSourceLang(),
+            $task->getTargetLang(),
             $task->getConfig(),
             (int) $task->getCustomerId()
         );

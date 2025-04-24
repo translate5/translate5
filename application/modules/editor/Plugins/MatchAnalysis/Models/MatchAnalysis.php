@@ -230,8 +230,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         // Get pricing
         $this->pricing = Factory::get(PresetPrices::class)->getPricesFor(
             $presetId,
-            (int) $task->getSourceLang(),
-            (int) $task->getTargetLang()
+            $task->getSourceLang(),
+            $task->getTargetLang()
         );
 
         ksort($ranges);

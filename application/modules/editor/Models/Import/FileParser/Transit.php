@@ -266,8 +266,8 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             return $this->contentProtector->protect(
                 $text,
                 $isSource,
-                (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang()
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang()
             );
         });
         if (strpos($segment, '<') === false) {

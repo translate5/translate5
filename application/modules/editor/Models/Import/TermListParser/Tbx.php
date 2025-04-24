@@ -370,10 +370,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
         // get all task source/target languages including the fuzzy languages
         $sourceLanguages = array_merge(
-            $fuzzyModel->getFuzzyLanguages((int) $this->task->getSourceLang(), includeMajor: true)
+            $fuzzyModel->getFuzzyLanguages($this->task->getSourceLang(), includeMajor: true)
         );
         $targetLanguages = array_merge(
-            $fuzzyModel->getFuzzyLanguages((int) $this->task->getTargetLang(), includeMajor: true)
+            $fuzzyModel->getFuzzyLanguages($this->task->getTargetLang(), includeMajor: true)
         );
 
         $matchSource = array_intersect($sourceLanguages, $collLangKeys);

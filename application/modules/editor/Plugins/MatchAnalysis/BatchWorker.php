@@ -76,7 +76,7 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
 
         $connector = $manager->getConnector(
             $languageResource,
-            (int) $task->getSourceLang(),
+            $task->getSourceLang(),
             (int) $targetLang,
             $task->getConfig(),
             (int) $task->getCustomerId(),
