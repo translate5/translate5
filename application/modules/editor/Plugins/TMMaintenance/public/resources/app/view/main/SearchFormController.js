@@ -238,6 +238,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             scrollable = view.getScrollable();
 
         if (abortPrev || !append) {
+            console.log('loadedQty was', vm.get('loadedQty'), 'but now reset to 0 at loadPageByChunks', abortPrev, !append);
+            console.trace();
             vm.set('loadedQty', 0);
         }
 
@@ -308,7 +310,18 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                 }
 
                 const offset = operation.getProxy().getReader().metaData.offset;
+                var wasQty = vm.get('loadedQty');
                 vm.set('loadedQty', vm.get('loadedQty') + records.length);
+                var nowQty = vm.get('loadedQty');
+                if (Ext.isNumber(nowQty)) {
+                    if (nowQty <= wasQty) {
+                        console.log('loadedQty not increased: wasQty', wasQty, 'nowQty', nowQty);
+                        console.trace();
+                    }
+                } else {
+                    console.log('loadedQty is not a number anymore : wasQty', wasQty, 'nowQty', nowQty);
+                    console.trace();
+                }
 
                 vm.set('lastOffset', offset);
                 vm.set('hasMoreRecords', null !== offset);
@@ -328,6 +341,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                     }
                 }
                 if (vm.get('hasMoreRecords') && vm.get('loadedQty') < pageSize) {
+                    console.log('loadedQty', vm.get('loadedQty'), 'pageSize', pageSize);
                     me.loadPageByChunks(pageSize, 1,true);
                 } else {
                     vm.set('loadingRecordNumber', false);
@@ -362,7 +376,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             offset = me.getViewModel().get('lastOffset'),
             loadingId = 'TM-offset-' + offset,
             scrollable = view.getScrollable();
-
+        console.log('loadedQty was', vm.get('loadedQty'), 'but now reset to 0 at onContainerScrollUp');
+        console.trace();
         vm.set('loadedQty', 0);
 
         store.getProxy().abortByPurpose = true;

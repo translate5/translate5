@@ -265,7 +265,7 @@ Ext.define('TMMaintenance.view.main.List', {
         y: true,
         listeners: {
             scrollstart: function() {
-                this.wasY = this.getPosition().y;
+                this.wasY = Math.round(this.getPosition().y);
             },
             scrollend: function() {
                 if (this.getPosition().y === 0) {
@@ -273,12 +273,12 @@ Ext.define('TMMaintenance.view.main.List', {
                 }
             },
             scroll: function () {
-                let maxPosition = this.getMaxPosition().y;
+                let maxPosition = Math.round(this.getMaxPosition().y);
                 let threshold = Math.ceil(this.getClientSize().y * 0.1);
-                let nowY = this.getPosition().y;
+                let nowY = Math.round(this.getPosition().y);
                 let ctrl = this.component.down('^ app-main searchform').getController();
                 if (nowY < this.wasY) {
-                    if (nowY + threshold / 2 < maxPosition) {
+                    if (nowY + threshold / 2 < this.wasY) {
                         ctrl.onContainerScrollUpEnd();
                     }
                 } else if (nowY > this.wasY) {
