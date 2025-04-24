@@ -191,7 +191,7 @@ final class DbHelper
             // that means, done-workers may have already been cleaned up
             if ($numNotAsExpected === 0 && $numFinished < $numTaskGuids) {
                 error_log('All found workers are in the expected state'
-                    . ' but we could not find workers for allen given task-guids');
+                    . ' but we could not find workers for all the given task-guids');
 
                 return;
             }

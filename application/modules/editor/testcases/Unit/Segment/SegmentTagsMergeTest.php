@@ -105,7 +105,6 @@ class SegmentTagsMergeTest extends SegmentTagsTestAbstract
         $originalMarkup = $this->shortToFull($original);
         $expectedMarkup = $this->shortToFull($expected);
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $originalMarkup, 'target', 'targetEdit');
-        error_log(htmlspecialchars($tags->debugStructure())); // TODO REMOVE
         // to make error-catching easier we assign comparing the reverted tags
         $this->assertEquals($this->fullToShort($expectedMarkup), $this->fullToShort($tags->render()));
         $this->createTagsTest($tags, $expectedMarkup);

@@ -44,6 +44,26 @@ final class Task extends AbstractResource
 {
     public const TASK_CONFIG_INI = 'task-config.ini';
 
+    /**
+     * Mime-detection for import/upload files
+     */
+    public static function evaluateMime(string $file): string
+    {
+        switch (pathinfo($file, PATHINFO_EXTENSION)) {
+            case 'zip':
+                return 'application/zip';
+            case 'csv':
+                return 'application/csv';
+            case 'tbx':
+            case 'xliff':
+            case 'xlf':
+            case 'xml':
+                return 'application/xml';
+            default:
+                return 'text/plain';
+        }
+    }
+
     public string $taskName;
 
     public string $sourceLang = 'en';
@@ -580,7 +600,7 @@ final class Task extends AbstractResource
             return; // zip is a highlander-format ...
         } elseif ($this->_uploadFiles !== null) {
             if (count($this->_uploadFiles) === 1) {
-                $mime = $this->evaluateMime($this->_uploadFiles[0]);
+                $mime = self::evaluateMime($this->_uploadFiles[0]);
                 $file = $api->getFile($this->_uploadFiles[0]);
                 // add/change a task-config.ini if we have configs. We must use a temporary zip then to not overwrite the original ZIP
                 if ($mime === 'application/zip' && count($this->_importConfigs) > 0) {
@@ -595,7 +615,7 @@ final class Task extends AbstractResource
                 }
             } else {
                 foreach ($this->_uploadFiles as $relPath) {
-                    $api->addImportFiles($api->getFile($relPath), $this->evaluateMime($relPath));
+                    $api->addImportFiles($api->getFile($relPath), self::evaluateMime($relPath));
                 }
             }
         } elseif ($this->_uploadData !== null) {
@@ -606,33 +626,13 @@ final class Task extends AbstractResource
         // add additional uploads if set (only for non ZIP or FOLDER uploads)
         if ($this->_additionalUploadFiles != null) {
             foreach ($this->_additionalUploadFiles as $data) {
-                $api->addFile($data['name'], $api->getFile($data['path']), $this->evaluateMime($data['path']));
+                $api->addFile($data['name'], $api->getFile($data['path']), self::evaluateMime($data['path']));
             }
         }
         // add optional task-configs if set (only for non ZIP or FOLDER uploads)
         if (count($this->_importConfigs) > 0) {
             $taskConfigIni = new TaskConfigIni(null, $this->_importConfigs);
             $api->addFilePlain('taskConfig', $taskConfigIni->getContents(), 'text/plain', self::TASK_CONFIG_INI);
-        }
-    }
-
-    /**
-     * mime detection for import files
-     */
-    private function evaluateMime(string $file): string
-    {
-        switch (pathinfo($file, PATHINFO_EXTENSION)) {
-            case 'zip':
-                return 'application/zip';
-            case 'csv':
-                return 'application/csv';
-            case 'tbx':
-            case 'xliff':
-            case 'xlf':
-            case 'xml':
-                return 'application/xml';
-            default:
-                return 'text/plain';
         }
     }
 

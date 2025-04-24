@@ -143,8 +143,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
             return $this->waitForProjectImported($task, $failOnError);
         } else {
             DbHelper::waitForWorkers(
-                /** @phpstan-ignore-next-line */
-                $this->test,
+                $this->test, /** @phpstan-ignore-line */
                 \editor_Models_Import_Worker_SetTaskToOpen::class,
                 [$task->taskGuid],
                 $failOnError,
@@ -154,6 +153,27 @@ final class Helper extends ZfExtended_Test_ApiHelper
 
             return $this->task = $this->loadTask((int) $task->id);
         }
+    }
+
+    /**
+     * Waits for a Task-operation to be finished
+     * Expects a task-Object, either the regular API one (preferred) or also the api-internal stdClass object
+     * and the finishing worker
+     * returns the data of the completely loaded task
+     * @throws Exception
+     */
+    public function waitForTaskOperation(Task|stdClass $task, string $finalWorker, bool $failOnError = true): stdClass
+    {
+        DbHelper::waitForWorkers(
+            $this->test, /** @phpstan-ignore-line */
+            $finalWorker,
+            [$task->taskGuid],
+            $failOnError,
+            self::RELOAD_TASK_LIMIT
+        );
+        sleep(1);
+
+        return $this->task = $this->loadTask((int) $task->id);
     }
 
     /**
