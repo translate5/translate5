@@ -22,7 +22,7 @@ class PivotResourceDefaults extends LanguageResourcesDefaults
         $taskGuid = $task->getTaskGuid();
 
         $data = $this->findMatchingAssocData(
-            (int) $task->getSourceLang(),
+            $task->getSourceLang(),
             (int) $task->getRelaisLang(),
             $customerAssocData
         );

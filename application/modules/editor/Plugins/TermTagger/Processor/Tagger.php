@@ -289,8 +289,8 @@ final class Tagger extends AbstractProcessor
 
             $groupedTerms = $termsProvider->retrieveTermsBasedOnTaggedString(
                 $segment->source,
-                (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang(),
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
                 $this->task->getTaskGuid()
             );
 

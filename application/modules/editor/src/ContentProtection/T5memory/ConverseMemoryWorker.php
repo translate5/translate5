@@ -143,6 +143,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                         'languageResource' => $this->languageResource,
                     ]
                 );
+                $this->resetConversionStarted();
 
                 return false;
             }

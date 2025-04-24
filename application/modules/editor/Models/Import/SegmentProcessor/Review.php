@@ -88,7 +88,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
 
         //init word counter
         $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $langModel->load((int) $task->getSourceLang());
+        $langModel->load($task->getSourceLang());
 
         $this->wordCount = ZfExtended_Factory::get(editor_Models_Segment_WordCount::class, [
             $langModel->getRfc5646(),

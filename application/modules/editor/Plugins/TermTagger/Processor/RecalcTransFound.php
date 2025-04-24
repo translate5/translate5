@@ -75,8 +75,8 @@ class RecalcTransFound
         $this->termModel = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermModel::class);
 
         $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $this->targetFuzzyLanguages = $lang->getFuzzyLanguages((int) $this->task->getTargetLang(), 'id', true);
-        $this->sourceFuzzyLanguages = $lang->getFuzzyLanguages((int) $this->task->getSourceLang(), 'id', true);
+        $this->targetFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getTargetLang(), 'id', true);
+        $this->sourceFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getSourceLang(), 'id', true);
 
         // Lazy load collectionIds defined for current task
         $this->collectionIds = $this->collectionIds ?? ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class)

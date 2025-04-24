@@ -402,8 +402,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $this->contentProtector->protect(
                 $segment,
                 $isSource,
-                (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang(),
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
                 EntityHandlingMode::Keep
             )
         );

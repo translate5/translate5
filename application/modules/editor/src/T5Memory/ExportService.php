@@ -33,9 +33,9 @@ namespace MittagQI\Translate5\T5Memory;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Connector_Exception as ConnectorException;
 use Generator;
-use GuzzleHttp\Client;
 use LogicException;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\HTTP\ClientFactory;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\RetryClient;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
@@ -65,7 +65,8 @@ class ExportService
      */
     public static function create(): self
     {
-        $httpClient = new RetryClient(new Client());
+        $clientFactory = ClientFactory::create();
+        $httpClient = new RetryClient($clientFactory->createClient([]));
         $config = \Zend_Registry::get('config');
 
         return new self(

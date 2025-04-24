@@ -331,6 +331,6 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     {
         return $this->getLanguagetoolService()
             ->getAdapter(AdapterConfigDTO::create(config: $task->getConfig()), $resourcePool)
-            ->getSpellCheckLangByTaskTargetLangId((int) $task->getTargetLang());
+            ->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
     }
 }

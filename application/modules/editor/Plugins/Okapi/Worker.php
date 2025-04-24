@@ -151,8 +151,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         $okapiDataDir = $this->getDataDir();
 
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $sourceLang = $language->loadLangRfc5646((int) $this->task->getSourceLang());
-        $targetLang = $language->loadLangRfc5646((int) $this->task->getTargetLang());
+        $sourceLang = $language->loadLangRfc5646($this->task->getSourceLang());
+        $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
 
         try {
             $taskConfig = $this->task->getConfig();
@@ -231,8 +231,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         $api = new OkapiAdapter($taskConfig);
 
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $sourceLang = $language->loadLangRfc5646((int) $this->task->getSourceLang());
-        $targetLang = $language->loadLangRfc5646((int) $this->task->getTargetLang());
+        $sourceLang = $language->loadLangRfc5646($this->task->getSourceLang());
+        $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
         $result = false;
 
         try {
