@@ -87,7 +87,7 @@ class UserProvider
             return [];
         }
 
-        if ($viewer->isPm() || $viewer->isClientPm()) {
+        if ($viewer->isPm() || $viewer->isClientPm() || $viewer->isPmLight()) {
             return $this->getSimpleUsers($viewer);
         }
 

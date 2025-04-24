@@ -30,11 +30,11 @@ namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 
 use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 use editor_Models_Import_FileParser_Xlf_ContentConverter as ContentConverter;
+use editor_Models_Import_FileParser_Xlf_ShortTagNumbers;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use ReflectionException;
-use ZfExtended_Factory;
 
 /**
  * XLF Fileparser Add On abstract class
@@ -89,12 +89,16 @@ abstract class AbstractNamespace
     /**
      * @throws ReflectionException
      */
-    public function getContentConverter(editor_Models_Task $task, string $filename): ContentConverter
-    {
-        return ZfExtended_Factory::get(ContentConverter::class, [
+    public function getContentConverter(
+        editor_Models_Task $task,
+        editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers,
+        string $filename
+    ): ContentConverter {
+        return new ContentConverter(
             $this,
             $task,
+            $shortTagNumbers,
             $filename,
-        ]);
+        );
     }
 }

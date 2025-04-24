@@ -47,10 +47,6 @@ abstract class LanguageResource extends AbstractResource
 
     public const MICROSOFT_TRANSLATOR = 'microsofttranslator';
 
-    public const TILDE_MT = 'tildemt';
-
-    public const OPEN_AI = 'openai';
-
     public const GOOGLE_TRANSLATE = 'googletranslate';
 
     public string $name;

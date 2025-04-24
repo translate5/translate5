@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,24 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Test\Model;
+declare(strict_types=1);
 
-/**
- * defines the compared & sanitized data for a visual source file entity
- */
-class VisualSourceFile extends AbstractModel
+namespace MittagQI\Translate5\ContentProtection\DTO;
+
+class ConversionToInternalTagResult
 {
-    protected array $whitelist = [
-        'import',
-        'fileName',
-        'splitFileName',
-        'fileOrder',
-        'source',
-        'sourceType',
-        'sourceAligned',
-        'generator',
-        'scroller',
-    ];
-
-    protected string $messageField = 'source';
+    /**
+     * @param array<string, string> $shortcutNumberMap
+     */
+    public function __construct(
+        public readonly string $segment,
+        public readonly int $shortTagIdent,
+        public readonly array $shortcutNumberMap,
+    ) {
+    }
 }

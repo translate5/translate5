@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 use editor_Models_Comment;
 use editor_Models_Export_FileParser_Xlf_Namespaces_Across;
 use editor_Models_Import_FileParser_Xlf_ContentConverter as OrigContentConverter;
+use editor_Models_Import_FileParser_Xlf_ShortTagNumbers;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
@@ -145,12 +146,16 @@ class Across extends AbstractNamespace
         return false;
     }
 
-    public function getContentConverter(editor_Models_Task $task, string $filename): OrigContentConverter
-    {
-        return ZfExtended_Factory::get(Across\ContentConverter::class, [
+    public function getContentConverter(
+        editor_Models_Task $task,
+        editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers,
+        string $filename
+    ): OrigContentConverter {
+        return new Across\ContentConverter(
             $this,
             $task,
+            $shortTagNumbers,
             $filename,
-        ]);
+        );
     }
 }

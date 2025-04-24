@@ -54,7 +54,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                     $this->xmlparser->getChunk($key),
                     $this->shortTagIdent,
                     $this->shortcutNumberMap
-                );
+                )->segment;
             });
         });
     }
