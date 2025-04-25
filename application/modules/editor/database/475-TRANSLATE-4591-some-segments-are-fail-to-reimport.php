@@ -30,8 +30,6 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
-use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
-use MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Executors\ReimportSegmentsActionExecutor;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
