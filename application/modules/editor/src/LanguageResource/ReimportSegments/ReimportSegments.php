@@ -99,7 +99,7 @@ class ReimportSegments
                 break;
             }
 
-            $this->addFailedSegmentsLog($failedSegmentsIds, $task);
+            $this->addFailedSegmentsLog($failedSegmentsIds, (int) $task->getId(), (int) $languageResource->getId());
 
             $tries++;
         }
@@ -217,11 +217,12 @@ class ReimportSegments
         $this->loggerProvider->getLogger()->info('E1713', $message, $params);
     }
 
-    private function addFailedSegmentsLog(array $failedSegmentsIds, Task $task): void
+    private function addFailedSegmentsLog(array $failedSegmentsIds, int $taskId, int $languageResourceId): void
     {
         $message = 'Task reimport finished with failed segments, trying to reimport them';
         $params = [
-            'taskId' => $task->getId(),
+            'taskId' => $taskId,
+            'tmId' => $languageResourceId,
             'failedSegments' => $failedSegmentsIds,
         ];
 

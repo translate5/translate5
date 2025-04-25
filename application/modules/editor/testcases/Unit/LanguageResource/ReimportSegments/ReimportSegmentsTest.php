@@ -237,8 +237,8 @@ class ReimportSegmentsTest extends TestCase
             ->with(
                 'info',
                 [
-                    'E0000',
-                    'Task {taskId} re-imported successfully into the desired TM {tmId}',
+                    'E1713',
+                    'Task {taskId} re-imported into the desired TM {tmId}',
                     [
                         'taskId' => $taskId,
                         'tmId' => $languageResourceId,
@@ -252,7 +252,7 @@ class ReimportSegmentsTest extends TestCase
         $this->reimportSegments->reimport(task: $taskMock, runId: $runId, languageResourceId: $languageResourceId);
     }
 
-    public function testUpdateWithError()
+    public function testUpdateWithError(): void
     {
         $taskGuid = bin2hex(random_bytes(16));
         $languageResourceId = random_int(1, 100);
@@ -308,21 +308,32 @@ class ReimportSegmentsTest extends TestCase
             ->method('getLogger')
             ->willReturn($loggerMock);
 
-        $loggerMock->expects(self::once())
-            ->method('__call')
+        $call = 0;
+        $loggerMock->method('__call')
             ->with(
                 'info',
-                [
-                    'E0000',
-                    'Task {taskId} re-imported successfully into the desired TM {tmId}',
-                    [
-                        'taskId' => $taskId,
-                        'tmId' => $languageResourceId,
-                        'emptySegments' => 0,
-                        'successfulSegments' => 0,
-                        'failedSegments' => [1, 2],
-                    ],
-                ]
+                self::callback(function (array $params) use (&$call) {
+                    $call++;
+
+                    // 10 here is an amount of retries during reimport having failed segments
+                    /** @see ReimportSegments::MAX_TRIES */
+                    if ($call <= 10) {
+                        self::assertEquals('E1714', $params[0]);
+                        self::assertEquals('Task reimport finished with failed segments, trying to reimport them', $params[1]);
+                        self::assertEquals([1, 2], $params[2]['failedSegments']);
+
+                        return true;
+                    }
+
+                    // After we reached the max tries we should log the final result having a list of failed segments
+                    self::assertEquals('E1713', $params[0]);
+                    self::assertEquals('Task {taskId} re-imported into the desired TM {tmId}', $params[1]);
+                    self::assertEquals(0, $params[2]['emptySegments']);
+                    self::assertEquals(0, $params[2]['successfulSegments']);
+                    self::assertEquals([1, 2], $params[2]['failedSegments']);
+
+                    return true;
+                })
             );
 
         $this->tmConversionServiceMock->method('convertPair')
