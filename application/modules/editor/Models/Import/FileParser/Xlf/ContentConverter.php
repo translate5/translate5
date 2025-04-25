@@ -98,6 +98,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
     private bool $useStrictEscaping;
 
+    private array $shortcutNumberMap = [];
+
     /**
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
@@ -325,8 +327,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
      * @param array|string $chunks can be either an array of chunks or a string which then will be parsed
      * @param bool $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
      */
-    public function convert(array|string $chunks, bool $source, bool $preserveWhitespace = false): array
-    {
+    public function convert(
+        array|string $chunks,
+        bool $source,
+        bool $preserveWhitespace,
+        array &$shortcutNumberMap,
+    ): array {
+        $this->shortcutNumberMap = &$shortcutNumberMap;
         // experimental feature: Strict escaping for the segment input stream
         if ($this->useStrictEscaping) {
             if (is_array($chunks)) {
@@ -441,7 +448,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
         $xmlChunks = $this->contentProtector->convertToInternalTagsInChunks(
             $text,
-            $this->shortTagNumbers->shortTagIdent
+            $this->shortTagNumbers->shortTagIdent,
+            $this->handleIsInSourceScope,
+            $this->shortcutNumberMap,
         );
 
         //to keep the generated tag objects we have to use the chunk-list instead of the returned string
