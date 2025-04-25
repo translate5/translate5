@@ -47,7 +47,7 @@ abstract class AbstractModel
      */
     public static function create(\stdClass $data, string $type): AbstractModel
     {
-        $className = 'MittagQI\Translate5\Test\Model\\' . ucfirst($type);
+        $className = str_contains($type, 'MittagQI\\') ? $type : 'MittagQI\Translate5\Test\Model\\' . ucfirst($type);
 
         return new $className($data);
     }

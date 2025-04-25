@@ -312,6 +312,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      */
     protected function extractSegment($lineArr)
     {
+        $this->shortTagIdent = 1;
         $this->segmentData = [];
         foreach ($this->colOrder as $name => $idx) {
             if ($name == self::CONFIG_COLUMN_MID) {
@@ -339,8 +340,17 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $this->segmentData[SegmentField::TYPE_TARGET]['original']
         );
 
-        $this->segmentData[SegmentField::TYPE_SOURCE]['original'] = $this->convertSegmentToInternalTags($source);
-        $this->segmentData[SegmentField::TYPE_TARGET]['original'] = $this->convertSegmentToInternalTags($target);
+        $convertedSource = $this->contentProtector
+            ->convertToInternalTagsWithShortcutNumberMapCollecting($source, $this->shortTagIdent);
+
+        $target = $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
+            $target,
+            $convertedSource->shortTagIdent,
+            $convertedSource->shortcutNumberMap,
+        );
+
+        $this->segmentData[SegmentField::TYPE_SOURCE]['original'] = $convertedSource->segment;
+        $this->segmentData[SegmentField::TYPE_TARGET]['original'] = $target;
 
         //just create a segment attributes object with default values
         $this->createSegmentAttributes($this->_mid);
@@ -354,13 +364,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
 
         return $lineArr;
-    }
-
-    private function convertSegmentToInternalTags(string $segment): string
-    {
-        $this->shortTagIdent = 1;
-
-        return $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
     }
 
     protected function parseSegment(string $segment, bool $isSource): string
@@ -399,8 +402,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $this->contentProtector->protect(
                 $segment,
                 $isSource,
-                (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang(),
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
                 EntityHandlingMode::Keep
             )
         );

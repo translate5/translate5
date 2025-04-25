@@ -472,7 +472,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
             $connector = $manager->getConnector(
                 $languageResource,
-                (int) $task->getSourceLang(),
+                $task->getSourceLang(),
                 (int) $task->getRelaisLang(),
                 $task->getConfig(),
                 (int) $task->getCustomerId(),
@@ -779,8 +779,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $task->loadByTaskGuid($taskGuid);
 
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $taskMajorSourceLangId = $language->findMajorLanguageById((int) $task->getSourceLang());
-        $taskMajorTargetLangId = $language->findMajorLanguageById((int) $task->getTargetLang());
+        $taskMajorSourceLangId = $language->findMajorLanguageById($task->getSourceLang());
+        $taskMajorTargetLangId = $language->findMajorLanguageById($task->getTargetLang());
         $this->resetBatchAssocs();
 
         $valid = [];

@@ -49,9 +49,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setForeignState(string $name)
  * @method string getDescription()
  * @method void setDescription(string $description)
- * @method string getSourceLang()
  * @method void setSourceLang(string|int $id)
- * @method string getTargetLang()
  * @method void setTargetLang(string|int $id)
  * @method string getRelaisLang()
  * @method void setRelaisLang(string|int $id)
@@ -791,7 +789,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     public function getTargetLanguage(): editor_Models_Languages
     {
-        return $this->getCachedLanguage((int) $this->getTargetLang());
+        return $this->getCachedLanguage($this->getTargetLang());
     }
 
     /**
@@ -1508,5 +1506,21 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
                 // in case of wrong configured variable and the load language fails, do nothing
             }
         }
+    }
+
+    /**
+     * @throws Zend_Exception
+     */
+    public function getSourceLang(): int
+    {
+        return (int) $this->get('sourceLang');
+    }
+
+    /**
+     * @throws Zend_Exception
+     */
+    public function getTargetLang(): int
+    {
+        return (int) $this->get('targetLang');
     }
 }

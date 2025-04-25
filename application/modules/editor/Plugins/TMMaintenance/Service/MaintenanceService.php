@@ -986,7 +986,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     {
         $status = $this->getStatus($this->resource, $this->languageResource, $memoryName);
 
-        if (! in_array($status, [LanguageResourceStatus::AVAILABLE, LanguageResourceStatus::CONVERSION_SCHEDULED], true)) {
+        if ($status !== LanguageResourceStatus::AVAILABLE) {
             throw new \editor_Services_Connector_Exception('E1377', [
                 'languageResource' => $this->languageResource,
                 'status' => $status,

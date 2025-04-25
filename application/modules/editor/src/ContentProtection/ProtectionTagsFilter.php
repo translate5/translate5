@@ -52,8 +52,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection;
 
-use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
-
 class ProtectionTagsFilter implements ProtectionTagsFilterInterface
 {
     public function __construct(
@@ -68,48 +66,10 @@ class ProtectionTagsFilter implements ProtectionTagsFilterInterface
         );
     }
 
-    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void
-    {
-        if (empty($sourceChunks) || empty($targetChunks)) {
-            return;
-        }
-
-        $sourceTags = $targetTags = [];
-
-        foreach ($sourceChunks as $key => $sourceChunk) {
-            if ($sourceChunk instanceof NumberTag) {
-                $sourceTags[$key] = $sourceChunk;
-            }
-        }
-
-        foreach ($targetChunks as $key => $targetChunk) {
-            if ($targetChunk instanceof NumberTag) {
-                $targetTags[$key] = $targetChunk;
-            }
-        }
-
-        foreach ($sourceTags as $sourceKey => $sourceTag) {
-            foreach ($targetTags as $targetKey => $targetTag) {
-                if ($sourceTag->equals($targetTag)) {
-                    $targetChunks[$targetKey] = clone $sourceTag;
-                    unset($targetTags[$targetKey]);
-
-                    continue 2;
-                }
-            }
-
-            $sourceChunks[$sourceKey] = $sourceTag->source;
-        }
-
-        foreach ($targetTags as $targetKey => $targetTag) {
-            $targetChunks[$targetKey] = $targetTag->source;
-        }
-    }
-
-    public function filterTags(string &$source, string &$target): void
+    public function filterTags(string $source, string $target): array
     {
         if ('' === $target || '' === $source) {
-            return;
+            return [$source, $target];
         }
 
         preg_match_all(NumberProtector::fullTagRegex(), $source, $sourceMatches, PREG_SET_ORDER);
@@ -118,17 +78,17 @@ class ProtectionTagsFilter implements ProtectionTagsFilterInterface
         if (! empty($sourceMatches) && empty($targetMatches)) {
             $source = $this->protector->unprotect($source, true);
 
-            return;
+            return [$source, $target];
         }
 
         if (empty($sourceMatches) && ! empty($targetMatches)) {
             $target = $this->protector->unprotect($target, true);
 
-            return;
+            return [$source, $target];
         }
 
         if (empty($sourceMatches) && empty($targetMatches)) {
-            return;
+            return [$source, $target];
         }
 
         $sourceTagsMap = $this->getMatchedTags($sourceMatches);
@@ -205,6 +165,8 @@ class ProtectionTagsFilter implements ProtectionTagsFilterInterface
                 $target = str_replace($targetTag, $targetContent, $target);
             }
         }
+
+        return [$source, $target];
     }
 
     /**

@@ -91,9 +91,10 @@ class CreateTaskTmOperationTest extends TestCase
             ['getId', [], $taskId],
             ['getTaskGuid', [], $taskGuid],
             ['getCustomerId', [], $customerId],
-            ['getSourceLang', [], $sourceLanguageId],
-            ['getTargetLang', [], $targetLanguageId],
         ]);
+
+        $this->task->method('getSourceLang')->willReturn($sourceLanguageId);
+        $this->task->method('getTargetLang')->willReturn($targetLanguageId);
         $this->taskRepository->method('getByGuid')->with($taskGuid)->willReturn($this->task);
 
         $this->languageResourceRepository->expects(self::once())

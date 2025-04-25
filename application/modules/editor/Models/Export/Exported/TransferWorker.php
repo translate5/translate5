@@ -90,7 +90,7 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
 
         // Get target language rfc5646-code
         $targetLangId = $task->getTargetLang();
-        $targetLangRfc = ZfExtended_Factory::get('editor_Models_Languages')->load((int) $targetLangId)->rfc5646;
+        $targetLangRfc = ZfExtended_Factory::get('editor_Models_Languages')->load($targetLangId)->rfc5646;
 
         // Prepare params to spoof/amend inside tbx
         $date = date('Y-10-03 H:i:s');

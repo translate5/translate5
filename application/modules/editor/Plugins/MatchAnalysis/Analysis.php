@@ -816,8 +816,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     private function getConnector(LanguageResource $languageResource): editor_Services_Connector
     {
         $language = Factory::get(editor_Models_Languages::class);
-        $taskMajorSourceLangId = $language->findMajorLanguageById((int) $this->task->getSourceLang());
-        $taskMajorTargetLangId = $language->findMajorLanguageById((int) $this->task->getTargetLang());
+        $taskMajorSourceLangId = $language->findMajorLanguageById($this->task->getSourceLang());
+        $taskMajorTargetLangId = $language->findMajorLanguageById($this->task->getTargetLang());
 
         $connector = $this->manager->getConnector(
             $languageResource,

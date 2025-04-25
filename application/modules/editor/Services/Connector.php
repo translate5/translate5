@@ -81,6 +81,12 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  *
  * @see editor_Services_Connector_Abstract::setCustomerId
  * @method void setCustomerId(int $customerId)
+ *
+ * @see editor_Services_Connector_BatchTrait::batchQuery
+ * @method void batchQuery(string $taskGuid, Closure $progressCallback = null)
+ *
+ * @see editor_Services_Connector_BatchTrait::getBatchExceptions
+ * @method array getBatchExceptions()
  */
 class editor_Services_Connector implements ExportAdapterInterface
 {

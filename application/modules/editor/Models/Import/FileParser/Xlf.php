@@ -30,6 +30,8 @@ use editor_Models_Import_FileParser_Xlf_LengthRestriction as XlfLengthRestrictio
 use editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract as AbstractSurroundingTagRemover;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTagRenderer;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Namespaces;
@@ -179,6 +181,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
     private Comments $comments;
 
+    private readonly NumberProtector $numberProtector;
+
+    protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
@@ -202,7 +208,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->comments = ZfExtended_Factory::get(Comments::class, [$this->task]);
         $this->namespaces = NamespaceRegistry::getImportNamespace($this->_origFile, $this->xmlparser, $this->comments);
 
-        $this->contentConverter = $this->namespaces->getContentConverter($this->task, $fileName);
+        $this->shortTagNumbers = new editor_Models_Import_FileParser_Xlf_ShortTagNumbers();
+        $this->contentConverter = $this->namespaces->getContentConverter($this->task, $this->shortTagNumbers, $fileName);
         $this->internalTag = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
         $this->segmentBareInstance = ZfExtended_Factory::get(editor_Models_Segment::class);
         $this->log = ZfExtended_Factory::get(ZfExtended_Log::class);
@@ -210,9 +217,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->task->getConfig(),
         ]);
         $this->surroundingTags = AbstractSurroundingTagRemover::factory($this->config);
-        $this->otherContent = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_OtherContent', [
-            $this->contentConverter, $this->segmentBareInstance, $this->task, $fileId,
-        ]);
+        $this->otherContent = new editor_Models_Import_FileParser_Xlf_OtherContent(
+            $this->contentConverter,
+            $this->segmentBareInstance,
+            $this->task,
+            $fileId,
+        );
+
+        $this->numberProtector = NumberProtector::create();
 
         $extensionsNoResnames = preg_split(
             '/\s*,\s*/',
@@ -665,7 +677,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->currentSource = [];
             $this->currentTarget = [];
             $this->sourceProcessOrder = [];
-            $this->currentPlainSource = null;
             // set to null to identify if there is no a target at all
             $this->currentPlainTarget = null;
             $this->otherContent->initOnUnitStart($this->xmlparser);
@@ -960,6 +971,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $currentSource = $this->currentSource[$mid];
             $isSourceMrkMissing = ($currentSource == self::MISSING_MRK);
 
+            $shortTagNumbers = new editor_Models_Import_FileParser_Xlf_ShortTagNumbers();
+
             if ($isSourceMrkMissing) {
                 $sourceChunksOriginal = $sourceChunks = [];
             } elseif ($this->otherContent->isOtherContent($mid) && $currentSource instanceof editor_Models_Import_FileParser_Xlf_OtherContent_Data) {
@@ -1034,20 +1047,48 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
             }
 
-            $this->contentProtector->filterTagsInChunks($sourceChunks, $targetChunks);
-
             $this->surroundingTags->calculate($preserveWhitespace, $sourceChunks, $targetChunks, $this->xmlparser);
+
+            $sourceOriginal = $this->xmlparser->join($this->surroundingTags->sliceTags($sourceChunks));
+            $sourceOriginal = $this->numberProtector->protect(
+                $sourceOriginal,
+                true,
+                (int) $this->task->getSourceLang(),
+                (int) $this->task->getTargetLang(),
+                EntityHandlingMode::Off
+            );
+
+            $targetOriginal = $this->xmlparser->join($this->surroundingTags->sliceTags($targetChunks));
+            $targetOriginal = $this->numberProtector->protect(
+                $targetOriginal,
+                false,
+                (int) $this->task->getSourceLang(),
+                (int) $this->task->getTargetLang(),
+                EntityHandlingMode::Off
+            );
+
+            [$sourceOriginal, $targetOriginal] = $this->contentProtector->filterTags($sourceOriginal, $targetOriginal);
+
+            $sourceConversionResult = $this->contentProtector->convertToInternalTagsWithShortcutNumberMapCollecting(
+                $sourceOriginal,
+                $this->shortTagNumbers->shortTagIdent
+            );
+
+            $targetOriginal = $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
+                $targetOriginal,
+                $sourceConversionResult->shortTagIdent,
+                $sourceConversionResult->shortcutNumberMap
+            );
 
             $this->segmentData = [];
             $this->segmentData[$sourceName] = [
                 //for source column we dont have a place holder, so we just cut off the leading/trailing tags and import the rest as source
-                'original' => $this->xmlparser->join($this->surroundingTags->sliceTags($sourceChunks)),
+                'original' => $sourceConversionResult->segment,
             ];
 
             //for target we have to do the same tag cut off on the converted chunks to be used,
-            $targetChunksTagCut = $this->surroundingTags->sliceTags($targetChunks);
             $this->segmentData[$targetName] = [
-                'original' => $this->xmlparser->join($targetChunksTagCut),
+                'original' => $targetOriginal,
             ];
 
             //parse attributes for each found segment not only for the whole trans-unit

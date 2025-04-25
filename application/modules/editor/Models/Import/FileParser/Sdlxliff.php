@@ -782,8 +782,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             return $this->contentProtector->protect(
                 $text,
                 $isSource,
-                (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang()
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang()
             );
         });
         if (strpos($segment, '<') === false) {

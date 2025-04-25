@@ -31,10 +31,10 @@ namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 use editor_Models_Export_FileParser_Xlf_Namespaces_Translate5;
 use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 use editor_Models_Import_FileParser_Xlf_ContentConverter as OrigContentConverter;
+use editor_Models_Import_FileParser_Xlf_ShortTagNumbers;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
-use ZfExtended_Factory;
 
 /**
  * XLF Fileparser Add On to parse Translate5 XLF specific stuff
@@ -116,13 +116,17 @@ class Translate5 extends AbstractNamespace
         return false;
     }
 
-    public function getContentConverter(editor_Models_Task $task, string $filename): OrigContentConverter
-    {
-        $this->contentConverter = ZfExtended_Factory::get(Translate5\ContentConverter::class, [
+    public function getContentConverter(
+        editor_Models_Task $task,
+        editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers,
+        string $filename
+    ): OrigContentConverter {
+        $this->contentConverter = new Translate5\ContentConverter(
             $this,
             $task,
+            $shortTagNumbers,
             $filename,
-        ]);
+        );
         $this->contentConverter->resetTagMap();
 
         return $this->contentConverter;

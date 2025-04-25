@@ -138,14 +138,14 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
         $t = $this->view->translate;
 
         try {
-            $lang->load((int) $task->getSourceLang());
+            $lang->load($task->getSourceLang());
             $params['sourceLanguageTranslated'] = $t->_($lang->getLangName());
         } catch (Exception $e) {
             $params['sourceLanguageTranslated'] = 'unknown';
         }
 
         try {
-            $lang->load((int) $task->getTargetLang());
+            $lang->load($task->getTargetLang());
             $params['targetLanguageTranslated'] = $t->_($lang->getLangName());
         } catch (Exception $e) {
             $params['targetLanguageTranslated'] = 'unknown';

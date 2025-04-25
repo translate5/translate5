@@ -54,7 +54,27 @@ abstract class AbstractVersionedApi
         RequestInterface $request,
     ): void {
         if ($response->getStatusCode() !== 200) {
-            throw new HttpException($response->getReasonPhrase(), $request, $response);
+            $body = (string) $response->getBody();
+            $error = $response->getReasonPhrase();
+
+            if (! empty($body)) {
+                try {
+                    $content = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+
+                    $lastStatusInfo = $content->ErrorMsg
+                        ?? $content->importErrorMsg
+                        ?? $content->reorganizeErrorMsg
+                        ?? null;
+
+                    if (null !== $lastStatusInfo) {
+                        $error = $lastStatusInfo;
+                    }
+                } catch (JsonException $e) {
+                    $error = $e->getMessage();
+                }
+            }
+
+            throw new HttpException($error, $request, $response);
         }
     }
 

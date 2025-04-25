@@ -2,17 +2,18 @@
 
 namespace MittagQI\Translate5\Task\Import\Defaults;
 
-use editor_Models_LanguageResources_CustomerAssoc;
-use editor_Models_LanguageResources_Languages;
-use editor_Models_Languages;
+use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
+use editor_Models_LanguageResources_Languages as LanguageResources_Languages;
+use editor_Models_Languages as Languages;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeType;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use Zend_Cache_Exception;
-use ZfExtended_Factory;
+use ZfExtended_Factory as Factory;
 
 class LanguageResourcesDefaults implements ITaskDefaults
 {
@@ -21,9 +22,17 @@ class LanguageResourcesDefaults implements ITaskDefaults
     ) {
     }
 
+    /**
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws \ZfExtended_Exception
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ReflectionException
+     */
     public function applyDefaults(Task $task, bool $importWizardUsed = false): void
     {
-        $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
+        $customerAssoc = Factory::get(CustomerAssoc::class);
 
         $customerAssocData = $customerAssoc->loadByCustomerIdsUseAsDefault([$task->getCustomerId()]);
 
@@ -33,18 +42,29 @@ class LanguageResourcesDefaults implements ITaskDefaults
 
         $taskGuid = $task->getTaskGuid();
 
+        // Get task source and target major languages
+        $language = Factory::get(Languages::class);
+        $taskMajorSourceLangId = $language->findMajorLanguageById($task->getSourceLang());
+        $taskMajorTargetLangId = $language->findMajorLanguageById($task->getTargetLang());
+
+        /* @var $taskPenaltyDataProvider TaskPenaltyDataProvider */
+        $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
+
         $data = $this->findMatchingAssocData(
-            (int) $task->getSourceLang(),
-            (int) $task->getTargetLang(),
+            $taskMajorSourceLangId,
+            $taskMajorTargetLangId,
             $customerAssocData
         );
 
         foreach ($data as $assocRow) {
-            $taskAssoc = ZfExtended_Factory::get(TaskAssociation::class);
+            $taskAssoc = Factory::get(TaskAssociation::class);
             $taskAssoc->setLanguageResourceId($assocRow['languageResourceId']);
             $taskAssoc->setTaskGuid($taskGuid);
 
-            if (! empty($assocRow['writeAsDefault'])) {
+            /** @var bool $sublangMismatch */
+            $sublangMismatch = $taskPenaltyDataProvider->getPenalties($taskGuid, $assocRow['languageResourceId'])['sublangMismatch'];
+
+            if (! empty($assocRow['writeAsDefault']) && $sublangMismatch === false) {
                 $taskAssoc->setSegmentsUpdateable(true);
             }
 
@@ -75,8 +95,8 @@ class LanguageResourcesDefaults implements ITaskDefaults
             return yield from [];
         }
 
-        $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
-        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $languages = Factory::get(LanguageResources_Languages::class);
+        $language = Factory::get(Languages::class);
 
         $sourceLanguages = $language->getFuzzyLanguages($sourceLang, 'id', true);
         $targetLanguages = $language->getFuzzyLanguages($targetLang, 'id', true);

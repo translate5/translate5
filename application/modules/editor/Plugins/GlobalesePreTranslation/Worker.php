@@ -93,9 +93,9 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Task_A
 
         $langModel = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $langModel editor_Models_Languages */
-        $this->api->setSourceLang($langModel->loadLangRfc5646((int) $this->task->getSourceLang()));
+        $this->api->setSourceLang($langModel->loadLangRfc5646($this->task->getSourceLang()));
 
-        $this->api->setTargetLang($langModel->loadLangRfc5646((int) $this->task->getTargetLang()));
+        $this->api->setTargetLang($langModel->loadLangRfc5646($this->task->getTargetLang()));
         $this->api->setTask($this->task);
 
         $this->createGlobaleseProject();

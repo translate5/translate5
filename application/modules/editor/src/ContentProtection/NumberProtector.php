@@ -55,6 +55,7 @@ namespace MittagQI\Translate5\ContentProtection;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
 use LogicException;
+use MittagQI\Translate5\ContentProtection\DTO\ConversionToInternalTagResult;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
@@ -226,13 +227,44 @@ class NumberProtector implements ProtectorInterface
         return [self::TAG_NAME];
     }
 
+    public function convertToInternalTagsWithShortcutNumberMapCollecting(
+        string $segment,
+        int $shortTagIdent,
+    ): ConversionToInternalTagResult {
+        $shortcutNumberMap = [];
+
+        $converted = $this->convertToInternalTags($segment, $shortTagIdent, true, $shortcutNumberMap);
+
+        return new ConversionToInternalTagResult($converted, $shortTagIdent, $shortcutNumberMap);
+    }
+
     public function convertToInternalTags(
         string $segment,
         int &$shortTagIdent,
         bool $collectTagNumbers = false,
         array &$shortcutNumberMap = [],
-        array &$xmlChunks = [],
     ): string {
+        $xml = $this->getXmlParser($shortTagIdent, $collectTagNumbers, $shortcutNumberMap);
+
+        return $xml->parse($segment, true, [self::TAG_NAME]);
+    }
+
+    public function convertToInternalTagsInChunks(
+        string $segment,
+        int &$shortTagIdent,
+        array &$shortcutNumberMap = [],
+    ): array {
+        $xml = $this->getXmlParser($shortTagIdent, false, $shortcutNumberMap);
+        $xml->parse($segment, true, [self::TAG_NAME]);
+
+        return $xml->getAllChunks();
+    }
+
+    private function getXmlParser(
+        int &$shortTagIdent,
+        bool $collectTagNumbers = false,
+        array &$shortcutNumberMap = [],
+    ): XmlParser {
         $xml = new XmlParser([
             'normalizeTags' => false,
         ]);
@@ -247,30 +279,17 @@ class NumberProtector implements ProtectorInterface
             }
         );
 
-        $result = $xml->parse($segment, true, [self::TAG_NAME]);
-        $xmlChunks = $xml->getAllChunks();
-
-        return $result;
-    }
-
-    public function convertToInternalTagsInChunks(
-        string $segment,
-        int &$shortTagIdent,
-        bool $collectTagNumbers = false,
-        array &$shortcutNumberMap = [],
-    ): array {
-        $xmlChunks = [];
-        $this->convertToInternalTags($segment, $shortTagIdent, $collectTagNumbers, $shortcutNumberMap, $xmlChunks);
-
-        return $xmlChunks;
+        return $xml;
     }
 
     public function convertToInternalTagsWithShortcutNumberMap(
         string $segment,
-        int &$shortTagIdent,
+        int $shortTagIdent,
         array $shortcutNumberMap,
-    ): string {
-        return $this->convertToInternalTags($segment, $shortTagIdent, shortcutNumberMap: $shortcutNumberMap);
+    ): ConversionToInternalTagResult {
+        $converted = $this->convertToInternalTags($segment, $shortTagIdent, shortcutNumberMap: $shortcutNumberMap);
+
+        return new ConversionToInternalTagResult($converted, $shortTagIdent, $shortcutNumberMap);
     }
 
     public function protect(
@@ -594,6 +613,17 @@ class NumberProtector implements ProtectorInterface
      */
     public function replaceTagsWithPlaceholders(string $textNode, array &$placeholders): string
     {
+        $textNode = preg_replace_callback(
+            \editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS,
+            function ($match) use (&$placeholders) {
+                $placeholder = sprintf(self::PLACEHOLDER_FORMAT, base64_encode($match[0]));
+                $placeholders[$placeholder] = $match[0];
+
+                return $placeholder;
+            },
+            $textNode,
+        );
+
         $xml = new XmlParser([
             'normalizeTags' => false,
         ]);

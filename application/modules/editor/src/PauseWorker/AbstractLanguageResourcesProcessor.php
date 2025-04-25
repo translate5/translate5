@@ -64,8 +64,8 @@ abstract class AbstractLanguageResourcesProcessor
             try {
                 $connector = $this->manager->getConnector(
                     $languageResource,
-                    (int) $task->getSourceLang(),
-                    (int) $task->getTargetLang(),
+                    $task->getSourceLang(),
+                    $task->getTargetLang(),
                     $task->getConfig(),
                     (int) $task->getCustomerId(),
                 );

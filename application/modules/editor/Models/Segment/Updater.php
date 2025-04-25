@@ -337,8 +337,8 @@ class editor_Models_Segment_Updater
                     $this->contentProtector->protect(
                         $text,
                         ! $isEditingTargetInFront,
-                        (int) $this->task->getSourceLang(),
-                        (int) $this->task->getTargetLang(),
+                        $this->task->getSourceLang(),
+                        $this->task->getTargetLang(),
                         EntityHandlingMode::Restore,
                         $isEditingTargetInFront ? NumberProtector::alias() : '',
                     )
@@ -364,8 +364,8 @@ class editor_Models_Segment_Updater
         /* @var $manager editor_Services_Manager */
         $connector = $manager->getConnector(
             $adapter,
-            (int) $this->task->getSourceLang(),
-            (int) $this->task->getTargetLang(),
+            $this->task->getSourceLang(),
+            $this->task->getTargetLang(),
             $this->task->getConfig()
         );
         /* @var $connector editor_Services_Connector */
