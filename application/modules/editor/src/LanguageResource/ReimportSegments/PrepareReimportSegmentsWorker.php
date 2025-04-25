@@ -74,7 +74,8 @@ class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
             $languageResourceId,
             $params[ReimportSegmentsOptions::FILTER_TIMESTAMP] ?? null,
             $params[ReimportSegmentsOptions::FILTER_ONLY_EDITED] ?? false,
-            $params[ReimportSegmentsOptions::USE_SEGMENT_TIMESTAMP] ?? false
+            $params[ReimportSegmentsOptions::USE_SEGMENT_TIMESTAMP] ?? false,
+            $params[ReimportSegmentsOptions::FILTER_ONLY_IDS] ?? [],
         );
 
         $reimportWorker = new ReimportSegmentsWorker();
