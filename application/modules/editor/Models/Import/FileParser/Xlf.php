@@ -677,6 +677,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->currentSource = [];
             $this->currentTarget = [];
             $this->sourceProcessOrder = [];
+            $this->currentPlainSource = null;
             // set to null to identify if there is no a target at all
             $this->currentPlainTarget = null;
             $this->otherContent->initOnUnitStart($this->xmlparser);
@@ -909,6 +910,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $targetName = $this->segmentFieldManager->getFirstTargetName();
 
         $placeHolders = [];
+        $shortcutNumberMap = [];
 
         //must be set before the loop, since in the loop the currentTarget is cleared on success
         $hasTargets = ! (empty($this->currentTarget));
@@ -942,7 +944,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         } else {
             $preserveWhitespace = $this->currentPlainTarget['openerMeta']['preserveWhitespace'];
         }
-        $this->otherContent->initOnUnitEnd($hasNoTarget || $hasEmptyTarget, $preserveWhitespace);
+        $this->otherContent->initOnUnitEnd($hasNoTarget || $hasEmptyTarget, $preserveWhitespace, $shortcutNumberMap);
         $this->otherContent->injectEditableOtherContent($this->sourceProcessOrder, $this->currentSource, $this->currentTarget);
 
         //find mrk mids missing in source and add them marked as missing
@@ -971,8 +973,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $currentSource = $this->currentSource[$mid];
             $isSourceMrkMissing = ($currentSource == self::MISSING_MRK);
 
-            $shortTagNumbers = new editor_Models_Import_FileParser_Xlf_ShortTagNumbers();
-
             if ($isSourceMrkMissing) {
                 $sourceChunksOriginal = $sourceChunks = [];
             } elseif ($this->otherContent->isOtherContent($mid) && $currentSource instanceof editor_Models_Import_FileParser_Xlf_OtherContent_Data) {
@@ -994,7 +994,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $sourceChunks = $this->contentConverter->convert(
                     $sourceChunks,
                     true,
-                    $currentSource['openerMeta']['preserveWhitespace']
+                    $currentSource['openerMeta']['preserveWhitespace'],
+                    $shortcutNumberMap,
                 );
                 $sourceSegment = $this->xmlparser->join($sourceChunks);
 
@@ -1037,11 +1038,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                     if (static::XML_REPARSE_CONTENT) {
                         $targetChunks = $this->xmlparser->join($targetChunks);
                     }
+
                     //in targetChunks the content is converted (tags, whitespace etc)
                     $targetChunks = $this->contentConverter->convert(
                         $targetChunks,
                         false,
-                        $currentTarget['openerMeta']['preserveWhitespace']
+                        $currentTarget['openerMeta']['preserveWhitespace'],
+                        $shortcutNumberMap,
                     );
                     unset($this->currentTarget[$mid]);
                 }
@@ -1074,10 +1077,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->shortTagNumbers->shortTagIdent
             );
 
+            $shortcutNumberMap = array_merge($shortcutNumberMap, $sourceConversionResult->shortcutNumberMap);
+
             $targetOriginal = $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
                 $targetOriginal,
                 $sourceConversionResult->shortTagIdent,
-                $sourceConversionResult->shortcutNumberMap
+                $shortcutNumberMap
             );
 
             $this->segmentData = [];

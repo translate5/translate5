@@ -62,7 +62,7 @@ class ContentProtector
     /**
      * @var array<string, ProtectorInterface>
      */
-    private array $protectors;
+    private array $protectors = [];
 
     /**
      * @var ProtectionTagsFilterInterface[]
@@ -281,6 +281,7 @@ class ContentProtector
     public function convertToInternalTagsInChunks(
         string $segment,
         int &$shortTagIdent,
+        bool $collectTagNumbers = false,
         array &$shortcutNumberMap = [],
     ): array {
         $tagsPattern = '/<.+\/>/U';
@@ -304,6 +305,7 @@ class ContentProtector
                     $chunkStorage[] = $protector->convertToInternalTagsInChunks(
                         $tags[$i],
                         $shortTagIdent,
+                        $collectTagNumbers,
                         $shortcutNumberMap,
                     );
 

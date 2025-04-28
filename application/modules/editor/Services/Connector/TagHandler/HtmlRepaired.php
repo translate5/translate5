@@ -83,7 +83,7 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
      * restores the tags from the sent image-tags and repairs lost tags or tag fragments
      * @throws ZfExtended_Exception
      */
-    public function restoreInResult(string $resultString): ?string
+    public function restoreInResult(string $resultString, bool $isSource = true): ?string
     {
         if (empty($this->currentSegment)) {
             throw new ZfExtended_Exception('editor_Services_Connector_TagHandler_HtmlRepaired::restoreInResult: A currentSegment must be provided per restore that identifies the query to use this tag-handler');

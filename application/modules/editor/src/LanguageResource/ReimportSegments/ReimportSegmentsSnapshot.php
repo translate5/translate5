@@ -66,7 +66,8 @@ class ReimportSegmentsSnapshot
         int $languageResourceId,
         ?string $timestamp,
         bool $onlyEdited,
-        bool $useSegmentTimestamp
+        bool $useSegmentTimestamp,
+        array $segmentIds = []
     ): void {
         $languageResource = $this->languageResourceRepository->get($languageResourceId);
         $connector = $this->getConnector($languageResource, $task);
@@ -88,6 +89,10 @@ class ReimportSegmentsSnapshot
         ];
 
         foreach ($segments as $segment) {
+            if (! empty($segmentIds) && ! in_array((int) $segment->getId(), $segmentIds, true)) {
+                continue;
+            }
+
             $updateDTO = $connector->getUpdateDTO($segment, $updateOptions);
 
             $this->segmentsRepository->save($runId, $updateDTO);

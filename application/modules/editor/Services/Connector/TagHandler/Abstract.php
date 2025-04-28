@@ -35,6 +35,8 @@ use MittagQI\Translate5\Segment\EntityHandlingMode;
  */
 abstract class editor_Services_Connector_TagHandler_Abstract
 {
+    public const OPTION_KEEP_WHITESPACE_TAGS = 'keepWhitespaceTags';
+
     /**
      * This parser is used to restore whitespace tags
      * @var editor_Models_Import_FileParser_XmlParser
@@ -92,16 +94,21 @@ abstract class editor_Services_Connector_TagHandler_Abstract
 
     protected bool $handleIsInSourceScope = true;
 
-    public function __construct()
+    public bool $keepWhitespaceTags;
+
+    /**
+     * Segment content after segment is prepared and before is sent to the resource
+     */
+    protected string $querySegment;
+
+    public function __construct(array $options = [])
     {
+        $this->keepWhitespaceTags = (bool) ($options[self::OPTION_KEEP_WHITESPACE_TAGS] ?? false);
         $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
         $this->trackChange = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
-
         $this->logger = ZfExtended_Factory::get(ZfExtended_Logger_Queued::class);
-
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
-
         //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
         $this->xmlparser->registerOther(function ($textNode, $key) {
             //set shortTagIdent of the tagTrait to the next usable number if there are new tags
@@ -131,7 +138,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
      * protects the internal tags for language resource processing as defined in the class
      * @return string|null returns NULL on error
      */
-    abstract public function restoreInResult(string $resultString): ?string;
+    abstract public function restoreInResult(string $resultString, bool $isSource = true): ?string;
 
     /**
      * Returns true if last restoreInResult call had errors
@@ -156,7 +163,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
         return $this->convertQuery(
             $this->utilities->internalTag->restore(
                 $this->trackChange->removeTrackChanges($queryString),
-                $this->contentProtector->tagList(),
+                $this->getTagsForRestore(),
                 $this->highestShortcutNumber,
                 $this->shortcutNumberMap
             ),
@@ -205,5 +212,30 @@ abstract class editor_Services_Connector_TagHandler_Abstract
     public function setCurrentSegment(editor_Models_Segment $segment): void
     {
         //empty function stub - to be implemented where needed
+    }
+
+    public function setInputTagMap(array $tagMap): void
+    {
+        //empty function stub - to be implemented where needed
+    }
+
+    public function setQuerySegment(string $querySegment): void
+    {
+        $this->querySegment = $querySegment;
+    }
+
+    public function getQuerySegment(): string
+    {
+        return $this->querySegment;
+    }
+
+    public function setKeepWhitespaceTags(bool $keepWhitespaceTags): void
+    {
+        $this->keepWhitespaceTags = $keepWhitespaceTags;
+    }
+
+    public function getTagsForRestore(): array
+    {
+        return $this->contentProtector->tagList();
     }
 }

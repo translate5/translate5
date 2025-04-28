@@ -152,10 +152,11 @@ class WhitespaceProtector implements ProtectorInterface
     public function convertToInternalTagsInChunks(
         string $segment,
         int &$shortTagIdent,
+        bool $collectTagNumbers,
         array &$shortcutNumberMap = [],
     ): array {
         $xmlChunks = [];
-        $this->whitespace->collectTagNumbers = empty($shortcutNumberMap);
+        $this->whitespace->collectTagNumbers = $collectTagNumbers;
         $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $shortcutNumberMap, $xmlChunks);
 
         return $xmlChunks;

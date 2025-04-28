@@ -142,10 +142,10 @@ class editor_Services_Connector implements ExportAdapterInterface
     /**
      * @throws editor_Services_Exceptions_NoService
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang = null, $targetLang = null): void
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang = null, $targetLang = null, $config = null): void
     {
         $this->connectToResourceOnly($languageResource->getResource());
-        $this->adapter->connectTo($languageResource, $sourceLang, $targetLang);
+        $this->adapter->connectTo($languageResource, $sourceLang, $targetLang, $config);
     }
 
     public function getValidExportTypes(): array

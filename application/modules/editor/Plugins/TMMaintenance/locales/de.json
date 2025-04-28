@@ -76,6 +76,7 @@
     "calculating": "Wird berechnet...",
     "loadingSegmentPlaceholder": "Laden...",
     "loadingSegmentNumber": "Lade Segment #",
+    "loadedSoFar": "Geladene {0} Segmente bis jetzt",
     "saving": "Speichert, bitte warten.",
     "columns": {
       "sourceText": "Quelle",

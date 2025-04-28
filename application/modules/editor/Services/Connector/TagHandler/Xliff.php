@@ -54,7 +54,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      */
     public function __construct(array $options = [])
     {
-        parent::__construct();
+        parent::__construct($options);
 
         //en/disable gTagPairing
         if (array_key_exists('gTagPairing', $options)) {
@@ -118,6 +118,9 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         $queryString = $this->processXliffTags($queryString);
 
         $this->mapCount = count($this->map);
+
+        // after the segment content is converted, store the value for latter use abd reference
+        $this->setQuerySegment($queryString);
 
         return $queryString;
     }

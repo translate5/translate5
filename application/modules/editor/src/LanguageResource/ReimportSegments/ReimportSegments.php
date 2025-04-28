@@ -45,6 +45,8 @@ use MittagQI\Translate5\Repository\SegmentRepository;
 
 class ReimportSegments
 {
+    private const MAX_TRIES = 10;
+
     public function __construct(
         private readonly ReimportSegmentRepositoryInterface $reimportSegmentRepository,
         private readonly LanguageResourceRepository $languageResourceRepository,
@@ -70,10 +72,43 @@ class ReimportSegments
     public function reimport(Task $task, string $runId, int $languageResourceId): void
     {
         $languageResource = $this->languageResourceRepository->get($languageResourceId);
-        $segments = $this->reimportSegmentRepository->getByTask($runId, $task->getTaskGuid());
-        $result = $this->updateSegments($languageResource, $task, $segments);
+        $result = $this->reimportWithRetry($task, $languageResource, $runId);
         $this->processResponse($result, $task, $languageResource);
         $this->reimportSegmentRepository->cleanByTask($runId, $task->getTaskGuid());
+    }
+
+    private function reimportWithRetry(
+        Task $task,
+        LanguageResource $languageResource,
+        string $runId
+    ): ReimportSegmentsResult {
+        $totalEmptySegmentsAmount = 0;
+        $totalSuccessfulSegmentsAmount = 0;
+        $failedSegmentsIds = [];
+        $tries = 0;
+
+        while ($tries < self::MAX_TRIES) {
+            $segments = $this->reimportSegmentRepository->getByTask($runId, $task->getTaskGuid());
+            $result = $this->updateSegments($languageResource, $task, $segments, $failedSegmentsIds);
+
+            $totalEmptySegmentsAmount += $result->emptySegmentsAmount;
+            $totalSuccessfulSegmentsAmount += $result->successfulSegmentsAmount;
+            $failedSegmentsIds = $result->failedSegmentIds;
+
+            if (empty($failedSegmentsIds)) {
+                break;
+            }
+
+            $this->addFailedSegmentsLog($failedSegmentsIds, (int) $task->getId(), (int) $languageResource->getId());
+
+            $tries++;
+        }
+
+        return new ReimportSegmentsResult(
+            $totalEmptySegmentsAmount,
+            $totalSuccessfulSegmentsAmount,
+            $failedSegmentsIds,
+        );
     }
 
     /**
@@ -83,19 +118,23 @@ class ReimportSegments
         LanguageResource $languageResource,
         Task $task,
         iterable $updateDTOs,
-    ): ?ReimportSegmentsResult {
+        array $updateOnlyIds = [],
+    ): ReimportSegmentsResult {
         $connector = $this->getConnector($languageResource, $task);
+        $options = [
+            UpdatableAdapterInterface::SAVE_TO_DISK => false,
+        ];
 
         $emptySegmentsAmount = 0;
         $successfulSegmentsAmount = 0;
         $failedSegmentsIds = [];
         $lastSegment = null;
 
-        $options = [
-            UpdatableAdapterInterface::SAVE_TO_DISK => false,
-        ];
-
         foreach ($updateDTOs as $updateDTO) {
+            if (! empty($updateOnlyIds) && ! in_array($updateDTO->segmentId, $updateOnlyIds, true)) {
+                continue;
+            }
+
             $segment = $this->segmentRepository->get($updateDTO->segmentId);
 
             if ($updateDTO->source === '' || $updateDTO->target === '') {
@@ -142,17 +181,15 @@ class ReimportSegments
 
         if ($lastSegment) {
             // And check the last segment if update was successful
-            // We consider that if first and last was successfully updated -
+            // We consider that if first and last were successfully updated -
             // high probability all in between were successful too
             $connector->checkUpdatedSegment($lastSegment);
         }
 
-        if (0 === $emptySegmentsAmount && 0 === $successfulSegmentsAmount && 0 === count($failedSegmentsIds)) {
-            return null;
+        if (0 !== $successfulSegmentsAmount) {
+            /** @phpstan-ignore-next-line */
+            $connector->flush();
         }
-
-        /** @phpstan-ignore-next-line */
-        $connector->flush();
 
         return new ReimportSegmentsResult($emptySegmentsAmount, $successfulSegmentsAmount, $failedSegmentsIds);
     }
@@ -169,7 +206,7 @@ class ReimportSegments
         ];
 
         if ($result !== null) {
-            $message = 'Task {taskId} re-imported successfully into the desired TM {tmId}';
+            $message = 'Task {taskId} re-imported into the desired TM {tmId}';
             $params = array_merge($params, [
                 'emptySegments' => $result->emptySegmentsAmount,
                 'successfulSegments' => $result->successfulSegmentsAmount,
@@ -177,7 +214,19 @@ class ReimportSegments
             ]);
         }
 
-        $this->loggerProvider->getLogger()->info('E0000', $message, $params);
+        $this->loggerProvider->getLogger()->info('E1713', $message, $params);
+    }
+
+    private function addFailedSegmentsLog(array $failedSegmentsIds, int $taskId, int $languageResourceId): void
+    {
+        $message = 'Task reimport finished with failed segments, trying to reimport them';
+        $params = [
+            'taskId' => $taskId,
+            'tmId' => $languageResourceId,
+            'failedSegments' => $failedSegmentsIds,
+        ];
+
+        $this->loggerProvider->getLogger()->info('E1714', $message, $params);
     }
 
     private function getConnector(

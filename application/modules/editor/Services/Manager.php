@@ -368,7 +368,7 @@ class editor_Services_Manager
         $serviceType = $languageResource->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get(editor_Services_Connector::class);
-        $connector->connectTo($languageResource, $sourceLang, $targetLang);
+        $connector->connectTo($languageResource, $sourceLang, $targetLang, $config);
 
         if (isset($config)) {
             $connector->setConfig($config);

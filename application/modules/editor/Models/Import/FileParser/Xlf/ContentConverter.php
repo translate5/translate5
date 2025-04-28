@@ -40,6 +40,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 {
     public const TAGS_WITH_CONTENT = ['it', 'ph', 'bpt', 'ept'];
 
+    public const TAGS_WITH_CTYPE_ATTRIBUTE = ['ph'];
+
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
@@ -97,6 +99,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
     private bool $handleIsInSourceScope = true;
 
     private bool $useStrictEscaping;
+
+    private array $shortcutNumberMap = [];
 
     /**
      * @param editor_Models_Task $task for debugging reasons only
@@ -303,7 +307,10 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             return $this->useTagContentOnlyNamespace;
         }
         //the native way is to check for a ctype in the tag, if there is one, show the tags also
-        if (array_key_exists('ctype', $opener['attributes'])) {
+        // INFO: Currently we can only check for ph tags. According to the xliff specification, bpt can contain ctype
+        // but not ept. And in case of bpt/ept pair, we will have different tag renders for the opening and closing tag
+        // the opening(bpt) will contain the tags in the fulltag form but not the closing(ept)
+        if (in_array($tag,self::TAGS_WITH_CTYPE_ATTRIBUTE) && array_key_exists('ctype', $opener['attributes'])) {
             return false;
         }
         // same if the tag contains only tags, then the surrounding tag also must be shown
@@ -325,8 +332,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
      * @param array|string $chunks can be either an array of chunks or a string which then will be parsed
      * @param bool $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
      */
-    public function convert(array|string $chunks, bool $source, bool $preserveWhitespace = false): array
-    {
+    public function convert(
+        array|string $chunks,
+        bool $source,
+        bool $preserveWhitespace,
+        array &$shortcutNumberMap,
+    ): array {
+        $this->shortcutNumberMap = &$shortcutNumberMap;
         // experimental feature: Strict escaping for the segment input stream
         if ($this->useStrictEscaping) {
             if (is_array($chunks)) {
@@ -441,7 +453,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
         $xmlChunks = $this->contentProtector->convertToInternalTagsInChunks(
             $text,
-            $this->shortTagNumbers->shortTagIdent
+            $this->shortTagNumbers->shortTagIdent,
+            $this->handleIsInSourceScope,
+            $this->shortcutNumberMap,
         );
 
         //to keep the generated tag objects we have to use the chunk-list instead of the returned string

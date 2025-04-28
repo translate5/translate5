@@ -57,6 +57,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private const VERSION_0_6 = '0.6';
 
+    protected const TAG_HANDLER_CONFIG_PART = 't5memory';
+
     public const NEXT_SUFFIX = '_next-';
 
     private const SEGMENT_NR_CONTEXT_PREFIX = 'SegmentNr: ';
@@ -66,18 +68,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      * @var editor_Services_OpenTM2_HttpApi
      */
     protected $api;
-
-    /**
-     * Using Xliff based tag handler here
-     * @var string
-     */
-    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_OpenTM2Xliff';
-
-    /**
-     * Just overwrite the class var hint here
-     * @var editor_Services_Connector_TagHandler_Xliff
-     */
-    protected $tagHandler;
 
     /**
      *  Is the connector generally able to support internal Tags for the translate-API
@@ -121,21 +111,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         LanguageResource $languageResource,
         $sourceLang,
         $targetLang,
+        $config = null,
     ): void {
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
-        // TODO T5MEMORY: remove when OpenTM2 is out of production
-        // t5 memory is not needing the OpenTM2 specific Xliff TagHandler, the default XLIFF TagHandler is sufficient
-        if ($this->tagHandler instanceof editor_Services_Connector_TagHandler_OpenTM2Xliff) {
-            $this->tagHandler = ZfExtended_Factory::get(
-                editor_Services_Connector_TagHandler_T5MemoryXliff::class,
-                [[
-                    'gTagPairing' => false,
-                ]]
-            );
-        }
-        parent::connectTo($languageResource, $sourceLang, $targetLang);
+        $this->tagHandler = $this->createTagHandler([
+            'gTagPairing' => false,
+        ]);
+
+        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
     }
 
     /**
@@ -1247,7 +1232,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $connector->connectTo(
             $fuzzyLanguageResource,
             $this->languageResource->getSourceLang(),
-            $this->languageResource->getTargetLang()
+            $this->languageResource->getTargetLang(),
+            $this->getConfig()
         );
         // copy the current config (for task specific config)
         $connector->setConfig($this->getConfig());

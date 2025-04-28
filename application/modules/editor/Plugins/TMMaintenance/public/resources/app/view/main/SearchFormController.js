@@ -3,7 +3,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     alias: 'controller.searchform',
 
     mixins: ['TMMaintenance.mixin.ErrorMessage'],
-
+    readTotalAt: 20,
     listen: {
         global: {
             onApplicationLoad: 'onApplicationLoad',
@@ -64,7 +64,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         this.getViewModel().set('selectedTm', values.tm);
         this.getViewModel().set('lastOffset', null);
         this.getViewModel().set('totalAmount', null);
-        this.loadPageByChunks(20,1, false, true);
+        this.loadPageByChunks(2000, 1, false, true);
         this.updateUrl(values);
     },
 
@@ -244,7 +244,9 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         if (abortPrev) {
             store.getProxy().abortByPurpose = true;
             store.getProxy().abort();
-            scrollable.resumeEvent('scrollend');
+            if (scrollable.suspendScrollend) {
+                scrollable.suspendScrollend --;
+            }
         }
 
         // Add dummy loading entry
@@ -266,7 +268,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         //
         vm.set('loadingRecordNumber', store.getCount());
 
-        scrollable.suspendEvent('scrollend');
+        scrollable.suspendScrollend ++;
         view.ensureVisible(store.last());
 
         store.load({
@@ -278,14 +280,18 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
                 // Remove dummy loading entry
                 if (loaderRec) {
-                    scrollable.suspendEvent('scrollend');
+                    scrollable.suspendScrollend ++;
                     store.remove(loaderRec, false, false);
-                    scrollable.resumeEvent('scrollend');
+                    scrollable.suspendScrollend --;
                 }
+
+                // Put total count in view model to be able to show 'Loaded X segments so far'
+                // in grid title when loading further segments aborted before me.readTotalAmount() call
+                vm.set('totalLoadedQty', store.getCount());
 
                 // It's important to resume scrollend-event AFTER the dummy record
                 // removal, because removal also leads to firing of scrollend event
-                scrollable.resumeEvent('scrollend');
+                scrollable.suspendScrollend --;
 
                 if (!success) {
 
@@ -294,6 +300,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                     }
                     if (operation.getProxy().abortByPurpose) {
                         delete operation.getProxy().abortByPurpose;
+                        vm.set('loadingRecordNumber', false);
+                        Ext.defer(() => scrollable.scrollBy(0, -10), 100);
                     }
 
                     return;
@@ -309,7 +317,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                     vm.set('hasMoreRecords', false);
                 }
 
-                if (store.getCount() === pageSize) {
+                if (store.getCount() === me.readTotalAt) {
                     vm.set('hasRecords', records.length > 0);
                     vm.set('loadingTotalAmount', true);
                     me.readTotalAmount();
@@ -329,7 +337,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         });
     },
 
-    onContainerScrollEnd: function () {
+    onContainerScrollDownEnd: function () {
         var me = this,
             vm = me.getViewModel(),
             total = vm.get('totalAmount'),
@@ -343,6 +351,13 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             return;
         }
 
-        me.loadPageByChunks(20,1, true, true);
+        me.loadPageByChunks(2000, 1, true, true);
+    },
+
+    onContainerScrollUpEnd: function () {
+        let store = Ext.getCmp('mainlist').getStore();
+        this.getViewModel().set('loadedQty', 0);
+        store.getProxy().abortByPurpose = true;
+        store.getProxy().abort();
     },
 });

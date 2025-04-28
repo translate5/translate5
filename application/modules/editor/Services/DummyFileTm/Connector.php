@@ -364,7 +364,12 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
 
         $connector = ZfExtended_Factory::get(get_class($this));
         /* @var $connector editor_Services_Connector */
-        $connector->connectTo($fuzzyLanguageResource, $this->languageResource->getSourceLang(), $this->languageResource->getTargetLang());
+        $connector->connectTo(
+            $fuzzyLanguageResource,
+            $this->languageResource->getSourceLang(),
+            $this->languageResource->getTargetLang(),
+            $this->getConfig()
+        );
         // copy the current config (for task specific config)
         $connector->setConfig($this->getConfig());
         // copy the worker user guid

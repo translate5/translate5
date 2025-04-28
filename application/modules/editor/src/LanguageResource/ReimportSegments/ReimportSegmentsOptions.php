@@ -36,5 +36,7 @@ class ReimportSegmentsOptions
 
     public const FILTER_ONLY_EDITED = 'onlyEdited';
 
+    public const FILTER_ONLY_IDS = 'filterOnlyIds';
+
     public const USE_SEGMENT_TIMESTAMP = 'useSegmentTimestamp';
 }

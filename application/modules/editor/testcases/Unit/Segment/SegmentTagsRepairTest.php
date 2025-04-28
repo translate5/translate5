@@ -31,6 +31,9 @@ namespace MittagQI\Translate5\Test\Unit\Segment;
 use editor_Segment_FieldTags;
 use editor_Segment_Internal_TagComparision;
 use editor_Segment_Internal_TagRepair;
+use editor_Services_Connector_TagHandler_PairedTags;
+use MittagQI\Translate5\Segment\TagRepair\Xliff\RegexTagParser;
+use MittagQI\Translate5\Segment\TagRepair\Xliff\XliffTagRepairer;
 use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
 
 /**
@@ -59,6 +62,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
     {
         $fixed = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing</2><5/> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $this->createRepairTest($fixed, $fixed, []);
+        $this->createRepairTestXlf($fixed, $fixed);
     }
 
     public function testTagRepair1(): void
@@ -67,6 +71,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // wrong order open/close
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     public function testTagRepair2(): void
@@ -75,6 +80,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt</3> ut<6/> labore et <4>dolore</4> magna aliquyam erat, sed diam voluptua.<7/>';
         // overlapping tags
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     public function testTagRepair3(): void
@@ -83,6 +89,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem <1>ipsum<6/></1> dolor sit amet, <4>consetetur</4> sadipscing<2><5/> elitr, sed diam nonumy eirmod tempor invidunt ut<3> labore</3> et </2>dolore magna aliquyam erat, sed diam voluptua.';
         // faulty structure
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     public function testTagRepair4()
@@ -91,6 +98,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem <1>ipsum<6/></1> dolor sit amet, <2>consetetur</2> sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut<3> labore</3> et <4>dolore</4> magna aliquyam erat, sed diam voluptua.';
         // faulty structure
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     public function testTagRepair5(): void
@@ -99,6 +107,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $broken = '<div class="open 6270742069643d2231223e266c743b72756e313e3c2f627074 internal-tag ownttip"><span title="<run1>" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;run1&gt;</span></div>T<div class="close 6570742069643d2231223e266c743b2f72756e313e3c2f657074 internal-tag ownttip"><span title="</run1>" class="short" id="ext-element-243">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;/run1&gt;</span></div><div class="open 6270742069643d2232223e266c743b72756e323e3c2f627074 internal-tag ownttip"><span title="<run2>" class="short">&lt;2&gt;</span><span data-originalid="2" data-length="-1" class="full">&lt;run2&gt;</span></div>ranslation Management System<div class="close 6570742069643d2233223e266c743b2f72756e333e3c2f657074 internal-tag ownttip"><span title="</run3>" class="short">&lt;/3&gt;</span><span data-originalid="3" data-length="-1" class="full">&lt;/run3&gt;</span></div>';
         // test based on real data from the AutoQA approval
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty', 'internal_tags_added'], false);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     public function testTagRepair6(): void
@@ -107,6 +116,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $broken = '<div class="open 6270742069643d2231223e266c743b72756e313e3c2f627074 internal-tag ownttip"><span class="short" title="<run1>" id="ext-element-241">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;run1&gt;</span></div>T<div class="close 6570742069643d2231223e266c743b2f72756e313e3c2f657074 internal-tag ownttip"><span class="short" title="</run1>">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/run1&gt;</span></div><div class="open 6270742069643d2232223e266c743b72756e323e3c2f627074 internal-tag ownttip"><span class="short" title="<run2>">&lt;2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;run2&gt;</span></div>ranslation <div class="open 6270742069643d2233223e266c743b72756e333e3c2f627074 internal-tag ownttip"><span class="short" title="<run3>">&lt;3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;run3&gt;</span></div>M<div class="close 6570742069643d2233223e266c743b2f72756e333e3c2f657074 internal-tag ownttip"><span class="short" title="</run3>">&lt;/3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;/run3&gt;</span></div>anagement <div class="close 6270742069643d2234223e266c743b72756e343e3c2f627074 internal-tag ownttip"><span class="short" title="<run4>">&lt;4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;run4&gt;</span></div>S<div class="close 6570742069643d2234223e266c743b2f72756e343e3c2f657074 internal-tag ownttip"><span class="short" title="</run4>">&lt;/4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;/run4&gt;</span></div>ystem<div class="close 6570742069643d2232223e266c743b2f72756e323e3c2f657074 internal-tag ownttip"><span class="short" title="</run2>">&lt;/2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;/run2&gt;</span></div>';
         // test based on real data from the AutoQA approval
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty', 'internal_tags_added'], false);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     /**
@@ -117,6 +127,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem ipsum<1><2><5/></2></1> dolor<3><6/></3> sit amet';
         $broken = 'Lorem ipsum<1><2><5/></1></2> dolor<3><6/></3> sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     /**
@@ -127,6 +138,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem ipsum<7/><1><2><3></3></2><4></4></1><5/> dolor<3><6/></3> sit amet';
         $broken = 'Lorem ipsum<7/><1><2><3></2></3></4><4></1><5/> dolor<3><6/></3> sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     /**
@@ -137,6 +149,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem ipsum<1><2></2><5/><3><4></4></3></1> dolor<3><6/></3> sit amet';
         $broken = 'Lorem ipsum<1><2></2><5/><3><4></3></4></1> dolor<3><6/></3> sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     /**
@@ -147,6 +160,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem ipsum<1><2><3><5/></3><6/></2><7/></1> dolor sit amet';
         $broken = 'Lorem ipsum<1><2><3><5/></1><6/></2><7/></3> dolor sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     /**
@@ -157,6 +171,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem ipsum<1><2><5/></2></1><6/><4><3><7/></3></4> dolor sit amet';
         $broken = 'Lorem ipsum<1><2><5/></1></2><6/><4><3><7/></4></3> dolor sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     /**
@@ -167,6 +182,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem ipsum<1><2><5/><4><3><6/></3></4><7/></2></1> dolor sit amet';
         $broken = 'Lorem ipsum<1><2><5/><4></2><6/><3></1><7/></3></4> dolor sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     public function testTagRepair13(): void
@@ -174,6 +190,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $fixed = 'Lorem ipsum<1><2></2><5/><4> dolor</4><6/><3></3><7/></1> sit amet';
         $broken = 'Lorem ipsum<1><2><5/><4></2> dolor<6/><3></1><7/></3></4> sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+        $this->createRepairTestXlf($fixed, $broken);
     }
 
     private function createRepairTest(string $fixed, string $broken, array|string $expectedState, bool $replaceShortToFull = true): void
@@ -201,5 +218,38 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         // make sure the fixed tags would be detected as correct
         $tagComparision = new editor_Segment_Internal_TagComparision($brokenTags, null);
         $this->assertEquals([], $tagComparision->getStati());
+    }
+
+    /**
+     * Test if the above test cases are fixable by the new xlf tag repairer.
+     * Because we can not test the content directly, the way how this will test the results are based on the tag order
+     * in the source and in the target.
+     */
+    private function createRepairTestXlf($fixed, $broken): void
+    {
+        $fixedSegment = $this->shortToFull($fixed);
+        $brokenSegment = $this->shortToFull($broken);
+
+        $tagHandlerBroken = new editor_Services_Connector_TagHandler_PairedTags();
+        $brokenQuery = $tagHandlerBroken->prepareQuery($brokenSegment);
+
+        $tagHandlerCorrect = new editor_Services_Connector_TagHandler_PairedTags();
+        $fixedQuery = $tagHandlerCorrect->prepareQuery($fixedSegment);
+
+        $tagRepair = new XliffTagRepairer();
+        $repaired = $tagRepair->repairTranslation($fixedQuery, $brokenQuery);
+
+        $tagParser = new RegexTagParser();
+
+        $correctRender = [];
+        foreach ($tagParser->extractTags($fixedQuery) as $correctTag) {
+            $correctRender[] = $correctTag->recreate();
+        }
+
+        $restoredRender = [];
+        foreach ($tagParser->extractTags($repaired) as $restoredTag) {
+            $restoredRender[] = $restoredTag->recreate();
+        }
+        self::assertEquals($correctRender, $restoredRender);
     }
 }

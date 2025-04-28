@@ -128,20 +128,23 @@ class editor_Models_Import_FileParser_Xlf_OtherContent
     /**
      * inits othercontent class for each transunit on the end of the unit, before processing starts
      */
-    public function initOnUnitEnd(bool $useSource, bool $preserveWhitespace)
-    {
+    public function initOnUnitEnd(
+        bool $useSource,
+        bool $preserveWhitespace,
+        array &$shortcutNumberMap,
+    ) {
         $this->useSource = $useSource;
         $this->preserveWhitespace = $preserveWhitespace;
 
         //CRUCIAL - source must be called before target! due tag numbering in contentconverter
-        $this->prepareContentPreserved(true);
-        $this->prepareContentPreserved(false);
+        $this->prepareContentPreserved(true, $shortcutNumberMap);
+        $this->prepareContentPreserved(false, $shortcutNumberMap);
     }
 
     /**
      * Prepare the other contents with preserved whitespace, returning already split the convert content on MRK boundaries
      */
-    private function prepareContentPreserved(bool $source): void
+    private function prepareContentPreserved(bool $source, array &$shortcutNumberMap): void
     {
         $data = $source ? $this->otherContentSource : $this->otherContentTarget;
         $containerBoundary = $source ? $this->sourceElementBoundary : $this->targetElementBoundary;
@@ -154,7 +157,12 @@ class editor_Models_Import_FileParser_Xlf_OtherContent
         $resetTagNumbers = $source || empty($this->otherContentSource);
 
         $concatContent = $this->xmlparser->join($this->convertBoundaryToContent($containerBoundary, $data));
-        $content = $this->contentConverter->convert($concatContent, $resetTagNumbers, $this->preserveWhitespace);
+        $content = $this->contentConverter->convert(
+            $concatContent,
+            $resetTagNumbers,
+            $this->preserveWhitespace,
+            $shortcutNumberMap
+        );
 
         //add the other data container for the first content BEFORE the first MRK:
         $firstOtherContent = new editor_Models_Import_FileParser_Xlf_OtherContent_Data(0, $containerBoundary[0], reset($data)->startMrkIdx);

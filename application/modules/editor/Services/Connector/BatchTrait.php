@@ -116,8 +116,12 @@ trait editor_Services_Connector_BatchTrait
         foreach ($segments as $segment) {
             $segmentCounter++;
 
-            //progress to update
-            $progress = $segmentCounter / $this->batchTask->getSegmentCount();
+            $segmentCount = (int) $this->batchTask->getSegmentCount();
+
+            if ($segmentCount > 0) {
+                //progress to update
+                $progress = $segmentCounter / $segmentCount;
+            }
 
             //For pre-translation only those segments should be send to the MT, that have an empty target.-> https://jira.translate5.net/browse/TRANSLATE-2335
             //For analysis, the mt matchrate will always be the same.So it make no difference here if it is pretranslation
@@ -267,6 +271,7 @@ trait editor_Services_Connector_BatchTrait
 
             $this->getQueryStringAndSetAsDefault($query['segment']);
             $this->tagHandler->setTagMap($query['tagMap']);
+            $this->tagHandler->setQuerySegment($query['query']);
             $this->processBatchResult($segmentResults);
 
             $this->logForSegment($query['segment']);

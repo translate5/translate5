@@ -48,18 +48,9 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
 
+    protected const TAG_HANDLER_CONFIG_PART = 't5memory';
+
     private \editor_Services_OpenTM2_HttpApi $api;
-
-    /**
-     * Using Xliff based tag handler here
-     */
-    protected $tagHandlerClass = \editor_Services_Connector_TagHandler_OpenTM2Xliff::class;
-
-    /**
-     * Just overwrite the class var hint here
-     * @var \editor_Services_Connector_TagHandler_Xliff
-     */
-    protected $tagHandler;
 
     /**
      *  Is the connector generally able to support internal Tags for the translate-API
@@ -96,6 +87,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         LanguageResource $languageResource,
         $sourceLang,
         $targetLang,
+        $config = null
     ): void {
         $this->api = \ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
@@ -106,8 +98,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 'gTagPairing' => false,
             ]]
         );
-        $this->t5MemoryConnector->connectTo($languageResource, $sourceLang, $targetLang);
-        parent::connectTo($languageResource, $sourceLang, $targetLang);
+        $this->t5MemoryConnector->connectTo($languageResource, $sourceLang, $targetLang, $config);
+        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
     }
 
     public function update(SegmentModel $segment, array $options = []): void

@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use Google\Cloud\Core\Exception\GoogleException;
 use Google\Cloud\Translate\V2\TranslateClient;
+use MittagQI\Translate5\Integration\Google\Enum\Format;
 
 /**
  * Wraps the Google Connection and converts the google errors to our internal errors
@@ -77,14 +78,21 @@ class editor_Services_Google_ApiWrapper
     /**
      * Search the api for given source/target language by domainCode
      *
-     * @return boolean
+     * @return mixed
      */
-    public function translate(string $text, string $sourceLang, string $targetLang)
+    public function translate(string $text, string $sourceLang, string $targetLang, Format $format)
     {
-        return $this->callWrapped(__FUNCTION__, [$text, [
-            'source' => $sourceLang,
-            'target' => $targetLang,
-        ]]);
+        return $this->callWrapped(
+            __FUNCTION__,
+            [
+                $text,
+                [
+                    'source' => $sourceLang,
+                    'target' => $targetLang,
+                    'format' => $format->value,
+                ],
+            ]
+        );
     }
 
     /**
@@ -92,12 +100,19 @@ class editor_Services_Google_ApiWrapper
      *
      * @return boolean
      */
-    public function translateBatch(array $text, string $sourceLang, string $targetLang)
+    public function translateBatch(array $text, string $sourceLang, string $targetLang, Format $format)
     {
-        return $this->callWrapped(__FUNCTION__, [$text, [
-            'source' => $sourceLang,
-            'target' => $targetLang,
-        ]]);
+        return $this->callWrapped(
+            __FUNCTION__,
+            [
+                $text,
+                [
+                    'source' => $sourceLang,
+                    'target' => $targetLang,
+                    'format' => $format->value,
+                ],
+            ]
+        );
     }
 
     /**
