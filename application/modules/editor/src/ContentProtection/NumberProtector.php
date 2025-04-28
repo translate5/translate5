@@ -252,9 +252,10 @@ class NumberProtector implements ProtectorInterface
     public function convertToInternalTagsInChunks(
         string $segment,
         int &$shortTagIdent,
+        bool $collectTagNumbers,
         array &$shortcutNumberMap = [],
     ): array {
-        $xml = $this->getXmlParser($shortTagIdent, false, $shortcutNumberMap);
+        $xml = $this->getXmlParser($shortTagIdent, $collectTagNumbers, $shortcutNumberMap);
         $xml->parse($segment, true, [self::TAG_NAME]);
 
         return $xml->getAllChunks();

@@ -255,7 +255,7 @@ class WhitespaceProtectorTest extends TestCase
         $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
         $shortTagIdent = 1;
 
-        self::assertEquals($xmlChunks, $whitespace->convertToInternalTagsInChunks($segment, $shortTagIdent));
+        self::assertEquals($xmlChunks, $whitespace->convertToInternalTagsInChunks($segment, $shortTagIdent, false));
         self::assertSame($finalTagIdent, $shortTagIdent);
     }
 

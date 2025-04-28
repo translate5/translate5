@@ -147,9 +147,6 @@ class XlfImportTest extends JsonTestAbstract
         $segments = static::api()->getSegments(null, 41);
         $this->assertNotEmpty($segments, 'No segments are found in the Task!');
 
-        require_once 'Models/Segment/TagAbstract.php';
-        require_once 'Models/Segment/InternalTag.php';
-
         foreach ($segments as $idx => $segToEdit) {
             if (empty($segToEdit->editable)) {
                 continue;
