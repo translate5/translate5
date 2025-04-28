@@ -442,30 +442,41 @@ class editor_Models_Segment_Whitespace
         array &$shortcutNumberMap
     ): editor_Models_Import_FileParser_Tag {
         $content = pack('H*', $content);
+        $shortcutKey = 'data-id=' . $id;
+
+        $shortTag  = null;
+        if (isset($shortcutNumberMap[$shortcutKey])) {
+            $shortTag = $shortcutNumberMap[$shortcutKey];
+        }
 
         //generate the html tag for the editor
         switch ($type) {
             case 'open':
                 $type = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
-                $shortTag = $this->currentShortTagNumber++;
-                $shortcutNumberMap[$id] = $shortTag;
+                if (null === $shortTag) {
+                    $shortTag = $this->currentShortTagNumber++;
+                }
 
                 break;
 
             case 'close':
                 //on tag protection it is ensured that tag pairs are wellformed, so on close we can rely that open nr exists:
                 $type = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
-                $shortTag = $shortcutNumberMap[$id];
+                $shortTag = $shortcutNumberMap[$shortcutKey];
 
                 break;
 
             case 'single':
             default:
                 $type = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
-                $shortTag = $this->currentShortTagNumber++;
+                if (null === $shortTag) {
+                    $shortTag = $this->currentShortTagNumber++;
+                }
 
                 break;
         }
+
+        $shortcutNumberMap[$shortcutKey] = $shortTag;
 
         $tag = new editor_Models_Import_FileParser_Tag($type);
         $tag->originalContent = $content;
