@@ -196,6 +196,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
         var me = this;
         Ext.Ajax.request({
             url:Editor.data.restpath+'languageresourceinstance/'+languageResourceid+'/query',
+                timeout: 180000,
                 method: "POST",
                 params: {
                     //column for which the search was done (target | source)
