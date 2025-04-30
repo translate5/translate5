@@ -40,8 +40,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 {
     public const TAGS_WITH_CONTENT = ['it', 'ph', 'bpt', 'ept'];
 
-    public const TAGS_WITH_CTYPE_ATTRIBUTE = ['ph'];
-
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
@@ -158,15 +156,15 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         }, function ($tag, $key, $opener) {
             $this->xmlparser->registerOther([$this, 'handleText']);
             $originalContent = $this->xmlparser->getRange($opener['openerKey'], $key, true);
-            if ($this->useTagContentOnly($tag, $key, $opener)) {
-                $text = $this->xmlparser->join($this->innerTag);
-                if (strlen($text) === 0) {
-                    $text = null; //a empty text makes no sense here, so we set to null so that a usable text is generated later
-                }
-            } else {
+            $text = $this->xmlparser->join($this->innerTag);
+            if (strlen($text) === 0) {
+                //a empty text makes no sense here, so we set to null so that a usable text is generated later
                 $text = null;
             }
-            $this->result[] = $this->createTag($opener, $tag, $originalContent, $text);
+            $tagDTO = $this->createTag($opener, $tag, $originalContent);
+            $tagDTO->innerTagText = $text;
+            $tagDTO->useInnerTagText = $this->useTagContentOnly($tag, $key, $opener);
+            $this->result[] = $tagDTO;
         });
 
         $this->xmlparser->registerElement('x,bx,ex', null, [$this, 'handleReplacerTag']);
@@ -193,9 +191,14 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
      * @param array $openerMeta openerMeta array to get the ID to identify tag pairs (for tagNr calculation)
      * @param string $originalContent this is value which is restored on export
      * @param string|null $text optional, this is the tag value which should be shown in the frontend
+     * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
-    protected function createTag(array $openerMeta, string $tag, string $originalContent, string $text = null): ?editor_Models_Import_FileParser_Tag
-    {
+    protected function createTag(
+        array $openerMeta,
+        string $tag,
+        string $originalContent,
+        string $text = null,
+    ): ?editor_Models_Import_FileParser_Tag {
         if ($this->removeTags) {
             return null;
         }
@@ -213,8 +216,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
                 // bx / ex: ID mandatory, RID for referencing the bx/ex partner (optional), no content, PAIRED TAG
                 // Since it is unclear from the spec if a bx/ex pair must be in the same trans-unit or not
-                // and since tag numbering should be consistent in our segments and since one trans-unit can contain multiple segments (mrk type seg)
-                // we define the type after parsing the whole segment, so we know if the partner is inside the same segment or not
+                // and since tag numbering should be consistent in our segments and since one trans-unit can contain
+                // multiple segments (mrk type seg) we define the type after parsing the whole segment,
+                // so we know if the partner is inside the same segment or not
             case 'bx':
             case 'bpt':
                 // bpt/ept ID mandatory, RID optional, content
@@ -307,10 +311,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             return $this->useTagContentOnlyNamespace;
         }
         //the native way is to check for a ctype in the tag, if there is one, show the tags also
-        // INFO: Currently we can only check for ph tags. According to the xliff specification, bpt can contain ctype
-        // but not ept. And in case of bpt/ept pair, we will have different tag renders for the opening and closing tag
-        // the opening(bpt) will contain the tags in the fulltag form but not the closing(ept)
-        if (in_array($tag,self::TAGS_WITH_CTYPE_ATTRIBUTE) && array_key_exists('ctype', $opener['attributes'])) {
+        if (array_key_exists('ctype', $opener['attributes'])) {
             return false;
         }
         // same if the tag contains only tags, then the surrounding tag also must be shown

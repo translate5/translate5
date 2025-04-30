@@ -100,6 +100,13 @@ class editor_Models_Import_FileParser_Tag
     public ?string $text = null;
 
     /**
+     * The inner text, stored separately. If it should be used as text: this is calculated on rendering then.
+     */
+    public ?string $innerTagText = null;
+
+    public bool $useInnerTagText = true;
+
+    /**
      * the rendered tag to be used in the GUI and saved in the DB
      */
     public string $renderedTag;
@@ -200,6 +207,15 @@ class editor_Models_Import_FileParser_Tag
         }
 
         $classes = [$this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags)];
+
+        //if a innerTagText is available and single or opener defines to use it, then use it as text.
+        // closer tags can not have the useInnerTagText info by nature, so we use the opener to check for it
+        if ($this->innerTagText !== null
+            && (! $this->isClose() && $this->useInnerTagText
+                || $this->isClose() && $this->partner->useInnerTagText)) {
+            $this->text = $this->innerTagText;
+        }
+
         $text = $this->text ?? htmlentities($this->originalContent, ENT_COMPAT); //PHP 8.1 fix - default changed!
 
         if ($cls !== null) {
