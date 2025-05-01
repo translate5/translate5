@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
+use editor_Services_Connector_TagHandler_Abstract as TagHandler;
 use GuzzleHttp\Client;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
@@ -116,11 +117,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
+        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
+
         $this->tagHandler = $this->createTagHandler([
             'gTagPairing' => false,
+            TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $this->isSendingWhitespaceAsTagEnabled(),
         ]);
-
-        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
     }
 
     /**
