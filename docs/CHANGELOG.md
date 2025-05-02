@@ -17,6 +17,44 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.23.1] - 2025-05-02
+
+### Important Notes:
+#### [TRANSLATE-4410](https://jira.translate5.net/browse/TRANSLATE-4410)
+Before language resources with mismatching sublanguage were NOT assigned at all to tasks by default read/write assignment, now they will be assigned with READ access. This means they could be used for pretranslation if you changed the sublanguage penalty below a value where matches can be found.
+ 
+
+
+### Changed
+**[TRANSLATE-3740](https://jira.translate5.net/browse/TRANSLATE-3740): Editor general, usability editor - Right QA panel of editor too small** <br>
+FIXED:  German keyboard layout problem with Ctrl+Alt+2 and Ctrl+Alt+3 combinations
+
+
+### Bugfixes
+**[TRANSLATE-4633](https://jira.translate5.net/browse/TRANSLATE-4633): Content Protection, t5memory - Number protection tags are removed in fuzzy requests** <br>
+Fixed bug which caused content protection tags to be removed when calling t5memory for matches
+
+**[TRANSLATE-4631](https://jira.translate5.net/browse/TRANSLATE-4631): Client management - delete client button missing** <br>
+Fix delete client button
+
+**[TRANSLATE-4629](https://jira.translate5.net/browse/TRANSLATE-4629): Import/Export - XLF tags with ctype content replacement fixed for paired tags** <br>
+Fix for native XLF dialect that the content of placeholder tags is either shown or not properly.
+
+**[TRANSLATE-4617](https://jira.translate5.net/browse/TRANSLATE-4617): InstantTranslate - Human Revision projects via Instanttranslate only visible for Sysadmin User** <br>
+Fixed visibility of InstantTranslate projects for PM users
+
+**[TRANSLATE-4499](https://jira.translate5.net/browse/TRANSLATE-4499): TM Maintenance - Missing German in TM Maintenance** <br>
+FIXED: grid columns menu items do now support German locale
+
+**[TRANSLATE-4445](https://jira.translate5.net/browse/TRANSLATE-4445): Editor general - Language resource did not respond in a reasonable time (termtagger?)** <br>
+Increased timeout for matchpanel requests to 3 minutes
+
+**[TRANSLATE-4410](https://jira.translate5.net/browse/TRANSLATE-4410): LanguageResources - Add default assignment possibility for wrong sublanguage TMs (penalty feature)** <br>
+translate5 - 7.23.0: If a TM has default read/write assignment for a client but task sublanguage mismatches - only use read assignment
+translate5 - 7.23.1: Revoked matching logic
+
+
 ## [7.23.0] - 2025-04-28
 
 ### Important Notes:
