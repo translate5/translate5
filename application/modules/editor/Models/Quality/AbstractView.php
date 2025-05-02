@@ -587,7 +587,8 @@ abstract class editor_Models_Quality_AbstractView
             return self::CHECKED_DEFAULT;
         }
         if ($category === null || $category === '') {
-            return array_key_exists($type, $this->checkedQualities);
+            return array_key_exists($type, $this->checkedQualities)
+                || array_key_exists("$type:$type", $this->checkedQualities);
         }
 
         return array_key_exists($type . ':' . $category, $this->checkedQualities);
