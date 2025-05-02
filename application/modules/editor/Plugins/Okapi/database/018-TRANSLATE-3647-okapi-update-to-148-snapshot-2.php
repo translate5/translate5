@@ -39,15 +39,6 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7 || ! isset($config)) 
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$sqlConfigWhere = 'name="runtimeOptions.plugins.Okapi.serverUsed" AND value IN("okapi-longhorn-147","okapi-longhorn-148-snapshot-1")';
-
-$db = Zend_Db_Table::getDefaultAdapter();
-$configNeedsUpdating = (int) $db->fetchOne('SELECT COUNT(*) FROM Zf_configuration WHERE ' . $sqlConfigWhere);
-$customerConfigNeedsUpdating = (int) $db->fetchOne('SELECT COUNT(*) FROM LEK_customer_config WHERE ' . $sqlConfigWhere);
-if (! $configNeedsUpdating && ! $customerConfigNeedsUpdating) {
-    return;
-}
-
 $insideBitbucket = ($_ENV['BITBUCKET_BUILD_NUMBER'] ?? 0);
 if ($insideBitbucket) {
     return;
@@ -56,6 +47,15 @@ if ($insideBitbucket) {
 $okapiServerConfig = new ConfigMaintenance();
 $okapiList = $okapiServerConfig->getServerList();
 if (empty($okapiList)) {
+    return;
+}
+
+$sqlConfigWhere = 'name="runtimeOptions.plugins.Okapi.serverUsed" AND value<>"okapi-longhorn-148-snapshot-2"';
+
+$db = Zend_Db_Table::getDefaultAdapter();
+$configNeedsUpdating = (int) $db->fetchOne('SELECT COUNT(*) FROM Zf_configuration WHERE ' . $sqlConfigWhere);
+$customerConfigNeedsUpdating = (int) $db->fetchOne('SELECT COUNT(*) FROM LEK_customer_config WHERE ' . $sqlConfigWhere);
+if (! $configNeedsUpdating && ! $customerConfigNeedsUpdating) {
     return;
 }
 
@@ -114,8 +114,8 @@ if (empty($server148_sp2)) {
     return;
 }
 
-$db->query('UPDATE Zf_configuration SET value="' . $server148_sp2 . '" WHERE ' . $sqlConfigWhere);
-$db->query('UPDATE LEK_customer_config SET value="' . $server148_sp2 . '" WHERE ' . $sqlConfigWhere);
+$db->query('UPDATE Zf_configuration SET value="' . $server148_sp2 . '" WHERE name="runtimeOptions.plugins.Okapi.serverUsed"');
+$db->query('UPDATE LEK_customer_config SET value="' . $server148_sp2 . '" WHERE name="runtimeOptions.plugins.Okapi.serverUsed"');
 
 echo "Updated okapi default server to $server148_sp2\n";
 
