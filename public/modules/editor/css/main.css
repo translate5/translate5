@@ -1059,7 +1059,8 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     line-height: initial;
     white-space: break-spaces;
     font-weight: bold;
-    display: inline-block;
+    display: inline;
+    word-break: break-all;
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner > div.no-content {
     font-weight: unset;
