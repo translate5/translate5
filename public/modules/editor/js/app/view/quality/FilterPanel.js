@@ -79,7 +79,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
                     if(record.isQualityRoot()){
                         meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-root');
                     }
-                    if(record.isEmpty()){
+                    if(record.isEmpty() && record.get('checked') === false){
                         meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-check-disabled');
                     }
                     if(record.hasCriticalErrors()){
