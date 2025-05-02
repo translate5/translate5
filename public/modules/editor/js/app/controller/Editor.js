@@ -647,6 +647,16 @@ Ext.define('Editor.controller.Editor', {
             }
         });
 
+        // Prevent ² and ³ from being inserted into opened segment editor
+        // when ctrl+alt+2 and ctrl+alt+3 combination pressed on German keyboard
+        // layout and toggle false positives as originally planned
+        docEl.dom.addEventListener('beforeinput', function(e) {
+            if (e.data === '²' || e.data === '³') {
+                e.preventDefault();
+                me.toggleFalsePositive(e.data === '²' ? 50 : 51);
+            }
+        })
+
         //add second cut handler to remove the content if default handler prevented
         docEl.on('cut', me.removeSelectionAfterCut, me, {priority: 1001, delegated: false});        
 

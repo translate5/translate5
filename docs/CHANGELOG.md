@@ -16,6 +16,49 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.23.0] - 2025-04-28
+
+### Important Notes:
+#### [TRANSLATE-4410](https://jira.translate5.net/browse/TRANSLATE-4410)
+Before language resources with mismatching sublanguage were NOT assigned at all to tasks by default read/write assignment, now they will be assigned with READ access. This means they could be used for pretranslation if you changed the sublanguage penalty below a value where matches can be found.
+ 
+
+
+### Changed
+**[TRANSLATE-4616](https://jira.translate5.net/browse/TRANSLATE-4616): VisualReview / VisualTranslation - Add Test for Visual Exchange** <br>
+Added API-test for Visual Exchange
+
+**[TRANSLATE-4614](https://jira.translate5.net/browse/TRANSLATE-4614): TM Maintenance - Load by 2000 segments until scroll up** <br>
+Segments are loaded one by one until 2000 are loaded or until scroll up
+
+**[TRANSLATE-4577](https://jira.translate5.net/browse/TRANSLATE-4577): Editor general - New database query command** <br>
+New cli tool database query
+
+**[TRANSLATE-4490](https://jira.translate5.net/browse/TRANSLATE-4490): openai - Check GPT tag handling** <br>
+Chat GPT resource now uses xliff paired tag handler with option to repair broken tags.
+
+
+### Bugfixes
+**[TRANSLATE-4620](https://jira.translate5.net/browse/TRANSLATE-4620): job coordinator - PM Light have empty user select in job assignment** <br>
+Fix job assignment creation for PM light user role
+
+**[TRANSLATE-4615](https://jira.translate5.net/browse/TRANSLATE-4615): LanguageResources - Inconsistency of t5memory language resources** <br>
+Fix of status rendering. Improve logging of t5memory resource
+
+**[TRANSLATE-4612](https://jira.translate5.net/browse/TRANSLATE-4612): Content Protection - Content Protection: Rule intended to protect whole segment applied for chunk of it** <br>
+Fix usage of whole segment rules
+
+**[TRANSLATE-4591](https://jira.translate5.net/browse/TRANSLATE-4591): LanguageResources, t5memory - Some segments are fail to reimport** <br>
+Added reimporting segments that fail to reimport in previous reimport attempt.
+
+**[TRANSLATE-4410](https://jira.translate5.net/browse/TRANSLATE-4410): LanguageResources - Add default assignment possibility for wrong sublanguage TMs (penalty feature)** <br>
+If a TM has default read/write assignment for a client but task sublanguage mismatches - only use read assignment
+
+**[TRANSLATE-4295](https://jira.translate5.net/browse/TRANSLATE-4295): LanguageResources - Resource tag handling** <br>
+Enable tag handling configuration for each resource. Introducing new xml tag handler with tag repair functionality.
+
+
 ## [7.22.0] - 2025-04-17
 
 ### Important Notes:
