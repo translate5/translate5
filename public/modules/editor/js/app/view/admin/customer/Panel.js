@@ -91,7 +91,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
     initConfig: function (instanceConfig) {
         const me = this,
             canAddCustomer = Editor.app.authenticatedUser.isAllowed('editorAddCustomer'),
-            canNotDeleteCustomer = Editor.app.authenticatedUser.isAllowed('editorDeleteCustomer'),
+            canDeleteCustomer = Editor.app.authenticatedUser.isAllowed('editorDeleteCustomer'),
             isOpenIdEditor = Editor.app.authenticatedUser.isAllowed('customerOpenIdAdministration'),
             resourceExportAllowed = Editor.app.authenticatedUser.isAllowed('customerResourceExport'),
             customerConfigAllowed = Editor.app.authenticatedUser.isAllowed('customerConfig')
@@ -333,7 +333,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     tooltip: Editor.data.l10n.clients.delete,
                                     scope: 'controller',
                                     handler: 'remove',
-                                    hidden: canNotDeleteCustomer
+                                    hidden: ! canDeleteCustomer
                                 }
                             ]
                         },

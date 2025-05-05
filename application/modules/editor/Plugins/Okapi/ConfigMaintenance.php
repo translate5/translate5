@@ -269,7 +269,7 @@ class ConfigMaintenance
     {
         $this->config->loadByName(self::CONFIG_SERVER);
 
-        return $this->fromJson($this->config->getValue());
+        return $this->fromJson($this->config->getValue()) ?? [];
     }
 
     /**

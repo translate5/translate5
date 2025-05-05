@@ -43,16 +43,16 @@ class LanguageResourcesDefaults implements ITaskDefaults
         $taskGuid = $task->getTaskGuid();
 
         // Get task source and target major languages
-        $language = Factory::get(Languages::class);
-        $taskMajorSourceLangId = $language->findMajorLanguageById($task->getSourceLang());
-        $taskMajorTargetLangId = $language->findMajorLanguageById($task->getTargetLang());
+        // $language = Factory::get(Languages::class);
+        // $taskMajorSourceLangId = $language->findMajorLanguageById($task->getSourceLang());
+        // $taskMajorTargetLangId = $language->findMajorLanguageById($task->getTargetLang());
 
         /* @var $taskPenaltyDataProvider TaskPenaltyDataProvider */
         $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
         $data = $this->findMatchingAssocData(
-            $taskMajorSourceLangId,
-            $taskMajorTargetLangId,
+            $task->getSourceLang(), // $taskMajorSourceLangId
+            $task->getTargetLang(), // $taskMajorTargetLangId
             $customerAssocData
         );
 
@@ -62,7 +62,10 @@ class LanguageResourcesDefaults implements ITaskDefaults
             $taskAssoc->setTaskGuid($taskGuid);
 
             /** @var bool $sublangMismatch */
-            $sublangMismatch = $taskPenaltyDataProvider->getPenalties($taskGuid, $assocRow['languageResourceId'])['sublangMismatch'];
+            $sublangMismatch = $taskPenaltyDataProvider->getPenalties(
+                $taskGuid,
+                $assocRow['languageResourceId']
+            )['sublangMismatch'];
 
             if (! empty($assocRow['writeAsDefault']) && $sublangMismatch === false) {
                 $taskAssoc->setSegmentsUpdateable(true);
