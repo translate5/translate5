@@ -28,42 +28,42 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api;
+namespace MittagQI\Translate5\T5Memory\Api\Response;
 
-use MittagQI\Translate5\HTTP\ClientFactory;
-use Psr\Http\Client\ClientInterface;
+use JsonException;
+use MittagQI\Translate5\T5Memory\Api\Contract\OverflowErrorInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-/**
- * @template T
- */
-class VersionedApiFactory
+class MutationResponse extends AbstractResponse implements OverflowErrorInterface
 {
-    public function __construct(
-        private readonly ClientInterface $client,
-    ) {
+    use OverflowErrorTrait;
+
+    public static function fromResponse(PsrResponseInterface $response): self
+    {
+        $content = $response->getBody()->getContents();
+
+        return static::fromContentAndStatus($content, $response->getStatusCode());
     }
 
-    public static function create(): self
+    public static function fromContentAndStatus(string $content, int $statusCode): self
     {
-        $factory = ClientFactory::create();
-        $httpClient = new RetryClient($factory->createClient([]));
+        $errorMsg = null;
+
+        try {
+            $body = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            $errorMsg = 'Invalid JSON response: ' . $content;
+            $body = [];
+        }
+
+        if (null === $errorMsg) {
+            $errorMsg = $body['ErrorMsg'] ?? null;
+        }
 
         return new self(
-            $httpClient,
+            $body,
+            $errorMsg,
+            $statusCode,
         );
-    }
-
-    /**
-     * @param class-string<T> $apiClass
-     * @return T
-     */
-    public function get(string $apiClass)
-    {
-        return match ($apiClass) {
-            V5\VersionedApi::class => new V5\VersionedApi($this->client),
-            V6\VersionedApi::class => new V6\VersionedApi($this->client),
-
-            default => throw new \InvalidArgumentException("Unknown API class: $apiClass"),
-        };
     }
 }

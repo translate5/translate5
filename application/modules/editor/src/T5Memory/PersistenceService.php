@@ -40,6 +40,13 @@ class PersistenceService
     ) {
     }
 
+    public static function create(): self
+    {
+        return new self(
+            \Zend_Registry::get('config'),
+        );
+    }
+
     public function getWritableMemory(LanguageResource $languageResource): string
     {
         foreach ($languageResource->getSpecificData('memories', parseAsArray: true) ?? [] as $memory) {
@@ -112,5 +119,60 @@ class PersistenceService
         }
 
         return $tmName;
+    }
+
+    public function addMemoryToLanguageResource(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $isInternalFuzzy = false,
+    ): void {
+        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
+        if (! empty($prefix)) {
+            //remove the prefix from being stored into the TM
+            $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
+        }
+
+        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+
+        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
+
+        $lastMemoryId = 0;
+
+        if (! empty($memories)) {
+            $lastMemoryId = end($memories)['id'];
+        }
+
+        $memories[] = [
+            'id' => $lastMemoryId + 1,
+            'filename' => $tmName,
+            'readonly' => false,
+        ];
+
+        $languageResource->addSpecificData('memories', $memories);
+
+        if (! $isInternalFuzzy) {
+            //saving it here makes the TM available even when the TMX import was crashed
+            $languageResource->save();
+        }
+    }
+
+    public function setMemoryReadonly(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $isInternalFuzzy = false,
+    ): void {
+        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+
+        foreach ($memories as $key => $memory) {
+            if ($memory['filename'] === $tmName) {
+                $memories[$key]['readonly'] = true;
+            }
+        }
+
+        $languageResource->addSpecificData('memories', $memories);
+
+        if (! $isInternalFuzzy) {
+            $languageResource->save();
+        }
     }
 }

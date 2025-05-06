@@ -30,8 +30,8 @@ declare(strict_types=1);
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Services_OpenTM2_Connector as Connector;
 use editor_Services_OpenTM2_Service;
+use MittagQI\Translate5\T5Memory\ReorganizeService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -93,6 +93,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         $this->assertInputValid($input);
 
         $languageResources = $this->getLanguageResourcesForReorganization($input);
+        $reorganizeService = ReorganizeService::create();
 
         foreach ($languageResources as $languageResource) {
             $this->io->text(sprintf(
@@ -102,11 +103,9 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
                 $languageResource->getLangResUuid()
             ));
 
-            $connector = $this->getConnectorForLanguageResource($languageResource);
-
             foreach ($languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
                 $tmName = $memory['filename'];
-                $this->reorganizeTm($connector, $tmName);
+                $this->reorganizeTm($reorganizeService, $languageResource, $tmName);
             }
         }
 
@@ -115,9 +114,12 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         return self::SUCCESS;
     }
 
-    private function reorganizeTm(Connector $connector, string $tmName): void
-    {
-        if ($connector->isReorganizingAtTheMoment($tmName)) {
+    private function reorganizeTm(
+        ReorganizeService $reorganizeService,
+        LanguageResource $languageResource,
+        string $tmName
+    ): void {
+        if ($reorganizeService->isReorganizingAtTheMoment($languageResource, $tmName)) {
             $this->io->warning('Memory "' . $tmName . '" is being reorganized at the moment');
 
             $helper = $this->getHelper('question');
@@ -128,25 +130,9 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
             }
         }
 
-        if ($connector->isReorganizeFailed($tmName)) {
-            $this->io->text('There was already an attempt to reorganize this memory, but it failed.');
-        }
-
         $this->io->text('Reorganizing memory "' . $tmName . '"');
 
-        $connector->reorganizeTm($tmName);
-        $result = $connector->getApi()->getResult();
-
-        if (property_exists($result, 'invalidSegmentCount')) {
-            $invalid = (int) $result->invalidSegmentCount;
-            $overall = (int) $result->reorganizedSegmentCount;
-            $msg = $invalid . ' segments of ' . $overall . ' have been invalid/lost while reorganizing';
-            if ($invalid > 0) {
-                $this->io->warning($msg);
-            } else {
-                $this->io->info($msg);
-            }
-        }
+        $reorganizeService->reorganizeTm($languageResource, $tmName);
     }
 
     /**
@@ -206,18 +192,6 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         $langResource->loadByUuid($uuid);
 
         return $langResource;
-    }
-
-    private function getConnectorForLanguageResource(LanguageResource $languageResource): Connector
-    {
-        $connector = new Connector();
-        $connector->connectTo(
-            $languageResource,
-            $languageResource->getSourceLang(),
-            $languageResource->getTargetLang()
-        );
-
-        return $connector;
     }
 
     protected function getInput(): InputInterface

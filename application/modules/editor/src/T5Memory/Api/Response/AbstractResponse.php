@@ -28,42 +28,42 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api;
+namespace MittagQI\Translate5\T5Memory\Api\Response;
 
-use MittagQI\Translate5\HTTP\ClientFactory;
-use Psr\Http\Client\ClientInterface;
+use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-/**
- * @template T
- */
-class VersionedApiFactory
+abstract class AbstractResponse implements ResponseInterface
 {
+    private readonly int $code;
+
     public function __construct(
-        private readonly ClientInterface $client,
+        public readonly array $body,
+        public readonly ?string $errorMessage,
+        public readonly int $statusCode,
     ) {
+        $this->code = (int) ($body['returnValue'] ?? 0);
     }
 
-    public static function create(): self
-    {
-        $factory = ClientFactory::create();
-        $httpClient = new RetryClient($factory->createClient([]));
+    abstract public static function fromResponse(PsrResponseInterface $response): AbstractResponse;
 
-        return new self(
-            $httpClient,
-        );
+    public function getBody(): array
+    {
+        return $this->body;
     }
 
-    /**
-     * @param class-string<T> $apiClass
-     * @return T
-     */
-    public function get(string $apiClass)
+    public function successful(): bool
     {
-        return match ($apiClass) {
-            V5\VersionedApi::class => new V5\VersionedApi($this->client),
-            V6\VersionedApi::class => new V6\VersionedApi($this->client),
+        return $this->statusCode === 200;
+    }
 
-            default => throw new \InvalidArgumentException("Unknown API class: $apiClass"),
-        };
+    public function getErrorMessage(): ?string
+    {
+        return $this->errorMessage;
+    }
+
+    public function getCode(): int
+    {
+        return $this->code;
     }
 }

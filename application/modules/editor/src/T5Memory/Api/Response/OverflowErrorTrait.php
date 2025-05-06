@@ -28,42 +28,39 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api;
+namespace MittagQI\Translate5\T5Memory\Api\Response;
 
-use MittagQI\Translate5\HTTP\ClientFactory;
-use Psr\Http\Client\ClientInterface;
-
-/**
- * @template T
- */
-class VersionedApiFactory
+trait OverflowErrorTrait
 {
-    public function __construct(
-        private readonly ClientInterface $client,
-    ) {
+    public function getErrorMessage(): ?string
+    {
+        return null;
     }
 
-    public static function create(): self
+    public function isMemoryOverflown(\Zend_Config $config): bool
     {
-        $factory = ClientFactory::create();
-        $httpClient = new RetryClient($factory->createClient([]));
+        if (null === $this->getErrorMessage()) {
+            return false;
+        }
 
-        return new self(
-            $httpClient,
+        $errorCodes = explode(
+            ',',
+            $config->runtimeOptions->LanguageResources->t5memory->memoryOverflowErrorCodes
         );
+        $errorCodes = array_map(fn ($code) => 'rc = ' . $code, $errorCodes);
+
+        return str_replace($errorCodes, '', $this->getErrorMessage()) !== $this->getErrorMessage();
     }
 
-    /**
-     * @param class-string<T> $apiClass
-     * @return T
-     */
-    public function get(string $apiClass)
+    public function isBlockOverflown(\Zend_Config $config): bool
     {
-        return match ($apiClass) {
-            V5\VersionedApi::class => new V5\VersionedApi($this->client),
-            V6\VersionedApi::class => new V6\VersionedApi($this->client),
+        if (null === $this->getErrorMessage()) {
+            return false;
+        }
 
-            default => throw new \InvalidArgumentException("Unknown API class: $apiClass"),
-        };
+        $errorCodes = ['5037'];
+        $errorCodes = array_map(fn ($code) => 'rc = ' . $code, $errorCodes);
+
+        return str_replace($errorCodes, '', $this->getErrorMessage()) !== $this->getErrorMessage();
     }
 }

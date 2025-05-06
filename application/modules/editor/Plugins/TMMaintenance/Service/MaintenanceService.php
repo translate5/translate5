@@ -38,8 +38,12 @@ use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
 use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
+use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
+use MittagQI\Translate5\T5Memory\ReorganizeService;
+use MittagQI\Translate5\T5Memory\RetryService;
 
 /**
  * This is a temporary service partially copying functionality from the OpenTM2Connector
@@ -62,6 +66,10 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     private readonly TmConversionService $tmConversionService;
 
+    private readonly ReorganizeService $reorganizeService;
+
+    private readonly RetryService $waitingService;
+
     public function __construct()
     {
         \editor_Services_Connector_Exception::addCodes([
@@ -79,6 +87,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         \ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
         $this->t5MemoryConnector = new T5MemoryConnector();
         $this->tmConversionService = TmConversionService::create();
+        $this->reorganizeService = ReorganizeService::create();
+        $this->waitingService = RetryService::create();
 
         parent::__construct();
     }
@@ -246,21 +256,23 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
             $successful = $this->api->deleteBatch($tmName, $deleteDto);
 
-            if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
-                $this->addReorganizeWarning();
-                $this->reorganizeTm($tmName);
+            $response = ApiResponse::fromContentAndStatus(
+                $this->api->getResponse()->getBody(),
+                $this->api->getResponse()->getStatus(),
+            );
+
+            if ($this->reorganizeService->needsReorganizing($response, $this->languageResource, $tmName)) {
+                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName);
 
                 $successful = $this->api->deleteBatch($tmName, $deleteDto);
             }
 
             if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
-                $retries = 0;
-                while ($retries < $this->getMaxRequestRetries() && ! $successful) {
-                    sleep($this->getRetryDelaySeconds());
-                    $retries++;
+                $deleteBatch = fn () => $this->api->deleteBatch($tmName, $deleteDto)
+                    ? [WaitCallState::Done, true]
+                    : [WaitCallState::Retry, false];
 
-                    $successful = $this->api->deleteBatch($tmName, $deleteDto);
-                }
+                $successful = (bool) $this->waitingService->callAwaiting($deleteBatch);
             }
 
             if (! $successful) {
@@ -336,12 +348,16 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $segmentIdsGenerated = $this->areSegmentIdsGenerated($tmName);
             $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
 
+            $response = ApiResponse::fromContentAndStatus(
+                $this->api->getResponse()->getBody(),
+                $this->api->getResponse()->getStatus(),
+            );
+
             if (
                 ! $segmentIdsGenerated
-                || (! $successful && $this->needsReorganizing($this->api->getError(), $tmName))
+                || $this->reorganizeService->needsReorganizing($response, $this->languageResource, $tmName)
             ) {
-                $this->addReorganizeWarning();
-                $this->reorganizeTm($tmName);
+                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName);
 
                 $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
             }
@@ -364,7 +380,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             }
 
             // In case we have at least one successful search, we reset the reorganize attempts
-            $this->resetReorganizeAttempts($this->languageResource);
+            $this->reorganizeService->resetReorganizeAttempts($this->languageResource);
 
             /** @var ?object{results: array, NewSearchPosition: string} $result */
             $result = $this->api->getResult();
@@ -535,9 +551,13 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $newName);
         }
 
-        if ($this->needsReorganizing($apiError, $memoryName)) {
-            $this->addReorganizeWarning();
-            $this->reorganizeTm($memoryName);
+        $response = ApiResponse::fromContentAndStatus(
+            $this->api->getResponse()->getBody(),
+            $this->api->getResponse()->getStatus(),
+        );
+
+        if ($this->reorganizeService->needsReorganizing($response, $this->languageResource, $memoryName)) {
+            $this->reorganizeService->reorganizeTm($this->languageResource, $memoryName);
 
             $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
         }
@@ -666,110 +686,12 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         return new \editor_Services_Connector_Exception($ecode, $data);
     }
 
-    #region Reorganize TM
     // Need to move this region to a dedicated class while refactoring connector
-    private const REORGANIZE_ATTEMPTS = 'reorganize_attempts';
-
-    private const REORGANIZE_STARTED_AT = 'reorganize_started_at';
-
-    private const MAX_REORGANIZE_TIME_MINUTES = 30;
-
-    private const REORGANIZE_WAIT_TIME_SECONDS = 60;
-
     private const VERSION_0_4 = '0.4';
 
     private const VERSION_0_5 = '0.5';
 
     private const VERSION_0_6 = '0.6';
-
-    private function needsReorganizing(\stdClass $error, string $tmName): bool
-    {
-        $errorCodes = explode(
-            ',',
-            $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
-        );
-
-        $errorSupposesReorganizing = (
-            isset($error->code)
-            && str_replace($errorCodes, '', $error->code) !== $error->code
-        )
-            || (isset($error->error) && $error->error === 500);
-
-        // Check if error codes contains any of the values
-        $needsReorganizing = $errorSupposesReorganizing && ! $this->isReorganizingAtTheMoment($tmName);
-
-        if ($needsReorganizing && $this->isMaxReorganizeAttemptsReached($this->languageResource)) {
-            $this->logger->warn(
-                'E1314',
-                'The queried TM returned error which is configured for automatic TM reorganization.' .
-                'But maximum amount of attempts to reorganize it reached.',
-                [
-                    'apiError' => $this->api->getError(),
-                ]
-            );
-            $needsReorganizing = false;
-        }
-
-        return $needsReorganizing;
-    }
-
-    public function reorganizeTm(?string $tmName = null): bool
-    {
-        if (null === $tmName) {
-            $tmName = $this->getWritableMemory();
-        }
-
-        $this->languageResource->refresh();
-        $this->increaseReorganizeAttempts($this->languageResource);
-        $this->setReorganizeStatusInProgress($this->languageResource);
-        $this->languageResource->save();
-
-        $version = $this->getT5MemoryVersion();
-
-        $reorganized = $this->api->reorganizeTm($tmName);
-
-        if ($version !== self::VERSION_0_4) {
-            $reorganized = $this->waitReorganizeFinished($tmName);
-        }
-
-        $this->languageResource->setStatus(
-            $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
-        );
-
-        $this->languageResource->save();
-
-        return $reorganized;
-    }
-
-    public function isReorganizingAtTheMoment(?string $tmName = null): bool
-    {
-        $this->resetReorganizingIfNeeded();
-
-        if ($this->getT5MemoryVersion() !== self::VERSION_0_4) {
-            $status = $this->getStatus($this->resource, tmName: $tmName);
-
-            return $status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
-        }
-
-        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
-    }
-
-    private function addReorganizeWarning(Task $task = null): void
-    {
-        $params = [
-            'apiError' => $this->api->getError(),
-        ];
-
-        if (null !== $task) {
-            $params['task'] = $task;
-        }
-
-        $this->logger->warn(
-            'E1314',
-            'The queried TM returned error which is configured for automatic TM reorganization',
-            $params
-        );
-    }
 
     private function addOverflowWarning(Task $task = null): void
     {
@@ -789,55 +711,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         );
     }
 
-    private function waitReorganizeFinished(?string $tmName = null): bool
-    {
-        $elapsedTime = 0;
-        $sleepTime = 5;
-
-        while ($elapsedTime < self::REORGANIZE_WAIT_TIME_SECONDS) {
-            if (! $this->isReorganizingAtTheMoment($tmName)) {
-                return true;
-            }
-
-            sleep($sleepTime);
-            $elapsedTime += $sleepTime;
-        }
-
-        return false;
-    }
-
-    private function isMaxReorganizeAttemptsReached(?LanguageResource $languageResource): bool
-    {
-        if (null === $languageResource) {
-            return false;
-        }
-
-        $currentAttempts = $languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0;
-        $maxAttempts = $this->config->runtimeOptions->LanguageResources->t5memory->maxReorganizeAttempts;
-
-        return $currentAttempts >= $maxAttempts;
-    }
-
-    private function increaseReorganizeAttempts(LanguageResource $languageResource): void
-    {
-        $languageResource->addSpecificData(
-            self::REORGANIZE_ATTEMPTS,
-            ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0) + 1
-        );
-    }
-
-    private function resetReorganizeAttempts(LanguageResource $languageResource): void
-    {
-        if ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) === null) {
-            return;
-        }
-
-        // In some cases language resource is detached from DB
-        $languageResource->refresh();
-        $languageResource->removeSpecificData(self::REORGANIZE_ATTEMPTS);
-        $languageResource->save();
-    }
-
     private function getT5MemoryVersion(): string
     {
         $success = $this->api->resources();
@@ -854,41 +727,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             default => self::VERSION_0_4,
         };
     }
-
-    /**
-     * Applicable only for t5memory 0.4.x
-     */
-    private function resetReorganizingIfNeeded(): void
-    {
-        $reorganizeStartedAt = $this->languageResource->getSpecificData(self::REORGANIZE_STARTED_AT);
-
-        if (null === $reorganizeStartedAt) {
-            return;
-        }
-
-        if ((new \DateTimeImmutable($reorganizeStartedAt))->modify(
-            sprintf('+%d minutes', self::MAX_REORGANIZE_TIME_MINUTES)
-        ) < new \DateTimeImmutable()
-        ) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $this->languageResource->refresh();
-            $this->languageResource->removeSpecificData(self::REORGANIZE_STARTED_AT);
-            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
-            $this->languageResource->save();
-        }
-    }
-
-    /**
-     * Applicable only for t5memory 0.4.x
-     */
-    private function setReorganizeStatusInProgress(LanguageResource $languageResource): void
-    {
-        $languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
-        $languageResource->addSpecificData(self::REORGANIZE_STARTED_AT, date(\DateTimeInterface::RFC3339));
-    }
-    #endregion Reorganize TM
 
     private function getWritableMemory(): string
     {

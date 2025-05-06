@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,42 +28,21 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api;
+namespace MittagQI\Translate5\T5Memory\Api\V6\Request;
 
-use MittagQI\Translate5\HTTP\ClientFactory;
-use Psr\Http\Client\ClientInterface;
+use GuzzleHttp\Psr7\Request;
 
-/**
- * @template T
- */
-class VersionedApiFactory
+class FlushTmRequest extends Request
 {
     public function __construct(
-        private readonly ClientInterface $client,
+        string $baseUrl,
+        string $tmName,
     ) {
-    }
+        $tmName = urlencode($tmName);
 
-    public static function create(): self
-    {
-        $factory = ClientFactory::create();
-        $httpClient = new RetryClient($factory->createClient([]));
-
-        return new self(
-            $httpClient,
+        parent::__construct(
+            'GET',
+            rtrim($baseUrl, '/') . "/$tmName/flush",
         );
-    }
-
-    /**
-     * @param class-string<T> $apiClass
-     * @return T
-     */
-    public function get(string $apiClass)
-    {
-        return match ($apiClass) {
-            V5\VersionedApi::class => new V5\VersionedApi($this->client),
-            V6\VersionedApi::class => new V6\VersionedApi($this->client),
-
-            default => throw new \InvalidArgumentException("Unknown API class: $apiClass"),
-        };
     }
 }

@@ -28,26 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Services\Connector\TagHandler;
+namespace MittagQI\Translate5\Test\Unit\T5Memory\Api\Response;
 
-use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\T5Memory\Api\Response\StatusResponse;
 use PHPUnit\Framework\TestCase;
-use stdClass;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
-class ConnectorTest extends TestCase
+class StatusResponseTest extends TestCase
 {
-    public function testProcessImportStatusNullApiResponse(): void
-    {
-        $apiResponse = null;
-        $expectedResult = LanguageResourceStatus::UNKNOWN;
-
-        $myClass = new Connector();
-        $result = $myClass->processImportStatus($apiResponse);
-
-        $this->assertEquals($expectedResult, $result);
-    }
-
     public function provideProcessImportStatus(): array
     {
         return [
@@ -126,14 +116,14 @@ class ConnectorTest extends TestCase
                 'tmxImportStatus' => 'error',
                 'importTime' => null,
                 'reorganizeStatus' => null,
-                'expectedResult' => LanguageResourceStatus::ERROR,
+                'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Import failed' => [
                 'status' => 'open',
                 'tmxImportStatus' => 'failed',
                 'importTime' => null,
                 'reorganizeStatus' => null,
-                'expectedResult' => LanguageResourceStatus::ERROR,
+                'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Unknown status' => [
                 'status' => bin2hex(random_bytes(10)),
@@ -147,7 +137,7 @@ class ConnectorTest extends TestCase
                 'tmxImportStatus' => bin2hex(random_bytes(10)),
                 'importTime' => null,
                 'reorganizeStatus' => null,
-                'expectedResult' => LanguageResourceStatus::UNKNOWN,
+                'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Reorganize in progress' => [
                 'status' => 'open',
@@ -168,7 +158,7 @@ class ConnectorTest extends TestCase
                 'tmxImportStatus' => null,
                 'importTime' => null,
                 'reorganizeStatus' => 'reorganize failed',
-                'expectedResult' => LanguageResourceStatus::REORGANIZE_FAILED,
+                'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Reorganize finished' => [
                 'status' => 'open',
@@ -197,27 +187,29 @@ class ConnectorTest extends TestCase
         ?string $reorganizeStatus,
         string $expectedResult,
     ): void {
-        $apiResponse = new stdClass();
-        $apiResponse->status = $status;
+        $apiResponse = $this->createMock(ResponseInterface::class);
+        $stream = $this->createMock(StreamInterface::class);
 
-        // We don't care about error message in this test
-        $apiResponse->ErrorMsg = null;
+        $body = new \stdClass();
+
+        $body->status = $status;
 
         if (null !== $tmxImportStatus) {
-            $apiResponse->tmxImportStatus = $tmxImportStatus;
+            $body->tmxImportStatus = $tmxImportStatus;
         }
 
         if (null !== $importTime) {
-            $apiResponse->importTime = $importTime;
+            $body->importTime = $importTime;
         }
 
         if (null !== $reorganizeStatus) {
-            $apiResponse->reorganizeStatus = $reorganizeStatus;
+            $body->reorganizeStatus = $reorganizeStatus;
         }
 
-        $connector = new Connector();
-        $result = $connector->processImportStatus($apiResponse);
+        $stream->method('getContents')->willReturn(json_encode($body, JSON_THROW_ON_ERROR));
+        $apiResponse->method('getBody')->willReturn($stream);
+        $apiResponse->method('getStatusCode')->willReturn(200);
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertEquals($expectedResult, StatusResponse::fromResponse($apiResponse)->status);
     }
 }

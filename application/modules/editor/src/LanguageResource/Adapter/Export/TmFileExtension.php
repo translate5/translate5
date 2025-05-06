@@ -2,7 +2,7 @@
 
 namespace MittagQI\Translate5\LanguageResource\Adapter\Export;
 
-enum ExportTmFileExtension: string
+enum TmFileExtension: string
 {
     case TM = 'tm';
     case TMX = 'tmx';

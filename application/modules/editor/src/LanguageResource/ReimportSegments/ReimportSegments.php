@@ -42,6 +42,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimpo
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\SegmentRepository;
+use MittagQI\Translate5\T5Memory\FlushMemoryService;
 
 class ReimportSegments
 {
@@ -54,6 +55,7 @@ class ReimportSegments
         private readonly ReimportSegmentsLoggerProvider $loggerProvider,
         private readonly SegmentRepository $segmentRepository,
         private readonly TmConversionService $tmConversionService,
+        private readonly FlushMemoryService $flushMemoryService,
     ) {
     }
 
@@ -66,6 +68,7 @@ class ReimportSegments
             new ReimportSegmentsLoggerProvider(),
             SegmentRepository::create(),
             TmConversionService::create(),
+            FlushMemoryService::create(),
         );
     }
 
@@ -187,8 +190,7 @@ class ReimportSegments
         }
 
         if (0 !== $successfulSegmentsAmount) {
-            /** @phpstan-ignore-next-line */
-            $connector->flush();
+            $this->flushMemoryService->flushCurrentWritable($languageResource);
         }
 
         return new ReimportSegmentsResult($emptySegmentsAmount, $successfulSegmentsAmount, $failedSegmentsIds);

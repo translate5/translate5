@@ -45,6 +45,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLogger
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\SegmentRepository;
+use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zend_Config;
@@ -66,6 +67,8 @@ class ReimportSegmentsTest extends TestCase
 
     private TmConversionService|MockObject $tmConversionServiceMock;
 
+    private FlushMemoryService|MockObject $flushMemoryService;
+
     protected function setUp(): void
     {
         $this->reimportSegmentRepositoryMock = $this->createMock(ReimportSegmentRepositoryInterface::class);
@@ -74,6 +77,7 @@ class ReimportSegmentsTest extends TestCase
         $this->loggerProviderMock = $this->createMock(ReimportSegmentsLoggerProvider::class);
         $this->segmentRepositoryMock = $this->createMock(SegmentRepository::class);
         $this->tmConversionServiceMock = $this->createMock(TmConversionService::class);
+        $this->flushMemoryService = $this->createMock(FlushMemoryService::class);
 
         $this->reimportSegments = new ReimportSegments(
             reimportSegmentRepository: $this->reimportSegmentRepositoryMock,
@@ -82,6 +86,7 @@ class ReimportSegmentsTest extends TestCase
             loggerProvider: $this->loggerProviderMock,
             segmentRepository: $this->segmentRepositoryMock,
             tmConversionService: $this->tmConversionServiceMock,
+            flushMemoryService: $this->flushMemoryService,
         );
     }
 

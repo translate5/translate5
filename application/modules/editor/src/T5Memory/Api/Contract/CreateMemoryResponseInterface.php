@@ -28,42 +28,13 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api;
+namespace MittagQI\Translate5\T5Memory\Api\Contract;
 
-use MittagQI\Translate5\HTTP\ClientFactory;
-use Psr\Http\Client\ClientInterface;
-
-/**
- * @template T
- */
-class VersionedApiFactory
+interface CreateMemoryResponseInterface
 {
-    public function __construct(
-        private readonly ClientInterface $client,
-    ) {
-    }
+    public function getErrorMessage(): ?string;
 
-    public static function create(): self
-    {
-        $factory = ClientFactory::create();
-        $httpClient = new RetryClient($factory->createClient([]));
+    public function getTmName(): string;
 
-        return new self(
-            $httpClient,
-        );
-    }
-
-    /**
-     * @param class-string<T> $apiClass
-     * @return T
-     */
-    public function get(string $apiClass)
-    {
-        return match ($apiClass) {
-            V5\VersionedApi::class => new V5\VersionedApi($this->client),
-            V6\VersionedApi::class => new V6\VersionedApi($this->client),
-
-            default => throw new \InvalidArgumentException("Unknown API class: $apiClass"),
-        };
-    }
+    public function successful(): bool;
 }

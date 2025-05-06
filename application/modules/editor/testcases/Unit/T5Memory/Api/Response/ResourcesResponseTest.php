@@ -30,11 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\T5Memory\Api\Response;
 
+use MittagQI\Translate5\T5Memory\Api\ConstantApi;
 use MittagQI\Translate5\T5Memory\Api\Exception\CorruptResponseBodyException;
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidJsonInResponseBodyException;
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidResponseStructureException;
 use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
-use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -66,7 +66,7 @@ class ResourcesResponseTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new VersionFetchingApi($client);
+        $api = new ConstantApi($client);
 
         self::expectException(InvalidResponseStructureException::class);
         $api->version('http://example.com', false);
@@ -83,7 +83,7 @@ class ResourcesResponseTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new VersionFetchingApi($client);
+        $api = new ConstantApi($client);
 
         self::expectException(CorruptResponseBodyException::class);
         $api->version('http://example.com', false);
@@ -100,7 +100,7 @@ class ResourcesResponseTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new VersionFetchingApi($client);
+        $api = new ConstantApi($client);
 
         self::expectException(InvalidJsonInResponseBodyException::class);
         $api->version('http://example.com', false);

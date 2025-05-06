@@ -53,19 +53,23 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Integration\Services\OpenTM2;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_LanguageResources_Languages as LanguageResourceLanguage;
 use editor_Services_OpenTM2_Connector as Connector;
-use editor_Services_OpenTM2_HttpApi;
 use editor_Services_OpenTM2_Service;
+use Http\Client\Exception\HttpException;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use PHPUnit\Framework\TestCase;
 
 class IsLanguageResourceHasEmptyMemoryTest extends TestCase
 {
-    private editor_Services_OpenTM2_HttpApi $api;
+    private CreateMemoryService $createMemoryService;
 
     private Connector $connector;
 
     private LanguageResource $languageResource;
+
+    private LanguageResourceLanguage $languageResourceLanguage;
 
     private ?string $t5memoryName = null;
 
@@ -86,17 +90,28 @@ class IsLanguageResourceHasEmptyMemoryTest extends TestCase
         $en = $languageRepository->findByRfc5646('en');
         $de = $languageRepository->findByRfc5646('de');
 
-        $this->api = new editor_Services_OpenTM2_HttpApi();
-        $this->api->setLanguageResource($this->languageResource);
+        $this->languageResourceLanguage = new LanguageResourceLanguage();
+        $this->languageResourceLanguage->setLanguageResourceId($this->languageResource->getId());
+        $this->languageResourceLanguage->setSourceLang((int) $en->getId());
+        $this->languageResourceLanguage->setSourceLangCode($en->getRfc5646());
+        $this->languageResourceLanguage->setTargetLang((int) $de->getId());
+        $this->languageResourceLanguage->setTargetLangCode($de->getRfc5646());
+        $this->languageResourceLanguage->save();
+
+        $this->createMemoryService = CreateMemoryService::create();
 
         $name = \ZfExtended_Utils::guid();
 
-        $t5memoryName = $this->api->createEmptyMemory($name, 'de');
+        try {
+            $this->t5memoryName = $this->createMemoryService->createEmptyMemory($this->languageResource, $name);
+        } catch (\Exception $e) {
+            $error = $e->getMessage();
 
-        if (! $t5memoryName) {
-            $apiError = $this->api->getError();
+            if ($e instanceof HttpException) {
+                $error = $e->getResponse()->getBody()->getContents() ?: $error;
+            }
 
-            self::fail('Could not create empty memory: ' . print_r($apiError, true));
+            self::fail('Could not create empty memory: ' . $error);
         }
 
         $this->connector = new Connector();
@@ -111,6 +126,7 @@ class IsLanguageResourceHasEmptyMemoryTest extends TestCase
             }
         }
 
+        $this->languageResource->delete();
         $this->languageResource->delete();
     }
 
