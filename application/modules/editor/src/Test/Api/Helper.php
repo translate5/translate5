@@ -775,26 +775,21 @@ final class Helper extends ZfExtended_Test_ApiHelper
         return $result;
     }
 
-    /***
-     * Get all segments from jsonFile or from remote api with the option to provide which fields should be removed from
+    /**
+     * Get all segments from remote api with the option to provide which fields should be removed from
      * the result list. By default, mid will be removed from the segments array because this field is
      * not always the same.
      *
-     * @param string|null $jsonFileName
-     * @param int $limit
-     * @param int $start
-     * @param int $page
-     * @param array $fieldsToExclude
-     * @return array
+     * @param string|null $jsonFileNameToCapture target file to capture data into if capturing is enabled
      */
     public function getSegments(
-        string $jsonFileName = null,
+        string $jsonFileNameToCapture = null,
         int $limit = 200,
         int $start = 0,
         int $page = 1,
         array $fieldsToExclude = ['mid'],
     ): array {
-        $segments = $this->getSegmentsRequest($jsonFileName, $limit, $start, $page);
+        $segments = $this->getSegmentsRequest($jsonFileNameToCapture, $limit, $start, $page);
 
         foreach ($segments as $segment) {
             foreach ($fieldsToExclude as $field) {

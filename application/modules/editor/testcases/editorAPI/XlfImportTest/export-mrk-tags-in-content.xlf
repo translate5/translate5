@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="Test1" datatype="x-testdata" xml:space="preserve" source-language="de" target-language="zen">
+    <body>
+        <trans-unit id="1745066349296">
+        <source xml:lang="de">Testof x-generic<mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic"></mrk></source>
+            <seg-source><mrk mid="1728494718313-N10004" mtype="seg">Test</mrk><mrk mid="1728494718313-N1000A" mtype="seg">of x-generic</mrk><mrk mid="1728494718313-N1001B" mtype="seg"><mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic"></mrk></mrk></seg-source>
+            <target xml:lang="en"><mrk mtype="seg" mid="1728494718313-N10004">Test - edited 155</mrk><mrk mtype="seg" mid="1728494718313-N1000A">of x-generic - edited 156</mrk><mrk mtype="seg" mid="1728494718313-N1001B"><mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic"></mrk></mrk></target>
+        </trans-unit>
+        <trans-unit id="1745066349297">
+        <source xml:lang="de">Testof x-generic<mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic"></mrk>beside text</source>
+            <seg-source><mrk mid="1728494718313-N10004" mtype="seg">Test</mrk><mrk mid="1728494718313-N1000A" mtype="seg">of x-generic</mrk><mrk mid="1728494718313-N1001B" mtype="seg"><mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic"></mrk>beside text</mrk></seg-source>
+            <target xml:lang="en"><mrk mtype="seg" mid="1728494718313-N10004">Test - edited 157</mrk><mrk mtype="seg" mid="1728494718313-N1000A">of x-generic - edited 158</mrk><mrk mtype="seg" mid="1728494718313-N1001B"><mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic"></mrk>beside text - edited 159</mrk></target>
+        </trans-unit>
+        <trans-unit id="1745066349298">
+        <source xml:lang="de">Testof x-generic<mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic">with content</mrk>beside text</source>
+        <seg-source><mrk mid="1728494718313-N10004" mtype="seg">Test</mrk><mrk mid="1728494718313-N1000A" mtype="seg">of x-generic</mrk><mrk mid="1728494718313-N1001B" mtype="seg"><mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic">with content</mrk>beside text</mrk></seg-source>
+        <target xml:lang="en"><mrk mtype="seg" mid="1728494718313-N10004">Test - edited 160</mrk><mrk mtype="seg" mid="1728494718313-N1000A">of x-generic - edited 161</mrk><mrk mtype="seg" mid="1728494718313-N1001B"><mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic">with content</mrk>beside text - edited 162</mrk></target>
+        </trans-unit>
+        <trans-unit id="1745066349299">
+        <source xml:lang="de"><mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic">with text only in generic</mrk></source>
+        <seg-source><mrk mid="1728494718313-N10004" mtype="seg"><mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic">with text only in generic</mrk></mrk></seg-source>
+        <target xml:lang="en"><mrk mtype="seg" mid="1728494718313-N10004"><mrk mid="1728494718372-1728494718313-N1001B.SMCRefControl" mtype="x-generic">with text only in generic</mrk></mrk></target>
+        </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -127,6 +127,10 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
                 return;
             }
+            if ($this->xmlparser->getAttribute($attributes, 'mtype') === 'x-generic') {
+                // considered and handled as tag
+                return;
+            }
 
             //test transunits with mrk tags are disabledd in the test xlf!
             //The trans-unit content contains MRK tags other than type=seg, which are currently not supported! Stop Import.
@@ -150,7 +154,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         //since phs may contain only <sub> elements we have to handle text only inside a ph
         // that implies that the handling of <sub> elements is done in the main Xlf Parser and in the ph we get just a placeholder
         // see class description of parent Xlf Parser
-        $this->xmlparser->registerElement('ph,it,bpt,ept', function ($tag, $attributes) {
+        $this->xmlparser->registerElement('ph,it,bpt,ept,mrk[mtype=x-generic]', function ($tag, $attributes) {
             $this->innerTag = [];
             $this->xmlparser->registerOther([$this, 'handleContentTagText']);
         }, function ($tag, $key, $opener) {
@@ -203,8 +207,18 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             return null;
         }
 
+        //specific MRK tags defined:
+        if ($tag === 'mrk' && $openerMeta['attributes']['mtype'] === 'x-generic') {
+            $tag = 'mrk-x-generic';
+        }
+
         switch ($tag) {
-            // ID mandatory, no content, SINGLE TAG
+            //specific mrk tags
+            case 'mrk-x-generic':
+                $tag = 'mrk';
+
+                // ID mandatory, no content, SINGLE TAG
+                // no break
             case 'x':
                 // ID mandatory, content, SINGLE TAG
             case 'ph':
