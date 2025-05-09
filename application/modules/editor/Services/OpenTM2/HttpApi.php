@@ -633,7 +633,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
     private function getSearchData(SearchDTO $searchDTO, ?string $searchPosition = null, ?int $numResults = null): array
     {
-        $searchOptions = ', CASEINSENSETIVE';
+        // Please note that "SENSETIVE" here is a typo in the t5memory API, so please do not change it to "SENSITIVE"
+        $caseSensitive = $searchDTO->caseSensitive ? 'CASESENSETIVE' : 'CASEINSENSETIVE';
+        $searchOptions = ', ' . $caseSensitive;
 
         return [
             'source' => $searchDTO->source,

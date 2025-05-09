@@ -56,7 +56,8 @@
     "deleteAllTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht",
     "deleteAllDisabledTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht. <br> Diese Funktion ist erst ab 20 Treffern verfügbar, da \"Alle löschen\" eine Re-Organistion des TMs nach sich zieht, <br> die einige Zeit in Anspruch nehmen kann, während der das TM nicht verfügbar ist.",
     "sourceLanguage": "Quellsprache",
-    "targetLanguage": "Zielsprache"
+    "targetLanguage": "Zielsprache",
+    "caseSensitive": "Groß- und Kleinschreibung beachten"
   },
   "createForm": {
     "title": "Neues erstellen",

@@ -56,7 +56,8 @@
     "deleteAllTooltip": "All segments that match the current search settings are deleted",
     "deleteAllDisabledTooltip": "All segments that match the current search settings are deleted. <br> This function is only available from 20 hits, as \"Delete all\" results in a reorganisation of the TM, <br> which can take some time during which the TM is not available.",
     "sourceLanguage": "Source language",
-    "targetLanguage": "Target language"
+    "targetLanguage": "Target language",
+    "caseSensitive": "Case-sensitive"
   },
   "createForm": {
     "title": "Create new",
