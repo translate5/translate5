@@ -376,6 +376,11 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 continue;
             }
 
+            if (in_array(0, array_column($result->results, 'segmentId'), true)) {
+                $this->addReorganizeWarning();
+                $this->reorganizeTm($tmName);
+            }
+
             $data = array_map(
                 static function ($item) use ($id) {
                     $item->internalKey = $id . ':' . $item->internalKey;
@@ -448,13 +453,14 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 }
             }
 
-            if (! $successful) {
+            $result = $this->api->getResult();
+
+            if (empty($result->NumOfFoundSegments)) {
                 $this->logger->exception($this->getBadGatewayException($tmName));
 
                 continue;
             }
 
-            $result = $this->api->getResult();
             $amount += $result->NumOfFoundSegments;
         }
 
