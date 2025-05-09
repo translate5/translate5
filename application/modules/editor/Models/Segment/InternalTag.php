@@ -192,6 +192,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             'close' => 0,
             'single' => 0,
             'whitespace' => 0,
+            'number' => 0,
             'tag' => 0,
             'all' => 0,
         ];
@@ -200,9 +201,12 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         if (! $result['all']) {
             return $result;
         }
-        //count whitespace and "normal" tags
+        //count whitespace, number and "normal" tags
         $result['whitespace'] = count(array_filter($matches[3], function ($id) {
             return in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS);
+        }));
+        $result['number'] = count(array_filter($matches[3], function ($id) {
+            return $id === 'number';
         }));
         $result['tag'] = $result['all'] - $result['whitespace'];
 
