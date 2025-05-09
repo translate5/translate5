@@ -234,8 +234,10 @@ Ext.define('Editor.controller.Editor', {
             'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'F3':             [Ext.EventObjectImpl.F3,{ctrl: false, alt: false}, me.handleF3KeyPress, true],
             'alt-F3':         [Ext.EventObjectImpl.F3,{ctrl: false, alt: true}, me.handleAltF3KeyPress, true],
-            'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copyReferenceToTarget],
-            'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copyReferenceToTarget], //Mac Alternative key code,
+            'ctrl-insert':       [Ext.EventObjectImpl.INSERT, {ctrl: true, shift: false, alt: false}, me.copySourceToTarget],
+            'ctrl-dot':          [190, {ctrl: true, shift: false, alt: false}, me.copySourceToTarget], //Mac Alternative key code,
+            'ctrl-shift-insert': [Ext.EventObjectImpl.INSERT, {ctrl: true, shift: true, alt: false}, me.copyReferenceToTarget],
+            'ctrl-shift-dot':    [190, {ctrl: true, shift: true, alt: false}, me.copyReferenceToTarget], //Mac Alternative key code,
             // DEC_DIGITS:
             // (If you change the setting for a defaultEventAction for DEC_DIGITS,
             // please check if eventIsTranslate5() still works as expected 
@@ -1720,17 +1722,30 @@ Ext.define('Editor.controller.Editor', {
     },
 
     copyReferenceToTarget: function() {
-        var plug = this.getEditPlugin();
+        const plug = this.getEditPlugin();
+
         //do only something when editing targets:
         if(!this.isEditing || !/^target/.test(plug.editor.columnToEdit)){
             return;
         }
+
         const referenceField = plug.editor.mainEditor.getReferenceField(
             plug.context.record.get('target'),
             plug.context.record.get('pretrans'),
             plug.context.record.get('matchRateType'),
         );
         plug.editor.mainEditor.insertMarkup(plug.context.record.get(referenceField));
+    },
+
+    copySourceToTarget: function() {
+        const plug = this.getEditPlugin();
+
+        //do only something when editing targets:
+        if(!this.isEditing || !/^target/.test(plug.editor.columnToEdit)){
+            return;
+        }
+
+        plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
     },
     insertWhitespaceNbsp: function(key,e) {
         this.insertWhitespace(key,e,'nbsp');
