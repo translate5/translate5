@@ -56,6 +56,9 @@ use const NOW_ISO;
  */
 class ArchiveWorker extends ZfExtended_Worker_Abstract
 {
+    // Most file systems have filename length restriction ~255 chars; when exceeded, an attempt to create a file fails
+    private const MAX_FILENAME_LENGTH = 200;
+
     private editor_Models_Task $task;
 
     /**
@@ -84,7 +87,7 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
 
         //move to destination (flexible)!
         try {
-            $filename = $this->replaceTargetPathVariables($parameters['options']->targetPath, $taskJson);
+            $filename = self::replaceTargetPathVariables($parameters['options']->targetPath, $taskJson, self::MAX_FILENAME_LENGTH);
             $targetFile = $this->backupZip($zipfile, $filename, $parameters['options']);
 
             //we have to set the taskGuid to null here,
@@ -121,11 +124,11 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
     /**
      * replaces the {NAME} placeholders in the configured target name with the same NAMEd values from task meta JSON
      */
-    protected function replaceTargetPathVariables(string $targetPath, object $taskJson): string
+    private static function replaceTargetPathVariables(string $targetPath, object $taskJson, int $maxLength = 0): string
     {
         $charsToProtect = str_split('#%&{}\\<>*?/$!\'":@+`|=()[] ');
 
-        return preg_replace(
+        $path = preg_replace(
             '/-+/',
             '-',
             preg_replace_callback('#{([a-zA-Z0-9_-]+)}#', function ($matches) use ($taskJson, $charsToProtect) {
@@ -134,9 +137,16 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
                     return NOW_ISO;
                 }
 
-                return str_replace($charsToProtect, '-', $taskJson->$var ?? $var);
+                return str_replace($charsToProtect, '-', isset($taskJson->$var) ? trim($taskJson->$var) : $var);
             }, $targetPath)
         );
+
+        if ($maxLength > 0 && strlen($path) > $maxLength) {
+            $meta = pathinfo($path);
+            $path = substr($meta['filename'], 0, $maxLength - strlen($meta['extension']) - 1) . '.' . $meta['extension'];
+        }
+
+        return $path;
     }
 
     /**

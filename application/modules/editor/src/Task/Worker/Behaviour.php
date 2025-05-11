@@ -109,11 +109,32 @@ class Behaviour extends ZfExtended_Worker_Behaviour_Default
                 if ($task->isImporting()) {
                     $task->setErroneous();
                 }
+
+                $memoryLimit = ! empty($error['message'])
+                    && (str_contains($error['message'], 'Allowed memory size of')
+                        || str_contains($error['message'], 'Out of memory'));
+
+                $executionTime = ! empty($error['message'])
+                    && str_contains($error['message'], 'Maximum execution time of');
+
                 if (Zend_Registry::isRegistered('logger')) {
                     try {
                         $logger = Zend_Registry::get('logger');
                         /* @var ZfExtended_Logger $logger */
-                        $logger->error('E1027', 'Fatal system error on task usage - check system log!', [
+                        if ($memoryLimit) {
+                            $ecode = 'E1715';
+                            $msg = 'The memory limit of the system was reached. '
+                                . 'Did you try to import a huge task? Please try to reduce task size if possible.';
+                        } elseif ($executionTime) {
+                            $ecode = 'E1716';
+                            $msg = 'The maximum execution time of the system was reached. '
+                                . 'Did you try to import a huge task? Please try to reduce task size if possible.';
+                        } else {
+                            $ecode = 'E1027';
+                            $msg = 'Fatal system error on task usage - check system log!';
+                        }
+                        $logger->error($ecode, $msg, [
+                            'worker' => $worker?->getWorker() ?? 'none',
                             'task' => $task,
                         ]);
                     } catch (Zend_Exception $e) {

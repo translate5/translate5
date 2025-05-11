@@ -129,13 +129,33 @@ class XlfImportTest extends JsonTestAbstract
     public function testHtmlEntities()
     {
         $jsonFileName = 'expectedSegmentsHtmlEntities.json';
-        $segments = static::api()->getSegments($jsonFileName, 8, 147);
+        $segments = static::api()->getSegments($jsonFileName, 7, 147);
         $this->assertSegmentsEqualsJsonFile(
-            'expectedSegmentsHtmlEntities.json',
+            $jsonFileName,
             $segments,
             'Imported segments are not as expected!'
         );
     }
+
+    /**
+     * @throws Zend_Http_Client_Exception
+     */
+    public function testMrkInContent()
+    {
+        $jsonFileName = 'expectedSegmentsMrkInContent.json';
+        $segments = static::api()->getSegments($jsonFileName, 8, 154);
+        foreach ($segments as $segToEdit) {
+            $editedData = $segToEdit->source . ' - edited ' . $segToEdit->segmentNrInTask;
+            static::api()->saveSegment($segToEdit->id, $editedData);
+        }
+        $this->assertSegmentsEqualsJsonFile(
+            $jsonFileName,
+            $segments,
+            'Imported segments are not as expected!'
+        );
+    }
+
+    //FIXME Test fertig stellen, Segment editieren und Export tessten ob dann der x-generic wieder drin ist
 
     /**
      * @depends testSegmentValuesAfterImport
@@ -347,6 +367,17 @@ class XlfImportTest extends JsonTestAbstract
             'editor/task/export/id/' . $task->id,
             '12-html-entities.xlf',
             'export-html-entities.xlf'
+        );
+    }
+
+    public function testMrkInContentExport()
+    {
+        $task = static::api()->getTask();
+        $this->checkExport(
+            $task,
+            'editor/task/export/id/' . $task->id,
+            '13-mrk-tags-in-content.xlf',
+            'export-mrk-tags-in-content.xlf'
         );
     }
 

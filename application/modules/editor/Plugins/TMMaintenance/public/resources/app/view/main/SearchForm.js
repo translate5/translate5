@@ -135,6 +135,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                             valueField: 'rfc5646',
                             queryMode: 'local',
                             primaryFilter: 'filterTargetLanguage',
+                            margin: '0 15 0 0',
                             store: [],
                             flex: 1,
                             disabled: '{!selectedTm}',
@@ -145,6 +146,17 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                                 label: '{l10n.searchForm.targetLanguage}'
                             },
                         },
+                        {
+                            xtype: 'checkboxfield',
+                            name: 'caseSensitive',
+                            label: 'Case-sensitive',
+                            bind: {
+                                label: '{l10n.searchForm.caseSensitive}',
+                                hidden: '{!l10n.searchForm.caseSensitive}',
+                            },
+                            required: false,
+                            flex: 1,
+                        }
                     ]
                 },
                 {

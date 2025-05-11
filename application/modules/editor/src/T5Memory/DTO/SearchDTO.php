@@ -48,6 +48,7 @@ class SearchDTO
         public readonly string $context,
         public readonly string $contextMode,
         public readonly bool $onlyCount,
+        public readonly bool $caseSensitive,
     ) {
     }
 
@@ -71,6 +72,7 @@ class SearchDTO
             $data['context'],
             $data['contextMode'],
             $data['onlyCount'],
+            $data['caseSensitive'],
         );
     }
 }

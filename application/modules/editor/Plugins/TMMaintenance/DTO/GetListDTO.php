@@ -55,6 +55,7 @@ class GetListDTO
         public readonly string $context,
         public readonly string $contextMode,
         public readonly bool $onlyCount,
+        public readonly bool $caseSensitive,
     ) {
     }
 
@@ -83,6 +84,7 @@ class GetListDTO
             isset($data['context']) ? (string) $data['context'] : '',
             isset($data['contextMode']) ? (string) $data['contextMode'] : '',
             (bool) ($data['onlyCount'] ?? false),
+            (bool) ($data['caseSensitive'] ?? false),
         );
     }
 
@@ -109,6 +111,7 @@ class GetListDTO
             'context' => $this->context,
             'contextMode' => $this->contextMode,
             'onlyCount' => $this->onlyCount,
+            'caseSensitive' => $this->caseSensitive,
         ];
     }
 }
