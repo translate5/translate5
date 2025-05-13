@@ -564,6 +564,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                     $this->parseSegment($target, false)
                 );
 
+                $this->tagIdShortTagIdentMap = [];
+
                 $this->segmentData[$sourceName] = [
                     'original' => $parsedSource,
                 ];
