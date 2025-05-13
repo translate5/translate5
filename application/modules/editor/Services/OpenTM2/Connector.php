@@ -890,7 +890,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         // TODO remove after fully migrated to t5memory v0.5.x
 
-        $status = $this->constantApi->getStatus($this->languageResource->getResource()->getUrl(), $tmName);
+        $status = $this->constantApi->getStatus(
+            $this->languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($tmName)
+        );
 
         if ($status->successful()) {
             return $status->status;
@@ -918,7 +921,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $name = $memories[0]['filename'];
 
-        $status = $this->constantApi->getStatus($this->languageResource->getResource()->getUrl(), $name);
+        $status = $this->constantApi->getStatus(
+            $this->languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($name)
+        );
 
         if (LanguageResourceStatus::ERROR === $status->status) {
             return false;

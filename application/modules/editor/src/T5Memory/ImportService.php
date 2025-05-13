@@ -167,7 +167,10 @@ class ImportService
         }
 
         $waitNonImportStatus = function () use ($languageResource, $tmName) {
-            $status = $this->constantApi->getImportStatus($languageResource->getResource()->getUrl(), $tmName);
+            $status = $this->constantApi->getImportStatus(
+                $languageResource->getResource()->getUrl(),
+                $this->persistenceService->addTmPrefix($tmName)
+            );
 
             return $status->status === ImportStatusEnum::Importing
                 ? [WaitCallState::Retry, $status]

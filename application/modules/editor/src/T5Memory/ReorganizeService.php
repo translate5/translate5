@@ -162,7 +162,10 @@ class ReorganizeService
         }
 
         if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $languageResource)) {
-            $status = $this->constantApi->getStatus($languageResource->getResource()->getUrl(), $tmName);
+            $status = $this->constantApi->getStatus(
+                $languageResource->getResource()->getUrl(),
+                $this->persistenceService->addTmPrefix($tmName)
+            );
 
             return $status->status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
         }
