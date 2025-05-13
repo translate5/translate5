@@ -65,6 +65,10 @@ class StatusResponse extends AbstractResponse implements OverflowErrorInterface
 
         $errorStatusMessage = null;
 
+        if (($body['status'] ?? '') === 'not found') {
+            $errorStatusMessage = 'TM not found';
+        }
+
         if (500 === $response->getStatusCode()) {
             $errorStatusMessage = $body['ErrorMsg']
                 ?? $body['importErrorMsg']

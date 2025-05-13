@@ -32,10 +32,7 @@ namespace MittagQI\Translate5\T5Memory\Api\Response;
 
 trait OverflowErrorTrait
 {
-    public function getErrorMessage(): ?string
-    {
-        return null;
-    }
+    abstract public function getErrorMessage(): ?string;
 
     public function isMemoryOverflown(\Zend_Config $config): bool
     {
