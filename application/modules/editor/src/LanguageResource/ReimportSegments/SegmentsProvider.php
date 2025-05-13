@@ -36,7 +36,7 @@ use editor_Models_Segment_Iterator;
 use MittagQI\Translate5\Segment\FilteredIterator;
 use ZfExtended_Models_Filter_ExtJs6;
 
-class ReimportSegmentsProvider
+class SegmentsProvider
 {
     public function __construct(
         private readonly Segment $segment

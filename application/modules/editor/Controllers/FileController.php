@@ -206,7 +206,7 @@ class editor_FileController extends ZfExtended_RestController
 
         foreach ($resources as $resource) {
             try {
-                (new ReimportSegmentsQueue())->queueReimport(
+                (new ReimportSegmentsQueue())->queueSnapshot(
                     $this->getCurrentTask()->getTaskGuid(),
                     $resource['languageResourceId'],
                     [

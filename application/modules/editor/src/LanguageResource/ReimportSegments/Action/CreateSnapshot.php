@@ -28,25 +28,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
+namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Action;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as Segment;
 use editor_Models_Task as Task;
 use editor_Services_Manager;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimportSegmentsRepository;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\SegmentsProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Segment\FilteredIterator;
 
-class ReimportSegmentsSnapshot
+class CreateSnapshot
 {
     public function __construct(
         private readonly editor_Services_Manager $serviceManager,
         private readonly ReimportSegmentRepositoryInterface $segmentsRepository,
         private readonly LanguageResourceRepository $languageResourceRepository,
-        private readonly ReimportSegmentsProvider $reimportSegmentsProvider,
+        private readonly SegmentsProvider $reimportSegmentsProvider,
     ) {
     }
 
@@ -56,7 +58,7 @@ class ReimportSegmentsSnapshot
             new editor_Services_Manager(),
             new JsonlReimportSegmentsRepository(),
             new LanguageResourceRepository(),
-            new ReimportSegmentsProvider(new Segment()),
+            new SegmentsProvider(new Segment()),
         );
     }
 

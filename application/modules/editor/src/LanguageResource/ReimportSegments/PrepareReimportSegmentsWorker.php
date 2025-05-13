@@ -31,6 +31,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
 use editor_Models_Task_AbstractWorker;
+use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\CreateSnapshot;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use Throwable;
@@ -44,12 +46,18 @@ class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
 
     private ReimportSegmentsLoggerProvider $loggerProvider;
 
+    private CreateSnapshot $snapshot;
+
+    private ReimportSegmentsQueue $reimportSegmentsQueue;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->languageResourceRepository = new LanguageResourceRepository();
         $this->loggerProvider = new ReimportSegmentsLoggerProvider();
+        $this->snapshot = CreateSnapshot::create();
+        $this->reimportSegmentsQueue = new ReimportSegmentsQueue();
     }
 
     protected function validateParameters(array $parameters): bool
@@ -68,7 +76,7 @@ class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
 
         $runId = bin2hex(random_bytes(16));
 
-        ReimportSegmentsSnapshot::create()->createSnapshot(
+        $this->snapshot->createSnapshot(
             $this->task,
             $runId,
             $languageResourceId,
@@ -78,20 +86,15 @@ class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
             $params[ReimportSegmentsOptions::FILTER_ONLY_IDS] ?? [],
         );
 
-        $reimportWorker = new ReimportSegmentsWorker();
-
-        $options = [
-            'languageResourceId' => $languageResourceId,
-            'runId' => $runId,
-        ];
-
-        $success = $reimportWorker->init($this->task->getTaskGuid(), $options);
-
-        if (! $success) {
+        try {
+            $this->reimportSegmentsQueue->queueReimport(
+                $this->task->getTaskGuid(),
+                $languageResourceId,
+                $runId,
+            );
+        } catch (ReimportQueueException) {
             throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
         }
-
-        $reimportWorker->queue();
 
         return true;
     }

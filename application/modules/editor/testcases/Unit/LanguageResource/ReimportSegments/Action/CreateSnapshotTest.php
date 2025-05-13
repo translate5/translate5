@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\LanguageResource\ReimportSegments;
+namespace LanguageResource\ReimportSegments\Action;
 
 use DateTimeImmutable;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
@@ -37,16 +37,16 @@ use editor_Models_Task as Task;
 use editor_Services_Manager;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\CreateSnapshot;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsProvider;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsSnapshot;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\SegmentsProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zend_Config;
 
-class ReimportSegmentsSnapshotTest extends TestCase
+class CreateSnapshotTest extends TestCase
 {
     private editor_Services_Manager|MockObject $serviceManagerMock;
 
@@ -54,18 +54,18 @@ class ReimportSegmentsSnapshotTest extends TestCase
 
     private LanguageResourceRepository|MockObject $languageResourceRepositoryMock;
 
-    private ReimportSegmentsProvider|MockObject $reimportSegmentsProviderMock;
+    private SegmentsProvider|MockObject $reimportSegmentsProviderMock;
 
-    private ReimportSegmentsSnapshot $snapshot;
+    private CreateSnapshot $snapshot;
 
     protected function setUp(): void
     {
         $this->serviceManagerMock = $this->createMock(editor_Services_Manager::class);
         $this->segmentsRepositoryMock = $this->createMock(ReimportSegmentRepositoryInterface::class);
         $this->languageResourceRepositoryMock = $this->createMock(LanguageResourceRepository::class);
-        $this->reimportSegmentsProviderMock = $this->createMock(ReimportSegmentsProvider::class);
+        $this->reimportSegmentsProviderMock = $this->createMock(SegmentsProvider::class);
 
-        $this->snapshot = new ReimportSegmentsSnapshot(
+        $this->snapshot = new CreateSnapshot(
             $this->serviceManagerMock,
             $this->segmentsRepositoryMock,
             $this->languageResourceRepositoryMock,

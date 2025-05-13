@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace LanguageResource\ReimportSegments;
+namespace LanguageResource\ReimportSegments\Action;
 
 use DateTimeImmutable;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
@@ -40,7 +40,7 @@ use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegments;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\ReimportSnapshot;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLoggerProvider;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
@@ -51,7 +51,7 @@ use PHPUnit\Framework\TestCase;
 use Zend_Config;
 use ZfExtended_Logger;
 
-class ReimportSegmentsTest extends TestCase
+class ReimportSnapshotTest extends TestCase
 {
     private ReimportSegmentRepositoryInterface&MockObject $reimportSegmentRepositoryMock;
 
@@ -61,7 +61,7 @@ class ReimportSegmentsTest extends TestCase
 
     private ReimportSegmentsLoggerProvider&MockObject $loggerProviderMock;
 
-    private ReimportSegments $reimportSegments;
+    private ReimportSnapshot $reimportSegments;
 
     private SegmentRepository|MockObject $segmentRepositoryMock;
 
@@ -79,7 +79,7 @@ class ReimportSegmentsTest extends TestCase
         $this->tmConversionServiceMock = $this->createMock(TmConversionService::class);
         $this->flushMemoryService = $this->createMock(FlushMemoryService::class);
 
-        $this->reimportSegments = new ReimportSegments(
+        $this->reimportSegments = new ReimportSnapshot(
             reimportSegmentRepository: $this->reimportSegmentRepositoryMock,
             languageResourceRepository: $this->languageResourceRepositoryMock,
             serviceManager: $this->serviceManagerMock,
@@ -295,9 +295,7 @@ class ReimportSegmentsTest extends TestCase
             ->with($runId, $taskGuid)
             ->willReturn([$updateDTOMock1, $updateDTOMock2]);
 
-        $this->reimportSegmentRepositoryMock->expects(self::once())
-            ->method('cleanByTask')
-            ->with($runId, $taskGuid);
+        $this->reimportSegmentRepositoryMock->expects(self::never())->method('cleanByTask');
 
         $connectorMock = $this->createMock(Connector::class);
         $connectorMock->expects(self::never())->method('checkUpdatedSegment');
@@ -316,12 +314,24 @@ class ReimportSegmentsTest extends TestCase
         $call = 0;
         $loggerMock->method('__call')
             ->with(
-                'info',
-                self::callback(function (array $params) use (&$call) {
+                self::callback(static function ($method) use (&$call) {
+                    /** @phpstan-ignore-next-line */
+                    if ($call < 10) {
+                        self::assertEquals('warn', $method);
+
+                        return true;
+                    }
+
+                    /** @phpstan-ignore-next-line */
+                    self::assertEquals('error', $method);
+
+                    return true;
+                }),
+                self::callback(static function (array $params) use (&$call) {
                     $call++;
 
                     // 10 here is an amount of retries during reimport having failed segments
-                    /** @see ReimportSegments::MAX_TRIES */
+                    /** @see ReimportSnapshot::MAX_TRIES */
                     if ($call <= 10) {
                         self::assertEquals('E1714', $params[0]);
                         self::assertEquals('Task reimport finished with failed segments, trying to reimport them', $params[1]);
@@ -332,7 +342,13 @@ class ReimportSegmentsTest extends TestCase
 
                     // After we reached the max tries we should log the final result having a list of failed segments
                     self::assertEquals('E1713', $params[0]);
-                    self::assertEquals('Task {taskId} re-imported into the desired TM {tmId}', $params[1]);
+                    self::assertEquals(
+                        'Task {taskId} re-imported into the desired TM {tmId}. '
+                                . 'Please note there are {failedSegmentsAmount} segments that failed to be reimported. <br/>'
+                                . 'This operation is retried in the background. '
+                                . 'If error stays, please check the log for details.',
+                        $params[1]
+                    );
                     self::assertEquals(0, $params[2]['emptySegments']);
                     self::assertEquals(0, $params[2]['successfulSegments']);
                     self::assertEquals([1, 2], $params[2]['failedSegments']);

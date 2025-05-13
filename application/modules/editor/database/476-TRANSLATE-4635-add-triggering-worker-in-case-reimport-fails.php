@@ -36,7 +36,7 @@ use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 
 ini_set('max_execution_time', 0);
 
-$SCRIPT_IDENTIFIER = '475-TRANSLATE-4591-some-segments-are-fail-to-reimport.php';
+$SCRIPT_IDENTIFIER = '476-TRANSLATE-4635-add-triggering-worker-in-case-reimport-fails.php';
 
 $logger = Zend_Registry::get('logger');
 $db = Zend_Db_Table::getDefaultAdapter();
@@ -46,7 +46,7 @@ $queue = new ReimportSegmentsQueue();
 
 $select = $db->select()
     ->from('Zf_errorlog', ['id', 'extra'])
-    ->where('eventCode = ?', 'E0000')
+    ->where('eventCode = ?', 'E1713')
     ->where("JSON_UNQUOTE(JSON_EXTRACT(extra, '$.failedSegments')) != '[]'")
     ->order('id ASC');
 
@@ -54,7 +54,7 @@ $result = $db->fetchAll($select);
 
 foreach ($result as $row) {
     if (! isset($row['extra'])) {
-        $logger->info('E0000', 'Migration 475-TRANSLATE-4591: Extra is not set', [
+        $logger->info('E0000', 'Migration 476-TRANSLATE-4635: Extra is not set', [
             'row' => $row,
         ]);
 
@@ -64,7 +64,7 @@ foreach ($result as $row) {
     try {
         $extra = json_decode($row['extra'], true, 512, JSON_THROW_ON_ERROR);
     } catch (JsonException) {
-        $logger->info('E0000', 'Migration 475-TRANSLATE-4591: Could not decode JSON extra: ', [
+        $logger->info('E0000', 'Migration 476-TRANSLATE-4635: Could not decode JSON extra: ', [
             'row' => $row,
         ]);
 
@@ -76,7 +76,7 @@ foreach ($result as $row) {
     $failedSegmentsIds = $extra['failedSegments'] ?? null;
 
     if (! $taskId || ! $languageResourceId || empty($failedSegmentsIds)) {
-        $logger->info('E0000', 'Migration 475-TRANSLATE-4591: Extra doesn\'t contain all necessary data for reimport', [
+        $logger->info('E0000', 'Migration 476-TRANSLATE-4635: Extra doesn\'t contain all necessary data for reimport', [
             'row' => $row,
         ]);
 
@@ -86,7 +86,7 @@ foreach ($result as $row) {
     try {
         $task = $taskRepository->get($taskId);
     } catch (InexistentTaskException) {
-        $logger->info('E0000', 'Migration 475-TRANSLATE-4591: Task not found', [
+        $logger->info('E0000', 'Migration 476-TRANSLATE-4635: Task not found', [
             'row' => $row,
         ]);
 
@@ -106,7 +106,7 @@ foreach ($result as $row) {
     } catch (ReimportQueueException) {
         $logger->error(
             'E0000',
-            'Migration 475-TRANSLATE-4591: Could not init worker for reimporting segments',
+            'Migration 476-TRANSLATE-4635: Could not init worker for reimporting segments',
             [
                 'task' => $taskId,
                 'languageResource' => $languageResourceId,

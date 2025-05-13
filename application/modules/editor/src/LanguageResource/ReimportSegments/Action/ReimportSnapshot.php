@@ -28,23 +28,25 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
+namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Action;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use editor_Services_Connector;
 use editor_Services_Manager;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLoggerProvider;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsResult;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimportSegmentsRepository;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\SegmentRepository;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
+use Throwable;
 
-class ReimportSegments
+class ReimportSnapshot
 {
     private const MAX_TRIES = 10;
 
@@ -72,22 +74,32 @@ class ReimportSegments
         );
     }
 
-    public function reimport(Task $task, string $runId, int $languageResourceId): void
-    {
+    public function reimport(
+        Task $task,
+        string $runId,
+        int $languageResourceId,
+        array $failedSegmentsIds = []
+    ): ReimportSegmentsResult {
         $languageResource = $this->languageResourceRepository->get($languageResourceId);
-        $result = $this->reimportWithRetry($task, $languageResource, $runId);
-        $this->processResponse($result, $task, $languageResource);
-        $this->reimportSegmentRepository->cleanByTask($runId, $task->getTaskGuid());
+        $result = $this->reimportWithRetry($task, $languageResource, $runId, $failedSegmentsIds);
+        $this->addFinalizationLog($result, $task, $languageResource);
+
+        if (empty($result->failedSegmentIds)) {
+            // Keep the segments in the repository for the next run and debug
+            $this->reimportSegmentRepository->cleanByTask($runId, $task->getTaskGuid());
+        }
+
+        return $result;
     }
 
     private function reimportWithRetry(
         Task $task,
         LanguageResource $languageResource,
-        string $runId
+        string $runId,
+        array $failedSegmentsIds = [],
     ): ReimportSegmentsResult {
         $totalEmptySegmentsAmount = 0;
         $totalSuccessfulSegmentsAmount = 0;
-        $failedSegmentsIds = [];
         $tries = 0;
 
         while ($tries < self::MAX_TRIES) {
@@ -150,8 +162,8 @@ class ReimportSegments
                 [$source, $target] = $this->tmConversionService->convertPair(
                     $updateDTO->source,
                     $updateDTO->target,
-                    (int) $task->getSourceLang(),
-                    (int) $task->getTargetLang(),
+                    $task->getSourceLang(),
+                    $task->getTargetLang(),
                 );
 
                 $updateDTO = new UpdateSegmentDTO(
@@ -166,7 +178,7 @@ class ReimportSegments
                 );
 
                 $connector->updateWithDTO($updateDTO, $options, $segment);
-            } catch (SegmentUpdateException) {
+            } catch (Throwable) {
                 $failedSegmentsIds[] = $updateDTO->segmentId;
 
                 continue;
@@ -196,27 +208,44 @@ class ReimportSegments
         return new ReimportSegmentsResult($emptySegmentsAmount, $successfulSegmentsAmount, $failedSegmentsIds);
     }
 
-    private function processResponse(
+    private function addFinalizationLog(
         ?ReimportSegmentsResult $result,
         Task $task,
         LanguageResource $languageResource,
     ): void {
-        $message = 'No segments for reimport';
         $params = [
             'taskId' => $task->getId(),
             'tmId' => $languageResource->getId(),
+            'task' => $task,
+            'languageResource' => $languageResource,
         ];
 
-        if ($result !== null) {
-            $message = 'Task {taskId} re-imported into the desired TM {tmId}';
-            $params = array_merge($params, [
-                'emptySegments' => $result->emptySegmentsAmount,
-                'successfulSegments' => $result->successfulSegmentsAmount,
-                'failedSegments' => $result->failedSegmentIds,
-            ]);
+        if (null === $result) {
+            $message = 'No segments for reimport';
+
+            $this->loggerProvider->getLogger()->info('E1713', $message, $params);
+
+            return;
         }
 
-        $this->loggerProvider->getLogger()->info('E1713', $message, $params);
+        $params = array_merge($params, [
+            'emptySegments' => $result->emptySegmentsAmount,
+            'successfulSegments' => $result->successfulSegmentsAmount,
+            'failedSegments' => $result->failedSegmentIds,
+        ]);
+
+        $message = 'Task {taskId} re-imported into the desired TM {tmId}';
+
+        if (empty($result->failedSegmentIds)) {
+            $this->loggerProvider->getLogger()->info('E1713', $message, $params);
+
+            return;
+        }
+
+        $message .= '. Please note there are {failedSegmentsAmount} segments that failed to be reimported. '
+            . 'This operation is retried in the background. If error stays, please check the log for details.';
+        $params['failedSegmentsAmount'] = count($result->failedSegmentIds);
+        $this->loggerProvider->getLogger()->error('E1713', $message, $params);
     }
 
     private function addFailedSegmentsLog(array $failedSegmentsIds, int $taskId, int $languageResourceId): void
@@ -228,7 +257,7 @@ class ReimportSegments
             'failedSegments' => $failedSegmentsIds,
         ];
 
-        $this->loggerProvider->getLogger()->info('E1714', $message, $params);
+        $this->loggerProvider->getLogger()->warn('E1714', $message, $params);
     }
 
     private function getConnector(

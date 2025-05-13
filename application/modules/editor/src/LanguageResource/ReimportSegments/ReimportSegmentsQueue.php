@@ -30,14 +30,16 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
+use DateTimeInterface;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
+use ZfExtended_Models_Worker;
 
 class ReimportSegmentsQueue
 {
     /**
      * @throws ReimportQueueException
      */
-    public function queueReimport(
+    public function queueSnapshot(
         string $taskGuid,
         int $languageResourceId,
         array $options = []
@@ -53,5 +55,56 @@ class ReimportSegmentsQueue
         }
 
         $worker->queue();
+    }
+
+    public function queueReimport(
+        string $taskGuid,
+        int $languageResourceId,
+        string $runId
+    ): void {
+        $reimportWorker = new ReimportSegmentsWorker();
+
+        $options = [
+            'languageResourceId' => $languageResourceId,
+            'runId' => $runId,
+        ];
+
+        $success = $reimportWorker->init($taskGuid, $options);
+
+        if (! $success) {
+            throw new ReimportQueueException();
+        }
+
+        $reimportWorker->queue();
+    }
+
+    public function queueReimportDelayed(
+        string $taskGuid,
+        int $languageResourceId,
+        string $runId,
+        int $currentRun,
+        DateTimeInterface $delayUntil,
+        array $reimportOnlyIds = [],
+    ): void {
+        $reimportWorker = new ReimportSegmentsWorker();
+
+        $options = [
+            'languageResourceId' => $languageResourceId,
+            'runId' => $runId,
+            'currentRun' => $currentRun,
+            'reimportOnlyIds' => $reimportOnlyIds,
+        ];
+
+        $success = $reimportWorker->init($taskGuid, $options);
+
+        if (! $success) {
+            throw new ReimportQueueException();
+        }
+
+        $reimportWorker->queue(state: ZfExtended_Models_Worker::STATE_DELAYED);
+        $model = $reimportWorker->getModel();
+        $model->setDelayedUntil($delayUntil->getTimestamp());
+        $model->setDelays($currentRun);
+        $model->save();
     }
 }

@@ -74,7 +74,7 @@ class ReimportSegmentsActionExecutorTest extends TestCase
             ->willReturn([]);
 
         $this->reimportQueue->expects(self::never())
-            ->method('queueReimport');
+            ->method('queueSnapshot');
 
         $executor = $this->createExecutor();
         $executor->reimportSegments($this->task);
@@ -165,7 +165,7 @@ class ReimportSegmentsActionExecutorTest extends TestCase
         $languageResourceIds = [4, 5, 6, 7];
         $loopIndex = 0;
         $this->reimportQueue->expects(self::exactly(count($languageResourceIds)))
-            ->method('queueReimport')
+            ->method('queueSnapshot')
             ->with(
                 $taskGuid,
                 self::callback(static function ($languageResourceId) use (&$loopIndex, $languageResourceIds) {

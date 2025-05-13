@@ -1227,7 +1227,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             if (! empty($this->data) && ! empty($this->data->toReImport)) {
                 foreach ($this->data->toReImport as $taskGuid) {
                     try {
-                        (new ReimportSegmentsQueue())->queueReimport(
+                        (new ReimportSegmentsQueue())->queueSnapshot(
                             $taskGuid,
                             $this->entity->getId(),
                             [

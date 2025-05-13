@@ -32,8 +32,8 @@ namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Services_OpenTM2_Service as Service;
 use editor_Workflow_Default as Workflow;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegments;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsSnapshot;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\CreateSnapshot;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\ReimportSnapshot;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use Symfony\Component\Console\Input\InputInterface;
@@ -121,8 +121,8 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
     {
         $languageResourceRepository = new LanguageResourceRepository();
         $taskRepository = TaskRepository::create();
-        $reimportSegmentsSnapshot = ReimportSegmentsSnapshot::create();
-        $reimportSegments = ReimportSegments::create();
+        $reimportSegmentsSnapshot = CreateSnapshot::create();
+        $reimportSegments = ReimportSnapshot::create();
 
         foreach ($taskIdsGrouped as $languageResourceId => $taskIds) {
             $languageResource = $languageResourceRepository->get($languageResourceId);
