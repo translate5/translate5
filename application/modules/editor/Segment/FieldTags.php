@@ -295,13 +295,16 @@ class editor_Segment_FieldTags extends editor_TagSequence
         $fixer = new \MittagQI\Translate5\Segment\TagRepair\TermTaggerTagsFixer($this);
         if ($fixer->needsFix()) {
             $this->tags = $fixer->getFixedTags();
-            $errorData = [
-                'task' => $this->task,
-                'text' => $this->getText(),
-                'details' => $fixer->getErrorDetails(),
-                'originalMarkup' => $this->getOriginalMarkup(),
-            ];
-            $this->createLogger()->warn('E1696', 'Termtagger created invalid markup: {details}', $errorData);
+            if ($fixer->hasWarnings()) {
+                $warningData = [
+                    'task' => $this->task,
+                    'text' => $this->getText(),
+                    'details' => $fixer->getWarnings(),
+                    'originalMarkup' => $this->getOriginalMarkup(),
+                ];
+                // we create only an info instead of a warning here as there is currently nothing, the user can do
+                $this->createLogger()->info('E1696', 'Termtagger created invalid markup: {details}', $warningData);
+            }
         }
     }
 
