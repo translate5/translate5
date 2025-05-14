@@ -88,7 +88,7 @@ class IntegerProtector extends FloatProtector
         $integer = $this->parse($number);
 
         $firstChar = mb_substr($number, 0, 1);
-        $sign = in_array($firstChar, ['-', '+']) ? $firstChar : '';
+        $sign = in_array($firstChar, ['-', '+', '±']) ? $firstChar : '';
 
         return sprintf(
             $this->tagFormat(),

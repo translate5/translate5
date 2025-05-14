@@ -158,5 +158,26 @@ class IntegerProtectorTest extends TestCase
             'protectionDto' => $protectionDtoKeepAsIs,
             'targetLang' => $targetLangDe,
         ];
+
+        $protectionDtoDash = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/(\s|^|\()([±\-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u',
+            0,
+            null,
+            false,
+            '#',
+            1
+        );
+        $targetLangDe = new editor_Models_Languages();
+        $targetLangDe->setId(0);
+        $targetLangDe->setRfc5646('de');
+
+        yield 'integer with ±' => [
+            'number' => '±123456',
+            'expected' => '<number type="integer" name="test-default" source="±123456" iso="±123456" target="±123456" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA"/>',
+            'protectionDto' => $protectionDtoDash,
+            'targetLang' => $targetLangDe,
+        ];
     }
 }

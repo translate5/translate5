@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2"
+       sdl:version="1.0">
+    <doc-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+        <cmt-defs>
+            <cmt-def id="da363102-dca6-4a9e-aa70-667f91b8d030">
+                <Comments>
+                    <Comment severity="Low" user="translate5" date="2024-03-12T15:46:00.8133772+00:00" version="1.0">and a comment for Sasha!</Comment>
+                </Comments>
+            </cmt-def>
+        </cmt-defs>
+    </doc-info>
+    <file original="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+          datatype="x-sdlfilterframework2" source-language="en-US" target-language="de-DE">
+        <header>
+            <reference>
+                <internal-file form="base64">
+                    UEsDBBQAAAAIAAVnUFjPYiCzK1MBAFpaAQARAAAAaXd1bjRhaXkuZXlmLmlkbWyMeVVUG1wTbVuk
+                </internal-file>
+            </reference>
+            <sdl:ref-files>
+                <sdl:ref-file uid="0" id="http://www.sdl.com/Sdl.FileTypeSupport.Filters.Idml/OriginalFile"
+                              name="1ndofncr.o0n.idml"
+                              o-path="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+                              date="02/16/2024 12:56:10" descr="Original file before conversion."
+                              expected-use="Generation"/>
+            </sdl:ref-files>
+            <file-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <value key="SDL:FileId">edce5922-59e0-461e-a719-958337a58bf2</value>
+                <value key="SDL:CreationDate">02/16/2024 15:29:26</value>
+                <value key="SDL:OriginalFilePath">
+                    \\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml
+                </value>
+                <value key="SDL:FileTypeDllVersion">1.9.9.0</value>
+                <value key="SDL:QuickInsertsList">
+                    qBold;qItalic;qUnderline;qSubscript;qSuperscript;qSmallCaps;qNoBold;qNoItalic;qNoUnderline;qNoSuperscript;qNoSubscript;qNoSmallCaps
+                </value>
+                <value key="ProcessFileInfo">Partial</value>
+                <value key="DisplayHiddenConditionalText">False</value>
+                <value key="SkipTrackingKerningInformation">False</value>
+                <value key="DisplayFootnoteOption">False</value>
+                <value key="SDL:AutoClonedFlagSupported">True</value>
+                <value key="FirstPageId">u738c7</value>
+                <value key="ParagraphTextDirections"></value>
+                <sniff-info>
+                    <detected-source-lang detection-level="Guess" lang="en-US"/>
+                </sniff-info>
+            </file-info>
+            <sdl:filetype-info>
+                <sdl:filetype-id>IDML v 1.0.0.0</sdl:filetype-id>
+            </sdl:filetype-info>
+            <cxt-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <cxt-def id="2" type="Querverweisformate" code="XRS" name="Querverweisformate"
+                         descr="Liste mit Querverweisformaten" color="DeepSkyBlue"/>
+            </cxt-defs>
+            <tag-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <tag id="782"><bpt name="prefix" word-end="false">&lt;prefix&gt;</bpt><ept name="prefix" word-end="false">&lt;/prefix&gt;</ept></tag>
+                <tag id="784"><bpt name="fct:Marker" seg-hint="IncludeWithText" word-end="false">&lt;fct:Marker fct:MarkerType=&quot;Hypertext&quot;&gt;</bpt><bpt-props><value key="SDL:AutoCloned">True</value></bpt-props><ept name="fct:Marker" word-end="false">&lt;/fct:Marker&gt;</ept><fmt id="1"/></tag>
+                <tag id="783"><bpt name="Hyper" word-end="false">&lt;Hyper&gt;</bpt><bpt-props><value key="SDL:AutoCloned">True</value></bpt-props><ept name="Hyper" word-end="false">&lt;/Hyper&gt;</ept><fmt id="1"/></tag>
+            </tag-defs>
+        </header>
+        <body>
+            <group>
+                <sdl:cxts>
+                    <sdl:node id="2"/>
+                </sdl:cxts>
+                <trans-unit id="e7d8ea3f-713f-4f2a-9a93-7e81b2df505e">
+                    <source><g id="782"><g id="783"><g id="784">OPT/TU 2.</g></g><g id="783"><g id="784"> </g></g><g id="783"><g id="784">Gasflasche /s</g></g>https://manuals.fronius.com/html/4204102960 </g></source>
+                    <seg-source><g id="782"><g id="783"><mrk mtype="seg" mid="64"><g id="784">OPT/TU 2.</g></mrk></g><g id="783"><g id="784"> </g></g><mrk mtype="seg" mid="65"><g id="783"><g id="784">Gasflasche /s</g></g>https://manuals.fronius.com/html/4204102960</mrk> </g></seg-source>
+                    <target><g id="782"><g id="783"><mrk mtype="seg" mid="64"><g id="784">OPT/TU 2.</g></mrk></g><g id="783"><g id="784"> </g></g><mrk mtype="seg" mid="65"><g id="783"><g id="784">Butla gazowa /s</g></g>https://manuals.fronius.com/html/4204102960</mrk> </g></target>
+                    <sdl:seg-defs><sdl:seg id="64" conf="Draft" origin="nmt" origin-system="DeepL Translator provider using DeepL Translator "/><sdl:seg id="65" conf="Draft" origin="nmt" origin-system="DeepL Translator provider using DeepL Translator "/></sdl:seg-defs>
+                </trans-unit>
+            </group>
+        </body>
+    </file>
+</xliff>
