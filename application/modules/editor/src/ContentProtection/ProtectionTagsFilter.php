@@ -91,8 +91,8 @@ class ProtectionTagsFilter implements ProtectionTagsFilterInterface
             return [$source, $target];
         }
 
-        $sourceTagsMap = $this->getMatchedTags($sourceMatches);
-        $targetTagsMap = $this->getMatchedTags($targetMatches);
+        $sourceTagsMap = $this->getMatchedTags($sourceMatches, true);
+        $targetTagsMap = $this->getMatchedTags($targetMatches, false);
 
         $tagCount = 0;
 
@@ -172,13 +172,18 @@ class ProtectionTagsFilter implements ProtectionTagsFilterInterface
     /**
      * @return array<string, array{tags: \SplQueue<string>, content: string}>
      */
-    public function getMatchedTags(array $matches): array
+    private function getMatchedTags(array $matches, bool $isSource): array
     {
         $tags = [];
 
         foreach ($matches as $match) {
             // needle = type + iso + target
             $needle = $match[1] . ':' . $match[4] . ':' . $match[5];
+
+            if (! $isSource) {
+                // needle = type + iso + source
+                $needle = $match[1] . ':' . $match[4] . ':' . $match[3];
+            }
 
             if (! isset($tags[$needle])) {
                 $tags[$needle] = [

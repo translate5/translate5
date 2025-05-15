@@ -585,6 +585,11 @@ class NumberProtectorTest extends TestCase
             'string' => "string ١٬٢٣٤٬٥٦٧٫٨٩ string",
             'expected' => 'string <number type="float" name="default arabian" source="١٬٢٣٤٬٥٦٧٫٨٩" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NTQiL658Oaim4tvLrm59Oaym8tvrri5MrbaUMe49uYazWrDWo2YlGowWwvCWB2Tog3UFaMHMkJFU7NGQwfGAlE1MZqa+qUA"/> string',
         ];
+
+        yield [
+            'string' => 'string 0,0 string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="0,0" iso="0.0" target="0.0" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjpASlNDI0YPpFJFU7NGQwfGAlE1MZqa+qUA"/> string',
+        ];
     }
 
     public function looksLikeFloat(): iterable
