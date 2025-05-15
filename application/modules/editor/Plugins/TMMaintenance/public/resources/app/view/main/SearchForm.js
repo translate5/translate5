@@ -18,7 +18,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
         change: {
             delegate: 'field',
             fn: function(field, newValue, oldValue) {
-                field.up('app-main').getViewModel().set('hasRecords', false);
+                field.up('app-main').getViewModel().set('deleteBatchAllowed', false);
             }
         }
     },
@@ -194,10 +194,10 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                             formBind: true,
                             disabled: true,
                             bind: {
-                                disabled: '{!hasRecords}',
+                                disabled: '{!deleteBatchAllowed}',
                                 text: '{l10n.searchForm.deleteAll}',
                                 hidden: '{!l10n.searchForm.deleteAll}',
-                                tooltip: '{hasRecords ? l10n.searchForm.deleteAllTooltip : l10n.searchForm.deleteAllDisabledTooltip}',
+                                tooltip: '{deleteBatchAllowed ? l10n.searchForm.deleteAllTooltip : l10n.searchForm.deleteAllDisabledTooltip}',
                             },
                             style: {
                                 pointerEvents: 'all'
