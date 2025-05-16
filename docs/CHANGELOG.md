@@ -9,13 +9,55 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+## [7.23.2] - 2025-05-16
+
+### Changed
+**[TRANSLATE-4638](https://jira.translate5.net/browse/TRANSLATE-4638): Import/Export - Support MRK tags x-generic in XLF import** <br>
+The XLF import can now import MRK tags of mtype x-generic - mostly introduced by XLF2 files converted to XLF by Okapi
+
+**[TRANSLATE-4636](https://jira.translate5.net/browse/TRANSLATE-4636): Content Protection - Improve "default simple" regex** <br>
+Improve default rules for content protection
+
+**[TRANSLATE-4632](https://jira.translate5.net/browse/TRANSLATE-4632): t5memory, TM Maintenance - Disable delete all button in case language filter is set** <br>
+Added disabling "Delete all" button if language filter is selected in TM Maintenance
+
+**[TRANSLATE-4605](https://jira.translate5.net/browse/TRANSLATE-4605): TM Maintenance - Case-Sensitive Search in TM-Maintenance** <br>
+Added capability to make search case-sensitive in TM Maintenance
+
+**[TRANSLATE-4594](https://jira.translate5.net/browse/TRANSLATE-4594): PlunetConnector - PlunetConnector should handle character-based reports** <br>
+PlunetConnector should handle character-based reports
+- analysis report is based on pricing-unit which is defined in task (not fixed to "word")
+- bugfix: pricing presets are not set properly if customer is not submitted in meta on task-creation
+- bugfix: Import of Plunt-Items which do not have a language information (e.g. file-preparation, meeting, ...)
 
 
+**[TRANSLATE-4513](https://jira.translate5.net/browse/TRANSLATE-4513): TermTagger integration - Send TBX ID as part of the URL to the termTagger** <br>
+7.23.2: Fix implementation as specified, TBX loading problems in termtagger lead now to delay instead termtagger disabling
+7.22.0: TBX ID is sent as part of the request/header to the termTagger
+
+**[TRANSLATE-4511](https://jira.translate5.net/browse/TRANSLATE-4511): Workflows - Add custom dialogs on task finishing** <br>
+7.23.2: Fix a problem preventing opening the waiting for PDF step again
+7.22.0: For customized workflows the possibility to add custom actions on workflow finish was added
 
 
+### Bugfixes
+**[TRANSLATE-4658](https://jira.translate5.net/browse/TRANSLATE-4658): LanguageResources, MatchAnalysis & Pretranslation - Tag repair tag handler uses wrong segment reference when repair is applied** <br>
+Fix for tag repair problem in xliff_paired_tags tag handler where wrong segment reference was used to recreate broken tags in batch pre-translation.
 
+**[TRANSLATE-4648](https://jira.translate5.net/browse/TRANSLATE-4648): Content Protection - Content Protection: string converted in task but not TM** <br>
+Fix protection of float numbers
 
+**[TRANSLATE-4647](https://jira.translate5.net/browse/TRANSLATE-4647): Import/Export - Internal Tag Numeration is wrong in sdlxliff** <br>
+Fix internal tag number assignment for sdlfliff files
 
+**[TRANSLATE-4642](https://jira.translate5.net/browse/TRANSLATE-4642): Main back-end mechanisms (Worker, Logging, etc.) - Change logging table db engine to innodb** <br>
+The logging table DB type was changed to remove performance problems in log table usage.
+
+**[TRANSLATE-4618](https://jira.translate5.net/browse/TRANSLATE-4618): Workflows - Restrict possible backup filename length** <br>
+Added max possible backup filename length limit to make sure backup files can be created and uploaded
+
+**[TRANSLATE-4611](https://jira.translate5.net/browse/TRANSLATE-4611): t5memory, TM Maintenance - T5Memory segment ids are 0 for some reason** <br>
+Added automatic memory reorganizing if not all segments have generated IDs in t5memory
 
 
 ## [7.23.1] - 2025-05-02

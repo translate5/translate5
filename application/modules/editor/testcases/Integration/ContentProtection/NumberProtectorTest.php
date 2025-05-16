@@ -588,7 +588,7 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => 'string 0,0 string',
-            'expected' => 'string <number type="float" name="default generic with comma" source="0,0" iso="0.0" target="0.0" regex="09eIKa6Jq4nR0NSI1tWOtdeINtS1jK0BkzEp2jUGmjpASlNDI0YPpFJFU7NGQwfGAlE1MZqa+qUA"/> string',
+            'expected' => 'string <number type="float" name="default generic with comma" source="0,0" iso="0.0" target="0.0" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4jGkIa6lrG1oDJmBTtGgNNHSClqamhER2jp2NtZa8YC9KqoqlZA6JqYjQ19UsB"/> string',
         ];
     }
 
