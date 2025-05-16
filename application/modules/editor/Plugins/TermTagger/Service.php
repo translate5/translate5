@@ -36,6 +36,7 @@ use MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
 use MittagQI\Translate5\PooledService\AbstractPooledService;
+use ReflectionException;
 use stdClass;
 use Throwable;
 use Zend_Http_Client;
@@ -66,22 +67,26 @@ final class Service extends AbstractPooledService
      */
     public const DEFAULT_TAG_TIMEOUT = 10;
 
+    private const TBX_BASE_URL_PATH = '/termTagger/tbxFile/';
+
+    private const DEFAULT_URL = 'http://termtagger.:9001';
+
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.termTagger.url.default',
         'type' => 'list',
-        'url' => 'http://termtagger.:9001',
+        'url' => self::DEFAULT_URL,
     ];
 
     protected array $guiConfigurationConfig = [
         'name' => 'runtimeOptions.termTagger.url.gui',
         'type' => 'list',
-        'url' => 'http://termtagger.:9001',
+        'url' => self::DEFAULT_URL,
     ];
 
     protected array $importConfigurationConfig = [
         'name' => 'runtimeOptions.termTagger.url.import',
         'type' => 'list',
-        'url' => 'http://termtagger.:9001',
+        'url' => self::DEFAULT_URL,
     ];
 
     protected array $testConfigs = [
@@ -110,6 +115,7 @@ final class Service extends AbstractPooledService
      *     version: string|null
      * }
      * @throws Zend_Http_Client_Exception
+     * @throws ReflectionException
      */
     protected function checkServiceUrl(string $url): array
     {
@@ -123,18 +129,27 @@ final class Service extends AbstractPooledService
         try {
             $response = $this->sendRequest($httpClient, $httpClient::GET);
         } catch (TimeOutException) {
-            $result['success'] = true; // the request URL is probably a termtagger which can not respond because it is processing data
+            // the request URL is probably a termtagger which can not respond because it is processing data
+            $result['success'] = true;
 
             return $result;
         } catch (Throwable) {
             return $result; // all other ecxceptione are regarded as service not functioning properly
         }
         if ($response) {
-            $result['success'] = ($this->wasSuccessfull() && strpos($response->getBody(), 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer') !== false);
-            // will be markup like <html> <title>TermTagger Version Information</title><body><h1>TermTagger Version Information</h1><h2>TermTagger REST Server</h2><b>Version:</b> 0.16<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.TermTaggerRestServer<br /><b>Compile Date: </b>Thu Jan 26 17:42:24 UTC 2023<hr><h2>TermTagger:</h2><b>Version:</b> 9.01<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.XliffTermTagger<br /><b>Compile Date: </b>Mon Jun 10 18:33:52 UTC 2019<hr><h2>OpenTMS Version: </h2>0.2.1</body></html>
+            $result['success'] = (
+                $this->wasSuccessfull()
+                && str_contains($response->getBody(), 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer')
+            );
+            // will be markup like <html> <title>TermTagger Version Information</title><body><h1>TermTagger
+            // Version Information</h1><h2>TermTagger REST Server</h2><b>Version:</b> 0.16<br />
+            //<b>Class: </b>de.folt.models.applicationmodel.termtagger.TermTaggerRestServer<br />
+            //<b>Compile Date: </b>Thu Jan 26 17:42:24 UTC 2023<hr><h2>TermTagger:</h2><b>Version:</b> 9.01<br />
+            //<b>Class: </b>de.folt.models.applicationmodel.termtagger.XliffTermTagger<br />
+            //<b>Compile Date: </b>Mon Jun 10 18:33:52 UTC 2019<hr><h2>OpenTMS Version: </h2>0.2.1</body></html>
             $parts = explode('Version:', $response->getBody());
             $parts = (count($parts) > 1) ? explode('<br', $parts[1]) : [];
-            $result['version'] = (count($parts) > 0) ? trim(strip_tags($parts[0])) : null;
+            $result['version'] = (! empty($parts)) ? trim(strip_tags($parts[0])) : null;
         }
 
         return $result;
@@ -165,17 +180,17 @@ final class Service extends AbstractPooledService
      * If $tbxHash is given, check if Server has loaded the tbx-file with the id $tbxHash.
      *
      * @param string $url url of the TermTagger-Server
-     * @param string tbxHash unique id for a tbx-file
      * @return bool True if ping was succesfull
      * @throws DownException
      * @throws NoResponseException
+     * @throws ReflectionException
      * @throws RequestException
      * @throws TimeOutException
      * @throws Zend_Http_Client_Exception
      */
-    public function ping(string $url, $tbxHash = false)
+    public function ping(string $url, string $tbxHash = ''): bool
     {
-        $httpClient = $this->getHttpClient($url . '/termTagger/tbxFile/' . $tbxHash);
+        $httpClient = $this->getHttpClient($url . self::TBX_BASE_URL_PATH . $tbxHash, $tbxHash);
         $httpClient->setConfig([
             'timeout' => self::CONNECT_TIMEOUT,
             'request_timeout' => self::DEFAULT_TAG_TIMEOUT,
@@ -184,21 +199,24 @@ final class Service extends AbstractPooledService
 
         $response = $this->sendRequest($httpClient, $httpClient::HEAD);
 
-        return ($response && (($tbxHash !== false && $this->wasSuccessfull()) || ($tbxHash === false && $this->getLastStatus() == 404)));
+        $hasHash = strlen($tbxHash) > 0;
+
+        return $response
+            && (($hasHash && $this->wasSuccessfull())
+                || (! $hasHash && $this->getLastStatus() == 404));
     }
 
     /**
      * Load a tbx-file $tbxFilePath into the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file
-     * @return stdClass|null
-     * @throws Zend_Http_Client_Exception
      * @throws DownException
      * @throws NoResponseException
      * @throws OpenException
+     * @throws ReflectionException
      * @throws RequestException
      * @throws TimeOutException
      * @throws Zend_Http_Client_Exception
      */
-    public function loadTBX(string $url, string $tbxHash, string $tbxData, ZfExtended_Logger $logger)
+    public function loadTBX(string $url, string $tbxHash, string $tbxData, ZfExtended_Logger $logger): stdClass
     {
         if (empty($tbxHash)) {
             //Could not load TBX into TermTagger: TBX hash is empty.
@@ -213,28 +231,35 @@ final class Service extends AbstractPooledService
         $serviceData->tbxdata = $tbxData;
 
         // send request to TermTagger-server
-        $httpClient = $this->getHttpClient($url . '/termTagger/tbxFile/');
+        $httpClient = $this->getHttpClient($url . self::TBX_BASE_URL_PATH, $tbxHash);
         $httpClient->setConfig([
             'timeout' => self::CONNECT_TIMEOUT,
             'request_timeout' => Configuration::TIMEOUT_TBXIMPORT,
         ]);
         $httpClient->setRawData(json_encode($serviceData), 'application/json');
         $response = $this->sendRequest($httpClient, $httpClient::POST);
-        $success = $this->wasSuccessfull();
-        if ($success && $response = $this->decodeServiceResult($logger, $response)) {
-            return $response;
+        $decodedResponse = $this->decodeServiceResult($logger, $response);
+        if ($this->wasSuccessfull() && $decodedResponse !== null) {
+            return $decodedResponse;
         }
-        $data = [
-            'httpStatus' => $this->getLastStatus(),
-            'termTaggerUrl' => $httpClient->getUri(true),
-            'plainServerResponse' => print_r($response, true),
-            'requestedData' => $serviceData,
-        ];
-        $errorCode = $success ? 'E1118' : 'E1117';
 
-        //E1117: Could not load TBX into TermTagger: TermTagger HTTP result was not successful!
-        //E1118: Could not load TBX into TermTagger: TermTagger HTTP result could not be decoded!'
-        throw new OpenException($errorCode, $data);
+        if ($this->isEmptyResponse($response)) {
+            $error = 'NO_RESPONSE';
+        } else {
+            $error = $decodedResponse->error ?? 'UNKNOWN';
+        }
+
+        $logData = $this->getLogExtraData($response, $httpClient, $serviceData);
+
+        throw match ($error) {
+            //NoResponseException → wrong name for NO_TBX_FILE and TBX_ID_ERROR but correct semantic, triggers delay
+            'NO_TBX_FILE', 'NO_RESPONSE', 'TBX_ID_ERROR' => new NoResponseException('E1719', $logData),
+            //E1117: Could not load TBX into TermTagger: TermTagger HTTP result was not successful!
+            'TERM_TAG_TBX_PROBLEM' => new OpenException('E1117', $logData),
+            //E1118: Could not load TBX into TermTagger: TermTagger HTTP result could not be decoded!
+            // not really happened anymore
+            default => new OpenException('E1118', $logData),
+        };
     }
 
     /**
@@ -245,13 +270,14 @@ final class Service extends AbstractPooledService
      * @throws RequestException
      * @throws TimeOutException
      * @throws Zend_Http_Client_Exception
+     * @throws ReflectionException
      */
     public function unloadTBX(string $url, string $tbxHash): void
     {
         if (empty($tbxHash)) {
             return;
         }
-        $httpClient = $this->getHttpClient($url . '/termTagger/tbxFile/' . $tbxHash);
+        $httpClient = $this->getHttpClient($url . self::TBX_BASE_URL_PATH . $tbxHash, $tbxHash);
         $httpClient->setConfig([
             'timeout' => self::CONNECT_TIMEOUT,
             'request_timeout' => self::DEFAULT_TAG_TIMEOUT,
@@ -263,22 +289,25 @@ final class Service extends AbstractPooledService
 
     /**
      * Requests the termtagger with the given service-url and the passed segment-data (wich has to be be encoded)
-     * @throws Zend_Http_Client_Exception
      * @throws DownException
      * @throws NoResponseException
      * @throws RequestException
      * @throws TimeOutException
      * @throws Zend_Http_Client_Exception
+     * @throws ReflectionException
      */
-    public function tagTerms(string $serviceUrl, ServiceData $serviceData, ZfExtended_Logger $logger, int $requestTimeout): ?stdClass
-    {
+    public function tagTerms(
+        string $serviceUrl,
+        ServiceData $serviceData,
+        ZfExtended_Logger $logger,
+        int $requestTimeout
+    ): ?stdClass {
         //test term tagger errors, start a dummy netcat server in the commandline: nc -l -p 8080
         // if the request was received in the commandline, just kill nc to simulate a termtagger crash.
         //$serviceUrl = 'http://michgibtesdefinitivnichtalsdomain.com:8080'; // this is the nc dummy URL then.
         //$serviceUrl = 'http://localhost:8080'; // this is the nc dummy URL then.
-        $httpClient = $this->getHttpClient($serviceUrl . '/termTagger/termTag/');
+        $httpClient = $this->getHttpClient($serviceUrl . '/termTagger/termTag/', $serviceData->tbxFile);
         $httpClient->setRawData(json_encode($serviceData), 'application/json');
-        $httpClient->setHeaders('x-tbxid', $serviceData->tbxFile);
         $httpClient->setConfig([
             'timeout' => self::CONNECT_TIMEOUT,
             'request_timeout' => $requestTimeout,
@@ -286,17 +315,22 @@ final class Service extends AbstractPooledService
         $this->applyPersistentConnections($httpClient);
         $httpResponse = $this->sendRequest($httpClient, $httpClient::POST);
         $response = $this->decodeServiceResult($logger, $httpResponse);
-        if (! $response) {
+        if ($this->isEmptyResponse($httpResponse) || ! $response) {
             //processing terms from the TermTagger result could not be decoded.
-            throw new RequestException('E1121', [
-                'httpStatus' => $this->getLastStatus(),
-                'termTaggerUrl' => $httpClient->getUri(true),
-                'plainServerResponse' => $httpResponse->getBody(),
-                'requestedData' => $serviceData,
-            ]);
+            throw new RequestException(
+                'E1121',
+                $this->getLogExtraData($httpResponse, $httpClient, $serviceData)
+            );
         }
 
         return $response;
+    }
+
+    private function isEmptyResponse(?Zend_Http_Response $response): bool
+    {
+        //if we use a dedicated proxy before the termtaggers,
+        // we may get a 502 or 429 if the termtagger is not responding, so we fake that here
+        return $response === null || in_array((int) $response->getStatus(), [429, 502], true);
     }
 
     /**
@@ -312,12 +346,12 @@ final class Service extends AbstractPooledService
         $this->lastStatus = false;
         $start = microtime(true);
 
-        try {
-            $extraData = [
-                'httpMethod' => $method,
-                'termTaggerUrl' => $client->getUri(true),
-            ];
+        $extraData = [
+            'httpMethod' => $method,
+            'termTaggerUrl' => $client->getUri(true),
+        ];
 
+        try {
             // use to trigger a NoResponse Exception to trigger a worker-delay
             // throw new ZfExtended_Zendoverwrites_Http_Exception_NoResponse('E1130', $extraData);
 
@@ -353,13 +387,16 @@ final class Service extends AbstractPooledService
 
     /**
      * instances a Zend_Http_Client Object, sets the desired URI and returns it
-     * @param string $uri
-     * @return Zend_Http_Client
+     * @throws Zend_Http_Client_Exception
+     * @throws ReflectionException
      */
-    private function getHttpClient($uri)
+    private function getHttpClient(string $uri, string $tbxHash = null): Zend_Http_Client
     {
         $client = ZfExtended_Factory::get(Zend_Http_Client::class);
         $client->setUri($uri);
+        if ($tbxHash !== null) {
+            $client->setHeaders('x-tbxid', $tbxHash);
+        }
 
         return $client;
     }
@@ -410,5 +447,31 @@ final class Service extends AbstractPooledService
             ]);
             $client->setHeaders('Connection', 'keep-alive');
         }
+    }
+
+    private function getLogExtraData(
+        Zend_Http_Response|null $response,
+        Zend_Http_Client $httpClient,
+        stdClass|ServiceData $serviceData
+    ): array {
+        if ($response === null) {
+            $logBody = 'Response was null';
+        } elseif (mb_strlen($response->getBody()) > 1024) {
+            $logBody = mb_substr($response->getBody(), 0, 1024) . ' > CUT AFTER 1024 CHARS';
+        } else {
+            $logBody = $response->getBody();
+        }
+
+        if ($serviceData instanceof stdClass && mb_strlen($serviceData->tbxdata) > 1024) {
+            $serviceData->tbxdata = mb_substr($serviceData->tbxdata, 0, 1024) . ' > CUT AFTER 1024 CHARS';
+        }
+
+        return [
+            'httpStatus' => $this->getLastStatus(),
+            'termTaggerUrl' => $httpClient->getUri(true),
+            'plainServerResponse' => $logBody,
+            'plainServerResponseHeaders' => $response?->getHeaders(),
+            'requestedData' => $serviceData,
+        ];
     }
 }

@@ -44,14 +44,15 @@ abstract class AbstractException extends ZfExtended_ErrorCodeException
     protected $domain = 'editor.terminology';
 
     /**
-     * Basically the termtagger exceptions produce just a warning
+     * Basically, the termtagger exceptions produce just a warning
      * @var integer
      */
     protected $level = ZfExtended_Logger::LEVEL_WARN;
 
     protected static $localErrorCodes = [
         'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
-        'E1117' => 'Could not load TBX into TermTagger: TermTagger HTTP result was not successful!',
+        'E1117' => 'Could not load TBX into TermTagger: TermTagger TBX parse error',
+        'E1719' => 'Could not load TBX into TermTagger: No Response from server or error in TBX loading',
         'E1118' => 'Could not load TBX into TermTagger: TermTagger HTTP result could not be decoded!',
         'E1119' => 'TermTagger communication Error',
         'E1130' => 'TermTagger communication Error, probably crashing the TermTagger instance.',
