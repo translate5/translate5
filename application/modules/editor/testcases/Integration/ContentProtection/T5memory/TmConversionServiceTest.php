@@ -9,6 +9,7 @@ use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Repository\LanguageRepository;
@@ -67,6 +68,30 @@ class TmConversionServiceTest extends TestCase
 
         $this->rules[] = $keep2;
 
+        $float1 = new ContentRecognition();
+        $float1->setName('float comma 0,0');
+        $float1->setType(FloatProtector::getType());
+        $float1->setEnabled(true);
+        $float1->setKeepAsIs(false);
+        $float1->setRegex('/0,0/');
+        $float1->setMatchId(0);
+        $float1->setFormat('#,#');
+        $float1->save();
+
+        $this->rules[] = $float1;
+
+        $float2 = new ContentRecognition();
+        $float2->setName('float dot 0.0');
+        $float2->setType(FloatProtector::getType());
+        $float2->setEnabled(true);
+        $float2->setKeepAsIs(false);
+        $float2->setRegex('/0.0/');
+        $float2->setMatchId(0);
+        $float2->setFormat('#.#');
+        $float2->save();
+
+        $this->rules[] = $float2;
+
         $inputMapping = new InputMapping();
         $inputMapping->setLanguageId((int) $this->sourceLang->getId());
         $inputMapping->setContentRecognitionId($keep1->getId());
@@ -78,6 +103,18 @@ class TmConversionServiceTest extends TestCase
         $inputMapping->setContentRecognitionId($keep2->getId());
         $inputMapping->setPriority(5);
         $inputMapping->save();
+
+        $inputMapping = new InputMapping();
+        $inputMapping->setLanguageId((int) $this->sourceLang->getId());
+        $inputMapping->setContentRecognitionId($float1->getId());
+        $inputMapping->setPriority(6);
+        $inputMapping->save();
+
+        $outputMapping = new OutputMapping();
+        $outputMapping->setLanguageId((int) $this->targetLang->getId());
+        $outputMapping->setInputContentRecognitionId($float1->getId());
+        $outputMapping->setOutputContentRecognitionId($float2->getId());
+        $outputMapping->save();
     }
 
     protected function tearDown(): void
@@ -156,30 +193,51 @@ class TmConversionServiceTest extends TestCase
         self::assertFileEquals(__DIR__ . '/TmConversionServiceTest/expected_small.tmx', $file);
     }
 
-    public function testConvertPair(): void
+    /**
+     * @dataProvider pairsProvider
+     */
+    public function testConvertPair(array $pair, array $expected): void
     {
         $service = TmConversionService::create();
 
-        $source = 'segment <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="15"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="20"/>V';
-        $target = 'segment <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="20"/>V and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="15"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/>';
-
         [$sourceResult, $targetResult] = $service->convertPair(
-            $source,
-            $target,
+            $pair['source'],
+            $pair['target'],
             (int) $this->sourceLang->getId(),
             (int) $this->targetLang->getId()
         );
 
         self::assertSame(
-            'segment <t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/> and <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="15"/> and <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="20"/>V',
+            $expected['source'],
             $sourceResult,
             'Source converted incorrectly'
         );
 
-        self::assertSame(
-            'segment <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="20"/>V and <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="15"/> and <t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/>',
-            $targetResult,
-            'Target converted incorrectly'
-        );
+        self::assertSame($expected['target'], $targetResult, 'Target converted incorrectly');
+    }
+
+    public function pairsProvider(): iterable
+    {
+        yield 'pair 1' => [
+            'pair' => [
+                'source' => 'segment <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="15"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="20"/>V',
+                'target' => 'segment <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="20"/>V and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="15"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/>',
+            ],
+            'expected' => [
+                'source' => 'segment <t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/> and <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="15"/> and <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="20"/>V',
+                'target' => 'segment <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="20"/>V and <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="15"/> and <t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/>',
+            ],
+        ];
+
+        yield 'pair 2' => [
+            'pair' => [
+                'source' => 'string 0,0 string',
+                'target' => 'string 0.0 string',
+            ],
+            'expected' => [
+                'source' => 'string <t5:n id="1" r="0zfQMdAHAA==" n="0,0"/> string',
+                'target' => 'string <t5:n id="1" r="0zfQMdAHAA==" n="0.0"/> string',
+            ],
+        ];
     }
 }

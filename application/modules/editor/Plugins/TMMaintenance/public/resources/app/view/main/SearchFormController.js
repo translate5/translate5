@@ -125,6 +125,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             timeout: 900000,
             success: xhr => {
                 this.getViewModel().set('totalAmount', JSON.parse(xhr.responseText).totalAmount);
+                this.getViewModel().set('deleteBatchAllowed', this.isDeleteBatchAllowed());
             },
             error: xhr => {
                 console.log('Error reading total amount');
@@ -317,8 +318,9 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                     vm.set('hasMoreRecords', false);
                 }
 
+                vm.set('deleteBatchAllowed', me.isDeleteBatchAllowed());
+
                 if (store.getCount() === me.readTotalAt) {
-                    vm.set('hasRecords', records.length > 0);
                     vm.set('loadingTotalAmount', true);
                     me.readTotalAmount();
                 } else {
@@ -360,4 +362,20 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         store.getProxy().abortByPurpose = true;
         store.getProxy().abort();
     },
+
+    isDeleteBatchAllowed: function () {
+        const store = this.getView().down('^ app-main mainlist').getStore();
+        const values = this.getView().getValues();
+        const vm = this.getViewModel();
+
+        // if language filter is set we disallow delete batch button, because language filter is not respected
+        // in delete batch operation by t5memory
+        return values.sourceLanguage === ''
+            && values.targetLanguage === ''
+            && (
+                (store.getCount() >= this.readTotalAt)
+                // Uncomment this line to enable delete batch button even if amount is less, usefull for testing
+                // || vm.get('hasMoreRecords') === false
+            );
+    }
 });
