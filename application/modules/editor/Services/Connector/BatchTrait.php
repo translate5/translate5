@@ -141,6 +141,13 @@ trait editor_Services_Connector_BatchTrait
                 'segment' => clone $segment,
                 //collect the source text
                 'query' => $querySegment,
+                // INFO: why we have query and querySegment fields
+                // For almost all tag handlers the query and query segment is the same expect for the RepairedTags(xliff_paired_tags)
+                // For this tag handler we convert the xliff tags to custom translate5 tags (<t5_1_1>) and sent this kind of
+                // structure to the translation services. In that case, the "query" field contains segments with this structure
+                // and the querySegment contains the segment with xliff structure. Since our tag repair works with xliff
+                // tag structure we need to store this value of the segment here and use it later for repair
+                'querySegment' => $this->tagHandler->getQuerySegment(),
                 'tagMap' => $this->tagHandler->getTagMap(),
             ];
 
@@ -271,7 +278,7 @@ trait editor_Services_Connector_BatchTrait
 
             $this->getQueryStringAndSetAsDefault($query['segment']);
             $this->tagHandler->setTagMap($query['tagMap']);
-            $this->tagHandler->setQuerySegment($query['query']);
+            $this->tagHandler->setQuerySegment($query['querySegment']);
             $this->processBatchResult($segmentResults);
 
             $this->logForSegment($query['segment']);
