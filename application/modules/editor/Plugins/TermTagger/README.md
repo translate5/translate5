@@ -22,10 +22,11 @@ MalfunctionException
 
 NoResponseException
  * => will be thrown when the Http-Error is like "Unable to read response, or response is empty"
+ * => or if termtaggers are behind a dedicated proxy and that gives 502 or 429 - which means response is empty from termtagger then
  * => sets the segments as unprocessed and delays the worker in a "repeated" delay of 2 sec up to 1h
 
 OpenException
- * => will be thrown if the task has Terminology but no TBX-Hash or the TBX had no data or could not be loaded
+ * => will be thrown if the task has Terminology but no TBX-Hash or the TBX had no data or could not be parsed
  * => Sets the termonologie-flag for the task to false, logs a task-event-log and ends the worker
 
 RequestException
