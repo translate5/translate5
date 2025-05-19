@@ -91,6 +91,8 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
 
         $res = $this->sendToProxy($proxy, $params);
 
+        $this->tagHandler->setQuerySegment($searchString);
+
         if (! (empty($res['text']) && $res['text'] !== "0")) {
             $res['text'] = str_replace(['\[', '\]'], ['[', ']'], $res['text']);
             if ($reimportWhitespace) {

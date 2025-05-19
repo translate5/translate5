@@ -181,20 +181,20 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $results = $searchCollection->search($queryString, $useWildcards);
 
         //load all available languages, so we can set the term rfc value to the frontend
-        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
+        $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
         $lngs = $langModel->loadAllKeyValueCustom('id', 'rfc5646');
 
         $groupids = array_column($results, 'termEntryId');
         $groupids = array_unique($groupids);
 
-        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel */
+        $term = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermModel::class);
         $definitions = $term->getDeffinitionsByEntryIds($groupids);
 
-        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel */
+        $term = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermModel::class);
         $groups = $term->sortTerms([$results]);
+
+        $this->tagHandler->setQuerySegment($queryString);
+
         foreach ($groups as $group) {
             foreach ($group as $res) {
                 //add all available definitions from the term termEntry
