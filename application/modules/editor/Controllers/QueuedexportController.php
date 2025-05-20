@@ -82,7 +82,7 @@ class editor_QueuedexportController extends ZfExtended_RestController
 
         $filePath = $this->exportService->composeExportFilepath($queue);
         if (! file_exists($filePath)) {
-            throw new ZfExtended_NotFoundException('File no longer exists');
+            throw new ZfExtended_NotFoundException('File no longer exists or export was terminated');
         }
 
         Header::sendDownload(

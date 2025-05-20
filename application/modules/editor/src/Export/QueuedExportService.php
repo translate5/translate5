@@ -92,7 +92,8 @@ class QueuedExportService
         $worker = $this->workerRepository->find((int) $queue->getWorkerId());
 
         if (! $worker) {
-            throw new ZfExtended_NotFoundException('Export was terminated');
+            // it may be deleted as done by cleanup logic
+            return true;
         }
 
         if ($worker->isDefunct()) {
