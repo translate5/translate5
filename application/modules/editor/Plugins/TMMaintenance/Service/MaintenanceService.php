@@ -433,6 +433,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             return $resultList;
         }
 
+        $this->tagHandler->setQuerySegment($searchString);
+
         foreach ($results as $result) {
             $resultList->addResult(
                 $this->tagHandler->restoreInResult($result->target, $isSource),

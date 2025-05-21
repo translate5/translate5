@@ -276,6 +276,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
     protected function makeMatch($queryString, $source, $target)
     {
         $percent = 0;
+        $this->tagHandler->setQuerySegment($queryString);
         $source = $this->tagHandler->restoreInResult($source);
         $target = $this->tagHandler->restoreInResult($target);
         similar_text($queryString, $source, $percent);

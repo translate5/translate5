@@ -532,6 +532,13 @@ https://confluence.translate5.net/display/TAD/EventCodes
 |:------------------------|:-------------------|:-----------------------------------------------------------------------------|:-------------------------------------------------------------------------------------|
 | <a id="E1192"></a>E1192 | Search and replace | Replace all can not be used for task with usageMode &quot;simultaneous&quot; | The replace all is disabled for the tasks where the task usage mode is simultaneous. |
 
+### Statistics
+
+| EventCode               | Context         | EventMessage                            | Description/Solution                                      |
+|:------------------------|:----------------|:----------------------------------------|:----------------------------------------------------------|
+| <a id="E1722"></a>E1722 | Task Statistics | Multi purpose code for duration logging | Logging of the levensthein / aggregation command duration |
+
+
 ### QA / AutoQA
 
 | EventCode               | Context                                              | EventMessage                                                                                                                        | Description/Solution                                          |
