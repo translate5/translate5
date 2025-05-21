@@ -264,7 +264,11 @@ END LICENSE AND COPYRIGHT
 
     protected function printDuration($start, $end): string
     {
-        $s = (int) strtotime($end) - strtotime($start);
+        if (is_numeric($start) && is_numeric($end)) {
+            $s = (int) $end - $start;
+        } else {
+            $s = (int) strtotime($end) - strtotime($start);
+        }
 
         return sprintf(
             ' %02d:%02d:%02d',

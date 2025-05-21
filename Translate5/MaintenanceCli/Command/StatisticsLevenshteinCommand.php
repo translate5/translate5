@@ -36,6 +36,7 @@ use Symfony\Component\Console\Input\{InputInterface, InputOption};
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Zend_Db_Adapter_Abstract;
+use Zend_Registry;
 
 class StatisticsLevenshteinCommand extends Translate5AbstractCommand
 {
@@ -73,6 +74,7 @@ class StatisticsLevenshteinCommand extends Translate5AbstractCommand
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
+        $start = time();
 
         $this->io->warning(
             'The existing segments history data will be used to calculate missing levenshtein values.'
@@ -132,7 +134,17 @@ class StatisticsLevenshteinCommand extends Translate5AbstractCommand
         $progressBar->finish();
         $this->io->writeln("\n");
 
-        $this->io->success('Processing done');
+        $duration = $this->printDuration($start, time());
+        $this->io->success(
+            'Processing done - ' . $totalCount . ' records processed in ' . $duration
+        );
+
+        Zend_Registry::get('logger')
+            ->cloneMe('core.db.statistics')
+            ->info('E1722', 'Statistics::levensthein - {totalCount} records processed in {duration}', [
+                '{totalCount}' => $totalCount,
+                '{duration}' => $duration,
+            ]);
 
         return self::SUCCESS;
     }

@@ -88,6 +88,7 @@ class StatisticsAggregateCommand extends Translate5AbstractCommand
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
+        $start = time();
 
         $statDB = Zend_Registry::get('statistics');
         /* @var $statDB AbstractStatisticsDB */
@@ -187,7 +188,17 @@ class StatisticsAggregateCommand extends Translate5AbstractCommand
         $statDB->optimize(SegmentHistoryAggregation::TABLE_NAME, $compact);
         $statDB->optimize(SegmentHistoryAggregation::TABLE_NAME_LEV, $compact);
 
-        $this->io->success('Processing done');
+        $duration = $this->printDuration($start, time());
+        $this->io->success(
+            'Processing done - ' . $totalCount . ' records processed in ' . $duration
+        );
+
+        Zend_Registry::get('logger')
+            ->cloneMe('core.db.statistics')
+            ->info('E1722', 'Statistics::aggregate - {totalCount} records processed in {duration}', [
+                '{totalCount}' => $totalCount,
+                '{duration}' => $duration,
+            ]);
 
         return self::SUCCESS;
     }
