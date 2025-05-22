@@ -37,7 +37,7 @@ class TaskMetaDTO
 {
     public function __construct(
         public readonly string $taskGuid,
-        public ?string $mappingType = 'source',
+        public ?string $mappingType = null,
         public ?int $bconfId = null,
         public ?string $bconfInZip = null,
         public ?int $pricingPresetId = null,
