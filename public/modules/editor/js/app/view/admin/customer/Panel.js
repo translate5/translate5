@@ -267,10 +267,14 @@ Ext.define('Editor.view.admin.customer.Panel', {
                     reference: 'list',
                     resizable: false,
                     title: '',
-                    forceFit: true,
                     bind: {
                         store: 'customersStore'
                     },
+                    dockedItems: [
+                        {
+                            xtype: 'activeFiltersToolbar',
+                        }
+                    ],
                     listeners: {
                         itemdblclick: {
                             fn: 'dblclick',

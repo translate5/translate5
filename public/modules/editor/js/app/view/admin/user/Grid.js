@@ -33,6 +33,7 @@ Ext.define('Editor.view.admin.user.Grid', {
       'Editor.view.admin.user.GridViewController',
       'Editor.view.admin.user.AddWindow',
       'Editor.view.admin.TaskGrid',
+      'Editor.view.ui.activeFilters.Toolbar',
   ],
   alias: 'widget.adminUserGrid',
   plugins: ['gridfilters'],
@@ -233,9 +234,11 @@ Ext.define('Editor.view.admin.user.Grid', {
               glyph: 'f234@FontAwesome5FreeSolid',
               itemId: 'add-user-btn',
               text: me.strings.addUser,
-              hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddUser'), 
+              hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddUser'),
               tooltip: me.strings.addUserTip
           }]
+      },{
+          xtype: 'activeFiltersToolbar'
       }]
     };
 

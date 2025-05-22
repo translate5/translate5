@@ -39,6 +39,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     extend: 'Ext.grid.Panel',
     requires: [
         'Editor.view.admin.customer.CustomerFilter',
+        'Editor.view.ui.activeFilters.Toolbar',
         'Editor.view.LanguageResources.TmOverviewViewController',
         'Editor.view.LanguageResources.TermCollectionExportActionMenu',
         'Editor.view.admin.TaskGrid',
@@ -438,6 +439,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         dataIndex: 'isTaskTm',
                         hidden: true,
                         flex: 1,
+                        text: Editor.data.l10n.tmOverview.taskTm,
                         bind: {
                             text: '{l10n.tmOverview.taskTm}',
                         },
@@ -500,6 +502,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                             },
                         ],
                     },
+                    {
+                        xtype: 'activeFiltersToolbar'
+                    }
                 ],
             };
 

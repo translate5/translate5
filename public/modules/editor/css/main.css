@@ -1334,3 +1334,6 @@ del.tmMatchGridResultTooltip {
 ins.tmMatchGridResultTooltip {
     text-decoration: line-through;
 }
+[id^=customerPanel-] [id^=activeFiltersToolbar-] {
+    top: -1px !important;
+}
