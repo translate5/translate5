@@ -62,10 +62,12 @@ class editor_Models_Terminology_Import_TbxFileImport
         'E1472' => [
             'qty' => 0,
             'msg' => '',
+            'cases' => [],
         ],
         'E1446' => [
             'qty' => 0,
             'msg' => '',
+            'cases' => [],
         ],
     ];
 
@@ -285,6 +287,7 @@ class editor_Models_Terminology_Import_TbxFileImport
             // Do log
             $this->log($info['msg'], $ecode, [
                 'occurrencesQty' => $info['qty'],
+                'cases' => array_values($info['cases']),
             ], 'warn');
         }
 
@@ -1053,6 +1056,10 @@ class editor_Models_Terminology_Import_TbxFileImport
         if (array_key_exists($code, $this->eventQty)) {
             $this->eventQty[$code]['qty']++;
             $this->eventQty[$code]['msg'] = $logMessage;
+            if ($code === 'E1446') {
+                $val = "Type => {$extra['type']}; Was elementName => {$extra['wasElementName']}; Now elementName => {$extra['elementName']}";
+                $this->eventQty[$code]['cases'][$val] = $val;
+            }
         } else {
             $extra['languageResource'] = $this->collection;
             if (! empty($this->task)) {
