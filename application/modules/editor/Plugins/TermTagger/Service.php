@@ -240,6 +240,12 @@ final class Service extends AbstractPooledService
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         $decodedResponse = $this->decodeServiceResult($logger, $response);
         if ($this->wasSuccessfull() && $decodedResponse !== null) {
+            if (! empty($decodedResponse->error)) {
+                $logData = $this->getLogExtraData($response, $httpClient, $serviceData);
+                $logData['error'] = $decodedResponse->error;
+                $logger->error('E1133', 'TermTagger reports error on successful request "{error}".', $logData);
+            }
+
             return $decodedResponse;
         }
 
@@ -315,10 +321,21 @@ final class Service extends AbstractPooledService
         $this->applyPersistentConnections($httpClient);
         $httpResponse = $this->sendRequest($httpClient, $httpClient::POST);
         $response = $this->decodeServiceResult($logger, $httpResponse);
-        if ($this->isEmptyResponse($httpResponse) || ! $response) {
+        if ($this->isEmptyResponse($httpResponse)
+            || ! $response
+            || ((! $this->wasSuccessfull() || ! empty($response->error)) && empty($response->segments))
+        ) {
             //processing terms from the TermTagger result could not be decoded.
             throw new RequestException(
                 'E1121',
+                $this->getLogExtraData($httpResponse, $httpClient, $serviceData)
+            );
+        }
+
+        if (! $this->wasSuccessfull() || ! empty($response->error)) {
+            $logger->warn(
+                'E1120',
+                'TermTagger reports error but did contain segments in result - please check the log for details!',
                 $this->getLogExtraData($httpResponse, $httpClient, $serviceData)
             );
         }
@@ -411,12 +428,6 @@ final class Service extends AbstractPooledService
         }
         $data = json_decode($result->getBody());
         if (! empty($data)) {
-            if (! empty($data->error)) {
-                $logger->error('E1133', 'TermTagger reports error "{error}".', [
-                    'error' => print_r($data, 1),
-                ]);
-            }
-
             return $data;
         }
         $logger->error('E1134', 'TermTagger produces invalid JSON: "{jsonError}".', [

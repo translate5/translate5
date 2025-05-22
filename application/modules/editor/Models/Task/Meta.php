@@ -168,7 +168,12 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
         if ($this->getTaskGuid() !== $dto->taskGuid) {
             throw new ZfExtended_Exception('taskGuid mismatch when saving DTO to task-meta');
         }
-        $this->setMappingType($dto->mappingType);
+        // we only update the value, when it differs from the Zend-default
+        // otherwise we loose the database-default ...
+        if ($this->row->mappingType !== $dto->mappingType) { // @phpstan-ignore-line
+            $this->setMappingType($dto->mappingType);
+        }
+        // the other fields have null as default ...
         $this->setBconfId($dto->bconfId);
         $this->setBconfInZip($dto->bconfInZip);
         $this->setPricingPresetId($dto->pricingPresetId);
