@@ -38,7 +38,6 @@ use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 
 /**
@@ -225,6 +224,26 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
         $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
 
+        if (
+            ! $successful
+            && $this->needsReorganizing($this->api->getError(), $memoryName)
+        ) {
+            $this->reorganizeTm($memoryName);
+
+            $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
+        }
+
+        if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
+            $retries = 0;
+
+            while ($retries < $this->getMaxRequestRetries() && ! $successful) {
+                sleep($this->getRetryDelaySeconds());
+                $retries++;
+
+                $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
+            }
+        }
+
         if (! $successful) {
             throw new \editor_Services_Connector_Exception('E1688', [
                 'languageResource' => $this->languageResource,
@@ -233,7 +252,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         }
     }
 
-    public function deleteBatch(DeleteBatchDTO $deleteDto): bool
+    public function deleteBatch(SearchDTO $dto): bool
     {
         $this->assertVersionFits();
 
@@ -244,13 +263,13 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         foreach ($memories as ['filename' => $tmName]) {
             $this->assertMemoryAvailable($tmName);
 
-            $successful = $this->api->deleteBatch($tmName, $deleteDto);
+            $successful = $this->api->deleteBatch($tmName, $dto);
 
             if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
 
-                $successful = $this->api->deleteBatch($tmName, $deleteDto);
+                $successful = $this->api->deleteBatch($tmName, $dto);
             }
 
             if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
@@ -259,7 +278,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                     sleep($this->getRetryDelaySeconds());
                     $retries++;
 
-                    $successful = $this->api->deleteBatch($tmName, $deleteDto);
+                    $successful = $this->api->deleteBatch($tmName, $dto);
                 }
             }
 
@@ -287,11 +306,12 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
      *
      * {@inheritDoc}
      */
-    public function search(
+    public function concordanceSearch(
         string $searchString,
-        $field = 'source',
-        $offset = null,
-        SearchDTO $searchDTO = null
+        string $field,
+        ?string $offset,
+        SearchDTO $searchDTO,
+        int $amountOfResults = self::CONCORDANCE_SEARCH_NUM_RESULTS
     ): \editor_Services_ServiceResult {
         $this->assertVersionFits();
 
@@ -334,7 +354,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $this->assertMemoryAvailable($tmName);
 
             $segmentIdsGenerated = $this->areSegmentIdsGenerated($tmName);
-            $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
+            $successful = $this->api->search($tmName, $tmOffset, $amountOfResults, $searchDTO);
 
             if (
                 ! $segmentIdsGenerated
@@ -343,7 +363,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
 
-                $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
+                $successful = $this->api->search($tmName, $tmOffset, $amountOfResults, $searchDTO);
             }
 
             if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
@@ -353,7 +373,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                     sleep($this->getRetryDelaySeconds());
                     $retries++;
 
-                    $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
+                    $successful = $this->api->search($tmName, $tmOffset, $amountOfResults, $searchDTO);
                 }
             }
 
@@ -377,7 +397,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             }
 
             if (in_array(0, array_column($result->results, 'segmentId'), true)) {
-                $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
             }
 
@@ -404,7 +423,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
             // if we get enough results then response them
             /** @var int $resultsCount */
-            if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
+            if ($amountOfResults <= $resultsCount) {
                 break;
             }
         }

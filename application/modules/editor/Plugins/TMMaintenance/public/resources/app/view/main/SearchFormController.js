@@ -88,11 +88,18 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         const me = this;
         const dialog = me.getView().up('app-main').down('#deleteBatchDialog');
         dialog.mask();
+        const data = this.getView().getValues();
+        const batchMode = this.getViewModel().get('totalAmount') >= 300 ? 'batch' : 'single';
+        const params = {data: JSON.stringify(data), batchMode: batchMode};
+
+        if (batchMode === 'single') {
+            params.limit = 300;
+        }
 
         Ext.Ajax.request({
             url: '/editor/plugins_tmmaintenance_api/delete-batch/',
-            params: {data: JSON.stringify(this.getView().getValues())},
-            async: false,
+            params: params,
+            async: true,
             method: 'POST',
             success: function (xhr) {
                 const mainList = Ext.getCmp('mainlist');
@@ -102,12 +109,14 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                 dialog.hide();
             },
             error: function (xhr) {
+                dialog.unmask();
                 dialog.hide();
                 me.showServerError(JSON.parse(xhr.responseText));
                 console.log('Error deleting batch');
                 console.log(xhr);
             },
             failure: function (xhr) {
+                dialog.unmask();
                 dialog.hide();
                 me.showServerError(JSON.parse(xhr.responseText));
                 console.log('Error deleting batch');
@@ -327,6 +336,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                     me.getViewModel().set('loadingTotalAmount', false);
                     if (store.getCount() < pageSize && vm.get('hasMoreRecords') === false) {
                         vm.set('totalAmount', store.getCount());
+                        this.getViewModel().set('deleteBatchAllowed', this.isDeleteBatchAllowed());
                     }
                 }
                 if (vm.get('hasMoreRecords') && vm.get('loadedQty') < pageSize) {
@@ -372,10 +382,11 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         // in delete batch operation by t5memory
         return values.sourceLanguage === ''
             && values.targetLanguage === ''
-            && (
-                (store.getCount() >= this.readTotalAt)
+            // && (
+                // (store.getCount() >= this.readTotalAt)
                 // Uncomment this line to enable delete batch button even if amount is less, usefull for testing
                 // || vm.get('hasMoreRecords') === false
-            );
+            // )
+            && vm.get('totalAmount') !== null;
     }
 });

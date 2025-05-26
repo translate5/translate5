@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
-use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
+use MittagQI\Translate5\Plugins\TMMaintenance\Enum\BatchMode;
 use MittagQI\Translate5\Plugins\TMMaintenance\Exception\ErrorException;
 use MittagQI\Translate5\Plugins\TMMaintenance\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Plugins\TMMaintenance\Service\SegmentProcessor;
@@ -142,10 +142,11 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     public function deletebatchAction(): void
     {
-        $dto = DeleteBatchDTO::fromRequest($this->getRequest());
+        $dto = GetListDTO::fromRequest($this->getRequest());
+        $mode = BatchMode::from($this->getRequest()->get('batchMode'));
 
         try {
-            $this->getSegmentsProcessor()->deleteBatch($dto);
+            $this->getSegmentsProcessor()->deleteBatch($dto, $mode);
         } catch (editor_Services_Connector_Exception $exception) {
             $this->transformException($exception);
         }

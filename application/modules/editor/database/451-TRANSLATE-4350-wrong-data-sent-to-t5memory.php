@@ -34,7 +34,6 @@ use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
 use MittagQI\Translate5\LanguageResource\TaskTm\Workflow\Executors\ReimportSegmentsActionExecutor;
 use MittagQI\Translate5\Plugins\TMMaintenance\Service\MaintenanceService;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
-use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 
 ini_set('max_execution_time', 0);
@@ -147,7 +146,6 @@ foreach ($ids as $id) {
 
                 $searchCriteria[$field] = $value;
 
-                $deleteDto = DeleteBatchDTO::fromArray($searchCriteria);
                 $searchDto = SearchDTO::fromArray($searchCriteria);
 
                 $timeElapsed = 0;
@@ -165,7 +163,7 @@ foreach ($ids as $id) {
                     }
 
                     try {
-                        $result = $maintenanceService->search('', $field, '', searchDTO: $searchDto);
+                        $result = $maintenanceService->concordanceSearch('', $field, '', searchDTO: $searchDto);
                     } catch (\editor_Services_Connector_Exception) {
                         sleep(2);
                         $timeElapsed += 2;
@@ -178,7 +176,7 @@ foreach ($ids as $id) {
 
                 while (count($result->getResult()) > 0) {
                     try {
-                        $maintenanceService->deleteBatch($deleteDto);
+                        $maintenanceService->deleteBatch($searchDto);
                     } catch (\Throwable $e) {
                         $logger->error('E0000', 'Migration 451-TRANSLATE-4350: Failed to delete segments', [
                             'languageResource' => $languageResource,
@@ -202,7 +200,7 @@ foreach ($ids as $id) {
                     }
 
                     try {
-                        $result = $maintenanceService->search('', $field, '', searchDTO: $searchDto);
+                        $result = $maintenanceService->concordanceSearch('', $field, '', searchDTO: $searchDto);
                     } catch (\editor_Services_Connector_Exception) {
                         $logger->error(
                             'E0000',
