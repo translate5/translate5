@@ -126,27 +126,32 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
      */
     private static function replaceTargetPathVariables(string $targetPath, object $taskJson, int $maxLength = 0): string
     {
-        $charsToProtect = str_split('#%&{}\\<>*?/$!\'":@+`|=()[] ');
+        $path = preg_replace_callback('#{([a-zA-Z0-9_-]+)}#', function ($matches) use ($taskJson) {
+            $var = $matches[1];
+            if ($var === 'time') {
+                return NOW_ISO;
+            }
 
-        $path = preg_replace(
-            '/-+/',
-            '-',
-            preg_replace_callback('#{([a-zA-Z0-9_-]+)}#', function ($matches) use ($taskJson, $charsToProtect) {
-                $var = $matches[1];
-                if ($var === 'time') {
-                    return NOW_ISO;
-                }
-
-                return str_replace($charsToProtect, '-', isset($taskJson->$var) ? trim($taskJson->$var) : $var);
-            }, $targetPath)
-        );
+            return trim(
+                preg_replace(
+                    '/[^a-zA-Z0-9_-]+/',
+                    '-',
+                    isset($taskJson->$var) ? trim($taskJson->$var) : $var
+                ),
+                '-'
+            );
+        }, $targetPath);
 
         if ($maxLength > 0 && strlen($path) > $maxLength) {
             $meta = pathinfo($path);
-            $path = substr($meta['filename'], 0, $maxLength - strlen($meta['extension']) - 1) . '.' . $meta['extension'];
+            $path = substr(
+                $meta['filename'],
+                0,
+                $maxLength - strlen($meta['extension']) - 1
+            ) . '.' . $meta['extension'];
         }
 
-        return $path;
+        return preg_replace('/-+/', '-', $path);
     }
 
     /**
