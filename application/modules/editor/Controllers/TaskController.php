@@ -288,6 +288,7 @@ class editor_TaskController extends ZfExtended_RestController
             $this->adjustFilter($this->entity->getFilter()),
             (int) $this->getParam('start', 0),
             (int) $this->getParam('limit', 0),
+            false
         );
 
         $kpi = new editor_Models_KPI(SegmentHistoryAggregationRepository::create());
