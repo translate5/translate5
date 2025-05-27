@@ -196,7 +196,9 @@ final class editor_T5connectController extends ZfExtended_RestController
             foreach ($task['users'] as $user) {
                 if (in_array($user['workflowStepName'], $relevantWorkflowSteps)) {
                     $assigned++;
-                    if ($user['state'] === editor_Workflow_Default::STATE_FINISH) {
+                    if ($user['state'] === editor_Workflow_Default::STATE_FINISH ||
+                        $user['state'] === editor_Workflow_Default::STATE_AUTO_FINISH
+                    ) {
                         $finished++;
                     }
                 }
