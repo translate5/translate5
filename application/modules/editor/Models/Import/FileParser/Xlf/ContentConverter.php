@@ -137,6 +137,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             throw new editor_Models_Import_FileParser_Xlf_Exception('E1195', [
                 'file' => $this->filename,
                 'task' => $this->task,
+                'mtypeFound' => $this->xmlparser->getAttribute($attributes, 'mtype'),
             ]);
         }, function ($tag, $key, $opener) {
             $start = $opener['openerKey'];
