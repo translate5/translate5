@@ -997,16 +997,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $context
         );
 
+        // UGLY/QUIRK: client-restricted PMs may save languageresources, that contain assocs to customers, the PMs cannot see in the frontend and they have no rights to remove.
+        // we fix that here by re-adding them
+        if (ZfExtended_Authentication::getInstance()->isUserClientRestricted()) {
+            $this->transformClientRestrictedCustomerAssocs();
+        }
+
         parent::putAction();
         if ($this->wasValid) {
             // especially tests are not respecting the array format ...
             editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
-
-            // UGLY/QUIRK: client-restricted PMs may save languageresources, that contain assocs to customers, the PMs cannot see in the frontend and they have no rights to remove.
-            // we fix that here by re-adding them
-            if (ZfExtended_Authentication::getInstance()->isUserClientRestricted()) {
-                $this->transformClientRestrictedCustomerAssocs();
-            }
 
             if ((bool) $this->getParam('forced', false) === true) {
                 $this->checkOrCleanCustomerAssociation(true, $this->getDataField('customerIds') ?? []);
