@@ -58,6 +58,11 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
                 render: 'onEditableColumnRender',
             },
         },
+        store: {
+            '#Segments': {
+                load: 'onSegmentsLoad'
+            }
+        }
     },
 
     statics: {
@@ -85,8 +90,19 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             view = grid.down('tableview'),
             field,
             cellNode,
-            rowSelector = '#' + view.id + '-record-' + rec.internalId,
-            colSelector;
+            colSelector,
+            rowSelector = '#' + view.id + '-record-' + rec.internalId;
+
+        // If background colors info has been set up
+        if (this.background) {
+
+            var itemCol = this.background.column === 'target' ? 'targetEdit' : 'source',
+                itemColSelector = '[data-columnid="' + itemCol + 'Column"] .x-grid-cell-inner',
+                itemNode = document.querySelector(rowSelector + ' ' + itemColSelector);
+
+            // Apply
+            itemNode.style.background = this.background.colors[rec.getId()];
+        }
 
         // If we're here due to source-prop is updated - return
         if (rec.get('sourceUpdated')) {
@@ -224,5 +240,104 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         }
         // create and return node-props
         return props;
+    },
+
+    /**
+     * @param store
+     */
+    onSegmentsLoad: function(store) {
+        this.setupInconsistencyStyle(store);
+    },
+
+    /**
+     * @param store
+     */
+    setupInconsistencyStyle: function(store) {
+        var filters = store.getProxy().extraParams.qualities || '',
+            inconsistencyFilters = filters.matchAll('consistent:(source|target)').toArray(),
+            inconsistent = inconsistencyFilters.length === 1 ? inconsistencyFilters[0][1] : false;
+
+        // If right now either no inconsistency filters are applied,
+        // or applied but both for source and target at the same time - do nothing
+        if (!inconsistent) {
+            this.background = false;
+            return;
+        }
+
+        // Auxiliary variables
+        var baseColors = [
+                'hsl(100deg 100% 50%)',     // green
+                'hsl(349.52deg 100% 85%)'   // pink
+            ],
+            groups = {},
+            groupBy = inconsistent === 'target'
+                ? (Editor.data.task.get('enableSourceEditing')
+                    ? 'sourceEditToSort'
+                    : 'sourceToSort')
+                : 'targetEditToSort',
+            groupVal,
+            groupIdx,
+            group,
+            groupColor,
+            itemIdx,
+            itemPos,
+            lightnessRange = 16;
+
+        // Get groups
+        store.getData().each((page, records) => {
+            for (var rec of records) {
+                groupVal = rec.get(groupBy);
+                if (groupVal in groups) {
+                    groups[groupVal].push(rec.getId());
+                } else {
+                    groups[groupVal] = [rec.getId()];
+                }
+            }
+        });
+
+        // Unset groups having only one item
+        for (groupVal in groups) {
+            if (groups[groupVal].length === 1) {
+                delete groups[groupVal];
+            }
+        }
+
+        // Info to be further used in rendering
+        this.background = {
+            column: inconsistent,
+            colors: {}
+        };
+
+        // Foreach page of records
+        store.getData().each((page, records) => {
+
+            // Foreach record on page
+            for (var rec of records) {
+
+                // Get group md5
+                groupVal = rec.get(groupBy);
+
+                // If we do really have a repetition group under such md5
+                if (groupVal in groups) {
+
+                    // Get group base color
+                    groupIdx = Object.keys(groups).indexOf(groupVal);
+                    groupColor = baseColors[groupIdx % 2];
+
+                    // Get item color
+                    group = groups[groupVal];
+                    itemIdx = group.indexOf(rec.getId());
+                    itemPos = itemIdx / group.length;
+                    this.background.colors[rec.getId()] = groupColor.replace(
+                        /([0-9]+)(%\))/,
+                        ($0, $1) => (parseInt($1) - lightnessRange / 2 * itemPos) + '%)'
+                    );
+
+                    // Reset item color
+                } else {
+                    this.background.colors[rec.getId()] = '';
+                }
+            }
+        });
     }
 });

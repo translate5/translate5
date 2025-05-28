@@ -877,12 +877,31 @@ Ext.define('Editor.controller.Segments', {
      * Listens to the filter panel controller and delegates it to our store and changes the view if the stored filter changed
      */
     onQualityFilterChanged: function (filter) {
-        var store = this.getSegmentsStore();
+        var store = this.getSegmentsStore(), sorters = store.getSorters();
         // the store checks if the filter actually changed and we adjut the view only if requested
         if (store.setQualityFilter(filter)) {
             this.isQualityFiltered = (filter && filter != '');
             store.removeAll();
-            store.reload();
+
+            var inconsistencyFilters = filter.matchAll('consistent:(source|target)').toArray(),
+                inconsistent = inconsistencyFilters.length === 1 ? inconsistencyFilters[0][1] : false;
+
+            // If exactly one inconsistency filter is applied
+            if (inconsistent) {
+                if (sorters.getCount() && !this.wasSort) {
+                    this.wasSort = {
+                        property: sorters.getAt(0).getProperty(),
+                        direction: sorters.getAt(0).getDirection(),
+                    };
+                }
+                store.sort(inconsistent === 'source' ? 'targetEdit' : 'source', 'ASC');
+            } else if (this.wasSort) {
+                store.sort(this.wasSort.property, this.wasSort.direction);
+                delete this.wasSort;
+            } else {
+                this.clearSegmentSort();
+                store.reload();
+            }
         }
     }
 });
