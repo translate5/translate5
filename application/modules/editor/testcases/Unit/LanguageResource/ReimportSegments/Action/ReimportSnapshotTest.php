@@ -250,6 +250,8 @@ class ReimportSnapshotTest extends TestCase
                         'emptySegments' => 2,
                         'successfulSegments' => 0,
                         'failedSegments' => [],
+                        'task' => $taskMock,
+                        'languageResource' => $languageResourceMock,
                     ],
                 ]
             );
@@ -344,7 +346,7 @@ class ReimportSnapshotTest extends TestCase
                     self::assertEquals('E1713', $params[0]);
                     self::assertEquals(
                         'Task {taskId} re-imported into the desired TM {tmId}. '
-                                . 'Please note there are {failedSegmentsAmount} segments that failed to be reimported. <br/>'
+                                . 'Please note there are {failedSegmentsAmount} segments that failed to be reimported. '
                                 . 'This operation is retried in the background. '
                                 . 'If error stays, please check the log for details.',
                         $params[1]

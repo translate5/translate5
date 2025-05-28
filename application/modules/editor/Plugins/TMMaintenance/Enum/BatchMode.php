@@ -26,8 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Plugins\TMMaintenance\DTO;
+declare(strict_types=1);
 
-class DeleteBatchDTO extends GetListDTO
+namespace MittagQI\Translate5\Plugins\TMMaintenance\Enum;
+
+enum BatchMode: string
 {
+    case Batch = 'batch';
+    case Single = 'single';
 }

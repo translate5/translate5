@@ -33,12 +33,11 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 use editor_Models_LanguageResources_LanguageResource;
 use editor_Services_Connector_Exception;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
-use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
+use MittagQI\Translate5\Plugins\TMMaintenance\Enum\BatchMode;
 use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
-use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO as T5DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO as T5SearchDTO;
 use ZfExtended_Factory;
 use ZfExtended_Utils;
@@ -52,7 +51,7 @@ final class SegmentProcessor
      */
     public function getList(GetListDTO $getListDto): array
     {
-        $connector = $this->getOpenTM2Connector($getListDto->tmId);
+        $connector = $this->getConnector($getListDto->tmId);
         $totalAmount = 0;
         $limit = $getListDto->limit;
         $result = [];
@@ -60,7 +59,7 @@ final class SegmentProcessor
         $searchDto = $this->getSearchDto($getListDto);
 
         while ($totalAmount < $limit) {
-            $resultList = $connector->search(
+            $resultList = $connector->concordanceSearch(
                 '',
                 '',
                 $offset,
@@ -97,7 +96,7 @@ final class SegmentProcessor
 
     public function countResults(GetListDTO $getListDTO): int
     {
-        $connector = $this->getOpenTM2Connector($getListDTO->tmId);
+        $connector = $this->getConnector($getListDTO->tmId);
         $searchDto = $this->getSearchDto($getListDTO);
 
         return $connector->countSegments($searchDto);
@@ -105,7 +104,7 @@ final class SegmentProcessor
 
     public function create(CreateDTO $createDto): void
     {
-        $connector = $this->getOpenTM2Connector($createDto->tmId);
+        $connector = $this->getConnector($createDto->tmId);
         $connector->createSegment(
             $createDto->source,
             $createDto->target,
@@ -120,7 +119,7 @@ final class SegmentProcessor
     {
         [$tmId, $memoryId, $recordKey, $targetKey] = explode(':', $updateDto->internalKey);
 
-        $connector = $this->getOpenTM2Connector($updateDto->tmId);
+        $connector = $this->getConnector($updateDto->tmId);
         $connector->updateSegment(
             (int) $memoryId,
             $updateDto->id,
@@ -139,14 +138,33 @@ final class SegmentProcessor
     {
         [$tmId, $memoryId, $recordKey, $targetKey] = explode(':', $deleteDto->internalKey);
 
-        $connector = $this->getOpenTM2Connector((int) $tmId);
+        $connector = $this->getConnector((int) $tmId);
         $connector->deleteEntry((int) $memoryId, $deleteDto->id, (int) $recordKey, (int) $targetKey);
     }
 
-    public function deleteBatch(DeleteBatchDTO $deleteBatchDto): void
+    public function deleteBatch(GetListDTO $dto, BatchMode $mode): void
     {
-        $connector = $this->getOpenTM2Connector($deleteBatchDto->tmId);
-        $connector->deleteBatch($this->getDeleteBatchDto($deleteBatchDto));
+        $connector = $this->getConnector($dto->tmId);
+
+        if ($mode === BatchMode::Batch) {
+            $connector->deleteBatch($this->getSearchDto($dto));
+
+            return;
+        }
+
+        $result = $this->getList($dto);
+        $items = $result['items'];
+        $items = array_reverse($items);
+
+        foreach ($items as $item) {
+            [$tmId, $memoryId, $recordKey, $targetKey] = explode(':', $item['internalKey']);
+            $connector->deleteEntry(
+                (int) $memoryId,
+                $item['metaData']['segmentId'],
+                (int) $recordKey,
+                (int) $targetKey
+            );
+        }
     }
 
     private function reformatData(array $data): array
@@ -169,7 +187,7 @@ final class SegmentProcessor
         return $result;
     }
 
-    private function getOpenTM2Connector(int $languageResourceId): MaintenanceService
+    private function getConnector(int $languageResourceId): MaintenanceService
     {
         $languageResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
         $languageResource->load($languageResourceId);
@@ -196,15 +214,6 @@ final class SegmentProcessor
         $data = $this->transformSearchData($data);
 
         return T5SearchDTO::fromArray($data);
-    }
-
-    private function getDeleteBatchDto(DeleteBatchDTO $deleteBatchDto): T5DeleteBatchDTO
-    {
-        $data = $deleteBatchDto->toArray();
-
-        $data = $this->transformSearchData($data);
-
-        return T5DeleteBatchDTO::fromArray($data);
     }
 
     private function transformSearchData(array $data): array

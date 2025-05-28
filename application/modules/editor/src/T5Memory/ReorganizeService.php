@@ -86,8 +86,7 @@ class ReorganizeService
             $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
         );
 
-        $errorSupposesReorganizing = (! $response->successful() && null !== $response->getErrorMessage())
-            || in_array($response->getCode(), $errorCodes);
+        $errorSupposesReorganizing = in_array($response->getCode(), $errorCodes);
         // Check if error codes contains any of the values
         $needsReorganizing = $errorSupposesReorganizing &&
             ! $this->isReorganizingAtTheMoment($languageResource, $tmName, $isInternalFuzzy);
