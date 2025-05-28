@@ -1,10 +1,10 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2025 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -21,33 +21,33 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
-END LICENSE AND COPYRIGHT
-*/
-
+ END LICENSE AND COPYRIGHT
+ */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\File\Filter;
+namespace Translate5\MaintenanceCli\L10n;
 
-use ZfExtended_ErrorCodeException;
-
-/**
- * This Exception usually is deserialized from database-data.
- * Therefore, some ugly constructor-overriding was necessary
- */
-final class FilterException extends ZfExtended_ErrorCodeException
+class JsonFiles
 {
-    protected static array $localErrorCodes = [];
+    public function __construct(
+        private readonly string $rootPath
+    ) {
+    }
 
-    protected $domain = 'editor.filefilter';
-
-    public function __construct(string $errorCode, string $errorMsg, array $extra = [], string $domain = null)
+    public function findFiles(string $language): array
     {
-        FilterException::$localErrorCodes[$errorCode] = $errorMsg;
-        if (! empty($domain)) {
-            $this->domain = $domain;
-        }
-        parent::__construct($errorCode, $extra);
+        $cwd = getcwd();
+        chdir($this->rootPath);
+
+        $find = sprintf(
+            'find -iname "*%s.json" -not -path "./vendor/*" -not -path "./data/*" -path "*/locales/*"',
+            $language
+        );
+        $files = shell_exec($find);
+        chdir($cwd);
+
+        return explode("\n", trim($files));
     }
 }

@@ -25,22 +25,39 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+declare(strict_types=1);
 
-interface editor_Models_File_IFilter
+namespace MittagQI\Translate5\File\Filter;
+
+use editor_Models_Task;
+
+interface FileFilterInterface
 {
     /**
      * Setting the filter manager so that it can be used internally
      */
-    public function initFilter(editor_Models_File_FilterManager $manager, editor_Models_File_FilterConfig $config);
+    public function initFilter(Manager $manager, FilterConfig $config): void;
 
     /**
      * @return string the filename of the file (can be changed internally for further processing)
-     * @throws \MittagQI\Translate5\File\Filter\FilterException
+     * @throws FilterException
      */
-    public function applyImportFilter(editor_Models_Task $task, int $fileId, string $filePath, ?string $parameters): string;
+    public function applyImportFilter(
+        editor_Models_Task $task,
+        int $fileId,
+        string $filePath,
+        ?string $parameters,
+    ): string;
 
     /**
      * @return string the filename of the file (can be changed internally for further processing)
      */
-    public function applyExportFilter(editor_Models_Task $task, int $fileId, string $filePath, ?string $parameters): string;
+    public function applyExportFilter(
+        editor_Models_Task $task,
+        int $fileId,
+        string $filePath,
+        ?string $parameters,
+    ): string;
+
+    public static function getWeight(): int;
 }

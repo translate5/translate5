@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2025 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,26 +28,38 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\File\Filter;
+namespace MittagQI\Translate5\L10n;
 
-use ZfExtended_ErrorCodeException;
+use ZfExtended_Exception;
 
 /**
- * This Exception usually is deserialized from database-data.
- * Therefore, some ugly constructor-overriding was necessary
+ * L10n worker to rename the JSON files to the target language - needed in a worker due Okapi dependency
  */
-final class FilterException extends ZfExtended_ErrorCodeException
+class ExportWorker extends \editor_Models_Task_AbstractWorker
 {
-    protected static array $localErrorCodes = [];
-
-    protected $domain = 'editor.filefilter';
-
-    public function __construct(string $errorCode, string $errorMsg, array $extra = [], string $domain = null)
+    public function work(): bool
     {
-        FilterException::$localErrorCodes[$errorCode] = $errorMsg;
-        if (! empty($domain)) {
-            $this->domain = $domain;
+        $params = $this->workerModel->getParameters();
+        if (file_exists($params['inputFilePath'])) {
+            rename($params['inputFilePath'], $params['outputFilePath']);
         }
-        parent::__construct($errorCode, $extra);
+
+        return true;
+    }
+
+    /**
+     * @throws ZfExtended_Exception
+     */
+    protected function validateParameters(array $parameters): bool
+    {
+        $requiredParameters = ['fileId', 'sourceLanguage', 'targetLanguage', 'inputFilePath', 'outputFilePath'];
+
+        foreach ($requiredParameters as $param) {
+            if (empty($parameters[$param])) {
+                throw new ZfExtended_Exception('missing or empty parameter: ' . $param);
+            }
+        }
+
+        return true;
     }
 }

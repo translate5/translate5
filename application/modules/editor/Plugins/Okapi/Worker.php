@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Export_FileParser_Xlf as XlfFileparser;
+use editor_Models_Import_DirectoryParser_ReferenceFiles as ReferenceFiles;
+use MittagQI\Translate5\File\Filter\Manager;
+use MittagQI\Translate5\File\Filter\Type;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 
@@ -188,15 +192,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             copy($convertedFile, $file . $api::OUTPUT_FILE_EXTENSION);
 
             //add okapi export file filter for that file
-            $filterManager = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+            $filterManager = ZfExtended_Factory::get(Manager::class);
             $filterManager->addFilter(
-                $filterManager::TYPE_IMPORT,
+                Type::Import,
                 $this->taskGuid,
                 $fileId,
                 editor_Plugins_Okapi_FileFilter::class
             );
             $filterManager->addFilter(
-                $filterManager::TYPE_EXPORT,
+                Type::Export,
                 $this->taskGuid,
                 $fileId,
                 editor_Plugins_Okapi_FileFilter::class
@@ -247,7 +251,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             $this->xliffExportPreValidation($workFile);
 
             //if a file with source in empty targets exists, take that for okapi reconvertion
-            $workfile2 = new SplFileInfo($workFile . editor_Models_Export_FileParser_Xlf::SOURCE_TO_EMPTY_TARGET_SUFFIX);
+            $workfile2 = new SplFileInfo($workFile . XlfFileparser::SOURCE_TO_EMPTY_TARGET_SUFFIX);
             if ($workfile2->isFile()) {
                 $api->uploadWorkFile($originalFile . $api::OUTPUT_FILE_EXTENSION, $workfile2);
                 if (ZfExtended_Debug::hasLevel('plugin', 'OkapiKeepIntermediateFiles')) {
@@ -304,6 +308,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
      * @param bool $import true on import, false on export
      * @return ZfExtended_Logger_Event|null the resulting event of the thrown exception
      * @throws Zend_Exception
+     * @throws ReflectionException
      */
     protected function handleException(
         Exception $e,
@@ -328,10 +333,11 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
                     'file' => basename($file->__toString()),
                 ],
             ];
-            // this will trigger an exception when the filter is resolved in the main application on import/export finish
-            $filterManager = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+            // this will trigger an exception when the filter
+            // is resolved in the main application on import/export finish
+            $filterManager = ZfExtended_Factory::get(Manager::class);
             $filterManager->addFilter(
-                $filterManager::TYPE_IMPORT,
+                Type::Import,
                 $this->taskGuid,
                 $fileId,
                 editor_Plugins_Okapi_FileFilter::class,
@@ -402,7 +408,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         /* @var $importConfig editor_Models_Import_Configuration */
 
         $realFile = $params['file'];
-        $refFolder = $params['importFolder'] . '/' . editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
+        $refFolder = $params['importFolder'] . '/' . ReferenceFiles::getDirectory();
         $workfilesDirectory = $params['importFolder'] . '/' . $importConfig->getWorkfilesDirName();
 
         //cut off review folder from realfile:

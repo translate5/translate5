@@ -30,10 +30,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task\Reimport;
 
 use editor_Models_File;
-use editor_Models_File_FilterManager;
 use editor_Models_Import_FileParser;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
+use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\Task\Import\FileParser\Factory;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
@@ -73,7 +73,7 @@ class ReimportFile
         $file->load($fileId);
         $parserCls = $file->getFileParser();
 
-        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+        $fileFilter = ZfExtended_Factory::get(Manager::class);
         $fileFilter->initReImport($this->task, Worker::FILEFILTER_CONTEXT_NEW);
 
         // get the parser dynamically even of only xliff is supported

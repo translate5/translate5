@@ -25,16 +25,24 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\File\Filter;
+
+use editor_Models_File_Filter;
+use editor_Models_Import_Configuration;
+use editor_Models_Task;
+use ReflectionException;
+use Zend_Db_Statement_Exception;
+use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
 /**
  * Manage file filters for pre/post-processing files on im-/export
  */
-class editor_Models_File_FilterManager
+class Manager
 {
-    public const TYPE_IMPORT = 'import';
-
-    public const TYPE_EXPORT = 'export';
-
     protected editor_Models_Task $task;
 
     /**
@@ -42,76 +50,87 @@ class editor_Models_File_FilterManager
      */
     protected array $filters;
 
-    private editor_Models_File_FilterConfig $config;
+    private FilterConfig $config;
 
     public function __construct()
     {
-        $this->config = new editor_Models_File_FilterConfig();
+        $this->config = new FilterConfig();
     }
 
     /**
      * loads all file filters for a given task
+     * @throws ReflectionException
      */
     public function initImport(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig): void
     {
-        //FIXME can we get the context from importConfig?
         $this->config->importConfig = $importConfig;
         $this->config->parentWorkerId = $importConfig->workerId;
-        $this->loadFilters($task, self::TYPE_IMPORT);
+        $this->loadFilters($task, Type::Import);
     }
 
     /**
      * loads all file filters for a given task
+     * @throws ReflectionException
      */
     public function initReImport(editor_Models_Task $task, string $context): void
     {
         $this->config->context = $context;
-        $this->loadFilters($task, self::TYPE_IMPORT);
+        $this->loadFilters($task, Type::Import);
     }
 
     /**
      * loads all file filters for a given task
+     * @throws ReflectionException
      */
     public function initExport(editor_Models_Task $task, int $workerId, string $context): void
     {
         $this->config->context = $context;
         $this->config->parentWorkerId = $workerId;
-        $this->loadFilters($task, self::TYPE_EXPORT);
+        $this->loadFilters($task, Type::Export);
     }
 
     /**
      * loads all file filters for a given task
+     * @throws ReflectionException
      */
-    protected function loadFilters(editor_Models_Task $task, string $type): void
+    protected function loadFilters(editor_Models_Task $task, Type $type): void
     {
         $this->task = $task;
         $filter = ZfExtended_Factory::get(editor_Models_File_Filter::class);
-        $filters = $filter->loadForTask($task->getTaskGuid(), $type);
+        $filters = $filter->loadForTask($task->getTaskGuid(), $type->value);
         $this->filters = [];
         foreach ($filters as $filter) {
-            settype($this->filters[$filter->fileId], 'array');
-            $this->filters[$filter->fileId][] = $filter;
+            if (isset($filter->fileId)) {
+                settype($this->filters[$filter->fileId], 'array');
+                $this->filters[$filter->fileId][] = $filter;
+            }
         }
     }
 
     /**
      * returns the filename of the affected file (could be changed by the filters due conversion)
-     * @throws \MittagQI\Translate5\File\Filter\FilterException
+     * @throws FilterException
+     * @throws ReflectionException
      */
     public function applyImportFilters(string $path, int $fileId): string
     {
-        return $this->applyFilters(self::TYPE_IMPORT, $path, $fileId);
-    }
-
-    public function applyExportFilters(string $path, int $fileId): string
-    {
-        return $this->applyFilters(self::TYPE_EXPORT, $path, $fileId);
+        return $this->applyFilters(Type::Import, $path, $fileId);
     }
 
     /**
-     * @throws \MittagQI\Translate5\File\Filter\FilterException
+     * @throws FilterException
+     * @throws ReflectionException
      */
-    protected function applyFilters($type, string $path, int $fileId): string
+    public function applyExportFilters(string $path, int $fileId): string
+    {
+        return $this->applyFilters(Type::Export, $path, $fileId);
+    }
+
+    /**
+     * @throws FilterException
+     * @throws ReflectionException
+     */
+    protected function applyFilters(Type $type, string $path, int $fileId): string
     {
         if (empty($this->filters[$fileId])) {
             return $path;
@@ -119,9 +138,9 @@ class editor_Models_File_FilterManager
         $filters = $this->filters[$fileId];
         foreach ($filters as $filter) {
             $filterInstance = ZfExtended_Factory::get($filter->filter);
-            /** @var editor_Models_File_IFilter $filterInstance */
+            /** @var FileFilterInterface $filterInstance */
             $filterInstance->initFilter($this, $this->config);
-            if ($type === self::TYPE_EXPORT) {
+            if ($type === Type::Export) {
                 $path = $filterInstance->applyExportFilter($this->task, $fileId, $path, $filter->parameters);
             } else {
                 //import filters may change the used file path! Dangerous!
@@ -134,41 +153,78 @@ class editor_Models_File_FilterManager
 
     /**
      * Adds the given file filter for the given file
+     * @param class-string<FileFilterInterface> $filterClass
+     * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function addFilter(string $type, string $taskGuid, int $fileId, string $filterClass, string $params = null): void
-    {
+    public function addFilter(
+        Type $type,
+        string $taskGuid,
+        int $fileId,
+        string $filterClass,
+        string $params = null,
+    ): void {
         $filter = ZfExtended_Factory::get(editor_Models_File_Filter::class);
         $filter->setFileId($fileId);
         $filter->setTaskGuid($taskGuid);
         $filter->setFilter($filterClass);
-        $filter->setType($type);
+        $filter->setType($type->value);
         $filter->setParameters($params);
+        $filter->setWeight($filterClass::getWeight());
         $filter->save();
     }
 
     /**
      * returns true if the file have at least one filter (or if $type given a for the specific type)
+     * @throws ReflectionException
      */
-    public function hasFilter(int $fileId, string $type = null): bool
+    public function hasFilter(int $fileId, Type $type = null): bool
     {
         $checkTypes = [
-            self::TYPE_EXPORT,
-            self::TYPE_IMPORT,
+            Type::Export,
+            Type::Import,
         ];
         if (! empty($type)) {
             $checkTypes = [$type];
         }
         $filter = ZfExtended_Factory::get(editor_Models_File_Filter::class);
         foreach ($checkTypes as $type) {
-            $rowset = $filter->loadForFile($fileId, $type);
+            $rowset = $filter->loadForFile($fileId, $type->value);
             if ($rowset->count() > 0) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint|ReflectionException
+     */
+    public function addByConfig(
+        string $taskGuid,
+        editor_Models_Import_Configuration $importConfig,
+        array $fileList,
+    ): void {
+        foreach ($importConfig->fileFilters as $fileFilter) {
+            if (! is_subclass_of($fileFilter, FileFilterByConfigInterface::class)) {
+                continue;
+            }
+            foreach ($fileList as $fileId => $filePath) {
+                $types = $fileFilter::getTypesForFile($filePath);
+                foreach ($types as $type) {
+                    $this->addFilter(
+                        $type,
+                        $taskGuid,
+                        $fileId,
+                        $fileFilter
+                    );
+                }
+            }
+        }
     }
 }

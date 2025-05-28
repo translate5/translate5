@@ -25,16 +25,11 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+declare(strict_types=1);
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
-
- /**
-  * Loads the task specific config from uploaded task-config and stores it to the task
-  */
+/**
+ * Loads the task-specific config from uploaded task-config and stores it to the task
+ */
 class editor_Models_Import_TaskConfig
 {
     /**
@@ -42,12 +37,19 @@ class editor_Models_Import_TaskConfig
      */
     public const CONFIG_TEMPLATE = 'task-config.ini';
 
+    public function __construct(
+        private readonly editor_Models_TaskConfig $taskConfig
+    ) {
+    }
+
     /***
      * Load the config template for the task if it is provided in the import package
      * @throws Exception
      */
-    public function loadConfigTemplate(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig)
-    {
+    public function loadAndProcessConfigTemplate(
+        editor_Models_Task $task,
+        editor_Models_Import_Configuration $importConfig
+    ): void {
         $template = $importConfig->importFolder . '/' . self::CONFIG_TEMPLATE;
         if (! file_exists($template)) {
             return;
@@ -58,13 +60,18 @@ class editor_Models_Import_TaskConfig
         ];
         $config = parse_ini_file($template);
         $log = Zend_Registry::get('logger');
-        /* @var $log ZfExtended_Logger */
         foreach ($config as $name => $value) {
-            $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
-
-            /* @var $taskConfig editor_Models_TaskConfig */
             try {
-                $taskConfig->updateInsertConfig($task->getTaskGuid(), $name, $value);
+                if (str_starts_with($name, 'runtimeOptions.')) {
+                    $this->taskConfig->updateInsertConfig($task->getTaskGuid(), $name, $value);
+
+                    continue;
+                }
+                if ($name === 'fileFilter' && is_array($value)) {
+                    foreach ($value as $filter) {
+                        $importConfig->fileFilters[] = $filter;
+                    }
+                }
             } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint) {
                 $logData['name'] = $name;
                 $log->exception(new editor_Models_Import_FileParser_Exception('E1327', $logData), [

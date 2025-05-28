@@ -561,6 +561,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1142"></a>E1142 | Segment | Excel Reimport: at least one segment needs to be controlled.                                                                  | This is actually a warning. You have to control all segments in the given list. They may have an invalid tag-structure (eg. open a tag but not closing it) or something similar. This can lead to problems on further workflow steps. |
 | <a id="E1148"></a>E1148 | Task    | Task can not be locked for excel export, no excel export could be created.                                                    | That means the task is currently in use by another user / process.<br />This is logged as info, since this can happen if another reviewer&nbsp;is editing while another&nbsp;reviewer is finishing the task.                          |
 
+### L10n / Localization
+
+| EventCode               | Context      | EventMessage                            | Description/Solution |
+|:------------------------|:-------------|:----------------------------------------|:---------------------|
+| <a id="E1720"></a>E1720 | Localization | L10n File Filter has no Import Filter!  | Development Error    |
+
 ### CSRF Protection
 
 | EventCode               | Context         | EventMessage                                                                                            | Description/Solution |
@@ -682,6 +688,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1474"></a>E1474 | Plug-In Okapi | Okapi Plug-In: The Okapi plug-in is disabled so no export into the original import format can be done at the moment                     | Re-enable the Okapi Plug-In                                                                                                                                                                                                                                                                                                | 
 | <a id="E1686"></a>E1686 | Plug-In Okapi | Okapi Plug-In: The uploaded filter/fprm file is not valid ({details})                                                                   | The uploaded fprm/filter file is not valid. Details will be part of the message                                                                                                                                                                                                                                            |
 | <a id="E1687"></a>E1687 | Plug-In Okapi | Okapi Plug-In: The uploaded pipeline file is not valid ({details})                                                                      | The uploaded pipeline file is not valid. Details will be part of the message                                                                                                                                                                                                                                               |
+| <a id="E1721"></a>E1721 | Plug-In Okapi | Okapi File Filter can not be added by configuration                                                                                     | Development error                                                                                                                                                                                                                                                                                                          |
 
 #### Plug-In PangeaMt
 
@@ -953,6 +960,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1672"></a>E1672 | Private Plugin Plunet Connector | Failed ending task                                                                                |                      |
 | <a id="E1673"></a>E1673 | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Quotes |                      |
 | <a id="E1674"></a>E1674 | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Orders |                      |
+
 
 ## EventCode Design rules / decisions
 

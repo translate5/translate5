@@ -122,12 +122,12 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
     /***
      * Update or insert new config for given task
      *
-     * @param string $taskGuid
-     * @param string $name
      * @param mixed $value
-     * @return number
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function updateInsertConfig(string $taskGuid, string $name, $value)
+    public function updateInsertConfig(string $taskGuid, string $name, $value): Zend_Db_Statement_Interface
     {
         if (is_array($value)) {
             $value = implode('","', $value);

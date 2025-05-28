@@ -25,25 +25,15 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+declare(strict_types=1);
 
-/**
- * Configuration passed to each file filter
- */
-class editor_Models_File_FilterConfig
+namespace MittagQI\Translate5\File\Filter;
+
+interface FileFilterByConfigInterface extends FileFilterInterface
 {
     /**
-     * The import config object
+     * Returns an array of file filter types (im- / export) for the given file type, or empty array if non-applicable
+     * @return Type[]
      */
-    public ?editor_Models_Import_Configuration $importConfig = null;
-
-    /**
-     * The import / export context
-     * FIXME convert to enum here, see also editor_Models_Export::EXPORT_*
-     */
-    public ?string $context = null;
-
-    /**
-     * contains the worker id of the parent worker
-     */
-    public ?int $parentWorkerId = null;
+    public static function getTypesForFile(string $filePath): array;
 }

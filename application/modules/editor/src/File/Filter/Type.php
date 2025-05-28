@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2025 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -25,29 +25,15 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\File\Filter;
 
-use ZfExtended_ErrorCodeException;
-
 /**
- * This Exception usually is deserialized from database-data.
- * Therefore, some ugly constructor-overriding was necessary
+ * Configuration passed to each file filter
  */
-final class FilterException extends ZfExtended_ErrorCodeException
+enum Type: string
 {
-    protected static array $localErrorCodes = [];
-
-    protected $domain = 'editor.filefilter';
-
-    public function __construct(string $errorCode, string $errorMsg, array $extra = [], string $domain = null)
-    {
-        FilterException::$localErrorCodes[$errorCode] = $errorMsg;
-        if (! empty($domain)) {
-            $this->domain = $domain;
-        }
-        parent::__construct($errorCode, $extra);
-    }
+    case Export = 'export';
+    case Import = 'import';
 }

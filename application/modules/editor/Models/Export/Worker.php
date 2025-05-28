@@ -114,7 +114,16 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract
         $export = ZfExtended_Factory::get($exportClass);
         /* @var $export editor_Models_Export */
         $export->setTaskToExport($task, $parameters['diff']);
-        $export->export($parameters[self::PARAM_EXPORT_FOLDER], (int) $this->workerModel->getId());
+
+        try {
+            $export->export($parameters[self::PARAM_EXPORT_FOLDER], (int) $this->workerModel->getId());
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            //by default NotFoundExceptions are not logged,
+            // in that case they must be logged - otherwise we have no idea why the export will die.
+            $this->log->exception($e);
+
+            throw $e;
+        }
 
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', [$exportClass]);
