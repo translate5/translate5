@@ -87,7 +87,24 @@ class SegmentInfoCommand extends Translate5AbstractCommand
         $table = $this->io->createTable();
         $table->setHeaders($headers);
         $rows = [];
-        $values = ['id', 'segmentNrInTask', 'taskGuid', 'editable', 'pretrans', 'matchRate', 'matchRateType', 'workflowStepNr', 'workflowStep', 'isRepeated', 'source', 'sourceEdit', 'target', 'targetEdit'];
+        $values = [
+            'id',
+            'segmentNrInTask',
+            'taskGuid',
+            'editable',
+            'pretrans',
+            'matchRate',
+            'matchRateType',
+            'workflowStepNr',
+            'workflowStep',
+            'isRepeated',
+            'source',
+            'sourceMd5',
+            'sourceEdit',
+            'target',
+            'targetMd5',
+            'targetEdit'
+        ];
         foreach ($values as $val) {
             $rows[] = [
                 'name' => $val,
