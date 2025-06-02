@@ -142,8 +142,8 @@ class StatisticsLevenshteinCommand extends Translate5AbstractCommand
         Zend_Registry::get('logger')
             ->cloneMe('core.db.statistics')
             ->info('E1722', 'Statistics::levensthein - {totalCount} records processed in {duration}', [
-                '{totalCount}' => $totalCount,
-                '{duration}' => $duration,
+                'totalCount' => $totalCount,
+                'duration' => $duration,
             ]);
 
         return self::SUCCESS;
