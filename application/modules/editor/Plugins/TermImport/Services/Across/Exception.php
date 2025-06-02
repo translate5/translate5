@@ -17,6 +17,7 @@ class Exception extends \ZfExtended_ErrorCodeException
         'E1456' => 'Across TBX Export: Error on connecting to Across under "{url}"',
         'E1457' => 'Across TBX Export: Can not create Across security token',
         'E1458' => 'Across TBX Export: Error on communication with Across',
+        'E1724' => 'Across TBX Export: Error on communication with Across - got null. SSL Problem?',
         'E1459' => 'Across TBX Export: Can not create temporary filestream',
         'E1460' => 'Across TBX Export: Can not read from file with fileguid {fileGuid}',
     ];
