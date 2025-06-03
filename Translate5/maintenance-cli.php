@@ -280,6 +280,7 @@ if (file_exists('.git')) {
     $commands[] = new DevelopmentTriggerworkflowCommand();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
+    $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixArayaCommand();
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
     $commands[] = new DevelopmentLocalServicesCommand();
     $commands[] = new DevelopmentSymlinksCommand();
