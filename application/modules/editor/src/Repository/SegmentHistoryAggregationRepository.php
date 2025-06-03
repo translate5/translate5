@@ -73,7 +73,8 @@ class SegmentHistoryAggregationRepository
         /* FINAL keyword in the query below is needed for Clickhouse's ReplacingMergeTree ENGINE only
         and causes no issues for SQLite/MariaDB */
         $sql = ' FINAL WHERE taskGuid IN (:taskGuids) AND editable=1' . self::getExtraFiltersSQLWhere($filters, $bind);
-        $sqlWorkflowStep = ' AND workflowStepName NOT IN("' . editor_Workflow_Default::STEP_NO_WORKFLOW . '","' . editor_Workflow_Default::STEP_WORKFLOW_ENDED . '")';
+        $sqlWorkflowStep = ' AND workflowStepName NOT IN(' . self::quote(editor_Workflow_Default::STEP_NO_WORKFLOW) .
+            ',' . self::quote(editor_Workflow_Default::STEP_WORKFLOW_ENDED) . ')';
         $lastEditFlag = false;
 
         foreach ($filters as $filter) {
@@ -158,7 +159,7 @@ class SegmentHistoryAggregationRepository
                 $rows[] = $this->client->oneAssoc(
                     'SELECT ROUND(AVG(t.levAvg),' . self::LEVENSHTEIN_PRECISION . ') AS ' . $levenshteinColumn .
                     ' FROM (SELECT AVG(levenshtein' . $value . ') AS levAvg FROM ' . SegmentHistoryAggregation::TABLE_NAME_LEV . $sql .
-                    (' AND workflowStepName="' . $workflowStep . '"') . ' GROUP BY segmentId) AS t',
+                    (' AND workflowStepName=' . self::quote($workflowStep)) . ' GROUP BY segmentId) AS t',
                     $bind
                 );
 
@@ -166,7 +167,7 @@ class SegmentHistoryAggregationRepository
                 $rows[] = $this->client->oneAssoc(
                     'SELECT ROUND(AVG(t.timeSum)/1000,2) AS ' . $durationColumn .
                     ' FROM (SELECT SUM(duration) AS timeSum FROM ' . SegmentHistoryAggregation::TABLE_NAME . $sql .
-                    (' AND workflowStepName="' . $workflowStep . '"') . ' GROUP BY segmentId) AS t',
+                    (' AND workflowStepName=' . self::quote($workflowStep)) . ' GROUP BY segmentId) AS t',
                     $bind
                 );
             }
@@ -248,6 +249,13 @@ class SegmentHistoryAggregationRepository
             );
     }
 
+    private function logError(string $errMsg): void
+    {
+        $this->logger->error('E1633', 'Statistics DB error: {msg}', [
+            'msg' => $errMsg,
+        ]);
+    }
+
     private static function trimBrackets(array $guids): array
     {
         return array_map(fn ($guid) => trim($guid, '{}'), $guids);
@@ -286,10 +294,10 @@ class SegmentHistoryAggregationRepository
         return $sqlWhere;
     }
 
-    private function logError(string $errMsg): void
+    /* Single quotes usage is intentional for compatibility's sake with DuckDb CLI which can be used
+    to directly read data from a SQLite database file */
+    private static function quote(string $s): string
     {
-        $this->logger->error('E1633', 'Statistics DB error: {msg}', [
-            'msg' => $errMsg,
-        ]);
+        return "'" . $s . "'";
     }
 }

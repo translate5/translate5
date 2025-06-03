@@ -2473,7 +2473,7 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         // get all matching tasks before filtering out non-relevant ones
-        $taskDataList = $this->taskViewDataProvider->getTaskList($this->authenticatedUser, $filter);
+        $taskDataList = $this->taskViewDataProvider->getTaskList($this->authenticatedUser, $filter, buildTaskView: false);
 
         if (! empty($taskDataList['rows'])) { // tasks re-filtering may be needed
             $taskGuids = array_column($taskDataList['rows'], 'taskGuid');

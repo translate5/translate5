@@ -72,7 +72,7 @@ class ClickHouseDB extends AbstractStatisticsDB
         return $result;
     }
 
-    public function upsert(string $table, array $values, array $columns = []): void
+    public function upsert(string $table, array $values, array $columns): void
     {
         $client = $this->getClient();
         if (null === $client) {

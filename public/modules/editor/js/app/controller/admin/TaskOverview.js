@@ -637,6 +637,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         Ext.Ajax.request({
             url: url,
             method: 'POST',
+            timeout: 60000, //60s
             params: params,
             success: function (response) {
                 var resp = Ext.util.JSON.decode(response.responseText),
