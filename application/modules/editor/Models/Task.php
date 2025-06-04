@@ -94,7 +94,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setEmptyTargets(bool $emptyTargets)
  * @method null|string getImportAppVersion()
  * @method void setImportAppVersion(?string $version)
- * @method null|string getCustomerId()
+ * @method null|string|int getCustomerId()
  * @method void setCustomerId(string|int|null $customerId)
  * @method string getUsageMode()
  * @method void setUsageMode(string $usageMode)

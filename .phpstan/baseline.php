@@ -7277,11 +7277,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/FrontEndMessageBus/Init.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Class editor_Models_Task referenced with incorrect case\\: editor_Models_task\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/FrontEndMessageBus/Init.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method editor_Plugins_FrontEndMessageBus_Bus\\:\\:garbageCollection\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/FrontEndMessageBus/Init.php',
@@ -7869,11 +7864,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method editor_Models_TaskUsageLog\\:\\:setYearAndMonth\\(\\)\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Filetranslationhelper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Class editor_Models_Task referenced with incorrect case\\: editor_Models_task\\.$#',
-	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Filetranslationhelper.php',
 ];
 $ignoreErrors[] = [
@@ -9927,11 +9917,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermTagger/Tag.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Class editor_Models_Task referenced with incorrect case\\: editor_Models_task\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermTagger/Tag.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method MittagQI\\\\Translate5\\\\Plugins\\\\TermTagger\\\\Worker\\:\\:createService\\(\\) should return MittagQI\\\\Translate5\\\\Plugins\\\\TermTagger\\\\Service but returns MittagQI\\\\ZfExtended\\\\Service\\\\ServiceAbstract\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermTagger/Worker.php',
@@ -10280,11 +10265,6 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$elements of method editor_Plugins_VisualReview_Html_Review\\:\\:removeElementsDomOnHandler\\(\\) expects array\\<DOMElement\\>, DOMNodeList\\<DOMElement\\> given\\.$#',
 	'count' => 14,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Html/Review.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Class editor_Models_Task referenced with incorrect case\\: editor_Models_task\\.$#',
-	'count' => 6,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Html/UrlsFile.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Logger\\:\\:warn\\(\\) invoked with 3 parameters, 0 required\\.$#',
@@ -12737,11 +12717,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Filetranslationhelper.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Class editor_Models_Task referenced with incorrect case\\: editor_Models_task\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Filetranslationhelper.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Filetranslationhelper.php',
@@ -13755,11 +13730,6 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$elements of method editor_Plugins_VisualReview_Html_Review\\:\\:removeElementsDomOnHandler\\(\\) expects array\\<DOMElement\\>, DOMNodeList\\<DOMElement\\> given\\.$#',
 	'count' => 14,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Html/Review.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Class editor_Models_Task referenced with incorrect case\\: editor_Models_task\\.$#',
-	'count' => 6,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Html/UrlsFile.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Logger\\:\\:warn\\(\\) invoked with 3 parameters, 0 required\\.$#',
@@ -15297,11 +15267,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Segment/Mqm/Provider.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Class editor_Models_Task referenced with incorrect case\\: editor_Models_task\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Mqm/Tag.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Segment/Mqm/Tag.php',
@@ -15680,11 +15645,6 @@ $ignoreErrors[] = [
 	'message' => '#^Static property editor_Segment_Quality_Provider\\:\\:\\$type \\(string\\) does not accept default value of type null\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Segment/Quality/Provider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Class editor_Models_Task referenced with incorrect case\\: editor_Models_task\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Tag.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method editor_Segment_Tag\\:\\:clone\\(\\) invoked with 1 parameter, 2 required\\.$#',
@@ -17759,11 +17719,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method editor_Models_TaskUsageLog\\:\\:setYearAndMonth\\(\\)\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/src/Task/Import/TaskUsageLogger.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Class editor_Models_Task referenced with incorrect case\\: editor_Models_task\\.$#',
-	'count' => 3,
 	'path' => __DIR__ . '/../application/modules/editor/src/Task/Import/TaskUsageLogger.php',
 ];
 $ignoreErrors[] = [

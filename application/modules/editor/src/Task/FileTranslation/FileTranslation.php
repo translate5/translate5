@@ -270,7 +270,7 @@ class FileTranslation
      * Return intersection between user customers and language resources customers.
      * Those customers will be used for logging the usage
      */
-    private function getCustomersForLogging(editor_Models_task $task): array
+    private function getCustomersForLogging(editor_Models_Task $task): array
     {
         $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
         //load all customers for the assigned language resources of the task (those customers are also the current user customers)
@@ -284,7 +284,7 @@ class FileTranslation
      * Insert task usage log for the current pretranslation request.
      * For each customer of the associated language resource, one log entry is inserted.
      */
-    private function insertTaskUsageLog(editor_Models_task $task): void
+    private function insertTaskUsageLog(editor_Models_Task $task): void
     {
         $customers = $this->getCustomersForLogging($task);
 
