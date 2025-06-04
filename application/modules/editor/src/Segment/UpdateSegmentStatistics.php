@@ -106,8 +106,6 @@ class UpdateSegmentStatistics
                     ]
                 )
             );
-
-            error_log((string) $duration);
         } else {
             $duration = 0;
         }

@@ -53,13 +53,13 @@ class SyncEditable
         $segmentIds = $db->fetchCol('SELECT DISTINCT segmentId FROM LEK_segment_history WHERE id > ' . $lastSegmentHistoryId .
             ' AND segmentId <= ' . $lastSegmentId);
 
-        $result = $db->fetchPairs('SELECT id,editable FROM LEK_segments WHERE id > ' . $lastSegmentId .
+        $result = $db->fetchAll('SELECT id,editable,taskGuid FROM LEK_segments WHERE id > ' . $lastSegmentId .
             ($segmentIds ? ' OR id IN (' . implode(',', $segmentIds) . ')' : ''));
 
         if ($result) {
             $aggregation = SegmentHistoryAggregation::create();
-            foreach ($result as $segmentId => $editable) {
-                $aggregation->updateEditable($segmentId, (int) $editable);
+            foreach ($result as $segment) {
+                $aggregation->updateEditable($segment['taskGuid'], (int) $segment['id'], (int) $segment['editable']);
             }
         }
 

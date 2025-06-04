@@ -342,7 +342,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         return true;
     }
 
-    public function finalize(editor_TagSequence $tags, editor_Models_task $task): void
+    public function finalize(editor_TagSequence $tags, editor_Models_Task $task): void
     {
         // finds our severity in our cclasses via the tasks MQM configuration
         $this->severity = editor_Segment_Mqm_Configuration::instance($task)->findMqmSeverity($this->classes, '');

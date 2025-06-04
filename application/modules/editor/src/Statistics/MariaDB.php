@@ -68,7 +68,7 @@ class MariaDB extends AbstractStatisticsDB
         return is_array($row) ? $row : [];
     }
 
-    public function upsert(string $table, array $values, array $columns = []): void
+    public function upsert(string $table, array $values, array $columns): void
     {
         $db = $this->getClient();
 
@@ -78,7 +78,12 @@ class MariaDB extends AbstractStatisticsDB
         if ($this->logQueryTime) {
             $this->initQueryTime();
         }
-        $sql = 'REPLACE INTO ' . $table . ' (' . implode(',', $columns) . ') VALUES (:' . implode(',:', $columns) . ')';
+        $updates = [];
+        foreach ($columns as $column) {
+            $updates[] = '`' . $column . '`=VALUES(`' . $column . '`)';
+        }
+        $sql = 'INSERT INTO ' . $table . ' (' . implode(',', $columns) . ') VALUES (:' .
+            implode(',:', $columns) . ') ON DUPLICATE KEY UPDATE ' . implode(',', $updates);
         foreach ($values as $value) {
             $bindings = array_combine($columns, $value);
             $db->query($sql, $bindings);

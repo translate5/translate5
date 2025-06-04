@@ -43,6 +43,10 @@ class SQLite extends AbstractStatisticsDB
 
     private ?SQLite3 $client = null;
 
+    private string $duckDbCli = '/usr/local/bin/duckdb';
+
+    private bool $readAveragesWithDuckDb = false;
+
     public function isAlive(): bool
     {
         return null !== $this->getClient();
@@ -66,28 +70,45 @@ class SQLite extends AbstractStatisticsDB
 
     public function oneAssoc(string $sql, array $bind = []): array
     {
-        if ($logQueryTime = ($this->logQueryTime && str_contains($sql, 'AVG('))) {
-            // we can query SQLite via DuckDB if ever needed
+        $withAverages = str_contains($sql, 'AVG(');
+        if ($logQueryTime = ($this->logQueryTime && $withAverages)) {
             $this->initQueryTime();
         }
-        $result = $this->execute($sql, $bind);
+        $errMsg = '';
+        $useDuckDb = $withAverages && $this->readAveragesWithDuckDb;
+        if ($useDuckDb) {
+            // query SQLite via DuckDB CLI, no PHP Client API yet (https://duckdb.org/docs/stable/clients/cli/overview.html)
+            $sql = $this->adjustBindings($sql, $bind);
+            exec($this->duckDbCli . ' -safe -readonly ' . $this->config->resources->db->statistics->sqliteDbname .
+                ' -json -c "' . $sql . '" 2>&1', $result, $code);
+            if ($code === 0) {
+                $result = json_decode($result[0], true);
+            } else {
+                $errMsg = $result[0];
+                $result = false;
+            }
+        } else {
+            $result = $this->execute($sql, $bind);
+        }
+
+        if ($result === false) {
+            $this->logLastError($errMsg);
+
+            return [];
+        }
+
         if ($logQueryTime) {
-            $this->logQueryTime('Read aggregation query took %.2f ms', [
+            $this->logQueryTime('Read aggregation query took %.2f ms' . ($useDuckDb ? ' (DuckDB)' : ''), [
                 'sql' => $sql,
             ]);
         }
 
-        if ($result === false) {
-            $this->logLastError();
-
-            return [];
-        }
-        $row = $result->fetchArray(SQLITE3_ASSOC);
+        $row = $useDuckDb ? $result[0] : $result->fetchArray(SQLITE3_ASSOC);
 
         return $row ?: [];
     }
 
-    public function upsert(string $table, array $values, array $columns = []): void
+    public function upsert(string $table, array $values, array $columns): void
     {
         $db = $this->getClient();
         if (null === $db) {
@@ -100,7 +121,8 @@ class SQLite extends AbstractStatisticsDB
         if ($this->logQueryTime) {
             $this->initQueryTime();
         }
-        $sql = 'REPLACE INTO ' . $table . ' (' . implode(',', $columns) . ') VALUES (:' . implode(',:', $columns) . ')';
+        $sql = 'INSERT OR REPLACE INTO ' . $table . ' (' . implode(',', $columns) . ') VALUES (:' .
+            implode(',:', $columns) . ')';
         foreach ($values as $value) {
             $bind = array_combine($columns, $value);
             $result = $this->execute($sql, $bind);
@@ -150,6 +172,22 @@ class SQLite extends AbstractStatisticsDB
         if ($db === null) {
             return false;
         }
+
+        $sql = $this->adjustBindings($sql, $bind);
+        $stmt = $db->prepare($sql);
+        if (! $stmt) {
+            return false;
+        }
+        foreach ($bind as $param => $value) {
+            $stmt->bindValue(':' . $param, $value);
+        }
+
+        return $stmt->execute();
+    }
+
+    private function adjustBindings(string $sql, array &$bind): string
+    {
+        $db = $this->getClient();
         foreach ($bind as $param => $value) {
             // handle IN(?) with array parameters
             if (is_array($value)) {
@@ -159,27 +197,21 @@ class SQLite extends AbstractStatisticsDB
                     $sqlValue = "'" . implode("','", array_map([$db, 'escapeString'], $value)) . "'";
                 }
                 $sql = str_replace(':' . $param, $sqlValue, $sql);
+                unset($bind[$param]);
             }
         }
 
-        $stmt = $db->prepare($sql);
-        if (! $stmt) {
-            return false;
-        }
-        foreach ($bind as $param => $value) {
-            if (! is_array($value)) {
-                $stmt->bindValue(':' . $param, $value);
-            }
-        }
-
-        return $stmt->execute();
+        return $sql;
     }
 
-    private function logLastError(): void
+    private function logLastError(string $msg = ''): void
     {
-        $defaultError = extension_loaded('sqlite3') ? 'unknown error' : 'missing "sqlite3" PHP extension';
+        if (empty($msg)) {
+            $defaultError = extension_loaded('sqlite3') ? 'unknown error' : 'missing "sqlite3" PHP extension';
+            $msg = $this->client ? $this->client->lastErrorMsg() : $defaultError;
+        }
         $this->logger->error('E1633', 'Statistics DB error: {msg}', [
-            'msg' => $this->client ? $this->client->lastErrorMsg() : $defaultError,
+            'msg' => $msg,
         ]);
     }
 
@@ -213,6 +245,13 @@ class SQLite extends AbstractStatisticsDB
                 }
                 if ((bool) $statConfig->sqliteWriteAheadLog) {
                     $this->query('PRAGMA journal_mode=wal');
+                }
+                if ((bool) $statConfig->sqliteReadAveragesWithDuckDb) {
+                    $this->readAveragesWithDuckDb = true;
+                    putenv("HOME=/tmp"); // otherwise DuckDB throws "IO Error: Can't find the home directory at ''"
+                }
+                if (isset($statConfig->duckDbCli)) {
+                    $this->duckDbCli = $statConfig->duckDbCli;
                 }
             } catch (\Throwable $e) {
                 $this->connectFailed = true;

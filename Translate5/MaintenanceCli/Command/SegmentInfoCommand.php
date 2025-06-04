@@ -26,12 +26,17 @@
  END LICENSE AND COPYRIGHT
  */
 
+declare(strict_types=1);
+
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Segment;
+use ReflectionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -54,11 +59,20 @@ class SegmentInfoCommand extends Translate5AbstractCommand
             InputArgument::REQUIRED,
             'The id of the segment to be printed'
         );
+
+        $this->addOption(
+            'meta',
+            'm',
+            InputOption::VALUE_NONE,
+            'Show also the meta data of the segment'
+        );
     }
 
     /**
      * Execute the command
      * {@inheritDoc}
+     * @throws Zend_Exception
+     * @throws ReflectionException
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -72,7 +86,7 @@ class SegmentInfoCommand extends Translate5AbstractCommand
 
         try {
             $segment->load((int) $segmentId);
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
             $this->io->error('Segment with the id "' . $segmentId . '" could not be found.');
 
             return self::FAILURE;
@@ -87,7 +101,24 @@ class SegmentInfoCommand extends Translate5AbstractCommand
         $table = $this->io->createTable();
         $table->setHeaders($headers);
         $rows = [];
-        $values = ['id', 'segmentNrInTask', 'taskGuid', 'editable', 'pretrans', 'matchRate', 'matchRateType', 'workflowStepNr', 'workflowStep', 'isRepeated', 'source', 'sourceEdit', 'target', 'targetEdit'];
+        $values = [
+            'id',
+            'segmentNrInTask',
+            'taskGuid',
+            'editable',
+            'pretrans',
+            'matchRate',
+            'matchRateType',
+            'workflowStepNr',
+            'workflowStep',
+            'isRepeated',
+            'source',
+            'sourceMd5',
+            'sourceEdit',
+            'target',
+            'targetMd5',
+            'targetEdit',
+        ];
         foreach ($values as $val) {
             $rows[] = [
                 'name' => $val,
@@ -98,6 +129,12 @@ class SegmentInfoCommand extends Translate5AbstractCommand
 
         $table->setRows($rows);
         $table->render();
+
+        if ($this->input->getOption('meta')) {
+            $this->io->section('Meta data of segment');
+            $data = $segment->meta()->getDataObject();
+            $this->writeAssoc((array) $data);
+        }
 
         return self::SUCCESS;
     }

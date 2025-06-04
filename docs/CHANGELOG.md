@@ -9,6 +9,57 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+
+## [7.23.3] - 2025-05-27
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4677](https://jira.translate5.net/browse/TRANSLATE-4677): t5memory - Add new code to reorganize** <br>
+Added new code to reorganize memory codes
+
+**[TRANSLATE-4664](https://jira.translate5.net/browse/TRANSLATE-4664): TBX-Import - TBX import: unexpected elements changed to expected - should be logged** <br>
+distinct unexpected element names (if any) are now logged during tbx import
+
+**[TRANSLATE-4654](https://jira.translate5.net/browse/TRANSLATE-4654): t5memory, TM Maintenance - Change batch deletion behavior in TM Maintenance** <br>
+Improved batch deletion in TM Maintenace for small batches
+
+**[TRANSLATE-4649](https://jira.translate5.net/browse/TRANSLATE-4649): GroupShare integration - GroupShare: The request produced an error in the queried service** <br>
+Fixed problem with concordance search in plugin.
+
+**[TRANSLATE-4513](https://jira.translate5.net/browse/TRANSLATE-4513): TermTagger integration - Send TBX ID as part of the URL to the termTagger** <br>
+7:23.3: Fix log entries produced when termtagger is not properly answering
+7.23.2: Fix implementation as specified, TBX loading problems in termtagger lead now to delay instead termtagger disabling
+7.22.0: TBX ID is sent as part of the request/header to the termTagger
+
+
+### Bugfixes
+**[TRANSLATE-4674](https://jira.translate5.net/browse/TRANSLATE-4674): VisualReview / VisualTranslation - Visual: mappingType is initialized wrongly when not given** <br>
+Visual mappingType was initialized wrongly for Hotfolder & ConnectWorldserver Tasks
+
+**[TRANSLATE-4670](https://jira.translate5.net/browse/TRANSLATE-4670): Workflows - Optimize excessive data load in kpiAction** <br>
+7.23.3: Reduced KPI window loading time - further improvements will follow
+
+**[TRANSLATE-4665](https://jira.translate5.net/browse/TRANSLATE-4665): Export - Export tries to get worker that no longer in DB** <br>
+Fix export worker in seldom case where worker was deleted before other depending calls were done
+
+
+**[TRANSLATE-4662](https://jira.translate5.net/browse/TRANSLATE-4662): AI - RootCause: rec.getMajor is not a function** <br>
+FIXED: server-side error behind a crash on attempt to add a pre-configured prompt to a training
+
+**[TRANSLATE-4650](https://jira.translate5.net/browse/TRANSLATE-4650): InstantTranslate - Newlines are sent to DeepL as individual segments** <br>
+FIXED: newlines are now not sent to DeepL as indivudual segments
+
+**[TRANSLATE-4618](https://jira.translate5.net/browse/TRANSLATE-4618): Workflows - Restrict possible backup filename length** <br>
+7.23.3: Remove all non ascii characters from file name
+7.23.2: Added max possible backup filename length limit to make sure backup files can be created and uploaded
+
+**[TRANSLATE-4252](https://jira.translate5.net/browse/TRANSLATE-4252): Import/Export, MatchAnalysis & Pretranslation - Task: word total in task counts "blocked" segments** <br>
+FIXED: blocked segments are now excluded from word count calculation; to re-calculate the wordcount check/uncheck the edit 100% match checkbox
+
+
 ## [7.23.2] - 2025-05-16
 
 ### Changed

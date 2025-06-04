@@ -52,7 +52,7 @@ abstract class AbstractStatisticsDB
 
     abstract public function oneAssoc(string $sql, array $bind = []): array;
 
-    abstract public function upsert(string $table, array $values, array $columns = []): void;
+    abstract public function upsert(string $table, array $values, array $columns): void;
 
     abstract public function query(string $sql, array $bind = []): void;
 

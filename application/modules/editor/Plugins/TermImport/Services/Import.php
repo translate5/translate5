@@ -81,6 +81,8 @@ class editor_Plugins_TermImport_Services_Import
 
     public const IMPORT_ACROSS_API_SSL_PEER_NAME = 'ssl_peer_name';
 
+    public const IMPORT_ACROSS_API_SSL_ALLOW_SELF_SIGNED = 'ssl_allow_self_signed';
+
     /***
      * Key from the crossapi config file for the across export files directory
      * @var string
@@ -287,14 +289,7 @@ class editor_Plugins_TermImport_Services_Import
             return $this->returnMessage;
         }
 
-        $additionalConfig = [];
-        if (! empty($this->configMap[self::IMPORT_ACROSS_API_SSL_PEER_NAME])) {
-            $additionalConfig['stream_context'] = stream_context_create([
-                'ssl' => [
-                    'peer_name' => $this->configMap[self::IMPORT_ACROSS_API_SSL_PEER_NAME],
-                ],
-            ]);
-        }
+        $additionalConfig = $this->getAdditionalConfig();
 
         //get all across export files from the dir
         $it = new FilesystemIterator($exportFilesDir, FilesystemIterator::SKIP_DOTS);
@@ -802,5 +797,31 @@ class editor_Plugins_TermImport_Services_Import
             error_log('Profiling TermPortal Import - ' . $msg . ": \n  Duration (seconds): " . $duration);
         }
         $this->profilingStart = microtime(true);
+    }
+
+    private function getAdditionalConfig(): array
+    {
+        $additionalConfig = [];
+        $hasPeerName = ! empty($this->configMap[self::IMPORT_ACROSS_API_SSL_PEER_NAME]);
+        $isSelfSignedAllowed = ! empty($this->configMap[self::IMPORT_ACROSS_API_SSL_ALLOW_SELF_SIGNED]);
+        if (! $hasPeerName && ! $isSelfSignedAllowed) {
+            return $additionalConfig;
+        }
+
+        $ssl = [];
+        if ($hasPeerName) {
+            $ssl['peer_name'] = $this->configMap[self::IMPORT_ACROSS_API_SSL_PEER_NAME];
+        }
+        if ($isSelfSignedAllowed) {
+            $ssl['verify_peer'] = false;
+            $ssl['verify_peer_name'] = false;
+            $ssl['allow_self_signed'] = true;
+        }
+
+        $additionalConfig['stream_context'] = stream_context_create([
+            'ssl' => $ssl,
+        ]);
+
+        return $additionalConfig;
     }
 }

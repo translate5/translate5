@@ -252,7 +252,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
         }
 
         //5. unlock the task too, if locked by the jobs user
-        $task = ZfExtended_Factory::get(editor_Models_task::class);
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->unlockForUser($job->getUserGuid(), $job->getTaskGuid());
     }
 

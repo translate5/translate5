@@ -101,6 +101,7 @@ class TaskViewDataProvider
         ?ZfExtended_Models_Filter $filter,
         int $offset = 0,
         int $limit = 0,
+        bool $buildTaskView = true,
     ): array {
         $totalSelect = $this->taskQuerySelectFactory->createTotalTaskCountSelect($viewer, $filter);
         $select = $this->taskQuerySelectFactory->createTaskSelect($viewer, $filter, $offset, $limit);
@@ -108,8 +109,10 @@ class TaskViewDataProvider
         $totalCount = $this->db->fetchOne($totalSelect);
         $tasks = $this->db->fetchAll($select);
 
-        foreach ($tasks as &$task) {
-            $task = $this->buildTaskView($task, $viewer);
+        if ($buildTaskView) {
+            foreach ($tasks as &$task) {
+                $task = $this->buildTaskView($task, $viewer);
+            }
         }
 
         // TODO: extract logic from TaskController to here

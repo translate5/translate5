@@ -11,6 +11,8 @@ apiPassword=pass
 ;In proxy / ssh tunneling setups, the crossAPIurl might point to the proxy host, but for SSL validation the
 ; real hostname of the target machine must be passed. This can be done with ssl_peer_name config:
 ;ssl_peer_name=REAL_HOST_NAME
+;in same scenarios self signed certs may be needed too, use that only in VPN / tunneling scenarios!
+;ssl_allow_self_signed=true
  
 ;mergeTerms: Allowed values: true or false.
 ;If this is true, terms will be merged as described at https://confluence.translate5.net/display/TAD/Term+Collection.

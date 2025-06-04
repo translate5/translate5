@@ -652,11 +652,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     private static function getSkipCoreParserSet(ImportFilter $importFilter, ?BconfEntity $bconf, ?string $bconfInZip): array
     {
         // we support XLIFF-via-OKAPI only with BCONFs from Version 10 on to enable full compatibility with older task-archives
-        $bconfVersion10Plus = $bconf !== null ? $bconf->getPipeline()->getBconfVersion() >= 10 : str_contains(
+        $skipCoreParser = $bconf !== null ? ! $bconf->isSystemDefault() && $bconf->getPipeline()->getBconfVersion() >= 10 : str_contains(
             file_get_contents($bconfInZip),
             ' ' . Pipeline::BCONF_VERSION_ATTR . '="' // as the flag was added since v10
         );
-        if (! $bconfVersion10Plus) {
+        if (! $skipCoreParser) {
             return [];
         }
         $skipCoreParserSet = [];

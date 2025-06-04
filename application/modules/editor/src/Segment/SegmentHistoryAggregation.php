@@ -230,14 +230,22 @@ class SegmentHistoryAggregation
         return $this->flushUpserts();
     }
 
-    public function updateEditable(int $segmentId, int $editable): void
+    public function updateEditable(string $taskGuid, int $segmentId, int $editable): void
     {
+        $bind = [
+            'taskGuid' => trim($taskGuid, '{}'),
+        ];
+
         try {
             $this->client->query(
-                'UPDATE ' . self::TABLE_NAME . ' SET editable=' . $editable . ' WHERE segmentId=' . $segmentId
+                'UPDATE ' . self::TABLE_NAME . ' SET editable=' . $editable .
+                ' WHERE taskGuid = :taskGuid AND segmentId=' . $segmentId,
+                $bind
             );
             $this->client->query(
-                'UPDATE ' . self::TABLE_NAME_LEV . ' SET editable=' . $editable . ' WHERE segmentId=' . $segmentId
+                'UPDATE ' . self::TABLE_NAME_LEV . ' SET editable=' . $editable .
+                ' WHERE taskGuid = :taskGuid AND segmentId=' . $segmentId,
+                $bind
             );
         } catch (Throwable $e) {
             $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
@@ -246,10 +254,11 @@ class SegmentHistoryAggregation
 
     public function removeTaskData(string $taskGuid): void
     {
+        $bind = [
+            'taskGuid' => trim($taskGuid, '{}'),
+        ];
+
         try {
-            $bind = [
-                'taskGuid' => trim($taskGuid, '{}'),
-            ];
             $this->client->query(
                 'DELETE FROM ' . self::TABLE_NAME . ' WHERE taskGuid = :taskGuid',
                 $bind
