@@ -156,6 +156,25 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $unmodifiedSegmentsEventHandler->register();
 
         \MittagQI\Translate5\LanguageResource\TaskTm\EventListener::create($eventManager)->atachAll();
+
+        $eventManager->attach(
+            Editor_CustomerController::class,
+            'afterPostAction',
+            function (Zend_EventManager_Event $event): void {
+                /* @var editor_Models_Customer_Customer $entity */
+                $entity = $event->getParam('entity');
+                if (ZfExtended_Authentication::getInstance()->isUserClientRestricted()) {
+                    $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+                    $user->loadByGuid(ZfExtended_Authentication::getInstance()->getUserGuid());
+
+                    $customers = $user->getCustomersArray();
+                    $customers[] = $entity->getId();
+
+                    $user->assignCustomers(array_unique($customers));
+                    $user->save();
+                }
+            }
+        );
     }
 
     public static function initModuleSpecific()
