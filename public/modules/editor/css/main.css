@@ -1050,24 +1050,21 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     padding: 0 10px 1px;
     line-height: 0;
 }
-.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:first-child {
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div {
     line-height: 15px;
     white-space: break-spaces;
-    display: inline;
+    word-break: break-all;
 }
-.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2) {
-    line-height: initial;
-    white-space: break-spaces;
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div > span {
     font-weight: bold;
     display: inline;
     word-break: break-all;
 }
-.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div.no-content {
-    font-weight: unset;
+.x-fieldset.segmentQualities .quality {
+    vertical-align: inherit;
 }
-.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):before {
-    font-weight: normal;
-    content: ' » ';
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div > span.no-content {
+    font-weight: unset;
 }
 .t5falsePositivesGrid .fa {
     font-family: FontAwesome5FreeSolid;
