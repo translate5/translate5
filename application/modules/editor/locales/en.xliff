@@ -2845,6 +2845,10 @@
                 <source>Serbisch (Kyrillisch) (Serbien und Montenegro)</source>
                 <target>Serbian (Cyrillic) (Serbia and Montenegro)</target>
             </trans-unit>
+            <trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuIHVuZCBNb250ZW5lZ3JvKQ=='>
+                <source>Serbisch (Latein Serbien und Montenegro)</source>
+                <target>Serbian (Latin Serbia and Montenegro)</target>
+            </trans-unit>
             <trans-unit id='U2Nod2VkaXNjaCAoRmlubmxhbmQp'>
                 <source>Schwedisch (Finnland)</source>
                 <target>Swedish (Finland)</target>
