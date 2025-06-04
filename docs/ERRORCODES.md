@@ -878,6 +878,13 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1534"></a>E1534 | Plug-In AcrossHotfolder | Plug-In AcrossHotfolder: [{project}]: Provided bconf [{bconf}] does not exists                                      | Okapi Bconf name provided in instruction.xml not present in DB                  |
 | <a id="E1695"></a>E1695 | Plug-In AcrossHotfolder | Plug-In AcrossHotfolder: Unsuccessful folder move: {errorMsg}                                                       | On attempt to move folder or file error occurred                                |
 
+#### Plug-In CotiHotfolder
+
+| EventCode               | Context               | EventMessage                                                               | Description/Solution                                                    |
+|:------------------------|:----------------------|:---------------------------------------------------------------------------|:------------------------------------------------------------------------|
+| <a id="E1717"></a>E1717 | Plug-In CotiHotfolder | Plug-In CotiHotfolder: {message}                                           | Generic CotiHotfolder audit message                                     |
+| <a id="E1718"></a>E1718 | Plug-In CotiHotfolder | Plug-In CotiHotfolder: 'defaultPM' is not set in config or not valid PM id | Invalid value set for 'runtimeOptions.plugins.CotiHotfolder.defaultPM'  |
+
 #### Plug-In TextShuttle
 
 | EventCode               | Context             | EventMessage                                                                           | Description/Solution                                                                                                                                                                                                                                                                                           |
