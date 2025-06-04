@@ -195,7 +195,7 @@ class editor_Models_Segment_AutoStates
 
     public function __construct()
     {
-        $this->segmentHistory = new SegmentHistoryRepository();
+        $this->segmentHistory = SegmentHistoryRepository::create();
     }
 
     #region Getters

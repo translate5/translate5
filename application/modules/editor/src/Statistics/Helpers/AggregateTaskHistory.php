@@ -57,7 +57,7 @@ class AggregateTaskHistory
         private readonly string $sqlSince = '',
     ) {
         $this->jobsLogged = new LoggedJobsData($sqlSince);
-        $this->history = new SegmentHistoryRepository();
+        $this->history = SegmentHistoryRepository::create();
         $this->historyData = new SegmentHistoryDataRepository();
         $this->aggregator = SegmentHistoryAggregation::create();
         $this->db = Zend_Db_Table::getDefaultAdapter();

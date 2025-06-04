@@ -60,7 +60,20 @@ final class Service extends DockerServiceAbstract
             $checked = false;
         }
 
-        return $checked;
+        $bus = new \editor_Plugins_FrontEndMessageBus_Bus(\editor_Plugins_FrontEndMessageBus_Init::CLIENT_VERSION);
+        if ($checked && $bus->ping()) {
+            return true;
+        }
+
+        if (! is_null($bus->getLastResponse())) {
+            $response = $bus->getLastResponse();
+            $this->errors[] = 'HTTP ' . $response->getStatus() . ': ' . $response->getBody();
+
+            return false;
+        }
+        $this->errors[] = 'Unknown error - empty response from server';
+
+        return false;
     }
 
     public function locate(SymfonyStyle $io, mixed $url, bool $doSave = false, array $config = []): bool

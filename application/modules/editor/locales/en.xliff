@@ -10578,6 +10578,10 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
                 <target>Cancel</target>
             </trans-unit>
+            <trans-unit id="ezB9IFdpZWRlcmhvbHVuZ2VuIHp1ciBCZWFyYmVpdHVuZyB2b3JnZXNlaGVu">
+                <source>{0} Wiederholungen zur Bearbeitung vorgesehen</source>
+                <target>{0} repetitions scheduled for processing</target>
+            </trans-unit>
             <trans-unit id="TnVyIFNlZ21lbnRlIG1pdCBLb21tZW50YXIgYW56ZWlnZW4=">
               <source>Nur Segmente mit Kommentar anzeigen</source>
               <target>Show only commented segments</target>
@@ -10590,7 +10594,7 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Sekunden</source>
                 <target>seconds</target>
             </trans-unit>
-	    <trans-unit id='RGF0ZW4gbmljaHQgdmVyZsO8Z2Jhcg=='>
+	        <trans-unit id='RGF0ZW4gbmljaHQgdmVyZsO8Z2Jhcg=='>
                 <source>Daten nicht verfügbar</source>
                 <target>Data unavailable</target>
             </trans-unit>

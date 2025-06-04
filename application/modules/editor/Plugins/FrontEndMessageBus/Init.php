@@ -26,7 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\Plugins\VisualReview\Annotation\AnnotationEntity;
+use MittagQI\Translate5\Repository\SegmentRepository;
+use MittagQI\Translate5\Segment\Repetition\Event\RepetitionProcessedEvent;
+use MittagQI\Translate5\Segment\Repetition\Event\RepetitionProcessingFailedEvent;
+use MittagQI\Translate5\Segment\Repetition\Event\RepetitionReplacementRequestedEvent;
+use MittagQI\Translate5\Task\Events\TaskProgressUpdatedEvent;
 
 class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
 {
@@ -35,9 +41,13 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
     public const CHANNEL_CHAT = 'chat';
 
     /**
-     * Increase me on each change! (also SERVER_VERSION in server.php!)
+     * Increase me on each change! (also SERVER_VERSION in server.php when changes reflected in server!)
+     *  - Major Version change on backwards incompatible changes.
+     *  - Minor Version change on backwards compatible changes.
      */
-    public const CLIENT_VERSION = '1.1';
+    public const CLIENT_VERSION = '2.0';
+
+    protected const SEGMENTS_PROCESSED_MESSAGE = 'segmentsProcessed';
 
     protected static string $description = 'Provides the MessageBus (WebSocket) functionality for multi-user usage and other functions improving the user experience.';
 
@@ -80,7 +90,28 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
         //$this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', [$this, 'handleSegmentSave']);
         $this->eventManager->attach('Editor_AlikesegmentController', 'afterGetAction', [$this, 'handleAlikeLoad']);
-        $this->eventManager->attach('Editor_AlikesegmentController', 'afterPutAction', [$this, 'handleAlikeSave']);
+
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            RepetitionReplacementRequestedEvent::class,
+            [$this, 'sendSegmentRepetitionProcessingStarted']
+        );
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            RepetitionProcessedEvent::class,
+            [$this, 'sendSegmentProcessed']
+        );
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            TaskProgressUpdatedEvent::class,
+            [$this, 'sendTaskProgressUpdated']
+        );
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            RepetitionProcessingFailedEvent::class,
+            [$this, 'unlockProcessingRepetitionSegments']
+        );
+
         $this->eventManager->attach('Editor_IndexController', 'beforeIndexAction', [$this, 'handleStartSession']);
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', [$this, 'injectFrontendConfig']);
         $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', [$this, 'handleGarbageCollection']);
@@ -275,23 +306,63 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
 
         $view = $event->getParam('view');
         $alikeIds = array_column($view->rows, 'id');
+
         $this->bus->notify(self::CHANNEL_TASK, 'segmentAlikesLoaded', [
             'connectionId' => $this->getHeaderConnId(),
-            'masterSegment' => $masterSegment->getDataObject(),
+            'masterSegment' => [
+                'id' => (int) $masterSegment->getId(),
+                'taskGuid' => $masterSegment->getTaskGuid(),
+            ],
             'sessionId' => Zend_Session::getId(),
             'alikeIds' => $alikeIds,
         ]);
     }
 
-    public function handleAlikeSave(Zend_EventManager_Event $event)
+    public function sendSegmentRepetitionProcessingStarted(Zend_EventManager_Event $zendEvent)
     {
-        $segment = $event->getParam('entity');
-        /* @var $segment editor_Models_Segment */
+        /** @var RepetitionReplacementRequestedEvent $event */
+        $event = $zendEvent->getParam('event');
 
-        $this->bus->notify(self::CHANNEL_TASK, 'segmentAlikeSave', [
-            'connectionId' => $this->getHeaderConnId(),
-            'segment' => $segment->getDataObject(),
-            'sessionId' => Zend_Session::getId(),
+        $this->bus->notify(self::CHANNEL_TASK, 'segmentProcessingStarted', [
+            'taskGuid' => $event->taskGuid,
+            'segmentIds' => [$event->masterId, ...$event->repetitionIds],
+        ]);
+    }
+
+    public function sendSegmentProcessed(Zend_EventManager_Event $zendEvent)
+    {
+        /** @var RepetitionProcessedEvent $event */
+        $event = $zendEvent->getParam('event');
+
+        $this->bus->notify(self::CHANNEL_TASK, self::SEGMENTS_PROCESSED_MESSAGE, [
+            'taskGuid' => $event->taskGuid,
+            'segmentIds' => $event->repetitionIds,
+        ]);
+    }
+
+    public function sendTaskProgressUpdated(Zend_EventManager_Event $zendEvent): void
+    {
+        /** @var TaskProgressUpdatedEvent $event */
+        $event = $zendEvent->getParam('event');
+
+        $this->bus->notify(self::CHANNEL_TASK, 'updateTaskProgress', [
+            'taskGuid' => $event->taskGuid,
+            'progress' => $event->getProgress(),
+        ]);
+    }
+
+    public function unlockProcessingRepetitionSegments(Zend_EventManager_Event $zendEvent): void
+    {
+        /** @var RepetitionProcessingFailedEvent $event */
+        $event = $zendEvent->getParam('event');
+
+        $segmentRepository = SegmentRepository::create();
+
+        $segment = $segmentRepository->get($event->masterId);
+
+        $this->bus->notify(self::CHANNEL_TASK, self::SEGMENTS_PROCESSED_MESSAGE, [
+            'taskGuid' => $segment->getTaskGuid(),
+            'segmentIds' => [$event->masterId, ...$event->repetitionIds],
         ]);
     }
 

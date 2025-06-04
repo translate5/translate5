@@ -10386,6 +10386,10 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
                 <target>Abbrechen</target>
             </trans-unit>
+            <trans-unit id="ezB9IFdpZWRlcmhvbHVuZ2VuIHp1ciBCZWFyYmVpdHVuZyB2b3JnZXNlaGVu">
+                <source>{0} Wiederholungen zur Bearbeitung vorgesehen</source>
+                <target>{0} Wiederholungen zur Bearbeitung vorgesehen</target>
+            </trans-unit>
             <trans-unit id="TnVyIFNlZ21lbnRlIG1pdCBLb21tZW50YXIgYW56ZWlnZW4=">
               <source>Nur Segmente mit Kommentar anzeigen</source>
               <target>Nur Segmente mit Kommentar anzeigen</target>

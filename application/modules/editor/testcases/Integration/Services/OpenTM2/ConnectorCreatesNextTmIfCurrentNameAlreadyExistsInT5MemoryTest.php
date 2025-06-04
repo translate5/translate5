@@ -97,6 +97,14 @@ class ConnectorCreatesNextTmIfCurrentNameAlreadyExistsInT5MemoryTest extends Tes
 
         $this->connector = new Connector();
         $this->connector->connectTo($this->languageResource, (int) $en->getId(), (int) $de->getId());
+
+        $this->connector->deleteMemory(
+            sprintf(
+                'ID%s-%s',
+                $this->languageResource->getId(),
+                $this->languageResource->getName(),
+            )
+        );
     }
 
     public function tearDown(): void

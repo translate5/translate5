@@ -33,6 +33,7 @@ use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
+use MittagQI\Translate5\Segment\Repetition\RepetitionUpdater;
 use ZfExtended_Factory as Factory;
 
 /**
@@ -85,8 +86,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
     /**
      * Holds the repetition updater
+     * @var RepetitionUpdater
      */
-    protected ?editor_Models_Segment_RepetitionUpdater $repetitionUpdater = null;
+    protected $repetitionUpdater;
 
     private editor_Services_Manager $manager;
 
@@ -107,6 +109,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->analysisId = $analysisId;
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         $this->manager = Factory::get(editor_Services_Manager::class);
+        $this->repetitionUpdater = RepetitionUpdater::create();
 
         parent::__construct($analysisId);
     }
@@ -138,6 +141,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         /** @var editor_Models_Segment $segment */
         foreach ($segments as $segment) {
+            /* @var $segment editor_Models_Segment */
+
             $segmentCounter++;
 
             //progress to update
@@ -232,11 +237,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         // If segment has descriptor set - it indicates that the segment had res-name on import
         // and such segment should be treated as a unique segment in pair with the descriptor
         $segmentHash = $segment->getRepetitionHash();
-
-        //lazy init, we need only instance, the here given $segment will be overwritten wuth the updateRepetition call
-        if (null === $this->repetitionUpdater) {
-            $this->repetitionUpdater = new editor_Models_Segment_RepetitionUpdater($segment, $this->task->getConfig());
-        }
 
         //check if the segment source hash exist in the repetition array
         //segment exist in the repetition array -> it is repetition, save it as 102 (repetition) and 0 languageResource
@@ -354,7 +354,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             return null;
         }
 
-        if ($this->repetitionUpdater->updateTargetOfRepetition($master, $segment)) {
+        if ($this->repetitionUpdater->updateTarget($master, $segment)) {
             // the returning result must be the one from the first of the repetition group.
             // to get the correct content for the repetition we get the value from $segment, which was updated by the repetition updater
             // we may not update the repetitionHash, this would interfer with the other repetitions
@@ -630,13 +630,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
 
         if ($languageResourceid === 0) {
-            $type = MatchRateType::TYPE_AUTO_PROPAGATED;
+            $type = editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED;
         } elseif (array_key_exists($languageResourceid, $this->resources)) {
             $type = $this->resources[$languageResourceid]->getResourceType();
             $matchAnalysis->setPenaltyGeneral($this->penalty['general'][$languageResourceid]);
             $matchAnalysis->setPenaltySublang($this->penalty['sublang'][$languageResourceid]);
         } else {
-            $type = MatchRateType::TYPE_UNKNOWN;
+            $type = editor_Models_Segment_MatchRateType::TYPE_UNKNOWN;
         }
 
         $matchAnalysis->setType($type);

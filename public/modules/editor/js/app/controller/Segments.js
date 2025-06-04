@@ -113,6 +113,13 @@ Ext.define('Editor.controller.Segments', {
         selector: 'qualityFilterPanel'
     }],
     listen: {
+        messagebus: {
+            '#translate5 task': {
+                updateTaskProgress: function (params) {
+                    this.updateSegmentFinishCountViewModel(params.taskProgress, params.userProgress);
+                }
+            }
+        },
         controller: {
             '#Editor.$application': {
                 editorViewportClosed: 'clearSegments',
@@ -839,7 +846,7 @@ Ext.define('Editor.controller.Segments', {
      * Update the taskProgress and userProgress
      *
      * @param {float} taskProgress
-     * @param {float} userProgress
+     * @param {float|null} userProgress
      */
     updateSegmentFinishCountViewModel: function (taskProgress, userProgress) {
         var me = this,
@@ -853,7 +860,10 @@ Ext.define('Editor.controller.Segments', {
 
         // Update taskProgress and userProgress
         vm.set('taskProgress', taskProgress);
-        vm.set('userProgress', userProgress);
+
+        if (userProgress !== null) {
+            vm.set('userProgress', userProgress);
+        }
     },
     /**
      * Handles the cancel edit of the segment grid

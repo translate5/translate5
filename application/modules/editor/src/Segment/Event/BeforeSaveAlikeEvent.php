@@ -26,20 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * Klasse zum Zugriff auf die Tabelle mit Namen des Klassennamens (in lower case)
- */
-class editor_Models_Db_SegmentsHistory extends Zend_Db_Table_Abstract
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Segment\Event;
+
+use editor_Models_Segment;
+use editor_Models_Task;
+
+class BeforeSaveAlikeEvent
 {
-    public const TABLE_NAME = 'LEK_segment_history';
-
-    protected $_name = self::TABLE_NAME;
-
-    public $_primary = 'id';
+    public function __construct(
+        public readonly editor_Models_Task $task,
+        public readonly editor_Models_Segment $masterSegment,
+        public readonly editor_Models_Segment $alikeSegment,
+    ) {
+    }
 }

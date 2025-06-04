@@ -26,20 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * Klasse zum Zugriff auf die Tabelle mit Namen des Klassennamens (in lower case)
- */
-class editor_Models_Db_SegmentsHistory extends Zend_Db_Table_Abstract
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Segment\Repetition\Event;
+
+class RepetitionProcessingFailedEvent
 {
-    public const TABLE_NAME = 'LEK_segment_history';
+    /**
+     * @param int[] $repetitionIds
+     */
+    public readonly array $repetitionIds;
 
-    protected $_name = self::TABLE_NAME;
-
-    public $_primary = 'id';
+    public function __construct(
+        public readonly int $masterId,
+        array $repetitionIds,
+    ) {
+        $this->repetitionIds = array_map('intval', $repetitionIds);
+    }
 }

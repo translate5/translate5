@@ -56,7 +56,7 @@ class UpdateSegmentStatistics
     public static function create(): self
     {
         return new self(
-            new SegmentHistoryRepository(),
+            SegmentHistoryRepository::create(),
             new SegmentHistoryDataRepository(),
             SegmentHistoryAggregation::create()
         );

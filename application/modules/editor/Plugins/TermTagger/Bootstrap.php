@@ -31,6 +31,7 @@ use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\RecalcTransFound;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
+use MittagQI\Translate5\Segment\Event\BeforeSaveAlikeEvent;
 use MittagQI\Translate5\Terminology\CleanupCollection;
 
 /**
@@ -88,7 +89,11 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract
         // event-listeners
         $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', [$this, 'handleImportMeta']);
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', [$this, 'termtaggerStateHandler']);
-        $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', [$this, 'handleBeforeSaveAlike']);
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            BeforeSaveAlikeEvent::class,
+            [$this, 'handleBeforeSaveAlike']
+        );
 
         $this->eventManager->attach(
             EventDispatcher::class,
@@ -323,17 +328,13 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract
      * When using change alikes, the transFound information in the source has to be changed.
      * This is done by this handler.
      */
-    public function handleBeforeSaveAlike(Zend_EventManager_Event $event)
+    public function handleBeforeSaveAlike(Zend_EventManager_Event $zendEvent)
     {
-        $masterSegment = $event->getParam('masterSegment');
-        /* @var $masterSegment editor_Models_Segment */
-        $alikeSegment = $event->getParam('alikeSegment');
-        /* @var $alikeSegment editor_Models_Segment */
-        $task = $event->getParam('task');
-        /* @var $task editor_Models_Task */
+        /** @var BeforeSaveAlikeEvent $event */
+        $event = $zendEvent->getParam('event');
 
         // disable when source/target language similar, see TRANSLATE-2373
-        if ($task->isSourceAndTargetLanguageSimilar()) {
+        if ($event->task->isSourceAndTargetLanguageSimilar()) {
             return;
         }
 
@@ -345,11 +346,12 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract
 
         // lazy instanciation of markTransFound
         if (empty($this->markTransFound)) {
-            $task = editor_ModelInstances::taskByGuid($masterSegment->getTaskGuid());
+            $task = editor_ModelInstances::taskByGuid($event->masterSegment->getTaskGuid());
             $this->markTransFound = new RecalcTransFound($task);
         }
-        $sourceOrig = $alikeSegment->getSource();
-        $targetEdit = $alikeSegment->getTargetEdit();
-        $alikeSegment->setSource($this->markTransFound->recalc($sourceOrig, $targetEdit));
+
+        $sourceOrig = $event->alikeSegment->getSource();
+        $targetEdit = $event->alikeSegment->getTargetEdit();
+        $event->alikeSegment->setSource($this->markTransFound->recalc($sourceOrig, $targetEdit));
     }
 }

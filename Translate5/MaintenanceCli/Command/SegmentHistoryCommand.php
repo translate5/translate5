@@ -92,7 +92,7 @@ The single versions are showing only the values different to the current one! Th
 
         $segment = $this->findSegment($taskGuid);
 
-        $history = new SegmentHistoryRepository();
+        $history = SegmentHistoryRepository::create();
         $historyEntries = array_reverse($history->loadBySegmentId((int) $segment->getId()));
         $historyData = new SegmentHistoryDataRepository();
         $historyDataEntries = $historyData->loadBySegmentId((int) $segment->getId(), \editor_Models_SegmentField::TYPE_TARGET);
