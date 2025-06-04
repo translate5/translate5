@@ -85,6 +85,7 @@ For Details see https://fonts.google.com/attribution
 
     --color-red_01: #FF1C00;
     --color-green_01: #00C444;
+    --color-orange_01: #ff8f00;
 
 
     --font-size-giant: 32px;
@@ -216,6 +217,15 @@ a.error:hover {
     color: var(--color-red_01);
     filter: brightness(0.7);
 }
+.warning,
+a.warning {
+    color: var(--color-orange_01);
+}
+
+a.warning:hover {
+    color: var(--color-orange_01);
+    filter: brightness(0.7);
+}
 
 /* --------------- boxes --------------- */
 
@@ -243,6 +253,9 @@ a.error:hover {
 }
 .box__result__header__red {
     border-bottom-color: var(--color-red_01);
+}
+.box__result__header__orange {
+    border-bottom-color: var(--color-orange_01);
 }
 
 /* --------------- header --------------- */
@@ -485,7 +498,7 @@ a.error:hover {
 
 .icon-t5_termstate-information-small-white,
 
-.icon-t5_attention {background-image: url("../images/icons/t5_attention.svg");}
+.icon-t5_attention {background-image: url("../images/icons/t5_attention.svg"); filter: hue-rotate(403deg) brightness(1.5);}
 .icon-t5_check_cyan {background-image: url("../images/icons/t5_check_cyan.svg");}
 .icon-t5_check_green {background-image: url("../images/icons/t5_check_green.svg");}
 .icon-t5_check_grey {background-image: url("../images/icons/t5_check_grey.svg");}
@@ -556,8 +569,9 @@ a.error:hover {
 /* --------------- target --------------- */
 
 .translation-sourcediff .highlight {
-    background-color: var(--color-grey_03);
+    background-color: var(--color-orange_01);
     padding: 5px;
+    color: white;
 }
 
 
