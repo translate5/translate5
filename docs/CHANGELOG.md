@@ -10,6 +10,118 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.24.0] - 2025-06-04
+
+### Important Notes:
+#### [TRANSLATE-4644](https://jira.translate5.net/browse/TRANSLATE-4644)
+The visualconverter container is required to be updated to 0.14
+ 
+
+
+### Added
+**[TRANSLATE-4212](https://jira.translate5.net/browse/TRANSLATE-4212): Hotfolder Import, Import/Export - COTI-Level 2 Support for translate5** <br>
+COTI-Level 2 Support for translate5
+
+
+### Changed
+**[TRANSLATE-4681](https://jira.translate5.net/browse/TRANSLATE-4681): LanguageResources - ClientPM user gets misleading popup on attempt to change client list in language resource** <br>
+Fix change of client list in language resource by Client PM
+
+**[TRANSLATE-4679](https://jira.translate5.net/browse/TRANSLATE-4679): openai - Make capacity be configurable for Azure integration** <br>
+Added new configuration value capacity for Azure cloud integration
+
+**[TRANSLATE-4654](https://jira.translate5.net/browse/TRANSLATE-4654): t5memory, TM Maintenance - Change batch deletion behavior in TM Maintenance** <br>
+7.24.0: Changes needed for feature release
+7.23.3: Improved batch deletion in TM Maintenace for small batches
+
+**[TRANSLATE-4644](https://jira.translate5.net/browse/TRANSLATE-4644): VisualReview / VisualTranslation - Improve Visual: Better Segmentation, better handling of linebreaks in the WYSIWYG** <br>
+Visual improvement: Improve segmentation by finding repetitions immediately after a segment, improve the WYSIWYG by removing all linebreaks but headline-seperatory when exchanging texts
+FIX cloning of tasks: Task-Meta was not cloned
+REDUCE level of termtagger-warnings about tagging-errors to info
+
+**[TRANSLATE-4639](https://jira.translate5.net/browse/TRANSLATE-4639): InstantTranslate - InstantTranslate changeFuzzy-Matches color scheme** <br>
+Fuzzy matches are now styled with orange instead of red color to stop misleading the users
+
+**[TRANSLATE-4635](https://jira.translate5.net/browse/TRANSLATE-4635): t5memory - Add triggering worker in case there are reimport failed segments** <br>
+In case there are segments that are failed to reimport due to t5memory overload - new worker is scheduled for another try. The worker is started after 15 minutes delay.
+
+**[TRANSLATE-4634](https://jira.translate5.net/browse/TRANSLATE-4634): Import/Export - Improve error-handling / message for XLIFF2 import** <br>
+Improved error message when importing a xliff2-file without okapi
+
+**[TRANSLATE-4619](https://jira.translate5.net/browse/TRANSLATE-4619): openai - add link to LLM fine-tuning** <br>
+GPT model props window: added info-icons with links to docs page
+
+**[TRANSLATE-4358](https://jira.translate5.net/browse/TRANSLATE-4358): Hotfolder Import - Add functional test for AcrossHotfolder** <br>
+New tests for Hotfolder plugin
+
+**[TRANSLATE-4085](https://jira.translate5.net/browse/TRANSLATE-4085): Auto-QA - tooltip to ignore QA error too small, error count and quality loading** <br>
+Solved Firefox-specific problem with appearance of qualities in the right panel and in toolip shown on right-click
+
+**[TRANSLATE-4076](https://jira.translate5.net/browse/TRANSLATE-4076): usability language resources, usability task overview - Improve filtering** <br>
+Improved toolbar items order and added active filters toolbar in all major tabs
+
+**[TRANSLATE-4061](https://jira.translate5.net/browse/TRANSLATE-4061): Auto-QA - AutoQA: no content for spelling error** <br>
+FIXED: appearance problem for qualities grid in the right side panel
+
+**[TRANSLATE-4042](https://jira.translate5.net/browse/TRANSLATE-4042): Auto-QA - QA filter for solved segments can not be removed.** <br>
+FIXED: An auto-QA filter can not be removed if all problems were solved.
+
+**[TRANSLATE-3712](https://jira.translate5.net/browse/TRANSLATE-3712): usability editor - Enhance usability of consistency check** <br>
+added sorting and background highlighting for inconsistent segments when one of corresponding AutoQA filters is in use
+
+
+### Bugfixes
+**[TRANSLATE-4695](https://jira.translate5.net/browse/TRANSLATE-4695): WebSocket Server - Error: Class "editor_Models_task" does not exist** <br>
+Fixed typo in class name leading to fatal error
+
+**[TRANSLATE-4692](https://jira.translate5.net/browse/TRANSLATE-4692): Workflows - Make KPI calculation and advanced filtering as fast as possible** <br>
+- Reduced task view refresh delay on certain filters change (match rate range, language resource type, language resource)
+- Increased KPI window load timeout to 60s
+- Optimized MariaDb/SQLite bulk write queries
+- Added optional usage of DuckDb CLI  to directly query KPI-related data from a SQLite database file
+
+**[TRANSLATE-4688](https://jira.translate5.net/browse/TRANSLATE-4688): TBX-Import - Across TBX import problems with SSL URLs** <br>
+Fixed the access to across instances with self signed certificates.
+
+**[TRANSLATE-4687](https://jira.translate5.net/browse/TRANSLATE-4687): User Management - Allow Client PM to create clients** <br>
+Allow Client PM to create clients
+
+**[TRANSLATE-4682](https://jira.translate5.net/browse/TRANSLATE-4682): API - Fix percentage filter** <br>
+Fix general DB error when using percentage filters (like finished column) as client PM.
+
+**[TRANSLATE-4678](https://jira.translate5.net/browse/TRANSLATE-4678): Configuration - Correct several config default values** <br>
+Corrected the default value of several configuration values, which is used to determine if a value is considered as changed or not.
+
+**[TRANSLATE-4670](https://jira.translate5.net/browse/TRANSLATE-4670): Workflows - Optimize excessive data load in kpiAction** <br>
+7.24.0: Additional fixes regarding statistics performance
+7.23.3: Reduced KPI window loading time - further improvements will follow
+
+**[TRANSLATE-4661](https://jira.translate5.net/browse/TRANSLATE-4661): I10N - Improve internal translation toolset** <br>
+Improve the toolset to handle internal translations of the application
+
+**[TRANSLATE-4657](https://jira.translate5.net/browse/TRANSLATE-4657): VisualReview / VisualTranslation - Visual: SVG backround for empty PDFs optionally** <br>
+Visual Ennhancement: Optionally detect empty imported or exchanged PDFs and render them as vector-grapghics
+
+**[TRANSLATE-4652](https://jira.translate5.net/browse/TRANSLATE-4652): Main back-end mechanisms (Worker, Logging, etc.) - Add missing languages** <br>
+Adds additional language: sr-Latn-SP
+
+**[TRANSLATE-4651](https://jira.translate5.net/browse/TRANSLATE-4651): VisualReview / VisualTranslation - Fix hint for font-imports** <br>
+Visual: Fix hint in import wizard about font-upload
+
+**[TRANSLATE-4598](https://jira.translate5.net/browse/TRANSLATE-4598): t5memory - t5memory reboot not handled in import** <br>
+Handle t5memory reboot in process of import
+
+**[TRANSLATE-4524](https://jira.translate5.net/browse/TRANSLATE-4524): Editor general - CTRL + INS/. should always use source for reference** <br>
+CTRL + INS (CTRL + .) shortcut now inserts source field content instead of reference field content.
+
+**[TRANSLATE-4432](https://jira.translate5.net/browse/TRANSLATE-4432): Auto-QA - QA filter "Empty Segments" not persistent** <br>
+FIXED: Empty Segments QA filter unintended unchecking problem
+
+**[TRANSLATE-4389](https://jira.translate5.net/browse/TRANSLATE-4389): Search & Replace (editor) - Timeouts and delays for user when use repetition editor** <br>
+Repetition editor: process repetitions asynchronously if Frontend Message Bus plugin is active
+
+
 ## [7.23.3] - 2025-05-27
 
 ### Important Notes:
