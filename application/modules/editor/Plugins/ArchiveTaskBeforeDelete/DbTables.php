@@ -54,6 +54,8 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_change_log' => false,
         'LEK_comments' => 'taskGuid',
         'LEK_comment_meta' => 'taskGuid',
+        'LEK_coti_project_upload_assoc' => false,
+        'LEK_coti_upload' => false,
         'LEK_customer_config' => false,
         'LEK_files' => 'taskGuid',
         'LEK_file_filter' => 'taskGuid',
