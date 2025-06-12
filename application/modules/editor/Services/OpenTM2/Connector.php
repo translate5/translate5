@@ -265,7 +265,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->importService->importTmx(
                 $this->languageResource,
                 $this->getImportFilesFromUpload($fileinfo),
-                $this->getStripFramingTagsValue($params)
+                $this->getStripFramingTagsValue($params),
+                $params['tmName'] ?? null,
             );
         } catch (\Exception $e) {
             $this->logger->error('E1304', 't5memory: could not import TMX', [

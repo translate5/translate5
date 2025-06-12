@@ -88,6 +88,7 @@ class ImportService
         LanguageResource $languageResource,
         iterable $files,
         StripFramingTags $stripFramingTags,
+        ?string $tmName = null,
     ): void {
         foreach ($files as $file) {
             try {
@@ -116,7 +117,7 @@ class ImportService
             $this->importTmxIntoMemory(
                 $languageResource,
                 $importFilename,
-                $this->persistenceService->getWritableMemory($languageResource),
+                $tmName ?: $this->persistenceService->getWritableMemory($languageResource),
                 $stripFramingTags,
             );
 
