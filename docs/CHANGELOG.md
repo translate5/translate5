@@ -12,7 +12,7 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
-## [7.23.4] - 2025-06-12
+## [7.24.1] - 2025-06-12
 
 ### Important Notes:
  
