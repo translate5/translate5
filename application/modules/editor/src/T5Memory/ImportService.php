@@ -198,6 +198,10 @@ class ImportService
                 break;
 
             case ImportStatusEnum::Error:
+                if ($status->isMemoryOverflown($this->config)) {
+                    break;
+                }
+
                 $this->logger->error('E1304', 't5memory: could not import TMX', [
                     'languageResource' => $languageResource,
                     'apiError' => $status->getBody(),
