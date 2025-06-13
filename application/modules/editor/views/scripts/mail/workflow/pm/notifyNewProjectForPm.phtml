@@ -51,10 +51,17 @@ $data = [
     'projectType' => $this->translate->_('taskType::' . $this->project->getTaskType()->id()),
 ];
 
-$data['body'] = $this->templateApply('Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+$message = 'Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
 <strong>Project ID:</strong> {projectId} <br />
-<strong>Project Name:</strong> {projectName}',
-$data);
+<strong>Project Name:</strong> {projectName}';
+
+if ($this->createdByUser) {
+    $data['createdByUser'] = $this->createdByUser;
+    $message .= ' <br />
+<strong>Erstellt von:</strong> {createdByUser}';
+}
+
+$data['body'] = $this->templateApply($message, $data);
 
 // Build mail body
 $mailBody = $this->templateApply('
