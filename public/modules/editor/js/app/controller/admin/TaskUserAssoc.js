@@ -323,16 +323,17 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                     callback:function (){
 
                         me.handleCancel();
-                        if (!rec.store) {
-                            store.insert(0, rec);
-                            grid.getSelectionModel().select(rec);
-                            me.fireEvent('addUserAssoc', me, rec, store);
-                        }
 
-                        // enable the panel again after the task is reloaded
-                        Editor.MessageBox.addByOperation(op);
-                        Editor.MessageBox.addSuccess(me.messages.assocSave);
-                        win.setLoading(false);
+                        store.load({
+                            callback: function () {
+                                grid.getSelectionModel().select(savedRec);
+                                me.fireEvent('editUserAssoc', savedRec, form);
+                                // enable the panel again after the task is reloaded
+                                Editor.MessageBox.addByOperation(op);
+                                Editor.MessageBox.addSuccess(me.messages.assocSave);
+                                win.setLoading(false);
+                            }
+                        });
                     }
                 });
             },
