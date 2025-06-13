@@ -7962,6 +7962,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Tab am Anfang</source>
                 <target>Tab am Anfang</target>
             </trans-unit>
+            <trans-unit id='Tm9ybWFsZXMgTGVlcnplaWNoZW4gYW0gQW5mYW5n'>
+                <source>Normales Leerzeichen am Anfang</source>
+                <target>Normales Leerzeichen am Anfang</target>
+            </trans-unit>
+            <trans-unit id='Tm9ybWFsZXMgTGVlcnplaWNoZW4gYW0gRW5kZQ=='>
+                <source>Normales Leerzeichen am Ende</source>
+                <target>Normales Leerzeichen am Ende</target>
+            </trans-unit>
             <trans-unit id='VW1icnVjaCBhbSBBbmZhbmc='>
                 <source>Umbruch am Anfang</source>
                 <target>Umbruch am Anfang</target>
