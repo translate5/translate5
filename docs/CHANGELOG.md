@@ -12,6 +12,41 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.24.2] - 2025-06-13
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4705](https://jira.translate5.net/browse/TRANSLATE-4705): Import/Export - Inability to export task with a special chars sequence in source segment** <br>
+Fix inability to export tasks with some chars sequences in source segments
+
+**[TRANSLATE-4703](https://jira.translate5.net/browse/TRANSLATE-4703): InstantTranslate - Buttons "Zur menschlichen Revision senden/ In menschlicher Revision"** <br>
+* InstantTranslate: Improve visibility of buttons
+
+**[TRANSLATE-4689](https://jira.translate5.net/browse/TRANSLATE-4689): t5memory - Change batch deletion to one-by-one for up to 5000 segments** <br>
+TMMaintenance: Increased amount of segments that are deleted one-by-one in batch deletion to 5000.
+
+**[TRANSLATE-4660](https://jira.translate5.net/browse/TRANSLATE-4660): InstantTranslate - Send to Human Revision: Doesn't show client user** <br>
+Added user who send file translation to human revision to PM's email notification
+
+
+### Bugfixes
+**[TRANSLATE-4716](https://jira.translate5.net/browse/TRANSLATE-4716): Task Management - Job sorter is not applied when adding new job in task user association panel** <br>
+Job sorting by workflow now will be applied when new job is added or removed from the task jobs list.
+
+**[TRANSLATE-4711](https://jira.translate5.net/browse/TRANSLATE-4711): Client management - ClientPM's attempt to assign client to language resource result in in invalid client list** <br>
+Fix Client PM management of clients in language resource
+
+**[TRANSLATE-4707](https://jira.translate5.net/browse/TRANSLATE-4707): TM Maintenance - Tags validation works in TMMaintenance** <br>
+Fixed tags validation in TM Maintenance
+
+**[TRANSLATE-4690](https://jira.translate5.net/browse/TRANSLATE-4690): VisualReview / VisualTranslation - JavaScript Error in Visual TextReflow-Converter** <br>
+Fixed JavaScript-error in Visual's text-Reflow converter
+
+
 ## [7.24.1] - 2025-06-12
 
 ### Important Notes:
