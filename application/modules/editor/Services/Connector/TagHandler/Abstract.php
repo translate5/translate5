@@ -99,7 +99,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
     /**
      * Segment content after segment is prepared and before is sent to the resource
      */
-    protected string $querySegment;
+    protected ?string $querySegment;
 
     public function __construct(array $options = [])
     {
@@ -224,9 +224,9 @@ abstract class editor_Services_Connector_TagHandler_Abstract
         $this->querySegment = $querySegment;
     }
 
-    public function getQuerySegment(): string
+    public function getQuerySegment(): ?string
     {
-        return $this->querySegment;
+        return $this->querySegment ?? null;
     }
 
     public function setKeepWhitespaceTags(bool $keepWhitespaceTags): void

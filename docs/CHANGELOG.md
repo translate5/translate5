@@ -11,6 +11,27 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.24.1] - 2025-06-12
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4713](https://jira.translate5.net/browse/TRANSLATE-4713): Content Protection - Conversion of TM result in deletion of TM on t5memory side** <br>
+Fix TM conversion
+
+**[TRANSLATE-4712](https://jira.translate5.net/browse/TRANSLATE-4712): t5memory - TMX splitting in import process produces error** <br>
+Fix TMX splitting on import
+
+**[TRANSLATE-4706](https://jira.translate5.net/browse/TRANSLATE-4706): openai - Trained model can not be trained again if using Azure cloud** <br>
+Fixed bug, which may prevent OpenAI model to be trained more than 1 time.
+
+**[TRANSLATE-4698](https://jira.translate5.net/browse/TRANSLATE-4698): Editor general - hide fuzzy match panel in new "review visual view"** <br>
+Fuzzy match panel is hidden in the new "Review visual view" mode
+
+
 ## [7.24.0] - 2025-06-04
 
 ### Important Notes:

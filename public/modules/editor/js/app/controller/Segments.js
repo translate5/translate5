@@ -893,7 +893,8 @@ Ext.define('Editor.controller.Segments', {
             this.isQualityFiltered = (filter && filter != '');
             store.removeAll();
 
-            var inconsistencyFilters = filter.matchAll('consistent:(source|target)').toArray(),
+            var matchedInconsistencyFilters = filter.matchAll('consistent:(source|target)'),
+                inconsistencyFilters = matchedInconsistencyFilters ? Array.from(matchedInconsistencyFilters) : [],
                 inconsistent = inconsistencyFilters.length === 1 ? inconsistencyFilters[0][1] : false;
 
             // If exactly one inconsistency filter is applied
