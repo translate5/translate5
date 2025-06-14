@@ -997,20 +997,28 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $context
         );
 
+        $this->decodePutData();
+
         // UGLY/QUIRK: client-restricted PMs may save languageresources, that contain assocs to customers, the PMs cannot see in the frontend and they have no rights to remove.
         // we fix that here by re-adding them
         if (ZfExtended_Authentication::getInstance()->isUserClientRestricted()) {
             $this->transformClientRestrictedCustomerAssocs();
         }
 
-        parent::putAction();
-        if ($this->wasValid) {
+        $this->checkOrCleanCustomerAssociation(
+            (bool) $this->getParam('forced', false),
+            $this->getDataField('customerIds') ?? []
+        );
+
+        $this->processClientReferenceVersion();
+        $this->setDataInEntity();
+
+        if ($this->validate()) {
+            $this->entity->save();
+            $this->view->rows = $this->entity->getDataObject();
+
             // especially tests are not respecting the array format ...
             editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
-
-            if ((bool) $this->getParam('forced', false) === true) {
-                $this->checkOrCleanCustomerAssociation(true, $this->getDataField('customerIds') ?? []);
-            }
 
             CustomerAssocService::create()->updateAssociations(
                 AssociationFormValues::fromArray(
@@ -1020,18 +1028,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             );
 
             $this->addAssocData();
-        }
-    }
-
-    /**
-     * The above injectors add additional error messages, which are evaluated here
-     * @throws ZfExtended_ValidateException
-     */
-    protected function additionalValidations()
-    {
-        if ($this->getRequest()->isPut() && (bool) $this->getParam('forced', false) === false) {
-            // check for association to be cleaned only when it is put and the forced flag is not set
-            $this->checkOrCleanCustomerAssociation(false, $this->getDataField('customerIds') ?? []);
         }
     }
 
@@ -1961,13 +1957,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         array $allowedCustomerIs,
         bool $doDebug,
     ): void {
+        $originalValue = array_map('intval', $originalValue);
+        $allowedCustomerIs = array_map('intval', $allowedCustomerIs);
+
         // evaluate the ids the client-restricted user is not allowed to change
         $notAllowedIds = array_values(array_diff($originalValue, $allowedCustomerIs));
 
         if (! empty($notAllowedIds)) {
             // if there are clients, the user is not allowed to remove, add them to the sent data
             $sentIds = $this->getDataField($paramName) ?? [];
-            $newIds = array_values(array_unique(array_merge($sentIds, $notAllowedIds)));
+            $newIds = array_values(array_unique(array_merge(array_map('intval', $sentIds), $notAllowedIds)));
 
             if ($doDebug) {
                 error_log(

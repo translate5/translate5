@@ -69,7 +69,8 @@
   "deleteBatch": {
     "no": "Cancel",
     "yes": "Delete all",
-    "warningText": "All segments in the current list will be deleted and the TM will be reorganised afterwards, this may take some time. Do you still want to delete all segments?"
+    "warningText": "All segments in the current list will be deleted and the TM will be reorganised afterwards, this may take some time. Do you still want to delete all segments?",
+    "warningTextOneByOne": "Each segment of the current search will be deleted individually, which may take some time. The UI will be blocked until the process is complete. If you wish to use TM-Maintenance during this time, please open a new tab."
   },
   "list" : {
     "title": "Segments",

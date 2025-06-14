@@ -69,7 +69,8 @@
   "deleteBatch": {
     "no": "Abbrechen",
     "yes": "Alle löschen",
-    "warningText": "Alle Segmente der aktuell angezeigten Liste werden gelöscht und das TM anschließend re-organisiert, was einige Zeit in Anspruch nehmen kann. Möchten Sie dennoch alle Segmente löschen?"
+    "warningText": "Alle Segmente der aktuell angezeigten Liste werden gelöscht und das TM anschließend re-organisiert, was einige Zeit in Anspruch nehmen kann. Möchten Sie dennoch alle Segmente löschen?",
+    "warningTextOneByOne": "Jedes Segment der aktuellen Suche wird einzeln gelöscht, was einige Zeit dauern kann. Die Benutzeroberfläche wird blockiert, bis der Vorgang abgeschlossen ist. Wenn Sie TM-Maintenance während dieser Zeit nutzen möchten, öffnen Sie bitte einen neuen Tab."
   },
   "list" : {
     "title": "Segmente",

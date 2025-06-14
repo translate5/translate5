@@ -3295,6 +3295,18 @@
 <strong>Project Name:</strong> {projectName} <br />
                 </target>
             </trans-unit>
+            <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZWluIG5ldWVzIHtwcm9qZWN0VHlwZX0gZXJzdGVsbHQuPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBJRDo8L3N0cm9uZz4ge3Byb2plY3RJZH0gPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBOYW1lOjwvc3Ryb25nPiB7cHJvamVjdE5hbWV9IDxiciAvPgo8c3Ryb25nPkVyc3RlbGx0IHZvbjo8L3N0cm9uZz4ge2NyZWF0ZWRCeVVzZXJ9'>
+                <source>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName} <br />
+<strong>Erstellt von:</strong> {createdByUser}
+                </source>
+                <target>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName} <br />
+<strong>Erstellt von:</strong> {createdByUser}
+                </target>
+            </trans-unit>
             <trans-unit id='ZGllIG1lbnNjaGxpY2hlIFJldmlzaW9uIGRlciBEYXRlaSB7ZmlsZU5hbWV9IHd1cmRlIGJlZW5kZXQgdW5kIHN0ZWh0IHVudGVyIHt1cmx9IGFscyBEb3dubG9hZCB6dXIgVmVyZsO8Z3VuZy4='>
                 <source>die menschliche Revision der Datei {fileName} wurde beendet und steht unter {url} als Download zur Verfügung.</source>
                 <target>die menschliche Revision der Datei "{fileName}" wurde beendet und steht unter {url} als Download zur Verfügung.</target>

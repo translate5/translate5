@@ -4,6 +4,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
     mixins: ['TMMaintenance.mixin.ErrorMessage'],
     readTotalAt: 20,
+    batchThreshold: 5000,
     listen: {
         global: {
             onApplicationLoad: 'onApplicationLoad',
@@ -39,7 +40,17 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     },
 
     onDeleteBatchPress: function () {
-        this.getView().up('app-main').down('#deleteBatchDialog').show();
+        this.stopLoading();
+
+        const dialog = this.getView().up('app-main').down('#deleteBatchDialog');
+        let html = `<h3>`+ this.getStrings().deleteBatch.warningText + `</h3>`;
+
+        if (this.getViewModel().get('totalAmount') <= this.batchThreshold) {
+            html = `<h3>` + this.getStrings().deleteBatch.warningTextOneByOne + `</h3>`;
+        }
+
+        dialog.setHtml(html);
+        dialog.show();
     },
 
     onSearchFieldChange: function () {
@@ -89,21 +100,22 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         const dialog = me.getView().up('app-main').down('#deleteBatchDialog');
         dialog.mask();
         const data = this.getView().getValues();
-        const batchMode = this.getViewModel().get('totalAmount') >= 300 ? 'batch' : 'single';
+        const batchMode = this.getViewModel().get('totalAmount') >= this.batchThreshold ? 'batch' : 'single';
         const params = {data: JSON.stringify(data), batchMode: batchMode};
 
         if (batchMode === 'single') {
-            params.limit = 300;
+            params.limit = this.batchThreshold;
         }
 
         Ext.Ajax.request({
             url: '/editor/plugins_tmmaintenance_api/delete-batch/',
+            timeout: 1800000,
             params: params,
             async: true,
             method: 'POST',
             success: function (xhr) {
                 const mainList = Ext.getCmp('mainlist');
-                mainList.setTitle(me.getStrings().title);
+                mainList.setTitle(me.getStrings().list.title);
                 mainList.store.removeAll();
                 dialog.unmask();
                 dialog.hide();
@@ -234,7 +246,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     },
 
     getStrings: function () {
-        return this.getViewModel().get('l10n').list;
+        return this.getViewModel().get('l10n');
     },
 
     loadPageByChunks: function(pageSize, chunkSize, append, abortPrev) {
@@ -252,8 +264,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         }
 
         if (abortPrev) {
-            store.getProxy().abortByPurpose = true;
-            store.getProxy().abort();
+            this.stopLoading();
             if (scrollable.suspendScrollend) {
                 scrollable.suspendScrollend --;
             }
@@ -367,10 +378,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     },
 
     onContainerScrollUpEnd: function () {
-        let store = Ext.getCmp('mainlist').getStore();
         this.getViewModel().set('loadedQty', 0);
-        store.getProxy().abortByPurpose = true;
-        store.getProxy().abort();
+        this.stopLoading();
     },
 
     isDeleteBatchAllowed: function () {
@@ -388,5 +397,11 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                 // || vm.get('hasMoreRecords') === false
             // )
             && vm.get('totalAmount') !== null;
+    },
+
+    stopLoading: function () {
+        const store = Ext.getCmp('mainlist').getStore();
+        store.getProxy().abortByPurpose = true;
+        store.getProxy().abort();
     }
 });

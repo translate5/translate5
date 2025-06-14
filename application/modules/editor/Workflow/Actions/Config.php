@@ -54,19 +54,15 @@ class editor_Workflow_Actions_Config
 
     public ZfExtended_Models_User $authenticatedUser;
 
-    /**
-     * @var boolean
-     */
     public bool $isCalledByCron = false;
 
     public ?string $trigger;
 
     public ZfExtended_EventManager $events;
 
-    /***
-     * @var stdClass|null
-     */
     public ?stdClass $parameters;
+
+    public ?string $createdByUser = null;
 
     public function isHandleDirect(): bool
     {
