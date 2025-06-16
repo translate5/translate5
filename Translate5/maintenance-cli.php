@@ -106,6 +106,7 @@ use Translate5\MaintenanceCli\Command\{
     T5Memory\T5MemoryDuplicateLanguageResourceCommand,
     T5Memory\T5MemoryExportCommand,
     T5Memory\T5MemoryFixCommand,
+    T5Memory\T5MemoryLanguageResourceSpecificDataSnapshotCommand,
     T5Memory\T5MemoryMigrationCommand,
     T5Memory\T5MemoryReimportTaskCommand,
     T5Memory\T5MemoryReorganizeCommand,
@@ -244,6 +245,7 @@ $commands = [
     new WorkflowListCommand(),
     new WorkflowStepCommand(),
     new ContentProtectionLanguageRulesHashesRefreshCommand(),
+    new T5MemoryLanguageResourceSpecificDataSnapshotCommand(),
 ];
 
 // integrate Plugin-specific CLI commands

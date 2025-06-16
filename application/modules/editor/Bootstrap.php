@@ -38,6 +38,7 @@ use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Service\SystemCheck;
 use MittagQI\Translate5\Statistics\Helpers\SyncEditable;
 use MittagQI\Translate5\Statistics\Helpers\UnmodifiedSegmentsEventHandler;
+use MittagQI\Translate5\T5Memory\T5MemoryLanguageResourceSpecificDataSnapshot;
 use MittagQI\Translate5\Task\Deadline\TaskDeadlineEventHandler;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
 use MittagQI\Translate5\Task\TaskEventTrigger;
@@ -174,6 +175,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                     $user->save();
                 }
             }
+        );
+
+        $eventManager->attach(
+            CronEventTrigger::class,
+            CronEventTrigger::DAILY,
+            fn () => T5MemoryLanguageResourceSpecificDataSnapshot::create()->takeSnapshot()
         );
     }
 
