@@ -38,12 +38,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_DataProvider_Directory extends editor_Models_Import_DataProvider_Abstract
 {
-    /**
-     * @param string $pathToImportDirectory
-     */
-    public function __construct($pathToImportDirectory)
-    {
-        $this->importFolder = $pathToImportDirectory;
+    public function __construct(
+        private readonly string $pathToImportDirectory,
+    ) {
     }
 
     /**
@@ -53,6 +50,16 @@ class editor_Models_Import_DataProvider_Directory extends editor_Models_Import_D
     public function checkAndPrepare(editor_Models_Task $task)
     {
         $this->setTask($task);
+        $this->importFolder = $this->pathToImportDirectory;
+
+        if (! $task->isProject()) {
+            $this->setImportFolder();
+
+            if ($this->pathToImportDirectory !== $this->importFolder) {
+                ZfExtended_Utils::recursiveCopy($this->pathToImportDirectory, $this->importFolder);
+            }
+        }
+
         if (! is_dir($this->importFolder)) {
             //DataProvider Directory: The importRootFolder "{importRoot}" does not exist!
             throw new editor_Models_Import_DataProvider_Exception('E1248', [
