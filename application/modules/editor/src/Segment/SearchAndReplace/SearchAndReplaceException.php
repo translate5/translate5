@@ -26,20 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Workflow\Assert\WriteableWorkflowAssert;
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Segment\SearchAndReplace;
 
 /**
- * provides reusable workflow methods for controllers
+ * General exception in segment processing.
  */
-class Editor_Controller_Helper_Workflow extends Zend_Controller_Action_Helper_Abstract
+class SearchAndReplaceException extends \ZfExtended_ErrorCodeException
 {
     /**
-     * checks the user state of given taskGuid and userGuid,
-     * throws a ZfExtended_NoAccessException if user is not allowed to write to the loaded task
-     * @throws ZfExtended_NoAccessException
+     * @var string
      */
-    public function checkWorkflowWriteable(string $taskGuid, string $userGuid, editor_Workflow_Default $workflow = null)
-    {
-        WriteableWorkflowAssert::create()->assert($taskGuid, $userGuid, $workflow);
-    }
+    protected $domain = 'editor.searchandreplace';
+
+    protected static $localErrorCodes = [
+        'E1192' => 'Replace all can not be used for task with usageMode "simultaneous"',
+    ];
 }

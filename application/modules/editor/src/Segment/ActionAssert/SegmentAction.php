@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,20 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Workflow\Assert\WriteableWorkflowAssert;
+declare(strict_types=1);
 
-/**
- * provides reusable workflow methods for controllers
- */
-class Editor_Controller_Helper_Workflow extends Zend_Controller_Action_Helper_Abstract
+namespace MittagQI\Translate5\Segment\ActionAssert;
+
+enum SegmentAction: string
 {
-    /**
-     * checks the user state of given taskGuid and userGuid,
-     * throws a ZfExtended_NoAccessException if user is not allowed to write to the loaded task
-     * @throws ZfExtended_NoAccessException
-     */
-    public function checkWorkflowWriteable(string $taskGuid, string $userGuid, editor_Workflow_Default $workflow = null)
-    {
-        WriteableWorkflowAssert::create()->assert($taskGuid, $userGuid, $workflow);
-    }
+    case Read = 'read';
+    case Update = 'update';
+    case Delete = 'delete';
 }

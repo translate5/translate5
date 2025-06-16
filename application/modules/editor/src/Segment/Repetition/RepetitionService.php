@@ -48,10 +48,16 @@ use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\Repository\SegmentHistoryRepository;
 use MittagQI\Translate5\Repository\SegmentRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Segment\Event\BeforeSaveAlikeEvent;
-use MittagQI\Translate5\Segment\Repetition\Event\RepetitionProcessedEvent;
+use MittagQI\Translate5\Segment\Event\SegmentProcessedEvent;
+use MittagQI\Translate5\Segment\QueuedBatchUpdateWorker;
+use MittagQI\Translate5\Segment\Repetition\DTO\ReplaceDto;
+use MittagQI\Translate5\Segment\Repetition\Event\RepetitionProcessingFailedEvent;
+use MittagQI\Translate5\Segment\Repetition\Event\RepetitionReplacementRequestedEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use stdClass;
+use Throwable;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
@@ -69,6 +75,7 @@ class RepetitionService
         private readonly TaskRepository $taskRepository,
         private readonly editor_Models_TaskProgress $taskProgress,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly UserJobRepository $jobRepository,
     ) {
     }
 
@@ -85,22 +92,51 @@ class RepetitionService
             TaskRepository::create(),
             new editor_Models_TaskProgress(),
             EventDispatcher::create(),
+            UserJobRepository::create(),
         );
     }
 
-    /**
-     * @param int[] $repetitionSegmentIds
-     */
-    public function replaceBatch(
-        Segment $master,
-        UserJob $userJob,
-        array $repetitionSegmentIds,
-        int $duration,
-        string $columnToEdit,
-    ): void {
-        $task = $this->taskRepository->getByGuid($master->getTaskGuid());
+    public function queueReplaceBatch(ReplaceDto $replaceDto): void
+    {
+        $worker = new QueuedBatchUpdateWorker();
 
-        $alikeQualities = new AlikeQualities((int) $master->getId());
+        if ($worker->init(
+            $replaceDto->taskGuid,
+            [
+                'dto' => $replaceDto,
+            ]
+        )) {
+            $worker->queue();
+        }
+    }
+
+    public function replaceBatch(ReplaceDto $replaceDto): void
+    {
+        $this->eventDispatcher->dispatch(
+            new RepetitionReplacementRequestedEvent(
+                userJobId: $replaceDto->userJobId,
+                taskGuid: $replaceDto->taskGuid,
+                masterId: $replaceDto->masterId,
+                repetitionIds: $replaceDto->repetitionIds,
+            )
+        );
+
+        try {
+            $this->executeReplaceBatch($replaceDto);
+        } catch (Throwable) {
+            $this->eventDispatcher->dispatch(new RepetitionProcessingFailedEvent(
+                $replaceDto->masterId,
+                $replaceDto->repetitionIds,
+            ));
+        }
+    }
+
+    private function executeReplaceBatch(ReplaceDto $replaceDto): void
+    {
+        $task = $this->taskRepository->getByGuid($replaceDto->taskGuid);
+
+        $alikeQualities = new AlikeQualities($replaceDto->masterId);
+
         // no direct instantiation of the hasher, since it overwritten in one of plugins
         $hasher = ZfExtended_Factory::get(RepetitionHash::class, [$task]);
 
@@ -111,13 +147,13 @@ class RepetitionService
 
         $durationDto = new stdClass();
 
-        $this->updateDuration(SegmentField::TYPE_TARGET, $durationDto, $duration);
+        $this->updateDuration(SegmentField::TYPE_TARGET, $durationDto, $replaceDto->duration);
         if ($isSourceEditable) {
-            $this->updateDuration(SegmentField::TYPE_SOURCE, $durationDto, $duration);
+            $this->updateDuration(SegmentField::TYPE_SOURCE, $durationDto, $replaceDto->duration);
         }
 
-        $repeatedIncludingEdited = $repetitionSegmentIds;
-        $repeatedIncludingEdited[] = (int) $master->getId();
+        $repeatedIncludingEdited = $replaceDto->repetitionIds;
+        $repeatedIncludingEdited[] = $replaceDto->masterId;
 
         sort($repeatedIncludingEdited, SORT_NUMERIC);
 
@@ -135,7 +171,7 @@ class RepetitionService
             ->useSourceForReference
         ;
 
-        $count = count($repetitionSegmentIds);
+        $count = count($replaceDto->repetitionIds);
 
         // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
         // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is saved,
@@ -143,9 +179,12 @@ class RepetitionService
         // qualities on segments where needed
         $this->qualityManager->preProcessTask($task, editor_Segment_Processing::ALIKE);
 
+        $master = $this->segmentRepository->get($replaceDto->masterId);
+        $userJob = $this->jobRepository->get($replaceDto->userJobId);
+
         $validTargetMd5 = $this->getValidTargetMd5($master);
 
-        foreach ($repetitionSegmentIds as $segmentId) {
+        foreach ($replaceDto->repetitionIds as $segmentId) {
             $repetition = $this->segmentRepository->get($segmentId);
 
             $this->replaceAlike(
@@ -161,17 +200,13 @@ class RepetitionService
                 $isSourceEditable,
                 $useSourceForReference,
                 $count,
-                $columnToEdit,
             );
         }
 
         // finally, we have to update the master segment
-        $this->eventDispatcher->dispatch(new RepetitionProcessedEvent(
+        $this->eventDispatcher->dispatch(new SegmentProcessedEvent(
             $task->getTaskGuid(),
-            $columnToEdit,
-            [
-                (int) $master->getId(),
-            ]
+            (int) $master->getId(),
         ));
 
         // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
@@ -196,7 +231,6 @@ class RepetitionService
         bool $isSourceEditable,
         bool $useSourceForReference,
         int $alikeCount,
-        string $columnToEdit,
     ): void {
         $history = null;
 
@@ -324,12 +358,9 @@ class RepetitionService
             $this->logger->exception($e, $data);
         } finally {
             // always dispatch the event, even if the segment was not saved
-            $this->eventDispatcher->dispatch(new RepetitionProcessedEvent(
+            $this->eventDispatcher->dispatch(new SegmentProcessedEvent(
                 $task->getTaskGuid(),
-                $columnToEdit,
-                [
-                    (int) $repetition->getId(),
-                ]
+                (int) $repetition->getId(),
             ));
         }
     }

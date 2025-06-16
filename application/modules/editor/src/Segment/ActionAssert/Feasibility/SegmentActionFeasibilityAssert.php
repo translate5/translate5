@@ -26,20 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Workflow\Assert\WriteableWorkflowAssert;
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Segment\ActionAssert\Feasibility;
+
+use MittagQI\Translate5\ActionAssert\Feasibility\ActionFeasibilityAssert;
+use MittagQI\Translate5\Segment\ActionAssert\Feasibility\Asserts\SegmentIsEditableAssert;
+use MittagQI\Translate5\Segment\ActionAssert\Feasibility\Asserts\TaskIsConfirmedAssert;
 
 /**
- * provides reusable workflow methods for controllers
+ * @extends ActionFeasibilityAssert<\editor_Models_Segment>
  */
-class Editor_Controller_Helper_Workflow extends Zend_Controller_Action_Helper_Abstract
+final class SegmentActionFeasibilityAssert extends ActionFeasibilityAssert
 {
     /**
-     * checks the user state of given taskGuid and userGuid,
-     * throws a ZfExtended_NoAccessException if user is not allowed to write to the loaded task
-     * @throws ZfExtended_NoAccessException
+     * @codeCoverageIgnore
      */
-    public function checkWorkflowWriteable(string $taskGuid, string $userGuid, editor_Workflow_Default $workflow = null)
+    public static function create(): self
     {
-        WriteableWorkflowAssert::create()->assert($taskGuid, $userGuid, $workflow);
+        return new self([
+            SegmentIsEditableAssert::create(),
+            TaskIsConfirmedAssert::create(),
+        ]);
     }
 }

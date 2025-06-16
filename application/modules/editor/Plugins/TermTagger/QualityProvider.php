@@ -231,15 +231,19 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
                 return $tags;
             }
             $config = $task->getConfig();
-            $messages = Zend_Registry::get('rest_messages');
-            /* @var $messages ZfExtended_Models_Messages */
+
+            $messages = null;
+            if (Zend_Registry::isRegistered('rest_messages')) {
+                /** @var ZfExtended_Models_Messages $messages */
+                $messages = Zend_Registry::get('rest_messages');
+            }
 
             // when the segment is oversized or shall be ignored due to not being editable we do not need to process it and just can return them
             // the editing non-editable segments check is only for completeness here
             if (($segment->meta()->getSourceWordCount() >= $this->getOversizeWordCount($config)) || (! $segment->getEditable() && ! $config->runtimeOptions->termTagger->tagReadonlySegments)) {
                 // to keep potentially existing tags/qualities we need to process them, otherwise the existing will simply be deleted
                 Tagger::findAndAddQualitiesInTags($tags);
-                $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
+                $messages?->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
 
                 return $tags;
             }

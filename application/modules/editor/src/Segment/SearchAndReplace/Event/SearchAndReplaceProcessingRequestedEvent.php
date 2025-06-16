@@ -28,20 +28,19 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\Repetition\Event;
+namespace MittagQI\Translate5\Segment\SearchAndReplace\Event;
 
-class RepetitionProcessedEvent
+class SearchAndReplaceProcessingRequestedEvent
 {
     /**
-     * @param int[] $repetitionIds
+     * @param int[] $segmentIds
      */
-    public readonly array $repetitionIds;
+    public readonly array $segmentIds;
 
     public function __construct(
         public readonly string $taskGuid,
-        public readonly string $columnToEdit,
-        array $repetitionIds,
+        array $segmentIds,
     ) {
-        $this->repetitionIds = array_map('intval', $repetitionIds);
+        $this->segmentIds = array_map('intval', $segmentIds);
     }
 }

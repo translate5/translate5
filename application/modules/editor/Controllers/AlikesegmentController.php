@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Repository\SegmentRepository;
-use MittagQI\Translate5\Segment\Repetition\AsyncRepetitionService;
+use MittagQI\Translate5\Segment\Repetition\DTO\ReplaceDto;
 use MittagQI\Translate5\Segment\Repetition\RepetitionService;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -106,30 +106,25 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
         $ids = $segmentRepository->filterTaskSegmentIds($task->getTaskGuid(), $this->getIds());
         $userJob = $this->getJob($task);
 
-        if ($this->_getParam('async', false)) {
-            $asyncRepetitionService = AsyncRepetitionService::create();
+        $repetitionService = RepetitionService::create();
 
-            $asyncRepetitionService->queueUpdate(
-                $userJob,
-                (int) $master->getId(),
-                $ids,
-                (int) $this->_getParam('duration'),
-                $this->_getParam('columnToEdit', 'targetEdit'),
-            );
+        $replaceDto = new ReplaceDto(
+            $task->getTaskGuid(),
+            (int) $master->getId(),
+            $ids,
+            (int) $userJob->getId(),
+            (int) $this->_getParam('duration'),
+        );
+
+        if ($this->_getParam('async', false)) {
+            $repetitionService->queueReplaceBatch($replaceDto);
 
             $this->view->total = count($ids);
 
             return;
         }
 
-        $repetitionService = RepetitionService::create();
-        $repetitionService->replaceBatch(
-            $master,
-            $userJob,
-            $ids,
-            (int) $this->_getParam('duration'),
-            $this->_getParam('columnToEdit', 'targetEdit'),
-        );
+        $repetitionService->replaceBatch($replaceDto);
 
         $this->appendTaskProgress($task);
 

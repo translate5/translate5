@@ -26,20 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Workflow\Assert\WriteableWorkflowAssert;
+declare(strict_types=1);
 
-/**
- * provides reusable workflow methods for controllers
- */
-class Editor_Controller_Helper_Workflow extends Zend_Controller_Action_Helper_Abstract
+namespace MittagQI\Translate5\Segment\SearchAndReplace\Event;
+
+class SearchAndReplaceProcessingFailedEvent
 {
     /**
-     * checks the user state of given taskGuid and userGuid,
-     * throws a ZfExtended_NoAccessException if user is not allowed to write to the loaded task
-     * @throws ZfExtended_NoAccessException
+     * @param int[] $segmentIds
      */
-    public function checkWorkflowWriteable(string $taskGuid, string $userGuid, editor_Workflow_Default $workflow = null)
-    {
-        WriteableWorkflowAssert::create()->assert($taskGuid, $userGuid, $workflow);
+    public readonly array $segmentIds;
+
+    public function __construct(
+        public readonly string $taskGuid,
+        array $segmentIds,
+    ) {
+        $this->segmentIds = array_map('intval', $segmentIds);
     }
 }

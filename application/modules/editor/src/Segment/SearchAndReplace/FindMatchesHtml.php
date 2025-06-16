@@ -26,15 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Segment\SearchAndReplace;
+
+/**
  * This class is used to find matches in the original segment text(html tags included) and return there start and end index.
  * The start and end index can be used as replace range.
  * The findContent function will return also the range content and the range content character length.
  *
  * @author aleksandar
- *
  */
-class editor_Models_SearchAndReplace_FindMatchesHtml
+class FindMatchesHtml
 {
     /***
      * The initial html text
@@ -75,7 +78,7 @@ class editor_Models_SearchAndReplace_FindMatchesHtml
      * Set the html text and tags mapping
      * @param string $html
      */
-    public function setHtml($html)
+    private function setHtml($html)
     {
         $this->html = $html;
         $regexp = '~<.*?>~su';
@@ -99,10 +102,10 @@ class editor_Models_SearchAndReplace_FindMatchesHtml
             'pos_in_content' => 0,
             'sum_length' => 0,
         ]);
-        array_push($this->tagMapping, [
+        $this->tagMapping[] = [
             0 => '',
             1 => strlen($html) - 1,
-        ]);
+        ];
     }
 
     /***
@@ -112,7 +115,7 @@ class editor_Models_SearchAndReplace_FindMatchesHtml
      * @param bool $isEnd - search for end index
      * @return integer
      */
-    public function findPosition($contentPosition, $isEnd = false)
+    private function findPosition($contentPosition, $isEnd = false): int
     {
         //binary search
         $idx = [
@@ -181,7 +184,7 @@ class editor_Models_SearchAndReplace_FindMatchesHtml
 
         $collectedValues = [];
         //for each match, find the start and end ingex in the original segment text
-        foreach ($matches[0] as &$match) {
+        foreach ($matches[0] as $match) {
             //get the start position index
             $posStart = $this->findPosition($match[1]);
 

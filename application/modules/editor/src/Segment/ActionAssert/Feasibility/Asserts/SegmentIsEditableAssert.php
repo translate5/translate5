@@ -26,17 +26,38 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Segment\ActionAssert\Feasibility\Asserts;
+
+use editor_Models_Segment;
+use MittagQI\Translate5\ActionAssert\Action;
+use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
+use ZfExtended_Models_Entity_NoAccessException;
+
 /**
- * General exception in segment processing.
+ * @implements FeasibilityAssertInterface<editor_Models_Segment>
  */
-class editor_Models_SearchAndReplace_Exception extends ZfExtended_ErrorCodeException
+class SegmentIsEditableAssert implements FeasibilityAssertInterface
 {
     /**
-     * @var string
+     * @codeCoverageIgnore
      */
-    protected $domain = 'editor.searchandreplace';
+    public static function create(): self
+    {
+        return new self(
+        );
+    }
 
-    protected static $localErrorCodes = [
-        'E1192' => 'Replace all can not be used for task with usageMode "simultaneous"',
-    ];
+    public function supports(Action $action): bool
+    {
+        return $action === Action::Update;
+    }
+
+    public function assertAllowed(object $object): void
+    {
+        if (! $object->isEditable()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+    }
 }
