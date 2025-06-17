@@ -1995,3 +1995,34 @@ Ext.override(Ext.ProgressBar, {
 Ext.override(Ext.toolbar.Paging, {
     inputItemWidth: 50
 });
+
+/**
+ * Overridden to check for dom-node prior setStyle call to prevent error
+ * https://jira.translate5.net/browse/TRANSLATE-4719 and log debug info
+ * which will be logged, though if suppressing leads to follow-up problems
+ */
+Ext.override(Ext.fx.target.Element, {
+    setElVal: function(element, attr, value) {
+        if (attr === 'x') {
+            element.setX(value);
+        } else if (attr === 'y') {
+            element.setY(value);
+        } else if (attr === 'scrollTop') {
+            element.scrollTo('top', value);
+        } else if (attr === 'scrollLeft') {
+            element.scrollTo('left', value);
+        } else if (attr === 'width') {
+            element.setWidth(value);
+        } else if (attr === 'height') {
+            element.setHeight(value);
+        } else {
+            if (element.dom) {                                                                                      // +
+                element.setStyle(attr, value);
+            } else if (jslogger) {                                                                                  // +
+                jslogger.addLogEntry({type: 'info', message: 'Attempt to setStyle on Element having no dom-node'}); // +
+                jslogger.addLogEntry({type: 'info', message: 'Element.id: ' + element.id});                         // +
+                jslogger.addLogEntry({type: 'info', message: 'Element.component?.id: ' + element.component?.id});   // +
+            }
+        }
+    }
+});
