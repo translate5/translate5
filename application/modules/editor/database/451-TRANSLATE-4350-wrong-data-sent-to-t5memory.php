@@ -263,7 +263,7 @@ foreach ($result as $row) {
     }
 
     try {
-        $queue->queueReimport($taskGuid, $languageResourceId);
+        $queue->queueSnapshot($taskGuid, $languageResourceId);
         /** @phpstan-ignore-next-line */
     } catch (\ZfExtended_Models_Entity_NotFoundException $e) {
         $logger->info('E0000', 'Migration 451-TRANSLATE-4350: Task not found', [

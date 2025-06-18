@@ -38,6 +38,7 @@ use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation as TaskTmTaskAssociationDb;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
+use Zend_Db_Table_Row;
 
 class LanguageResourceTaskAssocRepository
 {
@@ -64,6 +65,39 @@ class LanguageResourceTaskAssocRepository
     public function save(TaskAssociation $taskAssociation): void
     {
         $taskAssociation->save();
+    }
+
+    public function findByTaskGuidAndLanguageResource(string $taskGuid, int $languageResourceId): ?TaskAssociation
+    {
+        $select = $this->db->select()
+            ->from(
+                [
+                    'taskAssoc' => TaskAssociationDb::TABLE_NAME,
+                ]
+            )
+            ->where('taskAssoc.taskGuid = ?', $taskGuid)
+            ->where('taskAssoc.languageResourceId = ?', $languageResourceId)
+        ;
+
+        $row = $this->db->fetchRow($select);
+
+        if (! $row) {
+            return null;
+        }
+
+        $taskAssociation = new TaskAssociation();
+        $taskAssociation->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $taskAssociation->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $taskAssociation;
     }
 
     public function getAllByTaskGuid(string $taskGuid): array

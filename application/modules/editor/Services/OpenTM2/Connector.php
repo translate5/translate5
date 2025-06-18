@@ -29,22 +29,30 @@ END LICENSE AND COPYRIGHT
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use editor_Services_Connector_TagHandler_Abstract as TagHandler;
-use GuzzleHttp\Client;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\T5Memory\Api\RetryClient;
+use MittagQI\Translate5\T5Memory\Api\ConstantApi;
+use MittagQI\Translate5\T5Memory\Api\Response\MutationResponse as MutationApiResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
 use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
-use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
+use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
+use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
+use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 use MittagQI\Translate5\T5Memory\ExportService;
+use MittagQI\Translate5\T5Memory\FlushMemoryService;
+use MittagQI\Translate5\T5Memory\ImportService;
+use MittagQI\Translate5\T5Memory\MemoryNameGenerator;
 use MittagQI\Translate5\T5Memory\PersistenceService;
+use MittagQI\Translate5\T5Memory\ReorganizeService;
+use MittagQI\Translate5\T5Memory\RetryService;
 use MittagQI\Translate5\T5Memory\VersionService;
 
 /**
@@ -56,7 +64,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
 
-    private const VERSION_0_6 = '0.6';
+    private const VERSION_0_5 = '0.5';
 
     protected const TAG_HANDLER_CONFIG_PART = 't5memory';
 
@@ -76,19 +84,33 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      */
     protected $internalTagSupport = true;
 
-    private TmConversionService $conversionService;
+    private readonly TmConversionService $conversionService;
 
-    private VersionService $versionService;
+    private readonly VersionService $versionService;
 
-    private PersistenceService $persistenceService;
+    private readonly PersistenceService $persistenceService;
 
-    private ExportService $exportService;
+    private readonly ExportService $exportService;
+
+    private readonly ReorganizeService $reorganizeService;
+
+    private readonly ImportService $importService;
+
+    private readonly MemoryNameGenerator $memoryNameGenerator;
+
+    private readonly CreateMemoryService $createMemoryService;
+
+    private readonly RetryService $waitingService;
+
+    private readonly ConstantApi $constantApi;
+
+    private readonly FlushMemoryService $flushMemoryService;
 
     public function __construct()
     {
         editor_Services_Connector_Exception::addCodes([
-            'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
-            'E1333' => 'The queried OpenTM2 server has to many open TMs!',
+            'E1314' => 'The queried t5memory TM "{tm}" is corrupt and must be reorganized before usage!',
+            'E1333' => 'The queried t5memory server has to many open TMs!',
         ]);
 
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
@@ -96,16 +118,23 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         parent::__construct();
 
         $this->conversionService = TmConversionService::create();
-        $this->persistenceService = new PersistenceService($this->config);
-        $httpClient = new RetryClient(new Client());
-        $this->versionService = new VersionService(new VersionFetchingApi($httpClient));
+        $this->persistenceService = PersistenceService::create();
+        $this->versionService = VersionService::create();
         $this->exportService = new ExportService(
             $this->logger,
             $this->versionService,
             $this->conversionService,
-            new VersionedApiFactory($httpClient),
+            VersionedApiFactory::create(),
             $this->persistenceService
         );
+
+        $this->reorganizeService = ReorganizeService::create();
+        $this->importService = ImportService::create();
+        $this->memoryNameGenerator = new MemoryNameGenerator();
+        $this->createMemoryService = CreateMemoryService::create();
+        $this->waitingService = RetryService::create();
+        $this->constantApi = ConstantApi::create();
+        $this->flushMemoryService = FlushMemoryService::create();
     }
 
     public function connectTo(
@@ -130,20 +159,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      */
     public function addTm(array $fileinfo = null, array $params = null): bool
     {
-        $sourceLang = $this->languageResource->getSourceLangCode();
-
         //to ensure that we get unique TMs Names although of the above stripped content,
         // we add the LanguageResource ID and a prefix which can be configured per each translate5 instance
-        $name = $this->generateTmFilename($this->languageResource);
+        $name = $this->memoryNameGenerator->generateTmFilename($this->languageResource);
 
         if (isset($params['createNewMemory'])) {
-            $name = $this->generateNextMemoryName($this->languageResource);
+            $name = $this->memoryNameGenerator->generateNextMemoryName($this->languageResource);
         }
 
         // If we are adding a TMX file as LanguageResource, we must create an empty memory first.
         $validFileTypes = $this->getValidFiletypes();
         if (empty($validFileTypes['TMX'])) {
-            throw new ZfExtended_NotFoundException('OpenTM2: Cannot addTm for TMX-file; valid file types are missing.');
+            throw new ZfExtended_NotFoundException('t5memory: Cannot addTm for TMX-file; valid file types are missing.');
         }
 
         $noFile = empty($fileinfo);
@@ -155,113 +182,44 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             && preg_match('/(\.tmx|\.zip)$/', strtolower($fileinfo['name']));
 
         if ($noFile || $tmxUpload) {
-            $tmName = $this->createEmptyMemoryWithRetry($name, $sourceLang);
-
-            if (null !== $tmName) {
-                $this->addMemoryToLanguageResource($this->languageResource, $tmName);
-
-                //if initial upload is a TMX file, we have to import it.
-                if ($tmxUpload) {
-                    return $this->addAdditionalTm($fileinfo, [
-                        'tmName' => $tmName,
-                        'stripFramingTags' => $params['stripFramingTags'] ?? null,
-                    ]);
-                }
-
-                return true;
+            try {
+                $tmName = $this->createMemoryService->createEmptyMemoryWithRetry($this->languageResource, $name);
+            } catch (UnableToCreateMemoryException) {
+                return false;
             }
 
-            $this->logger->error('E1305', 'OpenTM2: could not create TM', [
-                'languageResource' => $this->languageResource,
-                'apiError' => $this->api->getError(),
-            ]);
+            $this->persistenceService->addMemoryToLanguageResource($this->languageResource, $tmName);
 
-            return false;
-        }
-
-        //initial upload is a TM file
-        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_6, $this->languageResource)) {
-            $tmName = $this->api->createMemoryWithFile(
-                $name,
-                $sourceLang,
-                $fileinfo['tmp_name'],
-                $this->getStripFramingTagsValue($params)
-            );
-        } else {
-            $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
-        }
-
-        if ($tmName) {
-            $this->addMemoryToLanguageResource($this->languageResource, $tmName);
+            //if initial upload is a TMX file, we have to import it.
+            if ($tmxUpload) {
+                return $this->addAdditionalTm($fileinfo, [
+                    'tmName' => $tmName,
+                    'stripFramingTags' => $params['stripFramingTags'] ?? null,
+                ]);
+            }
 
             return true;
         }
 
-        $this->logger->error('E1304', 'OpenTM2: could not create prefilled TM', [
-            'languageResource' => $this->languageResource,
-            'apiError' => $this->api->getError(),
-        ]);
+        try {
+            $tmName = $this->createMemoryService->createMemory(
+                $this->languageResource,
+                $name,
+                $fileinfo['tmp_name'],
+                $this->getStripFramingTagsValue($params)
+            );
+        } catch (\Exception $e) {
+            $this->logger->error('E1304', 't5memory: could not create prefilled TM', [
+                'languageResource' => $this->languageResource,
+            ]);
+            $this->logger->exception($e);
 
-        return false;
-    }
-
-    /**
-     * Updates the filename of the language resource instance with the filename coming from the TM system
-     * @throws Zend_Exception
-     */
-    private function addMemoryToLanguageResource(
-        LanguageResource $languageResource,
-        string $tmName,
-        bool $isInternalFuzzy = false,
-    ): void {
-        $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
-        if (! empty($prefix)) {
-            //remove the prefix from being stored into the TM
-            $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
+            return false;
         }
 
-        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+        $this->persistenceService->addMemoryToLanguageResource($this->languageResource, $tmName);
 
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-
-        $lastMemoryId = 0;
-
-        if (! empty($memories)) {
-            $lastMemoryId = end($memories)['id'];
-        }
-
-        $memories[] = [
-            'id' => $lastMemoryId + 1,
-            'filename' => $tmName,
-            'readonly' => false,
-        ];
-
-        $languageResource->addSpecificData('memories', $memories);
-
-        if (! $isInternalFuzzy) {
-            //saving it here makes the TM available even when the TMX import was crashed
-            $languageResource->save();
-        }
-    }
-
-    private function setMemoryReadonly(
-        LanguageResource $languageResource,
-        string $tmName,
-        bool $isInternalFuzzy = false,
-    ): void {
-        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
-
-        foreach ($memories as $key => $memory) {
-            if ($memory['filename'] === $tmName) {
-                $memories[$key]['readonly'] = true;
-            }
-        }
-
-        $languageResource->addSpecificData('memories', $memories);
-
-        if (! $isInternalFuzzy) {
-            $languageResource->save();
-        }
+        return true;
     }
 
     /**
@@ -280,7 +238,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $zip = new ZipArchive();
         if (! $zip->open($fileInfo['tmp_name'])) {
-            $this->logger->error('E1596', 'OpenTM2: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
+            $this->logger->error('E1596', 't5memory: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
 
             return yield from [];
         }
@@ -288,7 +246,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $newPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . pathinfo($fileInfo['name'], PATHINFO_FILENAME);
 
         if (! $zip->extractTo($newPath)) {
-            $this->logger->error('E1597', 'OpenTM2: Content from zip file could not be extracted.');
+            $this->logger->error('E1597', 't5memory: Content from zip file could not be extracted.');
             $zip->close();
 
             return yield from [];
@@ -303,43 +261,24 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
-        $result = true;
-
-        foreach ($this->getImportFilesFromUpload($fileinfo) as $file) {
-            try {
-                $importFilename = $this->conversionService->convertTMXForImport(
-                    $file,
-                    (int) $this->languageResource->getSourceLang(),
-                    (int) $this->languageResource->getTargetLang()
-                );
-            } catch (RuntimeException $e) {
-                $this->logger->error(
-                    'E1590',
-                    'Conversion: Error in process of TMX file conversion',
-                    [
-                        'reason' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                        'languageResource' => $this->languageResource,
-                    ]
-                );
-                $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
-                $this->languageResource->save();
-
-                $result = false;
-
-                continue;
-            }
-
-            $result = $result && $this->importTmxIntoMemory(
-                $importFilename,
-                $params['tmName'] ?? $this->persistenceService->getWritableMemory($this->languageResource),
-                $this->getStripFramingTagsValue($params)
+        try {
+            $this->importService->importTmx(
+                $this->languageResource,
+                $this->getImportFilesFromUpload($fileinfo),
+                $this->getStripFramingTagsValue($params),
+                $params['tmName'] ?? null,
             );
+        } catch (\Exception $e) {
+            $this->logger->error('E1304', 't5memory: could not import TMX', [
+                'languageResource' => $this->languageResource,
+                'apiError' => $e->getMessage(),
+            ]);
+            $this->logger->exception($e);
 
-            unlink($importFilename);
+            return false;
         }
 
-        return $result;
+        return true;
     }
 
     public function getValidFiletypes(): array
@@ -353,14 +292,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     public function getValidExportTypes(): array
     {
-        return ExportTmFileExtension::getValidExportTypes();
+        return TmFileExtension::getValidExportTypes();
     }
 
     public function getTm($mime)
     {
         $file = $this->exportService->export(
             $this->languageResource,
-            ExportTmFileExtension::fromMimeType($mime)
+            TmFileExtension::fromMimeType($mime)
         );
 
         if (null === $file) {
@@ -374,7 +313,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     {
         $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
 
-        if ($this->isReorganizingAtTheMoment($tmName)) {
+        if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())) {
             if ($options[UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR] ?? false) {
                 throw new RescheduleUpdateNeededException();
             }
@@ -453,7 +392,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     {
         $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
 
-        if ($this->isReorganizingAtTheMoment($tmName)) {
+        if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())) {
             if ($options[UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR] ?? false) {
                 throw new RescheduleUpdateNeededException();
             }
@@ -521,7 +460,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         $elapsedTime = 0;
-        $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
+        $maxWaitingTime = $this->waitingService->getMaxWaitingTimeSeconds();
 
         while ($elapsedTime < $maxWaitingTime) {
             $successful = $this->api->update(
@@ -544,12 +483,26 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
             $apiError = $this->api->getError();
 
-            if ($this->needsReorganizing($apiError, $tmName)) {
-                $this->addReorganizeWarning($segment->getTask());
-                $this->reorganizeTm($tmName);
-            } elseif ($this->isMemoryOverflown($apiError)) {
-                if (! $this->isBlockOverflown($apiError)) {
-                    $this->setMemoryReadonly($this->languageResource, $tmName, $this->isInternalFuzzy());
+            $response = MutationApiResponse::fromContentAndStatus(
+                $this->api->getResponse()->getBody(),
+                $this->api->getResponse()->getStatus()
+            );
+
+            if ($this->reorganizeService->needsReorganizing(
+                $response,
+                $this->languageResource,
+                $tmName,
+                $segment->getTask(),
+                $this->isInternalFuzzy()
+            )) {
+                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $this->isInternalFuzzy());
+            } elseif ($response->isMemoryOverflown($this->config)) {
+                if (! $response->isBlockOverflown($this->config)) {
+                    $this->persistenceService->setMemoryReadonly(
+                        $this->languageResource,
+                        $tmName,
+                        $this->isInternalFuzzy()
+                    );
                 }
 
                 $newName = $this->persistenceService->getNextWritableMemory($this->languageResource, $tmName);
@@ -560,54 +513,46 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                     continue;
                 }
 
-                $this->addOverflowWarning($segment->getTask());
-                $this->flushMemory($tmName);
-                $newName = $this->generateNextMemoryName($this->languageResource);
-                $newName = $this->createEmptyMemoryWithRetry($newName, $this->languageResource->getSourceLangCode());
+                $this->addOverflowLog($segment->getTask());
+                $this->flushMemoryService->flush($this->languageResource, $tmName);
+                $newName = $this->memoryNameGenerator->generateNextMemoryName($this->languageResource);
 
-                if (null === $newName) {
-                    $this->logger->error('E1305', 'OpenTM2: could not create TM', [
-                        'languageResource' => $this->languageResource,
-                        'apiError' => $this->api->getError(),
-                    ]);
-
+                try {
+                    $newName = $this->createMemoryService->createEmptyMemoryWithRetry(
+                        $this->languageResource,
+                        $newName,
+                    );
+                } catch (UnableToCreateMemoryException) {
                     break;
                 }
 
-                $this->addMemoryToLanguageResource($this->languageResource, $newName, $this->isInternalFuzzy());
+                $this->persistenceService->addMemoryToLanguageResource(
+                    $this->languageResource,
+                    $newName,
+                    $this->isInternalFuzzy()
+                );
                 $tmName = $newName;
             } elseif ($this->isLockingTimeoutOccurred($apiError)) {
                 // Wait before retrying
-                sleep($this->getRetryDelaySeconds());
+                sleep($this->waitingService->getRetryDelaySeconds());
             } else {
                 // If no specific error handling is applicable, break the loop
                 break;
             }
 
-            $elapsedTime = $this->getRetryDelaySeconds();
+            $elapsedTime = $this->waitingService->getRetryDelaySeconds();
         }
 
         // send the error to the frontend
         editor_Services_Manager::reportTMUpdateError($apiError ?? null);
 
-        $this->logger->error('E1306', 'OpenTM2: could not save segment to TM', [
+        $this->logger->error('E1306', 't5memory: could not save segment to TM', [
             'languageResource' => $this->languageResource,
             'segment' => $segment,
             'apiError' => $apiError ?? '',
         ]);
 
         throw new SegmentUpdateException();
-    }
-
-    public function flush(): void
-    {
-        $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
-        $this->api->flush($tmName);
-    }
-
-    private function flushMemory(string $tmName): void
-    {
-        $this->api->flush($tmName);
     }
 
     private function isLockingTimeoutOccurred(?object $error): bool
@@ -739,7 +684,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 continue;
             }
 
-            if ($this->isReorganizingAtTheMoment($tmName)) {
+            if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())) {
                 continue;
             }
 
@@ -747,22 +692,30 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
             $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
 
-            if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
-                $this->addReorganizeWarning();
-                $this->reorganizeTm($tmName);
+            $response = ApiResponse::fromContentAndStatus(
+                $this->api->getResponse()->getBody(),
+                $this->api->getResponse()->getStatus(),
+            );
+
+            if ($this->reorganizeService->needsReorganizing(
+                $response,
+                $this->languageResource,
+                $tmName,
+                null,
+                $this->isInternalFuzzy()
+            )) {
+                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $this->isInternalFuzzy());
+
                 $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
             }
 
             if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
-                $elapsedTime = 0;
-                $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
+                $concordanceSearch =
+                    fn () => $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults)
+                        ? [WaitCallState::Done, true]
+                        : [WaitCallState::Retry, false];
 
-                while ($elapsedTime < $maxWaitingTime && ! $successful) {
-                    sleep($this->getRetryDelaySeconds());
-                    $elapsedTime += $this->getRetryDelaySeconds();
-
-                    $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
-                }
+                $successful = (bool) $this->waitingService->callAwaiting($concordanceSearch);
             }
 
             if (! $successful) {
@@ -772,7 +725,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             }
 
             // In case we have at least one successful search, we reset the reorganize attempts
-            $this->resetReorganizeAttempts($this->languageResource);
+            $this->reorganizeService->resetReorganizeAttempts($this->languageResource, $this->isInternalFuzzy());
 
             $result = $this->api->getResult();
 
@@ -890,22 +843,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     }
 
     /**
-     * Replaces not allowed characters with "_" in memory names
-     * @param string $name
-     * @return string
-     */
-    private function filterName($name)
-    {
-        //since we are getting Problems on the OpenTM2 side with non ascii characters in the filenames,
-        // we strip them all. See also OPENTM2-13.
-        $name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
-
-        return preg_replace('/[^a-zA-Z0-9 _-]/', '_', $name);
-        //original not allowed string list:
-        //return str_replace("\\/:?*|<>", '_', $name);
-    }
-
-    /**
      * @throws editor_Services_Exceptions_InvalidResponse
      */
     public function getStatus(
@@ -921,12 +858,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         // for the rare cases where no language-resource is present
-        if (! isset($this->languageResource)) {
-            //ping call
-            $this->api = ZfExtended_Factory::get(editor_Services_OpenTM2_HttpApi::class);
-            $this->api->setResource($resource);
-
-            return $this->api->status(null) ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::ERROR;
+        if (null === $this->languageResource) {
+            return $this->constantApi->ping($resource->getUrl())
+                ? LanguageResourceStatus::AVAILABLE
+                : LanguageResourceStatus::ERROR;
         }
 
         if ($this->languageResource->isConversionStarted()) {
@@ -938,7 +873,36 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return LanguageResourceStatus::IMPORT;
         }
 
-        return $this->getStatusFromApi($this->languageResource, $tmName);
+        if (
+            ! $this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)
+            && $this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())
+        ) {
+            // Status import to prevent any other queries to TM to be performed
+            return LanguageResourceStatus::IMPORT;
+        }
+
+        $tmName = $tmName ?: $this->persistenceService->getLastWritableMemory($this->languageResource);
+
+        if (empty($tmName)) {
+            $this->lastStatusInfo = 'The internal stored filename is invalid';
+
+            return LanguageResourceStatus::NOCONNECTION;
+        }
+
+        // TODO remove after fully migrated to t5memory v0.5.x
+
+        $status = $this->constantApi->getStatus(
+            $this->languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($tmName)
+        );
+
+        if ($status->successful()) {
+            return $status->status;
+        }
+
+        $this->lastStatusInfo = $status->getErrorMessage();
+
+        return LanguageResourceStatus::ERROR;
     }
 
     public function isEmpty(): bool
@@ -958,191 +922,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $name = $memories[0]['filename'];
 
-        if ($this->api->status($name)) {
-            $result = $this->api->getResult();
+        $status = $this->constantApi->getStatus(
+            $this->languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($name)
+        );
 
-            if (! is_object($result)) {
-                return false;
-            }
-
-            $status = $result->status ?? '';
-
-            return 'open' === $status && 0 === $result->segmentIndex;
+        if (LanguageResourceStatus::ERROR === $status->status) {
+            return false;
         }
 
-        return false;
-    }
+        $body = $status->getBody();
 
-    private function getStatusFromApi(LanguageResource $languageResource, ?string $tmName): string
-    {
-        $name = $tmName ?: $this->persistenceService->getLastWritableMemory($languageResource);
-
-        if (empty($name)) {
-            $this->lastStatusInfo = 'The internal stored filename is invalid';
-
-            return LanguageResourceStatus::NOCONNECTION;
-        }
-
-        // TODO remove after fully migrated to t5memory v0.5.x
-        if (
-            ! $this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)
-            && $this->isReorganizingAtTheMoment($name)
-        ) {
-            // Status import to prevent any other queries to TM to be performed
-            return LanguageResourceStatus::IMPORT;
-        }
-
-        if ($this->api->status($name)) {
-            $result = $this->api->getResult();
-
-            return $this->processImportStatus(is_object($result) ? $result : null);
-        }
-        //down here the result contained an error, the json was invalid or HTTP Status was not 20X
-
-        // FIXME this is currently not true, because t5memory returns 404 only in case memory does not exist
-        // FIXME If it is not loaded, but exists on the disk the status will be 'available' - MITTAGQI-338
-        //Warning: this evaluates to "available" in the GUI, see the following explanation:
-        //a 404 response from the status call means:
-        // - OpenTM2 is online
-        // - the requested TM is currently not loaded, so there is no info about the existence
-        // - So we display the STATUS_NOT_LOADED instead
-        if ($this->api->getResponse()->getStatus() === 404) {
-            $this->lastStatusInfo = 'Die Ressource ist generell verfügbar, '
-                . 'stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
-
-            // This will be not needed after migration to t5memory completed
-            return LanguageResourceStatus::NOT_LOADED;
-        }
-
-        $error = $this->api->getError();
-
-        if (empty($error->type)) {
-            $this->lastStatusInfo = $error->error;
-        } else {
-            $this->lastStatusInfo = $error->type . ': ' . $error->error;
-        }
-
-        return LanguageResourceStatus::ERROR;
-    }
-
-    /**
-     * processes the import state
-     * Please note, method made public for testing purposes only,
-     * should be changed to private after the class is refactored
-     */
-    public function processImportStatus(?stdClass $apiResponse): string
-    {
-        $status = $apiResponse ? ($apiResponse->status ?? '') : '';
-        $tmxImportStatus = $apiResponse ? ($apiResponse->tmxImportStatus ?? '') : '';
-        $reorganizeStatus = $apiResponse ? ($apiResponse->reorganizeStatus ?? '') : '';
-
-        $lastStatusInfo = '';
-        $result = LanguageResourceStatus::UNKNOWN;
-
-        switch ($status) {
-            // TM not found at all
-            case 'not found':
-                // We have no status 'not found' at the moment, so we use 'error' instead
-                $result = LanguageResourceStatus::ERROR;
-
-                break;
-
-                // TM exists on a disk, but not loaded into memory
-            case 'available':
-                $result = LanguageResourceStatus::AVAILABLE;
-
-                // TODO change this to STATUS_NOT_LOADED after discussed with the team
-                //                $result = self::STATUS_NOT_LOADED;
-                break;
-
-                // TM exists and is loaded into memory
-            case 'open':
-                switch ($tmxImportStatus) {
-                    case '':
-                        $result = LanguageResourceStatus::AVAILABLE;
-
-                        break;
-
-                    case 'available':
-                        if (isset($apiResponse->importTime) && $apiResponse->importTime === 'not finished') {
-                            $result = LanguageResourceStatus::IMPORT;
-
-                            break;
-                        }
-
-                        $result = LanguageResourceStatus::AVAILABLE;
-
-                        break;
-
-                    case 'import':
-                        $lastStatusInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
-                        $result = LanguageResourceStatus::IMPORT;
-
-                        break;
-
-                    case 'error':
-                    case 'failed':
-                        $lastStatusInfo = $apiResponse->ErrorMsg
-                            ?? $apiResponse->importErrorMsg
-                            ?? $apiResponse->reorganizeErrorMsg
-                            ?? 'Unknown error';
-                        $result = LanguageResourceStatus::ERROR;
-
-                        break;
-
-                    default:
-                        break;
-                }
-
-                switch ($reorganizeStatus) {
-                    case 'reorganize':
-                        $result = LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
-
-                        break;
-
-                    case 'reorganize failed':
-                        $result = LanguageResourceStatus::REORGANIZE_FAILED;
-
-                        break;
-
-                    default:
-                        break;
-                }
-
-                break;
-
-            case 'reorganize running':
-                $result = LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
-
-                break;
-
-            case 'import running':
-                $result = LanguageResourceStatus::IMPORT;
-
-                break;
-
-            case 'waiting for loading':
-                $result = LanguageResourceStatus::WAITING_FOR_LOADING;
-
-                break;
-
-            case 'loading':
-                $result = LanguageResourceStatus::LOADING;
-
-                break;
-
-            case 'failed to open':
-                $result = LanguageResourceStatus::FAILED_TO_OPEN;
-
-                break;
-
-            default:
-                break;
-        }
-
-        $this->lastStatusInfo = $lastStatusInfo !== '' ? $lastStatusInfo : 'original OpenTM2 status ' . $status;
-
-        return $result;
+        return 'open' === ($body['status'] ?? null) && 0 === ($body['segmentIndex'] ?? null);
     }
 
     /**
@@ -1220,12 +1011,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $this->api->setResource($fuzzyLanguageResource->getResource());
 
-        $newTmFileName = $this->createEmptyMemoryWithRetry(
-            $this->generateTmFilename($fuzzyLanguageResource),
-            $this->languageResource->getSourceLangCode()
+        $newTmFileName = $this->createMemoryService->createEmptyMemoryWithRetry(
+            $this->languageResource,
+            $this->memoryNameGenerator->generateTmFilename($fuzzyLanguageResource),
         );
 
-        $this->addMemoryToLanguageResource($fuzzyLanguageResource, $newTmFileName, true);
+        $this->persistenceService->addMemoryToLanguageResource(
+            $fuzzyLanguageResource,
+            $newTmFileName,
+            true
+        );
 
         //INFO: The resources logging requires resource with valid id.
         //$fuzzyLanguageResource->setId(null);
@@ -1379,126 +1174,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return max(0, min($matchrate, 100) - $reducePercent);
     }
 
-    #region Reorganize TM
-    // Need to move this region to a dedicated class while refactoring connector
-    private const REORGANIZE_ATTEMPTS = 'reorganize_attempts';
-
-    private const REORGANIZE_STARTED_AT = 'reorganize_started_at';
-
-    // Applicable only for version < 0.5.x
-    private const MAX_REORGANIZE_TIME_MINUTES = 30;
-
-    private const REORGANIZE_WAIT_TIME_SECONDS = 60;
-
-    private const VERSION_0_5 = '0.5';
-
-    private function needsReorganizing(stdClass $error, string $tmName): bool
-    {
-        $errorCodes = explode(
-            ',',
-            $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
-        );
-
-        $errorSupposesReorganizing = (
-            isset($error->code)
-            && str_replace($errorCodes, '', $error->code) !== $error->code
-        )
-            || (isset($error->error) && $error->error === 500);
-
-        // Check if error codes contains any of the values
-        $needsReorganizing = $errorSupposesReorganizing && ! $this->isReorganizingAtTheMoment($tmName);
-
-        if ($needsReorganizing && $this->isMaxReorganizeAttemptsReached($this->languageResource)) {
-            $this->logger->warn(
-                'E1314',
-                'The queried TM returned error which is configured for automatic TM reorganization.' .
-                'But maximum amount of attempts to reorganize it reached.',
-                [
-                    'apiError' => $this->api->getError(),
-                ]
-            );
-            $needsReorganizing = false;
-        }
-
-        return $needsReorganizing;
-    }
-
-    public function reorganizeTm(?string $tmName = null): bool
-    {
-        if (null === $tmName) {
-            $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
-        }
-
-        if (! $this->isInternalFuzzy()) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $this->languageResource->refresh();
-            $this->increaseReorganizeAttempts($this->languageResource);
-            $this->setReorganizeStatusInProgress($this->languageResource);
-            $this->languageResource->save();
-        }
-
-        $reorganized = $this->api->reorganizeTm($tmName);
-
-        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
-            $reorganized = $this->waitReorganizeFinished($tmName);
-        }
-
-        if (! $this->isInternalFuzzy()) {
-            $this->languageResource->setStatus(
-                $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
-            );
-
-            $this->languageResource->save();
-        }
-
-        return $reorganized;
-    }
-
-    public function isReorganizingAtTheMoment(?string $tmName = null): bool
-    {
-        $this->resetReorganizingIfNeeded();
-
-        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
-            $status = $this->getStatus($this->resource, tmName: $tmName);
-
-            return $status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
-        }
-
-        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
-    }
-
-    public function isReorganizeFailed(?string $tmName = null): bool
-    {
-        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
-            return $this->getStatus(
-                $this->resource,
-                tmName: $tmName
-            ) === LanguageResourceStatus::REORGANIZE_FAILED;
-        }
-
-        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_FAILED;
-    }
-
-    private function addReorganizeWarning(Task $task = null): void
-    {
-        $params = [
-            'apiError' => $this->api->getError(),
-        ];
-
-        if (null !== $task) {
-            $params['task'] = $task;
-        }
-
-        $this->logger->warn(
-            'E1314',
-            'The queried TM returned error which is configured for automatic TM reorganization',
-            $params
-        );
-    }
-
-    private function addOverflowWarning(Task $task = null): void
+    private function addOverflowLog(Task $task = null): void
     {
         $params = [
             'name' => $this->languageResource->getName(),
@@ -1509,115 +1185,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $params['task'] = $task;
         }
 
-        $this->logger->warn(
+        $this->logger->info(
             'E1603',
             'Language Resource [{name}] current writable memory is overflown, creating a new one',
             $params
         );
-    }
-
-    private function waitReorganizeFinished(?string $tmName = null): bool
-    {
-        $elapsedTime = 0;
-        $sleepTime = 5;
-
-        while ($elapsedTime < $this->getReorganizeWaitingTimeSeconds()) {
-            if (! $this->isReorganizingAtTheMoment($tmName)) {
-                return true;
-            }
-
-            sleep($sleepTime);
-            $elapsedTime += $sleepTime;
-        }
-
-        return false;
-    }
-
-    private function getReorganizeWaitingTimeSeconds(): int
-    {
-        return $this->canWaitLongTaskFinish()
-            ? self::REORGANIZE_WAIT_TIME_SECONDS * 60
-            : self::REORGANIZE_WAIT_TIME_SECONDS;
-    }
-
-    private function isMaxReorganizeAttemptsReached(?LanguageResource $languageResource): bool
-    {
-        if (null === $languageResource) {
-            return false;
-        }
-
-        $currentAttempts = $languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0;
-        $maxAttempts = $this->config->runtimeOptions->LanguageResources->t5memory->maxReorganizeAttempts;
-
-        return $currentAttempts >= $maxAttempts;
-    }
-
-    private function increaseReorganizeAttempts(LanguageResource $languageResource): void
-    {
-        $languageResource->addSpecificData(
-            self::REORGANIZE_ATTEMPTS,
-            ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0) + 1
-        );
-    }
-
-    private function resetReorganizeAttempts(LanguageResource $languageResource): void
-    {
-        if ($this->isInternalFuzzy()) {
-            return;
-        }
-
-        if ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) === null) {
-            return;
-        }
-
-        // In some cases language resource is detached from DB
-        $languageResource->refresh();
-        $languageResource->removeSpecificData(self::REORGANIZE_ATTEMPTS);
-        $languageResource->save();
-    }
-
-    /**
-     * Applicable only for t5memory 0.4.x
-     */
-    private function resetReorganizingIfNeeded(): void
-    {
-        $reorganizeStartedAt = $this->languageResource->getSpecificData(self::REORGANIZE_STARTED_AT);
-
-        if (null === $reorganizeStartedAt || $this->isInternalFuzzy()) {
-            return;
-        }
-
-        if ((new DateTimeImmutable($reorganizeStartedAt))->modify(
-            sprintf('+%d minutes', self::MAX_REORGANIZE_TIME_MINUTES)
-        ) < new DateTimeImmutable()
-        ) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $this->languageResource->refresh();
-            $this->languageResource->removeSpecificData(self::REORGANIZE_STARTED_AT);
-            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
-            $this->languageResource->save();
-        }
-    }
-
-    /**
-     * Applicable only for t5memory 0.4.x
-     */
-    private function setReorganizeStatusInProgress(LanguageResource $languageResource): void
-    {
-        $languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
-        $languageResource->addSpecificData(self::REORGANIZE_STARTED_AT, date(DateTimeInterface::RFC3339));
-    }
-    #endregion Reorganize TM
-
-    /**
-     * This is forced to be public, because part of its functionality is used outside of this class
-     * Needs to be removed when refactoring connector
-     */
-    public function getApi(): editor_Services_OpenTM2_HttpApi
-    {
-        return $this->api;
     }
 
     private function queryTms(
@@ -1628,7 +1200,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
 
-        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
+        //if source is empty, t5memory will return an error, therefore we just return an empty list
         if (empty($queryString) && $queryString !== '0') {
             return $resultList;
         }
@@ -1637,7 +1209,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return $resultList;
         }
 
-        //Although we take the source fields from the OpenTM2 answer below
+        //Although we take the source fields from the t5memory answer below
         // we have to set the default source here to fill the be added internal tags
         $resultList->setDefaultSource($queryString);
         $query = $this->tagHandler->prepareQuery($queryString);
@@ -1647,32 +1219,42 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
             $tmName = $memory['filename'];
 
-            if ($this->isReorganizingAtTheMoment($tmName)) {
-                if (! $this->canWaitLongTaskFinish()) {
+            if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())) {
+                if (! $this->waitingService->canWaitLongTaskFinish()) {
                     continue;
                 }
 
-                $this->waitReorganizeFinished();
+                $this->reorganizeService->waitReorganizeFinished(
+                    $this->languageResource,
+                    $memory,
+                    $this->isInternalFuzzy(),
+                );
             }
 
             $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
 
-            if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
-                $this->addReorganizeWarning($segment->getTask());
-                $this->reorganizeTm($tmName);
+            $response = ApiResponse::fromContentAndStatus(
+                $this->api->getResponse()->getBody(),
+                $this->api->getResponse()->getStatus(),
+            );
+
+            if ($this->reorganizeService->needsReorganizing(
+                $response,
+                $this->languageResource,
+                $tmName,
+                null,
+                $this->isInternalFuzzy()
+            )) {
+                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $this->isInternalFuzzy());
                 $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
             }
 
             if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
-                $elapsedTime = 0;
-                $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
+                $lookup = fn () => $this->api->lookup($segment, $query, $fileName, $tmName)
+                    ? [WaitCallState::Done, true]
+                    : [WaitCallState::Retry, false];
 
-                while ($elapsedTime < $maxWaitingTime && ! $successful) {
-                    sleep($this->getRetryDelaySeconds());
-                    $elapsedTime += $this->getRetryDelaySeconds();
-
-                    $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
-                }
+                $successful = (bool) $this->waitingService->callAwaiting($lookup);
             }
 
             if (! $successful) {
@@ -1682,11 +1264,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             }
 
             // In case we have at least one successful lookup, we reset the reorganize attempts
-            $this->resetReorganizeAttempts($this->languageResource);
+            $this->reorganizeService->resetReorganizeAttempts($this->languageResource, $this->isInternalFuzzy());
 
             $result = $this->api->getResult();
 
-            if ((int) $result->NumOfFoundProposals === 0) {
+            if ((int) ($result->NumOfFoundProposals ?? 0) === 0) {
                 continue;
             }
 
@@ -1730,239 +1312,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $resultList;
     }
 
-    private function isMemoryOverflown(?object $error): bool
-    {
-        if (null === $error) {
-            return false;
-        }
-
-        $errorCodes = explode(
-            ',',
-            $this->config->runtimeOptions->LanguageResources->t5memory->memoryOverflowErrorCodes
-        );
-        $errorCodes = array_map(fn ($code) => 'rc = ' . $code, $errorCodes);
-
-        return isset($error->error)
-            && str_replace($errorCodes, '', $error->error) !== $error->error;
-    }
-
-    private function isBlockOverflown(?object $error): bool
-    {
-        if (null === $error) {
-            return false;
-        }
-
-        $errorCodes = ['5037'];
-        $errorCodes = array_map(fn ($code) => 'rc = ' . $code, $errorCodes);
-
-        return isset($error->error)
-            && str_replace($errorCodes, '', $error->error) !== $error->error;
-    }
-
-    private function importTmxIntoMemory(
-        string $importFilename,
-        string $tmName,
-        StripFramingTags $stripFramingTags,
-    ): bool {
-        $gotLock = false;
-        $successful = false;
-
-        while (! $gotLock) {
-            if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_6, $this->languageResource)) {
-                $successful = $this->api->importMemoryAsFile($importFilename, $tmName, $stripFramingTags);
-            } else {
-                $successful = $this->api->importMemory(file_get_contents($importFilename), $tmName, $stripFramingTags);
-            }
-
-            $error = $this->api->getError();
-
-            if (! $successful && $this->isLockingTimeoutOccurred($error)) {
-                sleep($this->getRetryDelaySeconds());
-
-                continue;
-            }
-
-            if (! $successful && $this->needsReorganizing($error, $tmName)) {
-                $this->addReorganizeWarning();
-                $this->reorganizeTm($tmName);
-
-                continue;
-            }
-
-            $gotLock = true;
-        }
-
-        if (! $successful) {
-            $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
-                'languageResource' => $this->languageResource,
-                'apiError' => $this->api->getError(),
-            ]);
-        }
-
-        $this->waitForImportFinish($tmName);
-        // At current point LR is in Import status to prevent race conditions
-        // Here we resetting state to fetch the actual status from t5memory
-        $this->languageResource->setStatus(LanguageResourceStatus::NOTCHECKED);
-        $status = $this->getStatusFromApi($this->languageResource, $tmName);
-        $statusResponse = $this->api->getResult();
-        $error = $this->api->getError();
-
-        // In case we've got memory overflow error we need to create another memory and import further
-        if ($status === LanguageResourceStatus::ERROR && $this->isMemoryOverflown($error)) {
-            $this->addOverflowWarning();
-            $this->flushMemory($tmName);
-
-            $newName = $this->generateNextMemoryName($this->languageResource);
-            $newName = $this->createEmptyMemoryWithRetry($newName, $this->languageResource->getSourceLangCode());
-            $this->addMemoryToLanguageResource($this->languageResource, $newName);
-
-            // Filter TMX data from already imported segments
-            $this->cutOffTmx(
-                $importFilename,
-                $this->getOverflowSegmentNumberFromStatus($statusResponse, $error->error)
-            );
-
-            // Import further
-            return $this->importTmxIntoMemory($importFilename, $newName, $stripFramingTags);
-        }
-
-        return $successful && $status !== LanguageResourceStatus::ERROR;
-    }
-
-    private function cutOffTmx(string $importFilename, int $segmentToStartFrom): void
-    {
-        // suppress: namespace error : Namespace prefix t5 on n is not defined
-        $errorLevel = error_reporting();
-        error_reporting($errorLevel & ~E_WARNING);
-
-        $doc = new DOMDocument();
-        $doc->load($importFilename);
-
-        if (! $doc->hasChildNodes()) {
-            $error = libxml_get_last_error();
-
-            if (false !== $error) {
-                throw new RuntimeException(
-                    'Error while loading TMX file: ' . $error->message,
-                    $error->code
-                );
-            }
-        }
-
-        // Create an XPath to query the document
-        $xpath = new DOMXPath($doc);
-
-        // Find all 'tu' elements
-        $tuNodes = $xpath->query('/tmx/body/tu');
-
-        // Remove 'tu' elements before the segment index
-        for ($i = 0; $i < $segmentToStartFrom; $i++) {
-            $tuNodes->item($i)->parentNode->removeChild($tuNodes->item($i));
-        }
-
-        $doc->save($importFilename);
-
-        error_reporting($errorLevel);
-    }
-
-    private function getOverflowSegmentNumberFromStatus(stdClass $statusResponse, string $error): int
-    {
-        if (! isset($statusResponse->tmxSegmentCount) || 0 === (int) $statusResponse->tmxSegmentCount) {
-            $this->logger->error(
-                'E1313',
-                't5memory responded with memory overflow error, ' .
-                'but we were unable to distinguish the segment number for reimport',
-                [
-                    'languageResource' => $this->languageResource,
-                ]
-            );
-
-            throw new editor_Services_Connector_Exception('E1313', [
-                'error' => $error,
-            ]);
-        }
-
-        return (int) $statusResponse->tmxSegmentCount;
-    }
-
-    private function waitForImportFinish(string $tmName): void
-    {
-        $elapsedTime = 0;
-        $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
-
-        while ($elapsedTime < $maxWaitingTime) {
-            try {
-                if (! $this->api->status($tmName) && empty($this->api->getError())) {
-                    sleep($this->getRetryDelaySeconds());
-                    $elapsedTime += $this->getRetryDelaySeconds();
-
-                    continue;
-                }
-            } catch (\ZfExtended_Zendoverwrites_Http_Exception $e) {
-                $this->logger->error(
-                    'E1313',
-                    't5memory: We got some unexpected response. Look into system logs for details.',
-                    [
-                        'languageResource' => $this->languageResource,
-                        'error' => $e->getMessage(),
-                    ]
-                );
-                $this->logger->exception($e);
-
-                sleep($this->getRetryDelaySeconds());
-                $elapsedTime += $this->getRetryDelaySeconds();
-
-                continue;
-            }
-
-            $result = $this->api->getResult();
-            $status = $this->processImportStatus(is_object($result) ? $result : null);
-
-            if ($status !== LanguageResourceStatus::IMPORT) {
-                break;
-            }
-
-            sleep($this->getRetryDelaySeconds());
-            $elapsedTime += $this->getRetryDelaySeconds();
-        }
-    }
-
-    private function generateNextMemoryName(
-        LanguageResource $languageResource,
-        string $usedName = null,
-        bool $forceNextSuffix = false,
-    ): string {
-        $pattern = sprintf('/%s(\d+)$/', self::NEXT_SUFFIX);
-
-        if (null !== $usedName && preg_match($pattern, $usedName, $matches)) {
-            return $this->generateTmFilename($languageResource) . self::NEXT_SUFFIX . ((int) $matches[1] + 1);
-        }
-
-        $memories = $languageResource->getSpecificData('memories', parseAsArray: true);
-
-        if (empty($memories) && ! $forceNextSuffix) {
-            return $this->generateTmFilename($languageResource);
-        }
-
-        $currentMax = 0;
-        foreach ($memories ?: [] as $memory) {
-            if (! preg_match($pattern, $memory['filename'], $matches)) {
-                continue;
-            }
-
-            $currentMax = $currentMax > $matches[1] ? $currentMax : (int) $matches[1];
-        }
-
-        return $this->generateTmFilename($languageResource) . self::NEXT_SUFFIX . ($currentMax + 1);
-    }
-
     public function export(string $mime): ?string
     {
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
         return $this->exportService->export(
             $this->languageResource,
-            ExportTmFileExtension::fromMimeType($mime, count($memories) > 1)
+            TmFileExtension::fromMimeType($mime, count($memories) > 1)
         );
     }
 
@@ -2072,78 +1428,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     private function getStripFramingTagsValue(?array $params): StripFramingTags
     {
         return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
-    }
-
-    private function generateTmFilename(editor_Models_LanguageResources_LanguageResource $languageResource): string
-    {
-        return 'ID' . $languageResource->getId() . '-' . $this->filterName($languageResource->getName());
-    }
-
-    private function getMaxRequestRetries(): int
-    {
-        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestMaxRetries;
-    }
-
-    private function getRetryDelaySeconds(): int
-    {
-        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestRetryDelaySeconds;
-    }
-
-    private function getMaxWaitingTimeSeconds(): int
-    {
-        if ($this->canWaitLongTaskFinish()) {
-            // 1 hour max waiting time
-            return 3600;
-        }
-
-        return $this->getRetryDelaySeconds() * $this->getMaxRequestRetries();
-    }
-
-    /**
-     * Shows if connector can wait for a long-running task (e.g. reorganize, import, export) to finish before do
-     * fuzzy requests or other operations.
-     */
-    private function canWaitLongTaskFinish(): bool
-    {
-        // This should be moved to config, but this requires refactoring of the connectors
-        // and introducing a connector factory instead of manager as it is implemented at the moment
-        return defined('ZFEXTENDED_IS_WORKER_THREAD');
-    }
-
-    private function createEmptyMemoryWithRetry(string $name, string $sourceLang): ?string
-    {
-        $t5memoryName = null;
-        $elapsedTime = 0;
-        $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
-
-        while ($elapsedTime < $maxWaitingTime) {
-            $t5memoryName = $this->api->createEmptyMemory($name, $sourceLang);
-
-            if ($t5memoryName) {
-                break;
-            }
-
-            $apiError = $this->api->getError();
-
-            $this->logger->warn(
-                'E1305',
-                't5memory: Could not create empty memory - waiting for {elapsedTime} seconds.',
-                [
-                    'languageResource' => $this->languageResource,
-                    'apiError' => $apiError,
-                    'elapsedTime' => $elapsedTime,
-                ]
-            );
-
-            sleep($this->getRetryDelaySeconds());
-            $elapsedTime += $this->getRetryDelaySeconds();
-
-            if (isset($apiError->error) && strpos($apiError->error, 'ERROR_MEM_NAME_EXISTS')) {
-                $name = $this->generateNextMemoryName($this->languageResource, $name, true);
-            }
-        }
-
-        return $t5memoryName;
     }
 
     protected function getSegmentContext(editor_Models_Segment $segment): string

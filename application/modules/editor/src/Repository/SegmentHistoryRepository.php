@@ -53,15 +53,41 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_SegmentHistory;
+use editor_Models_Db_SegmentsHistory;
+use editor_Models_Db_SegmentsHistoryData;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
 
 class SegmentHistoryRepository
 {
-    private \Zend_Db_Table_Abstract $db;
+    public function __construct(
+        private readonly Zend_Db_Adapter_Abstract $db,
+    ) {
+    }
 
-    public function __construct()
+    public static function create(): self
     {
-        $this->db = (new editor_Models_SegmentHistory())->db;
+        return new self(
+            Zend_Db_Table::getDefaultAdapter(),
+        );
+    }
+
+    public function getHistoryDataBySegmentId(int $id, ?string $field = null, int $limit = 0): array
+    {
+        $s = $this->db->select()
+            ->from(editor_Models_Db_SegmentsHistoryData::TABLE_NAME)
+            ->where('segmentId = ?', $id)
+            ->order('id DESC');
+
+        if (! empty($field)) {
+            $s->where('name = ?', $field);
+        }
+
+        if ($limit > 0) {
+            $s->limit($limit);
+        }
+
+        return $this->db->fetchAll($s);
     }
 
     /**
@@ -69,14 +95,16 @@ class SegmentHistoryRepository
      */
     public function loadBySegmentId(int $id, int $limit = 0): array
     {
-        $s = $this->db->select();
-        $s->where('segmentId = ?', $id)
+        $s = $this->db->select()
+            ->from(editor_Models_Db_SegmentsHistory::TABLE_NAME)
+            ->where('segmentId = ?', $id)
             ->order('id DESC');
+
         if ($limit > 0) {
             $s->limit($limit);
         }
 
-        return $this->db->fetchAll($s)->toArray();
+        return $this->db->fetchAll($s);
     }
 
     /**
@@ -85,21 +113,24 @@ class SegmentHistoryRepository
      */
     public function loadLatestForSegment(int $segmentId, array $filter = []): array
     {
-        $s = $this->db->select();
-        $s->where('segmentId = ?', $segmentId)
+        $s = $this->db->select()
+            ->from(editor_Models_Db_SegmentsHistory::TABLE_NAME)
+            ->where('segmentId = ?', $segmentId)
             ->order('id DESC')->limit(1);
+
         foreach ($filter as $field => $value) {
             $s->where($field, $value);
         }
-        $row = $this->db->fetchRow($s);
 
-        return $row ? $row->toArray() : [];
+        $result = $this->db->fetchRow($s);
+
+        return $result ?: [];
     }
 
     public function getHistoryIdsForSegment(int $segmentId, string $userGuid, array $filter = []): array
     {
-        $s = $this->db->select();
-        $s->from($s->getTable(), ['id'])
+        $s = $this->db->select()
+            ->from(editor_Models_Db_SegmentsHistory::TABLE_NAME, ['id'])
             ->where('segmentId = ?', $segmentId)
             ->where('userGuid = ?', $userGuid);
 
@@ -112,11 +143,6 @@ class SegmentHistoryRepository
             }
         }
 
-        $res = $this->db->fetchAll($s)->toArray();
-        if ($res) {
-            return array_column($res, 'id');
-        }
-
-        return [];
+        return $this->db->fetchCol($s);
     }
 }

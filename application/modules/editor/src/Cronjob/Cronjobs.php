@@ -129,6 +129,7 @@ class Cronjobs
         Rotation::rotate('php.log');
         Rotation::rotate('worker.log');
         Rotation::rotate('instanttranslate.log');
+        Rotation::rotate('t5memory-specificData.log');
     }
 
     /**

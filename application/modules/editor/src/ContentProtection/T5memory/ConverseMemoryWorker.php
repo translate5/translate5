@@ -35,7 +35,7 @@ use editor_Services_Manager;
 use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\ContentProtection\ConversionState;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
-use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
@@ -158,7 +158,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         foreach ($this->memoriesBackup as $memory) {
             $exportFilename = $this->exportService->export(
                 $this->languageResource,
-                ExportTmFileExtension::TMX,
+                TmFileExtension::TMX,
                 $memory['filename']
             );
 

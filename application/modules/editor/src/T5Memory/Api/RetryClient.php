@@ -58,9 +58,9 @@ class RetryClient implements ClientInterface
                 }
 
                 if (
-                    str_contains($e->getMessage(), 'cURL error 6')
-                    || str_contains($e->getMessage(), 'cURL error 7')
-                    || str_contains($e->getMessage(), 'cURL error 56')
+                    str_contains($e->getMessage(), 'cURL error 6') // Could not resolve host
+                    || str_contains($e->getMessage(), 'cURL error 7') // Failed to connect to host
+                    || str_contains($e->getMessage(), 'cURL error 56') // Recv failure
                 ) {
                     sleep(self::RETRY_DELAY_SECONDS);
                     $timeElapsed += self::RETRY_DELAY_SECONDS;

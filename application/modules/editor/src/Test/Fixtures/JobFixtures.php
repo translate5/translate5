@@ -53,11 +53,11 @@ class JobFixtures
         $this->trackingDto = new TrackChangesRightsDto(true, true, true);
     }
 
-    public static function create(): self
+    public static function create(string $wfName = 'default'): self
     {
         return new self(
             CreateUserJobOperation::create(),
-            (new editor_Workflow_Manager())->getCached('default'),
+            (new editor_Workflow_Manager())->getCached($wfName),
         );
     }
 

@@ -326,8 +326,8 @@ class ImportService
             throw $e;
         }
 
-        $taskConfig = ZfExtended_factory::get(editor_Models_Import_TaskConfig::class);
-        $taskConfig->loadConfigTemplate($task, $importConfig);
+        $taskConfig = new editor_Models_Import_TaskConfig(new \editor_Models_TaskConfig());
+        $taskConfig->loadAndProcessConfigTemplate($task, $importConfig);
 
         // add task defaults (user associations and language resources)
         $this->defaults->setTaskDefaults($task, $importWizardUsed);

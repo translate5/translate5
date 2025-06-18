@@ -59,6 +59,7 @@ use editor_Models_Languages;
 use editor_Models_Task;
 use editor_Models_TaskUsageLog;
 use editor_Task_Type;
+use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -83,7 +84,8 @@ class FileTranslation
         return new self(
             new UserRepository(),
             TaskRepository::create(),
-            $loggerDomain
+            $loggerDomain,
+            AssociateTaskOperation::create()
         );
     }
 
@@ -98,7 +100,8 @@ class FileTranslation
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly TaskRepository $taskRepository,
-        private readonly string $loggerDomain
+        private readonly string $loggerDomain,
+        private readonly AssociateTaskOperation $associateTaskOperation,
     ) {
     }
 
@@ -117,8 +120,12 @@ class FileTranslation
      * @throws \ZfExtended_Exception
      * @throws \ZfExtended_FileUploadException
      */
-    public function importAndTranslate(array $importFile, int $sourceLang, int $targetLang): editor_Models_Task
-    {
+    public function importAndTranslate(
+        array $importFile,
+        int $sourceLang,
+        int $targetLang,
+        bool $startQaTerminology
+    ): editor_Models_Task {
         $acl = ZfExtended_Acl::getInstance();
         if (! $acl->isInAllowedRoles(
             ZfExtended_Authentication::getInstance()->getUserRoles(),
@@ -141,16 +148,23 @@ class FileTranslation
          * genauso sollten wir es auch im InstantTranslate machen: Alles mit 100% oder mehr aus dem TM
          * und alles andere durch die Maschine."
          */
+        $data = [
+            'internalFuzzy' => 0,
+            'pretranslateMatchrate' => 100,
+            'pretranslateTmAndTerm' => 1,
+            'pretranslateMt' => 1,
+            'isTaskImport' => 0,
+        ];
+
+        if ($startQaTerminology) {
+            $data['internalFuzzy'] = 1;
+            $data['termtaggerSegment'] = 1;
+        }
+
         $requestData = new ApiRequestDTO(
             'PUT',
             'editor/task/' . $task->getId() . '/pretranslation/operation',
-            [
-                'internalFuzzy' => 0,
-                'pretranslateMatchrate' => 100,
-                'pretranslateTmAndTerm' => 1,
-                'pretranslateMt' => 1,
-                'isTaskImport' => 0,
-            ]
+            $data
         );
         $requestData->loggerDomain = $this->loggerDomain;
         ApiRequest::requestApi($requestData);
@@ -217,7 +231,7 @@ class FileTranslation
     /**
      * Assign LanguageResources to the task that match the language-combination.
      */
-    private function assignLanguageResources(editor_Models_Task $task): void
+    public function assignLanguageResources(editor_Models_Task $task): void
     {
         $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
         //get source and target language fuzzies
@@ -257,20 +271,14 @@ class FileTranslation
      */
     private function addLanguageResource(int $languageResourceId, string $taskGuid): void
     {
-        $requestData = new ApiRequestDTO('POST', 'editor/languageresourcetaskassoc');
-        $requestData->loggerDomain = $this->loggerDomain;
-        $requestData->params = [
-            "data" => '{"languageResourceId":"' . $languageResourceId . '",' .
-                '"taskGuid":"' . $taskGuid . '","segmentsUpdateable":"false"}',
-        ];
-        ApiRequest::requestApi($requestData);
+        $this->associateTaskOperation->associate($languageResourceId, $taskGuid);
     }
 
     /**
      * Return intersection between user customers and language resources customers.
      * Those customers will be used for logging the usage
      */
-    private function getCustomersForLogging(editor_Models_task $task): array
+    private function getCustomersForLogging(editor_Models_Task $task): array
     {
         $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
         //load all customers for the assigned language resources of the task (those customers are also the current user customers)
@@ -284,7 +292,7 @@ class FileTranslation
      * Insert task usage log for the current pretranslation request.
      * For each customer of the associated language resource, one log entry is inserted.
      */
-    private function insertTaskUsageLog(editor_Models_task $task): void
+    private function insertTaskUsageLog(editor_Models_Task $task): void
     {
         $customers = $this->getCustomersForLogging($task);
 

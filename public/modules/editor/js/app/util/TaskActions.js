@@ -339,6 +339,10 @@ Ext.define('Editor.util.TaskActions', {
         task.save({
             success: function(rec, op) {
                 callback(task, app, me.strings, op);
+
+                if(doFireLeaveEvent){
+                    Editor.app.fireEvent('afterTaskModifiedBeforeLeave');
+                }
             },
             callback: function(rec, op) {
                 if (op.hasOwnProperty('error') &&

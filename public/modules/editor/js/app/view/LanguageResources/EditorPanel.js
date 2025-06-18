@@ -54,7 +54,7 @@ Ext.define('Editor.view.LanguageResources.EditorPanel', {
         panelTitle:'#UT#Matches und Konkordanz-Suche'
     },
     bind: {
-        hidden: '{taskIsReadonly}'
+        hidden: '{taskIsReadonly || hideLanguageResourcePanel}'
     },
     itemId:'languageResourceEditorPanel',
     stateId: 'editor.languageResourceEditorPanel',

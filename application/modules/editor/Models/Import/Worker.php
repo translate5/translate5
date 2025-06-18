@@ -73,7 +73,7 @@ class editor_Models_Import_Worker extends editor_Models_Task_AbstractWorker
         $parameters = $this->workerModel->getParameters();
         $importConfig = $parameters['config'];
         /* @var $importConfig editor_Models_Import_Configuration */
-        $importConfig->workerId = $this->workerModel->getId();
+        $importConfig->workerId = (int) $this->workerModel->getId();
 
         // externalImport just triggers the event afterImport!
         $eventTrigger = new ImportEventTrigger();

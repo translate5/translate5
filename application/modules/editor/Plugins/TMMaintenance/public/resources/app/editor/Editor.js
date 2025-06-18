@@ -83,7 +83,7 @@ Ext.define('Ext.translate5.Editor', {
         location.record.set('isEditing', true);
 
         const value = location.record.get(this.config.editingDataIndex);
-        const referenceData = location.record.get('source');
+        const referenceData = value;
 
         if (this.editor) {
             this.setData(value, referenceData);

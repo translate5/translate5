@@ -147,7 +147,7 @@ trait editor_Services_Connector_BatchTrait
                 // structure to the translation services. In that case, the "query" field contains segments with this structure
                 // and the querySegment contains the segment with xliff structure. Since our tag repair works with xliff
                 // tag structure we need to store this value of the segment here and use it later for repair
-                'querySegment' => $this->tagHandler->getQuerySegment(),
+                'querySegment' => $this->tagHandler->getQuerySegment() ?? $querySegment,
                 'tagMap' => $this->tagHandler->getTagMap(),
             ];
 

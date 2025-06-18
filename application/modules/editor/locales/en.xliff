@@ -2139,6 +2139,18 @@
 <strong>Project name:</strong> {projectName} <br />
                 </target>
             </trans-unit>
+            <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZWluIG5ldWVzIHtwcm9qZWN0VHlwZX0gZXJzdGVsbHQuPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBJRDo8L3N0cm9uZz4ge3Byb2plY3RJZH0gPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBOYW1lOjwvc3Ryb25nPiB7cHJvamVjdE5hbWV9IDxiciAvPgo8c3Ryb25nPkVyc3RlbGx0IHZvbjo8L3N0cm9uZz4ge2NyZWF0ZWRCeVVzZXJ9'>
+                <source>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName} <br />
+<strong>Erstellt von:</strong> {createdByUser}
+                </source>
+                <target>A new {projectType} project has been assigned to you at {portalLink}.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project name:</strong> {projectName} <br />
+<strong>Created by:</strong> {createdByUser}
+                </target>
+            </trans-unit>
             <trans-unit id='ZGllIG1lbnNjaGxpY2hlIFJldmlzaW9uIGRlciBEYXRlaSB7ZmlsZU5hbWV9IHd1cmRlIGJlZW5kZXQgdW5kIHN0ZWh0IHVudGVyIHt1cmx9IGFscyBEb3dubG9hZCB6dXIgVmVyZsO8Z3VuZy4='>
                 <source>die menschliche Revision der Datei {fileName} wurde beendet und steht unter {url} als Download zur Verfügung.</source>
                 <target>Human revision of the file "{fileName}" has been finished and you can download it here {url}.</target>
@@ -2844,6 +2856,10 @@
             <trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuIHVuZCBNb250ZW5lZ3JvKQ=='>
                 <source>Serbisch (Kyrillisch) (Serbien und Montenegro)</source>
                 <target>Serbian (Cyrillic) (Serbia and Montenegro)</target>
+            </trans-unit>
+            <trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuIHVuZCBNb250ZW5lZ3JvKQ=='>
+                <source>Serbisch (Latein Serbien und Montenegro)</source>
+                <target>Serbian (Latin Serbia and Montenegro)</target>
             </trans-unit>
             <trans-unit id='U2Nod2VkaXNjaCAoRmlubmxhbmQp'>
                 <source>Schwedisch (Finnland)</source>
@@ -6212,6 +6228,14 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Tab am Anfang</source>
                 <target>Tab at the beginning</target>
             </trans-unit>
+            <trans-unit id='Tm9ybWFsZXMgTGVlcnplaWNoZW4gYW0gQW5mYW5n'>
+                <source>Normales Leerzeichen am Anfang</source>
+                <target>Normal space at the beginning</target>
+            </trans-unit>
+            <trans-unit id='Tm9ybWFsZXMgTGVlcnplaWNoZW4gYW0gRW5kZQ=='>
+                <source>Normales Leerzeichen am Ende</source>
+                <target>Normal space at the end</target>
+            </trans-unit>
             <trans-unit id='VW1icnVjaCBhbSBBbmZhbmc='>
                 <source>Umbruch am Anfang</source>
                 <target>Line break at the beginning</target>
@@ -6799,6 +6823,10 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='VE1NYWludGVuYW5jZV9hbGxDbGllbnRz'>
                 <source>TMMaintenance_allClients</source>
                 <target>TM Maintenance (all clients)</target>
+            </trans-unit>
+            <trans-unit id='VGFza092ZXJ2aWV3'>
+                <source>TaskOverview</source>
+                <target>Enable task overview</target>
             </trans-unit>
             <trans-unit id='RWRpdG9yLW9ubHktb3ZlcnJpZGU='>
                 <source>Editor-only-override</source>
@@ -10578,6 +10606,10 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
                 <target>Cancel</target>
             </trans-unit>
+            <trans-unit id="ezB9IFdpZWRlcmhvbHVuZ2VuIHp1ciBCZWFyYmVpdHVuZyB2b3JnZXNlaGVu">
+                <source>{0} Wiederholungen zur Bearbeitung vorgesehen</source>
+                <target>{0} repetitions scheduled for processing</target>
+            </trans-unit>
             <trans-unit id="TnVyIFNlZ21lbnRlIG1pdCBLb21tZW50YXIgYW56ZWlnZW4=">
               <source>Nur Segmente mit Kommentar anzeigen</source>
               <target>Show only commented segments</target>
@@ -10590,7 +10622,7 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Sekunden</source>
                 <target>seconds</target>
             </trans-unit>
-	    <trans-unit id='RGF0ZW4gbmljaHQgdmVyZsO8Z2Jhcg=='>
+	        <trans-unit id='RGF0ZW4gbmljaHQgdmVyZsO8Z2Jhcg=='>
                 <source>Daten nicht verfügbar</source>
                 <target>Data unavailable</target>
             </trans-unit>

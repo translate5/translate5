@@ -9,8 +9,13 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Translate5\MaintenanceCli\L10n\JsonFiles;
+use Zend_Db_Statement_Exception;
 use Zend_Exception;
+use ZfExtended_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User as User;
 use ZfExtended_Utils;
@@ -22,21 +27,21 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
     // the name of the command (the part after "bin/console")
     public const WORKFILES = 'workfiles';
 
-    public const PIVOTFILES = 'relais';
-
     public const ZXLIFF = '.zxliff';
 
     public const TARGET_LANGUAGES = 'targetLanguages';
 
     public const REVIEW = 'review';
 
-    public const PIVOT = 'pivot';
-
     public const KEEP_TARGET = 'keep-target';
 
     public const PM_LOGIN = 'pm-login';
 
     public const CUSTOMER = 'customer';
+
+    private const SIMULATE = 'simulate';
+
+    private const SOURCE = 'source';
 
     protected static $defaultName = 'l10n:task:create';
 
@@ -51,6 +56,8 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
     private bool $isReview = false;
 
     private array $targetLanguages = [];
+
+    private bool $isSimulate;
 
     protected function configure()
     {
@@ -80,13 +87,6 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         );
 
         $this->addOption(
-            self::PIVOT,
-            'p',
-            InputOption::VALUE_REQUIRED,
-            'Give the RFC 5646 value of the language to be used as pivot language'
-        );
-
-        $this->addOption(
             self::KEEP_TARGET,
             'k',
             InputOption::VALUE_NONE,
@@ -107,6 +107,19 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
             InputOption::VALUE_REQUIRED,
             'The customer number of the customer to be used. Defaults to defaultcustomer.'
         );
+
+        $this->addOption(
+            self::SOURCE,
+            mode: InputOption::VALUE_NONE,
+            description: 'Sets the source language to be used. Defaults to de.'
+        );
+
+        $this->addOption(
+            self::SIMULATE,
+            's',
+            InputOption::VALUE_NONE,
+            'Shows just which files would be put into the zip package, without actually creating it.'
+        );
     }
 
     /**
@@ -122,6 +135,11 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         $this->writeTitle('Translate5 L10n maintenance - create a translation package as translate5 task');
 
         $this->isReview = (bool) $this->input->getOption(self::REVIEW);
+        $sourceLanguage = $this->input->getOption(self::SOURCE);
+        if ($sourceLanguage) {
+            $this->sourceLanguage = $sourceLanguage;
+        }
+        $this->isSimulate = (bool) $this->input->getOption(self::SIMULATE);
         $this->targetLanguages = $this->input->getArgument(self::TARGET_LANGUAGES);
 
         if ($this->isReview) {
@@ -152,6 +170,7 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
      * @throws ReflectionException
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
+     * @uses \MittagQI\Translate5\L10n\FileFilter
      */
     protected function createPackage(string $targetLanguage, string $zipName): void
     {
@@ -164,19 +183,30 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         $this->zipArchive = new ZipArchive();
         $this->zipArchive->open($this->zip, ZipArchive::CREATE);
 
-        $pivotLanguage = $this->input->getOption(self::PIVOT);
         $keepTarget = (bool) $this->input->getOption(self::KEEP_TARGET);
 
         $this->processXliffFiles($targetLanguage, keepTarget: $keepTarget);
         $this->addJsonFile($targetLanguage);
 
-        if (! is_null($pivotLanguage)) {
-            $this->processXliffFiles($targetLanguage, $pivotLanguage);
-            $this->addJsonFile($targetLanguage, $pivotLanguage);
+        $this->zipArchive->addFromString(
+            'task-config.ini',
+            'fileFilter[] = \\MittagQI\\Translate5\\L10n\\FileFilter' . PHP_EOL .
+            'runtimeOptions.plugins.Okapi.preserveGeneratedXlfFiles = 0' . PHP_EOL
+        );
+
+        if ($this->isSimulate) {
+            $this->io->section('would create ' . $this->zip);
+            for ($i = 0; $i < $this->zipArchive->numFiles; $i++) {
+                $stat = $this->zipArchive->statIndex($i);
+                $this->io->writeln('- ' . $stat['name']);
+            }
+            $this->zipArchive->close();
+
+            return;
         }
 
         if ($this->zipArchive->close()) {
-            $this->importPackage($targetLanguage, $pivotLanguage);
+            $this->importPackage($targetLanguage);
             $this->io->success('created and imported ' . $this->zip);
         } else {
             $this->io->error($this->zipArchive->getStatusString());
@@ -188,7 +218,6 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
      */
     private function processXliffFiles(
         string $targetLanguage,
-        ?string $pivotLanguage = null,
         bool $keepTarget = false
     ): void {
         $xliffFiles = $this->getXliffFiles($targetLanguage);
@@ -196,18 +225,9 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         foreach ($xliffFiles as $filename) {
             $zxlfFilename = str_replace('.xliff', self::ZXLIFF, $filename);
             $filenameInZip = str_replace(APPLICATION_ROOT, '', $zxlfFilename);
+            $filenameInZip = self::WORKFILES . $filenameInZip;
 
-            if (is_null($pivotLanguage)) {
-                $filenameInZip = self::WORKFILES . $filenameInZip;
-            } else {
-                $filenameInZip = self::PIVOTFILES . str_replace(
-                    '/' . $pivotLanguage . self::ZXLIFF,
-                    '/' . $targetLanguage . self::ZXLIFF,
-                    $filenameInZip
-                );
-            }
-
-            if ($this->isReview || ! is_null($pivotLanguage) || $keepTarget) {
+            if ($this->isReview || $keepTarget) {
                 $this->addToZip($filename, $filenameInZip);
             } else {
                 copy($filename, $zxlfFilename);
@@ -239,6 +259,7 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
 
     private function addToZip($localFilename, $nameInZip): void
     {
+        $this->io->writeln('adding ' . $localFilename . ' to ' . $nameInZip);
         $this->zipArchive->addFile($localFilename, $nameInZip);
     }
 
@@ -255,24 +276,30 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
     /**
      * gets the available JSON file to a given language, currently hardcoded since only one!
      */
-    private function addJsonFile(string $language, ?string $pivotLanguage = null): void
+    private function addJsonFile(string $language): void
     {
-        $jsonName = 'application/modules/editor/PrivatePlugins/TermPortal/locales/%s.json';
-        if (is_null($pivotLanguage)) {
-            $nameInZip = self::WORKFILES . '/' . sprintf($jsonName, $language);
-        } else {
-            $nameInZip = self::PIVOTFILES . '/' . sprintf($jsonName, $pivotLanguage);
-        }
+        $jsonFiles = new JsonFiles(APPLICATION_ROOT);
+        $source = $this->sourceLanguage . '.json$';
 
-        $this->addToZip(sprintf($jsonName, $language), $nameInZip);
+        foreach ($jsonFiles->findFiles($this->sourceLanguage) as $jsonName) {
+            $jsonName = str_replace('#./', '', '#' . $jsonName);
+            $nameInZip = self::WORKFILES . '/' . str_replace($source, $language . '.json', $jsonName);
+
+            $this->addToZip(APPLICATION_ROOT . '/' . $jsonName, $nameInZip);
+        }
     }
 
     /**
      * Import the package into translate5 as tasks / project
      * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    private function importPackage(string $targetLanguage, ?string $pivotLanguage): void
+    private function importPackage(string $targetLanguage): void
     {
         $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
         $customerNr = $this->input->getOption(self::CUSTOMER);
@@ -306,7 +333,6 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
                 'pmGuid' => $pmGuid,
                 'customerNumber' => $customer->getNumber(),
                 'source' => $this->sourceLanguage,
-                'pivotLanguage' => $pivotLanguage,
                 'targets' => $this->isReview ? [$targetLanguage] : $this->targetLanguages,
                 'description' => 'description',
                 'workflow' => $customer->getConfig()->runtimeOptions->workflow->initialWorkflow,

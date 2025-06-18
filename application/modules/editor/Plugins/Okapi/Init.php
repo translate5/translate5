@@ -27,6 +27,8 @@
  */
 
 use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\File\Filter\Manager;
+use MittagQI\Translate5\File\Filter\Type;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Pipeline;
@@ -87,6 +89,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         'okapi-longhorn-147',
         'okapi-longhorn-148-snapshot-1',
         'okapi-longhorn-148-snapshot-2',
+        'okapi-longhorn-148-snapshot-3',
     ];
 
     protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
@@ -858,11 +861,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         }
         */
 
-        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+        $fileFilter = ZfExtended_Factory::get(Manager::class);
         foreach ($filelist as $fileId => $filePath) {
             $fileInfo = new SplFileInfo($importFolder . '/' . ZfExtended_Utils::filesystemEncode($filePath));
             //if there is a filefilter or we cannot convert the file we do not process the file with Okapi
-            if ($fileFilter->hasFilter($fileId, $fileFilter::TYPE_IMPORT) ||
+            if ($fileFilter->hasFilter($fileId, Type::Import) ||
                 ! $this->isProcessableFile($fileInfo, $fileTypeSupport, $importFilter)
             ) {
                 continue;

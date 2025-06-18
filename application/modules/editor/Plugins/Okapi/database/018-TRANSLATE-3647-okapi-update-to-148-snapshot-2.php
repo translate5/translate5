@@ -50,7 +50,8 @@ if (empty($okapiList)) {
     return;
 }
 
-$sqlConfigWhere = 'name="runtimeOptions.plugins.Okapi.serverUsed" AND value<>"okapi-longhorn-148-snapshot-2"';
+$lastOkapiId = editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION[count(editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION) - 1];
+$sqlConfigWhere = 'name="runtimeOptions.plugins.Okapi.serverUsed" AND value<>"' . $lastOkapiId . '"';
 
 $db = Zend_Db_Table::getDefaultAdapter();
 $configNeedsUpdating = (int) $db->fetchOne('SELECT COUNT(*) FROM Zf_configuration WHERE ' . $sqlConfigWhere);
@@ -63,21 +64,21 @@ if (! $configNeedsUpdating && ! $customerConfigNeedsUpdating) {
 $this->doNotSavePhpForDebugging = false;
 
 $serverUsed = $okapiServerConfig->getServerUsed();
-$server147_148 = $server148_sp2 = '';
+$server147_148 = $server148_snapshot = '';
 
-if (! empty($serverUsed) && ! empty($okapiList[$serverUsed]) && str_contains($okapiList[$serverUsed], 'okapi-longhorn-148-snapshot-2')) {
+if (! empty($serverUsed) && ! empty($okapiList[$serverUsed]) && str_contains($okapiList[$serverUsed], $lastOkapiId)) {
     $version = OkapiService::fetchServerVersion($okapiList[$serverUsed]);
     if ($version === '1.48.0-SNAPSHOT') {
-        $server148_sp2 = $serverUsed;
+        $server148_snapshot = $serverUsed;
     }
 }
-if (empty($server148_sp2)) {
+if (empty($server148_snapshot)) {
     // loop through configured servers
     foreach ($okapiList as $serverName => $serverUrl) {
-        if (str_contains($serverUrl, 'okapi-longhorn-148-snapshot-2')) {
+        if (str_contains($serverUrl, $lastOkapiId)) {
             $version = OkapiService::fetchServerVersion($serverUrl);
             if ($version === '1.48.0-SNAPSHOT') {
-                $server148_sp2 = $serverName;
+                $server148_snapshot = $serverName;
 
                 break;
             }
@@ -89,35 +90,35 @@ if (empty($server148_sp2)) {
         }
     }
 }
-if (empty($server148_sp2) && ! empty($server147_148)) {
-    // detect 148-2 by url
-    $server148_2Url = str_replace(parse_url($okapiList[$server147_148], PHP_URL_PATH), '/okapi-longhorn-148-snapshot-2/', $okapiList[$server147_148]);
-    $version = OkapiService::fetchServerVersion($server148_2Url);
+if (empty($server148_snapshot) && ! empty($server147_148)) {
+    // detect 148 snapshot by url
+    $server148_Url = str_replace(parse_url($okapiList[$server147_148], PHP_URL_PATH), '/' . $lastOkapiId . '/', $okapiList[$server147_148]);
+    $version = OkapiService::fetchServerVersion($server148_Url);
     if ($version === '1.48.0-SNAPSHOT') {
-        $server148_sp2 = 'okapi-longhorn-148-snapshot-2';
-        if (! empty($okapiList[$server148_sp2])) {
+        $server148_snapshot = $lastOkapiId;
+        if (! empty($okapiList[$server148_snapshot])) {
             // extra safety, should rarely happen if ever
-            $this->errors[] = 'Url for ' . $server148_sp2 . ' needs updating from ' . $okapiList[$server148_sp2] . ' to ' . $server148_2Url;
+            $this->errors[] = 'Url for ' . $server148_snapshot . ' needs updating from ' . $okapiList[$server148_snapshot] . ' to ' . $server148_Url;
 
             return;
         }
         // add new server entry if detected
-        $okapiServerConfig->addServer($server148_2Url, $server148_sp2);
+        $okapiServerConfig->addServer($server148_Url, $server148_snapshot);
 
-        echo "Added $server148_sp2 with $server148_2Url\n";
+        echo "Added $server148_snapshot with $server148_Url\n";
     }
 }
 
-if (empty($server148_sp2)) {
-    $this->errors[] = 'Could not find okapi-longhorn-148-snapshot-2: it contains important bugfixes and is highly recommended';
+if (empty($server148_snapshot)) {
+    $this->errors[] = 'Could not find ' . $lastOkapiId . ': it contains important bugfixes and is highly recommended';
 
     return;
 }
 
-$db->query('UPDATE Zf_configuration SET value="' . $server148_sp2 . '" WHERE name="runtimeOptions.plugins.Okapi.serverUsed"');
-$db->query('UPDATE LEK_customer_config SET value="' . $server148_sp2 . '" WHERE name="runtimeOptions.plugins.Okapi.serverUsed"');
+$db->query('UPDATE Zf_configuration SET value="' . $server148_snapshot . '" WHERE name="runtimeOptions.plugins.Okapi.serverUsed"');
+$db->query('UPDATE LEK_customer_config SET value="' . $server148_snapshot . '" WHERE name="runtimeOptions.plugins.Okapi.serverUsed"');
 
-echo "Updated okapi default server to $server148_sp2\n";
+echo "Updated okapi default server to $server148_snapshot\n";
 
 // file can be marked as processed
 $this->doNotSavePhpForDebugging = true;

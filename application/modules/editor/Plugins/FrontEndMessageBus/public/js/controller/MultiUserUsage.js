@@ -57,7 +57,9 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
         currentUser: '#UT#Aktueller Bearbeiter',
         editors: '#UT#Bearbeiter: ',
         myself: '#UT#Ich',
-        selectedBy: '#UT#Ausgewählt von'
+        selectedBy: '#UT#Ausgewählt von',
+        segmentChangedOnServerTitle: '#UT#Segment wurde auf der Serverseite geändert.',
+        segmentChangedOnServerMessage: '#UT#Segment wurde auf der Serverseite geändert.<br/><b>Quelltext:<b><br/>{source}<br/><b>Zieltext:<b><br/>{target}<br/>Möchten Sie die Änderungen akzeptieren?',
     },
 
     listen: {
@@ -79,7 +81,8 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
                 segmentSave: 'onSegmentSave',
                 segmentLocked: 'onSegmentLocked',
                 triggerReload: 'onTriggerTaskReload',
-                updateOnlineUsers: 'onUpdateOnlineUsers'
+                updateOnlineUsers: 'onUpdateOnlineUsers',
+                segmentsProcessed: 'onSegmentsProcessed'
             }
         },
         store: {
@@ -92,7 +95,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
                 editorViewportClosed: 'onCloseEditorViewport'
             },
             '#ChangeAlike': {
-                cancelManualProcessing: 'onCancelChangeAlikes' 
+                cancelManualProcessing: 'onCancelChangeAlikes'
             }
         },
         component: {
@@ -115,12 +118,12 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
             conf = Editor.data.plugins.FrontEndMessageBus,
             url = [];
         me.callParent(arguments);
-        
+
         if(!conf) {
             Ext.Logger.warn("MessageBus WebSocket communication deactivated due missing configuration of the socket server.");
             return;
         }
-        
+
         //if js logging is activated, we add some interesting data to it
         if(window.logger) {
             logger.data.messageBus = {
@@ -140,7 +143,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
         Ext.Ajax.setDefaultHeaders(Ext.apply({
             'X-Translate5-MessageBus-ConnId': conf.connectionId
         }, Ext.Ajax.getDefaultHeaders()));
-        
+
         me.bus = new Editor.util.messageBus.MessageBus({
             id: 'translate5',
             url: url.join(''),
@@ -154,7 +157,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
                 connectionId: conf.connectionId,
                 //to compare server and client version
                 version: conf.clientVersion
-                
+
             }
         });
         me.segmentUsageData = new Ext.util.Collection();
@@ -162,15 +165,15 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
         me.gcTask = Ext.TaskManager.start({
             interval: 5 * 60000, //5 minutes
             run: me.garbageCollector,
-            scope: me 
+            scope: me
         });
 
         //deactivate controller, is activated again when opening a multiuser task
-return; //FIXME prepare that socket server is only triggered for simultaneous usage, for beta testing we enable socket server just for each task 
+return; //FIXME prepare that socket server is only triggered for simultaneous usage, for beta testing we enable socket server just for each task
         this.deactivate();
     },
     /**
-     * On connection reconnect we send a ping to the server, if the reconnection was because of a server crash, 
+     * On connection reconnect we send a ping to the server, if the reconnection was because of a server crash,
      * the ping resyncs the session data from translate5
      * @param {Editor.util.messageBus.MessageBus} bus
      */
@@ -198,13 +201,13 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
     },
     onReconnect: function(bus){
         bus.send('instance', 'ping');
-        
+
         var me = this,
             grid = me.getSegmentGrid(),
             sel;
 
         //release all old locks (they may be not up to date anymore).
-        if(grid) {        
+        if(grid) {
             me.segmentUsageData.each(function(meta) {
                 meta.selectingConns = {};
                 if(meta.editingConn && meta.editingUser) {
@@ -255,16 +258,16 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             msg = me.strings,
             rec = context[0];
         if(!me.bus.isReady()) {
-            Ext.Msg.alert(msg.noConnection, msg.noConnectionSeg); 
+            Ext.Msg.alert(msg.noConnection, msg.noConnectionSeg);
             return;
         }
-        
+
         //if segment is not editable, we do not send a editrequest at all
         if(rec && !rec.get('editable')) {
             var meta = me.segmentUsageData.get(rec.get('id'));
             if(meta && meta.editingConn && meta.editingUser) {
                 Editor.MessageBox.addInfo(me.strings.inUseMsg);
-                return false;                
+                return false;
             }
             return;
         }
@@ -285,7 +288,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             msg = me.strings;
         if(me.editorPlugin && me.editorPlugin.editing && me.editorPlugin.context.record.get('id') === id) {
             me.editorPlugin.cancelEdit();
-            Ext.Msg.alert(msg.inUseTitle, msg.inUse);    
+            Ext.Msg.alert(msg.inUseTitle, msg.inUse);
         }
     },
     onSegmentLeave: function(data) {
@@ -306,11 +309,72 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         });
     },
     onSegmentSave: function(data) {
-        var segment,
-            grid = this.getSegmentGrid();
-        if(grid && (segment = grid.store.getById(data.segmentId))) {
-            this.segmentUnlock(this.getSegmentMeta(data.segmentId), data.connectionId, true);
+        this.unlockAndReload(data.segmentId, data.connectionId);
+    },
+    unlockAndReload: function (segmentId, connectionId) {
+        const segment = this.getSegment(segmentId);
+        if (segment) {
+            this.segmentUnlock(this.getSegmentMeta(segmentId), connectionId, true);
             segment.load();
+        }
+    },
+    getSegment: function(segmentId) {
+        const grid = this.getSegmentGrid();
+
+        if (! grid) {
+            return null;
+        }
+
+        return grid.store.getById(segmentId);
+    },
+    onSegmentsProcessed: function(data) {
+        const me = this,
+            msg = me.strings,
+            baseUrl = (Editor.data.restpath.indexOf('/task/') === -1)
+                ? Editor.data.restpath
+                : Editor.data.restpath.split('/task/')[0] + '/'
+        ;
+        let segmentIds = data.segmentIds;
+
+        if (this.editorPlugin && this.editorPlugin.editing) {
+            const currentSegmentId = this.editorPlugin.context.record.get('id');
+            const openSegmentId = data.segmentIds.find(id => id === currentSegmentId);
+            segmentIds = data.segmentIds.filter(id => id !== currentSegmentId);
+
+            if (openSegmentId) {
+                Ext.Ajax.request({
+                    url: baseUrl + 'segment/' + openSegmentId,
+                    method: "GET",
+                    success: function(response){
+                        const resp = Ext.util.JSON.decode(response.responseText),
+                            segment = resp.rows,
+                            message = msg.segmentChangedOnServerMessage
+                                .replace('{source}', segment.source)
+                                .replace('{target}', segment.target);
+
+                        Ext.Msg.confirm(
+                            msg.segmentChangedOnServerTitle,
+                            message,
+                            function (result) {
+                                if (result !== 'yes') {
+                                    return;
+                                }
+
+                                me.unlockAndReload(openSegmentId, data.connectionId);
+
+                                me.editorPlugin.cancelEdit();
+                            }
+                        );
+                    },
+                    failure: function(response){
+                        Editor.app.getController('ServerException').handleException(response);
+                    }
+                });
+            }
+        }
+
+        for (const segmentId of segmentIds) {
+            me.unlockAndReload(segmentId, data.connectionId);
         }
     },
     onSegmentLocked: function(data) {
@@ -320,11 +384,11 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             connectionId = data.connectionId,
             grid = me.getSegmentGrid(),
             segment;
-        
+
         if(!grid) {
             return;
         }
-    
+
         //add color mark to current segment and lock segment
         Ext.Array.each(lockedIds, function(lockedId){
             var meta = me.getSegmentMeta(lockedId);
@@ -396,17 +460,17 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
      */
     onSegmentSelect: function(data) {
         var me = this,
-            selectedId = data.segmentId, 
+            selectedId = data.segmentId,
             byTrackingId = data.trackingId,
             connectionId = data.connectionId,
             grid = me.getSegmentGrid(),
             meta = me.getSegmentMeta(selectedId),
             segment;
-        
+
         if(!grid) {
             return;
         }
-        
+
         //remove previous selection
         me.segmentUsageData.each(function(meta) {
             if(Ext.isDefined(meta.selectingConns[connectionId])) {
@@ -420,10 +484,10 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
                 me.removeUnused(meta);
             }
         });
-        
+
         //add user id as selector to the segment
         meta.selectingConns[connectionId] = byTrackingId;
-        
+
         //add color mark to current segment
         if(segment = grid.store.getById(selectedId)) {
             segment.commit(false); //trigger render
@@ -441,29 +505,29 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             if(meta && meta.editingConn && meta.editingUser) {
                 me.markSegmentEdited(segment);
             }
-            
+
         });
     },
     onSegmentRender: function(rowClass, segment, index, store) {
         //modify rowClass here
-        var me = this, 
+        var me = this,
             meta = me.segmentUsageData.get(segment.get('id')),
             tracking = Editor.data.task.userTracking(),
             trackedUser;
-        
+
         //if we do not have a meta entry to the rendering segment, nothing to be rendered then
         if(!Ext.isDefined(meta)) {
             return;
         }
-        
+
         //check if segment is edited by somebody
         if(meta.editingConn) {
             trackedUser = tracking.getById(meta.editingUser);
-            
+
             if(trackedUser) {
-                rowClass.push('other-user-edit'); 
+                rowClass.push('other-user-edit');
                 rowClass.push('usernr-'+trackedUser.get('taskOpenerNumber'));
-                return false; 
+                return false;
             }
             return; //if the segment is edited, this should be visualized and not the following selection stuff
         }
@@ -474,7 +538,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
                 if(trackedUser) {
                     rowClass.push('other-user-select');
                     rowClass.push('usernr-'+trackedUser.get('taskOpenerNumber'));
-                    return false; 
+                    return false;
                 }
             });
         }
@@ -483,7 +547,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         var sessionId = Ext.util.Cookies.get(Editor.data.app.sessionKey);
         if(!sessionId) {
             //if there is no session id, we can not resync it
-            return; 
+            return;
         }
         Ext.Ajax.request({
             url: Editor.data.restpath+'session/'+sessionId+'/resync/operation',
@@ -491,7 +555,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             scope: this,
             success: function(response){
                 Ext.Logger.info('Session resync successfull');
-            }, 
+            },
             failure: function(response){
                 Ext.Logger.warn('Session resync failed!');
                 Editor.app.getController('ServerException').handleException(response);
@@ -503,10 +567,10 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             view = grid.getView(),
             tracking = Editor.data.task.userTracking(),
             trackedUser;
-        
+
         //if the list of tracking user changes, we have to update the is online information
         tracking.on('datachanged', me.updateOnlineUsers, me);
-        
+
         //was previously invoked in #Editor.$application': editorViewportOpened, 
         // but then the open was triggerd when the grid was not ready yet, therefore resulting segment locks from the server were producing errors in the GUI
         me.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
@@ -524,7 +588,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             tpl:[
                 '<tpl if="values.length">',
                 me.strings.editors,
-                '</tpl>',                
+                '</tpl>',
                 '<tpl for=".">',
                 '<tpl if="userGuid == Editor.data.app.user.userGuid">',
                 '<span class="user usernr-{taskOpenerNumber}"><span class="icon"></span>'+me.strings.myself+'</span>',
@@ -539,7 +603,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
                     property: 'isOnline',
                     value: true
                 }]
-            })                 
+            })
         },{
             xtype: 'tbseparator'
         }]);
@@ -548,14 +612,14 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         if(trackedUser) {
             view.selectedItemCls += ' usernr-'+trackedUser.get('taskOpenerNumber');
         }
-        
+
         me.tooltip = Ext.create('Ext.tip.ToolTip', {
             cls: 'multi-user-list multi-user-tip',
             // The overall target element.
             target: view.el,
 
             // Each grid row causes its own separate show and hide.
-            delegate: view.itemSelector + ' tr.other-user-edit', 
+            delegate: view.itemSelector + ' tr.other-user-edit',
             // Moving within the row should not hide the tip.
             trackMouse: true,
             showOnTap: true,
@@ -606,8 +670,8 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
     },
     onTriggerReload: function() {
         //idea is to reload the store given as storeid, and optionally reload only one record of the store, given by id as optional second parameter.
-        Ext.Logger.warn("generic trigger reload NOT implemented yet"); 
-    },    
+        Ext.Logger.warn("generic trigger reload NOT implemented yet");
+    },
     /**
      * is called every 5 Minutes and removes unused segment usage data
      */
@@ -630,7 +694,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         this.updateOnlineUsers();
     },
     updateOnlineUsers: function() {
-        var me = this, 
+        var me = this,
             store = Editor.data.task && Editor.data.task.userTracking && Editor.data.task.userTracking();
         if(!store || !me.onlineUsers) {
             return;

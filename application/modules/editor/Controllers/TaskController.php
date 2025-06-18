@@ -1002,19 +1002,18 @@ class editor_TaskController extends ZfExtended_RestController
         $dpFactory = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
         $dataProvider = $dpFactory->createFromTask($this->entity);
 
+        // prepare meta data as clone of original
+        $metaData = $this->entity->meta()->toArray();
+        unset($metaData['id'], $metaData['taskGuid']);
+
         $cloner = new editor_Task_Cloner(
             new LanguageResourceRepository(),
             AssociateTaskOperation::create(),
             LanguageResourceTaskAssocRepository::create(),
         );
-
         $this->entity = $cloner->clone($this->entity);
 
         if ($this->validate()) {
-            // set meta data in controller as in post request
-            $metaData = $this->entity->meta()->toArray();
-            unset($metaData['id'], $metaData['taskGuid']);
-
             foreach ($metaData as $field => $value) {
                 $this->data[$field] = $value;
             }

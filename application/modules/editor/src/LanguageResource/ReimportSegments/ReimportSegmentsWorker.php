@@ -30,16 +30,22 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
+use DateTimeImmutable;
 use editor_Models_Task_AbstractWorker;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\ReimportSnapshot;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use Throwable;
 use ZfExtended_ErrorCodeException;
 
 class ReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
 {
+    private const MAX_RETRIES = 5;
+
     private LanguageResourceRepository $languageResourceRepository;
 
     private ReimportSegmentsLoggerProvider $loggerProvider;
+
+    private ReimportSegmentsQueue $reimportSegmentsQueue;
 
     public function __construct()
     {
@@ -47,6 +53,7 @@ class ReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
 
         $this->languageResourceRepository = new LanguageResourceRepository();
         $this->loggerProvider = new ReimportSegmentsLoggerProvider();
+        $this->reimportSegmentsQueue = new ReimportSegmentsQueue();
     }
 
     protected function validateParameters(array $parameters): bool
@@ -59,8 +66,21 @@ class ReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
         $params = $this->workerModel->getParameters();
         $runId = $params['runId'];
         $languageResourceId = (int) $params['languageResourceId'];
+        $currentRun = $params['currentRun'] ?? 0;
+        $segmentsToImport = $params['reimportOnlyIds'] ?? [];
 
-        ReimportSegments::create()->reimport($this->task, $runId, $languageResourceId);
+        $result = ReimportSnapshot::create()->reimport($this->task, $runId, $languageResourceId, $segmentsToImport);
+
+        if (! empty($result->failedSegmentIds) && $currentRun < self::MAX_RETRIES) {
+            $this->reimportSegmentsQueue->queueReimportDelayed(
+                $this->task->getTaskGuid(),
+                $languageResourceId,
+                $runId,
+                ++$currentRun,
+                new DateTimeImmutable('+ 15 minutes'),
+                $result->failedSegmentIds,
+            );
+        }
 
         return true;
     }

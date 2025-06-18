@@ -559,6 +559,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1142"></a>E1142 | Segment | Excel Reimport: at least one segment needs to be controlled.                                                                  | This is actually a warning. You have to control all segments in the given list. They may have an invalid tag-structure (eg. open a tag but not closing it) or something similar. This can lead to problems on further workflow steps. |
 | <a id="E1148"></a>E1148 | Task    | Task can not be locked for excel export, no excel export could be created.                                                    | That means the task is currently in use by another user / process.<br />This is logged as info, since this can happen if another reviewer&nbsp;is editing while another&nbsp;reviewer is finishing the task.                          |
 
+### L10n / Localization
+
+| EventCode               | Context      | EventMessage                            | Description/Solution |
+|:------------------------|:-------------|:----------------------------------------|:---------------------|
+| <a id="E1720"></a>E1720 | Localization | L10n File Filter has no Import Filter!  | Development Error    |
+
 ### CSRF Protection
 
 | EventCode               | Context         | EventMessage                                                                                            | Description/Solution |
@@ -633,7 +639,9 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1692"></a>E1692 | Plug-In InstantTranslate | InstantTranslate: Task was already sent to human revision                                           | The task that is being requested to be sent to human revision has been already sent to human revision before                                                                 |
 | <a id="E1693"></a>E1693 | Plug-In InstantTranslate | InstantTranslate: Task is not an InstantTranslate task                                              | The task that is being requested to be sent to human revision was not created in InstantTranslate therefore does not support such operation                                  |
 | <a id="E1694"></a>E1694 | Plug-In InstantTranslate | InstantTranslate: The PM user for sending task for human revision can not be resolved               | PM user for sending task to human revision can not be distinguished/found. Need to check config runtimeOptions.plugins.InstantTranslate.humanRevisionDefaultPM value         |
-
+| <a id="E1725"></a>E1725 | Plug-In InstantTranslate | InstantTranslate: Task is opened for editing and can not be sent to human revision                  | The task that is being requested to be sent to human revision is currently locked because it was opened for editing                                                          |
+| <a id="E1726"></a>E1726 | Plug-In InstantTranslate | InstantTranslate: Can not create instant translate TM                                               | Instant translate TM can not be created, probably because t5memory is not configured properly                                                                                |
+| <a id="E1727"></a>E1727 | Plug-In InstantTranslate | InstantTranslate: Can not import task to TM                                                         | Can not import task to instant translate TM, need to check logs for details                                                                                                  |
 
 #### Plug-In MatchAnalysis
 
@@ -680,6 +688,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1474"></a>E1474 | Plug-In Okapi | Okapi Plug-In: The Okapi plug-in is disabled so no export into the original import format can be done at the moment                     | Re-enable the Okapi Plug-In                                                                                                                                                                                                                                                                                                | 
 | <a id="E1686"></a>E1686 | Plug-In Okapi | Okapi Plug-In: The uploaded filter/fprm file is not valid ({details})                                                                   | The uploaded fprm/filter file is not valid. Details will be part of the message                                                                                                                                                                                                                                            |
 | <a id="E1687"></a>E1687 | Plug-In Okapi | Okapi Plug-In: The uploaded pipeline file is not valid ({details})                                                                      | The uploaded pipeline file is not valid. Details will be part of the message                                                                                                                                                                                                                                               |
+| <a id="E1721"></a>E1721 | Plug-In Okapi | Okapi File Filter can not be added by configuration                                                                                     | Development error                                                                                                                                                                                                                                                                                                          |
 
 #### Plug-In PangeaMt
 
@@ -870,6 +879,13 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1534"></a>E1534 | Plug-In AcrossHotfolder | Plug-In AcrossHotfolder: [{project}]: Provided bconf [{bconf}] does not exists                                      | Okapi Bconf name provided in instruction.xml not present in DB                  |
 | <a id="E1695"></a>E1695 | Plug-In AcrossHotfolder | Plug-In AcrossHotfolder: Unsuccessful folder move: {errorMsg}                                                       | On attempt to move folder or file error occurred                                |
 
+#### Plug-In CotiHotfolder
+
+| EventCode               | Context               | EventMessage                                                               | Description/Solution                                                    |
+|:------------------------|:----------------------|:---------------------------------------------------------------------------|:------------------------------------------------------------------------|
+| <a id="E1717"></a>E1717 | Plug-In CotiHotfolder | Plug-In CotiHotfolder: {message}                                           | Generic CotiHotfolder audit message                                     |
+| <a id="E1718"></a>E1718 | Plug-In CotiHotfolder | Plug-In CotiHotfolder: 'defaultPM' is not set in config or not valid PM id | Invalid value set for 'runtimeOptions.plugins.CotiHotfolder.defaultPM'  |
+
 #### Plug-In TextShuttle
 
 | EventCode               | Context             | EventMessage                                                                           | Description/Solution                                                                                                                                                                                                                                                                                           |
@@ -952,6 +968,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1672"></a>E1672 | Private Plugin Plunet Connector | Failed ending task                                                                                |                      |
 | <a id="E1673"></a>E1673 | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Quotes |                      |
 | <a id="E1674"></a>E1674 | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Orders |                      |
+
 
 ## EventCode Design rules / decisions
 

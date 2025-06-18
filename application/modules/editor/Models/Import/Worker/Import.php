@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\File\Filter\FilterException;
+use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Task\Import\FileParser\Factory;
@@ -114,16 +115,14 @@ class editor_Models_Import_Worker_Import
         ]);
     }
 
-    /**
-     * Importiert die Dateien und erzeugt die Taggrafiken
-     */
-    protected function importFiles()
+    protected function importFiles(): void
     {
         $treeDb = ZfExtended_Factory::get(editor_Models_Foldertree::class);
         $treeDb->setPathPrefix($this->importConfig->getWorkfilesDirName());
         $filelist = $treeDb->getPaths($this->task->getTaskGuid(), 'file');
 
-        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+        $fileFilter = ZfExtended_Factory::get(Manager::class);
+        $fileFilter->addByConfig($this->task->getTaskGuid(), $this->importConfig, $filelist);
         $fileFilter->initImport($this->task, $this->importConfig);
 
         $mqmProc = ZfExtended_Factory::get(editor_Models_Import_SegmentProcessor_MqmParser::class, [

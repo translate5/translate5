@@ -33,18 +33,18 @@ namespace MittagQI\Translate5\File\Filter;
 use ZfExtended_ErrorCodeException;
 
 /**
- * This Exception usually is deserialized from database-data
- * Therefore some ugly constructor-overriding was neccessary
+ * This Exception usually is deserialized from database-data.
+ * Therefore, some ugly constructor-overriding was necessary
  */
 final class FilterException extends ZfExtended_ErrorCodeException
 {
-    protected static $localErrorCodes = [];
+    protected static array $localErrorCodes = [];
 
     protected $domain = 'editor.filefilter';
 
     public function __construct(string $errorCode, string $errorMsg, array $extra = [], string $domain = null)
     {
-        static::$localErrorCodes[$errorCode] = $errorMsg;
+        FilterException::$localErrorCodes[$errorCode] = $errorMsg;
         if (! empty($domain)) {
             $this->domain = $domain;
         }

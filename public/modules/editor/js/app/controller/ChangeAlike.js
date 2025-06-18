@@ -72,7 +72,8 @@ Ext.define('Editor.controller.ChangeAlike', {
     alikeSingular: '#UT#Wiederholung wurde bearbeitet und gespeichert',
     alikePlural: '#UT#Wiederholungen wurden bearbeitet und gespeichert',
     alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.',
-    alikesFailure: '#UT#Die Wiederholungen konnten nicht gespeichert werden'
+    alikesFailure: '#UT#Die Wiederholungen konnten nicht gespeichert werden',
+    alikesScheduled: '#UT#Wiederholungen zur Bearbeitung vorgesehen'
   },
   alikesToProcess: null,
   fetchedAlikes: null,
@@ -404,15 +405,23 @@ Ext.define('Editor.controller.ChangeAlike', {
         me.callbackToSaveChain();
         return;
     }
+
+    let params = {
+      "duration": me.timeTracking,
+      "alikes": Ext.JSON.encode(alikes),
+      "columnToEdit": me.actualColumnToEdit
+    };
+
+    if (Editor.data.plugins.hasOwnProperty('FrontEndMessageBus')) {
+        params.async = true;
+    }
+
     Ext.Ajax.request({
       toSegmentId: id,
       url: me.alikeSegmentsUrl+'/'+id,
       method: 'put',
       timeout: 90000,
-      params: {
-          "duration": me.timeTracking,
-          "alikes": Ext.JSON.encode(alikes)
-      },
+      params: params,
       success: me.alikesSaveSuccessHandler,
       failure: me.alikesSaveFailureHandler,
       scope: me
@@ -501,8 +510,18 @@ Ext.define('Editor.controller.ChangeAlike', {
     var me = this,
     //id des Ziel Segments
     data = Ext.decode(resp.responseText),
-    alikes = me.alikesToProcess,
-    alikesSaved = (data.rows.length == 1 ? me.messages.alikeSingular : me.messages.alikePlural);
+    alikes = me.alikesToProcess;
+
+    if (Editor.data.plugins.hasOwnProperty('FrontEndMessageBus')) {
+        me.cleanUpAlikeSegments();
+
+        Editor.MessageBox.addSuccess(Ext.String.format(me.messages.alikesScheduled, data.total));
+
+        return;
+    }
+
+    const alikesSaved = (data.rows.length == 1 ? me.messages.alikeSingular : me.messages.alikePlural);
+
     if(!data.rows || data.rows.length == 0) {
  	    me.cleanUpAlikeSegments();
     	return;

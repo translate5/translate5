@@ -3295,6 +3295,18 @@
 <strong>Project Name:</strong> {projectName} <br />
                 </target>
             </trans-unit>
+            <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZWluIG5ldWVzIHtwcm9qZWN0VHlwZX0gZXJzdGVsbHQuPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBJRDo8L3N0cm9uZz4ge3Byb2plY3RJZH0gPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBOYW1lOjwvc3Ryb25nPiB7cHJvamVjdE5hbWV9IDxiciAvPgo8c3Ryb25nPkVyc3RlbGx0IHZvbjo8L3N0cm9uZz4ge2NyZWF0ZWRCeVVzZXJ9'>
+                <source>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName} <br />
+<strong>Erstellt von:</strong> {createdByUser}
+                </source>
+                <target>Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName} <br />
+<strong>Erstellt von:</strong> {createdByUser}
+                </target>
+            </trans-unit>
             <trans-unit id='ZGllIG1lbnNjaGxpY2hlIFJldmlzaW9uIGRlciBEYXRlaSB7ZmlsZU5hbWV9IHd1cmRlIGJlZW5kZXQgdW5kIHN0ZWh0IHVudGVyIHt1cmx9IGFscyBEb3dubG9hZCB6dXIgVmVyZsO8Z3VuZy4='>
                 <source>die menschliche Revision der Datei {fileName} wurde beendet und steht unter {url} als Download zur Verfügung.</source>
                 <target>die menschliche Revision der Datei "{fileName}" wurde beendet und steht unter {url} als Download zur Verfügung.</target>
@@ -4516,6 +4528,10 @@
             <trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuIHVuZCBNb250ZW5lZ3JvKQ=='>
                 <source>Serbisch (Kyrillisch) (Serbien und Montenegro)</source>
                 <target>Serbisch (Kyrillisch) (Serbien und Montenegro)</target>
+            </trans-unit>
+            <trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuIHVuZCBNb250ZW5lZ3JvKQ=='>
+                <source>Serbisch (Latein Serbien und Montenegro)</source>
+                <target>Serbisch (Latein Serbien und Montenegro)</target>
             </trans-unit>
             <trans-unit id='U2Nod2VkaXNjaCAoRmlubmxhbmQp'>
                 <source>Schwedisch (Finnland)</source>
@@ -6787,9 +6803,13 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
                 <source>TMMaintenance</source>
                 <target>TM Maintenance (ausgewählte Kunden)</target>
             </trans-unit>
-            <trans-unit id='VGVybVBNX2FsbENsaWVudHM'>
+            <trans-unit id='VE1NYWludGVuYW5jZV9hbGxDbGllbnRz'>
                 <source>TMMaintenance_allClients</source>
                 <target>TM Maintenance (alle Kunden)</target>
+            </trans-unit>
+            <trans-unit id='VGFza092ZXJ2aWV3'>
+                <source>TaskOverview</source>
+                <target>Taskübersicht anzeigen</target>
             </trans-unit>
             <trans-unit id='QWt0dWVsbGVyIFdvcmtmbG93LVNjaHJpdHQ='>
                 <source>Aktueller Workflow-Schritt</source>
@@ -7957,6 +7977,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='VGFiIGFtIEFuZmFuZw=='>
                 <source>Tab am Anfang</source>
                 <target>Tab am Anfang</target>
+            </trans-unit>
+            <trans-unit id='Tm9ybWFsZXMgTGVlcnplaWNoZW4gYW0gQW5mYW5n'>
+                <source>Normales Leerzeichen am Anfang</source>
+                <target>Normales Leerzeichen am Anfang</target>
+            </trans-unit>
+            <trans-unit id='Tm9ybWFsZXMgTGVlcnplaWNoZW4gYW0gRW5kZQ=='>
+                <source>Normales Leerzeichen am Ende</source>
+                <target>Normales Leerzeichen am Ende</target>
             </trans-unit>
             <trans-unit id='VW1icnVjaCBhbSBBbmZhbmc='>
                 <source>Umbruch am Anfang</source>
@@ -10385,6 +10413,10 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
             <trans-unit id='Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMudW5hc3NpZ25DdXN0b21lcldpbmRvdy5idXR0b25zLm5v'>
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
                 <target>Abbrechen</target>
+            </trans-unit>
+            <trans-unit id="ezB9IFdpZWRlcmhvbHVuZ2VuIHp1ciBCZWFyYmVpdHVuZyB2b3JnZXNlaGVu">
+                <source>{0} Wiederholungen zur Bearbeitung vorgesehen</source>
+                <target>{0} Wiederholungen zur Bearbeitung vorgesehen</target>
             </trans-unit>
             <trans-unit id="TnVyIFNlZ21lbnRlIG1pdCBLb21tZW50YXIgYW56ZWlnZW4=">
               <source>Nur Segmente mit Kommentar anzeigen</source>

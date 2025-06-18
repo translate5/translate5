@@ -62,7 +62,15 @@ class AssociateTaskOperation
         $taskAssoc->setSegmentsUpdateable($segmentsUpdatable);
         $taskAssoc->setAutoCreatedOnImport((int) $autoCreateOnImport);
 
-        $this->taskAssocRepository->save($taskAssoc);
+        try {
+            $this->taskAssocRepository->save($taskAssoc);
+        } catch (\ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
+            $taskAssoc = $this->taskAssocRepository->findByTaskGuidAndLanguageResource($taskGuid, $languageResourceId);
+            $taskAssoc->setSegmentsUpdateable($segmentsUpdatable);
+            $taskAssoc->setAutoCreatedOnImport((int) $autoCreateOnImport);
+
+            $this->taskAssocRepository->save($taskAssoc);
+        }
 
         return $taskAssoc;
     }

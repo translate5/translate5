@@ -8,7 +8,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Resource;
 use GuzzleHttp\Psr7\Stream;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\V5\VersionedApi as V5VersionedApi;
 use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
 use MittagQI\Translate5\T5Memory\ExportService;
@@ -84,7 +84,7 @@ class ExportServiceTest extends TestCase
             ->method('getTmx')
             ->willReturnCallback($streamCallback);
 
-        $file = $this->service->export($languageResource, ExportTmFileExtension::TMX);
+        $file = $this->service->export($languageResource, TmFileExtension::TMX);
 
         self::assertNotNull($file);
         self::assertSame(
@@ -127,7 +127,7 @@ class ExportServiceTest extends TestCase
             ->willReturnCallback($streamCallback);
 
         self::expectException(\LogicException::class);
-        $file = $this->service->export($languageResource, ExportTmFileExtension::TM, 'memory1');
+        $file = $this->service->export($languageResource, TmFileExtension::TM, 'memory1');
 
         self::assertNotNull($file);
         self::assertSame(
@@ -170,7 +170,7 @@ class ExportServiceTest extends TestCase
             ->willReturnCallback($streamCallback);
 
         self::expectException(\LogicException::class);
-        $file = $this->service->export($languageResource, ExportTmFileExtension::ZIP);
+        $file = $this->service->export($languageResource, TmFileExtension::ZIP);
 
         self::assertNotNull($file);
 

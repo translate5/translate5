@@ -113,6 +113,13 @@ Ext.define('Editor.controller.Segments', {
         selector: 'qualityFilterPanel'
     }],
     listen: {
+        messagebus: {
+            '#translate5 task': {
+                updateTaskProgress: function (params) {
+                    this.updateSegmentFinishCountViewModel(params.taskProgress, params.userProgress);
+                }
+            }
+        },
         controller: {
             '#Editor.$application': {
                 editorViewportClosed: 'clearSegments',
@@ -839,7 +846,7 @@ Ext.define('Editor.controller.Segments', {
      * Update the taskProgress and userProgress
      *
      * @param {float} taskProgress
-     * @param {float} userProgress
+     * @param {float|null} userProgress
      */
     updateSegmentFinishCountViewModel: function (taskProgress, userProgress) {
         var me = this,
@@ -853,7 +860,10 @@ Ext.define('Editor.controller.Segments', {
 
         // Update taskProgress and userProgress
         vm.set('taskProgress', taskProgress);
-        vm.set('userProgress', userProgress);
+
+        if (userProgress !== null) {
+            vm.set('userProgress', userProgress);
+        }
     },
     /**
      * Handles the cancel edit of the segment grid
@@ -877,12 +887,32 @@ Ext.define('Editor.controller.Segments', {
      * Listens to the filter panel controller and delegates it to our store and changes the view if the stored filter changed
      */
     onQualityFilterChanged: function (filter) {
-        var store = this.getSegmentsStore();
+        var store = this.getSegmentsStore(), sorters = store.getSorters();
         // the store checks if the filter actually changed and we adjut the view only if requested
         if (store.setQualityFilter(filter)) {
             this.isQualityFiltered = (filter && filter != '');
             store.removeAll();
-            store.reload();
+
+            var matchedInconsistencyFilters = filter.matchAll('consistent:(source|target)'),
+                inconsistencyFilters = matchedInconsistencyFilters ? Array.from(matchedInconsistencyFilters) : [],
+                inconsistent = inconsistencyFilters.length === 1 ? inconsistencyFilters[0][1] : false;
+
+            // If exactly one inconsistency filter is applied
+            if (inconsistent) {
+                if (sorters.getCount() && !this.wasSort) {
+                    this.wasSort = {
+                        property: sorters.getAt(0).getProperty(),
+                        direction: sorters.getAt(0).getDirection(),
+                    };
+                }
+                store.sort(inconsistent === 'source' ? 'targetEdit' : 'source', 'ASC');
+            } else if (this.wasSort) {
+                store.sort(this.wasSort.property, this.wasSort.direction);
+                delete this.wasSort;
+            } else {
+                this.clearSegmentSort();
+                store.reload();
+            }
         }
     }
 });

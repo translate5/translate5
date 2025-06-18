@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\T5Memory;
 use DateTime;
 use DateTimeInterface;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\T5Memory\Api\ConstantApi;
 use MittagQI\Translate5\T5Memory\Api\Contract\HasVersionInterface;
 use PharIo\Version\GreaterThanOrEqualToVersionConstraint;
 use PharIo\Version\Version;
@@ -42,8 +43,15 @@ class VersionService
     private bool $isInternalFuzzy = false;
 
     public function __construct(
-        private HasVersionInterface $versionFetchingApi
+        private readonly HasVersionInterface $versionFetchingApi,
     ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            ConstantApi::create(),
+        );
     }
 
     public function isLRVersionGreaterThan(string $version, ?LanguageResource $languageResource): bool
