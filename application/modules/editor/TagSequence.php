@@ -70,7 +70,7 @@ abstract class editor_TagSequence implements JsonSerializable
      * Can be used to debug and validate the unparsing-process. Use only for Development !!
      * @var boolean
      */
-    public const DO_DEBUG = true;
+    public const DO_DEBUG = false;
 
     /**
      * Mode for the replaced rendering: Strips all Markup & internal tags

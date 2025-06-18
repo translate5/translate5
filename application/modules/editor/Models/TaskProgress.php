@@ -27,19 +27,29 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Segment_AutoStates as AutoStates;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\Task\Events\TaskProgressUpdatedEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
+
 /**
  * Class encapsulating things for counting task/user progress
  */
 class editor_Models_TaskProgress
 {
+    private readonly EventDispatcherInterface $eventDispatcher;
+
+    public function __construct()
+    {
+        // TODO: place it into __construct parameter
+        $this->eventDispatcher = EventDispatcher::create();
+    }
+
     /**
      * Get blocked either locked segments count for given taskGuid
      *
-     * @param string $taskGuid
-     * @return int
      * @throws Zend_Db_Statement_Exception
      */
-    public function getNonEditableSegmentsCount(string $taskGuid) : int
+    public function getNonEditableSegmentsCount(string $taskGuid): int
     {
         return (int) Zend_Db_Table::getDefaultAdapter()->query("
             SELECT COUNT(*) FROM `LEK_segments`
@@ -52,14 +62,10 @@ class editor_Models_TaskProgress
      * Get quantity of segments that are matching $customWHERE in a certain task
      * and at the same time are within a certain $range, if given
      *
-     * @param string $taskGuid
-     * @param string $customWHERE
-     * @param string|null $range
-     * @return int
      * @throws Zend_Db_Statement_Exception
      */
-    public function countCustom(string $taskGuid, string $customWHERE, ?string $range = null) : int {
-
+    public function countCustom(string $taskGuid, string $customWHERE, ?string $range = null): int
+    {
         // Get db adapter
         $db = Zend_Db_Table::getDefaultAdapter();
 
@@ -69,7 +75,8 @@ class editor_Models_TaskProgress
             : 'TRUE';
 
         // Get count
-        return (int) $db->query("
+        return (int) $db->query(
+            "
             SELECT COUNT(*) 
             FROM `LEK_segments` 
             WHERE `taskGuid` = ?
@@ -94,37 +101,34 @@ class editor_Models_TaskProgress
      *   ]
      * ]
      *
-     * @param array $list
      * @param bool $trueForNoRange If certain assoc-record have no segment range defined return true
      *                             instead of actual user progress due to that user progress is always
      *                             equal to task overall progress in such case
-     * @return array
      */
-    public function loadProgressByTaskGuidList(array $list, bool $trueForNoRange = false) : array {
-
+    public function loadProgressByTaskGuidList(array $list, bool $trueForNoRange = false): array
+    {
         // Load assoc data
         $assocA = ZfExtended_Factory
             ::get('editor_Models_TaskUserAssoc')
-            ->loadByTaskGuidList($list) ?? [];
+                ->loadByTaskGuidList($list) ?: [];
 
         // Progress will be collected here
         $userProgress = [];
 
         // Foreach assoc-record
         foreach ($assocA as $assocI) {
-
             // If no role it means this user opened the task despite he is not assigned to the task, so skip this assoc-record
-            if (!$assocI['role']) continue;
+            if (! $assocI['role']) {
+                continue;
+            }
 
             // If no segments range defined for the user and $trueForNoRange flag is true
-            if (!$assocI['segmentrange'] && $trueForNoRange) {
-
+            if (! $assocI['segmentrange'] && $trueForNoRange) {
                 // Setup progress as true to indicate that user specific progress is equal to task overall progress
                 $value = true;
 
-            // Else apply ordinary logic
+                // Else apply ordinary logic
             } else {
-
                 // Setup shortcuts
                 $e = $assocI['segmentEditableCount'];
                 $f = $assocI['segmentFinishCount'];
@@ -134,7 +138,7 @@ class editor_Models_TaskProgress
             }
 
             // Collect progress
-            $userProgress[ $assocI['taskGuid'] ][ $assocI['userGuid'] ] = $value;
+            $userProgress[$assocI['taskGuid']][$assocI['userGuid']] = $value;
         }
 
         // Return progress-per-userGuid, grouped by taskGuid-s
@@ -143,11 +147,9 @@ class editor_Models_TaskProgress
 
     /**
      * This method is called from TaskController->indexAction()
-     *
-     * @param array $rows
      */
-    public function loadForRows(array &$rows) : void {
-
+    public function loadForRows(array &$rows): void
+    {
         // Get user progress data
         $userProgress = $this->loadProgressByTaskGuidList(
             array_column($rows, 'taskGuid'),
@@ -159,14 +161,13 @@ class editor_Models_TaskProgress
 
         // Foreach task
         foreach ($rows as &$row) {
-
             // Setup shortcuts
             $e = $row['segmentEditableCount'];
             $f = $row['segmentFinishCount'];
 
             // Calc progress
             $row['taskProgress'] = $e ? round($f / $e, 2) : 0;
-            $row['userProgress'] = $userProgress[ $row['taskGuid'] ][ $userGuid ] ?? false;
+            $row['userProgress'] = $userProgress[$row['taskGuid']][$userGuid] ?? false;
         }
     }
 
@@ -174,13 +175,12 @@ class editor_Models_TaskProgress
      * Recount values for segmentEditableCount and segmentFinishCount fields
      * of an editor_Models_TaskUserAssoc instance given as $tua arg
      *
-     * @param editor_Models_TaskUserAssoc $tua
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function recountEditableAndFinished(editor_Models_TaskUserAssoc $tua) : void {
-
+    public function recountEditableAndFinished(editor_Models_TaskUserAssoc $tua): void
+    {
         // Load task
         $taskM = ZfExtended_Factory::get(editor_Models_Task::class);
         $taskM->loadByTaskGuid($tua->getTaskGuid());
@@ -193,10 +193,7 @@ class editor_Models_TaskProgress
             )
         );
 
-        // If no workflow - return
-        if (empty($workflow = $taskM->getTaskActiveWorkflow())) {
-            return;
-        }
+        $workflow = $taskM->getTaskActiveWorkflow();
 
         // Prepare states
         $states = $taskM->getTaskRoleAutoStates() ?: [];
@@ -205,7 +202,7 @@ class editor_Models_TaskProgress
         $isWorkflowEnded = $workflow->isEnded($taskM);
 
         // If workflow is not ended, and we do not have any states to the current steps' role, we do not update anything
-        if (!$isWorkflowEnded && !$states) {
+        if (! $isWorkflowEnded && ! $states) {
             return;
         }
 
@@ -222,14 +219,11 @@ class editor_Models_TaskProgress
     /**
      * Check whether given segment is within the range
      *
-     * @param string $taskGuid
-     * @param int $segmentId
-     * @param string|null $range
-     * @return bool
      * @throws Zend_Db_Statement_Exception
      */
-    public function isSegmentInRange(string $taskGuid, int $segmentId, ?string $range = null): bool {
-        return !!$this->countCustom(
+    public function isSegmentInRange(string $taskGuid, int $segmentId, ?string $range = null): bool
+    {
+        return (bool) $this->countCustom(
             taskGuid: $taskGuid,
             customWHERE: "`id` = '$segmentId'",
             range: $range,
@@ -239,10 +233,6 @@ class editor_Models_TaskProgress
     /**
      * Adjust task editable segments count on bulk autoState change
      *
-     * @param string $taskGuid
-     * @param int $affectedSegmentsQty
-     * @param int $segmentsOldState
-     * @param int $segmentsNewState
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
@@ -254,11 +244,10 @@ class editor_Models_TaskProgress
         int $affectedSegmentsQty,
         int $segmentsOldState,
         int $segmentsNewState
-    ) : void {
-
+    ): void {
         // Setup flags indicating segment was/is editable
-        $wasEditable = !in_array($segmentsOldState, AutoStates::$nonEditableStates);
-        $nowEditable = !in_array($segmentsNewState, AutoStates::$nonEditableStates);
+        $wasEditable = ! in_array($segmentsOldState, AutoStates::$nonEditableStates);
+        $nowEditable = ! in_array($segmentsNewState, AutoStates::$nonEditableStates);
 
         // If editable state was not changed - do nothing
         if ($wasEditable === $nowEditable) {
@@ -270,7 +259,7 @@ class editor_Models_TaskProgress
         $task->loadByTaskGuid($taskGuid);
 
         // Get current quantity of editable segments
-        $was = $task->getSegmentEditableCount();
+        $was = (int) $task->getSegmentEditableCount();
 
         // Get sign indicating whether affected segments stopped/started being blocked
         $sign = $wasEditable === true && $nowEditable === false ? -1 : +1;
@@ -289,35 +278,32 @@ class editor_Models_TaskProgress
     /**
      * Setup/recount value for segmentEditableCount-field for the given $task
      *
-     * @param editor_Models_Task $task
-     * @return int
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function updateSegmentEditableCount(editor_Models_Task $task) : int
+    public function updateSegmentEditableCount(editor_Models_Task $task): int
     {
         // Get quantity of (b)locked segments
         $nonEditableQty = $this->getNonEditableSegmentsCount($task->getTaskGuid());
 
         // Update value in segmentEditableCount field
-        $task->setSegmentEditableCount($task->getSegmentCount() - $nonEditableQty);
+        $task->setSegmentEditableCount((int) $task->getSegmentCount() - $nonEditableQty);
         $task->save();
 
         // Return fresh value
-        return $task->getSegmentEditableCount();
+        return (int) $task->getSegmentEditableCount();
     }
 
     /**
      * Setup/recount value of segmentEditableCount-field for each user associated with current task
      *
-     * @param editor_Models_Task $task
-     * @return array
+     * @return array<string, int>
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function updateSegmentEditableCountForUsers(editor_Models_Task $task) : array
+    public function updateSegmentEditableCountForUsers(editor_Models_Task $task): array
     {
         // Get all users associated with task
         $tuaM = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
@@ -327,9 +313,10 @@ class editor_Models_TaskProgress
 
         // Foreach user
         foreach ($tuaM->loadAllOfATask($task->getTaskGuid()) as $tua) {
-
             // If no role it means this user opened the task despite he is not assigned to the task
-            if (!$tua['role']) continue;
+            if (! $tua['role']) {
+                continue;
+            }
 
             // Update count
             $tuaM->load($tua['id']);
@@ -349,21 +336,19 @@ class editor_Models_TaskProgress
     /**
      * Setup/recount value of segmentFinishCount-field based on the current task workflow step valid autoStates
      *
-     * @param editor_Models_Task $task
-     * @return int
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function updateSegmentFinishCount(editor_Models_Task $task) : int
+    public function updateSegmentFinishCount(editor_Models_Task $task): int
     {
         // Get finish info
-        if (!$info = $task->getWorkflowEndedOrFinishedAutoStates()) {
+        if (! $info = $task->getWorkflowEndedOrFinishedAutoStates()) {
             return 0;
         }
 
         // Pick $isWorkflowEnded flag and $autoStates from $info
-        list ($isWorkflowEnded, $autoStates) = $info;
+        list($isWorkflowEnded, $autoStates) = $info;
 
         // If workflow is ended  - set finished the count to 100% (segmentFinishCount = segmentEditableCount)
         // Else assume finished are the segments having autostates valid for the task workflow step
@@ -385,8 +370,6 @@ class editor_Models_TaskProgress
     /**
      * Setup/recount value of segmentFinishCount-field for each user associated with current task
      *
-     * @param editor_Models_Task $task
-     * @return array
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
@@ -394,12 +377,12 @@ class editor_Models_TaskProgress
     public function updateSegmentFinishCountForUsers(editor_Models_Task $task): array
     {
         // Get finish info
-        if (!$info = $task->getWorkflowEndedOrFinishedAutoStates()) {
+        if (! $info = $task->getWorkflowEndedOrFinishedAutoStates()) {
             return [];
         }
 
         // Pick $isWorkflowEnded flag and $autoStates from $info
-        list ($isWorkflowEnded, $autoStates) = $info;
+        list($isWorkflowEnded, $autoStates) = $info;
 
         // Get task user assoc model
         $tuaM = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
@@ -409,9 +392,10 @@ class editor_Models_TaskProgress
 
         // Foreach user - re-count finished segments
         foreach ($tuaM->loadAllOfATask($task->getTaskGuid()) as $tua) {
-
             // If no role it means this user opened the task despite he is not assigned to the task
-            if (!$tua['role']) continue;
+            if (! $tua['role']) {
+                continue;
+            }
 
             // Update count
             $tuaM->load($tua['id']);
@@ -433,8 +417,6 @@ class editor_Models_TaskProgress
      * If user identified by $userGuid is among the users assigned to current task - progress specific to
      * that user is returned as well
      *
-     * @param editor_Models_Task $task
-     * @param string|null $userGuid
      * @return int[]
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
@@ -442,9 +424,8 @@ class editor_Models_TaskProgress
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function refreshProgress(editor_Models_Task $task, ?string $userGuid = null): array
+    public function refreshProgress(editor_Models_Task $task, ?string $userGuid = null, bool $fireEvent = false): array
     {
-
         // Update task progress
         $taskProgress = [
             'taskEditable' => $te = $this->updateSegmentEditableCount($task),
@@ -455,52 +436,52 @@ class editor_Models_TaskProgress
         // Update user progress
         $userProgress = [
             'userEditable' => $this->updateSegmentEditableCountForUsers($task),
-            'userFinished' => $this->updateSegmentFinishCountForUsers($task)
+            'userFinished' => $this->updateSegmentFinishCountForUsers($task),
         ];
 
         // If $userGuid arg is not given or is null
         if ($userGuid === null) {
-
             // Return current task progress and progress for all users associated with this task
-            return $taskProgress + $userProgress;
+            $result = $taskProgress + $userProgress;
 
-        // Else if $userGuid arg is given, but such user is not assigned to current task
-        } else if (!isset($userProgress['userEditable'][$userGuid])) {
-
+            // Else if $userGuid arg is given, but such user is not assigned to current task
+        } elseif (! isset($userProgress['userEditable'][$userGuid])) {
             // Return task progress with no users specific progress
-            return $taskProgress + ['userProgress' => false];
+            $result = $taskProgress + [
+                'userProgress' => false,
+            ];
 
-        // Else return task progress plus progress of that specific user
+            // Else return task progress plus progress of that specific user
         } else {
-            return $taskProgress + [
+            $result = $taskProgress + [
                 'userEditable' => $ue = $userProgress['userEditable'][$userGuid],
                 'userFinished' => $uf = $userProgress['userFinished'][$userGuid],
-                'userProgress' => $ue ? round($uf / $ue, 2) : 0
+                'userProgress' => $ue ? round($uf / $ue, 2) : 0,
             ];
         }
+
+        if ($fireEvent) {
+            $this->eventDispatcher->dispatch(TaskProgressUpdatedEvent::fromArray($task->getTaskGuid(), $result));
+        }
+
+        return $result;
     }
 
     /**
      * Increment or decrement the segmentFinishCount value based on the given state logic
      *
-     * @param editor_Models_Task $task
-     * @param int $newAutoState
-     * @param int $oldAutoState
-     * @param int $segmentId
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function changeSegmentEditableAndFinishCount(editor_Models_Task $task, int $newAutoState,int $oldAutoState, int $segmentId) : void
+    public function changeSegmentEditableAndFinishCount(editor_Models_Task $task, int $newAutoState, int $oldAutoState, int $segmentId): void
     {
-
         // Setup flags indicating editable state before and after state change
-        $wasEditable = !in_array($oldAutoState, AutoStates::$nonEditableStates);
-        $nowEditable = !in_array($newAutoState, AutoStates::$nonEditableStates);
+        $wasEditable = ! in_array($oldAutoState, AutoStates::$nonEditableStates);
+        $nowEditable = ! in_array($newAutoState, AutoStates::$nonEditableStates);
 
         // If editable state was changed
         if ($wasEditable !== $nowEditable) {
-
             // Counter prop to be updated
             $counterProp = 'segmentEditableCount';
 
@@ -509,16 +490,25 @@ class editor_Models_TaskProgress
 
             // Update counter on task level
             $task->db->update(
-                [$counterProp => new Zend_Db_Expr("$counterProp$counterDiff")],
-                ['taskGuid = ?' => $task->getTaskGuid()]
+                [
+                    $counterProp => new Zend_Db_Expr("$counterProp$counterDiff"),
+                ],
+                [
+                    'taskGuid = ?' => $task->getTaskGuid(),
+                ]
             );
 
             // Update for each associated user
-            $this->changeSegmentFinishOrEditableCountForUsers($task->getTaskGuid(), $counterProp, $counterDiff, $segmentId);
+            $this->changeSegmentFinishOrEditableCountForUsers(
+                $task->getTaskGuid(),
+                $counterProp,
+                (int) $counterDiff,
+                $segmentId
+            );
         }
 
         // If no finished states - return
-        if (!$stateRoles = $task->getTaskRoleAutoStates()) {
+        if (! $stateRoles = $task->getTaskRoleAutoStates()) {
             return;
         }
 
@@ -528,7 +518,6 @@ class editor_Models_TaskProgress
 
         // If finished state was changed
         if ($wasFinished !== $nowFinished) {
-
             // Counter prop to be updated
             $counterProp = 'segmentFinishCount';
 
@@ -537,28 +526,34 @@ class editor_Models_TaskProgress
 
             // Update counter on task level
             $task->db->update(
-                [$counterProp => new Zend_Db_Expr("$counterProp$counterDiff")],
-                ['taskGuid = ?' => $task->getTaskGuid()]
+                [
+                    $counterProp => new Zend_Db_Expr("$counterProp$counterDiff"),
+                ],
+                [
+                    'taskGuid = ?' => $task->getTaskGuid(),
+                ]
             );
 
             // Update for each associated user
-            $this->changeSegmentFinishOrEditableCountForUsers($task->getTaskGuid(), $counterProp, $counterDiff, $segmentId);
+            $this->changeSegmentFinishOrEditableCountForUsers(
+                $task->getTaskGuid(),
+                $counterProp,
+                (int) $counterDiff,
+                $segmentId
+            );
         }
     }
 
     /**
      * Increase/decrease value of segmentFinishedCount for each user for whom given segment is editable
      *
-     * @param string $taskGuid
      * @param string $counterProp 'segmentEditableCount' or 'segmentFinishCount'
-     * @param int $counterDiff
-     * @param int $segmentId
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function changeSegmentFinishOrEditableCountForUsers(string $taskGuid, string $counterProp, int $counterDiff, int $segmentId) : void {
-
+    public function changeSegmentFinishOrEditableCountForUsers(string $taskGuid, string $counterProp, int $counterDiff, int $segmentId): void
+    {
         // Get task user assoc model
         $tuaM = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
 
@@ -567,9 +562,9 @@ class editor_Models_TaskProgress
             $tuaM->load($tua['id']);
             if ($this->isSegmentInRange($taskGuid, $segmentId, $tuaM->getSegmentrange())) {
                 if ($counterProp === 'segmentEditableCount') {
-                    $tuaM->setSegmentEditableCount($tuaM->getSegmentEditableCount() + $counterDiff);
-                } else if ($counterProp === 'segmentFinishCount') {
-                    $tuaM->setSegmentFinishCount($tuaM->getSegmentFinishCount() + $counterDiff);
+                    $tuaM->setSegmentEditableCount((int) $tuaM->getSegmentEditableCount() + $counterDiff);
+                } elseif ($counterProp === 'segmentFinishCount') {
+                    $tuaM->setSegmentFinishCount((int) $tuaM->getSegmentFinishCount() + $counterDiff);
                 }
                 $tuaM->save();
             }
@@ -580,17 +575,16 @@ class editor_Models_TaskProgress
      * Count non-(b)locked segments for a task among the $range, if given.
      * If range if NOT given - current value of segmentEditableCount is returned
      *
-     * @param editor_Models_Task $task
-     * @param string|null $range
-     * @param bool|array $autoStates
-     * @return int
      * @throws Zend_Db_Statement_Exception
      */
-    public function countEditableSegmentsForRange(editor_Models_Task $task, ?string $range = null, bool|array $autoStates = false) : int {
-
+    public function countEditableSegmentsForRange(
+        editor_Models_Task $task,
+        ?string $range = null,
+        bool|array $autoStates = false
+    ): int {
         // If $autoStates is true (which can be only if workflow ended) - return segmentEditableCount
         if ($autoStates === true) {
-            return $task->getSegmentEditableCount();
+            return (int) $task->getSegmentEditableCount();
         }
 
         // Prepare WHERE clause for autoStateId-column

@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\Api;
 
+use MittagQI\Translate5\HTTP\ClientFactory;
 use Psr\Http\Client\ClientInterface;
 
 /**
@@ -38,8 +39,18 @@ use Psr\Http\Client\ClientInterface;
 class VersionedApiFactory
 {
     public function __construct(
-        private readonly ClientInterface $client
+        private readonly ClientInterface $client,
     ) {
+    }
+
+    public static function create(): self
+    {
+        $factory = ClientFactory::create();
+        $httpClient = new RetryClient($factory->createClient([]));
+
+        return new self(
+            $httpClient,
+        );
     }
 
     /**

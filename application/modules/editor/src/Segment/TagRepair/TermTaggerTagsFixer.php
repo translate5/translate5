@@ -52,7 +52,7 @@ class TermTaggerTagsFixer
 
     private array $overlaps = [];
 
-    private array $errors = [];
+    private array $warnings = [];
 
     private array $tags;
 
@@ -110,12 +110,12 @@ class TermTaggerTagsFixer
                     // if we have a single ins-tag for the first char of the term, we simply remove it
                     $toRemove[] = $nested[0];
                     $text = $this->fieldTags->getTextPart($this->tags[$nested[0]]->startIndex, $this->tags[$nested[0]]->endIndex);
-                    $this->errors[] = 'Removed trackchanges-tag for the first character of term "' . $text
+                    $this->warnings[] = 'Removed trackchanges-tag for the first character of term "' . $text
                         . '" as it created an invalid markup-structure';
                 } else {
                     // otherwise we remove the term-tag as we cannot shrink or slice it
                     $toRemove[] = $idx;
-                    $this->addRemoveError($idx);
+                    $this->addRemoveWarning($idx);
                 }
             }
         }
@@ -142,11 +142,10 @@ class TermTaggerTagsFixer
                             $tag->startIndex = $termTag->endIndex;
                         }
                     }
-                    $this->errors[] = 'Fixed slightly overlapping tags';
                 } else {
                     // otherwise we remove the term-tag as we cannot shrink the trackchanges
                     $toRemove[] = $idx;
-                    $this->addRemoveError($idx);
+                    $this->addRemoveWarning($idx);
                 }
             }
         }
@@ -170,9 +169,14 @@ class TermTaggerTagsFixer
         return $this->tags;
     }
 
-    public function getErrorDetails(): string
+    public function hasWarnings(): bool
     {
-        return implode('; ', $this->errors);
+        return count($this->warnings) > 0;
+    }
+
+    public function getWarnings(): string
+    {
+        return implode('; ', $this->warnings);
     }
 
     private function findNested(editor_Segment_Tag $termTag): array
@@ -225,10 +229,10 @@ class TermTaggerTagsFixer
     /**
      * Adds an error for the given tag#s removal
      */
-    private function addRemoveError(int $idx): void
+    private function addRemoveWarning(int $idx): void
     {
         $text = $this->fieldTags->getTextPart($this->tags[$idx]->startIndex, $this->tags[$idx]->endIndex);
-        $this->errors[] = 'Removed terminology-tag for "' . $text . '" as it created an invalid markup-structure';
+        $this->warnings[] = 'Removed terminology-tag for "' . $text . '" as it created an invalid markup-structure';
     }
 
     /**
@@ -250,8 +254,6 @@ class TermTaggerTagsFixer
         // and finally swap position in array
         $this->tags[$outerIdx] = $inner;
         $this->tags[$innerIdx] = $outer;
-
-        $this->errors[] = 'Fixed wrong nesting';
     }
 
     /**

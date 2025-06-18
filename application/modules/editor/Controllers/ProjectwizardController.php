@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\JobAssignment\JobSorterService;
 use MittagQI\Translate5\JobAssignment\UserJob\UserJobViewDataProvider;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
@@ -76,8 +77,11 @@ class editor_ProjectwizardController extends ZfExtended_RestController
 
         $rows = $this->userJobViewDataProvider->buildViewForList($jobs, $authUser);
 
+        $jobSorterService = JobSorterService::create();
+        $workflowManager = new editor_Workflow_Manager();
+
         // @phpstan-ignore-next-line
-        $this->view->rows = $rows;
+        $this->view->rows = $jobSorterService->sortJobsByWorkflowPosition($rows, $workflowManager->get($workflow));
         $this->view->total = count($rows);
     }
 

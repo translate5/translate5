@@ -524,6 +524,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
         $this->createNotification(ACL_ROLE_PM, __FUNCTION__, [
             'project' => $project = $this->config->task,
             'user' => (array) $user->getDataObject(),
+            'createdByUser' => $this->config->createdByUser,
         ]);
 
         // Get trigger config

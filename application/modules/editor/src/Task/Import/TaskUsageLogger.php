@@ -31,7 +31,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\Import;
 
-use editor_Models_task;
+use editor_Models_Task;
 use editor_Models_TaskUsageLog;
 
 class TaskUsageLogger
@@ -45,7 +45,7 @@ class TaskUsageLogger
      * Handle the task usage log for given entity. This will update the sum counter or insert new record
      * based on the unique key of `taskType`,`customerId`,`yearAndMonth`
      */
-    public function log(editor_Models_task $task): void
+    public function log(editor_Models_Task $task): void
     {
         $this->log->setTaskType($task->getTaskType()->id());
         $this->log->setSourceLang($task->getSourceLang());

@@ -43,6 +43,7 @@ use ZfExtended_ErrorCodeException;
 use ZfExtended_EventManager;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Models_Db_DeadLockHandlerTrait;
 
 /**
  * LanguageResource Remover - to separate delete-logic from LanguageResourceController,
@@ -51,6 +52,8 @@ use ZfExtended_Factory;
  */
 class DeleteLanguageResourceOperation
 {
+    use ZfExtended_Models_Db_DeadLockHandlerTrait;
+
     public function __construct(
         private readonly CrossLanguageResourceSynchronizationService $crossLanguageResourceSynchronizationService,
         private readonly CustomerAssocService $customerAssocService,
@@ -93,6 +96,7 @@ class DeleteLanguageResourceOperation
 
         // wrap the deletion in a transaction to rollback if for
         // example the real file based resource can not be deleted
+        $this->reduceDeadlocks($languageResource->db);
         $languageResource->db->getAdapter()->beginTransaction();
 
         try {

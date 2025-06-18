@@ -183,7 +183,7 @@ class editor_Models_Export_TaskHistoryExcel
 
     protected function getTargetsByStep(editor_Models_Segment $segment): array
     {
-        $history = new MittagQI\Translate5\Repository\SegmentHistoryRepository();
+        $history = MittagQI\Translate5\Repository\SegmentHistoryRepository::create();
         $historyEntries = array_reverse($history->loadBySegmentId((int) $segment->getId()));
         $historyData = new MittagQI\Translate5\Repository\SegmentHistoryDataRepository();
         $historyDataEntries = $historyData->loadBySegmentId((int) $segment->getId(), editor_Models_SegmentField::TYPE_TARGET);

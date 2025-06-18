@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
  * @method bool sessionHasConnection(string $sessionId)
  * @method array getConnectionSessions() returns the sessionIds with an active connection
  * @method array getStalledSessions() returns the sessionIds with no active connection anymore
- * @method void ping()
+ * @method bool ping() returns false on failure
  * @method void resyncDone(string $connectionId)
  * @method void garbageCollection(array $existingSessionIds)
  * @method void updateMetrics(array $metrics)
@@ -57,6 +57,8 @@ class editor_Plugins_FrontEndMessageBus_Bus
      * @var string
      */
     protected $version;
+
+    private ?Zend_Http_Response $lastResponse = null;
 
     public function __construct($version)
     {
@@ -98,6 +100,7 @@ class editor_Plugins_FrontEndMessageBus_Bus
         $http->setParameterPost('instance', ZfExtended_Utils::installationHash('MessageBus'));
         $http->setParameterPost('instanceName', $serverName);
         $http->setParameterPost('version', $this->version);
+        $http->setParameterGet('version', $this->version); //additionally needed as GET for nginx mapping
         $http->setParameterPost('channel', $channel);
         $http->setParameterPost('command', $command);
         $http->setParameterPost('payload', json_encode($data));
@@ -132,6 +135,7 @@ class editor_Plugins_FrontEndMessageBus_Bus
      */
     protected function processResponse(Zend_Http_Response $response)
     {
+        $this->lastResponse = $response;
         $validStates = [200, 201];
 
         //check for HTTP State (REST errors)
@@ -162,5 +166,10 @@ class editor_Plugins_FrontEndMessageBus_Bus
         }
 
         return $result;
+    }
+
+    public function getLastResponse(): ?Zend_Http_Response
+    {
+        return $this->lastResponse;
     }
 }

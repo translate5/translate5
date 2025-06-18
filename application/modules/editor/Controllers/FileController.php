@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
@@ -206,7 +207,7 @@ class editor_FileController extends ZfExtended_RestController
 
         foreach ($resources as $resource) {
             try {
-                (new ReimportSegmentsQueue())->queueReimport(
+                (new ReimportSegmentsQueue())->queueSnapshot(
                     $this->getCurrentTask()->getTaskGuid(),
                     $resource['languageResourceId'],
                     [
@@ -232,7 +233,7 @@ class editor_FileController extends ZfExtended_RestController
         $tree = ZfExtended_Factory::get(editor_Models_Foldertree::class);
         $paths = $tree->getPaths($task->getTaskGuid(), editor_Models_Foldertree::TYPE_FILE);
 
-        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+        $fileFilter = ZfExtended_Factory::get(Manager::class);
         $fileFilter->initReImport($task, Worker::FILEFILTER_CONTEXT_EXISTING);
 
         $filesMetaData = [];

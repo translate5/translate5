@@ -567,7 +567,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         } elseif ($this->isSpace()) {
             return ' ';
         } elseif ($this->isNumber()) {
-            // Here dash-characters is used as it does not result in spellcheck-error
+            // Here dash-characters are used as they do not result in spellcheck-error
             // Initially, the idea was to use dash-character sequence of the same length
             // as protected number (e.g. '5,600' => '-----'), but the way of how number-tags
             // are processed during offsets calculation for spellcheck highlighting in browser

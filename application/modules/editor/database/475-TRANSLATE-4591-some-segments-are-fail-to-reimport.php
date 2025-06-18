@@ -94,7 +94,7 @@ foreach ($result as $row) {
     }
 
     try {
-        $queue->queueReimport(
+        $queue->queueSnapshot(
             $task->getTaskGuid(),
             $languageResourceId,
             [

@@ -51,7 +51,9 @@ Editor.controller.Localizer.addPluginInit('frontEndMessageBus', function() {
             currentUser: '<?php echo $this->translate->_('Aktueller Bearbeiter');?>',
             editors: '<?php echo $this->translate->_('Bearbeiter: ');?>',
             myself: '<?php echo $this->translate->_('Ich');?>',
-            selectedBy: '<?php echo $this->translate->_('Ausgewählt von');?>'
+            selectedBy: '<?php echo $this->translate->_('Ausgewählt von');?>',
+            segmentChangedOnServerTitle: '<?= $this->translate->_('Segment wurde auf der Serverseite geändert') ?>',
+            segmentChangedOnServerMessage: '<?= $this->translate->_('Segment wurde auf der Serverseite geändert.<br/><b>Quelltext:</b><br/>{source}<br/><b>Zieltext:</b><br/>{target}<br/>Möchten Sie die Änderungen akzeptieren?'); ?>',
         }
     });
 });

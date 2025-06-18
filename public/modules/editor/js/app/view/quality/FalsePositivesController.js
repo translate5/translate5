@@ -289,8 +289,11 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
         // Prepare css class for no content
         var nc = rif(!record.get('content'), ' class="no-content"');
 
+        // If there is content - append &raquo; to be a separator
+        qlty += ' » ';
+
         // Return
-        return '<div>' + Ext.String.format(qlty, cidx) + '</div><div' + nc + '>' + (record.get('content') || 'no content') + '</div>';
+        return '<div>' + Ext.String.format(qlty, cidx) + '<span' + nc + '>' + (record.get('content') || 'no content') + '</span></div>';
     },
 
     /**

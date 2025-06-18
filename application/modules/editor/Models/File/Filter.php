@@ -45,6 +45,8 @@ END LICENSE AND COPYRIGHT
  * @method void setParameters(string|null $parameters)
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $taskGuid)
+ * @method int getWeight()
+ * @method void setWeight(int $weight)
  */
 class editor_Models_File_Filter extends ZfExtended_Models_Entity_Abstract
 {
@@ -52,15 +54,13 @@ class editor_Models_File_Filter extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Loads all file filters for a specific file and type
-     * @param int $fileId
-     * @param string $type
-     * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function loadForFile($fileId, $type)
+    public function loadForFile(int $fileId, string $type): Zend_Db_Table_Rowset_Abstract
     {
         $s = $this->db->select()
             ->where('fileId = ?', $fileId)
             ->where('type = ?', $type)
+            ->order('weight ASC')
             ->order('id ASC');
 
         return $this->db->fetchAll($s);
@@ -68,15 +68,13 @@ class editor_Models_File_Filter extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Loads all file filters for a specific task and type
-     * @param string $taskGuid
-     * @param string $type
-     * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function loadForTask($taskGuid, $type)
+    public function loadForTask(string $taskGuid, string $type): Zend_Db_Table_Rowset_Abstract
     {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->where('type = ?', $type)
+            ->order('weight ASC')
             ->order('id ASC');
 
         return $this->db->fetchAll($s);

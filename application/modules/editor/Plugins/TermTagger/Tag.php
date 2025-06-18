@@ -129,7 +129,7 @@ final class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag
      * {@inheritDoc}
      * @see editor_Segment_Tag::finalize()
      */
-    public function finalize(editor_TagSequence $tags, editor_Models_task $task): void
+    public function finalize(editor_TagSequence $tags, editor_Models_Task $task): void
     {
         $this->category = static::getQualityState($this->classes, $tags->isSourceField());
     }

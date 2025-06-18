@@ -78,7 +78,7 @@ class ReimportSegmentsActionExecutor
             $languageResource->init($languageResourceData);
 
             try {
-                $this->languageResourceReimportQueue->queueReimport(
+                $this->languageResourceReimportQueue->queueSnapshot(
                     $task->getTaskGuid(),
                     (int) $languageResource->getId(),
                     [

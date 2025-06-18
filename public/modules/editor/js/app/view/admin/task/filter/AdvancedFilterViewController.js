@@ -36,7 +36,15 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
     onFilterHolderBeforeDeselect:function(combo,record,index,eOpts){
     	var me=this,
     		taskGrid=me.getView().getFilterGrid(),
-    		theFilter=taskGrid.getColumnFilter(record.get('property'));
+    		theFilter=taskGrid.getColumnFilter(record.get('property')),
+            preset = this.getView().up('grid').down('#userFilterPresetCombo');
+
+        // If preset combo exists - clear it's value
+        if (preset) {
+            preset.suspendEvent('change');
+            preset.setValue(0);
+            preset.resumeEvent('change');
+        }
 
     	//it is default filter, disable with filter setActive
     	if(theFilter){
@@ -115,7 +123,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
     	var me=this,
     		taskGrid=me.getView().getFilterGrid(),
     		tagField=me.getView().down('#filterHolder'),
-    		records=tagField.getStore().query('property',property),//all active tagfield records for the property
+    		records=tagField.getStore().query('property',property, false, false, true),
     		taskStore=Ext.StoreManager.get('admin.Tasks');
     	
     	records.each(function(rec){

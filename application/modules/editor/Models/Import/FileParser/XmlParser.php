@@ -216,7 +216,8 @@ class editor_Models_Import_FileParser_XmlParser
     protected function getTagRegex(array $validTags, bool $terminated): string
     {
         if (empty($validTags)) {
-            $regex = '(</?[a-zA-Z_][^>]*>)';
+            // regex is changed to match problems defined here: https://jira.translate5.net/browse/TRANSLATE-4705
+            $regex = '(</?[a-zA-Z_](?:[^>"\']|"[^"]*"|\'[^\']*\')*>)';
         } else {
             $regex = '(</?(' . join('|', $validTags) . ')(/?>| [^>]*>))';
         }

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\File\Filter\Manager;
+
 /**#@+
  * @author Marc Mittag
  * @package editor
@@ -108,7 +110,7 @@ class editor_Models_Export
             'LocalEncoded'
         );
 
-        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+        $fileFilter = ZfExtended_Factory::get(Manager::class);
         $fileFilter->initExport($this->task, $workerId, $context);
 
         sort($dirPaths);

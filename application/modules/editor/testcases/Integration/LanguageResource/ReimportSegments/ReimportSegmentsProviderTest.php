@@ -34,7 +34,7 @@ use editor_Models_Segment as Segment;
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Models_Segment_Iterator;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsProvider;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\SegmentsProvider;
 use MittagQI\Translate5\Segment\FilteredIterator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -44,12 +44,12 @@ class ReimportSegmentsProviderTest extends TestCase
 {
     private Segment|MockObject $segmentMock;
 
-    private ReimportSegmentsProvider $provider;
+    private SegmentsProvider $provider;
 
     protected function setUp(): void
     {
         $this->segmentMock = $this->createMock(Segment::class);
-        $this->provider = new ReimportSegmentsProvider($this->segmentMock);
+        $this->provider = new SegmentsProvider($this->segmentMock);
     }
 
     public function testGetSegmentsWithEmptyFilters(): void

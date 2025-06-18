@@ -33,7 +33,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Db_SegmentsHistoryData extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_segment_history_data';
+    public const TABLE_NAME = 'LEK_segment_history_data';
+
+    protected $_name = self::TABLE_NAME;
 
     public $_primary = 'id';
 }

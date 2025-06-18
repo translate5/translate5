@@ -40,10 +40,10 @@ use MittagQI\Translate5\ContentProtection\DTO\RulesHashDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\T5memory\Exception\UnableToCreateFileForTmxConversionException;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
-use RuntimeException;
 use XMLReader;
 use XMLWriter;
 use Zend_Registry;
@@ -271,14 +271,16 @@ class TmConversionService implements TmConversionServiceInterface
         }
 
         $exportDir = APPLICATION_PATH . '/../data/TMConversion/';
-        @mkdir($exportDir, recursive: true);
+        if (! is_dir($exportDir)) {
+            @mkdir($exportDir, recursive: true);
+        }
 
         $resultFilename = $exportDir . str_replace('.tmx', '', basename($filenameWithPath)) . '_converted.tmx';
 
         $writer = new XMLWriter();
 
         if (! $writer->openURI($resultFilename)) {
-            throw new RuntimeException('File for TMX conversion was not created. Filename: ' . $resultFilename);
+            throw new UnableToCreateFileForTmxConversionException($resultFilename);
         }
 
         $writer->startDocument('1.0', 'UTF-8');

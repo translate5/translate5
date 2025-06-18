@@ -54,6 +54,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Quality_Notifications as QualityNotifications;
+use editor_Models_Segment;
 use editor_Models_Segment_MaterializedView;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\Segment\Dto\SegmentView;
@@ -76,9 +77,12 @@ class SegmentRepository
         return new self(Zend_Db_Table::getDefaultAdapter());
     }
 
-    public function get(int $id): \editor_Models_Segment
+    /**
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     */
+    public function get(int $id): editor_Models_Segment
     {
-        $segment = new \editor_Models_Segment();
+        $segment = new editor_Models_Segment();
         $segment->load($id);
 
         return $segment;
@@ -105,5 +109,35 @@ class SegmentRepository
 
             yield new SegmentView($row);
         }
+    }
+
+    /**
+     * @param int[] $ids
+     * @return iterable<editor_Models_Segment>
+     */
+    public function getSegmentsByIds(array $ids): iterable
+    {
+        $segment = new editor_Models_Segment();
+
+        foreach ($ids as $id) {
+            $segment->load($id);
+
+            yield clone $segment;
+        }
+    }
+
+    /**
+     * @param int[] $segmentIds
+     * @return int[]
+     */
+    public function filterTaskSegmentIds(string $taskGuid, array $segmentIds): array
+    {
+        $select = $this->db->select()
+            ->from(\editor_Models_Db_Segments::TABLE_NAME, 'id')
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('id IN (?)', $segmentIds)
+        ;
+
+        return array_map('intval', $this->db->fetchCol($select));
     }
 }

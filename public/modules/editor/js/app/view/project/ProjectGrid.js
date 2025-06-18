@@ -34,7 +34,8 @@ Ext.define('Editor.view.project.ProjectGrid', {
     	'Editor.view.project.ProjectGridViewController',
         'Editor.view.task.LogInfoColumn',
         'Editor.view.admin.TaskGrid',
-        'Editor.view.admin.task.menu.TaskBatchActionMenu'
+        'Editor.view.admin.task.menu.TaskBatchActionMenu',
+        'Editor.view.ui.activeFilters.Toolbar',
 	],
 	controller:'projectGrid',
 	itemId: 'projectGrid',
@@ -276,7 +277,9 @@ Ext.define('Editor.view.project.ProjectGrid', {
         	                text: '{l10n.projectGrid.strings.onlyMyProjects}'
                         }
                     }]
-        		}]
+        		},{
+                    xtype: 'activeFiltersToolbar'
+                }]
         };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

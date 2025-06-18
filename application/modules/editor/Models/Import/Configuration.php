@@ -114,9 +114,8 @@ class editor_Models_Import_Configuration implements DirectoryLayoutInterface
 
     /**
      * Worker Id of the import worker, usable as parentId for subsequent workers
-     * @var integer
      */
-    public $workerId;
+    public int $workerId;
 
     /**
      * if true, the uploaded files are only processed if the file extension is supported. Conversion plug-ins may disable that.
@@ -137,6 +136,11 @@ class editor_Models_Import_Configuration implements DirectoryLayoutInterface
      * @var string
      */
     public $isDeprecatedDirectoryName = false;
+
+    /**
+     * Container for additional file filters added automatically if defined here
+     */
+    public array $fileFilters = [];
 
     /**
      * needed internally for de/serialization

@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Segment_MatchRateType as MatchRateType;
 use editor_Services_Connector as Connector;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 
@@ -260,12 +261,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation
 
         $targetResult = $result->target;
 
-        $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
-        /* @var $matchrateType editor_Models_Segment_MatchRateType */
+        $matchrateType = new MatchRateType();
 
         //set the type
+        /** @var LanguageResource $languageResource */
         $languageResource = $this->resources[$languageResourceid];
-        /* @var $languageResource LanguageResource */
 
         //just to display the TM name too, we add it here to the type
         $type = $languageResource->getServiceName() . ' - ' . $languageResource->getName();
@@ -273,7 +273,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
         //ignore internal fuzzy match target
         if ($this->isInternalFuzzy($targetResult)) {
             //set the internal fuzzy available matchrate type
-            $matchrateType->initPretranslated(editor_Models_Segment_MatchRateType::TYPE_INTERNAL_FUZZY_AVAILABLE, $type);
+            $matchrateType->initPretranslated(MatchRateType::TYPE_INTERNAL_FUZZY_AVAILABLE, $type);
             $segment->setMatchRateType((string) $matchrateType);
 
             //save the segment and history
@@ -296,7 +296,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             $matchType[] = $languageResource->getResourceType();
             $matchType[] = $type;
             if ($isRepetition) {
-                $matchType[] = $matchrateType::TYPE_AUTO_PROPAGATED;
+                $matchType[] = MatchRateType::TYPE_AUTO_PROPAGATED;
             }
 
             //negated explanation is easier: lock the pretranslations if 100 matches in the task are not editable,
@@ -306,7 +306,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             // and the segment is not editable
             $targetResult = $segment->getSource();
             $segment->setMatchRate(FileBasedInterface::CONTEXT_MATCH_VALUE);
-            $matchType[] = $matchrateType::TYPE_SOURCE;
+            $matchType[] = MatchRateType::TYPE_SOURCE;
             $segment->setEditable(false);
         }
         $matchrateType->initPretranslated(...$matchType);

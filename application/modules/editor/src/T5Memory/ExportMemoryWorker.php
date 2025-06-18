@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\T5Memory;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
 use Exception;
-use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\Repository\QueuedExportRepository;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
@@ -132,7 +132,7 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
 
         $file = $exportService->export(
             $this->languageResource,
-            ExportTmFileExtension::fromMimeType($this->mime, $memories > 1),
+            TmFileExtension::fromMimeType($this->mime, $memories > 1),
         );
 
         if (null === $file || ! file_exists($file)) {

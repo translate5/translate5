@@ -26,22 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\File\Filter\FileFilterInterface;
+use MittagQI\Translate5\File\Filter\FilterConfig;
 use MittagQI\Translate5\File\Filter\FilterException;
+use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 
 /**
  * File Filter to for invoking Okapi post process files on export
  */
-class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter
+class editor_Plugins_Okapi_FileFilter implements FileFilterInterface
 {
-    protected editor_Models_File_FilterManager $manager;
+    protected Manager $manager;
 
-    protected editor_Models_File_FilterConfig $config;
+    protected FilterConfig $config;
 
     /**
-     * @see editor_Models_File_IFilter::initFilter()
+     * @see FileFilterInterface::initFilter()
      */
-    public function initFilter(editor_Models_File_FilterManager $manager, editor_Models_File_FilterConfig $config)
+    public function initFilter(Manager $manager, FilterConfig $config): void
     {
         $this->config = $config;
         $this->manager = $manager;
@@ -90,5 +93,10 @@ class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter
                 throw new FilterException($data['errorCode'], $data['errorMsg'], $extra, 'plugin.okapi');
             }
         }
+    }
+
+    public static function getWeight(): int
+    {
+        return 0;
     }
 }

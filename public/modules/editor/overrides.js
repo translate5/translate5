@@ -499,7 +499,40 @@ Ext.override(Ext.view.Table, {
             fromComponent = null;
         }
         return this.callParent([fromComponent]);
-    }
+    },
+
+    /**
+     * This method is overridden to investigate
+     * https://jira.translate5.net/browse/TRANSLATE-4718
+     * https://app.therootcause.io/#marc-mittag/translate5/errors/055469bdeb3dd5fc6efda277517e5fc88a8f882e
+     */
+    createRowElement: function(record, index, updateColumns) {
+        var me = this,
+            div = me.renderBuffer,
+            tplData = me.collectData([
+                record
+            ], index);
+        tplData.columns = updateColumns;
+        me.tpl.overwrite(div, tplData);
+        // We don't want references to be retained on the prototype
+        me.cleanupData();
+        // Return first element within node containing element
+        // return Ext.fly(div).down(me.getNodeContainerSelector(), true).firstChild; // -
+
+        // <added block>
+        var dom = Ext.fly(div).down(me.getNodeContainerSelector(), true).firstChild;
+        if (!dom && updateColumns && jslogger) {
+            jslogger.addLogEntry({type: 'info', message: 'Undefined element returned'});
+            jslogger.addLogEntry({type: 'info', message: 'record index: ' + index});
+            jslogger.addLogEntry({type: 'info', message: 'record ID index: ' + record.getId()});
+            jslogger.addLogEntry({type: 'info', message: 'updateColumns: ' + JSON.stringify(updateColumns).replaceAll('"', '~')});
+            jslogger.addLogEntry({type: 'info', message: 'tplData: ' + JSON.stringify(tplData).replaceAll('"', '~')});
+            jslogger.addLogEntry({type: 'info', message: 'me.getNodeContainerSelector(): ' + me.getNodeContainerSelector()});
+            jslogger.addLogEntry({type: 'info', message: 'render div: ' + div.outerHTML});
+        }
+        return dom;
+        // </added block>
+    },
 });
 
 /**
@@ -1994,4 +2027,35 @@ Ext.override(Ext.ProgressBar, {
  */
 Ext.override(Ext.toolbar.Paging, {
     inputItemWidth: 50
+});
+
+/**
+ * Overridden to check for dom-node prior setStyle call to prevent error
+ * https://jira.translate5.net/browse/TRANSLATE-4719 and log debug info
+ * which will be logged, though if suppressing leads to follow-up problems
+ */
+Ext.override(Ext.fx.target.Element, {
+    setElVal: function(element, attr, value) {
+        if (attr === 'x') {
+            element.setX(value);
+        } else if (attr === 'y') {
+            element.setY(value);
+        } else if (attr === 'scrollTop') {
+            element.scrollTo('top', value);
+        } else if (attr === 'scrollLeft') {
+            element.scrollTo('left', value);
+        } else if (attr === 'width') {
+            element.setWidth(value);
+        } else if (attr === 'height') {
+            element.setHeight(value);
+        } else {
+            if (element.dom) {                                                                                      // +
+                element.setStyle(attr, value);
+            } else if (jslogger) {                                                                                  // +
+                jslogger.addLogEntry({type: 'info', message: 'Attempt to setStyle on Element having no dom-node'}); // +
+                jslogger.addLogEntry({type: 'info', message: 'Element.id: ' + element.id});                         // +
+                jslogger.addLogEntry({type: 'info', message: 'Element.component?.id: ' + element.component?.id});   // +
+            }
+        }
+    }
 });

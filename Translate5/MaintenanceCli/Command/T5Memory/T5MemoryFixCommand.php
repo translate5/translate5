@@ -286,7 +286,7 @@ class T5MemoryFixCommand extends Translate5AbstractCommand
                 'Reimporting segments for task ' . $taskGuid . ' and language resource ' . $languageResourceId
             );
 
-            $queue->queueReimport($taskGuid, (int) $languageResourceId);
+            $queue->queueSnapshot($taskGuid, (int) $languageResourceId);
             $this->io->writeln('Reimport queued');
 
             $db->query('UPDATE `Zf_errorlog` SET `level` = ? WHERE `id` = ?', [\ZfExtended_Logger::LEVEL_INFO, $logId]);

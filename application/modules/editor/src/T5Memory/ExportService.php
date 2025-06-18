@@ -35,10 +35,7 @@ use editor_Services_Connector_Exception as ConnectorException;
 use Generator;
 use LogicException;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\HTTP\ClientFactory;
-use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
-use MittagQI\Translate5\T5Memory\Api\RetryClient;
-use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Exception\ExportException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\StreamInterface;
@@ -65,28 +62,26 @@ class ExportService
      */
     public static function create(): self
     {
-        $clientFactory = ClientFactory::create();
-        $httpClient = new RetryClient($clientFactory->createClient([]));
         $config = \Zend_Registry::get('config');
 
         return new self(
             \Zend_Registry::get('logger'),
-            new VersionService(new VersionFetchingApi($httpClient)),
+            VersionService::create(),
             TmConversionService::create(),
-            new Api\VersionedApiFactory($httpClient),
+            Api\VersionedApiFactory::create(),
             new PersistenceService($config),
         );
     }
 
     public function export(
         LanguageResource $languageResource,
-        ExportTmFileExtension $extension,
+        TmFileExtension $extension,
         ?string $tmName = null,
     ): ?string {
         return match ($extension) {
-            ExportTmFileExtension::TMX => $this->composeTmxFile($languageResource, $tmName),
-            ExportTmFileExtension::TM => $this->exportSingleTm($languageResource, $tmName),
-            ExportTmFileExtension::ZIP => $this->exportAllAsArchive($languageResource, $tmName),
+            TmFileExtension::TMX => $this->composeTmxFile($languageResource, $tmName),
+            TmFileExtension::TM => $this->exportSingleTm($languageResource, $tmName),
+            TmFileExtension::ZIP => $this->exportAllAsArchive($languageResource, $tmName),
         };
     }
 
@@ -121,7 +116,7 @@ class ExportService
         }
 
         try {
-            $tmFilename = $this->composeFilename($languageResource, ExportTmFileExtension::TM);
+            $tmFilename = $this->composeFilename($languageResource, TmFileExtension::TM);
             $stream = $this->getSingleTmStream($languageResource, $tmName);
 
             file_put_contents($tmFilename, $stream->detach());
@@ -159,7 +154,7 @@ class ExportService
 
     private function composeTmxFile(LanguageResource $languageResource, ?string $tmName): ?string
     {
-        $tmxFilename = $this->composeFilename($languageResource, ExportTmFileExtension::TMX);
+        $tmxFilename = $this->composeFilename($languageResource, TmFileExtension::TMX);
 
         try {
             foreach ($this->exportAllAsOneTmx($languageResource, $tmName) as $chunk) {
@@ -362,7 +357,7 @@ class ExportService
         $tmpDir = $exportDir . $languageResource->getId() . '_' . uniqid() . '/';
         @mkdir($tmpDir, recursive: true);
 
-        $zipFilename = $this->composeFilename($languageResource, ExportTmFileExtension::ZIP);
+        $zipFilename = $this->composeFilename($languageResource, TmFileExtension::ZIP);
 
         $files = [];
 
@@ -398,7 +393,7 @@ class ExportService
         return $zipFilename;
     }
 
-    private function composeFilename(LanguageResource $languageResource, ExportTmFileExtension $extension): string
+    private function composeFilename(LanguageResource $languageResource, TmFileExtension $extension): string
     {
         $exportDir = APPLICATION_PATH . '/../data/TMExport/';
 

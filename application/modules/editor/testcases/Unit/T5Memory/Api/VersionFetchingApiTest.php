@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\T5Memory\Api;
 
-use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
+use MittagQI\Translate5\T5Memory\Api\ConstantApi;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -50,7 +50,7 @@ class VersionFetchingApiTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new VersionFetchingApi($client);
+        $api = new ConstantApi($client);
         $version = $api->version('http://example.com');
 
         $this->assertSame('1.0.0', $version);
@@ -67,7 +67,7 @@ class VersionFetchingApiTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new VersionFetchingApi($client);
+        $api = new ConstantApi($client);
         $version = $api->version('http://example.com');
 
         $this->assertSame('0.4', $version);
@@ -86,7 +86,7 @@ class VersionFetchingApiTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new VersionFetchingApi($client);
+        $api = new ConstantApi($client);
 
         self::expectException(\Throwable::class);
         $api->version('http://example.com', false);

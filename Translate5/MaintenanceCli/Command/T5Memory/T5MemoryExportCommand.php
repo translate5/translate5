@@ -33,7 +33,7 @@ namespace Translate5\MaintenanceCli\Command\T5Memory;
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager as ServicesManager;
-use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation;
 use MittagQI\Translate5\T5Memory\ExportService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -91,7 +91,7 @@ class T5MemoryExportCommand extends Translate5AbstractCommand
             $memories = count($languageResource->getSpecificData('memories', parseAsArray: true));
             $file = $exportService->export(
                 $languageResource,
-                ExportTmFileExtension::fromMimeType('application/xml', $memories > 1)
+                TmFileExtension::fromMimeType('application/xml', $memories > 1)
             );
 
             if (null === $file || ! file_exists($file)) {

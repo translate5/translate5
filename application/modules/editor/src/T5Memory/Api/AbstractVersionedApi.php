@@ -61,9 +61,9 @@ abstract class AbstractVersionedApi
                 try {
                     $content = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
 
-                    $lastStatusInfo = $content->ErrorMsg
-                        ?? $content->importErrorMsg
-                        ?? $content->reorganizeErrorMsg
+                    $lastStatusInfo = $content['ErrorMsg']
+                        ?? $content['importErrorMsg']
+                        ?? $content['reorganizeErrorMsg']
                         ?? null;
 
                     if (null !== $lastStatusInfo) {
@@ -73,6 +73,8 @@ abstract class AbstractVersionedApi
                     $error = $e->getMessage();
                 }
             }
+
+            $response->getBody()->rewind();
 
             throw new HttpException($error, $request, $response);
         }
@@ -96,5 +98,10 @@ abstract class AbstractVersionedApi
         $data = $this->tryParseResponseAsJson($response);
 
         return 506 === (int) ($data['ReturnValue'] ?? 0);
+    }
+
+    protected function sanitizeTmName(string $tmName): string
+    {
+        return str_replace('+', '-plus-', $tmName);
     }
 }

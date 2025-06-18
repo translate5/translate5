@@ -26,11 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use MittagQI\Translate5\Service\T5Memory;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
-use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 
 /**
@@ -51,15 +48,11 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     protected $languageResource;
 
-    private editor_Services_OpenTM2_FixLanguageCodes $fixLanguages;
-
     private PersistenceService $persistenceService;
 
     public function __construct()
     {
         $this->persistenceService = new PersistenceService(Zend_Registry::get('config'));
-        $this->fixLanguages = new editor_Services_OpenTM2_FixLanguageCodes();
-        $this->fixLanguages->setDisabled(true);
     }
 
     /**
@@ -70,7 +63,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     {
         $data = new stdClass();
         $data->name = $this->persistenceService->addTmPrefix($memory);
-        $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
+        $data->sourceLang = $sourceLanguage;
 
         $http = $this->getHttp('POST');
         $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
@@ -80,193 +73,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         }
 
         return null;
-    }
-
-    /**
-     * This method creates a new memory with TM file
-     * @throws Zend_Exception
-     */
-    public function createMemory($memory, $sourceLanguage, $tmData): ?string
-    {
-        $data = new stdClass();
-        $data->name = $this->persistenceService->addTmPrefix($memory);
-        $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
-        $data->data = base64_encode($tmData);
-
-        $http = $this->getHttp('POST');
-        $http->setConfig([
-            'timeout' => $this->createTimeout(1200),
-        ]);
-        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
-
-        if ($this->processResponse($http->request())) {
-            return $data->name;
-        }
-
-        return null;
-    }
-
-    /**
-     * This method imports a memory from a TMX file.
-     */
-    public function importMemory($tmData, string $tmName, StripFramingTags $stripFramingTags)
-    {
-        //In:{ "Method":"import", "Memory":"MyTestMemory", "TMXFile":"C:/FileArea/MyTstMemory.TMX" }
-        //Out: { "ReturnValue":0, "ErrorMsg":"" }
-
-        $data = new stdClass();
-
-        $data->tmxData = base64_encode($tmData);
-        $data->framingTags = $stripFramingTags->value;
-
-        $http = $this->getHttpWithMemory('POST', $tmName, '/import');
-        $http->setConfig([
-            'timeout' => $this->createTimeout(1200),
-        ]);
-        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
-
-        return $this->processResponse($http->request());
-    }
-
-    public function createMemoryWithFile(
-        string $memory,
-        string $sourceLanguage,
-        string $filePath,
-        StripFramingTags $stripFramingTags
-    ): ?string {
-        $data = new stdClass();
-        $data->name = $this->persistenceService->addTmPrefix($memory);
-        $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
-        $data->framingTags = $stripFramingTags->value;
-
-        $result = $this->sendStreamRequest(
-            rtrim($this->resource->getUrl(), '/') . '/',
-            $this->getStreamFromFile($filePath),
-            basename($filePath),
-            $data
-        );
-
-        return $result ? $data->name : null;
-    }
-
-    public function importMemoryAsFile(string $filePath, string $tmName, StripFramingTags $stripFramingTags): bool
-    {
-        $tmName = urlencode($this->persistenceService->addTmPrefix($tmName));
-
-        return $this->sendStreamRequest(
-            rtrim($this->resource->getUrl(), '/') . '/' . $tmName . '/importtmx',
-            $this->getStreamFromFile($filePath),
-            basename($filePath),
-            [
-                'framingTags' => $stripFramingTags->value,
-            ]
-        );
-    }
-
-    /**
-     * @throws RuntimeException
-     * @return resource
-     */
-    private function getStreamFromFile(string $filePath)
-    {
-        $stream = fopen($filePath, 'r');
-
-        if (false === $stream) {
-            throw new RuntimeException('Could not open file: ' . $filePath);
-        }
-
-        $bom = fread($stream, 2);
-
-        rewind($stream);
-
-        // Check for BOM indicating UTF-16 BE or LE
-        if ($bom === "\xFE\xFF" || $bom === "\xFF\xFE") {
-            $tmpFile = $filePath . bin2hex(random_bytes(2));
-            $outputHandle = fopen($tmpFile, 'w');
-
-            $from = $bom === "\xFE\xFF" ? 'UTF-16' : 'UTF-16LE';
-
-            while (! feof($stream)) {
-                $chunk = fread($stream, 4096); // Read in chunks
-                if ($chunk === false) {
-                    break;
-                }
-
-                // Convert the chunk from UTF-16 to UTF-8
-                $utf8Chunk = mb_convert_encoding($chunk, 'UTF-8', $from);
-                fwrite($outputHandle, $utf8Chunk);
-            }
-
-            fclose($stream);
-            unlink($filePath);
-            fclose($outputHandle);
-
-            rename($tmpFile, $filePath);
-
-            $stream = fopen($filePath, 'r');
-        }
-
-        return $stream;
-    }
-
-    private function sendStreamRequest(string $uri, $stream, string $filename, array|object $data = null): bool
-    {
-        $client = new Client();
-        $multipart = [];
-
-        if (null !== $data) {
-            $multipart[] = [
-                'name' => 'json_data',
-                'contents' => json_encode($data, JSON_PRETTY_PRINT),
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                ],
-            ];
-        }
-
-        $multipart[] = [
-            'name' => 'file',
-            'contents' => $stream,
-            'filename' => $filename,
-        ];
-
-        try {
-            $response = $client->post($uri, [
-                'multipart' => $multipart,
-            ]);
-
-            // trigger this method to set http (yes! :( ) so that self::processResponse can get uri from it.
-            $this->getHttp('POST');
-
-            return $this->processResponse(
-                new Zend_Http_Response(
-                    $response->getStatusCode(),
-                    $response->getHeaders(),
-                    $response->getBody()->getContents()
-                )
-            );
-        } catch (RequestException $e) {
-            return $this->processPsrRequestException($e);
-        }
-    }
-
-    private function processPsrRequestException(RequestException $e): bool
-    {
-        if ($e->hasResponse()) {
-            $response = $e->getResponse();
-            $this->http = ZfExtended_Factory::get('Zend_Http_Client');
-            $this->http->setUri((string) $e->getRequest()->getUri());
-
-            return $this->processResponse(
-                new Zend_Http_Response(
-                    $response->getStatusCode(),
-                    $response->getHeaders(),
-                    $response->getBody()->getContents()
-                )
-            );
-        }
-
-        throw $e;
     }
 
     /**
@@ -300,36 +106,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $url = urlencode($this->persistenceService->addTmPrefix($tmName)) . '/' . ltrim($urlSuffix, '/');
 
         return $this->getHttp($method, $url);
-    }
-
-    /**
-     * retrieves the TM as TM file
-     * @param string|array $mime
-     * @return boolean
-     */
-    public function get($mime, string $tmName)
-    {
-        if (is_array($mime)) {
-            $mime = implode(',', $mime);
-        }
-        $http = $this->getHttpWithMemory('GET', $tmName);
-        $http->setConfig([
-            'timeout' => $this->createTimeout(1200),
-        ]);
-        $http->setHeaders('Accept', $mime);
-        $response = $http->request();
-        if ($response->getStatus() === 200) {
-            $this->result = $response->getBody();
-            if ($mime == "application/xml") {
-                $targetLang = $this->languageResource->getTargetLangCode();
-                $sourceLang = $this->languageResource->getSourceLangCode();
-                $this->result = $this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result);
-            }
-
-            return true;
-        }
-
-        return $this->processResponse($response);
     }
 
     /**
@@ -379,8 +155,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     {
         $json = new stdClass();
 
-        $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
-        $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
+        $json->sourceLang = $this->languageResource->getSourceLangCode();
+        $json->targetLang = $this->languageResource->getTargetLangCode();
         $json->markupTable = self::MARKUP_TABLE;
 
         if ($this->isToLong($queryString)) {
@@ -550,40 +326,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($http->request());
     }
 
-    public function reorganizeTm(string $tmName): bool
-    {
-        $http = $this->getHttpWithMemory('GET', $tmName, 'reorganize');
-
-        // TODO remove when version 0.4 is abandoned
-        if ($this->processResponse($http->request())) {
-            // since Version 0.4.48 we have the number of invalid segments in the result
-            // {
-            //     "axelloc-ID57-T5Memory 0448 TEST": "reorganized",
-            //     "time": "1 sec",
-            //     "reorganizedSegmentCount": "2277", -> since 0.4.48
-            //     "invalidSegmentCount": "0" -> since 0.4.48
-            // }
-            if (property_exists($this->result, 'invalidSegmentCount')) {
-                $invalid = (int) $this->result->invalidSegmentCount;
-
-                if ($invalid > 0) {
-                    $overall = (int) $this->result->reorganizedSegmentCount;
-                    $logger = Zend_Registry::get('logger');
-                    $logger->warn('E1555', 'Errors during Translation Memory reorganization: {invalid} of {overall} segments invalid in "{tmname}".', [
-                        'languageResource' => $this->languageResource,
-                        'invalid' => $invalid,
-                        'overall' => $overall,
-                        'tmname' => $this->languageResource->getName(),
-                    ]);
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
     public function flush(string $tmName): void
     {
         $http = $this->getHttpWithMemory('GET', $tmName, 'flush');
@@ -624,8 +366,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->target = $target;
         $json->type = "Manual";
         $json->markupTable = self::MARKUP_TABLE; //fixed markup table for our XLIFF subset
-        $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
-        $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
+        $json->sourceLang = $this->languageResource->getSourceLangCode();
+        $json->targetLang = $this->languageResource->getTargetLangCode();
         $json->timeStamp = $this->getNowDate();
 
         return $json;

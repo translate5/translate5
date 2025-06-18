@@ -715,7 +715,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * This API finishes the Field Tags generation. It is the final step and finishing work can be made here, e.g. the evaluation of task specific data
      */
-    public function finalize(editor_TagSequence $tags, editor_Models_task $task): void
+    public function finalize(editor_TagSequence $tags, editor_Models_Task $task): void
     {
     }
 

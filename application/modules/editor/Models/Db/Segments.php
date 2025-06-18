@@ -37,6 +37,8 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Db_Segments extends Zend_Db_Table_Abstract
 {
+    public const TABLE_NAME = 'LEK_segments';
+
     protected $_name;
 
     public $_primary = 'id';
@@ -44,7 +46,7 @@ class editor_Models_Db_Segments extends Zend_Db_Table_Abstract
     /**
      * @param array $config see Zend_Db_Table_Abstract::__construct
      */
-    public function __construct(array $config = [], $tableName = 'LEK_segments')
+    public function __construct(array $config = [], $tableName = self::TABLE_NAME)
     {
         $this->_name = $tableName;
         parent::__construct($config);

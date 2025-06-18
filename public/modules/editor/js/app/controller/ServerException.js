@@ -167,6 +167,19 @@ Ext.define('Editor.controller.ServerException', {
                     jslogger.addLogEntry({type: 'info', message: 'Response text: ' + respText.toString().replaceAll('"', '~')});
                     jslogger.addLogEntry({type: 'info', message: 'Request URL: ' + method + ' ' + url});
                     jslogger.addLogEntry({type: 'info', message: 'Request URL Length: ' + url.length});
+
+                    // In some cases RootCause shows too little frames in stack trace, so here we check if the current limit
+                    // is still having the expected value (1000), and if no - update it and hope it will be respected by browser
+                    jslogger.addLogEntry({type: 'info', message: 'Current Error.stackTraceLimit: ' + Error.stackTraceLimit});
+                    if (Error.stackTraceLimit !== 1000) {
+                        jslogger.addLogEntry({type: 'info', message: 'Updated Error.stackTraceLimit: ' + (Error.stackTraceLimit = 1000)});
+                    }
+
+                    // Attempt to load such a URL leads to 404 error, and the only guess right now is that this model class
+                    // for some reason was not loaded at the app load step, so here we check if that guess is true
+                    if (url.match('/Editor.model.admin.TaskUserAssoc')) {
+                        jslogger.addLogEntry({type: 'info', message: 'Ext.Loader.isInHistory[\'Editor.model.admin.TaskUserAssoc\']: ' + Ext.Loader.isInHistory['Editor.model.admin.TaskUserAssoc']});
+                    }
                 }
             }
 

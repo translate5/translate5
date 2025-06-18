@@ -54,7 +54,7 @@ class LevenshteinCalcTaskHistory
         private readonly string $sqlSince = '',
     ) {
         $this->jobsLogged = new LoggedJobsData($sqlSince, false);
-        $this->history = new SegmentHistoryRepository();
+        $this->history = SegmentHistoryRepository::create();
         $this->historyData = new SegmentHistoryDataRepository();
         $this->stepModel = new editor_Models_Workflow_Step();
         $this->db = Zend_Db_Table::getDefaultAdapter();

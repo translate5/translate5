@@ -88,11 +88,13 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method string getTargetMd5()
  * @method string getTarget()
  * @method void setTarget(string $content)
+ * @method string getSourceEdit()
  * @method string getTargetEdit()
  * @method void setTargetEdit(string $content)
  * @method string getTargetToSort()
  * @method string getTargetEditToSort()
  * @method void setTargetMd5(string $md5hash)
+ * @method string getTargetMd5()
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 {
@@ -263,10 +265,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $searchInToSort = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_SUFFIX;
 
         //check if search in locked segment is clicked, if yes, remove the editable filter
-        $searchLocked = false;
-        if ($parameters['searchInLockedSegments']) {
-            $searchLocked = $parameters['searchInLockedSegments'] === "true";
-        }
+        $searchLocked = $parameters['searchInLockedSegments'] ?? false;
 
         $select = $this->db->select()
             ->from($viewName, ['id', 'segmentNrInTask', $parameters['searchInField'], $searchInToSort, 'editable'])
@@ -305,7 +304,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
         $queryString = $parameters['searchField'];
         $searchInField = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_SUFFIX;
-        $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase']) == 'true') : false;
+        $matchCase = $parameters['matchCase'] ?? false;
 
         //search type regular expression
         if ($parameters['searchType'] === 'regularExpressionSearch') {
