@@ -92,15 +92,22 @@ $this->translations = array(
     'triggerTranslate' => $translate->_('Übersetzung'),
     'triggerTranslateReason' => $translate->_('Die vorige Anfrage dauerte länger als {timeout} Sekunden.<br />Daher wird die manuelle Auslösung der Übersetzung aktiviert.'),
     'errorFrom' => $translate->_('Fehlerrückgabe von'),
+    'dialog' => [
+        'yes' => $translate->_('Ja'),
+        'no' => $translate->_('Nein'),
+    ],
     'sendToHumanRevisionButton' => $translate->_('Zur menschlichen Revision senden'),
     'sendToHumanRevision' => [
         'title' => $translate->_('Zur menschlichen Revision senden'),
         'message' => $translate->_('Zur menschlichen Revision senden?'),
-        'yes' => $translate->_('Ja'),
-        'no' => $translate->_('Nein'),
     ],
     'inHumanRevision' => $translate->_('In menschlicher Revision'),
     'humanRevisionFinished' => $translate->_('Menschliche revision fertiggestellt'),
+    'editInEditorButton' => $translate->_('Aufgabe im Editor editieren'),
+    'saveToTmButton' => $translate->_('Aufgabe im TM speichern'),
+    'saveToTm' => [
+        'message' => $translate->_('Aufgabe im TM speichern?'),
+    ],
 );
 // Shortcut
 $rop = Zend_Registry::get('config')->runtimeOptions;

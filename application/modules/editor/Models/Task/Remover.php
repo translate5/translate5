@@ -108,11 +108,11 @@ final class editor_Models_Task_Remover
             'isProject' => $this->task->isProject(),
         ];
 
+        $this->removeRelatedDbData();
+        $this->jobsPurger->purgeTaskJobs($this->task->getTaskGuid());
         if ($removeFiles) {
             $this->removeDataDirectory();
         }
-        $this->removeRelatedDbData();
-        $this->jobsPurger->purgeTaskJobs($this->task->getTaskGuid());
         $this->task->delete();
 
         // give plugins a chance to clean up task data

@@ -124,8 +124,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      * Serve application markup
      * @throws Zend_Exception
      */
-    public function indexAction()
+    public function indexAction(): void
     {
+        Dispatcher::getInstance()->checkForceRedirect(
+            ZfExtended_Authentication::getInstance()->getUserRoles(),
+            $this->isTaskProvided()
+        );
+
         $this->_helper->layout->disableLayout();
         $this->view->pathToIMAGES = APPLICATION_RUNDIR . $this->config->runtimeOptions->server->pathToIMAGES;
 
