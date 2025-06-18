@@ -53,6 +53,9 @@ class editor_Workflow_Default_Hooks
 
     public const DIRECT_TRIGGER = 'handleDirect::';
 
+    // Limited by available workflow step labels in de.xliff, up to 4 now
+    public const PDF_REVIEW_ITERATIONS_MAX = 4;
+
     /**
      * @var editor_Workflow_Default
      */
@@ -105,13 +108,14 @@ class editor_Workflow_Default_Hooks
 
     protected $validDirectTrigger = [
         'notifyAllUsersAboutTaskAssociation',
+        'notifyUserAboutOpenTaskAssociation',
         'finishPrintApprovalJobs1',
         'finishWaitingPdfJob1',
     ];
 
     public function __construct(editor_Workflow_Default $workflow)
     {
-        for ($i = 2; $i <= 10; $i++) {
+        for ($i = 2; $i <= self::PDF_REVIEW_ITERATIONS_MAX; $i++) {
             $this->validDirectTrigger[] = 'nextPdfReviewIteration' . $i;
             $this->validDirectTrigger[] = 'finishPrintApprovalJobs' . $i;
             $this->validDirectTrigger[] = 'finishWaitingPdfJob' . $i;

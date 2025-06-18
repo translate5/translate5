@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\Workflow\Notification;
 
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use ZfExtended_Models_User;
 use ZfExtended_TemplateBasedMail as Mail;
 
 class NotificationMailFactory
@@ -65,17 +64,6 @@ class NotificationMailFactory
         if (null !== $pm) {
             $mailer->setReplyTo($pm->getEmail(), $pm->getFirstName() . ' ' . $pm->getSurName());
         }
-
-        return $mailer;
-    }
-
-    public function createVisualApprovalPmNotificationMail(ZfExtended_Models_User $pm, array $parameters): Mail
-    {
-        $mailer = new Mail();
-        $mailer->setTemplate($this->getMailTemplate(ACL_ROLE_PM, 'notifyVisualApproval'));
-        $parameters['user'] = (array) $pm->getDataObject();
-        $mailer->setParameters($parameters);
-        $mailer->setReplyTo($pm->getEmail(), $pm->getFirstName() . ' ' . $pm->getSurName());
 
         return $mailer;
     }

@@ -93,6 +93,11 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
             return;
         }
 
+        // give plugins the chance to intercept...
+        if (! this.getView().fireEvent('beforeLeaveTaskPrompt', task)) {
+            return false;
+        }
+
         // Create dialog
         var mbox = Ext.create('Ext.window.MessageBox', {
 
@@ -102,9 +107,7 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
                     cls='';
                 if (btnId==='no') {
                     cls='ico-arrow-back';
-                }
-
-                if (btnId==='yes') {
+                } else if (btnId==='yes') {
                     cls='ico-finish-task';
                 }
                 return new Ext.button.Button({
