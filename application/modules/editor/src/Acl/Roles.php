@@ -49,6 +49,8 @@ final class Roles
 
     public const EDITOR = 'editor';
 
+    public const TASK_OVERVIEW = 'taskOverview';
+
     public const BASIC = 'basic';
 
     public const NORIGHTS = 'noRights';
@@ -97,6 +99,7 @@ final class Roles
 
     private const FRONTEND_ROLES = [
         self::EDITOR,
+        self::TASK_OVERVIEW,
         self::EDITOR_ONLY_OVERRIDE,
         self::CLIENTPM,
         self::PM,
@@ -160,6 +163,7 @@ final class Roles
     {
         return [
             self::EDITOR,
+            self::TASK_OVERVIEW,
         ];
     }
 

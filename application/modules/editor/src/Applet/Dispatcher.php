@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Applet;
 
-use JetBrains\PhpStorm\NoReturn;
 use MittagQI\ZfExtended\Acl\ResourceInterface;
 use MittagQI\ZfExtended\Acl\RightDTO;
 use Zend_Registry;
@@ -65,7 +64,7 @@ class Dispatcher implements ResourceInterface
         return self::$instance;
     }
 
-    public function registerApplet(string $name, AppletAbstract $applet)
+    public function registerApplet(string $name, AppletAbstract $applet): void
     {
         $this->applets[$name] = $applet;
     }
@@ -88,7 +87,7 @@ class Dispatcher implements ResourceInterface
     /**
      * Dispatch the configured applets by evaluating the given redirect hash
      */
-    public function dispatch(string $target = null)
+    public function dispatch(string $target = null): void
     {
         //sort applets by weight
         uasort($this->applets, function (AppletAbstract $appletA, AppletAbstract $appletB) {
@@ -206,8 +205,16 @@ class Dispatcher implements ResourceInterface
         return $applett;
     }
 
-    #[NoReturn]
-    private function redirect(AppletAbstract $app)
+    public function checkForceRedirect(array $userRoles, bool $isTaskRequest): void
+    {
+        foreach ($this->applets as $applet) {
+            if ($applet->shouldForceRedirect($userRoles, $isTaskRequest)) {
+                $this->redirect($applet);
+            }
+        }
+    }
+
+    private function redirect(AppletAbstract $app): void
     {
         header('HTTP/1.1 302 Moved Temporarily');
         header('Location: ' . $app->getUrlPathPart());

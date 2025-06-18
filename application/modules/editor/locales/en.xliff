@@ -6816,6 +6816,10 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>TMMaintenance_allClients</source>
                 <target>TM Maintenance (all clients)</target>
             </trans-unit>
+            <trans-unit id='VGFza092ZXJ2aWV3'>
+                <source>TaskOverview</source>
+                <target>Enable task overview</target>
+            </trans-unit>
             <trans-unit id='RWRpdG9yLW9ubHktb3ZlcnJpZGU='>
                 <source>Editor-only-override</source>
                 <target>Enable task overview (Only in editor-only-mode)</target>

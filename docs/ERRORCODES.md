@@ -639,7 +639,9 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1692"></a>E1692 | Plug-In InstantTranslate | InstantTranslate: Task was already sent to human revision                                           | The task that is being requested to be sent to human revision has been already sent to human revision before                                                                 |
 | <a id="E1693"></a>E1693 | Plug-In InstantTranslate | InstantTranslate: Task is not an InstantTranslate task                                              | The task that is being requested to be sent to human revision was not created in InstantTranslate therefore does not support such operation                                  |
 | <a id="E1694"></a>E1694 | Plug-In InstantTranslate | InstantTranslate: The PM user for sending task for human revision can not be resolved               | PM user for sending task to human revision can not be distinguished/found. Need to check config runtimeOptions.plugins.InstantTranslate.humanRevisionDefaultPM value         |
-
+| <a id="E1725"></a>E1725 | Plug-In InstantTranslate | InstantTranslate: Task is opened for editing and can not be sent to human revision                  | The task that is being requested to be sent to human revision is currently locked because it was opened for editing                                                          |
+| <a id="E1726"></a>E1726 | Plug-In InstantTranslate | InstantTranslate: Can not create instant translate TM                                               | Instant translate TM can not be created, probably because t5memory is not configured properly                                                                                |
+| <a id="E1727"></a>E1727 | Plug-In InstantTranslate | InstantTranslate: Can not import task to TM                                                         | Can not import task to instant translate TM, need to check logs for details                                                                                                  |
 
 #### Plug-In MatchAnalysis
 

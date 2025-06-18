@@ -6803,9 +6803,13 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
                 <source>TMMaintenance</source>
                 <target>TM Maintenance (ausgewählte Kunden)</target>
             </trans-unit>
-            <trans-unit id='VGVybVBNX2FsbENsaWVudHM'>
+            <trans-unit id='VE1NYWludGVuYW5jZV9hbGxDbGllbnRz'>
                 <source>TMMaintenance_allClients</source>
                 <target>TM Maintenance (alle Kunden)</target>
+            </trans-unit>
+            <trans-unit id='VGFza092ZXJ2aWV3'>
+                <source>TaskOverview</source>
+                <target>Taskübersicht anzeigen</target>
             </trans-unit>
             <trans-unit id='QWt0dWVsbGVyIFdvcmtmbG93LVNjaHJpdHQ='>
                 <source>Aktueller Workflow-Schritt</source>

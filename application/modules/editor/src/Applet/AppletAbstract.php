@@ -75,4 +75,9 @@ abstract class AppletAbstract
     {
         return $this->weight;
     }
+
+    public function shouldForceRedirect(array $userRoles, bool $isTaskRequest): bool
+    {
+        return false;
+    }
 }

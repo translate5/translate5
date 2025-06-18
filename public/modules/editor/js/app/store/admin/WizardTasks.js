@@ -35,7 +35,7 @@ Ext.define('Editor.store.admin.WizardTasks', {
     model: 'Editor.model.admin.Task',
     remoteSort: true,
     remoteFilter: true,
-    autoLoad: true,
+    autoLoad: false,
     sorters: [{
         property: 'id',
         direction: 'desc'
