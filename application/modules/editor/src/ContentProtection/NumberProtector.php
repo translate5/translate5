@@ -187,7 +187,7 @@ class NumberProtector implements ProtectorInterface
     {
         preg_match('/iso="(.+)"/U', $tag, $matches);
 
-        return $matches[1];
+        return 'iso:' . $matches[1];
     }
 
     public function types(): array
