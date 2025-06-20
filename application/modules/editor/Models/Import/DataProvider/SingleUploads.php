@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Gets the Import Data from single uploaded files
  */
-class editor_Models_Import_DataProvider_SingleUploads extends editor_Models_Import_DataProvider_Directory
+class editor_Models_Import_DataProvider_SingleUploads extends editor_Models_Import_DataProvider_Abstract
 {
     /**
      * @var array
@@ -61,7 +61,14 @@ class editor_Models_Import_DataProvider_SingleUploads extends editor_Models_Impo
     {
         $this->setTask($task);
         $this->checkAndMakeTempImportFolder();
-        parent::checkAndPrepare($task);
+
+        if (! is_dir($this->importFolder)) {
+            //DataProvider Directory: The importRootFolder "{importRoot}" does not exist!
+            throw new editor_Models_Import_DataProvider_Exception('E1248', [
+                'task' => $this->task,
+                'importRoot' => $this->importFolder,
+            ]);
+        }
 
         foreach ($this->filesToProcess as $type => $files) {
             if (empty($files)) {
@@ -112,5 +119,14 @@ class editor_Models_Import_DataProvider_SingleUploads extends editor_Models_Impo
     public function handleImportException(Exception $e)
     {
         $this->removeTempFolder();
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_DataProvider_Abstract::archiveImportedData()
+     */
+    public function archiveImportedData($filename = null)
+    {
+        $this->createImportedDataArchive($this->getZipArchivePath($filename));
     }
 }
