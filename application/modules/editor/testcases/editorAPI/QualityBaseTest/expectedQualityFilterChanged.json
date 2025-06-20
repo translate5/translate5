@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 499,
-    "qtotal": 499,
+    "qcount": 500,
+    "qtotal": 500,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -966,7 +966,7 @@
         {
             "qid": -1,
             "qtype": "whitespace",
-            "qcount": 0,
+            "qcount": 1,
             "qcomplete": true,
             "children": [
                 {
@@ -1029,6 +1029,33 @@
                     "qcategory": "nbsp_end",
                     "qcountfp": 0,
                     "text": "Non-breaking space at the end",
+                    "qtooltip": "",
+                    "mustBeZeroErrors": false,
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_begin",
+                    "qcountfp": 0,
+                    "text": "Normal space at the beginning",
+                    "qtooltip": "",
+                    "mustBeZeroErrors": false,
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "1221",
+                    "qtype": "whitespace",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "space_end",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Normal space at the end",
                     "qtooltip": "",
                     "mustBeZeroErrors": false,
                     "leaf": true,
@@ -1106,8 +1133,8 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "White space at the beginning/end",
-            "qtotal": 0,
-            "expanded": false,
+            "qtotal": 1,
+            "expanded": true,
             "checked": false
         }
     ]

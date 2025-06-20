@@ -969,6 +969,10 @@ Ext.define('Editor.controller.SearchReplace', {
         //get the search parameters
         params=me.getSearchReplaceParams(true);
 
+        if (Editor.data.plugins.hasOwnProperty('FrontEndMessageBus')) {
+            params.async = true;
+        }
+
         Ext.Ajax.request({
             url: Editor.data.restpath+'segment/replaceall',
             timeout:'120000',//increase the timeout to 2 min
@@ -1002,8 +1006,10 @@ Ext.define('Editor.controller.SearchReplace', {
                 }
                 tabPanelviewModel.set('hasMqm',false);
 
-                //update the modefied segments in the segment store
-                me.segmentGridOnReplaceAll(replacedSegments,true);
+                if (! params.async) {
+                    //update the modefied segments in the segment store
+                    me.segmentGridOnReplaceAll(replacedSegments, true);
+                }
 
                 //reset some of the viewmodels properties (clean the search results)
                 me.resetSearchParameters();

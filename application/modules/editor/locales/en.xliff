@@ -6228,6 +6228,14 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Tab am Anfang</source>
                 <target>Tab at the beginning</target>
             </trans-unit>
+            <trans-unit id='Tm9ybWFsZXMgTGVlcnplaWNoZW4gYW0gQW5mYW5n'>
+                <source>Normales Leerzeichen am Anfang</source>
+                <target>Normal space at the beginning</target>
+            </trans-unit>
+            <trans-unit id='Tm9ybWFsZXMgTGVlcnplaWNoZW4gYW0gRW5kZQ=='>
+                <source>Normales Leerzeichen am Ende</source>
+                <target>Normal space at the end</target>
+            </trans-unit>
             <trans-unit id='VW1icnVjaCBhbSBBbmZhbmc='>
                 <source>Umbruch am Anfang</source>
                 <target>Line break at the beginning</target>

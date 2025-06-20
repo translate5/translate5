@@ -38,6 +38,8 @@ class editor_Segment_Whitespace_Check
 
     public const TAB_BEG = 'tab_begin';
 
+    public const SPACE_BEG = 'space_begin';
+
     public const LNBR_BEG = 'lnbr_begin';
 
     public const SPACE_TAG_END = 'space_tag_end';
@@ -45,6 +47,8 @@ class editor_Segment_Whitespace_Check
     public const NBSP_END = 'nbsp_end';
 
     public const TAB_END = 'tab_end';
+
+    public const SPACE_END = 'space_end';
 
     public const LNBR_END = 'lnbr_end';
 
@@ -59,6 +63,19 @@ class editor_Segment_Whitespace_Check
 
     public function __construct(editor_Models_Task $task, editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment)
     {
+        // Get field text with tags rendered into placeholders
+        $fieldRenderedText = $fieldTags->renderReplaced(editor_TagSequence::MODE_ORIGINAL);
+
+        // Detect space at the beginning
+        if (str_starts_with($fieldRenderedText, ' ')) {
+            $this->states[self::SPACE_BEG] = self::SPACE_BEG;
+        }
+
+        // Detect space at the end
+        if (str_ends_with($fieldRenderedText, ' ')) {
+            $this->states[self::SPACE_END] = self::SPACE_END;
+        }
+
         // If no tags - do nothing
         if (! $fieldTags->hasTags()) {
             return;
@@ -69,7 +86,7 @@ class editor_Segment_Whitespace_Check
         $tags = $fieldTags->cloneWithoutTrackChanges();
 
         // Get end index
-        $endIndex = $tags->getFieldTextLength() - 1;
+        $endIndex = $tags->getFieldTextLength();
 
         // Get field text
         $fieldText = $tags->getFieldText(true, false);
@@ -124,7 +141,7 @@ class editor_Segment_Whitespace_Check
 
             // If kind is detected
             if ($kind) {
-                // If tag location at the beginning and/or ending detectedbegin
+                // If tag location at the beginning and/or ending detected
                 foreach ($sideA as $side => $info) {
                     // Get quality category by referring to a correct constant
                     $const = constant('self::' . $kind . '_' . $side);

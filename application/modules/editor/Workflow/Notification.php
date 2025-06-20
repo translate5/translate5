@@ -288,16 +288,29 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
             'task' => $task,
             'workflow' => $workflow,
         ];
-        //send to the PM
-        $pms = $this->getTaskPmUsers();
-        foreach ($pms as $pm) {
-            $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
-            $this->attachXliffSegmentList($segmentHash, $segments, $currentStep);
-            $this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
-            $this->notify($pm);
+
+        // Avoid automated e-mail to PM within some steps
+        if (empty($triggerConfig->skipPm?->step) || ! preg_match('/' . $triggerConfig->skipPm->step . '/', $currentStep)) {
+            //send to the PM
+            $pms = $this->getTaskPmUsers();
+            foreach ($pms as $pm) {
+                //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
+                $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params);
+                $this->attachXliffSegmentList($segmentHash, $segments, $currentStep);
+                $this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
+                $this->notify($pm);
+            }
         }
 
         if (empty($nextStep)) {
+            return;
+        }
+        // Avoid automated e-mail to users within some steps
+        if (! empty($triggerConfig->skipUsers?->step) && preg_match('/' . $triggerConfig->skipUsers->step . '/', $currentStep)) {
+            return;
+        }
+        // Avoid automated e-mail to users before some steps
+        if (! empty($triggerConfig->skipUsers?->nextStep) && preg_match('/' . $triggerConfig->skipUsers->nextStep . '/', $nextStep)) {
             return;
         }
 

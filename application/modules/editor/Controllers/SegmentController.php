@@ -27,7 +27,18 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Segment\ActionAssert\Permission\SegmentActionPermissionAssert;
+use MittagQI\Translate5\Segment\ActionAssert\SegmentAction;
+use MittagQI\Translate5\Segment\Operation\Factory\UpdateSegmentDtoFactory;
+use MittagQI\Translate5\Segment\Operation\WithAuthentication\UpdateSegmentOperation;
 use MittagQI\Translate5\Segment\Operations;
+use MittagQI\Translate5\Segment\SearchAndReplace\ReplaceDtoFactory;
+use MittagQI\Translate5\Segment\SearchAndReplace\SearchAndReplaceException;
+use MittagQI\Translate5\Segment\SearchAndReplace\SearchAndReplaceService;
+use MittagQI\Translate5\Segment\SearchAndReplace\SearchQueryDtoFactory;
+use MittagQI\Translate5\Segment\SearchAndReplace\SearchService;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Terminology\TermportletData;
@@ -161,7 +172,17 @@ class Editor_SegmentController extends ZfExtended_RestController
     {
         $segmentId = (int) $this->_getParam('segmentId');
         $this->entity->load($segmentId);
-        $this->checkTaskGuidAndEditable();
+        $this->checkTaskGuid($this->getCurrentTask());
+
+        $permissionAssert = SegmentActionPermissionAssert::create();
+        $userRepository = new UserRepository();
+        $authUser = $userRepository->getByGuid(ZfExtended_Authentication::getInstance()->getUserGuid());
+
+        $permissionAssert->assertGranted(
+            SegmentAction::Read,
+            $this->entity,
+            new PermissionAssertContext($authUser)
+        );
 
         $context = new stdClass(); // this needs to be an object to make sure it is passed by reference through the events API
         $context->result = [];
@@ -300,43 +321,21 @@ class Editor_SegmentController extends ZfExtended_RestController
         $auth = ZfExtended_Authentication::getInstance();
         $this->entity->load((int) $this->_getParam('id'));
 
-        //check if update is allowed
-        $this->checkTaskGuidAndEditable();
-        $task = $this->checkTaskState();
-        $wfh = $this->_helper->workflow;
-        /** @var Editor_Controller_Helper_Workflow $wfh */
-        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $auth->getUserGuid());
+        $task = $this->getCurrentTask();
+        $this->checkTaskGuid($task);
 
-        //the history entry must be created before the original entity is modified
-        $history = $this->entity->getNewHistoryEntity();
-        //update the segment
-        $updater = ZfExtended_Factory::get(editor_Models_Segment_Updater::class, [$task, $auth->getUserGuid()]);
+        $updateSegmentOperation = UpdateSegmentOperation::create();
+        $updateSegmentDtoFactory = UpdateSegmentDtoFactory::create();
+        $userRepository = new UserRepository();
 
-        $allowedAlternatesToChange = $this->entity->getEditableDataIndexList(true);
+        $updateSegmentOperation->update(
+            $this->entity,
+            $updateSegmentDtoFactory->fromRequest($this->entity, $this->getRequest()),
+            $userRepository->get($auth->getUserId()),
+            $this->restMessages,
+        );
 
-        // CRUCIAL: we need to exclude the segment-content fields from sanitization and sanitize them as HTML
-        $this->dataSanitizationMap = [];
-        foreach ($allowedAlternatesToChange as $key) {
-            $this->dataSanitizationMap[$key] = ZfExtended_Sanitizer::MARKUP;
-        }
-
-        $this->decodePutData();
-
-        //set the editing durations for time tracking into the segment object
-        settype($this->data->durations, 'object');
-        $this->entity->setTimeTrackData($this->data->durations, $this->durationsDivisor);
-
-        $allowedToChange = ['stateId', 'autoStateId', 'matchRate', 'matchRateType'];
-
-        $this->checkPlausibilityOfPut($allowedAlternatesToChange);
-        $this->sanitizeEditedContent($updater, $allowedAlternatesToChange);
-
-        $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
-        $this->entity->setUserGuid($auth->getUser()->getUserGuid());
-        $this->entity->setUserName($auth->getUser()->getUserName());
-
-        /* @var $updater editor_Models_Segment_Updater */
-        $updater->update($this->entity, $history);
+        $this->entity->refresh();
 
         // To always have a consistent view-model, we convert the stdClass to an assoc array,
         // no matter if anonymization is required or not
@@ -359,7 +358,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->appendTaskProgress($task);
     }
 
-    /***
+    /**
      * Search segment action.
      * @throws NoAccessException
      * @throws Zend_Exception
@@ -369,24 +368,18 @@ class Editor_SegmentController extends ZfExtended_RestController
     {
         $parameters = $this->getAllParams();
         $this->validateTaskAccess($parameters['taskGuid']);
-        //set the default search parameters if no values are given
-        $parameters = $this->entity->setDefaultSearchParameters($parameters);
 
-        //check if the required search parameters are in the request
-        $this->checkRequiredSearchParameters($parameters);
-        $parameters['searchField'] = htmlentities($parameters['searchField'], ENT_XML1);
-
-        //check character number limit
-        if (! $this->checkSearchStringLength($parameters['searchField'])) {
+        if (! $this->checkSearchStringLength($parameters['searchField'] ?? '')) {
             return;
         }
 
-        //find all segments for the search parameters
-        $result = $this->entity->search($parameters);
+        $searchService = SearchService::create();
+        $searchQuery = SearchQueryDtoFactory::create()->fromRequest($this->getRequest());
+
+        $result = $searchService->search($searchQuery);
 
         if (! $result || empty($result)) {
-            $t = ZfExtended_Zendoverwrites_Translate::getInstance(); /* @var $t ZfExtended_Zendoverwrites_Translate */
-            ;
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             $this->view->message = $t->_('Keine Ergebnisse für die aktuelle Suche!');
 
             return;
@@ -427,15 +420,14 @@ class Editor_SegmentController extends ZfExtended_RestController
         $task = editor_ModelInstances::taskByGuid($parameters['taskGuid']);
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */
-        if ($task->getUsageMode() == $task::USAGE_MODE_SIMULTANEOUS && $this->isOpenedByMoreThanOneUser($parameters['taskGuid'])) {
-            throw new editor_Models_SearchAndReplace_Exception('E1192', [
+        if (
+            $task->getUsageMode() === $task::USAGE_MODE_SIMULTANEOUS
+            && $this->isOpenedByMoreThanOneUser($parameters['taskGuid'])
+        ) {
+            throw new SearchAndReplaceException('E1192', [
                 'task' => $task,
             ]);
         }
-
-        $this->checkRequiredSearchParameters($parameters);
-        $parameters['searchField'] = htmlentities($parameters['searchField'], ENT_XML1);
-        $parameters['replaceField'] = htmlentities($parameters['replaceField'], ENT_XML1);
 
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
@@ -446,17 +438,11 @@ class Editor_SegmentController extends ZfExtended_RestController
             return;
         }
 
-        //check character number limit
-        if (! $this->checkSearchStringLength($parameters['searchField'])) {
-            return;
-        }
-
         //find all segments for the search parameters
-        $results = $this->entity->search($parameters);
+        $searchService = SearchService::create();
+        $searchQuery = SearchQueryDtoFactory::create()->fromRequest($this->getRequest());
 
-        $searchInField = $parameters['searchInField'];
-        $searchType = $parameters['searchType'] ?? $this->entity::DEFAULT_SEARCH_TYPE;
-        $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase']) == 'true') : false;
+        $results = $searchService->search($searchQuery);
 
         if (! $results || empty($results)) {
             $this->view->message = $t->_('Keine Ergebnisse für die aktuelle Suche!');
@@ -464,86 +450,24 @@ class Editor_SegmentController extends ZfExtended_RestController
             return;
         }
 
-        $resultsCount = count($results);
-        foreach ($results as $idx => $result) {
-            $replace = ZfExtended_Factory::get(editor_Models_SearchAndReplace_ReplaceMatchesSegment::class, [
-                $result[$searchInField], //text to be replaced
-                $searchInField, //replace target field
-                $result['id'], //segment id
-            ]);
+        $replaceDtoFactory = ReplaceDtoFactory::create();
+        $searchAndReplaceService = SearchAndReplaceService::create();
 
-            //if the trackchanges are active, setup some trackchanges parameters
-            if (isset($parameters['isActiveTrackChanges']) && $parameters['isActiveTrackChanges']) {
-                $replace->trackChangeTag->attributeWorkflowstep = $parameters['attributeWorkflowstep'];
-                $replace->trackChangeTag->userColorNr = $parameters['userColorNr'];
-                $replace->trackChangeTag->userTrackingId = $parameters['userTrackingId'];
-                $replace->isActiveTrackChanges = $parameters['isActiveTrackChanges'];
-            }
+        $replaceDto = $replaceDtoFactory->fromRequest($this->getRequest());
 
-            //find matches in the html text and replace them
-            $replace->replaceText($parameters['searchField'], $parameters['replaceField'], $searchType, $matchCase);
+        if ($this->_getParam('async', false)) {
+            $searchAndReplaceService->queueReplaceAll($replaceDto);
 
-            //init the entity
-            $this->entity = ZfExtended_Factory::get($this->entityClass);
+            $this->view->total = count($results);
 
-            //set the segment id
-            $this->getRequest()->setParam('id', $result['id']);
-
-            //create the object for the data parameters
-            $ob = new stdClass();
-            $ob->$searchInField = $replace->segmentText;
-            $ob->autoStateId = 999;
-
-            //create duration for modefied field
-            $duration = new stdClass();
-            $duration->$searchInField = $parameters['durations'];
-            $ob->durations = $duration;
-
-            //set the duration devisor to the number of the results so the duration is splitted equally for each replaced result
-            $this->durationsDivisor = $resultsCount;
-
-            $this->getRequest()->setParam('data', null);
-            $this->getRequest()->setParam('data', json_encode((array) $ob));
-
-            //trigger the before put action
-            $this->beforeActionEvent('put');
-
-            try {
-                // call the put action so the segment is modefied and saved
-                $this->putAction();
-                //trigger the after put action
-                $this->afterActionEvent('put');
-            } catch (Exception $e) {
-                /**
-                 * Any exception on saving a segment in replace all should not break the whole loop.
-                 * But the problem should be logged, and also the user should be informed in the GUI
-                 */
-                unset($results[$idx]); //remove the unchanged segment from result list, so that GUI knows there was going something wrong
-                $task = editor_ModelInstances::taskByGuid($this->entity->getTaskGuid());
-                $this->log->exception($e, [
-                    'level' => $this->log::LEVEL_WARN,
-                    'extra' => [
-                        'task' => $task,
-                        'loadedSegment' => $this->entity->getDataObject(),
-                    ],
-                ]);
-            }
-
-            //do not return the segment text, it will be loaded by the segments store
-            $result[$searchInField] = '';
+            return;
         }
 
+        $searchAndReplaceService->replaceAll($replaceDto);
+
         //return the modefied segments
-        $this->view->rows = $results;
-
-        //TODO: this should be implemented via websokets
-        //reload the task and get the lates segmentFinishCount
-        $task->loadByTaskGuid($this->entity->getTaskGuid());
-
-        // Recalculate task progress and assign results into view
-        $this->appendTaskProgress($task);
-
-        $this->view->total = count($results);
+        $this->view->rows = $searchService->search($searchQuery);
+        $this->view->total = count($this->view->rows);
     }
 
     /**
@@ -601,82 +525,16 @@ class Editor_SegmentController extends ZfExtended_RestController
     }
 
     /**
-     * Applies the import whitespace replacing to the edited user by the content
-     */
-    protected function sanitizeEditedContent(editor_Models_Segment_Updater $updater, array $fieldnames): void
-    {
-        $sanitized = false;
-        foreach ($this->data as $key => $data) {
-            //consider only changeable datafields:
-            if (! in_array($key, $fieldnames)) {
-                continue;
-            }
-
-            $sanitized = $updater->sanitizeEditedContent($data, 'targetEdit' === $key) || $sanitized;
-            $this->data->{$key} = $data;
-        }
-
-        if ($sanitized) {
-            $this->restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
-        }
-    }
-
-    /**
-     * checks if current session taskguid matches to loaded segment taskguid
-     * and if the user is allowed to edit the segment at all
+     * checks if current session task guid matches to loaded segment task guid
      * @throws ZfExtended_Models_Entity_NoAccessException
-     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function checkTaskGuidAndEditable()
+    protected function checkTaskGuid(\editor_Models_Task $task)
     {
-        $isTaskGuidAndEditable = true;
-
         $editable = $this->entity->getEditable();
-        $task = $this->getCurrentTask();
 
         if (empty($editable) || $task->getTaskGuid() !== $this->entity->getTaskGuid()) {
-            $isTaskGuidAndEditable = false;
-        }
-
-        if ($isTaskGuidAndEditable && $editable) {
-            // if the user can edit only segmentranges, we must also check if s/he is allowed to edit and save this segment
-            $authUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($authUserGuid, $task);
-            $step = $tua->getWorkflowStepName();
-
-            if ($tua->isSegmentrangedTaskForStep($task, $step)) {
-                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $authUserGuid, $step);
-
-                if (! in_array($this->entity->getSegmentNrInTask(), $assignedSegments)) {
-                    $isTaskGuidAndEditable = false;
-                }
-            }
-        }
-
-        if (! $isTaskGuidAndEditable) {
-            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
-    }
-
-    /**
-     * checks if current task state allows editing
-     * @throws ZfExtended_Models_Entity_NoAccessException
-     */
-    protected function checkTaskState(): editor_Models_Task
-    {
-        $task = editor_ModelInstances::taskByGuid($this->entity->getTaskGuid());
-        if ($task->getState() === $task::STATE_UNCONFIRMED) {
-            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
-            throw new ZfExtended_Models_Entity_NoAccessException('Task is not confirmed so no segment can be edited! Task: ' . $task->getTaskGuid());
-        }
-
-        return $task;
-    }
-
-    protected function isEditable()
-    {
-        return empty($this->entity->getEditable());
     }
 
     public function getAction()
@@ -955,23 +813,6 @@ class Editor_SegmentController extends ZfExtended_RestController
         }
 
         return $isValid;
-    }
-
-    /**
-     * Check if the required search parameters are provided
-     *
-     * @throws ZfExtended_ValidateException
-     */
-    private function checkRequiredSearchParameters(array $parameters)
-    {
-        if (empty($parameters['searchInField']) || (empty($parameters['searchField']) && strlen($parameters['searchField']) === 0) || empty($parameters['searchType'])) {
-            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-            /* @var $t ZfExtended_Zendoverwrites_Translate */
-            $e = new ZfExtended_ValidateException();
-            $e->setMessage($t->_('Missing search parameter. Required parameters: searchInField, searchField, searchType. Given was: ') . print_r($parameters, 1));
-
-            throw $e;
-        }
     }
 
     /***

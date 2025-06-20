@@ -54,8 +54,8 @@ class TaskProgressUpdatedEvent
             $progress['taskEditable'],
             $progress['taskFinished'],
             $progress['taskProgress'],
-            $progress['userEditable'],
-            $progress['userFinished'],
+            $progress['userEditable'] ?? null,
+            $progress['userFinished'] ?? null,
             $progress['userProgress'] ?? null,
         );
     }

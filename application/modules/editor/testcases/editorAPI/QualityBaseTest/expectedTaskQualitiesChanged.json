@@ -407,20 +407,35 @@
         {
             "qid": -1,
             "qtype": "whitespace",
-            "qcount": 0,
+            "qcount": 1,
             "qcomplete": true,
+            "children": [
+                {
+                    "qid": "1221",
+                    "qtype": "whitespace",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "space_end",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Normal space at the end",
+                    "qtooltip": "",
+                    "mustBeZeroErrors": false,
+                    "leaf": true
+                }
+            ],
             "qcategory": null,
             "qtooltip": "",
             "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "White space at the beginning/end",
-            "qtotal": 0,
-            "leaf": true
+            "qtotal": 1,
+            "expanded": false
         }
     ],
     "metaData": {
-        "numSegments": 499,
+        "numSegments": 500,
         "hasFaultyInternalTags": false
     }
 }

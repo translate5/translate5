@@ -192,4 +192,31 @@ class LanguageResourceRepository
 
         return $grouped;
     }
+
+    public function getAllByServiceName(string $serviceName): iterable
+    {
+        $languageResource = new LanguageResource();
+        $db = $languageResource->db;
+        $s = $db->select()
+            ->from(
+                [
+                    'languageResources' => $db->info($db::NAME),
+                ],
+            )
+            ->where('serviceName = ?', $serviceName);
+        $rows = $db->fetchAll($s)->toArray();
+        foreach ($rows as $row) {
+            $languageResource->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $db,
+                        'data' => $row,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+            yield clone $languageResource;
+        }
+    }
 }

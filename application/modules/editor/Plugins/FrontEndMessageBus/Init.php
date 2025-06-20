@@ -29,9 +29,12 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\Plugins\VisualReview\Annotation\AnnotationEntity;
 use MittagQI\Translate5\Repository\SegmentRepository;
-use MittagQI\Translate5\Segment\Repetition\Event\RepetitionProcessedEvent;
+use MittagQI\Translate5\Segment\Event\SegmentProcessedEvent;
+use MittagQI\Translate5\Segment\Event\SegmentUpdatedEvent;
 use MittagQI\Translate5\Segment\Repetition\Event\RepetitionProcessingFailedEvent;
 use MittagQI\Translate5\Segment\Repetition\Event\RepetitionReplacementRequestedEvent;
+use MittagQI\Translate5\Segment\SearchAndReplace\Event\SearchAndReplaceProcessingFailedEvent;
+use MittagQI\Translate5\Segment\SearchAndReplace\Event\SearchAndReplaceProcessingRequestedEvent;
 use MittagQI\Translate5\Task\Events\TaskProgressUpdatedEvent;
 
 class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
@@ -88,9 +91,13 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
         $this->eventManager->attach('editor_Models_TaskUserTracking', 'afterUserTrackingInsert', [$this, 'handleUpdateUserTracking']);
         $this->eventManager->attach('editor_Models_Task', 'unlock', [$this, 'handleTaskUnlock']);
         //$this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
-        $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', [$this, 'handleSegmentSave']);
         $this->eventManager->attach('Editor_AlikesegmentController', 'afterGetAction', [$this, 'handleAlikeLoad']);
 
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            SegmentUpdatedEvent::class,
+            [$this, 'handleSegmentSave']
+        );
         $this->eventManager->attach(
             EventDispatcher::class,
             RepetitionReplacementRequestedEvent::class,
@@ -98,7 +105,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
         );
         $this->eventManager->attach(
             EventDispatcher::class,
-            RepetitionProcessedEvent::class,
+            SegmentProcessedEvent::class,
             [$this, 'sendSegmentProcessed']
         );
         $this->eventManager->attach(
@@ -110,6 +117,16 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
             EventDispatcher::class,
             RepetitionProcessingFailedEvent::class,
             [$this, 'unlockProcessingRepetitionSegments']
+        );
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            SearchAndReplaceProcessingRequestedEvent::class,
+            [$this, 'sendSegmentSearchAndReplaceProcessingStarted']
+        );
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            SearchAndReplaceProcessingFailedEvent::class,
+            [$this, 'unlockProcessingSearchAndReplaceSegments']
         );
 
         $this->eventManager->attach('Editor_IndexController', 'beforeIndexAction', [$this, 'handleStartSession']);
@@ -329,14 +346,25 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
         ]);
     }
 
+    public function sendSegmentSearchAndReplaceProcessingStarted(Zend_EventManager_Event $zendEvent)
+    {
+        /** @var SearchAndReplaceProcessingRequestedEvent $event */
+        $event = $zendEvent->getParam('event');
+
+        $this->bus->notify(self::CHANNEL_TASK, 'segmentProcessingStarted', [
+            'taskGuid' => $event->taskGuid,
+            'segmentIds' => $event->segmentIds,
+        ]);
+    }
+
     public function sendSegmentProcessed(Zend_EventManager_Event $zendEvent)
     {
-        /** @var RepetitionProcessedEvent $event */
+        /** @var SegmentProcessedEvent $event */
         $event = $zendEvent->getParam('event');
 
         $this->bus->notify(self::CHANNEL_TASK, self::SEGMENTS_PROCESSED_MESSAGE, [
             'taskGuid' => $event->taskGuid,
-            'segmentIds' => $event->repetitionIds,
+            'segmentIds' => $event->segmentIds,
         ]);
     }
 
@@ -366,6 +394,17 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
         ]);
     }
 
+    public function unlockProcessingSearchAndReplaceSegments(Zend_EventManager_Event $zendEvent): void
+    {
+        /** @var SearchAndReplaceProcessingFailedEvent $event */
+        $event = $zendEvent->getParam('event');
+
+        $this->bus->notify(self::CHANNEL_TASK, self::SEGMENTS_PROCESSED_MESSAGE, [
+            'taskGuid' => $event->taskGuid,
+            'segmentIds' => $event->segmentIds,
+        ]);
+    }
+
     public function handleAfterTaskClose(Zend_EventManager_Event $event)
     {
         $task = $event->getParam('task');
@@ -378,14 +417,14 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
         ]);
     }
 
-    public function handleSegmentSave(Zend_EventManager_Event $event)
+    public function handleSegmentSave(Zend_EventManager_Event $zendEvent)
     {
-        $segment = $event->getParam('entity');
-        /* @var $segment editor_Models_Segment */
+        /** @var SegmentUpdatedEvent $event */
+        $event = $zendEvent->getParam('event');
 
         $this->bus->notify(self::CHANNEL_TASK, 'segmentSave', [
             'connectionId' => $this->getHeaderConnId(),
-            'segment' => $segment->getDataObject(),
+            'segment' => $event->segment->getDataObject(),
             'sessionId' => Zend_Session::getId(),
         ]);
     }
