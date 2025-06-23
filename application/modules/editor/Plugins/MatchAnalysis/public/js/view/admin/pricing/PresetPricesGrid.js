@@ -111,12 +111,14 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetPricesGrid', {
         bind: {
             text: '{l10n.MatchAnalysis.pricing.range.create}'
         },
+        itemId: 'rangeCreate',
         handler: 'openRangePrompt'
     }, {
         xtype: 'button',
         bind: {
             text: '{l10n.MatchAnalysis.pricing.range.delete}'
         },
+        itemId: 'rangeDelete',
         handler: 'deleteRange'
     },{
         xtype: 'tbtext',
