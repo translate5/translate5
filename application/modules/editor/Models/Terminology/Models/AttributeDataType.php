@@ -331,36 +331,33 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
         $entry = $this->db->getAdapter()->query('
             SELECT DISTINCT `dataTypeId`
             FROM `terms_attributes`
-            WHERE 1
-              AND `collectionId` = ?
+            WHERE `collectionId` = ?
               AND `termEntryId` IS NOT NULL 
               AND `language` IS NULL
               AND `termId` IS NULL
-            ORDER BY FIND_IN_SET(`dataTypeId`, ?) ASC 
+            ORDER BY FIND_IN_SET(`dataTypeId`, ?) ASC, `type` ASC 
         ', [$collectionId, $list])->fetchAll(PDO::FETCH_COLUMN);
 
         // Get language-level dataTypeIds usages
         $language = $this->db->getAdapter()->query('
             SELECT DISTINCT `dataTypeId`
             FROM `terms_attributes`
-            WHERE 1
-              AND `collectionId` = ? 
+            WHERE `collectionId` = ? 
               AND `termEntryId` IS NOT NULL 
               AND `language` IS NOT NULL
               AND `termId` IS NULL
-            ORDER BY FIND_IN_SET(`dataTypeId`, ?) ASC 
+            ORDER BY FIND_IN_SET(`dataTypeId`, ?) ASC, `type` ASC 
         ', [$collectionId, $list])->fetchAll(PDO::FETCH_COLUMN);
 
         // Get term-level dataTypeIds usages
         $term = $this->db->getAdapter()->query('
             SELECT DISTINCT `dataTypeId`
             FROM `terms_attributes`
-            WHERE 1
-              AND `collectionId` = ? 
+            WHERE `collectionId` = ? 
               AND `termEntryId` IS NOT NULL 
               AND `language` IS NOT NULL
               AND `termId` IS NOT NULL
-            ORDER BY FIND_IN_SET(`dataTypeId`, ?) ASC 
+            ORDER BY FIND_IN_SET(`dataTypeId`, ?) ASC, `type` ASC 
         ', [$collectionId, $list])->fetchAll(PDO::FETCH_COLUMN);
 
         // Collect usage info, so that for each level we have arrays of [dataTypeId => title] pairs
