@@ -1,0 +1,12 @@
+{
+    "entityVersion": "3",
+    "name": "Translate4734Test",
+    "color": null,
+    "resourceId": "editor_Services_TermCollection",
+    "serviceType": "editor_Services_TermCollection",
+    "serviceName": "TermCollection",
+    "specificData": "{\"fileName\":\"imported.tbx\",\"status\":\"available\",\"termEntry\":5,\"term\":15,\"attribute\":30}",
+    "resourceType": "termcollection",
+    "writeSource": "0",
+    "specificId": null
+}

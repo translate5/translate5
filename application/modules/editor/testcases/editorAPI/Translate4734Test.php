@@ -98,6 +98,86 @@ class Translate4734Test extends JsonTestAbstract
         unlink($xlsxFile);
     }
 
+    /**
+     * Test two-step xlsx export for a TermCollection
+     *
+     * @throws Zend_Http_Client_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    public function testSearchtermexists()
+    {
+        // Prepare xlsx file and print preparation progress as html
+        $json = static::api()->getJson('/editor/termcollection/searchtermexists', [
+            'searchTerms' => json_encode([
+                [
+                    "text" => "term1-de-admitted",
+                    "anyOtherProp1" => "Some other value 1",
+                    "anyOtherProp2" => "Some other value 2",
+                 ],
+                [
+                    "text" => "term1-de-standardized",
+                    "anyOtherProp1" => "Some other value 3",
+                    "anyOtherProp2" => "Some other value 4",
+                ],
+                [
+                    "text" => " term1-de-nonexisting",
+                    "anyOtherProp1" => "Some other value 5",
+                    "anyOtherProp2" => "Some other value 6",
+                ]
+             ]),
+            'targetLang' => 'de'
+        ]);
+
+        // Compare to expected
+        $this->assertFileContents(
+            $file = 'only-non-existing-terms.json',
+            json_encode($json),
+            "Non-existing terms returned - are different from the expected ones in $file",
+            static::api()->isCapturing()
+        );
+    }
+
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    public function testListAndDetails()
+    {
+        // Get info about our TermCollection
+        $specific = static::api()->getJson('/editor/termcollection/' . self::$tc->getId());
+
+        // Unset props that prevent compare
+        unset($specific->id, $specific->langResUuid, $specific->timestamp);
+
+        // Compare to expected
+        $this->assertFileContents(
+            $file = 'termcollection-details.json',
+            json_encode($specific, JSON_PRETTY_PRINT),
+            "TermCollection details are not as expected in $file",
+            static::api()->isCapturing()
+        );
+
+        // Get TermCollections list
+        $json = static::api()->getJson('/editor/termcollection');
+
+        // Find our TermCollection in the list
+        $found = false;
+        foreach ($json as $item) {
+
+            // Unset props that prevent compare
+            unset($item->id, $item->langResUuid, $item->timestamp);
+
+            // If found - exit loop
+            if (json_encode($item) === json_encode($specific)) {
+                $found = true;
+                break;
+            }
+        }
+
+        // Check if found
+        $this->assertEquals(true, $found, 'Specific expected TermCollection is not in the list');
+    }
+
     private function sanitizeXlsxContent(string $xml): string
     {
         return str_replace("\r\n", "\n", $xml);
