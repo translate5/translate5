@@ -122,7 +122,7 @@ class Translate4734Test extends JsonTestAbstract
                     "anyOtherProp1" => "Some other value 5",
                     "anyOtherProp2" => "Some other value 6",
                 ],
-             ]),
+            ]),
             'targetLang' => 'de',
         ]);
 
