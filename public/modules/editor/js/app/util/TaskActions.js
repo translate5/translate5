@@ -347,6 +347,7 @@ Ext.define('Editor.util.TaskActions', {
             callback: function(rec, op) {
                 if (op.hasOwnProperty('error') &&
                     op.error.hasOwnProperty('response') &&
+                    op.error.response.hasOwnProperty('responseJson') &&
                     op.error.response.responseJson.errorCode === 'E1163'
                 ) {
                     app.openAdministration(null);
