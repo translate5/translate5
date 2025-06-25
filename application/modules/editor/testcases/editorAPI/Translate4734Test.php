@@ -39,8 +39,6 @@ class Translate4734Test extends JsonTestAbstract
 {
     /**
      * Imported TermCollection
-     *
-     * @var LanguageResource|null
      */
     protected static ?LanguageResource $tc = null;
 
@@ -113,7 +111,7 @@ class Translate4734Test extends JsonTestAbstract
                     "text" => "term1-de-admitted",
                     "anyOtherProp1" => "Some other value 1",
                     "anyOtherProp2" => "Some other value 2",
-                 ],
+                ],
                 [
                     "text" => "term1-de-standardized",
                     "anyOtherProp1" => "Some other value 3",
@@ -123,9 +121,9 @@ class Translate4734Test extends JsonTestAbstract
                     "text" => " term1-de-nonexisting",
                     "anyOtherProp1" => "Some other value 5",
                     "anyOtherProp2" => "Some other value 6",
-                ]
+                ],
              ]),
-            'targetLang' => 'de'
+            'targetLang' => 'de',
         ]);
 
         // Compare to expected
@@ -163,13 +161,13 @@ class Translate4734Test extends JsonTestAbstract
         // Find our TermCollection in the list
         $found = false;
         foreach ($json as $item) {
-
             // Unset props that prevent compare
             unset($item->id, $item->langResUuid, $item->timestamp);
 
             // If found - exit loop
             if (json_encode($item) === json_encode($specific)) {
                 $found = true;
+
                 break;
             }
         }
