@@ -27,7 +27,7 @@
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`,
                                 `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`)
-VALUES ('runtimeOptions.termTagger.disableSameLanguageCheck', '1', 'app', 'termtagger', '1',
-        '1', '', 'boolean', 'Enable the config to disable the same language tag prevention of the termtagger', 8,
+VALUES ('runtimeOptions.termTagger.disableSameLanguageCheck', '1', 'app', 'termtagger', '0',
+        '0', '', 'boolean', 'Enable the config to disable the same language tag prevention of the termtagger', 8,
         'TermTagger same language import prevention', 'TermTagger', 'Temporary config for evaluation only');
 
