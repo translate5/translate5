@@ -80,6 +80,8 @@ class Comments
             $comment->setSegmentId($segmentId);
             $comment->save();
         }
+        //reset internal resname collector
+        $this->resnameComments = [];
 
         $config = $this->task->getConfig();
         if (! $config->runtimeOptions->import->xliff->importComments || empty($this->comments)) {

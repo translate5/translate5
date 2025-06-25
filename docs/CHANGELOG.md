@@ -13,6 +13,70 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.25.0] - 2025-06-20
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3567](https://jira.translate5.net/browse/TRANSLATE-3567): Editor general - Open a task in translate5's editor from InstantTranslate** <br>
+Added possibility to open task for editing from instant translate
+
+
+### Changed
+**[TRANSLATE-4721](https://jira.translate5.net/browse/TRANSLATE-4721): InstantTranslate - Update German UI text in InstantTranslate** <br>
+Use "Hochladen" in "Drag and Drop oder anklicken zum hochladen einer Datei" text
+
+**[TRANSLATE-4717](https://jira.translate5.net/browse/TRANSLATE-4717): Content Protection - Rules for complex integers need some improvements** <br>
+Improvement for complex integer rules
+
+**[TRANSLATE-4686](https://jira.translate5.net/browse/TRANSLATE-4686): TermPortal - Add support for non-base64-encoded params hash** <br>
+Term search params specified after #termportal/search/... can now be given as query string values, i.e. param1=value1&param2=value2 instead of their base64-encoded version
+
+**[TRANSLATE-4675](https://jira.translate5.net/browse/TRANSLATE-4675): LanguageResources - Improve glossary usage** <br>
+Use more wide range of terms as source for pre-translation with variety of language resources 
+
+**[TRANSLATE-4672](https://jira.translate5.net/browse/TRANSLATE-4672): Workflows - reduce print approval job finish dialogue** <br>
+Improve leaving print approval job dialog
+
+**[TRANSLATE-4653](https://jira.translate5.net/browse/TRANSLATE-4653): t5memory - Daily logging of t5memory specificData** <br>
+The specificData field for t5memory language resources is logged daily separately for easier backup usage of the TMs.
+
+
+### Bugfixes
+**[TRANSLATE-4723](https://jira.translate5.net/browse/TRANSLATE-4723): Content Protection, Import/Export - content protection tag short tag numbers are wrong in target for review task** <br>
+Fixed bug which may cause short tag number for content protection tags to be different in target comparing to source for review tasks
+
+**[TRANSLATE-4722](https://jira.translate5.net/browse/TRANSLATE-4722): Editor general - RootCause: Invalid JSON - answer seems not to be from translate5** <br>
+DEBUG: added logging for further investigation once this error pops again
+
+**[TRANSLATE-4719](https://jira.translate5.net/browse/TRANSLATE-4719): Editor general - RootCause: Unresolved Cannot read properties of null (reading 'style')** <br>
+DEBUG: suppressed ExtJS core javascript error and added logging if this would still lead to any follow-up error, for further investigation
+
+**[TRANSLATE-4718](https://jira.translate5.net/browse/TRANSLATE-4718): Editor general - RootCause: d is undefined** <br>
+added debug code for further investigation if this error pop next time
+
+**[TRANSLATE-4715](https://jira.translate5.net/browse/TRANSLATE-4715): Repetition editor - Fix Message bus segment workflow** <br>
+Fix Message bus segment workflow
+
+**[TRANSLATE-4702](https://jira.translate5.net/browse/TRANSLATE-4702): Task Management - ERROR in core: E0000 - Export folder not found or not write able** <br>
+Sometimes task deletions lead to errors resulting in defect tasks. 
+
+**[TRANSLATE-4694](https://jira.translate5.net/browse/TRANSLATE-4694): Workflows - Rename "Visual approve" workflow** <br>
+Renamed "Visual approve" workflow to "Review and Print approval"
+
+**[TRANSLATE-4646](https://jira.translate5.net/browse/TRANSLATE-4646): Hotfolder Import - "Missing files" Okapi errors in T5 multi-target project** <br>
+Fix file handling in hotfolder processing
+
+**[TRANSLATE-4560](https://jira.translate5.net/browse/TRANSLATE-4560): Auto-QA - Check for normal space at start or end of segment missing in AutoQA** <br>
+Added AutoQA check for a normal space at the start/end of a segment
+
+**[TRANSLATE-4353](https://jira.translate5.net/browse/TRANSLATE-4353): Search & Replace (editor) - Timeout when Searching/Replacing in Segments** <br>
+Make Search and Replace editor feature to work asynchronously to improve user experience
+
+
 ## [7.24.2] - 2025-06-13
 
 ### Important Notes:
