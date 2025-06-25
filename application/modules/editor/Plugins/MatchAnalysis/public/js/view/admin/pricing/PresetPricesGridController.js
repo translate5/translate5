@@ -51,8 +51,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetPricesGridCont
     control: {
         '#': { // # references the view
             close: 'handleClose',
-            beforeedit: 'onPricesBeforeEdit',
-            canceledit: 'onPricesCancelEdit',
+            beforeedit: 'suspendRangeChange',
+            canceledit: 'resumeRangeChange',
             edit: 'onPricesEdit',
             headerclick: 'onHeaderClick'
         },
@@ -331,7 +331,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetPricesGridCont
      */
     onPricesEdit: function(plugin, context) {
         // Enable create/delete buttons back when editing completed
-        this.getView().query('#rangeCreate, #rangeDelete').forEach(button => button.enable());
+        this.resumeRangeChange();
         Ext.Ajax.request({
             url: Editor.data.restpath + 'plugins_matchanalysis_pricingpresetprices',
             method: 'PUT',
@@ -705,14 +705,14 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetPricesGridCont
     /**
      * Disable create/delete buttons when editing starts
      */
-    onPricesBeforeEdit: function() {
+    suspendRangeChange: function() {
         this.getView().query('#rangeCreate, #rangeDelete').forEach(button => button.disable());
     },
 
     /**
      * Enable create/delete buttons back when editing cancelled
      */
-    onPricesCancelEdit: function() {
+    resumeRangeChange: function() {
         this.getView().query('#rangeCreate, #rangeDelete').forEach(button => button.enable());
     }
 });
