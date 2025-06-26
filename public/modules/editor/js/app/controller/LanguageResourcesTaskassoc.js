@@ -119,9 +119,17 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
         var me = this,
             oldValue = record.isModified('segmentsUpdateable') && record.getModified('segmentsUpdateable');
 
-        record.set('segmentsUpdateable', checked && oldValue);
-
-        me.saveRecord(record);
+        // Prevent double click
+        if (this.clickTimeout) {
+            clearTimeout(this.clickTimeout);
+            this.clickTimeout = null;
+            return;
+        }
+        this.clickTimeout = setTimeout(() => {
+            record.set('segmentsUpdateable', checked && oldValue);
+            me.saveRecord(record);
+            this.clickTimeout = null;
+        }, 250);
     },
     /**
      * check row when segmentsUpdateable is checked
