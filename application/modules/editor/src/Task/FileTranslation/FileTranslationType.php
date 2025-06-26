@@ -70,7 +70,7 @@ class FileTranslationType extends editor_Task_Type_Abstract
 
     protected bool $isTask = true;
 
-    protected bool $terminologyDisabled = true;
+    protected bool $terminologyDisabled = false;
 
     protected bool $autoStartAutoQA = false;
 

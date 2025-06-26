@@ -41,8 +41,12 @@ class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task
      */
     private $processingMode;
 
+    private bool $skipCheck;
+
     protected function validateParameters(array $parameters): bool
     {
+        $this->skipCheck = (bool) ($parameters['skipCheck'] ?? false);
+
         // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
         if (array_key_exists('processingMode', $parameters)) {
             $this->processingMode = $parameters['processingMode'];
@@ -56,7 +60,12 @@ class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task
     protected function work(): bool
     {
         // write the segments back to the segments model
-        editor_Segment_Quality_Manager::instance()->finishOperation($this->processingMode, $this->task);
+        editor_Segment_Quality_Manager::instance()->finishOperation(
+            $this->processingMode,
+            $this->task,
+            $this->skipCheck
+        );
+
         // if not importing, unlock the task if locked (we lock in the operation worker)
         if ($this->processingMode != editor_Segment_Processing::IMPORT && $this->task->isLocked($this->task->getTaskGuid())) {
             $this->task->unlock();
