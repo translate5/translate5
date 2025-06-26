@@ -246,6 +246,8 @@ Modified values are shown bold in the simple listing.');
         }
         $name = (string) $configData['name'];
 
+        $configData['defaults'] = $config->getDefaultsFromTypeClass($configData['defaults'], $configData['typeClass']);
+
         $out = [
             '       <info>name: <options=bold>' . OutputFormatter::escape($name) . '</>',
             '      value: ' . $value,

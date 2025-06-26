@@ -155,7 +155,11 @@ class editor_Models_Config extends ZfExtended_Models_Config
         foreach ($dbResults as &$row) {
             $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
             $type = $typeManager->getType($row['typeClass']);
+            if ($type === null) {
+                continue;
+            }
             $row['typeClassGui'] = $type->getGuiViewCls(); //we can overwrite the typeClass here, since php class value is not usable in GUI
+            $row['defaults'] = $type::getDefaultList($row['defaults']);
             $dbResultsNamed[$row['name']] = $row;
         }
 
@@ -353,10 +357,23 @@ class editor_Models_Config extends ZfExtended_Models_Config
                 $result[$row['name']]['overwritten'] = $result[$row['name']]['value'];
                 $result[$row['name']]['value'] = $row['value'];
                 $result[$row['name']]['origin'] = $configSource;
+                $result[$row['name']]['defaults'] = $this->getDefaultsFromTypeClass(
+                    $result[$row['name']]['defaults'],
+                    $result[$row['name']]['typeClass']
+                );
             }
         }
 
         return $result;
+    }
+
+    public function getDefaultsFromTypeClass(?string $defaults, ?string $typeClass): ?string
+    {
+        if (! empty($typeClass) && is_subclass_of($typeClass, ZfExtended_DbConfig_Type_Abstract::class)) {
+            return $typeClass::getDefaultList($defaults);
+        }
+
+        return $defaults;
     }
 
     /**

@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Plugins_IpAuthentication_Models_IpBaseUser as IpBaseUser;
+use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Plugins\IpAuthentication\AclResource;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\ZfExtended\Acl\ResourceManager as ACLResourceManager;
@@ -87,7 +88,7 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
      * @throws Zend_Exception
      * @throws ReflectionException
      */
-    public function onLoginBeforeIndexAction(): void
+    public function onLoginBeforeIndexAction(Zend_EventManager_Event $event): void
     {
         $logger = Zend_Registry::get('logger')->cloneMe('plugin.ipAuthentication');
         /* @var $logger ZfExtended_Logger */
@@ -95,8 +96,11 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
         $user = ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
         /* @var $user editor_Plugins_IpAuthentication_Models_IpBaseUser */
 
+        $controller = $event->getParam('controller');
+        $redirectTo = $controller->getHelper('Access')->getRedirectTo();
+
         // if there is no ip configuration, do nothing
-        if (empty($user->getConfiguredIps())) {
+        if (empty($user->getConfiguredIps()) || ! $this->isUsableApplet($redirectTo)) {
             return;
         }
 
@@ -114,6 +118,20 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
             'ip' => $user->getIp(),
         ]);
         ZfExtended_Authentication::getInstance()->authenticateUser($user);
+    }
+
+    private function isUsableApplet(string $redirectTo): bool
+    {
+        $applet = Dispatcher::getInstance()->getAppletToRedirect($redirectTo);
+        $applets = Zend_Registry::get('config')->runtimeOptions->authentication->ipbased->applets;
+        $applets = $applets->toArray();
+
+        // if nothing is set, we assume all as usable to keep compatiblity with legacy
+        if (empty($applets)) {
+            return true;
+        }
+
+        return in_array($applet, $applets);
     }
 
     /**
