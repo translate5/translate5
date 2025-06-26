@@ -172,7 +172,10 @@ class NumberProtectorTest extends TestCase
      */
     public function testProtect(string $node, string $expected): void
     {
-        $protector = NumberProtector::create($this->getNumberFormatRepository());
+        preg_match_all('/name="(.+)"/U', $expected, $matches);
+        $names = $matches[1] ?? '';
+
+        $protector = NumberProtector::create($this->getNumberFormatRepository(...$names));
 
         self::assertTrue($protector->hasEntityToProtect($node));
 
@@ -181,7 +184,7 @@ class NumberProtectorTest extends TestCase
 
     public function testProtectRepeatableNumbers(): void
     {
-        $protector = NumberProtector::create($this->getNumberFormatRepository());
+        $protector = NumberProtector::create($this->getNumberFormatRepository("default Ymd"));
 
         self::assertSame(
             'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdUwiDbUtYytMYw20DWK1YRxgaRRLFAIyDQGUoaxmpoaGjF6IM0qmpo1GjowFoiqidHU1AcA"/> string',
@@ -621,15 +624,15 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => 'string 1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with comma separator" source="1,234,567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZDR1MDyDSujTHW1AIzNDU0omP0dKyt7BVjQXpVNDVrQFRNjKamfikA"/> string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="1,234,567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZDQ0dTA8g2rtXR1ALTmvaaGhrRMXo61lb2irEg3SqamjUgqiZGU1O/FAA="/> string',
         ];
         yield [
             'string' => 'string -1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with comma separator" source="-1,234,567" iso="-1234567" target="-1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZDR1MDyDSujTHW1AIzNDU0omP0dKyt7BVjQXpVNDVrQFRNjKamfikA"/> string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="-1,234,567" iso="-1234567" target="-1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZDQ0dTA8g2rtXR1ALTmvaaGhrRMXo61lb2irEg3SqamjUgqiZGU1O/FAA="/> string',
         ];
         yield [
             'string' => 'string +1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with comma separator" source="+1,234,567" iso="+1234567" target="+1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZDR1MDyDSujTHW1AIzNDU0omP0dKyt7BVjQXpVNDVrQFRNjKamfikA"/> string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="+1,234,567" iso="+1234567" target="+1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZDQ0dTA8g2rtXR1ALTmvaaGhrRMXo61lb2irEg3SqamjUgqiZGU1O/FAA="/> string',
         ];
 
         yield [
@@ -643,17 +646,17 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => 'string 1˙234˙567 string',
-            'expected' => 'string <number type="integer" name="default generic with dot above separator" source="1˙234˙567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFbj9ExNDSDbuDbGWFMLzNDU0IiO0dOxtrJXjAVpVtHUrAFRNTGamvqlAA=="/> string',
+            'expected' => 'string <number type="integer" name="default generic with dot above separator" source="1˙234˙567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZD4/RMTQ0gx7gWyNACMzTtNTU0omP0dKyt7BVjQfpVNDVrQFRNjKamfikA"/> string',
         ];
 
         yield [
             'string' => "string 1'234'567 string",
-            'expected' => 'string <number type="integer" name="default generic with apostrophe separator" source="1\'234\'567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZDXVMDyDSujTHW1AIzNDU0omP0dKyt7BVjQXpVNDVrQFRNjKamfikA"/> string',
+            'expected' => 'string <number type="integer" name="default generic with apostrophe separator" source="1\'234\'567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZDQ11TA8g2rlXX1ALTmvaaGhrRMXo61lb2irEg3SqamjUgqiZGU1O/FAA="/> string',
         ];
 
         yield [
             'string' => 'string 1.234.567 string',
-            'expected' => 'string <number type="integer" name="default generic with dot" source="1.234.567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWI0ZPU9NeA8gzro0x0dQCMzQ1NKJj9HSsrewVY0H6VTQ1a0BUTYympn4pAA=="/> string',
+            'expected' => 'string <number type="integer" name="default generic with dot" source="1.234.567" iso="1234567" target="1234567" regex="09eIKa6Jq4nR0NSIPrQxRlc71j7aUNcyNial2kDHqFZDI0ZPUwPIMa4FMrTADE17TQ2N6Bg9HWsre8VYkH4VTc0aEFUTo6mpXwoA"/> string',
         ];
 
         yield [
@@ -906,24 +909,28 @@ class NumberProtectorTest extends TestCase
         ];
     }
 
-    private function getNumberFormatRepository(): ContentProtectionRepository
+    private function getNumberFormatRepository(string ...$names): ContentProtectionRepository
     {
         return $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
-                'getAllForSource' => $this->getProtectionDtos(),
+                'getAllForSource' => $this->getProtectionDtos(...$names),
                 'hasActiveTextRules' => true,
             ]
         );
     }
 
-    private function getProtectionDtos(): iterable
+    private function getProtectionDtos(string ...$names): iterable
     {
+        $names = array_map(
+            static fn ($name) => str_replace('"', '\"', html_entity_decode($name)),
+            $names
+        );
         $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
         $contentRecognitionTable = $dbContentRecognition->info($dbContentRecognition::NAME);
 
         $getAll = function ($select) use ($dbContentRecognition) {
-            foreach ($dbContentRecognition->fetchAll($select) as $formatData) {
+            foreach ($dbContentRecognition->fetchAll($select, order: 'id ASC') as $formatData) {
                 $formatData = $formatData->toArray();
                 $formatData['outputFormat'] = match ($formatData['type']) {
                     DateProtector::getType() => 'Y-m-d',
@@ -942,7 +949,8 @@ class NumberProtectorTest extends TestCase
                 'recognition' => $contentRecognitionTable,
             ], ['recognition.*'])
             ->where('isDefault = true')
-            ->where('type = "ip-address"');
+            ->where('type = "ip-address"')
+            ->where('name IN ("' . implode('","', $names) . '")');
 
         yield from $getAll($selectIps);
 
@@ -951,7 +959,8 @@ class NumberProtectorTest extends TestCase
                 'recognition' => $contentRecognitionTable,
             ], ['recognition.*'])
             ->where('isDefault = true')
-            ->where('type = "mac-address"');
+            ->where('type = "mac-address"')
+            ->where('name IN ("' . implode('","', $names) . '")');
 
         yield from $getAll($selectMacs);
 
@@ -960,7 +969,8 @@ class NumberProtectorTest extends TestCase
                 'recognition' => $contentRecognitionTable,
             ], ['recognition.*'])
             ->where('isDefault = true')
-            ->where('type = "date"');
+            ->where('type = "date"')
+            ->where('name IN ("' . implode('","', $names) . '")');
 
         yield from $getAll($selectDates);
 
@@ -969,7 +979,8 @@ class NumberProtectorTest extends TestCase
                 'recognition' => $contentRecognitionTable,
             ], ['recognition.*'])
             ->where('isDefault = true')
-            ->where('type = "float"');
+            ->where('type = "float"')
+            ->where('name IN ("' . implode('","', $names) . '")');
 
         yield from $getAll($selectFloats);
 
@@ -978,7 +989,8 @@ class NumberProtectorTest extends TestCase
                 'recognition' => $contentRecognitionTable,
             ], ['recognition.*'])
             ->where('isDefault = true')
-            ->where('type = "integer"');
+            ->where('type = "integer"')
+            ->where('name IN ("' . implode('","', $names) . '")');
 
         yield from $getAll($selectIntegers);
 
