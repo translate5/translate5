@@ -195,13 +195,15 @@ class editor_Models_Segment_EditablesFinder
     protected function addSortInner(Zend_Db_Select $sql, string $prop, bool $next, bool $isAsc): void
     {
         $value = $this->segment->get($prop);
-
-        $comparator = ($isAsc xor $next) ? '<' : '>';
-        //id comparator depends only on prev/next, since order for id is always ASC!
-        $f = $this->segment->db . '.`' . $prop . '` ';
-        $sql->where('(' . $f . $comparator . ' ?', $value);
-        $sql->orWhere('(' . $f . '= ?', $value);
-        $sql->where($this->segment->db . '.id' . $comparator . ' ? ))', $this->segment->getId());
+        // we have seen scenarios where the value actually was null leading to invalid SQL !
+        if ($value !== null) {
+            $comparator = ($isAsc xor $next) ? '<' : '>';
+            //id comparator depends only on prev/next, since order for id is always ASC!
+            $f = $this->segment->getTableName() . '.`' . $prop . '` ';
+            $sql->where('(' . $f . $comparator . ' ?', $value);
+            $sql->orWhere('(' . $f . '= ?', $value);
+            $sql->where($this->segment->getTableName() . '.id ' . $comparator . ' ? ))', $this->segment->getId());
+        }
     }
 
     /**

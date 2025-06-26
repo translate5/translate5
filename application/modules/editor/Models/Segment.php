@@ -94,7 +94,6 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method string getTargetToSort()
  * @method string getTargetEditToSort()
  * @method void setTargetMd5(string $md5hash)
- * @method string getTargetMd5()
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 {
