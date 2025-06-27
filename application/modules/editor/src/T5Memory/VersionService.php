@@ -72,6 +72,8 @@ class VersionService
             return HasVersionInterface::FALLBACK_VERSION;
         }
 
+        return $this->versionFetchingApi->version($languageResource->getResource()->getUrl());
+
         $version = $languageResource->getSpecificData('version', true);
 
         if (isset($version['version'], $version['lastSynced'])

@@ -514,7 +514,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 }
 
                 $this->addOverflowLog($segment->getTask());
-                $this->flushMemoryService->flush($this->languageResource, $tmName);
+
+                if ($this->isInternalFuzzy()) {
+                    $this->flushMemoryService->flush($this->languageResource, $tmName);
+                }
+
                 $newName = $this->memoryNameGenerator->generateNextMemoryName($this->languageResource);
 
                 try {
