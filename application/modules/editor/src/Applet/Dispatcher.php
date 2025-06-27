@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Applet;
 
+use JetBrains\PhpStorm\NoReturn;
 use MittagQI\ZfExtended\Acl\ResourceInterface;
 use MittagQI\ZfExtended\Acl\RightDTO;
 use Zend_Registry;
@@ -67,6 +68,14 @@ class Dispatcher implements ResourceInterface
     public function registerApplet(string $name, AppletAbstract $applet): void
     {
         $this->applets[$name] = $applet;
+        uasort($this->applets, function (AppletAbstract $appletA, AppletAbstract $appletB) {
+            return $appletB->getWeight() - $appletA->getWeight();
+        });
+    }
+
+    public function getAllApplets(): array
+    {
+        return $this->applets;
     }
 
     /**
@@ -89,11 +98,6 @@ class Dispatcher implements ResourceInterface
      */
     public function dispatch(string $target = null): void
     {
-        //sort applets by weight
-        uasort($this->applets, function (AppletAbstract $appletA, AppletAbstract $appletB) {
-            return $appletB->getWeight() - $appletA->getWeight();
-        });
-
         if (empty($target)) {
             $target = $this->getDefaultAppletForUser();
         }
@@ -141,7 +145,7 @@ class Dispatcher implements ResourceInterface
     /**
      * Call the desired applet by the given URL hash, which is tried to be used as name for the applet
      */
-    public function call(string $hash = null, bool $useFallbackLoop = true)
+    public function call(string $hash = null, bool $useFallbackLoop = true): void
     {
         //if the requested app could be used, then use it
         $applet = $this->getApplet($hash);
@@ -214,10 +218,23 @@ class Dispatcher implements ResourceInterface
         }
     }
 
+    #[NoReturn]
     private function redirect(AppletAbstract $app): void
     {
         header('HTTP/1.1 302 Moved Temporarily');
         header('Location: ' . $app->getUrlPathPart());
         exit;
+    }
+
+    public function getAppletToRedirect(string $redirectTo): string|null
+    {
+        $redirectTo = rtrim($redirectTo, '/');
+        foreach ($this->applets as $hash => $applet) {
+            if (rtrim($applet->getUrlPathPart(), '/') == $redirectTo) {
+                return $hash;
+            }
+        }
+
+        return null;
     }
 }

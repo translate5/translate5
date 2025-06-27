@@ -218,27 +218,36 @@ final class editor_Segment_Quality_Manager
      * Adds the neccessary import workers
      * This is called after the "afterDirectoryParsing" of the FileFileTree Worker
      */
-    public function queueImport(editor_Models_Task $task, int $workerParentId = 0)
+    public function queueImport(editor_Models_Task $task, int $workerParentId = 0, bool $skipCheck = false): void
     {
-        if ($this->isProcessingSkipped(editor_Segment_Processing::IMPORT, $task, true)) {
+        if (
+            ! $skipCheck
+            && $this->isProcessingSkipped(editor_Segment_Processing::IMPORT, $task, true)
+        ) {
             return;
         }
+
         // add starting worker - with the mandatory params
         $workerParams = [
             'processingMode' => editor_Segment_Processing::IMPORT,
             'operationType' => editor_Task_Operation::IMPORT,
+            'skipCheck' => $skipCheck,
         ];
         $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationWorker::class);
+
         if ($worker->init($task->getTaskGuid(), $workerParams)) {
             $workerId = $worker->queue($workerParentId, null, false);
+
             if ($workerParentId === 0) {
                 // in case there was no parent worker the Quality-Operation will be the parent ...
                 $workerParentId = $workerId;
             }
+
             // add the workers of our providers
             $this->queueProviderWorkers(editor_Segment_Processing::IMPORT, $task, $workerParentId, []);
             // add finishing worker
             $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationFinishingWorker::class);
+
             if ($worker->init($task->getTaskGuid(), $workerParams)) {
                 $worker->queue($workerParentId, null, false);
             }
@@ -287,11 +296,12 @@ final class editor_Segment_Quality_Manager
      * @throws editor_Models_ConfigException
      * @throws Zend_Exception
      */
-    public function prepareOperation(string $processingMode, editor_Models_Task $task, int $parentWorkerId)
+    public function prepareOperation(string $processingMode, editor_Models_Task $task, bool $skipCheck): void
     {
-        if ($this->isProcessingSkipped($processingMode, $task)) {
+        if (! $skipCheck && $this->isProcessingSkipped($processingMode, $task)) {
             return;
         }
+
         $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
 
         //  we have to remove all existing qualities when performing an operation ... NOT when running a solitary operation as then the qualities of the other providers remain untouched
@@ -319,11 +329,12 @@ final class editor_Segment_Quality_Manager
      * @throws Zend_Db_Table_Exception
      * @throws editor_Models_ConfigException
      */
-    public function finishOperation(string $processingMode, editor_Models_Task $task)
+    public function finishOperation(string $processingMode, editor_Models_Task $task, bool $skipCheck = false): void
     {
-        if ($this->isProcessingSkipped($processingMode, $task)) {
+        if (! $skipCheck && $this->isProcessingSkipped($processingMode, $task)) {
             return;
         }
+
         $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
         $taskGuid = $task->getTaskGuid();
         $segmentTable = ZfExtended_Factory::get(editor_Models_Db_Segments::class);

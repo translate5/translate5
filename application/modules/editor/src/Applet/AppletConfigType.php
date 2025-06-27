@@ -1,7 +1,7 @@
 <?php
 /*
 START LICENSE AND COPYRIGHT
- Copyright (c) 2013 - 2025 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file is part of a paid plug-in for translate5.
@@ -51,47 +51,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\FileTranslation;
+namespace MittagQI\Translate5\Applet;
 
-use editor_Task_Type_Abstract;
-use ZfExtended_Authentication;
+use editor_Models_Config;
+use ZfExtended_DbConfig_Type_CoreTypes;
 
-/**
- * An internal task to represent file translations for instant translate
- */
-class FileTranslationType extends editor_Task_Type_Abstract
+class AppletConfigType extends ZfExtended_DbConfig_Type_CoreTypes
 {
-    // must match the acl_rule of the role 'instantTranslate' for the resource 'initial_tasktype'!
-    public const ID = 'instanttranslate-pre-translate';
-
-    protected bool $isInternalTask = true;
-
-    protected bool $isProject = false;
-
-    protected bool $isTask = true;
-
-    protected bool $terminologyDisabled = false;
-
-    protected bool $autoStartAutoQA = false;
-
-    protected bool $exportUsage = false;
-
-    protected bool $supportsTaskTm = false;
-
-    public function __construct()
+    /**
+     * returns true if there are "defaults" values and the given value is one of them
+     */
+    public function isValidInDefaults(editor_Models_Config $config, string $value): bool
     {
-        $seeTasks = ZfExtended_Authentication::getInstance()
-            ->isUserAllowed(FileTranslationRights::ID, FileTranslationRights::ACCESS_INSTANTTRANSLATE_TASK);
-        if ($seeTasks) {
-            $this->isInternalTask = false;
-            $this->isProject = true;
-        }
+        $error = '';
+        $values = $this->jsonDecode($value, $error);
+        $diffFound = array_diff($values, array_keys(Dispatcher::getInstance()->getAllApplets()));
+
+        return empty($diffFound);
     }
 
-    public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType)
+    public static function getDefaultList(?string $dbValue): ?string
     {
-        //if a project task is requested, the default project type is Project
-        $projectType = self::ID;
-        $taskType = self::ID;
+        return join(',', array_keys(Dispatcher::getInstance()->getAllApplets()));
     }
 }

@@ -155,7 +155,7 @@ class SessionApiTest extends ImportTestAbstract
     public function requestSessionToken(Closure $request, $withTask = false): void
     {
         $task = static::api()->getTask();
-        $taskGuid = $task->taskGuid;
+        $taskGuid = $task?->taskGuid ?? null;
         static::api()->logout();
         $loginData = [
             'login' => TestUser::TestManager->value,
@@ -204,12 +204,12 @@ class SessionApiTest extends ImportTestAbstract
         if (! empty($sessionData->user->customers)) {
             //if a customer is set, it must like the following regex
             //but customers are not mandatory, so empty check before
-            $this->assertMatchesRegularExpression('/^,[0-9]+,$/', $sessionData->user->customers);
+            $this->assertMatchesRegularExpression('/^,[0-9,]+,$/', $sessionData->user->customers);
         }
         $sessionData->user->customers = null;
         // TODO FIXME: it seems for these rights there is additional SQL needed in the test-creation SQL ?
         // $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"noreply@translate5.net","roles":["pm","editor","admin","instantTranslate","api","termCustomerSearch","termProposer","termFinalizer","termPM","termPM_allClients","termReviewer","instantTranslateWriteTm","basic","noRights"],"passwd":"********","editable":0,"locale":"en","customers":null,"userName":"manager test"}}';
-        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"noreply@translate5.net","roles":["pm","editor","admin","instantTranslate","api","instantTranslateWriteTm","basic","noRights"],"passwd":"********","editable":0,"locale":"en","customers":null,"userName":"manager test","isClientRestricted":false,"restrictedClientIds":[]}}';
+        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"noreply@translate5.net","roles":["pm","editor","admin","instantTranslate","api","instantTranslateWriteTm","taskOverview","basic","noRights"],"passwd":"********","editable":0,"locale":"en","customers":null,"userName":"manager test","isClientRestricted":false,"restrictedClientIds":[]}}';
         $this->assertEquals(json_decode($expected), $sessionData, 'User was not properly authenticated via ');
 
         if (! $withTask) {

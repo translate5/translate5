@@ -35,8 +35,12 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
      */
     private $processingMode;
 
+    private bool $skipCheck = false;
+
     protected function validateParameters(array $parameters): bool
     {
+        $this->skipCheck = (bool) ($parameters['skipCheck'] ?? false);
+
         // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
         if (array_key_exists('processingMode', $parameters)) {
             $this->processingMode = $parameters['processingMode'];
@@ -60,7 +64,7 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
         editor_Segment_Quality_Manager::instance()->prepareOperation(
             $this->processingMode,
             $this->task,
-            (int) $this->workerModel->getId()
+            $this->skipCheck,
         );
 
         return true;

@@ -9,9 +9,64 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+## [7.25.1] - 2025-06-27
+
+### Important Notes:
+#### [TRANSLATE-3567](https://jira.translate5.net/browse/TRANSLATE-3567)
+Important for SSO / OpenID users: The editor role is since 7.25.0 NOT containing anymore the task overview. Therefore a new role taskOverview is added. So if your editor users should also access the task overview, that new role taskOverview must be added in your IDP to be transferred also on user creation / updating!
+ 
 
 
+### Added
+**[TRANSLATE-3567](https://jira.translate5.net/browse/TRANSLATE-3567): Editor general - Open a task in translate5's editor from InstantTranslate** <br>
+7.25.1: Terminology fixes; Add missing new default role taskOverview to allowed roles in OpenID config of clients<br>
+7.25.0: Added possibility to open task for editing from instant translate
 
+
+### Changed
+**[TRANSLATE-4744](https://jira.translate5.net/browse/TRANSLATE-4744): Editor general - workflowStep filter leads to invalid filter SQL** <br>
+FIX: numeric or date filters in filtered grids lead to SQL errors when values are empty
+
+**[TRANSLATE-4736](https://jira.translate5.net/browse/TRANSLATE-4736): Editor general - Add new special characters** <br>
+New special characters registered in the editor.
+
+**[TRANSLATE-3827](https://jira.translate5.net/browse/TRANSLATE-3827): Authentication - IP-based Authentication should still allow to log in as a user** <br>
+Introduced a new config to control for which applets (editor,instanttranslate,termportal etc) the ip based authentication should be applied or the normal login page should be shown.
+
+
+### Bugfixes
+**[TRANSLATE-4742](https://jira.translate5.net/browse/TRANSLATE-4742): t5memory - Reorganise of memory in internal fuzzy leads to memory deletion** <br>
+Fix reorganise logic in internal fuzzy analysis scope
+
+**[TRANSLATE-4741](https://jira.translate5.net/browse/TRANSLATE-4741): Editor general - RootCause: You're trying to decode an invalid JSON String** <br>
+FIXED: error on languageresource checkbox doubleclick in 3rd step of task import wizard 
+
+**[TRANSLATE-4737](https://jira.translate5.net/browse/TRANSLATE-4737): OpenId Connect - New role taskOverview is not set in allowed roles of OpenID Connect** <br>
+New role taskOverview is not added to allowed roles of OpenID Configuration
+
+**[TRANSLATE-4735](https://jira.translate5.net/browse/TRANSLATE-4735): Import/Export - HOTFIX: Import of comments leads to deadlock** <br>
+HOTFIX: Import of resname-comments had bugs leading to extremely slow imports and may resulting in Deadlocks
+
+**[TRANSLATE-4733](https://jira.translate5.net/browse/TRANSLATE-4733): MatchAnalysis & Pretranslation - No analysis entries saved for term collection repetitions** <br>
+Analysis entries are added for term collection repetitions.
+
+**[TRANSLATE-4732](https://jira.translate5.net/browse/TRANSLATE-4732): MatchAnalysis & Pretranslation - RootCause: Cannot read properties of undefined (reading 'dataSource')** <br>
+FIXED: Row-editor problem in 'MatchRanges and Pricing' tab
+
+**[TRANSLATE-4731](https://jira.translate5.net/browse/TRANSLATE-4731): Authentication - Allow session delete API endpoint** <br>
+According to the documentation the sessions are deletable via API, this is currently not possible.
+For the deletion via internal Unique ID the prefix internal- must be added to the given ID in the DELETE URL.
+Since the feature was anyway broken we consider this not as an incompatible API change.
+
+**[TRANSLATE-4730](https://jira.translate5.net/browse/TRANSLATE-4730): Content Protection - Fix CP rules** <br>
+Fix some rules
+
+**[TRANSLATE-4726](https://jira.translate5.net/browse/TRANSLATE-4726): InstantTranslate - DeepL problem with & character in Chinese** <br>
+FIXED: DeepL problem with '&' character in Chinese
+
+**[TRANSLATE-2373](https://jira.translate5.net/browse/TRANSLATE-2373): TermTagger integration - Prevent termtagger usage if source and target language are equal** <br>
+7.25.1: introduce a config to disable this behaviour<br>
+5.1.0: Prevent termtagger hanging when source and target language of a task are identical. Now in these cases the terms are not tagged anymore
 
 
 ## [7.25.0] - 2025-06-20

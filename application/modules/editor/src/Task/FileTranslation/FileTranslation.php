@@ -59,8 +59,12 @@ use editor_Models_Languages;
 use editor_Models_Task;
 use editor_Models_TaskUsageLog;
 use editor_Task_Type;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
+use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeType;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\ZfExtended\ApiRequest;
@@ -85,7 +89,8 @@ class FileTranslation
             new UserRepository(),
             TaskRepository::create(),
             $loggerDomain,
-            AssociateTaskOperation::create()
+            AssociateTaskOperation::create(),
+            LanguageResourceRepository::create()
         );
     }
 
@@ -102,6 +107,7 @@ class FileTranslation
         private readonly TaskRepository $taskRepository,
         private readonly string $loggerDomain,
         private readonly AssociateTaskOperation $associateTaskOperation,
+        private readonly LanguageResourceRepository $languageResourceRepository,
     ) {
     }
 
@@ -123,8 +129,7 @@ class FileTranslation
     public function importAndTranslate(
         array $importFile,
         int $sourceLang,
-        int $targetLang,
-        bool $startQaTerminology
+        int $targetLang
     ): editor_Models_Task {
         $acl = ZfExtended_Acl::getInstance();
         if (! $acl->isInAllowedRoles(
@@ -155,11 +160,6 @@ class FileTranslation
             'pretranslateMt' => 1,
             'isTaskImport' => 0,
         ];
-
-        if ($startQaTerminology) {
-            $data['internalFuzzy'] = 1;
-            $data['termtaggerSegment'] = 1;
-        }
 
         $requestData = new ApiRequestDTO(
             'PUT',
@@ -272,6 +272,14 @@ class FileTranslation
     private function addLanguageResource(int $languageResourceId, string $taskGuid): void
     {
         $this->associateTaskOperation->associate($languageResourceId, $taskGuid);
+
+        EventDispatcher::create()->dispatch(
+            new LanguageResourceTaskAssociationChangeEvent(
+                $this->languageResourceRepository->get($languageResourceId),
+                $taskGuid,
+                LanguageResourceTaskAssociationChangeType::Add,
+            )
+        );
     }
 
     /**

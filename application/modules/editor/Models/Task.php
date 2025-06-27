@@ -755,6 +755,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     public function isSourceAndTargetLanguageSimilar(): bool
     {
+        //FIXME: this is just termporary way to override used
+        // anyway only in context of termtagging to test if it is still needed!
+        if ($this->getConfig()->runtimeOptions->termTagger?->disableSameLanguageCheck) {
+            return false;
+        }
+
         return ($this->isSourceAndTargetLanguageEqual()
             || ($this->getSourceLanguage()->getMajorRfc5646() == $this->getTargetLanguage()->getMajorRfc5646()));
     }

@@ -252,7 +252,7 @@ class NumberProtectorTest extends TestCase
         $parsedTag1->id = 'number';
         $parsedTag1->tag = 'number';
         $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
-        $parsedTag1->iso = '2023-10-20';
+        $parsedTag1->iso = 'iso:2023-10-20';
         $parsedTag1->source = '20231020';
         $parsedTag1->renderedTag = $converted1;
 
@@ -271,7 +271,7 @@ class NumberProtectorTest extends TestCase
         $parsedTag2->id = 'number';
         $parsedTag2->tag = 'number';
         $parsedTag2->text = '{"source":"1234","target":""}';
-        $parsedTag2->iso = '1234';
+        $parsedTag2->iso = 'iso:1234';
         $parsedTag2->source = '1234';
         $parsedTag2->renderedTag = $converted2;
 

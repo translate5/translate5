@@ -128,6 +128,8 @@ class ReorganizeService
         $reorganized = true;
 
         try {
+            $this->versionService->setInternalFuzzy($isInternalFuzzy);
+
             $this->reorganize($languageResource, $tmName);
         } catch (\Throwable $e) {
             $this->logger->exception($e);

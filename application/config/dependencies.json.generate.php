@@ -91,33 +91,6 @@ $dep->dependencies = [[
         // title       optional, overwrites default title (defined in ZfExtended_Models_Installer_License)
     ]],
 ], [
-    "name" => "termtagger", //DEPRECATED WITH DOCKER!
-    "label" => "openTMS TermTagger",
-    "url" => "RELEASE:openTMStermTagger.zip",
-    "target" => "application/modules/editor/ThirdParty/XliffTermTagger/",
-    "licenses" => [[
-        "uses" => "the openTMS TermTagger",
-        "license" => "Apache License 2.0",
-        "relpath" => "docs/third-party-licenses/openTMStermTagger-license.txt",
-    ], [
-        "label" => "openTMS TermTagger libraries",
-        "license" => "CDDL 1.1",
-        "relpath" => "docs/third-party-licenses/CDDL-license.txt",
-        "agreement" => 'Grizzly project and others license agreement description:
-  Some of the libraries openTMS TermTagger builds on are licensed
-  under the CDDL license. Please read the following license agreement
-  and accept it for these libraries (like the Grizzly project and
-  others). Which library uses which license is listed in the openTMS
-  TermTagger installation directory which you will find in your
-  translate5 application directory beneath
-
-    application/modules/editor/ThirdParty/XliffTermTagger/
-
-  after installation. You must accept the terms of this agreement for
-  these components by typing "y" before continuing with the
-  installation.',
-    ]],
-], [
     "name" => "extjs-62",
     "label" => "ExtJS (Version 6)",
     "version" => "6.2.0",
@@ -127,6 +100,17 @@ $dep->dependencies = [[
         "uses" => "ExtJS",
         "license" => "GPL 3.0",
         "relpath" => "docs/third-party-licenses/ExtJs6-license.txt",
+    ]],
+], [
+    "name" => "extjs-70",
+    "label" => "ExtJS (Version 7)",
+    "version" => "7.0.0",
+    "url" => "RELEASE:extjs7-for-tmmaintenance.zip",
+    "target" => "application/modules/editor/Plugins/TMMaintenance/public/resources/ext",
+    "licenses" => [[
+        "uses" => "ExtJS",
+        "license" => "GPL 3.0",
+        "relpath" => "docs/third-party-licenses/ExtJs7-license.txt",
     ]],
 ],
 ];
