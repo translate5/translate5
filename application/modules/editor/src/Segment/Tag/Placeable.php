@@ -94,7 +94,7 @@ final class Placeable
      */
     private static function xpathSearch(string $content, array $xpathes): ?string
     {
-        // normal: we search the Placeable in an attribute or in the the content of the xliff
+        // normal: we search the Placeable in an attribute or in the content of the xliff-tag
         $match = self::xpathSearchInMarkup($content, $xpathes);
         if ($match === null
             && (str_starts_with($content, '<ph') || str_starts_with($content, '<it'))
@@ -108,7 +108,7 @@ final class Placeable
             }
         }
 
-        return $match;
+        return ($match !== null && mb_strlen(static::cleanContent($match)) > 0) ? $match : null;
     }
 
     /**
@@ -157,6 +157,22 @@ final class Placeable
     }
 
     /**
+     * cleans the placable content to get what will be shown in the tag
+     * Strips all tags albeit the allowed ones for placeables and removes all attributes from the allowed
+     */
+    private static function cleanContent(string $markup): string
+    {
+        $markup = htmlspecialchars_decode($markup, ENT_QUOTES);
+        $markup = str_replace('&nbsp;', ' ', $markup);
+        if (strip_tags($markup) !== $markup) {
+            $markup = strip_tags($markup, self::ALLOWED_TAGS);
+            $markup = preg_replace('/<([a-z][a-z0-9]*)[^<|>]*?(\/?)>/si', '<\1\2>', $markup);
+        }
+
+        return (string) $markup;
+    }
+
+    /**
      * Retrieves the XML-value of a DOM-node
      */
     private static function renderDomNode(DOMNode $node): string
@@ -191,23 +207,7 @@ final class Placeable
 
     public function __construct(string $content)
     {
-        $this->content = $this->clean($content);
-    }
-
-    /**
-     * Strips all tags albeit the allowed ones for placeables and removes all attributes from the allowed
-     * @return array|string|string[]|null
-     */
-    public function clean(string $markup)
-    {
-        $markup = htmlspecialchars_decode($markup, ENT_QUOTES);
-        $markup = str_replace('&nbsp;', ' ', $markup);
-        if (strip_tags($markup) !== $markup) {
-            $markup = strip_tags($markup, self::ALLOWED_TAGS);
-            $markup = preg_replace('/<([a-z][a-z0-9]*)[^<|>]*?(\/?)>/si', '<\1\2>', $markup);
-        }
-
-        return $markup;
+        $this->content = static::cleanContent($content);
     }
 
     /**
