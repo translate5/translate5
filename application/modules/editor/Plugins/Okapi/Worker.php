@@ -165,7 +165,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             $serverUsed = $okapiConfig->serverUsed ?? 'not set';
             $this->logger->info(
                 'E1444',
-                'Okapi Plug-In: File "{fileName}" (id: {fileId}) was imported with Okapi "{okapi}"',
+                'Okapi Plug-In: File "{fileName}" (id: {fileId}) will be imported with Okapi "{okapi}"',
                 [
                     'task' => $this->task,
                     'okapi' => $serverUsed,
