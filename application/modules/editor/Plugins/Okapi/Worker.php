@@ -148,7 +148,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         $params = $this->workerModel->getParameters();
 
         $file = new SplFileInfo($params['file']);
-        $suffix = $file->getExtension();
+        $suffix = strtolower($file->getExtension());
         $fileId = (int) $params['fileId'];
         $fileName = sprintf(self::ORIGINAL_FILE, $fileId, $suffix);
         $manifestFile = $this->getManifestFile($fileId);
