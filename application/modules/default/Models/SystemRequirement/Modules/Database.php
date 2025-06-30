@@ -26,15 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package portal
- * @version 2.0
- *
- */
-
 class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_SystemRequirement_Modules_Abstract
 {
+    private const DB_MIN_VERSION = '11.4.5';
+
     /**
      * @see ZfExtended_Models_SystemRequirement_Modules_Abstract::validate()
      */
@@ -50,6 +45,7 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
 
+        $this->checkDbVersion($db);
         $this->checkOpenUpdates();
         $this->checkCharset($db);
         $this->checkTimezones($db);
@@ -82,6 +78,32 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         }
         $msg = 'Your DB timezone (GMT ' . $mysqlZone . ') and your PHP timezone (GMT ' . $phpZone . ') differ! Please ensure that PHP (apache and CLI) timezone is set correctly and the DBs timezone is the same!';
         $this->result->error[] = $msg;
+    }
+
+    protected function checkDbVersion(Zend_Db_Adapter_Abstract $db)
+    {
+        $result = $db->query("SELECT VERSION() AS version;");
+        $res = $result->fetchObject();
+        if (empty($res)) {
+            return; // should not be
+        }
+
+        $version = $res->version;
+
+        // Extract the version numbers
+        if (preg_match('/^(\d+)\.(\d+)\.(\d+)/', $version, $matches)) {
+            $major = $matches[1];
+            $minor = $matches[2];
+            $patch = $matches[3];
+
+            // Check if the version is less than the min defined
+            if (version_compare($major . '.' . $minor . '.' . $patch, self::DB_MIN_VERSION, '<')) {
+                $this->result->error[] = 'Your DB version is '
+                    . $version . '. Minimum required version is MariaDB ' . self::DB_MIN_VERSION;
+            }
+        } else {
+            $this->result->error[] = 'Unable to determine the DB version.';
+        }
     }
 
     protected function checkTableCharsets(Zend_Db_Adapter_Abstract $db)
