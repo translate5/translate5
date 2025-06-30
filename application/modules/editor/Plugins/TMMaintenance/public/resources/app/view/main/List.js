@@ -40,19 +40,18 @@ Ext.define('TMMaintenance.view.main.List', {
             dataIndex: 'id',
             xtype: 'templatecolumn',
             text: 'ID',
-            hidden: true,
             groupable: false,
         },
         {
             tpl: '{metaData.internalKey}',
             xtype: 'templatecolumn',
             text: 'Internal key',
-            hidden: true,
+            width: 105,
             groupable: false,
         },
         {
             dataIndex: 'source',
-            minWidth: 300,
+            minWidth: 310,
             flex: 1,
             editable: true,
             sortable: false,
@@ -225,7 +224,6 @@ Ext.define('TMMaintenance.view.main.List', {
             tpl: '{metaData.documentName}',
             xtype: 'templatecolumn',
             flex: 1,
-            hidden: true,
             bind: {
                 text: '{l10n.list.columns.document}',
             },
@@ -235,7 +233,6 @@ Ext.define('TMMaintenance.view.main.List', {
             tpl: '{metaData.additionalInfo}',
             xtype: 'templatecolumn',
             flex: 1,
-            hidden: true,
             bind: {
                 text: '{l10n.list.columns.additionalInfo}',
             },
