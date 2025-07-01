@@ -101,7 +101,9 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
                 itemNode = document.querySelector(rowSelector + ' ' + itemColSelector);
 
             // Apply
-            itemNode?.style.background = this.background.colors[rec.getId()];
+            if (itemNode) {
+                itemNode.style.background = this.background.colors[rec.getId()];
+            }
         }
 
         // If we're here due to source-prop is updated - return
