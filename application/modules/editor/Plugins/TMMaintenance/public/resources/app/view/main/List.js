@@ -24,7 +24,9 @@ Ext.define('TMMaintenance.view.main.List', {
             triggerEvent: 'tap'
         },
     },
-
+    userSelectable: {
+        bodyElement: 'text'
+    },
     itemConfig: {
         viewModel: true,
     },
