@@ -215,7 +215,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.component.Codefinder', {
                         name: 'codeFinderRules.useAllRulesWhenTesting.b',
                         checked: this.filterObj.getFieldValue('codeFinderRules_useAllRulesWhenTesting', true, 'boolean', false),
                         bind: {
-                            disabled: '{!useCodeFinder.checked}'
+                            readOnly: '{!useCodeFinder.checked}'
                         },
                         labelWidth: 130,
                         fieldLabel: this.strings.testWithAllRules
@@ -224,7 +224,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.component.Codefinder', {
                     xtype: 'textareafield',
                     value: this.filterObj.getFieldValue('codeFinderRules_sample', '', 'string', true),
                     bind: {
-                        disabled: '{!useCodeFinder.checked}'
+                        readOnly: '{!useCodeFinder.checked}'
                     },
                     itemId: 'sample',
                     name: 'codeFinderRules.sample',
@@ -253,7 +253,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.component.Codefinder', {
     },
 
     getFormValues: function (vals) {
-        delete vals['codeFinderRules.result'];
         const fieldId = this.gridId.split('_').pop(),
             records = Ext.ComponentQuery.query('#' + this.gridId)[0].getStore().getRange();
         let rowIdxOut = 0;
@@ -268,9 +267,13 @@ Ext.define('Editor.plugins.Okapi.view.fprm.component.Codefinder', {
                 rowIdxOut++;
             }
         }
+        delete vals[fieldId + '.result'];
+        if (!vals[fieldId + '.sample']) {
+            vals[fieldId + '.sample'] = '';
+        }
         vals[fieldId + '.count.i'] = rowIdxOut;
         vals['useCodeFinder.b'] = !!vals['useCodeFinder.b'];
-        vals['codeFinderRules.useAllRulesWhenTesting.b'] = !!vals['codeFinderRules.useAllRulesWhenTesting.b'];
+        vals[fieldId + '.useAllRulesWhenTesting.b'] = !!vals['codeFinderRules.useAllRulesWhenTesting.b'];
         return vals;
     },
 
