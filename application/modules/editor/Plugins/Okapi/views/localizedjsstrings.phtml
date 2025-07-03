@@ -150,4 +150,27 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
             no: '<?php echo $this->translate->_('Nein'); ?>'
         }
     });
+    Ext.define('Editor.locale.plugins.Okapi.view.fprm.component.Grid', {
+        override: 'Editor.plugins.Okapi.view.fprm.component.Grid',
+        strings: {
+            actions: '<?php echo $this->translate->_('Aktionen');?>',
+            actionClone: '<?php echo $this->translate->_('Klonen');?>',
+            actionDelete: '<?php echo $this->translate->_('Löschen');?>'
+        }
+    });
+    Ext.define('Editor.locale.plugins.Okapi.view.fprm.component.Codefinder', {
+        override: 'Editor.plugins.Okapi.view.fprm.component.Codefinder',
+        strings: {
+            useCodefinder: '<?php echo $this->translate->_('Codefinder verwenden');?>',
+            add: '<?php echo $this->translate->_('Hinzufügen');?>',
+            remove: '<?php echo $this->translate->_('Entfernen');?>',
+            moveUp: '<?php echo $this->translate->_('Hochschieben');?>',
+            moveDown: '<?php echo $this->translate->_('Untenschieben');?>',
+            modify: '<?php echo $this->translate->_('Ändern');?>',
+            accept: '<?php echo $this->translate->_('Akzeptieren');?>',
+            discard: '<?php echo $this->translate->_('Abbrechen');?>',
+            patterns: '<?php echo $this->translate->_('Muster');?>',
+            testWithAllRules: '<?php echo $this->translate->_('Test mit allen Regeln');?>'
+        }
+    });
 });

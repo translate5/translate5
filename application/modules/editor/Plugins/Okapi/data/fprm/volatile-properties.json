@@ -14,6 +14,7 @@
       "characterLeadingMaxIgnoranceThreshold",
       "characterBaselineShiftMinIgnoranceThreshold",
       "characterBaselineShiftMaxIgnoranceThreshold",
+      "excludedStyleConfigurations",
       "fontMappings",
       "useCodeFinder",
       "codeFinderRules"

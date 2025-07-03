@@ -2,6 +2,7 @@
     "helpLink": "http://okapiframework.org/wiki/index.php/XLIFF_Filter",
     "tabOptions": "Options",
     "tabContentProcessing": "Content Processing",
+    "tabCodeFinder": "Code Finder",
     "fallbackToID": "Use the trans-unit id attribute for the text unit name if there is no resname",
     "ignoreInputSegmentation": "Ignore the segmentation information in the input",
     "alwaysUseSegSource": "Always use the content of seg-source even if there are differences between<br>source",

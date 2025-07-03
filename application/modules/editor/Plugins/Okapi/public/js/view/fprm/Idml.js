@@ -61,52 +61,84 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
-    width: 700,
-    formPanelLayout: 'form',
+    requires: [
+        'Editor.plugins.Okapi.view.fprm.component.Grid',
+        'Editor.plugins.Okapi.view.fprm.component.Codefinder'
+    ],
+    width: 900,
+    formPanelLayout: 'fit',
+    formPanelPadding: 2,
+    grid: null,
+    codefinder: null,
     fieldDefinitions: {
-        'maxAttributeSize.i': {},
-        'untagXmlStructures.b': {},
-        'extractNotes.b': {},
-        'extractMasterSpreads.b': {},
-        'extractHiddenLayers.b': {},
-        'extractHiddenPasteboardItems.b': {},
-        'skipDiscretionaryHyphens.b': {},
-        'extractBreaksInline.b': {},
-        'extractCustomTextVariables.b': {},
-        'extractIndexTopics.b': {},
-        'extractHyperlinkTextSourcesInline.b': {},
-        'extractExternalHyperlinks.b': {},
-        'specialCharacterPattern': { config: { hasTooltip: true }},
-        // 4 params below are hidden until "Use codefinder" functionality is implemented
-        'useCodeFinder.b': { config: { hidden: true, valueDefault: false }},
-        'codeFinderRules.count.i': { config: { hidden: true, valueDefault: 0 }},
-        'codeFinderRules.sample': { config: { hidden: true, valueDefault: '' }},
-        'codeFinderRules.useAllRulesWhenTesting.b': { config: { hidden: true, valueDefault: true }},
-
-        'ignoreCharacterKerning.b': { type: 'boolset', children: {
-            'characterKerningMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-            'characterKerningMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+        'tabGeneral': { type: 'tab', icon: 'fa-cog', children: {
+            'maxAttributeSize.i': {},
+            'untagXmlStructures.b': {},
+            'extractNotes.b': {},
+            'extractMasterSpreads.b': {},
+            'extractHiddenLayers.b': {},
+            'extractHiddenPasteboardItems.b': {},
+            'skipDiscretionaryHyphens.b': {},
+            'extractBreaksInline.b': {},
+            'extractCustomTextVariables.b': {},
+            'extractIndexTopics.b': {},
+            'extractHyperlinkTextSourcesInline.b': {},
+            'extractExternalHyperlinks.b': {},
+            'specialCharacterPattern': { config: { hasTooltip: true }}
         }},
-        'ignoreCharacterTracking.b': { type: 'boolset', children: {
-            'characterTrackingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-            'characterTrackingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+        'tabCodeFinder': { type: 'tab', icon: 'fa-tags', children: {
+            'codeFinderRules': { type: 'codefinder' }
         }},
+        'tabFormatting': { type: 'tab', icon: 'fa-cogs', children: {
+            'ignoreCharacterKerning.b': { type: 'boolset', children: {
+                'characterKerningMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+                'characterKerningMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+            }},
+            'ignoreCharacterTracking.b': { type: 'boolset', children: {
+                'characterTrackingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+                'characterTrackingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+            }},
 
-        'ignoreCharacterLeading.b': { type: 'boolset', children: {
-            'characterLeadingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-            'characterLeadingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+            'ignoreCharacterLeading.b': { type: 'boolset', children: {
+                'characterLeadingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+                'characterLeadingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+            }},
+
+            'ignoreCharacterBaselineShift.b': { type: 'boolset', children: {
+                'characterBaselineShiftMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+                'characterBaselineShiftMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+            }}
         }},
-
-        'ignoreCharacterBaselineShift.b': { type: 'boolset', children: {
-            'characterBaselineShiftMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-            'characterBaselineShiftMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+        'tabExcludedStyles': { type: 'tab', icon: 'fa-minus-circle', children: {
+            'excludedStyleConfigurations': { type: 'grid', config: {
+                cols: [{
+                    itemId: 'namePattern',
+                    editor: {
+                        allowBlank: false
+                    }
+                }]
+            }}
+        }},
+        'tabFontMappings': { type: 'tab', icon: 'fa-font', children: {
+            'fontMappings': { type: 'grid', config: {
+                cols: [{
+                    itemId: 'sourceLocalePattern'
+                },{
+                    itemId: 'targetLocalePattern'
+                },{
+                    itemId: 'sourceFontPattern'
+                },{
+                    itemId: 'targetFont',
+                    flex: 0.75
+                }]
+            }}
         }}
     },
     /**
      * Overridden to resolve our dependencies
      */
     resolveFieldDependencies: function(){
-        // if the ckeckbox is not set we need to remove the related Kerning-Values
+        // if the checkbox is not set we need to remove the related Kerning-Values
         if(this.form.findField('ignoreCharacterKerning.b').getValue() === false){
             this.form.findField('characterKerningMinIgnoranceThreshold').setRawValue(null);
             this.form.findField('characterKerningMaxIgnoranceThreshold').setRawValue(null);
@@ -123,5 +155,33 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
             this.form.findField('characterBaselineShiftMinIgnoranceThreshold').setRawValue(null);
             this.form.findField('characterBaselineShiftMaxIgnoranceThreshold').setRawValue(null);
         }
+    },
+
+    addCustomFieldControl: function (data, id, name, config, holder, disabled) {
+        if (data.type === 'grid') {
+            if (this.grid === null) {
+                this.grid = Ext.create('Editor.plugins.Okapi.view.fprm.component.Grid', this);
+            }
+            return this.grid.addCustomFieldControl(data, id, name, config, holder, disabled);
+        }
+        if (data.type === 'codefinder') {
+            if (this.codefinder === null) {
+                this.codefinder = Ext.create('Editor.plugins.Okapi.view.fprm.component.Codefinder', this);
+            }
+            return this.codefinder.addCustomFieldControl(data, id, name, config, holder, disabled);
+        }
+        throw new Error('addCustomFieldControl: unknown field type "'+data.type+'"');
+    },
+
+    getFormValues: function () {
+        let vals = this.callParent();
+        if (this.grid !== null) {
+            vals = this.grid.getFormValues(vals);
+        }
+        if (this.codefinder !== null) {
+            vals = this.codefinder.getFormValues(vals);
+        }
+        return vals;
     }
+
 });

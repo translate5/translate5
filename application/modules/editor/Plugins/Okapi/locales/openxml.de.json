@@ -1,9 +1,11 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/OpenXML_Filter",
     "tabGeneralOptions": "Allgemeine Optionen",
+    "tabFontMappings": "Schriftartzuordnungen",
     "tabWordOptions": "Word Optionen",
     "tabExcelOptions": "Excel Optionen",
     "tabPowerpointOptions": "PowerPoint Optionen",
+    "tabWorksheetConfigurations": "Arbeitsblattkonfigurationen",
     "maxAttributeSize": "Maximale Attribut-Größe von XML Attributen",
     "bPreferenceTranslateDocProperties": "Dokumenteigenschaften übersetzen",
     "bPreferenceTranslateComments": "Kommentare übersetzen",
@@ -60,5 +62,17 @@
     "ignoreWordFontColors": "Schriftfarben ignorieren",
     "wordFontColorsMinIgnoranceThreshold": "Schriftfarben Mindestunkenntnisschwelle",
     "wordFontColorsMaxIgnoranceThreshold": "Schriftfarben maximale Ignoranzschwelle",
-    "bPreferenceAllowEmptyTargets": "Leere Zieltexte erlauben"
+    "bPreferenceAllowEmptyTargets": "Leere Zieltexte erlauben",
+    "sourceLocalePattern": "Quell-Locale-Muster",
+    "targetLocalePattern": "Zielgebietsschema",
+    "sourceFontPattern": "Ausgangsschriftart-Muster",
+    "targetFont": "Zielschrift",
+    "namePattern": "Namensmuster",
+    "sourceColumns": "Quellspalten",
+    "targetColumns": "Zielspalten",
+    "targetColumnsMaxCharacters": "Zielspalten Max Zeichen",
+    "excludedRows": "Ausgeschlossene Zeilen",
+    "excludedColumns": "Ausgeschlossene Spalten",
+    "metadataRows": "Metadaten-Zeilen",
+    "metadataColumns": "Metadaten-Spalten"
 }

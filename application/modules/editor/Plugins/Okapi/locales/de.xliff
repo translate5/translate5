@@ -300,6 +300,34 @@
                 <source>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet. Daher werden die Filteroptionen in der Okapi-Hilfe erläutert.</source>
                 <target>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet. Daher werden die Filteroptionen in der Okapi-Hilfe erläutert.</target>
             </trans-unit>
+            <trans-unit id='Q29kZWZpbmRlciB2ZXJ3ZW5kZW4='>
+                <source>Codefinder verwenden</source>
+                <target>Codefinder verwenden</target>
+            </trans-unit>
+            <trans-unit id='VW50ZW5zY2hpZWJlbg=='>
+                <source>Untenschieben</source>
+                <target>Untenschieben</target>
+            </trans-unit>
+            <trans-unit id='SG9jaHNjaGllYmVu'>
+                <source>Hochschieben</source>
+                <target>Hochschieben</target>
+            </trans-unit>
+            <trans-unit id='w4RuZGVybg=='>
+                <source>Ändern</source>
+                <target>Bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='QWt6ZXB0aWVyZW4='>
+                <source>Akzeptieren</source>
+                <target>Akzeptieren</target>
+            </trans-unit>
+            <trans-unit id='TXVzdGVy'>
+                <source>Muster</source>
+                <target>Muster</target>
+            </trans-unit>
+            <trans-unit id='VGVzdCBtaXQgYWxsZW4gUmVnZWxu'>
+                <source>Test mit allen Regeln</source>
+                <target>Test mit allen Regeln</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

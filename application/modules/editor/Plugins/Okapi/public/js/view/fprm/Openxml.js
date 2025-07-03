@@ -61,9 +61,13 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
+    requires: [
+        'Editor.plugins.Okapi.view.fprm.component.Grid'
+    ],
     width: 900,
     formPanelLayout: 'fit',
     formPanelPadding: 2,
+    grid: null,
     fieldDefinitions: {
         /* General Options */
         'tabGeneralOptions': { type: 'tab', icon: 'fa-cog', children: {
@@ -76,7 +80,21 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'bPreferenceAddTabAsCharacter.b': {},
             'bPreferenceAddLineSeparatorAsCharacter.b': {},
             'bExtractExternalHyperlinks.b': {}
-            // new "Font Mappings" grid added
+        }},
+        /* Font Mappings */
+        'tabFontMappings': { type: 'tab', icon: 'fa-font', children: {
+            'fontMappings': { type: 'grid', config: {
+                cols: [{
+                    itemId: 'sourceLocalePattern'
+                },{
+                    itemId: 'targetLocalePattern'
+                },{
+                    itemId: 'sourceFontPattern'
+                },{
+                    itemId: 'targetFont',
+                    flex: 0.75
+                }]
+            }}
         }},
         /* Word Options */
         'tabWordOptions': { type: 'tab', icon: 'fa-file-word-o', children: {
@@ -148,6 +166,28 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'bPreferencePowerpointIncludedSlideNumbersOnly.b': { type: 'boolset', children: {
                 'tsPowerpointIncludedSlideNumbers.i': { type: 'tagfield', identifier: 'sln', guiData: 'numbers' }
             }}
+        }},
+        /* Worksheet Configurations */
+        'tabWorksheetConfigurations': { type: 'tab', icon: 'fa-file-excel-o', children: {
+            'worksheetConfigurations': { type: 'grid', config: {
+                cols: [{
+                    itemId: 'namePattern'
+                },{
+                    itemId: 'sourceColumns'
+                },{
+                    itemId: 'targetColumns'
+                },{
+                    itemId: 'targetColumnsMaxCharacters'
+                },{
+                    itemId: 'excludedRows'
+                },{
+                    itemId: 'excludedColumns'
+                },{
+                    itemId: 'metadataRows'
+                },{
+                    itemId: 'metadataColumns'
+                }]
+            }}
         }}
     },
     initConfig: function(config){
@@ -166,7 +206,12 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
      * @returns {Ext.panel.Panel}
      */
     addCustomFieldControl: function(data, id, name, config, holder, disabled){
-        if(data.type === 'tagfield'){
+        if (data.type === 'grid'){
+            if (this.grid === null) {
+                this.grid = Ext.create('Editor.plugins.Okapi.view.fprm.component.Grid', this);
+            }
+            return this.grid.addCustomFieldControl(data, id, name, config, holder, disabled);
+        } else if(data.type === 'tagfield'){
             config = Object.assign(config, {
                 xtype: 'tagfield',
                 fieldLabel: this.getFieldCaption(id, config),
@@ -299,6 +344,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
      */
     getFormValues: function(){
         var vals = this.callParent();
+        if (this.grid !== null) {
+            vals = this.grid.getFormValues(vals);
+        }
         // adding the tagfield-contents cached in additionalFormVals the crazy way (especially for "zzz")
         if(this.additionalFormVals){
             for(var name in this.additionalFormVals){
@@ -341,4 +389,5 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             this.form.findField('tsPowerpointIncludedSlideNumbers.i').setRawValue([]);
         }
     }
+
 });

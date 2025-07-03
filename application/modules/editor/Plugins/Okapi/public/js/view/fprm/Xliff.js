@@ -77,7 +77,11 @@ pcdataSubfilter=
   */
 Ext.define('Editor.plugins.Okapi.view.fprm.Xliff', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
+    requires: [
+        'Editor.plugins.Okapi.view.fprm.component.Codefinder'
+    ],
     width: 900,
+    codefinder: null,
     fieldDefinitions: {
         /* Options */
         'tabOptions': { type: 'tab', icon: 'fa-cog', children: {
@@ -130,13 +134,29 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Xliff', {
         /* Content Processing */
         'tabContentProcessing': { type: 'tab', icon: 'fa-cogs', children: {
             'cdataSubfilter': {},
-            'pcdataSubfilter': {},
-            // 4 params below are hidden until "Use codefinder" functionality is implemented
-            'useCodeFinder.b': { config: { hidden: true, valueDefault: false }},
-            'codeFinderRules.count.i': { config: { hidden: true, valueDefault: 1 }},
-            'codeFinderRules.rule0': { config: { hidden: true, valueDefault: '</?([A-Z0-9a-z]*)\b[^>]*>' }},
-            'codeFinderRules.sample': { config: { hidden: true, valueDefault: '&name; <tag></at><tag/> <tag attr=\'val\'> </tag="val">' }},
-            'codeFinderRules.useAllRulesWhenTesting.b': { config: { hidden: true, valueDefault: true }},
+            'pcdataSubfilter': {}
+        }},
+        'tabCodeFinder': { type: 'tab', icon: 'fa-tags', children: {
+            'codeFinderRules': { type: 'codefinder' }
         }}
+    },
+
+    addCustomFieldControl: function (data, id, name, config, holder, disabled) {
+        if (data.type === 'codefinder') {
+            if (this.codefinder === null) {
+                this.codefinder = Ext.create('Editor.plugins.Okapi.view.fprm.component.Codefinder', this);
+            }
+            return this.codefinder.addCustomFieldControl(data, id, name, config, holder, disabled);
+        }
+        throw new Error('addCustomFieldControl: unknown field type "'+data.type+'"');
+    },
+
+    getFormValues: function () {
+        let vals = this.callParent();
+        if (this.codefinder !== null) {
+            vals = this.codefinder.getFormValues(vals);
+        }
+        return vals;
     }
+
 });

@@ -1,5 +1,10 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/IDML_Filter",
+    "tabGeneral": "General",
+    "tabFormatting": "Formatting",
+    "tabExcludedStyles": "Excluded Styles",
+    "tabFontMappings": "Font Mappings",
+    "tabCodeFinder": "Code Finder",
     "maxAttributeSize": "Maximal attribute size",
     "untagXmlStructures": "Untag XML structures",
     "extractNotes": "Extract notes",
@@ -27,5 +32,10 @@
     "characterBaselineShiftMinIgnoranceThreshold": "Character baseline shift minimum ignorance threshold",
     "characterBaselineShiftMaxIgnoranceThreshold": "Character baseline shift maximum ignorance threshold",
     "useCodeFinder": "Use codefinder",
-    "codeFinderRules.useAllRulesWhenTesting": "Test using all rules"
+    "codeFinderRules.useAllRulesWhenTesting": "Test using all rules",
+    "namePattern": "Name Pattern",
+    "sourceLocalePattern": "Source Locale Pattern",
+    "targetLocalePattern": "Target Locale Pattern",
+    "sourceFontPattern": "Source Font Pattern",
+    "targetFont": "Target Font"
 }

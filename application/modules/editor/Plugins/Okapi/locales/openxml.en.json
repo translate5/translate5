@@ -1,9 +1,11 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/OpenXML_Filter",
     "tabGeneralOptions": "General Options",
+    "tabFontMappings": "Font Mappings",
     "tabWordOptions": "Word Options",
     "tabExcelOptions": "Excel Options",
     "tabPowerpointOptions": "PowerPoint Options",
+    "tabWorksheetConfigurations": "Worksheet Configurations",
     "maxAttributeSize": "Maximal attribute size of xml attributes",
     "bPreferenceTranslateDocProperties": "Translate document properties",
     "bPreferenceTranslateComments": "Translate comments",
@@ -60,5 +62,17 @@
     "ignoreWordFontColors": "Ignore font colours",
     "wordFontColorsMinIgnoranceThreshold": "Font colours minimum ignorance threshold",
     "wordFontColorsMaxIgnoranceThreshold": "Font colours maximum ignorance threshold",
-    "bPreferenceAllowEmptyTargets": "Allow empty targets"
+    "bPreferenceAllowEmptyTargets": "Allow empty targets",
+    "sourceLocalePattern": "Source Locale Pattern",
+    "targetLocalePattern": "Target Locale Pattern",
+    "sourceFontPattern": "Source Font Pattern",
+    "targetFont": "Target Font",
+    "namePattern": "Name Pattern",
+    "sourceColumns": "Source Columns",
+    "targetColumns": "Target Columns",
+    "targetColumnsMaxCharacters": "Target Columns Max Characters",
+    "excludedRows": "Excluded Rows",
+    "excludedColumns": "Excluded Columns",
+    "metadataRows": "Metadata Rows",
+    "metadataColumns": "Metadata Columns"
 }
