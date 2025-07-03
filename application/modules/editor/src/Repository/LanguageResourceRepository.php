@@ -197,6 +197,7 @@ class LanguageResourceRepository
     {
         $languageResource = new LanguageResource();
         $db = $languageResource->db;
+
         $s = $db->select()
             ->from(
                 [
@@ -204,7 +205,9 @@ class LanguageResourceRepository
                 ],
             )
             ->where('serviceName = ?', $serviceName);
+
         $rows = $db->fetchAll($s)->toArray();
+
         foreach ($rows as $row) {
             $languageResource->init(
                 new Zend_Db_Table_Row(
@@ -216,6 +219,7 @@ class LanguageResourceRepository
                     ]
                 )
             );
+
             yield clone $languageResource;
         }
     }

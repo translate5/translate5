@@ -30,21 +30,28 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\Api;
 
+use GuzzleHttp\Exception\ConnectException;
 use MittagQI\Translate5\HTTP\ClientFactory;
+use MittagQI\Translate5\T5Memory\Api\Contract\DeletesMemoryInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\FetchesStatusInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\HasVersionInterface;
+use MittagQI\Translate5\T5Memory\Api\Contract\ProvidesMemoryListInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseExceptionInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\SavesTmsInterface;
+use MittagQI\Translate5\T5Memory\Api\Exception\UnsuccessfulRequestException;
+use MittagQI\Translate5\T5Memory\Api\Request\DeleteTmRequest;
+use MittagQI\Translate5\T5Memory\Api\Request\MemoryListRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\ResourcesRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\SaveTmsRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\StatusRequest;
 use MittagQI\Translate5\T5Memory\Api\Response\ImportStatusResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\MemoryListResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\Response;
 use MittagQI\Translate5\T5Memory\Api\Response\StatusResponse;
 use Psr\Http\Client\ClientInterface;
 
-class ConstantApi implements HasVersionInterface, FetchesStatusInterface, SavesTmsInterface
+class ConstantApi implements HasVersionInterface, FetchesStatusInterface, SavesTmsInterface, ProvidesMemoryListInterface, DeletesMemoryInterface
 {
     /**
      * @var string[]
@@ -68,7 +75,11 @@ class ConstantApi implements HasVersionInterface, FetchesStatusInterface, SavesT
 
     public function ping(string $baseUrl): bool
     {
-        $response = $this->client->sendRequest(new ResourcesRequest($baseUrl));
+        try {
+            $response = $this->client->sendRequest(new ResourcesRequest($baseUrl));
+        } catch (ConnectException) {
+            return false;
+        }
 
         return $response->getStatusCode() === 200;
     }
@@ -113,5 +124,32 @@ class ConstantApi implements HasVersionInterface, FetchesStatusInterface, SavesT
         $response = $this->client->sendRequest(new SaveTmsRequest($baseUrl));
 
         return Response::fromResponse($response);
+    }
+
+    public function getMemories(string $baseUrl): MemoryListResponse
+    {
+        $response = $this->client->sendRequest(new MemoryListRequest($baseUrl));
+
+        return MemoryListResponse::fromResponse($response);
+    }
+
+    public function deleteTm(string $baseUrl, string $tmName): void
+    {
+        $response = $this->client->sendRequest(new DeleteTmRequest($baseUrl, $tmName));
+
+        if (200 === $response->getStatusCode()) {
+            return;
+        }
+
+        $content = $response->getBody()->getContents();
+
+        if (500 === $response->getStatusCode() && str_contains($content, 'not found(error 48)')) {
+            // This is a known error when trying to delete a TM that does not exist.
+            return;
+        }
+
+        $response->getBody()->rewind();
+
+        throw new UnsuccessfulRequestException($response);
     }
 }

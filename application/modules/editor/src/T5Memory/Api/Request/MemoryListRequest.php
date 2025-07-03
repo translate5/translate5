@@ -28,16 +28,21 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Exception;
+namespace MittagQI\Translate5\T5Memory\Api\Request;
 
-use Exception;
-use MittagQI\Translate5\T5Memory\Api\Contract\ResponseExceptionInterface;
-use RuntimeException;
+use GuzzleHttp\Psr7\Request;
 
-class CorruptResponseBodyException extends RuntimeException implements ResponseExceptionInterface
+class MemoryListRequest extends Request
 {
-    public function __construct(Exception $contentException)
+    public function __construct(string $baseUrl)
     {
-        parent::__construct('Unable to get Content from response body', previous: $contentException);
+        parent::__construct(
+            'GET',
+            rtrim($baseUrl, '/') . '/',
+            [
+                'Accept-charset' => 'UTF-8',
+                'Accept' => 'application/json; charset=utf-8',
+            ]
+        );
     }
 }

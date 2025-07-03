@@ -156,6 +156,48 @@ class PersistenceService
         }
     }
 
+    public function removeMemoryFromLanguageResource(LanguageResource $languageResource, string $tmName): void
+    {
+        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
+
+        if (! empty($prefix)) {
+            //remove the prefix from being stored into the TM
+            $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
+        }
+
+        $oldMemories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+
+        usort($oldMemories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
+
+        $memoryId = 0;
+        $memories = [];
+        $hasWritableMemory = false;
+
+        foreach ($oldMemories as $memory) {
+            if ($memory['filename'] === $tmName) {
+                continue;
+            }
+
+            $memories[] = [
+                'id' => $memoryId + 1,
+                'filename' => $memory['filename'],
+                'readonly' => $memory['readonly'],
+            ];
+
+            if (! $memory['readonly']) {
+                $hasWritableMemory = true;
+            }
+        }
+
+        if (! $hasWritableMemory) {
+            $memories[0]['readonly'] = false; // ensure at least one memory is writable
+        }
+
+        $languageResource->addSpecificData('memories', $memories);
+
+        $languageResource->save();
+    }
+
     public function setMemoryReadonly(
         LanguageResource $languageResource,
         string $tmName,

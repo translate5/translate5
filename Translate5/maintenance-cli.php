@@ -102,6 +102,7 @@ use Translate5\MaintenanceCli\Command\{
     SystemCheckCommand,
     SystemMailtestCommand,
     SystemVersionCommand,
+    T5Memory\T5MemoryCleanUpCommand,
     T5Memory\T5MemoryDeleteTmCommand,
     T5Memory\T5MemoryDuplicateLanguageResourceCommand,
     T5Memory\T5MemoryExportCommand,
@@ -245,6 +246,7 @@ $commands = [
     new WorkflowListCommand(),
     new WorkflowStepCommand(),
     new ContentProtectionLanguageRulesHashesRefreshCommand(),
+    new T5MemoryCleanUpCommand(),
     new T5MemoryLanguageResourceSpecificDataSnapshotCommand(),
 ];
 

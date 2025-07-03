@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,16 +28,24 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Exception;
+namespace MittagQI\Translate5\T5Memory\Api\Request;
 
-use Exception;
-use MittagQI\Translate5\T5Memory\Api\Contract\ResponseExceptionInterface;
-use RuntimeException;
+use GuzzleHttp\Psr7\Request;
 
-class CorruptResponseBodyException extends RuntimeException implements ResponseExceptionInterface
+class DeleteTmRequest extends Request
 {
-    public function __construct(Exception $contentException)
-    {
-        parent::__construct('Unable to get Content from response body', previous: $contentException);
+    public function __construct(
+        string $baseUrl,
+        string $tmName,
+    ) {
+        $tmName = urlencode($tmName);
+
+        parent::__construct(
+            'DELETE',
+            rtrim($baseUrl, '/') . "/$tmName",
+            [
+                'Accept' => 'application/json',
+            ]
+        );
     }
 }

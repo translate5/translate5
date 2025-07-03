@@ -31,13 +31,19 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory\Api\Exception;
 
 use Exception;
-use MittagQI\Translate5\T5Memory\Api\Contract\ResponseExceptionInterface;
-use RuntimeException;
+use Psr\Http\Message\ResponseInterface;
 
-class CorruptResponseBodyException extends RuntimeException implements ResponseExceptionInterface
+class UnsuccessfulRequestException extends Exception
 {
-    public function __construct(Exception $contentException)
-    {
-        parent::__construct('Unable to get Content from response body', previous: $contentException);
+    public function __construct(
+        public readonly ResponseInterface $response
+    ) {
+        parent::__construct(
+            sprintf(
+                'Request resulted in not successful response: Status code %d, body: %s',
+                $response->getStatusCode(),
+                $response->getBody()->getContents(),
+            )
+        );
     }
 }

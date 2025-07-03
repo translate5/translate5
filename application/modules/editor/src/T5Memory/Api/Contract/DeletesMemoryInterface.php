@@ -28,16 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Exception;
+namespace MittagQI\Translate5\T5Memory\Api\Contract;
 
-use Exception;
-use MittagQI\Translate5\T5Memory\Api\Contract\ResponseExceptionInterface;
-use RuntimeException;
+use MittagQI\Translate5\T5Memory\Api\Exception\UnsuccessfulRequestException;
 
-class CorruptResponseBodyException extends RuntimeException implements ResponseExceptionInterface
+interface DeletesMemoryInterface
 {
-    public function __construct(Exception $contentException)
-    {
-        parent::__construct('Unable to get Content from response body', previous: $contentException);
-    }
+    /**
+     * @throws UnsuccessfulRequestException
+     */
+    public function deleteTm(string $baseUrl, string $tmName): void;
 }

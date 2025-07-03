@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,18 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-declare(strict_types=1);
+namespace MittagQI\Translate5\T5Memory\DTO;
 
-namespace MittagQI\Translate5\T5Memory\Api\Exception;
+use MittagQI\Translate5\T5Memory\Enum\MemoryAvailableness;
 
-use Exception;
-use MittagQI\Translate5\T5Memory\Api\Contract\ResponseExceptionInterface;
-use RuntimeException;
-
-class CorruptResponseBodyException extends RuntimeException implements ResponseExceptionInterface
+class MemoryDTO
 {
-    public function __construct(Exception $contentException)
-    {
-        parent::__construct('Unable to get Content from response body', previous: $contentException);
+    final public function __construct(
+        public readonly string $name,
+        public readonly MemoryAvailableness $availableness,
+    ) {
     }
 }
