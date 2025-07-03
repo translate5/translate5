@@ -26,9 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\ContentProtection\ContentProtector;
-use MittagQI\Translate5\ContentProtection\NumberProtector;
-use MittagQI\Translate5\Segment\EntityHandlingMode;
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
 use MittagQI\ZfExtended\Tools\Markup;
@@ -92,7 +90,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
-    private ContentProtector $contentProtector;
+    private WhitespaceProtector $whitespaceProtector;
 
     private bool $handleIsInSourceScope = true;
 
@@ -114,8 +112,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         $this->task = $task;
         $this->filename = $filename;
 
+        $this->whitespaceProtector = WhitespaceProtector::create();
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
-        $this->contentProtector = ContentProtector::create();
         $this->shortTagNumbers = $shortTagNumbers;
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
 
@@ -414,15 +412,15 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
     /**
      * default text handler
-     * @param string $text
      * @throws editor_Models_ConfigException
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
-    public function handleText($text)
+    public function handleText(string $text): void
     {
         if ($this->inMrk) {
             return;
         }
+
         if (! $this->preserveWhitespace) {
             $text = preg_replace("/[ \t\n\r]+/u", ' ', $text);
             if (is_null($text)) {
@@ -438,6 +436,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
                 ]);
             }
         }
+
         //we have to decode entities here, otherwise our generated XLF won't be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
@@ -448,26 +447,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
 
             $text = $this->utilities->tagProtection->protectTags($text);
-
-            $text = $this->contentProtector->protect(
-                $text,
-                $this->handleIsInSourceScope,
-                $this->task->getSourceLang(),
-                $this->task->getTargetLang(),
-                EntityHandlingMode::Off,
-                NumberProtector::alias()
-            );
-        } else {
-            $text = $this->contentProtector->protect(
-                $text,
-                $this->handleIsInSourceScope,
-                $this->task->getSourceLang(),
-                $this->task->getTargetLang(),
-                exceptProtectors: NumberProtector::alias()
-            );
         }
 
-        $xmlChunks = $this->contentProtector->convertToInternalTagsInChunks(
+        $chunks = $this->whitespaceProtector->convertToInternalTagsInChunks(
             $text,
             $this->shortTagNumbers->shortTagIdent,
             $this->handleIsInSourceScope,
@@ -475,7 +457,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         );
 
         //to keep the generated tag objects we have to use the chunk-list instead of the returned string
-        array_push($this->result, ...$xmlChunks);
+        array_push($this->result, ...$chunks);
     }
 
     /**
