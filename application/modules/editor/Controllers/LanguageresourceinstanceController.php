@@ -36,6 +36,7 @@ use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
+use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
@@ -282,7 +283,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $data = $customerAssoc->loadByCustomerIdsUseAsDefault([$postData['customerId']]);
 
-        $languageResourcesDefaults = new LanguageResourcesDefaults(new LanguageResourceRepository());
+        $languageResourcesDefaults = new LanguageResourcesDefaults(
+            new LanguageResourceRepository(),
+            AssociateTaskOperation::create(),
+        );
 
         $iterator = $languageResourcesDefaults->findMatchingAssocData(
             $postData['sourceId'],

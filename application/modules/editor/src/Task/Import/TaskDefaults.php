@@ -30,6 +30,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task\Import;
 
 use editor_Models_Task;
+use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Task\Import\Defaults\ITaskDefaults;
 use MittagQI\Translate5\Task\Import\Defaults\JobAssignmentDefaults;
@@ -46,9 +47,10 @@ class TaskDefaults
     public function __construct()
     {
         $languageResourceRepository = new LanguageResourceRepository();
+        $associateOperation = AssociateTaskOperation::create();
         $this->defaults = [
-            new LanguageResourcesDefaults($languageResourceRepository),
-            new PivotResourceDefaults($languageResourceRepository),
+            new LanguageResourcesDefaults($languageResourceRepository, $associateOperation),
+            new PivotResourceDefaults($languageResourceRepository, $associateOperation),
             JobAssignmentDefaults::create(),
         ];
     }

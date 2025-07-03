@@ -9,7 +9,7 @@ use editor_Models_Task as Task;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeType;
-use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use Zend_Cache_Exception;
@@ -18,7 +18,8 @@ use ZfExtended_Factory as Factory;
 class LanguageResourcesDefaults implements ITaskDefaults
 {
     public function __construct(
-        private readonly LanguageResourceRepository $languageResourceRepository
+        private readonly LanguageResourceRepository $languageResourceRepository,
+        private readonly AssociateTaskOperation $associateTaskOperation,
     ) {
     }
 
@@ -47,7 +48,6 @@ class LanguageResourcesDefaults implements ITaskDefaults
         // $taskMajorSourceLangId = $language->findMajorLanguageById($task->getSourceLang());
         // $taskMajorTargetLangId = $language->findMajorLanguageById($task->getTargetLang());
 
-        /* @var $taskPenaltyDataProvider TaskPenaltyDataProvider */
         $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
         $data = $this->findMatchingAssocData(
@@ -57,21 +57,16 @@ class LanguageResourcesDefaults implements ITaskDefaults
         );
 
         foreach ($data as $assocRow) {
-            $taskAssoc = Factory::get(TaskAssociation::class);
-            $taskAssoc->setLanguageResourceId($assocRow['languageResourceId']);
-            $taskAssoc->setTaskGuid($taskGuid);
+            $languageResourceId = (int) $assocRow['languageResourceId'];
 
-            /** @var bool $sublangMismatch */
-            $sublangMismatch = $taskPenaltyDataProvider->getPenalties(
+            $subLangMismatch = $taskPenaltyDataProvider->getPenalties(
                 $taskGuid,
-                $assocRow['languageResourceId']
+                $languageResourceId
             )['sublangMismatch'];
 
-            if (! empty($assocRow['writeAsDefault']) && $sublangMismatch === false) {
-                $taskAssoc->setSegmentsUpdateable(true);
-            }
+            $segmentsUpdatable = ! empty($assocRow['writeAsDefault']) && $subLangMismatch === false;
 
-            $taskAssoc->save();
+            $this->associateTaskOperation->associate($languageResourceId, $taskGuid, $segmentsUpdatable);
 
             EventDispatcher::create()->dispatch(
                 new LanguageResourceTaskAssociationChangeEvent(
