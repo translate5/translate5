@@ -80,9 +80,9 @@ class Translate4734Test extends JsonTestAbstract
             'collectionId' => static::$tc->getId(),
         ]);
 
-        // Write downloaded contents to temporary xlsx file
-        $xlsxFile = APPLICATION_DATA . '/api-test-TermCollection.xlsx';
-        file_put_contents($xlsxFile, $xlsx->getRawBody());
+        // Write downloaded xlsx contents as a temporary zip file
+        $xlsxFile = APPLICATION_DATA . '/api-test-TermCollection.zip';
+        file_put_contents($xlsxFile, $xlsx->getBody());
 
         // Compare to expected
         $this->assertFileContents(
