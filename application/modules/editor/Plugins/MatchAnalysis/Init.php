@@ -35,6 +35,7 @@ use MittagQI\Translate5\PauseWorker\AbstractPauseWorker;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker;
+use MittagQI\Translate5\Task\FileTranslation\FileTranslationType;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
 use MittagQI\ZfExtended\Worker\Queue;
@@ -289,10 +290,15 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         /* @var editor_Models_Task $task */
         $task = $event->getParam('task');
         $config = $task->getConfig();
+
         if ($config->runtimeOptions->plugins?->MatchAnalysis?->readImportAnalysis) {
             $this->handleReadImportAnalysis($task);
         }
-        if ($config->runtimeOptions->plugins?->MatchAnalysis?->autoPretranslateOnTaskImport) {
+
+        if (
+            $config->runtimeOptions->plugins?->MatchAnalysis?->autoPretranslateOnTaskImport
+            && (string) $task->getTaskType() !== FileTranslationType::ID
+        ) {
             $this->handleOperation($task, [
                 'pretranslate' => true,
                 'isTaskImport' => true,
