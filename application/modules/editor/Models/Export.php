@@ -39,6 +39,11 @@ use MittagQI\Translate5\File\Filter\Manager;
  */
 class editor_Models_Export
 {
+    /**
+     * The directory in the task-data-folder where the exported files are generated/cached
+     */
+    public const DIRECTORY = 'export';
+
     public const EXPORT_DEFAULT = 'DEFAULT'; //FIXME convert us to an enum
 
     public const EXPORT_PACKAGE = 'PACKAGE'; //FIXME convert us to an enum

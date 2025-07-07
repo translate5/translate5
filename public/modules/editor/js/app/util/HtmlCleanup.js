@@ -80,9 +80,9 @@ Ext.define('Editor.util.HtmlCleanup', {
 	 * Open-close combinations will be preserved as it can be assumed they once surrounded some text which was removed
 	 * by the author
 	 * @param {string} html
-	 * @param {string} splitKey: defaults to "<t5split>"
-	 * @param {Boolean} stripWhitespace: if set, all internal whitespace tags are removed
-	 * @return {string}: the cleaned html with split-values
+	 * @param {string} splitKey defaults to "<t5split>"
+	 * @param {Boolean} stripWhitespace if set, all internal whitespace tags are removed
+	 * @return {string} the cleaned html with split-values
 	 */
 	cleanAndSplitInternalTags: function(html, splitKey, stripWhitespace){
 		if(!splitKey){
@@ -121,23 +121,13 @@ Ext.define('Editor.util.HtmlCleanup', {
 	},
 
 	/**
-	 * Removes any whitespace that may have been added by splitting/replacing internal tags with cleanAndSplitInternalTags
-	 * @param {string} html
-	 * @returns {string}
-	 */
-	cleanReplacedWhitespaceTags: function(html){
-		// the split-values need to match what was added in cleanAndSplitInternalTags !!
-		return html.split('<br/>').join('').split('&nbsp;').join(' ').split(' &emsp;').join(' ');
-	},
-
-	/**
      * Removes the "internal tags", div's with the classname "internal" and their contents.
 	 * The replacement can be given, the default is the empty string
      * Multiple internal tags in a sequence are condensed to one replacement
-     * @param {string} html: the markup to clean
-     * @param {string} replacement: the replacement for the tag, defaults to ""
-     * @param {string[]} classNames: if set, can specify the additional classnames of the internal tag to replace
-     * @return {string}: the cleaned text
+     * @param {string} html the markup to clean
+     * @param {string} replacement the replacement for the tag, defaults to ""
+     * @param {string[]} classNames if set, can specify the additional classnames of the internal tag to replace
+     * @return {string} the cleaned text
      */
     cleanInternalTags: function(html, replacement, classNames){
         if(!replacement){
@@ -255,7 +245,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 	/**
 	 * Replaces Placeables with the placeablöe text and wraps the placeable with the given split-value
 	 * @param {string} html
-	 * @param {string} splitKey: defaults to "<t5split>"
+	 * @param {string} splitKey defaults to "<t5split>"
 	 * @return {string}: the replaced html with split-values
 	 */
 	replacePlaceables: function(html, splitKey){

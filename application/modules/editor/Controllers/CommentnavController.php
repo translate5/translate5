@@ -57,7 +57,7 @@ class Editor_CommentnavController extends ZfExtended_RestController
     }
 
     /**
-     * @return editor_Workflow_Anonymize
+     * @return editor_Workflow_Anonymize|null
      */
     public function getWfAnonymize()
     {

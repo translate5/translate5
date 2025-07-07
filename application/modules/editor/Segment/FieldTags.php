@@ -455,6 +455,27 @@ class editor_Segment_FieldTags extends editor_TagSequence
     }
 
     /**
+     * Replaces the tag at the given index to a placehandler.
+     * Be aware, that this can only be done with singular tags currently and otherwise leads to an exception
+     * @throws ZfExtended_Exception
+     */
+    public function toPlaceholderAt(int $index, string $placeholder): editor_Segment_PlaceholderTag
+    {
+        if ($index < count($this->tags)) {
+            $tag = $this->tags[$index];
+            if ($tag->isSingular()) {
+                $this->tags[$index] = new editor_Segment_PlaceholderTag($tag->startIndex, $tag->endIndex, $placeholder);
+
+                return $this->tags[$index];
+            }
+
+            throw new ZfExtended_Exception('Only singular Segment-tags can currently be turned to placeholder-tags');
+        }
+
+        throw new ZfExtended_Exception('toPlaceholderAt: Index out of boundaries');
+    }
+
+    /**
      * Removes all TrackChanges tags, also deletes all contents of del-tags
      */
     private function deleteTrackChangesTags(bool $condenseBlanks = true): bool

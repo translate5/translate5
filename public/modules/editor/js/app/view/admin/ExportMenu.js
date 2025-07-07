@@ -61,6 +61,8 @@ Ext.define('Editor.view.admin.ExportMenu', {
         if (task && !task.isErroneous()) {
             me.items = me.initExportOptions();
             me.addExcelExport(task);
+
+            me.fireEvent('itemsinitialized', me.items, task);
         }
 
         //add download archive link if allowed

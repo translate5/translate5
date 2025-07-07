@@ -28,8 +28,6 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test;
 
-use editor_Models_Task;
-use ZfExtended_Factory;
 use ZfExtended_Utils;
 
 /**
@@ -37,15 +35,15 @@ use ZfExtended_Utils;
  */
 abstract class MockedTaskTestAbstract extends UnitTestAbstract
 {
-    protected static ?editor_Models_Task $testTask = null;
+    protected static ?MockedTask $testTask = null;
 
     /**
      * Retrieves a test-tak to init field-tags with
      */
-    protected function getTestTask(): editor_Models_Task
+    protected function getTestTask(): MockedTask
     {
         if (static::$testTask == null) {
-            $task = ZfExtended_Factory::get(editor_Models_Task::class);
+            $task = new MockedTask();
             $task->setId(1234);
             $task->setEntityVersion(280);
             $task->setTaskGuid(ZfExtended_Utils::uuid());
@@ -58,7 +56,7 @@ abstract class MockedTaskTestAbstract extends UnitTestAbstract
             $task->setQmSubsegmentFlags('{"qmSubsegmentFlags":[{"text":"Accuracy","id":1,"children":[{"text":"Terminology","id":2},{"text":"Mistranslation","id":3},{"text":"Omission","id":4},{"text":"Untranslated","id":5},{"text":"Addition","id":6}]},{"text":"Fluency","id":7,"children":[{"text":"Content","id":8,"children":[{"text":"Register","id":9},{"text":"Style","id":10},{"text":"Inconsistency","id":11}]},{"text":"Mechanical","id":12,"children":[{"text":"Spelling","id":13},{"text":"Typography","id":14},{"text":"Grammar","id":15},{"text":"Locale violation","id":16}]},{"text":"Unintelligible","id":17}]},{"text":"Verity","id":18,"children":[{"text":"Completeness","id":19},{"text":"Legal requirements","id":20},{"text":"Locale applicability","id":21}]}],"severities":{"critical":"Critical","major":"Major","minor":"Minor"}}');
             $task->setTaskType('default');
             $task->setProjectId(1233);
-            // TODO FIXME: set row-object to readonly
+            $task->setReadOnly();
             static::$testTask = $task;
         }
 

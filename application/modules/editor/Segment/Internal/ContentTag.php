@@ -55,6 +55,7 @@ final class editor_Segment_Internal_ContentTag extends editor_Tag implements Jso
     {
         $contentTag = new editor_Segment_Internal_ContentTag($tag->getName());
         $tag->transferProps($contentTag, true);
+        // we want the inner content as string, not structure
         $contentTag->setInnerHTML($tag->renderChildren());
 
         return $contentTag;
@@ -111,6 +112,11 @@ final class editor_Segment_Internal_ContentTag extends editor_Tag implements Jso
     public function getTextLength(): int
     {
         return mb_strlen(strip_tags($this->innerHTML));
+    }
+
+    public function getContent(): string
+    {
+        return $this->innerHTML;
     }
 
     public function addChild(editor_Tag $child): bool

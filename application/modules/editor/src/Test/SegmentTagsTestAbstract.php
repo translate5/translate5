@@ -45,12 +45,12 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
      * Some Internal Tags to create Tests with
      */
     protected array $testTags = [
-        '<1>' => '<div class="open 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
-        '</1>' => '<div class="close 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;/2&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
-        '<2>' => '<div class="open 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
-        '</2>' => '<div class="close 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;/3&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
-        '<3/>' => '<div class="single 313930 number internal-tag ownttip"><span class="short" title="&amp;lt;1/&amp;gt;: Number">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="3" data-source="190" data-target="190"></span></div>',
-        '<4/>' => '<div class="single 3c63686172206e616d653d22496e64656e74222f3e internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;6/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>',
+        '<1>' => '<div class="open 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '</1>' => '<div class="close 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;/1&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>',
+        '<2>' => '<div class="open 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;2&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '</2>' => '<div class="close 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;/2&gt;</span><span class="full" data-originalid="125" data-length="-1">TEST</span></div>',
+        '<3/>' => '<div class="single 313930 number internal-tag ownttip"><span class="short" title="&amp;lt;3/&amp;gt;: Number">&lt;3/&gt;</span><span class="full" data-originalid="number" data-length="3" data-source="190" data-target="190"></span></div>',
+        '<4/>' => '<div class="single 3c63686172206e616d653d22496e64656e74222f3e internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;4/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>',
         '<ins1>' => '<ins class="trackchanges ownttip" data-usertrackingid="12477" data-usercssnr="usernr1" data-workflowstep="review1ndlanguage1" data-timestamp="2025-03-11T11:13:07+02:00">',
         '<ins2>' => '<ins class="trackchanges ownttip" data-usertrackingid="35288" data-usercssnr="usernr3" data-workflowstep="review2ndlanguage1" data-timestamp="2025-03-13T09:45:48+02:00">',
         '<ins3>' => '<ins class="trackchanges ownttip" data-usertrackingid="2345" data-usercssnr="usernr2" data-workflowstep="no workflow1" data-timestamp="2024-11-03T12:33:09+02:00">',

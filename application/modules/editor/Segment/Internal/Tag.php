@@ -429,6 +429,31 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         return Markup::unescapeAllQuotes($this->shortTag->getText());
     }
 
+    /**
+     * Retrieves the shown Content/Markup of an placeable, number-tag or special char
+     * For number-tags, this may differs if for source/target
+     */
+    public function getReplacedContent(bool $isSource = true): string
+    {
+        if ($this->isPlaceable()) {
+            return Markup::unescape($this->fullTag->getContent());
+        }
+        if ($this->isSpecialCharacter()) {
+            // special characters will only be rendered if they have a textual representation,
+            // @see editor_Models_Segment_Whitespace::PROTECTED_CHARACTERS
+            $text = $this->fullTag->getContent();
+
+            return str_starts_with($text, '[') ? '' : $text;
+        }
+        if ($this->isNumber()) {
+            $dataAttrib = $isSource ? 'source' : 'target';
+
+            return $this->fullTag->getData($dataAttrib);
+        }
+
+        return $this->fullTag->getText();
+    }
+
     /* *************************************** Overwritten Tag API *************************************** */
 
     /**

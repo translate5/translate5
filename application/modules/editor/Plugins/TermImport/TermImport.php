@@ -176,10 +176,6 @@ class TermImport
     }
 
     /**
-     * @param string $processingDir
-     * @param InstructionsDTO $instructions
-     * @param FilesystemService $filesystem
-     * @param string $filesystemKey
      * @throws TermImportException
      * @throws \ReflectionException
      * @throws \Exception
@@ -211,7 +207,7 @@ class TermImport
                 'local://' . ltrim($targetTbxDir, '/')
             );
 
-        // If something was thrown - remove temp dir and re-throw
+            // If something was thrown - remove temp dir and re-throw
         } catch (Throwable $e) {
             rmdir($targetTbxDir);
 

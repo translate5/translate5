@@ -334,6 +334,11 @@ abstract class editor_TagSequence implements JsonSerializable
         return (count($this->tags) > 0);
     }
 
+    public function numTags(): int
+    {
+        return count($this->tags);
+    }
+
     /**
      * Sorts the items ascending, takes the second index into account when items have the same startIndex
      */

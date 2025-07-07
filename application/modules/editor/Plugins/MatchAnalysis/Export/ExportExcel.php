@@ -43,10 +43,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
     }
 
     /**
-     * @param editor_Models_Task $task
-     * @param array $rows
-     * @param string $filename
-     * @return void
      * @throws ReflectionException
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
@@ -108,8 +104,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
     }
 
     /**
-     * @param array $rows
-     * @return array
      * @throws Zend_Exception
      */
     protected function prepareDataArray(array $rows): array
@@ -143,8 +137,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
     }
 
     /**
-     * @param ZfExtended_Models_Entity_ExcelExport $spreadsheet
-     * @return void
      * @throws Zend_Exception
      */
     protected function setLabels(ZfExtended_Models_Entity_ExcelExport $spreadsheet): void
@@ -178,8 +170,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
     }
 
     /**
-     * @param int $match
-     * @return string
      * @throws Zend_Exception
      */
     private function getSingleElementRangeLabel(int $match): string
