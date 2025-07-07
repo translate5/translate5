@@ -30,7 +30,6 @@ use editor_Models_Import_FileParser_Xlf_LengthRestriction as XlfLengthRestrictio
 use editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract as AbstractSurroundingTagRemover;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTagRenderer;
-use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
@@ -181,8 +180,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
     private Comments $comments;
 
-    private readonly NumberProtector $numberProtector;
-
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
     /**
@@ -223,8 +220,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->task,
             $fileId,
         );
-
-        $this->numberProtector = NumberProtector::create();
 
         $extensionsNoResnames = preg_split(
             '/\s*,\s*/',
@@ -1053,7 +1048,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->surroundingTags->calculate($preserveWhitespace, $sourceChunks, $targetChunks, $this->xmlparser);
 
             $sourceOriginal = $this->xmlparser->join($this->surroundingTags->sliceTags($sourceChunks));
-            $sourceOriginal = $this->numberProtector->protect(
+
+            $sourceOriginal = $this->contentProtector->protect(
                 $sourceOriginal,
                 true,
                 (int) $this->task->getSourceLang(),
@@ -1062,7 +1058,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             );
 
             $targetOriginal = $this->xmlparser->join($this->surroundingTags->sliceTags($targetChunks));
-            $targetOriginal = $this->numberProtector->protect(
+            $targetOriginal = $this->contentProtector->protect(
                 $targetOriginal,
                 false,
                 (int) $this->task->getSourceLang(),

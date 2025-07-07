@@ -355,7 +355,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
         if ($this->hasParam('taskId')) {
             $task = $this->taskRepository->getByGuid($job->getTaskGuid());
 
-            if ((int) $task->getId() !== (int) $this->getRequest()->getParam('taskId')) {
+            if (
+                (int) $task->getId() !== (int) $this->getRequest()->getParam('taskId')
+                && $task->getTaskGuid() !== $this->getRequest()->getParam('taskId')
+            ) {
                 throw new ZfExtended_NotFoundException('Job not found');
             }
         }
