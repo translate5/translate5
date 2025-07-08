@@ -1,5 +1,7 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/XLIFF-2_Filter",
+    "tabOptions": "Options",
+    "tabCodeFinder": "Code Finder",
     "maxValidation": "Perform maximum validation when parsing",
     "forceUniqueIds": "Ensure tag IDs are unique within units",
     "ignoreTagTypeMatch": "Ignore tag type mismatch between source and target",

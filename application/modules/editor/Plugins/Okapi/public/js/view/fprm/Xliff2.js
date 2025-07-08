@@ -46,22 +46,43 @@ subfilterOverwriteTarget.b=false
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Xliff2', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
-    width: 700,
+    requires: [
+        'Editor.plugins.Okapi.view.fprm.component.Codefinder'
+    ],
+    width: 900,
+    codefinder: null,
     fieldDefinitions: {
-        'maxValidation.b': {},
-        'forceUniqueIds.b': {},
-        'ignoreTagTypeMatch.b': {},
-        'discardInvalidTargets.b': {},
-        'writeOriginalData.b': {},
-        'subfilter': { config: { hasTooltip: true }},
-        'subfilterOverwriteTarget.b': { config: { hasTooltip: true }},
-        'simplifyTags.b': { config: { hidden: true, valueDefault: false }},
-        'needsSegmentation.b': { config: { hidden: true, valueDefault: false }},
-        // 4 params below are hidden until "Use codefinder" functionality is implemented
-        'useCodeFinder.b': { config: { hidden: true, valueDefault: false }},
-        'codeFinderRules.count.i': { config: { hidden: true, valueDefault: 1 }},
-        'codeFinderRules.rule0': { config: { hidden: true, valueDefault: '</?([A-Z0-9a-z]*)\b[^>]*>' }},
-        'codeFinderRules.sample': { config: { hidden: true, valueDefault: '&name; <tag></at><tag/> <tag attr=\'val\'> </tag="val">' }},
-        'codeFinderRules.useAllRulesWhenTesting.b': { config: { hidden: true, valueDefault: true }}
+        'tabOptions': { type: 'tab', icon: 'fa-cog', children: {
+            'maxValidation.b': {},
+            'forceUniqueIds.b': {},
+            'ignoreTagTypeMatch.b': {},
+            'discardInvalidTargets.b': {},
+            'writeOriginalData.b': {},
+            'subfilter': { config: { hasTooltip: true }},
+            'subfilterOverwriteTarget.b': { config: { hasTooltip: true }},
+            'simplifyTags.b': { config: { hidden: true, valueDefault: false }},
+            'needsSegmentation.b': { config: { hidden: true, valueDefault: false }}
+        }},
+        'tabCodeFinder': { type: 'tab', icon: 'fa-tags', children: {
+            'codeFinderRules': { type: 'codefinder' }
+        }}
+    },
+
+    addCustomFieldControl: function (data, id, name, config, holder, disabled) {
+        if (data.type === 'codefinder') {
+            if (this.codefinder === null) {
+                this.codefinder = Ext.create('Editor.plugins.Okapi.view.fprm.component.Codefinder', this);
+            }
+            return this.codefinder.addCustomFieldControl(data, id, name, config, holder, disabled);
+        }
+        throw new Error('addCustomFieldControl: unknown field type "'+data.type+'"');
+    },
+
+    getFormValues: function () {
+        let vals = this.callParent();
+        if (this.codefinder !== null) {
+            vals = this.codefinder.getFormValues(vals);
+        }
+        return vals;
     }
 });
