@@ -1510,7 +1510,16 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         $isEditAllTasks = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS)
-            || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+            || $this->isAuthUserTaskPm($this->entity->getPmGuid())
+            || (
+                $this->authenticatedUser->isCoordinator()
+                && $this->taskActionPermissionAssert->isGranted(
+                    TaskAction::Edit,
+                    $this->entity,
+                    new PermissionAssertContext($this->authenticatedUser)
+                )
+            )
+        ;
         $isOpen = $this->isOpenTaskRequest();
 
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
