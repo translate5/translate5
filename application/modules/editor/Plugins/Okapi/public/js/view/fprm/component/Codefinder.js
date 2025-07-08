@@ -268,9 +268,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.component.Codefinder', {
             }
         }
         delete vals[fieldId + '.result'];
-        if (!vals[fieldId + '.sample']) {
-            vals[fieldId + '.sample'] = '';
-        }
         vals[fieldId + '.count.i'] = rowIdxOut;
         vals['useCodeFinder.b'] = !!vals['useCodeFinder.b'];
         vals[fieldId + '.useAllRulesWhenTesting.b'] = !!vals['codeFinderRules.useAllRulesWhenTesting.b'];
