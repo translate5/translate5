@@ -500,4 +500,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     {
         return APPLICATION_PATH . '/../data/tbx-import/tbx-for-filesystem-import/';
     }
+
+    /**
+     * Get collection import base directories
+     */
+    public static function getCollectionImportBaseDirectories(): array
+    {
+        return glob(APPLICATION_DATA . '/tbx-import/' . 'tbx-for-*-import', GLOB_ONLYDIR);
+    }
 }

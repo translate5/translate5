@@ -338,9 +338,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         return $this->db->fetchAll($s)->toArray();
     }
 
-    /***
+    /**
      * Load all collection entities
      * @return editor_Models_TermCollection_TermCollection[]
+     * @throws ReflectionException
      */
     public function loadAllEntities(): array
     {
@@ -458,8 +459,9 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function removeCollectionDir(int $collectionId)
     {
-        $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $collectionId;
-        $this->removeDirectoryRecursive($collectionPath);
+        foreach (editor_Models_Import_TermListParser_Tbx::getCollectionImportBaseDirectories() as $baseDir) {
+            $this->removeDirectoryRecursive("$baseDir/tc_$collectionId");
+        }
     }
 
     /***
@@ -482,13 +484,14 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function removeOldCollectionTbxFiles(int $collectionId, int $olderThan): void
     {
-        $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $collectionId;
-        if (is_dir($collectionPath)) {
-            /* @var ZfExtended_Controller_Helper_Recursivedircleaner $recursiveDirCleaner */
-            $recursiveDirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Recursivedircleaner'
-            );
-            $recursiveDirCleaner->deleteOldFiles($collectionPath, $olderThan);
+        foreach (editor_Models_Import_TermListParser_Tbx::getCollectionImportBaseDirectories() as $baseDir) {
+            if (is_dir($collectionPath = "$baseDir/tc_$collectionId")) {
+                /* @var ZfExtended_Controller_Helper_Recursivedircleaner $recursiveDirCleaner */
+                $recursiveDirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                    'Recursivedircleaner'
+                );
+                $recursiveDirCleaner->deleteOldFiles($collectionPath, $olderThan);
+            }
         }
     }
 
