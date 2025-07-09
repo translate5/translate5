@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 16,
-    "qtotal": 16,
+    "qcount": 14,
+    "qtotal": 14,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -13,16 +13,15 @@
         {
             "qid": -1,
             "qtype": "consistent",
-            "qcount": 3,
+            "qcount": 0,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "15",
+                    "qid": -1,
                     "qtype": "consistent",
-                    "qcount": 3,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "source",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Inconsistent source",
                     "qtooltip": "Finds segments with the same target, but different source (tags ignored)",
@@ -50,8 +49,8 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Consistency",
-            "qtotal": 3,
-            "expanded": true,
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         },
         {
@@ -76,9 +75,9 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "13",
+                    "qid": "66",
                     "qtype": "internal",
-                    "qcount": 1,
+                    "qcount": 2,
                     "qcomplete": true,
                     "qcategory": "internal_tag_structure_faulty",
                     "qcatidx": "-1",
@@ -105,12 +104,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "14",
+                    "qid": -1,
                     "qtype": "internal",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "internal_tags_missing",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Internal tags missing",
                     "qtooltip": "",
@@ -613,7 +611,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "12",
+                    "qid": "65",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -674,6 +672,19 @@
                     "qcountfp": 0,
                     "text": "Dubious number from source unchanged in target",
                     "qtooltip": "If this is not a decimal number but a list with missing spaces between list elements, please insert spaces between list elements in target. In case of wrongly used decimal separator in the source please ignore message.",
+                    "mustBeZeroErrors": false,
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num14",
+                    "qcountfp": 0,
+                    "text": "(Possibly erroneous) separator from SRC found unchanged in TRG",
+                    "qtooltip": "Bitte prüfen, ob es sich um eine echte Zahl vs. eine Produktnummer o.ä. handelt. Bei verwendetem Trenner in einer eine Produktnummer o.ä. handelt in SRC bitte ignorieren.",
                     "mustBeZeroErrors": false,
                     "leaf": true,
                     "checked": false
@@ -796,7 +807,7 @@
         {
             "qid": -1,
             "qtype": "term",
-            "qcount": 10,
+            "qcount": 11,
             "qcomplete": true,
             "children": [
                 {
@@ -813,9 +824,9 @@
                     "checked": false
                 },
                 {
-                    "qid": "5",
+                    "qid": "57",
                     "qtype": "term",
-                    "qcount": 2,
+                    "qcount": 3,
                     "qcomplete": true,
                     "qcategory": "forbidden_in_target",
                     "qcatidx": "-1",
@@ -827,7 +838,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "1",
+                    "qid": "54",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -851,16 +862,16 @@
                             "qtype": "term",
                             "qcount": 0,
                             "qcomplete": true,
-                            "qcategory": "not_found_in_target_admitted",
+                            "qcategory": "not_found_in_target_standardized",
                             "qcountfp": 0,
-                            "text": "Admitted",
+                            "text": "Standardized",
                             "qtooltip": "",
                             "mustBeZeroErrors": false,
                             "leaf": true,
                             "checked": false
                         },
                         {
-                            "qid": "7",
+                            "qid": "60",
                             "qtype": "term",
                             "qcount": 1,
                             "qcomplete": true,
@@ -878,9 +889,9 @@
                             "qtype": "term",
                             "qcount": 0,
                             "qcomplete": true,
-                            "qcategory": "not_found_in_target_standardized",
+                            "qcategory": "not_found_in_target",
                             "qcountfp": 0,
-                            "text": "Standardized",
+                            "text": "Others",
                             "qtooltip": "",
                             "mustBeZeroErrors": false,
                             "leaf": true,
@@ -891,9 +902,9 @@
                             "qtype": "term",
                             "qcount": 0,
                             "qcomplete": true,
-                            "qcategory": "not_found_in_target",
+                            "qcategory": "not_found_in_target_admitted",
                             "qcountfp": 0,
-                            "text": "Others",
+                            "text": "Admitted",
                             "qtooltip": "",
                             "mustBeZeroErrors": false,
                             "leaf": true,
@@ -915,7 +926,7 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Terminology",
-            "qtotal": 10,
+            "qtotal": 11,
             "expanded": true,
             "checked": false
         },
@@ -1028,6 +1039,32 @@
                     "qcategory": "nbsp_end",
                     "qcountfp": 0,
                     "text": "Non-breaking space at the end",
+                    "qtooltip": "",
+                    "mustBeZeroErrors": false,
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_begin",
+                    "qcountfp": 0,
+                    "text": "Normal space at the beginning",
+                    "qtooltip": "",
+                    "mustBeZeroErrors": false,
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_end",
+                    "qcountfp": 0,
+                    "text": "Normal space at the end",
                     "qtooltip": "",
                     "mustBeZeroErrors": false,
                     "leaf": true,

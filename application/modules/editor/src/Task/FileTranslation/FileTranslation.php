@@ -95,11 +95,6 @@ class FileTranslation
     }
 
     /**
-     * Collection of all associated langauge resources of the task to pretranslate
-     */
-    private array $assignedLanguageResources = [];
-
-    /**
      * @throws ReflectionException
      */
     public function __construct(
@@ -143,7 +138,7 @@ class FileTranslation
         }
 
         $task = $this->prepareTaskImport($importFile, $sourceLang, $targetLang);
-        $this->assignLanguageResources($task);
+        $assignedLanguageResourceIds = $this->assignLanguageResources($task);
         // pretranslate the task
         /*
          * (Marc:)
@@ -175,7 +170,7 @@ class FileTranslation
         ApiRequest::requestApi($requestData);
 
         // add usage log
-        $this->insertTaskUsageLog($task);
+        $this->insertTaskUsageLog($task, $assignedLanguageResourceIds);
 
         return $task;
     }
@@ -231,7 +226,7 @@ class FileTranslation
     /**
      * Assign LanguageResources to the task that match the language-combination.
      */
-    public function assignLanguageResources(editor_Models_Task $task): void
+    public function assignLanguageResources(editor_Models_Task $task): array
     {
         $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
         //get source and target language fuzzies
@@ -242,28 +237,33 @@ class FileTranslation
         //get the languageresources to the current user and to the given languages
         $tobeUsed = $langRes->loadByUserCustomerAssocs([], $sourceLangs, $targetLangs);
 
-        $langResTua = ZfExtended_Factory::get(TaskAssociation::class);
+        $langResTaskAssocs = ZfExtended_Factory::get(TaskAssociation::class);
         // some LanguageResources have been already auto assigned on creating the task:
-        $allAssigned = $langResTua->loadByTaskGuids([$task->getTaskGuid()]);
-        $allAssignedIds = array_column($allAssigned, 'languageResourceId');
+        $currentlyAssigned = $langResTaskAssocs->loadByTaskGuids([$task->getTaskGuid()]);
+        $currentlyAssignedIds = array_column($currentlyAssigned, 'languageResourceId');
 
         //collect assigned
-        $this->assignedLanguageResources = array_merge($this->assignedLanguageResources, $allAssignedIds);
+        $assignedLanguageResources = $currentlyAssignedIds;
 
         // add LanguageResources that have not been assigned already while creating the task:
         foreach ($tobeUsed as $languageResource) {
-            //collect the associated language resource id
-            $this->assignedLanguageResources[] = $languageResource['id'];
-
-            // is it not assigned already??
-            if (in_array($languageResource['id'], $allAssignedIds)) {
+            if ($languageResource['isTaskTm']) {
                 continue;
             }
+
+            // is it not assigned already??
+            if (in_array($languageResource['id'], $currentlyAssignedIds)) {
+                continue;
+            }
+
+            //collect the associated language resource id
+            $assignedLanguageResources[] = $languageResource['id'];
+
             // then assign it now:
             $this->addLanguageResource((int) $languageResource['id'], $task->getTaskGuid());
         }
-        //remove the duplicate ids
-        $this->assignedLanguageResources = array_unique($this->assignedLanguageResources);
+
+        return $assignedLanguageResources;
     }
 
     /**
@@ -286,11 +286,11 @@ class FileTranslation
      * Return intersection between user customers and language resources customers.
      * Those customers will be used for logging the usage
      */
-    private function getCustomersForLogging(editor_Models_Task $task): array
+    private function getCustomersForLogging(editor_Models_Task $task, array $assignedLanguageResourceIds): array
     {
         $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
         //load all customers for the assigned language resources of the task (those customers are also the current user customers)
-        $resourceCustomers = $customerAssoc->loadLanguageResourcesCustomers($this->assignedLanguageResources);
+        $resourceCustomers = $customerAssoc->loadLanguageResourcesCustomers($assignedLanguageResourceIds);
         $user = $this->userRepository->getByGuid($task->getPmGuid());
 
         return array_intersect($user->getCustomersArray(), $resourceCustomers);
@@ -300,9 +300,9 @@ class FileTranslation
      * Insert task usage log for the current pretranslation request.
      * For each customer of the associated language resource, one log entry is inserted.
      */
-    private function insertTaskUsageLog(editor_Models_Task $task): void
+    private function insertTaskUsageLog(editor_Models_Task $task, array $assignedLanguageResourceIds): void
     {
-        $customers = $this->getCustomersForLogging($task);
+        $customers = $this->getCustomersForLogging($task, $assignedLanguageResourceIds);
 
         //if no customers are found, it make no sence to log the ussage
         if (empty($customers)) {

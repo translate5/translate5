@@ -218,6 +218,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
             $s = $this->db->select()
                 ->where('userGuid = ?', $userGuid)
                 ->where('taskGuid = ?', $taskGuid)
+                ->where('type != ?', TypeEnum::Coordinator->value)
                 ->where('(workflowStepName = ? OR isPmOverride = 1)', $workflowStepName); //load the given state or load pmoveride (pmoveride is when for the given task#user#role no record is found)
             if (! is_null($state)) {
                 $s->where('state = ?', $state);

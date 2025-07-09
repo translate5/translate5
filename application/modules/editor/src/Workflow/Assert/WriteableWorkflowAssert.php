@@ -30,19 +30,28 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Workflow\Assert;
 
-use editor_Models_Loaders_Taskuserassoc;
-use editor_Models_Task;
 use editor_Workflow_Default;
 use editor_Workflow_Manager;
-use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
+use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use ZfExtended_NoAccessException;
 
 class WriteableWorkflowAssert
 {
+    public function __construct(
+        private readonly TaskRepository $taskRepository,
+        private readonly UserJobRepository $userJobRepository,
+        private readonly editor_Workflow_Manager $workflowManager,
+    ) {
+    }
+
     public static function create(): self
     {
-        return new self();
+        return new self(
+            TaskRepository::create(),
+            UserJobRepository::create(),
+            new editor_Workflow_Manager(),
+        );
     }
 
     /**
@@ -54,23 +63,20 @@ class WriteableWorkflowAssert
     public function assert(
         string $taskGuid,
         string $userGuid,
-        editor_Workflow_Default $workflow = null
+        editor_Workflow_Default $workflow = null,
     ): void {
+        $task = $this->taskRepository->getByGuid($taskGuid);
+
         if (empty($workflow)) {
-            $task = ZfExtended_Factory::get(editor_Models_Task::class);
-            $task->loadByTaskGuid($taskGuid);
-
-            $wfm = ZfExtended_Factory::get(editor_Workflow_Manager::class);
-
-            $workflow = $wfm->getByTask($task);
+            $workflow = $this->workflowManager->getByTask($task);
         }
 
-        $tua = null;
+        $tua = $this->userJobRepository->findUserJobInTask(
+            $userGuid,
+            $taskGuid,
+            $task->getWorkflowStepName(),
+        );
 
-        try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($userGuid, $taskGuid);
-        } catch (ZfExtended_Models_Entity_NotFoundException) {
-        }
         if (empty($tua) || ! $workflow->isWritingAllowedForState($tua->getUsedState())) {
             $e = new ZfExtended_NoAccessException();
             $e->setLogging(false); //TODO info level logging

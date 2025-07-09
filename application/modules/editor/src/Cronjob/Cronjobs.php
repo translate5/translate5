@@ -34,6 +34,8 @@ use Bootstrap;
 use editor_Workflow_Exception;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\Logging\Rotation;
+use MittagQI\ZfExtended\Mail\MailLogger;
+use MittagQI\ZfExtended\Worker\Logger;
 use ReflectionException;
 use Zend_Application_Bootstrap_Exception as Zend_Application_Bootstrap_ExceptionAlias;
 use Zend_Exception;
@@ -127,7 +129,8 @@ class Cronjobs
     {
         // Rotate php log
         Rotation::rotate('php.log');
-        Rotation::rotate('worker.log');
+        Rotation::rotate(MailLogger::LOG_NAME);
+        Rotation::rotate(Logger::LOG_NAME);
         Rotation::rotate('instanttranslate.log');
         Rotation::rotate('t5memory-specificData.log');
     }

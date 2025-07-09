@@ -749,8 +749,7 @@ class Models_Installer_Standalone
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $admins = $user->loadAllByRole(['admin']);
-        $mail = ZfExtended_Factory::get('ZfExtended_Mailer', ['utf8']);
-        /* @var $mail ZfExtended_Mailer */
+        $mail = new MittagQI\ZfExtended\Mailer(new MittagQI\ZfExtended\Mail\MailLogger(), 'utf8');
         $mail->setSubject("ChangeLog to translate5 version " . $version . ' on ' . $this->hostname);
         $html = 'Your translate5 installation on ' . $this->hostname . ' was updated to version <b>' . $version . '</b>.<br><br>';
         $html .= '<b><u>ChangeLog</u></b><br>';

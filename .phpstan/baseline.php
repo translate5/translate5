@@ -19549,11 +19549,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Logger/Writer/DirectMail.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method ZfExtended_Mailer\\:\\:send\\(\\) should return ZfExtended_Mailer but returns null\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Mailer.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$pmGuid$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Config.php',

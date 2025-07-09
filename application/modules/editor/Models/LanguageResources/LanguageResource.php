@@ -520,19 +520,38 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
         //each sdlcloud language resource can have only one language combination
         $s = $this->db->select()
-            ->from([
-                'tm' => 'LEK_languageresources',
-            ], ['tm.*'])
+            ->from(
+                [
+                    'tm' => 'LEK_languageresources',
+                ],
+                ['tm.*']
+            )
             ->setIntegrityCheck(false)
-            ->join([
-                'ca' => 'LEK_languageresources_customerassoc',
-            ], 'tm.id = ca.languageResourceId', '')
-            ->join([
-                'l' => 'LEK_languageresources_languages',
-            ], 'tm.id = l.languageResourceId', [
-                'GROUP_CONCAT(`l`.`sourceLang`) as sourceLang',
-                'GROUP_CONCAT(`l`.`targetLang`) as targetLang',
-            ])->where('ca.customerId IN(?)', $customers);
+            ->join(
+                [
+                    'ca' => 'LEK_languageresources_customerassoc',
+                ],
+                'tm.id = ca.languageResourceId',
+                ''
+            )
+            ->join(
+                [
+                    'l' => 'LEK_languageresources_languages',
+                ],
+                'tm.id = l.languageResourceId',
+                [
+                    'GROUP_CONCAT(`l`.`sourceLang`) as sourceLang',
+                    'GROUP_CONCAT(`l`.`targetLang`) as targetLang',
+                ]
+            )
+            ->joinLeft(
+                [
+                    'ttm' => TaskTmTaskAssociation::TABLE,
+                ],
+                'tm.id = ttm.languageResourceId',
+                'IF(ISNULL(ttm.id), 0, 1) AS isTaskTm'
+            )
+            ->where('ca.customerId IN(?)', $customers);
 
         if (! empty($serviceNames)) {
             $s->where('tm.serviceName IN(?)', $serviceNames);
