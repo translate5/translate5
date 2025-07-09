@@ -43,7 +43,7 @@ use MittagQI\Translate5\T5Memory\Api\Response\MutationResponse as MutationApiRes
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
 use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
-use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
+use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 use MittagQI\Translate5\T5Memory\ExportService;
@@ -192,10 +192,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
             //if initial upload is a TMX file, we have to import it.
             if ($tmxUpload) {
-                return $this->addAdditionalTm($fileinfo, [
-                    'tmName' => $tmName,
-                    'stripFramingTags' => $params['stripFramingTags'] ?? null,
-                ]);
+                $params['tmName'] = $tmName;
+
+                return $this->addAdditionalTm($fileinfo, $params);
             }
 
             return true;
@@ -206,7 +205,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $this->languageResource,
                 $name,
                 $fileinfo['tmp_name'],
-                $this->getStripFramingTagsValue($params)
+                ImportOptions::fromParams($params)->stripFramingTags
             );
         } catch (\Exception $e) {
             $this->logger->error('E1304', 't5memory: could not create prefilled TM', [
@@ -261,11 +260,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
+        $customerId = current($this->languageResource->getCustomers());
+
         try {
             $this->importService->importTmx(
                 $this->languageResource,
                 $this->getImportFilesFromUpload($fileinfo),
-                $this->getStripFramingTagsValue($params),
+                ImportOptions::fromParams($params, $customerId ? (int) $customerId : null),
                 $params['tmName'] ?? null,
             );
         } catch (\Exception $e) {
@@ -1427,11 +1428,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 default => 'Unknown reason',
             });
         }
-    }
-
-    private function getStripFramingTagsValue(?array $params): StripFramingTags
-    {
-        return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
     }
 
     protected function getSegmentContext(editor_Models_Segment $segment): string

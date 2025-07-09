@@ -5,12 +5,16 @@
 /data/tbx-import*
 /data/dummyTm_*
 /data/lock*
+/data/TMConversion
+/data/TMExport
+/data/TmxImportPreprocessing
 
 # Dirs
 /.idea/
 /client-specific*
 /nbproject/
 /vendor/
+
 
 # External dependencies
 /public/ext-6.2.0

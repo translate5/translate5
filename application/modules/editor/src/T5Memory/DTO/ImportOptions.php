@@ -28,29 +28,31 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\T5memory;
+namespace MittagQI\Translate5\T5Memory\DTO;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\ContentProtection\ConversionState;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
+use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 
-interface TmConversionServiceInterface
+class ImportOptions
 {
-    public function setRulesHash(LanguageResource $languageResource, int $sourceLanguageId, int $targetLangId): void;
+    public function __construct(
+        public readonly StripFramingTags $stripFramingTags,
+        public readonly bool $resegmentTmx,
+        public readonly ?int $customerId = null,
+    ) {
+    }
 
-    public function isTmConverted(int $languageResourceId): bool;
+    public static function fromParams(array $params, ?int $customerId = null): self
+    {
+        return new self(
+            self::getStripFramingTagsValue($params),
+            (bool) ($params[TranslationUnitResegmentProcessor::RESEGMENT_TU_OPTION] ?? false),
+            $customerId,
+        );
+    }
 
-    public function getConversionState(int $languageResourceId): ConversionState;
-
-    public function scheduleConversion(int $languageResourceId): void;
-
-    public function convertT5MemoryTagToContent(string $string): string;
-
-    /**
-     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
-     */
-    public function convertContentTagToT5MemoryTag(
-        string $queryString,
-        bool $isSource,
-        array &$numberTagMap = []
-    ): string;
+    private static function getStripFramingTagsValue(?array $params): StripFramingTags
+    {
+        return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
+    }
 }

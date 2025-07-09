@@ -95,6 +95,7 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             );
 
             $result[$id]->stripFramingTagsConfig = $this->getStrippingFramingTagsConfig($resource);
+            $result[$id]->resegmentationConfig = $resource->getResegmentationConfig();
         }
 
         // (2) the unconfigured services

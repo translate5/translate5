@@ -28,29 +28,48 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\T5memory;
+namespace MittagQI\Translate5\Segment;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\ContentProtection\ConversionState;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 
-interface TmConversionServiceInterface
+class SegmentationService
 {
-    public function setRulesHash(LanguageResource $languageResource, int $sourceLanguageId, int $targetLangId): void;
-
-    public function isTmConverted(int $languageResourceId): bool;
-
-    public function getConversionState(int $languageResourceId): ConversionState;
-
-    public function scheduleConversion(int $languageResourceId): void;
-
-    public function convertT5MemoryTagToContent(string $string): string;
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self();
+    }
 
     /**
-     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
+     * Splits the text into an array
+     *
+     * @throws \ZfExtended_Exception
      */
-    public function convertContentTagToT5MemoryTag(
-        string $queryString,
-        bool $isSource,
-        array &$numberTagMap = []
-    ): string;
+    public function splitTextToSegments(
+        string $text,
+        string $rfc5646,
+        ?int $customerId = null,
+    ): array {
+        // Normalize newlines
+        $text = str_replace("\r\n", "\n", $text);
+        $text = str_replace("\r", "\n", $text);
+
+        $bconf = new BconfEntity();
+        // Get Srx-class instance
+        $srx = $bconf->getDefaultBconf($customerId)->getSrx('source');
+
+        // Get SRX-based splitting-rules
+        $rules = $srx->getSegmentationRules($rfc5646);
+
+        // If it's not possible to get splitting-rules from srx-file for given $rfc5646
+        if (! $rules) {
+            // Use basic splitting
+            return preg_split("/([\s]*[.\n:?!]+)([\s]*)/", $text);
+        }
+
+        // Use SRX-based splitting
+        return $srx->splitTextToSegments($text, $rules);
+    }
 }

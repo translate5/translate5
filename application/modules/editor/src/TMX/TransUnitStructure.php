@@ -28,29 +28,18 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\T5memory;
+namespace MittagQI\Translate5\TMX;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\ContentProtection\ConversionState;
-
-interface TmConversionServiceInterface
+class TransUnitStructure
 {
-    public function setRulesHash(LanguageResource $languageResource, int $sourceLanguageId, int $targetLangId): void;
+    public const SOURCE_PLACEHOLDER = '*source*';
 
-    public function isTmConverted(int $languageResourceId): bool;
+    public const TARGET_PLACEHOLDER = '*target*';
 
-    public function getConversionState(int $languageResourceId): ConversionState;
-
-    public function scheduleConversion(int $languageResourceId): void;
-
-    public function convertT5MemoryTagToContent(string $string): string;
-
-    /**
-     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
-     */
-    public function convertContentTagToT5MemoryTag(
-        string $queryString,
-        bool $isSource,
-        array &$numberTagMap = []
-    ): string;
+    public function __construct(
+        public readonly string $template,
+        public readonly string $source,
+        public readonly string $target,
+    ) {
+    }
 }

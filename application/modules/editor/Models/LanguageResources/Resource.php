@@ -32,7 +32,7 @@ class editor_Models_LanguageResources_Resource
 {
     public const STRIP_FRAMING_TAGS_VALUES = 'values';
 
-    public const STRIP_FRAMING_TAGS_FILE_EXTENSIONS = 'fileExtensions';
+    public const FILE_EXTENSIONS = 'fileExtensions';
 
     /**
      * name of the resource
@@ -84,6 +84,8 @@ class editor_Models_LanguageResources_Resource
 
     protected bool $supportsStrippingFramingTags = false;
 
+    protected bool $supportsResegmentation = false;
+
     /**
      * index is the fieldname for export values in the controller
      * value is the internal fieldname / getter
@@ -102,6 +104,7 @@ class editor_Models_LanguageResources_Resource
         'creatable' => 'creatable',
         'engineBased' => 'engineBased',
         'supportsStrippingFramingTags' => 'supportsStrippingFramingTags',
+        'supportsResegmentation' => 'supportsResegmentation',
     ];
 
     /**
@@ -392,7 +395,17 @@ class editor_Models_LanguageResources_Resource
         return $this->supportsStrippingFramingTags;
     }
 
+    public function getSupportsResegmentation(): bool
+    {
+        return $this->supportsResegmentation;
+    }
+
     public function getStrippingFramingTagsConfig(): array
+    {
+        return [];
+    }
+
+    public function getResegmentationConfig(): array
     {
         return [];
     }

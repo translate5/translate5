@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\ContentProtection\T5memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Languages;
-use editor_Models_Languages as Language;
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\ConversionState;
@@ -40,12 +39,9 @@ use MittagQI\Translate5\ContentProtection\DTO\RulesHashDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
-use MittagQI\Translate5\ContentProtection\T5memory\Exception\UnableToCreateFileForTmxConversionException;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
-use XMLReader;
-use XMLWriter;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
@@ -261,103 +257,6 @@ class TmConversionService implements TmConversionServiceInterface
         return $queryString;
     }
 
-    public function convertTMXForImport(string $filenameWithPath, int $sourceLangId, int $targetLangId): string
-    {
-        $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
-        $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
-
-        if (! $this->contentProtectionRepository->hasActiveRules($sourceLang, $targetLang)) {
-            return $filenameWithPath;
-        }
-
-        $exportDir = APPLICATION_PATH . '/../data/TMConversion/';
-        if (! is_dir($exportDir)) {
-            @mkdir($exportDir, recursive: true);
-        }
-
-        $resultFilename = $exportDir . str_replace('.tmx', '', basename($filenameWithPath)) . '_converted.tmx';
-
-        $writer = new XMLWriter();
-
-        if (! $writer->openURI($resultFilename)) {
-            throw new UnableToCreateFileForTmxConversionException($resultFilename);
-        }
-
-        $writer->startDocument('1.0', 'UTF-8');
-        $writer->setIndent(true);
-
-        $reader = new XMLReader();
-        $reader->open($filenameWithPath);
-        $writtenElements = 0;
-        $brokenTus = 0;
-
-        // suppress: namespace error : Namespace prefix t5 on n is not defined
-        $errorLevel = error_reporting();
-        error_reporting($errorLevel & ~E_WARNING);
-
-        while ($reader->read()) {
-            if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
-                $writer->writeRaw($reader->readOuterXML());
-            }
-
-            if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
-                $writtenElements++;
-                $writer->writeRaw(
-                    $this->convertTransUnit(
-                        $reader->readOuterXML(),
-                        $sourceLang,
-                        $targetLang,
-                        $brokenTus
-                    )
-                );
-            }
-
-            if (! in_array($reader->name, ['tmx', 'body'], true)) {
-                continue;
-            }
-
-            if ($reader->nodeType == XMLReader::ELEMENT) {
-                $writer->startElement($reader->name);
-
-                if ($reader->hasAttributes) {
-                    while ($reader->moveToNextAttribute()) {
-                        $writer->writeAttribute($reader->name, $reader->value);
-                    }
-                }
-
-                if ($reader->isEmptyElement) {
-                    $writer->endElement();
-                }
-            }
-        }
-
-        error_reporting($errorLevel);
-
-        $reader->close();
-
-        $writer->flush();
-
-        if (0 !== $writtenElements) {
-            // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
-            // so add body and tmx closing tags manually
-            file_put_contents($resultFilename, PHP_EOL . '</body>', FILE_APPEND);
-        }
-
-        file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
-
-        if (0 !== $brokenTus) {
-            $this->logger->error(
-                'E1593',
-                'Trans unit has unexpected structure and was excluded from TMX import',
-                [
-                    'count' => $brokenTus,
-                ]
-            );
-        }
-
-        return $resultFilename;
-    }
-
     public function convertPair(string $source, string $target, int $sourceLang, int $targetLang): array
     {
         $source = $this->convertT5MemoryTagToContent($source);
@@ -387,78 +286,5 @@ class TmConversionService implements TmConversionServiceInterface
             $this->convertContentTagToT5MemoryTag($source, true, $tagMap),
             $this->convertContentTagToT5MemoryTag($target, false, $tagMap),
         ];
-    }
-
-    private function convertTransUnit(
-        string $transUnit,
-        Language $sourceLang,
-        Language $targetLang,
-        int &$brokenTus,
-    ): string {
-        $sourceSegment = '';
-        $targetSegment = '';
-
-        $xml = XMLReader::XML($transUnit);
-
-        while ($xml->read()) {
-            if ($xml->nodeType !== XMLReader::ELEMENT) {
-                continue;
-            }
-
-            if ($xml->name !== 'tuv') {
-                continue;
-            }
-
-            $tuv = $xml->readOuterXML();
-            $lang = strtolower($xml->getAttribute('xml:lang'));
-
-            $segment = str_replace(['<seg>', '</seg>'], '', trim($xml->readInnerXml()));
-
-            if ($this->isSourceTuv($lang, $sourceLang, $targetLang)) {
-                $sourceSegment = $segment;
-                $transUnit = str_replace($tuv, str_replace($sourceSegment, '*source*', $tuv), $transUnit);
-            } else {
-                $targetSegment = $segment;
-                $transUnit = str_replace($tuv, str_replace($targetSegment, '*target*', $tuv), $transUnit);
-            }
-
-            if ('' !== $sourceSegment && '' !== $targetSegment) {
-                break;
-            }
-        }
-
-        // if there is no source or target tuv, then we assume that tu is broken
-        if ('' === $sourceSegment || '' === $targetSegment) {
-            $brokenTus++;
-
-            return '';
-        }
-
-        return str_replace(
-            [
-                '*source*',
-                '*target*',
-            ],
-            $this->convertPair(
-                $sourceSegment,
-                $targetSegment,
-                (int) $sourceLang->getId(),
-                (int) $targetLang->getId()
-            ),
-            $transUnit
-        );
-    }
-
-    private function isSourceTuv(string $tuvLang, Language $sourceLang, Language $targetLang): bool
-    {
-        if (strtolower($sourceLang->getRfc5646()) === $tuvLang) {
-            return true;
-        }
-
-        if (strtolower($targetLang->getRfc5646()) === $tuvLang) {
-            return false;
-        }
-
-        return str_contains($tuvLang, strtolower($sourceLang->getMajorRfc5646()));
     }
 }

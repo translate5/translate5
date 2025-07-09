@@ -1,19 +1,15 @@
 <?php
 
-namespace MittagQI\Translate5\Test\Integration\ContentProtection\T5memory;
+namespace ContentProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\ContentProtector;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
-use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Repository\LanguageRepository;
-use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
 
 class TmConversionServiceTest extends TestCase
@@ -134,63 +130,6 @@ class TmConversionServiceTest extends TestCase
             $outputMapping->load($item['id']);
             $outputMapping->delete();
         }
-    }
-
-    public function testConvertTMXForImport(): void
-    {
-        $contentProtectionRepository = $this->createMock(ContentProtectionRepository::class);
-        $contentProtector = $this->createMock(ContentProtector::class);
-        $languageRepository = $this->createMock(LanguageRepository::class);
-        $languageRulesHashService = $this->createMock(LanguageRulesHashService::class);
-
-        $sourceLang = $this->createMock(editor_Models_Languages::class);
-        $sourceLang->method('getMajorRfc5646')->willReturn('de');
-        $sourceLang->method('__call')->willReturnMap([
-            ['getId', [], 1],
-            ['getRfc5646', [], 'de'],
-        ]);
-
-        $targetLang = $this->createMock(editor_Models_Languages::class);
-        $targetLang->method('getMajorRfc5646')->willReturn('en');
-        $targetLang->method('__call')->willReturnMap([
-            ['getId', [], 2],
-            ['getRfc5646', [], 'en'],
-        ]);
-
-        $languageRepository->method('find')->willReturnMap([
-            [1, $sourceLang],
-            [2, $targetLang],
-        ]);
-
-        $contentProtectionRepository->method('hasActiveRules')->willReturn(true);
-
-        $contentProtector->method('filterTags')->willReturnOnConsecutiveCalls(
-            [
-                '<number type="replace-content" name="replace" source="SOME_TEXT" iso="SOME_TEXT -> OTHER_TEXT" target="OTHER_TEXT" regex="04+LSdFWCA12UdEHAA=="/>',
-                '<number type="replace-content" name="replace" source="SOME_TEXT" iso="SOME_TEXT -> OTHER_TEXT" target="OTHER_TEXT" regex="04+LSdFWCA12UdEHAA=="/>',
-            ],
-            [
-                '<number type="keep-content" name="keep" source="VQ1" iso="VQ1" target="VQ1" regex="LSdFWCA12UdEHAA"/>',
-                '<number type="keep-content" name="keep" source="VQ1" iso="VQ1" target="VQ1" regex="LSdFWCA12UdEHAA"/>',
-            ]
-        );
-
-        $contentProtector->method('unprotect')->willReturnCallback(fn (string $segment) => $segment);
-        $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
-        $logger = $this->createMock(\ZfExtended_Logger::class);
-
-        $service = new TmConversionService(
-            $contentProtectionRepository,
-            $contentProtector,
-            $languageRepository,
-            $languageRulesHashService,
-            $languageResourceRepository,
-            $logger,
-        );
-
-        $file = $service->convertTMXForImport(__DIR__ . '/TmConversionServiceTest/small.tmx', 1, 2);
-
-        self::assertFileEquals(__DIR__ . '/TmConversionServiceTest/expected_small.tmx', $file);
     }
 
     /**

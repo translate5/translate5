@@ -38,7 +38,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         resourceId: null,
         uploadLabel: null,
         engineBased: null,
-        strippingFramingTagsSupported: false
+        strippingFramingTagsSupported: false,
+        resegmentationSupported: false,
     },
     stores: {
         customers: {
@@ -86,6 +87,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         },
         isStrippingFramingTagsSupported: function (get) {
             return get('strippingFramingTagsSupported');
+        },
+        isResegmentingTmxSupported: function(get) {
+            return get('resegmentationSupported');
         }
     }
 });

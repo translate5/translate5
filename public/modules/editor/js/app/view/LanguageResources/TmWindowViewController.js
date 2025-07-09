@@ -93,6 +93,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         targetField.resumeEvents();
 
         this.updateStrippingFramingTagsSupport();
+        this.updateResegmentationSupport();
 
         if (record && me.isEngineBasedResource(record)) {
             engineCombo.suspendEvents();
@@ -120,6 +121,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
 
     onSelectFile: function (field, value) {
         this.updateStrippingFramingTagsSupport();
+        this.updateResegmentationSupport();
     },
 
     /**
@@ -380,4 +382,39 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             supportedByResource && supportedByExtension
         );
     },
+
+    updateResegmentationSupport: function (skipExtensionCheck = false) {
+        const viewModel = this.getView().getViewModel(),
+            resourceType = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(viewModel.get('resourceId')),
+            uploadFileValue = this.getView().down('filefield[name="tmUpload"]').value,
+            resegmentationField = this.getView().down('checkbox[name="resegmentTmx"]');
+
+        resegmentationField.suspendEvents();
+        resegmentationField.setValue(false);
+        resegmentationField.resumeEvents();
+
+        const resegmentationConfig = resourceType ? resourceType.get('resegmentationConfig') : [];
+
+        if (! Object.keys(resegmentationConfig).length) {
+            viewModel.set('resegmentationSupported', false);
+
+            return;
+        }
+
+        const supportedByResource = resourceType.get('supportsResegmentation');
+
+        let supportedByExtension = skipExtensionCheck;
+        for (const extension of resegmentationConfig['fileExtensions'] ?? []) {
+            if (uploadFileValue.endsWith(extension)) {
+                supportedByExtension = true;
+                break;
+            }
+        }
+
+        viewModel.set(
+            'resegmentationSupported',
+            supportedByResource && supportedByExtension
+        );
+    },
+
 });

@@ -32,11 +32,13 @@ use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 class editor_Services_OpenTM2_Resource extends editor_Models_LanguageResources_Resource
 {
+    protected bool $supportsStrippingFramingTags = true;
+
+    protected bool $supportsResegmentation = true;
+
     public function __construct(string $id, string $name, string $url)
     {
         parent::__construct($id, $name, $url);
-
-        $this->supportsStrippingFramingTags = true;
     }
 
     public function getStrippingFramingTagsConfig(): array
@@ -47,7 +49,14 @@ class editor_Services_OpenTM2_Resource extends editor_Models_LanguageResources_R
                 [StripFramingTags::All->value, 'Alle'],
                 [StripFramingTags::Paired->value, 'Tagpaare'],
             ],
-            self::STRIP_FRAMING_TAGS_FILE_EXTENSIONS => ['.tmx', '.zip'],
+            self::FILE_EXTENSIONS => ['.tmx', '.zip'],
+        ];
+    }
+
+    public function getResegmentationConfig(): array
+    {
+        return [
+            self::FILE_EXTENSIONS => ['.tmx', '.zip'],
         ];
     }
 

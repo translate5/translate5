@@ -70,8 +70,9 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         pivotAsDefaultTooltip:'#UT#Standardmäßig als Pivot verwenden',
         stripFramingTags: '#UT#Umschließende Tags beim Import löschen',
         stripFramingTagsTooltip: '#UT#Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.',
+        resegmentTmxTooltip: '#UT#',
     },
-    height: 600,
+    height: 730,
     width: 800,
     modal: true,
     layout: 'fit',
@@ -295,6 +296,22 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                             }
                         },
                         {
+                            xtype: 'checkbox',
+                            bind: {
+                                hidden: '{!isResegmentingTmxSupported}',
+                                disabled: '{!isResegmentingTmxSupported}',
+                                fieldLabel: '{l10n.languageResources.resegmentTmx}'
+                            },
+                            itemId: 'resegmentTmx',
+                            name: 'resegmentTmx',
+                            value: false,
+                            labelClsExtra: 'lableInfoIcon',
+                            autoEl: {
+                                tag: 'div',
+                                'data-qtip': me.strings.resegmentTmxTooltip
+                            }
+                        },
+                        {
                             xtype: 'Editor.tagfield',
                             name: 'categories',
                             id: 'categories',
@@ -307,7 +324,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                             multiSelect: true,
                             queryMode: 'local',
                             encodeSubmitValue: true
-                        }
+                        },
                     ]
                 }],
                 dockedItems: [{

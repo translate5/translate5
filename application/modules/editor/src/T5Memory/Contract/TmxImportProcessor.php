@@ -28,29 +28,36 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\T5memory;
+namespace MittagQI\Translate5\T5Memory\Contract;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\ContentProtection\ConversionState;
+use editor_Models_Languages as Language;
+use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
 
-interface TmConversionServiceInterface
+interface TmxImportProcessor
 {
-    public function setRulesHash(LanguageResource $languageResource, int $sourceLanguageId, int $targetLangId): void;
+    public function supports(Language $sourceLang, Language $targetLang, ImportOptions $importOptions): bool;
 
-    public function isTmConverted(int $languageResourceId): bool;
+    public function next(): ?TmxImportProcessor;
 
-    public function getConversionState(int $languageResourceId): ConversionState;
-
-    public function scheduleConversion(int $languageResourceId): void;
-
-    public function convertT5MemoryTagToContent(string $string): string;
+    public function setNext(TmxImportProcessor $processor): void;
 
     /**
-     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
+     * Higher value will be processed first.
      */
-    public function convertContentTagToT5MemoryTag(
-        string $queryString,
-        bool $isSource,
-        array &$numberTagMap = []
-    ): string;
+    public function order(): int;
+
+    /**
+     * Processes a translation unit (tu) for import into a TMX file.
+     *
+     * @param string $tu An iterable collection of translation units to process.
+     * @return iterable<string> An iterable collection of processed translation units.
+     */
+    public function process(
+        string $tu,
+        Language $sourceLang,
+        Language $targetLang,
+        ImportOptions $importOptions,
+        BrokenTranslationUnitLogger $brokenTranslationUnitLogger,
+    ): iterable;
 }

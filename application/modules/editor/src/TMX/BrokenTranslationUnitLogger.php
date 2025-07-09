@@ -28,29 +28,35 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\T5memory;
+namespace MittagQI\Translate5\TMX;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\ContentProtection\ConversionState;
+use ZfExtended_Logger;
 
-interface TmConversionServiceInterface
+class BrokenTranslationUnitLogger
 {
-    public function setRulesHash(LanguageResource $languageResource, int $sourceLanguageId, int $targetLangId): void;
+    private bool $problemLogged = false;
 
-    public function isTmConverted(int $languageResourceId): bool;
+    private function __construct(
+        private readonly ZfExtended_Logger $logger,
+    ) {
+    }
 
-    public function getConversionState(int $languageResourceId): ConversionState;
+    public static function create(ZfExtended_Logger $logger): self
+    {
+        return new self($logger);
+    }
 
-    public function scheduleConversion(int $languageResourceId): void;
+    public function logProblemOnce(): void
+    {
+        if ($this->problemLogged) {
+            return;
+        }
 
-    public function convertT5MemoryTagToContent(string $string): string;
+        $this->problemLogged = true;
 
-    /**
-     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
-     */
-    public function convertContentTagToT5MemoryTag(
-        string $queryString,
-        bool $isSource,
-        array &$numberTagMap = []
-    ): string;
+        $this->logger->error(
+            'E1593',
+            'Some translation units had unexpected structure and were excluded from TMX import',
+        );
+    }
 }

@@ -34,11 +34,11 @@ use DOMDocument;
 use DOMXPath;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use LogicException;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\ConstantApi;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
 use MittagQI\Translate5\T5Memory\Api\Response\ImportStatusResponse;
+use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Enum\ImportStatusEnum;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
@@ -54,7 +54,7 @@ class ImportService
         private readonly Zend_Config $config,
         private readonly ZfExtended_Logger $logger,
         private readonly VersionService $versionService,
-        private readonly TmConversionService $conversionService,
+        private readonly TmxImportPreprocessor $tmxImportPreprocessor,
         private readonly Api\VersionedApiFactory $versionedApiFactory,
         private readonly PersistenceService $persistenceService,
         private readonly ReorganizeService $reorganizeService,
@@ -72,7 +72,7 @@ class ImportService
             \Zend_Registry::get('config'),
             \Zend_Registry::get('logger')->cloneMe('editor.t5memory.import'),
             VersionService::create(),
-            TmConversionService::create(),
+            TmxImportPreprocessor::create(),
             Api\VersionedApiFactory::create(),
             PersistenceService::create(),
             ReorganizeService::create(),
@@ -87,15 +87,16 @@ class ImportService
     public function importTmx(
         LanguageResource $languageResource,
         iterable $files,
-        StripFramingTags $stripFramingTags,
+        ImportOptions $importOptions,
         ?string $tmName = null,
     ): void {
         foreach ($files as $file) {
             try {
-                $importFilename = $this->conversionService->convertTMXForImport(
+                $importFilename = $this->tmxImportPreprocessor->process(
                     $file,
                     (int) $languageResource->getSourceLang(),
                     (int) $languageResource->getTargetLang(),
+                    $importOptions
                 );
             } catch (RuntimeException $e) {
                 $this->logger->error(
@@ -118,7 +119,7 @@ class ImportService
                 $languageResource,
                 $importFilename,
                 $tmName ?: $this->persistenceService->getWritableMemory($languageResource),
-                $stripFramingTags,
+                $importOptions->stripFramingTags,
             );
 
             unlink($importFilename);

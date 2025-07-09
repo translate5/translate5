@@ -44,6 +44,7 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
         cancel: '#UT#Abbrechen',
         stripFramingTags: '#UT#Umschließende Tags beim Import löschen',
         stripFramingTagsTooltip: '#UT#Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.',
+        resegmentTmxTooltip: '#UT#',
     },
     height : 300,
     width : 500,
@@ -52,11 +53,15 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
     viewModel: {
         data: {
             resourceId: null,
-            strippingFramingTagsSupported: false
+            strippingFramingTagsSupported: false,
+            resegmentationSupported: false
         },
         formulas: {
             isStrippingFramingTagsSupported: function(get) {
                 return get('strippingFramingTagsSupported');
+            },
+            isResegmentingTmxSupported: function(get) {
+                return get('resegmentationSupported');
             }
         }
     },
@@ -113,7 +118,24 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
                             tag: 'div',
                             'data-qtip': me.strings.stripFramingTagsTooltip
                         }
-                    }]
+                    },
+                    {
+                        xtype: 'checkbox',
+                        bind: {
+                            hidden: '{!isResegmentingTmxSupported}',
+                            disabled: '{!isResegmentingTmxSupported}',
+                            fieldLabel: '{l10n.languageResources.resegmentTmx}'
+                        },
+                        itemId: 'resegmentTmx',
+                        name: 'resegmentTmx',
+                        value: false,
+                        labelClsExtra: 'lableInfoIcon',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.resegmentTmxTooltip
+                        }
+                    },
+                    ]
                 }],
                 dockedItems : [{
                     xtype : 'toolbar',
@@ -153,5 +175,6 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
         me.languageResourceRecord = record;
         this.getViewModel().set('resourceId', record.get('resourceId'));
         this.getController().updateStrippingFramingTagsSupport(true);
+        this.getController().updateResegmentationSupport(true);
     }
 });

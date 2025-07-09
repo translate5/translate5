@@ -10747,6 +10747,14 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>language_resource.status.conversion_scheduled</source>
                 <target>Conversion scheduled</target>
             </trans-unit>
+            <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2UucmVzZWdtZW50X3RteC5maWVsZA=='>
+                <source>language_resource.resegment_tmx.field</source>
+                <target>Further segmentation of segments for TMX import</target>
+            </trans-unit>
+            <trans-unit id='bGFuZ3VhZ2VfcmVzb3VyY2UucmVzZWdtZW50X3RteC50b29sdGlw'>
+                <source>language_resource.resegment_tmx.tooltip</source>
+                <target>Segmentation rules for the respective language are applied to the source and target text of the segments. If the same number of segments is found, the segments are re-segmented (i.e. further segmented). The segmentation rules that are stored as standard for the selected customer are used. If several customers are assigned to the language resource, the rules of the first assigned customer are used.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
