@@ -49,9 +49,9 @@ final class editor_T5connectController extends ZfExtended_RestController
     /**
      * The workflow-steps that must be assigned & confirmed to have a task regarded as "confirmed"
      */
-    private const RELEVANT_CONFIRMED_STEPS = [
-        editor_Workflow_Default::STEP_REVIEWING,
-        editor_Workflow_Default::STEP_TRANSLATORCHECK,
+    private const RELEVANT_CONFIRMED_TYPES = [
+        editor_Workflow_Default::ROLE_REVIEWER,
+        editor_Workflow_Default::ROLE_TRANSLATORCHECK,
     ];
 
     /**
@@ -149,7 +149,7 @@ final class editor_T5connectController extends ZfExtended_RestController
      */
     public function confirmedAction(): void
     {
-        $relevantWorkflowSteps = $this->evaluateRelevantWorkflowSteps();
+        $relevantWorkflowTypes = $this->evaluateRelevantWorkflowTypes();
         $select = $this->createBaseSelect();
         $tasks = $this->entity->db->fetchAll($select)->toArray();
         $confirmedTasks = [];
@@ -159,7 +159,7 @@ final class editor_T5connectController extends ZfExtended_RestController
             $assigned = 0;
             $confirmed = 0;
             foreach ($task['users'] as $user) {
-                if (in_array($user['workflowStepName'], $relevantWorkflowSteps)) {
+                if (in_array($user['role'], $relevantWorkflowTypes)) {
                     $assigned++;
                     if (! in_array($user['state'], self::EXCLUDED_CONFIRMED_USERSTATES)) {
                         $confirmed++;
@@ -184,7 +184,7 @@ final class editor_T5connectController extends ZfExtended_RestController
      */
     public function finishedAction(): void
     {
-        $relevantWorkflowSteps = $this->evaluateRelevantWorkflowSteps();
+        $relevantWorkflowTypes = $this->evaluateRelevantWorkflowTypes();
         $select = $this->createBaseSelect();
         $tasks = $this->entity->db->fetchAll($select)->toArray();
         $finishedTasks = [];
@@ -194,7 +194,7 @@ final class editor_T5connectController extends ZfExtended_RestController
             $assigned = 0;
             $finished = 0;
             foreach ($task['users'] as $user) {
-                if (in_array($user['workflowStepName'], $relevantWorkflowSteps)) {
+                if (in_array($user['role'], $relevantWorkflowTypes)) {
                     $assigned++;
                     if ($user['state'] === editor_Workflow_Default::STATE_FINISH ||
                         $user['state'] === editor_Workflow_Default::STATE_AUTO_FINISH
@@ -313,13 +313,13 @@ final class editor_T5connectController extends ZfExtended_RestController
     /**
      * @return string[]
      */
-    private function evaluateRelevantWorkflowSteps(): array
+    private function evaluateRelevantWorkflowTypes(): array
     {
         return explode(
             ',',
             $this->getRequest()->getParam(
                 'workflowSteps',
-                implode(',', self::RELEVANT_CONFIRMED_STEPS)
+                implode(',', self::RELEVANT_CONFIRMED_TYPES)
             )
         );
     }

@@ -90,10 +90,6 @@ class editor_Workflow_Default
 
     public const STEP_WORKFLOW_ENDED = 'workflowEnded';
 
-    public const STEP_REVIEWING = 'reviewing';
-
-    public const STEP_TRANSLATORCHECK = 'translatorCheck';
-
     public const CACHE_KEY = 'workflow_definitions_';
 
     /**
@@ -464,7 +460,10 @@ class editor_Workflow_Default
      */
     public function getSteps()
     {
-        return array_merge($this->getFilteredConstants('STEP_'), $this->definition->steps);
+        return array_merge(
+            $this->getFilteredConstants('STEP_'),
+            $this->definition->steps
+        );
     }
 
     /**
