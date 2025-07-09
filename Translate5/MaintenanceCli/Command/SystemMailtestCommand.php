@@ -98,7 +98,7 @@ class SystemMailtestCommand extends Translate5AbstractCommand
 
         $this->io->section('Send test e-mail to "' . $email . '"');
 
-        $mail = new \ZfExtended_Mailer('utf-8');
+        $mail = new \MittagQI\ZfExtended\Mailer(new \MittagQI\ZfExtended\Mail\MailLogger(), 'utf-8');
         $mail->setSubject('Translate5 test E-Mail - from ' . $config->runtimeOptions->server->name);
         $body = [
             'This is a test e-mail to check if the',

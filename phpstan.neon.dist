@@ -7,6 +7,7 @@ parameters:
 	bootstrapFiles:
 		- .phpstan/constants.php
 	editorUrl: 'phpstorm://open?file=%%relFile%%&line=%%line%%'
+	editorUrlTitle: 'PHPStorm: %%relFile%%'
 	level: 5
 	reportUnmatchedIgnoredErrors: false
 	paths:

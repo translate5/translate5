@@ -182,7 +182,7 @@ if (file_exists(APPLICATION_PATH . '/../data/logs/BrokenSegmentsInReviewTask.log
 
     $toEmail = is_array($receiver) ? $receiver[0] : $receiver;
 
-    $mail = new \ZfExtended_Mailer('utf-8');
+    $mail = new MittagQI\ZfExtended\Mailer(new MittagQI\ZfExtended\Mail\MailLogger(), 'utf-8');
     $mail->setSubject('Translate5 TRANSLATE-3487 E-Mail - from ' . $config->runtimeOptions->server->name);
     $mail->setBodyText('This is email for collected errors and debug output from TRANSLATE-3487');
     $mail->addTo($toEmail);
@@ -235,7 +235,7 @@ if (! empty($replaceInfo)) {
         //CHECK TAGS
         $tags = new editor_Segment_FieldTags(
             $task,
-            $segment->getId(),
+            (int) $segment->getId(),
             $targetEdit,
             'target',
             'targetEdit'
@@ -252,7 +252,7 @@ if (! empty($replaceInfo)) {
             //REPAIR TAGS
             $brokenTags = new editor_Segment_FieldTags(
                 $task,
-                $segment->getId(),
+                (int) $segment->getId(),
                 $targetEdit,
                 'target',
                 'targetEdit'

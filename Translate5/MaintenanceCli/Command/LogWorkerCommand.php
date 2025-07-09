@@ -28,6 +28,8 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\ZfExtended\Worker\Logger;
+
 class LogWorkerCommand extends AbstractLogfileCommand
 {
     protected static $defaultName = 'log:worker';
@@ -41,7 +43,7 @@ class LogWorkerCommand extends AbstractLogfileCommand
 
     protected function getLogFilePath(): string
     {
-        return APPLICATION_DATA . '/logs/worker.log';
+        return APPLICATION_DATA . '/logs/' . Logger::LOG_NAME;
     }
 
     protected function getCommandDescription(): string
