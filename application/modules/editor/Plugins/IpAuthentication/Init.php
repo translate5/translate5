@@ -91,16 +91,23 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
     public function onLoginBeforeIndexAction(Zend_EventManager_Event $event): void
     {
         $logger = Zend_Registry::get('logger')->cloneMe('plugin.ipAuthentication');
-        /* @var $logger ZfExtended_Logger */
 
-        $user = ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
-        /* @var $user editor_Plugins_IpAuthentication_Models_IpBaseUser */
+        $auth = ZfExtended_Authentication::getInstance();
+        $user = ZfExtended_Factory::get(IpBaseUser::class);
 
         $controller = $event->getParam('controller');
         $redirectTo = $controller->getHelper('Access')->getRedirectTo();
 
+        if ($auth->isAuthenticated()
+            && $user->isIpBasedUser($auth->getUserGuid())
+            && ! $this->isUsableApplet($user, $redirectTo)) {
+            $controller->redirect('/login/logout');
+
+            return;
+        }
+
         // if there is no ip configuration, do nothing
-        if (empty($user->getConfiguredIps()) || ! $this->isUsableApplet($redirectTo)) {
+        if (! $user->hasIpAuthConfiguration() || ! $this->isUsableApplet($user, $redirectTo)) {
             return;
         }
 
@@ -112,18 +119,20 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
             return;
         }
 
-        $user->handleIpBasedUser();
+        $authenticatedUser = $user->createOrLoadUser();
         $logger->info('E0000', 'Logged in as {user} from {ip}', [
-            'user' => $user->getLogin(),
+            'user' => $authenticatedUser->getLogin(),
             'ip' => $user->getIp(),
         ]);
-        ZfExtended_Authentication::getInstance()->authenticateUser($user);
+        ZfExtended_Authentication::getInstance()->authenticateUser($authenticatedUser);
     }
 
-    private function isUsableApplet(string $redirectTo): bool
-    {
+    private function isUsableApplet(
+        IpBaseUser $ipBaseUser,
+        string $redirectTo
+    ): bool {
         $applet = Dispatcher::getInstance()->getAppletToRedirect($redirectTo);
-        $applets = Zend_Registry::get('config')->runtimeOptions->authentication->ipbased->applets;
+        $applets = $ipBaseUser->getConfig()->runtimeOptions->authentication->ipbased->applets;
         $applets = $applets->toArray();
 
         // if nothing is set, we assume all as usable to keep compatiblity with legacy
@@ -137,13 +146,13 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
     /**
      * On garbage collection clean up remove all temrporary users with expired session
      * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function onGarbageCollectorCleanUp(): void
     {
         //remove all ip based user wich can not be found in the session
-        $users = ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
-        /* @var $users editor_Plugins_IpAuthentication_Models_IpBaseUser */
+        $users = ZfExtended_Factory::get(IpBaseUser::class);
 
         $users = $users->findAllExpired();
 
@@ -152,8 +161,7 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
         }
 
         foreach ($users as $user) {
-            $model = ZfExtended_Factory::get('ZfExtended_Models_User');
-            /* @var $model ZfExtended_Models_User */
+            $model = ZfExtended_Factory::get(ZfExtended_Models_User::class);
             $model->init($user);
             $this->deleteTemporaryUser($model);
         }

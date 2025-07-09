@@ -33,6 +33,11 @@ use MittagQI\ZfExtended\CsrfProtection;
  */
 class Editor_TermportalController extends ZfExtended_Controllers_Action
 {
+    /**
+     * @throws Zend_Exception
+     * @throws Zend_View_Exception
+     * @throws ZfExtended_Plugin_Exception
+     */
     public function indexAction()
     {
         $pluginmanager = Zend_Registry::get('PluginManager');
@@ -93,11 +98,22 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
 
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-        $this->view->addScriptPath(APPLICATION_ROOT . '/application/modules/editor/Plugins/TermPortal/public/resources/');
+        $this->view->addScriptPath(APPLICATION_PATH . '/modules/editor/Plugins/TermPortal/public/resources/');
         $which = ZfExtended_Utils::getAppVersion() == ZfExtended_Utils::VERSION_DEVELOPMENT
             ? 'build/production/TermPortal/index.php'
             : 'index.php';
-        echo $this->view->render($which);
+
+        try {
+            echo $this->view->render($which);
+        } catch (Zend_View_Exception $e) {
+            if (str_contains($e->getMessage(), 'not found in path')) {
+                echo $this->view->render('index.php');
+
+                return;
+            }
+
+            throw $e;
+        }
     }
 
     public function customheaderAction()
