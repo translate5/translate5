@@ -25,6 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+declare(strict_types=1);
 
 namespace MittagQI\Translate5\Terminology;
 
@@ -38,52 +39,65 @@ use editor_Models_TermCollection_TermCollection;
  */
 class CleanupCollection
 {
-    /***
+    /**
      * File older than months
      */
     public const FILE_OLDER_THAN_MONTHS = 3;
 
-    /***
+    /**
      * How many files should be kept in term collection
      */
     public const KEEP_FILES_COUNT = 3;
 
     public function __construct(
-        private editor_Models_TermCollection_TermCollection $collection
+        private readonly editor_Models_TermCollection_TermCollection $collection
     ) {
     }
 
-    /***
+    /**
      * Remove all files older than FILE_OLDER_THAN_MONTHS but only if there are more than 3 files for the given term
      * collection
-     * @return void
+     * returns the list of files removed or to be removed with $dryRun = true
      */
-    public function checkAndClean(): void
+    public function checkAndClean(bool $dryRun = false): array
     {
-        $files = $this->getFilesSorted();
-        $files = array_slice($files, self::KEEP_FILES_COUNT);
+        $directories = editor_Models_Import_TermListParser_Tbx::getCollectionImportBaseDirectories();
+        $deleted = [];
+        foreach ($directories as $directory) {
+            $deleted = array_merge($deleted, $this->cleanTbxImportDirectory($directory, $dryRun));
+        }
 
-        // Calculate the timestamp for 3 months ago
+        return $deleted;
+    }
+
+    private function cleanTbxImportDirectory(string $baseDir, bool $dryRun): array
+    {
+        $files = $this->getFilesSorted($baseDir);
+        $files = array_slice($files, self::KEEP_FILES_COUNT);
+        $deleted = [];
+
+        // calculate the timestamp as old as needed
         $threeMonthsAgo = strtotime('-' . self::FILE_OLDER_THAN_MONTHS . ' months');
 
         foreach ($files as $path => $fileTimestamp) {
             // Check if the file is older than 3 months
             if ($fileTimestamp < $threeMonthsAgo) {
-                unlink($path);
+                if (! $dryRun) {
+                    unlink($path);
+                }
+                $deleted[] = $path;
             }
         }
+
+        return $deleted;
     }
 
-    /***
+    /**
      * Get all collection files sorted by date.
-     * @return array
      */
-    private function getFilesSorted(): array
+    private function getFilesSorted(string $baseDir): array
     {
-        $collectionPath =
-            editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() .
-            'tc_' .
-            $this->collection->getId();
+        $collectionPath = $baseDir . '/tc_' . $this->collection->getId();
 
         if (! is_dir($collectionPath)) {
             return [];

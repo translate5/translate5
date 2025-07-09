@@ -114,9 +114,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract
         );
     }
 
-    /***
+    /**
      * Cron controller daily action
-     * @param Zend_EventManager_Event $event
      */
     public function handleAfterDailyAction(Zend_EventManager_Event $event): void
     {
