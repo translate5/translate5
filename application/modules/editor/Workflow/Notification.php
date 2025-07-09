@@ -289,6 +289,10 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
             'workflow' => $workflow,
         ];
 
+        if (count($users) === 1) {
+            $params['taskUserAssoc'] = $users[0];
+        }
+
         // Avoid automated e-mail to PM within some steps
         if (empty($triggerConfig->skipPm?->step) || ! preg_match('/' . $triggerConfig->skipPm->step . '/', $currentStep)) {
             //send to the PM
