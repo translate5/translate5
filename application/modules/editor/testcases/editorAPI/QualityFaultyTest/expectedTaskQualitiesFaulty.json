@@ -1,34 +1,19 @@
 {
-    "text": "{e9ff0529-b4d4-4039-afe3-799f8c0f8213}",
+    "text": "{c446f382-e5f0-48ea-af55-f4fce0b5e698}",
     "children": [
         {
             "qid": -1,
             "qtype": "consistent",
-            "qcount": 3,
+            "qcount": 0,
             "qcomplete": true,
-            "children": [
-                {
-                    "qid": "15",
-                    "qtype": "consistent",
-                    "qcount": 3,
-                    "qcomplete": true,
-                    "qcategory": "source",
-                    "qcatidx": "-1",
-                    "qcountfp": 0,
-                    "text": "Inconsistent source",
-                    "qtooltip": "Finds segments with the same target, but different source (tags ignored)",
-                    "mustBeZeroErrors": false,
-                    "leaf": true
-                }
-            ],
             "qcategory": null,
             "qtooltip": "",
             "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Consistency",
-            "qtotal": 3,
-            "expanded": false
+            "qtotal": 0,
+            "leaf": true
         },
         {
             "qid": -1,
@@ -51,9 +36,9 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "13",
+                    "qid": "66",
                     "qtype": "internal",
-                    "qcount": 1,
+                    "qcount": 2,
                     "qcomplete": true,
                     "qcategory": "internal_tag_structure_faulty",
                     "qcatidx": "-1",
@@ -64,19 +49,6 @@
                     "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
                     "leaf": true,
                     "qfaulty": true
-                },
-                {
-                    "qid": "14",
-                    "qtype": "internal",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "internal_tags_missing",
-                    "qcatidx": "-1",
-                    "qcountfp": 0,
-                    "text": "Internal tags missing",
-                    "qtooltip": "",
-                    "mustBeZeroErrors": false,
-                    "leaf": true
                 }
             ],
             "qcategory": null,
@@ -137,7 +109,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "12",
+                    "qid": "65",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -162,13 +134,13 @@
         {
             "qid": -1,
             "qtype": "term",
-            "qcount": 10,
+            "qcount": 11,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "5",
+                    "qid": "57",
                     "qtype": "term",
-                    "qcount": 2,
+                    "qcount": 3,
                     "qcomplete": true,
                     "qcategory": "forbidden_in_target",
                     "qcatidx": "-1",
@@ -179,7 +151,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "1",
+                    "qid": "54",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -192,7 +164,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "7",
+                    "qid": "60",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -211,7 +183,7 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Terminology",
-            "qtotal": 10,
+            "qtotal": 11,
             "expanded": false
         },
         {
@@ -244,7 +216,7 @@
         }
     ],
     "metaData": {
-        "numSegments": 16,
+        "numSegments": 14,
         "hasFaultyInternalTags": true
     }
 }

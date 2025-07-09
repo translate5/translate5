@@ -74,7 +74,7 @@ class QualityFaultyTest extends JsonTestAbstract
         // we will edit segments 1 & 3
 
         // we made the tags overlapping
-        $segment1Edit = 'Apache wird vielleicht multithreaded gebaut indem <div class="open 672069643d2233323822 internal-tag ownttip"><span class="short" title="&lt;var class=&quot;filename&quot;&gt;">&lt;1&gt;</span><span class="full" data-originalid="328" data-length="-1">&lt;var class=&quot;filename&quot;&gt;</span></div>worker selektiert wird.<div class="open 672069643d2233323922 internal-tag ownttip"><span class="short" title="&lt;var class=&quot;filename&quot;&gt;">&lt;2&gt;</span><span class="full" data-originalid="329" data-length="-1">&lt;var class=&quot;filename&quot;&gt;</span></div> MPM,<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/var&gt;">&lt;/1&gt;</span><span class="full" data-originalid="328" data-length="-1">&lt;/var&gt;</span></div> statt dem standard modul <div class="term supersededTerm exact" title="" data-tbxid="term_44427" data-t5qid="25122">prefork</div><div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/var&gt;">&lt;/2&gt;</span><span class="full" data-originalid="329" data-length="-1">&lt;/var&gt;</span></div> MPM, wenn Apache gebaut wird.';
+        $segment1Edit = 'Apache wird vielleicht multithreaded gebaut indem <div class="open 672069643d2233323822 internal-tag ownttip"><span class="short" title="&lt;var class=&quot;filename&quot;&gt;">&lt;1&gt;</span><span class="full" data-originalid="328" data-length="-1">&lt;var class=&quot;filename&quot;&gt;</span></div>worker selektiert wird. <div class="open 672069643d2233323922 internal-tag ownttip"><span class="short" title="&lt;var class=&quot;filename&quot;&gt;">&lt;2&gt;</span><span class="full" data-originalid="329" data-length="-1">&lt;var class=&quot;filename&quot;&gt;</span></div>MPM, statt <div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/var&gt;">&lt;/1&gt;</span><span class="full" data-originalid="328" data-length="-1">&lt;/var&gt;</span></div>dem standard modul <div class="term supersededTerm exact" title="" data-tbxid="53d8a3b4-767b-4e9b-9b7d-bd55c0e0dde0" data-t5qid="44">prefork</div><div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/var&gt;">&lt;/2&gt;</span><span class="full" data-originalid="329" data-length="-1">&lt;/var&gt;</span></div>MPM, wenn Apache gebaut wird.';
 
         // we changed opener & closer
         $segment3Edit = '<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/strong&gt;">&lt;/1&gt;</span><span class="full" data-originalid="343" data-length="-1">&lt;/strong&gt;</span></div>Hinweis<div class="open 672069643d2233343322 internal-tag ownttip"><span class="short" title="&lt;strong class=&quot;note&quot;&gt;">&lt;1&gt;</span><span class="full" data-originalid="343" data-length="-1">&lt;strong class=&quot;note&quot;&gt;</span></div>:';
@@ -86,7 +86,7 @@ class QualityFaultyTest extends JsonTestAbstract
         $this->assertSegmentEqualsJsonFile($jsonFile, $segment1);
 
         // edit segment 3, swap open/close tag
-        $segment3 = static::$segments[1];
+        $segment3 = static::$segments[3];
         $jsonFile = 'testSegment3EditTarget.json';
         $segment3 = static::api()->saveSegment($segment3->id, $segment3Edit, null, $jsonFile);
         $this->assertSegmentEqualsJsonFile($jsonFile, $segment3);
