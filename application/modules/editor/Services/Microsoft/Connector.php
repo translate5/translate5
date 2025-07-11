@@ -52,6 +52,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         parent::__construct();
 
         $this->defaultMatchRate = $this->config->runtimeOptions->LanguageResources->microsoft->matchrate;
+        // Max. request size is 50.000 characters ... 20kB is a empirical value
         $this->batchQueryBuffer = 20;
 
         editor_Services_Connector_Exception::addCodes([
