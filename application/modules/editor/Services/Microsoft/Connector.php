@@ -50,8 +50,9 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
     public function __construct()
     {
         parent::__construct();
+
         $this->defaultMatchRate = $this->config->runtimeOptions->LanguageResources->microsoft->matchrate;
-        $this->batchQueryBuffer = 30;
+        $this->batchQueryBuffer = 20;
 
         editor_Services_Connector_Exception::addCodes([
             'E1344' => '{service} returns an error: {errorNr} - {message}',
