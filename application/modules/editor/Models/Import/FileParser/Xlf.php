@@ -182,6 +182,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
+    private bool $protectTags;
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
@@ -199,6 +201,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     {
         parent::__construct($path, $fileName, $fileId, $task);
 
+        $this->protectTags = $this->config->runtimeOptions->import->fileparser->options->protectTags ?? false;
         $this->xmlparser = ZfExtended_Factory::get(XmlParser::class, [[
             'preparsexml' => $this->config->runtimeOptions->import->xlf->preparse,
         ]]);
@@ -990,7 +993,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                     $sourceChunks,
                     true,
                     $currentSource['openerMeta']['preserveWhitespace'],
-                    $shortcutNumberMap,
                 );
                 $sourceSegment = $this->xmlparser->join($sourceChunks);
 
@@ -1039,7 +1041,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                         $targetChunks,
                         false,
                         $currentTarget['openerMeta']['preserveWhitespace'],
-                        $shortcutNumberMap,
                     );
                     unset($this->currentTarget[$mid]);
                 }
@@ -1052,39 +1053,53 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $sourceOriginal = $this->contentProtector->protect(
                 $sourceOriginal,
                 true,
-                (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang(),
-                EntityHandlingMode::Off
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
+                $this->protectTags ? EntityHandlingMode::Off : EntityHandlingMode::Restore,
             );
 
             $targetOriginal = $this->xmlparser->join($this->surroundingTags->sliceTags($targetChunks));
             $targetOriginal = $this->contentProtector->protect(
                 $targetOriginal,
                 false,
-                (int) $this->task->getSourceLang(),
-                (int) $this->task->getTargetLang(),
-                EntityHandlingMode::Off
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
+                $this->protectTags ? EntityHandlingMode::Off : EntityHandlingMode::Restore,
             );
 
             [$sourceOriginal, $targetOriginal] = $this->contentProtector->filterTags($sourceOriginal, $targetOriginal);
 
-            $sourceConversionResult = $this->contentProtector->convertToInternalTagsWithShortcutNumberMapCollecting(
+            $sourceProtectedChunks = $this->contentProtector->convertToInternalTagsInChunks(
                 $sourceOriginal,
-                $this->shortTagNumbers->shortTagIdent
-            );
-
-            $shortcutNumberMap = array_merge($shortcutNumberMap, $sourceConversionResult->shortcutNumberMap);
-
-            $targetOriginal = $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
-                $targetOriginal,
-                $sourceConversionResult->shortTagIdent,
+                $this->shortTagNumbers->shortTagIdent,
+                true,
                 $shortcutNumberMap
             );
+            $targetProtectedChunks = $this->contentProtector->convertToInternalTagsInChunks(
+                $targetOriginal,
+                $this->shortTagNumbers->shortTagIdent,
+                false,
+                $shortcutNumberMap
+            );
+
+            // cache previous surrounding tags
+            $leadingTags = $this->surroundingTags->getLeading();
+            $tailingTags = $this->surroundingTags->getTrailing();
+
+            $this->surroundingTags->calculate(
+                $preserveWhitespace,
+                $sourceProtectedChunks,
+                $targetProtectedChunks,
+                $this->xmlparser
+            );
+
+            $sourceOriginal = $this->xmlparser->join($this->surroundingTags->sliceTags($sourceProtectedChunks));
+            $targetOriginal = $this->xmlparser->join($this->surroundingTags->sliceTags($targetProtectedChunks));
 
             $this->segmentData = [];
             $this->segmentData[$sourceName] = [
                 //for source column we dont have a place holder, so we just cut off the leading/trailing tags and import the rest as source
-                'original' => $sourceConversionResult->segment,
+                'original' => $sourceOriginal,
             ];
 
             //for target we have to do the same tag cut off on the converted chunks to be used,
@@ -1144,8 +1159,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->comments->importComments((int) $segmentId);
             }
             if ($currentTarget !== self::MISSING_MRK) {
+                $leadingTags .= $this->surroundingTags->getLeading();
+                $tailingTags .= $this->surroundingTags->getTrailing();
                 //we add a placeholder if it is a real segment, not just a placeholder for a missing mrk
-                $placeHolders[$mid] = $this->surroundingTags->getLeading() . $this->getFieldPlaceholder($segmentId, $targetName) . $this->surroundingTags->getTrailing();
+                $placeHolders[$mid] = $leadingTags . $this->getFieldPlaceholder($segmentId, $targetName) . $tailingTags;
             }
         }
 

@@ -26,7 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
 use MittagQI\ZfExtended\Tools\Markup;
@@ -90,13 +89,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
-    private WhitespaceProtector $whitespaceProtector;
-
-    private bool $handleIsInSourceScope = true;
-
     private bool $useStrictEscaping;
-
-    private array $shortcutNumberMap = [];
 
     /**
      * @param editor_Models_Task $task for debugging reasons only
@@ -112,7 +105,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         $this->task = $task;
         $this->filename = $filename;
 
-        $this->whitespaceProtector = WhitespaceProtector::create();
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
         $this->shortTagNumbers = $shortTagNumbers;
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
@@ -350,9 +342,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         array|string $chunks,
         bool $source,
         bool $preserveWhitespace,
-        array &$shortcutNumberMap,
     ): array {
-        $this->shortcutNumberMap = &$shortcutNumberMap;
         // experimental feature: Strict escaping for the segment input stream
         if ($this->useStrictEscaping) {
             if (is_array($chunks)) {
@@ -365,7 +355,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         $this->result = [];
         $this->removeTags = false;
         $this->shortTagNumbers->init($source);
-        $this->handleIsInSourceScope = $source;
 
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content
         $this->preserveWhitespace = $preserveWhitespace;
@@ -449,15 +438,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             $text = $this->utilities->tagProtection->protectTags($text);
         }
 
-        $chunks = $this->whitespaceProtector->convertToInternalTagsInChunks(
-            $text,
-            $this->shortTagNumbers->shortTagIdent,
-            $this->handleIsInSourceScope,
-            $this->shortcutNumberMap,
-        );
-
-        //to keep the generated tag objects we have to use the chunk-list instead of the returned string
-        array_push($this->result, ...$chunks);
+        $this->result[] = $text;
     }
 
     /**

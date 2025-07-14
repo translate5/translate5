@@ -12,12 +12,12 @@ should make any problem!]]></header>
                 &#13; &nbsp;&#10;
                 <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
                 <mrk mtype="seg" mid="3">&szlig; should be ß</mrk>
-                <mrk mtype="seg" mid="3">&#228; should be ä</mrk>
-                <mrk mtype="seg" mid="4">&#128; should be a char tag</mrk>
-                <mrk mtype="seg" mid="5">See https://infra.spec.whatwg.org/#ascii-whitespace</mrk>
-                <mrk mtype="seg" mid="6">&#13; carriage return is explicitly excluded as HTML numbered entity, in translate5 its converted to the proper internal tag then</mrk>
-                <mrk mtype="seg" mid="7">&#11; vertical tab is no ASCII whitespace, in translate5 its encoded to an internal tag then</mrk>
-                <mrk mtype="seg" mid="8">&shy; should not occur in XML, but should still converted to a char tag</mrk>
+                <mrk mtype="seg" mid="4">&#228; should be ä</mrk>
+                <mrk mtype="seg" mid="5">&#128; should be a char tag</mrk>
+                <mrk mtype="seg" mid="6">See https://infra.spec.whatwg.org/#ascii-whitespace</mrk>
+                <mrk mtype="seg" mid="7">&#13; carriage return is explicitly excluded as HTML numbered entity, in translate5 its converted to the proper internal tag then</mrk>
+                <mrk mtype="seg" mid="8">&#11; vertical tab is no ASCII whitespace, in translate5 its encoded to an internal tag then</mrk>
+                <mrk mtype="seg" mid="9">&shy; should not occur in XML, but should still converted to a char tag</mrk>
         </seg-source>
       </trans-unit>
     </body>

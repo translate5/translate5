@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection;
 
+use editor_Models_Segment_InternalTag as InternalTag;
 use editor_Models_Segment_Utility as SegmentUtility;
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\DTO\ConversionToInternalTagResult;
@@ -141,7 +142,7 @@ class ContentProtector
             return $text;
         }
 
-        $text = SegmentUtility::entityCleanup($text, $entityHandling);
+        $text = $this->cleanupEntities($text, $entityHandling);
 
         foreach ($this->protectors as $protector) {
             if (in_array($protector::alias(), $exceptProtectors, true)) {
@@ -154,6 +155,69 @@ class ContentProtector
         }
 
         return $text;
+    }
+
+    private function cleanupEntities(string $text, EntityHandlingMode $entityHandling): string
+    {
+        if (EntityHandlingMode::Off === $entityHandling) {
+            return $text;
+        }
+
+        // In XLF import we may have protected tags here already
+        // replace them with internal tags placeholders
+        if (preg_match_all(InternalTag::REGEX_INTERNAL_TAGS, $text, $internalTagMatches)) {
+            $count = 0;
+            $text = preg_replace_callback(
+                InternalTag::REGEX_INTERNAL_TAGS,
+                function ($matches) use (&$count) {
+                    $count++;
+
+                    return "<internalTag c=\"{$count}\" />";
+                },
+                $text
+            );
+        }
+
+        $tagList = $this->tagList();
+        $tagList[] = 'internalTag'; // add internalTag to the list
+        $tagList[] = \editor_Models_Segment_TagProtection::TAG_NAME;
+
+        $regex = '#<(' . join('|', $tagList) . ').*/>#U';
+
+        // all this tags are protected, so we should skip them
+        if (! preg_match_all($regex, $text, $matches)) {
+            return SegmentUtility::entityCleanup($text, $entityHandling);
+        }
+
+        $tags = $matches[0];
+        $parts = preg_split($regex, $text);
+        $tagCount = count($tags);
+
+        $cleaned = '';
+
+        for ($i = 0; $i <= $tagCount; $i++) {
+            if (isset($parts[$i]) && '' !== $parts[$i]) {
+                $cleaned .= SegmentUtility::entityCleanup($parts[$i], $entityHandling);
+            }
+
+            if (! isset($tags[$i])) {
+                continue;
+            }
+
+            $cleaned .= $tags[$i];
+        }
+
+        if (empty($internalTagMatches)) {
+            return $cleaned;
+        }
+
+        return preg_replace_callback(
+            '#<internalTag c="(\d+)" />#s',
+            function ($matches) use ($internalTagMatches) {
+                return $internalTagMatches[0][((int) $matches[1]) - 1];
+            },
+            $cleaned
+        );
     }
 
     public function tagList(): array
@@ -245,7 +309,7 @@ class ContentProtector
     public function convertToInternalTagsWithShortcutNumberMap(
         string $segment,
         int $shortTagIdent,
-        array $shortcutNumberMap
+        array $shortcutNumberMap,
     ): string {
         foreach ($this->protectors as $protector) {
             if ($protector->hasTagsToConvert($segment)) {
@@ -267,7 +331,7 @@ class ContentProtector
         int $sourceLang,
         int $targetLang,
         int &$shortTagIdent,
-        EntityHandlingMode $entityHandling = EntityHandlingMode::Restore
+        EntityHandlingMode $entityHandling = EntityHandlingMode::Restore,
     ): string {
         return $this->convertToInternalTags(
             $this->protect($text, $isSource, $sourceLang, $targetLang, $entityHandling),

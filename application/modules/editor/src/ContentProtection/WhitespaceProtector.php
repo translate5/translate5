@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection;
 
+use editor_Models_Segment_InternalTag as InternalTag;
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\DTO\ConversionToInternalTagResult;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
@@ -101,6 +102,37 @@ class WhitespaceProtector implements ProtectorInterface
         EntityHandlingMode $entityHandling = EntityHandlingMode::Restore,
     ): string {
         $excludedCharacters = $this->withoutNumberWhitespaces ? $this->numberWhitespaces : [];
+
+        if (! preg_match_all(InternalTag::REGEX_INTERNAL_TAGS, $textNode, $matches)) {
+            return $this->protectWhitespace($textNode, $excludedCharacters, $entityHandling);
+        }
+
+        $tags = $matches[0];
+        $parts = preg_split(InternalTag::REGEX_INTERNAL_TAGS, $textNode);
+        $tagCount = count($tags);
+
+        $protected = '';
+
+        for ($i = 0; $i <= $tagCount; $i++) {
+            if (isset($parts[$i]) && '' !== $parts[$i]) {
+                $protected .= $this->protectWhitespace($parts[$i], $excludedCharacters, $entityHandling);
+            }
+
+            if (! isset($tags[$i])) {
+                continue;
+            }
+
+            $protected .= $tags[$i];
+        }
+
+        return $protected;
+    }
+
+    private function protectWhitespace(
+        string $textNode,
+        array $excludedCharacters,
+        EntityHandlingMode $entityHandling
+    ): string {
         if (! preg_match_all(self::TAG_REGEX, $textNode, $matches)) {
             return $this->whitespace->protectWhitespace($textNode, $excludedCharacters, $entityHandling);
         }
