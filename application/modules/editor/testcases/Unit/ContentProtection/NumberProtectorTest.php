@@ -211,7 +211,7 @@ class NumberProtectorTest extends TestCase
     public function internalTagsProvider(): iterable
     {
         $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: default" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
 
         yield [
             'segment' => "string $tag1 string",
@@ -220,7 +220,7 @@ class NumberProtectorTest extends TestCase
         ];
 
         $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target=""/>';
-        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="" class="full"></span></div>';
+        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="" class="full"></span></div>';
 
         yield [
             'segment' => "string $tag1 string $tag2 string",
@@ -244,7 +244,7 @@ class NumberProtectorTest extends TestCase
     public function internalTagsInChunksProvider(): iterable
     {
         $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: default" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
 
         $parsedTag1 = new NumberTag();
         $parsedTag1->originalContent = $tag1;
@@ -263,7 +263,7 @@ class NumberProtectorTest extends TestCase
         ];
 
         $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target=""/>';
-        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="" class="full"></span></div>';
+        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="" class="full"></span></div>';
 
         $parsedTag2 = new NumberTag();
         $parsedTag2->originalContent = $tag2;
