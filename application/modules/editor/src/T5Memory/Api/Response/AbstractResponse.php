@@ -42,7 +42,7 @@ abstract class AbstractResponse implements ResponseInterface
         public readonly ?string $errorMessage,
         public readonly int $statusCode,
     ) {
-        $this->code = (int) ($body['returnValue'] ?? 0);
+        $this->code = (int) ($body['returnValue'] ?? $body['ReturnValue'] ?? 0);
     }
 
     abstract public static function fromResponse(PsrResponseInterface $response): AbstractResponse;
