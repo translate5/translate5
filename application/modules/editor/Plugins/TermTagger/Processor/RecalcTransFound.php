@@ -352,9 +352,12 @@ class RecalcTransFound
                         $firstA = [];
                     }
 
-                    // Append the best target term we have in each homonym termEntry
+                    // Append the best target term we have in each homonym termEntry,
+                    // if such a termEntry have at least one target term
                     foreach ($this->homonym[$srcId] ?? [] as $termEntryId) {
-                        $firstA[] = array_values($this->trans[$termEntryId])[0];
+                        if (isset($this->trans[$termEntryId])) {
+                            $firstA[] = array_values($this->trans[$termEntryId])[0];
+                        }
                     }
 
                     // Wrap $firstA into an array to mame it compatible with further TermModel->sortTerms()
