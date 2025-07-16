@@ -2036,26 +2036,26 @@ Ext.override(Ext.toolbar.Paging, {
  */
 Ext.override(Ext.fx.target.Element, {
     setElVal: function(element, attr, value) {
-        if (attr === 'x') {
-            element.setX(value);
-        } else if (attr === 'y') {
-            element.setY(value);
-        } else if (attr === 'scrollTop') {
-            element.scrollTo('top', value);
-        } else if (attr === 'scrollLeft') {
-            element.scrollTo('left', value);
-        } else if (attr === 'width') {
-            element.setWidth(value);
-        } else if (attr === 'height') {
-            element.setHeight(value);
-        } else {
-            if (element.dom) {                                                                                      // +
+        if (element.dom) {                                                                                              // +
+            if (attr === 'x') {
+                element.setX(value);
+            } else if (attr === 'y') {
+                element.setY(value);
+            } else if (attr === 'scrollTop') {
+                element.scrollTo('top', value);
+            } else if (attr === 'scrollLeft') {
+                element.scrollTo('left', value);
+            } else if (attr === 'width') {
+                element.setWidth(value);
+            } else if (attr === 'height') {
+                element.setHeight(value);
+            } else {
                 element.setStyle(attr, value);
-            } else if (jslogger) {                                                                                  // +
-                jslogger.addLogEntry({type: 'info', message: 'Attempt to setStyle on Element having no dom-node'}); // +
-                jslogger.addLogEntry({type: 'info', message: 'Element.id: ' + element.id});                         // +
-                jslogger.addLogEntry({type: 'info', message: 'Element.component?.id: ' + element.component?.id});   // +
             }
-        }
+        } else if (jslogger) {                                                                                          // +
+            jslogger.addLogEntry({type: 'info', message: 'Attempt to amend '+ attr + 'on Element having no dom-node'}); // +
+            jslogger.addLogEntry({type: 'info', message: 'Element.id: ' + element.id});                                 // +
+            jslogger.addLogEntry({type: 'info', message: 'Element.component?.id: ' + element.component?.id});           // +
+        }                                                                                                               // +
     }
 });
