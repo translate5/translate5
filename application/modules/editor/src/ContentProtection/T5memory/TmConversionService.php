@@ -363,6 +363,9 @@ class TmConversionService implements TmConversionServiceInterface
         $source = $this->convertT5MemoryTagToContent($source);
         $target = $this->convertT5MemoryTagToContent($target);
 
+        $source = $this->collapseTmxTags($source);
+        $target = $this->collapseTmxTags($target);
+
         $protectedSource = $this->contentProtector->protect(
             $source,
             true,
@@ -387,6 +390,11 @@ class TmConversionService implements TmConversionServiceInterface
             $this->convertContentTagToT5MemoryTag($source, true, $tagMap),
             $this->convertContentTagToT5MemoryTag($target, false, $tagMap),
         ];
+    }
+
+    private function collapseTmxTags(string $segment): string
+    {
+        return preg_replace('#<(ph|bpt|ept) ([^>]*)>(.*)</\1>#U', '<$1 $2/>', $segment);
     }
 
     private function convertTransUnit(
