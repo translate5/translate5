@@ -51,10 +51,17 @@ class TbxCleanCommand extends Translate5AbstractCommand
             ->setHelp('Removes old TBX files left over from TBX imports');
 
         $this->addOption(
-            'delete-data',
+            'execute',
             'd',
             InputOption::VALUE_NONE,
             'deletes the files'
+        );
+
+        $this->addOption(
+            'summary',
+            's',
+            InputOption::VALUE_NONE,
+            'show summary only'
         );
     }
 
@@ -68,25 +75,32 @@ class TbxCleanCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
 
-        $dryRun = ! $input->getOption('delete-data');
+        $dryRun = ! $input->getOption('execute');
         $this->writeTitle('Cleaning up TBX data ' . ($dryRun ? '- DRY RUN - would delete files' : 'deleted files'));
 
         $collectionModel = new \editor_Models_TermCollection_TermCollection();
         $collections = $collectionModel->loadAllEntities();
 
         $nothingDeleted = true;
+        $count = 0;
         foreach ($collections as $collection) {
             $cleanup = new CleanupCollection($collection);
             $deleted = $cleanup->checkAndClean($dryRun);
-            if (count($deleted) > 0) {
-                $this->io->section('from Term Collection #' . $collection->getId() . ' - ' . $collection->getName());
-                $this->io->writeln($deleted);
+            $deleteCount = count($deleted);
+            $count += $deleteCount;
+            if ($deleteCount > 0) {
+                if (! $input->getOption('summary')) {
+                    $this->io->section('from Term Collection #' . $collection->getId() . ' - ' . $collection->getName());
+                    $this->io->writeln($deleted);
+                }
                 $nothingDeleted = false;
             }
         }
 
         if ($nothingDeleted) {
             $this->io->warning('Nothing to delete');
+        } elseif ($input->getOption('summary')) {
+            $this->io->info($count . ' TBX files deleted / to be deleted');
         }
 
         return self::SUCCESS;

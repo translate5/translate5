@@ -48,7 +48,8 @@ class TaskCleanCommand extends Translate5AbstractCommand
     {
         $this
         // the short description shown while running "php bin/console list"
-            ->setDescription('provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories')
+            ->setDescription('provides information about and the possibility to delete hanging '
+            . 'import / erroneous tasks and orphaned task data directories')
 
         // the full command description shown when running the command with
         // the "--help" option
@@ -82,11 +83,19 @@ class TaskCleanCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'deletes all orphaned data folders'
         );
+
         $this->addOption(
             'delete-agg-data',
             'a',
             InputOption::VALUE_NONE,
             'deletes all orphaned aggregated data records'
+        );
+
+        $this->addOption(
+            'summary',
+            's',
+            InputOption::VALUE_NONE,
+            'Shows only a summary instead of each task'
         );
     }
 
@@ -120,9 +129,14 @@ class TaskCleanCommand extends Translate5AbstractCommand
 
         $this->handleErrorTasks($stateError);
         $this->handleImportTasks($stateImport);
-        $this->handleOrphanedTaskData($availableDataDirs);
+        $this->handleOrphanedTaskData($availableDataDirs, $allTasks);
         $this->handleOrphanedAggregations($allTasks);
         $this->handleSetToError();
+
+        if ($input->getOption('summary')) {
+            return self::SUCCESS;
+        }
+
         $this->io->section('Use the following option parameters to delete the listed tasks:');
         $this->io->text([
             '--delete-error [ID]  - deletes one (with ID) or all tasks with errors',
@@ -132,7 +146,7 @@ class TaskCleanCommand extends Translate5AbstractCommand
             '--delete-statistics-data  - deletes all orphaned aggregated task history data records',
         ]);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     protected function handleErrorTasks(array $errorTasks)
@@ -143,9 +157,13 @@ class TaskCleanCommand extends Translate5AbstractCommand
 
             return;
         }
-        $table = new TaskTable($this->output);
-        $table->setRows($errorTasks);
-        $table->render();
+        if ($this->input->getOption('summary')) {
+            $this->io->info(count($errorTasks) . ' tasks with status "error" found.');
+        } else {
+            $table = new TaskTable($this->output);
+            $table->setRows($errorTasks);
+            $table->render();
+        }
         $this->output->writeln(['', '']);
 
         $toDelete = $this->input->getOption('delete-error');
@@ -193,7 +211,11 @@ class TaskCleanCommand extends Translate5AbstractCommand
 
         $toDelete = (int) $this->input->getOption('delete-import');
         if (empty($toDelete)) {
-            $table->render();
+            if ($this->input->getOption('summary')) {
+                $this->io->info(count($stateImport) . ' tasks with status "import" found.');
+            } else {
+                $table->render();
+            }
             $this->output->writeln(['', '']);
 
             return;
@@ -246,7 +268,11 @@ class TaskCleanCommand extends Translate5AbstractCommand
         }
         $this->io->section('Aggregated task history data records without a task:');
         if ($hasAtLeastOneOrphaned) {
-            $table->render();
+            if ($this->input->getOption('summary')) {
+                $this->io->info(count($orphanedTaskIds) . ' aggregated task history data records for a task without a task');
+            } else {
+                $table->render();
+            }
             $this->output->writeln(['']);
             if ($delete) {
                 $this->io->success('The above listed aggregated task history data records were successfully deleted !');
@@ -258,9 +284,8 @@ class TaskCleanCommand extends Translate5AbstractCommand
 
     /**
      * find orphaned data directories
-     * @return array
      */
-    protected function handleOrphanedTaskData(array $availableDataDirs)
+    protected function handleOrphanedTaskData(array $availableDataDirs, $allTasks): void
     {
         //we just add the dot directories as available, so they are ignored
         $availableDataDirs[] = '.';
@@ -296,13 +321,16 @@ class TaskCleanCommand extends Translate5AbstractCommand
         }
         $this->io->section('Data Directories without a task:');
         if ($hasAtLeastOneOrphaned) {
-            $table->render();
-            $this->output->writeln(['']);
+            if ($this->input->getOption('summary')) {
+                $this->io->info(count($orphaned) . ' orphaned task data directories found.');
+            } else {
+                $table->render();
+            }
             $usage = number_format($totalSize / 1048576, 2) . ' MB';
             if ($delete) {
                 $this->io->success('The above listed folders were successfully deleted (' . $usage . ' freed) !');
             } else {
-                $this->io->text('Disk usage of the above folders <info>' . $usage . '</>!');
+                $this->io->text('Disk usage of the orphaned task folders <info>' . $usage . '</>!');
             }
         } else {
             $this->io->text('<info>No orphaned data directories found!</>');

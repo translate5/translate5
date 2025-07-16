@@ -2008,10 +2008,7 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         $clean = function () use ($exportFolder) {
-            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Recursivedircleaner'
-            );
-            $recursivedircleaner->delete($exportFolder);
+            ZfExtended_Utils::recursiveDelete($exportFolder);
         };
 
         $translatedfile = $exportFolder . DIRECTORY_SEPARATOR . $foundFile;

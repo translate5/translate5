@@ -594,9 +594,7 @@ class editor_Models_Export_Terminology_Tbx
             unlink($this->getFile());
 
             // Drop temporary media/ directory
-            ZfExtended_Zendoverwrites_Controller_Action_HelperBroker
-                ::getStaticHelper('Recursivedircleaner')
-                    ->delete($this->zip['media']);
+            ZfExtended_Utils::recursiveDelete($this->zip['media']);
 
             // Set up headers to download the zip
             Header::sendDownload(

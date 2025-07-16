@@ -1978,7 +1978,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Get data for tbx-export
      *
-     * @param array $ids Comma-separated list of ids, or array of ids
+     * @param array|string $ids Comma-separated list of ids, or array of ids
      * @param string $idsProp Name of ids-prop, 'termEntryId' by default
      * @return array
      * @throws Zend_Db_Statement_Exception

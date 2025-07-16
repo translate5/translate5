@@ -97,10 +97,7 @@ class editor_Models_Export
         if ($cleanTarget) {
             umask(0); // needed for samba access
             if (is_dir($exportRootFolder)) {
-                $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                    'Recursivedircleaner'
-                );
-                $recursivedircleaner->delete($exportRootFolder);
+                ZfExtended_Utils::recursiveDelete($exportRootFolder);
             }
         }
         if (! file_exists($exportRootFolder) && ! mkdir($exportRootFolder, 0777, true) && ! is_dir($exportRootFolder)) {

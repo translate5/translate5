@@ -6372,11 +6372,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/Term/History.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Zend_Controller_Action_Helper_Abstract\\:\\:deleteOldFiles\\(\\)\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/TermCollection/TermCollection.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method MittagQI\\\\Translate5\\\\LanguageResource\\\\TaskAssociation\\:\\:setAutoCreatedOnImport\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/TermCollection/TermCollection.php',
@@ -20567,11 +20562,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Strict comparison using \\=\\=\\= between int and false will always evaluate to false\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Utils.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Unsafe call to private method ZfExtended_Utils\\:\\:recursiveDoDeleteExtension\\(\\) through static\\:\\:\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Utils.php',
 ];

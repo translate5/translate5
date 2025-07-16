@@ -85,11 +85,7 @@ $removedCount = 0;
 foreach ($collectionIds as $coll) {
     $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $coll;
     if (is_dir($collectionPath)) {
-        $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-            'Recursivedircleaner'
-        );
-        /* @var ZfExtended_Controller_Helper_Recursivedircleaner $recursivedircleaner */
-        $recursivedircleaner->delete($collectionPath);
+        ZfExtended_Utils::recursiveDelete($collectionPath);
         $removedCount++;
     }
 }

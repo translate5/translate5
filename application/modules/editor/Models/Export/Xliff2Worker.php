@@ -65,10 +65,7 @@ class editor_Models_Export_Xliff2Worker extends ZfExtended_Worker_Abstract
     {
         //we create it if it does not exist
         if (is_dir($directory)) {
-            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Recursivedircleaner'
-            );
-            $recursivedircleaner->delete($directory);
+            ZfExtended_Utils::recursiveDelete($directory);
         }
 
         if (! file_exists($directory) && ! @mkdir($directory, 0777, true)) {

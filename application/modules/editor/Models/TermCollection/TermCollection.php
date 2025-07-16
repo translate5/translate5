@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Tools\RecursiveFileDeletion;
+
 class editor_Models_TermCollection_TermCollection extends editor_Models_LanguageResources_LanguageResource
 {
     /**
@@ -486,11 +488,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     {
         foreach (editor_Models_Import_TermListParser_Tbx::getCollectionImportBaseDirectories() as $baseDir) {
             if (is_dir($collectionPath = "$baseDir/tc_$collectionId")) {
-                /* @var ZfExtended_Controller_Helper_Recursivedircleaner $recursiveDirCleaner */
-                $recursiveDirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                    'Recursivedircleaner'
-                );
-                $recursiveDirCleaner->deleteOldFiles($collectionPath, $olderThan);
+                (new RecursiveFileDeletion())->deleteOldFiles($baseDir, $olderThan);
             }
         }
     }

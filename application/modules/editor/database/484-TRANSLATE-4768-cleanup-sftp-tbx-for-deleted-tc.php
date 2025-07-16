@@ -56,11 +56,6 @@ $existingIdA = Zend_Db_Table
         ->query("SELECT `id` FROM `LEK_languageresources` WHERE serviceName='TermCollection'")
         ->fetchAll(PDO::FETCH_COLUMN);
 
-/** @var ZfExtended_Controller_Helper_Recursivedircleaner $dirCleaner */
-$dirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-    'Recursivedircleaner'
-);
-
 // Foreach dir where TermCollections' tbx files are kept
 foreach (editor_Models_Import_TermListParser_Tbx::getCollectionImportBaseDirectories() as $base) {
     // Quantity of deleted dirs
@@ -83,7 +78,7 @@ foreach (editor_Models_Import_TermListParser_Tbx::getCollectionImportBaseDirecto
         }
 
         // Delete dir
-        $dirCleaner->delete("$base/$name");
+        ZfExtended_Utils::recursiveDelete("$base/$name");
 
         // Increment counter
         $cleanedQty++;

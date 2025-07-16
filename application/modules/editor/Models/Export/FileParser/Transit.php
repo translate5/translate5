@@ -93,8 +93,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         parent::loadSkeleton($file);
         $extractDir = $this->extractSkeletonZip();
         $this->setSkeletonFiles($extractDir);
-        $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
-        $recursivedircleaner->delete($extractDir);
+        ZfExtended_Utils::recursiveDelete($extractDir);
     }
 
     /**
@@ -249,12 +248,12 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         if (is_null($this->currentId)) {
             //since FileParser instance is recreated per file, we have to give the fileid
             $seg = $segment->loadFirst($taskGuid, $this->_fileId);
-            $this->currentId = $seg->getId();
+            $this->currentId = (int) $seg->getId();
             $this->segmentCache[$segId] = $seg;
         } else {
             //since FileParser instance is recreated per file, we have to give the fileid
             $seg = $segment->loadNext($taskGuid, $this->currentId, $this->_fileId);
-            $this->currentId = $seg->getId();
+            $this->currentId = (int) $seg->getId();
             $this->segmentCache[$segId] = $seg;
         }
         if ($seg->meta()->getMrkMid() != $segId) {

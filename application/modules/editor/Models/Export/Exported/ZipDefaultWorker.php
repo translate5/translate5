@@ -125,8 +125,6 @@ class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Expor
         }
 
         // Drop folderToBeZipped
-        ZfExtended_Zendoverwrites_Controller_Action_HelperBroker
-            ::getStaticHelper('Recursivedircleaner')
-                ->delete($params['folderToBeZipped']);
+        ZfExtended_Utils::recursiveDelete($params['folderToBeZipped']);
     }
 }

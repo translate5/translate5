@@ -53,10 +53,15 @@ class QueuedExportService
     public static function create(): self
     {
         return new self(
-            APPLICATION_PATH . '/../data/Export/',
+            self::getExportDirectory(),
             QueuedExportRepository::create(),
             new WorkerRepository(),
         );
+    }
+
+    public static function getExportDirectory(): string
+    {
+        return APPLICATION_DATA . '/Export/';
     }
 
     public function makeQueueRecord(string $token, int $workerId, string $resultFilename): QueuedExport
