@@ -435,6 +435,7 @@ class NumberProtector implements ProtectorInterface
     ): NumberTag {
         $source = $xml->getAttribute($opener['attributes'], 'source', null);
         $target = $xml->getAttribute($opener['attributes'], 'target', null);
+        $name = $xml->getAttribute($opener['attributes'], 'name', null);
 
         $wholeTag = $xml->getChunk($key);
         $shortTagNumber = $shortTagIdent;
@@ -464,7 +465,7 @@ class NumberProtector implements ProtectorInterface
         $tagObj->iso = $iso;
         $tagObj->source = $source;
         //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
-        $tagObj->renderTag(title: '&lt;' . $shortTagNumber . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
+        $tagObj->renderTag(title: "&lt;$shortTagNumber/&gt; CP: $name", cls: ' ' . self::TAG_NAME);
 
         return $tagObj;
     }

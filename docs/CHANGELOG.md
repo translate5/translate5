@@ -9,6 +9,96 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+
+## [7.25.2] - 2025-07-15
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4779](https://jira.translate5.net/browse/TRANSLATE-4779): t5memory - Add t5memory version 0.7 support** <br>
+Added basic support of t5memory version 0.7
+
+**[TRANSLATE-4761](https://jira.translate5.net/browse/TRANSLATE-4761): InstantTranslate - Disable editing file translations by config** <br>
+Added new config which disallows opening task for edit from Instant Translate
+
+**[TRANSLATE-4760](https://jira.translate5.net/browse/TRANSLATE-4760): Content Protection - Content Protection: content protection rule label in mouseover** <br>
+Show used rule on hover over content protection tag
+
+**[TRANSLATE-4756](https://jira.translate5.net/browse/TRANSLATE-4756): InstantTranslate, MatchAnalysis & Pretranslation - Improve speed for file translations** <br>
+Fixed bug which caused scheduling Match analysis twice for all file translations in case runtimeOptions.plugins.MatchAnalysis.autoPretranslateOnTaskImport config is activated
+
+**[TRANSLATE-3827](https://jira.translate5.net/browse/TRANSLATE-3827): Authentication - IP-based Authentication should still allow to log in as a user** <br>
+7.25.2: added tests, log out the IP based user when access to other applets are allowed for non IP users on accessing them, change available applets on customer level
+7.25.1: Introduced a new config to control for which applets (editor,instanttranslate,termportal etc) the ip based authentication should be applied or the normal login page should be shown.
+
+
+### Bugfixes
+**[TRANSLATE-4792](https://jira.translate5.net/browse/TRANSLATE-4792): Auto-QA - Terminology QA check fails when homonyms have no translations** <br>
+error on terminology QA check when homonyms have no translations
+
+**[TRANSLATE-4783](https://jira.translate5.net/browse/TRANSLATE-4783): t5memory - Error 8009 is not handled properly** <br>
+Fixed handling t5memory error '8009'
+
+**[TRANSLATE-4782](https://jira.translate5.net/browse/TRANSLATE-4782): Import/Export - Task archiving failure for tasks with long taskNames** <br>
+Fixed task archiving for tasks with long task names
+
+**[TRANSLATE-4780](https://jira.translate5.net/browse/TRANSLATE-4780): Export - Okapi error on task:export command** <br>
+Added missing Okapi worker dependency for t5 task:export command
+
+**[TRANSLATE-4776](https://jira.translate5.net/browse/TRANSLATE-4776): LanguageResources - Special data field in language resource table is too small** <br>
+Expand max size of Language Resources specificData field in DB
+
+**[TRANSLATE-4770](https://jira.translate5.net/browse/TRANSLATE-4770): job coordinator - Job Coordinator can't edit segments without user job** <br>
+Allow Job coordinator to edit segments in task where coordinator does not have user job
+
+**[TRANSLATE-4768](https://jira.translate5.net/browse/TRANSLATE-4768): TBX-Import - Not all temporary TBX files are cleaned up** <br>
+Not all tempory TBX files are removed from disk after import, so disk space is wasted here. 
+
+**[TRANSLATE-4765](https://jira.translate5.net/browse/TRANSLATE-4765): job coordinator - Project wizard: workflow user assignment error message** <br>
+Fix check for task in coordinator list call
+
+**[TRANSLATE-4763](https://jira.translate5.net/browse/TRANSLATE-4763): Import/Export - Task Export may fails for old tasks due to non-set BCONF in ZIP** <br>
+Old tasks may fail to export because historically  bconfInZip & bconfId are not set in task-meta
+
+**[TRANSLATE-4759](https://jira.translate5.net/browse/TRANSLATE-4759): Editor general, TrackChanges - Error in editor with trackchanges** <br>
+Fixed bug which prevented editor to be opened in some cases if there are trackchanges without usertracking id
+
+**[TRANSLATE-4757](https://jira.translate5.net/browse/TRANSLATE-4757): User Management - pre-select "enable task overview" for creating new users** <br>
+Made role "taskOverview" always preselected when creating a new user
+
+**[TRANSLATE-4754](https://jira.translate5.net/browse/TRANSLATE-4754): TermPortal - RootCause: f is null** <br>
+problem with term search result selection by non-existing id
+
+**[TRANSLATE-4752](https://jira.translate5.net/browse/TRANSLATE-4752): Okapi integration - Okapi file import: uppercase document names produces error on import** <br>
+Fix for uppercase file extensions producing import errors.
+
+**[TRANSLATE-4750](https://jira.translate5.net/browse/TRANSLATE-4750): Import/Export - Placeables: May be created with empty content leading to UI glitches** <br>
+FIX: Placeables may have empty content leading to glitches in the UI
+
+**[TRANSLATE-4749](https://jira.translate5.net/browse/TRANSLATE-4749): openai - OpenAI model can not be trained more than 2 times in Azure cloud** <br>
+Fixed bug which prevented OpenAI model to be trained more than 2 times in Azure cloud
+
+**[TRANSLATE-4748](https://jira.translate5.net/browse/TRANSLATE-4748): Content Protection - Content protected incorrectly for some xlf segments** <br>
+Fix content protection for XLF import
+
+**[TRANSLATE-4746](https://jira.translate5.net/browse/TRANSLATE-4746): Main back-end mechanisms (Worker, Logging, etc.) - No logs about e-mailing available** <br>
+A simple log file (data/logs/mail.log) about which emails are sended when is added.
+
+**[TRANSLATE-4745](https://jira.translate5.net/browse/TRANSLATE-4745): TermPortal - Tooltips missing for active filters tags** <br>
+FIXED: tooltips missing for active filters tags when browser tab opened with URL having search params
+
+**[TRANSLATE-4740](https://jira.translate5.net/browse/TRANSLATE-4740): Editor general - RootCause: Cannot read properties of undefined (reading 'errorCode')** <br>
+FIXED: added a check for aborted request
+
+**[TRANSLATE-4724](https://jira.translate5.net/browse/TRANSLATE-4724): InstantTranslate - Task TMs should not be used for pre-translation in InstantTranslate** <br>
+Now Task TMs are not assigned for file pretranslation in InstantTranslate
+
+**[TRANSLATE-4697](https://jira.translate5.net/browse/TRANSLATE-4697): Workflows - new workflow "Review and Print approval" should not have auto-assigned jobs** <br>
+Removed default jobs autocreation for "Review and Print approval" workflow (can be configured individually)
+
+
 ## [7.25.1] - 2025-06-27
 
 ### Important Notes:

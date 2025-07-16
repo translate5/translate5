@@ -144,11 +144,8 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
 
         if ($maxLength > 0 && strlen($path) > $maxLength) {
             $meta = pathinfo($path);
-            $path = substr(
-                $meta['filename'],
-                0,
-                $maxLength - strlen($meta['extension']) - 1
-            ) . '.' . $meta['extension'];
+            $len = strlen($meta['extension']) + 1;
+            $path = substr(substr($path, 0, -$len), 0, $maxLength - $len) . '.' . $meta['extension'];
         }
 
         return preg_replace('/-+/', '-', $path);

@@ -161,11 +161,14 @@ class editor_Models_Import_FileParser_Xlf_OtherContent
             $concatContent,
             $resetTagNumbers,
             $this->preserveWhitespace,
-            $shortcutNumberMap
         );
 
         //add the other data container for the first content BEFORE the first MRK:
-        $firstOtherContent = new editor_Models_Import_FileParser_Xlf_OtherContent_Data(0, $containerBoundary[0], reset($data)->startMrkIdx);
+        $firstOtherContent = new editor_Models_Import_FileParser_Xlf_OtherContent_Data(
+            '0',
+            $containerBoundary[0],
+            reset($data)->startMrkIdx
+        );
         if ($source) {
             array_unshift($this->otherContentSource, $firstOtherContent);
             $data = $this->otherContentSource;

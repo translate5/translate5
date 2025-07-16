@@ -98,7 +98,7 @@ Ext.define('Editor.view.admin.user.GridViewController', {
             email: '',
             login: '',
             gender: 'n',
-            roles: 'editor'
+            roles: 'editor,taskOverview'
         });
     },
 

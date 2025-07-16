@@ -725,6 +725,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     private const VERSION_0_6 = '0.6';
 
+    private const VERSION_0_7 = '0.7';
+
     private function addOverflowWarning(Task $task = null): void
     {
         $params = [
@@ -756,6 +758,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         return match (true) {
             str_starts_with($resources->Version ?? '', self::VERSION_0_5) => self::VERSION_0_5,
             str_starts_with($resources->Version ?? '', self::VERSION_0_6) => self::VERSION_0_6,
+            str_starts_with($resources->Version ?? '', self::VERSION_0_7) => self::VERSION_0_7,
             default => self::VERSION_0_4,
         };
     }
@@ -860,8 +863,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     {
         $version = $this->getT5MemoryVersion();
 
-        // TODO fix when export is merged
-        if ($version !== self::VERSION_0_6) {
+        // TODO remove after versioned API is removed
+        if (! in_array($version, [self::VERSION_0_6, self::VERSION_0_7], true)) {
             throw new \editor_Services_Connector_Exception('E1616', [
                 'languageResource' => $this->languageResource,
             ]);

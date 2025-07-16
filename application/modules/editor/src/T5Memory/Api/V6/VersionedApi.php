@@ -54,7 +54,7 @@ use RuntimeException;
 
 class VersionedApi extends AbstractVersionedApi
 {
-    public const VERSION = '^0.6';
+    public const VERSION = '^0.6 || ^0.7';
 
     public function __construct(
         private readonly ClientInterface $client,
