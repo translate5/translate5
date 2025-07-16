@@ -326,9 +326,8 @@ class editor_Workflow_Default_Hooks
 
     /**
      * can be triggered via API, valid triggers are currently
-     * @param string $trigger
      */
-    public function doDirectTrigger(editor_Models_Task $task, $trigger)
+    public function doDirectTrigger(editor_Models_Task $task, string $trigger, ?string $authUserGuid = null)
     {
         if (! in_array($trigger, $this->validDirectTrigger)) {
             return false;
@@ -337,7 +336,10 @@ class editor_Workflow_Default_Hooks
 
         try {
             //try to load an user assoc between current user and task
-            $this->newTaskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->getUserGuid(), $task);
+            $this->newTaskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask(
+                $authUserGuid ?? $this->authenticatedUser->getUserGuid(),
+                $task
+            );
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->newTaskUserAssoc = null;
         }
