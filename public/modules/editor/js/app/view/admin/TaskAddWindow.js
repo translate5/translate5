@@ -175,7 +175,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     fieldLabel: me.strings.taskNrLabel
                                 },{
                                     xtype: 'textarea',
-                                    maxLength: 500,
+                                    maxLength: 1000,
                                     name: 'description',
                                     fieldLabel: me.strings.description,
                                     renderer: (value) => Ext.String.htmlEncode(value)

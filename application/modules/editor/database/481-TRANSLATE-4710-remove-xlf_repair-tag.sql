@@ -25,9 +25,20 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE LEK_file_filter ADD COLUMN weight int default 0;
+UPDATE Zf_configuration set `value` = 'xliff_paired_tags' where `value` = 'xlf_repair';
+UPDATE Zf_configuration set `default` = 'xliff_paired_tags' where `default` = 'xlf_repair';
 
-INSERT INTO Zf_worker_dependencies (worker, dependency)
-VALUES ('MittagQI\\Translate5\\L10n\\ExportWorker', 'editor_Plugins_Okapi_Worker'),
-       ('editor_Models_Export_Exported_Worker', 'MittagQI\\Translate5\\L10n\\ExportWorker'),
-       ('editor_Models_Export_Exported_ZipDefaultWorker', 'MittagQI\\Translate5\\L10n\\ExportWorker');
+UPDATE LEK_task_config SET `value` = 'xliff_paired_tags' where `name` like '%.tagHandler' AND `value` = 'xlf_repair';
+UPDATE LEK_customer_config SET `value` = 'xliff_paired_tags' where `name` like '%.tagHandler' AND `value` = 'xlf_repair';
+
+
+UPDATE `Zf_configuration`
+SET `defaults` = CASE
+ WHEN `defaults` = 'xlf_repair' THEN ''
+ WHEN `defaults` LIKE 'xlf_repair,%' THEN SUBSTRING(`defaults`, 12)
+ WHEN `defaults` LIKE '%,xlf_repair' THEN SUBSTRING(`defaults`, 1, LENGTH(`defaults`) - 11)
+ WHEN `defaults` LIKE '%,xlf_repair,%' THEN REPLACE(`defaults`, ',xlf_repair,', ',')
+ ELSE `defaults`
+    END
+WHERE `name` LIKE '%.tagHandler'
+  AND `defaults` LIKE '%xlf_repair%';

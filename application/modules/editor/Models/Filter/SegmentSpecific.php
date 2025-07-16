@@ -162,6 +162,10 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
             $field = $table . '`.`' . $field;
         }
         $value = $this->escapeMysqlWildcards($value);
-        $this->where(' lower(`' . $field . '`) like lower(?) COLLATE utf8mb4_bin', '%' . $value . '%');
+        if (FEATURE_TRANSLATE_4673_ENABLE){
+            $this->where("`$field` like ? COLLATE utf8mb4_0900_as_ci", "%$value%");
+        } else {
+            $this->where(' lower(`' . $field . '`) like lower(?) COLLATE utf8mb4_bin', '%' . $value . '%');
+        }
     }
 }

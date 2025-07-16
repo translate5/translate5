@@ -31,7 +31,7 @@ VALUES
  
 INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) VALUES 
 ('editor_Models_Export_Xliff2Worker', 'editor_Models_Export_Worker'), -- if both are used, call the default export before
-('editor_Models_Export_ExportedWorker', 'editor_Models_Export_Xliff2Worker'),
+('editor_Models_Export_Exported_Worker', 'editor_Models_Export_Xliff2Worker'),
 ('editor_Plugins_SegmentStatistics_CleanUpWorker', 'editor_Models_Export_Xliff2Worker'),
 ('editor_Plugins_SegmentStatistics_Worker', 'editor_Models_Export_Xliff2Worker'),
 ('editor_Plugins_SegmentStatistics_WriteStatisticsWorker', 'editor_Models_Export_Xliff2Worker');

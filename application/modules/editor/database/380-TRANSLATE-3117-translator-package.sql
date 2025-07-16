@@ -31,7 +31,7 @@ VALUES
  ('runtimeOptions.worker.MittagQI\\Translate5\\Task\\Export\\Package\\Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'How many parallel processes are allowed for the package export. This value depends on what your hardware can serve. Please consult translate5s team, if you change this.','Package export: Max. parallel import processes','System setup: Load balancing','2');
  
  
-INSERT INTO `Zf_worker_dependencies` (`id`, `worker`, `dependency`) VALUES (NULL, 'editor_Models_Export_ExportedWorker', 'MittagQI\\Translate5\\Task\\Export\\Package\\Worker');
+INSERT INTO `Zf_worker_dependencies` (`id`, `worker`, `dependency`) VALUES (NULL, 'editor_Models_Export_Exported_Worker', 'MittagQI\\Translate5\\Task\\Export\\Package\\Worker');
 INSERT INTO `Zf_worker_dependencies` (`id`, `worker`, `dependency`) VALUES (NULL, 'editor_Plugins_SegmentStatistics_CleanUpWorker', 'MittagQI\\Translate5\\Task\\Export\\Package\\Worker');
 INSERT INTO `Zf_worker_dependencies` (`id`, `worker`, `dependency`) VALUES (NULL, 'editor_Plugins_SegmentStatistics_Worker', 'MittagQI\\Translate5\\Task\\Export\\Package\\Worker');
 INSERT INTO `Zf_worker_dependencies` (`id`, `worker`, `dependency`) VALUES (NULL, 'editor_Plugins_SegmentStatistics_WriteStatisticsWorker', 'MittagQI\\Translate5\\Task\\Export\\Package\\Worker');

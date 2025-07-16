@@ -262,6 +262,9 @@ class TmConversionService implements TmConversionServiceInterface
         $source = $this->convertT5MemoryTagToContent($source);
         $target = $this->convertT5MemoryTagToContent($target);
 
+        $source = $this->collapseTmxTags($source);
+        $target = $this->collapseTmxTags($target);
+
         $protectedSource = $this->contentProtector->protect(
             $source,
             true,
@@ -286,5 +289,83 @@ class TmConversionService implements TmConversionServiceInterface
             $this->convertContentTagToT5MemoryTag($source, true, $tagMap),
             $this->convertContentTagToT5MemoryTag($target, false, $tagMap),
         ];
+    }
+
+    private function collapseTmxTags(string $segment): string
+    {
+        return preg_replace('#<(ph|bpt|ept) ([^>]*)>(.*)</\1>#U', '<$1 $2/>', $segment);
+    }
+
+    private function convertTransUnit(
+        string $transUnit,
+        Language $sourceLang,
+        Language $targetLang,
+        int &$brokenTus,
+    ): string {
+        $sourceSegment = '';
+        $targetSegment = '';
+
+        $xml = XMLReader::XML($transUnit);
+
+        while ($xml->read()) {
+            if ($xml->nodeType !== XMLReader::ELEMENT) {
+                continue;
+            }
+
+            if ($xml->name !== 'tuv') {
+                continue;
+            }
+
+            $tuv = $xml->readOuterXML();
+            $lang = strtolower($xml->getAttribute('xml:lang'));
+
+            $segment = str_replace(['<seg>', '</seg>'], '', trim($xml->readInnerXml()));
+
+            if ($this->isSourceTuv($lang, $sourceLang, $targetLang)) {
+                $sourceSegment = $segment;
+                $transUnit = str_replace($tuv, str_replace($sourceSegment, '*source*', $tuv), $transUnit);
+            } else {
+                $targetSegment = $segment;
+                $transUnit = str_replace($tuv, str_replace($targetSegment, '*target*', $tuv), $transUnit);
+            }
+
+            if ('' !== $sourceSegment && '' !== $targetSegment) {
+                break;
+            }
+        }
+
+        // if there is no source or target tuv, then we assume that tu is broken
+        if ('' === $sourceSegment || '' === $targetSegment) {
+            $brokenTus++;
+
+            return '';
+        }
+
+        return str_replace(
+            [
+                '*source*',
+                '*target*',
+            ],
+            $this->convertPair(
+                $sourceSegment,
+                $targetSegment,
+                (int) $sourceLang->getId(),
+                (int) $targetLang->getId()
+            ),
+            $transUnit
+        );
+    }
+
+    private function isSourceTuv(string $tuvLang, Language $sourceLang, Language $targetLang): bool
+    {
+        if (strtolower($sourceLang->getRfc5646()) === $tuvLang) {
+            return true;
+        }
+
+        if (strtolower($targetLang->getRfc5646()) === $tuvLang) {
+            return false;
+        }
+
+        return str_contains($tuvLang, strtolower($sourceLang->getMajorRfc5646()));
     }
 }

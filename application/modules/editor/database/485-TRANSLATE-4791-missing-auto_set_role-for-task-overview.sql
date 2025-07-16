@@ -25,9 +25,17 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE LEK_file_filter ADD COLUMN weight int default 0;
-
-INSERT INTO Zf_worker_dependencies (worker, dependency)
-VALUES ('MittagQI\\Translate5\\L10n\\ExportWorker', 'editor_Plugins_Okapi_Worker'),
-       ('editor_Models_Export_Exported_Worker', 'MittagQI\\Translate5\\L10n\\ExportWorker'),
-       ('editor_Models_Export_Exported_ZipDefaultWorker', 'MittagQI\\Translate5\\L10n\\ExportWorker');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES
+    ('default', 'admin', 'auto_set_role', 'taskOverview'),
+    ('default', 'api', 'auto_set_role', 'taskOverview'),
+    ('default', 'clientpm', 'auto_set_role', 'taskOverview'),
+    ('default', 'jobCoordinator', 'auto_set_role', 'taskOverview'),
+    ('default', 'pm', 'auto_set_role', 'taskOverview'),
+    ('editor', 'admin', 'auto_set_role', 'taskOverview'),
+    ('editor', 'api', 'auto_set_role', 'taskOverview'),
+    ('editor', 'clientpm', 'auto_set_role', 'taskOverview'),
+    ('editor', 'pm', 'auto_set_role', 'taskOverview'),
+    ('editor', 'pmlight', 'auto_set_role', 'taskOverview'),
+    ('editor', 'systemadmin', 'auto_set_role', 'taskOverview')
+;

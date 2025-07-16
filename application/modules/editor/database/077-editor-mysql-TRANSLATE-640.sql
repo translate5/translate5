@@ -27,7 +27,7 @@
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
- ('runtimeOptions.worker.editor_Models_Export_ExportedWorker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the export completed notification worker.'),
+ ('runtimeOptions.worker.editor_Models_Export_Exported_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the export completed notification worker.'),
 ('runtimeOptions.worker.editor_Models_Import_Worker_SetTaskToOpen.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the Import completed notification worker'),
 ('runtimeOptions.worker.editor_Plugins_MtComparEval_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the MtComparEval communication worker'),
 ('runtimeOptions.worker.editor_Plugins_MtComparEval_CheckStateWorker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of MtComparEval check state worker'),
