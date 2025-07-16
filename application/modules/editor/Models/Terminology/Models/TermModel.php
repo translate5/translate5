@@ -256,8 +256,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $isTermForNewLanguage = ! $this->db->getAdapter()->query(
             'SELECT `id` 
             FROM `terms_term` 
-            WHERE TRUE 
-              AND `termEntryId` = :termEntryId
+            WHERE `termEntryId` = :termEntryId
               AND `languageId` = :languageId
               AND `id` != :id
             LIMIT 1',
@@ -959,7 +958,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Keyword WHERE clauses using LIKE
         foreach ($cols as $col) {
-            $keywordWHERE[] = sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);
+            if (FEATURE_TRANSLATE_4673_ENABLE) {
+                $keywordWHERE[] = sprintf('%s LIKE :keyword', $col);
+            } else {
+                $keywordWHERE[] = sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);
+            }
         }
 
         // Render keyword WHERE string
@@ -1916,8 +1919,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         return $this->db->getAdapter()->query(
             'SELECT `termTbxId` 
             FROM `terms_term` 
-            WHERE 1
-              AND `termEntryTbxId` IN ("' . join('","', $termEntryTbxIds) . '") 
+            WHERE `termEntryTbxId` IN ("' . join('","', $termEntryTbxIds) . '") 
               AND `term` = ?
               AND `languageId` IN (' . join(',', $languageIds) . ')',
             $term
@@ -2600,11 +2602,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Get termIds (as keys), for which proposals are detected
         $detected = $this->db->getAdapter()->query(
-            'SELECT `id`, 1 
+            "SELECT `id`, 1
             FROM `terms_term` 
-            WHERE 1
-              AND ' . $idWHERE . '
-              AND (`processStatus` = "unprocessed" OR `proposal` != "")'
+            WHERE $idWHERE
+              AND (`processStatus` = 'unprocessed' OR `proposal` != '')"
         )->fetchAll(PDO::FETCH_KEY_PAIR);
 
         // Unset those items from $termIdByAttrIdA for which no proposals were detected

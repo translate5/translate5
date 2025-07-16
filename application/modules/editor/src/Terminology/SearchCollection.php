@@ -163,7 +163,9 @@ class SearchCollection
         $s = $db->select()
             ->setIntegrityCheck(false)
             ->from('terms_term')
-            ->where('lower(term) ' . $compareWith . ' lower(?) COLLATE utf8mb4_bin', $this->query)
+            ->where(FEATURE_TRANSLATE_4673_ENABLE
+                ? ('term ' . $compareWith .  '?')
+                : ('lower(term) ' . $compareWith . ' lower(?) COLLATE utf8mb4_bin'), $this->query)
             ->where('collectionId = ?', $this->collectionId)
             ->where('languageId IN(?)', $langauges)
             ->group('termEntryTbxId');

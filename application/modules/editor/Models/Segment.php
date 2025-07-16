@@ -329,11 +329,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             $queryString = str_replace("?", "_", $queryString);
         }
         //if match case, search without lower function
-        if ($matchCase) {
-            return $adapter->quoteIdentifier($searchInField) . ' like ' . $adapter->quote('%' . $queryString . '%') . ' COLLATE utf8mb4_bin';
-        }
+        if(FEATURE_TRANSLATE_4673_ENABLE) {
+            if ($matchCase) {
+                return $adapter->quoteIdentifier($searchInField) . ' like ' . $adapter->quote("%$queryString%") . ' COLLATE utf8mb4_0900_as_ci';
+            }
 
-        return 'lower(' . $adapter->quoteIdentifier($searchInField) . ') like lower(' . $adapter->quote('%' . $queryString . '%') . ') COLLATE utf8mb4_bin';
+            return $adapter->quoteIdentifier($searchInField) . ' like ' . $adapter->quote("%$queryString%") . ' COLLATE utf8mb4_0900_as_ci';
+        } else {
+            if ($matchCase) {
+                return $adapter->quoteIdentifier($searchInField) . ' like ' . $adapter->quote('%' . $queryString . '%') . ' COLLATE utf8mb4_bin';
+            }
+
+            return 'lower(' . $adapter->quoteIdentifier($searchInField) . ') like lower(' . $adapter->quote('%' . $queryString . '%') . ') COLLATE utf8mb4_bin';
+        }
     }
 
     /**
