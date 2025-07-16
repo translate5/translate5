@@ -11,6 +11,60 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.26.0] - 2025-07-16
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4680](https://jira.translate5.net/browse/TRANSLATE-4680): LanguageResources - Re-Segment TMX on TMX import** <br>
+Add new Re-segment TMX on import feature
+
+
+### Changed
+**[TRANSLATE-4751](https://jira.translate5.net/browse/TRANSLATE-4751): TM Maintenance - TM maintenance: column selection not persistent** <br>
+All columns in TM segments grid are now visible by default
+
+**[TRANSLATE-4747](https://jira.translate5.net/browse/TRANSLATE-4747): TM Maintenance - TM Maintenance: text from columns cannot be marked (and copied)** <br>
+Text values in segments grid columns are now selectable
+
+**[TRANSLATE-4734](https://jira.translate5.net/browse/TRANSLATE-4734): Export, LanguageResources, TermPortal - API test for TermCollection excel export** <br>
+added missing API tests
+
+**[TRANSLATE-4714](https://jira.translate5.net/browse/TRANSLATE-4714): Auto-QA, InstantTranslate, LanguageResources - Assign all language resources on sending to human revision** <br>
+All language resource used for file translation are now assigned to a task after sending to human revision.
+
+**[TRANSLATE-4699](https://jira.translate5.net/browse/TRANSLATE-4699): ConnectWorldserver - Plugin ConnectWorldserver: Attribut “translate5_translation_tmx” optional** <br>
+Plugin ConnectWorldserver:
+providing a TM in Worldserver projects is now optional and not mandatory any more.
+
+**[TRANSLATE-4302](https://jira.translate5.net/browse/TRANSLATE-4302): Okapi integration - Add new grids/windows missing in the Okapi Plugin (idml, openxml, xliff)** <br>
+Added filter options missing in the Okapi Plugin (idml, openxml, xliff)
+
+
+### Bugfixes
+**[TRANSLATE-4795](https://jira.translate5.net/browse/TRANSLATE-4795): Export - Implement clean up of the data/Export folder to save disk space** <br>
+Sometimes data generated for export is not properly cleaned up, what might lead to unneeded hard disk usage. An automatic clean up for such data is generated.
+
+**[TRANSLATE-4738](https://jira.translate5.net/browse/TRANSLATE-4738): Auto-QA - RootCause: Cannot read properties of null (reading 'style')** <br>
+FIXED: problem with repeated sources/targets backgound color set up
+
+**[TRANSLATE-4728](https://jira.translate5.net/browse/TRANSLATE-4728): Workflows - Avoid duplicate workflow step labels in job's workflow steps list** <br>
+Avoid duplicate optional workflow step labels in job's workflow steps list
+
+**[TRANSLATE-4727](https://jira.translate5.net/browse/TRANSLATE-4727): InstantTranslate, t5memory - Use client's segmentation rules in InstantTranslate text field and for further segmentation of tmx on tmx import** <br>
+Use client's segmentation rules for InstantTranslate text field instead of hard-coded srx-rules
+
+**[TRANSLATE-4726](https://jira.translate5.net/browse/TRANSLATE-4726): InstantTranslate - DeepL problem with & character in Chinese** <br>
+7.26.0: Additional languages fixed
+7.25.1: FIXED: DeepL problem with '&' character in Chinese
+
+**[TRANSLATE-4134](https://jira.translate5.net/browse/TRANSLATE-4134): LanguageResources, t5memory - Clean-up CLI command for find and cleaning orphaned TMs and LanguageResources** <br>
+It may happen that Language Resources are deleted in translate5 but the files remain in t5memory and vice versa. There is now a CLI tool to find that fragments and clean them up.
+
+
 ## [7.25.3] - 2025-07-16
 
 ### Important Notes:
