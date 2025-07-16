@@ -86,7 +86,7 @@ the format is:
   log timestamp       level ecode (#ID)  app.domain → message'
             );
 
-        $this->setAliases(['logx']);
+        $this->setAliases(['logx', 'logy']);
 
         $this->addArgument('filter', InputArgument::OPTIONAL, 'Provide keywords to filter output. EXXXX is recognized as ecodes, text.text.text as domains and all other is searched in message. If keyword is only one Number, it is assumed that is a log ID an only that entry is shown.');
 
@@ -175,6 +175,10 @@ the format is:
         if ($input->getFirstArgument() === 'logx') {
             $input->setOption('since', 'today');
             $input->setOption('level', 7);
+        }
+
+        if ($input->getFirstArgument() === 'logy') {
+            $input->setOption('since', 'today');
         }
 
         if ($input->getOption('list-origin')) {
