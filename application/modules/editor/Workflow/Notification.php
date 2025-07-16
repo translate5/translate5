@@ -289,6 +289,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
             'workflow' => $workflow,
         ];
 
+        // To make deadline info available for visualApprover e-mail
         if (count($users) === 1) {
             $params['taskUserAssoc'] = $users[0];
         }

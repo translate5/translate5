@@ -1170,7 +1170,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
         $model = new ZfExtended_Models_Worker();
         // check if there are running exports
-        if ($model->isExportRunning($this->getTaskGuid(), $exportClass)) {
+        if ($model->hasWaitingWorker($this->getTaskGuid(), $exportClass)) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1538' => 'Task export: the task already contains running or pending exports. Try again later',
             ]);
