@@ -4420,9 +4420,9 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>translate5 wird geladen:</source>
                 <target>translate5 is loading:</target>
             </trans-unit>
-            <trans-unit id='dHJhbnNsYXRlNSBEb21haW4='>
-                <source>translate5 Domain</source>
-                <target>translate5 domain</target>
+            <trans-unit id='SW50ZXJuZXRhZHJlc3NlIChudXIgZGllIERvbWFpbik='>
+                <source>Internetadresse (nur die Domain)</source>
+                <target>Website address (domain only)</target>
             </trans-unit>
             <trans-unit id='T3BlbklEIHNlcnZlcg=='>
                 <source>OpenID server</source>
@@ -6756,9 +6756,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</source>
                 <target>Defines the number of days that the deadline should be in the future - seen from the time of of the project creation. Value sets the same config, as the "System configuration overwrite" of the same name.</target>
             </trans-unit>
-            <trans-unit id='Qml0dGUga29uZmlndXJpZXJlbiBTaWUgenVuw6RjaHN0IGRhcyBGZWxkICJ0cmFuc2xhdGU1IERvbWFpbiIgaW0gVGFiICJBbGxnZW1laW4iLiBEYW5hY2gga8O2bm5lbiBTaWUgT3BlbklEIENvbm5lY3QgZsO8ciBkaWVzZW4gS3VuZGVuIGVpbnJpY2h0ZW4u'>
-                <source>Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.</source>
-                <target>Please configure the "translate5 domain" field in the "General" tab first. After that you can set up OpenID Connect for this customer.</target>
+            <trans-unit id='Qml0dGUga29uZmlndXJpZXJlbiBTaWUgenVuw6RjaHN0IGRhcyBGZWxkICJJbnRlcm5ldGFkcmVzc2UgKG51ciBkaWUgRG9tYWluKSIgaW0gVGFiICJBbGxnZW1laW4iLiBEYW5hY2gga8O2bm5lbiBTaWUgT3BlbklEIENvbm5lY3QgZsO8ciBkaWVzZW4gS3VuZGVuIGVpbnJpY2h0ZW4u'>
+                <source>Bitte konfigurieren Sie zunächst das Feld "Internetadresse (nur die Domain)" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.</source>
+                <target>Please configure the "Website address (domain only)" field in the "General" tab first. After that you can set up OpenID Connect for this customer.</target>
             </trans-unit>
             <trans-unit id='QWxsZ2VtZWlu'>
                 <source>Allgemein</source>
