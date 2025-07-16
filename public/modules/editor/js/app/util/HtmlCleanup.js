@@ -120,6 +120,17 @@ Ext.define('Editor.util.HtmlCleanup', {
 		return html.replace(/<t5single>/ig, splitKey);
 	},
 
+    /**
+     * Removes any whitespace that may have been added by splitting/replacing internal tags with cleanAndSplitInternalTags
+     * TODO FIXME: This function is obsolete after TRANSLATE-4231 was integrated
+     * @param {string} html
+     * @returns {string}
+     */
+    cleanReplacedWhitespaceTags: function(html){
+        // the split-values need to match what was added in cleanAndSplitInternalTags !!
+        return html.split('<br/>').join('').split('&nbsp;').join(' ').split(' &emsp;').join(' ');
+    },
+
 	/**
      * Removes the "internal tags", div's with the classname "internal" and their contents.
 	 * The replacement can be given, the default is the empty string
