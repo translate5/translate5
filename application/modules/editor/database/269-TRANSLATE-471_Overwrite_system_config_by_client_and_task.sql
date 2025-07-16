@@ -1889,7 +1889,7 @@ UPDATE Zf_configuration SET
                  `level` = "1",
                  `description`  = "Max parallel running workers of the export completed notification worker.",
                  `comment` = ""
-                 WHERE `name` = "runtimeOptions.worker.editor_Models_Export_ExportedWorker.maxParallelWorkers";
+                 WHERE `name` = "runtimeOptions.worker.editor_Models_Export_Exported_Worker.maxParallelWorkers";
 UPDATE Zf_configuration SET
                  `default` = "1",
                  `defaults` = "",

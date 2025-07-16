@@ -29,5 +29,5 @@ ALTER TABLE LEK_file_filter ADD COLUMN weight int default 0;
 
 INSERT INTO Zf_worker_dependencies (worker, dependency)
 VALUES ('MittagQI\\Translate5\\L10n\\ExportWorker', 'editor_Plugins_Okapi_Worker'),
-       ('editor_Models_Export_ExportedWorker', 'MittagQI\\Translate5\\L10n\\ExportWorker'),
+       ('editor_Models_Export_Exported_Worker', 'MittagQI\\Translate5\\L10n\\ExportWorker'),
        ('editor_Models_Export_Exported_ZipDefaultWorker', 'MittagQI\\Translate5\\L10n\\ExportWorker');
