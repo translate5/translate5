@@ -141,6 +141,13 @@ class RecursiveFileDeletionTest extends TestCase
         });
         sort($deleteList);
         sort($deletedFiles);
+        $deleteList = array_map(function ($item) {
+            if (! str_starts_with($item, '/')) {
+                return sys_get_temp_dir() . '/' . $item;
+            }
+
+            return $item;
+        }, $deleteList);
         $this->assertEquals($deletedFiles, $deleteList);
         $this->assertFileStructureOnDisk($this->fileList);
     }
