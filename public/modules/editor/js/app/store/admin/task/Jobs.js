@@ -31,7 +31,10 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Store
  */
 Ext.define('Editor.store.admin.task.Jobs', {
-  extend : 'Ext.data.Store',
+    requires: [
+        'Editor.model.admin.TaskUserAssoc',
+    ],
+    extend : 'Ext.data.Store',
     model: 'Editor.model.admin.TaskUserAssoc',
     remoteFilter: false,
     pageSize: false,

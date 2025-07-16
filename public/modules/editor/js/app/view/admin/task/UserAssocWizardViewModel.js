@@ -29,6 +29,9 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.task.UserAssocWizardViewModel', {
     extend: 'Editor.view.admin.user.AssocViewModel',
     alias: 'viewmodel.adminTaskUserAssocWizard',
+    requires: [
+        'Editor.model.admin.TaskUserAssoc',
+    ],
 
     data:{
         sendPreImportOperation:false
