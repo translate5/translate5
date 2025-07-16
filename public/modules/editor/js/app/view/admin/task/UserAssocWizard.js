@@ -47,7 +47,8 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     itemId:'adminTaskUserAssocWizard',
     requires: [
         'Editor.view.admin.task.UserAssoc',
-        'Editor.view.admin.task.UserAssocWizardViewController'
+        'Editor.view.admin.task.UserAssocWizardViewController',
+        'Editor.model.admin.TaskUserAssoc'
     ],
     viewModel:{
         type:'adminTaskUserAssocWizard'

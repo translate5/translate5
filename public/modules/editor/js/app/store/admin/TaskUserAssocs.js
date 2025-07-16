@@ -32,7 +32,10 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Store
  */
 Ext.define('Editor.store.admin.TaskUserAssocs', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.admin.TaskUserAssoc',
-  autoLoad: false
+    requires: [
+        'Editor.model.admin.TaskUserAssoc',
+    ],
+    extend : 'Ext.data.Store',
+    model: 'Editor.model.admin.TaskUserAssoc',
+    autoLoad: false
 });
