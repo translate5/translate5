@@ -10,6 +10,38 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.25.3] - 2025-07-16
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4758](https://jira.translate5.net/browse/TRANSLATE-4758): ConnectWorldserver - Plugin ConnectWorldserver: Flexible language mapping** <br>
+Add configurable language mappings between Worldserver languages and translate5 languages
+
+**[TRANSLATE-4710](https://jira.translate5.net/browse/TRANSLATE-4710): LanguageResources - Remove xlf_repair tag repair** <br>
+xlf_repair tag repair is removed.
+
+
+### Bugfixes
+**[TRANSLATE-4799](https://jira.translate5.net/browse/TRANSLATE-4799): Workflows - Extend project description to 1000 characters** <br>
+Extended max project description length to 1000 characters
+
+**[TRANSLATE-4791](https://jira.translate5.net/browse/TRANSLATE-4791): Editor general, sso - Missing auto_set_role for new taskOverview role** <br>
+Added missing automatic role set for the new taskOverview role which might have caused problems on SSO login
+
+**[TRANSLATE-4788](https://jira.translate5.net/browse/TRANSLATE-4788): Export - HOTFIX: Wrong export-exported worker-name in DB** <br>
+FIX: Wrong worker-name for export-exported worker in worker-dependency table
+
+**[TRANSLATE-4787](https://jira.translate5.net/browse/TRANSLATE-4787): Editor general - RootCause: can't access property "getStyle" of null** <br>
+DEBUG: Added suppressing this problem in more cases to see if this help
+
+**[TRANSLATE-4786](https://jira.translate5.net/browse/TRANSLATE-4786): Editor general - RootCause: Invalid JSON - answer seems not to be from translate5** <br>
+Added pre-loading of a possibly missing script to solve 'Not found' error
+
+
 ## [7.25.2] - 2025-07-15
 
 ### Important Notes:
