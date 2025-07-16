@@ -30,7 +30,6 @@ namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation;
 
 use MittagQI\Translate5\Plugins\Okapi\Bconf\ResourceFile;
 use ZfExtended_Dom;
-use ZfExtended_Exception;
 
 /**
  * Class representing a SRX file
@@ -40,21 +39,6 @@ use ZfExtended_Exception;
 final class Srx extends ResourceFile
 {
     public const EXTENSION = 'srx';
-
-    /**
-     * @var string
-     */
-    public const SYSTEM_TARGET_SRX = '/application/modules/editor/Plugins/Okapi/data/srx/translate5/languages-2.srx';
-
-    /**
-     * Create and return self instance using SYSTEM_TARGET_SRX as path
-     *
-     * @throws ZfExtended_Exception
-     */
-    public static function createSystemTargetSrx(): Srx
-    {
-        return new self(APPLICATION_ROOT . self::SYSTEM_TARGET_SRX);
-    }
 
     // a SRX is generally a XML variant
     protected string $mime = 'text/xml';

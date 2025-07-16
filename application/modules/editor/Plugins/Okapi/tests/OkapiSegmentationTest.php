@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Test\UnitTestAbstract;
 
 /**
@@ -42,7 +42,8 @@ class OkapiSegmentationTest extends UnitTestAbstract
     public function testSegmentation()
     {
         // Get Srx-class instance
-        $srx = Srx::createSystemTargetSrx();
+        $bconf = new BconfEntity();
+        $srx = $bconf->getDefaultBconf()->getSrx('source');
 
         // Text to be splitted by segments
         $text = 'Herzlich Willkommen zum Verkaufstraining für die barrierefreie Nullschwelle in Verbindung mit dem Schüco AD UP. Nutzen Sie die Abschnitte rechts, um das Produkt kennenzulernen und sich optimal auf die Beratung Ihrer Partner und Kunden vorzubereiten. Am Ende eines Abschnitts werden Sie auf Quizfragen stoßen, die Ihnen helfen, Ihr Wissen zu überprüfen. Beantworten Sie 80% der Fragen richtig für einen erfolgreichen Abschluss. Die Offline-Präsentation wird von David O. McKay und B. H. Roberts durchgeführt. Los geht\'s!';
