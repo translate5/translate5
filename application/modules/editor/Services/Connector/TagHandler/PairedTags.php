@@ -26,9 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\ProtectionTagsFilter;
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\Segment\TagRepair\Xliff\TranslationTagConverter;
+use MittagQI\Translate5\Segment\TagRepair\Xliff\XliffTagRepairer;
 
-class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Connector_TagHandler_PairedTagsSelfClosing
+class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Connector_TagHandler_Xliff
 {
     /**
      * Translation service used to convert the xlff format tags to service tags and vice versa.
@@ -38,7 +42,14 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
 
     public function __construct(array $options = [])
     {
+        $options['gTagPairing'] = false;
         parent::__construct($options);
+        $protectors = [];
+
+        if ($this->keepWhitespaceTags === false) {
+            $protectors[] = new WhitespaceProtector($this->utilities->whitespace);
+        }
+        $this->contentProtector = new ContentProtector($protectors, [ProtectionTagsFilter::create()]);
         $this->translationTagConverter = new TranslationTagConverter($this->logger);
     }
 
@@ -77,7 +88,10 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
 
         try {
             $convertedString = $this->translationTagConverter->convertToOriginalFormat($resultString);
-            $restoredString = parent::restoreInResult($convertedString);
+            $repairer = new XliffTagRepairer();
+            $repairedText = $repairer->repairTranslation($this->getQuerySegment(), $convertedString);
+
+            $restoredString = parent::restoreInResult($repairedText);
 
             return $restoredString;
         } catch (Exception $e) {
@@ -95,5 +109,21 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
 
             return strip_tags($resultString);
         }
+    }
+
+    protected function convertQueryContent(string $queryString, bool $isSource = true): string
+    {
+        if ($this->keepWhitespaceTags) {
+            return $queryString;
+        }
+        $queryString = $this->utilities->internalTag->restore(
+            $this->trackChange->removeTrackChanges($queryString),
+            $this->getTagsForRestore(),
+            $this->highestShortcutNumber,
+            $this->shortcutNumberMap
+        );
+        $whitespace = WhitespaceProtector::create();
+
+        return $whitespace->unprotect($queryString, false);
     }
 }

@@ -33,7 +33,6 @@ namespace MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing;
 use editor_Services_Connector_TagHandler_Abstract;
 use editor_Services_Connector_TagHandler_HtmlRepaired;
 use editor_Services_Connector_TagHandler_PairedTags;
-use editor_Services_Connector_TagHandler_PairedTagsSelfClosing;
 use editor_Services_Connector_TagHandler_Remover;
 use editor_Services_Connector_TagHandler_T5MemoryXliff;
 use editor_Services_Connector_TagHandler_Xliff;
@@ -57,7 +56,6 @@ class TagHandlerFactory
             'xliff' => Factory::get(editor_Services_Connector_TagHandler_Xliff::class, [$params]),
             'html_image' => Factory::get(editor_Services_Connector_TagHandler_HtmlRepaired::class, [$params]),
             't5memoryxliff' => Factory::get(editor_Services_Connector_TagHandler_T5MemoryXliff::class, [$params]),
-            'xlf_repair' => Factory::get(editor_Services_Connector_TagHandler_PairedTagsSelfClosing::class, [$params]),
             'xliff_paired_tags' => Factory::get(editor_Services_Connector_TagHandler_PairedTags::class, [$params]),
             default => Factory::get(editor_Services_Connector_TagHandler_Remover::class, [$params]),
         };
