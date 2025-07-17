@@ -25,5 +25,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_worker_dependencies` (`worker`,`dependency`) VALUES
+INSERT IGNORE INTO `Zf_worker_dependencies` (`worker`,`dependency`) VALUES
     ("MittagQI\\Translate5\\Workflow\\ArchiveWorker", "editor_Plugins_Okapi_Worker");
