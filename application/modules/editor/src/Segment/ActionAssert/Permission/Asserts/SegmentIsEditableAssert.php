@@ -79,7 +79,7 @@ class SegmentIsEditableAssert implements PermissionAssertInterface
             $task->getWorkflowStepName()
         );
 
-        if ($tua->isSegmentrangedTaskForStep($task, $task->getWorkflowStepName())) {
+        if ($tua && $tua->isSegmentrangedTaskForStep($task, $task->getWorkflowStepName())) {
             $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep(
                 $task->getTaskGuid(),
                 $context->actor->getUserGuid(),
