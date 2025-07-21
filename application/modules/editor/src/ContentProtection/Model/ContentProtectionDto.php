@@ -88,4 +88,18 @@ class ContentProtectionDto
             (int) $row['priority'],
         );
     }
+
+    public static function fake(string $type, string $name, string $regex): self
+    {
+        return new self(
+            $type,
+            $name,
+            $regex,
+            0,
+            null,
+            true,
+            null,
+            1,
+        );
+    }
 }

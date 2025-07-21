@@ -50,15 +50,35 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\Model\Db;
+namespace MittagQI\Translate5\T5Memory\ContentProtection;
 
-use Zend_Db_Table_Abstract;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\AbstractProtector;
 
-class ContentRecognitionTable extends Zend_Db_Table_Abstract
+/**
+ * Used to compose CP tag of content found only in TM and not in task on fuzzy search
+ */
+class DiffProtector extends AbstractProtector
 {
-    public const TABLE_NAME = 'LEK_content_protection_content_recognition';
+    public static function create(): self
+    {
+        return new self(
+            ContentProtectionRepository::create(),
+        );
+    }
 
-    protected $_name = self::TABLE_NAME;
+    public static function getType(): string
+    {
+        return 'diff';
+    }
 
-    public $_primary = 'id';
+    public function validateFormat(string $format): bool
+    {
+        return true;
+    }
+
+    public function getFormatedExample(string $format): string
+    {
+        return '/some example content/';
+    }
 }

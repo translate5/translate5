@@ -59,13 +59,10 @@ use MittagQI\Translate5\ContentProtection\DTO\ConversionToInternalTagResult;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\NumberProtectorProvider;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\MacAddressProtector;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
@@ -79,11 +76,6 @@ class NumberProtector implements ProtectorInterface
 
     private const PLACEHOLDER_FORMAT = '¿¿¿%s¿¿¿';
 
-    /**
-     * @var array<string, NumberProtectorInterface>
-     */
-    private array $protectors;
-
     private array $protectedNumbers = [];
 
     /**
@@ -96,28 +88,22 @@ class NumberProtector implements ProtectorInterface
      */
     private array $hasTextRules = [];
 
-    /**
-     * @param array<NumberProtectorInterface> $protectors
-     */
     public function __construct(
-        array $protectors,
         private readonly ContentProtectionRepository $numberRepository,
         private readonly LanguageRepository $languageRepository,
         private readonly ZfExtended_Logger $logger,
+        private readonly NumberProtectorProvider $numberProtectorProvider,
     ) {
-        foreach ($protectors as $protector) {
-            $this->protectors[$protector::getType()] = $protector;
-        }
     }
 
     public function validateFormat(string $type, string $format): bool
     {
-        return $this->protectors[$type]->validateFormat($format);
+        return $this->numberProtectorProvider->getByType($type)->validateFormat($format);
     }
 
     public function getFormatedExample(string $type, string $format): string
     {
-        return $this->protectors[$type]->getFormatedExample($format);
+        return $this->numberProtectorProvider->getByType($type)->getFormatedExample($format);
     }
 
     /**
@@ -163,18 +149,10 @@ class NumberProtector implements ProtectorInterface
         $logger = $logger ?: Zend_Registry::get('logger')->cloneMe('translate5.content_protection');
 
         return new self(
-            [
-                new DateProtector($numberRepository),
-                new FloatProtector($numberRepository),
-                new IntegerProtector($numberRepository),
-                new IPAddressProtector($numberRepository),
-                new MacAddressProtector($numberRepository),
-                new KeepContentProtector($numberRepository),
-                new ReplaceContentProtector($numberRepository),
-            ],
             $numberRepository,
             new LanguageRepository(),
             $logger,
+            NumberProtectorProvider::create(),
         );
     }
 
@@ -183,16 +161,11 @@ class NumberProtector implements ProtectorInterface
         return (bool) preg_match(self::fullTagRegex(), $tag);
     }
 
-    public static function getIsoFromTag(string $tag): string
+    public static function getTagUniqueKey(string $tag): string
     {
-        preg_match('/iso="(.+)"/U', $tag, $matches);
+        preg_match(self::fullTagRegex(), $tag, $matches);
 
-        return 'iso:' . $matches[1];
-    }
-
-    public function types(): array
-    {
-        return array_keys($this->protectors);
+        return 'type:' . $matches[1] . ';iso:' . $matches[4];
     }
 
     public function priority(): int
@@ -440,15 +413,15 @@ class NumberProtector implements ProtectorInterface
         $wholeTag = $xml->getChunk($key);
         $shortTagNumber = $shortTagIdent;
 
-        $iso = self::getIsoFromTag($wholeTag);
+        $uniqueKey = self::getTagUniqueKey($wholeTag);
 
         if ($collectTagNumbers) {
-            $shortcutNumberMap[$iso][] = $shortTagNumber;
+            $shortcutNumberMap[$uniqueKey][] = $shortTagNumber;
             $shortTagIdent++;
         }
         //either we get a reusable shortcut number in the map, or we have to increment one
-        elseif (! empty($shortcutNumberMap) && ! empty($shortcutNumberMap[$iso])) {
-            $shortTagNumber = array_shift($shortcutNumberMap[$iso]);
+        elseif (! empty($shortcutNumberMap) && ! empty($shortcutNumberMap[$uniqueKey])) {
+            $shortTagNumber = array_shift($shortcutNumberMap[$uniqueKey]);
         } else {
             $shortTagIdent++;
         }
@@ -462,7 +435,7 @@ class NumberProtector implements ProtectorInterface
             'source' => $source,
             'target' => $target,
         ]);
-        $tagObj->iso = $iso;
+        $tagObj->iso = $uniqueKey;
         $tagObj->source = $source;
         //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
         $tagObj->renderTag(title: "&lt;$shortTagNumber/&gt; CP: $name", cls: ' ' . self::TAG_NAME);
@@ -593,7 +566,8 @@ class NumberProtector implements ProtectorInterface
         if (! isset($this->protectedNumbers[$numberKey])) {
             try {
                 $protectedNumber = $this
-                    ->protectors[$langFormat->type]
+                    ->numberProtectorProvider
+                    ->getByType($langFormat->type)
                     ->protect($number, $langFormat, $sourceLang, $targetLang);
             } catch (NumberParsingException) {
                 // if match was not actually a number - return it as is

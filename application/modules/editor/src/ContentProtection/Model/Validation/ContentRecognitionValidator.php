@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection\Model\Validation;
 
 use MittagQI\Translate5\ContentProtection\Model\Db\ContentRecognitionTable;
-use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\NumberProtectorProvider;
 use Zend_Validate;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Abstract;
@@ -61,7 +61,7 @@ class ContentRecognitionValidator extends ValidatorWithContext
         ]), true);
         $this->addValidatorInstance('id', $idValidator);
 
-        $this->addValidator('type', 'InArray', [NumberProtector::create()->types()]);
+        $this->addValidator('type', 'InArray', [NumberProtectorProvider::create()->types()]);
         //`name` varchar(255) NOT NULL,
         $this->addValidator('name', 'stringLength', [
             'min' => 3,

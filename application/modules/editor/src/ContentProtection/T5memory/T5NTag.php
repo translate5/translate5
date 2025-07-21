@@ -53,6 +53,11 @@ class T5NTag
         );
     }
 
+    public function getRegex(): string
+    {
+        return gzinflate(base64_decode($this->rule));
+    }
+
     public static function fullTagRegex(): string
     {
         return sprintf('/<%s id="(\d+)" r="(.+)" n="(.+)"\s?\/>/Uu', self::TAG);

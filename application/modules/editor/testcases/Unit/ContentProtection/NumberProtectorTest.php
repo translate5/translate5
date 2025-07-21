@@ -55,6 +55,7 @@ namespace MittagQI\Translate5\Test\Unit\ContentProtection;
 use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
+use MittagQI\Translate5\ContentProtection\NumberProtection\NumberProtectorProvider;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
@@ -96,8 +97,14 @@ class NumberProtectorTest extends TestCase
         $numberRepository = $this->createConfiguredMock(ContentProtectionRepository::class, []);
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
         $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
+        $numberProtectorProvider = $this->createConfiguredMock(
+            NumberProtectorProvider::class,
+            [
+                'getByType' => $processor,
+            ]
+        );
 
-        $protector = new NumberProtector([$processor], $numberRepository, $languageRepository, $logger);
+        $protector = new NumberProtector($numberRepository, $languageRepository, $logger, $numberProtectorProvider);
 
         self::assertTrue($protector->hasEntityToProtect('text with number [2] in it'));
         self::assertTrue($protector->hasEntityToProtect('text with part of mac [aa:] in it'));
@@ -133,12 +140,18 @@ class NumberProtectorTest extends TestCase
             'find' => $sourceLang,
         ]);
         $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
+        $numberProtectorProvider = $this->createConfiguredMock(
+            NumberProtectorProvider::class,
+            [
+                'getByType' => new IPAddressProtector($numberRepository),
+            ]
+        );
 
         $protector = new NumberProtector(
-            [new IPAddressProtector($numberRepository)],
             $numberRepository,
             $languageRepository,
-            $logger
+            $logger,
+            $numberProtectorProvider,
         );
 
         self::assertSame(
@@ -178,11 +191,18 @@ class NumberProtectorTest extends TestCase
         $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
         $logger->expects($this->once())->method('__call')->with('warn');
 
+        $numberProtectorProvider = $this->createConfiguredMock(
+            NumberProtectorProvider::class,
+            [
+                'getByType' => new IPAddressProtector($numberRepository),
+            ]
+        );
+
         $protector = new NumberProtector(
-            [new IPAddressProtector($numberRepository)],
             $numberRepository,
             $languageRepository,
-            $logger
+            $logger,
+            $numberProtectorProvider,
         );
 
         self::assertSame(
@@ -219,8 +239,8 @@ class NumberProtectorTest extends TestCase
             'finalTagIdent' => 2,
         ];
 
-        $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target=""/>';
-        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="" class="full"></span></div>';
+        $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target="1234"/>';
+        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d2231323334222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="1234" class="full"></span></div>';
 
         yield [
             'segment' => "string $tag1 string $tag2 string",
@@ -252,7 +272,7 @@ class NumberProtectorTest extends TestCase
         $parsedTag1->id = 'number';
         $parsedTag1->tag = 'number';
         $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
-        $parsedTag1->iso = 'iso:2023-10-20';
+        $parsedTag1->iso = 'type:date;iso:2023-10-20';
         $parsedTag1->source = '20231020';
         $parsedTag1->renderedTag = $converted1;
 
@@ -262,16 +282,16 @@ class NumberProtectorTest extends TestCase
             'finalTagIdent' => 2,
         ];
 
-        $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target=""/>';
-        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="" class="full"></span></div>';
+        $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target="1234"/>';
+        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d2231323334222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="1234" class="full"></span></div>';
 
         $parsedTag2 = new NumberTag();
         $parsedTag2->originalContent = $tag2;
         $parsedTag2->tagNr = 2;
         $parsedTag2->id = 'number';
         $parsedTag2->tag = 'number';
-        $parsedTag2->text = '{"source":"1234","target":""}';
-        $parsedTag2->iso = 'iso:1234';
+        $parsedTag2->text = '{"source":"1234","target":"1234"}';
+        $parsedTag2->iso = 'type:integer;iso:1234';
         $parsedTag2->source = '1234';
         $parsedTag2->renderedTag = $converted2;
 

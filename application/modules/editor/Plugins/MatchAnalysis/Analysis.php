@@ -267,7 +267,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         // If it is repetition match, no need to do anything bellow. Just pre-translate the segment out of the master
         // repetition
-        if ($masterResult->matchrate === FileBasedInterface::TERMCOLLECTION_MATCH_VALUE) {
+        if ($masterHasResult && $masterResult->matchrate === FileBasedInterface::TERMCOLLECTION_MATCH_VALUE) {
             $this->saveAnalysis($segment, FileBasedInterface::REPETITION_MATCH_VALUE, 0);
             $masterResult->matchrate = FileBasedInterface::REPETITION_MATCH_VALUE;
             $masterResult->isRepetition = true;

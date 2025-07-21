@@ -422,7 +422,7 @@ class ContentProtectorTest extends UnitTestAbstract
         $parsedTag1->tag = 'number';
         $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
         $parsedTag1->renderedTag = $converted1;
-        $parsedTag1->iso = 'iso:2023-10-20';
+        $parsedTag1->iso = 'type:date;iso:2023-10-20';
         $parsedTag1->source = '20231020';
 
         yield [

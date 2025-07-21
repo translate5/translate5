@@ -152,6 +152,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             'gTagPairing' => false,
             TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $this->isSendingWhitespaceAsTagEnabled(),
         ]);
+        $this->tagHandler->setLanguages(
+            (int) ($sourceLang ?: $languageResource->getSourceLang()),
+            (int) ($targetLang ?: $languageResource->getSourceLang()),
+        );
     }
 
     /**

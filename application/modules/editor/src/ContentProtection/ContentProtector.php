@@ -318,6 +318,7 @@ class ContentProtector
                     $shortTagIdent,
                     $shortcutNumberMap
                 );
+                $shortTagIdent = $dto->shortTagIdent;
                 $segment = $dto->segment;
             }
         }

@@ -288,7 +288,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $shortcutNumberMapKey = $result;
 
             if (NumberProtector::isNumberTag($result)) {
-                $shortcutNumberMapKey = NumberProtector::getIsoFromTag($result);
+                $shortcutNumberMapKey = NumberProtector::getTagUniqueKey($result);
             }
 
             if (! array_key_exists($shortcutNumberMapKey, $shortcutNumberMap)) {

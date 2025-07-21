@@ -58,6 +58,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Languages as Languages;
 use editor_Services_Manager;
 use MittagQI\Translate5\ContentProtection\DTO\RulesHashDto;
+use MittagQI\Translate5\ContentProtection\Model\Db\ContentRecognitionTable;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceContentProtector;
 use MittagQI\Translate5\Repository\LanguageRepository;
@@ -418,6 +419,40 @@ class ContentProtectionRepository
         }
 
         return $hashes;
+    }
+
+    public function findRecognitionByRegex(string $regex): ?ContentRecognition
+    {
+        $select = $this->db
+            ->select()
+            ->from(
+                [
+                    'recognition' => ContentRecognitionTable::TABLE_NAME,
+                ],
+                ['recognition.*']
+            )
+            ->where('recognition.regex = ?', $regex)
+            ->limit(1);
+
+        $row = $this->db->fetchRow($select);
+
+        if (! $row) {
+            return null;
+        }
+
+        $recognition = new ContentRecognition();
+        $recognition->init(
+            new \Zend_Db_Table_Row(
+                [
+                    'table' => $recognition->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $recognition;
     }
 
     private function getKeepAsIsSelect(array $sourceIds): Zend_Db_Table_Select

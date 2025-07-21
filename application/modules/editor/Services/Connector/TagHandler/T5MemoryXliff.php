@@ -26,9 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
+use MittagQI\Translate5\ContentProtection\NumberProtection\NumberProtectorProvider;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTag;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\T5Memory\ContentProtection\DiffProtector;
 
 class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff
 {
@@ -36,12 +42,20 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
 
     private NumberProtector $numberProtector;
 
-    private TmConversionService $conversionService;
+    private readonly TmConversionService $conversionService;
 
     /**
      * @var array<string, array<string, \SplQueue<int>>>
      */
-    private array $numberTagMap = [];
+    private array $contentProtectionTagMap = [];
+
+    private readonly ContentProtectionRepository $contentProtectionRepository;
+
+    private readonly NumberProtectorProvider $numberProtectorProvider;
+
+    private readonly DiffProtector $diffProtector;
+
+    private readonly LanguageRepository $languageRepository;
 
     public function __construct(array $options = [])
     {
@@ -50,39 +64,54 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         $this->numberProtector = NumberProtector::create();
         $this->xmlparser->registerElement(NumberProtector::TAG_NAME, null, function ($tagName, $key, $opener) {
             $this->xmlparser->replaceChunk($key, function () use ($key) {
-                return $this->numberProtector->convertToInternalTagsWithShortcutNumberMap(
+                $dto = $this->numberProtector->convertToInternalTagsWithShortcutNumberMap(
                     $this->xmlparser->getChunk($key),
                     $this->shortTagIdent,
                     $this->shortcutNumberMap
-                )->segment;
+                );
+
+                $this->shortTagIdent = $dto->shortTagIdent;
+
+                // current shortTagIdent is the next free number, so we set it to the highest used number
+                $this->highestShortcutNumber = $this->shortTagIdent - 1;
+
+                return $dto->segment;
             });
         });
+        $this->contentProtectionRepository = ContentProtectionRepository::create();
+        $this->numberProtectorProvider = NumberProtectorProvider::create();
+        $this->diffProtector = DiffProtector::create();
+        $this->languageRepository = LanguageRepository::create();
     }
 
     public function restoreInResult(string $resultString, bool $isSource = true): ?string
     {
         $t5nTagRegex = T5NTag::fullTagRegex();
+        $protectionDtos = [];
+        $sourceLang = $this->languageRepository->find($this->sourceLang);
+        $targetLang = $this->languageRepository->find($this->targetLang);
 
         if (preg_match_all($t5nTagRegex, $resultString, $matches, PREG_SET_ORDER)) {
-            $numberTags = [];
+            $contentProtectionTags = [];
             foreach ($matches as $match) {
-                // $numberTags[*r*][*id*] = ['number' => *n*, 'tag' => *wholeTag*];
-                $numberTags[$match[2]][$match[1]] = [
-                    'number' => html_entity_decode($match[3]),
-                    'tag' => $match[0],
+                $tag = T5NTag::fromMatch($match);
+                // $contentProtectionTags[*rule*][*id*] = ['tag' => *T5NTag*, 'render' => *wholeTag*];
+                $contentProtectionTags[$tag->rule][$tag->id] = [
+                    'render' => $match[0],
+                    'tag' => $tag,
                 ];
             }
 
-            foreach ($numberTags as $rule => $tags) {
+            foreach ($contentProtectionTags as $rule => $tags) {
                 // sort tags by their ids
                 ksort($tags);
                 // get rid of the keys
                 $tags = array_values($tags);
 
-                if (isset($this->numberTagMap[$rule])) {
+                if (isset($this->contentProtectionTagMap[$rule])) {
                     $taskSegmentTags = [];
 
-                    foreach ($this->numberTagMap[$rule] as $tag => $ids) {
+                    foreach ($this->contentProtectionTagMap[$rule] as $tag => $ids) {
                         foreach ($ids as $id) {
                             $taskSegmentTags[$id] = $tag;
                         }
@@ -96,7 +125,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                             break;
                         }
 
-                        $resultString = str_replace($tags[$id]['tag'], $segmentTag, $resultString);
+                        $resultString = str_replace($tags[$id]['render'], $segmentTag, $resultString);
 
                         unset($tags[$id]);
                     }
@@ -106,8 +135,43 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                     }
                 }
 
-                foreach ($tags as ['number' => $number, 'tag' => $tag]) {
-                    $resultString = str_replace($tag, $number, $resultString);
+                foreach ($tags as ['tag' => $tag, 'render' => $render]) {
+                    if (null === $sourceLang || null === $targetLang) {
+                        // no language found, so we just unprotect the content
+                        $resultString = str_replace($render, $tag->content, $resultString);
+
+                        continue;
+                    }
+
+                    if (! isset($protectionDtos[$rule])) {
+                        $recognition = $this->contentProtectionRepository->findRecognitionByRegex($tag->getRegex());
+
+                        $protectionDtos[$rule] = null === $recognition
+                            ? ContentProtectionDto::fake(
+                                DiffProtector::getType(),
+                                'Missing rule - in TM only',
+                                $tag->getRegex(),
+                            )
+                            : ContentProtectionDto::fake(
+                                $recognition->getType(),
+                                $recognition->getName() . ' - in TM only',
+                                $recognition->getRegex(),
+                            )
+                        ;
+                    }
+
+                    $dto = $protectionDtos[$rule];
+
+                    $resultString = str_replace(
+                        $render,
+                        $this->getProtector($dto->type)->protect(
+                            $tag->content,
+                            $dto,
+                            $sourceLang,
+                            $targetLang,
+                        ),
+                        $resultString
+                    );
                 }
             }
         }
@@ -115,11 +179,20 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         return parent::restoreInResult($resultString, $isSource);
     }
 
+    private function getProtector(string $type): NumberProtectorInterface
+    {
+        if (DiffProtector::getType() === $type) {
+            return $this->diffProtector;
+        }
+
+        return $this->numberProtectorProvider->getByType($type);
+    }
+
     protected function convertQuery(string $queryString, bool $isSource): string
     {
-        $this->numberTagMap = [];
+        $this->contentProtectionTagMap = [];
 
-        return $this->conversionService->convertContentTagToT5MemoryTag($queryString, $isSource, $this->numberTagMap);
+        return $this->conversionService->convertContentTagToT5MemoryTag($queryString, $isSource, $this->contentProtectionTagMap);
     }
 
     protected function processXliffTags(string $queryString): string
