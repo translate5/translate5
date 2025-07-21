@@ -80,7 +80,9 @@ Ext.define('Editor.controller.BatchEditing', {
 
     onProjectGridCheckColumnCheckChange: function (cmp, rowIndex, checked, record){
 
-        this.redirectTo('project/' + record.get('id') + '/focus');
+        if (!location.hash.match('project/' + record.get('id') + '/')) {
+            this.redirectTo('project/' + record.get('id') + '/focus');
+        }
 
         const projectGridView = this.getProjectGridView();
         if (projectGridView.getNode(rowIndex)) {
