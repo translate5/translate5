@@ -34,10 +34,14 @@ use Bootstrap;
 use editor_Workflow_Exception;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\Logging\Rotation;
+use MittagQI\Translate5\Tools\DatabaseOptimizer;
+use MittagQI\Translate5\Tools\DatabaseOptimizer\ReportDto;
 use MittagQI\ZfExtended\Mail\MailLogger;
 use MittagQI\ZfExtended\Worker\Logger;
 use ReflectionException;
 use Zend_Application_Bootstrap_Exception as Zend_Application_Bootstrap_ExceptionAlias;
+use Zend_Db;
+use Zend_Db_Exception;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Debug;
@@ -102,6 +106,7 @@ class Cronjobs
 
         // Rotate logs
         $this->rotateLogs();
+        $this->databaseOptimize();
         $this->logCall(CronEventTrigger::DAILY);
     }
 
@@ -148,5 +153,38 @@ class Cronjobs
             $workflow = $wfm->get($wfId);
             $workflow->hookin()->$fn();
         }
+    }
+
+    /**
+     * @throws Zend_Exception
+     * @throws Zend_Db_Exception
+     */
+    private function databaseOptimize(): void
+    {
+        $dbConfig = Zend_Registry::get('config')->resources->db;
+
+        $optimizer = new DatabaseOptimizer(Zend_Db::factory($dbConfig));
+        $logger = Zend_Registry::get('logger')->cloneMe('core.database');
+        $optimizer->optimizeDaily(function (ReportDto $reportDto) use ($logger) {
+            if ($reportDto->statusOk) {
+                $logger->info(
+                    'E1730',
+                    'Daily DB table optimization SUCCESS: {table} {text}',
+                    [
+                        'table' => $reportDto->table,
+                        'text' => $reportDto->text,
+                    ]
+                );
+            } else {
+                $logger->error(
+                    'E1731',
+                    'Daily DB table optimization FAILED: {table} {text}',
+                    [
+                        'table' => $reportDto->table,
+                        'text' => $reportDto->text,
+                    ]
+                );
+            }
+        });
     }
 }
