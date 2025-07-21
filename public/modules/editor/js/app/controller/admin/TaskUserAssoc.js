@@ -388,12 +388,23 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             form = me.getUserAssocForm(),
             task = me.getPrefWindow().getCurrentTask(),
             stateCombo = form.down('combo[name="state"]'),
-            isCompetitive = task.get('usageMode') === Editor.model.admin.Task.usageModes.COMPETITIVE,
+            isCompetitive,
             newState = Editor.model.admin.Task.userStates.OPEN,
             rec = form.getRecord(),
             isChanged = stateCombo.getValue() && stateCombo.getValue() !== rec.get('state'),
-            meta = task.getWorkflowMetaData(),
-            initialStates = meta.initialStates[task.get('workflowStepName')];
+            meta,
+            initialStates;
+
+        // This is a fix for https://jira.translate5.net/browse/TRANSLATE-4796:
+        // The task might be missing in viewModel for some reason
+        if (!task) {
+            return;
+        }
+
+        // Setup variables that rely on task after the check
+        isCompetitive = task.get('usageMode') === Editor.model.admin.Task.usageModes.COMPETITIVE;
+        meta = task.getWorkflowMetaData();
+        initialStates = meta.initialStates[task.get('workflowStepName')];
 
         stateCombo.getStore().clearFilter();
 
