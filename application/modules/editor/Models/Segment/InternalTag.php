@@ -337,7 +337,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $match[0] = Markup::escape($match[0]);
 
             // use already existing xlf tags from given inputTagMap
-            if (! empty($this->inputTagMap) && $foundInputTag = array_search($match[0], $this->inputTagMap, true)) {
+            $foundInputTag = $this->searchInMap($match[0]);
+
+            if ($foundInputTag) {
                 $replaceMap[$foundInputTag] = [$foundInputTag, $match[0]];
                 unset($this->inputTagMap[$foundInputTag]);
 
@@ -386,6 +388,45 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         }
 
         return $result;
+    }
+
+    private function searchInMap(string $tagToCompare): string|bool
+    {
+        if (empty($this->inputTagMap)) {
+            return false;
+        }
+
+        $key = array_search($tagToCompare, $this->inputTagMap, true);
+
+        // if we have the full match - return it
+        if (false !== $key) {
+            return $key;
+        }
+
+        // If no then try to find matching tag by its content, id and type
+        foreach ($this->inputTagMap as $key => $tag) {
+            if ($this->isSameTag($tag, $tagToCompare)) {
+                return $key;
+            }
+        }
+
+        return false;
+    }
+
+    private function isSameTag(string $tagA, string $tagB): bool
+    {
+        // regex with the 3 groups
+        $pattern = '/<div[^>]*\bclass="[^"]*\b(open|close|single)\b[^"]*"[^>]*>.*?' # retrieve tag type
+            . '<span[^>]*\bclass="short"[^>]*>(.*?)' # retrieve short tag content
+            . '<\/span>.*?\bdata-originalid="([^"]+)"/six'; # retrieve original id value
+
+        if (! preg_match($pattern, $tagA, $matchesA) || ! preg_match($pattern, $tagB, $matchesB)) {
+            return false;
+        }
+
+        return $matchesA[1] === $matchesB[1]
+            && $matchesA[2] === $matchesB[2]
+            && $matchesA[3] === $matchesB[3];
     }
 
     /**
