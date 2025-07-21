@@ -63,7 +63,22 @@ class Translate1484Test extends JsonTestAbstract
             ->setProperty('edit100PercentMatch', false);
     }
 
-    /***
+    /**
+     * To be able to compare results properly
+     */
+    private static array $rowKeys = [
+        'category',
+        'langageResourceName',
+        'langageResourceServiceName',
+        'sourceLang',
+        'targetLang',
+        'taskCount',
+        'repetition',
+        'charactersPerCustomer',
+        'totalCharacters',
+    ];
+
+    /**
      * Test the Excel export.
      */
     public function testExportResourcesLog()
@@ -74,24 +89,71 @@ class Translate1484Test extends JsonTestAbstract
         ], $jsonFileName);
         $expectedObject = static::api()->getFileContent($jsonFileName);
         // we need to order the results to avoid tests failing due to runtime-differences
-        $this->sortExportResource($actualObject);
-        $this->sortExportResource($expectedObject);
+        $actual = $this->convertResultForComparision(json_decode(json_encode($actualObject), true));
+        $expected = $this->convertResultForComparision(json_decode(json_encode($expectedObject), true));
         $this->assertEquals(
-            $expectedObject,
-            $actualObject,
+            $expected,
+            $actual,
             'The expected file (exportResults) an the result file does not match.'
             . PHP_EOL
-            . json_encode($actualObject, JSON_PRETTY_PRINT)
+            . json_encode($actual, JSON_PRETTY_PRINT)
         );
     }
 
-    private function sortExportResource(stdClass $exportResource)
+    private function convertResultForComparision(array $data): array
     {
-        usort($exportResource->MonthlySummaryByResource, function ($a, $b) {
-            return $a->totalCharacters - $b->totalCharacters;
+        $result = [];
+        foreach ($data as $category => $rows) {
+            foreach ($rows as $rowData) {
+                $result[] = $this->createResultRow($category, $rowData);
+            }
+        }
+
+        usort($result, function ($a, $b) {
+            //category
+            $compare = strcmp($a[0], $b[0]);
+            if ($compare === 0) {
+                // langageResourceName
+                $compare = strcmp($a[1], $b[1]);
+                if ($compare === 0) {
+                    // charactersPerCustomer
+                    if ($a[7] !== '' && $b[7] !== '') {
+                        return intval($a[7]) - intval($b[7]);
+                    }
+                    // totalCharacters
+                    if ($a[8] !== '' && $b[8] !== '') {
+                        return intval($a[8]) - intval($b[8]);
+                    }
+
+                    return 0;
+                } else {
+                    return $compare;
+                }
+            } else {
+                return $compare;
+            }
         });
-        usort($exportResource->UsageLogByCustomer, function ($a, $b) {
-            return $a->charactersPerCustomer - $b->charactersPerCustomer;
-        });
+
+        $lines = [];
+        foreach ($result as $row) {
+            $line = '';
+            foreach ($row as $column) {
+                $comma = ($line === '') ? '' : ', ';
+                $line .= ($column === '') ? '' : $comma . $column;
+            }
+            $lines[] = $line;
+        }
+
+        return $lines;
+    }
+
+    private function createResultRow(string $category, array $data): array
+    {
+        $row = [];
+        foreach (self::$rowKeys as $key) {
+            $row[] = ($key === 'category') ? $category : (array_key_exists($key, $data) ? $data[$key] : '');
+        }
+
+        return $row;
     }
 }
