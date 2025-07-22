@@ -405,6 +405,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
             $edit100PercentMatch,
         );
 
+        $this->config->task->setEdit100PercentMatch((int) $edit100PercentMatch);
+        $this->config->task->save();
         if ($edit100PercentMatch) {
             try {
                 //trigger auto QA, since the now editable segments might be without QA information
