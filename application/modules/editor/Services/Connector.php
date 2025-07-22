@@ -33,6 +33,7 @@ use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
+use MittagQI\Translate5\LanguageResource\QueryDurationLogger;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 
@@ -134,6 +135,8 @@ class editor_Services_Connector implements ExportAdapterInterface
 
     private ContentProtector $contentProtector;
 
+    private ?QueryDurationLogger $queryDurationLogger = null;
+
     public function __construct()
     {
         $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
@@ -146,6 +149,7 @@ class editor_Services_Connector implements ExportAdapterInterface
     {
         $this->connectToResourceOnly($languageResource->getResource());
         $this->adapter->connectTo($languageResource, $sourceLang, $targetLang, $config);
+        $this->queryDurationLogger = new QueryDurationLogger($languageResource);
     }
 
     public function getValidExportTypes(): array
@@ -192,14 +196,13 @@ class editor_Services_Connector implements ExportAdapterInterface
         return $fuzzyConnector;
     }
 
-    /***
+    /**
      * Invoke the query resource action so the MT logger can be used
-     * @param editor_Models_Segment $segment
-     * @return editor_Services_ServiceResult
+     * @throws ReflectionException
      */
-    protected function _query(editor_Models_Segment $segment)
+    protected function _query(editor_Models_Segment $segment): editor_Services_ServiceResult
     {
-        $serviceResult = null;
+        $this->queryDurationLogger->startQuery();
         $isBatchRequest = $this->batchEnabled && $this->adapter->isBatchQuery();
         //if the batch query is enabled, get the results from the cache
         if ($isBatchRequest) {
@@ -207,6 +210,7 @@ class editor_Services_Connector implements ExportAdapterInterface
         } else {
             $serviceResult = $this->adapter->query($segment);
         }
+        $this->queryDurationLogger->stopQuery($isBatchRequest);
         //log the MT ussage when there are mt results
         //Info: for loggin TM results, the result is logged only when the result is used (segment save/update , matchrate >=100)
         //for batch query, the segments will be loged in the batch proccess
@@ -500,5 +504,10 @@ class editor_Services_Connector implements ExportAdapterInterface
         if (method_exists($this->adapter, 'processAfterCreation')) {
             $this->adapter->processAfterCreation();
         }
+    }
+
+    public function getQueryDurationLogger(): QueryDurationLogger
+    {
+        return $this->queryDurationLogger;
     }
 }

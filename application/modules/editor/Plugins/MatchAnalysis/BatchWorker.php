@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\QueryDurationLogger;
+
 /***
  * This will send multiple segments at once for translation
  * and save the result in separate table in the database. Later those results will be used for match analysis and pre-translation.
@@ -43,6 +45,14 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
         return ! empty($parameters['languageResourceId']);
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws editor_Services_Exceptions_NoService
+     * @throws editor_Models_ConfigException
+     * @throws ZfExtended_Exception
+     * @throws ReflectionException
+     */
     public function work(): bool
     {
         $params = $this->workerModel->getParameters();
@@ -60,8 +70,7 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
 
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var editor_Models_Task $task */
+        $task = new editor_Models_Task();
         $task->loadByTaskGuid($this->taskGuid);
 
         $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
@@ -95,6 +104,14 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
             //update the worker model progress with progress value reported from the batch query
             $this->updateProgress($progress);
         });
+
+        QueryDurationLogger::logFromWorker(
+            'MatchAnalysis BATCH query duration sum {workerId} {resource} queries: {queryCount} in {sum}',
+            [
+                'task' => $task,
+                'workerId' => (int) $this->workerModel->getId(),
+            ]
+        );
 
         $exceptions = $connector->getBatchExceptions();
         foreach ($exceptions as $e) {

@@ -200,7 +200,7 @@ class TaskInfoCommand extends TaskCommand
         $segmentDivisor = max(1, $segmentCount / 100);
 
         $events = \ZfExtended_Factory::get(editor_Models_Logger_Task::class);
-        $workerLog = array_reverse($events->getByTaskGuidAndEventCodes($task->getTaskGuid(), ['E1547']));
+        $workerLog = array_reverse($events->getByTaskGuidAndEventCodes($task->getTaskGuid(), ['E1547', 'E1732']));
 
         if (empty($workerLog)) {
             return;
@@ -236,20 +236,45 @@ class TaskInfoCommand extends TaskCommand
             if ($idx === 0) {
                 $sum = $this->addGapRow($extra, $task, $table, $sum);
             }
-            $table->addRow([
-                $item['state'],
-                $extra->worker,
-                $extra->id,
-                $extra->start,
-                $extra->end,
-                $extra->duration,
-                round($extra->duration / $segmentDivisor),
-                $sum += $extra->duration,
-                $extra->state,
-            ]);
-            if ((($idx + 1) < $workerCount) && in_array($extra->worker, self::WORKER_SECTION_END)) {
-                $sum = 0;
-                $table->addRow(new TableSeparator());
+            if ($item['eventCode'] === 'E1732') {
+                //                print_r($extra);    [id] => 4593
+                //    [resource] => editor_Plugins_DeepL_1
+                //    [queryCount] => 0
+                //    [queryCountFromCache] => 33
+                //    [sumFromCache] => 0.015703439712524
+                //    [sum] => 0
+                //    [workerId] => 97827
+                //    [analysisId] => 1649
+
+                $durationSum = $extra->sum + $extra->sumFromCache;
+                $requestSum = (int) $extra->queryCount + $extra->queryCountFromCache;
+                $table->addRow([
+                    $item['state'],
+                    ' ' . $extra->resource . ' ID:' . $extra->id,
+                    $extra->workerId,
+                    'requests: ' . $extra->queryCount . ' (cache: ' . $extra->queryCountFromCache . ')',
+                    'sum: ' . $extra->sum . ' (cache: ' . $extra->sumFromCache . ')',
+                    $durationSum,
+                    'ø req: ' . ($requestSum > 0 ? round($durationSum / $requestSum, 4) : '-'),
+                    $sum,
+                    '',
+                ]);
+            } else {
+                $table->addRow([
+                    $item['state'],
+                    $extra->worker,
+                    $extra->id,
+                    $extra->start,
+                    $extra->end,
+                    $extra->duration,
+                    round($extra->duration / $segmentDivisor),
+                    $sum += $extra->duration,
+                    $extra->state,
+                ]);
+                if ((($idx + 1) < $workerCount) && in_array($extra->worker, self::WORKER_SECTION_END)) {
+                    $sum = 0;
+                    $table->addRow(new TableSeparator());
+                }
             }
             $idx++;
         }

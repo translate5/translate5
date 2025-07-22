@@ -26,13 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\QueryDurationLogger;
+
 class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWorker
 {
-    /**
-     * @var editor_Plugins_MatchAnalysis_Analysis
-     */
-    protected $analysis;
+    protected editor_Plugins_MatchAnalysis_Analysis $analysis;
 
+    /**
+     * @throws Zend_Exception
+     */
     public function __construct()
     {
         parent::__construct();
@@ -41,7 +43,15 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
 
     protected function validateParameters(array $parameters): bool
     {
-        $neededEntries = ['internalFuzzy', 'pretranslateMatchrate', 'pretranslateTmAndTerm', 'pretranslateMt', 'isTaskImport', 'pretranslate'];
+        $neededEntries = [
+            'internalFuzzy',
+            'pretranslateMatchrate',
+            'pretranslateTmAndTerm',
+            'pretranslateMt',
+            'isTaskImport',
+            'pretranslate',
+        ];
+
         $foundEntries = array_keys($parameters);
         $keyDiff = array_diff($neededEntries, $foundEntries);
 
@@ -60,9 +70,14 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             }
             // when error happens unlock the task
             $this->task->unlock();
-            $this->log->error('E1100', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run. See additional errors for more Information.', [
-                'task' => $this->task,
-            ]);
+            $this->log->error(
+                'E1100',
+                'MatchAnalysis Plug-In: analysis and pre-translation cannot be run. '
+                    . 'See additional errors for more Information.',
+                [
+                    'task' => $this->task,
+                ]
+            );
             $this->log->exception($e, [
                 'extra' => [
                     'task' => $this->task,
@@ -80,6 +95,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
      * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Exception
      */
     protected function doWork(): bool
     {
@@ -117,6 +133,16 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
                 $this->updateProgress($progress);
             }
         });
+
+        QueryDurationLogger::logFromWorker(
+            'MatchAnalysis query duration sum {workerId} {resource} - '
+                . '{queryCount} ({queryCountFromCache}) queries in {sum} ({sumFromCache})',
+            [
+                'task' => $this->task,
+                'workerId' => (int) $this->workerModel->getId(),
+                'analysisId' => $analysisId,
+            ]
+        );
 
         if (! empty($lastProgress)) {
             $this->updateProgress($lastProgress);

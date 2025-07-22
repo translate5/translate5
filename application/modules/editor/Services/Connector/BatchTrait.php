@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
+use MittagQI\Translate5\LanguageResource\QueryDurationLogger;
 
 /**
  * Provides reusable batch functionality for LanguageResource Service Connectors
@@ -69,6 +70,8 @@ trait editor_Services_Connector_BatchTrait
 
     private editor_Models_Segment $lastDefaultSegmentSet;
 
+    private ?QueryDurationLogger $queryDurationLogger = null;
+
     /**
      * returns the collected batchExceptions or an empty array
      */
@@ -97,6 +100,7 @@ trait editor_Services_Connector_BatchTrait
      */
     public function batchQuery(string $taskGuid, Closure $progressCallback = null)
     {
+        $this->queryDurationLogger = new QueryDurationLogger($this->languageResource);
         $this->initBatchQuery();
 
         $segments = ZfExtended_Factory::get(editor_Models_Segment_Iterator::class, [$taskGuid]);
@@ -252,6 +256,7 @@ trait editor_Services_Connector_BatchTrait
 
         //we handle only our own exceptions, since the connector should only throw such
         try {
+            $this->queryDurationLogger->startQuery();
             if (! $this->batchSearch(array_column($batchQuery, 'query'), $sourceLang, $targetLang)) {
                 return;
             }
@@ -260,6 +265,8 @@ trait editor_Services_Connector_BatchTrait
             $this->batchExceptions[] = $e;
 
             return;
+        } finally {
+            $this->queryDurationLogger->stopQuery();
         }
 
         $results = $this->getResponseData();
