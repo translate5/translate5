@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
+use MittagQI\Translate5\Segment\EntityHandlingMode;
+
 /**
  * Handles OtherContent (recognition and length calculation) on XLIFF import
  * OtherContent is content outside of MRK type seg tags in a segment containing such MRKs
@@ -96,6 +99,8 @@ class editor_Models_Import_FileParser_Xlf_OtherContent
 
     private array $orphanedTags = [];
 
+    private WhitespaceProtector $whitespaceProtector;
+
     /**
      * Constructor
      */
@@ -110,6 +115,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent
         $this->segmentBareInstance = $segment;
         $this->segmentMetaBareInstance = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         $this->fileId = $fileId;
+        $this->whitespaceProtector = WhitespaceProtector::create();
     }
 
     /**
@@ -178,6 +184,36 @@ class editor_Models_Import_FileParser_Xlf_OtherContent
         }
 
         $content = $this->splitAtMrk($content);
+
+        $shortTagIdent = 1;
+
+        foreach ($content as $mid => $chunks) {
+            $newChunks = [];
+
+            foreach ($chunks as $chunk) {
+                if (! is_string($chunk)) {
+                    $newChunks[] = [$chunk];
+
+                    continue;
+                }
+
+                $protected = $this->whitespaceProtector->protect(
+                    $chunk,
+                    $source,
+                    $this->task->getSourceLang(),
+                    $this->task->getTargetLang(),
+                    EntityHandlingMode::Off
+                );
+                $newChunks[] = $this->whitespaceProtector->convertToInternalTagsInChunks(
+                    $protected,
+                    $shortTagIdent,
+                    $source,
+                    $shortcutNumberMap
+                );
+            }
+
+            $content[$mid] = array_merge(...$newChunks);
+        }
 
         $this->checkAndPrepareContent($content, $data);
         $this->protectOrphanedTags($data);

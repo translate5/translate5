@@ -1149,7 +1149,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 //  on reviewing needs $hasOriginalTarget to be true, which is the case by above if
                 $placeHolders[$mid] = $this->xmlparser->join($emptyInitialTarget ? $sourceChunksOriginal : $targetChunksOriginal);
                 // we add the length of the ignored segment to the additionalUnitLength
-                $this->otherContent->addIgnoredSegmentLength($emptyInitialTarget ? $sourceChunks : $targetChunks, $attributes);
+                $this->otherContent->addIgnoredSegmentLength($emptyInitialTarget ? $sourceProtectedChunks : $targetProtectedChunks, $attributes);
 
                 continue;
             }
