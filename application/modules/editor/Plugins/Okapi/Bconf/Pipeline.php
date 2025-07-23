@@ -178,14 +178,14 @@ final class Pipeline extends ResourceFile
             throw new ZfExtended_Exception('A SRX file must have the file-extension "srx": ' . $file);
         }
         if ($field === 'source') {
-            $this->content =
-                preg_replace('~sourceSrxPath\s*=\s*' . pathinfo($this->sourceSrxPath, PATHINFO_FILENAME)
-                    . '~', 'sourceSrxPath=' . pathinfo($file, PATHINFO_FILENAME), $this->content);
+            $this->content = preg_replace_callback('~sourceSrxPath\s*=([^\r\n]*)~', function ($m) use ($file) {
+                return 'sourceSrxPath=' . pathinfo($m[1], PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR . $file;
+            }, $this->content);
             $this->sourceSrxPath = $file;
         } elseif ($field === 'target') {
-            $this->content =
-                preg_replace('~targetSrxPath\s*=\s*' . pathinfo($this->targetSrxPath, PATHINFO_FILENAME)
-                    . '~', 'targetSrxPath=' . pathinfo($file, PATHINFO_FILENAME), $this->content);
+            $this->content = preg_replace_callback('~targetSrxPath\s*=([^\r\n]*)~', function ($m) use ($file) {
+                return 'targetSrxPath=' . pathinfo($m[1], PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR . $file;
+            }, $this->content);
             $this->targetSrxPath = $file;
         } else {
             throw new MismatchException('E2004', [$field, 'field']);

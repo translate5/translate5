@@ -38,6 +38,7 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\PropertiesValidation;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Pipeline;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\RandomAccessFile;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
 use Throwable;
 use Zend_Exception;
 use ZfExtended_Exception;
@@ -141,10 +142,10 @@ abstract class BconfParser
 
             //=== Section 2: Read contained reference files of the pipeline's parameters
 
-            $refMap = []; // numeric indices are read from the bconf, starting with 1
+            $srxMap = [];
 
             while (($refIndex = $this->raf->readInt()) != -1 && ! is_null($refIndex)) {
-                $file = $refMap[$refIndex] = $this->raf->readUTF();
+                $file = $this->raf->readUTF();
                 // Skip over the data to move to the next reference
                 // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf.
                 // En/Decoding of 64 byte values creates Exceptions on 32bit OS,
@@ -153,9 +154,13 @@ abstract class BconfParser
                 $size = $this->raf->readInt();
                 if ($size > 0) {
                     // extracts the harvested file to disk - if we have a concrete bconf
-                    // this is a bit of unneccessary, we save the srx first and then exchange it if it is a standard T5 srx
+                    // this is a bit of unnecessary, we save the srx first and then exchange it if it is a standard T5 srx
                     $this->createReferencedFile($size, $file);
-                    $referencedFiles[] = basename($file); // can the read filename contain pathes ?
+                    $file = basename($file); // can the read filename contain paths ?
+                    $referencedFiles[] = $file;
+                    if (pathinfo($file, PATHINFO_EXTENSION) === Srx::EXTENSION) {
+                        $srxMap[] = $file;
+                    }
                 }
             }
 
@@ -164,7 +169,7 @@ abstract class BconfParser
                     'Malformed references list. Read null instead of integer before byte ' . $this->raf->ftell()
                 );
             }
-            if (($refCount = count($refMap)) < 2) {
+            if (($refCount = count($srxMap)) < 2) {
                 throw new BconfInvalidException(
                     "Only $refCount references included. Need sourceSRX and targetSRX."
                 );
@@ -184,6 +189,12 @@ abstract class BconfParser
                 if (! $pipeline->validate(true)) {
                     throw new BconfInvalidException('Invalid Pipeline: ' . $pipeline->getValidationError());
                 } else {
+                    if ($pipeline->getSrxFile('source') !== $srxMap[0]) {
+                        $pipeline->setSrxFile('source', $srxMap[0]);
+                    }
+                    if ($pipeline->getSrxFile('target') !== $srxMap[1]) {
+                        $pipeline->setSrxFile('target', $srxMap[1]);
+                    }
                     // the pipeline is only valid if the contained SRX files have been saved to disk
                     if (! in_array($pipeline->getSrxFile('source'), $referencedFiles)) {
                         throw new BconfInvalidException(
