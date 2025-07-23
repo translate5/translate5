@@ -112,6 +112,7 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
     }
 
     /**
+     * FIXME this self mutation code must be eliminated!!!
      * Get id of a pricing preset to be used for pricing calculation for current task
      */
     public function getPricingPresetId()

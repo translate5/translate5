@@ -106,7 +106,7 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
         });
 
         QueryDurationLogger::logFromWorker(
-            'MatchAnalysis BATCH query duration sum {workerId} {resource} queries: {queryCount} in {sum}',
+            'MatchAnalysis BATCH query duration: WID#{workerId} {resource} (ID#{id}) queries: {queryCount} in {sum}',
             [
                 'task' => $task,
                 'workerId' => (int) $this->workerModel->getId(),

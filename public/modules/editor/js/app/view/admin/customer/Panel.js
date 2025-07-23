@@ -69,12 +69,12 @@ Ext.define('Editor.view.admin.customer.Panel', {
         customerDeleteTitle: '#UT#Kunden löschen',
         customerDeletedMsg: '#UT#Kunde gelöscht',
         export: '#UT#Ressourcen-Nutzung Exportieren',
-        domain: '#UT#translate5 Domain',
+        domain: '#UT#Internetadresse (nur die Domain)',
         propertiesTabPanelTitle: '#UT#Allgemein',
         configTabTitle:'#UT#Überschreibung der Systemkonfiguration',
         actionColumn:'#UT#Aktionen',
         customerEditActionIcon:'#UT#Kundenprofil bearbeiten',
-        openIdTabPanelDisabledTooltip:'#UT#Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.'
+        openIdTabPanelDisabledTooltip:'#UT#Bitte konfigurieren Sie zunächst das Feld "Internetadresse (nur die Domain)" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.'
     },
     shrinkWrap: 0,
     layout: 'border',

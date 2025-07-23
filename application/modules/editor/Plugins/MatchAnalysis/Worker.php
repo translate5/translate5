@@ -135,7 +135,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         });
 
         QueryDurationLogger::logFromWorker(
-            'MatchAnalysis query duration sum {workerId} {resource} - '
+            'MatchAnalysis query duration WID#{workerId} {resource} (ID#{id}) - '
                 . '{queryCount} ({queryCountFromCache}) queries in {sum} ({sumFromCache})',
             [
                 'task' => $this->task,

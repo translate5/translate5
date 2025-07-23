@@ -35,7 +35,7 @@ class PivotWorker extends editor_Models_Task_AbstractWorker
             $pivot->pretranslate();
 
             QueryDurationLogger::logFromWorker(
-                'Pivot PreTranslation query duration sum {workerId} {resource} queries: '
+                'Pivot PreTranslation query durations - WID#{workerId} {resource} (ID#{id}) queries: '
                     . '{queryCount} ({queryCountFromCache}) in {sum} ({sumFromCache})',
                 [
                     'task' => $this->task,
