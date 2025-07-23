@@ -47,14 +47,6 @@ final class editor_T5connectController extends ZfExtended_RestController
     private const MAX_YEARS = 5;
 
     /**
-     * The workflow-steps that must be assigned & confirmed to have a task regarded as "confirmed"
-     */
-    private const RELEVANT_CONFIRMED_TYPES = [
-        editor_Workflow_Default::ROLE_REVIEWER,
-        editor_Workflow_Default::ROLE_TRANSLATORCHECK,
-    ];
-
-    /**
      * The user-states that do not count for a user being part of a confirmed task
      */
     private const EXCLUDED_CONFIRMED_USERSTATES = [
@@ -84,6 +76,8 @@ final class editor_T5connectController extends ZfExtended_RestController
 
     private string $t5foreignName;
 
+    private array $t5relevantWorkflowSteps;
+
     private User $authenticatedUser;
 
     private TaskViewDataProvider $taskViewDataProvider;
@@ -91,7 +85,10 @@ final class editor_T5connectController extends ZfExtended_RestController
     public function init(): void
     {
         parent::init();
-        $this->t5foreignName = Zend_Registry::get('config')->runtimeOptions->t5connect->foreignName;
+        $config = Zend_Registry::get('config')->runtimeOptions->t5connect;
+        $this->t5foreignName = $config->foreignName;
+        // The workflow-steps that must be assigned & confirmed to have a task regarded as "confirmed"
+        $this->t5relevantWorkflowSteps = $config->relevantWorkflowSteps->toArray();
         $this->taskViewDataProvider = TaskViewDataProvider::create();
         $this->authenticatedUser = (new UserRepository())->get(ZfExtended_Authentication::getInstance()->getUserId());
     }
@@ -149,7 +146,7 @@ final class editor_T5connectController extends ZfExtended_RestController
      */
     public function confirmedAction(): void
     {
-        $relevantWorkflowTypes = $this->evaluateRelevantWorkflowTypes();
+        $relevantWorkflowSteps = $this->evaluateRelevantWorkflowSteps();
         $select = $this->createBaseSelect();
         $tasks = $this->entity->db->fetchAll($select)->toArray();
         $confirmedTasks = [];
@@ -159,7 +156,7 @@ final class editor_T5connectController extends ZfExtended_RestController
             $assigned = 0;
             $confirmed = 0;
             foreach ($task['users'] as $user) {
-                if (in_array($user['role'], $relevantWorkflowTypes)) {
+                if (in_array($user['workflowStepName'], $relevantWorkflowSteps)) {
                     $assigned++;
                     if (! in_array($user['state'], self::EXCLUDED_CONFIRMED_USERSTATES)) {
                         $confirmed++;
@@ -184,7 +181,7 @@ final class editor_T5connectController extends ZfExtended_RestController
      */
     public function finishedAction(): void
     {
-        $relevantWorkflowTypes = $this->evaluateRelevantWorkflowTypes();
+        $relevantWorkflowSteps = $this->evaluateRelevantWorkflowSteps();
         $select = $this->createBaseSelect();
         $tasks = $this->entity->db->fetchAll($select)->toArray();
         $finishedTasks = [];
@@ -194,7 +191,7 @@ final class editor_T5connectController extends ZfExtended_RestController
             $assigned = 0;
             $finished = 0;
             foreach ($task['users'] as $user) {
-                if (in_array($user['role'], $relevantWorkflowTypes)) {
+                if (in_array($user['workflowStepName'], $relevantWorkflowSteps)) {
                     $assigned++;
                     if ($user['state'] === editor_Workflow_Default::STATE_FINISH ||
                         $user['state'] === editor_Workflow_Default::STATE_AUTO_FINISH
@@ -313,13 +310,13 @@ final class editor_T5connectController extends ZfExtended_RestController
     /**
      * @return string[]
      */
-    private function evaluateRelevantWorkflowTypes(): array
+    private function evaluateRelevantWorkflowSteps(): array
     {
         return explode(
             ',',
             $this->getRequest()->getParam(
                 'workflowSteps',
-                implode(',', self::RELEVANT_CONFIRMED_TYPES)
+                implode(',', $this->t5relevantWorkflowSteps)
             )
         );
     }
