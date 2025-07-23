@@ -41,7 +41,7 @@ Ext.define('Editor.view.admin.task.UserAssocGridWindowController', {
             }
         }
     },
-    
+
     onNotifyAssociatedUsersBtnClick: function() {
         var view = this.getView(),
             vm = view.lookupViewModel();
@@ -51,7 +51,7 @@ Ext.define('Editor.view.admin.task.UserAssocGridWindowController', {
             buttons: Ext.Msg.YESNO,
             icon: Ext.Msg.QUESTION,
             scope: this,
-            fn: this.notifyUsers(vm.get('currentTask'), view.strings)
+            fn: this.notifyUsers(view.up('adminTaskTaskManagement').getCurrentTask(), view.strings)
         });
     },
     
@@ -64,7 +64,7 @@ Ext.define('Editor.view.admin.task.UserAssocGridWindowController', {
             if (btn !== 'yes') {
                 return;
             }
-            
+
             Ext.Ajax.request({
                 url: Editor.data.restpath+'task/'+task.get('id')+'/workflow',
                 method: 'POST',

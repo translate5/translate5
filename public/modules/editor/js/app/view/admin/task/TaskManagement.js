@@ -176,6 +176,17 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
     },
 
     getCurrentTask:function(){
-        return this.getViewModel().get('currentTask');
+        var vm = this.getViewModel(), task = vm.get('currentTask');
+
+        // If no task in viewModel
+        if (!task) {
+
+            // Pick from selection
+            task = this.down('^ projectPanel projectTaskGrid').getSelection().pop();
+
+            // Put into viewModel
+            vm.set('currentTask', task);
+        }
+        return task;
     }
 });
