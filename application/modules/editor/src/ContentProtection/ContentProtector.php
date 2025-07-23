@@ -220,11 +220,20 @@ class ContentProtector
         );
     }
 
-    public function tagList(): array
+    public function tagList(?string ...$protectorAliases): array
     {
+        $protectors = $this->protectors;
+
+        if (! empty($protectorAliases)) {
+            $protectors = array_filter(
+                $this->protectors,
+                fn ($protector) => in_array($protector::alias(), $protectorAliases, true)
+            );
+        }
+
         $tags = [];
 
-        foreach ($this->protectors as $protector) {
+        foreach ($protectors as $protector) {
             $tags[] = $protector->tagList();
         }
 

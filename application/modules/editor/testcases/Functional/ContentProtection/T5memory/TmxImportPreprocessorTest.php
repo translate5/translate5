@@ -35,11 +35,13 @@ use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
+use MittagQI\Translate5\T5Memory\TmxImportPreprocessor;
 use PHPUnit\Framework\TestCase;
 
-class TmConversionServiceTest extends TestCase
+class TmxImportPreprocessorTest extends TestCase
 {
     private editor_Models_Languages $sourceLang;
 
@@ -125,14 +127,15 @@ class TmConversionServiceTest extends TestCase
 
     public function testConvertTMXForImport(): void
     {
-        $service = TmConversionService::create();
+        $service = TmxImportPreprocessor::create();
 
-        $file = $service->convertTMXForImport(
-            __DIR__ . '/TmConversionServiceTest/small.tmx',
+        $file = $service->process(
+            __DIR__ . '/TmxImportPreprocessorTest/small.tmx',
             (int) $this->sourceLang->getId(),
             (int) $this->targetLang->getId(),
+            new ImportOptions(StripFramingTags::None, false)
         );
 
-        self::assertFileEquals(__DIR__ . '/TmConversionServiceTest/expected_small.tmx', $file);
+        self::assertFileEquals(__DIR__ . '/TmxImportPreprocessorTest/expected_small.tmx', $file);
     }
 }

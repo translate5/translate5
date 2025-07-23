@@ -27,8 +27,11 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\ConversionState;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceAction;
 use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceActionPermissionAssert;
@@ -100,6 +103,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     private UserRepository $userRepository;
 
+    private ContentProtector $contentProtector;
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
@@ -129,6 +134,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $this->languageResourceActionPermissionAssert = LanguageResourceActionPermissionAssert::create();
         $this->userRepository = new UserRepository();
+        $this->contentProtector = ContentProtector::create();
     }
 
     /**
@@ -1826,20 +1832,26 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         return $tag->replace($segment, function ($match) use (&$tags, $tag) {
             $submatch = null;
+            $placeholder = 'notfound';
+
             if (preg_match($tag::REGEX_STARTTAG, $match[0], $submatch)) {
                 $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, 'start-' . $submatch[1]);
             } elseif (preg_match($tag::REGEX_ENDTAG, $match[0], $submatch)) {
                 $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, 'end-' . $submatch[1]);
             } elseif (preg_match($tag::REGEX_SINGLETAG, $match[0], $submatch)) {
                 $id = $match[3];
-                if (in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
-                    //for diffing the content of the whitespace tags is important not the number on it!
-                    $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $id . '-' . $tag->getLength($match[0]));
-                } else {
-                    $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, 'single-' . $submatch[1]);
-                }
-            } else {
-                $placeholder = 'notfound';
+
+                $placeholder = match (true) {
+                    in_array($id, $this->contentProtector->tagList(WhitespaceProtector::alias())) => sprintf(
+                        $tag::PLACEHOLDER_TEMPLATE,
+                        $id . '-' . $tag->getLength($match[0])
+                    ),
+                    in_array($id, $this->contentProtector->tagList(NumberProtector::alias())) => sprintf(
+                        $tag::PLACEHOLDER_TEMPLATE,
+                        'number-' . $submatch[1]
+                    ),
+                    default => sprintf($tag::PLACEHOLDER_TEMPLATE, 'single-' . $submatch[1]),
+                };
             }
 
             $tags[$placeholder] = $match[0];
