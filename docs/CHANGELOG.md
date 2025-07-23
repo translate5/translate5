@@ -12,6 +12,65 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.26.1] - 2025-07-23
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4816](https://jira.translate5.net/browse/TRANSLATE-4816): LanguageResources - Implement duration logging of language resources** <br>
+Implement the logging of needed times for using language resources in pivot filling, analysis and pre-translation.
+
+**[TRANSLATE-4811](https://jira.translate5.net/browse/TRANSLATE-4811): Main back-end mechanisms (Worker, Logging, etc.) - Implement php level profiling for workers** <br>
+Import performance needs improvement; bottlenecks must be identified first, for which a PHP profiler suitable for production will be implemented.
+
+
+### Bugfixes
+**[TRANSLATE-4812](https://jira.translate5.net/browse/TRANSLATE-4812): t5connect, Workflows - Make the relevant t5connect steps configurable** <br>
+Avoid duplicate optional workflow step labels in job's workflow steps list
+
+**[TRANSLATE-4810](https://jira.translate5.net/browse/TRANSLATE-4810): Import/Export - White spaces and line breaks appear on xlf import** <br>
+Fixed import of line breaks in XLF import
+
+**[TRANSLATE-4809](https://jira.translate5.net/browse/TRANSLATE-4809): Workflows - changeEdit100PercentMatch workflow action should set task property** <br>
+The execution of changeEdit100PercentMatch workflow action now sets the related property in the task
+
+**[TRANSLATE-4808](https://jira.translate5.net/browse/TRANSLATE-4808): Editor general - RootCause: task is null** <br>
+Fixed error on 'Notify users' button click in Users-tab
+
+**[TRANSLATE-4807](https://jira.translate5.net/browse/TRANSLATE-4807): Content Protection - Content protection internal tag regex is no longer valid** <br>
+Fixed content protection internal tag regex
+
+**[TRANSLATE-4804](https://jira.translate5.net/browse/TRANSLATE-4804): Editor general - Nextsegments HTTP request fails for PM** <br>
+Fixed error when fetching info about next segments for PM user
+
+**[TRANSLATE-4802](https://jira.translate5.net/browse/TRANSLATE-4802): Editor general - RootCause: can't access property "get", task is undefined** <br>
+Fixed task being not deselected in project tasks grid anymore when project's batch-editing checkbox (in project grid) is clicked, so link to currently selected task is not broken
+
+**[TRANSLATE-4801](https://jira.translate5.net/browse/TRANSLATE-4801): Editor general - Internal tag numbers are processed wrong when saving segment** <br>
+Fixed bug which may cause wrong tag numbering saved to t5memory
+
+**[TRANSLATE-4800](https://jira.translate5.net/browse/TRANSLATE-4800): t5memory - Diff in matches in match table are shown incorrectly** <br>
+Fixed incorrect displaying of diff in match table's matches
+
+**[TRANSLATE-4796](https://jira.translate5.net/browse/TRANSLATE-4796): Editor general - RootCause: Cannot read properties of null (reading 'get')** <br>
+Fixed an error about missing task data in UI
+
+**[TRANSLATE-4790](https://jira.translate5.net/browse/TRANSLATE-4790): file format settings - OKAPI BCONF Import: SRX-files might be not imported if pipeline not correct** <br>
+Fixed case when BCONFs imported from RAINBOW could have SRX-files not detected when the PIPELINE settings were not valid (what can easily happen in Rainbow but has no effect in Longhorn)
+
+**[TRANSLATE-4781](https://jira.translate5.net/browse/TRANSLATE-4781): AI - translate5 AI: do not merge user defined system prompts on fine tuning** <br>
+When generating jsonl file, training pairs are now sent with assigned system message from the prompt
+
+**[TRANSLATE-4762](https://jira.translate5.net/browse/TRANSLATE-4762): Content Protection - Change display of content protection tags in fuzzy match panel** <br>
+Show protected content tags from TM in match table even if task segment does not have corresponding tag
+
+**[TRANSLATE-4669](https://jira.translate5.net/browse/TRANSLATE-4669): openai - translate5 AI: Show already trained prompts separated in training window** <br>
+Prompts that have been sent to training remain now separated in training window after training
+
+
 ## [7.26.0] - 2025-07-16
 
 ### Important Notes:
