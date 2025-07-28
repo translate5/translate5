@@ -135,6 +135,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         if (! $this->io->confirm('Does the important release notes contain all API / GUI relevant changes?', false)) {
             return 0;
         }
+        return self::SUCCESS;
         if ($this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', true)) {
             $sql = $this->createSql();
             $md = $this->updateChangeLog();
