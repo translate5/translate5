@@ -28,16 +28,20 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Exception;
 
 class ChangelogCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'changelog';
 
-    protected function configure()
+    private array $headlines = [];
+
+    protected function configure(): void
     {
         $this
         // the short description shown while running "php bin/console list"
@@ -60,87 +64,193 @@ class ChangelogCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Show only a summary'
         );
+
+        $this->addOption(
+            'list',
+            'l',
+            InputOption::VALUE_NONE,
+            'List only the available versions.'
+        );
+
+        $this->addOption(
+            'exact',
+            'e',
+            InputOption::VALUE_NONE,
+            'Shows only exactly the given version instead of from that version to the latest version.'
+        );
+
+        $this->addArgument(
+            'version',
+            InputArgument::OPTIONAL,
+            'The version number from which or exactly for which the changelog is shown. Defaults to the latest one.'
+        );
     }
 
     /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
+     * @throws Zend_Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
+        $this->writeTitle('Translate5 latest change log:');
 
-        $content = file_get_contents(APPLICATION_ROOT . '/docs/CHANGELOG.md');
-
-        $summary = $input->getOption('summary');
-
-        if ($input->getOption('important')) {
-            $this->writeTitle('Translate5 important release Notes:');
-            $firstPos = mb_strpos($content, "\n### Important Notes:") + 21;
-            $nextPos = mb_strpos($content, "\n### ", $firstPos + 5);
-            $content = substr($content, $firstPos, $nextPos - $firstPos);
-            $this->io->warning($content);
-
-            return 0;
+        if($input->getOption('list')) {
+            $this->io->writeln($this->readVersions());
+            return self::SUCCESS;
         }
 
-        $this->writeTitle('Translate5 latest change log:');
-        $firstPos = mb_strpos($content, "\n## [");
-        $nextPos = mb_strpos($content, "\n## [", $firstPos + 5);
-        $content = substr($content, $firstPos, $nextPos - $firstPos);
-        $chunks = preg_split('/^(#[#]+)\s*(.*)$/m', $content, flags: PREG_SPLIT_DELIM_CAPTURE);
+        $summary = $input->getOption('summary');
+        $importantOnly = (bool) $input->getOption('important');
+        $fromVersion = (string) $this->input->getArgument('version');
+        $isExactMatch = (bool) $input->getOption('exact');
+
+        if($isExactMatch && $fromVersion === null) {
+            $this->io->error('When using -e|--exact a version must be given as argument to the command');
+            return self::FAILURE;
+        }
+
+        if ($importantOnly) {
+            $filter = ['Important Notes:']; //Bugfixes / Changed / Added
+        } else {
+            $filter = [];
+        }
+
+        $chunks = $this->readContentAsChunks($isExactMatch, $fromVersion);
+
         $chunk = array_shift($chunks);
         $isImportant = false;
+        $currentType = null;
+        $this->headlines = [];
         while (! is_null($chunk)) {
             $chunk = array_shift($chunks);
             if (is_null($chunk)) {
-                return 0;
+                return self::SUCCESS;
             }
             switch ($chunk) {
                 case '##':
                     $isImportant = false;
-                    $this->io->title(array_shift($chunks));
+                    $this->addHeadline('release', array_shift($chunks));
 
                     continue 2;
-
-                    break;
                 case '###':
-                    $head = array_shift($chunks);
+                    $head = $currentType = array_shift($chunks);
                     $isImportant = $head === 'Important Notes:';
-                    $this->io->section($head);
+                    $this->addHeadline('types', $head);
 
                     continue 2;
                 case '####':
                     $head = array_shift($chunks);
                     if ($isImportant) {
-                        $this->io->warning($head);
+                        $this->addHeadline('important', $head);
                     } else {
-                        $this->io->text($head);
+                        $this->addHeadline('default', $head);
                     }
 
                     continue 2;
-
+                default:
                     break;
             }
-            $chunk = trim($chunk);
-            if (strlen($chunk) > 0) {
-                $matches = null;
-                if ($summary && preg_match_all('#\*\*\[([^]]+)\]\(([^)]+)\):(.+)\*\* <br>#', $chunk, $matches)) {
-                    foreach ($matches[1] as $idx => $key) {
-                        $url = $matches[2][$idx];
-                        $subject = $matches[3][$idx];
-                        $this->io->text('<info>' . $key . '</info> <options=bold>' . $subject . '</>');
-                    }
-                } else {
-                    $chunk = preg_replace('#\*\*\[([^]]+)\]\(([^)]+)\):(.+)\*\* <br>#', "<info>$1</info> <options=bold>$3</> \n <fg=gray>$2</>", $chunk);
-                    $this->io->text($chunk);
-                }
-                //<fg=yellow;options=bold>not optimal</>
+
+            if($currentType !== null && !empty($filter) && ! in_array($currentType, $filter)) {
+                continue;
             }
+
+            $this->printHeadlines();
+            $this->headlines = [];
+
+            $this->printContent($chunk, $summary);
         }
 
-        return 0;
+        return self::SUCCESS;
+    }
+
+    private function addHeadline(string $type, string $head): void
+    {
+        $this->headlines[] = [
+            'type' => $type,
+            'text' => $head
+        ];
+    }
+
+    private function printHeadlines(): void
+    {
+        foreach ($this->headlines as $line) {
+            switch ($line['type']) {
+                case 'release':
+                    $this->io->title($line['text']);
+                    break;
+
+                case 'types':
+                    $this->io->section($line['text']);
+                    break;
+
+                case 'important':
+                    $this->io->warning($line['text']);
+                    break;
+
+                default:
+                    $this->io->text($line['text']);
+                    break;
+            }
+        }
+    }
+
+    private function printContent(string $chunk, mixed $summary): void
+    {
+        $chunk = trim($chunk);
+        if (strlen($chunk) > 0) {
+            $matches = null;
+            if ($summary && preg_match_all('#\*\*\[([^]]+)]\(([^)]+)\):(.+)\*\* <br>#', $chunk, $matches)) {
+                foreach ($matches[1] as $idx => $key) {
+                    //$url = $matches[2][$idx];
+                    $subject = $matches[3][$idx];
+                    $this->io->text('<info>' . $key . '</info> <options=bold>' . $subject . '</>');
+                }
+            } else {
+                $chunk = preg_replace(
+                    '#\*\*\[([^]]+)]\(([^)]+)\):(.+)\*\* <br>#',
+                    "<info>$1</info> <options=bold>$3</> \n <fg=gray>$2</>",
+                    $chunk
+                );
+                $this->io->text($chunk);
+            }
+            //<fg=yellow;options=bold>not optimal</>
+        }
+    }
+
+    private function readVersions(): array
+    {
+        $content = file_get_contents(APPLICATION_ROOT . '/docs/CHANGELOG.md');
+        $firstPos = mb_strpos($content, "\n## [");
+        $content = substr($content, $firstPos);
+        return array_filter(preg_split('/^(## \[.*$)/m', $content, flags: PREG_SPLIT_DELIM_CAPTURE), function($item) {
+            return str_starts_with($item, '## [');
+        });
+    }
+
+    private function readContentAsChunks(bool $isExactMatch, string $fromVersion): array
+    {
+        $content = file_get_contents(APPLICATION_ROOT . '/docs/CHANGELOG.md');
+
+        if ($isExactMatch) {
+            $firstPos = mb_strpos($content, "\n## [" . $fromVersion); //exact match add version here: "\n## [7.20.5"
+        } else {
+            $firstPos = mb_strpos($content, "\n## [");
+        }
+
+        if ($fromVersion === null) {
+            $toPos = $firstPos + 5;
+        } else {
+            if ($isExactMatch) {
+                $toPos = mb_strpos($content, "\n## [", $firstPos + 5);
+            } else {
+                $toPos = mb_strpos($content, "\n## [" . $fromVersion, $firstPos + 5);
+                $toPos = mb_strpos($content, "\n## [", $toPos + 5);
+            }
+        }
+        $endPos = mb_strpos($content, "\n## [", $toPos);
+        $content = substr($content, $firstPos, $endPos - $firstPos);
+        return preg_split('/^(##+)\s*(.*)$/m', $content, flags: PREG_SPLIT_DELIM_CAPTURE);
     }
 }
