@@ -1235,7 +1235,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
                 $this->reorganizeService->waitReorganizeFinished(
                     $this->languageResource,
-                    $memory,
+                    $tmName,
                     $this->isInternalFuzzy(),
                 );
             }
