@@ -34,6 +34,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
 
+//FIXME phpcheck!!!! Ebenso auf die release:notes
+
 class ChangelogCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
@@ -95,18 +97,20 @@ class ChangelogCommand extends Translate5AbstractCommand
         $this->initTranslate5();
         $this->writeTitle('Translate5 latest change log:');
 
-        if($input->getOption('list')) {
+        if ($input->getOption('list')) {
             $this->io->writeln($this->readVersions());
+
             return self::SUCCESS;
         }
 
         $summary = $input->getOption('summary');
         $importantOnly = (bool) $input->getOption('important');
-        $fromVersion = (string) $this->input->getArgument('version');
+        $fromVersion = $this->input->getArgument('version');
         $isExactMatch = (bool) $input->getOption('exact');
 
-        if($isExactMatch && $fromVersion === null) {
+        if ($isExactMatch && $fromVersion === null) {
             $this->io->error('When using -e|--exact a version must be given as argument to the command');
+
             return self::FAILURE;
         }
 
@@ -152,7 +156,7 @@ class ChangelogCommand extends Translate5AbstractCommand
                     break;
             }
 
-            if($currentType !== null && !empty($filter) && ! in_array($currentType, $filter)) {
+            if ($currentType !== null && ! empty($filter) && ! in_array($currentType, $filter)) {
                 continue;
             }
 
@@ -169,7 +173,7 @@ class ChangelogCommand extends Translate5AbstractCommand
     {
         $this->headlines[] = [
             'type' => $type,
-            'text' => $head
+            'text' => $head,
         ];
     }
 
@@ -179,18 +183,22 @@ class ChangelogCommand extends Translate5AbstractCommand
             switch ($line['type']) {
                 case 'release':
                     $this->io->title($line['text']);
+
                     break;
 
                 case 'types':
                     $this->io->section($line['text']);
+
                     break;
 
                 case 'important':
                     $this->io->warning($line['text']);
+
                     break;
 
                 default:
                     $this->io->text($line['text']);
+
                     break;
             }
         }
@@ -224,12 +232,13 @@ class ChangelogCommand extends Translate5AbstractCommand
         $content = file_get_contents(APPLICATION_ROOT . '/docs/CHANGELOG.md');
         $firstPos = mb_strpos($content, "\n## [");
         $content = substr($content, $firstPos);
-        return array_filter(preg_split('/^(## \[.*$)/m', $content, flags: PREG_SPLIT_DELIM_CAPTURE), function($item) {
+
+        return array_filter(preg_split('/^(## \[.*$)/m', $content, flags: PREG_SPLIT_DELIM_CAPTURE), function ($item) {
             return str_starts_with($item, '## [');
         });
     }
 
-    private function readContentAsChunks(bool $isExactMatch, string $fromVersion): array
+    private function readContentAsChunks(bool $isExactMatch, ?string $fromVersion): array
     {
         $content = file_get_contents(APPLICATION_ROOT . '/docs/CHANGELOG.md');
 
@@ -251,6 +260,7 @@ class ChangelogCommand extends Translate5AbstractCommand
         }
         $endPos = mb_strpos($content, "\n## [", $toPos);
         $content = substr($content, $firstPos, $endPos - $firstPos);
+
         return preg_split('/^(##+)\s*(.*)$/m', $content, flags: PREG_SPLIT_DELIM_CAPTURE);
     }
 }
