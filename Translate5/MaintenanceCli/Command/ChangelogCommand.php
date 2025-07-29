@@ -34,8 +34,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
 
-//FIXME phpcheck!!!! Ebenso auf die release:notes
-
 class ChangelogCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
