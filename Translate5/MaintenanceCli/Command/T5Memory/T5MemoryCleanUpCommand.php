@@ -35,14 +35,12 @@ use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\Api\ConstantApi;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Translate5\MaintenanceCli\Command\Translate5AbstractCommand;
 
 class T5MemoryCleanUpCommand extends Translate5AbstractCommand
 {
-    private const OPTION_CLEAN_UP = 'clean-up';
-
     protected function configure(): void
     {
         parent::configure();
@@ -51,13 +49,7 @@ class T5MemoryCleanUpCommand extends Translate5AbstractCommand
             ->setName('t5memory:clean-up')
             ->setDescription('Searches for orphaned memories and records without actual memories on t5memory side.' .
                 ' Deletes files on t5memory side or removes invalid records.')
-            ->addOption(
-                self::OPTION_CLEAN_UP,
-                'c',
-                InputOption::VALUE_OPTIONAL,
-                'If true will process clean up, false - dry-run, only lists found problems (default false)',
-                false
-            );
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -67,6 +59,23 @@ class T5MemoryCleanUpCommand extends Translate5AbstractCommand
 
         $api = ConstantApi::create();
         $config = \Zend_Registry::get('config');
+        $persistenceService = PersistenceService::create();
+        $tmPrefix = $persistenceService->addTmPrefix('');
+
+        if ('' === $tmPrefix) {
+            $question = new ConfirmationQuestion(
+                'TM prefix is not set. Usage of command is too dangerous. Sure you want to proceed?',
+                false
+            );
+
+            $proceed = $this->io->askQuestion($question);
+
+            if (! $proceed) {
+                $this->io->info('Aborting command execution due to missing TM prefix.');
+
+                return self::SUCCESS;
+            }
+        }
 
         $serverMemoryList = [];
 
@@ -80,12 +89,15 @@ class T5MemoryCleanUpCommand extends Translate5AbstractCommand
             $memoryListResponse = $api->getMemories($baseUrl);
 
             foreach ($memoryListResponse->memories as $memory) {
+                if (strpos($memory->name, $tmPrefix) !== 0) {
+                    continue;
+                }
+
                 $serverMemoryList[$memory->name] = $baseUrl;
             }
         }
 
         $languageResourceRepository = LanguageResourceRepository::create();
-        $persistenceService = PersistenceService::create();
 
         $languageResources = $languageResourceRepository->getAllByServiceName(Service::NAME);
 
@@ -123,10 +135,17 @@ class T5MemoryCleanUpCommand extends Translate5AbstractCommand
             }
         }
 
-        if (! $input->hasOption(self::OPTION_CLEAN_UP)) {
-            $this->renderReport($memoriesWithoutFiles, $orphanedMemories);
+        $this->renderReport($memoriesWithoutFiles, $orphanedMemories);
 
-            $this->io->note('No clean up performed. Use --clean-up option to perform clean up.');
+        $question = new ConfirmationQuestion(
+            'Do you want to start proceed this clean up?',
+            false
+        );
+
+        $proceed = $this->io->askQuestion($question);
+
+        if (! $proceed) {
+            $this->io->note('No clean up performed');
 
             return self::SUCCESS;
         }

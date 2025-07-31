@@ -103,6 +103,9 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     SystemCleanCommand,
     SystemMailtestCommand,
     SystemVersionCommand,
+    T5Memory\ReimportFinishedTasksCommand,
+    T5Memory\ReimportTasksToBrokenTmsCommand,
+    T5Memory\SetMemoriesFromServerToLanguageResourceCommand,
     T5Memory\T5MemoryCleanUpCommand,
     T5Memory\T5MemoryDeleteTmCommand,
     T5Memory\T5MemoryDuplicateLanguageResourceCommand,
@@ -250,6 +253,9 @@ $commands = [
     new ContentProtectionLanguageRulesHashesRefreshCommand(),
     new T5MemoryCleanUpCommand(),
     new T5MemoryLanguageResourceSpecificDataSnapshotCommand(),
+    new ReimportFinishedTasksCommand(),
+    new ReimportTasksToBrokenTmsCommand(),
+    new SetMemoriesFromServerToLanguageResourceCommand(),
 ];
 
 // integrate Plugin-specific CLI commands
