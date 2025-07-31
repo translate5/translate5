@@ -90,7 +90,7 @@ class DateProtector extends AbstractProtector
 
         // 31.11.2023 -> 12.01.2023
         $errArr = DateTime::getLastErrors();
-        if (0 !== $errArr['warning_count'] + $errArr['error_count']) {
+        if ($errArr !== false && 0 !== $errArr['warning_count'] + $errArr['error_count']) {
             throw new NumberParsingException();
         }
 
