@@ -242,4 +242,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     handleClose: function(){
         window.location.hash = window.location.hash.replace(/\/filters.*$/,'');
     }
+}, function(){
+    this.borrow(Editor.plugins.Okapi.view.BconfGridController, ['createInfoSpan']);
 });
