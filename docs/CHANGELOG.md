@@ -13,6 +13,48 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.26.2] - 2025-07-31
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4823](https://jira.translate5.net/browse/TRANSLATE-4823): TBX-Import - TermCollection-Update: (At least) one term is lost, although in tbx** <br>
+FIXED: 'same' terms check is now case sensitive
+
+**[TRANSLATE-4793](https://jira.translate5.net/browse/TRANSLATE-4793): Configuration - Rename config runtimeOptions.worker.server** <br>
+The config name runtimeOptions.worker.server is misleading since its used in general for internal connections not only for workers. So its renamed to 
+runtimeOptions.server.internalURL.
+
+
+### Bugfixes
+**[TRANSLATE-4840](https://jira.translate5.net/browse/TRANSLATE-4840): TermPortal - batch set for "process status" in TermCollection not working** <br>
+UI: added loading mask until request completes - to prevent concurring requests
+
+**[TRANSLATE-4838](https://jira.translate5.net/browse/TRANSLATE-4838): t5memory - Type error on reorganise call** <br>
+Fix call of reorganise in fuzzy search logic
+
+**[TRANSLATE-4826](https://jira.translate5.net/browse/TRANSLATE-4826): file format settings - RootCause: controller.createInfoSpan is not a function** <br>
+FIXED: problem with incorrect handling of invalid uploaded filter/fprm file
+
+**[TRANSLATE-4825](https://jira.translate5.net/browse/TRANSLATE-4825): MatchAnalysis & Pretranslation - In pre-translation repetitions get tags in mixed oreder** <br>
+Fix tags order for repetitions in pre-translation
+
+**[TRANSLATE-4824](https://jira.translate5.net/browse/TRANSLATE-4824): Editor general - RootCause: Cannot read properties of undefined (reading 'isEmptyStore')** <br>
+FIXED: 'Language resources' combobox won't now be shown in 'Tasks'-tab's 'Advanced filters' window if current user have no rights for 'Language resources' tab
+
+**[TRANSLATE-4820](https://jira.translate5.net/browse/TRANSLATE-4820): t5memory - t5memory clean-up command deletes memories from other instances** <br>
+Fix t5memory:clean-up command. Provide new reimport commands
+
+**[TRANSLATE-4817](https://jira.translate5.net/browse/TRANSLATE-4817): Hotfolder Import - Integrity constraint error on failing hotfolder import** <br>
+On specific import failures of the hotfolder import the error is not handled properly and will lead to follow up errors. 
+
+**[TRANSLATE-4669](https://jira.translate5.net/browse/TRANSLATE-4669): AI - translate5 AI: Show already trained prompts separated in training window** <br>
+Prompts that have been sent to training remain now separated in training window after training
+
+
 ## [7.26.1] - 2025-07-23
 
 ### Important Notes:
