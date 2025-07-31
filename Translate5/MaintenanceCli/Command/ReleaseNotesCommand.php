@@ -493,7 +493,8 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
 
     private function updateReleaseVersionFile(string $version): bool
     {
-        $releaseVersionFile = APPLICATION_ROOT . '/build/release';
+        $releaseVersionFile = APPLICATION_DATA . '/tmp/release';
+
         list($major, $minor, $patch) = explode('.', $version);
         if (is_file($releaseVersionFile) && is_writable($releaseVersionFile)) {
             file_put_contents($releaseVersionFile, "#release version: created by ./translate5.sh release:notes command
