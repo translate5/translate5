@@ -98,7 +98,7 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
 
     protected function getAllTermsKey(editor_Models_Terminology_TbxObjects_Term $term): string
     {
-        return strtolower($term->language . '-' . $term->term);
+        return strtolower($term->language) . '-' . $term->term;
     }
 
     /**
