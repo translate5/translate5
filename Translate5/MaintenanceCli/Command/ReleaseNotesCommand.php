@@ -28,6 +28,7 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use Exception;
 use JiraRestApi\Configuration\ArrayConfiguration;
 use JiraRestApi\Issue\IssueService;
 use JiraRestApi\Issue\Version;
@@ -35,6 +36,8 @@ use JiraRestApi\JiraException;
 use JiraRestApi\Project\ProjectService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Exception;
+use ZfExtended_Utils;
 
 class ReleaseNotesCommand extends Translate5AbstractCommand
 {
@@ -44,32 +47,30 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
     public const PROJECT_KEY = 'TRANSLATE';
 
     // the name of the command (the part after "bin/console")
+    public const NEW_FEATURE = 'new feature';
+
     protected static $defaultName = 'release:notes';
 
     /**
      * Local storage for JIRA server config
-     * @var ArrayConfiguration
      */
-    protected $jiraConf = null;
+    protected ?ArrayConfiguration $jiraConf = null;
 
     /**
      * selected release version
-     * @var Version
      */
-    protected $releaseVersion = null;
+    protected ?Version $releaseVersion = null;
 
     /**
      * Container for the collected important release notes
-     * @var array
      */
-    protected $importantNotes = [];
+    protected array $importantNotes = [];
 
     /**
      * Container for the different issues
-     * @var array
      */
-    protected $issues = [
-        'new feature' => [],
+    protected array $issues = [
+        self::NEW_FEATURE => [],
         'change' => [],
         'fix' => [],
     ];
@@ -77,13 +78,13 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
     /**
      * available types and labels
      */
-    protected $types = [
-        'new feature' => 'New features',
+    protected array $types = [
+        self::NEW_FEATURE => 'New features',
         'change' => 'Changes',
         'fix' => 'Fixes',
     ];
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
         // the short description shown while running "php bin/console list"
@@ -97,16 +98,19 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
     /**
      * Execute the command
      * {@inheritDoc}
+     * @throws JiraException
+     * @throws Zend_Exception
+     * @throws Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
         $this->writeTitle('Update the translate5 release notes.');
 
-        $version = \ZfExtended_Utils::getAppVersion();
-        if ($version != \ZfExtended_Utils::VERSION_DEVELOPMENT) {
+        $version = ZfExtended_Utils::getAppVersion();
+        if ($version != ZfExtended_Utils::VERSION_DEVELOPMENT) {
             $this->io->error('This is a development command and can be run only in development instances!');
 
             return 1;
@@ -118,7 +122,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         try {
             $this->askReleaseVersion();
         } catch (JiraException $e) {
-            if (strpos($e->getMessage(), 'CURL HTTP Request Failed: Status Code : 401') === false) {
+            if (! str_contains($e->getMessage(), 'CURL HTTP Request Failed: Status Code : 401')) {
                 throw $e;
             }
             $this->initConfig(true);
@@ -129,34 +133,44 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         $url = \Zend_Registry::get('config')->runtimeOptions->jiraIssuesUrl;
         $this->io->text([
             '<info>URL to list and modify issues of this release</info>',
-            parse_url($url, PHP_URL_SCHEME) . '://' . parse_url($url, PHP_URL_HOST) . '/issues/?jql=project%20%3D%20' . self::PROJECT_KEY . '%20and%20fixVersion%20%3D%20%22' . $this->releaseVersion->id . '%22',
+            parse_url($url, PHP_URL_SCHEME) . '://' .
+            parse_url($url, PHP_URL_HOST) . '/issues/?jql=project%20%3D%20' .
+            self::PROJECT_KEY . '%20and%20fixVersion%20%3D%20%22' . $this->releaseVersion->id . '%22',
         ]);
 
         if (! $this->io->confirm('Does the important release notes contain all API / GUI relevant changes?', false)) {
-            return 0;
+            return self::SUCCESS;
         }
 
-        return self::SUCCESS;
+        $version = trim(str_replace(['translate5 - ', ' '], ['', '-'], $this->releaseVersion->name));
 
-        //        if ($this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', true)) {
-        //            $sql = $this->createSql();
-        //            $md = $this->updateChangeLog();
-        //            if ($this->io->confirm('git: stage above files, submodules and commit them?', true)) {
-        //                $sql = str_replace(getcwd() . '/', '', $sql);
-        //                $md = str_replace(getcwd() . '/', '', $md);
-        //                passthru('git add application/modules/editor/PrivatePlugins');
-        //                passthru('git add library/ZfExtended');
-        //                passthru('git add ' . $md);
-        //                passthru('git add ' . $sql);
-        //                passthru('git commit -m "change log and submodules release ' . $this->releaseVersion->name . '" application/modules/editor/PrivatePlugins library/ZfExtended ' . $sql . ' ' . $md);
-        //                passthru('git push');
-        //            }
-        //        }
-        //        if (! $this->releaseVersion->released) {
-        //            $this->io->note('Please release the version on URL https://jira.translate5.net/projects/TRANSLATE/versions/' . $this->releaseVersion->id);
-        //        }
-        //
-        //        return 0;
+        if (! $this->updateReleaseVersionFile($version)) {
+            $this->io->error('The new version could not be write to build/release file!');
+
+            return self::FAILURE;
+        }
+
+        $sql = $this->createSql();
+        $md = $this->updateChangeLog($version);
+        $sql = str_replace(getcwd() . '/', '', $sql);
+        $md = str_replace(getcwd() . '/', '', $md);
+        $this->io->writeln([
+            'Execute outside of the container: ',
+            'git add application/modules/editor/PrivatePlugins',
+            'git add library/ZfExtended',
+            'git add ' . $md,
+            'git add ' . $sql,
+            'git commit -m "change log and submodules release ' . $this->releaseVersion->name
+            . '" application/modules/editor/PrivatePlugins library/ZfExtended ' . $sql . ' ' . $md,
+            'git push',
+        ]);
+
+        if (! $this->releaseVersion->released) {
+            $this->io->note('Please release the version on URL https://jira.translate5.net/projects/TRANSLATE/versions/'
+                . $this->releaseVersion->id);
+        }
+
+        return 0;
     }
 
     /**
@@ -185,7 +199,9 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
     }
 
     /**
-     * Queries JIRA for releasable versions and asks the user for which version the release notes should be queried and created:
+     * Queries JIRA for releasable versions and asks the user for
+     * which version the release notes should be queried and created:
+     * @throws JiraException
      */
     protected function askReleaseVersion()
     {
@@ -194,7 +210,6 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         $vers = $proj->getVersions(self::PROJECT_KEY);
 
         foreach ($vers as $v) {
-            /* @var $v Version */
             if ($v->released) {
                 continue;
             }
@@ -206,7 +221,11 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             $unreleasedProjects[$name] = $v;
         }
 
-        $version = $this->io->choice('Choose the version for which the release notes should be created', array_keys($unreleasedProjects), 0);
+        $version = $this->io->choice(
+            'Choose the version for which the release notes should be created',
+            array_keys($unreleasedProjects),
+            0
+        );
         $this->releaseVersion = $unreleasedProjects[$version];
     }
 
@@ -229,9 +248,14 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             $item->key = $issue->key;
             $item->summary = trim($issue->fields->summary);
             $item->components = join(', ', array_column($issue->fields->components ?? [], 'name'));
-            $item->description = empty($issue->fields->customfield_11800) ? $issue->fields->description : $issue->fields->customfield_11800;
+            $item->description = empty($issue->fields->customfield_11800)
+                ? $issue->fields->description : $issue->fields->customfield_11800;
             if (! empty($issue->fields->customfield_11700)) {
-                $this->importantNotes[$issue->key] = preg_replace('~\R~u', "\n", trim($issue->fields->customfield_11700));
+                $this->importantNotes[$issue->key] = preg_replace(
+                    '~\R~u',
+                    "\n",
+                    trim($issue->fields->customfield_11700)
+                );
             }
 
             //to get the IDs go to https://jira.translate5.net/plugins/servlet/project-config/TRANSLATE/summary
@@ -245,7 +269,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
                 case 2: //New Feature
                 case 6: //Epic
                 case 7: //Story
-                    $this->issues['new feature'][$issue->key] = $item;
+                    $this->issues[self::NEW_FEATURE][$issue->key] = $item;
 
                     break;
                 case 3: //Task
@@ -256,7 +280,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
 
                     break;
                 default:
-                    throw new \Exception('Jira provides an unknown issue type in issue ' . $issue->key . ' ' . print_r($issue->fields->issuetype, 1));
+                    throw new Exception('Jira provides an unknown issue type in issue ' . $issue->key . ' ' . print_r($issue->fields->issuetype, 1));
             }
         }
 
@@ -316,7 +340,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
 --  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
 --  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
--- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+--              http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 --
 -- END LICENSE AND COPYRIGHT
 -- */
@@ -344,7 +368,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
 
         //headlines
 
-        foreach ($this->issues['new feature'] as $row) {
+        foreach ($this->issues[self::NEW_FEATURE] as $row) {
             $sqlData[] = $this->makeSqlRow($row, 'feature', $date, $groups);
         }
 
@@ -358,7 +382,11 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
 
         $sql .= join(",\n", $sqlData) . ';';
 
-        $version = str_replace(['translate5 - ', ' '], ['', '-'], $this->releaseVersion->name) . '-' . date('Y-m-d', time());
+        $version = str_replace(
+            ['translate5 - ', ' '],
+            ['', '-'],
+            $this->releaseVersion->name
+        ) . '-' . date('Y-m-d', time());
         $filename = APPLICATION_ROOT . '/application/modules/editor/database/sql-changelog-' . $version . '.sql';
         $this->io->success('Created SQL changelog file ' . $filename);
         file_put_contents($filename, $sql);
@@ -368,14 +396,12 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
 
     /**
      * Injects the MarkDown changelog into the CHANGELOG.md file
-     * @return string returns the filename of the changelog.md file
+     * returns the filename of the changelog.md file
+     * @throws Zend_Exception
      */
-    protected function updateChangeLog(): string
+    protected function updateChangeLog(string $version): string
     {
         $date = date('Y-m-d', time());
-
-        //headlines
-        $version = str_replace(['translate5 - ', ' '], ['', '-'], $this->releaseVersion->name);
 
         $importantNotes = [];
         if (! empty($this->importantNotes)) {
@@ -389,10 +415,10 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
 
         $md = "\n\n## [$version] - $date\n\n### Important Notes:\n$importantNotes \n\n";
 
-        if (! empty($this->issues['new feature'])) {
+        if (! empty($this->issues[self::NEW_FEATURE])) {
             $md .= "\n### Added\n";
         }
-        foreach ($this->issues['new feature'] as $row) {
+        foreach ($this->issues[self::NEW_FEATURE] as $row) {
             $md .= '**' . $this->linkIssue($row->key) . ': ' . $row->components . ' - ' . $row->summary . "** <br>\n" . $row->description . "\n\n";
         }
 
@@ -451,14 +477,32 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
     /**
      * Converts a TRANSLATE-XXX key into a link to JIRA
      * @param boolean $plain returns by default a MarkDown link, if plain = true it returns just the link
+     * @throws Zend_Exception
      */
-    protected function linkIssue(string $issue, $plain = false): string
+    protected function linkIssue(string $issue, bool $plain = false): string
     {
         $url = str_replace('{0}', '$1', \Zend_Registry::get('config')->runtimeOptions->jiraIssuesUrl);
         if (! $plain) {
             $url = '[$1](' . $url . ')';
         }
 
-        return preg_replace('/(TRANSLATE-[0-9]+)/', $url, $issue);
+        return preg_replace('/(TRANSLATE-\d+)/', $url, $issue);
+    }
+
+    private function updateReleaseVersionFile(string $version): bool
+    {
+        $releaseVersionFile = APPLICATION_ROOT . '/build/release';
+        list($major, $minor, $patch) = explode('.', $version);
+        if (is_file($releaseVersionFile) && is_writable($releaseVersionFile)) {
+            file_put_contents($releaseVersionFile, "#release version: created by ./translate5.sh release:notes command
+MAJOR_VER=$major
+MINOR_VER=$minor
+BUILD=$patch
+");
+
+            return true;
+        }
+
+        return false;
     }
 }
