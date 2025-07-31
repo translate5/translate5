@@ -14,6 +14,18 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.26.3] - 2025-07-31
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4684](https://jira.translate5.net/browse/TRANSLATE-4684): Main back-end mechanisms (Worker, Logging, etc.) - Upgrade translate5 to PHP 8.3** <br>
+Upcoming switch to PHP 8.3: compatibility related fixes
+
+
 ## [7.26.2] - 2025-07-31
 
 ### Important Notes:
