@@ -145,12 +145,12 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         $version = trim(str_replace(['translate5 - ', ' '], ['', '-'], $this->releaseVersion->name));
 
         if (! $this->updateReleaseVersionFile($version)) {
-            $this->io->error('The new version could not be write to build/release file!');
+            $this->io->error('The new version could not be write to data/tmp/release file!');
 
             return self::FAILURE;
         }
 
-        $this->io->success('Written version '.$version.' to build/release file!');
+        $this->io->success('Written version ' . $version . ' to data/tmp/release file!');
 
         $sql = $this->createSql();
         $md = $this->updateChangeLog($version);
@@ -158,13 +158,15 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         $md = str_replace(getcwd() . '/', '', $md);
         $this->io->writeln([
             'Execute outside of the container: ',
-            'git add application/modules/editor/PrivatePlugins',
-            'git add library/ZfExtended',
-            'git add ' . $md,
-            'git add ' . $sql,
-            'git commit -m "change log and submodules release ' . $this->releaseVersion->name
+            '',
+            '  git add application/modules/editor/PrivatePlugins',
+            '  git add library/ZfExtended',
+            '  git add ' . $md,
+            '  git add ' . $sql,
+            '  git commit -m "change log and submodules release ' . $this->releaseVersion->name
             . '" application/modules/editor/PrivatePlugins library/ZfExtended ' . $sql . ' ' . $md,
-            'git push',
+            '  git push',
+            '',
         ]);
 
         if (! $this->releaseVersion->released) {
@@ -494,18 +496,15 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
     private function updateReleaseVersionFile(string $version): bool
     {
         $releaseVersionFile = APPLICATION_DATA . '/tmp/release';
-
         list($major, $minor, $patch) = explode('.', $version);
-        if (is_file($releaseVersionFile) && is_writable($releaseVersionFile)) {
-            file_put_contents($releaseVersionFile, "#release version: created by ./translate5.sh release:notes command
+
+        return file_put_contents(
+            $releaseVersionFile,
+            "#release version: created by ./translate5.sh release:notes command
 MAJOR_VER=$major
 MINOR_VER=$minor
 BUILD=$patch
-");
-
-            return true;
-        }
-
-        return false;
+"
+        ) > 0;
     }
 }
