@@ -286,7 +286,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                         itemId: 'deadlineDate',
                         title: me.strings.deadlineDateText,
                         style: 'margin-top:80px'
-                    }, {
+                    }].concat(Editor.app.authenticatedUser.isAllowed('languageResourcesOverview') ? [{
                         xtype: 'tagfield',
                         name:'langResource',
                         itemId:'langResource',
@@ -305,7 +305,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                             type:'list',
                             textLabel:me.strings.langResources,
                         }
-                    }]
+                    }] : [])
                 }],
                 dockedItems: [{
                     xtype: 'toolbar',
