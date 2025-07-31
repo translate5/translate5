@@ -150,6 +150,8 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             return self::FAILURE;
         }
 
+        $this->io->success('Written version '.$version.' to build/release file!');
+
         $sql = $this->createSql();
         $md = $this->updateChangeLog($version);
         $sql = str_replace(getcwd() . '/', '', $sql);
