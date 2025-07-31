@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\ZfExtended\Tools\Markup;
 
 /**
@@ -91,10 +93,18 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
 
     private ?editor_ImageTag_Single $singleTag = null;
 
+    private readonly array $protectedWhitespaceTagList;
+
+    private readonly array $protectedContentTagList;
+
     public function __construct($replacerTemplate = null)
     {
         $this->replacerRegex = self::REGEX_INTERNAL_TAGS;
         $this->placeholderTemplate = $replacerTemplate ?? self::PLACEHOLDER_TEMPLATE;
+
+        $contentProtector = ContentProtector::create();
+        $this->protectedWhitespaceTagList = $contentProtector->tagList(WhitespaceProtector::alias());
+        $this->protectedContentTagList = $contentProtector->tagList(NumberProtector::alias());
     }
 
     /**
@@ -869,8 +879,13 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
                 $ignoreWhitespace
             ) {
                 $id = $match[3];
-                //if it is a whitespace tag, we do not replace it:
-                if ($ignoreWhitespace && in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
+                //if it is a whitespace tag or CP tag, we do not replace it:
+                if (
+                    in_array($id, $this->protectedContentTagList)
+                    || (
+                        $ignoreWhitespace && in_array($id, $this->protectedWhitespaceTagList)
+                    )
+                ) {
                     if (in_array($this->getTagNumber($match[0]), $shortTagNumbers)) {
                         return $this->replaceTagNumber($match[0], $newShortTagNumber++);
                     }
