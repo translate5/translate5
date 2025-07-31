@@ -1853,7 +1853,7 @@ UPDATE Zf_configuration SET
                  `level` = "1",
                  `description`  = "If empty defaults to \"runtimeOptions.server.protocol\" and \"runtimeOptions.server.name\". This config allows to access the local worker API through a different URL as the public one. Format of this configuration value: SCHEME://HOST:PORT",
                  `comment` = ""
-                 WHERE `name` = "runtimeOptions.worker.server";
+                 WHERE `name` = "runtimeOptions.server.internalURL";
 UPDATE Zf_configuration SET
                  `default` = "1",
                  `defaults` = "NULL",

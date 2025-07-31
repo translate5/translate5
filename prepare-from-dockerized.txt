@@ -18,7 +18,7 @@
 1.Stop the php-container within then docker-compose project you already have up and running
 2.Create file 'windows-installer-config.ini' having 'INSTALL_PHP_PATH=C:\your\path\to\php.exe' and 'INSTALL_MYSQL_PATH=C:\your\path\to\mysql.exe'
 3.Run command: "translate5.bat config runtimeOptions.plugins.VisualReview.visualConverterUrl http://visualconverter.:8087"
-4.Run command: "translate5.bat config runtimeOptions.worker.server http://php:80"
+4.Run command: "translate5.bat config runtimeOptions.server.internalURL http://php:80"
 5.Run command: "translate5.bat config runtimeOptions.plugins.IndiEngine.verifyPeer 0"
 6.Run command: "echo 127.0.0.1 translate5.local php db termtagger frontendmessagebus languagetool okapi pdfconverter visualconverter t5memory >> C:\Windows\System32\drivers\etc\hosts"
 7.Run SQL query: "DELETE FROM `Zf_memcache` WHERE `id` IN ('helper_paths_editor', 'helper_paths_default');" as paths are prefixed with '/var/www/' there

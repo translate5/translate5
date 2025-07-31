@@ -54,7 +54,7 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
         $rop = Zend_Registry::get('config')->runtimeOptions;
 
         // Get worker server origin
-        $workerServer = $rop->worker->server ?: $rop->server->protocol . $rop->server->name;
+        $workerServer = $rop->server->internalURL ?: $rop->server->protocol . $rop->server->name;
 
         // Init worker
         $this->init($taskGuid, [

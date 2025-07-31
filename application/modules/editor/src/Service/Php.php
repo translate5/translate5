@@ -42,7 +42,7 @@ final class Php extends DockerServiceAbstract
     protected bool $mandatory = false;
 
     protected array $configurationConfig = [
-        'name' => 'runtimeOptions.worker.server',
+        'name' => 'runtimeOptions.server.internalURL',
         'type' => 'string',
         'url' => 'http://php.:80',
         'healthcheck' => '/editor/index/applicationstate',

@@ -308,7 +308,7 @@ UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.worker.Mittag
 UPDATE Zf_configuration set level = 2 WHERE name = "runtimeOptions.worker.MittagQI\\Translate5\\Task\\Export\\Package\\Worker.maxParallelWorkers";
 UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.worker.MittagQI\\Translate5\\Task\\Reimport\\Worker.maxParallelWorkers";
 UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.worker.MittagQI\\Translate5\\Workflow\\ArchiveWorker.maxParallelWorkers";
-UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.worker.server";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.server.internalURL";
 UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.worker.triggerType";
 UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.workflow.default.anonymousColumns";
 UPDATE Zf_configuration set level = 4 WHERE name = "runtimeOptions.workflow.default.reviewing.defaultDeadlineDate";

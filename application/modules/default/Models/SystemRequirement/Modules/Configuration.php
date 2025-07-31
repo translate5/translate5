@@ -72,9 +72,9 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
         $curlError = '';
         $curlErrorWorker = '';
         $output = $this->callUrl($url, $curlError);
-        $hasWorkerUrl = ! empty($config->runtimeOptions->worker->server);
+        $hasWorkerUrl = ! empty($config->runtimeOptions->server->internalURL);
         if ($hasWorkerUrl) {
-            $outputWorker = $this->callUrl($config->runtimeOptions->worker->server . $path, $curlErrorWorker);
+            $outputWorker = $this->callUrl($config->runtimeOptions->server->internalURL . $path, $curlErrorWorker);
         }
 
         if (str_contains($curlErrorWorker, '503 Service Unavailable')) {
