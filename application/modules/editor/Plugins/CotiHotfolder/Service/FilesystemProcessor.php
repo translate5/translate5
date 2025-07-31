@@ -53,12 +53,19 @@ use MittagQI\Translate5\Plugins\CotiHotfolder\Factory\ProjectFactory;
 use MittagQI\Translate5\Plugins\CotiHotfolder\Service\Filesystem\FilesystemFactory;
 use MittagQI\Translate5\Plugins\CotiHotfolder\Service\Filesystem\FilesystemService;
 use MittagQI\Translate5\Repository\CustomerRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Task\Exception\ProjectAbortException;
 use MittagQI\Translate5\Task\Import\ImportService;
 use MittagQI\Translate5\Task\TaskService;
+use ReflectionException;
 use Throwable;
+use Zend_Db_Statement_Exception;
 use Zend_Db_Table;
+use Zend_Exception;
 use Zend_Filter_Compress_Zip;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_User as User;
 use ZfExtended_Utils;
 use ZipArchive;
@@ -258,6 +265,14 @@ class FilesystemProcessor
         return $subDirs;
     }
 
+    /**
+     * @throws ProjectAbortException
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
     private function processDir(
         string $processingDir,
         Customer $customer,
@@ -298,8 +313,6 @@ class FilesystemProcessor
                 $this->setDeadlineByProject($project, $instructions->project->deadline);
             }
         } catch (Throwable $e) {
-            $this->logger->exception($e);
-
             $this->mailer->sendErrorsToPm(
                 $this->projectManagerProvider->getByGuid($project->getPmGuid()),
                 $customer->getNumber(),
@@ -307,9 +320,12 @@ class FilesystemProcessor
                 [sprintf('Import of project "%s" aborted. Reason: %s', $project->getTaskName(), $e->getMessage())]
             );
 
-            $project->delete();
+            $project->setErroneous();
+            foreach (TaskRepository::create()->getProjectTaskList((int) $project->getId()) as $task) {
+                $task->setErroneous();
+            }
 
-            throw $e;
+            throw new ProjectAbortException($project, previous: $e);
         }
 
         $projectConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);

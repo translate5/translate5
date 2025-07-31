@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use ZfExtended_Logger as Logger;
+
 /**
  * Additional Log Writer which just logs all events with an field "task"
  * with a task Entity in its extra data to a separate task log table
@@ -67,9 +69,6 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
             return;
         }
 
-        /* @var $task editor_Models_Task */
-        $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');
-        /* @var $taskLog editor_Models_Logger_Task */
         if ($task->isModified()) {
             $modified = $task->getModifiedValues();
             foreach ($modified as $field => $value) {
@@ -81,17 +80,22 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
                 }
             }
         }
-        $taskLog->setFromEventAndTask($event, $task);
-        // we don't log the task data again, thats implicit via the taskGuid
-        // first we have to ensure that extraFlat is filled
-        $event->getExtraFlattenendAndSanitized();
-        //then we just unset the task in both
-        unset($event->extra['task']);
-        unset($event->extraFlat['task']);
-        $taskLog->setExtra($event->getExtraAsJson());
+
+        $this->prepareEvent($event);
+
+        $taskLog = ZfExtended_Factory::get(editor_Models_Logger_Task::class);
+        $taskLog->setFromEvent($event, $task->getTaskGuid(), $task->getState());
 
         try {
             $taskLog->save();
+            if ($task->isProject()) {
+                foreach ($task->loadProjectTasks($task->getId()) as $subTaskData) {
+                    $subTaskLog = ZfExtended_Factory::get(editor_Models_Logger_Task::class);
+                    $subTaskLog->setFromEvent($event, $subTaskData['taskGuid'], $subTaskData['state']);
+                    $subTaskLog->setMessage('IN PROJECT: ' . $subTaskLog->getMessage());
+                    $subTaskLog->save();
+                }
+            }
         } catch (Throwable) {
             //do nothing here! The error itself was logged in the system log,
             // the task seems to be deleted in the meantime, so no need and way to log it here
@@ -109,5 +113,15 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
         }
 
         return false;
+    }
+
+    private function prepareEvent(ZfExtended_Logger_Event $event): void
+    {
+        // we don't log the task data again, thats implicit via the taskGuid
+        // first we have to ensure that extraFlat is filled
+        $event->getExtraFlattenendAndSanitized();
+        //then we just unset the task in both
+        unset($event->extra['task']);
+        unset($event->extraFlat['task']);
     }
 }

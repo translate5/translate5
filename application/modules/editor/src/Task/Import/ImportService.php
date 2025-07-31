@@ -245,14 +245,21 @@ class ImportService
                 )
             );
 
-            $task->save();
+            try {
+                $task->save();
+                $this->prepareMeta($task, $data);
+                $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dataProvider, $data, $user);
+                //update the task usage log for this project-task
+                $this->usageLogger->log($task);
+            } catch (Throwable $e) {
+                $task->setErroneous();
 
-            $this->prepareMeta($task, $data);
-
-            $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dataProvider, $data, $user);
-
-            //update the task usage log for this project-task
-            $this->usageLogger->log($task);
+                Zend_Registry::get('logger')->exception($e, [
+                    'extra' => [
+                        'task' => $task,
+                    ],
+                ]);
+            }
 
             $projectTasks[] = $task->getDataObject();
         }

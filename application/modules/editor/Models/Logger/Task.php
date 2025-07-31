@@ -61,10 +61,10 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract
     /**
      * Sets the internal data from the given Event class
      */
-    public function setFromEventAndTask(ZfExtended_Logger_Event $event, editor_Models_Task $task): void
+    public function setFromEvent(ZfExtended_Logger_Event $event, string $taskGuid, string $taskState): void
     {
-        $this->setTaskGuid($task->getTaskGuid());
-        $this->setState($task->getState());
+        $this->setTaskGuid($taskGuid);
+        $this->setState($taskState);
         $this->setEventCode($event->eventCode);
         $this->setLevel($event->level);
         $this->setDomain($event->domain);
@@ -73,6 +73,7 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract
         $this->setAuthUserGuid($event->userGuid);
         $this->setAuthUser($event->userLogin);
         $this->setCreated($event->created);
+        $this->setExtra($event->getExtraAsJson());
     }
 
     /**
