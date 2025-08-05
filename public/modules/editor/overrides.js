@@ -1763,6 +1763,27 @@ Ext.define('Translate5.override.data.request.Ajax', {
     },
 
     /**
+     * This method is overridden to catch where the strange request is triggered from.
+     * Read more here: https://jira.translate5.net/browse/TRANSLATE-4855
+     */
+    start: function(data) {
+        var me = this;
+
+        // Log stack trace on attempt to load this js class in an inisual way
+        if (me.options.url.match('/Editor.model.admin.TaskUserAssoc')) {
+            console.log('Ext.Loader.isInHistory[\'Editor.model.admin.TaskUserAssoc\']: ' + Ext.Loader.isInHistory['Editor.model.admin.TaskUserAssoc']);
+            console.log('Unexpected way to load model js class, see stringified stack trace below');
+            console.log(new Error().stack);
+        }
+
+        // Call parent
+        var ret = me.callParent([data]);
+
+        // Preserving return value logic defined in parent
+        return me.async ? me : ret;
+    },
+
+    /**
      * Check whether response's message should be shown, and if so do show
      */
     parseResponse: function(response, options) {
