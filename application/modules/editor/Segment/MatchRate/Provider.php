@@ -77,7 +77,9 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider
             // Fuzzy Match check must be done on import (where it can be assumed that all targets are set with the match) and for taken over TMs otherwise
             if ($qualityConfig->enableUneditedFuzzyMatchCheck && $segment->getMatchRate() < 100 && $segment->isInteractive() === false) {
                 if ($segment->isPretranslated()) {
-                    $tags->addAllTargetsQuality(static::$type, self::UNEDITED_FUZZY_MATCH);
+                    if ($segment->isPretranslatedTM()) {
+                        $tags->addAllTargetsQuality(static::$type, self::UNEDITED_FUZZY_MATCH);
+                    }
                 } elseif ($segment->isEditedTM()) {
                     $uneditedTargetFields = $tags->getEditedTargetFields();
                     if (count($uneditedTargetFields) > 0) {
