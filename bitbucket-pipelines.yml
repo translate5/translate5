@@ -76,7 +76,7 @@ pipelines:
           size: 2x
           script:
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
-            - cd docker && ./bitbucket/test-script-php83.sh
+            - cd docker && ./bitbucket/test-script.sh
           artifacts:
             - translate5/data/**
           after-script:
