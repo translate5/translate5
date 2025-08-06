@@ -15,6 +15,56 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.26.4] - 2025-08-06
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4858](https://jira.translate5.net/browse/TRANSLATE-4858): TermPortal - Make sure TermPortal is compatible with PHP 8.3** <br>
+FIXED TermPortal compatibility problems with PHP 8.3
+
+**[TRANSLATE-4684](https://jira.translate5.net/browse/TRANSLATE-4684): Main back-end mechanisms (Worker, Logging, etc.) - Upgrade translate5 to PHP 8.3** <br>
+Upcoming switch to PHP 8.3: 
+7.26.4: fix things producing deprecated messages
+7.26.3: compatibility related fixes
+
+
+### Bugfixes
+**[TRANSLATE-4860](https://jira.translate5.net/browse/TRANSLATE-4860): t5memory - TMX import: tag content is imported** <br>
+Add new TMX processor and config with regex to filter problematic TUs from TMX on import
+
+**[TRANSLATE-4856](https://jira.translate5.net/browse/TRANSLATE-4856): Auto-QA - AutoQA: Unchanged Fuzzy Match check also lists not-changed MT pre-translations** <br>
+FIXED: MT-translations are not counted as Unedited fuzzy matches anymore
+
+**[TRANSLATE-4855](https://jira.translate5.net/browse/TRANSLATE-4855): Editor general - RootCause: Invalid JSON - answer seems not to be from translate5 - x-translate5-version header is missing.** <br>
+DEBUG: added debug code for further investigation
+
+**[TRANSLATE-4853](https://jira.translate5.net/browse/TRANSLATE-4853): VisualReview / VisualTranslation - Cannot read properties of null (reading 'segmentHasComments')** <br>
+FIX: JS-error in visual when delivery of data is very slow
+
+**[TRANSLATE-4852](https://jira.translate5.net/browse/TRANSLATE-4852): Workflows - list changed segments in review finished notification to PM again** <br>
+The changed segments in the review finished notification to the PM are listed again
+
+**[TRANSLATE-4850](https://jira.translate5.net/browse/TRANSLATE-4850): TermPortal - RootCause: can't access property "get", a.getRecord() is null** <br>
+FIXED: fixed problem popping on switching between TermCollections in Attributes management screen
+
+**[TRANSLATE-4843](https://jira.translate5.net/browse/TRANSLATE-4843): VisualReview / VisualTranslation - RootCause: Cannot read properties of undefined (reading 'length')** <br>
+FIX: Visual scroller might causes RootCause-error due to unitialized variable
+
+**[TRANSLATE-4842](https://jira.translate5.net/browse/TRANSLATE-4842): Workflows - Always skip the second confirmation window for finishing print approval** <br>
+The second confirmation window for finishing print approval is skipped now
+
+**[TRANSLATE-4840](https://jira.translate5.net/browse/TRANSLATE-4840): TermPortal - batch set for "process status" in TermCollection not working** <br>
+7.26.4: added more loading masks
+7.26.2: added loading mask until request completes - to prevent concurring requests
+
+**[TRANSLATE-4839](https://jira.translate5.net/browse/TRANSLATE-4839): t5memory - Check and potentially solve some output of logging of potentially problematic answers of t5memory** <br>
+Fix logging for some t5memory errors 
+
+
 ## [7.26.3] - 2025-07-31
 
 ### Important Notes:
