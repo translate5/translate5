@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "393bf07faf4d1a97dc694587d93cf448",
+    "content-hash": "abba782ddb31ef885fe90c272502c31f",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -2217,16 +2217,16 @@
         },
         {
             "name": "league/flysystem-ftp",
-            "version": "3.28.0",
+            "version": "3.29.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem-ftp.git",
-                "reference": "6c65e1de3767dca7f2712571a915cb952bae42e0"
+                "reference": "17e8e422cb43a7fefa06ec8ddf36ee8ec936d138"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem-ftp/zipball/6c65e1de3767dca7f2712571a915cb952bae42e0",
-                "reference": "6c65e1de3767dca7f2712571a915cb952bae42e0",
+                "url": "https://api.github.com/repos/thephpleague/flysystem-ftp/zipball/17e8e422cb43a7fefa06ec8ddf36ee8ec936d138",
+                "reference": "17e8e422cb43a7fefa06ec8ddf36ee8ec936d138",
                 "shasum": ""
             },
             "require": {
@@ -2261,9 +2261,9 @@
                 "ftpd"
             ],
             "support": {
-                "source": "https://github.com/thephpleague/flysystem-ftp/tree/3.28.0"
+                "source": "https://github.com/thephpleague/flysystem-ftp/tree/3.29.0"
             },
-            "time": "2024-05-06T20:05:52+00:00"
+            "time": "2024-06-12T09:46:12+00:00"
         },
         {
             "name": "league/flysystem-local",
@@ -9474,6 +9474,7 @@
         "ext-intl": "*",
         "ext-zlib": "*",
         "ext-sqlite3": "*",
+        "ext-ftp": "*",
         "lib-imagick-imagemagick": "*",
         "ext-imagick": "*",
         "ext-bcmath": "*",
@@ -9481,7 +9482,7 @@
     },
     "platform-dev": [],
     "platform-overrides": {
-        "php": "8.1.23"
+        "php": "8.1.26"
     },
     "plugin-api-version": "2.6.0"
 }
