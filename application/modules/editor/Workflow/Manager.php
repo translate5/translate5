@@ -39,12 +39,15 @@ class editor_Workflow_Manager
     protected static $workflowList;
 
     /**
+     * Workflow instances
+     */
+    private array $instances = [];
+
+    /**
      * Caches the workflow instance to taskGuids
      * @var array
      */
     protected static $workflowTaskCache = [];
-
-    private array $instances = [];
 
     public function __construct()
     {

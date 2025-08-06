@@ -36,7 +36,7 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  */
 class HtmlProcessor
 {
-    private Tags $tagRepair;
+    private Tags $tags;
 
     private bool $preparationFault = false;
 

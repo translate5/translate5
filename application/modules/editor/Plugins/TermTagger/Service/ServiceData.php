@@ -68,6 +68,24 @@ class ServiceData
      */
     public $segments = null;
 
+    public int $debug = 0;
+
+    public int $fuzzy = 0;
+
+    public int $stemmed = 0;
+
+    public int $fuzzyPercent = 0;
+
+    public int $maxWordLengthSearch = 0;
+
+    public int $minFuzzyStartLength = 0;
+
+    public int $minFuzzyStringLength = 0;
+
+    public int $targetStringMatch = 0;
+
+    public string $task = '';
+
     /**
      * If $task is sumbitted, ServerCommunication is initialized with all required fields,
      * so after that all there has to be done is addSegment()

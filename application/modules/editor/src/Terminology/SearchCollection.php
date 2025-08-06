@@ -75,6 +75,11 @@ class SearchCollection
     private bool $useWildcard;
 
     /**
+     * Search query
+     */
+    private string $query;
+
+    /**
      * @param int $collectionId collectionId where should be searched
      * @param int $sourceLang query string should match all terms with this sourceLang
      * @param int $targetLang the resul terms will be in this targetLanguage
@@ -163,8 +168,9 @@ class SearchCollection
         $s = $db->select()
             ->setIntegrityCheck(false)
             ->from('terms_term')
+            /* @phpstan-ignore-next-line since removed anyway in a short */
             ->where(FEATURE_TRANSLATE_4673_ENABLE
-                ? ('term ' . $compareWith .  '?')
+                ? ('term ' . $compareWith . '?')
                 : ('lower(term) ' . $compareWith . ' lower(?) COLLATE utf8mb4_bin'), $this->query)
             ->where('collectionId = ?', $this->collectionId)
             ->where('languageId IN(?)', $langauges)

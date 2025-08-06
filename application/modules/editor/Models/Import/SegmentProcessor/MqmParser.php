@@ -66,6 +66,10 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
      */
     protected $errors = [];
 
+    protected ?editor_Models_Segment $segment = null;
+
+    protected array $closeTags = [];
+
     /**
      * @param editor_Models_SegmentFieldManager $sfm receive the already inited sfm
      */

@@ -44,6 +44,11 @@ class editor_Models_Import_MetaData_QmSubsegments implements editor_Models_Impor
     protected $hasTaskSpecific = true;
 
     /**
+     * Auxiliary variable
+     */
+    private int $qmFlagId = 0;
+
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
      */

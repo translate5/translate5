@@ -104,6 +104,10 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
     private string $absoluteDataPath;
 
+    public string|array $sourceLangCode;
+
+    public string|array $targetLangCode;
+
     /***
      * Init the language resource instance for given editor_Models_LanguageResources_Resource
      * @param editor_Models_LanguageResources_Resource $resource
