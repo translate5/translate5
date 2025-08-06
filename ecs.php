@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use PhpCsFixer\Fixer\Import\NoUnusedImportsFixer;
+use PhpCsFixer\Fixer\PhpTag\BlankLineAfterOpeningTagFixer;
 use PhpCsFixer\Fixer\Whitespace\ArrayIndentationFixer;
 use PhpCsFixer\Fixer\Whitespace\BlankLineBeforeStatementFixer;
+use Symplify\CodingStandard\Fixer\Commenting\RemoveUselessDefaultCommentFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Translate5\PHPCodeSniffer\EnumPascalCaseFixer;
 
@@ -32,4 +34,8 @@ return ECSConfig::configure()
         spaces: true,
         namespaces: true,
     )
+    ->withSkip([
+        BlankLineAfterOpeningTagFixer::class,
+        RemoveUselessDefaultCommentFixer::class,
+    ])
 ;
