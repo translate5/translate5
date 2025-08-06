@@ -6,12 +6,12 @@ For a reference to the issue keys see http://jira.translate5.net
 
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-All updates are (downwards) compatible! If not this is listed in the important release notes.
+We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
+- MAJOR version change with backwards incompatible changes in API and big/very important UI changes
+- MINOR version change: New features and smaller UI / Usability changes (pointed to in important release notes)
+- PATCH version change: Only bug fixes and small enhancements
 
-
-
-
-
+All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
 
 
