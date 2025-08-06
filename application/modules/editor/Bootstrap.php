@@ -68,10 +68,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         parent::__construct($application);
 
         //START TEMP FEATURE SWITCH
-        define(
-            'FEATURE_TRANSLATE_4673_ENABLE',
-            (bool) (Zend_Registry::get('config')?->featureSwitch?->translate4673 ?? false)
-        );
+        if (! defined('FEATURE_TRANSLATE_4673_ENABLE')) {
+            define(
+                'FEATURE_TRANSLATE_4673_ENABLE',
+                (bool) (Zend_Registry::get('config')?->featureSwitch?->translate4673 ?? false)
+            );
+        }
         //END TEMP FEATURE SWITCH
 
         //Binding the worker clean up to the after import event, since import

@@ -22,11 +22,11 @@
       <prop type="tmgr:docname">simple-en-de.xlf</prop>
       <tuv xml:lang="en-US">
         <prop type="tmgr:language">English(U.S.)</prop>
-        <seg><g id="1">Note</g>:</seg>
+        <seg><bpt i="1" type="82" x="1" />Note<ept i="1" />:</seg>
       </tuv>
       <tuv xml:lang="de-DE">
         <prop type="tmgr:language">GERMAN(REFORM)</prop>
-        <seg><g id="1">Hinweis</g>:</seg>
+        <seg><bpt i="1" type="82" x="1" />Hinweis<ept i="1" />:</seg>
       </tuv>
     </tu>
     <tu tuid="3" creationdate="20220203T110704Z">
