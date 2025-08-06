@@ -65,11 +65,12 @@ Ext.define('Editor.util.TaskActions', {
          * {Object} strings Object containing default translations
          * 
          * @param {Function} callback
+         * @param {boolean} skipConfirm
          */
-        finish: function(callback) {
-            (new this()).finish(callback);
+        finish: function(callback, skipConfirm) {
+            (new this()).finish(callback, skipConfirm);
         },
-        
+
         /**
          * Confirms the task (if unconfirmed) and calls the given callback only if a confirmation was done, parameters are:
          * {Editor.model.admin.Task} task
@@ -210,7 +211,7 @@ Ext.define('Editor.util.TaskActions', {
             }
         }
     },
-    
+
     /**
      * if a segment is opened for editing, show a warning and return true
      * @return {Boolean}
@@ -246,18 +247,20 @@ Ext.define('Editor.util.TaskActions', {
     /**
      * finishes the current task
      * @param {Function} callback
+     * @param {boolean} skipConfirm
      */
-    finish: function(callback) {
+    finish: function(callback, skipConfirm) {
         var me = this;
         if(me.isEditing()) {
             return;
         }
+
         if(! Editor.app.authenticatedUser.isAllowed('editorFinishTask')){
             return;
         }
 
         //do not show the confirmation window if it is configured so
-        if(Editor.app.getTaskConfig('editor.showConfirmFinishTaskPopup') !== true){
+        if(Editor.app.getTaskConfig('editor.showConfirmFinishTaskPopup') !== true || skipConfirm){
             me._doFinish(callback);
             return;
         }
