@@ -128,6 +128,7 @@
     "ext-intl": "*",
     "ext-zlib": "*",
     "ext-sqlite3": "*",
+    "ext-redis": "*",
     "phpunit/phpunit": "^9",
     "shardj/zf1-future": "dev-master",
     "symfony/console": "^5.0",

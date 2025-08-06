@@ -60,6 +60,7 @@ final class Services
         'php' => Php::class,
         'proxy' => Proxy::class,
         't5memory' => T5Memory::class,
+        'redis' => Redis::class,
     ];
 
     /**

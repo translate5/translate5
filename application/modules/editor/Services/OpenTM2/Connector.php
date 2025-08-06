@@ -37,6 +37,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\LanguageResource\QueryCache;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\ConstantApi;
 use MittagQI\Translate5\T5Memory\Api\Response\MutationResponse as MutationApiResponse;
@@ -106,6 +107,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private readonly FlushMemoryService $flushMemoryService;
 
+    private QueryCache $queryCache;
+
     public function __construct()
     {
         editor_Services_Connector_Exception::addCodes([
@@ -135,6 +138,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $this->waitingService = RetryService::create();
         $this->constantApi = ConstantApi::create();
         $this->flushMemoryService = FlushMemoryService::create();
+        $this->queryCache = QueryCache::create();
     }
 
     public function connectTo(
@@ -1206,6 +1210,30 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     }
 
     private function queryTms(
+        string $queryString,
+        editor_Models_Segment $segment,
+        string $fileName,
+    ): editor_Services_ServiceResult {
+        //TODO final implemenation: get prefix and other key relevant information from underlying api instance
+        $key = [
+            $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix,
+            $this->languageResource->getId(),
+            $fileName,
+            //FIXME this part of the key will change with next feature release!
+            $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask(),
+            $queryString,
+        ];
+
+        $result = $this->queryCache->get($key);
+        if ($result === null) {
+            $result = $this->queryTmsNative($queryString, $segment, $fileName);
+            $this->queryCache->set($key, $result);
+        }
+
+        return $result;
+    }
+
+    private function queryTmsNative(
         string $queryString,
         editor_Models_Segment $segment,
         string $fileName,

@@ -92,6 +92,9 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
         'visualconverter' => [
             'url' => 'http://visualconverter.:80',
         ],
+        'redis' => [
+            'url' => 'http://redis.',
+        ],
     ];
 
     protected function configure()

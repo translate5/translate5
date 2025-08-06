@@ -56,13 +56,19 @@ class TaskImportCommand extends Translate5AbstractCommand
             'pm',
             '',
             InputOption::VALUE_REQUIRED,
-            'Project manager GUID',
+            'Project manager ID/login/GUID',
         );
         $this->addOption(
             'source',
             's',
             InputOption::VALUE_REQUIRED,
             'Source language RFC5646',
+        );
+        $this->addOption(
+            'pivot',
+            'p',
+            InputOption::VALUE_REQUIRED,
+            'Pivot language RFC5646',
         );
         $this->addOption(
             'targets',
@@ -195,6 +201,10 @@ class TaskImportCommand extends Translate5AbstractCommand
 
                 return self::FAILURE;
             }
+        }
+
+        if ($input->getOption('pivot')) {
+            $workerParams['pivotLanguage'] = $input->getOption('pivot');
         }
 
         $worker = new \editor_Models_Import_CliImportWorker();
