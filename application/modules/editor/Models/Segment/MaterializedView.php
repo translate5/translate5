@@ -45,7 +45,6 @@ class editor_Models_Segment_MaterializedView
 
     public function __construct($taskGuid = null)
     {
-        $this->config = Zend_Registry::get('config');
         if (! empty($taskGuid)) {
             $this->setTaskGuid($taskGuid);
         }

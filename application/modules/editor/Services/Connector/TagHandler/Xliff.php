@@ -49,6 +49,8 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      */
     protected bool $gTagPairing = true;
 
+    private editor_Models_Import_FileParser_XmlParser $xmlparserUnusableTags;
+
     /**
      * Valid options are: gTagPairing bool en/disables if bx/ex bpt/ept tags should be paired to g tags or not
      */

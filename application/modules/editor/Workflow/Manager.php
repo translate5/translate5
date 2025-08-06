@@ -44,6 +44,8 @@ class editor_Workflow_Manager
      */
     protected static $workflowTaskCache = [];
 
+    private array $instances = [];
+
     public function __construct()
     {
         /* @var $workflow editor_Models_Workflow */

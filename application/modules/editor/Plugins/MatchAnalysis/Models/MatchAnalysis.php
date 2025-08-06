@@ -196,8 +196,6 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                         $pricing[$prop] = ($pricing[$prop] ?? 0) + round($value * $this->pricing['noMatch'], 2);
                     } elseif ($prop == 'unitCountTotal' || $prop == 'penaltyTotal') {
                         // Skip that prop
-                    } elseif ($prop == 'resourceName') {
-                        $pricing[$prop] = 'amount';
                     } else {
                         $pricing[$prop] = 0;
                     }
@@ -207,6 +205,9 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 $pricing['unitCountTotal'] = round(array_sum($pricing), 2);
                 $pricing['priceAdjustment'] = (int) $this->pricing['priceAdjustment'];
                 $pricing['finalAmount'] = round($pricing['unitCountTotal'] + $pricing['priceAdjustment'], 2);
+                if (isset($pricing['resourceName'])) {
+                    $pricing['resourceName'] = 'amount';
+                }
 
                 // Append pricing-row
                 $rows[] = $pricing;

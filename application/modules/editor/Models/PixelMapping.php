@@ -48,6 +48,8 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract
 
     protected $validatorInstanceClass = 'editor_Models_Validator_PixelMapping';
 
+    private ?array $defaultPixelWidths;
+
     /**
      * Insert or update PixelMapping for Unicode-Character as given in pixel-mapping.xlsx or in import file
      */

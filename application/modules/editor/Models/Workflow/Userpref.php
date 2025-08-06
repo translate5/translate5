@@ -34,15 +34,15 @@ END LICENSE AND COPYRIGHT
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $taskGuid)
  * @method string getWorkflowStep()
- * @method void setWorkflowStep(string $step)
+ * @method void setWorkflowStep(?string $step)
  * @method string getNotEditContent()
  * @method void setNotEditContent(bool $cannot)
  * @method string getAnonymousCols()
  * @method void setAnonymousCols(bool $anon)
  * @method string getVisibility()
- * @method void setVisibility(string $vis)
+ * @method void setVisibility(bool|string $vis)
  * @method string getUserGuid()
- * @method void setUserGuid(string $userGuid)
+ * @method void setUserGuid(?string $userGuid)
  * @method string getFields()
  * @method void setFields(string $userGuid)
  * @method string getTaskUserAssocId()
@@ -79,6 +79,7 @@ class editor_Models_Workflow_Userpref extends ZfExtended_Models_Entity_Abstract
     protected function validatorLazyInstatiation()
     {
         parent::validatorLazyInstatiation();
+        // @phpstan-ignore-next-line
         $this->validator->setTaskGuid($this->getTaskGuid());
     }
 
