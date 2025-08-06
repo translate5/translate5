@@ -104,7 +104,7 @@ class ReorganizeService
         }
 
         if ($needsReorganizing) {
-            $this->addReorganizeWarning($response, $task);
+            $this->addReorganizeWarning($response, $languageResource, $task);
         }
 
         return $needsReorganizing;
@@ -285,9 +285,11 @@ class ReorganizeService
 
     private function addReorganizeWarning(
         ResponseInterface $response,
+        LanguageResource $languageResource,
         Task $task = null,
     ): void {
         $params = [
+            'languageResource' => $languageResource,
             'apiError' => $response->getBody(),
         ];
 

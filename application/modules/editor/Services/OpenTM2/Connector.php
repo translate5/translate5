@@ -113,7 +113,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             'E1333' => 'The queried t5memory server has to many open TMs!',
         ]);
 
-        ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
+        ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306');
 
         parent::__construct();
 
@@ -691,6 +691,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             // check if current memory was searched through in prev request
             if ('' !== $offsetTmId && $id < $offsetTmId) {
                 continue;
+            }
+
+            if ('' !== $offsetTmId && $id > $offsetTmId) {
+                $tmOffset = null;
             }
 
             if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())) {
@@ -1377,6 +1381,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      */
     public function checkUpdatedSegment(editor_Models_Segment $segment): void
     {
+        // Temporary suppress message until we migrate to t5memory V0.7
+        return;
+
         $targetSent = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
         $result = $this->query($segment);
