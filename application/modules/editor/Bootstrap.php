@@ -1165,6 +1165,14 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'setforeignstate',
             ]
         ));
+        $this->front->getRouter()->addRoute('editorConnectGetforeignname', new ZfExtended_Controller_RestLikeRoute(
+            'editor/t5connect/getforeignname',
+            [
+                'module' => 'editor',
+                'controller' => 't5connect',
+                'action' => 'getforeignname',
+            ]
+        ));
 
         // special endpoint to provide configs for API-Tests. Must only be added when serving API-tests
         if (defined('APPLICATION_APITEST') && APPLICATION_APITEST) {

@@ -105,6 +105,15 @@ final class editor_T5connectController extends ZfExtended_RestController
     }
 
     /**
+     * to check which foreignName is configured in this Translate5 installation
+     * it can be read out at this api-endpoint.
+     */
+    public function getforeignnameAction(): void
+    {
+        $this->view->foreignName = $this->t5foreignName;
+    }
+
+    /**
      * Retrieves all failed T5Connect tasks (that are in state error))
      * => /editor/t5connect/failed/?[lastDays=365][foreignState=someState]
      * @throws ZfExtended_BadRequest
