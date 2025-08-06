@@ -130,7 +130,8 @@ class ContentProtectionProcessorTest extends TestCase
                 new editor_Models_Languages(),
                 $options,
                 BrokenTranslationUnitLogger::create(
-                    $this->createMock(\ZfExtended_Logger::class)
+                    $this->createMock(\ZfExtended_Logger::class),
+                    'problematic_file_path.txt',
                 )
             )->current() // @phpstan-ignore-line
         );

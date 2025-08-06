@@ -36,14 +36,22 @@ class BrokenTranslationUnitLogger
 {
     private bool $problemLogged = false;
 
+    private bool $tuWasCollected = false;
+
     private function __construct(
         private readonly ZfExtended_Logger $logger,
+        private readonly string $problematicFilepath,
     ) {
     }
 
-    public static function create(ZfExtended_Logger $logger): self
-    {
-        return new self($logger);
+    public static function create(
+        ZfExtended_Logger $logger,
+        string $problematicFilepath,
+    ): self {
+        return new self(
+            $logger,
+            $problematicFilepath,
+        );
     }
 
     public function logProblemOnce(): void
@@ -57,6 +65,32 @@ class BrokenTranslationUnitLogger
         $this->logger->error(
             'E1593',
             'Some translation units had unexpected structure and were excluded from TMX import',
+        );
+    }
+
+    public function collectProblematicTU(string $tu): void
+    {
+        $this->tuWasCollected = true;
+
+        file_put_contents(
+            $this->problematicFilepath,
+            $tu . PHP_EOL,
+            FILE_APPEND | LOCK_EX,
+        );
+    }
+
+    public function writeCollectedTUsLog(): void
+    {
+        if (! $this->tuWasCollected) {
+            return;
+        }
+
+        $this->logger->info(
+            'E1593',
+            'Some translation were excluded from TMX import and were written to {file} for analysis.',
+            [
+                'file' => $this->problematicFilepath,
+            ],
         );
     }
 }

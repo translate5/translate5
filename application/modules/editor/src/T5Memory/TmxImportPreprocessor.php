@@ -36,6 +36,7 @@ use MittagQI\Translate5\T5Memory\Contract\TmxImportProcessor;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateFileForTmxPreprocessingException;
 use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\ContentProtectionProcessor;
+use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\RemoveCompromisedSegmentsProcessor;
 use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
 use XMLReader;
@@ -63,6 +64,7 @@ class TmxImportPreprocessor
         return new self(
             LanguageRepository::create(),
             [
+                RemoveCompromisedSegmentsProcessor::create(),
                 ContentProtectionProcessor::create(),
                 TranslationUnitResegmentProcessor::create(),
             ],
@@ -95,18 +97,27 @@ class TmxImportPreprocessor
             return $filepath;
         }
 
-        $exportDir = APPLICATION_PATH . '/../data/TmxImportPreprocessing/';
+        $processingDir = APPLICATION_PATH . '/../data/TmxImportPreprocessing/';
+        $problematicDir = $processingDir . 'problematic/';
 
-        if (! is_dir($exportDir)) {
-            @mkdir($exportDir, recursive: true);
+        if (! is_dir($processingDir)) {
+            @mkdir($processingDir, recursive: true);
         }
 
-        $resultFilename = $exportDir . str_replace('.tmx', '', basename($filepath)) . '_processed.tmx';
+        if (! is_dir($problematicDir)) {
+            @mkdir($problematicDir, recursive: true);
+        }
+
+        $processedFilename = str_replace('.tmx', '', basename($filepath)) . '_processed.tmx';
+        $problematicFilename = str_replace('.tmx', '', basename($filepath)) . '_problematic.tmx';
+
+        $resultFilepath = $processingDir . $processedFilename;
+        $problematicFilepath = $problematicDir . $problematicFilename;
 
         $writer = new XMLWriter();
 
-        if (! $writer->openURI($resultFilename)) {
-            throw new UnableToCreateFileForTmxPreprocessingException($resultFilename);
+        if (! $writer->openURI($resultFilepath)) {
+            throw new UnableToCreateFileForTmxPreprocessingException($resultFilepath);
         }
 
         $writer->startDocument('1.0', 'UTF-8');
@@ -120,7 +131,7 @@ class TmxImportPreprocessor
         $errorLevel = error_reporting();
         error_reporting($errorLevel & ~E_WARNING);
 
-        $brokenTranslationUnitIndicator = BrokenTranslationUnitLogger::create($this->logger);
+        $brokenTranslationUnitIndicator = BrokenTranslationUnitLogger::create($this->logger, $problematicFilepath);
 
         while ($reader->read()) {
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
@@ -174,14 +185,16 @@ class TmxImportPreprocessor
         if (0 !== $writtenElements) {
             // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
             // so add body and tmx closing tags manually
-            file_put_contents($resultFilename, PHP_EOL . '</body>', FILE_APPEND);
+            file_put_contents($resultFilepath, PHP_EOL . '</body>', FILE_APPEND);
         } else {
-            file_put_contents($resultFilename, PHP_EOL . '/>', FILE_APPEND);
+            file_put_contents($resultFilepath, PHP_EOL . '/>', FILE_APPEND);
         }
 
-        file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
+        file_put_contents($resultFilepath, PHP_EOL . '</tmx>', FILE_APPEND);
 
-        return $resultFilename;
+        $brokenTranslationUnitIndicator->writeCollectedTUsLog();
+
+        return $resultFilepath;
     }
 
     private function getProcessorsChain(

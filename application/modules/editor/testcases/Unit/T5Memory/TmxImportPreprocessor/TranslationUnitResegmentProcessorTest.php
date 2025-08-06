@@ -120,7 +120,8 @@ class TranslationUnitResegmentProcessorTest extends TestCase
             $lang,
             $options,
             BrokenTranslationUnitLogger::create(
-                $this->createMock(\ZfExtended_Logger::class)
+                $this->createMock(\ZfExtended_Logger::class),
+                'problematic_file_path.txt',
             )
         );
 
