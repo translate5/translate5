@@ -42,6 +42,7 @@ use MittagQI\Translate5\Segment\SearchAndReplace\SearchService;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Terminology\TermportletData;
+use MittagQI\ZfExtended\Logger\SimpleFileLogger;
 
 class Editor_SegmentController extends ZfExtended_RestController
 {
@@ -336,6 +337,15 @@ class Editor_SegmentController extends ZfExtended_RestController
         );
 
         $this->entity->refresh();
+
+        if(ZfExtended_Debug::hasLevel('editor', 'segmentSave')) {
+            $sfl = new SimpleFileLogger('segmentSave.log');
+            $sfl->log(
+                '#ID: '.$this->entity->getId().
+                '#RAW:'.urldecode($this->getRequest()->getRawBody()).'#ENDRAW'.
+                '#TARGET:'.$this->entity->getTargetEdit().'#ENDTARGET'
+            );
+        }
 
         // To always have a consistent view-model, we convert the stdClass to an assoc array,
         // no matter if anonymization is required or not
