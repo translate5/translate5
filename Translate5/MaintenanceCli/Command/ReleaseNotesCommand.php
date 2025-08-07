@@ -156,6 +156,9 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         $md = $this->updateChangeLog($version);
         $sql = str_replace(getcwd() . '/', '', $sql);
         $md = str_replace(getcwd() . '/', '', $md);
+
+        $this->writeGitCommandsFile($md, $sql);
+
         $this->io->writeln([
             'Execute outside of the container: ',
             '',
@@ -506,5 +509,23 @@ MINOR_VER=$minor
 BUILD=$patch
 "
         ) > 0;
+    }
+
+    private function writeGitCommandsFile(string $md, string $sql): bool
+    {
+        $releaseVersionFile = APPLICATION_DATA . '/tmp/release-git-commands';
+
+        if (file_exists($releaseVersionFile)) {
+            unlink($releaseVersionFile);
+        }
+
+        $cmds = [
+            'git add ' . $md,
+            'git add ' . $sql,
+            'git commit -m "change log and submodules release ' . $this->releaseVersion->name
+                . '" application/modules/editor/PrivatePlugins library/ZfExtended ' . $sql . ' ' . $md,
+            'git push',
+        ];
+        return file_put_contents($releaseVersionFile,join(";\n", $cmds)) > 0;
     }
 }
