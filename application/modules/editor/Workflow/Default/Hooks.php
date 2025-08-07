@@ -108,7 +108,7 @@ class editor_Workflow_Default_Hooks
 
     protected $validDirectTrigger = [
         'notifyAllUsersAboutTaskAssociation',
-        'notifyAllFinishOfARole',
+        'notifyPmFinishOfVisualApproval',
         'finishPrintApprovalJobs1',
         'finishWaitingPdfJob1',
     ];
