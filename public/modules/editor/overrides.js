@@ -1770,7 +1770,7 @@ Ext.define('Translate5.override.data.request.Ajax', {
         var me = this;
 
         // Log stack trace on attempt to load this js class in an inisual way
-        if (me.options.url.match('/Editor.model.admin.TaskUserAssoc')) {
+        if (me.options && me.options.url && me.options.url.match('/Editor.model.admin.TaskUserAssoc')) {
             console.log('Ext.Loader.isInHistory[\'Editor.model.admin.TaskUserAssoc\']: ' + Ext.Loader.isInHistory['Editor.model.admin.TaskUserAssoc']);
             console.log('Unexpected way to load model js class, see stringified stack trace below');
             console.log(new Error().stack);
