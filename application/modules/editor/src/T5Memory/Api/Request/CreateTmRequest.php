@@ -28,34 +28,54 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\DTO;
+namespace MittagQI\Translate5\T5Memory\Api\Request;
 
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use GuzzleHttp\Psr7\MultipartStream;
+use GuzzleHttp\Psr7\Request;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
-use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 
-class ImportOptions
+class CreateTmRequest extends Request
 {
+    /**
+     * @param resource $stream
+     */
     public function __construct(
-        public readonly StripFramingTags $stripFramingTags,
-        public readonly bool $resegmentTmx,
-        public readonly bool $saveDifferentTargetsForSameSource,
-        public readonly ?int $customerId = null,
+        string $baseUrl,
+        string $tmName,
+        string $sourceLang,
+        $stream,
+        StripFramingTags $stripFramingTags,
     ) {
-    }
+        $multipart[] = [
+            'name' => 'json_data',
+            'contents' => json_encode(
+                [
+                    'name' => $tmName,
+                    'sourceLang' => $sourceLang,
+                    'framingTags' => $stripFramingTags->value,
+                ],
+                JSON_PRETTY_PRINT
+            ),
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+        ];
 
-    public static function fromParams(array $params, ?int $customerId = null): self
-    {
-        return new self(
-            self::getStripFramingTagsValue($params),
-            (bool) ($params[TranslationUnitResegmentProcessor::RESEGMENT_TU_OPTION] ?? false),
-            (bool) ($params[UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] ?? false),
-            $customerId,
+        $multipart[] = [
+            'name' => 'file',
+            'contents' => $stream,
+            'filename' => bin2hex(random_bytes(8)) . '.tmx',
+        ];
+
+        $body = new MultipartStream($multipart);
+
+        parent::__construct(
+            'POST',
+            rtrim($baseUrl, '/') . "/",
+            [
+                'Content-Type' => 'multipart/form-data; boundary=' . $body->getBoundary(),
+            ],
+            $body,
         );
-    }
-
-    private static function getStripFramingTagsValue(?array $params): StripFramingTags
-    {
-        return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
     }
 }

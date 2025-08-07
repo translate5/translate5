@@ -36,6 +36,7 @@ use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\LanguageResource\QueryDurationLogger;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 
 /**
  * Language Resource Connector class
@@ -45,7 +46,7 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method editor_Services_ServiceResult query(editor_Models_Segment $segment)
  * @method editor_Services_ServiceResult search(string $searchString, $field = 'source', $offset = null)
  * @method editor_Services_ServiceResult translate(string $searchString)
- * @method void update(editor_Models_Segment $segment, array $options = []) editor_Services_Connector_Abstract::update()
+ * @method void update(editor_Models_Segment $segment, ?UpdateOptions $updateOptions = null) editor_Services_Connector_Abstract::update()
  * @method string getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
  * @method string getLastStatusInfo() returns the last store status info from the last getStatus call
  * @method string getTm($mime, string $tmName = '') FileBasedInterface::getTm()

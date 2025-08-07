@@ -31,7 +31,6 @@ use editor_Models_Task as Task;
 use editor_Services_Connector_TagHandler_Abstract as TagHandler;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
@@ -39,12 +38,13 @@ use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\QueryCache;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\T5Memory\Api\ConstantApi;
 use MittagQI\Translate5\T5Memory\Api\Response\MutationResponse as MutationApiResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
-use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
+use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 use MittagQI\Translate5\T5Memory\ExportService;
@@ -54,7 +54,6 @@ use MittagQI\Translate5\T5Memory\MemoryNameGenerator;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
-use MittagQI\Translate5\T5Memory\VersionService;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -64,8 +63,6 @@ use MittagQI\Translate5\T5Memory\VersionService;
 class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface, ExportAdapterInterface
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
-
-    private const VERSION_0_5 = '0.5';
 
     protected const TAG_HANDLER_CONFIG_PART = 't5memory';
 
@@ -87,8 +84,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private readonly TmConversionService $conversionService;
 
-    private readonly VersionService $versionService;
-
     private readonly PersistenceService $persistenceService;
 
     private readonly ExportService $exportService;
@@ -103,7 +98,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private readonly RetryService $waitingService;
 
-    private readonly ConstantApi $constantApi;
+    private readonly T5MemoryApi $t5MemoryApi;
 
     private readonly FlushMemoryService $flushMemoryService;
 
@@ -122,12 +117,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $this->conversionService = TmConversionService::create();
         $this->persistenceService = PersistenceService::create();
-        $this->versionService = VersionService::create();
+        $this->t5MemoryApi = T5MemoryApi::create();
         $this->exportService = new ExportService(
             $this->logger,
-            $this->versionService,
             $this->conversionService,
-            VersionedApiFactory::create(),
+            $this->t5MemoryApi,
             $this->persistenceService
         );
 
@@ -136,7 +130,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $this->memoryNameGenerator = new MemoryNameGenerator();
         $this->createMemoryService = CreateMemoryService::create();
         $this->waitingService = RetryService::create();
-        $this->constantApi = ConstantApi::create();
         $this->flushMemoryService = FlushMemoryService::create();
         $this->queryCache = QueryCache::create();
     }
@@ -269,6 +262,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
         $customerId = current($this->languageResource->getCustomers());
+        $params[UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] = $this->config->runtimeOptions
+            ->LanguageResources
+            ->t5memory
+            ->saveDifferentTargetsForSameSource;
 
         try {
             $this->importService->importTmx(
@@ -318,15 +315,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return file_get_contents($file);
     }
 
-    public function update(editor_Models_Segment $segment, array $options = []): void
+    public function update(editor_Models_Segment $segment, ?UpdateOptions $updateOptions = null): void
     {
         $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
 
-        if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())) {
-            if ($options[UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR] ?? false) {
-                throw new RescheduleUpdateNeededException();
-            }
-
+        if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName)) {
             throw new editor_Services_Connector_Exception('E1512', [
                 'status' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
                 'service' => $this->getResource()->getName(),
@@ -338,16 +331,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
-        $saveToDisk = $options[UpdatableAdapterInterface::SAVE_TO_DISK] ?? true;
+        $saveToDisk = $updateOptions?->saveToDisk ?? true;
         $saveToDisk = $saveToDisk && ! $this->isInternalFuzzy();
-        $useSegmentTimestamp = $options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false;
+        $useSegmentTimestamp = $updateOptions?->useSegmentTimestamp ?? false;
         $timestamp = $useSegmentTimestamp
             ? $this->api->getDate(strtotime($segment->getTimestamp()))
             : $this->api->getNowDate();
         $userName = $segment->getUserName();
         $context = $this->getSegmentContext($segment);
 
-        $recheckOnUpdate = $options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false;
+        $recheckOnUpdate = $updateOptions?->recheckOnUpdate ?? false;
         $dataSent = [
             'source' => $source,
             'target' => $target,
@@ -368,17 +361,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $saveToDisk,
             $dataSent,
             $segment,
-            $recheckOnUpdate
+            $recheckOnUpdate,
+            $updateOptions?->saveDifferentTargetsForSameSource ?? false,
         );
     }
 
-    public function getUpdateDTO(\editor_Models_Segment $segment, array $options = []): UpdateSegmentDTO
-    {
+    public function getUpdateDTO(
+        \editor_Models_Segment $segment,
+        UpdateOptions $updateOptions,
+    ): UpdateSegmentDTO {
         $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
-        $useSegmentTimestamp = $options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false;
+        $useSegmentTimestamp = $updateOptions->useSegmentTimestamp;
         $timestamp = $useSegmentTimestamp
             ? $this->api->getDate(strtotime($segment->getTimestamp()))
             : $this->api->getNowDate();
@@ -397,15 +393,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         );
     }
 
-    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, editor_Models_Segment $segment): void
-    {
+    public function updateWithDTO(
+        UpdateSegmentDTO $dto,
+        UpdateOptions $updateOptions,
+        editor_Models_Segment $segment
+    ): void {
         $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
 
-        if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())) {
-            if ($options[UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR] ?? false) {
-                throw new RescheduleUpdateNeededException();
-            }
-
+        if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName)) {
             throw new editor_Services_Connector_Exception('E1512', [
                 'status' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
                 'service' => $this->getResource()->getName(),
@@ -413,7 +408,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             ]);
         }
 
-        $saveToDisk = $options[UpdatableAdapterInterface::SAVE_TO_DISK] ?? true;
+        $saveToDisk = $updateOptions->saveToDisk;
         $saveToDisk = $saveToDisk && ! $this->isInternalFuzzy();
 
         $source = $dto->source;
@@ -430,7 +425,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             'timestamp' => $timestamp,
             'fileName' => $fileName,
         ];
-        $recheckOnUpdate = $options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false;
+        $recheckOnUpdate = $updateOptions->recheckOnUpdate;
 
         $this->updateWithRetry(
             $source,
@@ -443,7 +438,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $saveToDisk,
             $dataSent,
             $segment,
-            $recheckOnUpdate
+            $recheckOnUpdate,
+            $updateOptions->saveDifferentTargetsForSameSource,
         );
     }
 
@@ -459,6 +455,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         array $dataSent,
         editor_Models_Segment $segment,
         bool $recheckOnUpdate,
+        bool $saveDifferentTargetsForSameSource,
     ): void {
         if ($this->languageResource->isConversionStarted()) {
             throw new editor_Services_Connector_Exception('E1512', [
@@ -480,6 +477,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $timestamp,
                 $fileName,
                 $tmName,
+                $saveDifferentTargetsForSameSource,
                 $saveToDisk
             );
 
@@ -497,14 +495,21 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $this->api->getResponse()->getStatus()
             );
 
-            if ($this->reorganizeService->needsReorganizing(
-                $response,
-                $this->languageResource,
-                $tmName,
-                $segment->getTask(),
-                $this->isInternalFuzzy()
-            )) {
-                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $this->isInternalFuzzy());
+            if (
+                $this->reorganizeService->needsReorganizing(
+                    $response,
+                    $this->languageResource,
+                    $tmName,
+                    $segment->getTask(),
+                )
+            ) {
+                $options = new ReorganizeOptions($saveDifferentTargetsForSameSource);
+                $this->reorganizeService->reorganizeTm(
+                    $this->languageResource,
+                    $tmName,
+                    $options,
+                    $this->isInternalFuzzy(),
+                );
             } elseif ($response->isMemoryOverflown($this->config)) {
                 if (! $response->isBlockOverflown($this->config)) {
                     $this->persistenceService->setMemoryReadonly(
@@ -583,8 +588,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
         }
 
+        $saveDifferentTargetsForSameSource = (bool) $this->config
+            ->runtimeOptions
+            ->LanguageResources
+            ->t5memory
+            ->saveDifferentTargetsForSameSource;
+
         // TODO why we don't process any errors here?
-        $this->api->updateText($source, $target, $tmName);
+        $this->api->updateText($source, $target, $tmName, $saveDifferentTargetsForSameSource);
     }
 
     /**
@@ -701,7 +712,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $tmOffset = null;
             }
 
-            if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())) {
+            if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName)) {
                 continue;
             }
 
@@ -718,10 +729,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $response,
                 $this->languageResource,
                 $tmName,
-                null,
-                $this->isInternalFuzzy()
             )) {
-                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $this->isInternalFuzzy());
+                $options = new ReorganizeOptions(
+                    $this->config
+                        ->runtimeOptions
+                        ->LanguageResources
+                        ->t5memory
+                        ->saveDifferentTargetsForSameSource
+                );
+                $this->reorganizeService->reorganizeTm(
+                    $this->languageResource,
+                    $tmName,
+                    $options,
+                    $this->isInternalFuzzy(),
+                );
 
                 $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
             }
@@ -876,7 +897,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         // for the rare cases where no language-resource is present
         if (null === $this->languageResource) {
-            return $this->constantApi->ping($resource->getUrl())
+            return $this->t5MemoryApi->ping($resource->getUrl())
                 ? LanguageResourceStatus::AVAILABLE
                 : LanguageResourceStatus::ERROR;
         }
@@ -890,14 +911,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return LanguageResourceStatus::IMPORT;
         }
 
-        if (
-            ! $this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)
-            && $this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())
-        ) {
-            // Status import to prevent any other queries to TM to be performed
-            return LanguageResourceStatus::IMPORT;
-        }
-
         $tmName = $tmName ?: $this->persistenceService->getLastWritableMemory($this->languageResource);
 
         if (empty($tmName)) {
@@ -908,7 +921,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         // TODO remove after fully migrated to t5memory v0.5.x
 
-        $status = $this->constantApi->getStatus(
+        $status = $this->t5MemoryApi->getStatus(
             $this->languageResource->getResource()->getUrl(),
             $this->persistenceService->addTmPrefix($tmName)
         );
@@ -939,7 +952,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         $name = $memories[0]['filename'];
 
-        $status = $this->constantApi->getStatus(
+        $status = $this->t5MemoryApi->getStatus(
             $this->languageResource->getResource()->getUrl(),
             $this->persistenceService->addTmPrefix($name)
         );
@@ -1054,8 +1067,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         // copy the worker user guid
         $connector->setWorkerUserGuid($this->getWorkerUserGuid());
         $connector->isInternalFuzzy = true;
-        // tell version service to not update LR data
-        $connector->versionService->setInternalFuzzy(true);
 
         return $connector;
     }
@@ -1260,7 +1271,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
             $tmName = $memory['filename'];
 
-            if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, $this->isInternalFuzzy())) {
+            if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName)) {
                 if (! $this->waitingService->canWaitLongTaskFinish()) {
                     continue;
                 }
@@ -1268,7 +1279,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $this->reorganizeService->waitReorganizeFinished(
                     $this->languageResource,
                     $tmName,
-                    $this->isInternalFuzzy(),
                 );
             }
 
@@ -1283,10 +1293,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $response,
                 $this->languageResource,
                 $tmName,
-                null,
-                $this->isInternalFuzzy()
             )) {
-                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $this->isInternalFuzzy());
+                $options = new ReorganizeOptions(
+                    $this->config
+                        ->runtimeOptions
+                        ->LanguageResources
+                        ->t5memory
+                        ->saveDifferentTargetsForSameSource
+                );
+                $this->reorganizeService->reorganizeTm(
+                    $this->languageResource,
+                    $tmName,
+                    $options,
+                    $this->isInternalFuzzy(),
+                );
                 $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
             }
 
@@ -1412,6 +1432,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         // Temporary suppress message until we migrate to t5memory V0.7
         return;
 
+        // @phpstan-ignore-next-line
         $targetSent = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
         $result = $this->query($segment);

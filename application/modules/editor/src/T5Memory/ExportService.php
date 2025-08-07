@@ -36,11 +36,13 @@ use Generator;
 use LogicException;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
+use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\Exception\ExportException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\StreamInterface;
 use Throwable;
 use XMLReader;
+use Zend_Registry;
 use ZfExtended_Logger;
 use ZipArchive;
 
@@ -50,9 +52,8 @@ class ExportService
 
     public function __construct(
         private readonly ZfExtended_Logger $logger,
-        private readonly VersionService $versionService,
         private readonly TmConversionService $conversionService,
-        private readonly Api\VersionedApiFactory $versionedApiFactory,
+        private readonly T5MemoryApi $t5MemoryApi,
         private readonly PersistenceService $persistenceService,
     ) {
     }
@@ -62,14 +63,11 @@ class ExportService
      */
     public static function create(): self
     {
-        $config = \Zend_Registry::get('config');
-
         return new self(
-            \Zend_Registry::get('logger'),
-            VersionService::create(),
+            Zend_Registry::get('logger')->cloneMe('editor.t5memory.export'),
             TmConversionService::create(),
-            Api\VersionedApiFactory::create(),
-            new PersistenceService($config),
+            T5MemoryApi::create(),
+            PersistenceService::create(),
         );
     }
 
@@ -134,22 +132,10 @@ class ExportService
      */
     private function getSingleTmStream(LanguageResource $languageResource, string $tmName): StreamInterface
     {
-        $version = $this->versionService->getT5MemoryVersion($languageResource);
-
-        return match (true) {
-            Api\V6\VersionedApi::isVersionSupported($version) => $this->versionedApiFactory
-                ->get(Api\V6\VersionedApi::class)
-                ->downloadTm(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName)
-                ),
-            //  Code stays here for case if we fix TM export security issue in v5
-            //  Api\V5\VersionedApi::isVersionSupported($version) => $this->versionedApiFactory
-            //      ->get(Api\V5\VersionedApi::class)
-            //      ->getTm($languageResource->getResource()->getUrl(), $tmName),
-
-            default => throw new LogicException('Unsupported T5Memory version: ' . $version)
-        };
+        return $this->t5MemoryApi->downloadTm(
+            $languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($tmName)
+        );
     }
 
     private function composeTmxFile(LanguageResource $languageResource, ?string $tmName): ?string
@@ -260,30 +246,11 @@ class ExportService
      */
     private function exportTmxChunk(LanguageResource $languageResource, string $tmName): iterable
     {
-        $version = $this->versionService->getT5MemoryVersion($languageResource);
-
-        if (Api\V6\VersionedApi::isVersionSupported($version)) {
-            return yield from $this->versionedApiFactory
-                ->get(Api\V6\VersionedApi::class)
-                ->downloadTmx(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName),
-                    self::CHUNKSIZE
-                );
-        }
-
-        if (Api\V5\VersionedApi::isVersionSupported($version)) {
-            return yield from [
-                $this->versionedApiFactory
-                    ->get(Api\V5\VersionedApi::class)
-                    ->getTmx(
-                        $languageResource->getResource()->getUrl(),
-                        $this->persistenceService->addTmPrefix($tmName)
-                    ),
-            ];
-        }
-
-        throw new LogicException('Unsupported T5Memory version: ' . $version);
+        return yield from $this->t5MemoryApi->downloadTmx(
+            $languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($tmName),
+            self::CHUNKSIZE
+        );
     }
 
     /**

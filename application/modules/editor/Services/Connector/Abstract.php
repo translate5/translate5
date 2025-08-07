@@ -35,6 +35,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Services_Connector_TagHandler_Abstract as TagHandler;
 use MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing\TagHandlerFactory;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 
 /**
  * Abstract Base Connector
@@ -315,7 +316,7 @@ abstract class editor_Services_Connector_Abstract
      * Updates translations in the connected service
      * for returning error messages to the GUI use rest_messages
      */
-    public function update(editor_Models_Segment $segment, array $options = [])
+    public function update(editor_Models_Segment $segment, ?UpdateOptions $updateOptions = null): void
     {
         //to be implemented if needed
         $this->log(__METHOD__, ' segment ' . $segment->getId());

@@ -40,7 +40,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Translate5\MaintenanceCli\Command\Translate5AbstractCommand;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
-use Zend_Registry;
 
 class T5MemoryFixCommand extends Translate5AbstractCommand
 {
@@ -153,7 +152,7 @@ class T5MemoryFixCommand extends Translate5AbstractCommand
 
         $possibleLanguageResourceIds = array_unique($possibleLanguageResourceIds);
 
-        $persistenceService = new PersistenceService(Zend_Registry::get('config'));
+        $persistenceService = PersistenceService::create();
         $api = new T5MemoryApi();
         $corruptMemories = [];
 
@@ -169,7 +168,8 @@ class T5MemoryFixCommand extends Translate5AbstractCommand
                 timestamp: $api->getNowDate(),
                 filename: 'Test filename',
                 tmName: $tmName,
-                save2disk: false
+                saveDifferentTargetsForSameSource: false,
+                save2disk: false,
             );
 
             if (! $successful) {

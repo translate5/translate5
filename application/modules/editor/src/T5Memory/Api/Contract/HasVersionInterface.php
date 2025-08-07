@@ -32,7 +32,5 @@ namespace MittagQI\Translate5\T5Memory\Api\Contract;
 
 interface HasVersionInterface
 {
-    public const FALLBACK_VERSION = '0.4';
-
-    public function version(string $baseUrl, bool $suppressExceptions = true): string;
+    public function version(string $baseUrl): string;
 }

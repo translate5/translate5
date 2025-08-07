@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,41 +28,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory;
+namespace MittagQI\Translate5\T5Memory\DTO;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
+use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 
-class FlushMemoryService
+class UpdateOptions
 {
     public function __construct(
-        private readonly PersistenceService $persistenceService,
-        private readonly T5MemoryApi $t5MemoryApi,
+        public readonly bool $useSegmentTimestamp,
+        public readonly bool $saveToDisk,
+        public readonly bool $saveDifferentTargetsForSameSource,
+        public readonly bool $recheckOnUpdate,
     ) {
     }
 
-    public static function create(): self
+    public static function fromArray(array $options): self
     {
         return new self(
-            PersistenceService::create(),
-            T5MemoryApi::create()
-        );
-    }
-
-    public function flushCurrentWritable(LanguageResource $languageResource): void
-    {
-        $tmName = $this->persistenceService->getWritableMemory($languageResource);
-
-        $this->flush($languageResource, $tmName);
-    }
-
-    public function flush(
-        LanguageResource $languageResource,
-        string $tmName,
-    ): void {
-        $this->t5MemoryApi->flush(
-            $languageResource->getResource()->getUrl(),
-            $this->persistenceService->addTmPrefix($tmName),
+            (bool) ($options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false),
+            (bool) ($options[UpdatableAdapterInterface::SAVE_TO_DISK] ?? true),
+            (bool) ($options[UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] ?? false),
+            (bool) ($options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false),
         );
     }
 }

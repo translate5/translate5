@@ -53,7 +53,7 @@ class TmxImportPreprocessorTest extends TestCase
 
         $filename = 'small.tmx';
 
-        $options = new ImportOptions(StripFramingTags::None, true);
+        $options = new ImportOptions(StripFramingTags::None, true, false);
 
         self::assertSame($filename, $processor->process($filename, 1, 2, $options));
     }
@@ -162,7 +162,7 @@ TU;
             $logger,
         );
 
-        $options = new ImportOptions(StripFramingTags::None, true);
+        $options = new ImportOptions(StripFramingTags::None, true, false);
 
         $file = $service->process(__DIR__ . '/TmConversionServiceTest/small.tmx', 1, 2, $options);
 

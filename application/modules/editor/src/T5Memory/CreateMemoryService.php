@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use Http\Client\Exception\HttpException;
-use MittagQI\Translate5\T5Memory\Api\Contract\CreateMemoryResponseInterface;
+use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
@@ -40,9 +40,8 @@ use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 class CreateMemoryService
 {
     public function __construct(
-        private readonly VersionService $versionService,
         private readonly PersistenceService $persistenceService,
-        private readonly Api\VersionedApiFactory $versionedApiFactory,
+        private readonly T5MemoryApi $t5MemoryApi,
         private readonly MemoryNameGenerator $memoryNameGenerator,
         private readonly RetryService $waitingService,
     ) {
@@ -51,9 +50,8 @@ class CreateMemoryService
     public static function create(): self
     {
         return new self(
-            VersionService::create(),
             PersistenceService::create(),
-            Api\VersionedApiFactory::create(),
+            T5MemoryApi::create(),
             new MemoryNameGenerator(),
             RetryService::create()
         );
@@ -65,7 +63,13 @@ class CreateMemoryService
         string $fileName,
         StripFramingTags $stripFramingTags,
     ): string {
-        $response = $this->createTm($languageResource, $tmName, $fileName, $stripFramingTags);
+        $response = $this->t5MemoryApi->createTm(
+            $languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($tmName),
+            $languageResource->getSourceLangCode(),
+            $fileName,
+            $stripFramingTags,
+        );
 
         if ($response->successful()) {
             return $response->getTmName();
@@ -74,43 +78,6 @@ class CreateMemoryService
         throw new UnableToCreateMemoryException(
             'Unable to create memory: ' . $response->getErrorMessage()
         );
-    }
-
-    /**
-     * @throws UnableToCreateMemoryException
-     */
-    private function createTm(
-        LanguageResource $languageResource,
-        string $tmName,
-        string $fileName,
-        StripFramingTags $stripFramingTags,
-    ): CreateMemoryResponseInterface {
-        $version = $this->versionService->getT5MemoryVersion($languageResource);
-
-        if (Api\V6\VersionedApi::isVersionSupported($version)) {
-            return $this->versionedApiFactory
-                ->get(Api\V6\VersionedApi::class)
-                ->createTm(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName),
-                    $languageResource->getSourceLangCode(),
-                    $fileName,
-                    $stripFramingTags,
-                );
-        }
-
-        if (Api\V5\VersionedApi::isVersionSupported($version)) {
-            return $this->versionedApiFactory
-                ->get(Api\V5\VersionedApi::class)
-                ->createTm(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName),
-                    $languageResource->getSourceLangCode(),
-                    file_get_contents($fileName),
-                );
-        }
-
-        throw new \LogicException('Unsupported T5Memory version: ' . $version);
     }
 
     /**
@@ -159,7 +126,11 @@ class CreateMemoryService
         LanguageResource $languageResource,
         string $tmName,
     ): string {
-        $response = $this->createEmptyTm($languageResource, $tmName);
+        $response = $this->t5MemoryApi->createEmptyTm(
+            $languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($tmName),
+            $languageResource->getSourceLangCode(),
+        );
 
         if ($response->successful()) {
             return $response->getTmName();
@@ -168,37 +139,5 @@ class CreateMemoryService
         throw new UnableToCreateMemoryException(
             'Unable to create memory: ' . $response->getErrorMessage()
         );
-    }
-
-    /**
-     * @throws HttpException
-     */
-    private function createEmptyTm(
-        LanguageResource $languageResource,
-        string $tmName,
-    ): CreateMemoryResponseInterface {
-        $version = $this->versionService->getT5MemoryVersion($languageResource);
-
-        if (Api\V6\VersionedApi::isVersionSupported($version)) {
-            return $this->versionedApiFactory
-                ->get(Api\V6\VersionedApi::class)
-                ->createEmptyTm(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName),
-                    $languageResource->getSourceLangCode(),
-                );
-        }
-
-        if (Api\V5\VersionedApi::isVersionSupported($version)) {
-            return $this->versionedApiFactory
-                ->get(Api\V5\VersionedApi::class)
-                ->createEmptyTm(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName),
-                    $languageResource->getSourceLangCode(),
-                );
-        }
-
-        throw new \LogicException('Unsupported T5Memory version: ' . $version);
     }
 }

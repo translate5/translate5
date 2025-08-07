@@ -43,6 +43,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimpo
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\SegmentRepository;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use Throwable;
 
@@ -136,9 +137,11 @@ class ReimportSnapshot
         array $updateOnlyIds = [],
     ): ReimportSegmentsResult {
         $connector = $this->getConnector($languageResource, $task);
-        $options = [
-            UpdatableAdapterInterface::SAVE_TO_DISK => false,
-        ];
+        $options = UpdateOptions::fromArray(
+            [
+                UpdatableAdapterInterface::SAVE_TO_DISK => false,
+            ]
+        );
 
         $emptySegmentsAmount = 0;
         $successfulSegmentsAmount = 0;

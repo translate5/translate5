@@ -42,6 +42,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOption
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\SegmentsProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zend_Config;
@@ -112,9 +113,7 @@ class CreateSnapshotTest extends TestCase
             ->with($taskGuid, $filters)
             ->willReturn($segments);
 
-        $updateOptions = [
-            UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP => $useSegmentTimestamp,
-        ];
+        $updateOptions = new UpdateOptions($useSegmentTimestamp, true, false, false);
 
         $updateDTOMock1 = $this->getMockBuilder(UpdateSegmentDTO::class)->disableOriginalConstructor()->getMock();
         $updateDTOMock2 = $this->getMockBuilder(UpdateSegmentDTO::class)->disableOriginalConstructor()->getMock();

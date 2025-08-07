@@ -30,35 +30,27 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory;
 
-use DateTimeImmutable;
-use DateTimeInterface;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\T5Memory\Api\ConstantApi;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
+use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
+use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use Zend_Config;
+use ZfExtended_Logger;
 
 class ReorganizeService
 {
     // Need to move this region to a dedicated class while refactoring connector
     private const REORGANIZE_ATTEMPTS = 'reorganize_attempts';
 
-    private const REORGANIZE_STARTED_AT = 'reorganize_started_at';
-
-    // Applicable only for version < 0.5.x
-    private const MAX_REORGANIZE_TIME_MINUTES = 30;
-
     private const REORGANIZE_WAIT_TIME_SECONDS = 60;
 
-    private const VERSION_0_5 = '0.5';
-
     public function __construct(
-        private readonly \Zend_Config $config,
-        private readonly \ZfExtended_Logger $logger,
-        private readonly VersionService $versionService,
+        private readonly Zend_Config $config,
+        private readonly ZfExtended_Logger $logger,
         private readonly PersistenceService $persistenceService,
-        private readonly Api\VersionedApiFactory $versionedApiFactory,
-        private readonly ConstantApi $constantApi,
+        private readonly T5MemoryApi $t5MemoryApi,
     ) {
     }
 
@@ -67,10 +59,8 @@ class ReorganizeService
         return new self(
             \Zend_Registry::get('config'),
             \Zend_Registry::get('logger')->cloneMe('editor.t5memory.reorganize'),
-            VersionService::create(),
             PersistenceService::create(),
-            Api\VersionedApiFactory::create(),
-            ConstantApi::create(),
+            T5MemoryApi::create(),
         );
     }
 
@@ -79,7 +69,6 @@ class ReorganizeService
         LanguageResource $languageResource,
         string $tmName,
         Task $task = null,
-        bool $isInternalFuzzy = false,
     ): bool {
         $errorCodes = explode(
             ',',
@@ -89,7 +78,7 @@ class ReorganizeService
         $errorSupposesReorganizing = in_array($response->getCode(), $errorCodes);
         // Check if error codes contains any of the values
         $needsReorganizing = $errorSupposesReorganizing &&
-            ! $this->isReorganizingAtTheMoment($languageResource, $tmName, $isInternalFuzzy);
+            ! $this->isReorganizingAtTheMoment($languageResource, $tmName);
 
         if ($needsReorganizing && $this->isMaxReorganizeAttemptsReached($languageResource)) {
             $this->logger->warn(
@@ -113,6 +102,7 @@ class ReorganizeService
     public function reorganizeTm(
         LanguageResource $languageResource,
         string $tmName,
+        ReorganizeOptions $reorganizeOptions,
         bool $isInternalFuzzy = false,
     ): bool {
         if (! $isInternalFuzzy) {
@@ -121,25 +111,22 @@ class ReorganizeService
             // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
             $languageResource->refresh();
             $this->increaseReorganizeAttempts($languageResource);
-            $this->setReorganizeStatusInProgress($languageResource);
             $languageResource->save();
         }
 
-        $reorganized = true;
-
         try {
-            $this->versionService->setInternalFuzzy($isInternalFuzzy);
-
-            $this->reorganize($languageResource, $tmName);
+            $this->t5MemoryApi->reorganizeTm(
+                $languageResource->getResource()->getUrl(),
+                $this->persistenceService->addTmPrefix($tmName),
+                $reorganizeOptions,
+            );
         } catch (\Throwable $e) {
             $this->logger->exception($e);
 
-            $reorganized = false;
+            return false;
         }
 
-        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $languageResource)) {
-            $reorganized = $this->waitReorganizeFinished($languageResource, $tmName, $isInternalFuzzy);
-        }
+        $reorganized = $this->waitReorganizeFinished($languageResource, $tmName);
 
         if (! $isInternalFuzzy) {
             $languageResource->setStatus(
@@ -155,35 +142,24 @@ class ReorganizeService
     public function isReorganizingAtTheMoment(
         LanguageResource $languageResource,
         ?string $tmName = null,
-        bool $isInternalFuzzy = false,
     ): bool {
-        if (! $isInternalFuzzy) {
-            // TODO remove this when t5memory 0.4.x is not supported anymore
-            $this->resetReorganizingIfNeeded($languageResource);
-        }
+        $status = $this->t5MemoryApi->getStatus(
+            $languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($tmName)
+        );
 
-        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $languageResource)) {
-            $status = $this->constantApi->getStatus(
-                $languageResource->getResource()->getUrl(),
-                $this->persistenceService->addTmPrefix($tmName)
-            );
-
-            return $status->status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
-        }
-
-        return $languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+        return $status->status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
     }
 
     public function waitReorganizeFinished(
         LanguageResource $languageResource,
         ?string $tmName,
-        bool $isInternalFuzzy = false,
     ): bool {
         $elapsedTime = 0;
         $sleepTime = 5;
 
         while ($elapsedTime < $this->getReorganizeWaitingTimeSeconds()) {
-            if (! $this->isReorganizingAtTheMoment($languageResource, $tmName, $isInternalFuzzy)) {
+            if (! $this->isReorganizingAtTheMoment($languageResource, $tmName)) {
                 return true;
             }
 
@@ -248,41 +224,6 @@ class ReorganizeService
         $languageResource->save();
     }
 
-    /**
-     * Applicable only for t5memory 0.4.x
-     */
-    private function resetReorganizingIfNeeded(LanguageResource $languageResource): void
-    {
-        $reorganizeStartedAt = $languageResource->getSpecificData(self::REORGANIZE_STARTED_AT);
-
-        if (null === $reorganizeStartedAt) {
-            return;
-        }
-
-        $maxTimeOfReorganizing = (new DateTimeImmutable($reorganizeStartedAt))->modify(
-            sprintf('+%d minutes', self::MAX_REORGANIZE_TIME_MINUTES)
-        );
-
-        if ($maxTimeOfReorganizing < new DateTimeImmutable()) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $languageResource->refresh();
-            $languageResource->removeSpecificData(self::REORGANIZE_STARTED_AT);
-            $languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
-            $languageResource->save();
-        }
-    }
-
-    /**
-     * Applicable only for t5memory 0.4.x
-     */
-    private function setReorganizeStatusInProgress(LanguageResource $languageResource): void
-    {
-        $languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
-        $languageResource->addSpecificData(self::REORGANIZE_STARTED_AT, date(DateTimeInterface::RFC3339));
-    }
-
     private function addReorganizeWarning(
         ResponseInterface $response,
         LanguageResource $languageResource,
@@ -302,37 +243,5 @@ class ReorganizeService
             'The queried TM returned error which is configured for automatic TM reorganization',
             $params
         );
-    }
-
-    /**
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    private function reorganize(LanguageResource $languageResource, string $tmName): void
-    {
-        $version = $this->versionService->getT5MemoryVersion($languageResource);
-
-        if (Api\V6\VersionedApi::isVersionSupported($version)) {
-            $this->versionedApiFactory
-                ->get(Api\V6\VersionedApi::class)
-                ->reorganizeTm(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName),
-                );
-
-            return;
-        }
-
-        if (Api\V5\VersionedApi::isVersionSupported($version)) {
-            $this->versionedApiFactory
-                ->get(Api\V5\VersionedApi::class)
-                ->reorganizeTm(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName)
-                );
-
-            return;
-        }
-
-        throw new \LogicException('Unsupported T5Memory version: ' . $version);
     }
 }

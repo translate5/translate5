@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\Service\T5Memory;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\PersistenceService;
@@ -151,8 +152,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * searches for matches in the TM
      */
-    public function lookup(editor_Models_Segment $segment, string $queryString, string $filename, string $tmName): bool
-    {
+    public function lookup(
+        editor_Models_Segment $segment,
+        string $queryString,
+        string $filename,
+        string $tmName,
+    ): bool {
         $json = new stdClass();
 
         $json->sourceLang = $this->languageResource->getSourceLangCode();
@@ -226,9 +231,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($http->request());
     }
 
-    public function deleteBatch(string $tmName, SearchDTO $searchDTO): bool
-    {
+    public function deleteBatch(
+        string $tmName,
+        SearchDTO $searchDTO,
+        bool $saveDifferentTargetsForSameSource,
+    ): bool {
         $data = $this->getSearchData($searchDTO);
+        $data[UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] = $saveDifferentTargetsForSameSource ? '1' : '0';
         $http = $this->getHttpWithMemory('POST', $tmName, '/entriesdelete');
         $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
@@ -251,6 +260,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         string $timestamp,
         string $filename,
         string $tmName,
+        bool $saveDifferentTargetsForSameSource,
         bool $save2disk = true,
     ): bool {
         $this->error = null;
@@ -268,6 +278,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->context = $context; //INFO: this is segment stuff
         // t5memory does not understand boolean parameters, so we have to convert them to 0/1
         $json->save2disk = $save2disk ? '1' : '0';
+        $json->saveDifferentTargetsForSameSource = $saveDifferentTargetsForSameSource ? '1' : '0';
 
         $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
 
@@ -278,8 +289,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * Update text values ($source/$target) to the current tm memory
      * @throws Zend_Http_Client_Exception
      */
-    public function updateText(string $source, string $target, string $tmName): bool
-    {
+    public function updateText(
+        string $source,
+        string $target,
+        string $tmName,
+        bool $saveDifferentTargetsForSameSource,
+    ): bool {
         $this->error = null;
 
         $http = $this->getHttpWithMemory('POST', $tmName, 'entry');
@@ -293,6 +308,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->author = ZfExtended_Authentication::getInstance()->getUser()->getUserName();
         $json->context = '';
         $json->addInfo = $json->documentName;
+        $json->saveDifferentTargetsForSameSource = $saveDifferentTargetsForSameSource ? '1' : '0';
 
         $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
 

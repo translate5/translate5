@@ -36,6 +36,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 
 /**
  * FIXME reactivate me for pretranslation and analysis tests!
@@ -122,7 +123,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         return join("\n", $result);
     }
 
-    public function update(editor_Models_Segment $segment, array $options = []): void
+    public function update(editor_Models_Segment $segment, ?UpdateOptions $updateOptions = null): void
     {
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
@@ -153,7 +154,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
 
     public function getUpdateDTO(
         \editor_Models_Segment $segment,
-        array $options = []
+        UpdateOptions $updateOptions
     ): UpdateSegmentDTO {
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
@@ -170,8 +171,11 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         );
     }
 
-    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, editor_Models_Segment $segment): void
-    {
+    public function updateWithDTO(
+        UpdateSegmentDTO $dto,
+        UpdateOptions $updateOptions,
+        editor_Models_Segment $segment
+    ): void {
         $source = $this->tagHandler->prepareQuery($dto->source);
         $target = $this->tagHandler->prepareQuery($dto->target);
 

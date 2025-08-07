@@ -31,6 +31,7 @@ namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_OpenTM2_Service;
+use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -95,6 +96,11 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         $languageResources = $this->getLanguageResourcesForReorganization($input);
         $reorganizeService = ReorganizeService::create();
 
+        $config = \Zend_Registry::get('config');
+        $reorganizeOptions = new ReorganizeOptions(
+            (bool) $config->runtimeOptions->LanguageResources->t5memory->saveDifferentTargetsForSameSource,
+        );
+
         foreach ($languageResources as $languageResource) {
             $this->io->text(sprintf(
                 'Reorganizing all memories in language resource "%s" (ID %s, UUID %s)',
@@ -105,7 +111,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
 
             foreach ($languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
                 $tmName = $memory['filename'];
-                $this->reorganizeTm($reorganizeService, $languageResource, $tmName);
+                $this->reorganizeTm($reorganizeService, $languageResource, $tmName, $reorganizeOptions);
             }
         }
 
@@ -117,7 +123,8 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
     private function reorganizeTm(
         ReorganizeService $reorganizeService,
         LanguageResource $languageResource,
-        string $tmName
+        string $tmName,
+        ReorganizeOptions $reorganizeOptions,
     ): void {
         if ($reorganizeService->isReorganizingAtTheMoment($languageResource, $tmName)) {
             $this->io->warning('Memory "' . $tmName . '" is being reorganized at the moment');
@@ -132,7 +139,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
 
         $this->io->text('Reorganizing memory "' . $tmName . '"');
 
-        $reorganizeService->reorganizeTm($languageResource, $tmName);
+        $reorganizeService->reorganizeTm($languageResource, $tmName, $reorganizeOptions);
     }
 
     /**

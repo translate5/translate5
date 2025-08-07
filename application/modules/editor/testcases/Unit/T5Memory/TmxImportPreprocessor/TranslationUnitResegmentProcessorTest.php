@@ -81,7 +81,7 @@ class TranslationUnitResegmentProcessorTest extends TestCase
         $sourceLang = $this->createMock(editor_Models_Languages::class);
         $targetLang = $this->createMock(editor_Models_Languages::class);
 
-        $options = new ImportOptions(StripFramingTags::None, $supports);
+        $options = new ImportOptions(StripFramingTags::None, $supports, false);
 
         self::assertSame(
             $supports,
@@ -112,7 +112,7 @@ class TranslationUnitResegmentProcessorTest extends TestCase
             ['getRfc5646', [], 'en'],
         ]);
 
-        $options = new ImportOptions(StripFramingTags::None, true);
+        $options = new ImportOptions(StripFramingTags::None, true, false);
 
         $tus = $this->processor->process( // @phpstan-ignore-line
             'tu',

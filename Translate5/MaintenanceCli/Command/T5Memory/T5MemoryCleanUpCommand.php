@@ -32,7 +32,7 @@ namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Services_OpenTM2_Service as Service;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
-use MittagQI\Translate5\T5Memory\Api\ConstantApi;
+use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,7 +57,7 @@ class T5MemoryCleanUpCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $api = ConstantApi::create();
+        $api = T5MemoryApi::create();
         $config = \Zend_Registry::get('config');
         $persistenceService = PersistenceService::create();
         $tmPrefix = $persistenceService->addTmPrefix('');

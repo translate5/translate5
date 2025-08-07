@@ -38,8 +38,10 @@ use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Zend_Config;
 use ZfExtended_Logger;
 
 class UpdateSegmentOperationTest extends TestCase
@@ -79,12 +81,15 @@ class UpdateSegmentOperationTest extends TestCase
 
         $this->serviceManager->expects(self::never())->method('getConnector');
 
+        $config = new Zend_Config([]);
+
         $service = new UpdateSegmentOperation(
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
             $this->serviceManager,
-            $this->logger
+            $this->logger,
+            $config,
         );
         $service->updateSegment($segment);
     }
@@ -113,12 +118,23 @@ class UpdateSegmentOperationTest extends TestCase
             ->willReturn(null);
         $this->serviceManager->expects(self::never())->method('getConnector');
 
+        $config = new Zend_Config([
+            'runtimeOptions' => [
+                'LanguageResources' => [
+                    't5memory' => [
+                        'saveDifferentTargetsForSameSource' => false,
+                    ],
+                ],
+            ],
+        ]);
+
         $service = new UpdateSegmentOperation(
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
             $this->serviceManager,
-            $this->logger
+            $this->logger,
+            $config,
         );
         $service->updateSegment($segment);
     }
@@ -157,20 +173,28 @@ class UpdateSegmentOperationTest extends TestCase
             ->method('getConnector')
             ->willReturnOnConsecutiveCalls($connectorMock1, $connectorMock2);
 
-        $expectedOptions = [
-            UpdatableAdapterInterface::RECHECK_ON_UPDATE => true,
-            UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR => true,
-        ];
+        $expectedOptions = new UpdateOptions(false, true, false, true);
 
         $connectorMock1->expects(self::once())->method('update')->with($segment, $expectedOptions);
         $connectorMock2->expects(self::once())->method('update')->with($segment, $expectedOptions);
+
+        $config = new Zend_Config([
+            'runtimeOptions' => [
+                'LanguageResources' => [
+                    't5memory' => [
+                        'saveDifferentTargetsForSameSource' => false,
+                    ],
+                ],
+            ],
+        ]);
 
         $service = new UpdateSegmentOperation(
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
             $this->serviceManager,
-            $this->logger
+            $this->logger,
+            $config,
         );
         $service->updateSegment($segment);
     }
@@ -207,12 +231,23 @@ class UpdateSegmentOperationTest extends TestCase
             ->method('getConnector')
             ->willReturn($this->createMock(UpdatableAdapterInterface::class));
 
+        $config = new Zend_Config([
+            'runtimeOptions' => [
+                'LanguageResources' => [
+                    't5memory' => [
+                        'saveDifferentTargetsForSameSource' => false,
+                    ],
+                ],
+            ],
+        ]);
+
         $service = new UpdateSegmentOperation(
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
             $this->serviceManager,
-            $this->logger
+            $this->logger,
+            $config,
         );
         $service->updateSegment($segment);
     }
@@ -252,12 +287,23 @@ class UpdateSegmentOperationTest extends TestCase
 
         $this->logger->expects(self::once())->method('__call')->with('error');
 
+        $config = new Zend_Config([
+            'runtimeOptions' => [
+                'LanguageResources' => [
+                    't5memory' => [
+                        'saveDifferentTargetsForSameSource' => false,
+                    ],
+                ],
+            ],
+        ]);
+
         $service = new UpdateSegmentOperation(
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
             $this->serviceManager,
-            $this->logger
+            $this->logger,
+            $config,
         );
         $service->updateSegment($segment);
     }
@@ -314,12 +360,23 @@ class UpdateSegmentOperationTest extends TestCase
 
         $this->logger->expects(self::never())->method('__call')->with('error');
 
+        $config = new Zend_Config([
+            'runtimeOptions' => [
+                'LanguageResources' => [
+                    't5memory' => [
+                        'saveDifferentTargetsForSameSource' => false,
+                    ],
+                ],
+            ],
+        ]);
+
         $service = new UpdateSegmentOperation(
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
             $this->serviceManager,
-            $this->logger
+            $this->logger,
+            $config,
         );
         $service->updateSegment($segment);
     }

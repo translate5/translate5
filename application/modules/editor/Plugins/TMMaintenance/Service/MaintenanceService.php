@@ -39,7 +39,9 @@ use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
+use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
@@ -111,12 +113,12 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
     }
 
-    public function update(SegmentModel $segment, array $options = []): void
+    public function update(SegmentModel $segment, ?UpdateOptions $updateOptions = null): void
     {
         // Not used
     }
 
-    public function getUpdateDTO(SegmentModel $segment, array $options = []): UpdateSegmentDTO
+    public function getUpdateDTO(SegmentModel $segment, UpdateOptions $updateOptions): UpdateSegmentDTO
     {
         return new UpdateSegmentDTO(
             '',
@@ -130,7 +132,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         );
     }
 
-    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, SegmentModel $segment): void
+    public function updateWithDTO(UpdateSegmentDTO $dto, UpdateOptions $updateOptions, SegmentModel $segment): void
     {
         // Not used
     }
@@ -151,8 +153,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         int $timestamp,
         string $fileName,
     ): void {
-        $this->assertVersionFits();
-
         $source = $this->tagHandler->prepareQuery($source);
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($target, false);
@@ -188,8 +188,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         int $timestamp,
         string $fileName,
     ): void {
-        $this->assertVersionFits();
-
         $memoryName = $this->getMemoryNameById($memoryId);
 
         $this->assertMemoryAvailable($memoryName);
@@ -226,8 +224,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     public function deleteEntry(int $memoryId, int $segmentId, int $recordKey, int $targetKey): void
     {
-        $this->assertVersionFits();
-
         $memoryName = $this->getMemoryNameById($memoryId);
 
         $this->assertMemoryAvailable($memoryName);
@@ -243,7 +239,14 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             ! $successful
             || $this->reorganizeService->needsReorganizing($response, $this->languageResource, $memoryName)
         ) {
-            $this->reorganizeService->reorganizeTm($this->languageResource, $memoryName);
+            $saveDifferentTargetsForSameSource = (bool) $this->config
+                ->runtimeOptions
+                ->LanguageResources
+                ->t5memory
+                ->saveDifferentTargetsForSameSource;
+            $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
+
+            $this->reorganizeService->reorganizeTm($this->languageResource, $memoryName, $reorganizeOptions);
 
             $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
         }
@@ -269,16 +272,21 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     public function deleteBatch(SearchDTO $dto): bool
     {
-        $this->assertVersionFits();
-
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
         usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
 
+        $saveDifferentTargetsForSameSource = (bool) $this->config
+            ->runtimeOptions
+            ->LanguageResources
+            ->t5memory
+            ->saveDifferentTargetsForSameSource;
+        $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
+
         foreach ($memories as ['filename' => $tmName]) {
             $this->assertMemoryAvailable($tmName);
 
-            $successful = $this->api->deleteBatch($tmName, $dto);
+            $successful = $this->api->deleteBatch($tmName, $dto, $saveDifferentTargetsForSameSource);
 
             $response = ApiResponse::fromContentAndStatus(
                 $this->api->getResponse()->getBody(),
@@ -286,13 +294,13 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             );
 
             if ($this->reorganizeService->needsReorganizing($response, $this->languageResource, $tmName)) {
-                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName);
+                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $reorganizeOptions);
 
-                $successful = $this->api->deleteBatch($tmName, $dto);
+                $successful = $this->api->deleteBatch($tmName, $dto, $saveDifferentTargetsForSameSource);
             }
 
             if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
-                $deleteBatch = fn () => $this->api->deleteBatch($tmName, $dto)
+                $deleteBatch = fn () => $this->api->deleteBatch($tmName, $dto, $saveDifferentTargetsForSameSource)
                     ? [WaitCallState::Done, true]
                     : [WaitCallState::Retry, false];
 
@@ -330,8 +338,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         SearchDTO $searchDTO,
         int $amountOfResults = self::CONCORDANCE_SEARCH_NUM_RESULTS
     ): \editor_Services_ServiceResult {
-        $this->assertVersionFits();
-
         $offsetTmId = null;
         $recordKey = null;
         $targetKey = null;
@@ -358,6 +364,12 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $resultsCount = 0;
 
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+        $saveDifferentTargetsForSameSource = (bool) $this->config
+            ->runtimeOptions
+            ->LanguageResources
+            ->t5memory
+            ->saveDifferentTargetsForSameSource;
+        $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
 
         usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
         $ids = array_column($memories, 'id');
@@ -382,7 +394,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 ! $segmentIdsGenerated
                 || $this->reorganizeService->needsReorganizing($response, $this->languageResource, $tmName)
             ) {
-                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName);
+                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $reorganizeOptions);
 
                 $successful = $this->api->search($tmName, $tmOffset, $amountOfResults, $searchDTO);
             }
@@ -418,7 +430,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             }
 
             if (in_array(0, array_column($result->results, 'segmentId'), true)) {
-                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName);
+                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $reorganizeOptions);
             }
 
             $data = array_map(
@@ -473,8 +485,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     public function countSegments(SearchDTO $searchDTO): int
     {
-        $this->assertVersionFits();
-
         $amount = 0;
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
         usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
@@ -561,7 +571,22 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             (int) $this->languageResource->getTargetLang(),
         );
 
-        $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
+        $saveDifferentTargetsForSameSource = (bool) $this->config
+            ->runtimeOptions
+            ->LanguageResources
+            ->t5memory
+            ->saveDifferentTargetsForSameSource;
+
+        $successful = $this->api->update(
+            $source,
+            $target,
+            $userName,
+            $context,
+            $time,
+            $fileName,
+            $memoryName,
+            $saveDifferentTargetsForSameSource,
+        );
 
         if ($successful) {
             return;
@@ -580,7 +605,16 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 $newName = $currentWritableMemoryName;
             }
 
-            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $newName);
+            $successful = $this->api->update(
+                $source,
+                $target,
+                $userName,
+                $context,
+                $time,
+                $fileName,
+                $newName,
+                $saveDifferentTargetsForSameSource,
+            );
         }
 
         $response = ApiResponse::fromContentAndStatus(
@@ -589,9 +623,19 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         );
 
         if ($this->reorganizeService->needsReorganizing($response, $this->languageResource, $memoryName)) {
-            $this->reorganizeService->reorganizeTm($this->languageResource, $memoryName);
+            $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
+            $this->reorganizeService->reorganizeTm($this->languageResource, $memoryName, $reorganizeOptions);
 
-            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
+            $successful = $this->api->update(
+                $source,
+                $target,
+                $userName,
+                $context,
+                $time,
+                $fileName,
+                $memoryName,
+                $saveDifferentTargetsForSameSource,
+            );
         }
 
         if ($this->isLockingTimeoutOccurred($apiError)) {
@@ -601,7 +645,16 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 sleep($this->getRetryDelaySeconds());
                 $retries++;
 
-                $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
+                $successful = $this->api->update(
+                    $source,
+                    $target,
+                    $userName,
+                    $context,
+                    $time,
+                    $fileName,
+                    $memoryName,
+                    $saveDifferentTargetsForSameSource,
+                );
             }
         }
 
@@ -719,13 +772,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     }
 
     // Need to move this region to a dedicated class while refactoring connector
-    private const VERSION_0_4 = '0.4';
-
-    private const VERSION_0_5 = '0.5';
-
-    private const VERSION_0_6 = '0.6';
-
-    private const VERSION_0_7 = '0.7';
 
     private function addOverflowWarning(Task $task = null): void
     {
@@ -743,24 +789,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             'Language Resource [{name}] current writable memory is overflown, creating a new one',
             $params
         );
-    }
-
-    private function getT5MemoryVersion(): string
-    {
-        $success = $this->api->resources();
-
-        if (! $success) {
-            return self::VERSION_0_4;
-        }
-
-        $resources = $this->api->getResult();
-
-        return match (true) {
-            str_starts_with($resources->Version ?? '', self::VERSION_0_5) => self::VERSION_0_5,
-            str_starts_with($resources->Version ?? '', self::VERSION_0_6) => self::VERSION_0_6,
-            str_starts_with($resources->Version ?? '', self::VERSION_0_7) => self::VERSION_0_7,
-            default => self::VERSION_0_4,
-        };
     }
 
     private function getWritableMemory(): string
@@ -855,18 +883,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             throw new \editor_Services_Connector_Exception('E1377', [
                 'languageResource' => $this->languageResource,
                 'status' => $status,
-            ]);
-        }
-    }
-
-    private function assertVersionFits(): void
-    {
-        $version = $this->getT5MemoryVersion();
-
-        // TODO remove after versioned API is removed
-        if (! in_array($version, [self::VERSION_0_6, self::VERSION_0_7], true)) {
-            throw new \editor_Services_Connector_Exception('E1616', [
-                'languageResource' => $this->languageResource,
             ]);
         }
     }

@@ -94,7 +94,7 @@ class ContentProtectionProcessorTest extends TestCase
         $sourceLang = $this->createMock(editor_Models_Languages::class);
         $targetLang = $this->createMock(editor_Models_Languages::class);
 
-        $options = new ImportOptions(StripFramingTags::None, true);
+        $options = new ImportOptions(StripFramingTags::None, true, false);
 
         self::assertSame($hasRules, $this->processor->supports($sourceLang, $targetLang, $options));
     }
@@ -117,7 +117,7 @@ class ContentProtectionProcessorTest extends TestCase
                 'target' => 'converted_target',
             ]);
 
-        $options = new ImportOptions(StripFramingTags::None, true);
+        $options = new ImportOptions(StripFramingTags::None, true, false);
 
         self::assertSame(
             json_encode([

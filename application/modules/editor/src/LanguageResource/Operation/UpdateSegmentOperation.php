@@ -42,6 +42,8 @@ use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
+use Zend_Config;
 use Zend_Registry;
 use ZfExtended_BadGateway;
 use ZfExtended_Factory;
@@ -59,6 +61,7 @@ class UpdateSegmentOperation
         private readonly TaskTmRepository $taskTmRepository,
         private readonly editor_Services_Manager $serviceManager,
         private readonly ZfExtended_Logger $logger,
+        private readonly Zend_Config $config,
     ) {
     }
 
@@ -73,6 +76,7 @@ class UpdateSegmentOperation
             new TaskTmRepository(),
             ZfExtended_Factory::get(editor_Services_Manager::class),
             Zend_Registry::get('logger')->cloneMe('editor.languageresource.service'),
+            Zend_Registry::get('config'),
         );
     }
 
@@ -98,8 +102,19 @@ class UpdateSegmentOperation
             unset($data[$taskTm->getServiceType()]);
         }
 
+        $saveDifferentTargetsForSameSource = (bool) $this->config->runtimeOptions
+            ->LanguageResources
+            ->t5memory
+            ->saveDifferentTargetsForSameSource;
+        $updateOptions = UpdateOptions::fromArray(
+            [
+                UpdatableAdapterInterface::RECHECK_ON_UPDATE => true,
+                UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE => $saveDifferentTargetsForSameSource,
+            ]
+        );
+
         foreach ($data as $languageResourcesData) {
-            $this->updateSegmentInIntegrations($segment, $languageResourcesData);
+            $this->updateSegmentInIntegrations($segment, $languageResourcesData, $updateOptions);
         }
     }
 
@@ -115,17 +130,23 @@ class UpdateSegmentOperation
             true,
         );
 
+        $saveDifferentTargetsForSameSource = (bool) $this->config->runtimeOptions
+            ->LanguageResources
+            ->t5memory
+            ->saveDifferentTargetsForSameSource;
+
+        $updateOptions = UpdateOptions::fromArray(
+            [
+                UpdatableAdapterInterface::RECHECK_ON_UPDATE => true,
+                UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE => $saveDifferentTargetsForSameSource,
+            ]
+        );
+
         $atLeastOneUpdated = false;
         foreach ($taskTmLanguageResources as $taskTmLanguageResource) {
             $connector = $this->getConnector($taskTmLanguageResource, $task);
 
-            $connector->update(
-                $segment,
-                [
-                    UpdatableAdapterInterface::RECHECK_ON_UPDATE => true,
-                    UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR => true,
-                ]
-            );
+            $connector->update($segment, $updateOptions);
 
             $atLeastOneUpdated = true;
         }
@@ -138,8 +159,11 @@ class UpdateSegmentOperation
         }
     }
 
-    private function updateSegmentInIntegrations(Segment $segment, array $languageResourcesData): void
-    {
+    private function updateSegmentInIntegrations(
+        Segment $segment,
+        array $languageResourcesData,
+        UpdateOptions $updateOptions,
+    ): void {
         $task = $this->taskRepository->getByGuid($segment->getTaskGuid());
 
         foreach ($languageResourcesData as $languageResourceData) {
@@ -155,13 +179,7 @@ class UpdateSegmentOperation
             try {
                 $connector = $this->getConnector($languageResource, $task);
 
-                $connector->update(
-                    $segment,
-                    [
-                        UpdatableAdapterInterface::RECHECK_ON_UPDATE => true,
-                        UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR => true,
-                    ]
-                );
+                $connector->update($segment, $updateOptions);
             } catch (SegmentUpdateException) {
                 // Ignore the error here as it is already logged in the connector so nothing to do here
             } catch (editor_Services_Exceptions_NoService|editor_Services_Connector_Exception|ZfExtended_BadGateway $e) {

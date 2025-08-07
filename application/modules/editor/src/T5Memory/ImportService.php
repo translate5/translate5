@@ -33,19 +33,19 @@ namespace MittagQI\Translate5\T5Memory;
 use DOMDocument;
 use DOMXPath;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use LogicException;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\T5Memory\Api\ConstantApi;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
 use MittagQI\Translate5\T5Memory\Api\Response\ImportStatusResponse;
+use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\Enum\ImportStatusEnum;
-use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\ImportResultedInErrorException;
 use Psr\Http\Client\ClientExceptionInterface;
 use RuntimeException;
 use Zend_Config;
+use Zend_Registry;
 use ZfExtended_Logger;
 
 class ImportService
@@ -53,12 +53,10 @@ class ImportService
     public function __construct(
         private readonly Zend_Config $config,
         private readonly ZfExtended_Logger $logger,
-        private readonly VersionService $versionService,
+        private readonly T5MemoryApi $t5MemoryApi,
         private readonly TmxImportPreprocessor $tmxImportPreprocessor,
-        private readonly Api\VersionedApiFactory $versionedApiFactory,
         private readonly PersistenceService $persistenceService,
         private readonly ReorganizeService $reorganizeService,
-        private readonly ConstantApi $constantApi,
         private readonly MemoryNameGenerator $memoryNameGenerator,
         private readonly FlushMemoryService $flushMemoryService,
         private readonly CreateMemoryService $createMemoryService,
@@ -69,14 +67,12 @@ class ImportService
     public static function create(): self
     {
         return new self(
-            \Zend_Registry::get('config'),
-            \Zend_Registry::get('logger')->cloneMe('editor.t5memory.import'),
-            VersionService::create(),
+            Zend_Registry::get('config'),
+            Zend_Registry::get('logger')->cloneMe('editor.t5memory.import'),
+            T5MemoryApi::create(),
             TmxImportPreprocessor::create(),
-            Api\VersionedApiFactory::create(),
             PersistenceService::create(),
             ReorganizeService::create(),
-            ConstantApi::create(),
             new MemoryNameGenerator(),
             FlushMemoryService::create(),
             CreateMemoryService::create(),
@@ -119,7 +115,7 @@ class ImportService
                 $languageResource,
                 $importFilename,
                 $tmName ?: $this->persistenceService->getWritableMemory($languageResource),
-                $importOptions->stripFramingTags,
+                $importOptions,
             );
 
             unlink($importFilename);
@@ -134,16 +130,16 @@ class ImportService
         LanguageResource $languageResource,
         string $importFilename,
         string $tmName,
-        StripFramingTags $stripFramingTags,
+        ImportOptions $importOptions,
     ): void {
         $gotLock = false;
 
         do {
-            $response = $this->importTmxFile(
-                $languageResource,
-                $tmName,
+            $response = $this->t5MemoryApi->importTmx(
+                $languageResource->getResource()->getUrl(),
+                $this->persistenceService->addTmPrefix($tmName),
                 $importFilename,
-                $stripFramingTags
+                $importOptions,
             );
 
             if ($this->isLockingTimeoutOccurred($response)) {
@@ -153,7 +149,8 @@ class ImportService
             }
 
             if ($this->reorganizeService->needsReorganizing($response, $languageResource, $tmName)) {
-                $this->reorganizeService->reorganizeTm($languageResource, $tmName);
+                $reorganizeOptions = new ReorganizeOptions($importOptions->saveDifferentTargetsForSameSource);
+                $this->reorganizeService->reorganizeTm($languageResource, $tmName, $reorganizeOptions);
 
                 continue;
             }
@@ -169,7 +166,7 @@ class ImportService
         }
 
         $waitNonImportStatus = function () use ($languageResource, $tmName) {
-            $status = $this->constantApi->getImportStatus(
+            $status = $this->t5MemoryApi->getImportStatus(
                 $languageResource->getResource()->getUrl(),
                 $this->persistenceService->addTmPrefix($tmName)
             );
@@ -195,7 +192,7 @@ class ImportService
                     'apiError' => $status->getBody(),
                 ]);
 
-                $this->importTmxIntoMemory($languageResource, $importFilename, $tmName, $stripFramingTags);
+                $this->importTmxIntoMemory($languageResource, $importFilename, $tmName, $importOptions);
 
                 break;
 
@@ -237,7 +234,7 @@ class ImportService
             );
 
             // Import further
-            $this->importTmxIntoMemory($languageResource, $importFilename, $newName, $stripFramingTags);
+            $this->importTmxIntoMemory($languageResource, $importFilename, $newName, $importOptions);
         }
     }
 
@@ -318,42 +315,5 @@ class ImportService
     private function isLockingTimeoutOccurred(ResponseInterface $response): bool
     {
         return $response->getCode() === 506;
-    }
-
-    /**
-     * @throws ClientExceptionInterface
-     * @throws LogicException
-     */
-    private function importTmxFile(
-        LanguageResource $languageResource,
-        string $tmName,
-        string $filePath,
-        StripFramingTags $stripFramingTags,
-    ): ResponseInterface {
-        $version = $this->versionService->getT5MemoryVersion($languageResource);
-
-        if (Api\V6\VersionedApi::isVersionSupported($version)) {
-            return $this->versionedApiFactory
-                ->get(Api\V6\VersionedApi::class)
-                ->importTmx(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName),
-                    $filePath,
-                    $stripFramingTags,
-                );
-        }
-
-        if (Api\V5\VersionedApi::isVersionSupported($version)) {
-            return $this->versionedApiFactory
-                ->get(Api\V5\VersionedApi::class)
-                ->import(
-                    $languageResource->getResource()->getUrl(),
-                    $this->persistenceService->addTmPrefix($tmName),
-                    file_get_contents($filePath),
-                    $stripFramingTags,
-                );
-        }
-
-        throw new LogicException('Unsupported T5Memory version: ' . $version);
     }
 }

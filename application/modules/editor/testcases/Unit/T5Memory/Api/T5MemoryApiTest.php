@@ -28,81 +28,75 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\T5Memory\Api\Response;
+namespace MittagQI\Translate5\Test\Unit\T5Memory\Api;
 
-use MittagQI\Translate5\T5Memory\Api\Exception\CorruptResponseBodyException;
-use MittagQI\Translate5\T5Memory\Api\Exception\InvalidJsonInResponseBodyException;
-use MittagQI\Translate5\T5Memory\Api\Exception\InvalidResponseStructureException;
-use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class ResourcesResponseTest extends TestCase
+class T5MemoryApiTest extends TestCase
 {
-    public function testFromResponse(): void
+    public function testDownloadTmx(): void
     {
         $bodyMock = $this->createMock(StreamInterface::class);
-        $bodyMock->method('getContents')->willReturn('{"Version":"1.0.0"}');
 
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getBody')->willReturn($bodyMock);
-
-        $resourcesResponse = ResourcesResponse::fromResponse($response);
-
-        $this->assertSame('1.0.0', $resourcesResponse->version);
-    }
-
-    public function testVersionThrowsInvalidResponseStructureException(): void
-    {
-        $bodyMock = $this->createMock(StreamInterface::class);
-        $bodyMock->method('getContents')->willReturn('{"trash":"prop"}');
-
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getBody')->willReturn($bodyMock);
+        $response->method('getStatusCode')->willReturn(200);
 
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
         $api = new T5MemoryApi($client);
 
-        self::expectException(InvalidResponseStructureException::class);
-        $api->version('http://example.com');
+        $iterator = $api->downloadTmx('http://example.com', 'tmName', 20);
+
+        $chunks = iterator_to_array($iterator);
+
+        self::assertCount(1, $chunks);
+        self::assertInstanceOf(StreamInterface::class, current($chunks));
     }
 
-    public function testVersionThrowsCorruptResponseBodyException(): void
+    public function testDownloadTmxChunks(): void
     {
         $bodyMock = $this->createMock(StreamInterface::class);
-        $bodyMock->method('getContents')->willThrowException(new \RuntimeException());
 
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getBody')->willReturn($bodyMock);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $response->method('getHeader')->willReturnOnConsecutiveCalls(['11:1'], []);
 
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
         $api = new T5MemoryApi($client);
 
-        self::expectException(CorruptResponseBodyException::class);
-        $api->version('http://example.com');
+        $iterator = $api->downloadTmx('http://example.com', 'tmName', 20);
+
+        $chunks = iterator_to_array($iterator);
+
+        self::assertCount(2, $chunks);
+        self::assertInstanceOf(StreamInterface::class, current($chunks));
     }
 
-    public function testVersionThrowsInvalidJsonInResponseBodyException(): void
+    public function testDownloadTm(): void
     {
         $bodyMock = $this->createMock(StreamInterface::class);
-        $bodyMock->method('getContents')->willReturn('oops');
 
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getBody')->willReturn($bodyMock);
+        $response->method('getStatusCode')->willReturn(200);
 
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
         $api = new T5MemoryApi($client);
 
-        self::expectException(InvalidJsonInResponseBodyException::class);
-        $api->version('http://example.com');
+        $stream = $api->downloadTm('http://example.com', 'tmName');
+
+        self::assertInstanceOf(StreamInterface::class, $stream);
     }
 }

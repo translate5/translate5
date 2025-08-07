@@ -31,7 +31,7 @@ namespace MittagQI\Translate5\Segment;
 
 use editor_Models_Segment;
 use editor_Models_Segment_MatchRateType;
-use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
+use editor_Services_Connector_Exception;
 use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 use ZfExtended_Factory;
@@ -67,7 +67,11 @@ class UpdateLanguageResourcesWorker extends ZfExtended_Worker_Abstract
 
         try {
             UpdateSegmentOperation::create()->updateSegment($this->segment);
-        } catch (RescheduleUpdateNeededException) {
+        } catch (editor_Services_Connector_Exception $e) {
+            if ($e->getCode() !== 1512) {
+                throw $e;
+            }
+
             // Wait a little bit and reschedule self for next try
             sleep(30);
             (new TaskEventTrigger())->triggerAfterSegmentUpdate($this->segment->getTask(), $this->segment);

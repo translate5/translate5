@@ -31,22 +31,23 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LanguageResource\Adapter;
 
 use editor_Models_Segment as SegmentModel;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 
 interface UpdatableAdapterInterface
 {
     public const RECHECK_ON_UPDATE = 'recheckOnUpdate';
 
-    public const RESCHEDULE_UPDATE_ON_ERROR = 'rescheduleUpdateOnError';
-
     public const USE_SEGMENT_TIMESTAMP = 'useSegmentTimestamp';
 
     public const SAVE_TO_DISK = 'saveToDisk';
 
-    public function update(SegmentModel $segment, array $options = []): void;
+    public const SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE = 'saveDifferentTargetsForSameSource';
+
+    public function update(SegmentModel $segment, ?UpdateOptions $updateOptions = null): void;
 
     public function checkUpdatedSegment(SegmentModel $segment): void;
 
-    public function getUpdateDTO(SegmentModel $segment, array $options = []): UpdateSegmentDTO;
+    public function getUpdateDTO(SegmentModel $segment, UpdateOptions $updateOptions): UpdateSegmentDTO;
 
-    public function updateWithDTO(UpdateSegmentDTO $dto, array $options, SegmentModel $segment): void;
+    public function updateWithDTO(UpdateSegmentDTO $dto, UpdateOptions $updateOptions, SegmentModel $segment): void;
 }

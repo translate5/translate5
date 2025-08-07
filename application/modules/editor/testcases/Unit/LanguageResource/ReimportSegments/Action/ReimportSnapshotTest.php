@@ -38,13 +38,13 @@ use editor_Services_Manager;
 use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\ReimportSnapshot;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLoggerProvider;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\SegmentRepository;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -160,13 +160,13 @@ class ReimportSnapshotTest extends TestCase
                 }
             );
 
+        $options = new UpdateOptions(false, false, false, false);
+
         $connectorMock->expects(self::exactly(count($segments)))
             ->method('updateWithDTO')
             ->with(
                 self::callback(static fn ($updateDTO) => $updateDTO instanceof UpdateSegmentDTO),
-                options: [
-                    UpdatableAdapterInterface::SAVE_TO_DISK => false,
-                ],
+                options: $options,
                 segment: self::callback(static fn ($segment) => $segment instanceof Segment)
             );
 

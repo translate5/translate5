@@ -28,41 +28,20 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory;
+namespace MittagQI\Translate5\T5Memory\Api\Response;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
-class FlushMemoryService
+class DownloadTmResponse
 {
     public function __construct(
-        private readonly PersistenceService $persistenceService,
-        private readonly T5MemoryApi $t5MemoryApi,
+        public readonly StreamInterface $tm
     ) {
     }
 
-    public static function create(): self
+    public static function fromResponse(ResponseInterface $response): self
     {
-        return new self(
-            PersistenceService::create(),
-            T5MemoryApi::create()
-        );
-    }
-
-    public function flushCurrentWritable(LanguageResource $languageResource): void
-    {
-        $tmName = $this->persistenceService->getWritableMemory($languageResource);
-
-        $this->flush($languageResource, $tmName);
-    }
-
-    public function flush(
-        LanguageResource $languageResource,
-        string $tmName,
-    ): void {
-        $this->t5MemoryApi->flush(
-            $languageResource->getResource()->getUrl(),
-            $this->persistenceService->addTmPrefix($tmName),
-        );
+        return new self($response->getBody());
     }
 }

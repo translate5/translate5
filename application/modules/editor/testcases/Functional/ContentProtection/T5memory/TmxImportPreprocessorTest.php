@@ -133,7 +133,7 @@ class TmxImportPreprocessorTest extends TestCase
             __DIR__ . '/TmxImportPreprocessorTest/small.tmx',
             (int) $this->sourceLang->getId(),
             (int) $this->targetLang->getId(),
-            new ImportOptions(StripFramingTags::None, false)
+            new ImportOptions(StripFramingTags::None, false, false)
         );
 
         self::assertFileEquals(__DIR__ . '/TmxImportPreprocessorTest/expected_small.tmx', $file);

@@ -41,6 +41,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSeg
 use MittagQI\Translate5\LanguageResource\ReimportSegments\SegmentsProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Segment\FilteredIterator;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 
 class CreateSnapshot
 {
@@ -86,9 +87,9 @@ class CreateSnapshot
             return;
         }
 
-        $updateOptions = [
+        $updateOptions = UpdateOptions::fromArray([
             UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP => $useSegmentTimestamp,
-        ];
+        ]);
 
         foreach ($segments as $segment) {
             if (! empty($segmentIds) && ! in_array((int) $segment->getId(), $segmentIds, true)) {

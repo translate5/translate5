@@ -28,41 +28,19 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory;
+namespace MittagQI\Translate5\Test\Unit\T5Memory\Api\Request;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
+use MittagQI\Translate5\T5Memory\Api\Request\DownloadTmRequest;
+use PHPUnit\Framework\TestCase;
 
-class FlushMemoryService
+class DownloadTmRequestTest extends TestCase
 {
-    public function __construct(
-        private readonly PersistenceService $persistenceService,
-        private readonly T5MemoryApi $t5MemoryApi,
-    ) {
-    }
-
-    public static function create(): self
+    public function testCreation(): void
     {
-        return new self(
-            PersistenceService::create(),
-            T5MemoryApi::create()
-        );
-    }
+        $request = new DownloadTmRequest('http://example.com', 'tmName');
 
-    public function flushCurrentWritable(LanguageResource $languageResource): void
-    {
-        $tmName = $this->persistenceService->getWritableMemory($languageResource);
-
-        $this->flush($languageResource, $tmName);
-    }
-
-    public function flush(
-        LanguageResource $languageResource,
-        string $tmName,
-    ): void {
-        $this->t5MemoryApi->flush(
-            $languageResource->getResource()->getUrl(),
-            $this->persistenceService->addTmPrefix($tmName),
-        );
+        $this->assertSame('GET', $request->getMethod());
+        $this->assertSame('http://example.com/tmName/download.tm', (string) $request->getUri());
+        $this->assertSame('application/octet-stream', $request->getHeaderLine('Accept'));
     }
 }

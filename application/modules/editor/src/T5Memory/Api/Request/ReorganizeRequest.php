@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,41 +28,29 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory;
+namespace MittagQI\Translate5\T5Memory\Api\Request;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
+use GuzzleHttp\Psr7\Request;
 
-class FlushMemoryService
+class ReorganizeRequest extends Request
 {
     public function __construct(
-        private readonly PersistenceService $persistenceService,
-        private readonly T5MemoryApi $t5MemoryApi,
-    ) {
-    }
-
-    public static function create(): self
-    {
-        return new self(
-            PersistenceService::create(),
-            T5MemoryApi::create()
-        );
-    }
-
-    public function flushCurrentWritable(LanguageResource $languageResource): void
-    {
-        $tmName = $this->persistenceService->getWritableMemory($languageResource);
-
-        $this->flush($languageResource, $tmName);
-    }
-
-    public function flush(
-        LanguageResource $languageResource,
+        string $baseUrl,
         string $tmName,
-    ): void {
-        $this->t5MemoryApi->flush(
-            $languageResource->getResource()->getUrl(),
-            $this->persistenceService->addTmPrefix($tmName),
+        bool $saveDifferentTargetsForSameSource,
+    ) {
+        $tmName = urlencode($tmName);
+        $body = [
+            'saveDifferentTargetsForSameSource' => $saveDifferentTargetsForSameSource ? '1' : '0',
+        ];
+
+        parent::__construct(
+            'GET',
+            rtrim($baseUrl, '/') . "/$tmName/reorganize",
+            [
+                'Content-Type' => 'application/json',
+            ],
+            json_encode($body, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)
         );
     }
 }

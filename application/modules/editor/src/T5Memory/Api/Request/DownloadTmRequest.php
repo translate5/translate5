@@ -28,41 +28,22 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory;
+namespace MittagQI\Translate5\T5Memory\Api\Request;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
+use GuzzleHttp\Psr7\Request;
 
-class FlushMemoryService
+class DownloadTmRequest extends Request
 {
-    public function __construct(
-        private readonly PersistenceService $persistenceService,
-        private readonly T5MemoryApi $t5MemoryApi,
-    ) {
-    }
-
-    public static function create(): self
+    public function __construct(string $baseUrl, string $tmName)
     {
-        return new self(
-            PersistenceService::create(),
-            T5MemoryApi::create()
-        );
-    }
+        $tmName = urlencode($tmName);
 
-    public function flushCurrentWritable(LanguageResource $languageResource): void
-    {
-        $tmName = $this->persistenceService->getWritableMemory($languageResource);
-
-        $this->flush($languageResource, $tmName);
-    }
-
-    public function flush(
-        LanguageResource $languageResource,
-        string $tmName,
-    ): void {
-        $this->t5MemoryApi->flush(
-            $languageResource->getResource()->getUrl(),
-            $this->persistenceService->addTmPrefix($tmName),
+        parent::__construct(
+            'GET',
+            rtrim($baseUrl, '/') . "/$tmName/download.tm",
+            [
+                'Accept' => 'application/octet-stream',
+            ]
         );
     }
 }
