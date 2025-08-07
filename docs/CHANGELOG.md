@@ -16,6 +16,18 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.26.5] - 2025-08-07
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4863](https://jira.translate5.net/browse/TRANSLATE-4863): Editor general - RootCause: Cannot read properties of undefined (reading 'match')** <br>
+URGENT: added a fix for previously added debug code leading to errors in segment editor for bigger tasks
+
+
 ## [7.26.4] - 2025-08-06
 
 ### Important Notes:
