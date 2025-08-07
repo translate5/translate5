@@ -27,6 +27,8 @@
 /composer.phar
 # needed for ./translate5.sh release:notes
 /jira-cookie.txt
+/Makefile
+/.Makefile.swp
 
 # Special
 # needed for automated tests on server:
