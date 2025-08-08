@@ -17,6 +17,51 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.27.0] - 2025-08-08
+
+### Important Notes:
+#### [TRANSLATE-4822](https://jira.translate5.net/browse/TRANSLATE-4822)
+Due to a t5memory bug since some time segments, that share the same source but differ only in target and timestamp are saved as duplicates.
+Usually the newer segment should overwrite the older one in such a situation. And duplicates should only be stored, if author or other attributes differ.
+With soon coming t5memory 0.7 this will be solved and per default such duplicates will be overwritten again - what will lead to loss of all those duplicates in case of content conversion or TM reorganize, for example.
+As preparation for t5memory 0.7 we introduce the new system config saveDifferentTargetsForSameSource. By default it is disabled. If you activate it, even with t5memory 0.7 those duplicates will still be saved/kept.
+
+#### [TRANSLATE-4743](https://jira.translate5.net/browse/TRANSLATE-4743)
+ONLY FOR ON PREMISE USERS:
+!!! For on-premise useres: BACK COMPATIBILITY BREAK !!!
+End of support of t5memory older then version 0.6.x. Please make sure, you pulled t5memory "latest" in your docker setup (what you should do anyway with each update). If you still should be running TMs with 0.4 version, you need to migrate them with the "t5 t5memory:migrate" command. Get in touch with translate5 support in this case.
+
+#### [TRANSLATE-4231](https://jira.translate5.net/browse/TRANSLATE-4231)
+FOR ON PREMISE USERS:
+This Feature needs the newest Versions of the pdfconverter (1.3) and visualconverter (0.16). The Visual Plugin will not work with older versions anymore !
+A docker pull should normally solve that, since :latest is pointing to the above mentioned versions now. A t5 system:check after the update checks the versions.
+ 
+
+
+### Added
+**[TRANSLATE-4822](https://jira.translate5.net/browse/TRANSLATE-4822): t5memory - Save multiple target for the same source to t5memory** <br>
+Added config which purpose is to force t5memory to store segments with the same source as duplicates
+
+**[TRANSLATE-4231](https://jira.translate5.net/browse/TRANSLATE-4231): VisualReview / VisualTranslation - Offer WYSIWYG side of the visual as PDF download** <br>
+Visual: Add capabilities to export the visual as PDF for most visual types (Not Video obviously)
+
+
+### Changed
+**[TRANSLATE-4861](https://jira.translate5.net/browse/TRANSLATE-4861): t5memory - Add t5memory error code 5017 to list of codes, that triggers reorganize** <br>
+Added error 5017 to the errors list that are supposed to trigger t5memory memory reorganize process
+
+**[TRANSLATE-4841](https://jira.translate5.net/browse/TRANSLATE-4841): Workflows - Print approval: add size limit check for PDF attachment** <br>
+Print approval: added size limit check for PDF attachment
+
+
+### Bugfixes
+**[TRANSLATE-4743](https://jira.translate5.net/browse/TRANSLATE-4743): MatchAnalysis & Pretranslation - Omit versioning strategy for t5memory API** <br>
+ONLY FOR ON PREMISE USERS:
+!!! For on-premise useres: BACK COMPATIBILITY BREAK !!!
+End of support of t5memory older then version 0.6.x. Please make sure, you pulled t5memory "latest" in your docker setup (what you should do anyway with each update). If you still should be running TMs with 0.4 version, you need to migrate them with the "t5 t5memory:migrate" command. Get in touch with translate5 support in this case.
+
+
 ## [7.26.5] - 2025-08-07
 
 ### Important Notes:
