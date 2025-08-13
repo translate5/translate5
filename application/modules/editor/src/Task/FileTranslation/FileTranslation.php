@@ -288,8 +288,12 @@ class FileTranslation
      */
     private function getCustomersForLogging(editor_Models_Task $task, array $assignedLanguageResourceIds): array
     {
+        if (empty($assignedLanguageResourceIds)) {
+            return [];
+        }
         $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
-        //load all customers for the assigned language resources of the task (those customers are also the current user customers)
+        //load all customers for the assigned language resources of the task
+        // (those customers are also the current user customers)
         $resourceCustomers = $customerAssoc->loadLanguageResourcesCustomers($assignedLanguageResourceIds);
         $user = $this->userRepository->getByGuid($task->getPmGuid());
 
