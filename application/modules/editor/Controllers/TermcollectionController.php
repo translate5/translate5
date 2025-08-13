@@ -61,8 +61,8 @@ class editor_TermcollectionController extends ZfExtended_RestController
         $this->setDataInEntity($this->postBlacklist);
 
         if ($this->validate()) {
-            $customerIds = explode(',', $this->data->customerIds);
-            $collection = $this->entity->create($this->data->name);
+            $customerIds = explode(',', $this->data->customerIds ?? $this->getParam('customerIds'));
+            $collection = $this->entity->create($this->data->name ?? $this->getParam('name'));
 
             CustomerAssocService::create()->associateCustomers((int) $collection->getId(), $customerIds);
 
@@ -88,6 +88,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
 
         try {
             DeleteLanguageResourceOperation::create()->delete($this->entity, true);
+            $this->view->success = true;
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint) {
             //if there are associated tasks we can not delete the language resource
             ZfExtended_Models_Entity_Conflict::addCodes([

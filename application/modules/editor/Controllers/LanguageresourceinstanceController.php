@@ -1128,7 +1128,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
         $allowedCollections = $termCollection->getCollectionForAuthenticatedUser();
-        $rows = $proposals->loadProposalExportData(array_intersect($collectionIds, $allowedCollections), $this->getParam('exportDate'));
+        $rows = $proposals->loadProposalExportData(array_intersect($collectionIds, $allowedCollections), $this->getParam('exportDate', ''));
         if (empty($rows)) {
             $this->view->message = 'No results where found.';
 
