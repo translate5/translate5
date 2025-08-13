@@ -328,6 +328,14 @@
                 <source>Test mit allen Regeln</source>
                 <target>Test mit allen Regeln</target>
             </trans-unit>
+            <trans-unit id='RW50aXRpZXM='>
+                <source>Entities</source>
+                <target>Entities</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBuaWNodC1zdGFuZGFyZGlzaWVydGUgRW50aXRpZXMgaW4gaW1wb3J0aWVydGVuIFhNTC1EYXRlaWVuIHZvcmhhbmRlbiBzaW5kLCBtw7xzc2VuIGRpZXNlIGRla2xhcmllcnQgd2VyZGVuLCBkYW1pdCBkaWUgdmVyYXJiZWl0dW5nIG1pdCBPS0FQSSBmdW5rdGlvbmllcnQuIERpZSBTdGFuZGFyZC1FbnRpdGllcyBzaW5kOiBsdCwgZ3QsIGFtcCwgcXVvdCwgYXBvcy4gQml0dGUgZ2ViZW4gc2llIGFsbCBhbmRlcmVuIGluIGRpZXNlbSBGZWxkIGFuLg=='>
+                <source>Wenn nicht-standardisierte Entities in importierten XML-Dateien vorhanden sind, müssen diese deklariert werden, damit die verarbeitung mit OKAPI funktioniert. Die Standard-Entities sind: lt, gt, amp, quot, apos. Bitte geben sie all anderen in diesem Feld an.</source>
+                <target>Wenn nicht-standardisierte Entities in importierten XML-Dateien vorhanden sind, müssen diese deklariert werden, damit die verarbeitung mit OKAPI funktioniert. Die Standard-Entities sind: lt, gt, amp, quot, apos. Bitte geben sie all anderen in diesem Feld an.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

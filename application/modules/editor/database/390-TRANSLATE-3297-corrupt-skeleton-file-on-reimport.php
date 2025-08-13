@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
  * Update all corrupt task skeleton files from the task import archive.
  */
 
+use MittagQI\Translate5\Plugins\Okapi\Worker\OkapiWorkerHelper;
 use MittagQI\Translate5\Task\Reimport\Exception;
 
 set_time_limit(0);
@@ -102,7 +103,7 @@ class ReimportOverwrite extends editor_Models_Import_SegmentProcessor
         try {
             $segment->loadByFileidMid($this->fileId, $mid);
 
-            return $segment->getId();
+            return (int) $segment->getId();
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             return false;
         }
@@ -255,7 +256,7 @@ function fixFileCorruptedSkeletonFile(editor_Models_File $file): void
         ]);
 
         $parser->setSegmentFieldManager($sfm);
-        $processor->setSegmentFile($file->getId(), $parser->getFileName());
+        $processor->setSegmentFile((int) $file->getId(), $parser->getFileName());
         $parser->setIsReimport(true);
         $parser->addSegmentProcessor($processor);
         $parser->parseFile();
@@ -284,13 +285,13 @@ function fixFileCorruptedSkeletonFile(editor_Models_File $file): void
 function getFileCorruptedSkeletonFile(editor_Models_Task $task, editor_Models_File $file)
 {
     // in case it is okapi
-    $okapiPath = $task->getAbsoluteTaskDataPath() . '/' . editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR . '/';
+    $okapiPath = $task->getAbsoluteTaskDataPath() . '/' . OkapiWorkerHelper::OKAPI_REL_DATA_DIR . '/';
 
     if (is_dir($okapiPath)) {
         // original file extension.
         $ext = ZfExtended_Utils::getFileExtension($file->getFileName());
 
-        $fileName = sprintf(editor_Plugins_Okapi_Worker::ORIGINAL_FILE, $file->getId(), $ext);
+        $fileName = OkapiWorkerHelper::createOriginalFileName($file->getId(), $ext);
 
         // get the okapi xlf version of this file
         $fileName .= '.xlf';
