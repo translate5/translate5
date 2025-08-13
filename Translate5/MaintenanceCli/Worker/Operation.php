@@ -130,7 +130,9 @@ final class Operation
             'editor_Plugins_VisualReview_ImageHtmlWorker' => ['taskImport', 'visualExchange'],
             'MittagQI\Translate5\Plugins\VisualReview\Worker\VisualExchangeStartingWorker',
             'MittagQI\Translate5\Plugins\VisualReview\Worker\VisualExchangeFinishingWorker' => ['visualExchange'],
-
+            'MittagQI\Translate5\Plugins\VisualReview\Worker\VisualExportStartWorker',
+            'MittagQI\Translate5\Plugins\VisualReview\Worker\VisualExportPrintWorker',
+            'MittagQI\Translate5\Plugins\VisualReview\Worker\VisualExportMergePdfWorker' => ['visualExport'],
             default => ['UNKNOWN'],
         };
     }

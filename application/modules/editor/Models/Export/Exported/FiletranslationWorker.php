@@ -31,7 +31,7 @@ class editor_Models_Export_Exported_FiletranslationWorker extends editor_Models_
     /**
      * Empty method
      */
-    public function doWork(editor_Models_Task $task)
+    public function doWork(editor_Models_Task $task): void
     {
     }
 }

@@ -132,7 +132,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             relaisLang.setValue(null);
         }
 
-        me.fireEvent('workfilesRemoved',store.getData());
+        me.fireEvent('workfilesRemoved', store);
     },
 
     addFilesToStore: function(items, type) {
@@ -201,7 +201,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
                 me.validatePivotFileName();
 
-                me.fireEvent('workfileAdded',rec);
+                me.fireEvent('workfileAdded', store, rec);
             };
         });
     },
@@ -209,17 +209,15 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
     /***
      * Triggered after workfile is added to the workfiles-upload grid in the import wizard
-     * @param data
      */
-    onWorkfileAdded: function (data){
+    onWorkfileAdded: function (){
         this.getView().isValid();
     },
 
     /***
      * Triggered after workfiles are removed from the workfiles store with Remove files button
-     * @param itemsLeft
      */
-    onWorkfilesRemoved:function (itemsLeft){
+    onWorkfilesRemoved:function (){
         this.getView().isValid();
     },
 

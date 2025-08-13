@@ -68,7 +68,7 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
     /**
      * Get translated tbx file(s) for the task and import to the corresponsing TermCollection(s)
      */
-    protected function doWork(editor_Models_Task $task)
+    protected function doWork(editor_Models_Task $task): void
     {
         // Get params
         $parameters = $this->workerModel->getParameters();
