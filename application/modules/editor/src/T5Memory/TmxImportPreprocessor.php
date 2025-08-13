@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\T5Memory;
 
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\T5Memory\Api\Contract\TmxImportPreprocessorInterface;
 use MittagQI\Translate5\T5Memory\Contract\TmxImportProcessor;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateFileForTmxPreprocessingException;
@@ -44,7 +45,7 @@ use XMLWriter;
 use Zend_Registry;
 use ZfExtended_Logger;
 
-class TmxImportPreprocessor
+class TmxImportPreprocessor implements TmxImportPreprocessorInterface
 {
     /**
      * @param iterable<TmxImportProcessor> $tmxImportProcessors

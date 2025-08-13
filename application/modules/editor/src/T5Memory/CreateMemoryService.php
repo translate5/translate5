@@ -85,8 +85,12 @@ class CreateMemoryService
      */
     public function createEmptyMemoryWithRetry(
         LanguageResource $languageResource,
-        string $name,
+        ?string $name = null,
     ): string {
+        if (null === $name) {
+            $name = $this->memoryNameGenerator->generateNextMemoryName($languageResource);
+        }
+
         $createEmptyMemory = function () use ($languageResource, &$name) {
             try {
                 $t = $this->createEmptyMemory($languageResource, $name);

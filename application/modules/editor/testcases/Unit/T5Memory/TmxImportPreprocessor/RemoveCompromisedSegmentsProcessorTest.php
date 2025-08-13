@@ -71,7 +71,7 @@ class RemoveCompromisedSegmentsProcessorTest extends TestCase
         $sourceLang = $this->createMock(editor_Models_Languages::class);
         $targetLang = $this->createMock(editor_Models_Languages::class);
 
-        $options = new ImportOptions(StripFramingTags::None, true);
+        $options = new ImportOptions(StripFramingTags::None, true, false);
 
         self::assertTrue($this->processor->supports($sourceLang, $targetLang, $options));
     }
@@ -84,7 +84,7 @@ class RemoveCompromisedSegmentsProcessorTest extends TestCase
         $this->transUnitParser->method('extractStructure')->willReturn($structure);
 
         $lang = $this->createMock(editor_Models_Languages::class);
-        $options = new ImportOptions(StripFramingTags::None, false);
+        $options = new ImportOptions(StripFramingTags::None, false, false);
         $logger = $this->createMock(BrokenTranslationUnitLogger::class);
 
         $tus = $this->processor->process( // @phpstan-ignore-line
