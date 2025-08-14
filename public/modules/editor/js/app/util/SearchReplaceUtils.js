@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -21,14 +20,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class SearchReplaceUtils
- */
+// Move methods to SearchReplace controller and delete this file
 Ext.define('Editor.util.SearchReplaceUtils', {
     mixins: ['Editor.util.SegmentEditor'],
 
@@ -36,151 +33,95 @@ Ext.define('Editor.util.SearchReplaceUtils', {
     NODE_NAME_DEL: 'del',
     NODE_NAME_INS: 'ins',
 
-    CSS_CLASSNAME_REPLACED_INS:'searchreplace-replaced-ins',
-    CSS_CLASSNAME_HIDE_ELEMENT:'searchreplace-hide-element',
-    CSS_CLASSNAME_ACTIVE_MATCH:'searchreplace-active-match',
+    CSS_CLASSNAME_REPLACED_INS: 'searchreplace-replaced-ins',
+    CSS_CLASSNAME_HIDE_ELEMENT: 'searchreplace-hide-element',
+    CSS_CLASSNAME_ACTIVE_MATCH: 'searchreplace-active-match',
 
     //this regex will remove all mark html tags
-    CLEAN_MARK_TAG_REGEX:/<mark[^>]*>+|<\/mark>/g,
+    CLEAN_MARK_TAG_REGEX: /<mark[^>]*>+|<\/mark>/g,
 
-    /***
+    /**
      * Remove mark tags from the editor. The mark tags are used by search and replace
      */
-    cleanMarkTags:function(){
-        var me=this,
-            cell = me.getEditorBody();
-        
-        if(!cell){
-            return false;
-        }
-        cellHTML = cell.innerHTML.replace(me.CLEAN_MARK_TAG_REGEX, "");
-        cell.innerHTML = cellHTML;
-    },
-
-    /***
-    * Remove the replace node css class from the ins tags.
-    * TODO:"removeReplaceClass" and "prepareDelNodeForSearch" as one function
-    */
-    removeReplaceClass:function(){
-        var me = this;
-        if(!me.getEditorBodyExtDomElement()){
+    cleanMarkTags: function () {
+        if (!this.editor) {
             return;
         }
 
-        var insNodes=me.getEditorBodyExtDomElement().query(me.NODE_NAME_INS),
-            arrLength=insNodes.length;
-        
-        for (i = 0; i < arrLength; i++){
-            node = insNodes[i];
-            me.removeClass(node,me.CSS_CLASSNAME_REPLACED_INS);
-        }
- 
+        this.editor.editor.unmarkAll();
     },
 
-    /***
-     * Add or remove the display class to the del nodes.
-     * If true, the class will be add else removed.
+    /**
+     * Check if the given range contains node with replaced ins class
      */
-    prepareDelNodeForSearch:function(addClass){
-        var me = this;
-        if(!me.getEditorBodyExtDomElement()){
-            return;
-        }
-        
-        var delNodes=me.getEditorBodyExtDomElement().query(me.NODE_NAME_DEL),
-            arrLength = delNodes.length; 
-        
-        for (i = 0; i < arrLength; i++){
-            node = delNodes[i];
-            //node.style.display=displayValue;
-            if(addClass){
-                me.addClass(node,me.CSS_CLASSNAME_HIDE_ELEMENT);
-            }else{
-                me.removeClass(node,me.CSS_CLASSNAME_HIDE_ELEMENT);
-            }
-        }
-    },
-
-    /***
-    * Check if the given range contains node with replaced ins class
-    */
-    hasReplacedClass:function(range){
-        var me = this,
-            nodes;
-        nodes = range.getNodes([1,3], function(node) {
-            if(node.parentNode && me.hasClass(node.parentNode,me.CSS_CLASSNAME_REPLACED_INS)){
+    hasClassInRange: function (cls, range) {
+        const me = this;
+        const nodes = range.getNodes([1, 3], function (node) {
+            if (node.parentNode && me.hasClass(node.parentNode, cls)) {
                 return node;
             }
+
             return false;
         });
-        
-        return (nodes.length>0);
+
+        return (nodes.length > 0);
     },
 
-
-    /***
-     * Set the active match css class to all mark tagis within the active range
-     */
-    setActiveMatchClass:function(bookmarRange){
-        if(!bookmarRange){
-            return;
-        }
-        var me = this,
-            range = rangy.createRange();
-        
-        range.moveToBookmark(bookmarRange);
-
-        range.getNodes([1,3], function(node) {
-            if(node.nodeName.toLowerCase()===me.NODE_NAME_MARK){
-                me.addClass(node,me.CSS_CLASSNAME_ACTIVE_MATCH);
-                return;
-            }
-            if(node.parentNode.nodeName.toLowerCase()===me.NODE_NAME_MARK){
-                me.addClass(node.parentNode,me.CSS_CLASSNAME_ACTIVE_MATCH);
-            }
-        });
-
-        delete range;
-    },
-    
     /**
-	 * Method that checks whether cls is present in element object.
-	 * @param  {Object} ele DOM element which needs to be checked
-	 * @param  {Object} cls Classname is tested
-	 * @return {Boolean} True if cls is present, false otherwise.
-	 */
-	hasClass:function(ele, cls) {
-        if(!ele.getAttribute('class')){
+     * Check if the given range contains node with replaced ins class
+     */
+    isDeletion: function (range) {
+        const me = this;
+        const nodes = range.getNodes([1, 3], function (node) {
+            if (node.parentNode && node.parentNode.nodeName.toLowerCase() === me.NODE_NAME_DEL) {
+                return node;
+            }
+
+            return false;
+        });
+
+        return (nodes.length > 0);
+    },
+
+    /**
+     * Method that checks whether cls is present in element object.
+     * @param  {Object} node DOM element which needs to be checked
+     * @param  {Object} cls Classname is tested
+     * @return {Boolean} True if cls is present, false otherwise.
+     */
+    hasClass: function (node, cls) {
+        if (!node.getAttribute('class')) {
             return false;
         }
-	    return ele.getAttribute('class').indexOf(cls) > -1;
-	},
 
-	/**
-	 * Method that adds a class to given element.
-	 * @param  {Object} ele DOM element where class needs to be added
-	 * @param  {Object} cls Classname which is to be added
-	 * @return {null} nothing is returned.
-	 */
-	addClass:function(ele, cls) {
-	    if (ele.classList) {
-		    ele.classList.add(cls);
-	    } else if (!hasClass(ele, cls)) {
-		    ele.setAttribute('class', ele.getAttribute('class') + ' ' + cls);
-	    }
-	},
+        return node.getAttribute('class').indexOf(cls) > -1;
+    },
 
-	/**
-	 * Method that does a check to ensure that class is removed from element.
-	 * @param  {Object} ele DOM element where class needs to be removed
-	 * @param  {Object} cls Classname which is to be removed
-	 * @return {null} Null nothing is returned.
-	 */
-	removeClass:function(ele, cls) {
-	    if (ele.classList) {
-		    ele.classList.remove(cls);
-	    } else if (hasClass(ele, cls)) {
-		    ele.setAttribute('class', ele.getAttribute('class').replace(cls, ' '));
-	    }
-	}
+    /**
+     * Method that adds a class to given element.
+     * @param  {Object} node DOM element where class needs to be added
+     * @param  {Object} cls Classname which is to be added
+     * @return {null} nothing is returned.
+     */
+    addClass: function (node, cls) {
+        if (node.classList) {
+            node.classList.add(cls);
+        } else if (!this.hasClass(node, cls)) {
+            node.setAttribute('class', node.getAttribute('class') + ' ' + cls);
+        }
+    },
+
+    /**
+     * Method that does a check to ensure that class is removed from element.
+     * @param  {Object} node DOM element where class needs to be removed
+     * @param  {Object} cls Classname which is to be removed
+     * @return {null} Null nothing is returned.
+     */
+    removeClass: function (node, cls) {
+        if (node.classList) {
+            node.classList.remove(cls);
+        } else if (this.hasClass(node, cls)) {
+            node.setAttribute('class', node.getAttribute('class').replace(cls, ' '));
+        }
+    }
 });

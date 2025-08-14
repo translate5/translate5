@@ -8,19 +8,19 @@
   "main": "./build/ckeditor.js",
   "types": "./build/ckeditor.d.ts",
   "dependencies": {
-    "@ckeditor/ckeditor5-editor-classic": "41.3.1",
-    "@ckeditor/ckeditor5-essentials": "41.3.1",
-    "@ckeditor/ckeditor5-highlight": "41.3.1",
-    "@ckeditor/ckeditor5-html-support": "41.3.1",
-    "@ckeditor/ckeditor5-image": "41.3.1",
-    "@ckeditor/ckeditor5-paragraph": "41.3.1",
-    "@ckeditor/ckeditor5-undo": "41.3.1"
+    "@ckeditor/ckeditor5-editor-classic": "^45",
+    "@ckeditor/ckeditor5-essentials": "^45",
+    "@ckeditor/ckeditor5-highlight": "^45",
+    "@ckeditor/ckeditor5-html-support": "^45",
+    "@ckeditor/ckeditor5-image": "^45",
+    "@ckeditor/ckeditor5-paragraph": "^45",
+    "@ckeditor/ckeditor5-undo": "^45"
   },
   "devDependencies": {
-    "@ckeditor/ckeditor5-core": "41.3.1",
-    "@ckeditor/ckeditor5-dev-translations": "^32.1.2",
-    "@ckeditor/ckeditor5-dev-utils": "^32.1.2",
-    "@ckeditor/ckeditor5-theme-lark": "41.3.1",
+    "@ckeditor/ckeditor5-core": "^45",
+    "@ckeditor/ckeditor5-dev-translations": "^45",
+    "@ckeditor/ckeditor5-dev-utils": "^45",
+    "@ckeditor/ckeditor5-theme-lark": "^45",
     "css-loader": "^5.2.7",
     "postcss": "^8.4.38",
     "postcss-loader": "^4.3.0",
@@ -33,7 +33,7 @@
     "webpack-cli": "^4.10.0"
   },
   "scripts": {
-    "build": "webpack --mode production",
+    "build": "webpack --mode production --config webpack.config.mjs",
     "postbuild": "tsc --declaration --declarationDir build --stripInternal --emitDeclarationOnly"
   }
 }

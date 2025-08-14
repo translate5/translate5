@@ -18,8 +18,9 @@ const support = (function () {
 
 /**
  * Convert a template string into HTML DOM nodes
+ *
  * @param  {String} str The template string
- * @return {Node}       The template HTML
+ * @return {HTMLElement} The HTML div element containing the converted DOM nodes
  */
 export default function stringToDom (str) {
     // If DOMParser is supported, use it

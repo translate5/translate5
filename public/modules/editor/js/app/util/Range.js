@@ -387,19 +387,17 @@ Ext.define('Editor.util.Range', {
      * @params {Object} range
      * @returns {String} html 
      */
-    getContentWithWhitespaceImagesAsText: function(range) {
-        var allWhitespaceImages,
-            htmlForImage,
-            html = range.toHtml(),
-            rangeForWhitespace = rangy.createRange();
-        allWhitespaceImages = range.getNodes([1], function(node) {
-            return (node.nodeName == 'IMG' && node.classList.contains('whitespace'));
-        });
-        Ext.Array.each(allWhitespaceImages, function(imgNode) {
-            rangeForWhitespace.selectNode(imgNode);
-            htmlForImage = rangeForWhitespace.toHtml();
-            html = html.replace(imgNode.outerHTML, ' ');
-        });
+    getContentWithWhitespaceImagesAsText: function(text) {
+        let html = text;
+
+        const dom = RichTextEditor.stringToDom(html);
+
+        for (const node of dom.childNodes) {
+            if (node.nodeName == 'IMG' && node.classList.contains('whitespace')) {
+                html = html.replace(node.outerHTML, ' ');
+            }
+        }
+
         return html;
     },
     /**
@@ -517,15 +515,15 @@ Ext.define('Editor.util.Range', {
      * @param {String} direction (optional)
      * @returns {Object} range
      */
-    cleanBordersOfCharacterbasedRange: function(range,direction) {
-        var me = this,
+    cleanBordersOfCharacterbasedRange: function(range, direction) {
+        let me = this,
             documentFragmentForRange,
             tagNodesInRange,
             nodeAtBorder,
             nodeToSeperate,
-            i,
-            iMax,
-            isTagNodeInRange = function(nodeToCheck){
+            iMax;
+
+        let isTagNodeInRange = function(nodeToCheck){
                 var nodeFound = false;
                 Ext.Array.each(tagNodesInRange, function(node) {
                     if (node.id === nodeToCheck.id) {
@@ -561,9 +559,9 @@ Ext.define('Editor.util.Range', {
                 }
             },
             cleanBorderNodesFromRange = function(dir){
-                i = 0;
+                let i = 0;
                 nodeAtBorder = getNextBorderNode(dir);
-                while (i<iMax && nodeAtBorder != null && (isEmptyTextNode(nodeAtBorder) || isTagNodeInRange(nodeAtBorder)) ) {
+                while (i < iMax && nodeAtBorder != null && (isEmptyTextNode(nodeAtBorder) || isTagNodeInRange(nodeAtBorder))) {
                     switch(true) {
                         case isEmptyTextNode(nodeAtBorder):
                             // empty text-nodes are irrelevant, skip them
@@ -595,6 +593,7 @@ Ext.define('Editor.util.Range', {
         if (direction == null) {
             direction = 'fromBothEnds';
         }
+
         switch(direction) {
             case 'fromStart':
                 cleanBorderNodesFromRange('fromStart');

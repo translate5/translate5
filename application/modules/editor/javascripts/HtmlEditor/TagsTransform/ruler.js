@@ -1,13 +1,13 @@
 export default class Ruler {
-    constructor() {
+    constructor(editorElement) {
         this.rulerElement = null;
-        this.createRuler();
+        this.createRuler(editorElement);
     }
 
     /**
      * Creates the hidden "ruler" div that is used to measure text length
      */
-    createRuler() {
+    createRuler(editorElement) {
         this.rulerElement = document.createElement('div');
         this.rulerElement.classList.add('textmetrics');
         this.rulerElement.setAttribute('role', 'presentation');
@@ -17,7 +17,7 @@ export default class Ruler {
         this.rulerElement.style.top = '-1000px';
         this.rulerElement.style.visibility = 'hidden';
 
-        document.body.appendChild(this.rulerElement);
+        editorElement.appendChild(this.rulerElement);
     }
 
     /**

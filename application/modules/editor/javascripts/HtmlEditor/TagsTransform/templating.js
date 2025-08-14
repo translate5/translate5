@@ -16,6 +16,10 @@ export default class Templating {
             '<span title="{title}" class="short">{shortTag}</span>',
             '<span data-originalid="{id}" data-length="{length}" class="full">{text}</span>'
         ]);
+        this.intNumberSpansTpl = new Ext.Template([
+            '<span title="{title}" class="short">{shortTag}</span>',
+            '<span data-originalid="{id}" data-length="{length}" data-source="{source}" data-target="{target}" class="full"></span>'
+        ]);
         this.termSpanTpl = new Ext.Template([
             '<span class="{className}" title="{title}"></span>'
         ]);
@@ -25,9 +29,8 @@ export default class Templating {
         this.intImgTpl.compile();
         this.intImgTplQid.compile();
         this.intSpansTpl.compile();
+        this.intNumberSpansTpl.compile();
         this.termSpanTpl.compile();
         this.termSpanTplQid.compile();
     }
-
-
 }

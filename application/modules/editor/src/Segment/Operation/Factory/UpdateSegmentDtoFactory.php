@@ -147,47 +147,49 @@ class UpdateSegmentDtoFactory
             $regex = '#<img[^>]+class="duplicatesavecheck"[^>]+data-segmentid="([0-9]+)" data-fieldname="([^"]+)"[^>]*>#';
             $match = [];
 
-            if (! preg_match($regex, $value, $match)) {
+            if (preg_match($regex, $value, $match)) {
+                $textData[$key] = str_replace($match[0], '', $value);
+
                 continue;
             }
 
-            $textData[$key] = str_replace($match[0], '', $value);
-            //if segmentId and fieldname from content differ to the segment to be saved, throw the error!
-            if ($match[2] != $key || $match[1] != $segment->getId()) {
-                $error['real fieldname: ' . $key] = [
-                    'segmentId' => $match[1],
-                    'fieldName' => $match[2],
-                ];
-            }
+            $textData[$key] = $value;
+            //            //if segmentId and fieldname from content differ to the segment to be saved, throw the error!
+            //            if ($match[2] != $key || $match[1] != $segment->getId()) {
+            //                $error['real fieldname: ' . $key] = [
+            //                    'segmentId' => $match[1],
+            //                    'fieldName' => $match[2],
+            //                ];
+            //            }
         }
 
-        if (empty($error)) {
-            return $textData;
-        }
+        //        if (empty($error)) {
+        return $textData;
+        //        }
 
-        $logText = 'Error on saving a segment!!! Parts of the content in the PUT request ';
-        $logText .= 'delivered the following segmentId(s) and fieldName(s):' . PHP_EOL;
-        $logText .= print_r($error, true) . PHP_EOL;
-        $logText .= 'but the request was for segmentId ' . $segment->getId();
-        $logText .= ' (compare also the above fieldnames!).' . PHP_EOL;
-        $logText .= 'Therefore the segment has not been saved!' . PHP_EOL;
-        $logText .= 'Actually saved Segment PUT data and data to be saved in DB:' . PHP_EOL;
-        $logText .= print_r($data, true)
-            . PHP_EOL . print_r($segment->getDataObject(), true)
-            . PHP_EOL . PHP_EOL;
-        $logText .= 'Content of $_SERVER had been: ' . print_r($_SERVER, true);
-
-        $this->logger->logError('Possible Error on saving a segment!', $logText);
-
-        $e = new \ZfExtended_Exception();
-        $e->setMessage(
-            'Aufgrund der langsamen Verarbeitung von Javascript im Internet Explorer konnte das Segment nicht korrekt gespeichert werden.'
-            . ' Bitte öffnen Sie das Segment nochmals und speichern Sie es erneut.'
-            . ' Sollte das Problem bestehen bleiben, drücken Sie bitte F5 und bearbeiten dann das Segment erneut.'
-            . ' Vielen Dank!',
-            true
-        );
-
-        throw $e;
+        //        $logText = 'Error on saving a segment!!! Parts of the content in the PUT request ';
+        //        $logText .= 'delivered the following segmentId(s) and fieldName(s):' . PHP_EOL;
+        //        $logText .= print_r($error, true) . PHP_EOL;
+        //        $logText .= 'but the request was for segmentId ' . $segment->getId();
+        //        $logText .= ' (compare also the above fieldnames!).' . PHP_EOL;
+        //        $logText .= 'Therefore the segment has not been saved!' . PHP_EOL;
+        //        $logText .= 'Actually saved Segment PUT data and data to be saved in DB:' . PHP_EOL;
+        //        $logText .= print_r($data, true)
+        //            . PHP_EOL . print_r($segment->getDataObject(), true)
+        //            . PHP_EOL . PHP_EOL;
+        //        $logText .= 'Content of $_SERVER had been: ' . print_r($_SERVER, true);
+        //
+        //        $this->logger->logError('Possible Error on saving a segment!', $logText);
+        //
+        //        $e = new \ZfExtended_Exception();
+        //        $e->setMessage(
+        //            'Aufgrund der langsamen Verarbeitung von Javascript im Internet Explorer konnte das Segment nicht korrekt gespeichert werden.'
+        //            . ' Bitte öffnen Sie das Segment nochmals und speichern Sie es erneut.'
+        //            . ' Sollte das Problem bestehen bleiben, drücken Sie bitte F5 und bearbeiten dann das Segment erneut.'
+        //            . ' Vielen Dank!',
+        //            true
+        //        );
+        //
+        //        throw $e;
     }
 }

@@ -158,7 +158,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         if(!rowMeta) {
             rowMeta = {}; //nothing found
         }
-        Ext.Array.each(grid.columns, function(col, idx) {
+        Ext.Array.each(grid.getColumns(), function(col, idx) {
             if(col.dataIndex == ed.editor.getEditedField()) {
                 rowMeta.lastColumn = col;
             }

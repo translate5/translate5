@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -21,13 +20,11 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- */
 Ext.define('Editor.plugins.TermTagger.controller.Main', {
     extend: 'Ext.app.Controller',
     requires: ['Editor.plugins.TermTagger.view.TermPortlet'],
@@ -39,36 +36,50 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
             },
             '#segmentgrid': {
                 selectionchange: 'handleSegmentSelectionChange',
-                beforeedit: 'startEdit'
+                beforeedit: 'startEdit',
             },
             '#metaInfoForm': {
-                afterrender: 'metaInfoFormAfterRenderHandler'
-            }
+                afterrender: 'metaInfoFormAfterRenderHandler',
+            },
+            '#t5Editor': {
+                afterInstantiateEditor: 'onEditorInstantiate',
+            },
         },
         controller: {
             '#Segments': {
                 beforeSaveCall: 'onSegmentSaved'
             },
         },
-
     },
 
-    refs: [ {
-        ref: 'metaTermPanel',
-        selector: '#metapanel termPortalTermPortlet'
-    }, {
-        ref: 'segmentMeta',
-        selector: '#metapanel segmentsMetapanel'
-    }, {
-        ref: 'segmentGrid',
-        selector: '#segmentgrid'
-    }],
+    refs: [
+        {
+            ref: 'metaTermPanel',
+            selector: '#metapanel termPortalTermPortlet'
+        },
+        {
+            ref: 'segmentMeta',
+            selector: '#metapanel segmentsMetapanel'
+        },
+        {
+            ref: 'segmentGrid',
+            selector: '#segmentgrid'
+        }
+    ],
+
+    onEditorInstantiate: function (editor) {
+        editor.editor.registerModifier(
+            RichTextEditor.EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
+            (rawData, actions) => this._cleanTermOnTypingInside(rawData, actions, editor.editor.getTagsConversion()),
+            1
+        );
+    },
 
     /***
      *
      */
-    metaInfoFormAfterRenderHandler: function (form){
-        var tp = form.up('#metapanel').down('terminologyPanel');
+    metaInfoFormAfterRenderHandler: function (form) {
+        const tp = form.up('#metapanel').down('terminologyPanel');
 
         if (Editor.data.task.get('terminologie')) {
             tp.add({xtype: 'termPortalTermPortlet'});
@@ -85,7 +96,7 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
             if (!Ext.DomQuery.is(span, 'span.term')) {
                 return;
             }
-            var range;
+            let range;
             e.stopPropagation();
             e.preventDefault();
             if (document.selection) {
@@ -107,7 +118,7 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
      * @param {Array} selectedRecords
      */
     handleSegmentSelectionChange: function (sm, selectedRecords) {
-        if (selectedRecords.length == 0) {
+        if (selectedRecords.length === 0) {
             return;
         }
         this.loadTermPanel(selectedRecords[0].get('id'));
@@ -115,6 +126,7 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
 
     /**
      * @param {Object} editingPlugin
+     * @param {Object} context
      */
     startEdit: function (editingPlugin, context) {
         var me = this,
@@ -125,16 +137,17 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
     },
 
     /**
-     * @param {Integer} segmentId for which the terms should be loaded
+     * @param {integer} segmentId for which the terms should be loaded
      */
     loadTermPanel: function (segmentId) {
-        var me = this,
+        const me = this,
             panel = me.getMetaTermPanel();
 
-        if( !panel || !Editor.data.task.get('terminologie') ){
+        if (!panel || !Editor.data.task.get('terminologie')) {
             return;
         }
-        if ( !panel.html) {
+
+        if (!panel.html) {
             panel.getLoader().load({
                 params: {id: segmentId},
                 callback: function () {
@@ -167,5 +180,97 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
 
         // Reload termportlet
         this.loadTermPanel(segment.getId());
+    },
+
+    _cleanTermOnTypingInside(rawData, actions, tagsConversion) {
+        if (!actions.length) {
+            return [rawData, 0];
+        }
+
+        const doc = RichTextEditor.stringToDom(rawData);
+
+        for (const action of actions) {
+            if (!action.type) {
+                continue;
+            }
+
+            this._processNodes(doc, action, tagsConversion);
+        }
+
+        return [doc.innerHTML, actions[0].position];
+    },
+
+    _processNodes: function (doc, action, tagsConversion) {
+        const _this = this;
+        const position = action.position;
+        let pointer = 0;
+
+        function traverseNodes(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const isWithinNode = pointer + node.length >= position;
+                const isInserting = action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.INSERT;
+                const isDeletingSpellCheck = (
+                    action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.REMOVE
+                    && action.content.length
+                    && tagsConversion.isTermNode(action.content[0].toDom())
+                );
+
+                if (
+                    isWithinNode
+                    && tagsConversion.isTermNode(node.parentNode)
+                    && (isInserting || isDeletingSpellCheck)
+                ) {
+                    _this._unwrapTermNode(node.parentNode);
+
+                    return true;
+                }
+
+                if (
+                    isWithinNode
+                    && node.nextSibling
+                    && tagsConversion.isTermNode(node.nextSibling)
+                    && (
+                        action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.REMOVE
+                        && action.content.length > 1
+                        && tagsConversion.isTermNode(action.content[action.content.length - 1].toDom())
+                    )
+                ) {
+                    _this._unwrapTermNode(node.nextSibling);
+
+                    return true;
+                }
+
+                pointer += node.length;
+
+                return false;
+            }
+
+            if (tagsConversion.isTag(node)) {
+                pointer++;
+
+                return false;
+            }
+
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                for (let child of node.childNodes) {
+                    const changed = traverseNodes(child);
+
+                    // This is done to prevent endless recursion
+                    if (changed) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        traverseNodes(doc);
+    },
+
+    _unwrapTermNode: function (node) {
+        const insertFragment = document.createRange().createContextualFragment(node.innerHTML);
+        node.parentNode.insertBefore(insertFragment, node);
+        node.parentNode.removeChild(node);
     }
 });

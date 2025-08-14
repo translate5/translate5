@@ -56,16 +56,16 @@ Ext.define('Editor.controller.Comments', {
         selector: 'commentPanel[disabled=false] #commentContainer'
     },{
         ref: 'rowEditor',
-        selector: '#roweditor'
+        selector: '#t5RowEditor'
     },{
         ref: 'commentForm',
         selector: 'commentPanel[disabled=false] #commentForm'
     },{
         ref: 'autoStateDisplay',
-        selector: '#roweditor displayfield[name=autoStateId]'
+        selector: '#t5RowEditor displayfield[name=autoStateId]'
     },{
         ref: 'commentDisplay',
-        selector: '#roweditor displayfield[name=comments]'
+        selector: '#t5RowEditor displayfield[name=comments]'
     }],
     
     listen: {
@@ -78,12 +78,12 @@ Ext.define('Editor.controller.Comments', {
                     canceledit: 'cancelEdit',
                     edit: 'cancelEdit'
                 },
-                '#roweditor': {
+                '#t5RowEditor': {
                     afterEditorMoved: 'onEditorMoved'
                 },
                 
                 //this remains here, since it does nothing have todo with the panel
-                '#roweditor displayfield[name=comments]': {
+                '#t5RowEditor displayfield[name=comments]': {
                     change: 'updateEditorComment'
                 },
                 '#metapanel #commentPanel' : {

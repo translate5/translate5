@@ -57,7 +57,7 @@ Ext.define('Editor.controller.LanguageResources', {
       selector:'#segmentgrid'
   },{
       ref: 'matchrateDisplay',
-      selector: '#roweditor displayfield[name=matchRate]'
+      selector: '#t5RowEditor displayfield[name=matchRate]'
   },{
       ref: 'editorPanel',
       selector:'#languageResourceEditorPanel'
@@ -201,7 +201,7 @@ Ext.define('Editor.controller.LanguageResources', {
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
 
-          editor.mainEditor.setValueAndMarkup(
+          editor.mainEditor.setValue(
               me.languageResourceValueForEditor,
               rec,
               editor.columnToEdit,

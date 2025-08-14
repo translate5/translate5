@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -21,80 +20,58 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class Editor.plugins.SpellCheck.controller.Editor
- * @extends Ext.app.Controller
- *
- * FIXME Refactor this to make it reusable by other plugins
- */
 Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     extend: 'Ext.app.Controller',
-    requires: [
-        'Editor.util.SegmentContent'
+    requires: ['Editor.util.SegmentContent'],
+
+    mixins: ['Editor.util.DevelopmentTools', 'Editor.util.Event'],
+
+    refs: [
+        {
+            ref: 'segmentGrid',
+            selector: '#segmentgrid',
+        },
+        {
+            ref: 'editorPanel',
+            selector: '#SpellCheckEditorPanel',
+        },
+        {
+            ref: 'concordenceSourceSearch',
+            selector: 'languageResourceSearchGrid #sourceSearch',
+        },
     ],
-    mixins: ['Editor.util.DevelopmentTools',
-             'Editor.util.Event',
-             'Editor.util.Range',
-             'Editor.util.SegmentEditor',
-             'Editor.plugins.SpellCheck.controller.UtilLanguageTool',
-             'Editor.controller.SearchReplace',
-             'Editor.util.SearchReplaceUtils'
-    ],
-    refs:[{
-        ref: 'segmentGrid',
-        selector:'#segmentgrid'
-    },{
-        ref: 'editorPanel',
-        selector:'#SpellCheckEditorPanel'
-    },{
-        ref: 'concordenceSourceSearch',
-        selector:'languageResourceSearchGrid #sourceSearch'
-    }],
+
     listen: {
-        // When opening a task (all at once, in this order):
-        // - (1) #Editor.$application     editorViewportOpened
-        // - (2) segmentsHtmleditor       push
-        // - (3) segmentsHtmleditor       initialize
-        // When opening a segment:
-        // - (1) segmentsHtmleditor       push
-        // When closing a task:
-        // - (1) #Editor.$application     editorViewportClosed
         controller: {
             '#Editor': {
-                beforeKeyMapUsage: 'handleEditorKeyMapUsage'
+                beforeKeyMapUsage: 'addSpellcheckKeymapEntries',
             },
             '#Editor.$application': {
-                // editorViewportOpened: 'initSpellCheckPlugin' // NOW VIA #segmentStatusStrip afterRender (= comes first and needs this infos already)
-                editorViewportClosed: 'onDestroy'
-            }
+                editorViewportClosed: 'onDestroy',
+            },
         },
         component: {
-            'segmentsHtmleditor': {
-                initialize: 'initEditor',
-                push: 'handleAfterContentUpdate'
+            '#t5Editor': {
+                afterInstantiateEditor: 'onEditorInstantiate',
             },
-            '#segmentStatusStrip': {
-                afterRender: 'initTargetLang'
+            '#segmentgrid': {
+                afterRender: 'initTargetLang',
             },
             '#segmentStatusStrip #btnRunSpellCheck': {
-                click: 'startSpellCheckViaButton'
+                click: 'startSpellCheckViaButton',
             },
         },
     },
+
     spellCheckMessages: {
-        moreInformation: 'Mehr Informationen'
+        moreInformation: 'Mehr Informationen',
     },
+
     statics: {
         // spellcheck-Node
         NODE_NAME_MATCH: 'span',
@@ -106,198 +83,195 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-spellCheck-activeMatchIndex',
         ATTRIBUTE_QTIP: 'data-qtip',
         // In ToolTips
-        CSS_CLASSNAME_TOOLTIP_HEADER:  'spellcheck-tooltip-header',
-        CSS_CLASSNAME_REPLACEMENTLINK:  'spellcheck-replacement',
-        CSS_CLASSNAME_TOOLTIP_MOREINFO:  'spellcheck-tooltip-moreinformation',
+        CSS_CLASSNAME_TOOLTIP_HEADER: 'spellcheck-tooltip-header',
+        CSS_CLASSNAME_REPLACEMENTLINK: 'spellcheck-replacement',
+        CSS_CLASSNAME_TOOLTIP_MOREINFO: 'spellcheck-tooltip-moreinformation',
         // Milliseconds to pass before SpellCheck is started when no editing occurs
         EDIT_IDLE_MILLISECONDS: 1000,
     },
-    
+
     // =========================================================================
-    
-    targetLangCode: null,           // language to be checked
+
+    targetLangCode: null, // language to be checked
     isSupportedLanguage: undefined, // if the language is supported by our tool(s):
-                                    // - initially: undefined
-                                    // - on task is opened => start setLanguageSupport() => result: true or false
-                                    // - on push: when isSupportedLanguage is still undefined => start setLanguageSupport() => result: true or false
-    
-    allMatchesOfTool: null,         // all matches as found by the tool
-    allMatches: null,               // data of all matches found by the tool(s); here already stored independently from the tool
-    allMatchesRanges: null,         // bookmarks of all ranges for the matches found by the tool(s); here already stored independently from the tool
-    activeMatchNode: null,          // node of single match currently in use
-    
-    spellCheckTooltip: null,        // Ext.menu.Menu ("ToolTip"-instance)
-    
-    editIdleTimer: null,            // time since "nothing" is changed in the Editor's content; 1) user: presses no key 2) segmentsHtmleditor: no push, no afterInsertMarkup
-    
-    spellCheckInProgressID: false,  // id of the currently valid SpellCheck-Process (false if none is running)
-    // TODO: Instead of using IDs for the processes it would be better to use an object for each process 
+    // - initially: undefined
+    // - on task is opened => start setLanguageSupport() => result: true or false
+    // - on push: when isSupportedLanguage is still undefined => start setLanguageSupport() => result: true or false
+
+    // all matches as found by the tool
+    // allMatchesOfTool: null,
+    // data of all matches found by the tool(s); here already stored independently from the tool
+    // allMatches: null,
+    // bookmarks of all ranges for the matches found by the tool(s); here already stored independently from the tool
+    // allMatchesRanges: null,
+    activeMatchNode: null, // node of single match currently in use
+
+    spellCheckTooltip: null, // Ext.menu.Menu ("ToolTip"-instance)
+
+    // time since "nothing" is changed in the Editor's content;
+    // 1) user: presses no key 2) editor: no push, no afterInsertMarkup
+    editIdleTimer: null,
+
+    spellCheckInProgressID: false, // id of the currently valid SpellCheck-Process (false if none is running)
+    // TODO: Instead of using IDs for the processes it would be better to use an object for each process
     // (= handle the SpellCheck-Processes via a class with each process as an instance from it!).
-    
-    segmentId: null,                // ID of the currently edited Segment
-    
-    bookmarkForCaret: null,         // position of the caret in the Editor
-    
+
+    // segmentId: null,                // ID of the currently edited Segment
+
+    // bookmarkForCaret: null,         // position of the caret in the Editor
+
     // =========================================================================
-    
-    // TRANSLATE-1630 "Workaround for east asian problems with spellchecker" 
-    languagesToStopIdle: ['ja','ko','zh'],  // target-languages that cause problems when using SpellCheck via keyboard-idle
-    disableSpellCheckByIdle: null,          // = use button instead of idle (will be set according to the target-language)
+
+    // TRANSLATE-1630 "Workaround for east asian problems with spellchecker"
+    // target-languages that cause problems when using SpellCheck via keyboard-idle
+    languagesToStopIdle: ['ja', 'ko', 'zh'],
+    // = use button instead of idle (will be set according to the target-language)
+    disableSpellCheckByIdle: null,
+
+    tagsConversion: null,
 
     // =========================================================================
     // Init
     // =========================================================================
-    
-    init: function(){
-        var me = this;
+
+    init: function () {
         this.callParent(arguments);
-        me.consoleLog('0.1 init Editor.plugins.SpellCheck.controller.Editor');
+        this.consoleLog('0.1 init Editor.plugins.SpellCheck.controller.Editor');
     },
-    
-    onDestroy:function(){
-        var me=this;
-        if(me.spellCheckTooltip){
+
+    onDestroy: function () {
+        // TODO fixme
+        return;
+        var me = this;
+
+        if (me.spellCheckTooltip) {
             me.spellCheckTooltip.destroy();
             me.spellCheckTooltip = null;
         }
+
         Ext.dom.GarbageCollector.collect();
         me.editor = null;
         me.terminateSpellCheck();
         me.consoleLog('---------------- SpellCheck: onDestroy FINISHED. -------------');
     },
+
     /**
-     * Init basics according to the task's target-language: 
+     * Init basics according to the task's target-language:
      * - what's the target-language?
      * - do we use keyboard-idle or a statusStrip-button to start a SpellCheck?
      */
-    initTargetLang: function(statusStrip) {
-        var me = this;
-        me.consoleLog('0.2 SpellCheck: initTargetLang.');
-        me.setTargetLangCode();
-        me.setDisableSpellCheckByIdle(statusStrip);
+    initTargetLang: function () {
+        this.consoleLog('0.2 SpellCheck: initTargetLang.');
+        this.setTargetLangCode();
+        this.setDisableSpellCheckByIdle();
+        this.setLanguageSupport();
     },
+
     /**
      * Initialize Editor in general and language-support.
      */
-    initEditor: function(editor) {
-        var me = this;
-        me.consoleLog('0.3 SpellCheck: initEditor.');
-        me.editor = editor;
-        me.setLanguageSupport();
+    onEditorInstantiate: function (editor) {
+        this.consoleLog('0.3 SpellCheck: initEditor.');
+        this.editor = editor;
+        this.tagsConversion = editor.editor.getTagsConversion();
+        this.editor.editor.registerModifier(
+            RichTextEditor.EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
+            (text, actions) => this._cleanSpellcheckOnTypingInside(text, actions, this.tagsConversion),
+            2,
+        );
+        this.editor.editor.registerAsyncModifier(
+            RichTextEditor.EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
+            async (text, runId) => {
+                return this.startSpellCheckViaTimer(text, runId);
+            },
+        );
+        this.initEvents();
+        this.setBrowserSpellcheck();
     },
-    /**
-     * SpellCheck-specific for Editor
-     */
-    initSpellCheckInEditor: function() {
-        var me = this;
-        me.consoleLog('0.4 SpellCheck: initSpellCheckInEditor.');
-        me.initTooltips();
-        me.initEvents();
-        me.setBrowserSpellcheck();
-        me.setSnapshotHistory();
-    },
+
     /**
      * Init ToolTips
      */
-    initTooltips:function(){
-        var me = this;
+    initTooltips: function () {
+        const me = this;
         me.spellCheckTooltip = Ext.create('Ext.menu.Menu', {
             minWidth: 200,
             plain: true,
             renderTo: Ext.getBody(),
             items: [],
             onClick: Ext.emptyFn, // Actually, it's a built-in behaviour that ENTER-key press is equvalent to menuitem-click
-                                  // But somewhy this was not working that way until i made onClick to me empty function
+            // But somewhy this was not working that way until i made onClick to me empty function
             listeners: {
-                beforeshow: function() {
+                beforeshow: function () {
                     me.handleSpellCheckTooltip();
-                }
-            }
+                },
+            },
         });
     },
-    /**
-     * Init (+ "Reset") everything for the new keydown-Event
-     */
-    initKeyDownEvent: function(event) {
-        var me = this;
-        // "reset" for Editor.util.Event:
-        me.event = event;
-        me.ignoreEvent = false;
-        me.stopEvent = false;
-    },
+
     /**
      * Init Events
      */
-    initEvents: function() {
-        var me = this,
-            docEl = Ext.get(me.editor.getDoc()),
-            tooltipBody = Ext.getBody();
-        me.consoleLog('SpellCheck: initEvents...');
-        
-        if (!me.disableSpellCheckByIdle) {
-            docEl.on({
-                keyup:{
-                    delegated: false,
-                    priority: 9980,
-                    fn: me.handleKeyUp,
-                    scope: this,
-                    preventDefault: false
-                }
-            });
-        }
-        
-        me.editor.on({
-            afterInsertMarkup:{
+    initEvents: function () {
+        const tooltipBody = Ext.getBody();
+
+        this.consoleLog('SpellCheck: initEvents...');
+
+        // TODO do we still need it?
+        // docEl.on({
+        //     click: {
+        //         delegated: false,
+        //         fn: () => { this.consoleLog('SpellCheck: handleClickInEditor...'); this.terminateSpellCheck(); },
+        //         scope: this,
+        //         preventDefault: false
+        //     }
+        // });
+
+        Ext.get(this.editor.getEditorBody()).on({
+            contextmenu: {
                 delegated: false,
-                fn: me.handleAfterContentUpdate,
+                delegate: this.self.NODE_NAME_MATCH + '.' + Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK,
+                fn: this.showToolTip,
                 scope: this,
                 preventDefault: true,
-                options: {priority: -800}   // for fireEvent('afterInsertMarkup'): SpellCheck must run after(!!!) TrackChanges: 
-                                            // 1. TrackChanges needs the given range before SpellCheck changes it
-                                            // 2. SpellCheck will start an Ajax-call
-            }
+            },
         });
-        
-        docEl.on({
-            click:{
-                delegated: false,
-                fn: me.handleClickInEditor,
-                scope: this,
-                preventDefault: false
-            }
-        });
-        
-        me.getEditorBodyExtDomElement().on({
-            contextmenu:{
-                delegated: false,
-                delegate: me.self.NODE_NAME_MATCH + '.' + Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK,
-                fn: me.showToolTip,
-                scope: this,
-                preventDefault: true
-            }
-        });
-        
+
         tooltipBody.on({
-            click:{
+            click: {
                 delegated: false,
-                delegate: 'div.' + me.self.CSS_CLASSNAME_REPLACEMENTLINK,
-                fn: me.applyReplacement,
+                delegate: 'div.' + this.self.CSS_CLASSNAME_REPLACEMENTLINK,
+                fn: this.applyReplacement,
                 scope: this,
-                preventDefault: true
-            }
+                preventDefault: true,
+            },
         });
     },
+
     /**
      * Adds a keyboard shortcut for starting the SpellCheck
      */
-    handleEditorKeyMapUsage: function(cont, area) {
-        var me = this;
-        if (area  === 'editor') {
-            //same shortcut in micros%ft Word
-            cont.keyMapConfig['F7'] = [Ext.event.Event.F7, {ctrl: false, alt: false}, me.startSpellCheckViaShortcut, true, me];
+    addSpellcheckKeymapEntries: function (cont, area) {
+        if (area === 'editor') {
+            //same shortcut in Microsoft Word
+            cont.keyMapConfig['F7'] = [
+                Ext.event.Event.F7,
+                { ctrl: false, alt: false, shift: false },
+                this.startSpellCheckViaShortcut,
+                true,
+                this,
+            ];
         }
-        cont.keyMapConfig['CTRL+R'] = [Ext.event.Event.R, {ctrl: true, alt: false}, me.showToolTipViaShortcut, true, me];
+
+        cont.keyMapConfig['CTRL+R'] = [
+            Ext.event.Event.R,
+            { ctrl: true, alt: false, shift: false },
+            this.showToolTipViaShortcut,
+            true,
+            this,
+        ];
     },
+
     /**
      * Adds a "Run SpellCheck"-Button to the StatusStrip.
      * @param {Object} statusStrip
@@ -308,631 +282,827 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             cls: 'spellcheck-icon',
             text: 'SpellCheck',
             itemId: 'btnRunSpellCheck',
-            tooltip: 'F7'
+            tooltip: 'F7',
         });
     },
-    
-    // =========================================================================
-    // When do we run the SpellCheck?
-    // =========================================================================
-    
+
     /**
      * Start SpellCheck after idle (= when the user stopped editing for a certain time, see EDIT_IDLE_MILLISECONDS).
      */
-    startSpellCheckViaTimer: function() {
-        var me = this;
-        if (!me.isSupportedLanguage) {
-            me.consoleLog('startSpellCheckViaTimer not started because language is not supported or SpellCheck-Tool does not run.');
-            return;
-        }
-        if (me.disableSpellCheckByIdle) {
-            me.consoleLog('startSpellCheckViaTimer not started because disableSpellCheckByIdle is true.');
-            return;
-        }
-        // "reset" if a timer is already running
-        clearTimeout(me.editIdleTimer);
-        me.editIdleTimer = null;
-        // if a spellcheck is already running
-        me.spellCheckInProgressID = false;
-        // start new timer
-        me.consoleLog('(' + me.editIdleTimer + ') startSpellCheckViaTimer (' + Ext.Date.format(new Date(), 'c') + ')');
-        me.editIdleTimer = setTimeout(function(){
-                me.consoleLog('(' + me.editIdleTimer + ') setTimeout => will startSpellCheck now (' + Ext.Date.format(new Date(), 'c') + ')');
-                me.startSpellCheck();
-                clearTimeout(me.editIdleTimer);
-            }, me.self.EDIT_IDLE_MILLISECONDS);
+    startSpellCheckViaTimer(text, runId) {
+        return new Promise((resolve, reject) => {
+            if (!this.isSupportedLanguage) {
+                this.consoleLog(
+                    'startSpellCheckViaTimer not started because language is not supported or SpellCheck-Tool does not run.',
+                );
+                resolve([text, runId]);
+            }
+
+            if (this.disableSpellCheckByIdle) {
+                this.consoleLog('startSpellCheckViaTimer not started because disableSpellCheckByIdle is true.');
+                resolve([text, runId]);
+            }
+
+            // "reset" if a timer is already running
+            clearTimeout(this.editIdleTimer);
+            this.editIdleTimer = null;
+            // if a spellcheck is already running
+            this.spellCheckInProgressID = false;
+            // start new timer
+            this.consoleLog(
+                '(' + this.editIdleTimer + ') startSpellCheckViaTimer (' + Ext.Date.format(new Date(), 'c') + ')',
+            );
+
+            this.editIdleTimer = setTimeout(() => {
+                this.consoleLog(
+                    '(' +
+                        this.editIdleTimer +
+                        ') setTimeout => will startSpellCheck now (' +
+                        Ext.Date.format(new Date(), 'c') +
+                        ')',
+                );
+                this._startSpellCheck(text).then((result) => {
+                    clearTimeout(this.editIdleTimer);
+                    resolve([result, runId]);
+                });
+            }, this.self.EDIT_IDLE_MILLISECONDS);
+        });
     },
+
     /**
      * Start SpellCheck via StatusStrip-button.
      */
-    startSpellCheckViaButton: function() {
-        var me = this;
-        me.consoleLog('startSpellCheckViaButton');
-        me.terminateSpellCheck();
-        me.startSpellCheck();
+    startSpellCheckViaButton: function () {
+        this.consoleLog('startSpellCheckViaButton');
+        this.terminateSpellCheck();
+        this.editor.editor.triggerDataChanged();
     },
+
     /**
      * Start SpellCheck via F7.
      */
-    startSpellCheckViaShortcut: function() {
-        var me = this;
-        me.consoleLog('startSpellCheckViaShortcut');
-        me.terminateSpellCheck();
-        me.startSpellCheck();
+    startSpellCheckViaShortcut: function () {
+        this.consoleLog('startSpellCheckViaShortcut');
+        this.terminateSpellCheck();
+        this.editor.editor.triggerDataChanged();
+
+        return false;
     },
-    
-    // =========================================================================
-    // Additional handlers for events
-    // =========================================================================
-    
-    handleClickInEditor: function() {
-        var me = this;
-        me.consoleLog('SpellCheck: handleClickInEditor...');
-        me.terminateSpellCheck();
-    },
-    /**
-     * Handle KeyDown-Events of Editor.view.segments.HtmlEditor
-     * @param {Object} event
-     */
-    handleKeyUp: function(event) {
-        var me = this;
-        me.consoleLog('SpellCheck: handleKeyUp...');
-        if (!me.isSupportedLanguage) {
-            me.consoleLog('handleKeyUp stopped because language is not supported or SpellCheck-Tool does not run.');
-            return;
-        }
-        me.initKeyDownEvent(event);
-        if(me.eventHasToBeIgnored() || me.eventIsCtrlV()){ // CTRL+V: SpellCheck will run anyway after insert markup (afterInsertMarkup); don't start it twice
-            me.consoleLog(' => Ignored for SpellCheck.');
-            me.ignoreEvent = true;
-            me.stopEvent = false;
-        }
-        if(me.eventIsCtrlZ() || me.eventIsCtrlY() || me.eventHasToBeIgnoredAndStopped()){
-            me.consoleLog(' => Ignored for SpellCheck and stopped.');
-            me.ignoreEvent = true;
-            me.stopEvent = true;
-        }
-        
-        // Terminate running SpellChecks?
-        switch(true) {
-            case me.eventIsTranslate5():
-                me.consoleLog('translate5-Keyboard-Shortcut!');
-                me.terminateSpellCheck();
-            break;
-            case (!me.ignoreEvent || me.eventIsArrowKey()):
-                me.consoleLog('The user is still editing!');
-                me.startSpellCheckViaTimer(); // TODO: HÄ?????
-            break;
-        }
-        
-        me.startSpellCheckViaTimer(); // TODO: HÄ?????
-        
-        // Stop event?
-        if(me.stopEvent) {
-            event.stopEvent();
-        }
-    },
-    /**
-     * After each push etc.: When the content in the Editor gets updated, we start the timer for running the next SpellCheck.
-     */
-    handleAfterContentUpdate: function() {
-        var me = this;
-        // Stop if we open a task (not a segment) or try to open a segment that is not editable
-        if (me.getSegmentGrid().editingPlugin.context === undefined) {
-            me.consoleLog('(SpellCheck:) handleAfterContentUpdate => NO SpellCheck; no editable segment referred (eg. task opened).');
-            return;
-        }
-        
-        // Stop if the language is not supported (or we cannot tell yet) or the tool does not run.
-        if (!me.isSupportedLanguage) {
-            me.consoleLog('(SpellCheck:) handleAfterContentUpdate => NO SpellCheck; the language is not supported or the SpellCheck-Tool does not run.');
-            return;
-        }
-        
-        me.consoleLog('(SpellCheck:) handleAfterContentUpdate (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
-        
-        me.startSpellCheck();
-    },
-    
-    // =========================================================================
-    // Start and finish (!) the SpellCheck.
-    // =========================================================================
-    
+
     /**
      * Prepare and run the SpellCheck (be sure to run this only for supported languages).
      */
-    startSpellCheck: function() {
-        var me = this,
-            spellCheckProcessID,
-            editorContentAsText;
-        
-        if (!me.isSupportedLanguage) { // Should not be the case when we got here already, but that is not enough: it MUST NOT happen.
-            me.consoleLog('startSpellCheck failed eg because language is not supported or SpellCheck-Tool does not run.');
-            return;
-        }
-        
-        if (me.disableSpellCheckByIdle) {
-            me.setEditorDisabled(true);
-        }
-        // TrackChanges must remove it's placeholder.
-        me.fireEvent('removePlaceholdersInEditor');
-        
-        editorContentAsText = me.getEditorContentAsText(false);
-        
-        if (editorContentAsText.trim() === '') {
-            me.consoleLog('startSpellCheck stopped because editorContentAsText = ""');
-            me.terminateSpellCheck();
-            return true;
-        }
-        me.consoleLog('startSpellCheck for editorContentAsText: ' + editorContentAsText);
-        
-        me.consoleLog('(0.3 => startSpellCheck (' + Ext.Date.format(new Date(), 'c') + ').)');
-        spellCheckProcessID = Ext.Date.format(new Date(), 'time');
-        me.spellCheckInProgressID = spellCheckProcessID;
-        me.consoleLog('me.spellCheckInProgressID: ' + spellCheckProcessID);
-        
-        // where is the caret at the moment?
-        me.bookmarkForCaret = me.getPositionOfCaret();
-        
-        // "ignore" multiple whitespaces, because we delete them anyway on save.
-        // TODO FIXME: If whitespace is removed, the just captured caret bookmark is invalid and the caret will be inside the next word (if there is a next word)
-        me.collapseMultipleWhitespaceInEditor();
-        
-        me.allMatches = null;
-        me.allMatchesRanges = null;
-        me.runSpellCheck(editorContentAsText, spellCheckProcessID);
-        // => runSpellCheck with the tool calls applySpellCheck() when the results arrive.
+    _startSpellCheck: function (text) {
+        return new Promise((resolve, reject) => {
+            if (!this.isSupportedLanguage) {
+                // Should not be the case when we got here already, but that is not enough: it MUST NOT happen.
+                this.consoleLog(
+                    'startSpellCheck failed eg because language is not supported or SpellCheck-Tool does not run.',
+                );
+
+                resolve(text);
+            }
+
+            if (this.disableSpellCheckByIdle) {
+                this.setEditorDisabled(true);
+            }
+
+            // TrackChanges must remove its placeholder.
+            this.fireEvent('removePlaceholdersInEditor');
+
+            const originalTextCleared = this.cleanupSpellcheckNodes(RichTextEditor.stringToDom(text));
+            let editorContentAsText = this._getContentWithWhitespaceImagesAsText(text);
+            editorContentAsText = this.cleanupForSpellchecking(RichTextEditor.stringToDom(editorContentAsText));
+            editorContentAsText = RichTextEditor.unescapeHtml(editorContentAsText);
+
+            if (editorContentAsText.trim() === '') {
+                this.consoleLog('startSpellCheck stopped because editorContentAsText = ""');
+                this.terminateSpellCheck();
+
+                resolve(originalTextCleared);
+            }
+
+            this.consoleLog('startSpellCheck for editorContentAsText: ' + editorContentAsText);
+            this.consoleLog('(0.3 => startSpellCheck (' + Ext.Date.format(new Date(), 'c') + ').)');
+
+            const spellCheckProcessID = (this.spellCheckInProgressID = Ext.Date.format(new Date(), 'time'));
+            this.consoleLog('me.spellCheckInProgressID: ' + spellCheckProcessID);
+
+            // "ignore" multiple whitespaces, because we delete them anyway on save.
+            // TODO FIXME: If whitespace is removed, the just captured caret bookmark is invalid and the caret will be inside the next word (if there is a next word)
+            // TODO fix
+            // me.collapseMultipleWhitespaceInEditor();
+
+            this.allMatches = null;
+
+            this.runSpellCheck(editorContentAsText, originalTextCleared, spellCheckProcessID)
+                .then((result) => resolve(result))
+                .catch((error) => reject(error));
+        });
     },
+
+    cleanupForSpellchecking: function (dom) {
+        let result = '';
+
+        for (const node of dom.childNodes) {
+            if (node.nodeName === '#text') {
+                result += node.data;
+
+                continue;
+            }
+
+            if (node.nodeName === 'SPAN') {
+                result += this.cleanupForSpellchecking(node);
+
+                continue;
+            }
+
+            if (node.nodeName === 'IMG') {
+                continue;
+            }
+
+            if (node.nodeName === 'DEL') {
+                continue;
+            }
+
+            if (node.childNodes.length > 0) {
+                result += this.cleanupForSpellchecking(node);
+
+                continue;
+            }
+
+            result += node.outerHTML;
+        }
+
+        return result;
+    },
+
+    cleanupSpellcheckNodes: function (dom) {
+        let result = dom.innerHTML;
+
+        for (const node of dom.querySelectorAll('span' + Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK)) {
+            result = result.replace(node.outerHTML, node.innerHTML);
+        }
+
+        return result;
+    },
+
     /**
      * What to do after the SpellCheck has been run.
      */
-    finishSpellCheck: function(spellCheckProcessID) {
-        var me = this,
-            sourceSearch = me.getConcordenceSourceSearch();
-        
+    finishSpellCheck: function (spellCheckProcessID) {
+        let me = this;
+
         if (spellCheckProcessID !== me.spellCheckInProgressID) {
             me.consoleLog('do NOT finishSpellCheck...');
+
             return;
         }
+
         me.consoleLog('finishSpellCheck...');
-        
-        if (me.bookmarkForCaret != null) {
-            me.setPositionOfCaret(me.bookmarkForCaret);
-            me.bookmarkForCaret = null;
-        }
-        // if the user opens segment for editing and immediately after this
-        // uses f3 to focus on concordence search then ignore the editor focus
-        if(!sourceSearch || !sourceSearch.hasFocus){
-            me.getEditorBody().focus();
-        }
-        
+
         me.spellCheckInProgressID = false;
-        
+
         if (me.disableSpellCheckByIdle) {
             me.setEditorDisabled(false);
         }
     },
+
     /**
      * "Terminate" the SpellCheck.
      */
-    terminateSpellCheck: function() {
-        var me = this;
-        me.consoleLog('terminateSpellCheck.');
-        if (!me.isSupportedLanguage) {
-            me.consoleLog('terminateSpellCheck stopped eg because language is not supported or SpellCheck-Tool does not run.');
+    terminateSpellCheck: function () {
+        this.consoleLog('terminateSpellCheck.');
+
+        if (!this.isSupportedLanguage) {
+            this.consoleLog(
+                'terminateSpellCheck stopped eg because language is not supported or SpellCheck-Tool does not run.',
+            );
+
             return;
         }
-        clearTimeout(me.editIdleTimer);
-        me.editIdleTimer = null;
-        me.spellCheckInProgressID = false;
-        
-        if (me.editor === null) {
+
+        clearTimeout(this.editIdleTimer);
+        this.editIdleTimer = null;
+        this.spellCheckInProgressID = false;
+
+        if (this.editor === null) {
             return;
         }
-        
-        me.getEditorBody().focus();
-        
-        if (me.disableSpellCheckByIdle) {
-            me.setEditorDisabled(false);
+
+        if (this.disableSpellCheckByIdle) {
+            this.setEditorDisabled(false);
         }
     },
-    
-    // =========================================================================
-    // Work with the results that have been found by the tool.
-    // =========================================================================
-    
+
     /**
      * Apply the matches found by the SpellCheck (store them and apply the result to the Editor).
      */
-    applySpellCheck: function(spellCheckProcessID) {
-        var me = this;
-        
-        if (spellCheckProcessID !== me.spellCheckInProgressID) {
-            me.consoleLog('NO applySpellCheck, spellCheckProcess is no longer valid (' + spellCheckProcessID + '/' + me.spellCheckInProgressID + ').');
-            me.finishSpellCheck(spellCheckProcessID);
-            return;
+    applySpellCheck: function (matches, originalText, spellCheckProcessID) {
+        if (spellCheckProcessID !== this.spellCheckInProgressID) {
+            this.consoleLog(
+                'NO applySpellCheck, spellCheckProcess is no longer valid (' +
+                    spellCheckProcessID +
+                    '/' +
+                    this.spellCheckInProgressID +
+                    ').',
+            );
+            this.finishSpellCheck(spellCheckProcessID);
+
+            return originalText;
         }
-        
-        if (me.allMatchesOfTool === null || me.allMatchesOfTool.length === 0) {
-            me.consoleLog('allMatchesOfTool: no errors.');
-            me.cleanSpellCheckMarkupInEditor(); // in case there have been errors marked before
-            me.bookmarkForCaret = null;
-            me.finishSpellCheck(spellCheckProcessID);
-            return;
+
+        if (matches.length === 0) {
+            this.consoleLog('allMatchesOfTool: no errors.');
+            // this.cleanSpellCheckMarkupInEditor(); // in case there have been errors marked before
+            // this.bookmarkForCaret = null;
+            this.finishSpellCheck(spellCheckProcessID);
+
+            return originalText;
         }
-        
-        me.storeAllMatchesFromTool();
-        me.applySpellCheckResult(spellCheckProcessID);
+
+        this.storeMatchesFromTool(matches, originalText);
+
+        return this.applySpellCheckResult(matches, spellCheckProcessID, originalText);
     },
+
     /**
      * Apply the results.
      */
-    applySpellCheckResult: function(spellCheckProcessID) {
-        var me = this;
-        
-        if (spellCheckProcessID !== me.spellCheckInProgressID) {
-            me.consoleLog('NO applySpellCheckResult, spellCheckProcess is no longer valid (' + spellCheckProcessID + '/' + me.spellCheckInProgressID + ').');
-            me.finishSpellCheck(spellCheckProcessID);
-            return;
-        }
-        if (me.getEditorBodyExtDomElement() == null) {
-            me.consoleLog('applySpellCheck not started: no editor-body found (maybe the editor is closed already).');
-            me.finishSpellCheck(spellCheckProcessID);
-            return;
-        }
-        
-        me.cleanSpellCheckMarkupInEditor(); // in case a spellcheck has been run before already
-        
-        if (me.allMatchesOfTool.length > 0) {
-            me.applyAllMatches(spellCheckProcessID);
-            me.consoleLog('allMatches applied (' + spellCheckProcessID + ').');
-        }
-        
-        me.finishSpellCheck(spellCheckProcessID);
-    },
-    /**
-     * Apply replacement as suggested in the ToolTip.
-     */
-    applyReplacement: function(event) {
-        var me = this,
-            rangeForMatch = rangy.createRange(),
-            rangeForMatchBookmark,
-            replaceText,
-            bookmarkForCaretOnReplacement;
-
-        bookmarkForCaretOnReplacement = me.getPositionOfCaret();
-        
-        // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
-        rangeForMatch.selectNodeContents(me.activeMatchNode);
-        rangeForMatchBookmark = me.getBookmarkForRangeInTranslate5(rangeForMatch,true);
-        
-        // Remove SpellCheck- and TermTag-Markup.
-        me.cleanSpellCheckMarkupInEditor();
-        
-        // Update the range (the SpellCheck-Node is no longer in the DOM!...).
-        rangeForMatch = me.moveRangeToBookmarkInTranslate5(rangeForMatch,rangeForMatchBookmark,true);
-        rangeForMatchBookmark = me.getBookmarkForRangeInTranslate5(rangeForMatch,true);
-        
-        // Replacement
-        replaceText = Ext.get(event.currentTarget).query('a:first-child span:first-child')[0].innerHTML;
-        
-        me.isActiveTrackChanges();                                  // SearchReplace.js
-        if(!me.activeTrackChanges){                                 // SearchReplace.js
-            me.pureReplace(rangeForMatchBookmark,replaceText,true); // SearchReplace.js
-        } else {
-            me.setTrackChangesInternalSpellCheckFlag(true);
-            me.fireEvent('deleteAndReplace',
-                 rangeForMatchBookmark,
-                 replaceText
+    applySpellCheckResult: function (matches, spellCheckProcessID, originalText) {
+        if (spellCheckProcessID !== this.spellCheckInProgressID) {
+            this.consoleLog(
+                'NO applySpellCheckResult, spellCheckProcess is no longer valid (' +
+                    spellCheckProcessID +
+                    '/' +
+                    this.spellCheckInProgressID +
+                    ').',
             );
-            me.setTrackChangesInternalSpellCheckFlag(false);
+            this.finishSpellCheck(spellCheckProcessID);
+
+            return originalText;
         }
-        
-        me.consoleLog('replaceText (' + replaceText + ') applied.');
-        
-        me.spellCheckTooltip.hide();
-        
-        me.collapseMultipleWhitespaceInEditor();
-        
-        // new DOM after replacement => find and apply the matches again:
-        me.startSpellCheck();
-        
-        me.setPositionOfCaret(bookmarkForCaretOnReplacement); // TODO: does not land right if the replacement has not the same length as what was replaced
+
+        if (matches.length > 0) {
+            this.consoleLog('allMatches applied (' + spellCheckProcessID + ').');
+
+            var ret = this.applyAllMatches(spellCheckProcessID, originalText);
+            this.finishSpellCheck(spellCheckProcessID);
+            return ret;
+        }
+
+        return this.finishSpellCheck(spellCheckProcessID);
     },
-    
-    // =========================================================================
-    // SpellCheck: generic layer for integrating specific tools
-    // =========================================================================
-    
+
     /**
      * Is the language supported by the tool(s) we use?
      * The tool's specific code shall:
      * - store the result in me.isSupportedLanguage
      */
-    setLanguageSupport: function() {
-        var me = this;
-        me.setLanguageSupportWithTool();
-    },
-    /**
-     * Run the SpellCheck for the given text.
-     * The tool's specific code shall: 
-     * - call applySpellCheck()
-     * @param {String} textToCheck
-     */
-    runSpellCheck: function(textToCheck, spellCheckProcessID) {
-        var me = this;
-        if(textToCheck !== '') {
-            me.consoleLog('textToCheck: ' + textToCheck);
-            me.runSpellCheckWithTool(textToCheck, spellCheckProcessID);
-        } else {
-            me.finishSpellCheck(spellCheckProcessID);
-        }
-    },
-    /**
-     * Store data for all matches found by the tool (=> then accessable independent from tool).
-     */
-    storeAllMatchesFromTool: function() {
-        var me = this,
-            matchStart,
-            matchEnd,
-            singleMatchObject;
-        me.allMatches = [];
-        Ext.Array.each(me.allMatchesOfTool, function(match, index) {
-            // offsets of text-only version
-            matchStart = me.getStartOfMatchFromTool(match);
-            matchEnd = me.getEndOfMatchFromTool(match);
-            singleMatchObject = {
-                    matchIndex        : index,                                      // Integer
-                    range             : me.getRangeForMatch(matchStart,matchEnd),   // Rangy bookmark
-                    message           : me.getMessageForMatchFromTool(match),       // String
-                    replacements      : me.getReplacementsForMatchFromTool(match),  // Array
-                    infoURLs          : me.getInfoURLsForMatchFromTool(match),      // Array
-                    cssClassErrorType : me.getCSSForMatchFromTool(match)            // String
+    setLanguageSupport: function () {
+        const me = this,
+            url = Editor.data.restpath + 'plugins_spellcheck_spellcheckquery/languages',
+            method = 'GET',
+            params = {
+                targetLangCode: me.targetLangCode,
             };
-            me.allMatches[index] = singleMatchObject;
+
+        Ext.Ajax.request({
+            url: url,
+            method: method,
+            params: params,
+            success: function (response) {
+                me.consoleLog('- Checking supported languages (LanguageTool) done.');
+                const resultLT = Ext.util.JSON.decode(response.responseText);
+                me.setIsSupportedLanguage(resultLT);
+            },
+            failure: function (response) {
+                me.consoleLog('- Checking supported languages (LanguageTool) failed: ' + response.status);
+                me.terminateSpellCheck();
+            },
         });
     },
-    
+
+    /**
+     * Run the SpellCheck for the given text.
+     * The tool's specific code shall:
+     * - call applySpellCheck()
+     * @param {String} textToCheck
+     * @param {String} originalText
+     * @param {string} spellCheckProcessID
+     */
+    runSpellCheck: function (textToCheck, originalText, spellCheckProcessID) {
+        this.consoleLog('textToCheck: ' + textToCheck);
+
+        return new Promise((resolve, reject) => {
+            this.runSpellCheckWithTool(textToCheck)
+                .then((matches) => {
+                    resolve(this.applySpellCheck(matches, originalText, spellCheckProcessID));
+                })
+                .catch((error) => {
+                    this.consoleLog(error);
+                    this.terminateSpellCheck();
+
+                    reject(error);
+                });
+        });
+    },
+
+    /**
+     * Store data for all matches found by the tool (=> then accessible independent of tool).
+     */
+    storeMatchesFromTool: function (matches, originalText) {
+        const internalTagsPositions = [];
+        const internalTagsWithPositions = this.editor.editor.getInternalTagsPositions();
+        for (const position of Object.keys(internalTagsWithPositions)) {
+            // TODO use constant instead of a literal
+            if (internalTagsWithPositions[position].type !== 'whitespace') {
+                internalTagsPositions.push(position);
+            }
+        }
+
+        const deletionsPositions = [];
+        const doc = RichTextEditor.stringToDom(originalText);
+        const deletions = doc.querySelectorAll('del');
+        for (const deletion of deletions) {
+            const offsets = RichTextEditor.calculateNodeOffsets(doc, deletion);
+            deletionsPositions.push(offsets);
+        }
+
+        this.allMatches = [];
+
+        for (const [index, match] of matches.entries()) {
+            // offsets of text-only version
+            const matchStart = match.offset;
+            const matchEnd = matchStart + match.context.length;
+            const singleMatch = {
+                matchIndex: index,
+                range: this.getRangeForMatch(matchStart, matchEnd, internalTagsPositions, deletionsPositions),
+                message: this.getMessageForMatchFromTool(match),
+                replacements: this.getReplacementsForMatchFromTool(match),
+                infoURLs: this.getInfoURLsForMatchFromTool(match),
+                cssClassErrorType: this.getCSSForMatchFromTool(match),
+            };
+
+            this.allMatches.push(singleMatch);
+        }
+    },
+
     // =========================================================================
     // Helpers for the SpellChecker
     // =========================================================================
-    
+
     /**
      * Get the range of a match in the Editor using the offsets of the text-only version.
-     * @param {Integer} matchStart
-     * @param {Integer} matchEnd
+     * @param {int} matchStart
+     * @param {int} matchEnd
+     * @param {int[]} internalTagsPositions
+     * @param {Object<start: int, end: int>[]} deletionsPositions
      * @returns {Object}
      */
-    getRangeForMatch: function(matchStart,matchEnd) {
-        var me = this,
-            rangeForMatch = rangy.createRange(),
-            allDelNodes = [],
-            rangeForDelNode = rangy.createRange(),
-            bookmarkForDelNode,
-            lengthOfDelNode;
-        // me.consoleLog('---\n- matchStart: ' + matchStart + ' / matchEnd: ' + matchEnd);
-        //console.log('before', matchStart, matchEnd);
-        // move offsets according to hidden del-Nodes in front of the match's start and/or end
-        allDelNodes = me.getEditorBodyExtDomElement().query('del');
-        Ext.Array.each(allDelNodes, function(delNode) {
-            rangeForDelNode.selectNodeContents(delNode);
-            bookmarkForDelNode = rangeForDelNode.getBookmark();
-            //me.consoleLog('- bookmarkForDelNode: ' + bookmarkForDelNode.start + ' / ' + bookmarkForDelNode.end);
-            if (bookmarkForDelNode.start > matchStart && bookmarkForDelNode.end > matchEnd) {
-                //me.consoleLog('- we are already behind the match: ' + bookmarkForDelNode.start + ' > ' + matchStart + ' && ' + bookmarkForDelNode.end + ' > ' + matchEnd);
-                return false; // break here; we are already behind the match
+    getRangeForMatch: function (
+        matchStart,
+        matchEnd,
+        internalTagsPositions,
+        deletionsPositions
+    ) {
+        let deletionsBeforeStartLength = 0;
+        let deletionsBeforeEndLength = 0;
+
+        for (const deletion of deletionsPositions) {
+            const deletionLength = deletion.end - deletion.start;
+            const biasedStart = deletion.start - deletionsBeforeStartLength;
+            const biasedEnd = deletion.end - deletionsBeforeEndLength - deletionLength;
+
+            if (biasedStart < matchStart) {
+                deletionsBeforeStartLength += deletionLength;
             }
-            lengthOfDelNode = rangeForDelNode.text().length;
-            me.consoleLog('- length: ' + lengthOfDelNode);
-            if (bookmarkForDelNode.start <= matchStart) {
-                matchStart = matchStart + lengthOfDelNode;
-                matchEnd = matchEnd + lengthOfDelNode;
-                //me.consoleLog('- match NOW (start and end moved): ' + matchStart + ' / ' + matchEnd);
-            } else if (bookmarkForDelNode.end <= matchEnd) {
-                matchEnd = matchEnd + lengthOfDelNode;
-                //me.consoleLog('- match NOW (only end moved): ' + matchStart + ' / ' + matchEnd);
+
+            if (biasedEnd < matchEnd) {
+                deletionsBeforeEndLength += deletionLength;
             }
-        });
-        
-        // set range for Match by selecting characters
-        rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
-        //console.log('after', matchStart, matchEnd);
-        // return the bookmark
-        return rangeForMatch.getBookmark();
+        }
+
+        let start = matchStart
+            // Since internal tag length is 1 we can calculate amount of filtered tags
+            + internalTagsPositions.filter((el) => el < matchStart + deletionsBeforeStartLength).length
+            + deletionsBeforeStartLength;
+
+        let end = matchEnd
+            + internalTagsPositions.filter((el) => el < matchEnd + deletionsBeforeEndLength).length
+            + deletionsBeforeEndLength;
+
+        return {
+            start: start,
+            end: end,
+        };
     },
+
     /**
      * Apply results to captured content from the Editor.
      */
-    applyAllMatches: function(spellCheckProcessID) {
-        var me = this,
-            editorBody = me.getEditorBody(),
-            rangeForMatch,
-            documentFragmentForMatch,
-            spellCheckNode;
-        // apply the matches (iterate in reverse order; otherwise the ranges get lost due to DOM-changes "in front of them")
-        rangeForMatch = rangy.createRange(editorBody);
-        Ext.Array.each(me.allMatches, function(match, index) {
-            if (spellCheckProcessID !== me.spellCheckInProgressID) {
-                return false; // break (eg after a new keyDown-event)
-            }
-            rangeForMatch.moveToBookmark(match.range);
-            rangeForMatch = me.cleanBordersOfCharacterbasedRange(rangeForMatch);
-            documentFragmentForMatch = rangeForMatch.extractContents();
-            spellCheckNode = me.createSpellcheckNode(index);
-            spellCheckNode.appendChild(documentFragmentForMatch);
-            rangeForMatch.insertNode(spellCheckNode);
-        }, me, true);
+    applyAllMatches: function (spellCheckProcessID, originalText) {
+        let result = '';
 
-        if (!me.spellCheckInProgressID) {
-            return;
+        let index = 0;
+        let previousRangeEnd = 0;
+
+        for (const match of this.allMatches) {
+            if (previousRangeEnd !== match.range.start) {
+                result += this.editor.editor.getContentInRange(previousRangeEnd, match.range.start);
+            }
+
+            result += this.createSpellcheckNode(
+                this.editor.editor.getContentInRange(match.range.start, match.range.end),
+                index
+            );
+
+            if (index === this.allMatches.length - 1) {
+                result += this.editor.editor.getContentInRange(match.range.end, this.editor.editor.getContentLength());
+            }
+
+            previousRangeEnd = match.range.end;
+            index++;
         }
-        
-        me.cleanUpNode(editorBody);
+
+        if (!this.spellCheckInProgressID) {
+            return originalText;
+        }
+
+        return result;
     },
+
+    // applyMatch: function (result, index, start, end) {
+    //     let pointer = 0;
+    //     const _this = this;
+    //
+    //     function traverseNodes(node, start, end) {
+    //         if (_this.tagsConversion.isTrackChangesDelNode(node)) {
+    //             return false;
+    //         }
+    //
+    //         if (node.nodeType === Node.TEXT_NODE) {
+    //             const isWithinNode = pointer + node.length >= start && end <= pointer + node.length;
+    //
+    //             if (isWithinNode) {
+    //                 const string = node.data.substring(start - pointer, end - pointer);
+    //                 const textBefore = node.data.substring(0, start - pointer);
+    //                 const textAfter = node.data.substring(end - pointer);
+    //
+    //                 const spellCheckNode = _this.createSpellcheckNode(string, index);
+    //                 node.parentNode.insertBefore(document.createTextNode(textBefore), node);
+    //                 node.parentNode.insertBefore(RichTextEditor.stringToDom(spellCheckNode).firstChild, node);
+    //                 node.parentNode.insertBefore(document.createTextNode(textAfter), node);
+    //                 node.parentNode.removeChild(node);
+    //
+    //                 return true;
+    //             }
+    //
+    //             pointer += node.length;
+    //         }
+    //
+    //         if (_this.tagsConversion.isTag(node)) {
+    //             pointer++;
+    //
+    //             return false;
+    //         }
+    //
+    //         if (node.nodeType === Node.ELEMENT_NODE) {
+    //             for (let child of node.childNodes) {
+    //                 const changed = traverseNodes(child, start, end);
+    //
+    //                 // This is done to prevent endless recursion
+    //                 if (changed) {
+    //                     return true;
+    //                 }
+    //             }
+    //         }
+    //
+    //         return false;
+    //     }
+    //
+    //     traverseNodes(result, start, end);
+    // },
+
     /**
      * Create and return a new node for SpellCheck-Match of the given index.
      * For match-specific data, get the data from the tool.
-     * @param {Integer} index
+     *
+     * @param {string} text
+     * @param {int} index
+     *
      * @returns {Object}
      */
-    createSpellcheckNode: function(index, matches){
-        var me = this,
-            match = matches ? matches[index] : me.allMatches[index],
-            nodeElParams = { tag: me.self.NODE_NAME_MATCH };
-        // CSS-class(es)
-        nodeElParams['cls'] = Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK + ' ' + match.cssClassErrorType + ' ownttip';
-        // activeMatchIndex
-        nodeElParams[me.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
-        nodeElParams[me.self.ATTRIBUTE_QTIP] = Editor.data.l10n.SpellCheck.nodeTitle;
-        // create and return node
-        return Ext.DomHelper.createDom(nodeElParams);
-    },
-    /**
-     * Fire event so the internal flag isSearchReplaceRangeFromSpellCheck in trackchanges class is set
-     * That is used to enable/disable some of the trackchanges functionality needed for the search and replace
-     * @param {Boolean}
-     */
-    setTrackChangesInternalSpellCheckFlag:function(isSpellCheckRange){
-        this.fireEvent('isSearchReplaceRangeFromSpellCheck',isSpellCheckRange);
-    },
-    
-    // =========================================================================
-    // Helpers for the Editor and Task
-    // =========================================================================
+    createSpellcheckNode: function (text, index) {
+        const match = this.allMatches[index];
 
-    
+        return (
+            '<' +
+            this.self.NODE_NAME_MATCH +
+            ' ' +
+            'class="' +
+            Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK +
+            ' ' +
+            match.cssClassErrorType +
+            ' ownttip" ' +
+            this.self.ATTRIBUTE_ACTIVEMATCHINDEX +
+            '="' +
+            index +
+            '" ' +
+            this.self.ATTRIBUTE_QTIP +
+            '="' +
+            Editor.data.l10n.SpellCheck.nodeTitle +
+            '">' +
+            text +
+            '</' +
+            this.self.NODE_NAME_MATCH +
+            '>'
+        );
+    },
+
     /**
      * TRANSLATE-1630 "Workaround for east asian problems with spellchecker"
      * For example, typing Japanese with European keys requires time for the user
      * to use Space and Enter. Running a SpellCheck disrupts the typing. Hence,
-     * the SpellCheck must only start when intentionally invoked by the user 
+     * the SpellCheck must only start when intentionally invoked by the user
      * (= using a Button instead of keyboard-Idle).
-     * @param {Ext.container.Container} statusStrip
      */
-    setDisableSpellCheckByIdle: function (statusStrip) {
-        var me = this,
-            targetLangSplit = me.targetLangCode.split('-'),
+    setDisableSpellCheckByIdle: function () {
+        const targetLangSplit = this.targetLangCode.split('-'),
             mainLang = targetLangSplit[0];
+
         // is the target-language one of those that cause problems?
-        me.disableSpellCheckByIdle = (me.languagesToStopIdle.indexOf(mainLang) !== -1);
+        this.disableSpellCheckByIdle = this.languagesToStopIdle.indexOf(mainLang) !== -1;
+
         // if yes, add button in statusStrip:
-        if (me.disableSpellCheckByIdle) {
-            me.addSpellCheckButton(statusStrip);
+        if (this.disableSpellCheckByIdle) {
+            this.addSpellCheckButton(Ext.ComponentQuery.query('t5editor')[0].statusStrip);
         }
     },
+
     /***
      * Set targetLangCode for the current task.
      * @returns {String}
      */
-    setTargetLangCode: function(){
-        var me = this,
-            task = Editor.data.task,
+    setTargetLangCode: function () {
+        const task = Editor.data.task,
             languages = Ext.getStore('admin.Languages'),
             targetLang = languages.getById(task.get('targetLang'));
-        me.targetLangCode = targetLang.get('rfc5646');
+
+        this.targetLangCode = targetLang.get('rfc5646');
     },
+
     /**
-     * Disable the browser's SpellChecker? 
+     * Disable the browser's SpellChecker?
      * (When me.isSupportedLanguage is false or undefined, we still need the browser's SpellCheck!)
      */
-    setBrowserSpellcheck: function(){
-        var me = this,
-            editorBody = me.getEditorBody();
-        editorBody.spellcheck = (me.isSupportedLanguage) ? false : true;
-        me.consoleLog('Browser-Spellcheck is set to: ' + editorBody.spellcheck + '.');
+    setBrowserSpellcheck: function () {
+        const editorBody = this.editor.editor.getEditorViewNode();
+        editorBody.spellcheck = this.isSupportedLanguage ? false : true;
+        this.consoleLog('Browser-Spellcheck is set to: ' + editorBody.spellcheck + '.');
     },
-    /**
-     * Enable SnapshotHistory if needed.
-     */
-    setSnapshotHistory: function(){
-        var me = this;
-    	if (me.isSupportedLanguage) {
-            me.fireEvent('activateSnapshotHistory');
-            me.consoleLog('Spellcheck activateSnapshotHistory: yes');
-    	} else {
-            me.consoleLog('Spellcheck activateSnapshotHistory: no');
-    	}
-    },
-    
-    // =========================================================================
-    // ToolTips
-    // =========================================================================
-    
+
+    // /**
+    //  * Enable SnapshotHistory if needed.
+    //  */
+    // setSnapshotHistory: function () {
+    //     var me = this;
+    //     if (me.isSupportedLanguage) {
+    //         me.fireEvent('activateSnapshotHistory');
+    //         me.consoleLog('Spellcheck activateSnapshotHistory: yes');
+    //     } else {
+    //         me.consoleLog('Spellcheck activateSnapshotHistory: no');
+    //     }
+    // },
+
+    // region ToolTips
+
     /***
      * Tooltips for the spellcheck-matches.
      */
-    handleSpellCheckTooltip: function() {
-        var me = this,
-            oldMenuItems,
-            spellCheckData;
+    handleSpellCheckTooltip: function () {
+        let me = this;
+
         // remove formerly added menu-items
-        oldMenuItems = me.spellCheckTooltip.items.items;
-        Ext.Array.each(oldMenuItems, function(itemToRemove) {
+        let oldMenuItems = me.spellCheckTooltip.items.items;
+        for (const itemToRemove of oldMenuItems) {
             me.spellCheckTooltip.remove(itemToRemove);
-        },me, true);
+        }
+
         // update Tooltip
-        spellCheckData = me.getSpellCheckData();
+        let spellCheckData = me.getSpellCheckData();
+
         if (spellCheckData !== false) {
             me.spellCheckTooltip.add(spellCheckData);
         }
     },
-    getSpellCheckData: function() {
-        var me = this,
-            activeMatchIndex,
-            activeMatch,
-            message,
-            replacements,
-            infoURLs,
-            items;
+
+    getSpellCheckData: function () {
+        let me = this;
+
         if (me.allMatches === null || me.allMatches.length < 1) {
             return false;
         }
-        activeMatchIndex = me.activeMatchNode.getAttribute(me.self.ATTRIBUTE_ACTIVEMATCHINDEX);
-        activeMatch = me.allMatches[activeMatchIndex];
 
-        if( !activeMatch){
+        const activeMatchIndex = me.activeMatchNode.getAttribute(me.self.ATTRIBUTE_ACTIVEMATCHINDEX);
+        const activeMatch = me.allMatches[activeMatchIndex];
+
+        if (!activeMatch) {
             return false;
         }
 
-        message      = activeMatch.message;
-        replacements = activeMatch.replacements;
-        infoURLs     = activeMatch.infoURLs;
-        items = [];
+        const message = activeMatch.message;
+        const replacements = activeMatch.replacements;
+        const infoURLs = activeMatch.infoURLs;
+        const items = [];
+
         // message
-        items.push({text: '<b>'+message+'</b>',
-                    cls: me.self.CSS_CLASSNAME_TOOLTIP_HEADER });
+        items.push({
+            text: '<b>' + message + '</b>',
+            cls: me.self.CSS_CLASSNAME_TOOLTIP_HEADER,
+        });
+
         // replacement(s)
         if (replacements.length > 0) {
-            Ext.Array.each(replacements, function(replacement) {
-                items.push({text: replacement.replace(' ', '&nbsp;'), // quick and dirty workaround for empty spaces (e.g. when "  " should be replaced with " " or when " - " should be replaced with " – ")
-                            cls: me.self.CSS_CLASSNAME_REPLACEMENTLINK });
-            });
+            for (const replacement of replacements) {
+                items.push({
+                    text: replacement.replace(' ', '&nbsp;'), // quick and dirty workaround for empty spaces (e.g. when "  " should be replaced with " " or when " - " should be replaced with " – ")
+                    cls: me.self.CSS_CLASSNAME_REPLACEMENTLINK,
+                });
+            }
         }
+
         // infoURL(s)
         if (infoURLs.length > 0) {
-            Ext.Array.each(infoURLs, function(url) {
-                items.push({text: Editor.data.l10n.SpellCheck.moreInformation,
-                            cls: me.self.CSS_CLASSNAME_TOOLTIP_MOREINFO,
-                            href: url,
-                            hrefTarget: '_blank'});
-            });
+            for (const url of infoURLs) {
+                items.push({
+                    text: Editor.data.l10n.SpellCheck.moreInformation,
+                    cls: me.self.CSS_CLASSNAME_TOOLTIP_MOREINFO,
+                    href: url,
+                    hrefTarget: '_blank',
+                });
+            }
         }
+
         return items;
     },
-    showToolTip: function(event) {
-        var me = this,
-            posX = event.getX() + me.editor.iframeEl.getX(),
-            posY = event.getY() + me.editor.iframeEl.getY();
-        me.activeMatchNode = event.currentTarget;
-        me.initTooltips(); // me.spellCheckTooltip.hide() is not enough (e.g. after a contextmenu had been shown with a long list of replacements, the next contextmenu was placed as if it still has that height)
-        me.spellCheckTooltip.showAt(posX,posY).focus();
+
+    showToolTip: function (event) {
+        const posX = event.getX();
+        const posY = event.getY();
+
+        this.activeMatchNode = event.currentTarget;
+        this.initTooltips(); // me.spellCheckTooltip.hide() is not enough (e.g. after a contextmenu had been shown with a long list of replacements, the next contextmenu was placed as if it still has that height)
+        this.spellCheckTooltip.showAt(posX, posY);
     },
 
-    showToolTipViaShortcut: function(_, event) {
+    /**
+     * Apply replacement as suggested in the ToolTip.
+     */
+    applyReplacement: function (event) {
+        const index = this.activeMatchNode.getAttribute(this.self.ATTRIBUTE_ACTIVEMATCHINDEX);
+        const range = this.allMatches[index].range;
+        const replaceText = event.currentTarget.querySelector('a:first-child span:first-child').innerHTML;
+        this.editor.editor.replaceContentInRange(range.start, range.end, replaceText);
+        this.spellCheckTooltip.hide();
 
-        // Auxiliary variables
-        var ed = this.editor, selection = ed.getWin().getSelection(),
-            node = selection.focusNode.parentNode;
+        this.consoleLog('replaceText (' + replaceText + ') applied.');
+    },
+    // endregion
+
+    languageToCheckLongCode: null, // longCode of LanguageTool's language, e.g "en", "en-AU", ...
+
+    /**
+     * Checks if the language of the current task is supported
+     * and stores the result in me.isSupportedLanguage.
+     * @param {Boolean|Object} resultLT
+     */
+    setIsSupportedLanguage: function (resultLT) {
+        if (resultLT.rows === false) {
+            this.isSupportedLanguage = false;
+            this.languageToCheckLongCode = null;
+            this.consoleLog(
+                '=> isSupportedLanguage: ' + this.isSupportedLanguage + ' (' + this.languageToCheckLongCode + ')',
+            );
+
+            return;
+        }
+
+        this.isSupportedLanguage = true;
+        this.languageToCheckLongCode = resultLT.rows.longCode;
+        this.consoleLog(
+            '=> isSupportedLanguage: ' + this.isSupportedLanguage + ' (' + this.languageToCheckLongCode + ')',
+        );
+        this.consoleLog('0.4 SpellCheck: initSpellCheckInEditor.');
+        this.initTooltips();
+        // this.setSnapshotHistory();
+    },
+    /**
+     * @param {String} textToCheck
+     */
+    runSpellCheckWithTool: function (textToCheck) {
+        const params = {
+            text: textToCheck,
+            language: this.languageToCheckLongCode,
+        };
+
+        return new Promise((resolve, reject) => {
+            Ext.Ajax.request({
+                url: Editor.data.restpath + 'plugins_spellcheck_spellcheckquery/matches',
+                method: 'POST',
+                params: params,
+                success: (response) => {
+                    this.consoleLog('runSpellCheckWithTool (LanguageTool) done.');
+                    const result = JSON.parse(response.responseText);
+                    resolve(result && result.rows && result.rows.matches ? result.rows.matches : []);
+                },
+                failure: (response) => {
+                    this.consoleLog('runSpellCheckWithTool (LanguageTool) failed: ' + response.status);
+                    reject();
+                },
+            });
+        });
+    },
+
+    /**
+     * extract data from match: css according to issueType.
+     * @param {Object} match
+     * @returns {String}
+     */
+    getCSSForMatchFromTool: function (match) {
+        return Editor.data.plugins.SpellCheck.cssMap[match.rule.issueType] || '';
+    },
+    /**
+     * extract data from match: message
+     * @param {Object} match
+     * @returns {String}
+     */
+    getMessageForMatchFromTool: function (match) {
+        return match.message;
+    },
+    /**
+     * extract data from match: replacement(s)
+     * @param {Object} match
+     * @returns {Array}
+     */
+    getReplacementsForMatchFromTool: function (match) {
+        let replacements = [];
+
+        for (const replacement of match.replacements) {
+            replacements.push(replacement.value);
+        }
+
+        return replacements;
+    },
+    /**
+     * extract data from match: URL(s) for more information
+     * @param {Object} match
+     * @returns {Array}
+     */
+    getInfoURLsForMatchFromTool: function (match) {
+        let infoURLs = [];
+
+        if (!match.rule.urls) {
+            return infoURLs;
+        }
+
+        for (const url of match.rule.urls) {
+            infoURLs.push(url.value);
+        }
+
+        return infoURLs;
+    },
+
+    /**
+     * Replace whitespace-images with whitespace-text. Returns the new html.
+     * TODO Copied from Editor.util.Range
+     *
+     * @params {string} text
+     * @returns {String} html
+     */
+    _getContentWithWhitespaceImagesAsText: function (text) {
+        let html = text;
+
+        const dom = RichTextEditor.stringToDom(html);
+
+        for (const node of dom.childNodes) {
+            if (node.nodeName === 'IMG' && node.classList.contains('whitespace')) {
+                html = html.replace(node.outerHTML, ' ');
+            }
+        }
+
+        return html;
+    },
+
+    showToolTipViaShortcut: function (_, event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        let node = this.editor.editor.getDomNodeUnderCursor();
+
+        if (!node) {
+            return;
+        }
 
         // Go upper until .t5spellcheck-node is met, if possible
         while (node.classList && !node.classList.contains('t5spellcheck') && node.parentNode) {
@@ -941,15 +1111,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
 
         // If it was possible to met .t5spellcheck-node, e.g. cursor is inside such a node
         if (node.classList?.contains('t5spellcheck')) {
-
             // Get node sizing info
             var rect = node.getBoundingClientRect();
 
             // Spoof event.xy with synthetic values
-            event.xy = [
-                rect.left + rect.width * 0.5,
-                rect.top + rect.height * 0.5
-            ];
+            event.xy = [rect.left + rect.width * 0.5, rect.top + rect.height * 0.5];
 
             // Spoof event.currentTarget with .t5spellcheck-node
             event.currentTarget = node;
@@ -957,5 +1123,114 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             // Feed that to showToolTip()
             this.showToolTip(event);
         }
-    }
+    },
+
+    _cleanSpellcheckOnTypingInside: function (rawData, actions, tagsConversion) {
+        if (!actions.length) {
+            return [rawData, 0];
+        }
+
+        const doc = RichTextEditor.stringToDom(rawData);
+
+        for (const action of actions) {
+            if (!action.type) {
+                continue;
+            }
+
+            this._processNodes(doc, action, tagsConversion);
+        }
+
+        return [doc.innerHTML, actions[0].position];
+    },
+
+    _processNodes: function (doc, action, tagsConversion) {
+        const _this = this;
+        const position = action.position;
+        let pointer = 0;
+
+        function traverseNodes(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const isWithinNode = pointer + node.length >= position;
+                const isInserting = action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.INSERT;
+                const dom = !isInserting && action.content.length ? action.content[0].toDom() : null;
+                const isDeletingSpellCheck =
+                    !isInserting &&
+                    dom &&
+                    (
+                        tagsConversion.isSpellcheckNode(dom) ||
+                        // If one of its children is a spellcheck node
+                        (dom.nodeType === Node.ELEMENT_NODE && dom.querySelectorAll('.t5spellcheck'))
+                    );
+
+                if (
+                    isWithinNode &&
+                    tagsConversion.isSpellcheckNode(node.parentNode) &&
+                    (isInserting || isDeletingSpellCheck)
+                ) {
+                    _this._unwrapNodesWithMatchIndex(
+                        doc,
+                        node.parentNode.getAttribute(_this.self.ATTRIBUTE_ACTIVEMATCHINDEX)
+                    );
+
+                    return true;
+                }
+
+                if (
+                    isWithinNode &&
+                    node.nextSibling &&
+                    tagsConversion.isSpellcheckNode(node.nextSibling) &&
+                    action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.REMOVE &&
+                    action.content.length > 1 &&
+                    tagsConversion.isSpellcheckNode(action.content[action.content.length - 1].toDom())
+                ) {
+                    _this._unwrapNodesWithMatchIndex(
+                        doc,
+                        node.nextSibling.getAttribute(_this.self.ATTRIBUTE_ACTIVEMATCHINDEX)
+                    );
+
+                    return true;
+                }
+
+                pointer += node.length;
+
+                return false;
+            }
+
+            if (tagsConversion.isTag(node)) {
+                pointer++;
+
+                return false;
+            }
+
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                for (let child of node.childNodes) {
+                    const changed = traverseNodes(child);
+
+                    // This is done to prevent endless recursion
+                    if (changed) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        traverseNodes(doc);
+    },
+
+    _unwrapNodesWithMatchIndex: function (doc, matchIndex) {
+        const nodes = doc.querySelectorAll(`span[${this.self.ATTRIBUTE_ACTIVEMATCHINDEX}*="${matchIndex}"]`);
+
+        for (const node of nodes) {
+            this._unwrapSpellcheckNode(node);
+        }
+    },
+
+    _unwrapSpellcheckNode: function (spellCheckNode) {
+        const spellCheckNodeParent = spellCheckNode.parentNode;
+        const insertFragment = document.createRange().createContextualFragment(spellCheckNode.innerHTML);
+        spellCheckNodeParent.insertBefore(insertFragment, spellCheckNode);
+        spellCheckNodeParent.removeChild(spellCheckNode);
+    },
 });

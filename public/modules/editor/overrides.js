@@ -2013,17 +2013,17 @@ Ext.override(Ext.dom.Element, {
             nodeType = sourceNode.nodeType;
 
             // If node structure is out of sync, just drop innerHTML in and return
-            if (nodeType !== destNode.nodeType || (nodeType === 1 && sourceNode.tagName !== destNode.tagName)) {
+            if (nodeType !== destNode.nodeType || (nodeType === Node.ELEMENT_NODE && sourceNode.tagName !== destNode.tagName)) {
                 dest.innerHTML = source.innerHTML;
                 return;
             }
 
             // Update text node
-            if (nodeType === 3) {
+            if (nodeType === Node.TEXT_NODE) {
                 destNode.data = sourceNode.data;
             }
             // Sync element content
-            else {
+            else if (nodeType !== Node.COMMENT_NODE) {
                 if (sourceNode.id && destNode.id !== sourceNode.id) {
                     destNode.id = sourceNode.id;
                 }

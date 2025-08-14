@@ -358,15 +358,15 @@ Ext.define('Editor.view.comments.PanelViewController', {
     },
 
     getCommentDisplay:function(){
-        return Ext.ComponentQuery.query('#roweditor displayfield[name=comments]')[0];
+        return Ext.ComponentQuery.query('#t5RowEditor displayfield[name=comments]')[0];
     },
     
     getAutoStateDisplay:function(){
-        return Ext.ComponentQuery.query('#roweditor displayfield[name=autoStateId]')[0];
+        return Ext.ComponentQuery.query('#t5RowEditor displayfield[name=autoStateId]')[0];
     },
 
     getRowEditor:function(){
-        return Ext.ComponentQuery.query('#roweditor')[0];
+        return Ext.ComponentQuery.query('#t5RowEditor')[0];
     },
 
     getSegmentGrid:function(){
