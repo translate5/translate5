@@ -238,7 +238,7 @@ Ext.define('Editor.controller.Editor', {
             'alt-del':        [Ext.EventObjectImpl.DELETE,{ctrl: false, alt: true}, me.resetSegment],
             'ctrl-alt-up':    [Ext.EventObjectImpl.UP,{ctrl: true, alt: true}, me.goToUpperNoSave, true],
             'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
-            // 'alt-c':          ['C',{ctrl: false, alt: true}, me.handleOpenComments, true],
+            'alt-c':          ['C', {ctrl: false, alt: true}, me.handleOpenComments, true],
             'alt-s':          ['S', {ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
             // 'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'F3':             [Ext.EventObjectImpl.F3,{ctrl: false, alt: false}, me.handleF3KeyPress, true],
@@ -339,30 +339,35 @@ Ext.define('Editor.controller.Editor', {
         /**
          * disable the column show / hide menu while editing a segment (EXT6UPD-85)
          */
-        // Ext.override(segmentsGrid.getHeaderContainer(), {
-        //     beforeMenuShow: function(menu) {
-        //         this.callParent([menu]);
-        //         menu.down('#columnItem').setDisabled(plug.editing);
-        //     }
-        // });
+        Ext.override(segmentsGrid.getHeaderContainer(), {
+            beforeMenuShow: function(menu) {
+                this.callParent([menu]);
+                menu.down('#columnItem').setDisabled(plug.editing);
+            }
+        });
 
         me.generalKeyMap = new Ext.util.KeyMap(
             Ext.getDoc(),
-            me.getKeyMapConfig('application', {
-                // 'alt-c':[
-                //     'C',{ctrl: false, alt: true},
-                //     function(key, e){
-                //         e.stopEvent();
-                //         Ext.fireEvent('editorOpenComments');
-                //         return false;
-                //     }
-                // ]
-            }));
+            me.getKeyMapConfig(
+                'application',
+                {
+                    'alt-c': [
+                        'C', {ctrl: false, alt: true},
+                        function (key, e) {
+                            e.stopEvent();
+                            Ext.fireEvent('editorOpenComments');
+
+                            return false;
+                        }
+                    ]
+                }
+            )
+        );
 
         //inits the editor directly after loading the application
         plug.editor = plug.initEditor();
 
-        // me.handleReferenceFilesMessage();
+        me.handleReferenceFilesMessage();
 
         //after segment grid is rendered, get the segment grid segment size values and update the html editor text size with those values
         // me.onSegmentGridSegmentsSizeChanged(segmentsGrid,segmentsGrid.newSegmentSizeCls,segmentsGrid.oldSegmentSizeCls);
@@ -564,6 +569,7 @@ Ext.define('Editor.controller.Editor', {
             if (overwrite[key]) {
                 return;
             }
+
             overwrite[key] = item;
         });
 
@@ -1242,12 +1248,12 @@ Ext.define('Editor.controller.Editor', {
         return false;
     },
 
-    // /**
-    //  * Handles pressing the comment keyboard shortcut
-    //  */
-    // handleOpenComments: function() {
-    //     Ext.fireEvent('editorOpenComments');
-    // },
+    /**
+     * Handles pressing the comment keyboard shortcut
+     */
+    handleOpenComments: function() {
+        Ext.fireEvent('editorOpenComments');
+    },
 
     /**
      * Handles pressing the MQM tag shortcuts, without shift 1-10, with shift 11-20
@@ -1969,19 +1975,19 @@ Ext.define('Editor.controller.Editor', {
     //         this.generalKeyMap.handleTargetEvent(e);
     //     }
     // },
-    //
-    // handleReferenceFilesMessage:function(){
-    //     //if there are reference files for the task and if it is show reference files is alowed from config
-    //     if(Editor.data.task.get('referenceFiles') && Editor.app.getTaskConfig('editor.showReferenceFilesPopup')===true){
-    //         var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
-    //         task = new Ext.util.DelayedTask(function(){
-    //             referenceInfoMessage.destroy();
-    //         });
-    //         task.delay(20000);
-    //         referenceInfoMessage.show();
-    //     }
-    // },
-    //
+
+    handleReferenceFilesMessage:function(){
+        //if there are reference files for the task and if it is show reference files is alowed from config
+        if(Editor.data.task.get('referenceFiles') && Editor.app.getTaskConfig('editor.showReferenceFilesPopup')===true){
+            var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
+            task = new Ext.util.DelayedTask(function(){
+                referenceInfoMessage.destroy();
+            });
+            task.delay(20000);
+            referenceInfoMessage.show();
+        }
+    },
+
     // /***
     //  * "Reference files info message" window button handler
     //  */
