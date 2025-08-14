@@ -70,10 +70,6 @@ class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
         $params = $this->workerModel->getParameters();
         $languageResourceId = (int) $params['languageResourceId'];
 
-        if (! $this->isWritableLanguageResourceForTask($this->task->getTaskGuid(), $languageResourceId)) {
-            return true;
-        }
-
         $runId = bin2hex(random_bytes(16));
 
         $this->snapshot->createSnapshot(
@@ -97,14 +93,6 @@ class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
         }
 
         return true;
-    }
-
-    private function isWritableLanguageResourceForTask(string $taskGuid, int $languageResourceId): bool
-    {
-        $assoc = ZfExtended_Factory::get(TaskAssociation::class);
-        $assoc->loadByTaskGuidAndTm($taskGuid, $languageResourceId);
-
-        return ! empty($assoc->getSegmentsUpdateable());
     }
 
     protected function handleWorkerException(Throwable $workException): void
