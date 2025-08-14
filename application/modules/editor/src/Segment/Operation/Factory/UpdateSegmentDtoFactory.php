@@ -64,7 +64,7 @@ use ZfExtended_Sanitized_HttpRequest;
 class UpdateSegmentDtoFactory
 {
     public function __construct(
-        private readonly ZfExtended_Log $logger,
+        //        private readonly ZfExtended_Log $logger,
     ) {
     }
 
@@ -74,7 +74,7 @@ class UpdateSegmentDtoFactory
     public static function create(): self
     {
         return new self(
-            new ZfExtended_Log(),
+            //            new ZfExtended_Log(),
         );
     }
 
@@ -134,7 +134,7 @@ class UpdateSegmentDtoFactory
      */
     protected function getTextData(Segment $segment, array $data): array
     {
-        $error = [];
+        //        $error = [];
         $textData = [];
         $allowedAlternatesToChange = $segment->getEditableDataIndexList(true);
 
