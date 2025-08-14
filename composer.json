@@ -1,7 +1,7 @@
 {
   "config": {
     "platform": {
-      "php": "8.1.26"
+      "php": "8.3.23"
     },
     "allow-plugins": {
       "wikimedia/composer-merge-plugin": true,
@@ -129,6 +129,7 @@
     "ext-zlib": "*",
     "ext-sqlite3": "*",
     "ext-ftp": "*",
+    "ext-redis": "*",
     "phpunit/phpunit": "^9",
     "shardj/zf1-future": "dev-master",
     "symfony/console": "^5.0",

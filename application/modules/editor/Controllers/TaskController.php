@@ -1810,6 +1810,18 @@ class editor_TaskController extends ZfExtended_RestController
 
         $diff = (bool) $this->getRequest()->getParam('diff');
 
+        // an export may be handled by plugins
+        $this->events->trigger(
+            'beforeTaskExport',
+            $this,
+            [
+                'task' => $this->entity,
+                'context' => $context,
+                'diff' => $diff,
+                'lock' => $lock,
+            ]
+        );
+
         switch ($context) {
             case 'importArchive':
                 $this->logInfo('Task import archive downloaded');
@@ -1901,7 +1913,7 @@ class editor_TaskController extends ZfExtended_RestController
             case 'filetranslation':
             case 'transfer':
             default:
-                /* @var editor_Models_Export_Exported_Worker $finalExportWorker */
+                /** @var editor_Models_Export_Exported_Worker $finalExportWorker */
                 $finalExportWorker = editor_Models_Export_Exported_Worker::factory($context);
 
                 $this->entity->checkExportAllowed($finalExportWorker::class);
@@ -1964,7 +1976,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         if ($diff) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-            /* @var ZfExtended_Zendoverwrites_Translate $translate */
+            /** @var ZfExtended_Zendoverwrites_Translate $translate */
             $suffix = $translate->_(' - mit Aenderungen nachverfolgen.zip');
         } else {
             $suffix = '.zip';
@@ -2027,21 +2039,10 @@ class editor_TaskController extends ZfExtended_RestController
         if (! empty('.' . $pathInfo['extension'])) {
             $filenameExport .= '.' . $pathInfo['extension'];
         }
-        $this->view->layout()->disableLayout();
-        $this->_helper->viewRenderer->setNoRender(true);
 
-        Header::sendDownload(
-            $filenameExport,
-            null,
-            'no-cache',
-            -1,
-            [
-                'Content-Transfer-Encoding' => 'binary',
-                'Content-Description' => 'File Transfer',
-                'Expires' => '0',
-                'Pragma' => 'public',
-            ]
-        );
+        $this->disableLayoutAndView();
+
+        Header::sendFileTranslation($filenameExport, null);
 
         readfile($translatedfile);
         $clean(); //remove export dir
@@ -2052,11 +2053,9 @@ class editor_TaskController extends ZfExtended_RestController
      * @param string $zipFile
      * @param string $nameSuffix
      */
-    protected function provideZipDownload($zipFile, $nameSuffix)
+    public function provideZipDownload($zipFile, $nameSuffix)
     {
-        // disable layout and view
-        $this->view->layout()->disableLayout();
-        $this->_helper->viewRenderer->setNoRender(true);
+        $this->disableLayoutAndView();
 
         Header::sendDownload(
             $this->entity->getTasknameForDownload($nameSuffix),
@@ -2064,6 +2063,12 @@ class editor_TaskController extends ZfExtended_RestController
         );
 
         readfile($zipFile);
+    }
+
+    public function disableLayoutAndView(): void
+    {
+        $this->view->layout()->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
     }
 
     /**

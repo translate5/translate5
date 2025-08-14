@@ -39,7 +39,12 @@
             <file>../Plugins/VisualReview/tests/VisualPdfTest.php</file>
             <file>../Plugins/VisualReview/tests/VisualMergePdfTest.php</file>
             <file>../Plugins/VisualReview/tests/VisualVideoTest.php</file>
+            <file>../Plugins/VisualReview/tests/Integration/WebsiteDownload/WebsiteDownloadConverterTest.php</file>
+            <file>../Plugins/VisualReview/tests/Unit/WebsiteDownload/WebsiteResourceCollectorTest.php</file>
             <file>../Plugins/VisualReview/tests/VisualHeadlessBrowserHtmlTest.php</file>
+            <file>../Plugins/VisualReview/tests/VisualExchangeTest.php</file>
+            <file>../Plugins/VisualReview/tests/VisualPdfWorkfileTest.php</file>
+            <file>../Plugins/VisualReview/tests/VisualPdfInstantTranslateTest.php</file>
         </testsuite>
         <testsuite name="connectworldserver">
             <file>../Plugins/ConnectWorldserver/tests/ExternalOnlineReviewTest.php</file>

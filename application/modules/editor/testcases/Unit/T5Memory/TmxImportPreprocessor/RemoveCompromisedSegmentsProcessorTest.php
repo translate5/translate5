@@ -52,7 +52,7 @@ class RemoveCompromisedSegmentsProcessorTest extends TestCase
     public function setUp(): void
     {
         $this->transUnitParser = $this->createMock(TransUnitParser::class);
-        $this->config = $config = new Zend_Config([
+        $this->config = new Zend_Config([
             'runtimeOptions' => [
                 'tmxImportProcessor' => [
                     'removeCompromisedSegmentsRegex' => '/problematic/',

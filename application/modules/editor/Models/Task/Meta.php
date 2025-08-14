@@ -43,6 +43,8 @@ use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
  * @method null|string getBconfInZip()
  * @method void setBconfInZip(string $bconfInZip)
  * @method void setPricingPresetId(int $pricingPresetId)
+ * @method string getVisualPdfWorkfile()
+ * @method void setVisualPdfWorkfile(string $visualPdfWorkfile)
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
 {
@@ -134,6 +136,14 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
 
         // Return pricingPresetId
         return $this->row->pricingPresetId; // @phpstan-ignore-line
+    }
+
+    /**
+     * Retrieves if a visual PDF-workfile is set
+     */
+    public function hasVisualPdfWorkfile(): bool
+    {
+        return ! empty($this->getVisualPdfWorkfile());
     }
 
     /**

@@ -38,6 +38,24 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract
 {
+    public static function triggerExportCompleted(
+        editor_Models_Export_Exported_Worker $worker,
+        editor_Models_Task $task,
+        array $parameters,
+    ): void {
+        // the event will always be triggered in the scope of the base-exported-worker
+        $eventManager = ZfExtended_Factory::get(
+            ZfExtended_EventManager::class,
+            [
+                editor_Models_Export_Exported_Worker::class,
+            ]
+        );
+        $eventManager->trigger('exportCompleted', $worker, [
+            'task' => $task,
+            'parameters' => $parameters,
+        ]);
+    }
+
     protected function validateParameters(array $parameters): bool
     {
         return true;
@@ -63,28 +81,15 @@ class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract
 
     public function work(): bool
     {
-        // Get params
         $parameters = $this->workerModel->getParameters();
 
-        /* @var $task editor_Models_Task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-
-        // Load task
+        $task = new editor_Models_Task();
         $task->loadByTaskGuid($this->taskGuid);
 
-        // Do work
         $this->doWork($task);
 
-        // Get event manager
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', [__CLASS__]);
+        self::triggerExportCompleted($this, $task, $parameters);
 
-        // Trigger event
-        $eventManager->trigger('exportCompleted', $this, [
-            'task' => $task,
-            'parameters' => $parameters,
-        ]);
-
-        // Return
         return true;
     }
 
@@ -97,5 +102,12 @@ class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract
     public function setup($taskGuid, $parameters = [])
     {
         return parent::init($taskGuid, $parameters);
+    }
+
+    /**
+     * Override to implement a workload
+     */
+    protected function doWork(editor_Models_Task $task): void
+    {
     }
 }
