@@ -299,40 +299,56 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
     /**
      * Changes the decoration-class in the HtmlEditor of the tag
      */
-    decorateFalsePositive: function(record, qualityId, checked){
-        // reference to htmlEditor is somehow dirty, may add a global API to achieve this ? Hint: we're created too late to catch the HtmlEditors init event
-        var htmlEditor = Editor.app.getController('Editor').htmlEditor,
-            selector = Editor.util.Util.createSelectorFromProps(null, record.get('cssClass'), [{ name: this.qualityIdDataName, value: qualityId }]);
-        if(htmlEditor){
-            // quirk: we can not use the tag-name because in the html-editor-markup these may are changed
-            if(this.decorateElements(htmlEditor.getElementsBySelector(selector), checked)){
+    decorateFalsePositive: function (record, qualityId, checked) {
+        const editorController = Editor.app.getController('Editor');
+
+        if (editorController.isEditing) {
+            const htmlEditor = editorController.htmlEditor.mainEditor.editor;
+            const dom = RichTextEditor.stringToDom(htmlEditor.getDataT5Format());
+
+            const selector = Editor.util.Util.createSelectorFromProps(
+                null,
+                record.get('cssClass'),
+                [{name: this.qualityIdDataName, value: qualityId}]
+            );
+
+            if (this.decorateElements(dom.querySelectorAll(selector), checked)) {
+                editorController.htmlEditor.mainEditor.setData(dom.innerHTML);
+
                 return true;
             }
         }
-        // if not found in the html-editor we search in the other contents of the html-editor. This is only for optical reasons
-        htmlEditor = Ext.ComponentQuery.query('#roweditor')[0];
-        if(htmlEditor){
-            var elements = htmlEditor.getEl().dom.querySelectorAll('.segment-tag-container ' + selector);
-            return this.decorateElements(elements, checked);
-        }
+
+        // // if not found in the html-editor we search in the other contents of the html-editor. This is only for optical reasons
+        // htmlEditor = Ext.ComponentQuery.query('#t5RowEditor')[0];
+        //
+        // if (htmlEditor) {
+        //     var elements = htmlEditor.getEl().dom.querySelectorAll('.segment-tag-container ' + selector);
+        //
+        //     return this.decorateElements(elements, checked);
+        // }
+
         return false;
     },
+
     /**
      * Decorates a list of elements with the false-positive decorators
      */
-    decorateElements: function(elements, checked){
-        var fpc = this.falsePositiveCssClass, cfpc;
-        if(elements && elements.length > 0){
-            elements.forEach(function(element){
-                cfpc = element.classList.contains(fpc);
-                if(checked && !cfpc){
-                    element.classList.add(fpc);
-                } else if(!checked && cfpc){
-                    element.classList.remove(fpc);
-                }
-            });
-            return true;
+    decorateElements: function (elements, checked) {
+        if (! elements || elements.length === 0) {
+            return false;
         }
-        return false;
+
+        for (const element of elements) {
+            if (checked) {
+                element.classList.add(this.falsePositiveCssClass);
+
+                continue;
+            }
+
+            element.classList.remove(this.falsePositiveCssClass);
+        }
+
+        return true;
     }
 });

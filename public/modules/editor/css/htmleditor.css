@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,46 +25,195 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-body{box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;cursor:text;font-size:10px; background-color: rgb(255 255 255) !important;white-space: pre-wrap;}
-body.hide-tag img{display:none;}
-img {vertical-align:middle;cursor: pointer;}
-img + img {margin-left:1px;}
-img.duplicatesavecheck {width:0 !important;height:0 !important;display:none;}
-span.term {background:transparent;border-bottom:1px solid #0000ff;}
-span.source-transNotFound {border-bottom-color:#ff0000;}
-span.source-transNotDefined {border-bottom-color:#8F4C36;}
-span.notRecommended,
-span.supersededTerm,
-span.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}
-span.term.t5qfalpos {background:transparent;border-bottom:1px solid #8282FF;}
-span.source-transNotFound.t5qfalpos {border-bottom-color:#FF8888;}
-span.source-transNotDefined.t5qfalpos {border-bottom-color:#C2A8A8;}
-span.notRecommended.t5qfalpos,
-span.supersededTerm.t5qfalpos,
-span.deprecatedTerm.t5qfalpos {border-bottom:none;background-color:#FDC4FF;}
-img.qmflag { width: auto !important;height: 14px !important; vertical-align:middle;margin-left:1px;margin-right:1px; }
-img.qmflag.t5qfalpos { opacity:50%; }
-body.fakedsel strong, body.fakedsel b {font-weight:normal;background:#b0b0b0;}
+.x-panel-body-default .ck {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    cursor: text;
+    font-size: initial;
+    background-color: rgb(255 255 255) !important;
+    white-space: pre-wrap;
+    color: #000000;
+}
+
+.x-panel-body-default .ck.hide-tag img {
+    display: none;
+}
+
+.x-panel-body-default .ck img {
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.x-panel-body-default .ck img + img {
+    margin-left: 1px;
+}
+
+.x-panel-body-default .ck img.duplicatesavecheck {
+    width: 0 !important;
+    height: 0 !important;
+    display: none;
+}
+
+.x-panel-body-default .ck span.term {
+    background: transparent;
+    border-bottom: 1px solid #0000ff;
+}
+
+.x-panel-body-default .ck span.source-transNotFound {
+    border-bottom-color: #ff0000;
+}
+
+.x-panel-body-default .ck span.source-transNotDefined {
+    border-bottom-color: #8F4C36;
+}
+
+.x-panel-body-default .ck span.notRecommended,
+.x-panel-body-default .ck span.supersededTerm,
+.x-panel-body-default .ck span.deprecatedTerm {
+    border-bottom: none;
+    background-color: #fa51ff;
+}
+
+.x-panel-body-default .ck span.term.t5qfalpos {
+    background: transparent;
+    border-bottom: 1px solid #8282FF;
+}
+
+.x-panel-body-default .ck span.source-transNotFound.t5qfalpos {
+    border-bottom-color: #FF8888;
+}
+
+.x-panel-body-default .ck span.source-transNotDefined.t5qfalpos {
+    border-bottom-color: #C2A8A8;
+}
+
+.x-panel-body-default .ck span.notRecommended.t5qfalpos,
+.x-panel-body-default .ck span.supersededTerm.t5qfalpos,
+.x-panel-body-default .ck span.deprecatedTerm.t5qfalpos {
+    border-bottom: none;
+    background-color: #FDC4FF;
+}
+
+.x-panel-body-default .ck img.qmflag {
+    width: auto !important;
+    height: 14px !important;
+    vertical-align: middle;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.x-panel-body-default .ck img.qmflag.t5qfalpos {
+    opacity: 50%;
+}
+
+.x-panel-body-default .ck.fakedsel strong, .ck.fakedsel b {
+    font-weight: normal;
+    background: #b0b0b0;
+}
 
 /* segment grid font sizing */
-body.segment-size-1 {font-size: 7pt !important;line-height: 11px;}
-/* old details mode: */
-body.segment-size-2 {font-size: 9pt !important;line-height: 14px;}
-body.segment-size-3 {font-size: 11pt !important;line-height: 19px;}
-/* old ergonomic mode: */
-body.segment-size-4 {font-size: 13pt !important;line-height: 23px;}
-body.segment-size-5 {font-size: 16pt !important;line-height: 26px;}
-body.segment-size-6 {font-size: 19pt !important;line-height: 30px;}
+body.segment-size-1 .ck {
+    font-size: 7pt !important;
+    line-height: 11px;
+}
 
-body.segment-size-1 img {height: 11px;}
 /* old details mode: */
-body.segment-size-2 img {height: 14px;}
-body.segment-size-3 img {height: 19px;}
-/* old ergonomic mode: */
-body.segment-size-4 img {height: 23px;}
-body.segment-size-5 img {height: 26px;}
-body.segment-size-6 img {height: 30px;}
+body.segment-size-2 .ck {
+    font-size: 9pt !important;
+    line-height: 14px;
+}
 
-.searchreplace-active-match {background-color: rgb(255, 0, 0) !important;}
-/* this class exist also in t5 main css. It is used also by the segment grid */
-.searchreplace-hide-element {display: none !important;}
+body.segment-size-3 .ck {
+    font-size: 11pt !important;
+    line-height: 19px;
+}
+
+/* old ergonomic mode: */
+body.segment-size-4 .ck {
+    font-size: 13pt !important;
+    line-height: 23px;
+}
+
+body.segment-size-5 .ck {
+    font-size: 16pt !important;
+    line-height: 26px;
+}
+
+body.segment-size-6 .ck {
+    font-size: 19pt !important;
+    line-height: 30px;
+}
+
+.x-panel-body-default .ck.ck-editor__editable .image-inline {
+    bottom: -1px;
+}
+
+body.segment-size-1 .ck .image-inline img {
+    height: 11px;
+}
+
+/* old details mode: */
+body.segment-size-2 .ck .image-inline img {
+    height: 14px;
+}
+
+body.segment-size-3 .ck .image-inline img {
+    height: 19px;
+}
+
+/* old ergonomic mode: */
+body.segment-size-4 .ck .image-inline img {
+    height: 23px;
+}
+
+body.segment-size-5 .ck .image-inline img {
+    height: 26px;
+}
+
+body.segment-size-6 .ck .image-inline img {
+    height: 30px;
+}
+
+.x-html-editor-input [data-ref=textareaEl] + .ck-editor + .ck-editor {
+    display: none;
+}
+
+[id^="t5editor-"] .x-form-layout-wrap {
+    border-spacing: 0;
+}
+
+.x-grid-row-editor .x-field {
+    margin-left: 1px !important;
+}
+
+.x-grid-row-editor > [data-ref="bodyWrap"] > [data-ref="body"] > [data-ref="innerCt"] {
+    min-width: 100%;
+    width: inherit !important;
+}
+
+.x-grid-row-editor > [data-ref="bodyWrap"] > [data-ref="body"] > [data-ref="innerCt"] > [data-ref="targetEl"] {
+    width: 100% !important;
+}
+
+.ck-powered-by {
+    display: none;
+}
+
+.x-panel-body-default .ck .ck-editor__editable {
+    padding: 4px 9px 3px 9px;
+}
+:root {
+    --ck-inner-shadow: none;
+}
+.x-panel-body-default .ck .ck-editor__editable > p {
+    margin: 0;
+}
+.ck-content .image-inline {
+    vertical-align: text-top;
+}
+.ck.ck-editor__top.ck-reset_all {
+    height: 0;
+}
+
+

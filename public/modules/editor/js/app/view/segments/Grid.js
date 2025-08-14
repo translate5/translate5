@@ -185,7 +185,7 @@ Ext.define('Editor.view.segments.Grid', {
     constructor: function() {
         this.plugins = [
             'gridfilters',
-            Ext.create('Editor.view.segments.RowEditing')
+            'segmentrowediting',
         ];
         this.callParent(arguments);
     },
@@ -213,6 +213,7 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'segmentNrInTaskColumn',
             itemId: 'segmentNrInTaskColumn',
             stateId: 'segmentNrInTaskColumn',
+            editor: false,
             width: 50
         },{
             xtype: 'workflowStepColumn',
@@ -231,6 +232,7 @@ Ext.define('Editor.view.segments.Grid', {
         },{
             xtype: 'matchrateColumn',
             stateId: 'matchrateColumn',
+            editor: false,
         },{
             xtype: 'numbercolumn',
             stateId: 'penaltyGeneral',
@@ -256,6 +258,7 @@ Ext.define('Editor.view.segments.Grid', {
         },{
             xtype: 'matchrateTypeColumn',
             stateId: 'matchrateTypeColumn',
+            editor: false,
             hidden: true
         }]);
         
@@ -322,6 +325,7 @@ Ext.define('Editor.view.segments.Grid', {
                     isEditableContentColumn: true,//TODO those properties are missing
                     tooltip: Ext.String.htmlEncode(rec.get('label')),
                     text: label,
+                    editor: false,
                     width: width
                 };
                 columns.push(col2push);

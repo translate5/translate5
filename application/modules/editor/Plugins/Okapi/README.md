@@ -13,7 +13,7 @@
   * on export ("original file, translated"), these placeholders are replaced with the translaed/reviewed segment targets and the resulting xlf is uploaded with the "manifest.rkm" to okapi again
   * for import, the selected file-format-settings are used (-> BCONF), the selected BCONF defines, which extensions the workfiles can have. These BCONFS are manageable in the "File format settings"
   * on export, a fixed BCONF is used "okapi_default_export.bconf"
-  * both steps are implemented in the editor_Plugins_Okapi_Worker
+  * the workers are OkapiImportWorker and OkapiExportWorker
   * for both steps the used OKAPI-version is saved in the config to ensure the export works with the same codebase as the import
   * "import" in t5 equals "extraction" in longhorn/rainbow, "export" equals "merging"
 

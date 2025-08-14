@@ -41,18 +41,20 @@ export default class DataTransformer {
     }
 
     #transform(items, referenceItems = []) {
-        this.#parseReferenceItems(this.#transformItems(referenceItems));
+        this.#retrieveTags(this.#transformItems(referenceItems), this._referenceTags);
         this._tagCheck = new TagCheck(
             this._referenceTags,
             this._tagsConversion,
             this.#userCanModifyWhitespaceTags,
             this.#userCanInsertWhitespaceTags
         );
-        this._transformedNodes = this.#transformItems(items, true);
+        this._transformedNodes = this.#transformItems(items);
+        this.#retrieveTags(this._transformedNodes, this._transformedTags);
     }
     
     transformPartial(items) {
-        const nodes = this.#transformItems(items, true);
+        const nodes = this.#transformItems(items);
+        this.#retrieveTags(nodes, this._transformedTags);
 
         let result = '';
         for (const node of nodes) {
@@ -60,6 +62,12 @@ export default class DataTransformer {
         }
 
         return result;
+    }
+
+    transformWhitespace(whitespce) {
+        const items = this.#transformItems([whitespce], true);
+
+        return items.pop();
     }
 
     /**
@@ -71,7 +79,9 @@ export default class DataTransformer {
     reverseTransform(data) {
         let checkResult = this._tagCheck.checkTags(data);
 
-        return {"data": this.#reverseTransformItems(data), "checkResult": checkResult};
+        // Replace encoded spaces is done here because of the processing of the data on the server side
+        // The editor is mixing normal spaces with encoded spaces, so we need to replace them back
+        return {"data": this.#replaceEncodedSpaces(this.#reverseTransformItems(data)), "checkResult": checkResult};
     }
 
     toString() {
@@ -84,71 +94,44 @@ export default class DataTransformer {
         return result;
     }
 
-    #transformItems(items, useReference = false) {
+    /**
+     * @param {int} tagNumber
+     * @returns {boolean}
+     */
+    hasSingleReferenceTag(tagNumber) {
+        return this._referenceTags[TagsConversion.TYPE.SINGLE][tagNumber] !== undefined;
+    }
+
+    getSingleReferenceTag(tagNumber) {
+        return this.#getSingleReferenceTagAtIndex(tagNumber);
+    }
+
+    /**
+     * @param {int} tagNumber
+     * @returns {boolean}
+     */
+    hasPairedReferenceTag(tagNumber) {
+        return this._referenceTags[TagsConversion.TYPE.OPEN][tagNumber] !== undefined
+            && this._referenceTags[TagsConversion.TYPE.CLOSE][tagNumber] !== undefined;
+    }
+
+    getPairedReferenceTag(tagNumber) {
+        return {
+            "open": this.#getOpeningReferenceTagAtIndex(tagNumber),
+            "close": this.#getClosingReferenceTagAtIndex(tagNumber),
+        };
+    }
+
+    #transformItems(items, reference = false) {
         let result = [];
 
         for (const item of items) {
-            let node;
+            let node = new Node(item, this._tagsConversion.transform(item));
 
-            if (this._tagsConversion.isInternalTagNode(item) && useReference) {
-                const type = this._tagsConversion.getInternalTagType(item);
-                const tagNumber = this._tagsConversion.getInternalTagNumber(item);
+            result.push(node);
 
-                switch (type) {
-                    case TagsConversion.TYPE.OPEN:
-                        node = this.#getOpeningReferenceTagAtIndex(tagNumber);
-
-                        if (!node) {
-                            continue;
-                        }
-
-                        break;
-
-                    case TagsConversion.TYPE.CLOSE:
-                        node = this.#getClosingReferenceTagAtIndex(tagNumber);
-
-                        if (!node) {
-                            continue;
-                        }
-
-                        break;
-
-                    case TagsConversion.TYPE.WHITESPACE:
-                        node = this.#getWhitespaceReferenceTagAtIndex(tagNumber);
-
-                        if (!node && this._tagCheck.isAllowedAddingWhitespaceTags()) {
-                            node = new Node(item, this._tagsConversion.transform(item));
-                        }
-
-                        if (!node) {
-                            continue;
-                        }
-
-                        break;
-
-                    case TagsConversion.TYPE.SINGLE:
-                        node = this.#getSingleReferenceTagAtIndex(tagNumber);
-
-                        if (!node) {
-                            continue;
-                        }
-
-                        break;
-                }
-
-                if (!this._transformedTags[type][tagNumber]) {
-                    this._transformedTags[type][tagNumber] = node;
-                }
-            } else {
-                node = new Node(item, this._tagsConversion.transform(item));
-            }
-
-            if (node) {
-                result.push(node);
-
-                if (item.childNodes.length) {
-                    node._children = this.#transformItems(item.childNodes, useReference);
-                }
+            if (item.childNodes.length) {
+                node._children = this.#transformItems(item.childNodes);
             }
         }
 
@@ -162,7 +145,7 @@ export default class DataTransformer {
             if (this._tagsConversion.isInternalTagNode(item)) {
                 const tagType = this._tagsConversion.getInternalTagType(item);
                 const tagNumber = this._tagsConversion.getInternalTagNumber(item);
-                result += this._transformedTags[tagType][tagNumber]._original.outerHTML;
+                result += this._transformedTags[tagType][tagNumber]?._original.outerHTML ?? '';
 
                 continue;
             }
@@ -181,6 +164,12 @@ export default class DataTransformer {
                 continue;
             }
 
+            if (this._tagsConversion.isMQMNode(item)) {
+                result += item.outerHTML;
+
+                continue;
+            }
+
             // other elements like spellcheck nodes etc.
             if (item.childNodes.length) {
                 result += this.#reverseTransformItems(item);
@@ -194,7 +183,7 @@ export default class DataTransformer {
         return result;
     }
 
-    #parseReferenceItems(items) {
+    #retrieveTags(items, tags) {
         for (const item of items) {
             if (
                 this._tagsConversion.isInternalTagNode(item._original)
@@ -202,11 +191,13 @@ export default class DataTransformer {
             ) {
                 const tagType = this._tagsConversion.getInternalTagType(item._original);
                 const tagNumber = this._tagsConversion.getInternalTagNumber(item._original);
-                this._referenceTags[tagType][tagNumber] = item;
+                tags[tagType][tagNumber] = tags[tagType][tagNumber] || item;
+
+                continue;
             }
 
             if (item._children.length) {
-                this.#parseReferenceItems(item._children);
+                this.#retrieveTags(item._children, tags);
             }
         }
     }
@@ -233,5 +224,9 @@ export default class DataTransformer {
 
     #htmlEncode(string) {
         return string.replace(/[\u00A0-\u9999<>&]/g, i => '&#'+i.charCodeAt(0)+';');
+    }
+
+    #replaceEncodedSpaces(string) {
+        return string.replace(/&nbsp;/g, ' ');
     }
 }

@@ -37,7 +37,6 @@ Ext.define('Editor.view.segments.StatusStrip', {
     ],
     framed: false,
     style: 'background: #e4edf4;',
-    layout:"column",
 
     defaults: {
         margin: '0 5 0 5' //top right bottom left (clockwise) margins of each item/column,
@@ -61,7 +60,13 @@ Ext.define('Editor.view.segments.StatusStrip', {
             margin: '1 0 0 0',
             width: '100%'
         });
-        
+
+        instanceConfig.htmlEditor.on(
+            'afterStartEdit',
+            (editor) => { this.updateSegment(editor.currentlyEditingRecord, editor.currentlyEditingColumnToEdit); },
+            this
+        );
+
         if (configItems.length > 0) {
             config = {
                 items: configItems
@@ -71,12 +76,13 @@ Ext.define('Editor.view.segments.StatusStrip', {
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
+
         return me.callParent([config]);
     },
 
     /***
      * For each child element in the status strip, set the record instance
-     * @param {Editor.models.Segment} record
+     * @param {Editor.model.Segment} record
      * @param {String} fieldName
      */
     updateSegment:function(record, fieldName){

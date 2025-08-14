@@ -125,7 +125,7 @@ Ext.define('Editor.model.Segment', {
      * @param {Function} [outerSuccess] success callback, optional
      * @param {Function} [outerFailure] fail callback, optional
      */
-    toogleBookmark: function(outerSuccess, outerFailure) {
+    toggleBookmark: function(outerSuccess, outerFailure) {
         let me = this,
             isWatched = Boolean(this.get('isWatched')),
             model, config,

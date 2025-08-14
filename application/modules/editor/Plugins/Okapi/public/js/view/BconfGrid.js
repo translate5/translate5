@@ -65,6 +65,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         customerStandardTooltip: '#UT#Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden',
         filters: '#UT#Filter',
         filtersTooltip: '#UT#Anpassen von Dateifiltern in diesem Filterset',
+        entities: '#UT#Entities',
+        entitiesTooltip: '',
         action: '#UT#Aktionen',
         actionDelete: '#UT#Filterset löschen',
         actionClone: '#UT#Filterset klonen',
@@ -136,7 +138,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
             },
             {
                 xtype: 'gridcolumn',
-                width: 260,
+                width: 250,
                 dataIndex: 'name',
                 stateId: 'name',
                 renderer: function(value, metadata) {
@@ -337,6 +339,82 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         handler: 'downloadPipeline'
                     }
                 ]
+            }, {
+                xtype: 'gridcolumn',
+                dataIndex: 'patchedEntities',
+                width: 120,
+                stateId: 'patchedEntities',
+                text: me.text_cols.entities,
+                tooltip: me.text_cols.entitiesTooltip,
+                renderer: function(value){
+                    return value.join(', ');
+                },
+                editor: {
+                    xtype: 'tagfield',
+                    itemId: 'entitiesMap',
+                    queryMode: 'local',
+                    createNewOnEnter: true,
+                    createNewOnBlur: true,
+                    filterPickList: true, // true clears list on custom value
+                    validator: function (values) {
+                        if (!Array.isArray(values)) {
+                            values = values.trim().split(/\s*,\s* /);
+                        }
+                        const badEntities = [],
+                            forbidden = ['<', '>', '&', '"', "'"], // already defined in XML
+                            element = document.createElement('div');
+                        let char;
+                        for (const val of values) {
+                            element.innerHTML = '&' + val + ';';
+                            char = element.textContent;
+                            if (char.length !== 1 || forbidden.includes(char)) {
+                                badEntities.push(val);
+                            }
+                        }
+                        return !badEntities.length;
+                    },
+                    displayField: 'name',
+                    valueField: 'value',
+                    store: new Ext.data.ArrayStore({
+                        fields: ['name', 'value'],
+                        // common list of named entities
+                        data: [
+                            ['NBSP', 'nbsp'],
+                            ['SHY', 'shy'],
+                            ['© (copy)', 'copy'],
+                            ['´ (acute)', 'acute'],
+                            ['« (laquo)', 'laquo'],
+                            ['» (raquo)', 'raquo'],
+                            ['µ (micro)', 'micro'],
+                            ['¶ (para)', 'para'],
+                            ['¸ (cedil)', 'cedil'],
+                            ['¡ (iexcl)', 'iexcl'],
+                            ['¢ (cent)', 'cent'],
+                            ['£ (pound)', 'pound'],
+                            ['¤ (curren)', 'curren'],
+                            ['¥ (yen)', 'yen'],
+                            ['¦ (brvbar)', 'brvbar'],
+                            ['§ (sect)', 'sect'],
+                            ['¨ (uml)', 'uml'],
+                            ['ª (ordf)', 'ordf'],
+                            ['¬ (not)', 'not'],
+                            ['® (reg)', 'reg'],
+                            ['¯ (macr)', 'macr'],
+                            ['° (deg)', 'deg'],
+                            ['± (plusmn)', 'plusmn'],
+                            ['¹ (sup1)', 'sup1'],
+                            ['² (sup2)', 'sup2'],
+                            ['³ (sup3)', 'sup3'],
+                            ['º (ordm)', 'ordm'],
+                            ['½ (frac12)', 'frac12'],
+                            ['¼ (frac14)', 'frac14'],
+                            ['¾ (frac34)', 'frac34'],
+                            ['¿ (iquest)', 'iquest'],
+                            ['× (times)', 'times'],
+                            ['÷ (divide)', 'divide']
+                        ]
+                    })
+                }
             }
         ];
         config.dockedItems = [{

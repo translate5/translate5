@@ -1,7 +1,7 @@
 import Ruler from "./ruler";
-import TagsModeProvider from "./tags-mode-provider";
 import Templating from "./templating";
 import stringToDom from "../Tools/string-to-dom";
+import isEqual from 'lodash/isEqual';
 
 const htmlEncode = require('js-htmlencode').htmlEncode;
 
@@ -16,7 +16,7 @@ export default class TagsConversion {
     constructor(editorElement, tagsModeProvider) {
         this._editorElement = editorElement;
         this._idPrefix = 'tag-image-';
-        this._ruler = new Ruler();
+        this._ruler = new Ruler(editorElement);
         this._tagModeProvider = tagsModeProvider;
         this._templating = new Templating(this._idPrefix);
     };
@@ -65,9 +65,13 @@ export default class TagsConversion {
             return result;
         }
 
-        if (this._isImageNode(item)) {
-            return 'image FIXME';
-            let result = this._imgNodeToString(item, true);
+        if (this.isMQMNode(item)) {
+            return item.cloneNode();
+        }
+
+        if (this._isImageNode(item) && this.isInternalTagNode(item)) {
+            // Already converted internal tag
+            return item.cloneNode();
         }
 
         // Span for terminology
@@ -147,6 +151,14 @@ export default class TagsConversion {
                 data.length = '1';
                 data.text = '→';
                 break;
+
+            default:
+                let tagData = whitespaceType.split("|");
+                classNameForTagType = 'single ' + tagData[1] + ' char';
+                data.title = '&lt;' + data.nr + '/&gt;: ' + tagData[2];
+                data.id = 'char';
+                data.length = '1';
+                data.text = tagData[0];
         }
 
         className = classNameForTagType + ' internal-tag ownttip';
@@ -181,8 +193,16 @@ export default class TagsConversion {
         return /(^|[\s])term([\s]|$)/.test(item.className);
     }
 
+    isSpellcheckNode(item) {
+        return /(^|[\s])t5spellcheck([\s]|$)/.test(item.className);
+    }
+
     isInternalTagNode(item) {
         return /(^|[\s])internal-tag([\s]|$)/.test(item.className);
+    }
+
+    isInternalSpanNode(item) {
+        return this.isTermNode(item) || this.isSpellcheckNode(item);
     }
 
     isWhitespaceNode(item) {
@@ -214,16 +234,25 @@ export default class TagsConversion {
     }
 
     /**
-     *
      * @param {HTMLDivElement} item
      * @returns {string}
      */
     getInternalTagNumber(item) {
         if (item.tagName === 'IMG') {
+            if (this.isMQMNode(item)) {
+                return this.#getMqmFlagNumber(item);
+            }
+
             return item.getAttribute('data-tag-number');
         }
 
         const spanShort = item.querySelector('span.short');
+
+        if (!spanShort) {
+            // span.short can be missing in case of drag'n'drop from another field in segment grid
+            return '0';
+        }
+
         let number;
 
         let shortTagContent = spanShort.innerHTML;
@@ -236,10 +265,37 @@ export default class TagsConversion {
         return number;
     }
 
+    /**
+     * @param {HTMLElement} htmlNode
+     * @returns {boolean}
+     */
+    isTag(htmlNode) {
+        return this.isInternalTagNode(htmlNode)
+            || this.isWhitespaceNode(htmlNode)
+            || htmlNode.tagName === 'IMG';
+    }
+
+    /**
+     * @param {HTMLElement} tag1
+     * @param {HTMLElement} tag2
+     * @returns {boolean}
+     */
+    isSameTag(tag1, tag2) {
+        return (
+            this.isInternalTagNode(tag1)
+            && this.isInternalTagNode(tag2)
+            && this.getInternalTagNumber(tag1) === this.getInternalTagNumber(tag2)
+            && this.getInternalTagType(tag1) === this.getInternalTagType(tag2)
+        )
+        || (
+            this.isTag(tag1) && this.isTag(tag2) && isEqual(Array.from(tag1.classList), Array.from(tag2.classList))
+        )
+    }
+
     _replaceInternalTagToImage(item, editorElement, pixelMapping) {
         let data = this._extractInternalTagsData(item, pixelMapping);
 
-        if (this._tagModeProvider.isFullTagMode() || data.whitespaceTag) {
+        if (this._tagModeProvider.isFullTagMode() || data.whitespaceTag || data.numberTag || data.placeableTag) {
             data.path = this._getSvg(data.text, data.fullWidth, editorElement);
         } else {
             data.path = this._getSvg(data.shortTag, data.shortWidth, editorElement);
@@ -318,11 +374,20 @@ export default class TagsConversion {
         data.nr = this.getInternalTagNumber(item);
         data = this._addTagType(item.className, data);
 
+        if (data.numberTag) {
+            data.source = spanFull.getAttribute('data-source');
+            data.target = spanFull.getAttribute('data-target');
+        }
+
         // if it is a whitespace tag we have to precalculate the pixel width of the tag (if possible)
-        if (data.whitespaceTag && pixelMapping) {
+        if ((data.whitespaceTag || data.placeableTag) && pixelMapping) {
             data.pixellength = pixelMapping.getPixelLengthFromTag(item);
         } else {
             data.pixellength = 0;
+        }
+
+        if (data.numberTag) {
+            data.text = data.target ? data.target : data.source;
         }
 
         // get the dimensions of the inner spans
@@ -385,6 +450,8 @@ export default class TagsConversion {
         data.key = data.type + data.nr;
         data.shortTag = '&lt;' + data.shortTag + '&gt;';
         data.whitespaceTag = /nbsp|tab|space|newline|char|whitespace/.test(className);
+        data.numberTag = /number/.test(className);
+        data.placeableTag = /t5placeable/.test(className);
 
         if (data.whitespaceTag) {
             data.type += ' whitespace';
@@ -411,20 +478,30 @@ export default class TagsConversion {
     _getSvg(text, width, editorElement) {
         let prefix = 'data:image/svg+xml;charset=utf-8,',
             svg = '',
-            styles = this._getStyle(editorElement, ['font-size', 'font-style', 'font-weight', 'font-family', 'line-height', 'text-transform', 'letter-spacing', 'word-break']),
-            lineHeight = styles['line-height'].replace(/px/, '');
+            styles = this._getStyle(
+                editorElement,
+                [
+                    'font-size',
+                    'font-style',
+                    'font-weight',
+                    'font-family',
+                    'line-height',
+                    'text-transform',
+                    'letter-spacing',
+                    'word-break'
+                ]
+            ),
+            lineHeight = parseInt(styles['line-height'].replace(/px/, ''));
 
-        // TODO get rid of Ext dependency
-        if (!Ext.isNumber(lineHeight)) {
-            lineHeight = Math.round(styles['font-size'].replace(/px/, '') * 1.3);
+        if (isNaN(lineHeight)) {
+            lineHeight = Math.round(styles['font-size'].replace(/px/, ''));
         }
 
-        // padding left 1px and right 1px by adding x+1 and width + 2
-        // svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
-        svg += '<svg xmlns="http://www.w3.org/2000/svg" height="' + lineHeight + '" width="' + (width + 2) + '">';
+        svg += '<svg xmlns="http://www.w3.org/2000/svg" height="' + lineHeight + '" width="' + width + '">';
         svg += '<rect width="100%" height="100%" fill="rgb(207,207,207)" rx="3" ry="3"/>';
-        svg += '<text x="1" y="' + (lineHeight - 5) + '" font-size="' + styles['font-size'] + '" font-weight="' + styles['font-weight'] + '" font-family="' + styles['font-family'].replace(/"/g, "'") + '">'
-        svg += htmlEncode(text) + '</text></svg>';
+        svg += '<text x="1" y="' + (lineHeight - 5) + '" font-size="' + styles['font-size'] + '" font-weight="'
+            + styles['font-weight'] + '" font-family="' + styles['font-family'].replace(/"/g, "'") + '">';
+        svg += htmlEncode(text).replace('&amp;nbsp;', '&nbsp;') + '</text></svg>';
 
         return prefix + encodeURI(svg);
     }
@@ -487,6 +564,9 @@ export default class TagsConversion {
             case 'internalspans':
                 return this._templating.intSpansTpl.apply(data);
 
+            case 'numberspans':
+                return this.intNumberSpansTpl.apply(data);
+
             case 'termspan':
                 return (this._hasQIdProp(data) ? this._templating.termSpanTplQid.apply(data) : this._templating.termSpanTpl.apply(data));
 
@@ -511,7 +591,8 @@ export default class TagsConversion {
      * @return String
      */
     _renderInternalTags(className, data) {
-        return '<div class="' + className + '">' + this._applyTemplate('internalspans', data) + '</div>';
+        const type = data.numberTag ? 'numberspans' : 'internalspans';
+        return '<div class="' + className + '">' + this._applyTemplate(type, data) + '</div>';
     }
 
     /**
@@ -531,11 +612,19 @@ export default class TagsConversion {
     }
 
     isTrackChangesNode(item) {
-        return item.tagName === 'INS' || this.isTrackChangesDelNode(item);
+        return this.isTrackChangesInsNode(item) || this.isTrackChangesDelNode(item);
     }
 
     isTrackChangesDelNode(item) {
         return item.tagName === 'DEL';
+    }
+
+    isTrackChangesInsNode(item) {
+        return item.tagName === 'INS';
+    }
+
+    isMQMNode(item) {
+        return /(^|[\s])qmflag([\s]|$)/.test(item.className);
     }
 
     _isImageNode(item) {
@@ -572,5 +661,15 @@ export default class TagsConversion {
 
     _isWhitespaceTag(className) {
         return /whitespace|nbsp|tab|space|newline|char/.test(className);
+    }
+
+    #getMqmFlagNumber(element) {
+        const qmFlagClass = Array.from(element.classList).find(cls => cls.startsWith('qmflag-'));
+
+        if (!qmFlagClass) {
+            return null;
+        }
+
+        return qmFlagClass.replace('qmflag-', '');
     }
 }

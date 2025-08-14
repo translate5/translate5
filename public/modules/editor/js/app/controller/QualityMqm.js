@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -31,24 +30,30 @@ END LICENSE AND COPYRIGHT
  * The MQM tags adder will be added in the segments editor east panel in the MetaPanel
  */
 Ext.define('Editor.controller.QualityMqm', {
-    extend : 'Ext.app.Controller',
+    extend: 'Ext.app.Controller',
     views: ['ToolTip'],
-    refs:[{
-    	ref : 'addMenuFirstLevel',
-    	selector : 'qualityMqmFieldset button > menu'
-    },{
-    	ref : 'mqmFieldset',
-    	selector : 'qualityMqmFieldset'
-    },{
-	    ref : 'segmentGrid',
-	    selector : '#segmentgrid'
-    },{
-	    ref : 'metaInfoForm',
-	    selector : '#metaInfoForm'
-    },{
-        ref: 'metaSevCombo',
-        selector: '#metapanel combobox[name="mqmseverity"]'
-    }],
+    refs: [
+        {
+            ref: 'addMenuFirstLevel',
+            selector: 'qualityMqmFieldset button > menu'
+        },
+        {
+            ref: 'mqmFieldset',
+            selector: 'qualityMqmFieldset'
+        },
+        {
+            ref: 'segmentGrid',
+            selector: '#segmentgrid'
+        },
+        {
+            ref: 'metaInfoForm',
+            selector: '#metaInfoForm'
+        },
+        {
+            ref: 'metaSevCombo',
+            selector: '#metapanel combobox[name="mqmseverity"]'
+        }
+    ],
     listen: {
         controller: {
             '#Editor': {
@@ -65,258 +70,275 @@ Ext.define('Editor.controller.QualityMqm', {
         }
     },
     strings: {
-    	buttonTooltip10: '#UT# (ALT+{0})',
-    	buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
+        buttonTooltip10: '#UT# (ALT+{0})',
+        buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
     },
 
-    handleInitEditor: function() {
+    handleInitEditor: function () {
         this.initFieldSet();
-        var combo = this.getMetaSevCombo(),
+        const combo = this.getMetaSevCombo(),
             sevStore = Ext.create('Ext.data.Store', {
                 fields: ['id', 'text'],
                 storeId: 'Severities',
                 data: Editor.data.task.getMqmSeverities()
             });
-        if(!combo){
+
+        if (!combo) {
             return;
         }
+
         //bindStore dynamically to combo:
         combo.bindStore(sevStore);
         combo.setValue(sevStore.getAt(0).get('id'));
         combo.resetOriginalValue();
     },
+
     /**
      * initialises the QM SubSegment Fieldset in the MetaPanel
      * TODO FIXME: The MQM panel should be an own view with & this class here it's view controller
      */
-    initFieldSet: function() {
-    	if(!Editor.data.task.hasMqm()){
-    		return;
-    	}
-    	var mpForm = this.getMetaInfoForm(),
-    		pos = mpForm.items.findIndex('itemId', 'segmentQm') + 1; // MQM will be added after QM panel
-    	mpForm.insert(pos, {
-    		xtype: 'qualityMqmFieldset',
-			stateId: 'editor.eastPanelSegmentsMqmInside',
-			menuConfig: this.getMenuConfig(),
-			stateEvents: ['collapse', 'expand'],
-			stateful: {
-				collapsed: true
-			}
-    	});
+    initFieldSet: function () {
+        if (!Editor.data.task.hasMqm()) {
+            return;
+        }
+
+        const mpForm = this.getMetaInfoForm(),
+            pos = mpForm.items.findIndex('itemId', 'segmentQm') + 1; // MQM will be added after QM panel
+
+        mpForm.insert(pos, {
+            xtype: 'qualityMqmFieldset',
+            stateId: 'editor.eastPanelSegmentsMqmInside',
+            menuConfig: this.getMenuConfig(),
+            stateEvents: ['collapse', 'expand'],
+            stateful: {
+                collapsed: true
+            }
+        });
     },
+
     /**
      * generates the config menu tree for QM Flag Menu
      * @returns
      */
-    getMenuConfig: function() {
-		Editor.mqmFlagTypeCache = {};
-		var me = this,
-			cache = Editor.mqmFlagTypeCache,
-		iterate = function(node) {
-			var result, 
-			    text, id;
-			if(Ext.isArray(node)){
-				result = [];
-				Ext.each(node, function(item) {
-					result.push(iterate(item));
-				});
-				return result;
-			}
-			
-			text = node.text;
-			if(node.id <= 10) {
-			    id = node.id == 10 ? 0 : node.id;
-			    text += Ext.String.format(me.strings.buttonTooltip10, id);
-			}
-			else if(node.id > 10 && node.id <= 20) {
-			    id = node.id == 20 ? 0 : (node.id - 10);
-			    text += Ext.String.format(me.strings.buttonTooltip20, id);
-			}
-			
-			result = {
-				text: text,
-				qmid: node.id,
-				icon: me.getImgTagSrc(node.id, true),
-				qmtype: 'qm-'+node.id,
-				menuAlign: 'tr-tl'
-			};
-			cache[node.id] = node.text; 
-			if(node.children && node.children.length > 0) {
-				result.menu = {
-					enableKeyNav: false,
-					bodyCls: 'qmflag-menu',
-					items: iterate(node.children),
-	                listeners: {
-	                    afterrender: function(component) {
-	                    	if(component.keyNav) {
-	                    		component.keyNav.disable();
-	                    	}
-	                    }
-                	}
-				};
-			}
-			return result;
-		};
-		return iterate(Editor.data.task.getMqmCategories());
-	},
+    getMenuConfig: function () {
+        Editor.mqmFlagTypeCache = {};
+        const me = this,
+            cache = Editor.mqmFlagTypeCache,
+            iterate = function (node) {
+                var result,
+                    text, id;
+                if (Ext.isArray(node)) {
+                    result = [];
+                    Ext.each(node, function (item) {
+                        result.push(iterate(item));
+                    });
+                    return result;
+                }
+
+                text = node.text;
+                if (node.id <= 10) {
+                    id = node.id == 10 ? 0 : node.id;
+                    text += Ext.String.format(me.strings.buttonTooltip10, id);
+                } else if (node.id > 10 && node.id <= 20) {
+                    id = node.id == 20 ? 0 : (node.id - 10);
+                    text += Ext.String.format(me.strings.buttonTooltip20, id);
+                }
+
+                result = {
+                    text: text,
+                    qmid: node.id,
+                    icon: me.getImgTagSrc(node.id, true),
+                    qmtype: 'qm-' + node.id,
+                    menuAlign: 'tr-tl'
+                };
+                cache[node.id] = node.text;
+                if (node.children && node.children.length > 0) {
+                    result.menu = {
+                        enableKeyNav: false,
+                        bodyCls: 'qmflag-menu',
+                        items: iterate(node.children),
+                        listeners: {
+                            afterrender: function (component) {
+                                if (component.keyNav) {
+                                    component.keyNav.disable();
+                                }
+                            }
+                        }
+                    };
+                }
+                return result;
+            };
+        return iterate(Editor.data.task.getMqmCategories());
+    },
+
     /**
      * Inserts the QM Issue Tag in the Editor by key shortcut
      * @param key
      */
-    handleAddMqmKey: function(key) {
-        var me = this,
-            found = false,
-            menuitem = me.getMqmFieldset().down('menuitem[qmid='+key+']');
-        
+    handleAddMqmKey: function (key) {
+        const menuitem = this.getMqmFieldset().down('menuitem[qmid=' + key + ']');
+
         if (menuitem) {
-            me.handleAddMqmClick(menuitem);
+            this.handleAddMqmClick(menuitem);
         }
     },
+
     /**
      * Inserts the QM Issue Tag in the Editor
      * @param menuitem
      */
-    handleAddMqmClick: function(menuitem) {
-        var me = this,
-            sev = me.getMqmFieldset().down('combo[name="mqmseverity"]');
-            commentField = me.getMqmFieldset().down('textfield[name="mqmcomment"]'),
+    handleAddMqmClick: function (menuitem) {
+        const sev = this.getMqmFieldset().down('combo[name="mqmseverity"]'),
+            commentField = this.getMqmFieldset().down('textfield[name="mqmcomment"]'),
             format = Ext.util.Format,
-            comment = format.stripTags(commentField.getValue()).replace(/[<>"'&]/g,'');
-            //@todo when we are going to make qm subsegments editable, we should improve the handling of html tags in comments.
-            //since TRANSLATE-80 we are stripping the above chars, 
-            //because IE did not display the segment content completly with qm subsegments containing these chars
-            //WARNING: if we allow tags and special chars here, we must fix CSV export too! See comment in export/FileParser/Csv.php
-                
-        me.addMqmFlagToEditor(menuitem.qmid, comment, sev.getValue());
+            comment = format.stripTags(commentField.getValue()).replace(/[<>"'&]/g, '');
+
+        //@todo when we are going to make qm subsegments editable, we should improve the handling of html tags in comments.
+        //since TRANSLATE-80 we are stripping the above chars,
+        //because IE did not display the segment content completly with qm subsegments containing these chars
+        //WARNING: if we allow tags and special chars here, we must fix CSV export too! See comment in export/FileParser/Csv.php
+
+        this.addMqmFlagToEditor(menuitem.qmid, comment, sev.getValue());
         sev.reset();
         commentField.reset();
-        me.addMqmHistory(menuitem);
+        this.addMqmHistory(menuitem);
     },
+
     /**
-     * Inserts the QM Issue IMG Tags around the text selection in the editor 
+     * Inserts the QM Issue IMG Tags around the text selection in the editor
      * @param {Number} qmid Qm Issue ID
-     * @param {String} comment 
+     * @param {String} comment
      * @param {String} sev Severity ID
      * @return {Boolean}
      */
-    addMqmFlagToEditor: function(qmid, comment, sev){
-        var editor = this.getSegmentGrid().editingPlugin.editor.mainEditor,
-            tagDef;
+    addMqmFlagToEditor: function (qmid, comment, sev) {
+        const editor = this.getSegmentGrid().editingPlugin.editor.mainEditor;
+        let tagDef;
+
         // MQM tags must not be added in DEL tags, so there must be an error message for the user when his MQM selection ends in a delete tag.
-        if(! this.fireEvent('beforeInsertMqmTag')) {
+        if (!this.fireEvent('beforeInsertMqmTag')) {
             return;
         }
-        tagDef = this.insertMqmFlag(editor,qmid, comment, sev);
+
+        tagDef = this.insertMqmFlag(editor, qmid, comment, sev);
+
         // there may was no text selected
-        if(tagDef == null){
+        if (tagDef == null) {
             return;
         }
-        this.fireEvent('afterInsertMqmTag',tagDef); // Inserted tags are marked with INS-trackChange-markers.
+
+        this.fireEvent('afterInsertMqmTag', tagDef); // Inserted tags are marked with INS-trackChange-markers.
+
         return true;
     },
+
     /**
-     * QM IMG Tag Inserter for for Modern Browsers (= not IE) 
+     * QM IMG Tag Inserter for for Modern Browsers (= not IE)
      * @param {Editor.view.segments.HtmlEditor} editor
      * @param {Number} qmid Qm Issue ID
-     * @param {String} comment 
+     * @param {String} comment
      * @param {String} sev Severity ID
      * @returns {Object}
      */
-    insertMqmFlag: function(editor, qmid, comment, sev){
-		var doc = editor.getDoc(),
-			rangeBegin = doc.getSelection().getRangeAt(0),
-			rangeEnd = rangeBegin.cloneRange(),
-			tagDef = this.getImgTagDomConfig(qmid, comment, sev),
-			open = Ext.DomHelper.createDom(tagDef.open),
-			close = Ext.DomHelper.createDom(tagDef.close);
+    insertMqmFlag: function (editor, qmid, comment, sev) {
+        const selection = editor.editor.getSelection();
 
-		// check if there is actual text selected
-		if(rangeBegin.startOffset === rangeBegin.endOffset) {
-		    return null;
-		}
+        // check if there is actual text selected
+        if (selection.start === selection.end) {
+            return null;
+        }
 
-		rangeBegin.collapse(true);
-		rangeEnd.collapse(false);
-		rangeEnd.insertNode(close);
-		rangeBegin.insertNode(open);
-		doc.getSelection().removeAllRanges();
-		rangeEnd.collapse(false);
-		doc.getSelection().addRange(rangeEnd);
-		return tagDef;
+        const tagDef = this.getImgTagDomConfig(qmid, comment, sev),
+            open = Ext.DomHelper.createDom(tagDef.open).outerHTML,
+            close = Ext.DomHelper.createDom(tagDef.close).outerHTML;
+
+        editor.editor.replaceContentInRange(selection.end, selection.end, close);
+        editor.editor.replaceContentInRange(selection.start, selection.start, open);
+
+        return tagDef;
     },
+
     /**
-     * generates a Dom Config Object with the to image tags 
+     * generates a Dom Config Object with the to image tags
      * @param {Number} qmid Qm Issue ID
-     * @param {String} comment 
+     * @param {String} comment
      * @param {String} sev Severity ID
      * @returns {Object}
      */
-    getImgTagDomConfig: function(qmid, comment, sev) {
-    	var me = this, 
-    		uniqid = Ext.id(), // retrieves something like ext-1234. This is crucial to distinguish these IDs from real database quality id's
-    		config = function(open){
-    		return {
-    			tag: 'img', 
-    			id: 'qm-image-'+(open ? 'open' : 'close')+'-'+uniqid, 
-    			'data-comment': (comment ? comment : ""), 
-    			'data-t5qid': uniqid, 
-    			//minor qmflag qmflag-2 ownttip open
-    			cls: sev+' qmflag ownttip '+(open ? 'open' : 'close')+' qmflag-'+qmid, 
-    			src: me.getImgTagSrc(qmid, open)
-    		};
-    	};
-    	return {
-    		open: config(true),
-    		close: config(false)
-    	};
+    getImgTagDomConfig: function (qmid, comment, sev) {
+        const me = this,
+            uniqid = Ext.id(), // retrieves something like ext-1234. This is crucial to distinguish these IDs from real database quality id's
+            config = function (open) {
+                return {
+                    tag: 'img',
+                    id: 'qm-image-' + (open ? 'open' : 'close') + '-' + uniqid,
+                    'data-comment': (comment ? comment : ""),
+                    'data-t5qid': uniqid,
+                    //minor qmflag qmflag-2 ownttip open
+                    cls: sev + ' qmflag ownttip ' + (open ? 'open' : 'close') + ' qmflag-' + qmid,
+                    src: me.getImgTagSrc(qmid, open)
+                };
+            };
+
+        return {
+            open: config(true),
+            close: config(false)
+        };
     },
+
     /**
      * generates the image tag src
      * @param {String} qmid
      * @param {Boolean} open
      * @returns {String}
      */
-    getImgTagSrc: function(qmid, open) {
-    	return Editor.data.segments.subSegment.tagPath+'qmsubsegment-'+qmid+'-'+(open ? 'left' : 'right')+'.png';
+    getImgTagSrc: function (qmid, open) {
+        return Editor.data.segments.subSegment.tagPath + 'qmsubsegment-' + qmid + '-' + (open ? 'left' : 'right') + '.png';
     },
+
     /**
      * maintains the last used QM Flags in the first level of the menu
      * @param {Ext.menu.Item} menuitem
      */
-    addMqmHistory: function(menuitem) {
-    	if(menuitem.parentMenu && !menuitem.parentMenu.parentMenu) {
-    		return; //ignore first level and history menu entries
-    	}
-    	var me = this,
-    	id = menuitem.qmid,
-    	toremove,
-    	toadd = Ext.applyIf({}, menuitem.initialConfig),
-    	menu = me.getAddMenuFirstLevel();
-    	if(! me.lastUsed){
-        	me.lastUsed = [];
-        	me.historyTopIndex = menu.items.length + 1;
-        	menu.add('-');
-    	}
-    	delete toadd.menu;
-    	
-    	//if already in list ignore
-    	if(Ext.Array.contains(me.lastUsed, id)){
-    		Ext.Array.remove(me.lastUsed, id); // remove from stack
-    		me.lastUsed.push(id); //and put it to the end
-    		return;
-    	}
-    	
-    	menu.insert(me.historyTopIndex, toadd);
-    	
-    	//cycle through lastused id array
-    	me.lastUsed.push(id);
-    	if(me.lastUsed.length > 5) {
-    		toremove = me.lastUsed.shift();
-    		toremove = menu.query('> menuitem[qmid="'+toremove+'"]');
-    		if(toremove.length > 0){
-    			toremove[0].destroy();
-    		}
-    	}
+    addMqmHistory: function (menuitem) {
+        if (menuitem.parentMenu && !menuitem.parentMenu.parentMenu) {
+            return; //ignore first level and history menu entries
+        }
+
+        const me = this,
+            id = menuitem.qmid,
+            toadd = Ext.applyIf({}, menuitem.initialConfig),
+            menu = me.getAddMenuFirstLevel();
+
+        if (!me.lastUsed) {
+            me.lastUsed = [];
+            me.historyTopIndex = menu.items.length + 1;
+            menu.add('-');
+        }
+
+        delete toadd.menu;
+
+        //if already in list ignore
+        if (Ext.Array.contains(me.lastUsed, id)) {
+            Ext.Array.remove(me.lastUsed, id); // remove from stack
+            me.lastUsed.push(id); //and put it to the end
+
+            return;
+        }
+
+        menu.insert(me.historyTopIndex, toadd);
+
+        //cycle through lastused id array
+        me.lastUsed.push(id);
+        let toremove;
+
+        if (me.lastUsed.length > 5) {
+            toremove = me.lastUsed.shift();
+            toremove = menu.query('> menuitem[qmid="' + toremove + '"]');
+
+            if (toremove.length > 0) {
+                toremove[0].destroy();
+            }
+        }
     }
 });

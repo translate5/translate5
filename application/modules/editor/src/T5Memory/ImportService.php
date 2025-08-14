@@ -35,6 +35,7 @@ use DOMXPath;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
+use MittagQI\Translate5\T5Memory\Api\Contract\TmxImportPreprocessorInterface;
 use MittagQI\Translate5\T5Memory\Api\Response\ImportStatusResponse;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
@@ -54,10 +55,9 @@ class ImportService
         private readonly Zend_Config $config,
         private readonly ZfExtended_Logger $logger,
         private readonly T5MemoryApi $t5MemoryApi,
-        private readonly TmxImportPreprocessor $tmxImportPreprocessor,
+        private readonly TmxImportPreprocessorInterface $tmxImportPreprocessor,
         private readonly PersistenceService $persistenceService,
         private readonly ReorganizeService $reorganizeService,
-        private readonly MemoryNameGenerator $memoryNameGenerator,
         private readonly FlushMemoryService $flushMemoryService,
         private readonly CreateMemoryService $createMemoryService,
         private readonly RetryService $waitingService,
@@ -73,7 +73,6 @@ class ImportService
             TmxImportPreprocessor::create(),
             PersistenceService::create(),
             ReorganizeService::create(),
-            new MemoryNameGenerator(),
             FlushMemoryService::create(),
             CreateMemoryService::create(),
             RetryService::create(),
@@ -109,6 +108,20 @@ class ImportService
                 $languageResource->save();
 
                 throw $e;
+            }
+
+            if (! $tmName) {
+                try {
+                    $tmName = $this->persistenceService->getLastWritableMemory($languageResource);
+                } catch (\editor_Services_Connector_Exception $e) {
+                    // If there is no writable memory (E1564), we create a new one
+                    if (1564 !== $e->getCode()) {
+                        throw $e;
+                    }
+
+                    $tmName = $this->createMemoryService->createEmptyMemoryWithRetry($languageResource);
+                    $this->persistenceService->addMemoryToLanguageResource($languageResource, $tmName);
+                }
             }
 
             $this->importTmxIntoMemory(
@@ -221,9 +234,7 @@ class ImportService
             $this->addOverflowLog($languageResource, $status);
             $this->flushMemoryService->flush($languageResource, $tmName);
 
-            $newName = $this->memoryNameGenerator->generateNextMemoryName($languageResource);
-
-            $newName = $this->createMemoryService->createEmptyMemoryWithRetry($languageResource, $newName);
+            $newName = $this->createMemoryService->createEmptyMemoryWithRetry($languageResource);
 
             $this->persistenceService->addMemoryToLanguageResource($languageResource, $newName);
 

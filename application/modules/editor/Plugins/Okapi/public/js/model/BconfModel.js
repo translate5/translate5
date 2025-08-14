@@ -78,6 +78,19 @@ Ext.define('Editor.plugins.Okapi.model.BconfModel', {
         type: 'auto',
         defaultValue: [],
         persist: false
+    }, {
+        name: 'patchedEntities',
+        type: 'string',
+        convert: function (value) {
+            if(Array.isArray(value)){
+                return value.sort();
+            }
+            return String(value).split(',').sort();
+        },
+        serialize: function(value){
+            return value.join(',');
+        }
+
     }],
     toUrl: function(){
         return Ext.util.History.getToken().replace(/bconf\/?\d*.*$/, 'bconf/' + this.id)
