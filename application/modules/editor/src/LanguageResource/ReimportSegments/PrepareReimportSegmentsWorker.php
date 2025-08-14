@@ -33,12 +33,10 @@ namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 use editor_Models_Task_AbstractWorker;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\CreateSnapshot;
-use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use Throwable;
 use ZfExtended_ErrorCodeException;
 use ZfExtended_Exception;
-use ZfExtended_Factory;
 
 class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
 {
