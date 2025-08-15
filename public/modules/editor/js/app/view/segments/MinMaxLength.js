@@ -134,7 +134,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * Updates the
      */
     updateNumCharsLabel: function () {
-        const editorMarkup = this.editor.editor.getRawData(),
+        const editorMarkup = RichTextEditor.stringToDom(this.editor.editor.getRawData()),
             numChars = this.getLength(editorMarkup, {});
 
         this.update({
