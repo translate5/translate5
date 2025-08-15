@@ -27,7 +27,8 @@ export default class TagCheck {
 
         this.#fixDuplicateImgIds(tags);
         const checkResult = this.#validateTags(tags);
-        this.#removeOrphanedTags(tags);
+        // TODO clarify if we still need this
+        // this.#removeOrphanedTags(tags);
 
         if (!checkResult.isSuccessful()) {
             console.log('Check result is not successful');
@@ -38,12 +39,10 @@ export default class TagCheck {
     }
 
     #validateTags(tags) {
-        const _this = this;
-
         // Extract tags from HTML
         const tagList = Array.from(tags)
             // Filter out deleted tags and tags with the qmflag class as we don't need to check them
-            .filter(tag => !this.#isDeletedTag(tag) || /qmflag/.test(tag.className));
+            .filter(tag => ! this.#isDeletedTag(tag) && ! /qmflag/.test(tag.className));
 
         const ignoreWhitespace = this.#shouldIgnoreWhitespaceTags();
         const tagStack = [];
@@ -56,8 +55,8 @@ export default class TagCheck {
         };
 
         for (const tag of tagList) {
-            const tagType = _this.tagsConversion.getInternalTagType(tag);
-            const tagId = _this.tagsConversion.getInternalTagNumber(tag);
+            const tagType = this.tagsConversion.getInternalTagType(tag);
+            const tagId = this.tagsConversion.getInternalTagNumber(tag);
 
             let isWhitespaceTag = tagType === TagsConversion.TYPE.WHITESPACE;
 

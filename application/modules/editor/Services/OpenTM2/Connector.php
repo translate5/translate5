@@ -49,6 +49,7 @@ use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
+use MittagQI\Translate5\T5Memory\FuzzySearchService;
 use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\MemoryNameGenerator;
 use MittagQI\Translate5\T5Memory\PersistenceService;
@@ -64,7 +65,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
 
-    protected const TAG_HANDLER_CONFIG_PART = 't5memory';
+    public const TAG_HANDLER_CONFIG_PART = 't5memory';
 
     public const NEXT_SUFFIX = '_next-';
 
@@ -102,6 +103,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private readonly FlushMemoryService $flushMemoryService;
 
+    private readonly FuzzySearchService $fuzzySearchService;
+
     private QueryCache $queryCache;
 
     public function __construct()
@@ -131,6 +134,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $this->createMemoryService = CreateMemoryService::create();
         $this->waitingService = RetryService::create();
         $this->flushMemoryService = FlushMemoryService::create();
+        $this->fuzzySearchService = FuzzySearchService::create();
         $this->queryCache = QueryCache::create();
     }
 
@@ -607,7 +611,32 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     {
         $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
-        $resultList = $this->queryTms($queryString, $segment, $fileName);
+        $context = $this->getSegmentContext($segment);
+
+        //TODO final implemenation: get prefix and other key relevant information from underlying api instance
+        $key = [
+            $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix,
+            $this->languageResource->getId(),
+            $fileName,
+            $context,
+            $queryString,
+        ];
+
+        $resultList = $this->queryCache->get($key);
+
+        if ($resultList === null) {
+            $resultList = $this->fuzzySearchService->query(
+                $this->languageResource,
+                $queryString,
+                $context,
+                $fileName,
+                $this->calculateMatchRate($segment),
+                $this->config,
+                $this->isInternalFuzzy(),
+            );
+
+            $this->queryCache->set($key, $resultList);
+        }
 
         if (empty($resultList->getResult())) {
             return $resultList;
@@ -622,42 +651,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     protected function getFileName(editor_Models_Segment $segment): string
     {
         return editor_ModelInstances::file((int) $segment->getFileId())->getFileName();
-    }
-
-    /**
-     * Helper function to get the metadata which should be shown in the GUI out of a single result
-     *
-     * @return stdClass[]
-     */
-    private function getMetaData(object $found): array
-    {
-        $nameToShow = [
-            'segmentId',
-            'documentName',
-            'matchType',
-            'author',
-            'timestamp',
-            'context',
-            'additionalInfo',
-            'internalKey',
-            'sourceLang',
-            'targetLang',
-        ];
-        $result = [];
-
-        foreach ($nameToShow as $name) {
-            if (property_exists($found, $name)) {
-                $item = new stdClass();
-                $item->name = $name;
-                $item->value = $found->{$name};
-                if ($name == 'timestamp') {
-                    $item->value = date('Y-m-d H:i:s T', strtotime($item->value));
-                }
-                $result[] = $item;
-            }
-        }
-
-        return $result;
     }
 
     /**
@@ -809,7 +802,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $dummySegment = ZfExtended_Factory::get(editor_Models_Segment::class);
         $dummySegment->init();
 
-        return $this->queryTms($searchString, $dummySegment, 'source');
+        return $this->fuzzySearchService->query(
+            $this->languageResource,
+            $searchString,
+            '',
+            'source',
+            $this->calculateMatchRate($dummySegment),
+            $this->config,
+            $this->isInternalFuzzy(),
+        );
     }
 
     public function delete(): void
@@ -867,7 +868,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             'languageResource' => $this->languageResource ?? '',
             'tmName' => $tmName,
             'error' => $error,
+            'request' => $this->api->request,
+            'response' => $this->api->getResponse()->getBody(),
         ];
+
+        $this->api->request = null;
+
         if (strpos($error->error ?? '', 'needs to be organized') !== false) {
             $ecode = 'E1314';
             $data['tm'] = $this->languageResource->getName();
@@ -969,46 +975,41 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     /**
      * Calculate the new matchrate value.
      * Check if the current match is of type context-match or exact-exact match
-     *
-     * @param int $matchRate
-     * @param array $metaData
-     * @param editor_Models_Segment $segment
-     * @param string $filename
-     *
-     * @return integer
      */
-    protected function calculateMatchRate($matchRate, $metaData, $segment, $filename)
+    protected function calculateMatchRate(editor_Models_Segment $segment): callable
     {
-        if ($matchRate < 100) {
+        return function ($matchRate, $metaData, $filename) use ($segment) {
+            if ($matchRate < 100) {
+                return $matchRate;
+            }
+
+            $context = $this->getSegmentContext($segment);
+
+            $isExacExac = false;
+            $isContext = false;
+            foreach ($metaData as $data) {
+                //exact-exact match
+                if ($data->name == "documentName" && $data->value == $filename) {
+                    $isExacExac = true;
+                }
+
+                //context metch
+                if ($data->name == "context" && $data->value == $context) {
+                    $isContext = true;
+                }
+            }
+
+            if ($isExacExac && $isContext) {
+                return self::CONTEXT_MATCH_VALUE;
+            }
+
+            // exact match only for case when no res-name is set
+            if ($isExacExac && empty($segment->meta()->getSegmentDescriptor())) {
+                return self::EXACT_EXACT_MATCH_VALUE;
+            }
+
             return $matchRate;
-        }
-
-        $context = $this->getSegmentContext($segment);
-
-        $isExacExac = false;
-        $isContext = false;
-        foreach ($metaData as $data) {
-            //exact-exact match
-            if ($data->name == "documentName" && $data->value == $filename) {
-                $isExacExac = true;
-            }
-
-            //context metch
-            if ($data->name == "context" && $data->value == $context) {
-                $isContext = true;
-            }
-        }
-
-        if ($isExacExac && $isContext) {
-            return self::CONTEXT_MATCH_VALUE;
-        }
-
-        // exact match only for case when no res-name is set
-        if ($isExacExac && empty($segment->meta()->getSegmentDescriptor())) {
-            return self::EXACT_EXACT_MATCH_VALUE;
-        }
-
-        return $matchRate;
+        };
     }
 
     /**
@@ -1188,20 +1189,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $resultList;
     }
 
-    /**
-     * Reduce the given matchrate to given percent.
-     * It is used when unsupported tags are found in the response result, and those tags are removed.
-     * @param integer $matchrate
-     * @param integer $reducePercent
-     * @return number
-     */
-    protected function reduceMatchrate($matchrate, $reducePercent)
-    {
-        //reset higher matches than 100% to 100% match
-        //if the matchrate is higher than 0, reduce it by $reducePercent %
-        return max(0, min($matchrate, 100) - $reducePercent);
-    }
-
     private function addOverflowLog(Task $task = null): void
     {
         $params = [
@@ -1218,159 +1205,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             'Language Resource [{name}] current writable memory is overflown, creating a new one',
             $params
         );
-    }
-
-    private function queryTms(
-        string $queryString,
-        editor_Models_Segment $segment,
-        string $fileName,
-    ): editor_Services_ServiceResult {
-        //TODO final implemenation: get prefix and other key relevant information from underlying api instance
-        $key = [
-            $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix,
-            $this->languageResource->getId(),
-            $fileName,
-            //FIXME this part of the key will change with next feature release!
-            $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask(),
-            $queryString,
-        ];
-
-        $result = $this->queryCache->get($key);
-        if ($result === null) {
-            $result = $this->queryTmsNative($queryString, $segment, $fileName);
-            $this->queryCache->set($key, $result);
-        }
-
-        return $result;
-    }
-
-    private function queryTmsNative(
-        string $queryString,
-        editor_Models_Segment $segment,
-        string $fileName,
-    ): editor_Services_ServiceResult {
-        $resultList = new editor_Services_ServiceResult();
-        $resultList->setLanguageResource($this->languageResource);
-
-        //if source is empty, t5memory will return an error, therefore we just return an empty list
-        if (empty($queryString) && $queryString !== '0') {
-            return $resultList;
-        }
-
-        if ($this->languageResource->isConversionStarted()) {
-            return $resultList;
-        }
-
-        //Although we take the source fields from the t5memory answer below
-        // we have to set the default source here to fill the be added internal tags
-        $resultList->setDefaultSource($queryString);
-        $query = $this->tagHandler->prepareQuery($queryString);
-
-        $results = [];
-
-        foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
-            $tmName = $memory['filename'];
-
-            if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName)) {
-                if (! $this->waitingService->canWaitLongTaskFinish()) {
-                    continue;
-                }
-
-                $this->reorganizeService->waitReorganizeFinished(
-                    $this->languageResource,
-                    $tmName,
-                );
-            }
-
-            $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
-
-            $response = ApiResponse::fromContentAndStatus(
-                $this->api->getResponse()->getBody(),
-                $this->api->getResponse()->getStatus(),
-            );
-
-            if ($this->reorganizeService->needsReorganizing(
-                $response,
-                $this->languageResource,
-                $tmName,
-            )) {
-                $options = new ReorganizeOptions(
-                    $this->config
-                        ->runtimeOptions
-                        ->LanguageResources
-                        ->t5memory
-                        ->saveDifferentTargetsForSameSource
-                );
-                $this->reorganizeService->reorganizeTm(
-                    $this->languageResource,
-                    $tmName,
-                    $options,
-                    $this->isInternalFuzzy(),
-                );
-                $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
-            }
-
-            if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
-                $lookup = fn () => $this->api->lookup($segment, $query, $fileName, $tmName)
-                    ? [WaitCallState::Done, true]
-                    : [WaitCallState::Retry, false];
-
-                $successful = (bool) $this->waitingService->callAwaiting($lookup);
-            }
-
-            if (! $successful) {
-                $this->logger->exception($this->getBadGatewayException($tmName));
-
-                continue;
-            }
-
-            // In case we have at least one successful lookup, we reset the reorganize attempts
-            $this->reorganizeService->resetReorganizeAttempts($this->languageResource, $this->isInternalFuzzy());
-
-            $result = $this->api->getResult();
-
-            if ((int) ($result->NumOfFoundProposals ?? 0) === 0) {
-                continue;
-            }
-
-            $results[] = $result->results;
-        }
-
-        if (empty($results)) {
-            return $resultList;
-        }
-
-        $results = array_merge(...$results);
-
-        foreach ($results as $found) {
-            $target = $this->tagHandler->restoreInResult($found->target, false);
-            $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
-
-            $source = $this->tagHandler->restoreInResult($found->source);
-            $hasSourceErrors = $this->tagHandler->hasRestoreErrors();
-
-            if ($hasTargetErrors || $hasSourceErrors) {
-                //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
-                $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
-            }
-
-            $matchrate = $this->calculateMatchRate(
-                $found->matchRate,
-                $this->getMetaData($found),
-                $segment,
-                $fileName
-            );
-            $metaData = $this->getMetaData($found);
-            $metaDataAssoc = array_column($metaData, 'value', 'name');
-            $timestamp = 0;
-            if (! empty($metaDataAssoc['timestamp'])) {
-                $timestamp = (int) strtotime($metaDataAssoc['timestamp']);
-            }
-            $resultList->addResult($target, $matchrate, $metaData, $found->target, $timestamp);
-            $resultList->setSource($source);
-        }
-
-        return $resultList;
     }
 
     public function export(string $mime): ?string

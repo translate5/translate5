@@ -152,12 +152,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * searches for matches in the TM
      */
-    public function lookup(
-        editor_Models_Segment $segment,
-        string $queryString,
-        string $filename,
-        string $tmName,
-    ): bool {
+    public function lookup(string $queryString, string $context, string $filename, string $tmName): bool
+    {
         $json = new stdClass();
 
         $json->sourceLang = $this->languageResource->getSourceLangCode();
@@ -177,7 +173,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->documentName = $filename;
 
         $json->markupTable = self::MARKUP_TABLE; //NEEDED otherwise t5memory crashes
-        $json->context = $segment->meta()->getSegmentDescriptor() ?: $segment->getSegmentNrInTask();
+        $json->context = $context;
 
         $http = $this->getHttpWithMemory('POST', $tmName, 'fuzzysearch');
 
@@ -185,6 +181,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         return $this->processResponse($http->request());
     }
+
+    public $request = null;
 
     /**
      * This method searches the given search string in the proposals contained in a memory (concordance search).
@@ -215,6 +213,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->msSearchAfterNumResults = 250;
         $http = $this->getHttpWithMemory('POST', $tmName, 'concordancesearch');
         $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
+
+        $this->request = $this->jsonEncode($data);
 
         return $this->processResponse($http->request());
     }

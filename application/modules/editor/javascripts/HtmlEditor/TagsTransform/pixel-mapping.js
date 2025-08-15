@@ -64,7 +64,7 @@ export default class PixelMapping {
             pixelMappingForCharacter,
             charWidth;
 
-        const getCharWidth = function (unicodeCharNumeric) {
+        const getCharWidth = (unicodeCharNumeric) => {
             if (pixelMapping[unicodeCharNumeric] !== undefined) {
                 pixelMappingForCharacter = pixelMapping[unicodeCharNumeric];
                 if (pixelMappingForCharacter[this.font.fieldId] !== undefined) {

@@ -1,12 +1,23 @@
 import stringToDom from "../Tools/string-to-dom";
 
 export default class InsertPreprocessor {
+    /**
+     * @private
+     * @type {TagsConversion}
+     */
     #tagsConversion = null;
 
+    /**
+     * @param {TagsConversion} tagsTransform
+     */
     constructor(tagsTransform) {
         this.#tagsConversion = tagsTransform;
     }
 
+    /**
+     * @param {HTMLElement} doc
+     * @returns {HTMLElement}
+     */
     cleanup(doc) {
         const result = stringToDom('');
         const _this = this;
@@ -23,7 +34,7 @@ export default class InsertPreprocessor {
                     continue;
                 }
 
-                if (_this.#tagsConversion.isInternalTagNode(node)) {
+                if (_this.#tagsConversion.isInternalTagNode(node) || _this.#tagsConversion.isMQMNode(node)) {
                     result.appendChild(node.cloneNode(true));
 
                     continue;

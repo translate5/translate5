@@ -36,6 +36,8 @@ use MittagQI\Translate5\Plugins\Okapi\ImportFilter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use MittagQI\Translate5\Plugins\Okapi\OkapiService;
+use MittagQI\Translate5\Plugins\Okapi\Worker\OkapiImportWorker;
+use MittagQI\Translate5\Plugins\Okapi\Worker\OkapiWorkerHelper;
 use MittagQI\Translate5\Task\FileTranslation\FileTranslation;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
@@ -611,7 +613,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             $meta = $task->meta();
             $bconf = empty($meta->getBconfInZip()) ? self::getImportBconfById($task, $meta->getBconfId()) : null;
             $importFilter = new ImportFilter($bconf, $meta->getBconfInZip());
-            $okapiDataDir = $task->getAbsoluteTaskDataPath() . '/' . editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR;
+            $okapiDataDir = $task->getAbsoluteTaskDataPath() . '/' . OkapiWorkerHelper::OKAPI_REL_DATA_DIR;
             $okapiDataDirExists = is_dir($okapiDataDir);
 
             if ($this->doDebug) {
@@ -940,7 +942,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
 
         try {
             $worker = new ZfExtended_Models_Worker();
-            $worker->loadFirstOf(editor_Plugins_Okapi_Worker::class, $task->getTaskGuid());
+            $worker->loadFirstOf(OkapiImportWorker::class, $task->getTaskGuid());
 
             //proceed with the archive only, if a okapi worker was found for the current task
             $directoryProvider = ZfExtended_Factory::get(
@@ -1062,10 +1064,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      */
     protected function wasImportedWithOkapi(editor_Models_Task $task, int $fileId): bool
     {
-        $path = $task->getAbsoluteTaskDataPath() . '/' . editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR . '/';
-        $okapiManifestFile = new SplFileInfo(
-            $path . sprintf(editor_Plugins_Okapi_Worker::MANIFEST_FILE, $fileId)
-        );
+        $path = $task->getAbsoluteTaskDataPath() . '/' . OkapiWorkerHelper::OKAPI_REL_DATA_DIR . '/';
+        $okapiManifestFile = new SplFileInfo($path . OkapiWorkerHelper::createManifestFileName($fileId));
 
         return $okapiManifestFile->isReadable();
     }
@@ -1106,7 +1106,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         $workerParentId = $params['workerParentId'];
 
         $params = [
-            'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
             'fileId' => $fileId,
             'file' => (string) $file,
             'importFolder' => $params['importFolder'],
@@ -1116,7 +1115,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         ];
 
         // init worker and queue it
-        $worker = ZfExtended_Factory::get(editor_Plugins_Okapi_Worker::class);
+        $worker = new OkapiImportWorker();
         if (! $worker->init($task->getTaskGuid(), $params)) {
             return;
         }

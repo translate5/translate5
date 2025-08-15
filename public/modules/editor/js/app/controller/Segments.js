@@ -67,7 +67,7 @@ Ext.define('Editor.controller.Segments', {
     extend: 'Ext.app.Controller',
     stores: ['Segments'],
     //views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
-    views: ['segments.RowEditing', 'segments.HtmlEditor', 'ToolTip'],
+    views: ['segments.RowEditing', 'segments.new.EditorNew', 'ToolTip'],
     messages: {
         sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',
         segmentNotSaved: '#UT# Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!',
@@ -215,6 +215,7 @@ Ext.define('Editor.controller.Segments', {
         if (!grid || grid.isVisible(true) === false) {
             return;
         }
+
         me.updateFilteredCountDisplay(newTotal);
 
         if (filters.length > 0 || me.isQualityFiltered) {

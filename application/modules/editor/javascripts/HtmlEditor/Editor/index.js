@@ -5,7 +5,10 @@ import stringToDom from "../Tools/string-to-dom";
 import escapeHtml from "../Tools/escape-html";
 import unescapeHtml from "../Tools/unescape-html";
 import calculateNodeLength from "../Tools/calculate-node-length";
+import calculateNodeOffsets from "../Tools/calculate-node-offsets";
 import unwrapHtmlNodeToText from "../Tools/unwrap-html-node";
+import nodesAreSame from "../Tools/compare-html-nodes";
+import insertHtmlAt from "../Tools/insert-into-html";
 
 export {
     EditorWrapper,
@@ -15,5 +18,8 @@ export {
     escapeHtml,
     unescapeHtml,
     calculateNodeLength,
-    unwrapHtmlNodeToText
+    calculateNodeOffsets,
+    unwrapHtmlNodeToText,
+    nodesAreSame,
+    insertHtmlAt,
 };

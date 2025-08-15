@@ -166,6 +166,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->view->headLink()->appendStylesheet(APPLICATION_RUNDIR . "/" . $oneCss);
         }
 
+        $this->view->headLink()->appendStylesheet(
+            APPLICATION_RUNDIR . "/modules/" . Zend_Registry::get('module') . "/css/htmleditor.css"
+        );
+
         $this->view->appVersion = $appVersion = ZfExtended_Utils::getAppVersion();
         $this->setJsVarsInView();
         $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.theme']['defaults']);
@@ -431,10 +435,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->setLanguageResourceJsVars();
 
         $this->view->Php2JsVars()->set('editor.editorBrandingSource', $rop->editor->editorBrandingSource);
-
-        $this->view->Php2JsVars()->set('editor.htmleditorCss', [
-            APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module') . '/css/htmleditor.css',
-        ]);
 
         $helpWindowConfig = [];
         if (isset($rop->frontend->helpWindow)) {

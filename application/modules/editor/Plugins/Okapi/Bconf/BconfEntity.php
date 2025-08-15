@@ -85,6 +85,8 @@ use ZfExtended_Utils;
  * @method void setCustomerId(mixed $customerId)
  * @method string getVersionIdx()
  * @method void setVersionIdx(int $versionIdx)
+ * @method string getPatchedEntities()
+ * @method void setPatchedEntities(string $name)
  */
 final class BconfEntity extends ZfExtended_Models_Entity_Abstract
 {

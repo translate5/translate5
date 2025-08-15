@@ -1,3 +1,5 @@
+import escapeHtml from '../Tools/escape-html.js';
+
 export default DocumentFragment = {
     toHTMLString() {
         let html = '',
@@ -12,7 +14,7 @@ export default DocumentFragment = {
                 // Attributes
                 if (node.getAttributes()) {
                     for (const [key, value] of node.getAttributes()) {
-                        html += ` ${key}="${value}"`;
+                        html += ` ${key}="${escapeHtml(value)}"`;
                     }
                 }
 
@@ -27,7 +29,7 @@ export default DocumentFragment = {
                 html += `</${node.name}>`;
             } else if (node.is('text')) {
                 // Text node
-                html += node.data;
+                html += escapeHtml(node.data);
             }
         }
 

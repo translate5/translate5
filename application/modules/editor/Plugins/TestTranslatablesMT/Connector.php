@@ -46,6 +46,10 @@ class editor_Plugins_TestTranslatablesMT_Connector extends editor_Services_Conne
         $queryString = $this->tagHandler->prepareQuery($queryString);
         $results = [$this->replaceCharacters($queryString)];
 
+        if (empty($results)) {
+            return $this->resultList;
+        }
+
         foreach ($results as $result) {
             $this->resultList->addResult($this->tagHandler->restoreInResult($result), $this->defaultMatchRate);
             $this->resultList->setSource($this->tagHandler->restoreInResult($queryString));
@@ -61,6 +65,10 @@ class editor_Plugins_TestTranslatablesMT_Connector extends editor_Services_Conne
         }
 
         $allResults = [$this->replaceCharacters($searchString)];
+
+        if (empty($allResults)) {
+            return $this->resultList;
+        }
 
         $this->resultList->setDefaultSource($searchString);
 

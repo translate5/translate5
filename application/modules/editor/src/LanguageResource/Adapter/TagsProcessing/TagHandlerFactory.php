@@ -37,6 +37,7 @@ use editor_Services_Connector_TagHandler_Remover;
 use editor_Services_Connector_TagHandler_T5MemoryXliff;
 use editor_Services_Connector_TagHandler_Xliff;
 use Zend_Config;
+use Zend_Registry;
 use ZfExtended_Factory as Factory;
 
 class TagHandlerFactory
@@ -46,10 +47,17 @@ class TagHandlerFactory
     ) {
     }
 
-    public function createTagHandler(string $config, array $params = []): editor_Services_Connector_TagHandler_Abstract
+    public static function create(): self
     {
-        $config = $this->config->runtimeOptions->LanguageResources->{$config};
-        $configuredHandler = $config ? $config->tagHandler : null;
+        return new self(
+            Zend_Registry::get('config'),
+        );
+    }
+
+    public function createTagHandler(string $resourceAlias, array $params = [], ?Zend_Config $config = null): editor_Services_Connector_TagHandler_Abstract
+    {
+        $config = $config ?? $this->config;
+        $configuredHandler = $config->runtimeOptions->LanguageResources->{$resourceAlias}?->tagHandler ?? null;
 
         // Using Factory::get here for backwards compatibility as there might be overwritten tag handlers
         return match ($configuredHandler) {

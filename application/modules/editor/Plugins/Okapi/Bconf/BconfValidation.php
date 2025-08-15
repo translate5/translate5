@@ -29,9 +29,9 @@
 namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
 
 use editor_Models_ConfigException;
-use editor_Plugins_Okapi_Worker;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use MittagQI\Translate5\Plugins\Okapi\Worker\OkapiWorkerHelper;
 use ReflectionException;
 use SplFileInfo;
 use Throwable;
@@ -147,7 +147,7 @@ class BconfValidation
         if (! is_dir($testDir)) {
             @mkdir($testDir, 0777, true);
         }
-        $manifestFile = sprintf(editor_Plugins_Okapi_Worker::MANIFEST_FILE, 'test');
+        $manifestFile = sprintf(OkapiWorkerHelper::MANIFEST_FILE, 'test');
         $testfile = basename($testfilePath);
         $api = new OkapiAdapter();
 

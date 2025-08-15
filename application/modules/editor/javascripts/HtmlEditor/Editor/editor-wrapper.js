@@ -1,10 +1,9 @@
 import Editor from "../Source";
 import TagsConversion from "../TagsTransform/tags-conversion";
-import PixelMapping from "../TagsTransform/pixel-mapping";
 import stringToDom from "../Tools/string-to-dom";
 import DataTransformer from "../DataTransform/data-transformer";
 import CallbacksQueue from "./callbacks-queue";
-import DeletedElement from "./deleted-element";
+import ModelNode from "./model-node";
 import DocumentFragment from "../Mixin/document-fragment";
 import InsertPreprocessor from "../DataCleanup/insert-preprocessor";
 
@@ -21,6 +20,8 @@ export default class EditorWrapper {
 
     static EDITOR_EVENTS = {
         DATA_CHANGED: 'dataChanged',
+        ON_CLICK: 'onclick',
+        ON_ARROW_KEY: 'onArrowKey',
     };
 
     #font = null;
@@ -55,7 +56,11 @@ export default class EditorWrapper {
             [EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]: [],
         };
 
-        // this._cachedSelection = {content: null, position: null};
+        this.registerModifier(
+            EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
+            (text, actions) => this.#removeTagOnCorrespondingDeletion(text, actions),
+            0
+        );
 
         return this.#create();
     }
@@ -68,6 +73,7 @@ export default class EditorWrapper {
      * Reset editor state to avoid having history of editing from the previous instance
      */
     resetEditor() {
+        this.modifiersLastRunId = null;
         this._editor.model.change(writer => {
             const root = this._editor.model.document.getRoot();
             writer.remove(writer.createRangeIn(root));
@@ -105,7 +111,47 @@ export default class EditorWrapper {
             this.#userCanInsertWhitespaceTags
         );
         this.#setRawData(this.dataTransformer.toString());
+        this._editor.editing.view.focus();
+        this.setCursorToEnd();
         this.#triggerDataChanged();
+    }
+
+    addDataT5Format(data) {
+        const items = RichTextEditor.stringToDom(data).childNodes;
+        const transformed = this.dataTransformer.transformPartial(items);
+
+        const selection = this.getSelection();
+        const start = selection.start;
+        const end = selection.end < selection.start ? selection.start : selection.end;
+
+        this.replaceContentInRange(start, end, transformed);
+    }
+
+    replaceDataT5Format(data) {
+        const rangeStart = 0;
+        const rangeEnd = this._editor.model.document.getRoot().getChild(0).maxOffset;
+
+        const contentInRange = this.#getModelInRange(rangeStart, rangeEnd);
+        const actions = [];
+
+        if (contentInRange) {
+            const changes = [];
+
+            for (const child of contentInRange.getChildren()) {
+                changes.push(this.#createModelNode(child));
+            }
+
+            actions.push({type: EditorWrapper.ACTION_TYPE.REMOVE, content: changes, position: 0, correction: 0});
+        }
+
+        const items = RichTextEditor.stringToDom(data).childNodes;
+        const transformed = this.dataTransformer.transformPartial(items);
+        this.#setRawData('');
+        this._editor.editing.view.focus();
+        this.setCursorToEnd();
+
+        actions.push({type: EditorWrapper.ACTION_TYPE.INSERT, content: transformed, position: 0, correction: 0});
+        this.#triggerDataChanged(actions);
     }
 
     /**
@@ -116,16 +162,20 @@ export default class EditorWrapper {
      * @param {boolean} replaceWhitespaceBeforePosition
      */
     insertWhitespace(whitespaceType, position = null, replaceWhitespaceBeforePosition = false) {
-        const tagNumber = this._tagsConversion.getNextWhitespaceTagNumber(this.#getRawDataNode().getElementsByTagName('img'));
+        const tagNumber = this._tagsConversion
+            .getNextWhitespaceTagNumber(this.#getRawDataNode().getElementsByTagName('img'));
         const divSpanHtml = this._tagsConversion.generateWhitespaceTag(whitespaceType, tagNumber);
-        const pixelMapping = new PixelMapping(this.#font);
-        const image = this._tagsConversion.transform(divSpanHtml, pixelMapping).outerHTML;
+        const image = this.dataTransformer.transformWhitespace(divSpanHtml)._transformed.outerHTML;
 
         if (!position) {
+            const position = this._editor.model.document.selection.getFirstPosition().path[1];
+
             const viewFragment = this._editor.data.processor.toView(image);
             const modelFragment = this._editor.data.toModel(viewFragment);
             this._editor.model.insertContent(modelFragment);
-            this.#triggerDataChanged();
+
+            const action = {type: EditorWrapper.ACTION_TYPE.INSERT, content: image, position: position, correction: 0};
+            this.#triggerDataChanged([action]);
 
             return;
         }
@@ -152,11 +202,57 @@ export default class EditorWrapper {
      * @param {String} symbol
      */
     insertSymbol(symbol) {
+        const position = this._editor.model.document.selection.getFirstPosition().path[1];
+
         this._editor.model.change(writer => {
             this._editor.model.insertContent(writer.createText(symbol));
+            const action = {type: EditorWrapper.ACTION_TYPE.INSERT, content: symbol, position: position, correction: 0};
+            this.#triggerDataChanged([action]);
         });
+    }
 
-        this.#triggerDataChanged();
+    /**
+     * @param {int} tagNumber
+     */
+    insertTagFromReference(tagNumber) {
+        const selection = this.getSelection();
+
+        if (selection.isCollapsed()) {
+            if (this.dataTransformer.hasSingleReferenceTag(tagNumber)) {
+                const tag = this.dataTransformer.getSingleReferenceTag(tagNumber);
+                this.replaceContentInRange(selection.start, selection.start, tag._transformed.outerHTML);
+
+                return;
+            }
+
+            if (this.dataTransformer.hasPairedReferenceTag(tagNumber)) {
+                const positions = this.getInternalTagsPositions();
+                const leftSiblings = Object.keys(positions).filter((position) => position < selection.start);
+                const leftSibling = leftSiblings.length ? positions[Math.max(...leftSiblings)] : null;
+
+                let type = TagsConversion.TYPE.OPEN;
+                if (leftSibling && leftSibling.type === TagsConversion.TYPE.OPEN) {
+                    type = TagsConversion.TYPE.CLOSE;
+                }
+
+                const tags = this.dataTransformer.getPairedReferenceTag(tagNumber);
+                this.replaceContentInRange(selection.start, selection.start, tags[type]._transformed.outerHTML);
+            }
+        } else {
+            if (this.dataTransformer.hasPairedReferenceTag(tagNumber)) {
+                const tags = this.dataTransformer.getPairedReferenceTag(tagNumber);
+
+                this.replaceContentInRange(selection.end, selection.end, tags.close._transformed.outerHTML);
+                this.replaceContentInRange(selection.start, selection.start, tags.open._transformed.outerHTML);
+
+                return;
+            }
+
+            if (this.dataTransformer.hasSingleReferenceTag(tagNumber)) {
+                const tag = this.dataTransformer.getSingleReferenceTag(tagNumber);
+                this.replaceContentInRange(selection.start, selection.end, tag._transformed.outerHTML);
+            }
+        }
     }
 
     /**
@@ -193,7 +289,7 @@ export default class EditorWrapper {
     /**
      * Returns current selection in an editor
      *
-     * @returns {{start: (*|number), end: (*|number)}}
+     * @returns {{start: (*|number), end: (*|number), internalSelection: *, isCollapsed: (function(): boolean)}}
      */
     getSelection() {
         const selection = this._editor.model.document.selection.getFirstRange();
@@ -201,7 +297,64 @@ export default class EditorWrapper {
         return {
             start: selection.start.path[1] ?? 0,
             end: selection.end.path[1] ?? 0,
+            internalSelection: selection,
+            isCollapsed: function () { return this.start === this.end },
         };
+    }
+
+    selectRange(startPosition, endPosition) {
+        const root = this._editor.model.document.getRoot();
+        const rootChild = root.getChild(0);
+        const maxOffset = rootChild ? rootChild.maxOffset : 0;
+
+        if (
+            startPosition < 0 ||
+            endPosition < 0 ||
+            startPosition > endPosition ||
+            startPosition > maxOffset ||
+            endPosition > maxOffset
+        ) {
+            return;
+        }
+
+        this._editor.model.change((writer) => {
+            const start = writer.model.createPositionFromPath(root, [0, startPosition]);
+            const end = writer.model.createPositionFromPath(root, [0,  endPosition]);
+            const range = writer.model.createRange(start, end);
+
+            writer.setSelection(range);
+
+            this._editor.editing.view.focus();
+        });
+    }
+
+    setCursorPosition(position) {
+        const root = this._editor.model.document.getRoot();
+        const rootChild = root.getChild(0);
+        const maxOffset = rootChild ? rootChild.maxOffset : 0;
+        // Use the smallest of `to` or `maxOffset`
+        const effectiveTo = Math.min(position, maxOffset);
+
+        this._editor.model.change(writer => {
+            const start = writer.model.createPositionFromPath(root, [0, effectiveTo]);
+            const end = writer.model.createPositionFromPath(root, [0, effectiveTo]);
+            const range = writer.model.createRange(start, end);
+
+            writer.setSelection(range);
+        });
+    }
+
+    getCursorPosition() {
+        const selection = this._editor.model.document.selection.getFirstPosition();
+
+        return selection.path[1] ?? 0;
+    }
+
+    setCursorToEnd() {
+        const root = this._editor.model.document.getRoot();
+        const rootChild = root.getChild(0);
+        const maxOffset = rootChild ? rootChild.maxOffset : 0;
+        this.setCursorPosition(maxOffset);
     }
 
     /**
@@ -214,32 +367,28 @@ export default class EditorWrapper {
     getContentInRange(from, to) {
         let result = '';
 
-        this._editor.model.change((writer) => {
-            const preservedSelection = this._editor.model.document.selection.getFirstRange();
+        if (to < from) {
+            return result;
+        }
 
-            const root = writer.model.document.getRoot();
+        this._editor.model.change(() => {
+            const content = this.#getModelInRange(from, to);
 
-            const rootChild = root.getChild(0);
-            const maxOffset = rootChild ? rootChild.maxOffset : 0;
+            if (!content) {
+                return;
+            }
 
-            // Use the smallest of `to` or `maxOffset`
-            const effectiveTo = Math.min(to, maxOffset);
-
-            const start = writer.model.createPositionFromPath(root, [0, from]);
-            const end = writer.model.createPositionFromPath(root, [0, effectiveTo]);
-            const range = writer.model.createRange(start, end);
-
-            writer.setSelection(range);
-
-            const content = writer.model.getSelectedContent(writer.model.document.selection);
             const viewFragment = this._editor.data.toView(content);
-
-            writer.setSelection(preservedSelection);
-
             result = this._editor.data.processor.toData(viewFragment);
         });
 
         return result;
+    }
+
+    getContentLength() {
+        const root = this._editor.model.document.getRoot();
+        const rootChild = root.getChild(0);
+        return rootChild ? rootChild.maxOffset : 0;
     }
 
     /**
@@ -248,10 +397,19 @@ export default class EditorWrapper {
      * @param {integer} rangeStart
      * @param {integer} rangeEnd
      * @param {String} content
+     * @param skipDataChangeEvent
      */
-    replaceContentInRange(rangeStart, rangeEnd, content) {
+    replaceContentInRange(rangeStart, rangeEnd, content, skipDataChangeEvent = false) {
         this._editor.model.change((writer) => {
             const preservedSelection = this._editor.model.document.selection.getFirstRange();
+
+            const contentInRange = this.#getModelInRange(rangeStart, rangeEnd);
+            const changes = [];
+
+            // contentInRange can be null if rangeStart is at the very start of the document
+            for (const child of (contentInRange ? contentInRange.getChildren() : [])) {
+                changes.push(this.#createModelNode(child));
+            }
 
             const root = writer.model.document.getRoot();
             const start = writer.model.createPositionFromPath(root, [0, rangeStart]);
@@ -266,10 +424,23 @@ export default class EditorWrapper {
             this._editor.model.insertContent(modelFragment, range);
 
             writer.setSelection(preservedSelection);
-        });
 
-        // Create delete/insert actions based on content
-        this.#triggerDataChanged();
+            if (!skipDataChangeEvent) {
+                const actions = [];
+
+                if (rangeStart !== rangeEnd) {
+                    actions.push(
+                        {type: EditorWrapper.ACTION_TYPE.REMOVE, content: changes, position: rangeStart, correction: 0}
+                    );
+                }
+
+                actions.push(
+                    {type: EditorWrapper.ACTION_TYPE.INSERT, content: content, position: rangeStart, correction: 0}
+                );
+
+                this.#triggerDataChanged(actions);
+            }
+        });
     }
 
     /**
@@ -314,6 +485,8 @@ export default class EditorWrapper {
 
     /**
      * Returns an array of internal tags positions
+     * Please note the position is calculated based on the real position of a tag in the editor including
+     * track changes, whitespaces, etc.
      *
      * @returns {Object<string, string>}
      */
@@ -347,13 +520,41 @@ export default class EditorWrapper {
         return this._editor.ui.view.element;
     }
 
+    getDomNodeUnderCursor() {
+        if (!this.getSelection().isCollapsed()) {
+            return null;
+        }
+
+        const domConverter = this._editor.editing.view.domConverter;
+        const selection = this._editor.model.document.selection;
+        const position = selection.getFirstPosition();
+        let viewPosition = this._editor.editing.mapper.toViewPosition(position);
+        let node;
+
+        while (!node && viewPosition.parent) {
+            viewPosition = viewPosition.parent;
+            node = domConverter.mapViewToDom(viewPosition.parent);
+        }
+
+        // P is a root element, so we need to return null
+        if (node && node.tagName !== 'P') {
+            return node;
+        }
+
+        return null;
+    }
+
     getTagsConversion() {
         return this._tagsConversion;
     }
 
-    #triggerDataChanged() {
+    triggerDataChanged() {
+        this.#triggerDataChanged();
+    }
+
+    #triggerDataChanged(actions = null) {
         const position = this._editor.model.document.selection.getFirstPosition().path[1];
-        this.#runModifiers([{position: position, correction: 0}]);
+        this.#runModifiers(actions || [{position: position, correction: 0}]);
     }
 
     /**
@@ -367,17 +568,26 @@ export default class EditorWrapper {
 
         for (const node of element.getChildren()) {
             if (node.is('element')) {
-                if (node.name === 'imageInline'
+                if (
+                    node.name === 'imageInline'
                     && node.getAttribute('htmlImgAttributes').classes.includes('internal-tag')
+                    && ! node.getAttribute('htmlDel')
                 ) {
                     const imagePosition = writer.createPositionBefore(node);
-                    imagesWithPositions[imagePosition.path[1]] = this._tagsConversion.getInternalTagTypeByClass(
-                        node.getAttribute('htmlImgAttributes').classes.join(' ')
-                    );
+                    imagesWithPositions[imagePosition.path[1]] = {
+                        type: this._tagsConversion.getInternalTagTypeByClass(
+                            node.getAttribute('htmlImgAttributes').classes.join(' ')
+                        ),
+                        number: node.getAttribute('htmlImgAttributes').attributes['data-tag-number'],
+                    };
                 }
 
                 // Recursively check the children of the node
-                imagesWithPositions = Object.assign({}, imagesWithPositions, this.#getInternalTagsPositions(node, writer));
+                imagesWithPositions = Object.assign(
+                    {},
+                    imagesWithPositions,
+                    this.#getInternalTagsPositions(node, writer)
+                );
             }
         }
 
@@ -412,6 +622,7 @@ export default class EditorWrapper {
                         {model: 'redMarker', class: 'search-replace_marker-red', type: 'marker'},
                     ],
                 },
+                licenseKey: 'GPL',
             }
         ).then((editor) => {
             this._editor = editor;
@@ -465,25 +676,48 @@ export default class EditorWrapper {
     // region editor event listeners
     #addListeners(editor) {
         const viewDocument = editor.editing.view.document;
-        viewDocument.on('enter', (event, data) => {
-            this.#onPressEnter(event, data, editor);
-        }, {priority: 'high'});
-        viewDocument.on('paste', (event, data) => {
-            this.#onClipboardInput(event, data, editor);
+        viewDocument.on(
+            'enter',
+            (event, data) => {
+                this.#onPressEnter(event, data, editor);
+            },
+            {
+                priority: 'high'
+            }
+        );
+        viewDocument.on('paste', () => {
+            this.#onClipboardInput();
         });
-        viewDocument.on('drop', (event, data) => {
-            this.#onDrop(event, data, editor);
+        viewDocument.on('drop', () => {
+            this.#onDrop();
         });
         viewDocument.on('keydown', (event, data) => {
-            this.#onKeyDown(event, data, editor);
+            this.#onKeyDown(event, data);
         });
         viewDocument.on('clipboardOutput', (event, data) => {
             this.#onClipboardOutput(event, data, editor);
         });
+        viewDocument.on('dragstart', () => {
+            this.#onDragStart();
+        });
+        viewDocument.on('arrowKey', (event, data) => {
+            this.#onArrowKey(event, data, editor);
+        });
+
+        // This does not work, need to find a way to trigger it
+        // viewDocument.on('click', (event, data) => {
+        //     this.#onClick(event, data);
+        // });
+
+        // This is an inappropriate way of adding reaction to click event
+        // Need to find the reason why standard way does not work (see above)
+        this.getEditorViewNode().addEventListener('click', (event) => {
+            this.#onClick(event, {}, editor);
+        });
 
         const modelDocument = editor.model.document;
         modelDocument.on('change:data', (event, data) => {
-            this.#onDataChange(event, data, editor);
+            this.#onDataChange(event, data);
         });
         modelDocument.on('change', (event, data) => {
             this.#onDocumentChange(event, data, editor);
@@ -494,7 +728,7 @@ export default class EditorWrapper {
         });
     }
 
-    #onDataChange(event, data, editor) {
+    #onDataChange(event, data) {
         console.log('The data has changed!');
         this.modifiersLastRunId = null;
 
@@ -508,9 +742,13 @@ export default class EditorWrapper {
             return;
         }
 
+        const isProcessingDrop = this.#isProcessingDrop;
+        const isProcessingCut = this.#isProcessingCut;
+
         // Immediately reset the flags to prevent multiple calls
         this.#isProcessingDrop = false;
         this.#isProcessingPaste = false;
+        this.#isProcessingCut = false;
         const lastKeyPressed = this.#lastKeyPressed;
         this.#lastKeyPressed = null;
 
@@ -518,59 +756,154 @@ export default class EditorWrapper {
 
         const operations = data.operations
             // Filter out all operations except 'insert' and 'remove'
-            .filter(operation => operation.type === 'insert' || operation.type === 'remove')
+            .filter(operation => {
+                return operation.type === EditorWrapper.ACTION_TYPE.INSERT
+                || operation.type === EditorWrapper.ACTION_TYPE.REMOVE
+            })
             .reduce((_operations, operation) => {
                 // For 'insert' operations, pick the one with the highest 'baseVersion' as we don't need history
-                if (operation.type === 'insert') {
-                    if (!_operations.insert || _operations.insert.baseVersion < operation.baseVersion) {
-                        _operations.insert = operation;
-                    }
-                } else if (operation.type === 'remove' && !_operations.remove) {
+                if (operation.type === EditorWrapper.ACTION_TYPE.INSERT && operation.baseVersion) {
+                    _operations.insert ? _operations.insert.push(operation) : _operations.insert = [operation];
+                } else if (operation.type === EditorWrapper.ACTION_TYPE.REMOVE && !_operations.remove) {
                     // We only need the last 'remove' operation
                     // (usually it is the only one in the array, but just in case)
-                    _operations.remove = operation;
+                    _operations.remove = [operation];
                 }
 
                 return _operations;
             }, {insert: null, remove: null});
 
-        ['remove', 'insert'].forEach(type => {
-            const operation = operations[type];
-
-            if (!operation) {
+        [EditorWrapper.ACTION_TYPE.REMOVE, EditorWrapper.ACTION_TYPE.INSERT].forEach(type => {
+            if (!operations[type]) {
                 return;
             }
 
-            const path = operation.position?.path || operation.sourcePosition?.path;
+            for (const operation of operations[type]) {
+                if (!operation) {
+                    return;
+                }
 
-            if (path && path[1] !== undefined) {
-                actions.push(this.#createActionFromOperation(operation, lastKeyPressed));
+                const path = operation.position?.path || operation.sourcePosition?.path;
+
+                if (!path || path[1] === undefined) {
+                    continue;
+                }
+
+                const action = this.#createActionFromOperation(operation, lastKeyPressed);
+
+                // If the last action is 'insert' and the current one is 'insert' as well, merge them
+                if (
+                    type === EditorWrapper.ACTION_TYPE.INSERT
+                    && actions[actions.length - 1]?.type === EditorWrapper.ACTION_TYPE.INSERT
+                ) {
+                    actions[actions.length - 1].content += action.content;
+                    actions[actions.length - 1].correction += action.correction;
+
+                    continue;
+                }
+
+                // Check deleted content for tags and delete corresponding tags
+                // (if open tag is deleted - delete also paired closing one)
+                // Move this if to a separate method(s) after testing
+                if (type === EditorWrapper.ACTION_TYPE.REMOVE && !isProcessingDrop && !isProcessingCut) {
+                    const tagsRemoved = [];
+
+                    // Check if there are tags removed and remove corresponding tags also if any
+                    for (const modelNode of action.content) {
+                        const deletedDom = modelNode.toDom();
+
+                        if (
+                            this._tagsConversion.isTrackChangesDelNode(deletedDom) ||
+                            deletedDom.nodeType === Node.TEXT_NODE
+                        ) {
+                            continue;
+                        }
+
+                        if (
+                            this._tagsConversion.isInternalTagNode(deletedDom) &&
+                            !this._tagsConversion.isWhitespaceNode(deletedDom)
+                        ) {
+                            tagsRemoved.push({
+                                type: this._tagsConversion.getInternalTagType(deletedDom),
+                                number: this._tagsConversion.getInternalTagNumber(deletedDom),
+                                tag: deletedDom,
+                            });
+
+                            continue;
+                        }
+
+                        const tag = deletedDom.querySelector('img');
+
+                        if (
+                            tag &&
+                            !this._tagsConversion.isWhitespaceNode(deletedDom)
+                        ) {
+                            tagsRemoved.push({
+                                type: this._tagsConversion.getInternalTagType(tag),
+                                number: this._tagsConversion.getInternalTagNumber(tag),
+                                tag: tag,
+                            });
+                        }
+                    }
+
+                    if (tagsRemoved.length) {
+                        const contentInEditor = RichTextEditor.stringToDom(this.getRawData());
+
+                        for (const tag of tagsRemoved) {
+                            let correspondingTags;
+
+                            if (this._tagsConversion.isMQMNode(tag.tag)) {
+                                const classes = Array.from(tag.tag.classList);
+                                correspondingTags = contentInEditor.querySelectorAll(
+                                    `img.${classes.splice(classes.indexOf(tag.type, 1)).join('.')}`
+                                );
+                            } else {
+                                const expectedType = tag.type === TagsConversion.TYPE.OPEN ?
+                                    TagsConversion.TYPE.CLOSE :
+                                    TagsConversion.TYPE.OPEN;
+
+                                correspondingTags = contentInEditor.querySelectorAll(
+                                    `img.${expectedType}[data-tag-number="${tag.number}"]`
+                                );
+                            }
+
+                            const correspondingTag = Array.from(correspondingTags).find(tag => {
+                                return !tag.parentNode || !this._tagsConversion.isTrackChangesDelNode(tag.parentNode);
+                            });
+
+                            if (correspondingTag) {
+                                const offsets = RichTextEditor.calculateNodeOffsets(contentInEditor, correspondingTag);
+                                const modelNode = this.#createModelNode(
+                                    Array.from(this.#getModelInRange(offsets.start, offsets.end + 1).getChildren())[0],
+                                    true
+                                );
+
+                                actions.unshift({
+                                    type: EditorWrapper.ACTION_TYPE.REMOVE,
+                                    content: [modelNode],
+                                    position: offsets.start,
+                                    correction: 1,
+                                    correspondingDeletion: true,
+                                });
+                            }
+                        }
+                    }
+                }
+
+                actions.push(action);
             }
         });
 
         this.#runModifiers(actions);
     }
 
-    #createActionFromOperation(operation, lastKeyPressed) {
-        const position = operation.position?.path[1] || operation.sourcePosition?.path[1];
-
-        if (operation.type === 'remove') {
-            const content = this.#getDeletedContent(operation);
-
-            return {type: EditorWrapper.ACTION_TYPE.REMOVE, content, position, correction: 0, lastKeyPressed};
-        }
-
-        let content = operation.nodes?.getNode(0).data || '';
-        // Use Unicode for non-breaking space for further processing
-        // ckeditor mixes spaces, so need to manually replace them
-        content = content === ' ' ? '\u00A0' : content;
-        const correction = content.length;
-
-        return {type: EditorWrapper.ACTION_TYPE.INSERT, content, position, correction, lastKeyPressed};
+    #onClipboardOutput(event, data) {
+        this.#isProcessingCut = data.method === 'cut';
     }
 
-    #onClipboardOutput(event, data, editor) {
-        this.#isProcessingCut = data.method === 'cut';
+    #onDragStart() {
+        console.log('Drag start');
+        this.modifiersLastRunId = null;
     }
 
     #onDocumentChange(event, data, editor) {
@@ -578,7 +911,7 @@ export default class EditorWrapper {
         console.log('Position ' + editor.model.document.selection.getFirstPosition().path[1]);
     }
 
-    #onClipboardInput(event, data, editor) {
+    #onClipboardInput() {
         console.log('Paste from clipboard');
         if (this.#isProcessingDrop) {
             return;
@@ -594,7 +927,7 @@ export default class EditorWrapper {
         data.content = editor.data.htmlProcessor.toView(cleaned);
     }
 
-    #onDrop(event, data, editor) {
+    #onDrop() {
         console.log('Drop event');
         this.#isProcessingDrop = true;
     }
@@ -607,11 +940,70 @@ export default class EditorWrapper {
         editor.editing.view.scrollToTheSelection();
     }
 
-    #onKeyDown(event, data, editor) {
+    #onKeyDown(event, data) {
         this.#lastKeyPressed = data.domEvent.code;
     }
 
+    #onArrowKey(event, data, editor) {
+        const position = editor.model.document.selection.getFirstPosition().path[1];
+
+        const customEvent = new CustomEvent(EditorWrapper.EDITOR_EVENTS.ON_ARROW_KEY, {
+            detail: {
+                position: position
+            },
+            bubbles: true,
+        });
+
+        this.getEditorViewNode().dispatchEvent(customEvent);
+    }
+
+    #onClick(event, data, editor) {
+        const position = editor.model.document.selection.getFirstPosition().path[1];
+
+        const customEvent = new CustomEvent(EditorWrapper.EDITOR_EVENTS.ON_CLICK, {
+            detail: {
+                position: position
+            },
+            bubbles: true,
+        });
+
+        this.getEditorViewNode().dispatchEvent(customEvent);
+    }
+
     // endregion
+
+    /**
+     * @param {Object} operation
+     * @param {String} lastKeyPressed
+     * @returns {
+     *  {position: number, type: 'insert', correction: number, content: string, lastKeyPressed}
+     *  |{position: number, type: 'remove', correction: number, content: ModelNode[], lastKeyPressed}
+     * }
+     */
+    #createActionFromOperation(operation, lastKeyPressed) {
+        let position = operation.position?.path[1] || operation.sourcePosition?.path[1];
+        // Position can be null or NaN, so we need to set it to 0 in this case
+        position = position || 0;
+
+        if (operation.type === 'remove') {
+            const content = this.#getDeletedContent(operation);
+
+            return {type: EditorWrapper.ACTION_TYPE.REMOVE, content, position, correction: 0, lastKeyPressed};
+        }
+
+        let content = '';
+        for (const node of operation.nodes) {
+            const dom = this.#createModelNode(node).toDom();
+            content += dom.data ?? dom.outerHTML;
+        }
+
+        // Use Unicode for non-breaking space for further processing
+        // ckeditor mixes spaces, so need to manually replace them
+        content = content === ' ' ? '\u00A0' : content;
+        const correction = content.length;
+
+        return {type: EditorWrapper.ACTION_TYPE.INSERT, content, position, correction, lastKeyPressed};
+    }
 
     #getDeletedContent(operation) {
         const changes = [];
@@ -621,20 +1013,20 @@ export default class EditorWrapper {
                 break;
             }
 
-            changes.push(this.#createDeletedElement(change));
+            changes.push(this.#createModelNode(change, true));
         }
 
         return changes;
     }
 
-    #createDeletedElement(change) {
-        const data = change.data || null;
-        const iterator = change.getAttributes();
+    #createModelNode(modelPart, deletion = false) {
+        const data = modelPart.data || null;
+        const iterator = modelPart.getAttributes();
         const attributes = Array.from(iterator);
 
         // simple text has no attributes, so adding early return
         if (attributes.length === 0) {
-            return new DeletedElement(data, {}, DeletedElement.TYPE.TEXT);
+            return new ModelNode(data, {}, ModelNode.TYPE.TEXT);
         }
 
         const createParents = function (parents) {
@@ -644,17 +1036,17 @@ export default class EditorWrapper {
 
             const [name, attributes] = parents.shift();
 
-            if (
-                name === 'htmlSpan'
-                && (
-                    // Here we open implementation from other modules, need to rethink this approach
-                    attributes.classes.includes('t5spellcheck') || attributes.classes.includes('term')
-                )
-            ) {
-                return null;
-            }
+            // if (
+            //     name === 'htmlSpan'
+            //     && (
+            //         // Here we open implementation from other modules, need to rethink this approach
+            //         attributes.classes.includes('t5spellcheck') || attributes.classes.includes('term')
+            //     )
+            // ) {
+            //     return null;
+            // }
 
-            return new DeletedElement(
+            return new ModelNode(
                 null,
                 {...attributes.attributes, class: attributes.classes.join(' ')},
                 name,
@@ -671,13 +1063,15 @@ export default class EditorWrapper {
                     ...attrs,
                     ...value.attributes,
                     class: value.classes.join(' '),
-                }
+                };
 
                 continue;
             }
 
             if (['htmlIns', 'htmlDel', 'htmlSpan'].includes(name)) {
-                parent = createParents(attributes.slice(key));
+                if (deletion) {
+                    parent = parent || createParents(attributes.slice(key));
+                }
 
                 continue;
             }
@@ -685,10 +1079,44 @@ export default class EditorWrapper {
             attrs[name] = value;
         }
 
-        return new DeletedElement(data, attrs, change.name || 'text', parent);
+        return new ModelNode(data, attrs, modelPart.name || 'text', parent);
     }
 
-    //region Probably for moving to another class
+    #getModelInRange(from, to) {
+        let result;
+
+        this._editor.model.change((writer) => {
+            const preservedSelection = this._editor.model.document.selection.getFirstRange();
+
+            const root = writer.model.document.getRoot();
+
+            const rootChild = root.getChild(0);
+            const maxOffset = rootChild ? rootChild.maxOffset : 0;
+
+            // Use the smallest of `to` or `maxOffset`
+            const effectiveTo = Math.min(to, maxOffset);
+
+            if (effectiveTo === 0) {
+                result = null;
+
+                return;
+            }
+
+            const start = writer.model.createPositionFromPath(root, [0, from]);
+            const end = writer.model.createPositionFromPath(root, [0, effectiveTo]);
+            const range = writer.model.createRange(start, end);
+
+            writer.setSelection(range);
+
+            const content = writer.model.getSelectedContent(writer.model.document.selection);
+
+            writer.setSelection(preservedSelection);
+
+            result = content;
+        });
+
+        return result;
+    }
 
     #runModifiers(actions) {
         const originalText = this.getRawData();
@@ -722,7 +1150,7 @@ export default class EditorWrapper {
         // Now async modifiers can be executed in any order, need to change this to promises sequence
         for (const modifier of this._asyncModifiers[EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]) {
             modifier(originalText, this.modifiersLastRunId).then((result) => {
-                let position = this._editor.model.document.selection.getFirstPosition().path[1]
+                let position = this._editor.model.document.selection.getFirstPosition().path[1];
 
                 const [modifiedText, runId] = result;
 
@@ -736,37 +1164,39 @@ export default class EditorWrapper {
         }
     }
 
-    #replaceDataInEditor(data, position) {
+    #replaceDataInEditor(data, positionAfterReplace) {
         const doc = this._editor.model.document;
         const root = doc.getRoot();
+        const currentSelection = this.getSelection();
 
         this._editor.model.change(writer => {
-            writer.setSelection(root, 'in');
+            const entireSelection = writer.createSelection(root, 'in');
 
-            const selection = this._editor.model.document.selection;
-            this._editor.model.deleteContent(selection);
-
-            // TODO clear graveyard
-        });
-
-        this._editor.model.change(writer => {
             const viewFragment = this._editor.data.processor.toView(data);
             const modelFragment = this._editor.data.toModel(viewFragment);
 
-            this._editor.model.insertContent(modelFragment);
+            this._editor.model.insertContent(modelFragment, entireSelection);
 
             const maxOffset = root.getChild(0).maxOffset;
 
-            // Use the smallest of `to` or `maxOffset`
-            const effectiveTo = Math.min(position, maxOffset);
+            // If we have a selection that is not collapsed, replacing the data within the async operation
+            // in this case we need to restore the selection
+            if (!currentSelection.isCollapsed()) {
+                writer.setSelection(currentSelection.internalSelection);
 
-            const selection = this._editor.model.createPositionFromPath(this._editor.model.document.getRoot(), [0, effectiveTo]);
+                return;
+            }
+
+            // Use the smallest of `to` or `maxOffset`
+            const effectiveTo = Math.min(positionAfterReplace, maxOffset);
+
+            const selection = this._editor.model.createPositionFromPath(
+                this._editor.model.document.getRoot(),
+                [0, effectiveTo]
+            );
             writer.setSelection(selection);
         });
     };
-
-    //endregion
-
 
     //region data cleanup on insert or drop
     #cleanupDataOnInsertOrDrop(data) {
@@ -775,6 +1205,44 @@ export default class EditorWrapper {
 
         return this.dataTransformer.transformPartial(cleaned.childNodes);
     }
-
     //endregion
+
+    #removeTagOnCorrespondingDeletion(rawData, actions) {
+        const doc = RichTextEditor.stringToDom(rawData);
+
+        for (const action of actions) {
+            if (!action.type) {
+                continue;
+            }
+
+            if (!action.correspondingDeletion) {
+                continue;
+            }
+
+            const deletion = action.content[0];
+
+            let tag = deletion.toDom();
+            let parentNode;
+
+            if (!this._tagsConversion.isInternalTagNode(tag) && !this._tagsConversion.isMQMNode(tag)) {
+                parentNode = tag;
+                tag = tag.querySelector('img');
+            }
+
+            const allTags = doc.querySelectorAll('img');
+
+            for (const candidate of allTags) {
+                if (this._tagsConversion.isTrackChangesDelNode(candidate.parentNode)) {
+                    continue;
+                }
+
+                if (RichTextEditor.nodesAreSame(candidate, tag)) {
+                    candidate.parentNode.removeChild(candidate);
+                    break;
+                }
+            }
+        }
+
+        return [doc.innerHTML, actions[0].position];
+    }
 }

@@ -109,7 +109,7 @@ Ext.define('Editor.view.task.QuickSearchInfoMessage',{
      * Get the component target for the info message. In this case it is row editor row dom element
      */
     getTooltipTarget:function(){
-        var editor = Ext.ComponentQuery.query('#roweditor')[0];
+        var editor = Ext.ComponentQuery.query('#t5RowEditor')[0];
 
         if(editor === undefined){
             return null;

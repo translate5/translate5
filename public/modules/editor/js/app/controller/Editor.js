@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -32,16 +31,17 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.controller.Editor', {
-    extend : 'Ext.app.Controller',
+    extend: 'Ext.app.Controller',
     requires: [
         'Editor.view.segments.EditorKeyMap',
         'Editor.controller.editor.PrevNextSegment',
-        'Editor.view.task.ConfirmationWindow',
-        'Editor.view.ReferenceFilesInfoMessage',
-        'Editor.view.task.QuickSearchInfoMessage'
+        // 'Editor.view.task.ConfirmationWindow',
+        // 'Editor.view.ReferenceFilesInfoMessage',
+        // 'Editor.view.task.QuickSearchInfoMessage'
     ],
-    mixins: ['Editor.util.Event',
-        	 'Editor.util.Range'
+    mixins: [
+        'Editor.util.Event',
+        'Editor.util.Range'
     ],
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
@@ -58,7 +58,7 @@ Ext.define('Editor.controller.Editor', {
         takeTagTooltip: '#UT#STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.',
         saveAnyway: '#UT# Trotzdem speichern',
         doubleclickToTakeMatch: '#UT# Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.',
-        noVisibleContentColumn:'#UT#Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.',
+        noVisibleContentColumn: '#UT#Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.',
         gridEndReached: '#UT#Kein weiteres Segment bearbeitbar!',
         gridStartReached: '#UT#Kein vorheriges Segment bearbeitbar!',
         gridEndReachedWorkflow: '#UT#Kein weiteres Segment im Workflow bearbeitbar!',
@@ -67,28 +67,36 @@ Ext.define('Editor.controller.Editor', {
         gridStartReachedFiltered: '#UT#Keine vorherigen Segmente in der aktuellen Filterung'
     },
     DEC_DIGITS: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
-    refs : [{
-        ref : 'segmentGrid',
-        selector : '#segmentgrid'
-    },{
-        ref:'filepanel',
-        selector:'#filepanel'
-    },{
-        ref: 'falsePositiveCheckColumn',
-        selector: '#metapanel #falsePositives grid checkcolumn'
-    },{
-        ref:'segmentsHtmleditor',
-        selector:'#segmentsHtmleditor'
-    },{
-        ref: 'languageResourceSearchGrid',
-        selector: 'languageResourceSearchGrid'
-    },{
-        ref: 'languageResourceEditorPanel',
-        selector: 'languageResourceEditorPanel'
-    },{
-        ref:'synonymSearch',
-        selector: '#synonymSearch'
-    }],
+    refs: [
+        {
+            ref: 'segmentGrid',
+            selector: '#segmentgrid'
+        },
+        // {
+        //     ref:'filepanel',
+        //     selector:'#filepanel'
+        // },
+        // {
+        //     ref: 'falsePositiveCheckColumn',
+        //     selector: '#metapanel #falsePositives grid checkcolumn'
+        // }
+        // {
+        //     ref: 'segmentsHtmleditor',
+        //     selector: '#segmentsHtmleditor'
+        // },
+        {
+            ref: 'languageResourceSearchGrid',
+            selector: 'languageResourceSearchGrid'
+        },
+        {
+            ref: 'languageResourceEditorPanel',
+            selector: 'languageResourceEditorPanel'
+        },
+        // {
+        //     ref: 'synonymSearch',
+        //     selector: '#synonymSearch'
+        // }
+    ],
     registeredTooltips: [],
     isEditing: false,
     isCapturingChange: false,
@@ -97,7 +105,6 @@ Ext.define('Editor.controller.Editor', {
     generalKeyMap: null,
     prevNextSegment: null,
     sourceTags: null,
-    copiedSelectionWithTagHandling: null,
     resetSegmentValueForEditor: null,
     htmlEditor: null,
 
@@ -106,35 +113,40 @@ Ext.define('Editor.controller.Editor', {
     taskOpenRequest: false,
 
     listen: {
-        controller: {
-            '#Editor.$application': {
-                editorViewportClosed: 'onCloseEditorViewport',
-                editorViewportOpened: 'onOpenEditorViewport'
-            },
-            '#QualityMqm': {
-            	afterInsertMqmTag: 'handleAfterContentChange'
-            },
-            '#Editor.plugins.TrackChanges.controller.Editor':{
-                setValueForEditor: 'setValueForEditor'
-            },
-            '#ServerException':{
-                serverExceptionE1600: 'onServerExceptionE1600'
-            }
-        },
+        // controller: {
+        //     '#Editor.$application': {
+        //         editorViewportClosed: 'onCloseEditorViewport',
+        //         editorViewportOpened: 'onOpenEditorViewport'
+        //     },
+        //     '#QualityMqm': {
+        //     	afterInsertMqmTag: 'handleAfterContentChange'
+        //     },
+        //     '#Editor.plugins.TrackChanges.controller.Editor':{
+        //         setValueForEditor: 'setValueForEditor'
+        //     },
+        //     '#ServerException':{
+        //         serverExceptionE1600: 'onServerExceptionE1600'
+        //     }
+        // },
         component: {
-            'segmentsToolbar [dispatcher]' : {
-                click : 'buttonClickDispatcher'
-            },
-            '#segmentActionMenu menucheckitem': {
-                beforecheckchange: item => item.allowCheckChange,
-                click: 'onSegmentActionMenuItemClick',
-                checkchange: 'onSegmentActionMenuItemToggle'
-            },
-            'segmentsHtmleditor': {
+             'segmentsToolbar [dispatcher]' : {
+                 click : 'buttonClickDispatcher'
+             },
+             '#segmentActionMenu menucheckitem': {
+                 beforecheckchange: item => item.allowCheckChange,
+                 click: 'onSegmentActionMenuItemClick',
+                 checkchange: 'onSegmentActionMenuItemToggle'
+             },
+            '#t5RowEditor': {
                 initialize: 'initEditor',
-                contentErrors: 'handleSaveWithErrors',
-                afterSetValueAndMarkup: 'handleAfterContentChange',
-                afterInsertMarkup: 'handleDelayedChange'
+                contentErrors: 'onSaveWithErrors',
+                // afterStartEdit: 'onAfterStartEdit',
+                // afterSetValueAndMarkup: 'handleAfterContentChange',
+                // afterInsertMarkup: 'handleDelayedChange',
+            },
+            '#t5Editor': {
+                editorDataChanged: 'handleAfterContentChange',
+                afterStartEdit: 'onAfterStartEdit',
             },
             'roweditor': {
                 destroy: 'handleDestroyRoweditor'
@@ -144,20 +156,18 @@ Ext.define('Editor.controller.Editor', {
             },
             '#segmentgrid': {
                 afterrender: 'initEditPluginHandler',
-                select:'onSegmentGridSelect',
-                segmentSizeChanged:'onSegmentGridSegmentsSizeChanged'
+                select: 'onSegmentGridSelect',
+                // segmentSizeChanged:'onSegmentGridSegmentsSizeChanged'
             },
-            '#showReferenceFilesButton': {
-                click:'onShowReferenceFilesButtonClick'
-            },
-            
-            '#commentContainer textarea': {
-                specialkey: 'handleCommentEnter'
-            },
-            
-            'taskConfirmationWindow button': {
-                click:'taskConfirm'
-            },
+            // '#showReferenceFilesButton': {
+            //     click:'onShowReferenceFilesButtonClick'
+            // },
+            // '#commentContainer textarea': {
+            //     specialkey: 'handleCommentEnter'
+            // },
+            // 'taskConfirmationWindow button': {
+            //     click:'taskConfirm'
+            // },
             'segmentsToolbar #btnInsertWhitespaceNbsp': {
                 click: 'insertWhitespaceNbsp'
             },
@@ -173,16 +183,17 @@ Ext.define('Editor.controller.Editor', {
             'segmentsToolbar #specialCharactersCombo': {
                 change: 'insertWhitespaceCombo'
             },
-            '#segmentMinMaxLength': {
-                insertNewline: 'insertWhitespaceNewline'
-            },
-            'segmentsToolbar #specialChars': {
-                disable: btn => btn.hideMenu()
-            }
+            // '#segmentMinMaxLength': {
+            //     insertNewline: 'insertWhitespaceNewline'
+            // },
+            // 'segmentsToolbar #specialChars': {
+            //     disable: btn => btn.hideMenu()
+            // }
         },
-        store:{
-            '#Segments':{
-                load:'onSegmentsStoreLoad'
+
+        store: {
+            '#Segments': {
+                load: 'onSegmentsStoreLoad'
             }
         }
     },
@@ -192,10 +203,10 @@ Ext.define('Editor.controller.Editor', {
         'task/:id/edit': 'onTaskSegmentEditRoute',
     },
 
-    init : function() {
+    init: function () {
         var me = this;
-        
-        Ext.override('Ext.util.KeyMap',{
+
+        Ext.override('Ext.util.KeyMap', {
             handleTargetEvent: Editor.view.segments.EditorKeyMap.handleTargetEvent
         });
 
@@ -210,44 +221,60 @@ Ext.define('Editor.controller.Editor', {
         // https://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts
         // -------------------------------------------------------------------------------------
         me.keyMapConfig = {
-            'ctrl-d':         ['D',{ctrl: true, alt: false}, me.watchSegment, true],
-            'ctrl-s':         ['S',{ctrl: true, alt: false}, me.save, true],
+            'ctrl-d': ['D', {ctrl: true, alt: false}, me.watchSegment, true],
+            'ctrl-s': ['S', {ctrl: true, alt: false}, me.save, true],
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
-            'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
-            'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
+            // 'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
+            // 'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
             'ctrl-l':         ['L',{ctrl: true, alt: false}, me.toggleSegmentLock, true],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
-            'esc':            [Ext.EventObjectImpl.ESC, null, me.cancel],
-            'ctrl-alt-left':  [Ext.EventObjectImpl.LEFT,{ctrl: true, alt: true}, me.goToLeft],
-            'ctrl-alt-right': [Ext.EventObjectImpl.RIGHT,{ctrl: true, alt: true}, me.goToRight],
+            'esc': [Ext.EventObjectImpl.ESC, null, me.cancel],
+            // 'ctrl-alt-left':  [Ext.EventObjectImpl.LEFT,{ctrl: true, alt: true}, me.goToLeft],
+            // 'ctrl-alt-right': [Ext.EventObjectImpl.RIGHT,{ctrl: true, alt: true}, me.goToRight],
             'alt-pageup':     [Ext.EventObjectImpl.PAGE_UP,{ctrl: false, alt: true}, me.goToUpperByWorkflowNoSave],
             'alt-pagedown':   [Ext.EventObjectImpl.PAGE_DOWN,{ctrl: false, alt: true}, me.goToLowerByWorkflowNoSave],
             'alt-del':        [Ext.EventObjectImpl.DELETE,{ctrl: false, alt: true}, me.resetSegment],
             'ctrl-alt-up':    [Ext.EventObjectImpl.UP,{ctrl: true, alt: true}, me.goToUpperNoSave, true],
             'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
-            'alt-c':          ['C',{ctrl: false, alt: true}, me.handleOpenComments, true],
-            'alt-s':          ['S',{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
-            'ctrl-comma':     [188,{ctrl: true, alt: false, shift: false}, me.handleDigitPreparation(me.handleInsertTag), true],
-            'ctrl-shift-comma': [188,{ctrl: true, alt: false, shift: true}, me.handleDigitPreparation(me.handleInsertTagShift), true],
-            'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
+            // 'alt-c':          ['C',{ctrl: false, alt: true}, me.handleOpenComments, true],
+            'alt-s':          ['S', {ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
+            // 'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'F3':             [Ext.EventObjectImpl.F3,{ctrl: false, alt: false}, me.handleF3KeyPress, true],
-            'alt-F3':         [Ext.EventObjectImpl.F3,{ctrl: false, alt: true}, me.handleAltF3KeyPress, true],
-            'ctrl-insert':       [Ext.EventObjectImpl.INSERT, {ctrl: true, shift: false, alt: false}, me.copySourceToTarget],
+            // 'alt-F3':         [Ext.EventObjectImpl.F3,{ctrl: false, alt: true}, me.handleAltF3KeyPress, true],
+            'ctrl-insert':       [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
             'ctrl-dot':          [190, {ctrl: true, shift: false, alt: false}, me.copySourceToTarget], //Mac Alternative key code,
             'ctrl-shift-insert': [Ext.EventObjectImpl.INSERT, {ctrl: true, shift: true, alt: false}, me.copyReferenceToTarget],
             'ctrl-shift-dot':    [190, {ctrl: true, shift: true, alt: false}, me.copyReferenceToTarget], //Mac Alternative key code,
-            // DEC_DIGITS:
-            // (If you change the setting for a defaultEventAction for DEC_DIGITS,
-            // please check if eventIsTranslate5() still works as expected 
-            // in Editor.util.Event).
-            'ctrl-alt-DIGIT': [me.DEC_DIGITS,{ctrl: true, alt: true}, me.toggleFalsePositive, true],
-            'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
-            'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
-            'ctrl-zoomIn':    [[187, Ext.EventObjectImpl.NUM_PLUS],{ctrl: true, alt: false, shift: false}, me.handleZoomIn, true],
-            'ctrl-zoomOut':   [[189, Ext.EventObjectImpl.NUM_MINUS],{ctrl: true, alt: false, shift: false}, me.handleZoomOut, true]
+            // // DEC_DIGITS:
+            // // (If you change the setting for a defaultEventAction for DEC_DIGITS,
+            // // please check if eventIsTranslate5() still works as expected
+            // // in Editor.util.Event).
+            // 'ctrl-alt-DIGIT': [me.DEC_DIGITS,{ctrl: true, alt: true}, me.toggleFalsePositive, true],
+            'alt-DIGIT': [me.DEC_DIGITS, {ctrl: false, alt: true}, me.handleAssignMQMTag, true],
+            'DIGIT': [me.DEC_DIGITS, {ctrl: false, alt: false}, me.handleDigit],
+            'ctrl-zoomIn': [[187, Ext.EventObjectImpl.NUM_PLUS], {
+                ctrl: true,
+                alt: false,
+                shift: false
+            }, me.handleZoomIn, true],
+            'ctrl-zoomOut': [[189, Ext.EventObjectImpl.NUM_MINUS], {
+                ctrl: true,
+                alt: false,
+                shift: false
+            }, me.handleZoomOut, true],
         };
+
+        // Workaround for the not working zoom in/out handlers in firefox
+        if (navigator.userAgent.toLowerCase().includes('firefox')) {
+            document.addEventListener('keydown', event => {
+                if (event.ctrlKey && ~['+', '=', '-'].indexOf(event.key) && this.getSegmentGrid()) {
+                    event.preventDefault();
+                    event.key === '-' ? me.handleZoomOut() : me.handleZoomIn();
+                }
+            });
+        }
     },
 
     /**
@@ -277,38 +304,33 @@ Ext.define('Editor.controller.Editor', {
     },
 
     /**
-     * track isEditing state 
+     * track isEditing state
      */
     initEditPluginHandler: function (segmentsGrid) {
-        var me = this,
+        let me = this,
             plug = me.getEditPlugin(),
-            disableEditing = function(){
+            disableEditing = function () {
                 let vm = me.getSegmentGrid().lookupViewModel();
-                    //if needed add current edited segment here too
-                    vm.set('isEditingSegment', false);
+                //if needed add current edited segment here too
+                vm.set('isEditingSegment', false);
                 me.isEditing = false;
             };
-            
+
         plug.on('beforestartedit', me.handleBeforeStartEdit, me);
         plug.on('beforeedit', me.handleStartEdit, me);
         plug.on('canceledit', disableEditing);
         plug.on('edit', disableEditing);
-        
-        Ext.getDoc().on('copy', me.copySelectionWithInternalTags, me, {priority: 9999, delegated: false});
-        Ext.getDoc().on('cut', me.copySelectionWithInternalTags, me, {priority: 9999, delegated: false});
-        //previous cut handlers may stop default event processing, so we have to remove and cut the selected content manually in later handler:
-        Ext.getDoc().on('cut', me.removeSelectionAfterCut, me, {priority: 1001, delegated: false});        
-        
+
         me.tooltip = Ext.create('Editor.view.ToolTip', {
             target: segmentsGrid.getEl()
         });
-        
+
         me.prevNextSegment = Ext.create('Editor.controller.editor.PrevNextSegment', {
             editingPlugin: plug
         });
-        
+
         me.relayEvents(me.prevNextSegment, ['prevnextloaded']);
-        
+
         //reset the store next/prev information if data changed
         segmentsGrid.store.on('filterchange', me.handleSortOrFilter, me);
         segmentsGrid.store.on('sort', me.handleSortOrFilter, me);
@@ -317,30 +339,33 @@ Ext.define('Editor.controller.Editor', {
         /**
          * disable the column show / hide menu while editing a segment (EXT6UPD-85)
          */
-        Ext.override(segmentsGrid.getHeaderContainer(), {
-            beforeMenuShow: function(menu) {
-                this.callParent([menu]);
-                menu.down('#columnItem').setDisabled(plug.editing);
-            }
-        });
-        
-        me.generalKeyMap = new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig('application', {
-            'alt-c':[
-                'C',{ctrl: false, alt: true}, 
-                function(key, e){
-                    e.stopEvent();
-                    Ext.fireEvent('editorOpenComments');
-                    return false;
-                }
-            ]
-        }));
-        //inits the editor iframe directly after loading the application
-        plug.editor = plug.initEditor(); 
-        
-        me.handleReferenceFilesMessage();
+        // Ext.override(segmentsGrid.getHeaderContainer(), {
+        //     beforeMenuShow: function(menu) {
+        //         this.callParent([menu]);
+        //         menu.down('#columnItem').setDisabled(plug.editing);
+        //     }
+        // });
+
+        me.generalKeyMap = new Ext.util.KeyMap(
+            Ext.getDoc(),
+            me.getKeyMapConfig('application', {
+                // 'alt-c':[
+                //     'C',{ctrl: false, alt: true},
+                //     function(key, e){
+                //         e.stopEvent();
+                //         Ext.fireEvent('editorOpenComments');
+                //         return false;
+                //     }
+                // ]
+            }));
+
+        //inits the editor directly after loading the application
+        plug.editor = plug.initEditor();
+
+        // me.handleReferenceFilesMessage();
 
         //after segment grid is rendered, get the segment grid segment size values and update the html editor text size with those values
-        me.onSegmentGridSegmentsSizeChanged(segmentsGrid,segmentsGrid.newSegmentSizeCls,segmentsGrid.oldSegmentSizeCls);
+        // me.onSegmentGridSegmentsSizeChanged(segmentsGrid,segmentsGrid.newSegmentSizeCls,segmentsGrid.oldSegmentSizeCls);
     },
     
     handleSortOrFilter: function() {
@@ -357,21 +382,25 @@ Ext.define('Editor.controller.Editor', {
      * initializes the roweditor moveable tooltip
      */
     initMoveToolTip: function(displayfield){
-        var me = this,
+        let me = this,
             id = displayfield.getId()+'-bodyEl';
+
         if(displayfield.ownQuicktip){
             return;
         }
+
         me.registeredTooltips.push(id);
         Ext.tip.QuickTipManager.register({
             target: id,
-            title: me.messages.editorMoveTitle,
-            text: me.messages.editorMove + '<br /><br />' + me.messages.takeTagTooltip
+            //title: me.messages.editorMoveTitle,
+            text: me.messages.takeTagTooltip
         });
     },
+
     handleDestroyRoweditor: function() {
         //FIXME needed for Ext 6.2, possibly removable for further ExtJS updates, see T5DEV-172
-        var me = this;
+        let me = this;
+
         if(me.registeredTooltips && me.registeredTooltips.length > 0) {
             Ext.Array.each(me.registeredTooltips, function(item) {
                 if(Ext.tip.QuickTipManager.tip) {
@@ -380,20 +409,21 @@ Ext.define('Editor.controller.Editor', {
             });
         }
     },
+
     /**
-     * saves the segment of the already opened editor and restarts startEditing call 
+     * saves the segment of the already opened editor and restarts startEditing call
      */
     handleBeforeStartEdit: function(plugin, args){
-        var me = this, 
-            segment = args[0], 
-            i = 0, 
+        var me = this,
+            segment = args[0],
+            i = 0,
             deferInterval;
         //check the content editable column visibility
         me.handleNotEditableContentColumn();
-        
+
         //if there is already an edited segment, we have to save that first
         if(plugin.editing) {
-            this.fireEvent('prepareTrackChangesForSaving');
+            // this.fireEvent('prepareTrackChangesForSaving');
             this.fireEvent('saveSegment', {
                 scope: this,
                 //when the save was successful we open the previously requested segment again
@@ -403,7 +433,7 @@ Ext.define('Editor.controller.Editor', {
             });
             return false;
         }
-        
+
         //if segment is editable we proceed with the edit request
         if(segment.get('editable')){
             return true;
@@ -412,7 +442,7 @@ Ext.define('Editor.controller.Editor', {
         //if segment is not editable due a pending save, we stop the startEdit request and defer it
         if(segment.get('autoStateId') == Editor.data.segments.autoStates.PENDING) {
             //since there is no easy way to attach to the segment save (also it is unsure that a save is called at all)
-            // we just make a loop to check if the segment state is not pending anymore 
+            // we just make a loop to check if the segment state is not pending anymore
             me.getSegmentGrid().setLoading(me.messages.segmentStillSaving);
             deferInterval = Ext.interval(function(){
                 //skip after 6 seconds, with can not edit message
@@ -434,74 +464,73 @@ Ext.define('Editor.controller.Editor', {
             return false;
         }
 
-        //if we reach here, we just print the segment readonly message 
+        //if we reach here, we just print the segment readonly message
         Editor.MessageBox.addInfo(this.messages.f2Readonly);
-        
+
         return true;
     },
-    handleStartEdit: function(plugin, context) {
+
+    handleStartEdit: function (plugin, context) {
         let me = this,
             vm = me.getSegmentGrid().lookupViewModel();
         me.isEditing = true;
         //if needed add current edited segment here too
         vm.set('isEditingSegment', true);
         me.prevNextSegment.calculateRows(context); //context.record, context.rowIdx TODO
-        me.getReferenceTags(context);
     },
-    getReferenceTags: function(context) {
-        var me = this,
-            plug = me.getEditPlugin(),
-            source = context.record.get(
-                plug.editor.mainEditor.getReferenceField(
-                    context.record.get('target'),
-                    context.record.get('pretrans'),
-                    context.record.get('matchRateType'),
-                )
-            ),
-            tempNode, walkNodes;
 
-        me.sourceTags = [];
-        //do nothing when editing the source field
-        if(/^source/.test(context.column.dataIndex)){
-            return;
+    onAfterStartEdit: function (editor) {
+        if (this.editorKeyMap) {
+            this.editorKeyMap.destroy();
         }
 
-        tempNode = document.createElement('DIV');
-        Ext.fly(tempNode).update(source);
+        const el = editor.getEditorBody();
 
-        walkNodes = function(rootNode) {
-            Ext.each(rootNode.childNodes, function(item){
-                if(Ext.isTextNode(item) || item.tagName !== 'DIV'){
-                    return;
-                }
-                if(item.tagName === 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
-                    walkNodes(item);
-                    return;
-                }
-                var divItem = Ext.fly(item),
-                    tagNr = divItem.down('span.short').dom.innerHTML.replace(/[^0-9]/g, ''),
-                    tagType = item.className.match(/^(open|single|close)\s/),
-                    //we use a real array starting at 0 for tag 1
-                    idx = tagNr-1;
-                if(!tagType) {
-                    return;
-                }
-                tagType = tagType[1];
-                if(!me.sourceTags[idx]) {
-                    me.sourceTags[idx] = {};
-                }
-                me.sourceTags[idx][plug.editor.mainEditor.idPrefix+tagType+tagNr] = '<div class="'+item.className+'">'+item.innerHTML+'</div>';
-            });
-        };
-        walkNodes(tempNode);
+        this.editorKeyMap = new Editor.view.segments.EditorKeyMap({
+            target: el,
+            binding: this.getKeyMapConfig('editor', {
+                // insert editor-specific key events
+                'ctrl-comma': [188, {
+                    ctrl: true,
+                    alt: false,
+                    shift: false
+                }, this.handleDigitPreparation(this.handleInsertTag), true],
+                'ctrl-shift-comma': [188, {
+                    ctrl: true,
+                    alt: false,
+                    shift: true
+                }, this.handleDigitPreparation(this.handleInsertTagShift), true],
+                'ctrl-shift-space': [Ext.EventObjectImpl.SPACE, {
+                    ctrl: true,
+                    alt: false,
+                    shift: true
+                }, () => this.insertWhitespaceNbsp(), true],
+                'shift-enter': [Ext.EventObjectImpl.ENTER, {
+                    ctrl: false,
+                    alt: false,
+                    shift: true
+                }, () => this.insertWhitespaceNewline(), true],
+                'enter': [Ext.EventObjectImpl.ENTER, {
+                    ctrl: false,
+                    alt: false,
+                    shift: false
+                }, () => this.insertWhitespaceNewline(), true],
+                'tab': [Ext.EventObjectImpl.TAB, {
+                    ctrl: false,
+                    alt: false
+                }, () => this.insertWhitespaceTab(), true]
+            })
+        });
     },
+
     /**
      * Gibt die RowEditing Instanz des Grids zurück
      * @returns Editor.view.segments.RowEditing
      */
-    getEditPlugin: function() {
+    getEditPlugin: function () {
         return this.getSegmentGrid().editingPlugin;
     },
+
     /**
      * converts the here used simple keymap config to the fullblown KeyMap config
      * the simple config contains arrays with the following indizes:
@@ -511,143 +540,163 @@ Ext.define('Editor.controller.Editor', {
      * 3: boolean, if true prepend event propagation stopper
      * 4: scope (optional)
      *
-     * @param {String} area, a speakable name where the config is used. 
+     * @param {String} area, a speakable name where the config is used.
      *    Just passed to the keyMapConfig event to determine there if the event should be processed or not
      * @param {Object} overwrite a config object for dedicated overwriting of key bindings
      */
-    getKeyMapConfig: function(area, overwrite) {
+    getKeyMapConfig: function (area, overwrite) {
         var me = this,
             conf = [],
             overwrite = overwrite || {};
-            
+
         /*
         * event beforeKeyMapUsage parameters:
-        * @param {Editor.controller.Editor} 
-        * @param {String} area, the area describes where the keymap shall be used.  
-        * @param {Object} overwrite, the object with overwrite definitions 
+        * @param {Editor.controller.Editor}
+        * @param {String} area, the area describes where the keymap shall be used.
+        * @param {Object} overwrite, the object with overwrite definitions
         */
         me.fireEvent('beforeKeyMapUsage', this, area, overwrite);
 
-        //we may not use me.keyMapConfig to add the overwriten values, since it must remain unchanged, 
+        //we may not use me.keyMapConfig to add the overwriten values, since it must remain unchanged,
         // so we do it the other way round and copy all values to the overwrite object:
-        Ext.Object.each(me.keyMapConfig, function(key, item){
+        Ext.Object.each(me.keyMapConfig, function (key, item) {
             //copy the config to the overwrite object, only if it does not exist already!
-            if(overwrite[key]) {
+            if (overwrite[key]) {
                 return;
             }
             overwrite[key] = item;
         });
-        
+
         //no we process the merged configs:
-        Ext.Object.each(overwrite, function(key, item){
-            if(!item) {
+        Ext.Object.each(overwrite, function (key, item) {
+            if (!item) {
                 return;
             }
-            
+
             //applies the keys config and scope to a fresh conf object
-            var confObj = Ext.applyIf({
-                key: item[0],
-                scope: item[4] || me
-            }, item[1]);
-            if(item[3]) {
+            var confObj = Ext.applyIf(
+                {
+                    key: item[0],
+                    scope: item[4] || me
+                },
+                item[1]
+            );
+
+            if (item[3]) {
                 confObj.defaultEventAction = 'stopEvent';
                 //prepends the event propagation stopper
             }
-            confObj.fn = function(key, e) {
+
+            confObj.fn = function (key, e) {
                 item[2].apply(confObj.scope, arguments);
                 //FIXME Ausnahme für digitHandler definieren, wenn nicht im isDigitPreparation Modus!
                 return false; //stop further key binding processing
             };
+
             conf.push(confObj);
         });
+
         return conf;
     },
+
     /**
      * binds strg + enter as save segment combination
      * @param {Editor.view.segments.HtmlEditor} editor
      */
     initEditor: function(editor){
-        var me = this,
-            docEl = Ext.get(editor.getDoc());
+        console.log('initEditor');
+
+        let me = this,
+            docEl = Ext.get(document);
         this.htmlEditor = editor;
-        
-        if(me.editorKeyMap) {
+
+        if (me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
-        if(me.editorKeyMap_rowpanel) {
-            me.editorKeyMap_rowpanel.destroy();
-        }
 
-        editor.editorKeyMap_rowpanel = me.editorKeyMap_rowpanel = new Editor.view.segments.EditorKeyMap({
-            target: editor.up().el,
-            binding: me.getKeyMapConfig('editor_rowpanel')
-        });
-        editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
-            target: docEl,
-            binding: me.getKeyMapConfig('editor', {
-                // insert whitespace key events
-                'ctrl-shift-space': [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true],
-                'shift-enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true],
-                'enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: false}, me.insertWhitespaceNewline, true],
-                'tab': [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true]
-            })
-        });
-        editor.DEC_DIGITS = me.DEC_DIGITS;
-        
+        // if(me.editorKeyMap_rowpanel) {
+        //     me.editorKeyMap_rowpanel.destroy();
+        // }
+
+        // editor.editorKeyMap_rowpanel = me.editorKeyMap_rowpanel = new Editor.view.segments.EditorKeyMap({
+        //     target: editor.up().el,
+        //     binding: me.getKeyMapConfig('editor_rowpanel')
+        // });
+        //
+        // editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
+        //     target: docEl,
+        //     binding: me.getKeyMapConfig('editor', {
+        //         // insert whitespace key events
+        //         'ctrl-shift-space': [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true],
+        //         // 'shift-enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true],
+        //         // 'enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: false}, me.insertWhitespaceNewline, true],
+        //         'tab': [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true]
+        //     })
+        // });
+        // editor.DEC_DIGITS = me.DEC_DIGITS;
+
         docEl.on({
-            dragend:{
+            dragstart:{
                 delegated: false,
                 priority: 9999,
-                fn: me.handleDragEnd,
+                fn: this.onDragStart,
                 scope: this,
                 preventDefault: false
             },
-            keyup:{
-                delegated: false,
-                priority: 9999,
-                fn: me.handleKeyUp,
-                scope: this,
-                preventDefault: false
-            },
-            mouseup:{
-                delegated: false,
-                priority: 9999,
-                fn: me.handleMouseUp,
-                scope: this,
-                preventDefault: false
-            },
-            singletap:{
-                delegated: false,
-                priority: 9999,
-                fn: me.handleMouseUp,
-                scope: this,
-                preventDefault: false
-            },
+    //     dragend:{
+    //         delegated: false,
+    //         priority: 9999,
+    //         fn: me.handleDragEnd,
+    //         scope: this,
+    //         preventDefault: false
+    //     },
+    //     keyup:{
+    //         delegated: false,
+    //         priority: 9999,
+    //         fn: me.handleKeyUp,
+    //         scope: this,
+    //         preventDefault: false
+    //     },
+    //     mouseup:{
+    //         delegated: false,
+    //         priority: 9999,
+    //         fn: me.handleMouseUp,
+    //         scope: this,
+    //         preventDefault: false
+    //     },
+    //     singletap:{
+    //         delegated: false,
+    //         priority: 9999,
+    //         fn: me.handleMouseUp,
+    //         scope: this,
+    //         preventDefault: false
+    //     },
             copy: {
                 delegated: false,
                 priority: 9999,
                 fn: me.copySelectionWithInternalTags,
                 scope: me
             },
-            cut: {
-                delegated: false,
-                priority: 9999,
-                fn: me.copySelectionWithInternalTags,
-                scope: me
-            },
-            paste: {
-                delegated: false,
-                priority: 5000,
-                fn: me.pasteContent,
-                scope: me
-            },
-            selectionchange: {
-                delegated: false,
-                priority: 5000,
-                fn: me.onEditorSelectionChange,
-                scope: me
-            }
+    //     cut: {
+    //         delegated: false,
+    //         priority: 9999,
+    //         fn: me.copySelectionWithInternalTags,
+    //         scope: me
+    //     },
+    //     paste: {
+    //         delegated: false,
+    //         priority: 5000,
+    //         fn: me.pasteContent,
+    //         scope: me
+    //     },
+    //     selectionchange: {
+    //         delegated: false,
+    //         priority: 5000,
+    //         fn: me.onEditorSelectionChange,
+    //         scope: me
+    //     }
         });
+
 
         // Prevent ² and ³ from being inserted into opened segment editor
         // when ctrl+alt+2 and ctrl+alt+3 combination pressed on German keyboard
@@ -659,78 +708,77 @@ Ext.define('Editor.controller.Editor', {
             }
         })
 
-        //add second cut handler to remove the content if default handler prevented
-        docEl.on('cut', me.removeSelectionAfterCut, me, {priority: 1001, delegated: false});        
+    //add second cut handler to remove the content if default handler prevented
+    // docEl.on('cut', me.removeSelectionAfterCut, me, {priority: 1001, delegated: false});
 
-        
-        // Paste does not reach the browser's clipboard-functionality,
-        // so we need our own SnapshotHistory for handling CTRL+Z and CTRL+Y.
-        me.fireEvent('activateSnapshotHistory');
-        
-        if(me.editorTooltip){
-            me.editorTooltip.setTarget(editor.getEditorBody());
-            me.editorTooltip.targetIframe = editor.iframeEl;
-        }
-        else {
+
+    // Paste does not reach the browser's clipboard-functionality,
+    // so we need our own SnapshotHistory for handling CTRL+Z and CTRL+Y.
+    // me.fireEvent('activateSnapshotHistory');
+
+        if (me.editorTooltip) {
+            me.editorTooltip.setTarget(document.body);
+        } else {
             me.editorTooltip = Ext.create('Editor.view.ToolTip', {
-                target: editor.getDoc(),
-                targetIframe: editor.iframeEl
+                target: document,
             });
         }
     },
-    onOpenEditorViewport: function(app, task) {
-        if(! task.isUnconfirmed()) {
-            return;
-        }
-        this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
-    },
-    /**
-     * Cleanup stuff in the editor view port
-     */
-    onCloseEditorViewport: function() {
-        var me = this;
-        me.clearKeyMaps();
-        // removing the following handler has no effect, but it should be removed here!
-        //FIXME should be unbound since rebind on each task open!? or not? 
-        //Ext.getDoc().un('copy', me.copySelectionWithInternalTags);
-        me.tooltip && me.tooltip.destroy();
-        me.taskConfirmation && me.taskConfirmation.destroy();
-    },
-    clearKeyMaps: function() {
-        var me = this;
-        if(me.editorKeyMap) {
-            //FIXME: Fix for the bug in internet explorer
-            //http://jira.translate5.net/browse/TRANSLATE-1086
-        	//same problem with different error log under edge
-        	//https://jira.translate5.net/browse/TRANSLATE-2037
-            if(!Ext.isIE && !Ext.isEdge){
-                me.editorKeyMap.destroy();
-            }
-            me.editorKeyMap = null;
-        }
-        
-        if(me.generalKeyMap) {
-            //FIXME: Fix for the bug in internet explorer
-            //http://jira.translate5.net/browse/TRANSLATE-1086
-        	//same problem with different error log under edge
-        	//https://jira.translate5.net/browse/TRANSLATE-2037
-            if(!Ext.isIE && !Ext.isEdge){
-                me.generalKeyMap.destroy();
-            }
-            me.generalKeyMap = null;
-        }
-    },
+
+    // onOpenEditorViewport: function(app, task) {
+    //     if(! task.isUnconfirmed()) {
+    //         return;
+    //     }
+    //     this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
+    // },
+    // /**
+    //  * Cleanup stuff in the editor view port
+    //  */
+    // onCloseEditorViewport: function() {
+    //     var me = this;
+    //     me.clearKeyMaps();
+    //     // removing the following handler has no effect, but it should be removed here!
+    //     //FIXME should be unbound since rebind on each task open!? or not?
+    //     //Ext.getDoc().un('copy', me.copySelectionWithInternalTags);
+    //     me.tooltip && me.tooltip.destroy();
+    //     me.taskConfirmation && me.taskConfirmation.destroy();
+    // },
+    // clearKeyMaps: function() {
+    //     var me = this;
+    //     if(me.editorKeyMap) {
+    //         //FIXME: Fix for the bug in internet explorer
+    //         //http://jira.translate5.net/browse/TRANSLATE-1086
+    //     	//same problem with different error log under edge
+    //     	//https://jira.translate5.net/browse/TRANSLATE-2037
+    //         if(!Ext.isIE && !Ext.isEdge){
+    //             me.editorKeyMap.destroy();
+    //         }
+    //         me.editorKeyMap = null;
+    //     }
+    //
+    //     if(me.generalKeyMap) {
+    //         //FIXME: Fix for the bug in internet explorer
+    //         //http://jira.translate5.net/browse/TRANSLATE-1086
+    //     	//same problem with different error log under edge
+    //     	//https://jira.translate5.net/browse/TRANSLATE-2037
+    //         if(!Ext.isIE && !Ext.isEdge){
+    //             me.generalKeyMap.destroy();
+    //         }
+    //         me.generalKeyMap = null;
+    //     }
+    // },
     buttonClickDispatcher: function(btn, e) {
-        var me = this,
-            action = btn.itemId && btn.itemId.replace(/Btn$/, '');
-        if(action && Ext.isFunction(me[action])) {
-            me[action](btn, e);
-        }
+         var me = this,
+             action = btn.itemId && btn.itemId.replace(/Btn$/, '');
+         if(action && Ext.isFunction(me[action])) {
+             me[action](btn, e);
+         }
     },
+
     /**
      * Handler for save Button
      */
-    save: function() {
+    save: function () {
         var me = this,
             ed = me.getEditPlugin(),
             rec = ed.editing && ed.context.record;
@@ -738,25 +786,26 @@ Ext.define('Editor.controller.Editor', {
         //since save without moving was triggered, we have to reset the calculated data
         me.prevNextSegment.reset();
 
-        me.fireEvent('saveUnsavedComments');
-        if(me.isEditing && rec && rec.get('editable')) {
-            me.fireEvent('prepareTrackChangesForSaving');
+        // me.fireEvent('saveUnsavedComments');
+        if (me.isEditing && rec && rec.get('editable')) {
+            // me.fireEvent('prepareTrackChangesForSaving');
             me.fireEvent('saveSegment');
         }
     },
-    /**
-     * Handler for CTRL+X
-     */
-    undo: function() {
-        this.fireEvent('undo'); // see SnapshotHistory
-    },
-    /**
-     * Handler for CTRL+Y
-     */
-    redo: function() {
-        this.fireEvent('redo'); // see SnapshotHistory
-    },
 
+    // /**
+    //  * Handler for CTRL+X
+    //  */
+    // undo: function() {
+    //     this.fireEvent('undo'); // see SnapshotHistory
+    // },
+    // /**
+    //  * Handler for CTRL+Y
+    //  */
+    // redo: function() {
+    //     this.fireEvent('redo'); // see SnapshotHistory
+    // },
+    //
     /**
      * Handling CTRL-L
      */
@@ -787,116 +836,122 @@ Ext.define('Editor.controller.Editor', {
         prompt.down('textfield').focus(200);
     },
 
-    /**
-     * handleAfterContentChange: save snapshot.
-     */
     handleAfterContentChange: function(preventSaveSnapshot) {
-    	if(!preventSaveSnapshot) {
-    	    this.fireEvent('saveSnapshot'); // see SnapshotHistory
-    	}
-    	// trigger deferred change handler
-    	if(!this.isCapturingChange){
-    		var me = this;
-    		this.isCapturingChange = true;
-    		setTimeout(function(){ me.handleDelayedChange(); }, Editor.data.editor.deferredChangeTimeout);
-    	}
-    },
-    /**
-     * handleAfterCursorMove: save new position of cursor if necessary.
-     */
-    handleAfterCursorMove: function() {
-    	this.fireEvent('updateSnapshotBookmark'); // see SnapshotHistory
-    },
-    
-    /**
-     * handleAfterCursorMove: fire deferred change event if still changing
-     */    
-    handleDelayedChange: function(){
-    	if(this.isEditing) {
-    		this.fireEvent('clockedchange', this.htmlEditor, this.getEditPlugin().context); 
+        // if(!preventSaveSnapshot) {
+        //     this.fireEvent('saveSnapshot'); // see SnapshotHistory
+        // }
+        // trigger deferred change handler
+
+        if (!this.isCapturingChange) {
+            const me = this;
+            this.isCapturingChange = true;
+
+            setTimeout(function () {
+                me.handleDelayedChange();
+            }, Editor.data.editor.deferredChangeTimeout);
         }
-    	this.isCapturingChange = false;
     },
 
+    // /**
+    //  * handleAfterCursorMove: save new position of cursor if necessary.
+    //  */
+    // handleAfterCursorMove: function() {
+    // 	this.fireEvent('updateSnapshotBookmark'); // see SnapshotHistory
+    // },
+
     /**
-     * After keyboard-event: handle changes if event is not to be ignored.
-     * ('change'-event from segmentsHtmleditor does not work; is not really envoked when we need it!)
-     * @param event
+     * handleAfterCursorMove: fire deferred change event if still changing
      */
-    handleKeyUp: function(event) {
-        var me = this;
-        me.consoleLog('Editor: handleKeyUp');
-        me.event = event; // Editor.util.Event
-	    // New content? 
-        // Ignore 
-        // - keys that don't produce content (strg,alt,shift itself, arrows etc)
-        // - keys that must not change the content in the Editor (e.g. strg-z will not always do what the user expects)
-	    if (!me.eventIsCtrlZ() && !me.eventIsCtrlY() && !me.eventHasToBeIgnored() && !me.eventHasToBeIgnoredAndStopped()) {
-	    	me.handleAfterContentChange();
-	    	return;
-	    }
-	    // New position of cursor?
-	    if (me.eventIsArrowKey()) {
-	    	me.handleAfterCursorMove();
-	    }
+    handleDelayedChange: function () {
+        if (this.isEditing) {
+            this.fireEvent('clockedchange', this.htmlEditor, this.getEditPlugin().context);
+        }
+
+        this.isCapturingChange = false;
     },
-    /**
-     * After mouse-click.
-     */
-    handleMouseUp: function() {
-        var me = this;
-        me.consoleLog('Editor: handleMouseUp');
-        me.handleAfterCursorMove();
-    },
-    /**
-     * 
-     */
-    handleDragEnd: function() {
-        var me = this;
-        me.consoleLog('Editor: handleDragEnd');
-        me.fireEvent('afterDragEnd');
-    },
-    
+
+    // /**
+    //  * After keyboard-event: handle changes if event is not to be ignored.
+    //  * ('change'-event from segmentsHtmleditor does not work; is not really envoked when we need it!)
+    //  * @param event
+    //  */
+    // handleKeyUp: function(event) {
+    //     var me = this;
+    //     me.consoleLog('Editor: handleKeyUp');
+    //     me.event = event; // Editor.util.Event
+    //     // New content?
+    //     // Ignore
+    //     // - keys that don't produce content (strg,alt,shift itself, arrows etc)
+    //     // - keys that must not change the content in the Editor (e.g. strg-z will not always do what the user expects)
+    //     if (!me.eventIsCtrlZ() && !me.eventIsCtrlY() && !me.eventHasToBeIgnored() && !me.eventHasToBeIgnoredAndStopped()) {
+    //     	me.handleAfterContentChange();
+    //     	return;
+    //     }
+    //     // New position of cursor?
+    //     if (me.eventIsArrowKey()) {
+    //     	me.handleAfterCursorMove();
+    //     }
+    // },
+    // /**
+    //  * After mouse-click.
+    //  */
+    // handleMouseUp: function() {
+    //     var me = this;
+    //     me.consoleLog('Editor: handleMouseUp');
+    //     me.handleAfterCursorMove();
+    // },
+    // /**
+    //  *
+    //  */
+    // handleDragEnd: function() {
+    //     var me = this;
+    //     me.consoleLog('Editor: handleDragEnd');
+    //     me.fireEvent('afterDragEnd');
+    // },
+
     /**
      * Special Universal preparation Handler for pressing DIGIT keys
-     * A preparation keyboard shortcut can be defined, for example ALT-S. 
-     * If ALT-S is pressed, then if the next key is a DIGIT the given 
+     * A preparation keyboard shortcut can be defined, for example ALT-S.
+     * If ALT-S is pressed, then if the next key is a DIGIT the given
      * digithandler will be called with the preseed DIGIT.
      * @param {Function} must be function in the controller scope, since scope parameter is not supported
      */
-    handleDigitPreparation: function(digithandler) {
-        var me = this;
-        return function(key, event) {
-            me.digitHandler = digithandler;
+    handleDigitPreparation: function (digithandler) {
+        return (key, event) => {
+            this.digitHandler = digithandler;
             event.isDigitPreparation = true;
             event.stopEvent();
+
             return false;
         };
     },
+
     /**
      * Digit handler, does only something if a DIGIT preparation shortcut was pressed directly before.
      */
-    handleDigit: function(k, e) {
-        if(e.lastWasDigitPreparation){
+    handleDigit: function (k, e) {
+        if (e.lastWasDigitPreparation) {
             e.stopEvent();
             this.digitHandler(k, e);
+
             return false;
-        } 
+        }
     },
-    
+
     /**
      * Keyboard handler for zoom in, calls just the viewmodes function directly
      */
-    handleZoomIn: function() {
+    handleZoomIn: function (k, e) {
         this.getSegmentGrid().setSegmentSize(1, true);
     },
+
     /**
      * Keyboard handler for zoom out, calls just the viewmodes function directly
      */
-    handleZoomOut: function() {
+    handleZoomOut: function () {
         this.getSegmentGrid().setSegmentSize(-1, true);
     },
-    
+
     /**
      * Moves to the next row without saving current record
      * @return {Boolean} true if there is a next segment, false otherwise
@@ -944,7 +999,7 @@ Ext.define('Editor.controller.Editor', {
      */
     moveToAdjacentRow: function() {
         var me = this;
-        
+
         if(!me.isEditing) {
             return;
         }
@@ -1005,14 +1060,15 @@ Ext.define('Editor.controller.Editor', {
         this.calcNext(true);
         this.saveOtherRow();
     },
-    /**
-     * Handler for savePrevious Button
-     * @return {Boolean} true if there is a next segment, false otherwise
-     */
-    savePreviousByWorkflow: function() {
-        this.calcPrev(true);
-        this.saveOtherRow();
-    },
+    // /**
+    //  * Handler for savePrevious Button
+    //  * @return {Boolean} true if there is a next segment, false otherwise
+    //  */
+    // savePreviousByWorkflow: function() {
+    //     this.calcPrev(true);
+    //     this.saveOtherRow();
+    // },
+
     /**
      * API for plugins to save the current and open the next segment followed by the passed callback
      * @param {String} type
@@ -1023,24 +1079,21 @@ Ext.define('Editor.controller.Editor', {
         this.nextOpenedCallback = callback;
         this.prevNextSegment.calcNext(type, msg);
         this.saveOtherRow();
-        
     },
     /**
      * save and go to other row
      */
-    saveOtherRow: function() {
-        var me = this;
-        
-        me.fireEvent('saveUnsavedComments');
-        if(!me.isEditing) {
+    saveOtherRow: function () {
+        this.fireEvent('saveUnsavedComments');
+
+        if (!this.isEditing) {
             return;
         }
-        me.fireEvent('prepareTrackChangesForSaving');
-        
-        me.fireEvent('saveSegment', {
-            scope: me,
-            segmentUsageFinished: function(){
-                me.openNextRow();
+
+        this.fireEvent('saveSegment', {
+            scope: this,
+            segmentUsageFinished: () => {
+                this.openNextRow();
             }
         });
     },
@@ -1067,7 +1120,7 @@ Ext.define('Editor.controller.Editor', {
         if(!rowMeta.isMoveEditor){
         	scrollMode = ed.self.STARTEDIT_SCROLLUNDER;
         }
-        
+
         //if we have a nextSegment and it is rendered, bring into the view and open it
         if (rowMeta.rec && grid.getView().getNode(rowMeta.rec)) {
             selModel.select(rowMeta.rec);
@@ -1091,12 +1144,12 @@ Ext.define('Editor.controller.Editor', {
             });
             return;
         }
-        
+
         if(rowMeta.isBorderReached) {
             Editor.MessageBox.addInfo(rowMeta.errorText);
             return;
         }
-        
+
         if(rowMeta.isLoading) {
             Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
         }
@@ -1104,6 +1157,7 @@ Ext.define('Editor.controller.Editor', {
             Editor.MessageBox.addInfo(me.messages.segmentsChanged);
         }
     },
+
     /**
      * Applies any callbacks after opening a row (can currently only be one)
      */
@@ -1113,232 +1167,230 @@ Ext.define('Editor.controller.Editor', {
         }
         this.nextOpenedCallback = null;
     },
+
     /**
      * @param {Editor.view.segments.HtmlEditor} editor
      * @param {String} msg
-     * @param {Bool} isTagError (optional; default: true)
+     * @param {Boolean} isTagError (optional; default: true)
      */
-    handleSaveWithErrors: function(editor, msg, isTagError = true){
-        var me = this,
+    onSaveWithErrors: function (editor, msg, isTagError = true) {
+        let me = this,
             msgBox;
-        
+
         //if there was an empty message we assume that there was no error,
-        if(!msg) {
+        if (!msg) {
             return;
         }
-        
+
         msgBox = Ext.create('Ext.window.MessageBox', {
-            buttonText:{
+            buttonText: {
                 ok: 'OK',
                 yes: 'OK',
                 no: me.messages.saveAnyway
             }
         });
+
         // tag-errors: check if user is allowed to save anyway
-        if(isTagError && Editor.app.getTaskConfig('segments.userCanIgnoreTagValidation')) {
-            msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
-                if(btn === 'no') {
-                    me.saveAndIgnoreContentErrors();
-                }
-            },me);
-        }
-        else {
+        if (isTagError && Editor.app.getTaskConfig('segments.userCanIgnoreTagValidation')) {
+            msgBox.confirm(
+                me.messages.errorTitle, msg, function (btn) {
+                    if (btn === 'no') {
+                        me.saveAndIgnoreContentErrors();
+                    }
+                },
+                me
+            );
+        } else {
             msgBox.alert(me.messages.errorTitle, msg);
         }
     },
+
     /**
-     * triggers the save chain but ignoring htmleditor content errors then
+     * Triggers the save chain but ignoring htmleditor content errors then
      */
-    saveAndIgnoreContentErrors: function() {
-        var me = this,
-            plug = me.getEditPlugin();
-        plug.editor.mainEditor.disableContentErrorCheckOnce();
-        if(me.prevNextSegment.getCalculated()){
-            me.saveOtherRow.apply(me);
+    saveAndIgnoreContentErrors: function () {
+        this.getEditPlugin().editor.disableContentErrorCheckOnce();
+
+        if (this.prevNextSegment.getCalculated()) {
+            this.saveOtherRow.apply(this);
+
             return;
         }
-        me.save();
+
+        this.save();
     },
+
     /**
      * Handler für cancel Button
      */
-    cancel: function() {
+    cancel: function () {
         this.getEditPlugin().cancelEdit();
     },
+
     /**
      * Handles pressing the keyboard shortcuts for changing the segment state
      */
-    handleChangeState: function(key, e) {
+    handleChangeState: function (key, e) {
         var param = Number(key) - 48;
-        //we ignore 0, since this is no valid state
-        if(param !== 0){
+
+        // we ignore 0, since this is no valid state
+        if (param !== 0) {
             this.fireEvent('changeSegmentState', param);
             e.stopEvent();
         }
+
         return false;
     },
-    /**
-     * Handles pressing the comment keyboard shortcut
-     */
-    handleOpenComments: function() {
-        Ext.fireEvent('editorOpenComments');
-    },
 
-    /**
-     * Toggle false-positive on any of first 10 qualities, identified by numeric keys 1-9, and key '0' for 10th
-     *
-     * @param key
-     */
-    toggleFalsePositive: function(key) {
-        var me = this,
-            column = me.getFalsePositiveCheckColumn(),
-            rowIndex = (Number(key) - 48 || 10) - 1,
-            record = column.up('grid').getStore().getAt(rowIndex);
-
-        // If no record exists at such rowIndex - return
-        if (!record) return;
-
-        // Fire checkchange-event
-        column.fireEvent('checkchange', column, rowIndex, !record.get('falsePositive'), record);
-    },
+    // /**
+    //  * Handles pressing the comment keyboard shortcut
+    //  */
+    // handleOpenComments: function() {
+    //     Ext.fireEvent('editorOpenComments');
+    // },
 
     /**
      * Handles pressing the MQM tag shortcuts, without shift 1-10, with shift 11-20
      */
     handleAssignMQMTag: function(key, e) {
-        var me = this;
-        if(!me.isEditing) {
+        if(!this.isEditing) {
             return;
         }
+
         e.preventDefault();
         e.stopEvent();
-        var param = Number(key) - 48;
+
+        let param = Number(key) - 48;
+
         if (param === 0) {
             param = 10;
         }
+
         if(e.shiftKey) {
             param = param + 10;
         }
-        me.fireEvent('assignMQMTag', param);
-    },
-    /**
-     * Move the editor about one editable field
-     */
-    goToCustom: function(direction, saveRecord) {
-        var me = this,
-            info = me.getColInfo(),
-            idx = info && info.foundIdx,
-            cols = info && info.columns,
-            store = me.getSegmentGrid().store,
-            plug = me.getEditPlugin(),
-            newRec;
-        
-        if(info === false) {
-        return;
-        }
-        newRec = store.getAt(store.indexOf(plug.context.record) + direction);
-        
-        //check if there exists a next/prev row, if not we dont need to move the editor.
-        while(newRec && !newRec.get('editable')) {
-            newRec = store.getAt(store.indexOf(newRec) + direction);
-        }
-        if(cols[idx + direction]) {
-        plug.editor.changeColumnToEdit(cols[idx + direction]);
-        return;
-        }
-        if(direction > 0) {
-            //goto next segment and first col
-            if(newRec) {
-                plug.editor.changeColumnToEdit(cols[0]);
-            }
-            if (saveRecord) {
-            me.saveNext();
-            }
-            else {
-            me.goToLowerNoSave();
-            }
-            return;
-        }
-        //goto prev segment and last col
-        if(newRec) {
-            plug.editor.changeColumnToEdit(cols[cols.length - 1]);
-        }
-        if (saveRecord) {
-        me.savePrevious();
-        }
-        else {
-        me.goToUpperNoSave();
-        }
-    },
-    /**
-     * Move the editor about one editable field
-     */
-    goAlternateRight: function() {
-        this.goToCustom(1, true);
-    },
-    /**
-     * Move the editor about one editable field
-     */
-    goAlternateLeft: function() {
-        this.goToCustom(-1, true);
-    },
-    /**
-     * Move the editor about one editable field left
-     */
-    goToLeft: function(key, e) {
-        var me = this,
-            direction = -1;
-        if(!me.isEditing) {
-            return;
-        }
-        e.preventDefault();
-        e.stopEvent();
-        me.goToCustom(direction, true);
-    },
-    /**
-     * Move the editor about one editable field right
-     */
-    goToRight: function(key, e) {
-        var me = this,
-            direction = 1;
-        if(!me.isEditing) {
-            return;
-        }
-        e.preventDefault();
-        e.stopEvent();
-        me.goToCustom(direction, true);
-    },
-    /**
-     * returns the visible columns and which column has actually the editor
-     * @return {Object}
-     */
-    getColInfo: function() {
-        var me = this,
-            plug = me.getEditPlugin(),
-            columns = me.getSegmentGrid().query('contentEditableColumn:not([hidden])'),
-            foundIdx = false,
-            current = plug.editor.getEditedField();
-        
-        if(!plug || !plug.editor || !plug.editing) {
-            return false;
-        }
-        
-        Ext.Array.each(columns, function(col, idx) {
-        if(col.dataIndex === current) {
-            foundIdx = idx;
-        }
-        });
-        if(foundIdx === false) {
-        return false;
-        }
 
-        return {
-        plug: plug,
-        columns: columns,
-        foundIdx: foundIdx
-        };
+        this.fireEvent('assignMQMTag', param);
     },
-    
+
+    // /**
+    //  * Move the editor about one editable field
+    //  */
+    // goToCustom: function(direction, saveRecord) {
+    //     var me = this,
+    //         info = me.getColInfo(),
+    //         idx = info && info.foundIdx,
+    //         cols = info && info.columns,
+    //         store = me.getSegmentGrid().store,
+    //         plug = me.getEditPlugin(),
+    //         newRec;
+    //
+    //     if(info === false) {
+    //     return;
+    //     }
+    //     newRec = store.getAt(store.indexOf(plug.context.record) + direction);
+    //
+    //     //check if there exists a next/prev row, if not we dont need to move the editor.
+    //     while(newRec && !newRec.get('editable')) {
+    //         newRec = store.getAt(store.indexOf(newRec) + direction);
+    //     }
+    //     if(cols[idx + direction]) {
+    //     plug.editor.changeColumnToEdit(cols[idx + direction]);
+    //     return;
+    //     }
+    //     if(direction > 0) {
+    //         //goto next segment and first col
+    //         if(newRec) {
+    //             plug.editor.changeColumnToEdit(cols[0]);
+    //         }
+    //         if (saveRecord) {
+    //         me.saveNext();
+    //         }
+    //         else {
+    //         me.goToLowerNoSave();
+    //         }
+    //         return;
+    //     }
+    //     //goto prev segment and last col
+    //     if(newRec) {
+    //         plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+    //     }
+    //     if (saveRecord) {
+    //     me.savePrevious();
+    //     }
+    //     else {
+    //     me.goToUpperNoSave();
+    //     }
+    // },
+    // /**
+    //  * Move the editor about one editable field
+    //  */
+    // goAlternateRight: function() {
+    //     this.goToCustom(1, true);
+    // },
+    // /**
+    //  * Move the editor about one editable field
+    //  */
+    // goAlternateLeft: function() {
+    //     this.goToCustom(-1, true);
+    // },
+    // /**
+    //  * Move the editor about one editable field left
+    //  */
+    // goToLeft: function(key, e) {
+    //     var me = this,
+    //         direction = -1;
+    //     if(!me.isEditing) {
+    //         return;
+    //     }
+    //     e.preventDefault();
+    //     e.stopEvent();
+    //     me.goToCustom(direction, true);
+    // },
+    // /**
+    //  * Move the editor about one editable field right
+    //  */
+    // goToRight: function(key, e) {
+    //     var me = this,
+    //         direction = 1;
+    //     if(!me.isEditing) {
+    //         return;
+    //     }
+    //     e.preventDefault();
+    //     e.stopEvent();
+    //     me.goToCustom(direction, true);
+    // },
+    // /**
+    //  * returns the visible columns and which column has actually the editor
+    //  * @return {Object}
+    //  */
+    // getColInfo: function() {
+    //     var me = this,
+    //         plug = me.getEditPlugin(),
+    //         columns = me.getSegmentGrid().query('contentEditableColumn:not([hidden])'),
+    //         foundIdx = false,
+    //         current = plug.editor.getEditedField();
+    //
+    //     if(!plug || !plug.editor || !plug.editing) {
+    //         return false;
+    //     }
+    //
+    //     Ext.Array.each(columns, function(col, idx) {
+    //     if(col.dataIndex === current) {
+    //         foundIdx = idx;
+    //     }
+    //     });
+    //     if(foundIdx === false) {
+    //     return false;
+    //     }
+    //
+    //     return {
+    //     plug: plug,
+    //     columns: columns,
+    //     foundIdx: foundIdx
+    //     };
+    // },
+    //
     /**
      * brings the currently opened segment back into the view.
      */
@@ -1357,7 +1409,7 @@ Ext.define('Editor.controller.Editor', {
         plug.editor.setMode(plug.self.STARTEDIT_SCROLLUNDER);
         plug.editor.initialPositioning();
     },
-    
+
     /**
      * resets the htmleditor content to the original content
      */
@@ -1372,59 +1424,58 @@ Ext.define('Editor.controller.Editor', {
             columnToRead = editor.columnToEdit.replace(/Edit$/, '');
         Editor.MessageBox.addInfo(me.messages.segmentReset);
         me.setValueForEditor(rec.get(columnToRead));
-        me.fireEvent('prepareCompleteReplace',rec.get(columnToRead),true); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
-        editor.mainEditor.setValueAndMarkup(me.resetSegmentValueForEditor, rec, editor.columnToEdit);
+        // me.fireEvent('prepareCompleteReplace',rec.get(columnToRead),true); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
+        editor.mainEditor.setValue(me.resetSegmentValueForEditor, rec, editor.columnToEdit);
     },
     setValueForEditor: function(value) {
-        var me = this;
-        me.resetSegmentValueForEditor = value;
+        this.resetSegmentValueForEditor = value;
     },
-    /**
-     * handler for the F2 key
-     */
-    handleF2KeyPress: function() {
-        var me = this,
-            grid = me.getSegmentGrid(),
-            selModel = grid.getSelectionModel(),
-            ed = me.getEditPlugin(),
-            cols = grid.query('contentEditableColumn:not([hidden])'),
-            sel = [],
-            firstEditableRow = grid.store.getFirsteditableRow(),
-            callback;
-        
-        if(Ext.isEmpty(firstEditableRow)) {
-            return;
-        }
-
-        if (ed.editing) {
-            ed.editor.mainEditor.deferFocus();
-            return;
-        }
-        
-        if (selModel.hasSelection()){
-            //with selection scroll the selection into the viewport and open it afterwards
-            sel = selModel.getSelection();
-            grid.scrollTo(grid.store.indexOf(sel[0]),{
-                callback: function() {
-                    ed.startEdit(sel[0], cols[0]);
-                }
-            });
-        } else {
-            //with no selection, scroll to the first editable select, select it, then open it
-            callback = function() {
-                grid.selectOrFocus(firstEditableRow);
-                sel = selModel.getSelection();
-                var editStarted = ed.startEdit(sel[0], cols[0]);
-                if(editStarted) {
-                Editor.MessageBox.addInfo(me.messages.f2FirstOpened);
-                }
-            };
-            grid.scrollTo(firstEditableRow, {
-                callback: callback,
-                notScrollCallback: callback
-            });
-        }
-    },
+    // /**
+    //  * handler for the F2 key
+    //  */
+    // handleF2KeyPress: function() {
+    //     var me = this,
+    //         grid = me.getSegmentGrid(),
+    //         selModel = grid.getSelectionModel(),
+    //         ed = me.getEditPlugin(),
+    //         cols = grid.query('contentEditableColumn:not([hidden])'),
+    //         sel = [],
+    //         firstEditableRow = grid.store.getFirsteditableRow(),
+    //         callback;
+    //
+    //     if(Ext.isEmpty(firstEditableRow)) {
+    //         return;
+    //     }
+    //
+    //     if (ed.editing) {
+    //         ed.editor.mainEditor.deferFocus();
+    //         return;
+    //     }
+    //
+    //     if (selModel.hasSelection()){
+    //         //with selection scroll the selection into the viewport and open it afterwards
+    //         sel = selModel.getSelection();
+    //         grid.scrollTo(grid.store.indexOf(sel[0]),{
+    //             callback: function() {
+    //                 ed.startEdit(sel[0], cols[0]);
+    //             }
+    //         });
+    //     } else {
+    //         //with no selection, scroll to the first editable select, select it, then open it
+    //         callback = function() {
+    //             grid.selectOrFocus(firstEditableRow);
+    //             sel = selModel.getSelection();
+    //             var editStarted = ed.startEdit(sel[0], cols[0]);
+    //             if(editStarted) {
+    //             Editor.MessageBox.addInfo(me.messages.f2FirstOpened);
+    //             }
+    //         };
+    //         grid.scrollTo(firstEditableRow, {
+    //             callback: callback,
+    //             notScrollCallback: callback
+    //         });
+    //     }
+    // },
     /***
      * F3 editor event handler.
      * This will set the focus in the targetSearch field of concordance search panel
@@ -1436,290 +1487,340 @@ Ext.define('Editor.controller.Editor', {
             domNode,
             fieldType;
 
-        if ((domNode = event.getTarget('.type-source'))) {
-            fieldType = 'source';
-        } else {
-            domNode = event.getTarget('.type-target');
-            fieldType = 'target';
-        }
-
-        me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
-            field = searchGrid.down('#' + fieldType + 'Search');
-            if( selectedText === ''){
-                field.focus(false,500);
-                return;
+            if ((domNode = event.getTarget('.type-source'))) {
+                fieldType = 'source';
+            } else {
+                domNode = event.getTarget('.type-target');
+                fieldType = 'target';
             }
 
-            field.setValue(selectedText);
-            searchGrid.getController().setLastActiveField(field);
-            searchGrid.getController().handleSearchAll();
+        me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
+             field = searchGrid.down('#' + fieldType + 'Search');
+             if( selectedText === ''){
+                 field.focus(false,500);
+                 return;
+             }
+
+             field.setValue(selectedText);
+             searchGrid.getController().setLastActiveField(field);
+             searchGrid.getController().handleSearchAll();
         }, domNode);
 
     },
-
-    /***
-     * Event handler for alt+f3 shortcut.
-     * This will trigger synonym search with the selected text editor
-     */
-    handleAltF3KeyPress: function (){
-        var me = this,
-            searchGrid = me.getSynonymSearch(),
-            searchField;
-
-        me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
-            searchField = searchGrid.down('#textSearch');
-            if( selectedText === ''){
-                searchField.focus(false,500);
-                return;
-            }
-            searchField = searchGrid.down('#textSearch');
-            searchField.setValue(selectedText);
-            searchGrid.getController().search();
-        });
-    },
-
+    //
+    // /***
+    //  * Event handler for alt+f3 shortcut.
+    //  * This will trigger synonym search with the selected text editor
+    //  */
+    // handleAltF3KeyPress: function (){
+    //     var me = this,
+    //         searchGrid = me.getSynonymSearch(),
+    //         searchField;
+    //
+    //     me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
+    //         searchField = searchGrid.down('#textSearch');
+    //         if( selectedText === ''){
+    //             searchField.focus(false,500);
+    //             return;
+    //         }
+    //         searchField = searchGrid.down('#textSearch');
+    //         searchField.setValue(selectedText);
+    //         searchGrid.getController().search();
+    //     });
+    // },
+    //
     /***
      * Trigger search with selected text in the editor for given component(synonym or concordence).
      *
      * @param component
      * @param textCallback
      */
-    searchConcordenceOrSynonym: function (component, textCallback, node){
+    searchConcordenceOrSynonym: function (component, textCallback){
         var me = this,
             editorPanel = me.getLanguageResourceEditorPanel(),
-            delay,
             selectedText;
 
         if(!component){
             return;
         }
         if (editorPanel) {
-            // expand if collapsed and set the delay to 0.5 sec (delay because of expand animation)
-            if(editorPanel.getCollapsed()){
+            // expand if collapsed
+            if (editorPanel.getCollapsed()){
                 editorPanel.expand();
-                delay = 500;
             }
             editorPanel.setActiveTab(component);
         }
 
-        selectedText = me.getSelectedTextInNode(node);
+        selectedText = me.getSelectedTextInEditor();
         textCallback(selectedText);
     },
+    //
+    // removeSelectionAfterCut: function(e) {
+    //     if(!e.defaultPrevented || !e.stopped) {
+    //         return;
+    //     }
+    //     var activeElement = Ext.fly(Ext.Element.getActiveElement()),
+    //         sel;
+    //
+    //     //currently removing the content after cut is only useful in the htmleditor, nowhere else
+    //     if(activeElement.is('iframe.x-htmleditor-iframe')) {
+    //         sel = rangy.getSelection(this.getEditPlugin().editor.mainEditor.getEditorBody());
+    //         if(sel.rangeCount) {
+    //             sel.getRangeAt(0).deleteContents();
+    //             sel.getRangeAt(0).collapse();
+    //             sel.getRangeAt(0).select();
+    //         }
+    //     }
+    // },
 
-    removeSelectionAfterCut: function(e) {
-        if(!e.defaultPrevented || !e.stopped) {
+    onDragStart: function (event) {
+        const plugin = this.getEditPlugin();
+
+        //do only something when editing targets:
+        if (!this.isEditing || !/^target/.test(plugin.editor.columnToEdit)) {
             return;
         }
-        var activeElement = Ext.fly(Ext.Element.getActiveElement()),
-            sel;
 
-        //currently removing the content after cut is only useful in the htmleditor, nowhere else
-        if(activeElement.is('iframe.x-htmleditor-iframe')) {            
-            sel = rangy.getSelection(this.getEditPlugin().editor.mainEditor.getEditorBody());       
-            if(sel.rangeCount) {
-                sel.getRangeAt(0).deleteContents();
-                sel.getRangeAt(0).collapse();
-                sel.getRangeAt(0).select();
+        let activeElement = Ext.fly(Ext.Element.getActiveElement());
+        const isTagColumn = activeElement.hasCls('segment-tag-column');
+        const isTagContainer = activeElement.hasCls('segment-tag-container');
+
+        // if the focus is not in an element that can use internal tags, we have nothing to do.
+        if (!isTagContainer && !isTagColumn) {
+            return;
+        }
+
+        const selection = rangy.getSelection();
+        let selectedRange = selection.rangeCount ? selection.getRangeAt(0) : null;
+
+        if (selectedRange === null || selectedRange.collapsed) {
+            return;
+        }
+
+        // selections that need extra handling:
+        if (isTagColumn || isTagContainer || activeElement.hasCls('type-source')) {
+            if (isTagColumn && activeElement.down('div.x-grid-cell-inner')) {
+                activeElement = activeElement.down('div.x-grid-cell-inner');
+            }
+
+            // whole source segment selected? Then select the content within only.
+            // (= without the surrounding "<div (...) class="segment-tag-container (...) type-source">(...)</div>"
+            const position = this.getPositionInfoForRange(selectedRange, activeElement.dom);
+
+            if (position.atStart && position.atEnd) {
+                selection.selectAllChildren(activeElement.dom);
             }
         }
+
+        let content = '';
+
+        // Firefox uses multiple selections.
+        // For example: 'abc<del>def</del>ghi'
+        // - Firefox: first range: 'abc', second range: 'ghi'
+        // - Chrome: one single range with 'abc<del>def</del>ghi'
+        for (let i = 0; i < selection.rangeCount; i++) {
+            selectedRange = selection.getRangeAt(i);
+            selectedRange = this.getRangeWithFullInternalTags(selectedRange);
+            content += selectedRange.toHtml();
+        }
+
+        content = content.replace(/id="ext-element-[0-9]+"/, '');
+        let textContent = content;
+
+        const selectedInternalTags = selectedRange.getNodes([1], (node) => node.classList.contains('internal-tag'));
+        for (const internalTag of selectedInternalTags) {
+            textContent = textContent.replace(internalTag.outerHTML, '');
+        }
+
+        event.event.dataTransfer.clearData();
+        event.event.dataTransfer.setData('text/plain', textContent);
+        event.event.dataTransfer.setData('text/html', content);
     },
-    copySelectionWithInternalTags: function(e) {
+
+    copySelectionWithInternalTags: function (event) {
         // The user will expect the copied text to be available in the clipboard,
         // so we do NOT stop the propagation of the event.
-        if(!this.editorKeyMap) {
-            //if we are not in a task, we may not invoke. Easiest way: check for editorKeyMap 
+        if (!this.editorKeyMap) {
+            //if we are not in a task, we may not invoke. Easiest way: check for editorKeyMap
             return;
         }
+
         // CTRL+C gets the selected text (including internal tags)
-        var me = this,
-            plug = me.getEditPlugin(),
-            copy = {},
-            isTagColumn = false,
-            sel, selRange, i,
-            selInternalTags,
-            activeElement,
-            position;
+        const plugin = this.getEditPlugin();
 
-        //reset previous copies
-        me.copiedSelectionWithTagHandling = null;
-            
         //do only something when editing targets:
-        if(!me.isEditing || !/^target/.test(plug.editor.columnToEdit)){
+        if (!this.isEditing || !/^target/.test(plugin.editor.columnToEdit)) {
             return;
         }
 
-        activeElement = Ext.fly(Ext.Element.getActiveElement());
-        isTagColumn = activeElement.hasCls('segment-tag-column');
+        let activeElement = Ext.fly(Ext.Element.getActiveElement());
+        const isTagColumn = activeElement.hasCls('segment-tag-column');
+        const isTagContainer = activeElement.hasCls('segment-tag-container');
+
         // if the focus is not in an element that can use internal tags, we have nothing to do.
-        if (!activeElement.hasCls('segment-tag-container') && !isTagColumn && !activeElement.is('iframe.x-htmleditor-iframe')) {
+        if (!isTagContainer && !isTagColumn) {
             return;
         }
 
-        // Where does the copied text come from? If it's from a segment's source or the Editor itself, 
-        // we store the id from the segment, because in this case it will be allowed to paste the internal tags 
+        // Where does the copied text come from? If it's from a segment's source or the Editor itself,
+        // we store the id from the segment, because in this case it will be allowed to paste the internal tags
         // into the target (but only if the target belongs to the same segment as the source).
-        copy = {
+        const copy = {
             selDataHtml: '', // = selected content WITH internal tags
             selDataText: '', // = selected content WITHOUT internal tags
             selSegmentId: '',
             format: ''
         };
-        
-        sel = rangy.getSelection();
-        
-        // selections that need extra handling:
-        if(isTagColumn || activeElement.hasCls('segment-tag-container') || activeElement.hasCls('type-source')) {
-            if(isTagColumn && activeElement.down('div.x-grid-cell-inner')) {
-                activeElement = activeElement.down('div.x-grid-cell-inner');
-            }
-            // whole source segment selected? Then select the content within only.
-            // (= without the surrounding "<div (...) class="segment-tag-container (...) type-source">(...)</div>"
-            selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
-            position = me.getPositionInfoForRange(selRange, activeElement.dom);
-            if(position.atStart && position.atEnd){
-                sel.selectAllChildren(activeElement.dom);
-            }
-            copy.selSegmentId = plug.context.record.get('id');
-            copy.format = 'div';
-        }
-        else if (activeElement.is('iframe.x-htmleditor-iframe')) {
-            sel = rangy.getSelection(plug.editor.mainEditor.getEditorBody());
-            copy.selSegmentId = plug.context.record.get('id');
-            copy.format = 'img';
-        }
-        
-        selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
-        if (selRange === null || selRange.collapsed) {
+
+        const selection = rangy.getSelection();
+        let selectedRange = selection.rangeCount ? selection.getRangeAt(0) : null;
+
+        if (selectedRange === null || selectedRange.collapsed) {
             return;
         }
-        
-        // Firefox uses multiple selections. 
+
+        // selections that need extra handling:
+        if (isTagColumn || isTagContainer || activeElement.hasCls('type-source')) {
+            if (isTagColumn && activeElement.down('div.x-grid-cell-inner')) {
+                activeElement = activeElement.down('div.x-grid-cell-inner');
+            }
+
+            // whole source segment selected? Then select the content within only.
+            // (= without the surrounding "<div (...) class="segment-tag-container (...) type-source">(...)</div>"
+            const position = this.getPositionInfoForRange(selectedRange, activeElement.dom);
+
+            if (position.atStart && position.atEnd) {
+                selection.selectAllChildren(activeElement.dom);
+            }
+
+            copy.selSegmentId = plugin.context.record.get('id');
+            copy.format = 'div';
+        }
+
+        // Firefox uses multiple selections.
         // For example: 'abc<del>def</del>ghi'
         // - Firefox: first range: 'abc', second range: 'ghi'
         // - Chrome: one single range with 'abc<del>def</del>ghi'
-        for (i = 0; i < sel.rangeCount; i++) {
-            selRange = sel.getRangeAt(i);
-            selRange = me.getRangeWithFullInternalTags(selRange);
-            copy.selDataHtml += selRange.toHtml();
+        for (let i = 0; i < selection.rangeCount; i++) {
+            selectedRange = selection.getRangeAt(i);
+            selectedRange = this.getRangeWithFullInternalTags(selectedRange);
+            copy.selDataHtml += selectedRange.toHtml();
         }
-        
+
         // preset text and html with the found ranges
         // for insert as html (must not include element-ids that already exist in Ext.cache!)
         copy.selDataText = copy.selDataHtml = copy.selDataHtml.replace(/id="ext-element-[0-9]+"/, '');
-        
+
         // for insert as text only
         //the toString is working if copying img tags
-        if(copy.format == 'div') {
+        if (copy.format === 'div') {
             // for copying internal tags as divs we have to do the following:
-            selInternalTags = selRange.getNodes([1], function(node) {
-                return node.classList.contains('internal-tag');
-            });
-            Ext.Array.each(selInternalTags, function(internalTag) {
+            const selectedInternalTags = selectedRange.getNodes([1], (node) => node.classList.contains('internal-tag'));
+            for (const internalTag of selectedInternalTags) {
                 copy.selDataText = copy.selDataText.replace(internalTag.outerHTML, '');
-            });
+            }
+        } else {
+            copy.selDataText = selectedRange.toString();
         }
-        else {
-            copy.selDataText = selRange.toString();
-        }
-        
-        me.copiedSelectionWithTagHandling = copy;
 
-        // console.log(me.copiedSelectionWithTagHandling);
         // if we are in a regular copy / cut event we set the clipboard content to our needs
-        if(e && e.browserEvent) {
-            e.browserEvent.clipboardData.setData('text/plain', copy.selDataText);
-            e.browserEvent.clipboardData.setData('text/html', copy.selDataHtml);
-            e.preventDefault();
-            e.stopEvent();
+        if (event && event.browserEvent) {
+            event.browserEvent.clipboardData.setData('text/plain', copy.selDataText);
+            event.browserEvent.clipboardData.setData('text/html', copy.selDataHtml);
+            event.preventDefault();
+            event.stopEvent();
         }
     },
-    /**
-     * Pasting our own content must be handled special to insert correct tags
-     */
-    pasteContent: function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        var me = this,
-            plug = me.getEditPlugin(),
-            record = plug.context ? plug.context.record : null;
 
-        // if the user is fast enough to close the window and after this use ctr + v to paste the content, the event
-        // will be fired but the row editor will not exist anymore
-        if(!record){
-            return;
-        }
 
-        var segmentId = record.get('id'),
-            internalClip = me.copiedSelectionWithTagHandling || {},
-            clipboard = (e.browserEvent.clipboardData || window.clipboardData),
-            clipboardText = clipboard.getData('Text'),
-            clipboardHtml = clipboard.getData('text/html'),
-            toInsert, sel,
-            textMatch = clipboardText == internalClip.selDataText,
-            //the clipboardHtml adds meta information like charset and so on, so we just check if 
-            // the stored one is a substring of the one in the clipboard
-            htmlMatch = clipboardHtml.includes(internalClip.selDataHtml);
-
-        //remove selected content before pasting the new content
-        sel = rangy.getSelection(this.getEditPlugin().editor.mainEditor.getEditorBody());       
-        if(sel.rangeCount) {
-            sel.getRangeAt(0).deleteContents();
-            sel.getRangeAt(0).collapse();
-            sel.getRangeAt(0).select();
-        }
-
-        //when making a copy in translate5, we store the content in an internal variable and in the clipboard
-        //if neither the text or html clipboard content matches the internally stored content, 
-        // that means that the pasted content comes from outside and we insert just text:
-        if(me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
-            me.htmlEditor.insertMarkup(Ext.String.htmlEncode(clipboardText));
-            me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
-            me.copiedSelectionWithTagHandling = null;
-            return;
-        }
-        /*
-        console.log("text", clipboardText);
-        console.log("html", clipboardHtml);
-        console.log("data", internalClip);
-        */
-        //to insert tags, the copy/cut from segment must be the same as the paste to segment, so that tags are not moved between segments
-        if(segmentId === internalClip.selSegmentId) {
-            toInsert = internalClip.selDataHtml;
-        }
-        else {
-            toInsert = internalClip.selDataText;
-        }
-
-        // we always use insertMarkup, regardless if it is img or div content
-        me.htmlEditor.insertMarkup(toInsert);
-        me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
-    },
-
-    /***
-     * Event handler for text selection change in editor
-     */
-    onEditorSelectionChange: function (){
-        var me = this,
-            selectedText = me.getSelectedTextInNode(),
-            synonymGridExist =  me.getSynonymSearch() !== undefined,
-            editorPanelExist = me.getLanguageResourceEditorPanel() !== undefined;
-
-        if( !synonymGridExist && !editorPanelExist){
-            return;
-        }
-
-        // for less than 4 characters do not show the message
-        if( selectedText.length < 4){
-            return;
-        }
-        if(!me.quickSearchInfoMessage){
-            me.quickSearchInfoMessage = Ext.create('Editor.view.task.QuickSearchInfoMessage');
-        }
-
-        me.quickSearchInfoMessage.synonymGridExist = synonymGridExist;
-
-        me.quickSearchInfoMessage.showMessage();
-    },
+    // /**
+    //  * Pasting our own content must be handled special to insert correct tags
+    //  */
+    // pasteContent: function(e){
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    //     var me = this,
+    //         plug = me.getEditPlugin(),
+    //         record = plug.context ? plug.context.record : null;
+    //
+    //     // if the user is fast enough to close the window and after this use ctr + v to paste the content, the event
+    //     // will be fired but the row editor will not exist anymore
+    //     if(!record){
+    //         return;
+    //     }
+    //
+    //     var segmentId = record.get('id'),
+    //         internalClip = me.copiedSelectionWithTagHandling || {},
+    //         clipboard = (e.browserEvent.clipboardData || window.clipboardData),
+    //         clipboardText = clipboard.getData('Text'),
+    //         clipboardHtml = clipboard.getData('text/html'),
+    //         toInsert, sel,
+    //         textMatch = clipboardText == internalClip.selDataText,
+    //         //the clipboardHtml adds meta information like charset and so on, so we just check if
+    //         // the stored one is a substring of the one in the clipboard
+    //         htmlMatch = clipboardHtml.includes(internalClip.selDataHtml);
+    //
+    //     //remove selected content before pasting the new content
+    //     sel = rangy.getSelection(this.getEditPlugin().editor.mainEditor.getEditorBody());
+    //     if(sel.rangeCount) {
+    //         sel.getRangeAt(0).deleteContents();
+    //         sel.getRangeAt(0).collapse();
+    //         sel.getRangeAt(0).select();
+    //     }
+    //
+    //     //when making a copy in translate5, we store the content in an internal variable and in the clipboard
+    //     //if neither the text or html clipboard content matches the internally stored content,
+    //     // that means that the pasted content comes from outside and we insert just text:
+    //     if(me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
+    //         me.htmlEditor.insertMarkup(Ext.String.htmlEncode(clipboardText));
+    //         me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
+    //         me.copiedSelectionWithTagHandling = null;
+    //         return;
+    //     }
+    //     /*
+    //     console.log("text", clipboardText);
+    //     console.log("html", clipboardHtml);
+    //     console.log("data", internalClip);
+    //     */
+    //     //to insert tags, the copy/cut from segment must be the same as the paste to segment, so that tags are not moved between segments
+    //     if(segmentId === internalClip.selSegmentId) {
+    //         toInsert = internalClip.selDataHtml;
+    //     }
+    //     else {
+    //         toInsert = internalClip.selDataText;
+    //     }
+    //
+    //     // we always use insertMarkup, regardless if it is img or div content
+    //     me.htmlEditor.insertMarkup(toInsert);
+    //     me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
+    // },
+    //
+    // /***
+    //  * Event handler for text selection change in editor
+    //  */
+    // onEditorSelectionChange: function (){
+    //     var me = this,
+    //         selectedText = me.getSelectedTextInEditor(),
+    //         synonymGridExist =  me.getSynonymSearch() !== undefined,
+    //         editorPanelExist = me.getLanguageResourceEditorPanel() !== undefined;
+    //
+    //     if( !synonymGridExist && !editorPanelExist){
+    //         return;
+    //     }
+    //
+    //     // for less than 4 characters do not show the message
+    //     if( selectedText.length < 4){
+    //         return;
+    //     }
+    //     if(!me.quickSearchInfoMessage){
+    //         me.quickSearchInfoMessage = Ext.create('Editor.view.task.QuickSearchInfoMessage');
+    //     }
+    //
+    //     me.quickSearchInfoMessage.synonymGridExist = synonymGridExist;
+    //
+    //     me.quickSearchInfoMessage.showMessage();
+    // },
+    //
 
     copyReferenceToTarget: function() {
         const plug = this.getEditPlugin();
@@ -1734,7 +1835,13 @@ Ext.define('Editor.controller.Editor', {
             plug.context.record.get('pretrans'),
             plug.context.record.get('matchRateType'),
         );
-        plug.editor.mainEditor.insertMarkup(plug.context.record.get(referenceField));
+        plug.editor.mainEditor.setValue(
+            plug.context.record.get(referenceField),
+            plug.context.record,
+            plug.editor.columnToEdit,
+            false,
+            true
+        );
     },
 
     copySourceToTarget: function() {
@@ -1745,263 +1852,153 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
 
-        plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
+        plug.editor.mainEditor.setValue(
+            plug.context.record.get('source'),
+            plug.context.record,
+            plug.editor.columnToEdit,
+            false,
+            true
+        );
     },
+
     insertWhitespaceNbsp: function(key,e) {
-        this.insertWhitespace(key,e,'nbsp');
+        this.insertWhitespace('nbsp');
     },
-    insertWhitespaceNewline: function(key,e) {
-        this.insertWhitespace(key,e,'newline');
+    insertWhitespaceNewline: function(button, event, position = null, replaceWhitespaceBeforePosition = false) {
+        this.insertWhitespace('newline', position, replaceWhitespaceBeforePosition);
     },
-    insertWhitespaceTab: function(key,e) {
-        this.insertWhitespace(key,e,'tab');
+    insertWhitespaceTab: function(button, event, position = null) {
+        this.insertWhitespace('tab', position);
     },
     insertWhitespaceCombo: function(field, newVal, oldVal, eOpts) {
-        this.insertWhitespace(undefined,undefined,newVal);
+        this.insertWhitespace(newVal);
         field.up('#specialChars').hideMenu();
     },
 
-    /***
+    /**
      * Button handler for special characters buttons.
      * @param button
      * @param e
      */
-    insertSpecialCharacter: function (button, e){
-        var me = this,
-            plug = me.getEditPlugin(),
+    insertSpecialCharacter: function (button, e) {
+        let plug = this.getEditPlugin(),
             editor = plug && plug.editor.mainEditor;
 
-        if(editor){
-            editor.insertMarkup(button.value);
-            if (e.delegatedTarget.nodeName.toLowerCase() === 'a') {
-                editor.focus();
-            }
-            e.stopEvent();
-        }
-    },
-
-
-    insertWhitespace: function(key,e,whitespaceType) {
-        var me = this,
-            userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
-            tagNr,
-            plug,
-            editor;
-
-        if (!userCanInsertWhitespaceTags) {
+        if (!editor) {
             return;
         }
 
-        tagNr = me.getNextWhitespaceTagNumber();
-        plug = me.getEditPlugin();
-        editor = plug.editor.mainEditor;
-        editor.insertWhitespaceInEditor(whitespaceType, tagNr);
-        if (e === undefined) { // we can use insertWhitespace by firing an event, too
-            me.fireEvent('afterInsertWhitespace');
-            return;
-        }
-        if (e.delegatedTarget.nodeName.toLowerCase() === 'a') {
-            editor.focus();
-        }
+        editor.insertSymbol(button.value);
+
         e.stopEvent();
     },
-    /**
-     * What's the number for the next Whitespace-Tag?
-     * @return number nextTagNr
-     */
-    getNextWhitespaceTagNumber: function () {
-        var me = this,
-            plug = this.getEditPlugin(),
-            editor = plug.editor.mainEditor,
-            imgInTarget = editor.getDoc().getElementsByTagName('img'),
-            collectedIds = ['0'];
-        // source
-        if(me.sourceTags){
-            me.sourceTags.map(function(item){
-                collectedIds = collectedIds.concat(Ext.Object.getKeys(item));
-            });
+
+    insertWhitespace: function(whitespaceType, position = null, replaceWhitespaceBeforePosition = false) {
+        const userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
+            userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags');
+
+        if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
+            return;
         }
-        // target
-        Ext.Object.each(imgInTarget, function(key, imgNode){
-            var imgClassList = imgNode.classList;
-            if (imgClassList.contains('single') || imgClassList.contains('open')) {
-                collectedIds.push(imgNode.id);
-            }
-        });
-        // use the highest
-        return Math.max.apply(null, collectedIds.map(function(val){
-            return parseInt(val.replace(/[^0-9]*/,''));
-        })) + 1;
+
+        this.getEditPlugin().editor.mainEditor.insertWhitespace(whitespaceType, position, replaceWhitespaceBeforePosition);
     },
 
-        handleInsertTagShift: function(key, e) {
-            e.shiftKey = true; //somehow a hack, but is doing what it should do
-            this.handleInsertTag(key, e);
-        },
-        handleInsertTag: function(key, e) {
-            var me = this,
-                plug = this.getEditPlugin(),
-                editor = plug.editor.mainEditor,
-                tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
-                sourceTagsForTagIdx,
-                sel,
-                selRange,
-                rangeOpen,
-                bookmarkOpen,
-                rangeClose,
-                insertBothTags;
-
-            //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
-            if(tagIdx < 0) {
-                tagIdx = 9;
-            }
-
-            if(e.shiftKey) {
-                tagIdx = tagIdx + 10;
-            }
-                
-            //do only something when editing targets with tags and tag nrs > 1:
-            if(!me.sourceTags || !me.sourceTags[tagIdx]){
-                return;
-            }
-            
-            sourceTagsForTagIdx = [];
-            Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
-                var tagObject = {'id': id, 'tag': tag}; 
-                sourceTagsForTagIdx.push(tagObject);
-            });
-            
-            // If a text range is marked, this short-cut inserts immediately the opening tag
-            // at the start of the range and the closing tag at the end of the range.
-            insertBothTags = false;
-            sel = rangy.getSelection(editor.getEditorBody());
-            selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
-            if (selRange !== null && !selRange.collapsed) {
-                insertBothTags = true;
-                rangeOpen = selRange.cloneRange();
-                rangeOpen.collapse(true);
-                bookmarkOpen = rangeOpen.getBookmark();
-                rangeClose = selRange.cloneRange();
-                rangeClose.collapse(false);
-                // Make sure to insert closing tag first, otherwise the ranges gets messy.
-                sourceTagsForTagIdx.sort(function(a, b){
-                  var x = a.id.toLowerCase();
-                  var y = b.id.toLowerCase();
-                  if (x < y) {return -1;}
-                  if (x > y) {return 1;}
-                  return 0;
-                });
-            }
-            
-            Ext.Array.each(sourceTagsForTagIdx, function(tagObject){
-                var id = tagObject.id,
-		    tag = tagObject.tag,
-                    tagInTarget = editor.getDoc().getElementById(id);
-                if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase() !== 'del'){
-                    return;
-                }
-                if (insertBothTags) {
-                    switch (true) {
-                        case (id.indexOf('-open') !== -1):
-                            // In Firefox, sel.setSingleRange(rangeOpen) does NOT work. No idea why.
-                            // Workaround: use bookmark - THAT works somehow.
-                            selRange.moveToBookmark(bookmarkOpen);
-                            sel.setSingleRange(selRange);
-                        break;
-                        case (id.indexOf('-close') !== -1):
-                            sel.setSingleRange(rangeClose);
-                        break;
-                    }
-                }
-                editor.insertMarkup(tag);
-                if (!insertBothTags) {
-                    return false;
-                }
-            });
-            
-            if (insertBothTags) {
-                // place cursor at the end of the formerly selected content
-                sel.removeAllRanges();
-                sel.addRange(rangeClose);
-            }
-            
-            e.stopEvent();
-            return false;
-        },
-    /**
-     * scrolls to the first segment.
-     */
-    handleHomeKeyPress: function() {
-        this.getSegmentGrid().scrollTo(0);
+    handleInsertTagShift: function(key, e) {
+        e.shiftKey = true;
+        this.handleInsertTag(key, e);
     },
+
+    handleInsertTag: function (key, e) {
+            const editorWrapper = this.getEditPlugin().editor.mainEditor.editor,
+            tagIdx = Number(e.browserEvent.key);
+
+        if (e.shiftKey) {
+            tagIdx = tagIdx + 10;
+        }
+
+        editorWrapper.insertTagFromReference(tagIdx);
+
+        e.stopEvent();
+
+        return false;
+    },
+
+    // /**
+    //  * scrolls to the first segment.
+    //  */
+    // handleHomeKeyPress: function() {
+    //     this.getSegmentGrid().scrollTo(0);
+    // },
+
     /**
      * Handler for watchSegmentBtn
      */
     watchSegment: function() {
-        var me = this,
+        let me = this,
             ed = me.getEditPlugin(),
             edited = ed.context?.record,
             selected = this.getSegmentGrid()?.getViewModel()?.get('selectedSegment');
 
         // If we're not editing segment, or we are, but grid selection moved to another segment
         if (!me.isEditing || (selected && selected.get('id') !== edited.get('id'))) {
-
             // Toggle bookmark for the segment which is currently selected and is not the one that is being edited
-            return selected?.toogleBookmark();
+            return selected?.toggleBookmark();
         }
 
         // Toggle bookmark for the segment that is currently being edited
-        edited.toogleBookmark(() => {
-            var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
+        edited.toggleBookmark(() => {
+            let displayField = ed.editor.down('displayfield[name="autoStateId"]'),
                 autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
 
-            // Update autostate displayfield, since the displayfields are getting the rendered content,
+            // Update autoState displayField, since the displayFields are getting the rendered content,
             // we have to fetch it here from rendered HTML too
-            autoStateCell && displayfield.setValue(autoStateCell.getHtml());
+            autoStateCell && displayField.setValue(autoStateCell.getHtml());
         });
     },
 
-    /**
-     * In textareas ExtJS 6.2 enter keys are not bubbling up, but they are triggering a specialkey event
-     *  we listen to that event and process our own keys then. 
-     */
-    handleCommentEnter: function(field, e) {
-        var key = e.getKey();
-        
-        if (key === e.ENTER && e.hasModifier() && this.generalKeyMap) {
-            this.generalKeyMap.handleTargetEvent(e);
-        }
-    },
-    
-    handleReferenceFilesMessage:function(){
-        //if there are reference files for the task and if it is show reference files is alowed from config
-        if(Editor.data.task.get('referenceFiles') && Editor.app.getTaskConfig('editor.showReferenceFilesPopup')===true){
-            var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
-            task = new Ext.util.DelayedTask(function(){
-                referenceInfoMessage.destroy();
-            });
-            task.delay(20000);
-            referenceInfoMessage.show();
-        }
-    },
-
-    /***
-     * "Reference files info message" window button handler
-     */
-    onShowReferenceFilesButtonClick:function(){
-        var filePanel =this.getFilepanel().expand();
-        var taskFiles = filePanel.down('taskfiles').expand();
-        taskFiles.scrollable.scrollIntoView(taskFiles.down('referenceFileTree').view.el);
-    },
-
-    /**
-     * Confirm the current task
-     */
-    taskConfirm: function () {
-        Editor.util.TaskActions.confirm(function(task, app, strings){
-            Editor.MessageBox.addSuccess(strings.taskConfirmed);
-        });
-    },
+    //
+    // /**
+    //  * In textareas ExtJS 6.2 enter keys are not bubbling up, but they are triggering a specialkey event
+    //  *  we listen to that event and process our own keys then.
+    //  */
+    // handleCommentEnter: function(field, e) {
+    //     var key = e.getKey();
+    //
+    //     if (key === e.ENTER && e.hasModifier() && this.generalKeyMap) {
+    //         this.generalKeyMap.handleTargetEvent(e);
+    //     }
+    // },
+    //
+    // handleReferenceFilesMessage:function(){
+    //     //if there are reference files for the task and if it is show reference files is alowed from config
+    //     if(Editor.data.task.get('referenceFiles') && Editor.app.getTaskConfig('editor.showReferenceFilesPopup')===true){
+    //         var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
+    //         task = new Ext.util.DelayedTask(function(){
+    //             referenceInfoMessage.destroy();
+    //         });
+    //         task.delay(20000);
+    //         referenceInfoMessage.show();
+    //     }
+    // },
+    //
+    // /***
+    //  * "Reference files info message" window button handler
+    //  */
+    // onShowReferenceFilesButtonClick:function(){
+    //     var filePanel =this.getFilepanel().expand();
+    //     var taskFiles = filePanel.down('taskfiles').expand();
+    //     taskFiles.scrollable.scrollIntoView(taskFiles.down('referenceFileTree').view.el);
+    // },
+    //
+    // /**
+    //  * Confirm the current task
+    //  */
+    // taskConfirm: function () {
+    //     Editor.util.TaskActions.confirm(function(task, app, strings){
+    //         Editor.MessageBox.addSuccess(strings.taskConfirmed);
+    //     });
+    // },
 
     /**
      * Edit task and focus segment route
@@ -2074,66 +2071,68 @@ Ext.define('Editor.controller.Editor', {
     /***
      * Segments store load event handler
      */
-    onSegmentsStoreLoad: function(store){
-        var me = this,
-            segmentsGrid = me.getSegmentGrid();
+    onSegmentsStoreLoad: function (store) {
+        let segmentsGrid = this.getSegmentGrid();
 
         if(!segmentsGrid){
             return;
         }
 
         //check the content editable column visibility
-        me.handleNotEditableContentColumn();
-        
+        this.handleNotEditableContentColumn();
+
         // if already selected from other load listener or nothing selectable, return
-        if(!store.getCount() || segmentsGrid.selection) {
+        if (!store.getCount() || segmentsGrid.selection) {
             return;
         }
-        var jumpToSegmentIndex = 
+
+        let jumpToSegmentIndex =
             Editor.app.parseSegmentIdFromTaskEditHash(true)
             || (store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex)
             || 1;
+
         segmentsGrid.focusSegment(jumpToSegmentIndex);
     },
 
-    /**
-     * Segments grid segment size event handler
-     * 
-     * @param {Ext.Component} grid 
-     * @param {String} newSize 
-     * @param {String} oldSize 
-     */
-    onSegmentGridSegmentsSizeChanged: function(grid, newSize, oldSize){
-        var me=this,
-            htmlEditor = me.getSegmentsHtmleditor();
-        if(!htmlEditor){
-            return;
-        }
-        htmlEditor.setSegmentSize(grid,newSize,oldSize);
-    },
-    
+    // /**
+    //  * Segments grid segment size event handler
+    //  *
+    //  * @param {Ext.Component} grid
+    //  * @param {String} newSize
+    //  * @param {String} oldSize
+    //  */
+    // onSegmentGridSegmentsSizeChanged: function(grid, newSize, oldSize){
+    //     var me=this,
+    //         htmlEditor = me.getSegmentsHtmleditor();
+    //     if(!htmlEditor){
+    //         return;
+    //     }
+    //     htmlEditor.setSegmentSize(grid,newSize,oldSize);
+    // },
+
     /***
      * Make sure that there is an editable content column when user try to edit segment when the task is in edit mode
      */
-    handleNotEditableContentColumn: function(){
-        var me=this,
+    handleNotEditableContentColumn: function () {
+        var me = this,
             isReadOnly = me.getSegmentGrid().lookupViewModel().get('taskIsReadonly');
-        
-        if(isReadOnly){
+
+        if (isReadOnly) {
             return;
         }
-        
-        var hiddenEditable=Ext.ComponentQuery.query('contentEditableColumn[hidden="true"]'),
+
+        let hiddenEditable = Ext.ComponentQuery.query('contentEditableColumn[hidden="true"]'),
             allEditable = Ext.ComponentQuery.query('contentEditableColumn');
 
-        if(hiddenEditable.length == allEditable.length){
+        if (hiddenEditable.length === allEditable.length) {
             //no visible content editable column found. Show info message and display all hidden content editable columns
             Editor.MessageBox.addInfo(this.messages.noVisibleContentColumn);
-            for(var i=0;i<hiddenEditable.length;i++){
+            for (var i = 0; i < hiddenEditable.length; i++) {
                 hiddenEditable[i].setVisible(true);
             }
         }
     },
+
     /**
      * Adds types to the prev-next controller
      */
@@ -2145,43 +2144,49 @@ Ext.define('Editor.controller.Editor', {
 
     /***
      * Return the current selected text in editor without tags.
+     *
      * @returns {string|*}
      */
-    getSelectedTextInNode: function (node){
-        var me = this,
-            selectionInEditor,
-            rangeForSelection;
+    getSelectedTextInEditor: function (){
+        var grid = Ext.getCmp('segment-grid'),
+            isEditingSegment = grid.getViewModel().get('isEditingSegment'),
+            selection = window.getSelection(),
+            selectedText = selection.toString(),
+            selectedElem = selection.focusNode ? Ext.get(selection.focusNode.parentNode) : null;
 
-        // Use editor body as node by default
-        if (!node) node = me.getEditPlugin().editor.mainEditor.getEditorBody();
+        // If segment is opened for editing and selection changed within roweditor
+        if (isEditingSegment
+            && selectedElem
+            && selectedElem.up('.x-grid-row-editor')) {
 
-        selectionInEditor = rangy.getSelection(node);
-        rangeForSelection = selectionInEditor.rangeCount ? selectionInEditor.getRangeAt(0) : null;
-        if (rangeForSelection == null || rangeForSelection.collapsed){
-            return '';
-        }
-        return rangeForSelection.text();
-    },
-
-    /**
-     * Distinguish between menu item itself click and menu item checkbox click
-     *
-     * @param item
-     * @param event
-     */
-    onSegmentActionMenuItemClick: function(item, event) {
-        if (event.getTarget('.x-menu-item-checkbox')) {
-            item.allowCheckChange = true;
-            item.setChecked(!item.checked);
-            item.allowCheckChange = false;
-        } else {
-            var button = this.getSegmentGrid().down('segmentsToolbar #' + item.itemId);
-            if (button.dispatcher) {
-                this.buttonClickDispatcher(item,event);
-            } else {
-                button.click();
+            // If selection changed within roweditor's source-column or within target-column
+            if (selectedElem.hasCls('type-source') || selectedElem.up('.ck-content')) {
+                return selectedText;
             }
         }
+
+        return '';
+    },
+    //
+    // /**
+    //  * Distinguish between menu item itself click and menu item checkbox click
+    //  *
+    //  * @param item
+    //  * @param event
+    //  */
+    onSegmentActionMenuItemClick: function(item, event) {
+         if (event.getTarget('.x-menu-item-checkbox')) {
+             item.allowCheckChange = true;
+             item.setChecked(!item.checked);
+             item.allowCheckChange = false;
+         } else {
+             var button = this.getSegmentGrid().down('segmentsToolbar #' + item.itemId);
+             if (button.dispatcher) {
+                 this.buttonClickDispatcher(item);
+             } else {
+                 button.click();
+             }
+         }
     },
 
     /**

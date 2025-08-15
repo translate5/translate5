@@ -51,8 +51,8 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
 
     listen: {
         component: {
-            'segmentsHtmleditor': {
-                initialize: 'initEditor',
+            '#t5RowEditor': {
+                initialize: 'onRowEditorInit'
             },
             'contentEditableColumn': {
                 render: 'onEditableColumnRender',
@@ -81,16 +81,32 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
     /**
      * Initialize Editor in general and language-support.
      */
-    initEditor: function(editor) {
+    onRowEditorInit: function(editor) {
         this.editor = editor;
+    },
+
+    onEditableColumnRender: function (column) {
+        let me = this;
+        column.renderer = function (value, meta, record, rowIndex, colIndex, store) {
+            setTimeout(function () {
+                // in case no segments grid exist, ignore the logic below.
+                // this can happen i the user leaves the task, and the timeout callback kicks in
+                if(!me.getSegmentGrid()){
+                    return;
+                }
+                if (me.getSegmentGrid().editingPlugin.context) {
+                    return;
+                }
+
+                me.applyQualityStylesForRecord(store, record);
+            }, 50);
+            return value;
+        };
     },
 
     applyQualityStylesForRecord: function (store, rec, operation) {
         let grid = this.getSegmentGrid(),
             view = grid.down('tableview'),
-            field,
-            cellNode,
-            colSelector,
             rowSelector = '#' + view.id + '-record-' + rec.internalId;
 
         // If background colors info has been set up
@@ -100,8 +116,8 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
                 itemColSelector = '[data-columnid="' + itemCol + 'Column"] .x-grid-cell-inner',
                 itemNode = document.querySelector(rowSelector + ' ' + itemColSelector);
 
-            // Apply
             if (itemNode) {
+                // Apply
                 itemNode.style.background = this.background.colors[rec.getId()];
             }
         }
@@ -118,16 +134,15 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             let data = rec.get(type.field);
 
             // Foreach field where qualities were detected
-            for (field in data) {
-
+            for (const field in data) {
                 // Get
-                for (let columnPostfix of type.columnPostfixes) {
+                for (const columnPostfix of type.columnPostfixes) {
 
                     // Build grid cell column selector
-                    colSelector = '[data-columnid="' + field + columnPostfix + '"] .x-grid-cell-inner';
+                    const colSelector = '[data-columnid="' + field + columnPostfix + '"] .x-grid-cell-inner';
 
                     // Get grid cell node
-                    cellNode = document.querySelector(rowSelector + ' ' + colSelector);
+                    const cellNode = document.querySelector(rowSelector + ' ' + colSelector);
 
                     // If we're going to apply termtagger-qualities styles
                     if (type.field === 'termTagger') {
@@ -197,25 +212,6 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
                 .selectIndices(cellNode, match.range.start, match.range.end, ignored)
                 .decorate(decorationProps.tagName, decorationProps.classes, decorationProps.attributes);
         }
-    },
-
-    onEditableColumnRender: function (column) {
-        let me = this;
-        column.renderer = function (value, meta, record, rowIndex, colIndex, store) {
-            setTimeout(function () {
-                // in case no segments grid exist, ignore the logic below.
-                // this can happen i the user leaves the task, and the timeout callback kicks in
-                if(!me.getSegmentGrid()){
-                    return;
-                }
-                if (me.getSegmentGrid().editingPlugin.context) {
-                    return;
-                }
-
-                me.applyQualityStylesForRecord(store, record);
-            }, 50);
-            return value;
-        };
     },
 
     /**

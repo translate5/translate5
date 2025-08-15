@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -21,29 +20,22 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
  * Own Tooltip, bindable to iframes per boundFrame option
- * 
+ *
  * @class Editor.view.ToolTip
  * @extends Ext.tip.ToolTip
  */
 Ext.define('Editor.view.ToolTip', {
-    extend : 'Ext.tip.ToolTip',
+    extend: 'Ext.tip.ToolTip',
     //enable own ToolTips only for the following img classes 
-    delegate : '.ownttip', // accepts only simple selectors (no commas) so
+    delegate: '.ownttip', // accepts only simple selectors (no commas) so
     // define a own tooltip class
-    cls : 't5ttip',
+    cls: 't5ttip',
     targetIframe: null, //target iframe which should be used for offset calculation
     messages: {
         deletedby: '#UT#Deleted by',
@@ -53,13 +45,12 @@ Ext.define('Editor.view.ToolTip', {
         severity: '#UT#Gewichtung'
     },
     userStore: null,
-    listeners : {
-        beforeshow : 'onBeforeShow'
+    listeners: {
+        beforeshow: 'onBeforeShow'
     },
 
     // Change content dynamically depending on which element triggered the show.
-    onBeforeShow: function(tip) {
-
+    onBeforeShow: function (tip) {
         var me = this;
 
         if (!tip || !tip.triggerElement || !Ext.fly(tip.triggerElement) || !Ext.fly(tip.triggerElement).up()) {
@@ -74,6 +65,7 @@ Ext.define('Editor.view.ToolTip', {
         if (me.hasCustomTip(fly)) {
             if (qtip) {
                 up.dom.setAttribute('data-qclass', 'hidden');
+
                 return me.handleCollectedTooltip(t, tip, qtip);
             } else {
                 return me.handleCollectedTooltip(t, tip);
@@ -81,56 +73,64 @@ Ext.define('Editor.view.ToolTip', {
         } else if (qtip) {
             if (me.hasCustomTip(up)) {
                 fly.dom.setAttribute('data-qclass', 'hidden');
+
                 return me.handleCollectedTooltip(t.parentNode, tip, qtip);
             } else {
                 tip.update(qtip);
                 return true;
             }
         }
+
         return false;
     },
 
-    hasCustomTip: function(el) {
+    hasCustomTip: function (el) {
         return el.hasCls('qmflag') || el.hasCls('trackchanges') || el.hasCls('internal-tag');
     },
 
-    getQtip: function(el) {
-        if(!el || !el.dom) {
+    getQtip: function (el) {
+        if (!el || !el.dom) {
             return false;
         }
+
         return el.dom.getAttribute('data-qtip');
     },
 
-    constructor: function() {
+    constructor: function () {
         this.renderTo = Ext.getBody();
         this.callParent(arguments);
     },
-    onTargetOver: function(e) {
+
+    onTargetOver: function (e) {
         e.preventDefault(); //prevent title tags to be shown in IE
         this.callParent(arguments);
     },
-    getAlignRegion: function() {
+
+    getAlignRegion: function () {
         //add the iframes offset, if we are configured to be relative to an iframe
-        if(this.targetIframe) {
+        if (this.targetIframe) {
             this.targetOffset = this.targetIframe.getXY();
         }
+
         return this.callParent(arguments);
     },
-    
+
     /**
      * Collect data for"common" ToolTip.
      * First the node itself is checked, but (if necessary) be careful to check for parent or child-Nodes, too.
      */
-    handleCollectedTooltip: function(node, tip, appendText) {
-        var me = this,
+    handleCollectedTooltip: function (node, tip, appendText) {
+        let me = this,
             fly = Ext.fly(node),
-            result = '';
+            result;
+
         // 'default'
         // add tooltip for qmFlag?
-        if(fly.hasCls('qmflag')) {
+        if (fly.hasCls('qmflag')) {
             result = me.getQmFlagData(node);
         } else {
-            var allQmFlagNodes = node.getElementsByClassName('qmflag');
+            let allQmFlagNodes = node.getElementsByClassName('qmflag');
+
             if (allQmFlagNodes.length === 1) {
                 result = me.getQmFlagData(allQmFlagNodes[0]);
             } else {
@@ -139,8 +139,9 @@ Ext.define('Editor.view.ToolTip', {
                 result = '';
             }
         }
+
         // add tooltip for trackChanges?
-        if(fly.hasCls('trackchanges')) {
+        if (fly.hasCls('trackchanges')) {
             result += me.getTrackChangesData(node);
         } else if (node.parentNode && /(^|[\s])trackchanges([\s]|$)/.test(node.parentNode.className)) {
             result += me.getTrackChangesData(node.parentNode);
@@ -151,7 +152,7 @@ Ext.define('Editor.view.ToolTip', {
             fly.hasCls('internal-tag')
             && me.flyHasOneOfCls(fly, ['number', 'tab', 'space', 'newline', 'nbsp', 'char', 't5placeable'])
         ) {
-            var dom = fly.down('span.short');
+            let dom = fly.down('span.short');
             result = dom ? dom.getAttribute('title').split('<').join('&lt;') + (result ? '<br>'+result : '') : null;
         }
 
@@ -179,18 +180,19 @@ Ext.define('Editor.view.ToolTip', {
 
         return false;
     },
-    
+
     // ------------------------------------------------------------------
     // ----------------- get data ---------------------------------------
     // ------------------------------------------------------------------
-    
-    getQmFlagData: function(node) {
-        var me = this, 
+
+    getQmFlagData: function (node) {
+        let me = this,
             qmtype,
             cache = Editor.mqmFlagTypeCache,
             meta = {sevTitle: me.messages.severity};
         qmtype = node.className.match(/qmflag-([0-9]+)/);
-        if(qmtype && qmtype.length > 1) {
+
+        if (qmtype && qmtype.length > 1) {
             meta.cls = node.className.split(' ');
             // open/close classes are added on the backend while saving
             // and classes ordering can't be changed now, so just shift first class
@@ -204,16 +206,19 @@ Ext.define('Editor.view.ToolTip', {
             meta.comment = Ext.fly(node).getAttribute('data-comment');
             meta.qmtype = cache[meta.qmid] ? cache[meta.qmid] : 'Unknown Type'; //impossible => untranslated
         }
+
         if (meta.comment == null) {
             meta.comment = '';
         } else {
-            meta.comment = '<br />'+ meta.comment
+            meta.comment = '<br />' + meta.comment
         }
+
         // => For Tooltip:
-        return '<b>'+meta.qmtype+'</b><br />'+meta.sevTitle+': '+meta.sev+meta.comment+'<br />';
+        return '<b>' + meta.qmtype + '</b><br />' + meta.sevTitle + ': ' + meta.sev + meta.comment + '<br />';
     },
-    getTrackChangesData: function(node) {
-        var me = this,
+
+    getTrackChangesData: function (node) {
+        let me = this,
             trackChanges,
             attrnameUserTrackingId,
             attrnameUsername,
@@ -227,24 +232,28 @@ Ext.define('Editor.view.ToolTip', {
             nodeHistory = '',
             userTrackingId,
             taskUserTrackingsStore;
+
         // TrackChanges-Plugin activated?
         if (!Editor.plugins.TrackChanges) {
             return me.messages.notrackchangesplugin;
         }
+
         trackChanges = Editor.plugins.TrackChanges.controller.Editor;
         taskUserTrackingsStore = Editor.data.task.userTracking();
-        attrnameUserTrackingId = trackChanges.ATTRIBUTE_USERTRACKINGID;
-        attrnameUsername = trackChanges.ATTRIBUTE_USERNAME;
-        attrnameTimestamp = trackChanges.ATTRIBUTE_TIMESTAMP;
-        attrnameHistorylist = trackChanges.ATTRIBUTE_HISTORYLIST;
+        attrnameUserTrackingId = TrackChanges.ATTRIBUTE_USERTRACKINGID;
+        attrnameUsername = TrackChanges.ATTRIBUTE_USERNAME;
+        attrnameTimestamp = TrackChanges.ATTRIBUTE_TIMESTAMP;
+        attrnameHistorylist = TrackChanges.ATTRIBUTE_HISTORYLIST;
+
         // What has been done (INS/DEL)?
-        if (node.nodeName.toLowerCase() == trackChanges.NODE_NAME_INS) {
+        if (node.nodeName.toLowerCase() === TrackChanges.NODE_NAME_INS) {
             nodeAction = me.messages.insertedby;
-        } else if (node.nodeName.toLowerCase() == trackChanges.NODE_NAME_DEL) {
+        } else if (node.nodeName.toLowerCase() === TrackChanges.NODE_NAME_DEL) {
             nodeAction = me.messages.deletedby;
         } else {
             return;
         }
+
         // Who has done it?
         if (node.hasAttribute(attrnameUserTrackingId)) {
             userTrackingId = node.getAttribute(attrnameUserTrackingId);
@@ -255,39 +264,46 @@ Ext.define('Editor.view.ToolTip', {
             // (fallback for tasks before anonymizing was implemented)
             attrUserName = node.getAttribute(attrnameUsername);
         }
+
         nodeUser = attrUserName; // can be used just as it is
+
         // When?
         if (node.hasAttribute(attrnameTimestamp)) {
             attrTimestamp = node.getAttribute(attrnameTimestamp);
-            if (Number(parseInt(attrTimestamp)) == attrTimestamp) { // TRANSLATE-1202: some older dates might be stored in millisecond-timestamp, others now in ISO
-                nodeDate = Ext.Date.format(new Date(parseInt(attrTimestamp)),'Y-m-d H:i');
+
+            if (Number(parseInt(attrTimestamp)) === attrTimestamp) { // TRANSLATE-1202: some older dates might be stored in millisecond-timestamp, others now in ISO
+                nodeDate = Ext.Date.format(new Date(parseInt(attrTimestamp)), 'Y-m-d H:i');
             } else {
-                nodeDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
+                nodeDate = Ext.Date.format(new Date(attrTimestamp), 'Y-m-d H:i');
             }
         }
+
         // History
         if (node.hasAttribute(attrnameHistorylist)) {
-            nodeHistory += '<hr><b>'+me.messages.history+':</b><hr>';
-            var historyItems = node.getAttribute(attrnameHistorylist).split(",");
-            for(var i=0, len=historyItems.length; i < len; i++){
-                var attrnameHistoryAction,
-                    attrnameHistoryUsername,
-                    historyItemTimestamp = historyItems[i],
-                    historyItemAction,
+            nodeHistory += '<hr><b>' + me.messages.history + ':</b><hr>';
+            let historyItems = node.getAttribute(attrnameHistorylist).split(",");
+
+            for (let i = 0, len = historyItems.length; i < len; i++) {
+                let historyItemTimestamp = historyItems[i],
                     historyItemUser,
                     historyItemDate,
                     historyUserTrackingId;
+
                 // history-item: date
-                if (Number(parseInt(historyItemTimestamp)) == historyItemTimestamp) { // TRANSLATE-1202: some older dates might be stored in millisecond-timestamp, others now in ISO
-                    historyItemDate = Ext.Date.format(new Date(parseInt(historyItemTimestamp)),'Y-m-d H:i');
+                if (String(parseInt(historyItemTimestamp)) === historyItemTimestamp) {
+                    // TRANSLATE-1202: some older dates might be stored in millisecond-timestamp, others now in ISO
+                    historyItemDate = Ext.Date.format(new Date(parseInt(historyItemTimestamp)), 'Y-m-d H:i');
                 } else {
-                    historyItemDate = Ext.Date.format(new Date(historyItemTimestamp),'Y-m-d H:i');
+                    historyItemDate = Ext.Date.format(new Date(historyItemTimestamp), 'Y-m-d H:i');
                 }
-                if (Number(parseInt(historyItemTimestamp)) != historyItemTimestamp) { 
-                    historyItemTimestamp = Ext.Date.format(new Date(historyItemTimestamp), 'time'); // TRANSLATE-1202, but attribute-name would be invalid using ISO => still uses millisecond-timestamp
+
+                if (String(parseInt(historyItemTimestamp)) !== historyItemTimestamp) {
+                    // TRANSLATE-1202, but attribute-name would be invalid using ISO => still uses millisecond-timestamp
+                    historyItemTimestamp = Ext.Date.format(new Date(historyItemTimestamp), 'time');
                 }
+
                 // history-item: user
-                attrnameHistoryUsername = trackChanges.ATTRIBUTE_USERTRACKINGID + trackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
+                let attrnameHistoryUsername = TrackChanges.ATTRIBUTE_USERTRACKINGID + TrackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
                 if (node.hasAttribute(attrnameHistoryUsername)) {
                     historyUserTrackingId = node.getAttribute(attrnameHistoryUsername);
                     // returns username under consideration of anonymization
@@ -298,44 +314,48 @@ Ext.define('Editor.view.ToolTip', {
                     attrnameHistoryUsername = trackChanges.ATTRIBUTE_USERNAME + trackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
                     historyItemUser = node.getAttribute(attrnameHistoryUsername);
                 }
+
                 // history-item: action
-                attrnameHistoryAction = trackChanges.ATTRIBUTE_ACTION + trackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
-                historyItemAction = node.getAttribute(attrnameHistoryAction);
-                if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_INS) {
+                let attrnameHistoryAction = TrackChanges.ATTRIBUTE_ACTION + TrackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
+                let historyItemAction = node.getAttribute(attrnameHistoryAction);
+
+                if (historyItemAction.toLowerCase() === TrackChanges.NODE_NAME_INS) {
                     historyItemAction = me.messages.insertedby;
-                } else if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_DEL) {
+                } else if (historyItemAction.toLowerCase() === TrackChanges.NODE_NAME_DEL) {
                     historyItemAction = me.messages.deletedby;
                 }
+
                 // => history-item:
-                nodeHistory += '<b>'+historyItemAction+'</b><br>'+historyItemUser+'<br>'+historyItemDate+'<hr>';
+                nodeHistory += '<b>' + historyItemAction + '</b><br>' + historyItemUser + '<br>' + historyItemDate + '<hr>';
             }
         }
+
         // => For Tooltip:
-        return '<b>'+nodeAction+'</b><br>'+nodeUser+'<br>'+nodeDate+'<br>'+ nodeHistory;
+        return '<b>' + nodeAction + '</b><br>' + nodeUser + '<br>' + nodeDate + '<br>' + nodeHistory;
     },
-    
+
     // ------------------------------------------------------------------
-    
+
     /**
      * Override of default setTarget, only change see below.
      * Must be respected on ExtJS updates!
      */
-    setTarget: function(target) {
+    setTarget: function (target) {
         var me = this,
             listeners;
- 
+
         if (me.targetListeners) {
-            
+
             //FIXME: Fix for the bug in internet explorer
             //http://jira.translate5.net/browse/TRANSLATE-1086
-        	//same problem with different error log under edge
-        	//https://jira.translate5.net/browse/TRANSLATE-2037
-            if(!Ext.isIE && !Ext.isEdge){
-            	me.targetListeners.destroy();
+            //same problem with different error log under edge
+            //https://jira.translate5.net/browse/TRANSLATE-2037
+            if (!Ext.isIE && !Ext.isEdge) {
+                me.targetListeners.destroy();
             }
-            me.targetListeners=null;
+            me.targetListeners = null;
         }
- 
+
         if (target) {
             me.target = target = Ext.get(target.el || target);
             listeners = {
@@ -347,11 +367,11 @@ Ext.define('Editor.view.ToolTip', {
                 destroyable: true,
                 delegated: false    //this is the only change in comparision to the original code
             };
- 
+
             me.targetListeners = target.on(listeners);
         } else {
             me.target = null;
         }
     }
-    
+
 });

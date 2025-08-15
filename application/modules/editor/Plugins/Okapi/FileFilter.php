@@ -31,6 +31,7 @@ use MittagQI\Translate5\File\Filter\FilterConfig;
 use MittagQI\Translate5\File\Filter\FilterException;
 use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
+use MittagQI\Translate5\Plugins\Okapi\Worker\OkapiExportWorker;
 
 /**
  * File Filter to for invoking Okapi post process files on export
@@ -65,9 +66,8 @@ class editor_Plugins_Okapi_FileFilter implements FileFilterInterface
             //we do not re-export with okapi package export but return the filename with XLF extension
             return $this->applyImportFilter($task, $fileId, $filePath, $parameters);
         }
-        $worker = ZfExtended_Factory::get(editor_Plugins_Okapi_Worker::class);
+        $worker = new OkapiExportWorker();
         $params = [
-            'type' => editor_Plugins_Okapi_Worker::TYPE_EXPORT,
             'fileId' => $fileId,
             'file' => $filePath,
         ];

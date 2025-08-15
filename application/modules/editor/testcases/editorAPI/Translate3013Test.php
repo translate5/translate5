@@ -330,6 +330,5 @@ class Translate3013Test extends ApiTestAbstract
     {
         static::api()->login(TestUser::TestTermProposer->value);
         static::api()->delete('editor/termcollection/' . self::$collection1Id);
-        static::api()->delete('editor/termcollection/' . self::$collection2Id);
     }
 }

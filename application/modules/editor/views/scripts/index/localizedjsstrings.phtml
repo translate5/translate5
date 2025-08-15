@@ -348,8 +348,8 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-    Ext.define("Editor.locale.de.view.segments.HtmlEditor", {
-        override: "Editor.view.segments.HtmlEditor",
+    Ext.define("Editor.locale.de.view.segments.new.RowEditorNew", {
+        override: "Editor.view.segments.new.RowEditorNew",
         strings: {
             source: '<?php echo $this->translate->_('Quelltext');?>',
             targetAtImportTime: '<?php echo $this->translate->_('Zieltext') . ' ' . $this->translate->_('(zur Importzeit)');?>',
@@ -392,11 +392,13 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
+<?php
+//    Editor.view.segments.RowEditor.prototype.messages = {
+/*        segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',*/
+/*        cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!');?>'*/
+//    };
+?>
 
-    Editor.view.segments.RowEditor.prototype.messages = {
-        segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',
-        cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!');?>'
-    };
     Editor.view.segments.RowEditing.prototype.messages = {
         previousSegmentNotSaved: '<?php echo $this->translate->_('Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt seine Speicherung beendet hatte. Bitte versuchen Sie es noch einmal. Sollte es dann noch nicht funktionieren, drücken Sie bitte F5. Vielen Dank!');?>',
         edit100pWarning: '<?php echo $this->translate->_('Achtung, Sie editieren einen 100% Match!');?>'

@@ -1,9 +1,13 @@
 'use strict';
 
-const path = require('path');
-const {styles} = require('@ckeditor/ckeditor5-dev-utils');
+import path from 'path';
+import {createRequire} from 'module';
+import {styles} from '@ckeditor/ckeditor5-dev-utils';
 
-module.exports = {
+const require = createRequire(import.meta.url);
+const themePath = require.resolve('@ckeditor/ckeditor5-theme-lark');
+
+export default {
     // https://webpack.js.org/configuration/entry-context/
     entry: [
         './Editor/index.js',
@@ -39,7 +43,7 @@ module.exports = {
                         options: {
                             postcssOptions: styles.getPostCssConfig({
                                 themeImporter: {
-                                    themePath: require.resolve('@ckeditor/ckeditor5-theme-lark')
+                                    themePath: themePath
                                 },
                                 minify: true
                             })
@@ -52,7 +56,7 @@ module.exports = {
     mode: 'development',
     // Useful for debugging.
     devtool: 'source-map',
-    // By default webpack logs warnings if the bundle is bigger than 200kb.
+    // By default, webpack logs warnings if the bundle is bigger than 200kb.
     performance: {hints: false},
     watch: true,
     watchOptions: {
