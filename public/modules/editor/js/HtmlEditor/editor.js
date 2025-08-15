@@ -240,7 +240,7 @@ class DataTransformer {
             if (this._tagsConversion.isInternalTagNode(item)) {
                 const tagType = this._tagsConversion.getInternalTagType(item);
                 const tagNumber = this._tagsConversion.getInternalTagNumber(item);
-                result += this._transformedTags[tagType][tagNumber]?._original.outerHTML ?? '';
+                result += this._transformedTags[tagType][tagNumber]?._original.outerHTML ?? this._referenceTags[tagType][tagNumber]?._original.outerHTML ?? '';
 
                 continue;
             }
@@ -896,6 +896,12 @@ class EditorWrapper {
             const modelFragment = this._editor.data.toModel(viewFragment);
 
             this._editor.model.insertContent(modelFragment, range);
+
+            if (rangeStart === rangeEnd) {
+                // If rangeStart and rangeEnd are the same, we're inserting a tag and need to adjust the selection
+                preservedSelection.start.path[1]++;
+                preservedSelection.end.path[1]++;
+            }
 
             writer.setSelection(preservedSelection);
 
