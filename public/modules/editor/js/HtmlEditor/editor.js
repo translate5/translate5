@@ -897,6 +897,12 @@ class EditorWrapper {
 
             this._editor.model.insertContent(modelFragment, range);
 
+            if (rangeStart === rangeEnd) {
+                // If rangeStart and rangeEnd are the same, we're inserting a tag and need to adjust the selection
+                preservedSelection.start.path[1]++;
+                preservedSelection.end.path[1]++;
+            }
+
             writer.setSelection(preservedSelection);
 
             if (!skipDataChangeEvent) {
