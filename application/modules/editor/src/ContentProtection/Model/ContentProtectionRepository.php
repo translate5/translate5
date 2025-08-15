@@ -211,6 +211,11 @@ class ContentProtectionRepository
             $dbInputMapping->fetchAll($select)->toArray(),
         );
 
+        usort(
+            $rows,
+            static fn ($a, $b) => $b['priority'] <=> $a['priority']
+        );
+
         $collection = [];
         foreach ($rows as $formatData) {
             $collection[] = ContentProtectionDto::fromRow($formatData);
@@ -292,6 +297,11 @@ class ContentProtectionRepository
         $rows = array_merge(
             $dbOutputMapping->fetchAll($this->getKeepAsIsSelect($sourceIds))->toArray(),
             $dbOutputMapping->fetchAll($select)->toArray(),
+        );
+
+        usort(
+            $rows,
+            static fn ($a, $b) => $b['priority'] <=> $a['priority']
         );
 
         $collection = [];
