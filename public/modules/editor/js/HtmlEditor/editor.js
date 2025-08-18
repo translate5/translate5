@@ -472,6 +472,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _model_node__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./model-node */ "./Editor/model-node.js");
 /* harmony import */ var _Mixin_document_fragment__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../Mixin/document-fragment */ "./Mixin/document-fragment.js");
 /* harmony import */ var _DataCleanup_insert_preprocessor__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../DataCleanup/insert-preprocessor */ "./DataCleanup/insert-preprocessor.js");
+/* harmony import */ var _Tools_calculate_node_length__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../Tools/calculate-node-length */ "./Tools/calculate-node-length.js");
+
 
 
 
@@ -598,7 +600,7 @@ class EditorWrapper {
         const start = selection.start;
         const end = selection.end < selection.start ? selection.start : selection.end;
 
-        this.replaceContentInRange(start, end, transformed);
+        this.replaceContentInRange(start, end, transformed, false, true);
     }
 
     replaceDataT5Format(data) {
@@ -667,7 +669,7 @@ class EditorWrapper {
             start = position - 1;
         }
 
-        this.replaceContentInRange(start, end, image);
+        this.replaceContentInRange(start, end, image, false, true);
     }
 
     /**
@@ -694,7 +696,7 @@ class EditorWrapper {
         if (selection.isCollapsed()) {
             if (this.dataTransformer.hasSingleReferenceTag(tagNumber)) {
                 const tag = this.dataTransformer.getSingleReferenceTag(tagNumber);
-                this.replaceContentInRange(selection.start, selection.start, tag._transformed.outerHTML);
+                this.replaceContentInRange(selection.start, selection.start, tag._transformed.outerHTML, false, true);
 
                 return;
             }
@@ -710,13 +712,13 @@ class EditorWrapper {
                 }
 
                 const tags = this.dataTransformer.getPairedReferenceTag(tagNumber);
-                this.replaceContentInRange(selection.start, selection.start, tags[type]._transformed.outerHTML);
+                this.replaceContentInRange(selection.start, selection.start, tags[type]._transformed.outerHTML, false, true);
             }
         } else {
             if (this.dataTransformer.hasPairedReferenceTag(tagNumber)) {
                 const tags = this.dataTransformer.getPairedReferenceTag(tagNumber);
 
-                this.replaceContentInRange(selection.end, selection.end, tags.close._transformed.outerHTML);
+                this.replaceContentInRange(selection.end, selection.end, tags.close._transformed.outerHTML, false, true);
                 this.replaceContentInRange(selection.start, selection.start, tags.open._transformed.outerHTML);
 
                 return;
@@ -724,7 +726,7 @@ class EditorWrapper {
 
             if (this.dataTransformer.hasSingleReferenceTag(tagNumber)) {
                 const tag = this.dataTransformer.getSingleReferenceTag(tagNumber);
-                this.replaceContentInRange(selection.start, selection.end, tag._transformed.outerHTML);
+                this.replaceContentInRange(selection.start, selection.end, tag._transformed.outerHTML, false, true);
             }
         }
     }
@@ -871,9 +873,10 @@ class EditorWrapper {
      * @param {integer} rangeStart
      * @param {integer} rangeEnd
      * @param {String} content
-     * @param skipDataChangeEvent
+     * @param {Boolean} skipDataChangeEvent
+     * @param {Boolean} moveCarret - if true, move caret to the end of the inserted content
      */
-    replaceContentInRange(rangeStart, rangeEnd, content, skipDataChangeEvent = false) {
+    replaceContentInRange(rangeStart, rangeEnd, content, skipDataChangeEvent = false, moveCarret = false) {
         this._editor.model.change((writer) => {
             const preservedSelection = this._editor.model.document.selection.getFirstRange();
 
@@ -897,10 +900,10 @@ class EditorWrapper {
 
             this._editor.model.insertContent(modelFragment, range);
 
-            if (rangeStart === rangeEnd) {
-                // If rangeStart and rangeEnd are the same, we're inserting a tag and need to adjust the selection
-                preservedSelection.start.path[1]++;
-                preservedSelection.end.path[1]++;
+            if (moveCarret) {
+                const length = (0,_Tools_calculate_node_length__WEBPACK_IMPORTED_MODULE_8__["default"])((0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(content));
+                preservedSelection.start.path[1] += length;
+                preservedSelection.end.path[1] += length;
             }
 
             writer.setSelection(preservedSelection);
@@ -1209,7 +1212,7 @@ class EditorWrapper {
     }
 
     #onDataChange(event, data) {
-        console.log('The data has changed!');
+        // console.log('The data has changed!');
         this.modifiersLastRunId = null;
 
         if (data.isUndo) {
