@@ -61,6 +61,7 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\Event\SegmentProcessedEvent;
 use MittagQI\Translate5\Segment\Operation\DTO\DurationsDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
+use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\Segment\QueuedBatchUpdateWorker;
 use MittagQI\Translate5\Segment\SearchAndReplace\DTO\ReplaceDto;
@@ -174,6 +175,14 @@ class SearchAndReplaceService
                     $dto->searchQuery->matchCase,
                 );
 
+                $updateLogger = new UpdateSegmentLogger(
+                    'SearchAndReplace',
+                    (int) $foundSegment['id'],
+                    $segmentText,
+                    $foundSegment[$searchInField],
+                    $searchInField
+                );
+
                 $this->updateSegmentOperation->update(
                     $this->segmentRepository->get((int) $foundSegment['id']),
                     new UpdateSegmentDto(
@@ -189,6 +198,7 @@ class SearchAndReplaceService
                         autoStateId: 999,
                     ),
                     $actor,
+                    $updateLogger
                 );
             } catch (Exception $e) {
                 /**

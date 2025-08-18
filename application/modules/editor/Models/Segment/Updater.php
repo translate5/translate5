@@ -31,6 +31,7 @@ use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
+use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\Segment\UpdateSegmentStatistics;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 
@@ -73,11 +74,12 @@ class editor_Models_Segment_Updater
 
     public function __construct(
         editor_Models_Task $task,
-        private string $userGuid
+        private string $userGuid,
+        private ?UpdateSegmentLogger $updateLogger = null
     ) {
         $this->task = $task;
-        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [get_class($this)]);
-        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [get_class($this)]);
+        $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
         $this->updateStatistics = UpdateSegmentStatistics::create();
     }
@@ -98,6 +100,11 @@ class editor_Models_Segment_Updater
         $this->beforeSegmentUpdate($history);
 
         $this->segment->save();
+
+        if ($this->updateLogger !== null) {
+            $this->updateLogger->captureSegmentChange($segment, 'UpdaterSave');
+            $this->updateLogger->finish();
+        }
 
         $this->afterSegmentUpdate($history, $oldHash);
     }
@@ -312,11 +319,12 @@ class editor_Models_Segment_Updater
      * Applies the import whitespace replacing to the edited user by the content
      * @param string $content the content to be sanitized, the value is modified directly via reference!
      */
-    public function sanitizeEditedContent(string &$content, bool $isEditingTargetInFront = false): bool
+    public function sanitizeEditedContent(string &$content, string $field): bool
     {
+        $isEditingTargetInFront = ('targetEdit' === $field);
         $nbsp = json_decode('"\u00a0"');
 
-        //some browsers create nbsp instead of normal whitespaces, since nbsp are removed by the protectWhitespace code below
+        // some browsers create nbsp instead of normal whitespace, since nbsp are removed by the protectWhitespace code below
         // we convert it to usual whitespaces. If there are multiple ones, they are reduced to one then.
         // This is so far the desired behavior. No characters escaped as tag by the import should be addable through the editor.
         $content = str_replace($nbsp, ' ', $content);
@@ -349,6 +357,10 @@ class editor_Models_Segment_Updater
         //revoke the internaltag replacement
         $content = $this->utilities->internalTag->unprotect($content);
 
+        if ($this->updateLogger !== null) {
+            $this->updateLogger->captureChange($content, $field, 'ContentProtection');
+        }
+
         //return true if some whitespace content was changed
         return editor_Models_Segment_Utility::entityCleanup($content) !== editor_Models_Segment_Utility::entityCleanup($oldContent);
     }
@@ -360,8 +372,7 @@ class editor_Models_Segment_Updater
      */
     protected function logAdapterUsageOnSegmentEdit(editor_Models_LanguageResources_LanguageResource $adapter)
     {
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
+        $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $connector = $manager->getConnector(
             $adapter,
             $this->task->getSourceLang(),
@@ -383,8 +394,7 @@ class editor_Models_Segment_Updater
     private function handleWorkflowOnUpdate(): void
     {
         //@todo do this with events
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
+        $wfm = ZfExtended_Factory::get(editor_Workflow_Manager::class);
         $workflow = $wfm->getActive($this->segment->getTaskGuid());
 
         $segmentHandler = $workflow->getSegmentHandler();
@@ -407,6 +417,10 @@ class editor_Models_Segment_Updater
 
         // Update the Quality Tags
         editor_Segment_Quality_Manager::instance()->processSegment($this->segment, $this->task, editor_Segment_Processing::EDIT);
+
+        if ($this->updateLogger !== null) {
+            $this->updateLogger->captureSegmentChange($this->segment, 'AutoQA');
+        }
     }
 
     /**

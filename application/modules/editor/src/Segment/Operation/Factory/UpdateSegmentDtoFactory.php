@@ -132,7 +132,7 @@ class UpdateSegmentDtoFactory
     /**
      * @return array<string, string>
      */
-    protected function getTextData(Segment $segment, array $data): array
+    public function getTextData(Segment $segment, array $data): array
     {
         //        $error = [];
         $textData = [];
@@ -170,7 +170,7 @@ class UpdateSegmentDtoFactory
         //        $logText = 'Error on saving a segment!!! Parts of the content in the PUT request ';
         //        $logText .= 'delivered the following segmentId(s) and fieldName(s):' . PHP_EOL;
         //        $logText .= print_r($error, true) . PHP_EOL;
-        //        $logText .= 'but the request was for segmentId ' . $segment->getId();
+        //        $logText .= 'but the request was fofromRequestr segmentId ' . $segment->getId();
         //        $logText .= ' (compare also the above fieldnames!).' . PHP_EOL;
         //        $logText .= 'Therefore the segment has not been saved!' . PHP_EOL;
         //        $logText .= 'Actually saved Segment PUT data and data to be saved in DB:' . PHP_EOL;

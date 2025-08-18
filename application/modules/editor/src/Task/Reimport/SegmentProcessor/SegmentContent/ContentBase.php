@@ -73,12 +73,7 @@ abstract class ContentBase
         $this->sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->sfm->initFields($this->task->getTaskGuid());
 
-        $this->segmentUpdater = ZfExtended_Factory::get(
-            editor_Models_Segment_Updater::class,
-            [
-                $this->task, $this->user->getUserGuid(),
-            ]
-        );
+        $this->segmentUpdater = new editor_Models_Segment_Updater($this->task, $this->user->getUserGuid());
         $this->segmentTagger = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
         $this->diffTagger = ZfExtended_Factory::get(
             editor_Models_Export_DiffTagger_TrackChanges::class,

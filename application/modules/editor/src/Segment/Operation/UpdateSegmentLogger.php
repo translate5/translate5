@@ -50,51 +50,98 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\Operation\WithAuthentication;
+namespace MittagQI\Translate5\Segment\Operation;
 
-use editor_Models_Segment as Segment;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
-use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
-use MittagQI\Translate5\Segment\ActionAssert\Permission\SegmentActionPermissionAssert;
-use MittagQI\Translate5\Segment\ActionAssert\SegmentAction;
-use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentOperationInterface;
-use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
-use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
-use MittagQI\Translate5\User\Model\User;
-use ZfExtended_Models_Messages;
+use MittagQI\ZfExtended\Logger\SimpleFileLogger;
+use ZfExtended_Debug;
 
-class UpdateSegmentOperation implements UpdateSegmentOperationInterface
+class UpdateSegmentLogger
 {
+    private const LOG_ALWAYS = true;
+
+    private bool $doLog;
+
+    private string $baseField;
+
+    private array $log = [];
+
+    private bool $isSuspicious = false;
+
     public function __construct(
-        private readonly \MittagQI\Translate5\Segment\Operation\UpdateSegmentOperation $updateSegmentOperation,
-        private readonly ActionPermissionAssertInterface $permissionAssert,
+        private readonly string $process,
+        private readonly int $segmentId,
+        private readonly string $requestSentText,
+        private readonly string $textBeforeUpdate,
+        private readonly string $capturedField
     ) {
+        $this->doLog = ZfExtended_Debug::hasLevel('editor', 'segmentSave');
+        $this->baseField = str_contains(strtolower($this->capturedField), 'target') ? 'target' : 'source';
     }
 
     /**
-     * @codeCoverageIgnore
+     * Captures a change based on textual data
      */
-    public static function create(): self
+    public function captureChange(string $text, string $field, string $origin): void
     {
-        return new self(
-            \MittagQI\Translate5\Segment\Operation\UpdateSegmentOperation::create(),
-            SegmentActionPermissionAssert::create(),
-        );
+        if ($this->doLog && str_contains(strtolower($field), $this->baseField)) {
+            $this->log[] = [
+                'text' => $text,
+                'field' => $field,
+                'origin' => $origin,
+            ];
+            $this->checkSuspicious($text);
+        }
     }
 
-    public function update(
-        Segment $segment,
-        UpdateSegmentDto $updateDto,
-        User $actor,
-        UpdateSegmentLogger $updateLogger,
-        ?ZfExtended_Models_Messages $restMessages = null
-    ): void {
-        $this->permissionAssert->assertGranted(
-            SegmentAction::Update,
-            $segment,
-            new PermissionAssertContext($actor),
-        );
+    /**
+     * Captures a change based on the segment-entity
+     */
+    public function captureSegmentChange(\editor_Models_Segment $segment, string $origin): void
+    {
+        if ($this->doLog) {
+            $text = $segment->get($this->capturedField);
+            $this->log[] = [
+                'text' => $text,
+                'field' => $this->capturedField,
+                'origin' => $origin,
+            ];
+            $this->checkSuspicious($text);
+        }
+    }
 
-        $this->updateSegmentOperation->update($segment, $updateDto, $actor, $updateLogger, $restMessages);
+    /**
+     * Finishes the logging of the update & writes the entry when suspicious changes have been detected
+     */
+    public function finish(): void
+    {
+        if (($this->doLog && $this->isSuspicious) || self::LOG_ALWAYS) { // @phpstan-ignore-line
+            $sfl = new SimpleFileLogger('segmentSave.log');
+            $entry =
+                '#ID: ' . $this->segmentId .
+                '#PROCESS:' . $this->process .
+                '#SENT:' . $this->requestSentText . '#ENDSENT' .
+                '#BEFORE:' . $this->textBeforeUpdate . '#ENDBEFORE';
+            foreach ($this->log as $logEntry) {
+                $orig = strtoupper($logEntry['origin']);
+                $entry .= '#' . $orig . ':' . strtoupper($logEntry['text']) . ':' . $logEntry['text'] . '#END' . $orig;
+            }
+
+            $sfl->log($entry);
+        }
+    }
+
+    private function checkSuspicious(string $text): void
+    {
+        if ($this->condenseText($this->requestSentText) !== $this->condenseText($text)) {
+            $this->isSuspicious = true;
+        }
+    }
+
+    private function condenseText(string $text): string
+    {
+        $text = preg_replace('~\s+~', '', strip_tags($text));
+        $text = str_replace('&nbsp;', '', $text);
+
+        return html_entity_decode($text, ENT_QUOTES);
     }
 }
