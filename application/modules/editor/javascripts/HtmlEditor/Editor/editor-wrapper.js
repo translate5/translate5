@@ -6,6 +6,7 @@ import CallbacksQueue from "./callbacks-queue";
 import ModelNode from "./model-node";
 import DocumentFragment from "../Mixin/document-fragment";
 import InsertPreprocessor from "../DataCleanup/insert-preprocessor";
+import calculateNodeLength from "../Tools/calculate-node-length";
 
 export default class EditorWrapper {
     static REFERENCE_FIELDS = {
@@ -124,7 +125,7 @@ export default class EditorWrapper {
         const start = selection.start;
         const end = selection.end < selection.start ? selection.start : selection.end;
 
-        this.replaceContentInRange(start, end, transformed);
+        this.replaceContentInRange(start, end, transformed, false, true);
     }
 
     replaceDataT5Format(data) {
@@ -193,7 +194,7 @@ export default class EditorWrapper {
             start = position - 1;
         }
 
-        this.replaceContentInRange(start, end, image);
+        this.replaceContentInRange(start, end, image, false, true);
     }
 
     /**
@@ -220,7 +221,7 @@ export default class EditorWrapper {
         if (selection.isCollapsed()) {
             if (this.dataTransformer.hasSingleReferenceTag(tagNumber)) {
                 const tag = this.dataTransformer.getSingleReferenceTag(tagNumber);
-                this.replaceContentInRange(selection.start, selection.start, tag._transformed.outerHTML);
+                this.replaceContentInRange(selection.start, selection.start, tag._transformed.outerHTML, false, true);
 
                 return;
             }
@@ -236,13 +237,13 @@ export default class EditorWrapper {
                 }
 
                 const tags = this.dataTransformer.getPairedReferenceTag(tagNumber);
-                this.replaceContentInRange(selection.start, selection.start, tags[type]._transformed.outerHTML);
+                this.replaceContentInRange(selection.start, selection.start, tags[type]._transformed.outerHTML, false, true);
             }
         } else {
             if (this.dataTransformer.hasPairedReferenceTag(tagNumber)) {
                 const tags = this.dataTransformer.getPairedReferenceTag(tagNumber);
 
-                this.replaceContentInRange(selection.end, selection.end, tags.close._transformed.outerHTML);
+                this.replaceContentInRange(selection.end, selection.end, tags.close._transformed.outerHTML, false, true);
                 this.replaceContentInRange(selection.start, selection.start, tags.open._transformed.outerHTML);
 
                 return;
@@ -250,7 +251,7 @@ export default class EditorWrapper {
 
             if (this.dataTransformer.hasSingleReferenceTag(tagNumber)) {
                 const tag = this.dataTransformer.getSingleReferenceTag(tagNumber);
-                this.replaceContentInRange(selection.start, selection.end, tag._transformed.outerHTML);
+                this.replaceContentInRange(selection.start, selection.end, tag._transformed.outerHTML, false, true);
             }
         }
     }
@@ -397,9 +398,10 @@ export default class EditorWrapper {
      * @param {integer} rangeStart
      * @param {integer} rangeEnd
      * @param {String} content
-     * @param skipDataChangeEvent
+     * @param {Boolean} skipDataChangeEvent
+     * @param {Boolean} moveCarret - if true, move caret to the end of the inserted content
      */
-    replaceContentInRange(rangeStart, rangeEnd, content, skipDataChangeEvent = false) {
+    replaceContentInRange(rangeStart, rangeEnd, content, skipDataChangeEvent = false, moveCarret = false) {
         this._editor.model.change((writer) => {
             const preservedSelection = this._editor.model.document.selection.getFirstRange();
 
@@ -423,10 +425,10 @@ export default class EditorWrapper {
 
             this._editor.model.insertContent(modelFragment, range);
 
-            if (rangeStart === rangeEnd) {
-                // If rangeStart and rangeEnd are the same, we're inserting a tag and need to adjust the selection
-                preservedSelection.start.path[1]++;
-                preservedSelection.end.path[1]++;
+            if (moveCarret) {
+                const length = calculateNodeLength(stringToDom(content));
+                preservedSelection.start.path[1] += length;
+                preservedSelection.end.path[1] += length;
             }
 
             writer.setSelection(preservedSelection);
@@ -735,7 +737,7 @@ export default class EditorWrapper {
     }
 
     #onDataChange(event, data) {
-        console.log('The data has changed!');
+        // console.log('The data has changed!');
         this.modifiersLastRunId = null;
 
         if (data.isUndo) {

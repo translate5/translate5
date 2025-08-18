@@ -253,7 +253,7 @@ Ext.define('Editor.controller.QualityMqm', {
             close = Ext.DomHelper.createDom(tagDef.close).outerHTML;
 
         editor.editor.replaceContentInRange(selection.end, selection.end, close);
-        editor.editor.replaceContentInRange(selection.start, selection.start, open);
+        editor.editor.replaceContentInRange(selection.start, selection.start, open, false, true);
 
         return tagDef;
     },

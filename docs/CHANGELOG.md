@@ -19,9 +19,16 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
-## [7.28.0] - 2025-08-14
+
+
+
+
+## [7.28.0] - 2025-08-15
 
 ### Important Notes:
+#### [TRANSLATE-4880](https://jira.translate5.net/browse/TRANSLATE-4880)
+Config "Enable file translation task editing for InstantTranslate user" (runtimeOptions.plugins.InstantTranslate.enableTaskEdit) is now enabled by default for all so if you do not want to allow edit task button in Instant translate please disable it manually.
+
 #### [TRANSLATE-4778](https://jira.translate5.net/browse/TRANSLATE-4778)
 This Feature needs the latest OKAPI-java11 container to work properly (translate5/okapi-longhorn:combined-java11)
 
@@ -52,6 +59,12 @@ The editing component in translate5's editor (the open segment) has been rewritt
 
 
 ### Changed
+**[TRANSLATE-4880](https://jira.translate5.net/browse/TRANSLATE-4880): InstantTranslate - Enable instant translate task edits by default** <br>
+Instant translate task edit is now enabled by default
+
+**[TRANSLATE-4846](https://jira.translate5.net/browse/TRANSLATE-4846): Okapi integration - Update Okapi to Java 17 and Jetty 12** <br>
+Updated Okapi to Java 17 and Jetty 12
+
 **[TRANSLATE-4831](https://jira.translate5.net/browse/TRANSLATE-4831): VisualReview / VisualTranslation - Visual: API-Test for the new Features (Print Visual, PDF-Import as Reflown HTML)** <br>
 API-tests for the visual features "Export visual as PDF" and "Import PDF(s) as text-reflown HTML"
 
@@ -75,6 +88,15 @@ Cursor is now inside the segment after applying a replacement suggested by spell
 
 
 ### Bugfixes
+**[TRANSLATE-4883](https://jira.translate5.net/browse/TRANSLATE-4883): Editor general - Cursor at the wrong position after inserting tags** <br>
+Fixed cursor position after inserting tag with CTRL+, hotkey
+
+**[TRANSLATE-4881](https://jira.translate5.net/browse/TRANSLATE-4881): Editor general - Tags are missing after segment save** <br>
+Fixed bug which caused tags evaporating after segment is saved
+
+**[TRANSLATE-4878](https://jira.translate5.net/browse/TRANSLATE-4878): Content Protection - Priority of keep content rules always higher then other rules** <br>
+Fix priority handling of rules
+
 **[TRANSLATE-4867](https://jira.translate5.net/browse/TRANSLATE-4867): Client management - Zend_Db_Statement_Exception when loading customers** <br>
 Fixed a bug when no customers were set to a language resource.
 
