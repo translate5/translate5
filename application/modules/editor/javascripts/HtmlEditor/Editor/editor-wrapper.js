@@ -1153,11 +1153,23 @@ export default class EditorWrapper {
 
     #runAsyncModifiers() {
         this.modifiersLastRunId = Math.random().toString(36).substring(2, 16);
+        const preservedSelection = this.getSelection();
 
         const originalText = this.getRawData();
         // Now async modifiers can be executed in any order, need to change this to promises sequence
         for (const modifier of this._asyncModifiers[EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]) {
             modifier(originalText, this.modifiersLastRunId).then((result) => {
+                const currentSelection = this.getSelection();
+
+                if (
+                    preservedSelection.start !== currentSelection.start ||
+                    preservedSelection.end !== currentSelection.end
+                ) {
+                    // If the selection has changed, we should not replace the data
+                    // because it can lead to unexpected behavior
+                    return;
+                }
+
                 let position = this._editor.model.document.selection.getFirstPosition().path[1];
 
                 const [modifiedText, runId] = result;
