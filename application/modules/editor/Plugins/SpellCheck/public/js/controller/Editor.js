@@ -709,16 +709,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
 
         for (const match of this.allMatches) {
             if (previousRangeEnd !== match.range.start) {
-                result += this.editor.editor.getContentInRange(previousRangeEnd, match.range.start);
+                result += this._replaceSpace(this.editor.editor.getContentInRange(previousRangeEnd, match.range.start));
             }
 
             result += this.createSpellcheckNode(
-                this.editor.editor.getContentInRange(match.range.start, match.range.end),
+                this._replaceSpace(this.editor.editor.getContentInRange(match.range.start, match.range.end)),
                 index
             );
 
             if (index === this.allMatches.length - 1) {
-                result += this.editor.editor.getContentInRange(match.range.end, this.editor.editor.getContentLength());
+                result += this._replaceSpace(
+                    this.editor.editor.getContentInRange(match.range.end, this.editor.editor.getContentLength())
+                );
             }
 
             previousRangeEnd = match.range.end;
@@ -1232,5 +1234,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         const insertFragment = document.createRange().createContextualFragment(spellCheckNode.innerHTML);
         spellCheckNodeParent.insertBefore(insertFragment, spellCheckNode);
         spellCheckNodeParent.removeChild(spellCheckNode);
+    },
+
+    _replaceSpace: function (text) {
+        return text.replace(/&nbsp;$/, ' ').replace(/^&nbsp;/, ' ');
     },
 });

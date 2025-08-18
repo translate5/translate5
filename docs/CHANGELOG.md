@@ -23,6 +23,21 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.28.1] - 2025-08-18
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4887](https://jira.translate5.net/browse/TRANSLATE-4887): Editor general - Spaces are deleted on segment save** <br>
+Fixed bug wich may caused spaces in segment to disappear after segment is saved
+
+**[TRANSLATE-4886](https://jira.translate5.net/browse/TRANSLATE-4886): Editor general - Cursor at the wrong position when inserting source text via hotkey** <br>
+Fixed cursor position after inserting content with CTRL+. and CTRL+, hotkeys
+
+
 ## [7.28.0] - 2025-08-15
 
 ### Important Notes:
