@@ -57,7 +57,7 @@ use ZfExtended_Debug;
 
 class UpdateSegmentLogger
 {
-    private const LOG_ALWAYS = true;
+    private const LOG_ALWAYS = false;
 
     private bool $doLog;
 
@@ -74,7 +74,8 @@ class UpdateSegmentLogger
         private readonly string $textBeforeUpdate,
         private readonly string $capturedField
     ) {
-        $this->doLog = ZfExtended_Debug::hasLevel('editor', 'segmentSave');
+        // @phpstan-ignore-next-line
+        $this->doLog = self::LOG_ALWAYS || ZfExtended_Debug::hasLevel('editor', 'segmentSave');
         $this->baseField = str_contains(strtolower($this->capturedField), 'target') ? 'target' : 'source';
     }
 
@@ -123,7 +124,8 @@ class UpdateSegmentLogger
                 '#BEFORE:' . $this->textBeforeUpdate . '#ENDBEFORE';
             foreach ($this->log as $logEntry) {
                 $orig = strtoupper($logEntry['origin']);
-                $entry .= '#' . $orig . ':' . strtoupper($logEntry['text']) . ':' . $logEntry['text'] . '#END' . $orig;
+                $field = ($logEntry['field'] !== $this->capturedField) ? '|' . strtolower($logEntry['field']) : '';
+                $entry .= '#' . $orig . $field . ':' . $logEntry['text'] . '#END' . $orig;
             }
 
             $sfl->log($entry);
