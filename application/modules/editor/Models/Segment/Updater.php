@@ -321,7 +321,7 @@ class editor_Models_Segment_Updater
      */
     public function sanitizeEditedContent(string &$content, string $field): bool
     {
-        $isEditingTargetInFront = ('targetEdit' === $field);
+        $isEditingTargetInFront = ($field === 'targetEdit');
         $nbsp = json_decode('"\u00a0"');
 
         // some browsers create nbsp instead of normal whitespace, since nbsp are removed by the protectWhitespace code below
