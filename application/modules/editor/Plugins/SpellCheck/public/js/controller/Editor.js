@@ -176,7 +176,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         this.tagsConversion = editor.editor.getTagsConversion();
         this.editor.editor.registerModifier(
             RichTextEditor.EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-            (text, actions) => this._cleanSpellcheckOnTypingInside(text, actions, this.tagsConversion),
+            (text, actions, position) => this._cleanSpellcheckOnTypingInside(text, actions, position, this.tagsConversion),
             2,
         );
         this.editor.editor.registerAsyncModifier(
@@ -1127,9 +1127,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
     },
 
-    _cleanSpellcheckOnTypingInside: function (rawData, actions, tagsConversion) {
+    _cleanSpellcheckOnTypingInside: function (rawData, actions, position, tagsConversion) {
         if (!actions.length) {
-            return [rawData, 0];
+            return [rawData, position];
         }
 
         const doc = RichTextEditor.stringToDom(rawData);
@@ -1142,7 +1142,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             this._processNodes(doc, action, tagsConversion);
         }
 
-        return [doc.innerHTML, actions[0].position];
+        return [doc.innerHTML, position];
     },
 
     _processNodes: function (doc, action, tagsConversion) {

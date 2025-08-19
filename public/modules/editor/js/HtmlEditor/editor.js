@@ -530,30 +530,20 @@ class EditorWrapper {
             [EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]: new _callbacks_queue__WEBPACK_IMPORTED_MODULE_4__["default"](),
         };
 
-        this._modifiers[EditorWrapper.EDITOR_EVENTS.DATA_CHANGED].add(
-            // Modifier that runs as the latest one and checks if text is empty and insertion is present in actions list
-            // If text is empty and there is an insertion - there was a content insertion into editor but no modifier
-            // were able to process it correctly
-            (text, actions) => {
-                const insertion = actions.find(action => action.type === 'insert');
-
-                if (text === '' && insertion !== undefined) {
-                    return [insertion.content, Infinity];
-                }
-
-                return [text, actions.length ? actions[0].position + actions[0].correction : Infinity];
-            },
-            9999
-        );
-
         this._asyncModifiers = {
             [EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]: [],
         };
 
         this.registerModifier(
             EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-            (text, actions) => this.#removeTagOnCorrespondingDeletion(text, actions),
+            (text, actions, position) => this.#removeTagOnCorrespondingDeletion(text, actions, position),
             0
+        );
+
+        this.registerModifier(
+            EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
+            (text, actions, position) => this.#preserveOriginalTextIfNoModifications(text, actions, position),
+            9999
         );
 
         return this.#create();
@@ -1642,12 +1632,12 @@ class EditorWrapper {
     #runModifiers(actions) {
         const originalText = this.getRawData();
         let text = originalText;
-        let position;
+        let position = actions[0]?.position || 0;
         let forceUpdate = false;
 
         for (const modifier of this._modifiers[EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]) {
             // TODO position can be modified by modifier, need to pass it to the next one
-            [text, position, forceUpdate] = modifier(text, actions);
+            [text, position, forceUpdate] = modifier(text, actions, position);
         }
 
         if (text !== originalText || forceUpdate) {
@@ -1740,7 +1730,7 @@ class EditorWrapper {
     }
     //endregion
 
-    #removeTagOnCorrespondingDeletion(rawData, actions) {
+    #removeTagOnCorrespondingDeletion(rawData, actions, position) {
         const doc = RichTextEditor.stringToDom(rawData);
 
         for (const action of actions) {
@@ -1776,7 +1766,17 @@ class EditorWrapper {
             }
         }
 
-        return [doc.innerHTML, actions[0].position];
+        return [doc.innerHTML, position];
+    }
+
+    #preserveOriginalTextIfNoModifications(text, actions, position) {
+        const insertion = actions.find(action => action.type === 'insert');
+
+        if (text === '' && insertion !== undefined) {
+            return [insertion.content, Infinity];
+        }
+
+        return [text, position];
     }
 }
 
