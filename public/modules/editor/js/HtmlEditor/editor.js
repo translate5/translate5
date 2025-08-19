@@ -530,6 +530,22 @@ class EditorWrapper {
             [EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]: new _callbacks_queue__WEBPACK_IMPORTED_MODULE_4__["default"](),
         };
 
+        this._modifiers[EditorWrapper.EDITOR_EVENTS.DATA_CHANGED].add(
+            // Modifier that runs as the latest one and checks if text is empty and insertion is present in actions list
+            // If text is empty and there is an insertion - there was a content insertion into editor but no modifier
+            // were able to process it correctly
+            (text, actions) => {
+                const insertion = actions.find(action => action.type === 'insert');
+
+                if (text === '' && insertion !== undefined) {
+                    return [insertion.content, Infinity];
+                }
+
+                return [text, actions.length ? actions[0].position + actions[0].correction : Infinity];
+            },
+            9999
+        );
+
         this._asyncModifiers = {
             [EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]: [],
         };
@@ -624,11 +640,12 @@ class EditorWrapper {
 
         const items = RichTextEditor.stringToDom(data).childNodes;
         const transformed = this.dataTransformer.transformPartial(items);
+        actions.push({type: EditorWrapper.ACTION_TYPE.INSERT, content: transformed, position: 0, correction: 0});
+
         this.#setRawData('');
         this._editor.editing.view.focus();
         this.setCursorToEnd();
 
-        actions.push({type: EditorWrapper.ACTION_TYPE.INSERT, content: transformed, position: 0, correction: 0});
         this.#triggerDataChanged(actions);
     }
 

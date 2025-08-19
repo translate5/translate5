@@ -94,6 +94,7 @@ Ext.define('Editor.controller.LanguageResources', {
           '#ViewModes':{
               viewModeChanged:'viewModeChangeEvent'
           },
+          // TODO seems to be unused, remove?
           '#Editor.plugins.TrackChanges.controller.Editor':{
               setValueForEditor:'setValueForEditor'
           }
@@ -108,7 +109,7 @@ Ext.define('Editor.controller.LanguageResources', {
 	  //INFO: the default service is initialized in the TmOverview controller
 	  //since this controller can be disabled via the acl right, and the service classes are used
 	  //in the tmoverview panel
-	  
+
       //add the specific service instances, if needed
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.TermCollection'));
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.OpenTM2'));
@@ -145,11 +146,11 @@ Ext.define('Editor.controller.LanguageResources', {
   },
   handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
       var me = this;
-      
+
       if(me.isLanguageResourcesDisabled()){
     	  return;
       }
-      
+
       cont.keyMapConfig['ctrl-DIGIT'] = [cont.DEC_DIGITS,{ctrl: true, alt: false},function(key) {
           if(!me.getMatchgrid() || !me.getMatchgrid().isVisible()) {
               return;
@@ -173,7 +174,7 @@ Ext.define('Editor.controller.LanguageResources', {
       if(matchRecord.get('state') !== me.SERVER_STATUS.SERVER_STATUS_LOADED){
           return;
       }
-      
+
       //don't take over the match when the source column is edited
       if(editor.isSourceEditing()) {
           Editor.MessageBox.addWarning(this.strings.msgDisabledSourceEdit);
@@ -182,13 +183,8 @@ Ext.define('Editor.controller.LanguageResources', {
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           me.setValueForEditor(matchRecord.get('target'));
+          // TODO Seems to be unused, remove?
           me.fireEvent('prepareCompleteReplace',matchRecord.get('target'),false); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
-
-          let referenceField = editor.mainEditor.getReferenceField(
-              rec.get('target'),
-              rec.get('pretrans'),
-              rec.get('matchRateType')
-          );
 
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
@@ -205,7 +201,6 @@ Ext.define('Editor.controller.LanguageResources', {
               me.languageResourceValueForEditor,
               rec,
               editor.columnToEdit,
-              referenceField,
               true
           );
       }
@@ -225,7 +220,7 @@ Ext.define('Editor.controller.LanguageResources', {
       if(me.isLanguageResourcesDisabled()){
     	  return;
       }
-      
+
       if(vm.get('editorIsReadonly')) {
           me.getEditorPanel().collapse();
       }
@@ -280,7 +275,7 @@ Ext.define('Editor.controller.LanguageResources', {
       var store = this.assocStore;
       return store ? store.getTotalCount() : 0;
   },
-  
+
   /***
    * Check if the language resources match grid should be/is disabled
    */
@@ -289,19 +284,19 @@ Ext.define('Editor.controller.LanguageResources', {
           assoc = Editor.data.task.get('taskassocs') ? Editor.data.task.get('taskassocs') : null,
           assocCount = assoc ? assoc.length : 0,
           termCollectionCount = 0;
-      
+
       //no results in the assoc store -> disabled
       if(!assoc || assocCount <= 0){
         return true;
       }
-      
+
       //foreach rec in the assoc store get the termcollection count
       assoc.forEach(function(record){
         if(record.resourceType === Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
             termCollectionCount++;
         }
       });
-      
+
       //disabled if only term collections and it is configuret do disable the panel
       return termCollectionCount === assocCount && disableIfTermCollectionOnly;
   },
