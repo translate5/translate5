@@ -66,6 +66,7 @@ export default class DataTransformer {
 
     transformWhitespace(whitespce) {
         const items = this.#transformItems([whitespce], true);
+        this.#retrieveTags(items, this._transformedTags);
 
         return items.pop();
     }
