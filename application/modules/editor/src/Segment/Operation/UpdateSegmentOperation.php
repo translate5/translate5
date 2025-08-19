@@ -129,7 +129,9 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         $textData = $this->sanitizeEditedContent($updater, $updateDto->textData, $restMessages);
 
         foreach ($textData as $field => $text) {
-            $segment->set($field, $text);
+            // call via magic setter as this is the only way to set modified fields in model
+            $magicSetter = 'set' . ucfirst($field);
+            $segment->{$magicSetter}($text);
         }
 
         $segment->setUserGuid($actor->getUserGuid());
