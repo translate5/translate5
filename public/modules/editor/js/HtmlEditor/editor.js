@@ -498,6 +498,7 @@ class EditorWrapper {
         DATA_CHANGED: 'dataChanged',
         ON_CLICK: 'onclick',
         ON_ARROW_KEY: 'onArrowKey',
+        ON_SELECTION_CHANGE_COMPLETED: 'onSelectionChangeCompleted',
     };
 
     #font = null;
@@ -1187,6 +1188,14 @@ class EditorWrapper {
             this.#onArrowKey(event, data, editor);
         });
 
+        // viewDocument.on('selectionChange', (evt, data) => {
+        //     console.log('Selection changed (view level)', data);
+        // });
+
+        viewDocument.on('selectionChangeDone', (event, data) => {
+            this.#onSelectionChangeCompleted(event, data, editor);
+        });
+
         // This does not work, need to find a way to trigger it
         // viewDocument.on('click', (event, data) => {
         //     this.#onClick(event, data);
@@ -1446,6 +1455,17 @@ class EditorWrapper {
         const customEvent = new CustomEvent(EditorWrapper.EDITOR_EVENTS.ON_CLICK, {
             detail: {
                 position: position
+            },
+            bubbles: true,
+        });
+
+        this.getEditorViewNode().dispatchEvent(customEvent);
+    }
+
+    #onSelectionChangeCompleted(event, data, editor) {
+        const customEvent = new CustomEvent(EditorWrapper.EDITOR_EVENTS.ON_SELECTION_CHANGE_COMPLETED, {
+            detail: {
+                selection: data.domSelection
             },
             bubbles: true,
         });
