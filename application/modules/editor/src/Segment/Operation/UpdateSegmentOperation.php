@@ -94,6 +94,7 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         Segment $segment,
         UpdateSegmentDto $updateDto,
         User $actor,
+        UpdateSegmentLogger $updateLogger,
         ?ZfExtended_Models_Messages $restMessages = null
     ): void {
         $this->feasibilityAssert->assertAllowed(Action::Update, $segment);
@@ -105,7 +106,7 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         //the history entry must be created before the original entity is modified
         $history = $segment->getNewHistoryEntity();
         //update the segment
-        $updater = new editor_Models_Segment_Updater($task, $actor->getUserGuid());
+        $updater = new editor_Models_Segment_Updater($task, $actor->getUserGuid(), $updateLogger);
 
         $segment->setTimeTrackData($updateDto->durations->durations, $updateDto->durations->divisor);
 
@@ -128,9 +129,7 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         $textData = $this->sanitizeEditedContent($updater, $updateDto->textData, $restMessages);
 
         foreach ($textData as $field => $text) {
-            // call via magic setter as this is the only way to set modified fields in model
-            $magicSetter = 'set' . ucfirst($field);
-            $segment->{$magicSetter}($text);
+            $segment->set($field, $text);
         }
 
         $segment->setUserGuid($actor->getUserGuid());
@@ -156,9 +155,9 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         $sanitized = false;
         $result = [];
 
-        foreach ($textData as $key => $text) {
-            $sanitized = $updater->sanitizeEditedContent($text, 'targetEdit' === $key) || $sanitized;
-            $result[$key] = $text;
+        foreach ($textData as $field => $text) {
+            $sanitized = $updater->sanitizeEditedContent($text, $field) || $sanitized;
+            $result[$field] = $text;
         }
 
         if ($sanitized && null !== $restMessages) {

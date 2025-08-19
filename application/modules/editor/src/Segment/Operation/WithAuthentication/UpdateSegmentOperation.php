@@ -59,6 +59,7 @@ use MittagQI\Translate5\Segment\ActionAssert\Permission\SegmentActionPermissionA
 use MittagQI\Translate5\Segment\ActionAssert\SegmentAction;
 use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentOperationInterface;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
+use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Models_Messages;
 
@@ -85,7 +86,8 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         Segment $segment,
         UpdateSegmentDto $updateDto,
         User $actor,
-        ?ZfExtended_Models_Messages $restMessages = null,
+        UpdateSegmentLogger $updateLogger,
+        ?ZfExtended_Models_Messages $restMessages = null
     ): void {
         $this->permissionAssert->assertGranted(
             SegmentAction::Update,
@@ -93,6 +95,6 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
             new PermissionAssertContext($actor),
         );
 
-        $this->updateSegmentOperation->update($segment, $updateDto, $actor, $restMessages);
+        $this->updateSegmentOperation->update($segment, $updateDto, $actor, $updateLogger, $restMessages);
     }
 }

@@ -32,6 +32,7 @@ use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\ActionAssert\Permission\SegmentActionPermissionAssert;
 use MittagQI\Translate5\Segment\ActionAssert\SegmentAction;
 use MittagQI\Translate5\Segment\Operation\Factory\UpdateSegmentDtoFactory;
+use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\Segment\Operation\WithAuthentication\UpdateSegmentOperation;
 use MittagQI\Translate5\Segment\Operations;
 use MittagQI\Translate5\Segment\SearchAndReplace\ReplaceDtoFactory;
@@ -42,7 +43,6 @@ use MittagQI\Translate5\Segment\SearchAndReplace\SearchService;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Terminology\TermportletData;
-use MittagQI\ZfExtended\Logger\SimpleFileLogger;
 
 class Editor_SegmentController extends ZfExtended_RestController
 {
@@ -328,25 +328,27 @@ class Editor_SegmentController extends ZfExtended_RestController
         $updateSegmentOperation = UpdateSegmentOperation::create();
         $updateSegmentDtoFactory = UpdateSegmentDtoFactory::create();
         $userRepository = new UserRepository();
+        $updateDto = $updateSegmentDtoFactory->fromRequest($this->entity, $this->getRequest());
+
+        $fields = array_keys($updateDto->textData);
+        $loggedField = array_pop($fields);
+        $updateLogger = new UpdateSegmentLogger(
+            'SegmentPut',
+            (int) $this->entity->getId(),
+            $updateDto->textData[$loggedField],
+            $this->entity->get($loggedField),
+            $loggedField
+        );
 
         $updateSegmentOperation->update(
             $this->entity,
-            $updateSegmentDtoFactory->fromRequest($this->entity, $this->getRequest()),
+            $updateDto,
             $userRepository->get($auth->getUserId()),
+            $updateLogger,
             $this->restMessages,
         );
 
         $this->entity->refresh();
-
-        if(ZfExtended_Debug::hasLevel('editor', 'segmentSave')) {
-            $sfl = new SimpleFileLogger('segmentSave.log');
-            $sfl->log(
-                '#ID: '.$this->entity->getId().
-                '#RAW:'.urldecode($this->getRequest()->getRawBody()).'#ENDRAW'.
-                '#TARGET:'.$this->entity->getTargetEdit().'#ENDTARGET'
-            );
-        }
-
         // To always have a consistent view-model, we convert the stdClass to an assoc array,
         // no matter if anonymization is required or not
         $rows = json_decode(json_encode($this->entity->getDataObject()), true);
