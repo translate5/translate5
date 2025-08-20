@@ -52,7 +52,7 @@ class LanguageResourceProvider
 
             if (! empty($resource)) {
                 $languageResource = array_merge($languageResource, $resource->getMetaData());
-                $languageResource['serviceName'] = $this->serviceManager->getUiNameByType($languageResource['serviceType']);
+                $languageResource['serviceName'] = $this->serviceManager->getNameByType($languageResource['serviceType']);
                 $languageResource['isTaskTm'] = ($languageResource['isTaskTm'] ?? 0) === '1';
 
                 if (editor_Services_Manager::SERVICE_OPENTM2 === $languageResource['serviceType']) {

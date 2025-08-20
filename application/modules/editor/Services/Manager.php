@@ -201,20 +201,20 @@ class editor_Services_Manager
         return $service->getTmConversionService();
     }
 
-    public function getAllUiNames(): array
+    public function getAllNames(): array
     {
         $names = [];
 
         foreach ($this->getAll() as $serviceName) {
-            $names[] = ZfExtended_Factory::get($this->getServiceClassName($serviceName))->getUiName();
+            $names[] = ZfExtended_Factory::get($this->getServiceClassName($serviceName))->getName();
         }
 
         return $names;
     }
 
-    public function getUiNameByType(string $serviceType): string
+    public function getNameByType(string $serviceType): string
     {
-        return ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getUiName();
+        return ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getName();
     }
 
     /**

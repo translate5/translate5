@@ -219,7 +219,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
 
             $id = $lrData['id'];
-            $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
+            $lrData['serviceName'] = $serviceManager->getNameByType($lrData['serviceType']);
             $lrData['synchronizableService'] = in_array($lrData['serviceType'], $synchronizableServiceTypes, true);
 
             $lrData['tmConversionState'] = null;
@@ -472,7 +472,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         /** @phpstan-ignore-next-line */
-        $this->view->rows->serviceName = $serviceManager->getUiNameByType($this->view->rows->serviceType);
+        $this->view->rows->serviceName = $serviceManager->getNameByType($this->view->rows->serviceType);
 
         $eventLogger = ZfExtended_Factory::get(editor_Models_Logger_LanguageResources::class);
         $eventLoggerGroupped = $eventLogger->getLatesEventsCount([$this->entity->getId()]);
