@@ -161,6 +161,7 @@ class DataTransformer {
 
     transformWhitespace(whitespce) {
         const items = this.#transformItems([whitespce], true);
+        this.#retrieveTags(items, this._transformedTags);
 
         return items.pop();
     }
@@ -498,6 +499,7 @@ class EditorWrapper {
         DATA_CHANGED: 'dataChanged',
         ON_CLICK: 'onclick',
         ON_ARROW_KEY: 'onArrowKey',
+        ON_SELECTION_CHANGE_COMPLETED: 'onSelectionChangeCompleted',
     };
 
     #font = null;
@@ -534,8 +536,14 @@ class EditorWrapper {
 
         this.registerModifier(
             EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-            (text, actions) => this.#removeTagOnCorrespondingDeletion(text, actions),
+            (text, actions, position) => this.#removeTagOnCorrespondingDeletion(text, actions, position),
             0
+        );
+
+        this.registerModifier(
+            EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
+            (text, actions, position) => this.#preserveOriginalTextIfNoModifications(text, actions, position),
+            9999
         );
 
         return this.#create();
@@ -622,11 +630,12 @@ class EditorWrapper {
 
         const items = RichTextEditor.stringToDom(data).childNodes;
         const transformed = this.dataTransformer.transformPartial(items);
+        actions.push({type: EditorWrapper.ACTION_TYPE.INSERT, content: transformed, position: 0, correction: 0});
+
         this.#setRawData('');
         this._editor.editing.view.focus();
         this.setCursorToEnd();
 
-        actions.push({type: EditorWrapper.ACTION_TYPE.INSERT, content: transformed, position: 0, correction: 0});
         this.#triggerDataChanged(actions);
     }
 
@@ -1187,6 +1196,14 @@ class EditorWrapper {
             this.#onArrowKey(event, data, editor);
         });
 
+        // viewDocument.on('selectionChange', (evt, data) => {
+        //     console.log('Selection changed (view level)', data);
+        // });
+
+        viewDocument.on('selectionChangeDone', (event, data) => {
+            this.#onSelectionChangeCompleted(event, data, editor);
+        });
+
         // This does not work, need to find a way to trigger it
         // viewDocument.on('click', (event, data) => {
         //     this.#onClick(event, data);
@@ -1453,6 +1470,17 @@ class EditorWrapper {
         this.getEditorViewNode().dispatchEvent(customEvent);
     }
 
+    #onSelectionChangeCompleted(event, data, editor) {
+        const customEvent = new CustomEvent(EditorWrapper.EDITOR_EVENTS.ON_SELECTION_CHANGE_COMPLETED, {
+            detail: {
+                selection: data.domSelection
+            },
+            bubbles: true,
+        });
+
+        this.getEditorViewNode().dispatchEvent(customEvent);
+    }
+
     // endregion
 
     /**
@@ -1604,12 +1632,12 @@ class EditorWrapper {
     #runModifiers(actions) {
         const originalText = this.getRawData();
         let text = originalText;
-        let position;
+        let position = actions[0]?.position || 0;
         let forceUpdate = false;
 
         for (const modifier of this._modifiers[EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]) {
             // TODO position can be modified by modifier, need to pass it to the next one
-            [text, position, forceUpdate] = modifier(text, actions);
+            [text, position, forceUpdate] = modifier(text, actions, position);
         }
 
         if (text !== originalText || forceUpdate) {
@@ -1628,11 +1656,23 @@ class EditorWrapper {
 
     #runAsyncModifiers() {
         this.modifiersLastRunId = Math.random().toString(36).substring(2, 16);
+        const preservedSelection = this.getSelection();
 
         const originalText = this.getRawData();
         // Now async modifiers can be executed in any order, need to change this to promises sequence
         for (const modifier of this._asyncModifiers[EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]) {
             modifier(originalText, this.modifiersLastRunId).then((result) => {
+                const currentSelection = this.getSelection();
+
+                if (
+                    preservedSelection.start !== currentSelection.start ||
+                    preservedSelection.end !== currentSelection.end
+                ) {
+                    // If the selection has changed, we should not replace the data
+                    // because it can lead to unexpected behavior
+                    return;
+                }
+
                 let position = this._editor.model.document.selection.getFirstPosition().path[1];
 
                 const [modifiedText, runId] = result;
@@ -1690,7 +1730,7 @@ class EditorWrapper {
     }
     //endregion
 
-    #removeTagOnCorrespondingDeletion(rawData, actions) {
+    #removeTagOnCorrespondingDeletion(rawData, actions, position) {
         const doc = RichTextEditor.stringToDom(rawData);
 
         for (const action of actions) {
@@ -1726,7 +1766,17 @@ class EditorWrapper {
             }
         }
 
-        return [doc.innerHTML, actions[0].position];
+        return [doc.innerHTML, position];
+    }
+
+    #preserveOriginalTextIfNoModifications(text, actions, position) {
+        const insertion = actions.find(action => action.type === 'insert');
+
+        if (text === '' && insertion !== undefined) {
+            return [insertion.content, Infinity];
+        }
+
+        return [text, position];
     }
 }
 

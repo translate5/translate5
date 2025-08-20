@@ -37,7 +37,7 @@ Ext.define('Editor.controller.Editor', {
         'Editor.controller.editor.PrevNextSegment',
         // 'Editor.view.task.ConfirmationWindow',
         // 'Editor.view.ReferenceFilesInfoMessage',
-        // 'Editor.view.task.QuickSearchInfoMessage'
+        'Editor.view.task.QuickSearchInfoMessage'
     ],
     mixins: [
         'Editor.util.Event',
@@ -138,13 +138,14 @@ Ext.define('Editor.controller.Editor', {
                  checkchange: 'onSegmentActionMenuItemToggle'
              },
             '#t5RowEditor': {
-                initialize: 'initEditor',
+                initialize: 'onRowEditorInitialize',
                 contentErrors: 'onSaveWithErrors',
                 // afterStartEdit: 'onAfterStartEdit',
                 // afterSetValueAndMarkup: 'handleAfterContentChange',
                 // afterInsertMarkup: 'handleDelayedChange',
             },
             '#t5Editor': {
+                afterInstantiateEditor: 'onEditorInstantiate',
                 editorDataChanged: 'handleAfterContentChange',
                 afterStartEdit: 'onAfterStartEdit',
             },
@@ -242,7 +243,7 @@ Ext.define('Editor.controller.Editor', {
             'alt-s':          ['S', {ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
             // 'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'F3':             [Ext.EventObjectImpl.F3,{ctrl: false, alt: false}, me.handleF3KeyPress, true],
-            // 'alt-F3':         [Ext.EventObjectImpl.F3,{ctrl: false, alt: true}, me.handleAltF3KeyPress, true],
+            'alt-F3':         [Ext.EventObjectImpl.F3,{ctrl: false, alt: true}, me.handleAltF3KeyPress, true],
             'ctrl-insert':       [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
             'ctrl-dot':          [190, {ctrl: true, shift: false, alt: false}, me.copySourceToTarget], //Mac Alternative key code,
             'ctrl-shift-insert': [Ext.EventObjectImpl.INSERT, {ctrl: true, shift: true, alt: false}, me.copyReferenceToTarget],
@@ -605,11 +606,19 @@ Ext.define('Editor.controller.Editor', {
         return conf;
     },
 
+    onEditorInstantiate: function (editor) {
+        const viewNode = editor.editor.getEditorViewNode();
+
+        viewNode.addEventListener(RichTextEditor.EditorWrapper.EDITOR_EVENTS.ON_SELECTION_CHANGE_COMPLETED, (event) => {
+            this.onEditorSelectionChange(event);
+        });
+    },
+
     /**
      * binds strg + enter as save segment combination
      * @param {Editor.view.segments.HtmlEditor} editor
      */
-    initEditor: function(editor){
+    onRowEditorInitialize: function(editor){
         console.log('initEditor');
 
         let me = this,
@@ -619,27 +628,6 @@ Ext.define('Editor.controller.Editor', {
         if (me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
-
-        // if(me.editorKeyMap_rowpanel) {
-        //     me.editorKeyMap_rowpanel.destroy();
-        // }
-
-        // editor.editorKeyMap_rowpanel = me.editorKeyMap_rowpanel = new Editor.view.segments.EditorKeyMap({
-        //     target: editor.up().el,
-        //     binding: me.getKeyMapConfig('editor_rowpanel')
-        // });
-        //
-        // editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
-        //     target: docEl,
-        //     binding: me.getKeyMapConfig('editor', {
-        //         // insert whitespace key events
-        //         'ctrl-shift-space': [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true],
-        //         // 'shift-enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true],
-        //         // 'enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: false}, me.insertWhitespaceNewline, true],
-        //         'tab': [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true]
-        //     })
-        // });
-        // editor.DEC_DIGITS = me.DEC_DIGITS;
 
         docEl.on({
             dragstart:{
@@ -695,12 +683,12 @@ Ext.define('Editor.controller.Editor', {
     //         fn: me.pasteContent,
     //         scope: me
     //     },
-    //     selectionchange: {
-    //         delegated: false,
-    //         priority: 5000,
-    //         fn: me.onEditorSelectionChange,
-    //         scope: me
-    //     }
+    //         selectionchange: {
+    //             delegated: false,
+    //             priority: 5000,
+    //             fn: me.onEditorSelectionChange,
+    //             scope: me
+    //         }
         });
 
 
@@ -1482,84 +1470,94 @@ Ext.define('Editor.controller.Editor', {
     //         });
     //     }
     // },
+
     /***
      * F3 editor event handler.
      * This will set the focus in the targetSearch field of concordance search panel
      */
-    handleF3KeyPress: function(keyCode, event) {
-        var me = this,
-            searchGrid = me.getLanguageResourceSearchGrid(),
-            field,
-            domNode,
-            fieldType;
+    handleF3KeyPress: function (keyCode, event) {
+        const searchGrid = this.getLanguageResourceSearchGrid();
+        const editorPanel = this.getLanguageResourceEditorPanel();
 
-            if ((domNode = event.getTarget('.type-source'))) {
-                fieldType = 'source';
-            } else {
-                domNode = event.getTarget('.type-target');
-                fieldType = 'target';
+        if (editorPanel) {
+            // expand if collapsed
+            if (editorPanel.getCollapsed()) {
+                editorPanel.expand();
             }
 
-        me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
-             field = searchGrid.down('#' + fieldType + 'Search');
-             if( selectedText === ''){
-                 field.focus(false,500);
-                 return;
-             }
+            editorPanel.setActiveTab(searchGrid);
+        }
 
-             field.setValue(selectedText);
-             searchGrid.getController().setLastActiveField(field);
-             searchGrid.getController().handleSearchAll();
-        }, domNode);
+        let field,
+            fieldType;
 
+        if (event.getTarget('.type-source') || (this.htmlEditor && this.htmlEditor.getEditedField() === 'sourceEdit')) {
+            fieldType = 'source';
+        } else if (event.getTarget('.type-target') || (this.htmlEditor && this.htmlEditor.getEditedField() === 'targetEdit')) {
+            fieldType = 'target';
+        } else {
+            return;
+        }
+
+        this.searchConcordenceOrSynonym(
+            searchGrid,
+            function (selectedText) {
+                field = searchGrid.down('#' + fieldType + 'Search');
+
+                if (selectedText === '') {
+                    field.focus(false, 500);
+
+                    return;
+                }
+
+                field.setValue(selectedText);
+                searchGrid.getController().setLastActiveField(field);
+                searchGrid.getController().handleSearchAll();
+            }
+        );
     },
-    //
-    // /***
-    //  * Event handler for alt+f3 shortcut.
-    //  * This will trigger synonym search with the selected text editor
-    //  */
-    // handleAltF3KeyPress: function (){
-    //     var me = this,
-    //         searchGrid = me.getSynonymSearch(),
-    //         searchField;
-    //
-    //     me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
-    //         searchField = searchGrid.down('#textSearch');
-    //         if( selectedText === ''){
-    //             searchField.focus(false,500);
-    //             return;
-    //         }
-    //         searchField = searchGrid.down('#textSearch');
-    //         searchField.setValue(selectedText);
-    //         searchGrid.getController().search();
-    //     });
-    // },
-    //
+
+    /**
+     * Event handler for alt+f3 shortcut.
+     * This will trigger synonym search with the selected text editor
+     */
+    handleAltF3KeyPress: function () {
+        // Temporary disable until fixed
+        return;
+
+        const searchGrid = me.getSynonymSearch();
+
+        this.searchConcordenceOrSynonym(
+            searchGrid,
+            function (selectedText) {
+                const searchField = searchGrid.down('#textSearch');
+
+                if (selectedText === '') {
+                    searchField.focus(false, 500);
+                    return;
+                }
+
+                searchField = searchGrid.down('#textSearch');
+                searchField.setValue(selectedText);
+                searchGrid.getController().search();
+            }
+        );
+    },
+
     /***
      * Trigger search with selected text in the editor for given component(synonym or concordence).
      *
      * @param component
      * @param textCallback
      */
-    searchConcordenceOrSynonym: function (component, textCallback){
-        var me = this,
-            editorPanel = me.getLanguageResourceEditorPanel(),
-            selectedText;
-
-        if(!component){
+    searchConcordenceOrSynonym: function (component, textCallback) {
+        if (!component) {
             return;
         }
-        if (editorPanel) {
-            // expand if collapsed
-            if (editorPanel.getCollapsed()){
-                editorPanel.expand();
-            }
-            editorPanel.setActiveTab(component);
-        }
 
-        selectedText = me.getSelectedTextInEditor();
-        textCallback(selectedText);
+        textCallback(this.getSelectedText());
     },
+
     //
     // removeSelectionAfterCut: function(e) {
     //     if(!e.defaultPrevented || !e.stopped) {
@@ -1800,33 +1798,36 @@ Ext.define('Editor.controller.Editor', {
     //     me.htmlEditor.insertMarkup(toInsert);
     //     me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
     // },
-    //
-    // /***
-    //  * Event handler for text selection change in editor
-    //  */
-    // onEditorSelectionChange: function (){
-    //     var me = this,
-    //         selectedText = me.getSelectedTextInEditor(),
-    //         synonymGridExist =  me.getSynonymSearch() !== undefined,
-    //         editorPanelExist = me.getLanguageResourceEditorPanel() !== undefined;
-    //
-    //     if( !synonymGridExist && !editorPanelExist){
-    //         return;
-    //     }
-    //
-    //     // for less than 4 characters do not show the message
-    //     if( selectedText.length < 4){
-    //         return;
-    //     }
-    //     if(!me.quickSearchInfoMessage){
-    //         me.quickSearchInfoMessage = Ext.create('Editor.view.task.QuickSearchInfoMessage');
-    //     }
-    //
-    //     me.quickSearchInfoMessage.synonymGridExist = synonymGridExist;
-    //
-    //     me.quickSearchInfoMessage.showMessage();
-    // },
-    //
+
+    /**
+     * Event handler for text selection change in editor
+     */
+    onEditorSelectionChange: function () {
+        // Temporary disable until fixed
+        return;
+
+        var selectedText = this.getSelectedTextInEditor(),
+            synonymGridExist = this.getSynonymSearch() !== undefined,
+            editorPanelExist = this.getLanguageResourceEditorPanel() !== undefined;
+
+        if (!synonymGridExist && !editorPanelExist) {
+            return;
+        }
+
+        // for less than 4 characters do not show the message
+        if (selectedText.length < 4) {
+            return;
+        }
+
+        if (!this.quickSearchInfoMessage) {
+            this.quickSearchInfoMessage = Ext.create('Editor.view.task.QuickSearchInfoMessage');
+        }
+
+        this.quickSearchInfoMessage.synonymGridExist = synonymGridExist;
+
+        this.quickSearchInfoMessage.showMessage();
+    },
+
 
     copyReferenceToTarget: function() {
         const plug = this.getEditPlugin();
@@ -2173,6 +2174,23 @@ Ext.define('Editor.controller.Editor', {
 
         return '';
     },
+
+    /**
+     * Return the current selected text in editor without tags.
+     *
+     * @returns {string|*}
+     */
+    getSelectedText: function (){
+        const grid = Ext.getCmp('segment-grid'),
+            selection = window.getSelection();
+
+        if (! selection.isCollapsed && selection.rangeCount > 0) {
+            return selection.toString();
+        }
+
+        return '';
+    },
+
     //
     // /**
     //  * Distinguish between menu item itself click and menu item checkbox click

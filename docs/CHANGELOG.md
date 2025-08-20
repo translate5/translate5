@@ -23,6 +23,48 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+
+## [7.28.2] - 2025-08-19
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4892](https://jira.translate5.net/browse/TRANSLATE-4892): Editor general - Cursor at the wrong position when deleting a character** <br>
+Fixed cursor position when using a DEL key
+
+**[TRANSLATE-4891](https://jira.translate5.net/browse/TRANSLATE-4891): Editor general - F3 hotkey doesn't work** <br>
+Fixed F3 hotkey
+
+**[TRANSLATE-4890](https://jira.translate5.net/browse/TRANSLATE-4890): Editor general - Whitespace tags are removed on segment save** <br>
+Fixed saving segment containing whitespace tags
+
+**[TRANSLATE-4888](https://jira.translate5.net/browse/TRANSLATE-4888): Editor general - Applying a match from match panel does not work** <br>
+Fixed CTRL+digit hotkey for applying match from matches panel
+
+**[TRANSLATE-4882](https://jira.translate5.net/browse/TRANSLATE-4882): Editor general - New segment editor largely hides next segment in case of length check of char count actively shown** <br>
+FIXED: currently edited segment row height now fits the html-editor height to prevent overlapping the next segment row
+
+**[TRANSLATE-4870](https://jira.translate5.net/browse/TRANSLATE-4870): Editor general - HOTFIX: Frequently/rarely, Segments are not saved /saved with empty content** <br>
+Added logging for segment save.
+
+
+## [7.28.1] - 2025-08-18
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4887](https://jira.translate5.net/browse/TRANSLATE-4887): Editor general - Spaces are deleted on segment save** <br>
+Fixed bug wich may caused spaces in segment to disappear after segment is saved
+
+**[TRANSLATE-4886](https://jira.translate5.net/browse/TRANSLATE-4886): Editor general - Cursor at the wrong position when inserting source text via hotkey** <br>
+Fixed cursor position after inserting content with CTRL+. and CTRL+, hotkeys
+
+
 ## [7.28.0] - 2025-08-15
 
 ### Important Notes:

@@ -70,7 +70,7 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
     onEditorInstantiate: function (editor) {
         editor.editor.registerModifier(
             RichTextEditor.EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-            (rawData, actions) => this._cleanTermOnTypingInside(rawData, actions, editor.editor.getTagsConversion()),
+            (rawData, actions, position) => this._cleanTermOnTypingInside(rawData, actions, position, editor.editor.getTagsConversion()),
             1
         );
     },
@@ -182,9 +182,9 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
         this.loadTermPanel(segment.getId());
     },
 
-    _cleanTermOnTypingInside(rawData, actions, tagsConversion) {
+    _cleanTermOnTypingInside(rawData, actions, position, tagsConversion) {
         if (!actions.length) {
-            return [rawData, 0];
+            return [rawData, position];
         }
 
         const doc = RichTextEditor.stringToDom(rawData);
@@ -197,7 +197,7 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
             this._processNodes(doc, action, tagsConversion);
         }
 
-        return [doc.innerHTML, actions[0].position];
+        return [doc.innerHTML, position];
     },
 
     _processNodes: function (doc, action, tagsConversion) {

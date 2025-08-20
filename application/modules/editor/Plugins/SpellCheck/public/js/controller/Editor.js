@@ -176,7 +176,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         this.tagsConversion = editor.editor.getTagsConversion();
         this.editor.editor.registerModifier(
             RichTextEditor.EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-            (text, actions) => this._cleanSpellcheckOnTypingInside(text, actions, this.tagsConversion),
+            (text, actions, position) => this._cleanSpellcheckOnTypingInside(text, actions, position, this.tagsConversion),
             2,
         );
         this.editor.editor.registerAsyncModifier(
@@ -709,16 +709,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
 
         for (const match of this.allMatches) {
             if (previousRangeEnd !== match.range.start) {
-                result += this.editor.editor.getContentInRange(previousRangeEnd, match.range.start);
+                result += this._replaceSpace(this.editor.editor.getContentInRange(previousRangeEnd, match.range.start));
             }
 
             result += this.createSpellcheckNode(
-                this.editor.editor.getContentInRange(match.range.start, match.range.end),
+                this._replaceSpace(this.editor.editor.getContentInRange(match.range.start, match.range.end)),
                 index
             );
 
             if (index === this.allMatches.length - 1) {
-                result += this.editor.editor.getContentInRange(match.range.end, this.editor.editor.getContentLength());
+                result += this._replaceSpace(
+                    this.editor.editor.getContentInRange(match.range.end, this.editor.editor.getContentLength())
+                );
             }
 
             previousRangeEnd = match.range.end;
@@ -1125,9 +1127,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
     },
 
-    _cleanSpellcheckOnTypingInside: function (rawData, actions, tagsConversion) {
+    _cleanSpellcheckOnTypingInside: function (rawData, actions, position, tagsConversion) {
         if (!actions.length) {
-            return [rawData, 0];
+            return [rawData, position];
         }
 
         const doc = RichTextEditor.stringToDom(rawData);
@@ -1140,7 +1142,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             this._processNodes(doc, action, tagsConversion);
         }
 
-        return [doc.innerHTML, actions[0].position];
+        return [doc.innerHTML, position];
     },
 
     _processNodes: function (doc, action, tagsConversion) {
@@ -1232,5 +1234,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         const insertFragment = document.createRange().createContextualFragment(spellCheckNode.innerHTML);
         spellCheckNodeParent.insertBefore(insertFragment, spellCheckNode);
         spellCheckNodeParent.removeChild(spellCheckNode);
+    },
+
+    _replaceSpace: function (text) {
+        return text.replace(/&nbsp;$/, ' ').replace(/^&nbsp;/, ' ');
     },
 });

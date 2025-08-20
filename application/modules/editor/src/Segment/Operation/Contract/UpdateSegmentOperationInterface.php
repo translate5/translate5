@@ -54,6 +54,7 @@ namespace MittagQI\Translate5\Segment\Operation\Contract;
 
 use editor_Models_Segment as Segment;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
+use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Models_Messages;
 
@@ -63,6 +64,7 @@ interface UpdateSegmentOperationInterface
         Segment $segment,
         UpdateSegmentDto $updateDto,
         User $actor,
+        UpdateSegmentLogger $updateLogger,
         ?ZfExtended_Models_Messages $restMessages = null
     ): void;
 }

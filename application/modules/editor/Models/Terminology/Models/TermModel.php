@@ -958,7 +958,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Keyword WHERE clauses using LIKE
         foreach ($cols as $col) {
-            if (FEATURE_TRANSLATE_4673_ENABLE) {
+            if (defined('FEATURE_TRANSLATE_4673_ENABLE') && FEATURE_TRANSLATE_4673_ENABLE) {
                 $keywordWHERE[] = sprintf('%s LIKE :keyword', $col);
             } else {
                 $keywordWHERE[] = sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);

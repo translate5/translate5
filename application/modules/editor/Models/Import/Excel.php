@@ -244,14 +244,11 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
         //the history entry must be created before the original entity is modified
         $history = $t5Segment->getNewHistoryEntity();
         //update the segment
-        $updater = ZfExtended_Factory::get(
-            editor_Models_Segment_Updater::class,
-            [$this->task, $this->user->getUserGuid()]
-        );
+        $updater = new editor_Models_Segment_Updater($this->task, $this->user->getUserGuid());
 
-        if ($updater->sanitizeEditedContent($newContent, true)) {
+        if ($updater->sanitizeEditedContent($newContent, 'targetEdit')) {
             $this->addSegmentError(
-                $t5Segment->getSegmentNrInTask(),
+                (int) $t5Segment->getSegmentNrInTask(),
                 'Some non representable characters were removed from the segment'
                 . ' (multiple white-spaces, tabs, line-breaks etc.)!'
             );
@@ -348,7 +345,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
         $comment->setCreated(NOW_ISO);
 
         $comment->setTaskGuid($this->task->getTaskGuid());
-        $comment->setSegmentId($segment->getId());
+        $comment->setSegmentId((int) $segment->getId());
 
         $comment->setUserGuid($this->user->getUserGuid());
         $comment->setUserName($this->user->getUserName());
