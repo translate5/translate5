@@ -143,7 +143,7 @@ class RepetitionService
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         $sourceMeta = $sfm->getByName(SegmentField::TYPE_SOURCE);
         // @phpstan-ignore-next-line
-        $isSourceEditable = $sourceMeta !== false && $sourceMeta->editable == 1;
+        $isSourceEditable = $sourceMeta !== false && (int) $sourceMeta->editable == 1;
 
         $durationDto = new stdClass();
 

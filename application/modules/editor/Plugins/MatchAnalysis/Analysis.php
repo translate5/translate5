@@ -942,6 +942,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //if we are processing a repetition, we have to fix the tags:
         if ($rep && $master && $master->getId() !== $segment->getId()) {
             $bestMatchRateResult = $this->updateTargetOfRepetition($segment, $rep) ?: $this->getMtResult($segment);
+            $bestMatchRateResult->isRepetition = true;
         }
 
         return $bestMatchRateResult;
