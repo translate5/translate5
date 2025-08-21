@@ -58,6 +58,7 @@ Ext.define('Editor.view.project.ProjectTaskGridViewController', {
         if(!task){
             return;
         }
+        console.log('importProgress2', task.getId(), params.progress);
         task.set('importProgress',params.progress);
     },
     

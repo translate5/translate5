@@ -172,7 +172,7 @@ class Worker extends editor_Models_Task_AbstractWorker
         if (! $archiveUpdater->updateFiles($task, $filesToUpdate)) {
             $this->log->warn(
                 'E1475',
-                'Re-Import: No ImportArchive backup created: Import Archive does not exist or folder is not writeable',
+                'Reimport: No ImportArchive backup created: Import Archive does not exist or folder is not writeable',
                 [
                     'task' => $task,
                 ]

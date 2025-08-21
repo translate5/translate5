@@ -211,7 +211,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         if(!currentTask || currentTask.get('taskGuid')!== params.taskGuid){
             return;
         }
-
+        console.log('importProgress3', currentTask.getId());
         currentTask.load({
             callback:function (){
                 // After the task is loaded, check if the adminTaskTaskManagement is available/exist.
@@ -222,8 +222,12 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                     Ext.log({ msg: 'Task management panel is not found on updateProgress call.' , stack: true})
                     return;
                 }
+                console.log('debug1');
                 taskManagement.setCurrentTask(currentTask);
-                me.getView().down('adminTaskUserAssocGrid').getStore().load();
+                console.log('debug2');
+                var store = me.getView().down('adminTaskUserAssocGrid').getStore();
+                console.log('debug3');
+                store.load();
             }
         });
     },

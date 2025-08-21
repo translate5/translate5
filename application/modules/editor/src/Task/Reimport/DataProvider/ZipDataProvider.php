@@ -61,7 +61,7 @@ class ZipDataProvider extends AbstractDataProvider
 
         $filesFoundForImport = 0;
 
-        // loop over each file in zhe zip package(not unzipped) and validate if the provided
+        // loop over each file in the zip package(not unzipped) and validate if the provided
         // reimport file is supported by the segment processor
         for ($idx = 0; $zipFile = $zip->statIndex($idx); $idx++) {
             $nameFromZip = $this->checkFileFromZip($zipFile);
@@ -217,7 +217,7 @@ class ZipDataProvider extends AbstractDataProvider
         throw new Exception('E1442', [
             'task' => $this->task,
             'zip' => $uploadedFile['name'],
-            'zipError' => $errorHelper->_errorString($zipOpened),
+            'zipError' => $errorHelper->_errorString((string) $zipOpened),
         ]);
     }
 }

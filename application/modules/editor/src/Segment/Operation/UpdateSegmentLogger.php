@@ -52,16 +52,57 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\Operation;
 
+use editor_Models_Segment;
 use MittagQI\ZfExtended\Logger\SimpleFileLogger;
 use ZfExtended_Debug;
+use ZfExtended_Sanitized_HttpRequest;
 
-class UpdateSegmentLogger
+final class UpdateSegmentLogger
 {
+    public static function fromPutRequest(
+        string $process,
+        editor_Models_Segment $segment,
+        ZfExtended_Sanitized_HttpRequest $request,
+    ): self {
+        $data = $request->getData(true);
+        foreach (self::CAPTURED_FIELDS as $field) {
+            if (array_key_exists($field, $data)) {
+                return new self(
+                    $process,
+                    (int) $segment->getId(),
+                    $data[$field],
+                    $segment->get($field),
+                    $field
+                );
+            }
+        }
+        // when the segment text was saved unchanged, no field-data will be sent and the field (may) be encoded
+        // in "durations". In this case we take the actual segments field as request-sent data
+        foreach (self::CAPTURED_FIELDS as $field) {
+            if (array_key_exists('durations', $data) && array_key_exists($field, $data['durations'])) {
+                return new self(
+                    $process,
+                    (int) $segment->getId(),
+                    $segment->get($field),
+                    $segment->get($field),
+                    $field
+                );
+            }
+        }
+
+        // this will create a "dummy" logger that logs anything ...
+        return new self($process, (int) $segment->getId(), '', '', 'invalid');
+    }
+
+    private const CAPTURED_FIELDS = [
+        'sourceEdit',
+        'target',
+        'targetEdit',
+    ];
+
     private const LOG_ALWAYS = false;
 
     private bool $doLog;
-
-    private string $baseField;
 
     private array $log = [];
 
@@ -74,9 +115,8 @@ class UpdateSegmentLogger
         private readonly string $textBeforeUpdate,
         private readonly string $capturedField
     ) {
-        // @phpstan-ignore-next-line
-        $this->doLog = self::LOG_ALWAYS || ZfExtended_Debug::hasLevel('editor', 'segmentSave');
-        $this->baseField = str_contains(strtolower($this->capturedField), 'target') ? 'target' : 'source';
+        $this->doLog = in_array($capturedField, self::CAPTURED_FIELDS)
+            && (self::LOG_ALWAYS || ZfExtended_Debug::hasLevel('editor', 'segmentSave')); // @phpstan-ignore-line
     }
 
     /**
@@ -84,7 +124,7 @@ class UpdateSegmentLogger
      */
     public function captureChange(string $text, string $field, string $origin): void
     {
-        if ($this->doLog && str_contains(strtolower($field), $this->baseField)) {
+        if ($this->doLog && strtolower($field) === strtolower($this->capturedField)) {
             $this->log[] = [
                 'text' => $text,
                 'field' => $field,
@@ -97,7 +137,7 @@ class UpdateSegmentLogger
     /**
      * Captures a change based on the segment-entity
      */
-    public function captureSegmentChange(\editor_Models_Segment $segment, string $origin): void
+    public function captureSegmentChange(editor_Models_Segment $segment, string $origin): void
     {
         if ($this->doLog) {
             $text = $segment->get($this->capturedField);
@@ -115,7 +155,7 @@ class UpdateSegmentLogger
      */
     public function finish(): void
     {
-        if (($this->doLog && $this->isSuspicious) || self::LOG_ALWAYS) { // @phpstan-ignore-line
+        if ($this->doLog && $this->isSuspicious) {
             $sfl = new SimpleFileLogger('segmentSave.log');
             $entry =
                 '#ID: ' . $this->segmentId .

@@ -178,7 +178,19 @@ export default class DataTransformer {
                 continue;
             }
 
-            result += this.#htmlEncode(item.data);
+            try {
+                result += this.#htmlEncode(item.data);
+            } catch (e) {
+                // item is supposed to be a text node, but it is not
+                // This issue is not reproducible, so adding a log info here for debugging purposes
+                // TRANSLATE-4895
+                console.warn("DataTransformer: Unable to encode data", e);
+                console.log(this.#stringifyNodeForLogging(item));
+
+                if (jslogger) {
+                    jslogger.logException(e);
+                }
+            }
         }
 
         return result;
@@ -229,5 +241,21 @@ export default class DataTransformer {
 
     #replaceEncodedSpaces(string) {
         return string.replace(/&nbsp;/g, ' ');
+    }
+
+    /**
+     * @param {HTMLElement} node
+     * @returns {string}
+     */
+    #stringifyNodeForLogging(item) {
+        if (! item) {
+            return 'The item is empty';
+        }
+
+        if (item.nodeType === 3) {
+            return 'The item is a text: ' + item.textContent;
+        }
+
+        return 'The item is a dom node: ' + item.outerHTML;
     }
 }

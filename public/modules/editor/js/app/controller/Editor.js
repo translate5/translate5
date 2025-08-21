@@ -80,10 +80,6 @@ Ext.define('Editor.controller.Editor', {
         //     ref: 'falsePositiveCheckColumn',
         //     selector: '#metapanel #falsePositives grid checkcolumn'
         // }
-        // {
-        //     ref: 'segmentsHtmleditor',
-        //     selector: '#segmentsHtmleditor'
-        // },
         {
             ref: 'languageResourceSearchGrid',
             selector: 'languageResourceSearchGrid'
@@ -92,10 +88,10 @@ Ext.define('Editor.controller.Editor', {
             ref: 'languageResourceEditorPanel',
             selector: 'languageResourceEditorPanel'
         },
-        // {
-        //     ref: 'synonymSearch',
-        //     selector: '#synonymSearch'
-        // }
+        {
+            ref: 'synonymSearch',
+            selector: '#synonymSearch'
+        }
     ],
     registeredTooltips: [],
     isEditing: false,
@@ -120,9 +116,6 @@ Ext.define('Editor.controller.Editor', {
         //     },
         //     '#QualityMqm': {
         //     	afterInsertMqmTag: 'handleAfterContentChange'
-        //     },
-        //     '#Editor.plugins.TrackChanges.controller.Editor':{
-        //         setValueForEditor: 'setValueForEditor'
         //     },
         //     '#ServerException':{
         //         serverExceptionE1600: 'onServerExceptionE1600'
@@ -683,12 +676,6 @@ Ext.define('Editor.controller.Editor', {
     //         fn: me.pasteContent,
     //         scope: me
     //     },
-    //         selectionchange: {
-    //             delegated: false,
-    //             priority: 5000,
-    //             fn: me.onEditorSelectionChange,
-    //             scope: me
-    //         }
         });
 
 
@@ -1477,19 +1464,9 @@ Ext.define('Editor.controller.Editor', {
      */
     handleF3KeyPress: function (keyCode, event) {
         const searchGrid = this.getLanguageResourceSearchGrid();
-        const editorPanel = this.getLanguageResourceEditorPanel();
+        this.openEditorPanel(searchGrid);
 
-        if (editorPanel) {
-            // expand if collapsed
-            if (editorPanel.getCollapsed()) {
-                editorPanel.expand();
-            }
-
-            editorPanel.setActiveTab(searchGrid);
-        }
-
-        let field,
-            fieldType;
+        let fieldType;
 
         if (event.getTarget('.type-source') || (this.htmlEditor && this.htmlEditor.getEditedField() === 'sourceEdit')) {
             fieldType = 'source';
@@ -1499,22 +1476,18 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
 
-        this.searchConcordenceOrSynonym(
-            searchGrid,
-            function (selectedText) {
-                field = searchGrid.down('#' + fieldType + 'Search');
+        const selectedText = this.getSelectedText();
+        const searchField = searchGrid.down('#' + fieldType + 'Search');
 
-                if (selectedText === '') {
-                    field.focus(false, 500);
+        if (selectedText === '') {
+            searchField.focus(false, 500);
 
-                    return;
-                }
+            return;
+        }
 
-                field.setValue(selectedText);
-                searchGrid.getController().setLastActiveField(field);
-                searchGrid.getController().handleSearchAll();
-            }
-        );
+        searchField.setValue(selectedText);
+        searchGrid.getController().setLastActiveField(searchField);
+        searchGrid.getController().handleSearchAll();
     },
 
     /**
@@ -1522,40 +1495,35 @@ Ext.define('Editor.controller.Editor', {
      * This will trigger synonym search with the selected text editor
      */
     handleAltF3KeyPress: function () {
-        // Temporary disable until fixed
-        return;
+        const searchGrid = this.getSynonymSearch();
+        this.openEditorPanel(searchGrid);
 
-        const searchGrid = me.getSynonymSearch();
+        const selectedText = this.getSelectedText();
+        const searchField = searchGrid.down('#textSearch');
 
-        this.searchConcordenceOrSynonym(
-            searchGrid,
-            function (selectedText) {
-                const searchField = searchGrid.down('#textSearch');
+        if (selectedText === '') {
+            searchField.focus(false, 500);
 
-                if (selectedText === '') {
-                    searchField.focus(false, 500);
-                    return;
-                }
-
-                searchField = searchGrid.down('#textSearch');
-                searchField.setValue(selectedText);
-                searchGrid.getController().search();
-            }
-        );
-    },
-
-    /***
-     * Trigger search with selected text in the editor for given component(synonym or concordence).
-     *
-     * @param component
-     * @param textCallback
-     */
-    searchConcordenceOrSynonym: function (component, textCallback) {
-        if (!component) {
             return;
         }
 
-        textCallback(this.getSelectedText());
+        searchField.setValue(selectedText);
+        searchGrid.getController().search();
+    },
+
+    openEditorPanel: function (activeTab) {
+        const editorPanel = this.getLanguageResourceEditorPanel();
+
+        if (!editorPanel) {
+            return;
+        }
+
+        // expand if collapsed
+        if (editorPanel.getCollapsed()) {
+            editorPanel.expand();
+        }
+
+        editorPanel.setActiveTab(activeTab);
     },
 
     //
@@ -1802,11 +1770,8 @@ Ext.define('Editor.controller.Editor', {
     /**
      * Event handler for text selection change in editor
      */
-    onEditorSelectionChange: function () {
-        // Temporary disable until fixed
-        return;
-
-        var selectedText = this.getSelectedTextInEditor(),
+    onEditorSelectionChange: function (event) {
+        const selectedText = event.detail.selection.toString(),
             synonymGridExist = this.getSynonymSearch() !== undefined,
             editorPanelExist = this.getLanguageResourceEditorPanel() !== undefined;
 
@@ -1824,7 +1789,6 @@ Ext.define('Editor.controller.Editor', {
         }
 
         this.quickSearchInfoMessage.synonymGridExist = synonymGridExist;
-
         this.quickSearchInfoMessage.showMessage();
     },
 

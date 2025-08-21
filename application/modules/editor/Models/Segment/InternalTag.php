@@ -119,6 +119,13 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         return $matches[0];
     }
 
+    public function getMatches(string $segment): array
+    {
+        preg_match_all(self::REGEX_INTERNAL_TAGS, $segment, $matches, PREG_SET_ORDER);
+
+        return $matches;
+    }
+
     /**
      * Get all real (non whitespace) tags
      */
@@ -132,6 +139,15 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
 
         //return the real tags (with cleaned index) from matches[0] by the keys from the found real tags above
         return array_values(array_intersect_key($matches[0], $realTags));
+    }
+
+    public function getRealTagMatches(string $segment): array
+    {
+        preg_match_all(self::REGEX_INTERNAL_TAGS, $segment, $matches, PREG_SET_ORDER);
+
+        return array_filter($matches, function ($value) {
+            return ! in_array($value[3], editor_Models_Segment_Whitespace::WHITESPACE_TAGS);
+        });
     }
 
     /**
@@ -807,7 +823,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         }
 
         //in whitespace tags the number is also in the title
-        return preg_replace('#(ownttip"><span title="&lt;/?)([0-9]+)(/?&gt;:)#', '${1}' . $newShortNr . '${3}', $tag);
+        return preg_replace('#(ownttip"><span title="&lt;/?)([0-9]+)(/?&gt;:)#', '${1}' . $newShortNr . '${3}', $res);
     }
 
     /**
@@ -845,71 +861,131 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         bool $ignoreWhitespace = true,
         bool $callBackOnNotEqualTags = false
     ): bool {
-        // TODO: we could make much more use of the segment-tags code
-        // if only it would be more clear what this code does ...
-
-        $trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        $trackChangeTagHelper = new editor_Models_Segment_TrackChangeTag();
+        $segmentContent = $trackChangeTagHelper->protect($segmentContent);
 
         if ($ignoreWhitespace) {
-            $tagsToUse = $this->getRealTags($originalContent);
+            $originalTags = $this->getRealTagMatches($originalContent);
+            $segmentTags = $this->getRealTagMatches($segmentContent);
         } else {
-            $tagsToUse = $this->get($originalContent);
+            $originalTags = $this->getMatches($originalContent);
+            $segmentTags = $this->getMatches($segmentContent);
         }
 
-        $shortTagNumbers = $this->getTagNumbers($tagsToUse);
+        $originalTagsCount = 0;
+        $segmentTagsCount = count($segmentTags);
+        $processedTagsCount = 0;
 
-        if (empty($shortTagNumbers)) {
-            $newShortTagNumber = 1;
-        } else {
+        if (0 !== count($originalTags)) {
+            $originalTagsMap = [];
+            $segmentShortTagNumbers = [];
+
+            // collect the original and segment tags in a map, where the key is the short tag number
+            foreach ($originalTags as $originalMatch) {
+                $shortTagNumber = (int) $this->getTagNumber($originalMatch[0]);
+                // open|close|single
+                if (! isset($originalTagsMap[$shortTagNumber][$originalMatch[1]])) {
+                    $originalTagsCount++;
+                }
+                $originalTagsMap[$shortTagNumber][$originalMatch[1]] = $originalMatch;
+            }
+
+            foreach ($segmentTags as $segmentMatch) {
+                $shortTagNumber = (int) $this->getTagNumber($segmentMatch[0]);
+                // open|close|single
+                $segmentShortTagNumbers[$shortTagNumber][$segmentMatch[1]] = true;
+            }
+
+            $shortTagNumbers = array_keys($originalTagsMap);
             $newShortTagNumber = max($shortTagNumbers) + 1;
-        }
 
-        if (empty($tagsToUse)) {
-            //if there are no original tags we have to init $i with the realTagCount in the targetEdit for below check
-            $stat = $this->statistic($trackChangesTagHelper->protect($segmentContent));
-            $i = $stat['tag']; //if $i is > 0 here, this should not be a repetition at all.
-        } else {
-            $i = 0;
-            $segmentContent = $trackChangesTagHelper->protect($segmentContent);
-            $segmentContent = $this->replace($segmentContent, function ($match) use (
-                &$i,
-                $tagsToUse,
-                $shortTagNumbers,
-                &$newShortTagNumber,
-                $ignoreWhitespace
-            ) {
-                $id = $match[3];
-                //if it is a whitespace tag or CP tag, we do not replace it:
-                if (
-                    in_array($id, $this->protectedContentTagList)
-                    || (
-                        $ignoreWhitespace && in_array($id, $this->protectedWhitespaceTagList)
-                    )
+            // sort the tags by their short tag number
+            ksort($originalTagsMap);
+            ksort($segmentShortTagNumbers);
+
+            // omit short tag numbers as they may differ between the original and segment content
+            $originalTagsMap = array_values($originalTagsMap);
+
+            $segmentShortTagNumberToIdx = array_flip(array_keys($segmentShortTagNumbers));
+            $segmentShortTagNumberMapToIdx = [];
+
+            foreach ($segmentShortTagNumbers as $shortTagNumber => $types) {
+                foreach ($types as $type => $t) {
+                    $segmentShortTagNumberMapToIdx[$shortTagNumber][$type] = $segmentShortTagNumberToIdx[$shortTagNumber];
+                }
+            }
+
+            $segmentContent = $this->replace(
+                $segmentContent,
+                function ($match) use (
+                    &$processedTagsCount,
+                    $originalTagsMap,
+                    &$segmentShortTagNumberMapToIdx,
+                    $ignoreWhitespace,
+                    $shortTagNumbers,
+                    &$newShortTagNumber
                 ) {
-                    if (in_array($this->getTagNumber($match[0]), $shortTagNumbers)) {
-                        return $this->replaceTagNumber($match[0], $newShortTagNumber++);
+                    $shortTagNumber = $this->getTagNumber($match[0]);
+
+                    $type = $match[1];
+                    $idx = $segmentShortTagNumberMapToIdx[$shortTagNumber][$type] ?? null;
+                    // prevent double processing of the same tag
+                    unset($segmentShortTagNumberMapToIdx[$shortTagNumber][$type]);
+
+                    if ($ignoreWhitespace && in_array($match[3], $this->protectedWhitespaceTagList)) {
+                        if (in_array($shortTagNumber, $shortTagNumbers)) {
+                            return $this->replaceTagNumber($match[0], $newShortTagNumber++);
+                        }
+
+                        return $match[0];
                     }
 
-                    //Problem here: this may return a tag with number <2/> which does already exist
-                    // as real tag <2/> in "tags to use"
-                    // test if number of returned tag exists in $tagsToUse,
-                    // then get the highest number in $tagsToUse and increase number from there
-                    return $match[0];
-                }
+                    if (null === $idx) {
+                        // if the tag is not in the segment tags, we leave it as is
+                        return $match[0];
+                    }
 
-                return $tagsToUse[$i++] ?? '';
-            });
-            $segmentContent = $trackChangesTagHelper->unprotect($segmentContent);
+                    // if the tag is not in the original tags, we leave it as is
+                    if (! isset($originalTagsMap[$idx][$type])) {
+                        return $match[0];
+                    }
+
+                    $originalMatch = $originalTagsMap[$idx][$type];
+
+                    if (in_array($match[3], $this->protectedContentTagList) && ! in_array($originalMatch[3], $this->protectedContentTagList)) {
+                        return $match[0];
+                    }
+
+                    if (in_array($originalMatch[3], $this->protectedContentTagList) && ! in_array($match[3], $this->protectedContentTagList)) {
+                        return $match[0];
+                    }
+
+                    $processedTagsCount++;
+
+                    // if same tag hash is used, we can use the original tag
+                    if (
+                        in_array($match[3], $this->protectedContentTagList)
+                        && $match[2] === $originalMatch[2]
+                        && $shortTagNumber === $this->getTagNumber($originalMatch[0])
+                    ) {
+                        return $match[0];
+                    }
+
+                    return $originalMatch[0];
+                }
+            );
         }
-        //the count of tags available for the $segmentContent and the used tags ($i) must be equal!
-        // If this is not the case, the segment can not be processed (return false)!
-        if (count($tagsToUse) !== $i) {
+
+        $segmentContent = $trackChangeTagHelper->unprotect($segmentContent);
+
+        if ($originalTagsCount !== $processedTagsCount || $originalTagsCount !== $segmentTagsCount) {
             if ($callBackOnNotEqualTags) {
                 $updateField($originalContent, $segmentContent);
             }
 
             return false;
         }
+
         $updateField($originalContent, $segmentContent);
 
         return true;

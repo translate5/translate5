@@ -328,23 +328,12 @@ class Editor_SegmentController extends ZfExtended_RestController
         $updateSegmentOperation = UpdateSegmentOperation::create();
         $updateSegmentDtoFactory = UpdateSegmentDtoFactory::create();
         $userRepository = new UserRepository();
-        $updateDto = $updateSegmentDtoFactory->fromRequest($this->entity, $this->getRequest());
-
-        $fields = array_keys($updateDto->textData);
-        $loggedField = array_pop($fields);
-        $updateLogger = new UpdateSegmentLogger(
-            'SegmentPut',
-            (int) $this->entity->getId(),
-            $updateDto->textData[$loggedField],
-            $this->entity->get($loggedField),
-            $loggedField
-        );
 
         $updateSegmentOperation->update(
             $this->entity,
-            $updateDto,
+            $updateSegmentDtoFactory->fromRequest($this->entity, $this->getRequest()),
             $userRepository->get($auth->getUserId()),
-            $updateLogger,
+            UpdateSegmentLogger::fromPutRequest('SegmentPut', $this->entity, $this->getRequest()),
             $this->restMessages,
         );
 
