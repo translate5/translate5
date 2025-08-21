@@ -51,6 +51,6 @@ class Exception extends \ZfExtended_ErrorCodeException
         'E1434' => 'Reimport Segment processor: No matching segment was found for the given mid.',
         'E1441' => 'Reimport Segment processor: No content parser found for the file {file}',
         'E1442' => 'Reimport Zip: zip file could not be opened: {zipError}',
-        'E1462' => 'Reimport Zip: The provided zip package did not contain any file matching the files in the task.',
+        'E1462' => 'Reimport: Invalid zip archive structure. The provided zip-package does not contain any files matching the files in the task OR the files are not contained in a folder "workfiles" in the zip.',
     ];
 }
