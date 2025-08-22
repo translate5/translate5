@@ -25,6 +25,36 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.28.3] - 2025-08-21
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4900](https://jira.translate5.net/browse/TRANSLATE-4900): Editor general, TermPortal - RootCause: [PromiseRejectionEvent] undefined** <br>
+FIXED: this error seems to happen somewhere internally in ExtJS and it don't have stack trace to be investigated, so it's now made to be ignored
+
+**[TRANSLATE-4897](https://jira.translate5.net/browse/TRANSLATE-4897): Editor general - Editor breaks long words** <br>
+Fixed breaking long words in trackchanges nodes
+
+**[TRANSLATE-4895](https://jira.translate5.net/browse/TRANSLATE-4895): Editor general - RootCause: undefined is not an object (evaluating 'string.replace')** <br>
+Added logging for debug purposes
+
+**[TRANSLATE-4894](https://jira.translate5.net/browse/TRANSLATE-4894): Editor general - Strange request to GET /Editor.model.admin.TaskUserAssoc leading to RootCause error** <br>
+DEBUG: added debug code for further investigation
+
+**[TRANSLATE-4893](https://jira.translate5.net/browse/TRANSLATE-4893): Editor general - ALT+F3 hotkey doesn't work** <br>
+Fixed ALT+F3 hotkey
+
+**[TRANSLATE-4871](https://jira.translate5.net/browse/TRANSLATE-4871): Import/Export - Enhance error message on missing files on re-import of translator package** <br>
+Improve error message text when zip structure is not correct.
+
+**[TRANSLATE-4866](https://jira.translate5.net/browse/TRANSLATE-4866): MatchAnalysis & Pretranslation - Repeated 100%-Matches should be pre-translated and potentially locked** <br>
+Fix tag handling in repetition processing
+
+
 ## [7.28.2] - 2025-08-19
 
 ### Important Notes:
