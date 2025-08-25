@@ -1103,11 +1103,14 @@ Ext.define('Editor.controller.SearchReplace', {
             me.oldSerchedCell = cell.dom;
 
             let celInner = Ext.get(cell.dom).query('div.x-grid-cell-inner'),
-                contentDiv = celInner.length > 0 ? celInner[0] : null;
+                contentDiv = celInner.length > 0 ? celInner[0] : null,
+                divNodesToHide = [],
+                arrLength = 0;
+
             //if the contend div is found, try to find and hide all div childs(thay are not needed for the search)
             if (contentDiv) {
-                const divNodesToHide = Ext.get(contentDiv).query('div'),
-                    arrLength = divNodesToHide.length;
+                divNodesToHide = Ext.get(contentDiv).query('div');
+                arrLength = divNodesToHide.length;
 
                 for (let i = 0; i < arrLength; i++) {
                     const node = divNodesToHide[i];
