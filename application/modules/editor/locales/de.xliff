@@ -10558,6 +10558,50 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>language_resource.resegment_tmx.tooltip</source>
                 <target>Es werden Segmentierungsregeln für die jeweilige Sprache auf den Ausgangs- und Zieltext der Segmente angewendet. Wenn die gleiche Anzahl von Segmenten gefunden wurde, werden die Segmente neu (also weitergehend) segmentiert. Dabei werden die Segmentierungsregeln verwendet, die als Standard für den gewählten Kunden hinterlegt sind. Sind mehrere Kunden der Sprachressource zugewiesen, werden die Regeln des ersten zugewiesenen Kunden verwendet.</target>
             </trans-unit>
+            <trans-unit id='VHJvdHpkZW0gdmVybGFzc2Vu'>
+                <source>Trotzdem verlassen</source>
+                <target>Trotzdem verlassen</target>
+            </trans-unit>
+            <trans-unit id="QXVzc3RlaGVuZGUgQW5mcmFnZW4=">
+                <source>Ausstehende Anfragen</source>
+                <target>Ausstehende Anfragen</target>
+            </trans-unit>
+            <trans-unit id="RXMgc2luZCBub2NoIHswfSBBSkFYLUFuZnJhZ2VuIGF1c3N0ZWhlbmQuIFdlbm4gU2llIGpldHp0IHZlcmxhc3Nlbiwga2FubiBkaWVzIHp1IEZlaGxlcm4gaW4gZGVyIEJlbnV0emVyb2JlcmZsw6RjaGUgZsO8aHJlbi4gTcO2Y2h0ZW4gU2llIHdhcnRlbiwgYmlzIGRpZXNlIGFiZ2VzY2hsb3NzZW4gc2luZCwgb2RlciB0cm90emRlbSB2ZXJsYXNzZW4/">
+                <source>Es sind noch {0} AJAX-Anfragen ausstehend. Wenn Sie jetzt verlassen, kann dies zu Fehlern in der Benutzeroberfläche führen. Möchten Sie warten, bis diese abgeschlossen sind, oder trotzdem verlassen?</source>
+                <target>Es sind noch {0} AJAX-Anfragen ausstehend. Wenn Sie jetzt verlassen, kann dies zu Fehlern in der Benutzeroberfläche führen. Möchten Sie warten, bis diese abgeschlossen sind, oder trotzdem verlassen?</target>
+            </trans-unit>
+            <trans-unit id="QXVmIEFic2NobHVzcyB3YXJ0ZW4=">
+                <source>Auf Abschluss warten</source>
+                <target>Auf Abschluss warten</target>
+            </trans-unit>
+            <trans-unit id="QWJyZWNoZW4=">
+                <source>Abbrechen</source>
+                <target>Abbrechen</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgd2FydGVu">
+                <source>Bitte warten</source>
+                <target>Bitte warten</target>
+            </trans-unit>
+            <trans-unit id="V2FydGUgYXVmIEFic2NobHVzcyBkZXIgYXVzc3RlaGVuZGVuIEFuZnJhZ2VuLi4u">
+                <source>Warte auf Abschluss der ausstehenden Anfragen...</source>
+                <target>Warte auf Abschluss der ausstehenden Anfragen...</target>
+            </trans-unit>
+            <trans-unit id="ezB9IEFuZnJhZ2VuIHZlcmJsZWliZW5kLi4uICh7MX1zKQ==">
+                <source>{0} Anfragen verbleibend... ({1}s)</source>
+                <target>{0} Anfragen verbleibend... ({1}s)</target>
+            </trans-unit>
+            <trans-unit id="WmVpdMO8YmVyc2NocmVpdHVuZw==">
+                <source>Zeitüberschreitung</source>
+                <target>Zeitüberschreitung</target>
+            </trans-unit>
+            <trans-unit id="WmVpdMO8YmVyc2NocmVpdHVuZyBiZWltIFdhcnRlbiBhdWYgQWJzY2hsdXNzIGRlciBBbmZyYWdlbi4gRWluaWdlIEFuZnJhZ2VuIHNpbmQgbm9jaCBhdXNzdGVoZW5kLg==">
+                <source>Zeitüberschreitung beim Warten auf Abschluss der Anfragen. Einige Anfragen sind noch ausstehend.</source>
+                <target>Zeitüberschreitung beim Warten auf Abschluss der Anfragen. Einige Anfragen sind noch ausstehend.</target>
+            </trans-unit>
+            <trans-unit id="QmxlaWJlbg==">
+                <source>Bleiben</source>
+                <target>Bleiben</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

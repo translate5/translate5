@@ -2060,7 +2060,23 @@ Editor.data.l10n = {
     '<h2><?php echo $this->translate->_('Durchschnitt');?></h2><?php echo $this->translate->_('Der Durchschnitt wird dann als Durchschnitt aller Basiseinheiten für die Berechnung innerhalb der aktuellen Aufgabenfilterung berechnet.');?>'+
     '<h2><?php echo $this->translate->_('Nicht bearbeitete Segmente innerhalb eines Arbeitsablaufschritts');?></h2><?php echo $this->translate->_('Für Segmente, die nicht innerhalb eines Workflow-Schrittes bearbeitet wurden, wird der Levenshtein-Abstand für diesen Schritt als 0 gespeichert, sobald der letzte Benutzer eines Workflow-Schrittes seine Arbeit beendet hat.');?>',
     },
+
+
     segmentGrid: {
+        header : {
+            pendingRequestsTitle: '<?php echo $this->translate->_('Ausstehende Anfragen');?>',
+            pendingRequestsMessage: '<?php echo $this->translate->_('Es sind noch {0} AJAX-Anfragen ausstehend. Wenn Sie jetzt verlassen, kann dies zu Fehlern in der Benutzeroberfläche führen. Möchten Sie warten, bis diese abgeschlossen sind, oder trotzdem verlassen?');?>',
+            waitForCompletionBtn: '<?php echo $this->translate->_('Auf Abschluss warten');?>',
+            forceLeaveBtn: '<?php echo $this->translate->_('Trotzdem verlassen');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            pleaseWaitTitle: '<?php echo $this->translate->_('Bitte warten');?>',
+            waitingMessage: '<?php echo $this->translate->_('Warte auf Abschluss der ausstehenden Anfragen...');?>',
+            requestsRemainingProgress: '<?php echo $this->translate->_('{0} Anfragen verbleibend... ({1}s)');?>',
+            timeoutTitle: '<?php echo $this->translate->_('Zeitüberschreitung');?>',
+            timeoutMessage: '<?php echo $this->translate->_('Zeitüberschreitung beim Warten auf Abschluss der Anfragen. Einige Anfragen sind noch ausstehend.');?>',
+            leaveAnywayBtn: '<?php echo $this->translate->_('Trotzdem verlassen');?>',
+            stayBtn: '<?php echo $this->translate->_('Bleiben');?>',
+        },
         batchOperations: {
             loading: {
                 lock: '<?php echo $this->translate->_('Segmente werden gesperrt');?>',
