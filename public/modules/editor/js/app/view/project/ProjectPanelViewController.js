@@ -227,7 +227,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 console.log('debug2');
                 var store = me.getView().down('adminTaskUserAssocGrid').getStore();
                 console.log('debug3');
+                console.log('beforeload');
                 store.load();
+                console.log('load');
             }
         });
     },
