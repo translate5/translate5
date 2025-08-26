@@ -26,6 +26,33 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.28.4] - 2025-08-26
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4910](https://jira.translate5.net/browse/TRANSLATE-4910): Editor general - Approve job popup is not shown** <br>
+Fix problem where approve job popup was not displayed on task open
+
+**[TRANSLATE-4909](https://jira.translate5.net/browse/TRANSLATE-4909): Editor general - Prompt for leaving the task when requests are pending** <br>
+Prompt will be shown when task leave button is clicked while there are pending requests.
+
+**[TRANSLATE-4908](https://jira.translate5.net/browse/TRANSLATE-4908): Editor general - RootCause: arrLength is not defined** <br>
+FIXED: incorrect visiblity for couple of variables
+
+**[TRANSLATE-4905](https://jira.translate5.net/browse/TRANSLATE-4905): Editor general - Strange request to GET /Editor.model.admin.TaskUserAssoc leading to RootCause error. 2nd attempt** <br>
+DEBUG: added more debug code, plus added a fix to see if it help
+
+**[TRANSLATE-4904](https://jira.translate5.net/browse/TRANSLATE-4904): Editor general - RootCause undefined is not an object (evaluating 'string.replace')** <br>
+Fixed bug which prevented some special characters to be inserted in visual review
+
+**[TRANSLATE-4901](https://jira.translate5.net/browse/TRANSLATE-4901): Editor general - RootCause: E1381 error on the backend (caused by VisualReview)** <br>
+FIXED: segment refresh for 1st user when changed by 2nd user - is now prevented if 1st user left the task or it's another task
+
+
 ## [7.28.3] - 2025-08-21
 
 ### Important Notes:
