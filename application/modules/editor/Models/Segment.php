@@ -217,15 +217,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         parent::__construct();
     }
 
-    public function getRepetitionHash(bool $tmTranslation = true): string
-    {
-        if (! $tmTranslation) {
-            return $this->getSourceMd5();
-        }
-
-        return $this->getSourceMd5() . $this->meta()->getSegmentDescriptor();
-    }
-
     /**
      * "lazy load" for editor_Models_Segment_PixelLength (must fit to the segment's task!).
      */
@@ -1838,21 +1829,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             return [];
         }
         $segmentsViewName = $this->segmentFieldManager->getView()->getName();
-        $where = [
-            '((sourceMd5 = ? and sourceMd5 != ?) or (targetMd5 = ? and targetMd5 != ?))',
-            'taskGuid = ?',
-            'editable = 1',
-        ];
-
-        if ($this->meta()->getSegmentDescriptor()) {
-            $where[] = 'segmentDescriptor = ?';
-        } else {
-            $where[] = 'segmentDescriptor IS NULL';
-        }
 
         $sql = 'select id, segmentNrInTask, source, targetEdit as target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
                 from ' . $segmentsViewName . '
-                where ' . PHP_EOL . implode(' and ' . PHP_EOL, $where) . '
+                where ((sourceMd5 = ? and sourceMd5 != ?) or (targetMd5 = ? and targetMd5 != ?))
+                and taskGuid = ?
+                and editable = 1
                 order by fileOrder, id';
 
         $binds = [
@@ -1864,10 +1846,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             self::EMPTY_STRING_HASH,
             $taskGuid,
         ];
-
-        if ($this->meta()->getSegmentDescriptor()) {
-            $binds[] = $this->meta()->getSegmentDescriptor();
-        }
 
         //since alikes are only usable with segment field default layout we can use the following hardcoded methods
         $stmt = $this->db->getAdapter()->query($sql, $binds);
