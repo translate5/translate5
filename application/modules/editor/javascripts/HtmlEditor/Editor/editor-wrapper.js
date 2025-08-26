@@ -695,7 +695,7 @@ export default class EditorWrapper {
         viewDocument.on(
             'enter',
             (event, data) => {
-                this.#onPressEnter(event, data, editor);
+                return this.#onPressEnter(event, data, editor);
             },
             {
                 priority: 'high'
@@ -957,11 +957,12 @@ export default class EditorWrapper {
     }
 
     #onPressEnter(event, data, editor) {
-        //change enter to shift+enter to prevent ckeditor from inserting a new p tag
+        // suppress inserting a new line on Enter press
+        // because it should be handled by the controller
         data.preventDefault();
         event.stop();
-        editor.execute('shiftEnter');
-        editor.editing.view.scrollToTheSelection();
+
+        return false;
     }
 
     #onKeyDown(event, data) {
