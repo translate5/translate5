@@ -29,7 +29,7 @@
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
-use MittagQI\Translate5\T5Memory\Api\ConstantApi;
+use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -108,7 +108,7 @@ class SetMemoriesFromServerToLanguageResourceCommand extends Translate5AbstractC
             return self::SUCCESS;
         }
 
-        $api = ConstantApi::create();
+        $api = T5MemoryApi::create();
         $config = \Zend_Registry::get('config');
         $persistenceService = PersistenceService::create();
         $tmPrefix = $persistenceService->addTmPrefix('');
