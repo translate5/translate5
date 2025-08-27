@@ -24,7 +24,7 @@ export default class TagsConversion {
     transform(item, pixelMapping = null) {
         if (this.isTextNode(item)) {
             let text = item.cloneNode();
-            text.data = (htmlEncode(item.data));
+            text.data = item.data;
 
             return text;
         }
