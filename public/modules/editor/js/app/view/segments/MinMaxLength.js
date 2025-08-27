@@ -434,12 +434,20 @@ Ext.define('Editor.view.segments.MinMaxLength', {
 
                 case (i === linebreakNodes.length):
                     // = last line
-                    range.setStartAfter(previousLineBreak);
+                    if (previousLineBreak) {
+                        range.setStartAfter(previousLineBreak);
+                    } else {
+                        range.setStart(dom, 0);
+                    }
                     range.setEnd(dom, dom.childNodes.length);
                     break;
 
                 default:
-                    range.setStartAfter(previousLineBreak);
+                    if (previousLineBreak) {
+                        range.setStartAfter(previousLineBreak);
+                    } else {
+                        range.setStart(dom, 0);
+                    }
                     range.setEndBefore(lineBreak);
             }
 
