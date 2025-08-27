@@ -35,7 +35,7 @@ Ext.define('Editor.controller.Editor', {
     requires: [
         'Editor.view.segments.EditorKeyMap',
         'Editor.controller.editor.PrevNextSegment',
-        // 'Editor.view.task.ConfirmationWindow',
+        'Editor.view.task.ConfirmationWindow',
         // 'Editor.view.ReferenceFilesInfoMessage',
         'Editor.view.task.QuickSearchInfoMessage'
     ],
@@ -109,18 +109,18 @@ Ext.define('Editor.controller.Editor', {
     taskOpenRequest: false,
 
     listen: {
-        // controller: {
-        //     '#Editor.$application': {
-        //         editorViewportClosed: 'onCloseEditorViewport',
-        //         editorViewportOpened: 'onOpenEditorViewport'
-        //     },
-        //     '#QualityMqm': {
-        //     	afterInsertMqmTag: 'handleAfterContentChange'
-        //     },
-        //     '#ServerException':{
-        //         serverExceptionE1600: 'onServerExceptionE1600'
-        //     }
-        // },
+        controller: {
+            '#Editor.$application': {
+                editorViewportClosed: 'onCloseEditorViewport',
+                editorViewportOpened: 'onOpenEditorViewport'
+            },
+            /*'#QualityMqm': {
+            	afterInsertMqmTag: 'handleAfterContentChange'
+            },
+            '#ServerException':{
+                serverExceptionE1600: 'onServerExceptionE1600'
+            }*/
+        },
         component: {
              'segmentsToolbar [dispatcher]' : {
                  click : 'buttonClickDispatcher'
@@ -159,9 +159,9 @@ Ext.define('Editor.controller.Editor', {
             // '#commentContainer textarea': {
             //     specialkey: 'handleCommentEnter'
             // },
-            // 'taskConfirmationWindow button': {
-            //     click:'taskConfirm'
-            // },
+            'taskConfirmationWindow button': {
+                click:'taskConfirm'
+            },
             'segmentsToolbar #btnInsertWhitespaceNbsp': {
                 click: 'insertWhitespaceNbsp'
             },
@@ -486,6 +486,11 @@ Ext.define('Editor.controller.Editor', {
         const el = editor.getEditorBody();
 
         this.editorKeyMap = new Editor.view.segments.EditorKeyMap({
+            target: editor.editingPlugin.editor.el.down('.type-source'),
+            binding: this.getKeyMapConfig('editor', {})
+        });
+
+        this.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: el,
             binding: this.getKeyMapConfig('editor', {
                 // insert editor-specific key events
@@ -706,24 +711,26 @@ Ext.define('Editor.controller.Editor', {
         }
     },
 
-    // onOpenEditorViewport: function(app, task) {
-    //     if(! task.isUnconfirmed()) {
-    //         return;
-    //     }
-    //     this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
-    // },
-    // /**
-    //  * Cleanup stuff in the editor view port
-    //  */
-    // onCloseEditorViewport: function() {
-    //     var me = this;
-    //     me.clearKeyMaps();
-    //     // removing the following handler has no effect, but it should be removed here!
-    //     //FIXME should be unbound since rebind on each task open!? or not?
-    //     //Ext.getDoc().un('copy', me.copySelectionWithInternalTags);
-    //     me.tooltip && me.tooltip.destroy();
-    //     me.taskConfirmation && me.taskConfirmation.destroy();
-    // },
+    onOpenEditorViewport: function(app, task) {
+        if(! task.isUnconfirmed()) {
+            return;
+        }
+        this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
+    },
+    /**
+     * Cleanup stuff in the editor view port
+     */
+    onCloseEditorViewport: function() {
+        var me = this;
+        // TODO: disabled by Leon with the new editor
+        //me.clearKeyMaps();
+        // removing the following handler has no effect, but it should be removed here!
+        //FIXME should be unbound since rebind on each task open!? or not?
+        //Ext.getDoc().un('copy', me.copySelectionWithInternalTags);
+        // TODO: disabled by Leon with the new editor
+        // me.tooltip && me.tooltip.destroy();
+        me.taskConfirmation && me.taskConfirmation.destroy();
+    },
     // clearKeyMaps: function() {
     //     var me = this;
     //     if(me.editorKeyMap) {
@@ -1961,15 +1968,15 @@ Ext.define('Editor.controller.Editor', {
     //     var taskFiles = filePanel.down('taskfiles').expand();
     //     taskFiles.scrollable.scrollIntoView(taskFiles.down('referenceFileTree').view.el);
     // },
-    //
-    // /**
-    //  * Confirm the current task
-    //  */
-    // taskConfirm: function () {
-    //     Editor.util.TaskActions.confirm(function(task, app, strings){
-    //         Editor.MessageBox.addSuccess(strings.taskConfirmed);
-    //     });
-    // },
+
+    /**
+     * Confirm the current task
+     */
+    taskConfirm: function () {
+        Editor.util.TaskActions.confirm(function(task, app, strings){
+            Editor.MessageBox.addSuccess(strings.taskConfirmed);
+        });
+    },
 
     /**
      * Edit task and focus segment route

@@ -10755,6 +10755,50 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>language_resource.resegment_tmx.tooltip</source>
                 <target>Segmentation rules for the respective language are applied to the source and target text of the segments. If the same number of segments is found, the segments are re-segmented (i.e. further segmented). The segmentation rules that are stored as standard for the selected customer are used. If several customers are assigned to the language resource, the rules of the first assigned customer are used.</target>
             </trans-unit>
+            <trans-unit id='VHJvdHpkZW0gdmVybGFzc2Vu'>
+                <source>Trotzdem verlassen</source>
+                <target>Leave anyway</target>
+            </trans-unit>
+            <trans-unit id="QXVzc3RlaGVuZGUgQW5mcmFnZW4=">
+                <source>Ausstehende Anfragen</source>
+                <target>Pending requests</target>
+            </trans-unit>
+            <trans-unit id="RXMgc2luZCBub2NoIHswfSBBSkFYLUFuZnJhZ2VuIGF1c3N0ZWhlbmQuIFdlbm4gU2llIGpldHp0IHZlcmxhc3Nlbiwga2FubiBkaWVzIHp1IEZlaGxlcm4gaW4gZGVyIEJlbnV0emVyb2JlcmZsw6RjaGUgZsO8aHJlbi4gTcO2Y2h0ZW4gU2llIHdhcnRlbiwgYmlzIGRpZXNlIGFiZ2VzY2hsb3NzZW4gc2luZCwgb2RlciB0cm90emRlbSB2ZXJsYXNzZW4/">
+                <source>Es sind noch {0} AJAX-Anfragen ausstehend. Wenn Sie jetzt verlassen, kann dies zu Fehlern in der Benutzeroberfläche führen. Möchten Sie warten, bis diese abgeschlossen sind, oder trotzdem verlassen?</source>
+                <target>There are still {0} AJAX requests pending. Leaving now may cause errors in the user interface. Do you want to wait until they are completed or leave anyway?</target>
+            </trans-unit>
+            <trans-unit id="QXVmIEFic2NobHVzcyB3YXJ0ZW4=">
+                <source>Auf Abschluss warten</source>
+                <target>Wait for completion</target>
+            </trans-unit>
+            <trans-unit id="QWJyZWNoZW4=">
+                <source>Abbrechen</source>
+                <target>Cancel</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgd2FydGVu">
+                <source>Bitte warten</source>
+                <target>Please wait</target>
+            </trans-unit>
+            <trans-unit id="V2FydGUgYXVmIEFic2NobHVzcyBkZXIgYXVzc3RlaGVuZGVuIEFuZnJhZ2VuLi4u">
+                <source>Warte auf Abschluss der ausstehenden Anfragen...</source>
+                <target>Waiting for completion of pending requests...</target>
+            </trans-unit>
+            <trans-unit id="ezB9IEFuZnJhZ2VuIHZlcmJsZWliZW5kLi4uICh7MX1zKQ==">
+                <source>{0} Anfragen verbleibend... ({1}s)</source>
+                <target>{0} requests remaining... ({1}s)</target>
+            </trans-unit>
+            <trans-unit id="WmVpdMO8YmVyc2NocmVpdHVuZw==">
+                <source>Zeitüberschreitung</source>
+                <target>Timeout</target>
+            </trans-unit>
+            <trans-unit id="WmVpdMO8YmVyc2NocmVpdHVuZyBiZWltIFdhcnRlbiBhdWYgQWJzY2hsdXNzIGRlciBBbmZyYWdlbi4gRWluaWdlIEFuZnJhZ2VuIHNpbmQgbm9jaCBhdXNzdGVoZW5kLg==">
+                <source>Zeitüberschreitung beim Warten auf Abschluss der Anfragen. Einige Anfragen sind noch ausstehend.</source>
+                <target>Timeout waiting for requests to complete. Some requests are still pending.</target>
+            </trans-unit>
+            <trans-unit id="QmxlaWJlbg==">
+                <source>Bleiben</source>
+                <target>Stay</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

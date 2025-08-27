@@ -92,7 +92,7 @@ if(Ext.browser.is.IE) {
 
 Ext.application({
     name: 'Editor',
-    models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
+    models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault', 'admin.TaskUserAssoc'],
     stores: [
         'admin.TokenStore',
         'admin.contentProtection.InputMappingStore',
