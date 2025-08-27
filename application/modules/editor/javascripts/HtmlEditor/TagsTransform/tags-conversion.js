@@ -565,7 +565,7 @@ export default class TagsConversion {
                 return this._templating.intSpansTpl.apply(data);
 
             case 'numberspans':
-                return this.intNumberSpansTpl.apply(data);
+                return this._templating.intNumberSpansTpl.apply(data);
 
             case 'termspan':
                 return (this._hasQIdProp(data) ? this._templating.termSpanTplQid.apply(data) : this._templating.termSpanTpl.apply(data));
