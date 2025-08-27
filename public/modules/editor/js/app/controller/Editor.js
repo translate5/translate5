@@ -485,7 +485,7 @@ Ext.define('Editor.controller.Editor', {
         }
 
         if (this.editorKeyMap_rowEditor) {
-            this.editorKeyMap.destroy();
+            this.editorKeyMap_rowEditor.destroy();
         }
 
         this.editorKeyMap = new Editor.view.segments.EditorKeyMap({
