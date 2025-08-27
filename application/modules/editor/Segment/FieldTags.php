@@ -154,7 +154,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
 
     /**
      * Retrieves our field-text lines.
-     * This means, that all TrackChanges Del Contents are removed and our fild-text is splitted by all existing Internal Newline tags
+     * This means, that all TrackChanges Del Contents are removed and our field-text is splitted by all existing Internal Newline tags
      * @return string[]
      */
     public function getFieldTextLines(bool $condenseBlanks = true): array
@@ -447,6 +447,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
     public function cloneWithoutTrackChanges(array $includedTypes = null, bool $condenseBlanks = true): editor_Segment_FieldTags
     {
         $clonedTags = $this->cloneFiltered($includedTypes, false);
+        // if no trackchanges-tags were removed, the method will not fix parent orders...
         if (! $clonedTags->deleteTrackChangesTags($condenseBlanks)) {
             $clonedTags->fixParentOrders();
         }
@@ -483,7 +484,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
         $this->evaluateDeletedInserted(); // ensure this is properly set (normally always the case)
         $this->sort(); // making sure we're in order
         $hasTrackChanges = false;
-        foreach ($this->tags as $tag) {
+        foreach ($this->condenseTrackChangesDelTags(true) as $tag) {
             if ($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES) {
                 $tag->wasDeleted = true;
                 if ($tag->isDeleteTag() && $tag->endIndex > $tag->startIndex) {
@@ -520,6 +521,39 @@ class editor_Segment_FieldTags extends editor_TagSequence
     }
 
     /**
+     * Condenses all trackchanges del-tags, that immediately follow on each other.
+     * This is crucial to properly calculate whitespace before and after when removing <del>-tags
+     */
+    private function condenseTrackChangesDelTags(bool $forDeletion = false): array
+    {
+        $tags = [];
+        $lastTC = null;
+        foreach ($this->tags as $tag) {
+            if ($tag->getType() === editor_Segment_Tag::TYPE_TRACKCHANGES && $tag->isDeleteTag()) {
+                if ($tag->endIndex === $tag->startIndex) {
+                    if ($forDeletion) {
+                        $tag->wasDeleted = true;
+                    }
+                } elseif ($lastTC !== null && $lastTC->endIndex === $tag->startIndex) {
+                    $lastTC->endIndex = $tag->endIndex;
+                    if ($forDeletion) {
+                        $tag->wasDeleted = true;
+                    }
+                } else {
+                    // only when deleting TC tags afterwards we can (potentially) manipulate them,
+                    // otherwise we need to use clones
+                    $lastTC = ($forDeletion) ? $tag : $tag->clone(true, true);
+                    $tags[] = $lastTC;
+                }
+            } else {
+                $tags[] = $tag;
+            }
+        }
+
+        return $tags;
+    }
+
+    /**
      * Retrieves the boundries of a del-tag increased by the blanks that can be removed without affecting other tags
      */
     private function getRemovableBlanksBoundries(int $start, int $end): stdClass
@@ -529,10 +563,10 @@ class editor_Segment_FieldTags extends editor_TagSequence
         $boundries->left = $start;
         $boundries->right = $end;
         // increase the boundries to cover all blanks left and right
-        while (($boundries->left - 1) > 0 && $this->getTextPart($boundries->left - 1, $boundries->left) == ' ') {
+        while (($boundries->left - 1) > 0 && $this->getTextPart($boundries->left - 1, $boundries->left) === ' ') {
             $boundries->left -= 1;
         }
-        while (($boundries->right + 1) < $length && $this->getTextPart($boundries->right, $boundries->right + 1) == ' ') {
+        while (($boundries->right + 1) < $length && $this->getTextPart($boundries->right, $boundries->right + 1) === ' ') {
             $boundries->right += 1;
         }
         // reduce the boundries if there are tags covered
@@ -603,12 +637,17 @@ class editor_Segment_FieldTags extends editor_TagSequence
         $text = '';
         $start = 0;
         $length = $this->getFieldTextLength();
-        foreach ($this->tags as $tag) {
-            // the tag is only affected if not completely  before the hole
-            if ($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES && $tag->isDeleteTag() && $tag->endIndex > $tag->startIndex && $tag->endIndex > $start) {
+        foreach ($this->condenseTrackChangesDelTags() as $tag) {
+            // the tag is only affected if not completely before the hole
+            if (
+                $tag->getType() === editor_Segment_Tag::TYPE_TRACKCHANGES &&
+                $tag->isDeleteTag() &&
+                $tag->endIndex > $tag->startIndex &&
+                $tag->endIndex > $start
+            ) {
                 $boundries = ($condenseBlanks) ? $this->getRemovableBlanksBoundries($tag->startIndex, $tag->endIndex) : null;
                 if ($boundries != null && $boundries->left < $tag->startIndex && $boundries->right > $tag->endIndex) {
-                    // if there are removable blanks on both sides it is meaningless, on which side we leave one
+                    // if there are removable blanks on both sides, it is meaningless on which side we leave one
                     if ($boundries->left > $start) {
                         $text .= $this->getTextPart($start, $boundries->left);
                     }
