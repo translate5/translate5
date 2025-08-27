@@ -242,7 +242,7 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         return this.editor._editor.ui.view.element.clientHeight + this.statusStrip.getHeight() + 2;
     },
     getRecordHeightUsage: function() {
-        return this.up('[rowToEditOrigHeight]').rowToEditOrigHeight + 2;
+        return this.up('[?rowToEditOrigHeight]').rowToEditOrigHeight + 2;
     },
 
     pushValue: function() {
