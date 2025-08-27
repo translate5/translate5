@@ -486,6 +486,11 @@ Ext.define('Editor.controller.Editor', {
         const el = editor.getEditorBody();
 
         this.editorKeyMap = new Editor.view.segments.EditorKeyMap({
+            target: editor.editingPlugin.editor.el.down('.type-source'),
+            binding: this.getKeyMapConfig('editor', {})
+        });
+
+        this.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: el,
             binding: this.getKeyMapConfig('editor', {
                 // insert editor-specific key events
