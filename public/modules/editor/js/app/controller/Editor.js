@@ -479,19 +479,17 @@ Ext.define('Editor.controller.Editor', {
     },
 
     onAfterStartEdit: function (editor) {
+
         if (this.editorKeyMap) {
             this.editorKeyMap.destroy();
         }
 
-        const el = editor.getEditorBody();
+        if (this.editorKeyMap_rowEditor) {
+            this.editorKeyMap.destroy();
+        }
 
         this.editorKeyMap = new Editor.view.segments.EditorKeyMap({
-            target: editor.editingPlugin.editor.el.down('.type-source'),
-            binding: this.getKeyMapConfig('editor', {})
-        });
-
-        this.editorKeyMap = new Editor.view.segments.EditorKeyMap({
-            target: el,
+            target: editor.getEditorBody(),
             binding: this.getKeyMapConfig('editor', {
                 // insert editor-specific key events
                 'ctrl-comma': [188, {
@@ -524,6 +522,11 @@ Ext.define('Editor.controller.Editor', {
                     alt: false
                 }, () => this.insertWhitespaceTab(), true]
             })
+        });
+
+        this.editorKeyMap_rowEditor = new Editor.view.segments.EditorKeyMap({
+            target: editor.editingPlugin.editor.el,
+            binding: this.getKeyMapConfig('editor', {})
         });
     },
 
@@ -1471,6 +1474,12 @@ Ext.define('Editor.controller.Editor', {
      */
     handleF3KeyPress: function (keyCode, event) {
         const searchGrid = this.getLanguageResourceSearchGrid();
+
+        // If no concordance search grid present - do nothing
+        if (!searchGrid) {
+            return;
+        }
+
         this.openEditorPanel(searchGrid);
 
         let fieldType;
