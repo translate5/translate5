@@ -2,6 +2,8 @@ import Node from "./node";
 import TagsConversion from "../TagsTransform/tags-conversion";
 import TagCheck from "../TagsTransform/tag-check";
 
+const htmlEncode = require('js-htmlencode').htmlEncode;
+
 export default class DataTransformer {
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
@@ -58,7 +60,7 @@ export default class DataTransformer {
 
         let result = '';
         for (const node of nodes) {
-            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : node._transformed.textContent;
+            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : htmlEncode(node._transformed.textContent);
         }
 
         return result;
@@ -89,7 +91,7 @@ export default class DataTransformer {
         let result = "";
 
         for (const node of this._transformedNodes) {
-            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : node._transformed.textContent;
+            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : htmlEncode(node._transformed.textContent);
         }
 
         return result;

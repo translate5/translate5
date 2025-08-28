@@ -97,6 +97,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const htmlEncode = (__webpack_require__(/*! js-htmlencode */ "./node_modules/js-htmlencode/src/htmlencode.js").htmlEncode);
+
 class DataTransformer {
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
@@ -153,7 +155,7 @@ class DataTransformer {
 
         let result = '';
         for (const node of nodes) {
-            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : node._transformed.textContent;
+            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : htmlEncode(node._transformed.textContent);
         }
 
         return result;
@@ -184,7 +186,7 @@ class DataTransformer {
         let result = "";
 
         for (const node of this._transformedNodes) {
-            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : node._transformed.textContent;
+            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : htmlEncode(node._transformed.textContent);
         }
 
         return result;
