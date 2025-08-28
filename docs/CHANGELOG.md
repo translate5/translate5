@@ -29,6 +29,47 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.28.5] - 2025-08-28
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4914](https://jira.translate5.net/browse/TRANSLATE-4914): Editor general - F3 shortcut for concordance search does not work with new editor** <br>
+Added missing F3 shortcut row editor's source column
+
+
+### Bugfixes
+**[TRANSLATE-4927](https://jira.translate5.net/browse/TRANSLATE-4927): Editor general - Translation containing html is processed wrong** <br>
+[🐞 Fix] HTML-like content rendering in the editor now works correct without losing data
+
+**[TRANSLATE-4925](https://jira.translate5.net/browse/TRANSLATE-4925): Auto-QA - AutoQA: duplicated 'interactive' flag added on segment edit** <br>
+[🐞 Fix] Prevent duplicate 'interactive' flag from being added on segment edit
+
+**[TRANSLATE-4923](https://jira.translate5.net/browse/TRANSLATE-4923): Editor general - Single tags resolved incorrectly on segment save in editor** <br>
+[🐞 Fix] Fixed single tag handling in editor
+
+**[TRANSLATE-4919](https://jira.translate5.net/browse/TRANSLATE-4919): VisualReview / VisualTranslation - Fix potential JS error in the Visual** <br>
+[🐞 Fix] Potential JS-Error in Visual when segment-data is not properly set
+
+**[TRANSLATE-4916](https://jira.translate5.net/browse/TRANSLATE-4916): Editor general - New editor: Apostroph gets converted to HTML entity** <br>
+[🐞 Fix] Fixed bug which caused some special characters inside trackchanges to be shown as HTML encoded symbols
+
+**[TRANSLATE-4915](https://jira.translate5.net/browse/TRANSLATE-4915): Editor general - Length check with new editor ignores changes in line count** <br>
+[🐞 Fix] Fixed issue when deleted newline is shown by TrackChanges
+
+**[TRANSLATE-4913](https://jira.translate5.net/browse/TRANSLATE-4913): Editor general - New segment editor: Spaces get removed upon saving** <br>
+[🐞 Fix]  Fixed issue when changed whitespace processing in new editor may lead to disappearing blanks after saving a segment
+
+**[TRANSLATE-4912](https://jira.translate5.net/browse/TRANSLATE-4912): Editor general - New segment editor bug: Loss of whitespace and apostroph char on export** <br>
+[🐞 Fix]  Fixed issue when sequences of trackchanges deleting word-separating whitespace may lead to all whitespaces between two words being removed
+
+**[TRANSLATE-4907](https://jira.translate5.net/browse/TRANSLATE-4907): Editor general - RootCause: Cannot read properties of undefined (reading 'rowToEditOrigHeight')** <br>
+[🐞 Fix]  Used correct way to reference row editor
+
+
 ## [7.28.5] - 2025-08-28
 
 ### Important Notes:
