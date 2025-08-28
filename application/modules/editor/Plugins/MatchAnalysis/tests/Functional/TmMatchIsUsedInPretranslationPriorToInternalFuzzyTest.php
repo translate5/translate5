@@ -60,15 +60,15 @@ class TmMatchIsUsedInPretranslationPriorToInternalFuzzyTest extends ImportTestAb
             )
             ->setProperty('name', 'TmMatchIsUsedInPretranslationPriorToInternalFuzzyTest_TM1');
 
-//        $config
-//            ->addLanguageResource(
-//                'opentm2',
-//                'TmMatchIsUsedInPretranslationPriorToInternalFuzzyTest_TM2.tmx',
-//                $customerId,
-//                $sourceLangRfc,
-//                $targetLangRfc
-//            )
-//            ->setProperty('name', 'TmMatchIsUsedInPretranslationPriorToInternalFuzzyTest_TM2');
+        //        $config
+        //            ->addLanguageResource(
+        //                'opentm2',
+        //                'TmMatchIsUsedInPretranslationPriorToInternalFuzzyTest_TM2.tmx',
+        //                $customerId,
+        //                $sourceLangRfc,
+        //                $targetLangRfc
+        //            )
+        //            ->setProperty('name', 'TmMatchIsUsedInPretranslationPriorToInternalFuzzyTest_TM2');
 
         $config
             ->addPretranslation();
@@ -124,7 +124,7 @@ class TmMatchIsUsedInPretranslationPriorToInternalFuzzyTest extends ImportTestAb
 
         // First match. Has context match
         $segment1 = $segments[0];
-        self::assertSame(103, (int)$segment1->matchRate, $segmentsJson);
+        self::assertSame(103, (int) $segment1->matchRate, $segmentsJson);
         self::assertSame(
             'pretranslated;tm;OpenTM2 - TmMatchIsUsedInPretranslationPriorToInternalFuzzyTest_TM1',
             $segment1->matchRateType,
@@ -134,7 +134,7 @@ class TmMatchIsUsedInPretranslationPriorToInternalFuzzyTest extends ImportTestAb
 
         // Second match. Has own context match
         $segment2 = $segments[1];
-        self::assertSame(103, (int)$segment2->matchRate, $segmentsJson);
+        self::assertSame(103, (int) $segment2->matchRate, $segmentsJson);
         self::assertSame(
             'pretranslated;tm;OpenTM2 - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
             $segment2->matchRateType,
