@@ -701,6 +701,7 @@ Ext.define('Editor.controller.Segments', {
 
         // If segment was edited after some match was taken over - add 'interactive' flag
         if (record.isModified('targetEdit')
+            && !record.get('matchRateType').match('interactive')
             &&
             ((
                 record.get('matchRateType').match(Editor.data.LanguageResources.matchrateTypeChangedState)

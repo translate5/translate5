@@ -146,7 +146,9 @@ export default class DataTransformer {
             if (this._tagsConversion.isInternalTagNode(item)) {
                 const tagType = this._tagsConversion.getInternalTagType(item);
                 const tagNumber = this._tagsConversion.getInternalTagNumber(item);
-                result += this._transformedTags[tagType][tagNumber]?._original.outerHTML ?? this._referenceTags[tagType][tagNumber]?._original.outerHTML ?? '';
+                result += this._referenceTags[tagType][tagNumber]?._original.outerHTML
+                    ?? this._transformedTags[tagType][tagNumber]?._original.outerHTML
+                    ?? '';
 
                 continue;
             }

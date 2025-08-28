@@ -322,12 +322,14 @@ class editor_Models_Segment_Updater
     public function sanitizeEditedContent(string &$content, string $field): bool
     {
         $isEditingTargetInFront = ($field === 'targetEdit');
-        $nbsp = json_decode('"\u00a0"');
 
-        // some browsers create nbsp instead of normal whitespace, since nbsp are removed by the protectWhitespace code below
+        // some browsers create nbsp instead of normal whitespace, also if content is copied from other sources
+        // there may be some non-breaking spaces/narrow non-breaking space etc spaces in the content
+        // since all spaces except the normal one  are removed by the protectWhitespace code below
         // we convert it to usual whitespaces. If there are multiple ones, they are reduced to one then.
         // This is so far the desired behavior. No characters escaped as tag by the import should be addable through the editor.
-        $content = str_replace($nbsp, ' ', $content);
+        $nbsps = [json_decode('"\u00a0"'), json_decode('"\u202f"'), '&#160;', '&#8239;'];
+        $content = str_replace($nbsps, ' ', $content);
 
         //if there are tags to be ignored, we remove them here
         $oldContent = $content = $this->utilities->internalTag->removeIgnoredTags($content);

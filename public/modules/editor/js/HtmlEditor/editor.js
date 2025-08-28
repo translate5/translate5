@@ -241,7 +241,9 @@ class DataTransformer {
             if (this._tagsConversion.isInternalTagNode(item)) {
                 const tagType = this._tagsConversion.getInternalTagType(item);
                 const tagNumber = this._tagsConversion.getInternalTagNumber(item);
-                result += this._transformedTags[tagType][tagNumber]?._original.outerHTML ?? this._referenceTags[tagType][tagNumber]?._original.outerHTML ?? '';
+                result += this._referenceTags[tagType][tagNumber]?._original.outerHTML
+                    ?? this._transformedTags[tagType][tagNumber]?._original.outerHTML
+                    ?? '';
 
                 continue;
             }
@@ -1728,7 +1730,7 @@ class EditorWrapper {
 
             this._editor.model.insertContent(modelFragment, entireSelection);
 
-            const maxOffset = root.getChild(0).maxOffset;
+            const maxOffset = root.getChild(0)?.maxOffset || 0;
 
             // If we have a selection that is not collapsed, replacing the data within the async operation
             // in this case we need to restore the selection
@@ -2668,7 +2670,7 @@ class TagsConversion {
     transform(item, pixelMapping = null) {
         if (this.isTextNode(item)) {
             let text = item.cloneNode();
-            text.data = (htmlEncode(item.data));
+            text.data = item.data;
 
             return text;
         }
@@ -3209,7 +3211,7 @@ class TagsConversion {
                 return this._templating.intSpansTpl.apply(data);
 
             case 'numberspans':
-                return this.intNumberSpansTpl.apply(data);
+                return this._templating.intNumberSpansTpl.apply(data);
 
             case 'termspan':
                 return (this._hasQIdProp(data) ? this._templating.termSpanTplQid.apply(data) : this._templating.termSpanTpl.apply(data));
