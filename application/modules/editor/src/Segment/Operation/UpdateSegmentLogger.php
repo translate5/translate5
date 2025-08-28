@@ -156,7 +156,6 @@ final class UpdateSegmentLogger
     public function finish(): void
     {
         if ($this->doLog && $this->isSuspicious) {
-
             // create logger with upper limit of 20MB
             $sfl = new SimpleFileLogger('segmentSave.log', 20971520);
             $entry =
