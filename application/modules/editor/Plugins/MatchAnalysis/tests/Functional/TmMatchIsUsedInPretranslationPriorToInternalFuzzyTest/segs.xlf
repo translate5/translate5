@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+    <file original="/var/lib/tomcat9/work/Okapi-Longhorn-Files/1/input/original-255.odt/content.xml" source-language="en" target-language="de" datatype="x-undefined">
+        <body>
+            <trans-unit id="1" restype="x-text:h">
+                <source xml:lang="en">My test segment.</source>
+                <seg-source><mrk mid="0" mtype="seg">My test segment.</mrk></seg-source>
+                <target xml:lang="de"><mrk mtype="seg" mid="0"/></target>
+            </trans-unit>
+            <trans-unit id="2" restype="x-text:h">
+                <source xml:lang="en">My second test segment.</source>
+                <seg-source><mrk mid="1" mtype="seg">My second test segment.</mrk></seg-source>
+                <target xml:lang="de"><mrk mtype="seg" mid="1"/></target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

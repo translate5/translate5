@@ -64,6 +64,7 @@ class editor_Models_Segment_RepetitionHash
         $this->util = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->metaFieldsToAdd = $task->getConfig()->runtimeOptions->alike->segmentMetaFields->toArray() ?? [];
         $this->metaFieldsToAdd[] = 'segmentDescriptor';
+        $this->metaFieldsToAdd[] = 'transunitDescriptor';
 
         $contentProtector = ContentProtector::create();
         $this->protectedWhitespaceTagList = $contentProtector->tagList(WhitespaceProtector::alias());
@@ -200,13 +201,29 @@ class editor_Models_Segment_RepetitionHash
             // loop through the configured additional data and add them the hash calculation
             foreach ($this->metaFieldsToAdd as $field) {
                 if (empty($this->segment)) {
+                    if (! property_exists($this->attributes, $field)) {
+                        continue;
+                    }
                     //TODO check customAttributes too if no native found!
                     $toAdd = $this->attributes->$field;
                 } else {
-                    $toAdd = $this->segment->meta()->__call('get' . ucfirst($field), []);
+                    try {
+                        $toAdd = $this->segment->meta()->__call('get' . ucfirst($field), []);
+                    } catch (\Zend_Db_Table_Row_Exception) {
+                        continue;
+                    }
                 }
+
+                if (empty($toAdd)) {
+                    continue;
+                }
+
                 $value .= '#' . $toAdd;
             }
+        }
+
+        if ($this->attributes->transunitId == 'NFDBB2FA9-tu1') {
+            error_log(PHP_EOL . $value . PHP_EOL);
         }
 
         return md5($value);
