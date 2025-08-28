@@ -526,6 +526,7 @@ Ext.define('Editor.controller.Editor', {
 
         this.editorKeyMap_rowEditor = new Editor.view.segments.EditorKeyMap({
             target: editor.editingPlugin.editor.el,
+            processEvent: event => event.getTarget('.ck-editor__editable') ? false : event,
             binding: this.getKeyMapConfig('editor', {})
         });
     },
