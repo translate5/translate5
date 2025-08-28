@@ -156,7 +156,9 @@ final class UpdateSegmentLogger
     public function finish(): void
     {
         if ($this->doLog && $this->isSuspicious) {
-            $sfl = new SimpleFileLogger('segmentSave.log');
+
+            // create logger with upper limit of 20MB
+            $sfl = new SimpleFileLogger('segmentSave.log', 20971520);
             $entry =
                 '#ID: ' . $this->segmentId .
                 '#PROCESS:' . $this->process .
@@ -182,8 +184,8 @@ final class UpdateSegmentLogger
     private function condenseText(string $text): string
     {
         $text = preg_replace('~\s+~', '', strip_tags($text));
-        $text = str_replace('&nbsp;', '', $text);
+        $text = str_replace([json_decode('"\u00a0"'), json_decode('"\u202f"'), '&#160;'], '', $text);
 
-        return html_entity_decode($text, ENT_QUOTES);
+        return html_entity_decode($text, ENT_HTML5 | ENT_QUOTES, 'UTF-8');
     }
 }
