@@ -24,7 +24,7 @@ export default class TagsConversion {
     transform(item, pixelMapping = null) {
         if (this.isTextNode(item)) {
             let text = item.cloneNode();
-            text.data = (htmlEncode(item.data));
+            text.data = item.data;
 
             return text;
         }
@@ -565,7 +565,7 @@ export default class TagsConversion {
                 return this._templating.intSpansTpl.apply(data);
 
             case 'numberspans':
-                return this.intNumberSpansTpl.apply(data);
+                return this._templating.intNumberSpansTpl.apply(data);
 
             case 'termspan':
                 return (this._hasQIdProp(data) ? this._templating.termSpanTplQid.apply(data) : this._templating.termSpanTpl.apply(data));

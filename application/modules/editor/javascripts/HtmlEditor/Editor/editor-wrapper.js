@@ -1224,7 +1224,7 @@ export default class EditorWrapper {
 
             this._editor.model.insertContent(modelFragment, entireSelection);
 
-            const maxOffset = root.getChild(0).maxOffset;
+            const maxOffset = root.getChild(0)?.maxOffset || 0;
 
             // If we have a selection that is not collapsed, replacing the data within the async operation
             // in this case we need to restore the selection
