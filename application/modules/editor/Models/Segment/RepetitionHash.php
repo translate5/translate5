@@ -222,10 +222,6 @@ class editor_Models_Segment_RepetitionHash
             }
         }
 
-        if ($this->attributes->transunitId == 'NFDBB2FA9-tu1') {
-            error_log(PHP_EOL . $value . PHP_EOL);
-        }
-
         return md5($value);
     }
 
