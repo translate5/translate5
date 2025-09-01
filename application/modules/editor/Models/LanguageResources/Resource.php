@@ -351,18 +351,23 @@ class editor_Models_LanguageResources_Resource
     }
 
     /**
-     * Returns just the resources meta data
+     * Returns just the resource-types meta-data (that will be part of the frontend-model for the resource-type)
      * @return boolean[]
      */
     public function getMetaData()
     {
-        return [
+        $meta = [
             'deletable' => $this->deletable,
             'writable' => $this->writable,
             'analysable' => $this->analysable,
             'searchable' => $this->searchable,
             'filebased' => $this->filebased,
         ];
+
+        // gives the chance to add additional (preferrably boolean) Meta-Data per resource-type
+        $this->addAdditionalMeta($meta);
+
+        return $meta;
     }
 
     /**
@@ -413,5 +418,9 @@ class editor_Models_LanguageResources_Resource
     public function supportsInternalFuzzy(): bool
     {
         return false;
+    }
+
+    protected function addAdditionalMeta(array &$meta): void
+    {
     }
 }

@@ -228,11 +228,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 $lrData['tmConversionState'] = $tmConversionService->getConversionState($id)->value;
             }
 
-            if (
-                $filterTmNeedsConversion
-                && (
-                    null === $lrData['tmConversionState']
-                    || ConversionState::Converted->value === $lrData['tmConversionState']
+            if ($filterTmNeedsConversion &&
+                (
+                    null === $lrData['tmConversionState'] ||
+                    ConversionState::Converted->value === $lrData['tmConversionState']
                 )
             ) {
                 unset($rows[$rowId]);
