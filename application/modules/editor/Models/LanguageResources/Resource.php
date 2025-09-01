@@ -89,8 +89,9 @@ class editor_Models_LanguageResources_Resource
     /**
      * index is the fieldname for export values in the controller
      * value is the internal fieldname / getter
+     * @var array
      */
-    private array $fieldsForController = [
+    protected $fieldsForController = [
         'id' => 'id',
         'name' => 'name',
         'serviceName' => 'service',
@@ -102,8 +103,6 @@ class editor_Models_LanguageResources_Resource
         'defaultColor' => 'defaultColor',
         'creatable' => 'creatable',
         'engineBased' => 'engineBased',
-        'useEnginesCombo' => 'useEnginesCombo',
-        'domainCodePreset' => 'domainCodePreset',
         'supportsStrippingFramingTags' => 'supportsStrippingFramingTags',
         'supportsResegmentation' => 'supportsResegmentation',
     ];
@@ -126,10 +125,6 @@ class editor_Models_LanguageResources_Resource
     protected bool $creatable = true;
 
     protected bool $engineBased = false;
-
-    protected bool $useEnginesCombo = true;
-
-    protected string $domainCodePreset = '';
 
     protected string $defaultColor;
 
@@ -161,6 +156,50 @@ class editor_Models_LanguageResources_Resource
     }
 
     /**
+     * returns if resource is filebased or not
+     * @return boolean
+     */
+    public function getFilebased()
+    {
+        return $this->filebased;
+    }
+
+    /**
+     * returns if resource is searchable or not
+     * @return boolean
+     */
+    public function getSearchable()
+    {
+        return $this->searchable;
+    }
+
+    /**
+     * returns if resource is writable or not
+     * @return boolean
+     */
+    public function getWritable()
+    {
+        return $this->writable;
+    }
+
+    /***
+     * return if resource is analysable
+     * @return string
+     */
+    public function getAnalysable()
+    {
+        return $this->analysable;
+    }
+
+    /**
+     * return if resource is deletable
+     */
+    public function getDeletable(): bool
+    {
+        return $this->deletable;
+    }
+
+    /**
      * returns the service name
      * @return string
      */
@@ -184,6 +223,14 @@ class editor_Models_LanguageResources_Resource
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * returns the service type
+     */
+    public function getDefaultColor(): string
+    {
+        return $this->defaultColor;
     }
 
     public function getQueryMode(): string
@@ -264,12 +311,12 @@ class editor_Models_LanguageResources_Resource
     /**
      * sets the service type
      */
-    public function setService(editor_Services_ServiceAbstract $service, string $defaultColor)
+    public function setService(string $name, string $type, string $defaultColor, string $queryMode)
     {
-        $this->service = $service->getName();
-        $this->serviceType = $service->getServiceNamespace();
+        $this->service = $name;
+        $this->serviceType = $type;
         $this->defaultColor = $defaultColor;
-        $this->queryMode = $service->getQueryMode();
+        $this->queryMode = $queryMode;
     }
 
     /**
@@ -300,9 +347,6 @@ class editor_Models_LanguageResources_Resource
             $data->$key = $this->$method();
         }
 
-        // gives the chance to add additional Meta-Data per resource-type
-        $this->adjustMetaData($data, true);
-
         return $data;
     }
 
@@ -320,8 +364,8 @@ class editor_Models_LanguageResources_Resource
             'filebased' => $this->filebased,
         ];
 
-        // gives the chance to adjust or add Meta-Data per resource-type
-        $this->adjustMetaData($meta, false);
+        // gives the chance to add additional (preferrably boolean) Meta-Data per resource-type
+        $this->addAdditionalMeta($meta);
 
         return $meta;
     }
@@ -341,86 +385,24 @@ class editor_Models_LanguageResources_Resource
         ];
     }
 
-    /**
-     * returns if resource is filebased or not
-     * @return boolean
-     */
-    public function getFilebased()
-    {
-        return (bool) $this->getAdjustedMetaValue('filebased');
-    }
-
-    /**
-     * returns if resource is searchable or not
-     * @return boolean
-     */
-    public function getSearchable()
-    {
-        return (bool) $this->getAdjustedMetaValue('searchable');
-    }
-
-    /**
-     * returns if resource is writable or not
-     * @return boolean
-     */
-    public function getWritable()
-    {
-        return (bool) $this->getAdjustedMetaValue('writable');
-    }
-
-    /***
-     * return if resource is analysable
-     * @return string
-     */
-    public function getAnalysable()
-    {
-        return (bool) $this->getAdjustedMetaValue('analysable');
-    }
-
-    /**
-     * return if resource is deletable
-     */
-    public function getDeletable(): bool
-    {
-        return (bool) $this->getAdjustedMetaValue('deletable');
-    }
-
     public function getCreatable(): bool
     {
-        return (bool) $this->getAdjustedMetaValue('creatable');
-    }
-
-    /**
-     * returns the service type
-     */
-    public function getDefaultColor(): string
-    {
-        return (string) $this->getAdjustedMetaValue('defaultColor');
+        return $this->creatable;
     }
 
     public function getEngineBased(): bool
     {
-        return (bool) $this->getAdjustedMetaValue('engineBased');
-    }
-
-    public function getUseEnginesCombo(): bool
-    {
-        return (bool) $this->getAdjustedMetaValue('useEnginesCombo');
-    }
-
-    public function getDomainCodePreset(): string
-    {
-        return (string) $this->getAdjustedMetaValue('domainCodePreset');
+        return $this->engineBased;
     }
 
     public function getSupportsStrippingFramingTags(): bool
     {
-        return (bool) $this->getAdjustedMetaValue('supportsStrippingFramingTags');
+        return $this->supportsStrippingFramingTags;
     }
 
     public function getSupportsResegmentation(): bool
     {
-        return (bool) $this->getAdjustedMetaValue('supportsResegmentation');
+        return $this->supportsResegmentation;
     }
 
     public function getStrippingFramingTagsConfig(): array
@@ -438,24 +420,7 @@ class editor_Models_LanguageResources_Resource
         return false;
     }
 
-    /**
-     * Makes it possible to adjust the meta-data by service-name if needed
-     * The passed data is either an assoc array or stdClass object depending on the context
-     */
-    protected function adjustMetaData(array|stdClass &$data, bool $dataIsObject): void
+    protected function addAdditionalMeta(array &$meta): void
     {
-    }
-
-    /**
-     * Retrieves a single adjusted meta-value
-     */
-    private function getAdjustedMetaValue(string $name): mixed
-    {
-        $data = [
-            $name => $this->$name,
-        ];
-        $this->adjustMetaData($data, false);
-
-        return $data[$name];
     }
 }

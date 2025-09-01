@@ -53,9 +53,6 @@ abstract class editor_Services_ServiceAbstract
 
     protected $resourceClass = 'editor_Models_LanguageResources_Resource';
 
-    /**
-     * @var editor_Models_LanguageResources_Resource[]
-     */
     protected $resources = [];
 
     /**
@@ -127,7 +124,7 @@ abstract class editor_Services_ServiceAbstract
     {
         $res = ZfExtended_Factory::get($this->resourceClass, $constructorArgs);
         /* @var $res editor_Models_LanguageResources_Resource */
-        $res->setService($this, static::DEFAULT_COLOR);
+        $res->setService($this->getName(), $this->getServiceNamespace(), static::DEFAULT_COLOR, $this->getQueryMode());
         $this->resources[] = $res;
     }
 

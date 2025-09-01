@@ -63,23 +63,21 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     onResourceChange: function (field, resource) {
         let me = this,
             view = me.getView(),
-            /** @type {Editor.model.LanguageResources.Resource} */
-            selectedResource = field.getSelection();
+            serviceName = field.getSelection() && field.getSelection().get('serviceName'),
+            resourceType = field.getSelection() && field.getSelection().get('resourceType'),
+            engineBased = field.getSelection() && field.getSelection().get('engineBased'),
+            helppage = field.getSelection() && field.getSelection().get('helppage'),
+            viewModel = view.getViewModel(),
+            engineCombo = view.down('#engine');
 
-        if (!selectedResource || !this.isValidResource(selectedResource)) {
+        if (!me.isValidService(serviceName, helppage)) {
             return false;
         }
 
-        let viewModel = view.getViewModel(),
-            engineCombo = view.down('#engine');
-
-        viewModel.set('serviceName', selectedResource.get('serviceName'));
-        viewModel.set('resourceType', selectedResource.get('resourceType'));
+        viewModel.set('serviceName', serviceName);
+        viewModel.set('resourceType', resourceType);
         viewModel.set('resourceId', resource);
-        viewModel.set('engineBased', selectedResource.get('engineBased'));
-        viewModel.set('useEnginesCombo', selectedResource.get('useEnginesCombo'));
-        viewModel.set('domainCodePreset', selectedResource.get('domainCodePreset'));
-
+        viewModel.set('engineBased', engineBased);
         // upload field has different tooltip and label based on the selected resource
         me.updateUploadFieldConfig();
         let record = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(resource),
@@ -96,8 +94,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
 
         this.updateStrippingFramingTagsSupport();
         this.updateResegmentationSupport();
-        /** @type {Editor.model.LanguageResources.Resource} */
-        if (record && record.get('engineBased')) {
+
+        if (record && me.isEngineBasedResource(record)) {
             engineCombo.suspendEvents();
             engineCombo.clearValue(null);
             engineCombo.getStore().clearFilter();
@@ -127,22 +125,19 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     },
 
     /**
-     *
-     * @param {Editor.model.LanguageResources.Resource} selectedResource
-     * @returns {boolean}
+     * Check if the selected service is valid to be used. If not, the user gets a message shown.
+     * @returns boolean
      */
-    isValidResource: function (selectedResource) {
-        if (selectedResource.get('helppage') !== undefined && selectedResource.get('helppage') !== null) {
-            Editor.MessageBox.addError(Ext.String.format(
-                this.messages.notConfigured,
-                selectedResource.get('serviceName'),
-                selectedResource.get('helppage')
-            ));
-
+    isValidService: function (serviceName, helppage) {
+        var me = this;
+        // The resource combo now also includes unconfigured services.
+        // Other than resources, the objects for these items only have a name, serviceName and helppage.
+        // After "Cancel" (= helppage is null), no message is needed.
+        if (helppage !== undefined && helppage !== null) {
+            Editor.MessageBox.addError(Ext.String.format(me.messages.notConfigured, serviceName, helppage));
             return false;
         }
-
-        return !!selectedResource.get('serviceName');
+        return true;
     },
 
     /**
@@ -302,12 +297,19 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         engineComboField.resumeEvents();
     },
 
+    /**
+     * Is the current selected resource uses engines conception
+     */
+    isEngineBasedResource: function (resourceType) {
+        return resourceType.get('engineBased');
+    },
+
     /***
      * Is the current selected resource of termcollection type
      */
     isTermcollectionResource:function(){
         var vm=this.getView().getViewModel();
-        return vm.get('serviceName') === Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
+        return vm.get('serviceName')==Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
     },
 
     /***

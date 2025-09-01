@@ -210,30 +210,32 @@ Ext.define('Editor.controller.TmOverview', {
         var win = Ext.widget('addTmWindow');
         win.show();
     },
-
     handleButtonRefreshClick: function () {
         this.getTmOverviewPanel().getStore().load();
         this.getTmOverviewPanel().getController().onShowOnlyNotConverted(this.getShowConvertedFilterBtn(), false);
         Ext.StoreManager.get('Editor.store.LanguageResources.Resources').load();
     },
-
     handleSaveAddClick: function (button) {
         var me = this,
             window = me.getTmWindow(),
             windowViewController = window.getController(),
             form = window.down('form'),
             resourceField = form.down('combo[name="resourceId"]'),
-            selectedResource = resourceField.getSelection();
+            serviceName = resourceField.getSelection() && resourceField.getSelection().get('serviceName'),
+            helppage = resourceField.getSelection() && resourceField.getSelection().get('helppage');
 
-        if (!form.isValid() || !selectedResource || !windowViewController.isValidResource(selectedResource)) {
+        if (!form.isValid()) {
             return;
         }
 
-        // check and update the form fields from the engine
-        me.handleEngineSelect(form, window.getViewModel());
+        if (!windowViewController.isValidService(serviceName, helppage)) {
+            return;
+        }
+
+        //check and update the form fields from the engine
+        me.handleEngineSelect(form);
 
         window.setLoading(true);
-
         form.submit({
             timeout: 3600, //1h, is seconds here, ensure upload of bigger files
             params: {
@@ -261,6 +263,7 @@ Ext.define('Editor.controller.TmOverview', {
                 if (Ext.isArray(res.errors)) {
                     form.markInvalid(res.errors);
                     me.showGeneralErrors(res.errors);
+                    return;
                 }
             }
         });
@@ -660,32 +663,19 @@ Ext.define('Editor.controller.TmOverview', {
 
     /**
      * Set the labelText(domainCode) when engine with domain code is selected
-     * @param {Ext.form.Panel} form
-     * @param {Editor.view.LanguageResources.TmWindowViewModel} formViewModel
      */
-    handleEngineSelect: function (form, formViewModel) {
-        // fetch needed values by what was set for the view-model
-        if (formViewModel.get('engineBased')) {
-            let engineName = null,
-                domainCode = null;
-            if (formViewModel.get('useEnginesCombo')) {
-                var engine = form.down('#engine').getSelection();
-                engineName = engine.get('engineName');
-                domainCode = engine.get('domainCode');
-            } else {
-                engineName = form.down('#enginefield').getValue();
-                domainCode = (formViewModel.get('domainCodePreset') === '') ?
-                    form.down('#domaincodefield').getValue() : formViewModel.get('domainCodePreset');
-            }
-            //set the labelText field with the domain code if exist
-            if (engineName !== null && engineName !== '') {
-                form.getForm().findField('specificData').setValue(JSON.stringify({
-                    engineName: engineName,
-                    domainCode: domainCode
-                }));
-            }
+    handleEngineSelect: function (form) {
+        var engine = form.down('#engine').getSelection();
+
+        //set the labelText field with the domain code if exist
+        if (engine) {
+            form.getForm().findField('specificData').setValue(JSON.stringify({
+                domainCode: engine.get('domainCode'),
+                engineName: engine.get('engineName')
+            }));
         }
-        // forward events to plugins who need their own logic
+
+        // the same for plugins
         this.fireEvent('engineSelect', form);
     },
 
