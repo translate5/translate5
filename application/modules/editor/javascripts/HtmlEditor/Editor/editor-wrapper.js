@@ -7,6 +7,7 @@ import ModelNode from "./model-node";
 import DocumentFragment from "../Mixin/document-fragment";
 import InsertPreprocessor from "../DataCleanup/insert-preprocessor";
 import calculateNodeLength from "../Tools/calculate-node-length";
+// import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
 
 export default class EditorWrapper {
     static REFERENCE_FIELDS = {
@@ -642,6 +643,7 @@ export default class EditorWrapper {
             }
         ).then((editor) => {
             this._editor = editor;
+            // CKEditorInspector.attach(editor);
             this._tagsConversion = new TagsConversion(this.getEditorViewNode(), this.#tagsModeProvider);
             this.#addListeners(editor);
 
@@ -785,10 +787,10 @@ export default class EditorWrapper {
                 || operation.type === EditorWrapper.ACTION_TYPE.REMOVE
             })
             .reduce((_operations, operation) => {
-                // For 'insert' operations, pick the one with the highest 'baseVersion' as we don't need history
+                // For 'insert' operations, pick the one with the highest 'baseVersion' as we don't need history here
                 if (operation.type === EditorWrapper.ACTION_TYPE.INSERT && operation.baseVersion) {
                     _operations.insert ? _operations.insert.push(operation) : _operations.insert = [operation];
-                } else if (operation.type === EditorWrapper.ACTION_TYPE.REMOVE && !_operations.remove) {
+                } else if (operation.type === EditorWrapper.ACTION_TYPE.REMOVE) {
                     // We only need the last 'remove' operation
                     // (usually it is the only one in the array, but just in case)
                     _operations.remove = [operation];
@@ -1168,7 +1170,7 @@ export default class EditorWrapper {
             this.#replaceDataInEditor(text, position);
         }
 
-        this.#runAsyncModifiers(position);
+        this.#runAsyncModifiers();
 
         const event = new CustomEvent(EditorWrapper.EDITOR_EVENTS.DATA_CHANGED, {
             detail: 'Data changed',
@@ -1224,8 +1226,6 @@ export default class EditorWrapper {
 
             this._editor.model.insertContent(modelFragment, entireSelection);
 
-            const maxOffset = root.getChild(0)?.maxOffset || 0;
-
             // If we have a selection that is not collapsed, replacing the data within the async operation
             // in this case we need to restore the selection
             if (!currentSelection.isCollapsed()) {
@@ -1234,14 +1234,7 @@ export default class EditorWrapper {
                 return;
             }
 
-            // Use the smallest of `to` or `maxOffset`
-            const effectiveTo = Math.min(positionAfterReplace, maxOffset);
-
-            const selection = this._editor.model.createPositionFromPath(
-                this._editor.model.document.getRoot(),
-                [0, effectiveTo]
-            );
-            writer.setSelection(selection);
+            this.setCursorPosition(positionAfterReplace);
         });
     };
 
