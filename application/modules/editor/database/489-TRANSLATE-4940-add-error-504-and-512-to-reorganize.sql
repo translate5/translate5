@@ -25,12 +25,14 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE  `Zf_configuration`
-SET  `value` = CONCAT(value, ',504'), `default` = CONCAT(`default`, ',504')
-WHERE  `Zf_configuration`.`name` = "runtimeOptions.LanguageResources.t5memory.reorganizeErrorCodes"
-  AND NOT `Zf_configuration`.`value` LIKE '%,504%';
+UPDATE `Zf_configuration`
+SET `value`   = CONCAT(value, ',504'),
+    `default` = CONCAT(`default`, ',504')
+WHERE `name` = 'runtimeOptions.LanguageResources.t5memory.reorganizeErrorCodes'
+  AND NOT `Zf_configuration`.`value` LIKE '%504%';
 
-UPDATE  `Zf_configuration`
-SET  `value` = CONCAT(value, ',512'), `default` = CONCAT(`default`, ',512')
-WHERE  `Zf_configuration`.`name` = "runtimeOptions.LanguageResources.t5memory.reorganizeErrorCodes"
-  AND NOT `Zf_configuration`.`value` LIKE '%,512%';
+UPDATE `Zf_configuration`
+SET `value`   = CONCAT(value, ',512'),
+    `default` = CONCAT(`default`, ',512')
+WHERE `name` = 'runtimeOptions.LanguageResources.t5memory.reorganizeErrorCodes'
+  AND NOT `Zf_configuration`.`value` LIKE '%512%';
