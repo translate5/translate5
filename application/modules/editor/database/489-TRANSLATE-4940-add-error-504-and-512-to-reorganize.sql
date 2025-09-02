@@ -26,13 +26,13 @@
 -- */
 
 UPDATE `Zf_configuration`
-SET `value`   = CONCAT(value, ',504'),
+SET `value`   = CONCAT(`value`, ',504'),
     `default` = CONCAT(`default`, ',504')
 WHERE `name` = 'runtimeOptions.LanguageResources.t5memory.reorganizeErrorCodes'
-  AND NOT `Zf_configuration`.`value` LIKE '%504%';
+  AND NOT `value` LIKE '%504%';
 
 UPDATE `Zf_configuration`
-SET `value`   = CONCAT(value, ',512'),
+SET `value`   = CONCAT(`value`, ',512'),
     `default` = CONCAT(`default`, ',512')
 WHERE `name` = 'runtimeOptions.LanguageResources.t5memory.reorganizeErrorCodes'
-  AND NOT `Zf_configuration`.`value` LIKE '%512%';
+  AND NOT `value` LIKE '%512%';
