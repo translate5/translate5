@@ -10,8 +10,8 @@ export default class DataTransformer {
 
     /**
      * @param {TagsConversion} tagsConversion
-     * @param {NodeListOf<ChildNode>} items
-     * @param {NodeListOf<ChildNode>|Array} referenceItems
+     * @param {NodeListOf<HTMLElement>} items
+     * @param {NodeListOf<HTMLElement>|Array<HTMLElement>} referenceItems
      * @param {Boolean} userCanModifyWhitespaceTags
      * @param {Boolean} userCanInsertWhitespaceTags
      */
@@ -42,6 +42,10 @@ export default class DataTransformer {
         this.#transform(items, referenceItems);
     }
 
+    /**
+     * @param {NodeListOf<HTMLElement>} items
+     * @param {NodeListOf<HTMLElement>} referenceItems
+     */
     #transform(items, referenceItems = []) {
         this.#retrieveTags(this.#transformItems(referenceItems), this._referenceTags);
         this._tagCheck = new TagCheck(
@@ -53,7 +57,11 @@ export default class DataTransformer {
         this._transformedNodes = this.#transformItems(items);
         this.#retrieveTags(this._transformedNodes, this._transformedTags);
     }
-    
+
+    /**
+     * @param {NodeListOf<HTMLElement>} items
+     * @returns {string}
+     */
     transformPartial(items) {
         const nodes = this.#transformItems(items);
         this.#retrieveTags(nodes, this._transformedTags);
@@ -66,6 +74,10 @@ export default class DataTransformer {
         return result;
     }
 
+    /**
+     * @param {HTMLElement} whitespce
+     * @returns {*}
+     */
     transformWhitespace(whitespce) {
         const items = this.#transformItems([whitespce], true);
         this.#retrieveTags(items, this._transformedTags);
@@ -125,11 +137,22 @@ export default class DataTransformer {
         };
     }
 
+    /**
+     * @param {NodeListOf<HTMLElement>} items
+     * @param {Boolean} reference
+     * @returns {Array<Node>}
+     */
     #transformItems(items, reference = false) {
         let result = [];
 
         for (const item of items) {
-            let node = new Node(item, this._tagsConversion.transform(item));
+            const transformed = this._tagsConversion.transform(item);
+
+            if (! transformed) {
+                continue;
+            }
+
+            let node = new Node(item, transformed);
 
             result.push(node);
 
