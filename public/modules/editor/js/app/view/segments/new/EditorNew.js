@@ -231,6 +231,10 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         // Set height for both editor container and editor row panel
         me.setHeight(targetHeight).up().setHeight(targetHeight);
 
+        if (!me.currentlyEditingRecord) {
+            return;
+        }
+
         // Make sure grid row node's height fits the editor's row height
         // to prevent editor from overlapping next row node
         let recNode = me.editingPlugin.view.getNodeByRecord(me.currentlyEditingRecord);

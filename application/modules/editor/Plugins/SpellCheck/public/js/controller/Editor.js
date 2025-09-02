@@ -227,14 +227,24 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         //     }
         // });
 
-        Ext.get(this.editor.getEditorBody()).on({
-            contextmenu: {
-                delegated: false,
-                delegate: this.self.NODE_NAME_MATCH + '.' + Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK,
-                fn: this.showToolTip,
-                scope: this,
-                preventDefault: true,
-            },
+        this.editor.getEditorBody().addEventListener('contextmenu', event => {
+            let node = event.srcElement;
+
+            // Go upper until .t5spellcheck-node is met, if possible
+            while (node.classList && !node.classList.contains('t5spellcheck') && node.parentNode) {
+                node = node.parentNode;
+            }
+
+            if (!node.classList.contains(Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK)) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.showToolTip(node, event.pageX, event.pageY);
+
+            return false;
         });
 
         tooltipBody.on({
@@ -949,13 +959,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         return items;
     },
 
-    showToolTip: function (event) {
-        const posX = event.getX();
-        const posY = event.getY();
-
-        this.activeMatchNode = event.currentTarget;
+    showToolTip: function (element, pageX, pageY) {
+        this.activeMatchNode = element;
         this.initTooltips(); // me.spellCheckTooltip.hide() is not enough (e.g. after a contextmenu had been shown with a long list of replacements, the next contextmenu was placed as if it still has that height)
-        this.spellCheckTooltip.showAt(posX, posY);
+        this.spellCheckTooltip.showAt(pageX, pageY);
     },
 
     /**
@@ -1112,19 +1119,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
 
         // If it was possible to met .t5spellcheck-node, e.g. cursor is inside such a node
-        if (node.classList?.contains('t5spellcheck')) {
-            // Get node sizing info
-            var rect = node.getBoundingClientRect();
-
-            // Spoof event.xy with synthetic values
-            event.xy = [rect.left + rect.width * 0.5, rect.top + rect.height * 0.5];
-
-            // Spoof event.currentTarget with .t5spellcheck-node
-            event.currentTarget = node;
-
-            // Feed that to showToolTip()
-            this.showToolTip(event);
+        if (!node.classList?.contains('t5spellcheck')) {
+            return;
         }
+
+        const rect = node.getBoundingClientRect();
+        const x = rect.left + rect.width * 0.5;
+        const y = rect.top + rect.height * 0.5;
+
+        this.showToolTip(node, x, y);
     },
 
     _cleanSpellcheckOnTypingInside: function (rawData, actions, previousPosition, tagsConversion) {

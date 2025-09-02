@@ -17,5 +17,8 @@
   },
   "scripts": {
     "build": "webpack --mode development --config webpack.config.mjs"
+  },
+  "devDependencies": {
+    "@ckeditor/ckeditor5-inspector": "^5.0.0"
   }
 }
