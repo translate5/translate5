@@ -97,11 +97,11 @@ class PatchApplyCommand extends Translate5AbstractCommand
             'The commit ID in ZfExtended'
         );
 
-        $this->addOption(#
+        $this->addOption(
             self::PRIVATE_PLUGIN,
             'p',
             InputOption::VALUE_REQUIRED,
-            'The commit ID in ZfExtended'
+            'The commit ID in PrivatePlugins'
         );
     }
 
