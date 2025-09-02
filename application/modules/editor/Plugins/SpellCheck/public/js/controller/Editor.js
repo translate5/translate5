@@ -235,7 +235,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 node = node.parentNode;
             }
 
-            if (!node.classList.contains(Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK)) {
+            if (
+                node.nodeType === Node.DOCUMENT_NODE
+                || ! node.classList.contains(Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK)
+            ) {
                 return;
             }
 
