@@ -1130,19 +1130,23 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         this.showToolTip(node, x, y);
     },
 
-    _cleanSpellcheckOnTypingInside: function (rawData, actions, position, tagsConversion) {
+    _cleanSpellcheckOnTypingInside: function (rawData, actions, previousPosition, tagsConversion) {
         if (!actions.length) {
-            return [rawData, position];
+            return [rawData, previousPosition];
         }
 
         const doc = RichTextEditor.stringToDom(rawData);
+
+        let position = previousPosition;
 
         for (const action of actions) {
             if (!action.type) {
                 continue;
             }
 
-            this._processNodes(doc, action, tagsConversion);
+            const calculatedPosition = this._processNodes(doc, action, tagsConversion);
+
+            position = calculatedPosition !== null ? calculatedPosition : position;
         }
 
         return [doc.innerHTML, position];
@@ -1155,7 +1159,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
 
         function traverseNodes(node) {
             if (node.nodeType === Node.TEXT_NODE) {
-                const isWithinNode = pointer + node.length >= position;
+                const isWithinNode = pointer <= position && pointer + node.length >= position;
                 const isInserting = action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.INSERT;
                 const dom = !isInserting && action.content.length ? action.content[0].toDom() : null;
                 const isDeletingSpellCheck =
@@ -1177,7 +1181,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                         node.parentNode.getAttribute(_this.self.ATTRIBUTE_ACTIVEMATCHINDEX)
                     );
 
-                    return true;
+                    return isInserting ? position + action.correction : position;
                 }
 
                 if (
@@ -1193,18 +1197,22 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                         node.nextSibling.getAttribute(_this.self.ATTRIBUTE_ACTIVEMATCHINDEX)
                     );
 
-                    return true;
+                    return isInserting ? position + action.correction : position;
+                }
+
+                if (isWithinNode) {
+                    return isInserting ? position + action.correction : position;
                 }
 
                 pointer += node.length;
 
-                return false;
+                return null;
             }
 
             if (tagsConversion.isTag(node)) {
                 pointer++;
 
-                return false;
+                return null;
             }
 
             if (node.nodeType === Node.ELEMENT_NODE) {
@@ -1213,15 +1221,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
 
                     // This is done to prevent endless recursion
                     if (changed) {
-                        return true;
+                        return changed;
                     }
                 }
             }
 
-            return false;
+            return null;
         }
 
-        traverseNodes(doc);
+        return traverseNodes(doc);
     },
 
     _unwrapNodesWithMatchIndex: function (doc, matchIndex) {
