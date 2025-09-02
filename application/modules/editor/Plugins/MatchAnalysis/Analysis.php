@@ -192,7 +192,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             if (! empty($bestMatchRateResult)) {
                 //DIRTY but this is the only place where we know if a master of a repetition should be finally updated or not
                 // if yes, then the repetitions should also be updated, if the master is not updated (due what ever) then the repetitions should also not be updated
-                $segmentHash = $segment->getRepetitionHash();
+                $segmentHash = $segment->getSourceMd5();
 
                 $master = $this->repetitionMasterSegments[$segmentHash] ?? null;
                 $rep = $this->repetitionByHash[$segmentHash] ?? null;
@@ -236,7 +236,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         // calculate and set segment hash.
         // If segment has descriptor set - it indicates that the segment had res-name on import
         // and such segment should be treated as a unique segment in pair with the descriptor
-        $segmentHash = $segment->getRepetitionHash();
+        $segmentHash = $segment->getSourceMd5();
 
         //check if the segment source hash exist in the repetition array
         //segment exist in the repetition array -> it is repetition, save it as 102 (repetition) and 0 languageResource
@@ -357,8 +357,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             return null;
         }
 
-        $master = $this->repetitionMasterSegments[$segment->getRepetitionHash(false)] // repetition from MT
-            ?? $this->repetitionMasterSegments[$segment->getRepetitionHash()] // repetition from TM
+        $master = $this->repetitionMasterSegments[$segment->getSourceMd5()] // repetition from MT
+            ?? $this->repetitionMasterSegments[$segment->getSourceMd5()] // repetition from TM
             ?? null; // no repetition found
 
         if (null === $master) {
@@ -896,7 +896,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     {
         $hasRepetitions = in_array($segment->getId(), $this->segmentIdsWithRepetitions);
 
-        $mtSegmentHash = $segment->getRepetitionHash(false);
+        $mtSegmentHash = $segment->getSourceMd5();
 
         // if have already a MT result, since it is a repetition, then use that, instead of fetching again
         if ($this->repetitionByHash[$mtSegmentHash]?->isMT ?? false) {

@@ -380,15 +380,7 @@ class RepetitionService
         //the target hash must be one of the previous hashes or the current one:
         $targetMatch = in_array($alikeSegment->getTargetMd5(), $validTargetMd5);
 
-        if (! $sourceMatch && ! $targetMatch) {
-            return false;
-        }
-
-        if (empty($sourceSegment->meta()->getSegmentDescriptor())) {
-            return true;
-        }
-
-        return $sourceSegment->meta()->getSegmentDescriptor() === $alikeSegment->meta()->getSegmentDescriptor();
+        return $sourceMatch || $targetMatch;
     }
 
     /**
