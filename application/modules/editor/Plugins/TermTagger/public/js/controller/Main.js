@@ -207,7 +207,7 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
 
         function traverseNodes(node) {
             if (node.nodeType === Node.TEXT_NODE) {
-                const isWithinNode = pointer + node.length >= position;
+                const isWithinNode = pointer <= position && pointer + node.length >= position;
                 const isInserting = action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.INSERT;
                 const isDeletingSpellCheck = (
                     action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.REMOVE
@@ -237,6 +237,10 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
                 ) {
                     _this._unwrapTermNode(node.nextSibling);
 
+                    return true;
+                }
+
+                if (isWithinNode) {
                     return true;
                 }
 
