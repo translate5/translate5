@@ -46,3 +46,8 @@
 /testdata/*
 /apitest-csrf.token
 
+*node_modules*
+/npm-debug.log
+/yarn-error.log
+/pnpm-debug.log
+/.eslintcache
