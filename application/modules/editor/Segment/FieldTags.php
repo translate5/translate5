@@ -478,14 +478,15 @@ class editor_Segment_FieldTags extends editor_TagSequence
 
     /**
      * Removes all TrackChanges tags, also deletes all contents of del-tags
+     * Returns, if stuff was removed and the tags resorted/reordered
      */
     private function deleteTrackChangesTags(bool $condenseBlanks = true): bool
     {
         $this->evaluateDeletedInserted(); // ensure this is properly set (normally always the case)
         $this->sort(); // making sure we're in order
-        $hasTrackChanges = false;
         foreach ($this->condenseTrackChangesDelTags(true) as $tag) {
-            if ($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES) {
+            if ($tag->getType() === editor_Segment_Tag::TYPE_TRACKCHANGES) {
+                /** @var editor_Segment_TrackChanges_DeleteTag|editor_Segment_TrackChanges_InsertTag $tag */
                 $tag->wasDeleted = true;
                 if ($tag->isDeleteTag() && $tag->endIndex > $tag->startIndex) {
                     if ($condenseBlanks) {
@@ -498,31 +499,37 @@ class editor_Segment_FieldTags extends editor_TagSequence
                     }
                     $this->cutIndicesOut($tag->startIndex, $tag->endIndex);
                 }
-                $hasTrackChanges = true;
             }
         }
-        if ($hasTrackChanges) {
-            $newTags = [];
-            foreach ($this->tags as $tag) {
-                // removes the del-tags the "hole punching" may created more deleted tags - should not happen though
-                if (! $tag->wasDeleted) {
-                    if ($tag->wasInserted) {
-                        $tag->wasInserted = false;
-                    }
-                    $newTags[] = $tag;
+        $newTags = [];
+        $hasDeletedTags = false;
+        foreach ($this->tags as $tag) {
+            // removes the del-tags. The "hole punching" may created more deleted tags - should not happen though
+            if ($tag->wasDeleted) {
+                $hasDeletedTags = true;
+            } else {
+                if ($tag->wasInserted) {
+                    $tag->wasInserted = false;
                 }
+                $newTags[] = $tag;
             }
+        }
+        // only resort & reorder if there were tags deleted
+        if ($hasDeletedTags) {
             $this->tags = $newTags;
             $this->fixParentOrders();
             $this->sort();
         }
 
-        return $hasTrackChanges;
+        return $hasDeletedTags;
     }
 
     /**
      * Condenses all trackchanges del-tags, that immediately follow on each other.
      * This is crucial to properly calculate whitespace before and after when removing <del>-tags
+     * Note, that this will not return tags with no content-length (e.g. trackchanges containing just an internal tag),
+     * those tags will only be flagged for deletion ...
+     * @return editor_Segment_Tag[]
      */
     private function condenseTrackChangesDelTags(bool $forDeletion = false): array
     {
@@ -540,7 +547,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
                         $tag->wasDeleted = true;
                     }
                 } else {
-                    // only when deleting TC tags afterwards we can (potentially) manipulate them,
+                    // only when deleting TC tags after using this method, we can (potentially) manipulate them,
                     // otherwise we need to use clones
                     $lastTC = ($forDeletion) ? $tag : $tag->clone(true, true);
                     $tags[] = $lastTC;
@@ -684,7 +691,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
     }
 
     /**
-     * Sets the deleted / inserted properties for all tags.
+     * Sets the deleted / inserted properties for all tags inside trackchanges-tags.
      * This is the last step of unparsing the tags and deserialization from JSON
      * It is also crucial for evaluating qualities because only non-deleted tags will count
      */

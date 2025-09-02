@@ -159,16 +159,20 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
      * @param string $expectedTextNoTC The expected field-text after without track-changes
      * @throws \Exception
      */
-    protected function createTrackChangesTest(int $segmentId, string $markup, string $expectedTextNoTC): void
-    {
+    protected function createTrackChangesTest(
+        int $segmentId,
+        string $markup,
+        string $expectedTextNoTC,
+        string $expectedMarkupNoTC = null
+    ): void {
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
+        // make sure there are track-changes-tags in the test-scenario ...
+        $this->assertNotEmpty($tags->getByType(editor_Segment_Tag::TYPE_TRACKCHANGES, true));
 
         $fieldTextBefore = $tags->getFieldText();
         $jsonBefore = $tags->toJson();
         // compare field-text vs. stripped markup
         $this->assertEquals(editor_Segment_Tag::strip($markup), $fieldTextBefore);
-        // make sure there are track-changes-tags in the test-scenario ...
-        $this->assertNotEquals($fieldTextBefore, $expectedTextNoTC);
         // get text without track-changes
         $fieldTextNoTC = $tags->getFieldText(true);
         $this->assertEquals($fieldTextNoTC, $expectedTextNoTC);
@@ -182,8 +186,11 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         // make sure, clone does not have track-changes
         $this->assertEmpty(
             $tagsNoTC->getByType(editor_Segment_Tag::TYPE_TRACKCHANGES, true),
-            'Calling editor_Segment_FieldTags::cloneWithoutTrackChanges() did not remove all track-changes !'
+            'Calling editor_Segment_FieldTags::cloneWithoutTrackChanges() did not remove all track-changes!'
         );
+        if ($expectedMarkupNoTC !== null) {
+            $this->assertEquals($tagsNoTC->render(), $expectedMarkupNoTC);
+        }
     }
 
     /**
