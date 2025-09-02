@@ -31,6 +31,41 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.28.6] - 2025-09-02
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4940](https://jira.translate5.net/browse/TRANSLATE-4940): t5memory - Add error 504 and 512 to reorganize errors list** <br>
+Added errors 504 and 512 to the list of errors that should trigger t5memory memory automatic reorganize
+
+
+### Bugfixes
+**[TRANSLATE-4937](https://jira.translate5.net/browse/TRANSLATE-4937): Editor general - Cursor is on wrong position in case segment has spellcheck but no trackchanges** <br>
+[🐞 Fix] of the issue which may causing cursor to appear on the left of the typed letter in case segment has spellcheck markup and no trackchanges
+
+**[TRANSLATE-4936](https://jira.translate5.net/browse/TRANSLATE-4936): Export - Deleted content present in export** <br>
+[🐞 Fix] Track changes not completely removed on export when del-tag contained only singular internal tag
+
+**[TRANSLATE-4935](https://jira.translate5.net/browse/TRANSLATE-4935): Editor general - Error when applying match to editor** <br>
+[🐞 Fix] Applying a match from match panel to the editor produces error.
+
+**[TRANSLATE-4933](https://jira.translate5.net/browse/TRANSLATE-4933): Editor general - Inserting tags works wrong** <br>
+[🐞 Fix] Corrected detecting tag pairs when inserting a tag to the segment with a CTRL+, shortcut
+
+**[TRANSLATE-4932](https://jira.translate5.net/browse/TRANSLATE-4932): User Management - Custom Plugin: correct Plunet status-calculation for task** <br>
+[🐞 Fix] Set TUA-state "edit" equal to "open" for calculation, so state will be calculated correct as "in Arbeit"
+
+**[TRANSLATE-4928](https://jira.translate5.net/browse/TRANSLATE-4928): VisualReview / VisualTranslation - Visual: Reduce waiting-time until Visual export will be cleaned/deleted** <br>
+[🐞 Fix] Reduce time, an visual-export will not be recreated immediately to 30 sec.
+
+**[TRANSLATE-4926](https://jira.translate5.net/browse/TRANSLATE-4926): Editor general - when using backspace on a tracked deletion cursor will jump** <br>
+[🐞 Fix] Cursor position when typing with trackchanges is stable now and don't jump over the segment.
+
+
 ## [7.28.6] - 2025-09-02
 
 ### Important Notes:
