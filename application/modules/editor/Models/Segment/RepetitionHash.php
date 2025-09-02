@@ -26,6 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
+use MittagQI\Translate5\Segment\Tag\Placeable;
+
 class editor_Models_Segment_RepetitionHash
 {
     /**
@@ -49,11 +54,21 @@ class editor_Models_Segment_RepetitionHash
      */
     protected $metaFieldsToAdd = [];
 
+    private readonly array $protectedWhitespaceTagList;
+
+    private readonly array $protectedContentTagList;
+
     public function __construct(editor_Models_Task $task)
     {
         $this->isSourceEditing = (bool) $task->getEnableSourceEditing();
         $this->util = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->metaFieldsToAdd = $task->getConfig()->runtimeOptions->alike->segmentMetaFields->toArray() ?? [];
+        $this->metaFieldsToAdd[] = 'segmentDescriptor';
+        $this->metaFieldsToAdd[] = 'transunitDescriptor';
+
+        $contentProtector = ContentProtector::create();
+        $this->protectedWhitespaceTagList = $contentProtector->tagList(WhitespaceProtector::alias());
+        $this->protectedContentTagList = $contentProtector->tagList(NumberProtector::alias());
     }
 
     public function setSegment(editor_Models_Segment $segment): void
@@ -151,8 +166,24 @@ class editor_Models_Segment_RepetitionHash
         $value = $this->util->internalTag->replace($value, function ($match) {
             //whitespace tags and real tags can not replaced by each other, so they must be different in the hash,
             // so: "Das<x>Haus" may not be a repetition anymore of "DasTABHaus", even TAB and <x> are both replaced with an internal tag
-            if (in_array($match[3], editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
+            if (in_array($match[3], $this->protectedWhitespaceTagList)) {
                 return '<internal-ws-tag>';
+            }
+
+            if (in_array($match[3], $this->protectedContentTagList)) {
+                return '<internal-cp-tag>';
+            }
+
+            if (preg_match(Placeable::DETECTION_REGEX, $match[0])) {
+                return '<internal-placeable-tag>';
+            }
+
+            if ('open' === $match[1]) {
+                return '<internal-open-tag>';
+            }
+
+            if ('close' === $match[1]) {
+                return '<internal-close-tag>';
             }
 
             return '<internal-tag>';
@@ -170,11 +201,23 @@ class editor_Models_Segment_RepetitionHash
             // loop through the configured additional data and add them the hash calculation
             foreach ($this->metaFieldsToAdd as $field) {
                 if (empty($this->segment)) {
+                    if (! property_exists($this->attributes, $field)) {
+                        continue;
+                    }
                     //TODO check customAttributes too if no native found!
                     $toAdd = $this->attributes->$field;
                 } else {
-                    $toAdd = $this->segment->meta()->__call('get' . ucfirst($field), []);
+                    try {
+                        $toAdd = $this->segment->meta()->__call('get' . ucfirst($field), []);
+                    } catch (\Zend_Db_Table_Row_Exception) {
+                        continue;
+                    }
                 }
+
+                if (empty($toAdd)) {
+                    continue;
+                }
+
                 $value .= '#' . $toAdd;
             }
         }

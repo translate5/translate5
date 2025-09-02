@@ -76,10 +76,10 @@ Ext.define('Editor.controller.Editor', {
         //     ref:'filepanel',
         //     selector:'#filepanel'
         // },
-        // {
-        //     ref: 'falsePositiveCheckColumn',
-        //     selector: '#metapanel #falsePositives grid checkcolumn'
-        // }
+        {
+            ref: 'falsePositiveCheckColumn',
+            selector: '#metapanel #falsePositives grid checkcolumn'
+        },
         {
             ref: 'languageResourceSearchGrid',
             selector: 'languageResourceSearchGrid'
@@ -225,8 +225,8 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
             'esc': [Ext.EventObjectImpl.ESC, null, me.cancel],
-            // 'ctrl-alt-left':  [Ext.EventObjectImpl.LEFT,{ctrl: true, alt: true}, me.goToLeft],
-            // 'ctrl-alt-right': [Ext.EventObjectImpl.RIGHT,{ctrl: true, alt: true}, me.goToRight],
+            'ctrl-alt-left':  [Ext.EventObjectImpl.LEFT,{ctrl: true, alt: true}, me.goToLeft],
+            'ctrl-alt-right': [Ext.EventObjectImpl.RIGHT,{ctrl: true, alt: true}, me.goToRight],
             'alt-pageup':     [Ext.EventObjectImpl.PAGE_UP,{ctrl: false, alt: true}, me.goToUpperByWorkflowNoSave],
             'alt-pagedown':   [Ext.EventObjectImpl.PAGE_DOWN,{ctrl: false, alt: true}, me.goToLowerByWorkflowNoSave],
             'alt-del':        [Ext.EventObjectImpl.DELETE,{ctrl: false, alt: true}, me.resetSegment],
@@ -234,7 +234,7 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
             'alt-c':          ['C', {ctrl: false, alt: true}, me.handleOpenComments, true],
             'alt-s':          ['S', {ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
-            // 'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
+            'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'F3':             [Ext.EventObjectImpl.F3,{ctrl: false, alt: false}, me.handleF3KeyPress, true],
             'alt-F3':         [Ext.EventObjectImpl.F3,{ctrl: false, alt: true}, me.handleAltF3KeyPress, true],
             'ctrl-insert':       [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
@@ -245,7 +245,7 @@ Ext.define('Editor.controller.Editor', {
             // // (If you change the setting for a defaultEventAction for DEC_DIGITS,
             // // please check if eventIsTranslate5() still works as expected
             // // in Editor.util.Event).
-            // 'ctrl-alt-DIGIT': [me.DEC_DIGITS,{ctrl: true, alt: true}, me.toggleFalsePositive, true],
+            'ctrl-alt-DIGIT': [me.DEC_DIGITS,{ctrl: true, alt: true}, me.toggleFalsePositive, true],
             'alt-DIGIT': [me.DEC_DIGITS, {ctrl: false, alt: true}, me.handleAssignMQMTag, true],
             'DIGIT': [me.DEC_DIGITS, {ctrl: false, alt: false}, me.handleDigit],
             'ctrl-zoomIn': [[187, Ext.EventObjectImpl.NUM_PLUS], {
@@ -922,9 +922,10 @@ Ext.define('Editor.controller.Editor', {
      * Digit handler, does only something if a DIGIT preparation shortcut was pressed directly before.
      */
     handleDigit: function (k, e) {
-        if (e.lastWasDigitPreparation) {
+        if (this.digitHandler) {
             e.stopEvent();
             this.digitHandler(k, e);
+            delete this.digitHandler;
 
             return false;
         }
@@ -1242,6 +1243,24 @@ Ext.define('Editor.controller.Editor', {
     },
 
     /**
+     * Toggle false-positive on any of first 10 qualities, identified by numeric keys 1-9, and key '0' for 10th
+     *
+     * @param key
+     */
+    toggleFalsePositive: function(key) {
+        var me = this,
+            column = me.getFalsePositiveCheckColumn(),
+            rowIndex = (Number(key) - 48 || 10) - 1,
+            record = column.up('grid').getStore().getAt(rowIndex);
+
+        // If no record exists at such rowIndex - return
+        if (!record) return;
+
+        // Fire checkchange-event
+        column.fireEvent('checkchange', column, rowIndex, !record.get('falsePositive'), record);
+    },
+
+    /**
      * Handles pressing the MQM tag shortcuts, without shift 1-10, with shift 11-20
      */
     handleAssignMQMTag: function(key, e) {
@@ -1265,55 +1284,55 @@ Ext.define('Editor.controller.Editor', {
         this.fireEvent('assignMQMTag', param);
     },
 
-    // /**
-    //  * Move the editor about one editable field
-    //  */
-    // goToCustom: function(direction, saveRecord) {
-    //     var me = this,
-    //         info = me.getColInfo(),
-    //         idx = info && info.foundIdx,
-    //         cols = info && info.columns,
-    //         store = me.getSegmentGrid().store,
-    //         plug = me.getEditPlugin(),
-    //         newRec;
-    //
-    //     if(info === false) {
-    //     return;
-    //     }
-    //     newRec = store.getAt(store.indexOf(plug.context.record) + direction);
-    //
-    //     //check if there exists a next/prev row, if not we dont need to move the editor.
-    //     while(newRec && !newRec.get('editable')) {
-    //         newRec = store.getAt(store.indexOf(newRec) + direction);
-    //     }
-    //     if(cols[idx + direction]) {
-    //     plug.editor.changeColumnToEdit(cols[idx + direction]);
-    //     return;
-    //     }
-    //     if(direction > 0) {
-    //         //goto next segment and first col
-    //         if(newRec) {
-    //             plug.editor.changeColumnToEdit(cols[0]);
-    //         }
-    //         if (saveRecord) {
-    //         me.saveNext();
-    //         }
-    //         else {
-    //         me.goToLowerNoSave();
-    //         }
-    //         return;
-    //     }
-    //     //goto prev segment and last col
-    //     if(newRec) {
-    //         plug.editor.changeColumnToEdit(cols[cols.length - 1]);
-    //     }
-    //     if (saveRecord) {
-    //     me.savePrevious();
-    //     }
-    //     else {
-    //     me.goToUpperNoSave();
-    //     }
-    // },
+    /**
+     * Move the editor about one editable field
+     */
+    goToCustom: function(direction, saveRecord) {
+        var me = this,
+            info = me.getColInfo(),
+            idx = info && info.foundIdx,
+            cols = info && info.columns,
+            store = me.getSegmentGrid().store,
+            plug = me.getEditPlugin(),
+            newRec;
+
+        if (info === false) {
+            return;
+        }
+        newRec = store.getAt(store.indexOf(plug.context.record) + direction);
+
+        //check if there exists a next/prev row, if not we dont need to move the editor.
+        while (newRec && !newRec.get('editable')) {
+            newRec = store.getAt(store.indexOf(newRec) + direction);
+        }
+        if (cols[idx + direction]) {
+            plug.editor.changeColumnToEdit(cols[idx + direction]);
+            return;
+        }
+        if (direction > 0) {
+            //goto next segment and first col
+            if(newRec) {
+                plug.editor.changeColumnToEdit(cols[0]);
+            }
+            if (saveRecord) {
+                me.saveNext();
+            }
+            else {
+                me.goToLowerNoSave();
+            }
+            return;
+        }
+        //goto prev segment and last col
+        if (newRec) {
+            plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+        }
+        if (saveRecord) {
+            me.savePrevious();
+        }
+        else {
+            me.goToUpperNoSave();
+        }
+    },
     // /**
     //  * Move the editor about one editable field
     //  */
@@ -1326,63 +1345,65 @@ Ext.define('Editor.controller.Editor', {
     // goAlternateLeft: function() {
     //     this.goToCustom(-1, true);
     // },
-    // /**
-    //  * Move the editor about one editable field left
-    //  */
-    // goToLeft: function(key, e) {
-    //     var me = this,
-    //         direction = -1;
-    //     if(!me.isEditing) {
-    //         return;
-    //     }
-    //     e.preventDefault();
-    //     e.stopEvent();
-    //     me.goToCustom(direction, true);
-    // },
-    // /**
-    //  * Move the editor about one editable field right
-    //  */
-    // goToRight: function(key, e) {
-    //     var me = this,
-    //         direction = 1;
-    //     if(!me.isEditing) {
-    //         return;
-    //     }
-    //     e.preventDefault();
-    //     e.stopEvent();
-    //     me.goToCustom(direction, true);
-    // },
-    // /**
-    //  * returns the visible columns and which column has actually the editor
-    //  * @return {Object}
-    //  */
-    // getColInfo: function() {
-    //     var me = this,
-    //         plug = me.getEditPlugin(),
-    //         columns = me.getSegmentGrid().query('contentEditableColumn:not([hidden])'),
-    //         foundIdx = false,
-    //         current = plug.editor.getEditedField();
-    //
-    //     if(!plug || !plug.editor || !plug.editing) {
-    //         return false;
-    //     }
-    //
-    //     Ext.Array.each(columns, function(col, idx) {
-    //     if(col.dataIndex === current) {
-    //         foundIdx = idx;
-    //     }
-    //     });
-    //     if(foundIdx === false) {
-    //     return false;
-    //     }
-    //
-    //     return {
-    //     plug: plug,
-    //     columns: columns,
-    //     foundIdx: foundIdx
-    //     };
-    // },
-    //
+    /**
+     * Move the editor about one editable field left
+     */
+    goToLeft: function(key, e) {
+        var me = this,
+            direction = -1;
+        if (!me.isEditing) {
+            return;
+        }
+        e.preventDefault();
+        e.stopEvent();
+        me.goToCustom(direction, true);
+    },
+    /**
+     * Move the editor about one editable field right
+     */
+    goToRight: function(key, e) {
+        var me = this,
+            direction = 1;
+        if (!me.isEditing) {
+            return;
+        }
+        e.preventDefault();
+        e.stopEvent();
+        me.goToCustom(direction, true);
+    },
+
+    /**
+     * returns the visible columns and which column has actually the editor
+     * @return {Object}
+     */
+    getColInfo: function() {
+        var me = this,
+            plug = me.getEditPlugin(),
+            columns = me.getSegmentGrid().query('contentEditableColumn:not([hidden])'),
+            foundIdx = false,
+            current = this.htmlEditor?.getEditedField();
+
+        if (!plug || !plug.editor || !plug.editing) {
+            return false;
+        }
+
+        Ext.Array.each(columns, function(col, idx) {
+            if (col.dataIndex === current) {
+                foundIdx = idx;
+            }
+        });
+
+        if (foundIdx === false) {
+            return false;
+        }
+
+        return {
+            plug: plug,
+            columns: columns,
+            foundIdx: foundIdx
+        };
+    },
+
     /**
      * brings the currently opened segment back into the view.
      */
@@ -1422,52 +1443,51 @@ Ext.define('Editor.controller.Editor', {
     setValueForEditor: function(value) {
         this.resetSegmentValueForEditor = value;
     },
-    // /**
-    //  * handler for the F2 key
-    //  */
-    // handleF2KeyPress: function() {
-    //     var me = this,
-    //         grid = me.getSegmentGrid(),
-    //         selModel = grid.getSelectionModel(),
-    //         ed = me.getEditPlugin(),
-    //         cols = grid.query('contentEditableColumn:not([hidden])'),
-    //         sel = [],
-    //         firstEditableRow = grid.store.getFirsteditableRow(),
-    //         callback;
-    //
-    //     if(Ext.isEmpty(firstEditableRow)) {
-    //         return;
-    //     }
-    //
-    //     if (ed.editing) {
-    //         ed.editor.mainEditor.deferFocus();
-    //         return;
-    //     }
-    //
-    //     if (selModel.hasSelection()){
-    //         //with selection scroll the selection into the viewport and open it afterwards
-    //         sel = selModel.getSelection();
-    //         grid.scrollTo(grid.store.indexOf(sel[0]),{
-    //             callback: function() {
-    //                 ed.startEdit(sel[0], cols[0]);
-    //             }
-    //         });
-    //     } else {
-    //         //with no selection, scroll to the first editable select, select it, then open it
-    //         callback = function() {
-    //             grid.selectOrFocus(firstEditableRow);
-    //             sel = selModel.getSelection();
-    //             var editStarted = ed.startEdit(sel[0], cols[0]);
-    //             if(editStarted) {
-    //             Editor.MessageBox.addInfo(me.messages.f2FirstOpened);
-    //             }
-    //         };
-    //         grid.scrollTo(firstEditableRow, {
-    //             callback: callback,
-    //             notScrollCallback: callback
-    //         });
-    //     }
-    // },
+    /**
+     * handler for the F2 key
+     */
+    handleF2KeyPress: function() {
+        var me = this,
+            grid = me.getSegmentGrid(),
+            selModel = grid.getSelectionModel(),
+            ed = me.getEditPlugin(),
+            cols = grid.query('contentEditableColumn:not([hidden])'),
+            sel = [],
+            firstEditableRow = grid.store.getFirsteditableRow(),
+            callback;
+
+        if (Ext.isEmpty(firstEditableRow)) {
+            return;
+        }
+
+        if (this.isEditing) {
+            return;
+        }
+
+        if (selModel.hasSelection()) {
+            //with selection scroll the selection into the viewport and open it afterwards
+            sel = selModel.getSelection();
+            grid.scrollTo(grid.store.indexOf(sel[0]),{
+                callback: () => ed.startEdit(sel[0], cols[0]),
+                notScrollCallback: () => ed.startEdit(sel[0], cols[0])
+            })
+        } else {
+
+            //with no selection, scroll to the first editable select, select it, then open it
+            callback = function() {
+                grid.selectOrFocus(firstEditableRow);
+                sel = selModel.getSelection();
+                var editStarted = ed.startEdit(sel[0], cols[0]);
+                if(editStarted) {
+                    Editor.MessageBox.addInfo(me.messages.f2FirstOpened);
+                }
+            };
+            grid.scrollTo(firstEditableRow, {
+                callback: callback,
+                notScrollCallback: callback
+            });
+        }
+    },
 
     /***
      * F3 editor event handler.
@@ -1513,6 +1533,10 @@ Ext.define('Editor.controller.Editor', {
      */
     handleAltF3KeyPress: function () {
         const searchGrid = this.getSynonymSearch();
+
+        if (!searchGrid) {
+            return;
+        }
         this.openEditorPanel(searchGrid);
 
         const selectedText = this.getSelectedText();
@@ -1898,8 +1922,8 @@ Ext.define('Editor.controller.Editor', {
     },
 
     handleInsertTag: function (key, e) {
-            const editorWrapper = this.getEditPlugin().editor.mainEditor.editor,
-            tagIdx = Number(e.browserEvent.key);
+            const editorWrapper = this.getEditPlugin().editor.mainEditor.editor;
+            let tagIdx = Number(e.browserEvent.key);
 
         if (e.shiftKey) {
             tagIdx = tagIdx + 10;
