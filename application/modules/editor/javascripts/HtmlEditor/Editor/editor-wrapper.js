@@ -236,7 +236,9 @@ export default class EditorWrapper {
 
             if (this.dataTransformer.hasPairedReferenceTag(tagNumber)) {
                 const positions = this.getInternalTagsPositions();
-                const leftSiblings = Object.keys(positions).filter((position) => position < selection.start);
+                const leftSiblings = Object.keys(positions).filter((position) => {
+                    return position < selection.start && parseInt(positions[position].number) === tagNumber;
+                });
                 const leftSibling = leftSiblings.length ? positions[Math.max(...leftSiblings)] : null;
 
                 let type = TagsConversion.TYPE.OPEN;
