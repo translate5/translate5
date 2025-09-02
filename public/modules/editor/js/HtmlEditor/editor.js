@@ -105,8 +105,8 @@ class DataTransformer {
 
     /**
      * @param {TagsConversion} tagsConversion
-     * @param {NodeListOf<ChildNode>} items
-     * @param {NodeListOf<ChildNode>|Array} referenceItems
+     * @param {NodeListOf<HTMLElement>} items
+     * @param {NodeListOf<HTMLElement>|Array<HTMLElement>} referenceItems
      * @param {Boolean} userCanModifyWhitespaceTags
      * @param {Boolean} userCanInsertWhitespaceTags
      */
@@ -137,6 +137,10 @@ class DataTransformer {
         this.#transform(items, referenceItems);
     }
 
+    /**
+     * @param {NodeListOf<HTMLElement>} items
+     * @param {NodeListOf<HTMLElement>} referenceItems
+     */
     #transform(items, referenceItems = []) {
         this.#retrieveTags(this.#transformItems(referenceItems), this._referenceTags);
         this._tagCheck = new _TagsTransform_tag_check__WEBPACK_IMPORTED_MODULE_2__["default"](
@@ -148,7 +152,11 @@ class DataTransformer {
         this._transformedNodes = this.#transformItems(items);
         this.#retrieveTags(this._transformedNodes, this._transformedTags);
     }
-    
+
+    /**
+     * @param {NodeListOf<HTMLElement>} items
+     * @returns {string}
+     */
     transformPartial(items) {
         const nodes = this.#transformItems(items);
         this.#retrieveTags(nodes, this._transformedTags);
@@ -161,6 +169,10 @@ class DataTransformer {
         return result;
     }
 
+    /**
+     * @param {HTMLElement} whitespce
+     * @returns {*}
+     */
     transformWhitespace(whitespce) {
         const items = this.#transformItems([whitespce], true);
         this.#retrieveTags(items, this._transformedTags);
@@ -220,11 +232,22 @@ class DataTransformer {
         };
     }
 
+    /**
+     * @param {NodeListOf<HTMLElement>} items
+     * @param {Boolean} reference
+     * @returns {Array<Node>}
+     */
     #transformItems(items, reference = false) {
         let result = [];
 
         for (const item of items) {
-            let node = new _node__WEBPACK_IMPORTED_MODULE_0__["default"](item, this._tagsConversion.transform(item));
+            const transformed = this._tagsConversion.transform(item);
+
+            if (! transformed) {
+                continue;
+            }
+
+            let node = new _node__WEBPACK_IMPORTED_MODULE_0__["default"](item, transformed);
 
             result.push(node);
 
