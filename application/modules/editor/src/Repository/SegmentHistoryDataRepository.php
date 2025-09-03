@@ -88,6 +88,21 @@ class SegmentHistoryDataRepository
         return $this->db->fetchAll($s)->toArray();
     }
 
+    /**
+     * Get original md5 hash for target-field, which is (for some reason)
+     * available in the history only as a 2nd history-record
+     */
+    public function getOriginalMd5(int|string $segmentId, string $field = 'target'): ?string
+    {
+        $s = $this->db->select();
+        $s->where('segmentId = ?', $segmentId);
+        $s->where('name = ?', $field);
+        $s->order('id ASC');
+        $s->limit(1, 1);
+
+        return $this->db->fetchAll($s)->toArray()[0]['originalMd5'] ?? null;
+    }
+
     public function loadByHistoryId(int $id, $columns = []): array
     {
         $s = $this->db->select()->where('segmentHistoryId = ?', $id);

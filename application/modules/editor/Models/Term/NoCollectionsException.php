@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Exception on TBX creation for term tagging
  */
-class editor_Models_Term_TbxCreationException extends ZfExtended_ErrorCodeException
+class editor_Models_Term_NoCollectionsException extends ZfExtended_ErrorCodeException
 {
     /**
      * @var string
@@ -37,7 +37,6 @@ class editor_Models_Term_TbxCreationException extends ZfExtended_ErrorCodeExcept
     protected $domain = 'editor.terminology';
 
     protected static $localErrorCodes = [
-        'E1114' => 'The associated collections don\'t contain terms in the languages of the task.',
-        'E1115' => 'collected terms could not be converted to XML.',
+        'E1113' => 'No term collection assigned to task although tasks terminology flag is true.',
     ];
 }

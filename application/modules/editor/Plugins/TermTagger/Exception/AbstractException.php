@@ -62,5 +62,6 @@ abstract class AbstractException extends ZfExtended_ErrorCodeException
         'E1131' => 'TermTagger DOWN: No TermTagger instances are available, please enable them and reimport this task.',
         'E1240' => 'TermTagger TIMEOUT: The configured TermTagger "{termTaggerUrl}" did not respond in an appropriate time.',
         'E1326' => 'TermTagger can not work when source and target language are equal.',
+        'E1738' => 'All TermCollections have been removed from the task and thus no terminology was tagged.',
     ];
 }

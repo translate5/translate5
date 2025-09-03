@@ -697,7 +697,7 @@ Ext.define('Editor.controller.Segments', {
 
         // Regex to cleanup the match and segment before comparing
         // todo: investigate where undefined comes from?
-        var rex = /<del .*?<\/del>|<img.*?duplicatesavecheck.*?>|undefined$/g;
+        var rex = /<del .*?<\/del>|<img.*?duplicatesavecheck.*?>|<ins.+?>|<\/ins>|undefined$/g;
 
         // If segment was edited after some match was taken over - add 'interactive' flag
         if (record.isModified('targetEdit')

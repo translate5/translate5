@@ -36,6 +36,7 @@ use MittagQI\Translate5\Plugins\TermTagger\Exception\DownException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\OpenException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\RemovedException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\Remover;
@@ -180,6 +181,16 @@ class Worker extends AbstractProcessingWorker
             $this->onServiceDown($loopedProcessingException);
 
             // this will terminate the processing
+            return 0;
+        }
+        // RemovedException mean that all TermCollections have been removed from the task
+        if ($loopedProcessingException instanceof RemovedException) {
+            $this->logTaskException($loopedProcessingException);
+
+            // this will terminate the processing
+            // TODO FIXME: When all TermCollections were removed and we are not in an import
+            // (AutoQA operation. MatchAnalysis Operation) we should run the Remover instead
+            // Why does it happen that tasks can have a terminology still after all Collections have been removed ?
             return 0;
         }
         // OpenException Exceptions mean mostly that there is problem with the TBX data

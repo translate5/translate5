@@ -35,7 +35,7 @@ use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $guid)
  * @method string getTbxHash()
- * @method void setTbxHash(string $tbxHasj)
+ * @method void setTbxHash(string $tbxHash)
  * @method null|string getMappingType()
  * @method void setMappingType(string $mappingType)
  * @method null|string getBconfId()
