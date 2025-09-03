@@ -32,6 +32,50 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.29.0] - 2025-09-03
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4829](https://jira.translate5.net/browse/TRANSLATE-4829): AI - Max number of segments in request to LLM** <br>
+[🆕 Feature] AI-Plugin: 
+* updated model-list & model capabilities to match OpenAI latest changes
+* improved token-limit calculations
+* added model configuration to customize batch-size for pretranslation and disable batching all together
+
+**[TRANSLATE-4815](https://jira.translate5.net/browse/TRANSLATE-4815): AI - MS Azure AI Foundry integeration: Allow passing of model deployment name on language resource creation** <br>
+[🆕 Feature]  Added capabilities to use Azure cloud as LLM without the necessary credentials to manage/deploy models. In this case, the models need to be deployed by the user
+
+
+### Changed
+**[TRANSLATE-4903](https://jira.translate5.net/browse/TRANSLATE-4903): Configuration - Update phpstan to newer version** <br>
+[🛠️ Improvement] Updated software dependency
+
+**[TRANSLATE-4889](https://jira.translate5.net/browse/TRANSLATE-4889): t5memory - Document http://{{socket}}/t5memory/{{mem_name}}/addtotable end point** <br>
+[🛠️ Improvement] Update t5memory documentation.
+
+**[TRANSLATE-4438](https://jira.translate5.net/browse/TRANSLATE-4438): AI - Integrate Llama 3 as language resource analogous to GPT** <br>
+[🆕 Feature]  Added Meta Llama as available integration into Translate5 AI plugin
+
+
+### Bugfixes
+**[TRANSLATE-4924](https://jira.translate5.net/browse/TRANSLATE-4924): TermTagger integration - TermTagging: Editing Segments should not run into an Exception when all TermCollections have been removed** <br>
+[🐞 Fix] Do not throw Exception when all TermCollections were Removed and thus the task-TBX is not valid anymore when editing a segment.
+
+**[TRANSLATE-4899](https://jira.translate5.net/browse/TRANSLATE-4899): Import/Export - Repetition hash calculated incorrectly** <br>
+[🐞 Fix] Changed logic to calculate segment hashed. Will affect newly imported tasks only.
+
+**[TRANSLATE-4879](https://jira.translate5.net/browse/TRANSLATE-4879): LanguageResources, t5memory - Reimport fails in case after task finish language resource is unassigned** <br>
+[🐞 Fix] Changed reimport to work even in case when language resource is unassigned
+
+**[TRANSLATE-4856](https://jira.translate5.net/browse/TRANSLATE-4856): Auto-QA - AutoQA: Unchanged Fuzzy Match check also lists not-changed MT pre-translations** <br>
+translate5 - 7.26.4: [🐞 Fix] MT-translations are not counted as Unedited fuzzy matches anymore
+translate5 - 7.29.0: [🐞 Fix] Additional improvements and fixes.
+
+
 ## [7.28.6] - 2025-09-02
 
 ### Important Notes:
