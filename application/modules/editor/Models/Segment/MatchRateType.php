@@ -606,4 +606,15 @@ class editor_Models_Segment_MatchRateType
             'task' => $task,
         ]);
     }
+
+    /**
+     * Remove given flag from matchRateType
+     */
+    public function remove(string $type)
+    {
+        if ($this->isValidType($type) && in_array($type, $this->data)) {
+            unset($this->data[array_search($type, $this->data)]);
+            $this->data = array_values($this->data);
+        }
+    }
 }

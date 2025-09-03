@@ -30,6 +30,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
+use MittagQI\Translate5\Repository\SegmentHistoryDataRepository;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\Segment\UpdateSegmentStatistics;
@@ -255,9 +256,24 @@ class editor_Models_Segment_Updater
         // or with some changes but except when same or another match is (possibly again) taken over in UI
         if (str_starts_with($givenType, editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED) === false
             && $segment->getPretrans()) {
-            // Add interactive flag
+            // Get original md5 hash for target-field, which is (for some reason)
+            // available in the history only as a 2nd history-record
+            $originalMd5 = (new SegmentHistoryDataRepository())->getOriginalMd5($segment->getId());
+
+            // If no original md5 hash detected, it means there is no change history so far, i.e. right now it is
+            // the very first time target-field might have been changed, and in this case we can rely on the original
+            // md5 hash available right within the segment record itself
+            $originalMd5 ??= $segment->getModifiedValues()['targetMd5'];
+
+            // Init matchRate type object
             $matchrateType->init($givenType);
-            $matchrateType->add(editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE);
+
+            // So, let's compare and if it's not equal then add interactive flag
+            if ($segment->getTargetMd5() === $originalMd5) {
+                $matchrateType->remove(editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE);
+            } else {
+                $matchrateType->add(editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE);
+            }
             $segment->setMatchRateType($givenType = (string) $matchrateType);
         }
 
