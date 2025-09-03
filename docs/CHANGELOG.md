@@ -31,6 +31,7 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
 ## [7.28.6] - 2025-09-02
 
 ### Important Notes:
@@ -55,7 +56,7 @@ Added errors 504 and 512 to the list of errors that should trigger t5memory memo
 **[TRANSLATE-4933](https://jira.translate5.net/browse/TRANSLATE-4933): Editor general - Inserting tags works wrong** <br>
 [🐞 Fix] Corrected detecting tag pairs when inserting a tag to the segment with a CTRL+, shortcut
 
-**[TRANSLATE-4932](https://jira.translate5.net/browse/TRANSLATE-4932): User Management - StarMiele-Plugin: correct Plunet status-calculation for task** <br>
+**[TRANSLATE-4932](https://jira.translate5.net/browse/TRANSLATE-4932): User Management - Custom Plugin: correct Plunet status-calculation for task** <br>
 [🐞 Fix] Set TUA-state "edit" equal to "open" for calculation, so state will be calculated correct as "in Arbeit"
 
 **[TRANSLATE-4928](https://jira.translate5.net/browse/TRANSLATE-4928): VisualReview / VisualTranslation - Visual: Reduce waiting-time until Visual export will be cleaned/deleted** <br>
