@@ -1319,21 +1319,22 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
     /**
      * exports all terms of all termCollections associated to the task in the task's languages.
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
+     * @throws editor_Models_Term_NoCollectionsException
      * @throws editor_Models_Term_TbxCreationException
      */
     public function exportForTagging(editor_Models_Task $task): string
     {
-        $languageModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languageModel editor_Models_Languages */
+        $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
 
-        $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $assoc editor_Models_TermCollection_TermCollection */
+        $assoc = new editor_Models_TermCollection_TermCollection();
         $collectionIds = $assoc->getCollectionsForTask($task->getTaskGuid());
 
         if (empty($collectionIds)) {
             //No term collection assigned to task although tasks terminology flag is true.
             // This is normally not possible, since the terminology flag in the task is maintained on TC task assoc changes via API
-            throw new editor_Models_Term_TbxCreationException('E1113', [
+            throw new editor_Models_Term_NoCollectionsException('E1113', [
                 'task' => $task,
             ]);
         }

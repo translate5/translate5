@@ -27,6 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Plugins\TermTagger\Configuration;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\OpenException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\RemovedException;
+use MittagQI\Translate5\Plugins\TermTagger\Processor\Remover;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\Tagger;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
 use MittagQI\Translate5\Plugins\TermTagger\Worker;
@@ -240,7 +243,10 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
 
             // when the segment is oversized or shall be ignored due to not being editable we do not need to process it and just can return them
             // the editing non-editable segments check is only for completeness here
-            if (($segment->meta()->getSourceWordCount() >= $this->getOversizeWordCount($config)) || (! $segment->getEditable() && ! $config->runtimeOptions->termTagger->tagReadonlySegments)) {
+            if (
+                $segment->meta()->getSourceWordCount() >= $this->getOversizeWordCount($config) ||
+                (! $segment->getEditable() && ! $config->runtimeOptions->termTagger->tagReadonlySegments)
+            ) {
                 // to keep potentially existing tags/qualities we need to process them, otherwise the existing will simply be deleted
                 Tagger::findAndAddQualitiesInTags($tags);
                 $messages?->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
@@ -248,10 +254,25 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
                 return $tags;
             }
             // tag the terms in the segment
-            $service = editor_Plugins_TermTagger_Bootstrap::createService('termtagger'); /* @var Service $service */
+            $service = editor_Plugins_TermTagger_Bootstrap::createService(Service::SERVICE_ID);
             $serviceUrl = $service->getPooledServiceUrl('gui');
-            $processor = new Tagger($task, $service, $processingMode, $serviceUrl, false);
-            $processor->process($tags, false);
+
+            // tagging the sent segment
+            try {
+                $processor = new Tagger($task, $service, $processingMode, $serviceUrl, false);
+                $processor->process($tags, false);
+            } catch (RemovedException $e) {
+                // when all TermCollections have been removed, we remove all tags and save the segment
+                error_log('PROBLEM when editing segment: ' . $e->getErrorCode() . '-' . $e->getMessage());
+                $processor = new Remover($task, $service, $processingMode, $serviceUrl, false);
+                $processor->process($tags, false);
+            } catch (OpenException $e) {
+                // when the Terminology could not be loaded, we simply do nothing and write a warning
+                $this->getLogger($processingMode)->exception($e, [
+                    'level' => ZfExtended_Logger::LEVEL_WARN,
+                    'task' => $task,
+                ]);
+            }
         }
 
         return $tags;

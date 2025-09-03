@@ -218,13 +218,6 @@ final class Service extends AbstractPooledService
      */
     public function loadTBX(string $url, string $tbxHash, string $tbxData, ZfExtended_Logger $logger): stdClass
     {
-        if (empty($tbxHash)) {
-            //Could not load TBX into TermTagger: TBX hash is empty.
-            throw new OpenException('E1116', [
-                'termTaggerUrl' => $url,
-            ]);
-        }
-
         // get default- and additional- (if any) -options for server-communication
         $serviceData = new stdClass();
         $serviceData->tbxFile = $tbxHash;

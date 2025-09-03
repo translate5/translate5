@@ -274,10 +274,17 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     }
 
     /**
-     * checks if the needed TBX file exists, otherwise recreate if from DB
+     * recreates the TBX and Hash from DB
+     * @return array{data: string, hash: string}>
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
+     * @throws editor_Models_Term_NoCollectionsException
      * @throws editor_Models_Term_TbxCreationException
      */
-    public function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath): string
+    public function recreateTaskTbx(editor_Models_Task $task, SplFileInfo $tbxPath): array
     {
         //fallback for recreation of TBX file:
         $tbxData = $this->termModel->exportForTagging($task);
@@ -289,7 +296,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
         file_put_contents($tbxPath, $tbxData);
 
-        return $tbxData;
+        return [
+            'data' => $tbxData,
+            'hash' => $hash,
+        ];
     }
 
     /**

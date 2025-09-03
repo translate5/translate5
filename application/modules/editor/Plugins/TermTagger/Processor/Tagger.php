@@ -35,6 +35,7 @@ use editor_Models_Segment_TermTagTrackChange;
 use editor_Models_Segment_TrackChangeTag;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
+use editor_Models_Term_NoCollectionsException;
 use editor_Models_Term_TbxCreationException;
 use editor_Plugins_TermTagger_Bootstrap;
 use editor_Plugins_TermTagger_QualityProvider;
@@ -45,6 +46,7 @@ use MittagQI\Translate5\Plugins\TermTagger\Exception\AbstractException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\CheckTbxTimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\OpenException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\RemovedException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
 use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
@@ -638,9 +640,9 @@ final class Tagger extends AbstractProcessor
                 return;
             }
             // getDataTbx also creates the TbxHash
-            $tbx = $this->getTbxData();
-            $tbxHash = $this->task->meta()->getTbxHash();
-            $this->service->loadTBX($url, $tbxHash, $tbx, $this->logger);
+            $tbxData = $this->getTbxData();
+            $tbxHash = $tbxData['hash'];
+            $this->service->loadTBX($url, $tbxData['hash'], $tbxData['data'], $this->logger);
         } catch (TimeOutException $e) {
             // a TimeOutException will be "casted" to a CheckTbxTimeOutException
             // this is neccessary to distinguish Timeouts when Pinging or Loading TBX
@@ -661,19 +663,32 @@ final class Tagger extends AbstractProcessor
 
     /**
      * returns the TBX string to be loaded into the termtagger
+     * @return array{data: string, hash: string}
      * @throws OpenException
+     * @throws \ReflectionException
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    private function getTbxData(): string
+    private function getTbxData(): array
     {
         // try to load tbx-file to the TermTagger-server
         $tbxFileInfo = new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($this->task));
         $tbxParser = ZfExtended_Factory::get(editor_Models_Import_TermListParser_Tbx::class);
 
         try {
-            return $tbxParser->assertTbxExists($this->task, $tbxFileInfo);
+            return $tbxParser->recreateTaskTbx($this->task, $tbxFileInfo);
         } catch (editor_Models_Term_TbxCreationException $e) {
             // 'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
             throw new OpenException('E1116', [], $e);
+        } catch (editor_Models_Term_NoCollectionsException $e) {
+            // we reset all terminology-data of the task
+            $this->task->meta()->setTbxHash('');
+            $this->task->meta()->save();
+            $this->task->setTerminologie(false);
+            $this->task->save();
+
+            throw new RemovedException('E1738', [], $e);
         }
     }
 }

@@ -183,8 +183,8 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
 
                     throw $e;
                 }
-                // this makes sure, global processing is back in case inheriting code "forgets" is
-                // in case it was set back properly already, nothing happens with the states
+                // this makes sure, global processing is set back in case inheriting code "forgets" this
+                // in case it was set back properly already, nothing happens with the states here
                 $this->looper->setProcessingFinished($states, $this->doDebug);
 
                 if ($flag > 0) {
