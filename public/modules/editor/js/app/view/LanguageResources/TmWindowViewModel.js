@@ -38,6 +38,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         resourceId: null,
         uploadLabel: null,
         engineBased: null,
+        useEnginesCombo: true,
+        domainCodePreset: '',
         strippingFramingTagsSupported: false,
         resegmentationSupported: false,
     },
@@ -76,8 +78,17 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         }
     },
     formulas: {
-        isEngineBasedResource: function (get) {
-            return get('engineBased');
+        useEnginesListCombo: function (get) {
+            return get('engineBased') && get('useEnginesCombo');
+        },
+        useEngineTextfield: function (get) {
+            return get('engineBased') && !get('useEnginesCombo');
+        },
+        hasDomaincodeTextfield: function (get) {
+            return get('domainCodePreset') === '' && !get('useEnginesCombo');
+        },
+        getDomaincodePreset: function (get) {
+            return get('domainCodePreset');
         },
         isTermCollectionResource: function (get) {
             return get('serviceName') === Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;

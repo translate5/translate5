@@ -157,7 +157,7 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
 
     public function enginesAction(): void
     {
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $resourcesOfType = $serviceManager->getAllResourcesOfType($this->getRequest()->get('resourceType'));
 
         if (empty($resourcesOfType)) {

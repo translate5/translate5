@@ -122,13 +122,35 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                         xtype: 'enginecombo',
                         itemId: 'engine',
                         name: 'engines',
-                        bind: {
-                            hidden: '{!isEngineBasedResource}',
-                            disabled: '{!isEngineBasedResource}'
-                        },
                         allowBlank: false,
+                        bind: {
+                            hidden: '{!useEnginesListCombo}',
+                            disabled: '{!useEnginesListCombo}'
+                        },
                         listeners: {
                             change: 'onEngineComboChange'
+                        }
+                    }, {
+                        xtype: 'textfield',
+                        itemId: 'enginefield',
+                        name: 'engine',
+                        maxLength: 255,
+                        allowBlank: false,
+                        fieldLabel: 'Engine/Model',
+                        bind: {
+                            hidden: '{!useEngineTextfield}',
+                            disabled: '{!useEngineTextfield}'
+                        }
+                    }, {
+                        xtype: 'textfield',
+                        itemId: 'domaincodefield',
+                        name: 'domaincode',
+                        maxLength: 255,
+                        allowBlank: false,
+                        fieldLabel: 'Domain/Code',
+                        bind: {
+                            hidden: '{!hasDomaincodeTextfield}',
+                            disabled: '{!hasDomaincodeTextfield}'
                         }
                     }, {
                         xtype: 'textfield',
