@@ -33,12 +33,10 @@ namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 use editor_Models_Task_AbstractWorker;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\CreateSnapshot;
-use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use Throwable;
 use ZfExtended_ErrorCodeException;
 use ZfExtended_Exception;
-use ZfExtended_Factory;
 
 class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
 {
@@ -70,10 +68,6 @@ class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
         $params = $this->workerModel->getParameters();
         $languageResourceId = (int) $params['languageResourceId'];
 
-        if (! $this->isWritableLanguageResourceForTask($this->task->getTaskGuid(), $languageResourceId)) {
-            return true;
-        }
-
         $runId = bin2hex(random_bytes(16));
 
         $this->snapshot->createSnapshot(
@@ -97,14 +91,6 @@ class PrepareReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
         }
 
         return true;
-    }
-
-    private function isWritableLanguageResourceForTask(string $taskGuid, int $languageResourceId): bool
-    {
-        $assoc = ZfExtended_Factory::get(TaskAssociation::class);
-        $assoc->loadByTaskGuidAndTm($taskGuid, $languageResourceId);
-
-        return ! empty($assoc->getSegmentsUpdateable());
     }
 
     protected function handleWorkerException(Throwable $workException): void
