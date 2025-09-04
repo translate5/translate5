@@ -46,10 +46,10 @@ class ClientFactory
     ) {
     }
 
-    public static function create(): self
+    public static function create(bool $enableRawRequestResponseLogging = false): self
     {
         return new self(
-            CommunicationLogger::create()
+            CommunicationLogger::create($enableRawRequestResponseLogging)
         );
     }
 
