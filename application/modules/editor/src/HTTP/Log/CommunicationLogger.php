@@ -37,14 +37,16 @@ class CommunicationLogger implements LoggerInterface
     private function __construct(
         private readonly \Zend_Config $config,
         private readonly \ZfExtended_Logger $logger,
+        private readonly bool $enableRawRequestResponseLogging = false,
     ) {
     }
 
-    public static function create()
+    public static function create(bool $enableRawRequestResponseLogging = false)
     {
         return new self(
             \Zend_Registry::get('config'),
-            \Zend_Registry::get("logger")->cloneMe('http.client'),
+            \Zend_Registry::get('logger')->cloneMe('http.client'),
+            $enableRawRequestResponseLogging,
         );
     }
 
@@ -90,6 +92,31 @@ class CommunicationLogger implements LoggerInterface
 
     public function log($level, $message, array $context = []): void
     {
+        // raw logging into the PHP log
+        if ($this->enableRawRequestResponseLogging) {
+            if (str_starts_with($message, 'REQUEST')) {
+                error_log(
+                    "\n---------- REQUEST ----------\n"
+                    . trim(substr($message, 8))
+                    . (empty($context) ? '' : "\n" . print_r($context, true))
+                    . "\n==========\n"
+                );
+            } elseif (str_starts_with($message, 'RESPONSE')) {
+                error_log(
+                    "\n---------- RESPONSE ----------\n"
+                    . trim(substr($message, 9))
+                    . "\n==========\n"
+                );
+            } elseif ($level !== 'debug' && $level !== 'info' && $level !== 'notice' && $level !== 'warning') {
+                error_log(
+                    "\n---------- " . strtoupper($level) . " ----------\n"
+                    . trim($message)
+                    . (empty($context) ? '' : "\n" . print_r($context, true))
+                    . "\n==========\n"
+                );
+            }
+        }
+
         $pattern = '/(?:REQUEST: [A-Z]+ |RESPONSE: )(?<uri>\S+)/';
 
         if (! preg_match($pattern, $message, $matches)) {
