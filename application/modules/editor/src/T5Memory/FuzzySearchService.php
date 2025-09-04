@@ -354,8 +354,8 @@ class FuzzySearchService
         $successful = $api->lookup($query, $context, $fileName, $tmName);
 
         $response = Response::fromContentAndStatus(
-            $api->getResponse()->getBody(),
-            $api->getResponse()->getStatus(),
+            $api->getResponse() ? $api->getResponse()->getBody() : '{}',
+            $api->getResponse() ? $api->getResponse()->getStatus() : 200,
         );
 
         $saveDifferentTargetsForSameSource = (bool) $config
