@@ -53,7 +53,7 @@ abstract class editor_Services_Connector_HttpApiAbstract
     protected $httpMethod;
 
     /**
-     * @var Zend_Http_Response
+     * @var Zend_Http_Response|null
      */
     protected $response;
 
@@ -88,7 +88,7 @@ abstract class editor_Services_Connector_HttpApiAbstract
 
     /**
      * returns the raw response
-     * @return Zend_Http_Response
+     * @return Zend_Http_Response|null
      */
     public function getResponse()
     {
