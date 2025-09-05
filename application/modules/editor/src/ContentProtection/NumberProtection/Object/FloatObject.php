@@ -56,6 +56,8 @@ use NumberFormatter;
 
 class FloatObject
 {
+    private const SIGNS = ['-', '+', '±'];
+
     public function __construct(
         private readonly float $number,
         private readonly int $fractionDigits,
@@ -74,7 +76,7 @@ class FloatObject
         }
 
         $firstChar = mb_substr($float, 0, 1);
-        $sign = in_array($firstChar, ['-', '+']) ? $firstChar : '';
+        $sign = in_array($firstChar, self::SIGNS) ? $firstChar : '';
         $decimalPart = explode($decimalSeparator, $float)[1];
         // if format at the end has currency for example
         if (! preg_match('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $decimalPart)) {
@@ -100,7 +102,7 @@ class FloatObject
         $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $this->fractionDigits);
 
         $firstChar = mb_substr($format, 0, 1);
-        $signOfFormat = in_array($firstChar, ['-', '+']) ? $firstChar : '';
+        $signOfFormat = in_array($firstChar, self::SIGNS) ? $firstChar : '';
 
         return ($signOfFormat ? '' : $this->sign) . $formater->format($this->number);
     }
