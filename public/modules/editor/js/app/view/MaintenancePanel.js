@@ -87,7 +87,7 @@ Ext.define('Editor.view.MaintenancePanel', {
     },
     //check on each 'n' seconds if the maintenance is running
     isMaintenanceMode: function() {
-        let me = this;
+        const me = this;
         Ext.Ajax.request({
             method: 'HEAD',
             url: Editor.data.restpath + 'index/applicationstate',
