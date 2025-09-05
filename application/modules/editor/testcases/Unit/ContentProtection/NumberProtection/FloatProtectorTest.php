@@ -231,6 +231,24 @@ class FloatProtectorTest extends TestCase
             'protectionDto' => $protectionDtoWithMinus,
             'targetLang' => $targetLangDe,
         ];
+
+        $protectionDtoWithSimpleFloat = new ContentProtectionDto(
+            'float',
+            'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
+            '#,#',
+            false,
+            '#.#',
+            1
+        );
+
+        yield 'float with plus-minus' => [
+            'number' => '±123456,78',
+            'expected' => '<number type="float" name="test-default" source="±123456,78" iso="±123456.78" target="±123456.78" regex="049J0og21LWMjUmpNtAxqtXRrDas1QByjIFMLTAdoxeToh2TpF8KAA=="/>',
+            'protectionDto' => $protectionDtoWithSimpleFloat,
+            'targetLang' => $targetLangDe,
+        ];
     }
 
     public function testExceptionOnEmptyFormat(): void
