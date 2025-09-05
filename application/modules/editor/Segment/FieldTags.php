@@ -349,11 +349,42 @@ class editor_Segment_FieldTags extends editor_TagSequence
         bool $includeDeleted = false
     ): bool {
         foreach ($this->tags as $tag) {
-            if ($tag->getType() == $type
-                && $tag->hasClass($className)
-                && ($includeDeleted || ! $tag->wasDeleted)
-                && (($tag->startIndex >= $fromIdx && $tag->startIndex < $toIdx)
-                    || ($tag->endIndex >= $fromIdx && $tag->endIndex < $toIdx))) {
+            if ($tag->getType() === $type &&
+                $tag->hasClass($className) &&
+                ($includeDeleted || ! $tag->wasDeleted) &&
+                (
+                    ($tag->startIndex >= $fromIdx && $tag->startIndex < $toIdx) ||
+                    ($tag->endIndex >= $fromIdx && $tag->endIndex < $toIdx)
+                )
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Retrieves, if there are any (by default non-deleted) tags with a text-length of "0" (internal tags)
+     * at the given index that are not nested into the tags left/right of that position
+     */
+    public function hasNonNestedTagsAtIndex(
+        int $index,
+        editor_Segment_Tag $leftTag,
+        editor_Segment_Tag $rightTag,
+        bool $includeDeleted = false,
+    ): bool {
+        foreach ($this->tags as $tag) {
+            if (($includeDeleted || ! $tag->wasDeleted) &&
+                $tag !== $leftTag &&
+                $tag !== $rightTag &&
+                $tag->startIndex === $index &&
+                $tag->endIndex === $index &&
+                (
+                    $tag->parentOrder === -1 ||
+                    ($tag->parentOrder !== $leftTag->order && $tag->parentOrder !== $rightTag->order)
+                )
+            ) {
                 return true;
             }
         }
@@ -541,7 +572,11 @@ class editor_Segment_FieldTags extends editor_TagSequence
                     if ($forDeletion) {
                         $tag->wasDeleted = true;
                     }
-                } elseif ($lastTC !== null && $lastTC->endIndex === $tag->startIndex) {
+                } elseif (
+                    $lastTC !== null &&
+                    $lastTC->endIndex === $tag->startIndex &&
+                    ! $this->hasNonNestedTagsAtIndex($tag->startIndex, $lastTC, $tag)
+                ) {
                     $lastTC->endIndex = $tag->endIndex;
                     if ($forDeletion) {
                         $tag->wasDeleted = true;

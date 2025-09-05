@@ -14,6 +14,7 @@
             <file>Unit/Segment/SegmentTagsRepairTest.php</file>
             <file>Unit/Segment/SegmentTermTagsRepairTest.php</file>
             <file>Unit/Segment/TagsRepairTest.php</file>
+            <file>Unit/Segment/TrackChangesTest.php</file>
             <file>Unit/Tools/MarkupTest.php</file>
         </testsuite>
         <testsuite name="quality">

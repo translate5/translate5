@@ -627,6 +627,12 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     {
         if ($this->hasChildren()) {
             foreach ($this->children as $child) {
+                if ($child->isText()) {
+                    throw new Exception(
+                        'Invalid internal-tag: Content or whitespace between the inner tags is not allowed [' .
+                        $this->renderChildren() . ']'
+                    );
+                }
                 $this->addContentTag(ContentTag::fromTag($child));
             }
         }
