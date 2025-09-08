@@ -559,8 +559,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (matches.length > 0) {
             this.consoleLog('allMatches applied (' + spellCheckProcessID + ').');
 
-            var ret = this.applyAllMatches(spellCheckProcessID, originalText);
+            const ret = this.applyAllMatches(spellCheckProcessID, originalText);
             this.finishSpellCheck(spellCheckProcessID);
+
             return ret;
         }
 
@@ -731,9 +732,22 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             );
 
             if (index === this.allMatches.length - 1) {
-                result += this._replaceSpace(
-                    this.editor.editor.getContentInRange(match.range.end, this.editor.editor.getContentLength())
+                const contentLeft = this.editor.editor.getContentInRange(
+                    match.range.end,
+                    this.editor.editor.getContentLength()
                 );
+
+                if (contentLeft === '&nbsp;') {
+                    // If this is the latest nbsp in the whole content
+                    // do not replace it with space because it will be trimmed on applying it to editor
+                    result += contentLeft;
+                } else {
+                    result += this._replaceSpace(
+                        contentLeft,
+                        true,
+                        false
+                    );
+                }
             }
 
             previousRangeEnd = match.range.end;
@@ -1250,7 +1264,17 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         spellCheckNodeParent.removeChild(spellCheckNode);
     },
 
-    _replaceSpace: function (text) {
-        return text.replace(/&nbsp;$/, ' ').replace(/^&nbsp;/, ' ');
+    _replaceSpace: function (text, start = true, end = true) {
+        let result = text;
+
+        if (start) {
+            result = result.replace(/^&nbsp;/, ' ');
+        }
+
+        if (end) {
+            result = result.replace(/&nbsp;$/, ' ');
+        }
+
+        return result;
     },
 });
