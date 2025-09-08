@@ -92,6 +92,9 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
         'visualconverter' => [
             'url' => 'http://visualconverter.:80',
         ],
+        'officeconverter' => [
+            'url' => 'http://officeconverter.:80',
+        ],
         'redis' => [
             'url' => 'http://redis.',
         ],
