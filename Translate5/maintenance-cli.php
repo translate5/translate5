@@ -54,6 +54,7 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     DevelopmentNewModelCommand,
     DevelopmentNewdbchangeCommand,
     DevelopmentOkapiBconfNextVersionCommand,
+    DevelopmentSecurityXss,
     DevelopmentSymlinksCommand,
     DevelopmentTriggerworkflowCommand,
     DevelopmentWorkertreeCommand,
@@ -142,6 +143,8 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     TestRunSuiteCommand,
     UserCreateCommand,
     UserInfoCommand,
+    UserInvalidloginListCommand,
+    UserInvalidloginResetCommand,
     UserOnlineCommand,
     UserUpdateCommand,
     WorkerCleanCommand,
@@ -240,6 +243,8 @@ $commands = [
     new T5MemoryFixCommand(),
     new UserCreateCommand(),
     new UserInfoCommand(),
+    new UserInvalidloginListCommand(),
+    new UserInvalidloginResetCommand(),
     new UserOnlineCommand(),
     new UserUpdateCommand(),
     new WorkerCleanCommand(),
@@ -278,6 +283,7 @@ if (file_exists('.git')) {
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
     $commands[] = new DevelopmentWorkertreeCommand();
+    $commands[] = new DevelopmentSecurityXss();
     $commands[] = new TestApplytestsqlCommand();
     $commands[] = new TestRunAllCommand();
     $commands[] = new TestRunCommand();
