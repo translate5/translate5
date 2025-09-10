@@ -59,6 +59,11 @@ export default class EditorWrapper {
             [EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]: [],
         };
 
+        addEventListener('unhandledrejection', (event) => {
+            console.log('Unhandled promise rejection: ');
+            console.log(event.reason.message, event.promise, event.type, event.target);
+        });
+
         this.registerModifier(
             EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
             (text, actions, position) => this.#removeTagOnCorrespondingDeletion(text, actions, position),
@@ -89,16 +94,19 @@ export default class EditorWrapper {
         });
     }
 
+    isDataInitialized() {
+        return this.dataTransformer !== undefined && this.dataTransformer !== null;
+    }
+
     /**
      * Returns object containing data in t5 internal format and content
      *
-     * @returns {{data: string, checkResult: CheckResult}}
+     * @returns {{data: string, checkResult: CheckResult}|null}
      */
     getDataT5Format() {
-        // TODO Add length check
-        // this.checkSegmentLength(source || "");
-        // TODO add check for contentEdited
-        // me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
+        if (!this.isDataInitialized()) {
+            return null;
+        }
 
         return this.dataTransformer.reverseTransform(this.#getRawDataNode());
     }

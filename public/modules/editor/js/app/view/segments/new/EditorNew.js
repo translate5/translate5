@@ -332,14 +332,14 @@ Ext.define('Editor.view.segments.new.EditorNew', {
     },
 
     showFullTags: function () {
-        if (!this.editor) {
+        if (!this.editor || !this.editor.isDataInitialized()) {
             return;
         }
 
         this.setData(this.editor.getDataT5Format().data);
     },
     showShortTags: function () {
-        if (!this.editor) {
+        if (!this.editor || !this.editor.isDataInitialized()) {
             return;
         }
 
