@@ -10799,6 +10799,10 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Bleiben</source>
                 <target>Stay</target>
             </trans-unit>
+            <trans-unit id='VmVyZsO8Z2JhcmUgU3ByYWNocmVzc291cmNlIGbDvHIgRGF0ZWnDvGJlcnNldHp1bmc='>
+                <source>Verfügbare Sprachressource für Dateiübersetzung</source>
+                <target>Available language resource for file translation</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

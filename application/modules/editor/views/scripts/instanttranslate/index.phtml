@@ -342,6 +342,12 @@ $languageSelector[] = '</form>';
                 }
                 ?>
             </select>
+            
+            <!-- Language Resource selector for File Translation -->
+            <select id="fileLanguageResource" class="selectSourceTarget" name="fileLanguageResource" title="<?= $translate->_('Verfügbare Sprachressource für Dateiübersetzung'); ?>">
+                <!-- Options populated dynamically by instanttranslate.js -->
+            </select>
+            <div id="languageResourceSelectorError" class="instant-translation-error ui-state-error ui-corner-all box marginTop show-if-source-is-file" style="display:none"></div>
         </form>
         <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all box marginTop"></div>
         <div class="loadingSpinnerIndicator marginTop">

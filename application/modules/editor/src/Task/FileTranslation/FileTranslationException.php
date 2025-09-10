@@ -60,5 +60,6 @@ final class FileTranslationException extends ZfExtended_ErrorCodeException
     protected static $localErrorCodes = [
         'E1211' => 'File-Translation failed. "{msg}"',
         'E1213' => 'File-Translation: Error in config or roles. "{msg}"',
+        'E1740' => 'File-Translation: Some provided language resources are not assignable for this task.',
     ];
 }

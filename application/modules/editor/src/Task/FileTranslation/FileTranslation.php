@@ -124,7 +124,8 @@ class FileTranslation
     public function importAndTranslate(
         array $importFile,
         int $sourceLang,
-        int $targetLang
+        int $targetLang,
+        array $withResources = [],
     ): editor_Models_Task {
         $acl = ZfExtended_Acl::getInstance();
         if (! $acl->isInAllowedRoles(
@@ -138,7 +139,9 @@ class FileTranslation
         }
 
         $task = $this->prepareTaskImport($importFile, $sourceLang, $targetLang);
-        $assignedLanguageResourceIds = $this->assignLanguageResources($task);
+
+        $assignedLanguageResourceIds = $this->manageAssociation($task, $withResources);
+
         // pretranslate the task
         /*
          * (Marc:)
@@ -173,6 +176,45 @@ class FileTranslation
         $this->insertTaskUsageLog($task, $assignedLanguageResourceIds);
 
         return $task;
+    }
+
+    /**
+     * Validate and assign the provided language resources to the task. In case no resources are given, the automatic
+     * resources assignment will take place.
+     * @throws FileTranslationException
+     * @throws ReflectionException
+     * @throws \Zend_Cache_Exception
+     * @throws \Zend_Exception
+     */
+    private function manageAssociation(editor_Models_Task $task, array $withResources = []): array
+    {
+        if (empty($withResources)) {
+            return $this->assignLanguageResources($task);
+        }
+
+        $assignable = $this->getTaskAssignableResources($task);
+
+        // Validate that all requested resources are assignable for this task
+        $requested = array_map('intval', $withResources);
+        $invalid = array_values(array_diff($requested, $assignable));
+        if (! empty($invalid)) {
+            throw new FileTranslationException('E1740', [
+                'msg' => 'File-Translation: Some provided language resources are not assignable for this task.',
+                'invalidResourceIds' => $invalid,
+            ]);
+        }
+
+        $assignedLanguageResourceIds = [];
+
+        foreach ($withResources as $withResource) {
+            $this->addLanguageResource(
+                (int) $withResource,
+                $task->getTaskGuid()
+            );
+            $assignedLanguageResourceIds[] = (int) $withResource;
+        }
+
+        return $assignedLanguageResourceIds;
     }
 
     /**
@@ -228,42 +270,61 @@ class FileTranslation
      */
     public function assignLanguageResources(editor_Models_Task $task): array
     {
-        $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
-        //get source and target language fuzzies
-        $sourceLangs = $languageModel->getFuzzyLanguages((int) $task->getSourceLang(), 'id', true);
-        $targetLangs = $languageModel->getFuzzyLanguages((int) $task->getTargetLang(), 'id', true);
-
-        $langRes = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
-        //get the languageresources to the current user and to the given languages
-        $tobeUsed = $langRes->loadByUserCustomerAssocs([], $sourceLangs, $targetLangs);
+        $assignable = $this->getTaskAssignableResources($task);
 
         $langResTaskAssocs = ZfExtended_Factory::get(TaskAssociation::class);
         // some LanguageResources have been already auto assigned on creating the task:
         $currentlyAssigned = $langResTaskAssocs->loadByTaskGuids([$task->getTaskGuid()]);
-        $currentlyAssignedIds = array_column($currentlyAssigned, 'languageResourceId');
+        $currentlyAssignedIds = array_map('intval', array_column($currentlyAssigned, 'languageResourceId'));
 
         //collect assigned
         $assignedLanguageResources = $currentlyAssignedIds;
 
         // add LanguageResources that have not been assigned already while creating the task:
-        foreach ($tobeUsed as $languageResource) {
-            if ($languageResource['isTaskTm']) {
-                continue;
-            }
-
+        foreach ($assignable as $languageResource) {
             // is it not assigned already??
-            if (in_array($languageResource['id'], $currentlyAssignedIds)) {
+            if (in_array($languageResource, $currentlyAssignedIds)) {
                 continue;
             }
 
             //collect the associated language resource id
-            $assignedLanguageResources[] = $languageResource['id'];
+            $assignedLanguageResources[] = $languageResource;
 
             // then assign it now:
-            $this->addLanguageResource((int) $languageResource['id'], $task->getTaskGuid());
+            $this->addLanguageResource((int) $languageResource, $task->getTaskGuid());
         }
 
         return $assignedLanguageResources;
+    }
+
+    /**
+     * Find all assignable resources for a task customer and langauge combination. Task tms will be ignored
+     * @throws ReflectionException
+     * @throws \Zend_Cache_Exception
+     * @throws \Zend_Exception
+     */
+    private function getTaskAssignableResources(editor_Models_Task $task): array
+    {
+        $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
+        //get source and target language fuzzy
+        $sourceLangs = $languageModel->getFuzzyLanguages((int) $task->getSourceLang(), 'id', true);
+        $targetLangs = $languageModel->getFuzzyLanguages((int) $task->getTargetLang(), 'id', true);
+
+        $langRes = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
+        //get the language resources to the current user and to the given languages
+        $toBeUsed = $langRes->loadByUserCustomerAssocs([], $sourceLangs, $targetLangs);
+
+        $assignable = [];
+
+        foreach ($toBeUsed as $languageResource) {
+            if ($languageResource['isTaskTm']) {
+                continue;
+            }
+
+            $assignable[] = (int) $languageResource['id'];
+        }
+
+        return $assignable;
     }
 
     /**

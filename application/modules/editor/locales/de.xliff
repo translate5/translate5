@@ -10602,6 +10602,10 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>Bleiben</source>
                 <target>Bleiben</target>
             </trans-unit>
+            <trans-unit id='VmVyZsO8Z2JhcmUgU3ByYWNocmVzc291cmNlIGbDvHIgRGF0ZWnDvGJlcnNldHp1bmc='>
+                <source>Verfügbare Sprachressource für Dateiübersetzung</source>
+                <target>Verfügbare Sprachressource für Dateiübersetzung</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
