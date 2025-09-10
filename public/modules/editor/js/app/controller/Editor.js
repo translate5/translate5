@@ -631,7 +631,7 @@ Ext.define('Editor.controller.Editor', {
             me.editorKeyMap.destroy();
         }
 
-        docEl.on({
+        docEl.on(me.docEvents = {
             dragstart:{
                 delegated: false,
                 priority: 9999,
@@ -728,9 +728,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this;
         // TODO: disabled by Leon with the new editor
         //me.clearKeyMaps();
-        // removing the following handler has no effect, but it should be removed here!
-        //FIXME should be unbound since rebind on each task open!? or not?
-        //Ext.getDoc().un('copy', me.copySelectionWithInternalTags);
+        me.docEvents && Ext.getDoc().un(me.docEvents);
         // TODO: disabled by Leon with the new editor
         // me.tooltip && me.tooltip.destroy();
         me.taskConfirmation && me.taskConfirmation.destroy();
