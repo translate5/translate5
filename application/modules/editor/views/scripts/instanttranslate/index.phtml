@@ -101,6 +101,11 @@ $this->translations = array(
         'title' => $translate->_('Zur menschlichen Revision senden'),
         'message' => $translate->_('Zur menschlichen Revision senden?'),
     ],
+    'humanRevision' => [
+        'descriptionLabel' => $translate->_('Projektbeschreibung'),
+        'workflowLabel' => $translate->_('Workflow'),
+        'customFieldsLabel' => $translate->_('Benutzerdefinierte Felder für Aufgaben'),
+    ],
     'inHumanRevision' => $translate->_('In menschlicher Revision'),
     'humanRevisionFinished' => $translate->_('Menschliche revision fertiggestellt'),
     'editInEditorButton' => $translate->_('Aufgabe im Editor editieren'),
@@ -419,6 +424,7 @@ $languageSelector[] = '</form>';
 </div>
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/apps/js/ErrorHandler.js<?= $version ?>"></script>
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/js/shared.js<?php echo $version ?>"></script>
+<script src="<?= APPLICATION_RUNDIR ?>/editor/plugins/resources/InstantTranslate/js/humanRevision.js<?= $version ?>"></script>
 <script src="<?= APPLICATION_RUNDIR ?>/editor/plugins/resources/InstantTranslate/js/instanttranslate.js<?= $version ?>"></script>
 <script type="text/javascript">
 
