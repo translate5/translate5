@@ -91,6 +91,7 @@ class ReimportSegmentsActionExecutorTest extends TestCase
             'supported' => [
                 [
                     'id' => 1,
+                    'segmentsUpdateable' => '1',
                 ],
             ],
         ];
@@ -124,26 +125,33 @@ class ReimportSegmentsActionExecutorTest extends TestCase
             'unsupported' => [
                 [
                     'id' => 1,
+                    'segmentsUpdateable' => '1',
                 ],
                 [
                     'id' => 2,
+                    'segmentsUpdateable' => '1',
                 ],
                 [
                     'id' => 3,
+                    'segmentsUpdateable' => '1',
                 ],
             ],
             'supported' => [
                 [
                     'id' => 4,
+                    'segmentsUpdateable' => '1',
                 ],
                 [
                     'id' => 5,
+                    'segmentsUpdateable' => '1',
                 ],
                 [
                     'id' => 6,
+                    'segmentsUpdateable' => '1',
                 ],
                 [
                     'id' => 7,
+                    'segmentsUpdateable' => '1',
                 ],
             ],
         ];

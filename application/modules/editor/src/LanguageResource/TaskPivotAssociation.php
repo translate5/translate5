@@ -103,7 +103,7 @@ class TaskPivotAssociation extends AssociationAbstract
         $result = $this->loadFilterdCustom($s);
 
         foreach ($result as &$row) {
-            $row['serviceName'] = $manager->getUiNameByType($row['serviceType']);
+            $row['serviceName'] = $manager->getNameByType($row['serviceType']);
         }
 
         return $result;

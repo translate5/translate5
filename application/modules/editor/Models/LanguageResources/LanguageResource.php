@@ -169,8 +169,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public function loadAllByServices()
     {
-        $services = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $services editor_Services_Manager */
+        $services = ZfExtended_Factory::get(editor_Services_Manager::class);
 
         //get all service types from the available resources
         $resources = $services->getAllResources();

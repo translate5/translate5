@@ -74,6 +74,10 @@ class ReimportSegmentsActionExecutor
                 continue;
             }
 
+            if (! $languageResourceData['segmentsUpdateable']) {
+                continue;
+            }
+
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
             $languageResource->init($languageResourceData);
 

@@ -201,20 +201,20 @@ class editor_Services_Manager
         return $service->getTmConversionService();
     }
 
-    public function getAllUiNames(): array
+    public function getAllNames(): array
     {
         $names = [];
 
         foreach ($this->getAll() as $serviceName) {
-            $names[] = ZfExtended_Factory::get($this->getServiceClassName($serviceName))->getUiName();
+            $names[] = ZfExtended_Factory::get($this->getServiceClassName($serviceName))->getName();
         }
 
         return $names;
     }
 
-    public function getUiNameByType(string $serviceType): string
+    public function getNameByType(string $serviceType): string
     {
-        return ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getUiName();
+        return ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getName();
     }
 
     /**
@@ -328,7 +328,7 @@ class editor_Services_Manager
     }
 
     /**
-     * gets the reosurce to the given languageResource
+     * gets the resource to the given languageResource
      * @return editor_Models_LanguageResources_Resource
      */
     public function getResource(editor_Models_LanguageResources_LanguageResource $languageResource)
@@ -343,9 +343,10 @@ class editor_Services_Manager
     {
         $this->checkService($serviceType);
 
-        $resource = ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getResourceById($id);
+        /** @var editor_Services_ServiceAbstract $service */
+        $service = ZfExtended_Factory::get($this->getServiceClassName($serviceType));
 
-        return $resource ?? null;
+        return $service->getResourceById($id);
     }
 
     /**

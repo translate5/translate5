@@ -37,35 +37,42 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Model
  */
 Ext.define('Editor.model.LanguageResources.Resource', {
-  extend: 'Ext.data.Model',
+    extend: 'Ext.data.Model',
 
-  statics: {
-    //name of the sdl language cloud service
-    SDL_SERVICE_NAME: 'SDLLanguageCloud', //TODO deprecated, usages must be changed to polymorph services
-    TERMCOLLECTION_SERVICE_NAME:'TermCollection' //TODO deprecated, usages must be changed to polymorph services
-  },
-
-  fields: [
-    {name: 'id', type: 'string'},
-    {name: 'name', type: 'string'},
-    {name: 'filebased', type: 'boolean'},
-    {name: 'serviceType', type: 'string'},
-    {name: 'serviceName', type: 'string'},
-    {name: 'resourceType', type: 'string'},
-    {name: 'defaultColor', type: 'string'}
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'languageresourceresource', //same as PHP controller name
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+    statics: {
+        //name of the sdl language cloud service
+        SDL_SERVICE_NAME: 'SDLLanguageCloud', //TODO deprecated, usages must be changed to polymorph services
+        TERMCOLLECTION_SERVICE_NAME: 'TermCollection' //TODO deprecated, usages must be changed to polymorph services
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+
+    fields: [
+        {name: 'id', type: 'string'},
+        {name: 'name', type: 'string'},
+        {name: 'serviceType', type: 'string'},
+        {name: 'serviceName', type: 'string'},
+        {name: 'resourceType', type: 'string'},
+        {name: 'filebased', type: 'boolean'},
+        {name: 'searchable', type: 'boolean'},
+        {name: 'writable', type: 'boolean'},
+        {name: 'deletable', type: 'boolean'},
+        {name: 'analysable', type: 'boolean'},
+        {name: 'defaultColor', type: 'string'},
+        {name: 'engineBased', type: 'boolean'},
+        {name: 'useEnginesCombo', type: 'boolean'},
+        {name: 'domainCodePreset', type: 'string'}
+    ],
+    idProperty: 'id',
+    proxy : {
+        type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
+        url: Editor.data.restpath+'languageresourceresource', //same as PHP controller name
+        reader : {
+            rootProperty: 'rows',
+            type : 'json'
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false
+        }
     }
-  }
 });

@@ -1,16 +1,18 @@
 [
     {
-        "id": "52211",
+        "id": "1",
         "segmentNrInTask": "1",
-        "fileId": "2053",
+        "fileId": "1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
-        "taskGuid": "{3be2ad41-0d8c-42ab-9351-ee1030b9b714}",
-        "timestamp": "2022-07-19 15:33:38",
+        "taskGuid": "{fce34170-727e-4ab4-9ad6-afa37116829a}",
+        "timestamp": "2025-08-22 11:29:43",
         "editable": "1",
         "pretrans": "1",
         "matchRate": "100",
         "matchRateType": "pretranslated;tm;DummyFile TM - Translate2756Test",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "stateId": "0",
         "autoStateId": "15",
         "fileOrder": "0",
@@ -18,6 +20,9 @@
         "workflowStepNr": "0",
         "workflowStep": null,
         "isRepeated": "3",
+        "levenshteinOriginal": "0",
+        "levenshteinPrevious": "0",
+        "editedInStep": "",
         "source": "=&gt; Translate5 service kontaktieren",
         "sourceMd5": "ed9399a04a3a8d7284db47c63149b9b5",
         "sourceToSort": "=&gt; Translate5 service kontaktieren",
@@ -26,21 +31,51 @@
         "targetToSort": "=&gt; contact Translate5 service",
         "targetEdit": "=&gt; contact Translate5 service",
         "targetEditToSort": "=&gt; contact Translate5 service",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"52211\": {\"nr\":\"1\",\"length\":{\"targetEdit\":29}}}}",
-        "isWatched": false
+        "segmentDescriptor": null,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"1\": {\"nr\":\"1\",\"length\":{\"targetEdit\":29}}}}",
+        "isWatched": false,
+        "termTagger": {},
+        "spellCheck": {
+            "target": [
+                {
+                    "content": "=>",
+                    "matchIndex": 0,
+                    "range": {
+                        "start": 0,
+                        "end": 2
+                    },
+                    "message": "Do you wish to insert an arrow?",
+                    "replacements": [
+                        "→",
+                        "⇾",
+                        "≥",
+                        "⇉",
+                        "⇒",
+                        "⇨",
+                        "⇛"
+                    ],
+                    "infoURLs": [],
+                    "cssClassErrorType": "t5typographical",
+                    "id": 1,
+                    "falsePositive": 0
+                }
+            ]
+        }
     },
     {
-        "id": "52212",
+        "id": "2",
         "segmentNrInTask": "2",
-        "fileId": "2053",
+        "fileId": "1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
-        "taskGuid": "{3be2ad41-0d8c-42ab-9351-ee1030b9b714}",
-        "timestamp": "2022-07-19 15:33:38",
+        "taskGuid": "{fce34170-727e-4ab4-9ad6-afa37116829a}",
+        "timestamp": "2025-08-22 11:29:42",
         "editable": "1",
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;empty",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "stateId": "0",
         "autoStateId": "4",
         "fileOrder": "0",
@@ -48,6 +83,9 @@
         "workflowStepNr": "0",
         "workflowStep": null,
         "isRepeated": "0",
+        "levenshteinOriginal": "0",
+        "levenshteinPrevious": "0",
+        "editedInStep": "",
         "source": " =&gt; Translate5 Service kontaktieren",
         "sourceMd5": "d9861c06113df0c7e23e6cff28c62ec7",
         "sourceToSort": " =&gt; Translate5 Service kontaktieren",
@@ -56,21 +94,26 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"52212\": {\"nr\":\"2\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "segmentDescriptor": null,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"2\": {\"nr\":\"2\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "termTagger": {},
+        "spellCheck": {}
     },
     {
-        "id": "52213",
+        "id": "3",
         "segmentNrInTask": "3",
-        "fileId": "2053",
+        "fileId": "1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
         "userName": "lector test",
-        "taskGuid": "{3be2ad41-0d8c-42ab-9351-ee1030b9b714}",
-        "timestamp": "2022-07-19 15:33:42",
+        "taskGuid": "{fce34170-727e-4ab4-9ad6-afa37116829a}",
+        "timestamp": "2025-08-22 11:29:49",
         "editable": "1",
         "pretrans": "0",
         "matchRate": "91",
         "matchRateType": "edited;tm;DummyFile TM - Translate2756Test",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "stateId": "0",
         "autoStateId": "1",
         "fileOrder": "0",
@@ -78,6 +121,9 @@
         "workflowStepNr": "1",
         "workflowStep": "reviewing",
         "isRepeated": "3",
+        "levenshteinOriginal": "0",
+        "levenshteinPrevious": "0",
+        "editedInStep": "",
         "source": "Translate5 service kontaktieren",
         "sourceMd5": "1f609404653cfd679f62156baaa8dc21",
         "sourceToSort": "Translate5 service kontaktieren",
@@ -86,21 +132,47 @@
         "targetToSort": "",
         "targetEdit": "contact Translate5 service",
         "targetEditToSort": "contact Translate5 service",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"52213\": {\"nr\":\"3\",\"length\":{\"targetEdit\":26}}}}",
-        "isWatched": false
+        "segmentDescriptor": null,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"3\": {\"nr\":\"3\",\"length\":{\"targetEdit\":26}}}}",
+        "isWatched": false,
+        "termTagger": {},
+        "spellCheck": {
+            "target": [
+                {
+                    "content": "contact",
+                    "matchIndex": 0,
+                    "range": {
+                        "start": 0,
+                        "end": 7
+                    },
+                    "message": "This sentence does not start with an uppercase letter.",
+                    "replacements": [
+                        "Contact"
+                    ],
+                    "infoURLs": [
+                        "https://languagetool.org/insights/post/spelling-capital-letters/"
+                    ],
+                    "cssClassErrorType": "t5typographical",
+                    "id": 9,
+                    "falsePositive": 0
+                }
+            ]
+        }
     },
     {
-        "id": "52214",
+        "id": "4",
         "segmentNrInTask": "4",
-        "fileId": "2053",
+        "fileId": "1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
         "userName": "lector test",
-        "taskGuid": "{3be2ad41-0d8c-42ab-9351-ee1030b9b714}",
-        "timestamp": "2022-07-19 15:33:42",
+        "taskGuid": "{fce34170-727e-4ab4-9ad6-afa37116829a}",
+        "timestamp": "2025-08-22 11:29:49",
         "editable": "1",
         "pretrans": "0",
         "matchRate": "102",
         "matchRateType": "edited;tm;DummyFile TM - Translate2756Test;auto-propagated",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "stateId": "0",
         "autoStateId": "2",
         "fileOrder": "0",
@@ -108,6 +180,9 @@
         "workflowStepNr": "1",
         "workflowStep": "reviewing",
         "isRepeated": "3",
+        "levenshteinOriginal": "0",
+        "levenshteinPrevious": "0",
+        "editedInStep": "",
         "source": "Translate5 service kontaktieren",
         "sourceMd5": "1f609404653cfd679f62156baaa8dc21",
         "sourceToSort": "Translate5 service kontaktieren",
@@ -116,21 +191,47 @@
         "targetToSort": "=&gt; contact Translate5 service",
         "targetEdit": "contact Translate5 service",
         "targetEditToSort": "contact Translate5 service",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"52214\": {\"nr\":\"4\",\"length\":{\"targetEdit\":26}}}}",
-        "isWatched": false
+        "segmentDescriptor": null,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"4\": {\"nr\":\"4\",\"length\":{\"targetEdit\":26}}}}",
+        "isWatched": false,
+        "termTagger": {},
+        "spellCheck": {
+            "target": [
+                {
+                    "content": "contact",
+                    "matchIndex": 0,
+                    "range": {
+                        "start": 0,
+                        "end": 7
+                    },
+                    "message": "This sentence does not start with an uppercase letter.",
+                    "replacements": [
+                        "Contact"
+                    ],
+                    "infoURLs": [
+                        "https://languagetool.org/insights/post/spelling-capital-letters/"
+                    ],
+                    "cssClassErrorType": "t5typographical",
+                    "id": 11,
+                    "falsePositive": 0
+                }
+            ]
+        }
     },
     {
-        "id": "52215",
+        "id": "5",
         "segmentNrInTask": "5",
-        "fileId": "2053",
+        "fileId": "1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
-        "taskGuid": "{3be2ad41-0d8c-42ab-9351-ee1030b9b714}",
-        "timestamp": "2022-07-19 15:33:38",
+        "taskGuid": "{fce34170-727e-4ab4-9ad6-afa37116829a}",
+        "timestamp": "2025-08-22 11:29:42",
         "editable": "1",
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;empty",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "stateId": "0",
         "autoStateId": "4",
         "fileOrder": "0",
@@ -138,6 +239,9 @@
         "workflowStepNr": "0",
         "workflowStep": null,
         "isRepeated": "0",
+        "levenshteinOriginal": "0",
+        "levenshteinPrevious": "0",
+        "editedInStep": "",
         "source": "Translate5 Service kontaktieren",
         "sourceMd5": "2c978f0e630099bb4c82aa7c08e280d9",
         "sourceToSort": "Translate5 Service kontaktieren",
@@ -146,21 +250,26 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"52215\": {\"nr\":\"5\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "segmentDescriptor": null,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"5\": {\"nr\":\"5\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "termTagger": {},
+        "spellCheck": {}
     },
     {
-        "id": "52216",
+        "id": "6",
         "segmentNrInTask": "6",
-        "fileId": "2053",
+        "fileId": "1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
-        "taskGuid": "{3be2ad41-0d8c-42ab-9351-ee1030b9b714}",
-        "timestamp": "2022-07-19 15:33:38",
+        "taskGuid": "{fce34170-727e-4ab4-9ad6-afa37116829a}",
+        "timestamp": "2025-08-22 11:29:43",
         "editable": "1",
         "pretrans": "1",
         "matchRate": "100",
         "matchRateType": "pretranslated;tm;DummyFile TM - Translate2756Test;auto-propagated",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "stateId": "0",
         "autoStateId": "15",
         "fileOrder": "0",
@@ -168,6 +277,9 @@
         "workflowStepNr": "0",
         "workflowStep": null,
         "isRepeated": "3",
+        "levenshteinOriginal": "0",
+        "levenshteinPrevious": "0",
+        "editedInStep": "",
         "source": "=&gt; Translate5 service kontaktieren",
         "sourceMd5": "ed9399a04a3a8d7284db47c63149b9b5",
         "sourceToSort": "=&gt; Translate5 service kontaktieren",
@@ -176,21 +288,51 @@
         "targetToSort": "=&gt; contact Translate5 service",
         "targetEdit": "=&gt; contact Translate5 service",
         "targetEditToSort": "=&gt; contact Translate5 service",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"52216\": {\"nr\":\"6\",\"length\":{\"targetEdit\":29}}}}",
-        "isWatched": false
+        "segmentDescriptor": null,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"6\": {\"nr\":\"6\",\"length\":{\"targetEdit\":29}}}}",
+        "isWatched": false,
+        "termTagger": {},
+        "spellCheck": {
+            "target": [
+                {
+                    "content": "=>",
+                    "matchIndex": 0,
+                    "range": {
+                        "start": 0,
+                        "end": 2
+                    },
+                    "message": "Do you wish to insert an arrow?",
+                    "replacements": [
+                        "→",
+                        "⇾",
+                        "≥",
+                        "⇉",
+                        "⇒",
+                        "⇨",
+                        "⇛"
+                    ],
+                    "infoURLs": [],
+                    "cssClassErrorType": "t5typographical",
+                    "id": 2,
+                    "falsePositive": 0
+                }
+            ]
+        }
     },
     {
-        "id": "52217",
+        "id": "7",
         "segmentNrInTask": "7",
-        "fileId": "2053",
+        "fileId": "1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
-        "taskGuid": "{3be2ad41-0d8c-42ab-9351-ee1030b9b714}",
-        "timestamp": "2022-07-19 15:33:38",
+        "taskGuid": "{fce34170-727e-4ab4-9ad6-afa37116829a}",
+        "timestamp": "2025-08-22 11:29:43",
         "editable": "1",
         "pretrans": "1",
         "matchRate": "100",
         "matchRateType": "pretranslated;tm;DummyFile TM - Translate2756Test;auto-propagated",
+        "penaltyGeneral": "0",
+        "penaltySublang": "0",
         "stateId": "0",
         "autoStateId": "15",
         "fileOrder": "0",
@@ -198,6 +340,9 @@
         "workflowStepNr": "0",
         "workflowStep": null,
         "isRepeated": "3",
+        "levenshteinOriginal": "0",
+        "levenshteinPrevious": "0",
+        "editedInStep": "",
         "source": "=&gt; Translate5 service kontaktieren",
         "sourceMd5": "ed9399a04a3a8d7284db47c63149b9b5",
         "sourceToSort": "=&gt; Translate5 service kontaktieren",
@@ -206,7 +351,35 @@
         "targetToSort": "=&gt; contact Translate5 service",
         "targetEdit": "=&gt; contact Translate5 service",
         "targetEditToSort": "=&gt; contact Translate5 service",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"52217\": {\"nr\":\"7\",\"length\":{\"targetEdit\":29}}}}",
-        "isWatched": false
+        "segmentDescriptor": null,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"7\": {\"nr\":\"7\",\"length\":{\"targetEdit\":29}}}}",
+        "isWatched": false,
+        "termTagger": {},
+        "spellCheck": {
+            "target": [
+                {
+                    "content": "=>",
+                    "matchIndex": 0,
+                    "range": {
+                        "start": 0,
+                        "end": 2
+                    },
+                    "message": "Do you wish to insert an arrow?",
+                    "replacements": [
+                        "→",
+                        "⇾",
+                        "≥",
+                        "⇉",
+                        "⇒",
+                        "⇨",
+                        "⇛"
+                    ],
+                    "infoURLs": [],
+                    "cssClassErrorType": "t5typographical",
+                    "id": 3,
+                    "falsePositive": 0
+                }
+            ]
+        }
     }
 ]
