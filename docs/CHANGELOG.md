@@ -21,6 +21,84 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.29.1] - 2025-09-11
+
+### Important Notes:
+#### [TRANSLATE-3569](https://jira.translate5.net/browse/TRANSLATE-3569)
+FOR ON PREMISE USERS ONLY:
+translate5 now because of this feature needs officeconverter container added in Dockerfile:
+
+    officeconverter:
+        image: translate5/officeconverter:1.0
+
+docker compose up -d officeconverter (download and start the container)
+t5 system:check (check if the requirements are met)
+ 
+
+
+### Added
+**[TRANSLATE-3569](https://jira.translate5.net/browse/TRANSLATE-3569): VisualReview / VisualTranslation - provide Visual for MS Office files via LibreOffice CMD** <br>
+7.29.1: Added service to autodiscovery
+7.28.7: Added service to autodiscovery
+7.28.0: Added ability to have a visual from MS Office of LibreOffice-Files without having to upload the PDF version
+
+
+### Changed
+**[TRANSLATE-4939](https://jira.translate5.net/browse/TRANSLATE-4939): Installation & Update - Update tfpdf library** <br>
+The tfpdf library is updated to 1.33 v
+
+
+### Bugfixes
+**[TRANSLATE-4964](https://jira.translate5.net/browse/TRANSLATE-4964): Main back-end mechanisms (Worker, Logging, etc.) - User customer column need more characters** <br>
+[🐞 Fix] The size of the column for user customers is increased.
+
+**[TRANSLATE-4963](https://jira.translate5.net/browse/TRANSLATE-4963): Editor general - RootCause: Cannot read properties of null (reading 'getStore')** <br>
+[🐞 Fix] Concordance search request is now aborted on task leave
+
+**[TRANSLATE-4962](https://jira.translate5.net/browse/TRANSLATE-4962): Editor general - Cannot read properties of undefined (reading 'reverseTransform')** <br>
+[🐞 Fix] Prevent saving segment when editor is not yet properly instantiated
+
+**[TRANSLATE-4961](https://jira.translate5.net/browse/TRANSLATE-4961): VisualReview / VisualTranslation - Visual Exchange at times runs into an worker-exception and is stuck** <br>
+[🐞 Fix] Some exceptions in visual workers need special handling when occurring within a visual exchange
+
+**[TRANSLATE-4956](https://jira.translate5.net/browse/TRANSLATE-4956): Editor general - RootCause: The segment could not be opened for editing, since the previously opened segment was not correctly saved yet.** <br>
+[🐞 Fix] Added a fix for the possible wrong check implementation to see if this help
+
+**[TRANSLATE-4955](https://jira.translate5.net/browse/TRANSLATE-4955): User Management - Show all login log entries to a user and unlock user via CLI** <br>
+[🐞 Fix] Show all login log entries to a user (failed were missing) and unlock user via CLI instead of direct DB.
+
+**[TRANSLATE-4951](https://jira.translate5.net/browse/TRANSLATE-4951): VisualReview / VisualTranslation - Better titles for visual configs pointing at InstantTranslate's file-translation** <br>
+[🐞 Fix] Improve titles/descriptions for Visual configs relevant for InstantTranslate
+
+**[TRANSLATE-4949](https://jira.translate5.net/browse/TRANSLATE-4949): Main back-end mechanisms (Worker, Logging, etc.) - Maintenance Mode check blocks application** <br>
+[🐞 Fix] A check in the UI if the maintenance mode is still active was implemented in a way what could led to totally blocked server.
+
+**[TRANSLATE-4948](https://jira.translate5.net/browse/TRANSLATE-4948): Export - Internal Tags get lost when "surrounded" by trackchanges del-tags** <br>
+[🐞 Fix] Tags may get lost when surrounded by trackchanges deletions without other content inbetween
+
+**[TRANSLATE-4945](https://jira.translate5.net/browse/TRANSLATE-4945): Editor general - RootCause: Cannot read properties of undefined (reading 'editingPlugin')** <br>
+[🐞 Fix] Editor-specific event handlers are now cleaned up on task exit
+
+**[TRANSLATE-4944](https://jira.translate5.net/browse/TRANSLATE-4944): MatchAnalysis & Pretranslation, t5memory - Long segment causes error in fuzzy** <br>
+[🐞 Fix]  Fixed error preventing pretranslation to run in case task contains to long segments
+
+**[TRANSLATE-4943](https://jira.translate5.net/browse/TRANSLATE-4943): Editor general - deletion not treated as deletion (length restriction)** <br>
+[🐞 Fix] Fixed issue when deleted new line tag was not treated as deleted and was taking into account in length restriction calculation
+
+**[TRANSLATE-4942](https://jira.translate5.net/browse/TRANSLATE-4942): Workflows - Problem with TrackChanges permission on job creation** <br>
+[🐞 Fix] Fix permission checkboxes on user job creation
+
+**[TRANSLATE-4941](https://jira.translate5.net/browse/TRANSLATE-4941): Editor general - Whitespace in the end of written text is removed** <br>
+[🐞 Fix] Fixed removing whitespace at the end of the written text after applying spellcheck markup
+
+**[TRANSLATE-4931](https://jira.translate5.net/browse/TRANSLATE-4931): Content Protection - Content Protection: plus/minus sign not in output** <br>
+[🐞 Fix] Handling of symbol prefix in rules with transforming feature
+
+**[TRANSLATE-4911](https://jira.translate5.net/browse/TRANSLATE-4911): Editor general - Ctrl + V and Ctrl + 1 not working reliably** <br>
+[🐞 Fix] problems with Ctrl+V and Ctrl+1 keyboard shortcuts when used outside of htmleditor
+
+
 ## [7.29.0] - 2025-09-03
 
 ### Important Notes:
