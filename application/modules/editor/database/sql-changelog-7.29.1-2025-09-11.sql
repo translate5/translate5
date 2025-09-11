@@ -28,7 +28,7 @@
 
 -- userGroup calculation: basic: 1; editor: 2; pm: 4; admin: 8
             
-INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2025-09-11', 'TRANSLATE-3569', 'feature', 'VisualReview / VisualTranslation - provide Visual for MS Office files via LibreOffice CMD', '7.29.1: Added service to autodiscovery
+INSERT IGNORE INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2025-09-11', 'TRANSLATE-3569', 'feature', 'VisualReview / VisualTranslation - provide Visual for MS Office files via LibreOffice CMD', '7.29.1: Added service to autodiscovery
 7.28.7: Added service to autodiscovery
 7.28.0: Added ability to have a visual from MS Office of LibreOffice-Files without having to upload the PDF version', '15'),
 ('2025-09-11', 'TRANSLATE-4939', 'change', 'Installation & Update - Update tfpdf library', 'The tfpdf library is updated to 1.33 v', '15'),
