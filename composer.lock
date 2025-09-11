@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "03b636a08a1ca37c1a8474536d68b5ac",
+    "content-hash": "ba735bd06e7e6f1239ecf6ac547cf4a7",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -6997,16 +6997,16 @@
         },
         {
             "name": "setasign/tfpdf",
-            "version": "v1.32",
+            "version": "v1.33",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Setasign/tFPDF.git",
-                "reference": "a879b83485c263605cbf98ab2e8fdd4d37ca2707"
+                "reference": "050de12ab5359ce475dab49bae5cedbcf455f708"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Setasign/tFPDF/zipball/a879b83485c263605cbf98ab2e8fdd4d37ca2707",
-                "reference": "a879b83485c263605cbf98ab2e8fdd4d37ca2707",
+                "url": "https://api.github.com/repos/Setasign/tFPDF/zipball/050de12ab5359ce475dab49bae5cedbcf455f708",
+                "reference": "050de12ab5359ce475dab49bae5cedbcf455f708",
                 "shasum": ""
             },
             "type": "library",
@@ -7045,9 +7045,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Setasign/tFPDF/issues",
-                "source": "https://github.com/Setasign/tFPDF/tree/master"
+                "source": "https://github.com/Setasign/tFPDF/tree/v1.33"
             },
-            "time": "2020-08-31T07:28:46+00:00"
+            "time": "2022-12-20T10:26:07+00:00"
         },
         {
             "name": "shardj/zf1-future",
@@ -9515,13 +9515,13 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "shardj/zf1-future": 20,
-        "querypath/querypath": 20,
         "dream-group/horde-text-diff": 20,
-        "translate5/rangy-lib": 20,
+        "mittagqi/restful-zend-framework": 20,
+        "querypath/querypath": 20,
+        "shardj/zf1-future": 20,
         "translate5/php-html-parser": 20,
-        "wilsonglasser/spout": 20,
-        "mittagqi/restful-zend-framework": 20
+        "translate5/rangy-lib": 20,
+        "wilsonglasser/spout": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -9553,7 +9553,7 @@
         "ext-bcmath": "*",
         "ext-xsl": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.3.23"
     },

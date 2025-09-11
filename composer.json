@@ -146,7 +146,7 @@
     "translate5/instanttranslate-roboto-font": "26",
     "translate5/rangy-lib": "1.3.1-dev",
     "axelbecher/material-design-icons": "^1.0",
-    "setasign/tfpdf": "1.32",
+    "setasign/tfpdf": "1.33",
     "joshtronic/php-loremipsum": "^2.1",
     "league/flysystem": "^3.0",
     "league/flysystem-sftp": "^3.0",
