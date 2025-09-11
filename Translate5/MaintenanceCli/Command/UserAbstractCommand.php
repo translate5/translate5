@@ -28,17 +28,25 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use ReflectionException;
 use RuntimeException;
+use stdClass;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use Zend_Exception;
 use Zend_Registry;
+use Zend_Validate_Exception;
 use ZfExtended_Authentication;
+use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 use ZfExtended_PasswordCheck;
+use ZfExtended_Validate_Guid;
+use ZfExtended_Validate_Uuid;
 
 abstract class UserAbstractCommand extends Translate5AbstractCommand
 {
@@ -55,88 +63,74 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
 
     protected function configure()
     {
-        $this
-        // the short description shown while running "php bin/console list"
-            ->setDescription('Returns information about one or more users in translate5.')
+    }
 
-        // the full command description shown when running the command with
-        // the "--help" option
-            ->setHelp('Returns information about one or more users in translate5.');
-
-        $this->addArgument('identifier', InputArgument::REQUIRED, 'Either a numeric user ID, a user GUID (with or without curly braces), a login or part of a login when providing % placeholders, or an e-mail.');
+    protected function addIdentifierArgument(string $argument): void
+    {
+        $this->addArgument(
+            $argument,
+            InputArgument::REQUIRED,
+            'Either a numeric user ID, a user GUID (with or without curly braces), '
+            . 'a login or part of a login when providing % placeholders, or an e-mail.'
+        );
     }
 
     /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
+     * @return array<stdClass>
+     * @throws ReflectionException
+     * @throws Zend_Validate_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function findUsers(string $argumentName, bool $printTitles = true): array
     {
-        $identifier = $this->input->getArgument('identifier');
+        $identifier = $this->input->getArgument($argumentName);
 
-        $uuid = new \ZfExtended_Validate_Uuid();
-        $guid = new \ZfExtended_Validate_Guid();
+        $uuid = new ZfExtended_Validate_Uuid();
+        $guid = new ZfExtended_Validate_Guid();
 
-        $userModel = \ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel \ZfExtended_Models_User */
+        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
 
         if (is_numeric($identifier)) {
-            $this->writeTitle('Searching one user with ID "' . $identifier . '"');
+            if ($printTitles) {
+                $this->writeTitle('Searching one user with ID "' . $identifier . '"');
+            }
             $userModel->load($identifier);
-            $this->printOneUser($userModel->getDataObject());
 
-            return 0;
+            return [$userModel->getDataObject()];
         }
 
         if ($uuid->isValid($identifier)) {
             $identifier = '{' . $identifier . '}';
-            $this->writeTitle('Searching one user with GUID "' . $identifier . '"');
+            if ($printTitles) {
+                $this->writeTitle('Searching one user with GUID "' . $identifier . '"');
+            }
             $userModel->loadByGuid($identifier);
-            $this->printOneUser($userModel->getDataObject());
 
-            return 0;
+            return [$userModel->getDataObject()];
         }
 
         if ($guid->isValid($identifier)) {
-            $this->writeTitle('Searching one user with GUID "' . $identifier . '"');
+            if ($printTitles) {
+                $this->writeTitle('Searching one user with GUID "' . $identifier . '"');
+            }
             $userModel->loadByGuid($identifier);
-            $this->printOneUser($userModel->getDataObject());
 
-            return 0;
+            return [$userModel->getDataObject()];
         }
 
-        $this->writeTitle('Searching users with login or e-mail "' . $identifier . '"');
-        $users = $userModel->loadAllByLoginPartOrEMail($identifier);
-
-        foreach ($users as $user) {
-            $this->printOneUser((object) $user);
+        if ($printTitles) {
+            $this->writeTitle('Searching users with login or e-mail "' . $identifier . '"');
         }
 
-        return 0;
+        $result = $userModel->loadAllByLoginPartOrEMail($identifier);
+        foreach ($result as $k => $v) {
+            $result[$k] = (object) $v;
+        }
+
+        return $result;
     }
 
-    /**
-     * prints the login log from latest to oldes, amount limited to the limit parameter
-     */
-    protected function printLoginLog(string $userGuid, int $limit = 5)
-    {
-        $loginLog = \ZfExtended_Factory::get('ZfExtended_Models_LoginLog');
-        /* @var $loginLog \ZfExtended_Models_LoginLog */
-        $logs = $loginLog->loadByUserGuid($userGuid, $limit);
-
-        if (empty($logs)) {
-            $this->io->info('Not logged in yet.');
-        } else {
-            $this->io->section('Last 5 logins (timestamp, status, way):');
-        }
-
-        foreach ($logs as $log) {
-            $this->io->text($log['created'] . ' ' . $log['status'] . ' ' . $log['way']);
-        }
-    }
-
-    protected function printOneUser(\stdClass $data)
+    protected function printOneUser(stdClass $data): void
     {
         $out = [
             '       <info>ID:</info> ' . $data->id,
@@ -180,6 +174,7 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
 
     /**
      * @throws RuntimeException
+     * @throws Zend_Exception
      */
     protected function setUserPassword(ZfExtended_Models_User $userModel): bool
     {

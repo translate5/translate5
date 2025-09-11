@@ -20009,11 +20009,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Installer/Modules/Database.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ZfExtended_Models_Invalidlogin\\:\\:\\$maximum\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Invalidlogin.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$withFromPart of method Zend_Db_Table_Abstract\\:\\:select\\(\\) expects bool, array\\<string, string\\> given\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Invalidlogin.php',

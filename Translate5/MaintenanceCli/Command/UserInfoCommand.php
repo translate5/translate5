@@ -28,14 +28,21 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Db_Select_Exception;
+use Zend_Exception;
+use ZfExtended_Factory;
 use ZfExtended_Models_Db_Session;
+use ZfExtended_Models_Invalidlogin;
+use ZfExtended_Models_LoginLog;
 
 class UserInfoCommand extends UserAbstractCommand
 {
     // the name of the command (the part after "bin/console")
+    public const ARG_IDENTIFIER = 'identifier';
+
     protected static $defaultName = 'user:info';
 
     protected function configure()
@@ -48,59 +55,25 @@ class UserInfoCommand extends UserAbstractCommand
         // the "--help" option
             ->setHelp('Returns information about one or more users in translate5.');
 
-        $this->addArgument('identifier', InputArgument::REQUIRED, 'Either a numeric user ID, a user GUID (with or without curly braces), a login or part of a login when providing % placeholders, or an e-mail.');
+        $this->addIdentifierArgument(self::ARG_IDENTIFIER);
     }
 
     /**
      * Execute the command
      * {@inheritDoc}
+     * @throws Zend_Exception
+     * @throws ReflectionException
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->initInputOutput($input, $output);
-        $this->initTranslate5AppOrTest();
-        $identifier = $this->input->getArgument('identifier');
+        $users = $this->findUsers(self::ARG_IDENTIFIER);
 
-        $uuid = new \ZfExtended_Validate_Uuid();
-        $guid = new \ZfExtended_Validate_Guid();
-
-        $userModel = \ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel \ZfExtended_Models_User */
-
-        if (is_numeric($identifier)) {
-            $this->writeTitle('Searching one user with ID "' . $identifier . '"');
-            $userModel->load($identifier);
-            $this->printOneUser($userModel->getDataObject());
-            $this->printAdditionalInfo($userModel->getDataObject());
-
-            return 0;
-        }
-
-        if ($uuid->isValid($identifier)) {
-            $identifier = '{' . $identifier . '}';
-            $this->writeTitle('Searching one user with GUID "' . $identifier . '"');
-            $userModel->loadByGuid($identifier);
-            $this->printOneUser($userModel->getDataObject());
-            $this->printAdditionalInfo($userModel->getDataObject());
-
-            return 0;
-        }
-        if ($guid->isValid($identifier)) {
-            $this->writeTitle('Searching one user with GUID "' . $identifier . '"');
-            $userModel->loadByGuid($identifier);
-            $this->printOneUser($userModel->getDataObject());
-            $this->printAdditionalInfo($userModel->getDataObject());
-
-            return 0;
-        }
-        $this->writeTitle('Searching users with login or e-mail "' . $identifier . '"');
-        $users = $userModel->loadAllByLoginPartOrEMail($identifier);
         $isOne = count($users) === 1;
         foreach ($users as $user) {
-            $this->printOneUser((object) $user);
+            $this->printOneUser($user);
             if ($isOne) {
-                $this->printAdditionalInfo((object) $user);
+                $this->printAdditionalInfo($user);
             }
             $this->io->text('');
         }
@@ -108,14 +81,54 @@ class UserInfoCommand extends UserAbstractCommand
         return 0;
     }
 
-    protected function printAdditionalInfo(\stdClass $user)
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Db_Select_Exception
+     */
+    protected function printAdditionalInfo(\stdClass $user): void
     {
-        $this->printLoginLog($user->userGuid);
+        $this->printLoginLog($user->login);
         $this->printSessions($user->id);
         $this->printTasksUsed($user->userGuid);
     }
 
-    protected function printTasksUsed(string $userGuid)
+    /**
+     * prints the login log from latest to oldes, amount limited to the limit parameter
+     * @throws ReflectionException
+     * @throws Zend_Db_Select_Exception
+     */
+    protected function printLoginLog(string $login, int $limit = 5): void
+    {
+        $loginLog = ZfExtended_Factory::get(ZfExtended_Models_LoginLog::class);
+        //logs must be loaded by login and not guid, since guid is only logged for successful logins
+        $logs = $loginLog->loadByLogin($login, $limit);
+
+        if (empty($logs)) {
+            $this->io->info('Not logged in yet.');
+        } else {
+            $this->io->section('Last 5 logins (timestamp, status, way):');
+        }
+
+        foreach ($logs as $log) {
+            $this->io->text($log['created'] . ' ' . $log['status'] . ' ' . $log['way']);
+        }
+
+        $invalidLogin = ZfExtended_Factory::get(ZfExtended_Models_Invalidlogin::class);
+        $invalidLogins = $invalidLogin->loadInvalidLogins($login);
+
+        if (! empty($invalidLogins)) {
+            $this->io->section('Invalid logins (timestamp, login) - '
+                . ($invalidLogin->hasMaximumInvalidations($login) ? 'ALREADY LOGIN LOCKED!' : 'not locked yet') . ':');
+            foreach ($invalidLogins as $log) {
+                $this->io->text($log['created'] . ' ' . $log['login']);
+            }
+        }
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    protected function printTasksUsed(string $userGuid): void
     {
         $jobDb = \ZfExtended_Factory::get('editor_Models_Db_TaskUserAssoc');
         /* @var $jobDb \editor_Models_Db_TaskUserAssoc */
@@ -135,7 +148,7 @@ class UserInfoCommand extends UserAbstractCommand
         }
     }
 
-    protected function printSessions(int $userId)
+    protected function printSessions(int $userId): void
     {
         $sessionDb = new ZfExtended_Models_Db_Session();
         $sessions = $sessionDb->fetchAll(
