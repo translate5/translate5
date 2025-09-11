@@ -679,12 +679,12 @@ Ext.define('Editor.controller.Editor', {
     //         fn: me.copySelectionWithInternalTags,
     //         scope: me
     //     },
-    //     paste: {
-    //         delegated: false,
-    //         priority: 5000,
-    //         fn: me.pasteContent,
-    //         scope: me
-    //     },
+         paste: {
+             delegated: false,
+             priority: 5000,
+             fn: me.pasteContent,
+             scope: me
+         },
         });
 
 
@@ -1734,6 +1734,9 @@ Ext.define('Editor.controller.Editor', {
             copy.selDataText = selectedRange.toString();
         }
 
+        // Remember to further use on paste
+        this.copiedSelectionWithTagHandling = copy;
+
         // if we are in a regular copy / cut event we set the clipboard content to our needs
         if (event && event.browserEvent) {
             event.browserEvent.clipboardData.setData('text/plain', copy.selDataText);
@@ -1744,67 +1747,52 @@ Ext.define('Editor.controller.Editor', {
     },
 
 
-    // /**
-    //  * Pasting our own content must be handled special to insert correct tags
-    //  */
-    // pasteContent: function(e){
-    //     e.stopPropagation();
-    //     e.preventDefault();
-    //     var me = this,
-    //         plug = me.getEditPlugin(),
-    //         record = plug.context ? plug.context.record : null;
-    //
-    //     // if the user is fast enough to close the window and after this use ctr + v to paste the content, the event
-    //     // will be fired but the row editor will not exist anymore
-    //     if(!record){
-    //         return;
-    //     }
-    //
-    //     var segmentId = record.get('id'),
-    //         internalClip = me.copiedSelectionWithTagHandling || {},
-    //         clipboard = (e.browserEvent.clipboardData || window.clipboardData),
-    //         clipboardText = clipboard.getData('Text'),
-    //         clipboardHtml = clipboard.getData('text/html'),
-    //         toInsert, sel,
-    //         textMatch = clipboardText == internalClip.selDataText,
-    //         //the clipboardHtml adds meta information like charset and so on, so we just check if
-    //         // the stored one is a substring of the one in the clipboard
-    //         htmlMatch = clipboardHtml.includes(internalClip.selDataHtml);
-    //
-    //     //remove selected content before pasting the new content
-    //     sel = rangy.getSelection(this.getEditPlugin().editor.mainEditor.getEditorBody());
-    //     if(sel.rangeCount) {
-    //         sel.getRangeAt(0).deleteContents();
-    //         sel.getRangeAt(0).collapse();
-    //         sel.getRangeAt(0).select();
-    //     }
-    //
-    //     //when making a copy in translate5, we store the content in an internal variable and in the clipboard
-    //     //if neither the text or html clipboard content matches the internally stored content,
-    //     // that means that the pasted content comes from outside and we insert just text:
-    //     if(me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
-    //         me.htmlEditor.insertMarkup(Ext.String.htmlEncode(clipboardText));
-    //         me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
-    //         me.copiedSelectionWithTagHandling = null;
-    //         return;
-    //     }
-    //     /*
-    //     console.log("text", clipboardText);
-    //     console.log("html", clipboardHtml);
-    //     console.log("data", internalClip);
-    //     */
-    //     //to insert tags, the copy/cut from segment must be the same as the paste to segment, so that tags are not moved between segments
-    //     if(segmentId === internalClip.selSegmentId) {
-    //         toInsert = internalClip.selDataHtml;
-    //     }
-    //     else {
-    //         toInsert = internalClip.selDataText;
-    //     }
-    //
-    //     // we always use insertMarkup, regardless if it is img or div content
-    //     me.htmlEditor.insertMarkup(toInsert);
-    //     me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
-    // },
+    /**
+     * Pasting our own content must be handled special to insert correct tags
+     */
+    pasteContent: function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        var me = this,
+            plug = me.getEditPlugin(),
+            record = plug.context ? plug.context.record : null,
+            mainEditor = plug?.editor?.mainEditor;
+
+        // If the user is fast enough to close the window and after this use ctr + v to paste the content,
+        // the event will be fired but the row editor will not exist anymore
+        if (!record) {
+            return;
+        }
+
+        var segmentId = record.get('id'),
+            internalClip = me.copiedSelectionWithTagHandling || {},
+            clipboard = (e.browserEvent.clipboardData || window.clipboardData),
+            clipboardText = clipboard.getData('Text'),
+            clipboardHtml = clipboard.getData('text/html'),
+            textMatch = clipboardText === internalClip.selDataText,
+
+            // The clipboardHtml adds meta information like charset and so on, so we just check if
+            // the stored one is a substring of the one in the clipboard
+            htmlMatch = clipboardHtml.includes(internalClip.selDataHtml);
+
+        // When making a copy in translate5, we store the content in an internal variable and in the clipboard
+        // If neither the text or html clipboard content matches the internally stored content,
+        // that means that the pasted content comes from outside and we insert just text:
+        if (me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
+            mainEditor?.insertSymbol(Ext.String.htmlEncode(clipboardText));
+            me.copiedSelectionWithTagHandling = null;
+        } else {
+            // To insert tags, the copy/cut from segment must be the same
+            // as the paste to segment, so that tags are not moved between segments
+            mainEditor?.insertSymbol(Ext.String.htmlEncode(
+                internalClip[
+                    segmentId === internalClip.selSegmentId
+                        ? 'selDataHtml'
+                        : 'selDataText'
+                ]
+            ));
+         }
+    },
 
     /**
      * Event handler for text selection change in editor
