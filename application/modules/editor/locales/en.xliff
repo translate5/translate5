@@ -10799,6 +10799,14 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Bleiben</source>
                 <target>Stay</target>
             </trans-unit>
+            <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4=">
+                <source>Das Segment konnte nicht gespeichert werden.</source>
+                <target>Unable to save segment.</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgdmVyc3VjaGVuIFNpZSwgZGFzIFNlZ21lbnQgZXJuZXV0IHp1IMO2ZmZuZW4gdW5kIGVzIGVybmV1dCB6dSBiZWFyYmVpdGVuLiBXZW5uIGRlciBGZWhsZXIgd2VpdGVyaGluIGJlc3RlaHQsIGFrdHVhbGlzaWVyZW4gU2llIGRpZSBTZWl0ZS4=">
+                <source>Bitte versuchen Sie, das Segment erneut zu öffnen und es erneut zu bearbeiten. Wenn der Fehler weiterhin besteht, aktualisieren Sie die Seite.</source>
+                <target>Please try to reopen the segment and try to edit it again. If error stays refresh the page.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

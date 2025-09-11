@@ -109,6 +109,10 @@ Ext.define('Ext.translate5.Editor', {
             this.setData(value, referenceData);
 
             return editor;
+        }).catch((error) => {
+            console.error('Error initializing editor:', error);
+
+            return false;
         });
     },
 
