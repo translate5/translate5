@@ -170,7 +170,7 @@ class LogLoginCommand extends Translate5AbstractCommand
                 $item['created'],
                 $item['login'],
                 $item['userGuid'],
-                $item['status'], //kommt immer mit succes auch bei FAIL FIXME → werden da nur die success geladen???
+                $item['status'],
                 $item['way'],
             ]);
         }
