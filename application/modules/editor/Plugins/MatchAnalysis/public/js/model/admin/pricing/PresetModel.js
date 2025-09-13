@@ -62,9 +62,11 @@ Ext.define('Editor.plugins.MatchAnalysis.model.admin.pricing.PresetModel', {
     }, {
         name: 'name',
         type: 'string',
+        convert: v => Ext.String.htmlEncode(v)
     }, {
         name: 'description',
         type: 'string',
+        convert: v => Ext.String.htmlEncode(v)
     }, {
         name: 'priceAdjustment',
         type: 'number'

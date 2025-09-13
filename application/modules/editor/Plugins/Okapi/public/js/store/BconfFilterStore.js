@@ -129,6 +129,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
         this.extensionMap = new Map();
         // provide our items with the needed extensions
         this.identifierMap.forEach((id, identifier) => {
+            identifier = Ext.String.htmlEncode(identifier);
             record = this.getById(id);
             if(record) {
                 if (identifierToExtensions.hasOwnProperty(identifier)) {
@@ -143,6 +144,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
         // generate the extension => identifier map
         for(var identifier in identifierToExtensions){
             identifierToExtensions[identifier].forEach(extension => {
+                extension = Ext.String.htmlEncode(extension);
                 this.extensionMap.set(extension, identifier);
             });
         }

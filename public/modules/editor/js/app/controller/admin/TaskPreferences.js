@@ -414,7 +414,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
         this.getActualTask().segmentFields().each(function (field) {
             checkboxGroup.add({
                 xtype: 'checkbox',
-                boxLabel: field.get('label'),
+                boxLabel: Ext.String.htmlEncode(field.get('label')),
                 value: field.get('name'),
                 inputValue: field.get('name'),
                 name: 'fields'

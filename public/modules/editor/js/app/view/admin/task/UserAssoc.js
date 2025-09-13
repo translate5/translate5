@@ -114,7 +114,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                                 },
                                 {
                                     anchor: '100%',
-                                    xtype: 'Editor.combobox',
+                                    xtype: 'combobox',
                                     allowBlank: false,
                                     editable: false,
                                     forceSelection: true,
@@ -128,7 +128,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                                 },
                                 {
                                     anchor: '100%',
-                                    xtype: 'Editor.combobox',
+                                    xtype: 'combobox',
                                     allowBlank: false,
                                     listConfig: {
                                         loadMask: false

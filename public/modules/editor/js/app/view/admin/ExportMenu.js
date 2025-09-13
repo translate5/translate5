@@ -174,7 +174,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
                 field.get('editable') && result.push({
                     hrefTarget: '_blank',
                     href: me.makePath('quality/downloadstatistics/taskGuid/{1}/?type={2}', field.get('name')),
-                    text: Ext.String.format(me.messages.exportQmField, field.get('label'))
+                    text: Ext.String.format(me.messages.exportQmField, Ext.String.htmlEncode(field.get('label')))
                 });
             });
         }

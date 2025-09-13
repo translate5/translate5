@@ -892,11 +892,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/CommentnavController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method editor_Models_Config\\:\\:getLevel\\(\\)\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/ConfigController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$customerId on array\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/ConfigController.php',

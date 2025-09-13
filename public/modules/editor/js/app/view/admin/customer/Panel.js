@@ -356,7 +356,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             text: me.strings.customerNumber,
                             filter: {
                                 type: 'string'
-                            }
+                            },
+                            renderer: (v) => Ext.String.htmlEncode(v)
                         }
                     ]
                 },

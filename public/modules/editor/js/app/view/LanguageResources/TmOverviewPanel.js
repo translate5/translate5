@@ -157,7 +157,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                                 meta.tdAttr = 'data-qtip="' + resourceName + '"';
                             }
 
-                            return v;
+                            return Ext.String.htmlEncode(v);
                         },
                         filter: {
                             type: 'list',
@@ -172,6 +172,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                             type: 'string',
                         },
                         renderer: function (v, meta, rec) {
+                            //namerenderer is doing escaping!
                             return service(rec).getNameRenderer().call(this, v, meta, rec);
                         },
                         text: me.strings.name,
@@ -357,7 +358,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                             return (
                                 '<div style="float:left; width:15px; height:15px; margin-right:5px;' +
                                 ' border:1px solid rgba(0,0,0,.2); background:#' +
-                                record.data.color +
+                                Ext.String.htmlEncode(record.data.color) +
                                 ';"></div>'
                             );
                         },
@@ -662,7 +663,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             return '';
         }
         meta.tdAttr = 'data-qtip="' + this.getCustomersNames(value, true, true).join('</br>') + '"';
-
         return value.length;
     },
 
@@ -673,7 +673,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if (!value || value.length < 1) {
             return '';
         }
-
         return this.getCustomersNames(value).join(',');
     },
 
@@ -696,14 +695,16 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 return;
             }
 
-            let name = Ext.String.htmlEncode(rec.get('name'));
+            let name = Ext.String.htmlEncode(rec.get('name')),
+                number = Ext.String.htmlEncode(rec.get('number'));
 
             if (forQtip) {
                 name = Ext.String.htmlEncode(name);
+                number = Ext.String.htmlEncode(number);
             }
 
             if (addCustomerNumber) {
-                names.push('[' + rec.get('number') + '] ' + name);
+                names.push('[' + number + '] ' + name);
             } else {
                 names.push(name);
             }

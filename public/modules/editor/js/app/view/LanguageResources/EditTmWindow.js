@@ -151,7 +151,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         fieldLabel:me.strings.customers,
                         allowBlank: false
                     },{
-                        xtype:'Editor.tagfield',
+                        xtype:'tagfield',
                         name:'customerUseAsDefaultIds',
                         itemId:'useAsDefault',
                         dataIndex:'customerUseAsDefaultIds',
@@ -173,7 +173,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                             'data-qtip': me.strings.useAsDefaultTooltip
                         }
                     },{
-                        xtype:'Editor.tagfield',
+                        xtype:'tagfield',
                         name:'customerWriteAsDefaultIds',
                         itemId:'writeAsDefault',
                         dataIndex:'customerWriteAsDefaultIds',
@@ -192,7 +192,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                             'data-qtip': me.strings.writeAsDefaultTooltip
                         }
                     },{
-                        xtype:'Editor.tagfield',
+                        xtype:'tagfield',
                         name:'customerPivotAsDefaultIds',
                         itemId:'pivotAsDefault',
                         dataIndex:'customerPivotAsDefaultIds',

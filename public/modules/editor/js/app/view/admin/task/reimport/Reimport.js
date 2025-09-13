@@ -106,6 +106,7 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
                     bind:{
                         text: '{l10n.projectOverview.taskManagement.taskReimport.fileNameColumnText}'
                     },
+                    renderer: (v) => Ext.String.htmlEncode(v),
                     dataIndex: 'filename'
                 },{
                     xtype: 'actioncolumn',

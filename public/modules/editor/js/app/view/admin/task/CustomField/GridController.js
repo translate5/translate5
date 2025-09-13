@@ -131,9 +131,11 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * @param value
      * @returns {*}
      */
-    l10nRenderer: value => Editor.data.locale in (Ext.JSON.decode(value, true) || {})
+    l10nRenderer: value => Ext.String.htmlEncode(
+        Editor.data.locale in (Ext.JSON.decode(value, true) || {})
         ? (Ext.JSON.decode(value, true) || {})[Editor.data.locale]
-        : value,
+        : value
+    ),
 
     /**
      * Return human-friendly title for a value of type-field
@@ -191,7 +193,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
                 )[value]['name']
             )
         );
-        return render.join(', ');
+        return Ext.String.htmlEncode(render.join(', '));
     },
 
     /**

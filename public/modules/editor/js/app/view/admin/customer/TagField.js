@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.customer.TagField', {
-    extend: 'Editor.view.form.field.TagField',
+    extend: 'Ext.form.field.Tag',
     alias: 'widget.customers',
     itemId: 'customers',
     name: 'customers',
@@ -40,18 +40,5 @@ Ext.define('Editor.view.admin.customer.TagField', {
     displayField: 'name',
     valueField: 'id',
     store: 'customersStore',
-    queryMode: 'local',
-
-    tpl: Ext.create('Ext.XTemplate',
-        '<ul class="x-list-plain"><tpl for=".">',
-        '<li role="option" class="x-boundlist-item">{[Ext.String.htmlEncode(values.name)]}</li>',
-        '</tpl></ul>'
-    ),
-
-    // Custom template to escape name on render
-    tagTemplate: new Ext.XTemplate(
-        '<tpl for=".">',
-        '<span class="x-tagfield-item-text">{[Ext.util.Format.htmlEncode(values.name)]}</span>',
-        '</tpl>'
-    )
+    queryMode: 'local'
 });

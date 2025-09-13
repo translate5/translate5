@@ -198,6 +198,7 @@ Ext.define('Editor.view.admin.user.Grid', {
           filter: {
               type: 'string'
           },
+          renderer: (v) => Ext.String.htmlEncode(v),
           text: me.text_cols.locale,
           tooltip: me.strings.localeTooltip
       },

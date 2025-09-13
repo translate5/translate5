@@ -664,7 +664,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                     Object.keys(stepTypeToKey).forEach(function (stepType) {
                         if (workflowStepTypes === null || workflowStepTypes.includes(stepType)) {
                             averageProcessingTimeMessage.push(processingTimeLbl + me.strings[stepType + 'Step'] + ': ' +
-                                resp['averageProcessingTime' + stepTypeToKey[stepType]]);
+                                Ext.String.htmlEncode(resp['averageProcessingTime' + stepTypeToKey[stepType]]));
                         }
                     });
                 } else {
@@ -676,7 +676,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                     // build KPIs by workflow steps
                     processingTimeLbl += ' / ' + me.strings.workflowStep + ' ';
                     resp['byWorkflowSteps'].split(',').forEach(function (workflowStep) {
-                        averageProcessingTimeMessage.push(processingTimeLbl + stepLabels[workflowStep] + ': ' + resp[workflowStep]);
+                        averageProcessingTimeMessage.push(processingTimeLbl + stepLabels[workflowStep] + ': ' + Ext.String.htmlEncode(resp[workflowStep]));
                     });
                 }
 
@@ -702,7 +702,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 me.getLevenshteinDistanceOriginalDisplay().update(me.strings.levenshteinDistanceOriginalLabel + ': ' + resp.levenshteinOriginal);
                 me.getLevenshteinDistanceStartDisplay().update(me.strings.levenshteinDistanceStartLabel + ': ' + resp.levenshteinStart);
                 me.getLevenshteinDistanceEndDisplay().update(me.strings.levenshteinDistanceEndLabel + ': ' + resp.levenshteinEnd);
-                me.getExcelExportUsageDisplay().update(resp.excelExportUsage + ' ' + me.strings.excelExportUsageLabel);
+                me.getExcelExportUsageDisplay().update(Ext.String.htmlEncode(resp.excelExportUsage) + ' ' + me.strings.excelExportUsageLabel);
                 win.setLoading(false);
             },
             failure: function () {

@@ -257,6 +257,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
         if (qlty !== text) {
             qlty += ' » ' + text;
         }
+        qlty = Ext.String.htmlEncode(qlty);
 
         // Category index shortcut
         var cidx = record.get('categoryIndex');

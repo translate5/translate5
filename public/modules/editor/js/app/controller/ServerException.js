@@ -124,6 +124,9 @@ Ext.define('Editor.controller.ServerException', {
             url = response?.request?.requestOptions?.url?.replaceAll('"', '~') || 'null',
             method = response?.request?.requestOptions?.method || 'null',
             getServerMsg = function() {
+                if(json === null){
+                    return respText;
+                }
                 if(json.errorMessage){
                     return json.errorMessage;
                 }

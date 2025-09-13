@@ -32,11 +32,11 @@ Ext.define('Editor.model.admin.task.Log', {
     fields: [
         {name: 'id', type: 'int', persist: false},
         {name: 'level', type: 'int'},
-        {name: 'state', type: 'string'},
-        {name: 'eventCode', type: 'string'},
-        {name: 'domain', type: 'string'},
-        {name: 'message', type: 'string'},
-        {name: 'authUser', type: 'string'},
+        {name: 'state', type: 'string', convert: v => Ext.String.htmlEncode(v)},
+        {name: 'eventCode', type: 'string', convert: v => Ext.String.htmlEncode(v)},
+        {name: 'domain', type: 'string', convert: v => Ext.String.htmlEncode(v)},
+        {name: 'message', type: 'string', convert: v => Ext.String.htmlEncode(v)},
+        {name: 'authUser', type: 'string', convert: v => Ext.String.htmlEncode(v)},
         {name: 'extra', convert: function(val) {
             if(Ext.isObject(val)){
                 return val;

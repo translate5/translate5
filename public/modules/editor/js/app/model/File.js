@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.File', {
     extend: 'Ext.data.Model',
     fields: [
-        {name: 'text', type: 'string', mapping: 'filename'},
+        {name: 'text', type: 'string', mapping: 'filename', convert: v => Ext.String.htmlEncode(v)},
         {name: 'id', type: 'int'},
         {name: 'parentId', type: 'int', critical: true},
         {
@@ -56,7 +56,7 @@ Ext.define('Editor.model.File', {
             }
         },
         'cls',
-        {name: 'qtip', type: 'string', mapping: 'filename'},
+        {name: 'qtip', type: 'string', mapping: 'filename', convert: v => Ext.String.htmlEncode(v)},
         {name: 'leaf', type: 'boolean', mapping: 'isFile', defaultValue: false},
         {name: 'segmentid', type: 'int', defaultValue: 0},
         {name: 'index', type: 'int', critical: true}

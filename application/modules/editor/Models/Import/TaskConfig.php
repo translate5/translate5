@@ -55,32 +55,77 @@ class editor_Models_Import_TaskConfig
             return;
         }
         $logData = [
-            'filename' => self::CONFIG_TEMPLATE,
+            'fileName' => self::CONFIG_TEMPLATE,
             'task' => $task,
         ];
-        $config = parse_ini_file($template);
+        $config = $this->parseIniFile($template, $logData);
         $log = Zend_Registry::get('logger');
+        $dbConfig = new editor_Models_Config();
+
         foreach ($config as $name => $value) {
             try {
                 if (str_starts_with($name, 'runtimeOptions.')) {
+                    $this->checkConfigLevel($dbConfig, $name, $logData);
+
                     $this->taskConfig->updateInsertConfig($task->getTaskGuid(), $name, $value);
 
                     continue;
                 }
-                if ($name === 'fileFilter' && is_array($value)) {
-                    foreach ($value as $filter) {
-                        $importConfig->fileFilters[] = $filter;
-                    }
-                }
+                $this->extractFileFilters($name, $value, $importConfig);
             } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint) {
                 $logData['name'] = $name;
                 $log->exception(new editor_Models_Import_FileParser_Exception('E1327', $logData), [
                     'level' => $log::LEVEL_WARN,
                 ]);
+            } catch (editor_Models_Import_FileParser_Exception $e) {
+                throw $e;
             } catch (Exception $e) {
                 $logData['errorMessage'] = $e->getMessage();
 
                 throw new editor_Models_Import_FileParser_Exception('E1325', $logData);
+            }
+        }
+    }
+
+    /**
+     * @throws editor_Models_Import_FileParser_Exception
+     */
+    private function checkConfigLevel(editor_Models_Config $dbConfig, string $name, array $logData): void
+    {
+        $dbConfig->loadByName($name);
+        $level = (int) $dbConfig->getLevel();
+
+        //we allow only exactly task level configs, user level makes no sense since normally not related to task stuff
+        if ($level !== $dbConfig::CONFIG_LEVEL_TASKIMPORT && $level !== $dbConfig::CONFIG_LEVEL_TASK) {
+            $logData['name'] = $name;
+
+            throw new editor_Models_Import_FileParser_Exception('E1743', $logData);
+        }
+    }
+
+    /**
+     * @throws editor_Models_Import_FileParser_Exception
+     */
+    private function parseIniFile(string $template, array $logData): array
+    {
+        $config = parse_ini_file($template);
+        if ($config === false) {
+            $logData['errorMessage'] = error_get_last()['message'] ?? '';
+
+            throw new editor_Models_Import_FileParser_Exception('E1744', $logData);
+        }
+
+        return $config;
+    }
+
+    private function extractFileFilters(
+        string $name,
+        mixed $value,
+        editor_Models_Import_Configuration $importConfig
+    ): void {
+        if ($name === 'fileFilter' && is_array($value)) {
+            foreach ($value as $filter) {
+                $importConfig->fileFilters[] = $filter;
             }
         }
     }

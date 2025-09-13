@@ -119,6 +119,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                         text: me.strings.category,
                         dataIndex : 'text',
                         sortable: true,
+                        renderer: (v) => Ext.String.htmlEncode(v),
                         flex: 4
                     },{
                         xtype: 'gridcolumn',

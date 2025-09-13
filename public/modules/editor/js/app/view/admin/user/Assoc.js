@@ -166,7 +166,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 },
                                 {
                                     anchor: '100%',
-                                    xtype: 'Editor.combobox',
+                                    xtype: 'combobox',
                                     allowBlank: false,
                                     listConfig: {
                                         loadMask: false
