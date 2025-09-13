@@ -22,6 +22,18 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.29.2] - 2025-09-13
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4950](https://jira.translate5.net/browse/TRANSLATE-4950): Editor general - Implement a helper to find XSS vulnerabilities in translate5 and fix found vulnerabilities** <br>
+In order to be save against XSS attacks a helper tool to find them while implementation is introduced, so found vulnerabilities are fixed too.
+
+
 ## [7.29.1] - 2025-09-11
 
 ### Important Notes:
