@@ -33,6 +33,156 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [none] - 2025-09-15
+
+### Important Notes:
+#### [TRANSLATE-4530](https://jira.translate5.net/browse/TRANSLATE-4530)
+Not released
+
+#### [TRANSLATE-4528](https://jira.translate5.net/browse/TRANSLATE-4528)
+duplicate
+ 
+
+
+### Added
+**[TRANSLATE-4210](https://jira.translate5.net/browse/TRANSLATE-4210): AI - Llama3 integration analogous to current GPT integration** <br>
+,
+
+**[TRANSLATE-4209](https://jira.translate5.net/browse/TRANSLATE-4209): InstantTranslate, VisualReview / VisualTranslation - Instant Translate PDF translations** <br>
+.
+
+**[TRANSLATE-4032](https://jira.translate5.net/browse/TRANSLATE-4032): Hotfolder Import - Specification and time estimation for COTI-Level 2 Support for translate5** <br>
+,
+
+**[TRANSLATE-3491](https://jira.translate5.net/browse/TRANSLATE-3491): Task Management - Add column "Price" to project and task grid** <br>
+,
+
+**[TRANSLATE-2866](https://jira.translate5.net/browse/TRANSLATE-2866): InstantTranslate - Add automatic language detection to InstantTranslate** <br>
+,
+
+**[TRANSLATE-2418](https://jira.translate5.net/browse/TRANSLATE-2418): Task Management - Export of all tasks of one project in one zip file** <br>
+,
+
+
+### Changed
+**[TRANSLATE-4704](https://jira.translate5.net/browse/TRANSLATE-4704): InstantTranslate - segmentation rules for InstantTranslate in combination with GroupShare** <br>
+-
+
+**[TRANSLATE-4683](https://jira.translate5.net/browse/TRANSLATE-4683): Main back-end mechanisms (Worker, Logging, etc.) - Upgrade translate5 to PHP 8.2** <br>
+Updated translate5's Dockerfile to PHP 8.2
+
+**[TRANSLATE-4667](https://jira.translate5.net/browse/TRANSLATE-4667): AI - OpenAI Terminology: Add Terminology unwanted in source but wanted in target** <br>
+,
+
+**[TRANSLATE-4581](https://jira.translate5.net/browse/TRANSLATE-4581): Task Management - task-specific configs are not always used** <br>
+/
+
+**[TRANSLATE-4373](https://jira.translate5.net/browse/TRANSLATE-4373): AI - OpenAI GPT Training Improvements: Improve Model Properties & add Epochs** <br>
+Added 'Number of Epochs' field above 'Submit training' button in GPT training window
+
+**[TRANSLATE-4372](https://jira.translate5.net/browse/TRANSLATE-4372): AI - OpenAI GPT Training Improvements: Trainings Window Adjustments** <br>
+Added ablity to add pre-configured prompt(s) to a training
+
+**[TRANSLATE-4371](https://jira.translate5.net/browse/TRANSLATE-4371): AI - OpenAI GPT Training Improvements: Prompt Management** <br>
+Added ability to setup OpenAI GPT Prompts via 'Prompt management' section in 'Preferences' tab
+
+**[TRANSLATE-4370](https://jira.translate5.net/browse/TRANSLATE-4370): AI - OpenAI GPT Training Improvements: Data Model** <br>
+added database tables to store predefined prompts data
+
+**[TRANSLATE-4345](https://jira.translate5.net/browse/TRANSLATE-4345): MatchAnalysis & Pretranslation - Match Analysis: Language not found error on analysis entry for de-associated language resource** <br>
+fixed with https://jira.translate5.net/browse/TRANSLATE-4340
+
+**[TRANSLATE-4165](https://jira.translate5.net/browse/TRANSLATE-4165): Editor general - TMMaintenance plugin apache aliases** <br>
+not in changelog
+
+**[TRANSLATE-4130](https://jira.translate5.net/browse/TRANSLATE-4130): Editor general - Front-end Testing Findings** <br>
+-
+
+**[TRANSLATE-4100](https://jira.translate5.net/browse/TRANSLATE-4100): LanguageResources - Update OpenAI SDK recurring issue** <br>
+ ,
+
+**[TRANSLATE-4099](https://jira.translate5.net/browse/TRANSLATE-4099): LanguageResources - Update DeepL SDK recurring issue** <br>
+ ,
+
+**[TRANSLATE-4040](https://jira.translate5.net/browse/TRANSLATE-4040): LanguageResources - Improve system-message for GPT-4o** <br>
+,
+
+**[TRANSLATE-3746](https://jira.translate5.net/browse/TRANSLATE-3746): LanguageResources - Check, if MS Azure Cloud OPenAI Service is more stable and EU-based** <br>
+,
+
+**[TRANSLATE-3667](https://jira.translate5.net/browse/TRANSLATE-3667): Import/Export, t5memory - opening tags not highlighted inn grey** <br>
+-
+
+**[TRANSLATE-3340](https://jira.translate5.net/browse/TRANSLATE-3340): Installation & Update, Translate5 CLI - add optional autodiscovery call to plugin:enable** <br>
+Add an optional parameter to execute service autodiscovery on t5 plugin:enable call.
+
+**[TRANSLATE-2725](https://jira.translate5.net/browse/TRANSLATE-2725): Editor general - Do not delete tags on pressing "del" or "backspace" in certain cases** <br>
+,
+
+**[TRANSLATE-2326](https://jira.translate5.net/browse/TRANSLATE-2326): Main back-end mechanisms (Worker, Logging, etc.) - Change Worker invocation away from fsockopen for better error handling** <br>
+The current invocation of the workers does not provide the possibility to read out connection warnings, what would be very helpful in debugging.
+
+**[TRANSLATE-1829](https://jira.translate5.net/browse/TRANSLATE-1829): LanguageResources - NEC-TM concordance search should load more search results on scrolling** <br>
+,
+
+**[TRANSLATE-666](https://jira.translate5.net/browse/TRANSLATE-666): Test framework - Check activated plugins in API test** <br>
+Done a long time ago
+
+**[TRANSLATE-365](https://jira.translate5.net/browse/TRANSLATE-365): Main back-end mechanisms (Worker, Logging, etc.) - remove data from session, which is not needed in session** <br>
+-
+
+
+### Bugfixes
+**[TRANSLATE-4885](https://jira.translate5.net/browse/TRANSLATE-4885): Editor general - Cursor at the wrong position when inserting a tag using hotkey** <br>
+Fixed cursor position after inserting a tag with ctrl+, hotkey
+
+**[TRANSLATE-4739](https://jira.translate5.net/browse/TRANSLATE-4739): TrackChanges - Track changes missing when inserting special characters** <br>
+-
+
+**[TRANSLATE-4628](https://jira.translate5.net/browse/TRANSLATE-4628): Editor general - FIX Overlapping Terminology and TrackChanges and Spellcheck tags** <br>
+duplicates https://jira.translate5.net/browse/TRANSLATE-3118
+
+**[TRANSLATE-4573](https://jira.translate5.net/browse/TRANSLATE-4573): LanguageResources - Deepl error on different target sublanguages** <br>
+Fixed bug when deepl failed to recognize target language for different sublanguages (en-GB - en-US)
+
+**[TRANSLATE-4549](https://jira.translate5.net/browse/TRANSLATE-4549): Editor general, SpellCheck (LanguageTool integration), TrackChanges - Segment can not be saved due error 400 Bad Request - invalid Markup provided** <br>
+In special circumstances using spellcheck and track changes lead to non savable segments.
+
+**[TRANSLATE-4530](https://jira.translate5.net/browse/TRANSLATE-4530): usability task overview - user job list on mouse-over in task overview** <br>
+Not implemented
+
+**[TRANSLATE-4528](https://jira.translate5.net/browse/TRANSLATE-4528): MatchAnalysis & Pretranslation - Wrong word count if internal fuzzies are NOT used** <br>
+duplicate
+
+**[TRANSLATE-4485](https://jira.translate5.net/browse/TRANSLATE-4485): Export, LanguageResources - Out of memory on resource usage export** <br>
+,
+
+**[TRANSLATE-4450](https://jira.translate5.net/browse/TRANSLATE-4450): Editor general - css for tracked changes not applied** <br>
+duplicates https://jira.translate5.net/browse/TRANSLATE-3873
+
+**[TRANSLATE-4386](https://jira.translate5.net/browse/TRANSLATE-4386): TermPortal - TermPortal DE generic always shown in create term dropdown** <br>
+Not reproducible
+
+**[TRANSLATE-4129](https://jira.translate5.net/browse/TRANSLATE-4129): Comments - Quotation marks and apostrophes in comments are escaped** <br>
+No longer repeats
+
+**[TRANSLATE-4128](https://jira.translate5.net/browse/TRANSLATE-4128): Search & Replace (editor) - Replace All Functionality Timeout Results in Partial Processing of Segments** <br>
+,
+
+**[TRANSLATE-4071](https://jira.translate5.net/browse/TRANSLATE-4071): Auto-QA - inconsistent tag QA in sdlxliff** <br>
+Behaviour intended: reference field is source for pretranslated segments 
+
+**[TRANSLATE-4013](https://jira.translate5.net/browse/TRANSLATE-4013): Editor general - RootCause: You're trying to decode an invalid JSON String** <br>
+-
+
+**[TRANSLATE-3836](https://jira.translate5.net/browse/TRANSLATE-3836): MatchAnalysis & Pretranslation - Only one internal fuzzy per analysis** <br>
+was done in other issue
+
+**[TRANSLATE-3803](https://jira.translate5.net/browse/TRANSLATE-3803): TermTagger integration - term with hypens is not recognized** <br>
+-
+
+
 ## [7.28.7] - 2025-09-11
 
 ### Important Notes:
