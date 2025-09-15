@@ -1,15 +1,18 @@
 import Node from "./node";
 import TagsConversion from "../TagsTransform/tags-conversion";
 import TagCheck from "../TagsTransform/tag-check";
+import PixelMapping from "../TagsTransform/pixel-mapping";
 
 const htmlEncode = require('js-htmlencode').htmlEncode;
 
 export default class DataTransformer {
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
+    #font;
 
     /**
      * @param {TagsConversion} tagsConversion
+     * @param {Font} font
      * @param {NodeListOf<HTMLElement>} items
      * @param {NodeListOf<HTMLElement>|Array<HTMLElement>} referenceItems
      * @param {Boolean} userCanModifyWhitespaceTags
@@ -17,12 +20,14 @@ export default class DataTransformer {
      */
     constructor(
         tagsConversion,
+        font,
         items,
         referenceItems,
         userCanModifyWhitespaceTags,
         userCanInsertWhitespaceTags
     ) {
         this._tagsConversion = tagsConversion;
+        this.#font = font;
         this._referenceTags = {
             [TagsConversion.TYPE.SINGLE]: {},
             [TagsConversion.TYPE.OPEN]: {},
@@ -144,9 +149,10 @@ export default class DataTransformer {
      */
     #transformItems(items, reference = false) {
         let result = [];
+        const pixelMapping = new PixelMapping(this.#font);
 
         for (const item of items) {
-            const transformed = this._tagsConversion.transform(item);
+            const transformed = this._tagsConversion.transform(item, pixelMapping);
 
             if (! transformed) {
                 continue;

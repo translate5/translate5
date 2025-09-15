@@ -93,6 +93,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node */ "./DataTransform/node.js");
 /* harmony import */ var _TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../TagsTransform/tags-conversion */ "./TagsTransform/tags-conversion.js");
 /* harmony import */ var _TagsTransform_tag_check__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../TagsTransform/tag-check */ "./TagsTransform/tag-check.js");
+/* harmony import */ var _TagsTransform_pixel_mapping__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../TagsTransform/pixel-mapping */ "./TagsTransform/pixel-mapping.js");
+
 
 
 
@@ -102,9 +104,11 @@ const htmlEncode = (__webpack_require__(/*! js-htmlencode */ "./node_modules/js-
 class DataTransformer {
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
+    #font;
 
     /**
      * @param {TagsConversion} tagsConversion
+     * @param {Font} font
      * @param {NodeListOf<HTMLElement>} items
      * @param {NodeListOf<HTMLElement>|Array<HTMLElement>} referenceItems
      * @param {Boolean} userCanModifyWhitespaceTags
@@ -112,12 +116,14 @@ class DataTransformer {
      */
     constructor(
         tagsConversion,
+        font,
         items,
         referenceItems,
         userCanModifyWhitespaceTags,
         userCanInsertWhitespaceTags
     ) {
         this._tagsConversion = tagsConversion;
+        this.#font = font;
         this._referenceTags = {
             [_TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__["default"].TYPE.SINGLE]: {},
             [_TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__["default"].TYPE.OPEN]: {},
@@ -239,9 +245,10 @@ class DataTransformer {
      */
     #transformItems(items, reference = false) {
         let result = [];
+        const pixelMapping = new _TagsTransform_pixel_mapping__WEBPACK_IMPORTED_MODULE_3__["default"](this.#font);
 
         for (const item of items) {
-            const transformed = this._tagsConversion.transform(item);
+            const transformed = this._tagsConversion.transform(item, pixelMapping);
 
             if (! transformed) {
                 continue;
@@ -653,6 +660,7 @@ class EditorWrapper {
         this.#font = font;
         this.dataTransformer = new _DataTransform_data_transformer__WEBPACK_IMPORTED_MODULE_3__["default"](
             this._tagsConversion,
+            this.#font,
             (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(data).childNodes,
             (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(referenceData).childNodes,
             this.#userCanModifyWhitespaceTags,
