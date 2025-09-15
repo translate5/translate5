@@ -521,10 +521,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @returns integer|false
      */
     getMaxWidthForSingleLine: function (meta) {
-        if (!this.shouldUseMaxNumberOfLines(meta)) {
-            return Number.MAX_SAFE_INTEGER;
-        }
-
         // don't add messageSizeUnit here, will be used for calculating...
         return meta && meta.maxWidth ? meta.maxWidth : Number.MAX_SAFE_INTEGER;
     },
