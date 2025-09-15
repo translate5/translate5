@@ -122,6 +122,7 @@ export default class EditorWrapper {
         this.#font = font;
         this.dataTransformer = new DataTransformer(
             this._tagsConversion,
+            this.#font,
             stringToDom(data).childNodes,
             stringToDom(referenceData).childNodes,
             this.#userCanModifyWhitespaceTags,
