@@ -34,6 +34,24 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.28.8] - 2025-09-15
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4973](https://jira.translate5.net/browse/TRANSLATE-4973): TrackChanges - Problem with TrackChanges permission on client panel open** <br>
+[🐞 Fix] Fixed JS error in client panel
+
+**[TRANSLATE-4968](https://jira.translate5.net/browse/TRANSLATE-4968): Editor general - calculation of length differs from backend to frontend** <br>
+[🐞 Fix] Fixed calculation of tags width for pixel based length restriction
+
+**[TRANSLATE-4960](https://jira.translate5.net/browse/TRANSLATE-4960): Editor Length Check - Length-restriction limits are not shown/calculated** <br>
+[🐞 Fix] Fixed calculating max length for single line
+
+
 ## [none] - 2025-09-15
 
 ### Important Notes:
