@@ -64,7 +64,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     requires: [
         'Editor.plugins.Okapi.view.fprm.component.Grid'
     ],
-    width: 900,
+    width: 1080,
     formPanelLayout: 'fit',
     formPanelPadding: 2,
     grid: null,
@@ -129,22 +129,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'tsExcelExcludedColors.i': { type: 'tagfield', identifier: 'ccc', guiData: 'colors', dataPrefix: 'FF' },
             'bPreferenceTranslateExcelExcludeColors.b': { config: { hidden: true }},
             'subfilter': {}
-            /*'bPreferenceTranslateExcelExcludeColumns.b': { type: 'boolset', children: { // if not true, tsExcelExcludedColumns, tsExcelExcludedColumnsSheetN will not be processed
-                'tsExcelExcludedColumnsSheet1.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '1' }, // this is a "virtual" field that does not show up in the data
-                'tsExcelExcludedColumnsSheet2.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '2' }, // this is a "virtual" field that does not show up in the data
-                'tsExcelExcludedColumnsSheet3.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '3' } // this is a "virtual" field that does not show up in the data
-            }},
-            'tsExcelExcludedColumns.i': { config: { hidden: true }} // this stores the number of values for the 3 fields in bPreferenceTranslateExcelExcludeColumns.b
-            */
-            // the above is commented out as there's no more bPreferenceTranslateExcelExcludeColumns and tsExcelExcludedColumns - "Worksheet configurations" grid instead:
-            /* worksheetConfigurations.number.i=1
-            worksheetConfigurations.0.namePattern=Sheet1
-            worksheetConfigurations.0.sourceColumns=A
-            worksheetConfigurations.0.targetColumns=B
-            worksheetConfigurations.0.excludedRows=1,2
-            worksheetConfigurations.0.excludedColumns=C,D
-            worksheetConfigurations.0.metadataRows=3
-            worksheetConfigurations.0.metadataColumns=E */
         }},
         /* PowerPoint Options */
         'tabPowerpointOptions': { type: 'tab', icon: 'fa-file-powerpoint-o', children: {
@@ -167,7 +151,15 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
                 'tsPowerpointIncludedSlideNumbers.i': { type: 'tagfield', identifier: 'sln', guiData: 'numbers' }
             }}
         }},
-        /* Worksheet Configurations */
+        /* Worksheet Configurations
+            worksheetConfigurations.0.namePattern=Sheet1
+            worksheetConfigurations.0.sourceColumns=A,B
+            worksheetConfigurations.0.targetColumns=C,D
+            worksheetConfigurations.0.excludedRows=1,2
+            worksheetConfigurations.0.excludedColumns=E
+            worksheetConfigurations.0.metadataRows=3
+            worksheetConfigurations.0.metadataColumns=F,G
+         */
         'tabWorksheetConfigurations': { type: 'tab', icon: 'fa-file-excel-o', children: {
             'worksheetConfigurations': { type: 'grid', config: {
                 cols: [{
