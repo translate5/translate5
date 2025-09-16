@@ -2879,14 +2879,26 @@ class TagsConversion {
     }
 
     isTermNode(item) {
+        if (item.nodeType !== Node.ELEMENT_NODE) {
+            return false;
+        }
+
         return /(^|[\s])term([\s]|$)/.test(item.className);
     }
 
     isSpellcheckNode(item) {
+        if (item.nodeType !== Node.ELEMENT_NODE) {
+            return false;
+        }
+
         return /(^|[\s])t5spellcheck([\s]|$)/.test(item.className);
     }
 
     isInternalTagNode(item) {
+        if (item.nodeType !== Node.ELEMENT_NODE) {
+            return false;
+        }
+
         return /(^|[\s])internal-tag([\s]|$)/.test(item.className);
     }
 
@@ -2895,6 +2907,10 @@ class TagsConversion {
     }
 
     isWhitespaceNode(item) {
+        if (item.nodeType !== Node.ELEMENT_NODE) {
+            return false;
+        }
+
         return this._isWhitespaceTag(item.className);
     }
 

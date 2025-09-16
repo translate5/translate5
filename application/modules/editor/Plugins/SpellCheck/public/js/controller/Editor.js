@@ -1177,6 +1177,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         function traverseNodes(node) {
             if (node.nodeType === Node.TEXT_NODE) {
                 const isWithinNode = pointer <= position && pointer + node.length >= position;
+
+                if (!isWithinNode) {
+                    pointer += node.length;
+
+                    return null;
+                }
+
                 const isInserting = action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.INSERT;
                 const dom = !isInserting && action.content.length ? action.content[0].toDom() : null;
                 const isDeletingSpellCheck =
@@ -1185,11 +1192,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                     (
                         tagsConversion.isSpellcheckNode(dom) ||
                         // If one of its children is a spellcheck node
-                        (dom.nodeType === Node.ELEMENT_NODE && dom.querySelectorAll('.t5spellcheck'))
+                        (dom.nodeType === Node.ELEMENT_NODE && !!dom.querySelectorAll('.t5spellcheck').length)
                     );
 
+                // if we are inserting or deleting inside a spellcheck node, unwrap it
                 if (
-                    isWithinNode &&
                     tagsConversion.isSpellcheckNode(node.parentNode) &&
                     (isInserting || isDeletingSpellCheck)
                 ) {
@@ -1201,29 +1208,28 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                     return isInserting ? position + action.correction : position;
                 }
 
-                if (
-                    isWithinNode &&
-                    node.nextSibling &&
-                    tagsConversion.isSpellcheckNode(node.nextSibling) &&
-                    action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.REMOVE &&
-                    action.content.length > 1 &&
-                    tagsConversion.isSpellcheckNode(action.content[action.content.length - 1].toDom())
-                ) {
+                // if we are deleted at the beginning of the spellcheck node with the del or backspace key
+                // and due to calculation of the position of a change current node can be right before the
+                // spellcheck node that we need to unwrap
+                let siblingToUnwrap = node.nextSibling &&
+                    tagsConversion.isSpellcheckNode(node.nextSibling) ? node.nextSibling : null;
+
+                // sometimes next sibling should be checked on a parent node
+                if (! siblingToUnwrap && node.parentNode.lastChild === node) {
+                    siblingToUnwrap = node.parentNode.nextSibling &&
+                        tagsConversion.isSpellcheckNode(node.parentNode.nextSibling) ? node.parentNode.nextSibling : null;
+                }
+
+                if (siblingToUnwrap && isDeletingSpellCheck) {
                     _this._unwrapNodesWithMatchIndex(
                         doc,
-                        node.nextSibling.getAttribute(_this.self.ATTRIBUTE_ACTIVEMATCHINDEX)
+                        siblingToUnwrap.getAttribute(_this.self.ATTRIBUTE_ACTIVEMATCHINDEX)
                     );
 
                     return isInserting ? position + action.correction : position;
                 }
 
-                if (isWithinNode) {
-                    return isInserting ? position + action.correction : position;
-                }
-
-                pointer += node.length;
-
-                return null;
+                return isInserting ? position + action.correction : position;
             }
 
             if (tagsConversion.isTag(node)) {
