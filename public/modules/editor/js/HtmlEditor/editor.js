@@ -599,7 +599,12 @@ class EditorWrapper {
 
         addEventListener('unhandledrejection', (event) => {
             console.log('Unhandled promise rejection: ');
-            console.log(event.reason.message, event.promise, event.type, event.target);
+            console.log(
+                event.reason?.message,
+                event.promise,
+                event.type,
+                event.target
+            );
         });
 
         this.registerModifier(

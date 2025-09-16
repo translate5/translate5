@@ -1044,7 +1044,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 },
                 failure: (response) => {
                     this.consoleLog('runSpellCheckWithTool (LanguageTool) failed: ' + response.status);
-                    reject();
+                    reject(new Error('Spellcheck failed: ' + response.status));
                 },
             });
         });
