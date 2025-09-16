@@ -24,6 +24,27 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.29.4] - 2025-09-16
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4982](https://jira.translate5.net/browse/TRANSLATE-4982): Editor general - Error if segment has locked tag** <br>
+[🐞 Fix] Fixed error that appeared on a try to edit a segment that contains a "locked" tag
+
+**[TRANSLATE-4980](https://jira.translate5.net/browse/TRANSLATE-4980): Editor general - Error on unhandled promise rejection when trying to log the error** <br>
+[🐞 Fix] Fixed error that might happen on unsuccessful spellcheck request in certain cases
+
+**[TRANSLATE-4977](https://jira.translate5.net/browse/TRANSLATE-4977): LanguageResources - OpenAI service-state evaluation produces PHP-warnings flooding logs** <br>
+[🐞 Fix] OpenAI service evaluation could create PHP-warnings flooding logs
+
+**[TRANSLATE-4972](https://jira.translate5.net/browse/TRANSLATE-4972): Editor general - Error on processing trackchanges** <br>
+[🐞 Fix] Fixed error that was happening sometimes when trying to apply trackchanges on typing in editor
+
+
 ## [7.29.3] - 2025-09-15
 
 ### Important Notes:
