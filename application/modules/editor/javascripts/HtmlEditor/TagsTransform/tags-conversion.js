@@ -275,7 +275,7 @@ export default class TagsConversion {
         number = shortTagContent.replace(/[^0-9]/g, '');
 
         if (shortTagContent.search(/locked/) !== -1) {
-            number = 'locked' + data.nr;
+            number = 'locked' + number;
         }
 
         return number;
