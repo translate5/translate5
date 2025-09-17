@@ -22,6 +22,11 @@ export default class TagsConversion {
     };
 
     transform(item, pixelMapping = null) {
+        //some tags are marked as to be ignored in the editor, so we ignore them
+        if (this._isIgnoredNode(item)) {
+            return null;
+        }
+
         if (this.isTextNode(item)) {
             let text = item.cloneNode();
             text.data = item.data;
@@ -43,7 +48,10 @@ export default class TagsConversion {
                     // Keep nodes from TrackChanges, but run replaceTagToImage for them as well
                     result = stringToDom(openingTag + closingTag).childNodes[0];
                     for (const child of item.childNodes) {
-                        result.appendChild(this.transform(child, pixelMapping));
+                        const transformedChild = this.transform(child, pixelMapping);
+                        if (transformedChild) {
+                            result.appendChild(transformedChild);
+                        }
                     }
 
                     break;
@@ -93,15 +101,13 @@ export default class TagsConversion {
             let term = stringToDom(result).childNodes[0];
 
             item.childNodes.forEach((child) => {
-                term.appendChild(this.transform(child, pixelMapping));
+                const transformedChild = this.transform(child, pixelMapping);
+                if (transformedChild) {
+                    term.appendChild(transformedChild);
+                }
             });
 
             return term;
-        }
-
-        //some tags are marked as to be ignored in the editor, so we ignore them
-        if (this._isIgnoredNode(item)) {
-            return null;
         }
 
         //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
@@ -648,7 +654,11 @@ export default class TagsConversion {
     }
 
     _isIgnoredNode(item) {
-        return /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className);
+        if (item.nodeType !== Node.ELEMENT_NODE) {
+            return false;
+        }
+
+        return /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className) || item.tagName === 'TRANSLATE5:ESCAPED';
     }
 
     _isSingleTagNode(item) {
