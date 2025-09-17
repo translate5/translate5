@@ -25,6 +25,21 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.29.5] - 2025-09-17
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-4984](https://jira.translate5.net/browse/TRANSLATE-4984): Editor general - Error when editing a text next to a tag** <br>
+[🐞 Fix] Fixed error which might appear in certain cases when cursor is next to a tag
+
+**[TRANSLATE-4979](https://jira.translate5.net/browse/TRANSLATE-4979): Editor general - Error on open segment** <br>
+[🐞 Fix] Fixed error on trying to open segment that contains some unexpected data
+
+
 ## [7.29.4] - 2025-09-16
 
 ### Important Notes:
