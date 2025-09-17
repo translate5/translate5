@@ -196,7 +196,7 @@ export default class TagsConversion {
     }
 
     isTermNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -204,7 +204,7 @@ export default class TagsConversion {
     }
 
     isSpellcheckNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -212,7 +212,7 @@ export default class TagsConversion {
     }
 
     isInternalTagNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -224,7 +224,7 @@ export default class TagsConversion {
     }
 
     isWhitespaceNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -654,7 +654,7 @@ export default class TagsConversion {
     }
 
     _isIgnoredNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -697,5 +697,13 @@ export default class TagsConversion {
         }
 
         return qmFlagClass.replace('qmflag-', '');
+    }
+
+    #isAnElementNode(item) {
+        if (!item) {
+            return false;
+        }
+
+        return item.hasOwnProperty('nodeType') && item.nodeType !== Node.ELEMENT_NODE;
     }
 }

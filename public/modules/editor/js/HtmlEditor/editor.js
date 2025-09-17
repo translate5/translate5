@@ -2890,7 +2890,7 @@ class TagsConversion {
     }
 
     isTermNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -2898,7 +2898,7 @@ class TagsConversion {
     }
 
     isSpellcheckNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -2906,7 +2906,7 @@ class TagsConversion {
     }
 
     isInternalTagNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -2918,7 +2918,7 @@ class TagsConversion {
     }
 
     isWhitespaceNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -3348,7 +3348,7 @@ class TagsConversion {
     }
 
     _isIgnoredNode(item) {
-        if (item.nodeType !== Node.ELEMENT_NODE) {
+        if (!this.#isAnElementNode(item)) {
             return false;
         }
 
@@ -3391,6 +3391,14 @@ class TagsConversion {
         }
 
         return qmFlagClass.replace('qmflag-', '');
+    }
+
+    #isAnElementNode(item) {
+        if (!item) {
+            return false;
+        }
+
+        return item.hasOwnProperty('nodeType') && item.nodeType !== Node.ELEMENT_NODE;
     }
 }
 
