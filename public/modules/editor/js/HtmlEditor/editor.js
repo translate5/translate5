@@ -3398,7 +3398,7 @@ class TagsConversion {
             return false;
         }
 
-        return item.hasOwnProperty('nodeType') && item.nodeType !== Node.ELEMENT_NODE;
+        return typeof item.nodeType !== 'undefined' && item.nodeType === Node.ELEMENT_NODE;
     }
 }
 
