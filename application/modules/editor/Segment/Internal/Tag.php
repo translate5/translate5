@@ -413,6 +413,11 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
      */
     public function getComparisionHash(): string
     {
+        // for whitespace, we use the textual representation - which gives us identical hashes for identical types
+        if ($this->isWhitespace() && $this->fullTag != null) {
+            return Markup::unescapeAllQuotes($this->fullTag->getText());
+        }
+
         // we use our visual representation like "</6>" as key to compare tags
         if ($this->shortTag != null) {
             return Markup::unescapeAllQuotes($this->shortTag->getText());
