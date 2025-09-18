@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,26 +28,30 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\Adapter;
+namespace MittagQI\Translate5\Integration;
 
-use editor_Models_Segment as SegmentModel;
-use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
+use editor_Models_Segment;
+use editor_Models_SegmentField as SegmentField;
 
-interface UpdatableAdapterInterface
+class QueryStringProvider
 {
-    public const RECHECK_ON_UPDATE = 'recheckOnUpdate';
+    public static function create(): self
+    {
+        return new self();
+    }
 
-    public const USE_SEGMENT_TIMESTAMP = 'useSegmentTimestamp';
+    /**
+     * returns the original or edited source content to be queried, depending on source edit
+     */
+    public function getQueryString(editor_Models_Segment $segment): string
+    {
+        $sfm = \editor_Models_SegmentFieldManager::getForTaskGuid($segment->getTaskGuid());
+        $sourceMeta = $sfm->getByName(SegmentField::TYPE_SOURCE);
+        // @phpstan-ignore-next-line
+        $isSourceEdit = ($sourceMeta !== false && $sourceMeta->editable == 1);
 
-    public const SAVE_TO_DISK = 'saveToDisk';
-
-    public const SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE = 'saveDifferentTargetsForSameSource';
-
-    public function update(SegmentModel $segment, ?UpdateOptions $updateOptions = null): void;
-
-    public function checkUpdatedSegment(SegmentModel $segment): void;
-
-    public function getUpdateDTO(SegmentModel $segment, UpdateOptions $updateOptions): UpdateSegmentDTO;
-
-    public function updateWithDTO(UpdateSegmentDTO $dto, UpdateOptions $updateOptions, SegmentModel $segment): void;
+        return $isSourceEdit
+            ? $segment->getFieldEdited(SegmentField::TYPE_SOURCE)
+            : $segment->getFieldOriginal(SegmentField::TYPE_SOURCE);
+    }
 }

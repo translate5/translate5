@@ -38,7 +38,6 @@ use MittagQI\Translate5\ContentProtection\T5memory\TmConversionServiceInterface;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
 use MittagQI\Translate5\CrossSynchronization\SynchronizableIntegrationInterface;
 use MittagQI\Translate5\Integration\FileBasedInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\TaskTm\Operation\CreateTaskTmOperation;
 use MittagQI\Translate5\LanguageResource\TaskTm\SupportsTaskTmInterface;
 use MittagQI\Translate5\Service\DetectLanguageInterface;
@@ -365,7 +364,7 @@ class editor_Services_Manager
         int $targetLang = null,
         Zend_Config $config = null,
         ?int $customerId = null,
-    ): editor_Services_Connector|UpdatableAdapterInterface|FileBasedInterface {
+    ): editor_Services_Connector|FileBasedInterface {
         $serviceType = $languageResource->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get(editor_Services_Connector::class);

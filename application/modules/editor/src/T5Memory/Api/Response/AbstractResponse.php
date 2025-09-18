@@ -38,9 +38,9 @@ abstract class AbstractResponse implements ResponseInterface
     private readonly int $code;
 
     public function __construct(
-        public readonly array $body,
-        public readonly ?string $errorMessage,
-        public readonly int $statusCode,
+        private readonly array $body,
+        private readonly ?string $errorMessage,
+        protected readonly int $statusCode,
     ) {
         $this->code = (int) ($body['returnValue'] ?? $body['ReturnValue'] ?? 0);
     }

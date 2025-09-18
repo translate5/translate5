@@ -30,10 +30,16 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\DTO;
 
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
-
 class UpdateOptions
 {
+    public const USE_SEGMENT_TIMESTAMP = 'useSegmentTimestamp';
+
+    public const SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE = 'saveDifferentTargetsForSameSource';
+
+    public const RECHECK_ON_UPDATE = 'recheckOnUpdate';
+
+    public const SAVE_TO_DISK = 'saveToDisk';
+
     public function __construct(
         public readonly bool $useSegmentTimestamp,
         public readonly bool $saveToDisk,
@@ -45,10 +51,10 @@ class UpdateOptions
     public static function fromArray(array $options): self
     {
         return new self(
-            (bool) ($options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false),
-            (bool) ($options[UpdatableAdapterInterface::SAVE_TO_DISK] ?? true),
-            (bool) ($options[UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] ?? false),
-            (bool) ($options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false),
+            (bool) ($options[self::USE_SEGMENT_TIMESTAMP] ?? false),
+            (bool) ($options[self::SAVE_TO_DISK] ?? true),
+            (bool) ($options[self::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] ?? false),
+            (bool) ($options[self::RECHECK_ON_UPDATE] ?? false),
         );
     }
 }

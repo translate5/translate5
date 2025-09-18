@@ -28,39 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Response;
+namespace MittagQI\Translate5\T5Memory\Exception;
 
-use JsonException;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-
-class Response extends AbstractResponse
+class SegmentUpdateCheckException extends \RuntimeException
 {
-    public static function fromResponse(PsrResponseInterface $response): static
-    {
-        $content = $response->getBody()->getContents();
-
-        return static::fromContentAndStatus($content, $response->getStatusCode());
-    }
-
-    public static function fromContentAndStatus(string $content, int $statusCode): static
-    {
-        $errorMsg = null;
-
-        try {
-            $body = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            $errorMsg = 'Invalid JSON response: ' . $content;
-            $body = [];
-        }
-
-        if (null === $errorMsg) {
-            $errorMsg = $body['ErrorMsg'] ?? null;
-        }
-
-        return new static(
-            $body,
-            $errorMsg,
-            $statusCode,
-        );
+    public function __construct(
+        string $message = 'Segment update check failed.',
+        public readonly string $apiResponse = '',
+    ) {
+        parent::__construct($message);
     }
 }

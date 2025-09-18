@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\Service\T5Memory;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 
 /**
@@ -237,7 +237,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         bool $saveDifferentTargetsForSameSource,
     ): bool {
         $data = $this->getSearchData($searchDTO);
-        $data[UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] = $saveDifferentTargetsForSameSource ? '1' : '0';
+        $data[UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] = $saveDifferentTargetsForSameSource ? '1' : '0';
         $http = $this->getHttpWithMemory('POST', $tmName, '/entriesdelete');
         $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 

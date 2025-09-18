@@ -31,14 +31,10 @@ use editor_Models_Task as Task;
 use editor_Services_Connector_TagHandler_Abstract as TagHandler;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\QueryCache;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\T5Memory\Api\Response\MutationResponse as MutationApiResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
@@ -55,13 +51,14 @@ use MittagQI\Translate5\T5Memory\MemoryNameGenerator;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
+use MittagQI\Translate5\T5Memory\UpdateSegmentService;
 
 /**
  * T5memory / OpenTM2 Connector
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface, ExportAdapterInterface
+class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstract implements FileBasedInterface, ExportAdapterInterface
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
 
@@ -101,11 +98,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private readonly T5MemoryApi $t5MemoryApi;
 
-    private readonly FlushMemoryService $flushMemoryService;
-
     private readonly FuzzySearchService $fuzzySearchService;
 
     private QueryCache $queryCache;
+
+    private readonly UpdateSegmentService $updateSegmentService;
 
     public function __construct()
     {
@@ -133,9 +130,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $this->memoryNameGenerator = new MemoryNameGenerator();
         $this->createMemoryService = CreateMemoryService::create();
         $this->waitingService = RetryService::create();
-        $this->flushMemoryService = FlushMemoryService::create();
         $this->fuzzySearchService = FuzzySearchService::create();
         $this->queryCache = QueryCache::create();
+        $this->updateSegmentService = UpdateSegmentService::create();
     }
 
     public function connectTo(
@@ -266,7 +263,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
         $customerId = current($this->languageResource->getCustomers());
-        $params[UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] = $this->config->runtimeOptions
+        $params[UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] = $this->config->runtimeOptions
             ->LanguageResources
             ->t5memory
             ->saveDifferentTargetsForSameSource;
@@ -321,260 +318,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     public function update(editor_Models_Segment $segment, ?UpdateOptions $updateOptions = null): void
     {
-        $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
+        $updateOptions = new UpdateOptions(
+            $updateOptions?->useSegmentTimestamp,
+            $updateOptions?->saveToDisk && ! $this->isInternalFuzzy(),
+            $updateOptions?->saveDifferentTargetsForSameSource,
+            $updateOptions?->recheckOnUpdate,
+        );
 
-        if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName)) {
-            throw new editor_Services_Connector_Exception('E1512', [
-                'status' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
-                'service' => $this->getResource()->getName(),
-                'languageResource' => $this->languageResource,
-            ]);
-        }
-
-        $fileName = $this->getFileName($segment);
-        $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
-        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
-        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
-        $saveToDisk = $updateOptions?->saveToDisk ?? true;
-        $saveToDisk = $saveToDisk && ! $this->isInternalFuzzy();
-        $useSegmentTimestamp = $updateOptions?->useSegmentTimestamp ?? false;
-        $timestamp = $useSegmentTimestamp
-            ? $this->api->getDate(strtotime($segment->getTimestamp()))
-            : $this->api->getNowDate();
-        $userName = $segment->getUserName();
-        $context = $this->getSegmentContext($segment);
-
-        $recheckOnUpdate = $updateOptions?->recheckOnUpdate ?? false;
-        $dataSent = [
-            'source' => $source,
-            'target' => $target,
-            'userName' => $userName,
-            'context' => $context,
-            'timestamp' => $timestamp,
-            'fileName' => $fileName,
-        ];
-
-        $this->updateWithRetry(
-            $source,
-            $target,
-            $userName,
-            $context,
-            $timestamp,
-            $fileName,
-            $tmName,
-            $saveToDisk,
-            $dataSent,
+        $this->updateSegmentService->update(
+            $this->languageResource,
             $segment,
-            $recheckOnUpdate,
-            $updateOptions?->saveDifferentTargetsForSameSource ?? false,
+            $this->config,
+            $updateOptions,
         );
-    }
-
-    public function getUpdateDTO(
-        \editor_Models_Segment $segment,
-        UpdateOptions $updateOptions,
-    ): UpdateSegmentDTO {
-        $fileName = $this->getFileName($segment);
-        $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
-        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
-        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
-        $useSegmentTimestamp = $updateOptions->useSegmentTimestamp;
-        $timestamp = $useSegmentTimestamp
-            ? $this->api->getDate(strtotime($segment->getTimestamp()))
-            : $this->api->getNowDate();
-        $userName = $segment->getUserName();
-        $context = $this->getSegmentContext($segment);
-
-        return new UpdateSegmentDTO(
-            $segment->getTaskGuid(),
-            (int) $segment->getId(),
-            $source,
-            $target,
-            $fileName,
-            $timestamp,
-            $userName,
-            $context,
-        );
-    }
-
-    public function updateWithDTO(
-        UpdateSegmentDTO $dto,
-        UpdateOptions $updateOptions,
-        editor_Models_Segment $segment
-    ): void {
-        $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
-
-        if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName)) {
-            throw new editor_Services_Connector_Exception('E1512', [
-                'status' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
-                'service' => $this->getResource()->getName(),
-                'languageResource' => $this->languageResource,
-            ]);
-        }
-
-        $saveToDisk = $updateOptions->saveToDisk;
-        $saveToDisk = $saveToDisk && ! $this->isInternalFuzzy();
-
-        $source = $dto->source;
-        $target = $dto->target;
-        $userName = $dto->userName;
-        $context = $dto->context;
-        $timestamp = $dto->timestamp;
-        $fileName = $dto->fileName;
-        $dataSent = [
-            'source' => $source,
-            'target' => $target,
-            'userName' => $userName,
-            'context' => $context,
-            'timestamp' => $timestamp,
-            'fileName' => $fileName,
-        ];
-        $recheckOnUpdate = $updateOptions->recheckOnUpdate;
-
-        $this->updateWithRetry(
-            $source,
-            $target,
-            $userName,
-            $context,
-            $timestamp,
-            $fileName,
-            $tmName,
-            $saveToDisk,
-            $dataSent,
-            $segment,
-            $recheckOnUpdate,
-            $updateOptions->saveDifferentTargetsForSameSource,
-        );
-    }
-
-    private function updateWithRetry(
-        string $source,
-        string $target,
-        string $userName,
-        string $context,
-        string $timestamp,
-        string $fileName,
-        string $tmName,
-        bool $saveToDisk,
-        array $dataSent,
-        editor_Models_Segment $segment,
-        bool $recheckOnUpdate,
-        bool $saveDifferentTargetsForSameSource,
-    ): void {
-        if ($this->languageResource->isConversionStarted()) {
-            throw new editor_Services_Connector_Exception('E1512', [
-                'status' => LanguageResourceStatus::CONVERTING,
-                'service' => $this->getResource()->getName(),
-                'languageResource' => $this->languageResource,
-            ]);
-        }
-
-        $elapsedTime = 0;
-        $maxWaitingTime = $this->waitingService->getMaxWaitingTimeSeconds();
-
-        while ($elapsedTime < $maxWaitingTime) {
-            $successful = $this->api->update(
-                $source,
-                $target,
-                $userName,
-                $context,
-                $timestamp,
-                $fileName,
-                $tmName,
-                $saveDifferentTargetsForSameSource,
-                $saveToDisk
-            );
-
-            if ($successful) {
-                $this->checkUpdateResponse($dataSent, $this->api->getResult());
-                $this->checkUpdatedSegmentIfNeeded($segment, $recheckOnUpdate);
-
-                return;
-            }
-
-            $apiError = $this->api->getError();
-
-            $response = MutationApiResponse::fromContentAndStatus(
-                $this->api->getResponse()->getBody(),
-                $this->api->getResponse()->getStatus()
-            );
-
-            if (
-                $this->reorganizeService->needsReorganizing(
-                    $response,
-                    $this->languageResource,
-                    $tmName,
-                    $segment->getTask(),
-                )
-            ) {
-                $options = new ReorganizeOptions($saveDifferentTargetsForSameSource);
-                $this->reorganizeService->reorganizeTm(
-                    $this->languageResource,
-                    $tmName,
-                    $options,
-                    $this->isInternalFuzzy(),
-                );
-            } elseif ($response->isMemoryOverflown($this->config)) {
-                if (! $response->isBlockOverflown($this->config)) {
-                    $this->persistenceService->setMemoryReadonly(
-                        $this->languageResource,
-                        $tmName,
-                        $this->isInternalFuzzy()
-                    );
-                }
-
-                $newName = $this->persistenceService->getNextWritableMemory($this->languageResource, $tmName);
-
-                if ($newName) {
-                    $tmName = $newName;
-
-                    continue;
-                }
-
-                $this->addOverflowLog($segment->getTask());
-
-                if (! $this->isInternalFuzzy()) {
-                    $this->flushMemoryService->flush($this->languageResource, $tmName);
-                }
-
-                $newName = $this->memoryNameGenerator->generateNextMemoryName($this->languageResource);
-
-                try {
-                    $newName = $this->createMemoryService->createEmptyMemoryWithRetry(
-                        $this->languageResource,
-                        $newName,
-                    );
-                } catch (UnableToCreateMemoryException) {
-                    break;
-                }
-
-                $this->persistenceService->addMemoryToLanguageResource(
-                    $this->languageResource,
-                    $newName,
-                    $this->isInternalFuzzy()
-                );
-                $tmName = $newName;
-            } elseif ($this->isLockingTimeoutOccurred($apiError)) {
-                // Wait before retrying
-                sleep($this->waitingService->getRetryDelaySeconds());
-            } else {
-                // If no specific error handling is applicable, break the loop
-                break;
-            }
-
-            $elapsedTime = $this->waitingService->getRetryDelaySeconds();
-        }
-
-        // send the error to the frontend
-        editor_Services_Manager::reportTMUpdateError($apiError ?? null);
-
-        $this->logger->error('E1306', 't5memory: could not save segment to TM', [
-            'languageResource' => $this->languageResource,
-            'segment' => $segment,
-            'apiError' => $apiError ?? '',
-        ]);
-
-        throw new SegmentUpdateException();
     }
 
     private function isLockingTimeoutOccurred(?object $error): bool
@@ -1215,113 +971,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->languageResource,
             TmFileExtension::fromMimeType($mime, count($memories) > 1)
         );
-    }
-
-    private function checkUpdateResponse(array $request, object $response): void
-    {
-        // Temporary disable the check until it is fixed
-        //        $match =
-        //            $request['source'] === $response->source
-        //            && $request['target'] === $response->target
-        //            && mb_strtoupper($request['userName']) === $response->author
-        //            && $request['context'] === $response->context
-        ////            && $request['timestamp'] === $response->timestamp
-        //            && $request['fileName'] === $response->documentName;
-        //
-        //        if (! $match) {
-        //            $this->logger->error(
-        //                'E1586',
-        //                'Sent data does not match the response from t5memory in update call.',
-        //                [
-        //                    'languageResource' => $this->languageResource,
-        //                    'request' => $request,
-        //                    'response' => json_encode($response, JSON_PRETTY_PRINT),
-        //                ]
-        //            );
-        //        }
-    }
-
-    private function checkUpdatedSegmentIfNeeded(editor_Models_Segment $segment, bool $recheckOnUpdate): void
-    {
-        if (! in_array(
-            $this->getResource()->getUrl(),
-            $this->config->runtimeOptions->LanguageResources->checkSegmentsAfterUpdate->toArray(),
-            true
-        )
-            || ! $recheckOnUpdate
-        ) {
-            // Checking segment after update is disabled in config or in parameter, nothing to do
-            return;
-        }
-
-        $this->checkUpdatedSegment($segment);
-    }
-
-    /**
-     * Check if segment was updated properly
-     * and if not - add a log record for that for debug purposes
-     */
-    public function checkUpdatedSegment(editor_Models_Segment $segment): void
-    {
-        // Temporary suppress message until we migrate to t5memory V0.7
-        return;
-
-        // @phpstan-ignore-next-line
-        $targetSent = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
-
-        $result = $this->query($segment);
-
-        $logError = fn (string $reason) => $this->logger->error(
-            'E1586',
-            $reason,
-            [
-                'languageResource' => $this->languageResource,
-                'segment' => $segment,
-                'response' => json_encode($result->getResult(), JSON_PRETTY_PRINT),
-                'target' => $targetSent,
-            ]
-        );
-
-        $maxMatchRateResult = $result->getMaxMatchRateResult();
-
-        // If there is no result at all, it means that segment was not saved to TM
-        if (! $maxMatchRateResult) {
-            $logError('Segment was not saved to TM');
-
-            return;
-        }
-
-        // Just saved segment should have matchrate 103
-        $matchRateFits = $maxMatchRateResult->matchrate === 103;
-
-        // Decode html entities
-        $targetReceived = html_entity_decode($maxMatchRateResult->rawTarget);
-        // Decode unicode symbols
-        $targetReceived = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
-            return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-        }, $targetReceived);
-        // Replacing \r\n to \n back because t5memory replaces \n to \r\n
-        $targetReceived = str_replace("\r\n", "\n", $targetReceived);
-        $targetSent = str_replace("\r\n", "\n", $targetSent);
-        // Finally compare target that we've sent for saving with the one we retrieved from TM, they should be the same
-        // html_entity_decode() is used because sometimes t5memory returns target with decoded
-        // html entities regardless of the original target
-        $targetIsTheSame = $targetReceived === $targetSent
-            || html_entity_decode($targetReceived) === html_entity_decode($targetSent);
-
-        $resultTimestamp = $result->getMetaValue($maxMatchRateResult->metaData, 'timestamp');
-        $resultDate = DatetimeImmutable::createFromFormat('Y-m-d H:i:s T', $resultTimestamp);
-        // Timestamp should be not older than 1 minute otherwise it is an old segment which wasn't updated
-        $isResultFresh = $resultDate >= new DateTimeImmutable('-1 minute');
-
-        if (! $matchRateFits || ! $targetIsTheSame || ! $isResultFresh) {
-            $logError(match (false) {
-                $matchRateFits => 'Match rate is not 103',
-                $targetIsTheSame => 'Saved segment target differs with provided',
-                $isResultFresh => 'Got old result',
-                default => 'Unknown reason',
-            });
-        }
     }
 
     protected function getSegmentContext(editor_Models_Segment $segment): string

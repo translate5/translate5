@@ -28,39 +28,20 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Response;
+namespace MittagQI\Translate5\T5Memory;
 
-use JsonException;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-
-class Response extends AbstractResponse
+class SegmentContext
 {
-    public static function fromResponse(PsrResponseInterface $response): static
-    {
-        $content = $response->getBody()->getContents();
+    private const SEGMENT_NR_CONTEXT_PREFIX = 'SegmentNr: ';
 
-        return static::fromContentAndStatus($content, $response->getStatusCode());
+    public static function create(): self
+    {
+        return new self();
     }
 
-    public static function fromContentAndStatus(string $content, int $statusCode): static
+    public function getContext(\editor_Models_Segment $segment): string
     {
-        $errorMsg = null;
-
-        try {
-            $body = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            $errorMsg = 'Invalid JSON response: ' . $content;
-            $body = [];
-        }
-
-        if (null === $errorMsg) {
-            $errorMsg = $body['ErrorMsg'] ?? null;
-        }
-
-        return new static(
-            $body,
-            $errorMsg,
-            $statusCode,
-        );
+        return $segment->meta()->getSegmentDescriptor()
+            ?: self::SEGMENT_NR_CONTEXT_PREFIX . $segment->getSegmentNrInTask();
     }
 }

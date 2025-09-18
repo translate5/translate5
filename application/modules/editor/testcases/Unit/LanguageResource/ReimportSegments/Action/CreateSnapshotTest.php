@@ -34,9 +34,9 @@ use DateTimeImmutable;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as Segment;
 use editor_Models_Task as Task;
-use editor_Services_Manager;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\Integration\Contract\SegmentUpdateDtoFactoryInterface;
+use MittagQI\Translate5\Integration\SegmentUpdateDtoFactory;
+use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\CreateSnapshot;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
@@ -49,7 +49,7 @@ use Zend_Config;
 
 class CreateSnapshotTest extends TestCase
 {
-    private editor_Services_Manager|MockObject $serviceManagerMock;
+    private SegmentUpdateDtoFactory|MockObject $segmentUpdateDtoFactory;
 
     private ReimportSegmentRepositoryInterface|MockObject $segmentsRepositoryMock;
 
@@ -61,16 +61,16 @@ class CreateSnapshotTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serviceManagerMock = $this->createMock(editor_Services_Manager::class);
+        $this->segmentUpdateDtoFactory = new SegmentUpdateDtoFactory([]);
         $this->segmentsRepositoryMock = $this->createMock(ReimportSegmentRepositoryInterface::class);
         $this->languageResourceRepositoryMock = $this->createMock(LanguageResourceRepository::class);
         $this->reimportSegmentsProviderMock = $this->createMock(SegmentsProvider::class);
 
         $this->snapshot = new CreateSnapshot(
-            $this->serviceManagerMock,
             $this->segmentsRepositoryMock,
             $this->languageResourceRepositoryMock,
             $this->reimportSegmentsProviderMock,
+            $this->segmentUpdateDtoFactory,
         );
     }
 
@@ -84,7 +84,6 @@ class CreateSnapshotTest extends TestCase
         $taskGuid = 'test-task-guid';
 
         $languageResourceMock = $this->createMock(LanguageResource::class);
-        $connectorMock = $this->createMock(UpdatableAdapterInterface::class);
 
         $taskMock = $this->createMock(Task::class);
         $taskMock->method('__call')->willReturnMap([
@@ -98,9 +97,6 @@ class CreateSnapshotTest extends TestCase
             ->with($languageResourceId)
             ->willReturn($languageResourceMock);
 
-        $this->serviceManagerMock->method('getConnector')
-            ->willReturn($connectorMock);
-
         $filters = [
             ReimportSegmentsOptions::FILTER_TIMESTAMP => $timestamp,
             ReimportSegmentsOptions::FILTER_ONLY_EDITED => $onlyEdited,
@@ -113,22 +109,42 @@ class CreateSnapshotTest extends TestCase
             ->with($taskGuid, $filters)
             ->willReturn($segments);
 
-        $updateOptions = new UpdateOptions($useSegmentTimestamp, true, false, false);
-
         $updateDTOMock1 = $this->getMockBuilder(UpdateSegmentDTO::class)->disableOriginalConstructor()->getMock();
         $updateDTOMock2 = $this->getMockBuilder(UpdateSegmentDTO::class)->disableOriginalConstructor()->getMock();
-        $connectorMock->method('getUpdateDTO')
-            ->with(
-                self::callback(static function (Segment $segmentMock) {
-                    return true;
-                }),
-                $updateOptions
-            )
-            ->willReturnCallback(
-                static function (Segment $segmentMock) use ($segmentMock1, $updateDTOMock1, $updateDTOMock2) {
-                    return $segmentMock === $segmentMock1 ? $updateDTOMock1 : $updateDTOMock2;
-                }
-            );
+
+        $dtoFactoryStub = new class ($segmentMock1, $updateDTOMock1, $updateDTOMock2) implements SegmentUpdateDtoFactoryInterface
+        {
+            public static SegmentUpdateDtoFactoryInterface $self;
+
+            public function __construct(
+                private Segment $segmentMock1,
+                private UpdateSegmentDTO $updateDTOMock1,
+                private UpdateSegmentDTO $updateDTOMock2,
+            ) {
+            }
+
+            public static function create(): SegmentUpdateDtoFactoryInterface
+            {
+                return self::$self;
+            }
+
+            public function supports(LanguageResource $languageResource): bool
+            {
+                return true;
+            }
+
+            public function getUpdateDTO(
+                LanguageResource $languageResource,
+                Segment $segment,
+                Zend_Config $config,
+                ?UpdateOptions $updateOptions,
+            ): UpdateSegmentDTO {
+                return $segment === $this->segmentMock1 ? $this->updateDTOMock1 : $this->updateDTOMock2;
+            }
+        };
+        $dtoFactoryStub::$self = $dtoFactoryStub;
+
+        $this->segmentUpdateDtoFactory->addService(get_class($dtoFactoryStub));
 
         $i = 0;
         $this->segmentsRepositoryMock->expects(self::exactly(2))

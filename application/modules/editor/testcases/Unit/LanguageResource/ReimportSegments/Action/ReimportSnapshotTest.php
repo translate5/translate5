@@ -37,8 +37,11 @@ use editor_Models_Task as Task;
 use editor_Services_Manager;
 use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\Integration\Contract\SegmentUpdateDtoFactoryInterface;
+use MittagQI\Translate5\Integration\Contract\UpdateSegmentInterface;
+use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
+use MittagQI\Translate5\Integration\UpdateSegmentService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\ReimportSnapshot;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLoggerProvider;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
@@ -57,8 +60,6 @@ class ReimportSnapshotTest extends TestCase
 
     private LanguageResourceRepository&MockObject $languageResourceRepositoryMock;
 
-    private editor_Services_Manager&MockObject $serviceManagerMock;
-
     private ReimportSegmentsLoggerProvider&MockObject $loggerProviderMock;
 
     private ReimportSnapshot $reimportSegments;
@@ -69,6 +70,8 @@ class ReimportSnapshotTest extends TestCase
 
     private FlushMemoryService|MockObject $flushMemoryService;
 
+    private UpdateSegmentService|MockObject $updateSegmentService;
+
     protected function setUp(): void
     {
         $this->reimportSegmentRepositoryMock = $this->createMock(ReimportSegmentRepositoryInterface::class);
@@ -78,15 +81,16 @@ class ReimportSnapshotTest extends TestCase
         $this->segmentRepositoryMock = $this->createMock(SegmentRepository::class);
         $this->tmConversionServiceMock = $this->createMock(TmConversionService::class);
         $this->flushMemoryService = $this->createMock(FlushMemoryService::class);
+        $this->updateSegmentService = $this->createMock(UpdateSegmentService::class);
 
         $this->reimportSegments = new ReimportSnapshot(
             reimportSegmentRepository: $this->reimportSegmentRepositoryMock,
             languageResourceRepository: $this->languageResourceRepositoryMock,
-            serviceManager: $this->serviceManagerMock,
             loggerProvider: $this->loggerProviderMock,
             segmentRepository: $this->segmentRepositoryMock,
             tmConversionService: $this->tmConversionServiceMock,
             flushMemoryService: $this->flushMemoryService,
+            updateSegmentService: $this->updateSegmentService,
         );
     }
 
@@ -124,6 +128,7 @@ class ReimportSnapshotTest extends TestCase
                 ['getSourceLang', [], 4],
                 ['getTargetLang', [], 5],
             ]);
+        $taskMock->method('getConfig')->willReturn($this->createMock(Zend_Config::class));
 
         $languageResourceMock = $this->createMock(LanguageResource::class);
         $languageResourceMock->method('__call')
@@ -144,11 +149,7 @@ class ReimportSnapshotTest extends TestCase
             ->method('cleanByTask')
             ->with($runId, $taskGuid);
 
-        $connectorMock = $this->createMock(Connector::class);
-
-        $this->serviceManagerMock
-            ->method('getConnector')
-            ->willReturn($connectorMock);
+        $options = new UpdateOptions(false, false, false, false);
 
         $this->tmConversionServiceMock->method('convertPair')
             ->willReturnCallback(
@@ -159,20 +160,15 @@ class ReimportSnapshotTest extends TestCase
                     ];
                 }
             );
-
-        $options = new UpdateOptions(false, false, false, false);
-
-        $connectorMock->expects(self::exactly(count($segments)))
+        $this->updateSegmentService->expects(self::exactly(count($segments)))
             ->method('updateWithDTO')
             ->with(
-                self::callback(static fn ($updateDTO) => $updateDTO instanceof UpdateSegmentDTO),
+                languageResource: self::callback(static fn ($languageResource) => $languageResource instanceof LanguageResource),
+                segment: self::callback(static fn ($segment) => $segment instanceof Segment),
+                dto: self::callback(static fn ($updateDTO) => $updateDTO instanceof UpdateSegmentDTO),
+                config: self::callback(static fn ($config) => $config instanceof Zend_Config),
                 options: $options,
-                segment: self::callback(static fn ($segment) => $segment instanceof Segment)
             );
-
-        $connectorMock->expects(self::exactly(2))
-            ->method('checkUpdatedSegment')
-            ->with(self::callback(static fn ($segment) => $segment instanceof Segment));
 
         $loggerMock = $this->createMock(ZfExtended_Logger::class);
         $this->loggerProviderMock
@@ -223,14 +219,6 @@ class ReimportSnapshotTest extends TestCase
         $this->reimportSegmentRepositoryMock->expects(self::once())
             ->method('cleanByTask')
             ->with($runId, $taskGuid);
-
-        $connectorMock = $this->createMock(Connector::class);
-        $connectorMock->expects(self::never())->method('updateWithDTO');
-        $connectorMock->expects(self::never())->method('checkUpdatedSegment');
-
-        $this->serviceManagerMock
-            ->method('getConnector')
-            ->willReturn($connectorMock);
 
         $loggerMock = $this->createMock(ZfExtended_Logger::class);
         $this->loggerProviderMock
@@ -298,15 +286,6 @@ class ReimportSnapshotTest extends TestCase
             ->willReturn([$updateDTOMock1, $updateDTOMock2]);
 
         $this->reimportSegmentRepositoryMock->expects(self::never())->method('cleanByTask');
-
-        $connectorMock = $this->createMock(Connector::class);
-        $connectorMock->expects(self::never())->method('checkUpdatedSegment');
-        $connectorMock->method('updateWithDTO')
-            ->willThrowException(new SegmentUpdateException());
-
-        $this->serviceManagerMock
-            ->method('getConnector')
-            ->willReturn($connectorMock);
 
         $loggerMock = $this->createMock(ZfExtended_Logger::class);
         $this->loggerProviderMock
@@ -384,7 +363,7 @@ class ReimportSnapshotTest extends TestCase
             $sourceText,
             $targetText,
             bin2hex(random_bytes(16)),
-            (new DateTimeImmutable())->format('Y-m-d H:i:s'),
+            (new DateTimeImmutable())->getTimestamp(),
             bin2hex(random_bytes(8)),
             bin2hex(random_bytes(8)),
         );

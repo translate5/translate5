@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\T5Memory\Api;
 
+use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
@@ -49,7 +50,10 @@ class T5MemoryApiTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $client,
+            SegmentLengthValidator::create(),
+        );
 
         $iterator = $api->downloadTmx('http://example.com', 'tmName', 20);
 
@@ -72,7 +76,10 @@ class T5MemoryApiTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $client,
+            SegmentLengthValidator::create(),
+        );
 
         $iterator = $api->downloadTmx('http://example.com', 'tmName', 20);
 
@@ -93,7 +100,10 @@ class T5MemoryApiTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $client,
+            SegmentLengthValidator::create(),
+        );
 
         $stream = $api->downloadTm('http://example.com', 'tmName');
 

@@ -28,39 +28,32 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Response;
+namespace MittagQI\Translate5\Integration\Contract;
 
-use JsonException;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Segment as Segment;
+use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
+use Zend_Config;
 
-class Response extends AbstractResponse
+interface UpdateSegmentInterface
 {
-    public static function fromResponse(PsrResponseInterface $response): static
-    {
-        $content = $response->getBody()->getContents();
+    public static function create(): UpdateSegmentInterface;
 
-        return static::fromContentAndStatus($content, $response->getStatusCode());
-    }
+    public function supports(LanguageResource $languageResource): bool;
 
-    public static function fromContentAndStatus(string $content, int $statusCode): static
-    {
-        $errorMsg = null;
+    public function update(
+        LanguageResource $languageResource,
+        Segment $segment,
+        Zend_Config $config,
+        ?UpdateOptions $updateOptions = null,
+    ): void;
 
-        try {
-            $body = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            $errorMsg = 'Invalid JSON response: ' . $content;
-            $body = [];
-        }
-
-        if (null === $errorMsg) {
-            $errorMsg = $body['ErrorMsg'] ?? null;
-        }
-
-        return new static(
-            $body,
-            $errorMsg,
-            $statusCode,
-        );
-    }
+    public function updateWithDTO(
+        LanguageResource $languageResource,
+        Segment $segment,
+        UpdateSegmentDTO $dto,
+        Zend_Config $config,
+        UpdateOptions $updateOptions,
+    ): void;
 }

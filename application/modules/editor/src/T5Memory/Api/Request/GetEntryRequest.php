@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,39 +28,31 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Response;
+namespace MittagQI\Translate5\T5Memory\Api\Request;
 
-use JsonException;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use GuzzleHttp\Psr7\Request;
 
-class Response extends AbstractResponse
+class GetEntryRequest extends Request
 {
-    public static function fromResponse(PsrResponseInterface $response): static
-    {
-        $content = $response->getBody()->getContents();
-
-        return static::fromContentAndStatus($content, $response->getStatusCode());
-    }
-
-    public static function fromContentAndStatus(string $content, int $statusCode): static
-    {
-        $errorMsg = null;
-
-        try {
-            $body = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            $errorMsg = 'Invalid JSON response: ' . $content;
-            $body = [];
-        }
-
-        if (null === $errorMsg) {
-            $errorMsg = $body['ErrorMsg'] ?? null;
-        }
-
-        return new static(
-            $body,
-            $errorMsg,
-            $statusCode,
+    public function __construct(
+        string $baseUrl,
+        string $tmName,
+        string $recordKey,
+        string $targetKey,
+    ) {
+        $tmName = urlencode($tmName);
+        parent::__construct(
+            'POST',
+            rtrim($baseUrl, '/') . "/$tmName/getentry",
+            [
+                'Accept-charset' => 'UTF-8',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ],
+            json_encode([
+                'recordKey' => $recordKey,
+                'targetKey' => $targetKey,
+            ], JSON_PRETTY_PRINT)
         );
     }
 }

@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_Task as Task;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
@@ -68,8 +67,11 @@ class ReorganizeService
         ResponseInterface $response,
         LanguageResource $languageResource,
         string $tmName,
-        Task $task = null,
     ): bool {
+        if (str_contains($response->getErrorMessage(), 'Failed to load tm')) {
+            return false;
+        }
+
         $errorCodes = explode(
             ',',
             $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
@@ -93,7 +95,7 @@ class ReorganizeService
         }
 
         if ($needsReorganizing) {
-            $this->addReorganizeWarning($response, $languageResource, $task);
+            $this->addReorganizeWarning($response, $languageResource);
         }
 
         return $needsReorganizing;
@@ -227,16 +229,11 @@ class ReorganizeService
     private function addReorganizeWarning(
         ResponseInterface $response,
         LanguageResource $languageResource,
-        Task $task = null,
     ): void {
         $params = [
             'languageResource' => $languageResource,
             'apiError' => $response->getBody(),
         ];
-
-        if (null !== $task) {
-            $params['task'] = $task;
-        }
 
         $this->logger->warn(
             'E1314',

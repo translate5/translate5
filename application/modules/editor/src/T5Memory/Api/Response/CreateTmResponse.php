@@ -52,7 +52,7 @@ class CreateTmResponse extends AbstractResponse implements CreateMemoryResponseI
     public function successful(): bool
     {
         return $this->statusCode === 200
-            && empty($this->errorMessage)
+            && empty($this->getErrorMessage())
             && null !== $this->tmName
         ;
     }

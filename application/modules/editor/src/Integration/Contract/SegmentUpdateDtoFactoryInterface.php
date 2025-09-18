@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,19 +28,24 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\Adapter;
+namespace MittagQI\Translate5\Integration\Contract;
 
-class UpdateSegmentDTO
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Segment as Segment;
+use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
+use Zend_Config;
+
+interface SegmentUpdateDtoFactoryInterface
 {
-    public function __construct(
-        public readonly string $taskGuid,
-        public readonly int $segmentId,
-        public readonly string $source,
-        public readonly string $target,
-        public readonly string $fileName,
-        public readonly string $timestamp,
-        public readonly string $userName,
-        public readonly string $context,
-    ) {
-    }
+    public static function create(): SegmentUpdateDtoFactoryInterface;
+
+    public function supports(LanguageResource $languageResource): bool;
+
+    public function getUpdateDTO(
+        LanguageResource $languageResource,
+        Segment $segment,
+        Zend_Config $config,
+        ?UpdateOptions $updateOptions,
+    ): UpdateSegmentDTO;
 }

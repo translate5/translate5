@@ -34,6 +34,7 @@ use MittagQI\Translate5\T5Memory\Api\Exception\CorruptResponseBodyException;
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidJsonInResponseBodyException;
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidResponseStructureException;
 use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
+use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
@@ -66,7 +67,10 @@ class ResourcesResponseTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $client,
+            SegmentLengthValidator::create(),
+        );
 
         self::expectException(InvalidResponseStructureException::class);
         $api->version('http://example.com');
@@ -83,7 +87,10 @@ class ResourcesResponseTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $client,
+            SegmentLengthValidator::create(),
+        );
 
         self::expectException(CorruptResponseBodyException::class);
         $api->version('http://example.com');
@@ -100,7 +107,10 @@ class ResourcesResponseTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
 
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $client,
+            SegmentLengthValidator::create(),
+        );
 
         self::expectException(InvalidJsonInResponseBodyException::class);
         $api->version('http://example.com');

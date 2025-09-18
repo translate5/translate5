@@ -30,11 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Action;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as Segment;
 use editor_Models_Task as Task;
-use editor_Services_Manager;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\Integration\SegmentUpdateDtoFactory;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimportSegmentsRepository;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
@@ -46,20 +45,20 @@ use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 class CreateSnapshot
 {
     public function __construct(
-        private readonly editor_Services_Manager $serviceManager,
         private readonly ReimportSegmentRepositoryInterface $segmentsRepository,
         private readonly LanguageResourceRepository $languageResourceRepository,
         private readonly SegmentsProvider $reimportSegmentsProvider,
+        private readonly SegmentUpdateDtoFactory $segmentUpdateDtoFactory,
     ) {
     }
 
     public static function create(): self
     {
         return new self(
-            new editor_Services_Manager(),
             new JsonlReimportSegmentsRepository(),
             new LanguageResourceRepository(),
             new SegmentsProvider(new Segment()),
+            \Zend_Registry::get('integration.segment.update.dto_factory'),
         );
     }
 
@@ -73,7 +72,6 @@ class CreateSnapshot
         array $segmentIds = []
     ): void {
         $languageResource = $this->languageResourceRepository->get($languageResourceId);
-        $connector = $this->getConnector($languageResource, $task);
 
         $filters = [
             ReimportSegmentsOptions::FILTER_TIMESTAMP => $timestamp,
@@ -88,7 +86,7 @@ class CreateSnapshot
         }
 
         $updateOptions = UpdateOptions::fromArray([
-            UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP => $useSegmentTimestamp,
+            UpdateOptions::USE_SEGMENT_TIMESTAMP => $useSegmentTimestamp,
         ]);
 
         foreach ($segments as $segment) {
@@ -96,20 +94,25 @@ class CreateSnapshot
                 continue;
             }
 
-            $updateDTO = $connector->getUpdateDTO($segment, $updateOptions);
+            $updateDTO = $this->segmentUpdateDtoFactory->getUpdateDTO(
+                $languageResource,
+                $segment,
+                $task->getConfig(),
+                $updateOptions,
+            );
 
-            $this->segmentsRepository->save($runId, $updateDTO);
+            $reimportDTO = new ReimportSegmentDTO(
+                taskGuid: $segment->getTaskGuid(),
+                segmentId: (int) $segment->getId(),
+                source: $updateDTO->source,
+                target: $updateDTO->target,
+                fileName: $updateDTO->fileName,
+                timestamp: $updateDTO->timestamp,
+                userName: $updateDTO->userName,
+                context: $updateDTO->context,
+            );
+
+            $this->segmentsRepository->save($runId, $reimportDTO);
         }
-    }
-
-    private function getConnector(
-        LanguageResource $languageResource,
-        Task $task
-    ): UpdatableAdapterInterface|\editor_Services_Connector {
-        return $this->serviceManager->getConnector(
-            $languageResource,
-            config: $task->getConfig(),
-            customerId: (int) $task->getCustomerId(),
-        );
     }
 }

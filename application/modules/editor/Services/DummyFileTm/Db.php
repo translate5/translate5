@@ -35,7 +35,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Services_DummyFileTm_Db extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_languageresources_internal_tm';
+    public const NAME = 'LEK_languageresources_internal_tm';
+
+    protected $_name = self::NAME;
 
     public $_primary = 'id';
 }
