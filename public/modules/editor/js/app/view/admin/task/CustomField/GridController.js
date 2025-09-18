@@ -86,6 +86,21 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
             });
         });
 
+        // add only human revision role from instant translate. This is needed for human revision
+        // popup in the instant-translate file translation
+        const humanRevisionKey = "instantTranslateHumanRevisionAllowed";
+        const humanRevisionRole = Editor.data.app.roles[humanRevisionKey];
+
+        if (
+            humanRevisionRole &&
+            !items.some(item => item.inputValue === humanRevisionKey)
+        ) {
+            items.push({
+                boxLabel: humanRevisionRole.label,
+                inputValue: humanRevisionKey,
+            });
+        }
+
         // Do add
         cbgroup.add(items);
 
