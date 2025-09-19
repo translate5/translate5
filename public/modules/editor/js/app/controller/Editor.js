@@ -1751,8 +1751,6 @@ Ext.define('Editor.controller.Editor', {
      * Pasting our own content must be handled special to insert correct tags
      */
     pasteContent: function(e){
-        e.stopPropagation();
-        e.preventDefault();
         var me = this,
             plug = me.getEditPlugin(),
             record = plug.context ? plug.context.record : null,
@@ -1763,6 +1761,8 @@ Ext.define('Editor.controller.Editor', {
         if (!record) {
             return;
         }
+        e.stopPropagation();
+        e.preventDefault();
 
         var segmentId = record.get('id'),
             internalClip = me.copiedSelectionWithTagHandling || {},
