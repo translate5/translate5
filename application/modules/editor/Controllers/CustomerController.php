@@ -118,16 +118,21 @@ class Editor_CustomerController extends ZfExtended_RestController
 
     public function deleteAction()
     {
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1745' => 'The default client can not be deleted',
+            'E1047' => 'A client cannot be deleted as long as tasks are assigned to this client.',
+        ], 'editor.customer');
+
         try {
             $this->entityLoad();
             $this->processClientReferenceVersion();
 
+            if ($this->entity->isDefaultCustomer()) {
+                throw new ZfExtended_Models_Entity_Conflict('E1745');
+            }
+
             CustomerService::create()->delete($this->entity);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint) {
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1047' => 'A client cannot be deleted as long as tasks are assigned to this client.',
-            ], 'editor.customer');
-
             throw new ZfExtended_Models_Entity_Conflict('E1047');
         }
     }

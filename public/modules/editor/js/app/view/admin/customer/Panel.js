@@ -337,6 +337,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     tooltip: Editor.data.l10n.clients.delete,
                                     scope: 'controller',
                                     handler: 'remove',
+                                    isDisabled: function(view, rowIndex, colIndex, item, record) {
+                                        return !canDeleteCustomer || record.get('isDefaultCustomer');
+                                    },
                                     hidden: ! canDeleteCustomer
                                 }
                             ]
