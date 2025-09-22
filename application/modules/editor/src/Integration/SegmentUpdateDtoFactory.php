@@ -90,7 +90,8 @@ class SegmentUpdateDtoFactory
         }
 
         throw new \RuntimeException(
-            sprintf('No SegmentUpdateDtoFactory found for language resource %d, type: %s',
+            sprintf(
+                'No SegmentUpdateDtoFactory found for language resource %d, type: %s',
                 $languageResource->getId(),
                 $languageResource->getServiceName(),
             )

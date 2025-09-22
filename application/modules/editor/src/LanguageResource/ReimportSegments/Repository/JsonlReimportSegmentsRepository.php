@@ -46,9 +46,6 @@ class JsonlReimportSegmentsRepository implements ReimportSegmentRepositoryInterf
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getByTask(string $runId, string $taskGuid): iterable
     {
         $filename = $this->getFileName($runId, $taskGuid);

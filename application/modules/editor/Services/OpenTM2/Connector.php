@@ -44,7 +44,6 @@ use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 use MittagQI\Translate5\T5Memory\ExportService;
-use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use MittagQI\Translate5\T5Memory\FuzzySearchService;
 use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\MemoryNameGenerator;

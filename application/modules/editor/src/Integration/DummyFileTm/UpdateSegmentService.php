@@ -65,7 +65,6 @@ class UpdateSegmentService implements UpdateSegmentInterface
         Zend_Config $config,
         ?UpdateOptions $updateOptions = null,
     ): void {
-
         if (null === $updateOptions) {
             $updateOptions = new UpdateOptions(
                 useSegmentTimestamp: true,
@@ -110,7 +109,7 @@ class UpdateSegmentService implements UpdateSegmentInterface
                     'target' => $dto->target,
                 ],
                 [
-                    'id => ?' => $id
+                    'id => ?' => $id,
                 ],
             );
         } else {

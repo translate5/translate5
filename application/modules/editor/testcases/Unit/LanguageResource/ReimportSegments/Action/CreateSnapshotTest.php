@@ -35,8 +35,8 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as Segment;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\Integration\Contract\SegmentUpdateDtoFactoryInterface;
-use MittagQI\Translate5\Integration\SegmentUpdateDtoFactory;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
+use MittagQI\Translate5\Integration\SegmentUpdateDtoFactory;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\CreateSnapshot;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
@@ -112,8 +112,7 @@ class CreateSnapshotTest extends TestCase
         $updateDTOMock1 = $this->getMockBuilder(UpdateSegmentDTO::class)->disableOriginalConstructor()->getMock();
         $updateDTOMock2 = $this->getMockBuilder(UpdateSegmentDTO::class)->disableOriginalConstructor()->getMock();
 
-        $dtoFactoryStub = new class ($segmentMock1, $updateDTOMock1, $updateDTOMock2) implements SegmentUpdateDtoFactoryInterface
-        {
+        $dtoFactoryStub = new class($segmentMock1, $updateDTOMock1, $updateDTOMock2) implements SegmentUpdateDtoFactoryInterface {
             public static SegmentUpdateDtoFactoryInterface $self;
 
             public function __construct(

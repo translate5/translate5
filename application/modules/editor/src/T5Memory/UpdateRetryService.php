@@ -91,8 +91,7 @@ class UpdateRetryService
         UpdateSegmentDTO $dto,
         UpdateOptions $updateOptions,
         Zend_Config $config,
-    ): void
-    {
+    ): void {
         if ($languageResource->isConversionStarted()) {
             throw new editor_Services_Connector_Exception('E1512', [
                 'status' => Status::CONVERTING,

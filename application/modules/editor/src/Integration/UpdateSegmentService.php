@@ -61,7 +61,6 @@ class UpdateSegmentService
         ]);
     }
 
-
     public function addService(string $updater): void
     {
         $this->updaters[] = $updater;

@@ -68,6 +68,7 @@ class SegmentLengthValidator
 
         return ($realCharLength + $smileyCount) <= self::MAX_STR_LENGTH;
     }
+
     public function validate(string $string): void
     {
         if (! $this->isValid($string)) {

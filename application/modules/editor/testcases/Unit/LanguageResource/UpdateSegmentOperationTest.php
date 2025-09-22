@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\Test\Unit\LanguageResource;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment;
-use editor_Services_Manager;
 use MittagQI\Translate5\Integration\UpdateSegmentService;
 use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
