@@ -30,49 +30,42 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\Api\Response;
 
-use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
+use JsonException;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-abstract class AbstractResponse implements ResponseInterface
+class FuzzySearchResponse extends AbstractResponse
 {
-    private readonly int $code;
-
-    public function __construct(
-        private readonly array $body,
-        private readonly ?string $errorMessage,
-        protected readonly int $statusCode,
-    ) {
-        $this->code = (int) ($body['returnValue'] ?? $body['ReturnValue'] ?? 0);
-    }
-
-    abstract public static function fromResponse(PsrResponseInterface $response): AbstractResponse;
-
-    public function getBody(): array
+    public static function fromResponse(PsrResponseInterface $response): self
     {
-        return $this->body;
-    }
+        $content = self::getContent($response);
+        $errorMsg = null;
 
-    public function successful(): bool
-    {
-        return $this->statusCode === 200;
-    }
-
-    public function getErrorMessage(): ?string
-    {
-        return $this->errorMessage;
-    }
-
-    public function getCode(): int
-    {
-        return $this->code;
-    }
-
-    protected static function getContent(PsrResponseInterface $response): string
-    {
-        if ($response->getBody()->isSeekable()) {
-            $response->getBody()->rewind();
+        try {
+            $body = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            $errorMsg = 'Invalid JSON response: ' . $content;
+            $body = [];
         }
 
-        return $response->getBody()->getContents();
+        if (null === $errorMsg) {
+            $errorMsg = $body['ErrorMsg'] ?? null;
+        }
+
+        return new self(
+            $body,
+            $errorMsg,
+            $response->getStatusCode(),
+        );
+    }
+
+    /**
+     * @return MatchDTO[]
+     */
+    public function getMatches(): array
+    {
+        return array_map(
+            static fn (array $item): MatchDTO => MatchDTO::fromArray($item),
+            $this->getBody()['results'] ?? []
+        );
     }
 }

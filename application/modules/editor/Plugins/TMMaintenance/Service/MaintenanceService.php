@@ -399,7 +399,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
             }
 
             // In case we have at least one successful search, we reset the reorganize attempts
-            $this->reorganizeService->resetReorganizeAttempts($this->languageResource);
+            $this->reorganizeService->resetReorganizeAttempts($this->languageResource, $tmName);
 
             /** @var ?object{results: array, NewSearchPosition: string} $result */
             $result = $this->api->getResult();

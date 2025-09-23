@@ -46,7 +46,7 @@ class UpdateSegmentService implements UpdateSegmentInterface
     ) {
     }
 
-    public static function create(): UpdateSegmentInterface
+    public static function create(): self
     {
         return new self(
             SegmentUpdateDtoFactory::create(),

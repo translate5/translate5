@@ -30,19 +30,23 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory;
 
-use editor_Models_LanguageResources_LanguageResource;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Connector_Exception;
-use editor_Services_Connector_TagHandler_Abstract as TagHandler;
-use editor_Services_OpenTM2_Connector;
-use editor_Services_OpenTM2_HttpApi;
-use editor_Services_ServiceResult;
+use Exception;
+use GuzzleHttp\Exception\RequestException;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTag;
-use MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing\TagHandlerFactory;
-use MittagQI\Translate5\T5Memory\Api\Response\Response;
+use MittagQI\Translate5\T5Memory\Api\Contract\FuzzyInterface;
+use MittagQI\Translate5\T5Memory\Api\Response\FuzzySearchResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\MatchDTO;
+use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
+use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\ContentProtection\QueryStringGuesser;
 use MittagQI\Translate5\T5Memory\DTO\FuzzyMatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
+use MittagQI\Translate5\T5Memory\Exception\ReorganizeException;
+use Psr\Http\Client\RequestExceptionInterface;
+use Throwable;
 use Zend_Config;
 use Zend_Registry;
 use ZfExtended_Logger;
@@ -52,9 +56,12 @@ class FuzzySearchService
     public function __construct(
         private readonly ReorganizeService $reorganizeService,
         private readonly RetryService $retryService,
-        private readonly TagHandlerFactory $tagHandlerFactory,
         private readonly ZfExtended_Logger $logger,
         private readonly QueryStringGuesser $queryStringGuesser,
+        private readonly FuzzyInterface $api,
+        private readonly PersistenceService $persistenceService,
+        private readonly TagHandlerProvider $tagHandlerProvider,
+        private readonly SegmentLengthValidator $segmentLengthValidator,
     ) {
     }
 
@@ -63,148 +70,90 @@ class FuzzySearchService
         return new self(
             ReorganizeService::create(),
             RetryService::create(),
-            TagHandlerFactory::create(),
             Zend_Registry::get('logger')->cloneMe('editor.t5memory.fuzzy-search'),
             QueryStringGuesser::create(),
+            T5MemoryApi::create(),
+            PersistenceService::create(),
+            TagHandlerProvider::create(),
+            SegmentLengthValidator::create(),
         );
     }
 
+    /**
+     * @return iterable<FuzzyMatchDTO>
+     */
     public function query(
-        editor_Models_LanguageResources_LanguageResource $languageResource,
+        LanguageResource $languageResource,
         string $queryString,
         string $context,
         string $fileName,
         callable $calculateMatchRate,
         Zend_Config $config,
         bool $isInternalFuzzy,
-    ): editor_Services_ServiceResult {
-        $resultList = new editor_Services_ServiceResult();
-        $resultList->setLanguageResource($languageResource);
-
-        //if source is empty, t5memory will return an error, therefore we just return an empty list
+    ): iterable {
+        // if source is empty, t5memory will return an error, therefore we just return an empty list
         if (empty($queryString) && $queryString !== '0') {
-            return $resultList;
+            return yield from [];
         }
 
         if ($languageResource->isConversionStarted()) {
-            return $resultList;
+            return yield from [];
         }
 
-        //Although we take the source fields from the t5memory answer below
-        // we have to set the default source here to fill the be added internal tags
-        $resultList->setDefaultSource($queryString);
+        $tagHandler = $this->tagHandlerProvider->getTagHandler(
+            (int) $languageResource->getSourceLang(),
+            (int) $languageResource->getSourceLang(),
+            $config,
+        );
 
-        $matches = $this->queryTms(
+        $query = $tagHandler->prepareQuery($queryString);
+
+        if (! $this->segmentLengthValidator->isValid($query)) {
+            $this->logger->warn(
+                'E1742',
+                'Segment too long for queries in t5memory',
+                [
+                    'languageResource' => $languageResource,
+                    'queryString' => $queryString,
+                ]
+            );
+
+            return yield from [];
+        }
+
+        $hasProtectedContent = (bool) preg_match(T5NTag::fullTagRegex(), $query);
+
+        [$responses, $hasSkippedTms] = $this->lookup(
             $languageResource,
-            $queryString,
+            array_column(
+                $languageResource->getSpecificData('memories', parseAsArray: true),
+                'filename'
+            ),
+            $query,
             $context,
             $fileName,
-            $calculateMatchRate,
             $config,
             $isInternalFuzzy,
         );
 
-        foreach ($matches as $match) {
-            $resultList->addResult(
-                $match->target,
-                $match->matchrate,
-                $match->metaData,
-                $match->rawTarget,
-                $match->timestamp
-            );
-            $resultList->setSource($match->source);
+        $matches = [];
+
+        foreach ($responses as $response) {
+            $matches[] = $response->getMatches();
         }
 
-        return $resultList;
-    }
-
-    /**
-     * @return iterable<FuzzyMatchDTO>
-     */
-    private function queryTms(
-        editor_Models_LanguageResources_LanguageResource $languageResource,
-        string $queryString,
-        string $context,
-        string $fileName,
-        callable $calculateMatchRate,
-        Zend_Config $config,
-        bool $isInternalFuzzy,
-    ): iterable {
-        $tagHandler = $this->tagHandlerFactory->createTagHandler(
-            editor_Services_OpenTM2_Connector::TAG_HANDLER_CONFIG_PART,
-            [
-                'gTagPairing' => false,
-                TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $this->isSendingWhitespaceAsTagEnabled($config),
-            ],
-            $config,
-        );
-        $tagHandler->setLanguages((int) $languageResource->getSourceLang(), (int) $languageResource->getSourceLang());
-
-        $query = $tagHandler->prepareQuery($queryString);
-
-        $hasProtectedContent = (bool) preg_match(T5NTag::fullTagRegex(), $query);
-
-        foreach ($languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
-            $tmName = $memory['filename'];
-
-            $matches = $this->queryTm(
-                $languageResource,
-                $tmName,
-                $query,
-                $context,
-                $fileName,
-                $tagHandler,
-                $calculateMatchRate,
-                $hasProtectedContent,
-                $config,
-                $isInternalFuzzy,
-            );
-
-            foreach ($matches as $match) {
-                yield $match;
-            }
-        }
-    }
-
-    /**
-     * @return iterable<FuzzyMatchDTO>
-     */
-    private function queryTm(
-        editor_Models_LanguageResources_LanguageResource $languageResource,
-        string $tmName,
-        string $query,
-        string $context,
-        string $fileName,
-        TagHandler $tagHandler,
-        callable $calculateMatchRate,
-        bool $hasProtectedContent,
-        Zend_Config $config,
-        bool $isInternalFuzzy,
-    ): iterable {
-        $result = $this->lookup(
-            $languageResource,
-            $tmName,
-            $context,
-            $query,
-            $fileName,
-            $config,
-            $isInternalFuzzy
-        );
-
-        if ($result === null) {
-            return yield from [];
-        }
+        $matches = array_merge(...$matches);
 
         $iterator = $this->iterateThroughMatches(
-            $result->results,
+            $matches,
             $languageResource,
-            $tmName,
             $context,
             $query,
             $fileName,
-            $hasProtectedContent,
             $config,
-            $isInternalFuzzy
+            $hasProtectedContent,
+            $isInternalFuzzy,
+            $hasSkippedTms,
         );
 
         foreach ($iterator as $found) {
@@ -214,14 +163,15 @@ class FuzzySearchService
             $source = $tagHandler->restoreInResult($found->source);
             $hasSourceErrors = $tagHandler->hasRestoreErrors();
 
+            $matchRate = $found->matchRate;
             if ($hasTargetErrors || $hasSourceErrors) {
                 //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
-                $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
+                $matchRate = $this->reduceMatchRate($matchRate, 2);
             }
 
             $metaData = $this->getMetaData($found);
             $matchRate = $calculateMatchRate(
-                $found->matchRate,
+                $matchRate,
                 $metaData,
                 $fileName
             );
@@ -243,16 +193,20 @@ class FuzzySearchService
         }
     }
 
+    /**
+     * @param MatchDTO[] $matches
+     * @return iterable<MatchDTO>
+     */
     private function iterateThroughMatches(
         array $matches,
-        editor_Models_LanguageResources_LanguageResource $languageResource,
-        string $tmName,
+        LanguageResource $languageResource,
         string $context,
         string $query,
         string $fileName,
-        bool $hasProtectedContent,
         Zend_Config $config,
+        bool $hasProtectedContent,
         bool $isInternalFuzzy,
+        bool $hasSkippedTms,
     ): iterable {
         $hundredMatchFound = false;
 
@@ -260,7 +214,9 @@ class FuzzySearchService
             if ($found->matchRate >= 100) {
                 $hundredMatchFound = true;
             }
+        }
 
+        foreach ($matches as $found) {
             if (
                 ! $hundredMatchFound
                 && $hasProtectedContent
@@ -270,94 +226,124 @@ class FuzzySearchService
                 $betterMatches = $this->lookForBetterMatches(
                     $found,
                     $languageResource,
-                    $tmName,
                     $context,
                     $query,
                     $fileName,
                     $config,
-                    $isInternalFuzzy
+                    $isInternalFuzzy,
+                    $hasSkippedTms,
                 );
 
                 foreach ($betterMatches as $betterMatch) {
                     $hundredMatchFound = $hundredMatchFound || $betterMatch->matchRate >= 100;
 
-                    $betterMatch->guessed = true;
-
+                    // not optimal mark is set by lookForBetterMatches as it has additional lookup call inside
                     yield $betterMatch;
                 }
             }
 
-            yield $found;
+            yield $hasSkippedTms ? $found->makeNotOptimal() : $found;
         }
     }
 
     private function lookForBetterMatches(
-        object $match,
-        editor_Models_LanguageResources_LanguageResource $languageResource,
-        string $tmName,
+        MatchDTO $match,
+        LanguageResource $languageResource,
         string $context,
         string $query,
         string $fileName,
         Zend_Config $config,
         bool $isInternalFuzzy,
+        bool $hasSkippedTms,
     ): iterable {
-        $tunedQuery = $this->queryStringGuesser->filterExtraTags(
-            $query,
-            $match->source
-        );
+        $tunedQuery = $this->queryStringGuesser->filterExtraTags($query, $match->source);
 
-        $result = $this->lookup(
-            $languageResource,
-            $tmName,
-            $context,
-            $tunedQuery,
-            $fileName,
-            $config,
-            $isInternalFuzzy
-        );
-
-        if ($result === null) {
+        if ($tunedQuery === $query) {
             return yield from [];
         }
 
-        foreach ($result->results as $found) {
-            if ($found->matchRate > $match->matchRate) {
-                yield $found;
+        [$responses, $hasSkippedTms] = $this->lookup(
+            $languageResource,
+            array_column(
+                $languageResource->getSpecificData('memories', parseAsArray: true),
+                'filename'
+            ),
+            $tunedQuery,
+            $context,
+            $fileName,
+            $config,
+            $isInternalFuzzy,
+            $hasSkippedTms,
+        );
+
+        if (empty($responses)) {
+            return yield from [];
+        }
+
+        foreach ($responses as $response) {
+            foreach ($response->getMatches() as $found) {
+                if ($found->matchRate > $match->matchRate) {
+                    // we mark it as not optimal here because some tms may be skipped in current lookup
+                    yield $hasSkippedTms ? $found->makeGuessed()->makeNotOptimal() : $found->makeGuessed();
+                }
             }
         }
     }
 
+    private function getQueryableMemories(LanguageResource $languageResource, array $memories): array
+    {
+        $tms = [];
+        foreach ($memories as $memory) {
+            if ($this->reorganizeService->isReorganizingAtTheMoment($languageResource, $memory)) {
+                if (! $this->retryService->canWaitLongTaskFinish()) {
+                    continue;
+                }
+
+                $this->reorganizeService->waitReorganizeFinished(
+                    $languageResource,
+                    $memory,
+                );
+            }
+
+            $tms[] = $memory;
+        }
+
+        return $tms;
+    }
+
+    /**
+     * @return array{FuzzySearchResponse[], bool}
+     */
     private function lookup(
-        editor_Models_LanguageResources_LanguageResource $languageResource,
-        string $tmName,
-        string $context,
+        LanguageResource $languageResource,
+        array $memories,
         string $query,
+        string $context,
         string $fileName,
         Zend_Config $config,
         bool $isInternalFuzzy,
-    ): ?object {
-        if ($this->reorganizeService->isReorganizingAtTheMoment($languageResource, $tmName)) {
-            if (! $this->retryService->canWaitLongTaskFinish()) {
-                return null;
-            }
-
-            $this->reorganizeService->waitReorganizeFinished(
-                $languageResource,
-                $tmName,
-            );
-        }
-
-        // TODO move fuzzy search to \MittagQI\Translate5\T5Memory\Api\T5MemoryApi
-        $api = new editor_Services_OpenTM2_HttpApi();
-        $api->setLanguageResource($languageResource);
-
-        $successful = $api->lookup($query, $context, $fileName, $tmName);
-
-        $response = Response::fromContentAndStatus(
-            $api->getResponse() ? $api->getResponse()->getBody() : '{}',
-            $api->getResponse() ? $api->getResponse()->getStatus() : 200,
+        bool $hasSkippedTms = false,
+    ): array {
+        $count = count($memories);
+        $memories = $this->getQueryableMemories($languageResource, $memories);
+        $memories = array_map(
+            fn ($memory) => $this->persistenceService->addTmPrefix($memory),
+            $memories
         );
 
+        $hasSkippedTms = $hasSkippedTms || count($memories) < $count;
+
+        ['responses' => $responses, 'failures' => $failures] = $this->api->fuzzyParallel(
+            $languageResource->getResource()->getUrl(),
+            $memories,
+            $languageResource->getSourceLangCode(),
+            $languageResource->getTargetLangCode(),
+            $query,
+            $context,
+            $fileName,
+        );
+
+        $retryTms = [];
         $saveDifferentTargetsForSameSource = (bool) $config
             ->runtimeOptions
             ->LanguageResources
@@ -365,56 +351,97 @@ class FuzzySearchService
             ->saveDifferentTargetsForSameSource;
         $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
 
-        if ($this->reorganizeService->needsReorganizing(
-            $response,
-            $languageResource,
-            $tmName,
-        )) {
-            $this->reorganizeService->reorganizeTm($languageResource, $tmName, $reorganizeOptions, $isInternalFuzzy);
-            $successful = $api->lookup($query, $context, $fileName, $tmName);
+        foreach ($responses as $tmName => $response) {
+            if ($this->reorganizeService->needsReorganizing($response, $languageResource, $tmName)) {
+                unset($responses[$tmName]);
+
+                try {
+                    $this->reorganizeService->startReorganize(
+                        $languageResource,
+                        $tmName,
+                        $reorganizeOptions,
+                        $isInternalFuzzy
+                    );
+
+                    $retryTms[] = $tmName;
+                } catch (ReorganizeException $e) {
+                    $failures[$tmName] = $e;
+                }
+
+                continue;
+            }
+
+            $this->reorganizeService->resetReorganizeAttempts($languageResource, $tmName, $isInternalFuzzy);
+
+            if ($this->isLockingTimeoutOccurred($response)) {
+                $lookup = function () use (
+                    $languageResource,
+                    $tmName,
+                    $query,
+                    $context,
+                    $fileName,
+                ) {
+                    $response = $this->api->fuzzy(
+                        $languageResource->getResource()->getUrl(),
+                        $tmName,
+                        $languageResource->getSourceLangCode(),
+                        $languageResource->getTargetLangCode(),
+                        $query,
+                        $context,
+                        $fileName,
+                    );
+
+                    return $this->isLockingTimeoutOccurred($response)
+                        ? [WaitCallState::Retry, null]
+                        : [WaitCallState::Done, $response];
+                };
+
+                try {
+                    $response = $this->retryService->callAwaiting($lookup);
+
+                    if (null !== $response) {
+                        $responses[$tmName] = $response;
+
+                        continue;
+                    }
+
+                    $failures[$tmName] = new Exception('Retry failed after locking timeout');
+                } catch (Throwable $e) {
+                    $failures[$tmName] = $e;
+                }
+            }
         }
 
-        if (! $successful && $this->isLockingTimeoutOccurred($api->getError())) {
-            $lookup = fn () => $api->lookup($query, $context, $fileName, $tmName)
-                ? [WaitCallState::Done, true]
-                : [WaitCallState::Retry, false];
-
-            $successful = (bool) $this->retryService->callAwaiting($lookup);
+        foreach ($failures as $tmName => $failure) {
+            $this->logger->exception($this->getBadGatewayException($failure, $languageResource, $tmName));
         }
 
-        if (! $successful) {
-            $this->logger->exception($this->getBadGatewayException($api, $languageResource, $tmName));
+        if (! empty($retryTms)) {
+            [$retryResponses, $hasSkippedTms] = $this->lookup(
+                $languageResource,
+                $retryTms,
+                $query,
+                $context,
+                $fileName,
+                $config,
+                $isInternalFuzzy,
+                $hasSkippedTms,
+            );
 
-            return null;
+            foreach ($retryResponses as $tmName => $response) {
+                $responses[$tmName] = $response;
+            }
         }
 
-        // In case we have at least one successful lookup, we reset the reorganize attempts
-        $this->reorganizeService->resetReorganizeAttempts($languageResource, $isInternalFuzzy);
-
-        $result = $api->getResult();
-
-        if ((int) ($result->NumOfFoundProposals ?? 0) === 0) {
-            return null;
-        }
-
-        return $result;
+        return [$responses, $hasSkippedTms];
     }
 
-    private function isLockingTimeoutOccurred(?object $error): bool
+    private function isLockingTimeoutOccurred(FuzzySearchResponse $response): bool
     {
-        if (null === $error) {
-            return false;
-        }
-
-        return $error->returnValue === 506;
+        return $response->getCode() === 506;
     }
 
-    protected function isSendingWhitespaceAsTagEnabled(Zend_Config $config): bool
-    {
-        return (bool) $config->runtimeOptions->LanguageResources?->t5memory?->sendWhitespaceAsTag;
-    }
-
-    private function getMetaData(object $found): array
+    private function getMetaData(MatchDTO $found): array
     {
         $nameToShow = [
             'segmentId',
@@ -427,7 +454,6 @@ class FuzzySearchService
             'internalKey',
             'sourceLang',
             'targetLang',
-            'guessed',
         ];
         $result = [];
 
@@ -438,7 +464,6 @@ class FuzzySearchService
 
                 $item->value = match ($name) {
                     'timestamp' => date('Y-m-d H:i:s T', strtotime($found->{$name})),
-                    'guessed' => 'Some content was unprotected to get a better match',
                     default => $found->{$name}
                 };
 
@@ -446,50 +471,79 @@ class FuzzySearchService
             }
         }
 
+        if ($found->guessed) {
+            $item = new \stdClass();
+            $item->name = 'Guessed';
+            $item->value = 'Some content was unprotected to get a better match';
+
+            $result[] = $item;
+        }
+
+        if ($found->possiblyNotOptimal) {
+            $item = new \stdClass();
+            $item->name = 'Possibly not optimal';
+            $item->value = 'Language resource is currently being processed. Better matches might be available.';
+
+            $result[] = $item;
+        }
+
         return $result;
     }
 
     /**
-     * Reduce the given matchrate to given percent.
+     * Reduce the given match-rate to given percent.
      * It is used when unsupported tags are found in the response result, and those tags are removed.
-     * @param integer $matchrate
-     * @param integer $reducePercent
-     * @return number
      */
-    protected function reduceMatchrate($matchrate, $reducePercent)
+    protected function reduceMatchRate(int $matchRate, int $reducePercent): int
     {
-        //reset higher matches than 100% to 100% match
-        //if the matchrate is higher than 0, reduce it by $reducePercent %
-        return max(0, min($matchrate, 100) - $reducePercent);
+        return max(0, min($matchRate, 100) - $reducePercent);
     }
 
     private function getBadGatewayException(
-        editor_Services_OpenTM2_HttpApi $api,
-        editor_Models_LanguageResources_LanguageResource $languageResource,
-        string $tmName = '',
+        Throwable $e,
+        LanguageResource $languageResource,
+        string $tmName,
     ): editor_Services_Connector_Exception {
         $ecode = 'E1313';
-        $error = $api->getError();
+
+        $request = null;
+        $response = null;
+
+        if ($e instanceof RequestExceptionInterface) {
+            $request = $e->getRequest();
+        }
+
+        if ($e instanceof RequestException) {
+            $response = $e->getResponse();
+        }
+
+        if ($request?->getBody()->isSeekable()) {
+            $request->getBody()->rewind();
+        }
+
+        if ($response?->getBody()->isSeekable()) {
+            $response->getBody()->rewind();
+        }
+
         $data = [
             'service' => $languageResource->getResource()->getName(),
-            'languageResource' => $this->languageResource ?? '',
+            'languageResource' => $languageResource,
             'tmName' => $tmName,
-            'error' => $error,
-            'request' => $api->request,
-            'response' => $api->getResponse()->getBody(),
+            'error' => $e->getMessage(),
+            'uri' => $request?->getUri() ?? $languageResource->getResource()->getUrl(),
+            'request' => $request?->getBody()->getContents() ?? '',
+            'response' => $response?->getBody()->getContents() ?? '',
         ];
 
-        $api->request = null;
-
-        if (strpos($error->error ?? '', 'needs to be organized') !== false) {
+        if (str_contains($data['response'], 'needs to be organized')) {
             $ecode = 'E1314';
             $data['tm'] = $languageResource->getName();
         }
 
-        if (strpos($error->error ?? '', 'too many open translation memory databases') !== false) {
+        if (str_contains($data['response'], 'too many open translation memory databases')) {
             $ecode = 'E1333';
         }
 
-        return new editor_Services_Connector_Exception($ecode, $data);
+        return new editor_Services_Connector_Exception($ecode, $data, $e);
     }
 }

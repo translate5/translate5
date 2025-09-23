@@ -32,9 +32,12 @@ namespace MittagQI\Translate5\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\T5Memory\Api\Contract\FetchesStatusInterface;
+use MittagQI\Translate5\T5Memory\Api\Contract\ReorganizeInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\Exception\ReorganizeException;
 use Zend_Config;
 use ZfExtended_Logger;
 
@@ -49,7 +52,7 @@ class ReorganizeService
         private readonly Zend_Config $config,
         private readonly ZfExtended_Logger $logger,
         private readonly PersistenceService $persistenceService,
-        private readonly T5MemoryApi $t5MemoryApi,
+        private readonly ReorganizeInterface & FetchesStatusInterface $t5MemoryApi,
     ) {
     }
 
@@ -82,7 +85,7 @@ class ReorganizeService
         $needsReorganizing = $errorSupposesReorganizing &&
             ! $this->isReorganizingAtTheMoment($languageResource, $tmName);
 
-        if ($needsReorganizing && $this->isMaxReorganizeAttemptsReached($languageResource)) {
+        if ($needsReorganizing && $this->isMaxReorganizeAttemptsReached($languageResource, $tmName)) {
             $this->logger->warn(
                 'E1314',
                 'The queried TM returned error which is configured for automatic TM reorganization. ' .
@@ -95,24 +98,27 @@ class ReorganizeService
         }
 
         if ($needsReorganizing) {
-            $this->addReorganizeWarning($response, $languageResource);
+            $this->addReorganizeWarning($response, $languageResource, $tmName);
         }
 
         return $needsReorganizing;
     }
 
-    public function reorganizeTm(
+    /**
+     * @throws ReorganizeException
+     */
+    public function startReorganize(
         LanguageResource $languageResource,
         string $tmName,
         ReorganizeOptions $reorganizeOptions,
         bool $isInternalFuzzy = false,
-    ): bool {
+    ): void {
         if (! $isInternalFuzzy) {
             // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
             // without refreshing from DB, which leads th that here it is tried to be inserted as new one
             // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
             $languageResource->refresh();
-            $this->increaseReorganizeAttempts($languageResource);
+            $this->increaseReorganizeAttempts($languageResource, $tmName);
             $languageResource->save();
         }
 
@@ -125,6 +131,24 @@ class ReorganizeService
         } catch (\Throwable $e) {
             $this->logger->exception($e);
 
+            throw new ReorganizeException($e->getMessage(), $e->getCode(), previous: $e);
+        }
+    }
+
+    public function reorganizeTm(
+        LanguageResource $languageResource,
+        string $tmName,
+        ReorganizeOptions $reorganizeOptions,
+        bool $isInternalFuzzy = false,
+    ): bool {
+        try {
+            $this->startReorganize(
+                $languageResource,
+                $tmName,
+                $reorganizeOptions,
+                $isInternalFuzzy
+            );
+        } catch (ReorganizeException) {
             return false;
         }
 
@@ -141,10 +165,8 @@ class ReorganizeService
         return $reorganized;
     }
 
-    public function isReorganizingAtTheMoment(
-        LanguageResource $languageResource,
-        ?string $tmName = null,
-    ): bool {
+    public function isReorganizingAtTheMoment(LanguageResource $languageResource, string $tmName): bool
+    {
         $status = $this->t5MemoryApi->getStatus(
             $languageResource->getResource()->getUrl(),
             $this->persistenceService->addTmPrefix($tmName)
@@ -153,10 +175,8 @@ class ReorganizeService
         return $status->status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
     }
 
-    public function waitReorganizeFinished(
-        LanguageResource $languageResource,
-        ?string $tmName,
-    ): bool {
+    public function waitReorganizeFinished(LanguageResource $languageResource, string $tmName): bool
+    {
         $elapsedTime = 0;
         $sleepTime = 5;
 
@@ -190,49 +210,58 @@ class ReorganizeService
         return defined('ZFEXTENDED_IS_WORKER_THREAD');
     }
 
-    private function isMaxReorganizeAttemptsReached(?LanguageResource $languageResource): bool
+    private function isMaxReorganizeAttemptsReached(?LanguageResource $languageResource, string $tmName): bool
     {
         if (null === $languageResource) {
             return false;
         }
 
-        $currentAttempts = $languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0;
+        $currentAttempts = $languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS, true)[$tmName] ?? 0;
         $maxAttempts = $this->config->runtimeOptions->LanguageResources->t5memory->maxReorganizeAttempts;
 
         return $currentAttempts >= $maxAttempts;
     }
 
-    private function increaseReorganizeAttempts(LanguageResource $languageResource): void
+    private function increaseReorganizeAttempts(LanguageResource $languageResource, string $tmName): void
     {
-        $languageResource->addSpecificData(
-            self::REORGANIZE_ATTEMPTS,
-            ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0) + 1
-        );
+        $attempts = $languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS, true);
+        $attempts[$tmName] = ($attempts[$tmName] ?? 0) + 1;
+
+        $languageResource->addSpecificData(self::REORGANIZE_ATTEMPTS, $tmName);
     }
 
-    public function resetReorganizeAttempts(LanguageResource $languageResource, bool $isInternalFuzzy = false): void
-    {
+    public function resetReorganizeAttempts(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $isInternalFuzzy = false
+    ): void {
         if ($isInternalFuzzy) {
             return;
         }
 
-        if ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) === null) {
+        $attempts = $languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS, true);
+
+        if (! isset($attempts[$tmName])) {
             return;
         }
 
+        unset($attempts[$tmName]);
+
         // In some cases language resource is detached from DB
         $languageResource->refresh();
-        $languageResource->removeSpecificData(self::REORGANIZE_ATTEMPTS);
+        $languageResource->addSpecificData(self::REORGANIZE_ATTEMPTS, $attempts);
         $languageResource->save();
     }
 
     private function addReorganizeWarning(
         ResponseInterface $response,
         LanguageResource $languageResource,
+        string $tmName,
     ): void {
         $params = [
             'languageResource' => $languageResource,
             'apiError' => $response->getBody(),
+            'tmName' => $tmName,
         ];
 
         $this->logger->warn(
