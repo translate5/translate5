@@ -30,13 +30,16 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\T5Memory\Api\Response;
 
+use MittagQI\Translate5\T5Memory\Api\Contract\PoolAsyncClientInterface;
 use MittagQI\Translate5\T5Memory\Api\Exception\CorruptResponseBodyException;
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidJsonInResponseBodyException;
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidResponseStructureException;
 use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
+use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -63,10 +66,10 @@ class ResourcesResponseTest extends TestCase
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getBody')->willReturn($bodyMock);
 
-        $client = $this->createMock(ClientInterface::class);
-        $client->method('sendRequest')->willReturn($response);
-
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $this->getClient($response),
+            SegmentLengthValidator::create(),
+        );
 
         self::expectException(InvalidResponseStructureException::class);
         $api->version('http://example.com');
@@ -80,10 +83,10 @@ class ResourcesResponseTest extends TestCase
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getBody')->willReturn($bodyMock);
 
-        $client = $this->createMock(ClientInterface::class);
-        $client->method('sendRequest')->willReturn($response);
-
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $this->getClient($response),
+            SegmentLengthValidator::create(),
+        );
 
         self::expectException(CorruptResponseBodyException::class);
         $api->version('http://example.com');
@@ -97,12 +100,35 @@ class ResourcesResponseTest extends TestCase
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getBody')->willReturn($bodyMock);
 
-        $client = $this->createMock(ClientInterface::class);
-        $client->method('sendRequest')->willReturn($response);
-
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $this->getClient($response),
+            SegmentLengthValidator::create(),
+        );
 
         self::expectException(InvalidJsonInResponseBodyException::class);
         $api->version('http://example.com');
+    }
+
+    private function getClient(ResponseInterface $response): PoolAsyncClientInterface & ClientInterface
+    {
+        $client = new class($response) implements ClientInterface, PoolAsyncClientInterface {
+            public function __construct(
+                private ResponseInterface $response
+            ) {
+            }
+
+            public function sendRequest(RequestInterface $request): ResponseInterface
+            {
+                return $this->response;
+            }
+
+            public function poolAsync(array $requests, int $concurrency = 10, array $perRequestOptions = []): array
+            {
+                /** @phpstan-ignore-next-line */
+                return [];
+            }
+        };
+
+        return $client;
     }
 }

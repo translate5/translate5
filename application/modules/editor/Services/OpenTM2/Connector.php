@@ -400,7 +400,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     public function updateWithDTO(
         UpdateSegmentDTO $dto,
         UpdateOptions $updateOptions,
-        editor_Models_Segment $segment
+        editor_Models_Segment $segment,
     ): void {
         $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
 
@@ -607,7 +607,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      *
      * {@inheritDoc}
      */
-    public function query(editor_Models_Segment $segment): editor_Services_ServiceResult
+    public function query(editor_Models_Segment $segment, int $pretranslateMatchrate = 0): editor_Services_ServiceResult
     {
         $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
@@ -625,14 +625,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $resultList = $this->queryCache->get($key);
 
         if ($resultList === null) {
-            $resultList = $this->fuzzySearchService->query(
+            $resultList = $this->fuzzy(
                 $this->languageResource,
                 $queryString,
                 $context,
                 $fileName,
-                $this->calculateMatchRate($segment),
+                $segment,
                 $this->config,
-                $this->isInternalFuzzy(),
+                $pretranslateMatchrate
             );
 
             $this->queryCache->set($key, $resultList);
@@ -643,6 +643,57 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         return $this->getResultListGrouped($resultList);
+    }
+
+    private function fuzzy(
+        LanguageResource $languageResource,
+        string $queryString,
+        string $context,
+        string $fileName,
+        editor_Models_Segment $segment,
+        Zend_Config $config,
+        int $pretranslateMatchrate = 0,
+    ): editor_Services_ServiceResult {
+        $resultList = new editor_Services_ServiceResult();
+        $resultList->setLanguageResource($languageResource);
+        // Although we take the source fields from the t5memory answer below
+        // we have to set the default source here to fill the be added internal tags
+        $resultList->setDefaultSource($queryString);
+
+        $matches = $this->fuzzySearchService->query(
+            $languageResource,
+            $queryString,
+            $context,
+            $fileName,
+            $this->calculateMatchRate($segment),
+            $config,
+            $this->isInternalFuzzy(),
+        );
+
+        $skipWorseMatches = false;
+
+        foreach ($matches as $match) {
+            // in analysis + pre-translate step we can skip matches below the pretranslate matchrate
+            // they will not be used anyway neither for analysis nor for pre-translation
+            if ($skipWorseMatches && $match->matchrate < $pretranslateMatchrate) {
+                continue;
+            }
+
+            if ($pretranslateMatchrate > 0 && $match->matchrate >= $pretranslateMatchrate) {
+                $skipWorseMatches = true;
+            }
+
+            $resultList->addResult(
+                $match->target,
+                $match->matchrate,
+                $match->metaData,
+                $match->rawTarget,
+                $match->timestamp
+            );
+            $resultList->setSource($match->source);
+        }
+
+        return $resultList;
     }
 
     /**
@@ -756,7 +807,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             }
 
             // In case we have at least one successful search, we reset the reorganize attempts
-            $this->reorganizeService->resetReorganizeAttempts($this->languageResource, $this->isInternalFuzzy());
+            $this->reorganizeService->resetReorganizeAttempts($this->languageResource, $tmName, $this->isInternalFuzzy());
 
             $result = $this->api->getResult();
 
@@ -802,14 +853,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $dummySegment = ZfExtended_Factory::get(editor_Models_Segment::class);
         $dummySegment->init();
 
-        return $this->fuzzySearchService->query(
+        return $this->fuzzy(
             $this->languageResource,
             $searchString,
             '',
             'source',
-            $this->calculateMatchRate($dummySegment),
+            $dummySegment,
             $this->config,
-            $this->isInternalFuzzy(),
         );
     }
 

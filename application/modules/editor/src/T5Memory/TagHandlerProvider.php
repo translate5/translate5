@@ -28,51 +28,39 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Response;
+namespace MittagQI\Translate5\T5Memory;
 
-use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use editor_Services_Connector_TagHandler_Abstract as TagHandler;
+use MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing\TagHandlerFactory;
+use Zend_Config;
 
-abstract class AbstractResponse implements ResponseInterface
+class TagHandlerProvider
 {
-    private readonly int $code;
-
     public function __construct(
-        public readonly array $body,
-        public readonly ?string $errorMessage,
-        public readonly int $statusCode,
+        private readonly TagHandlerFactory $tagHandlerFactory,
     ) {
-        $this->code = (int) ($body['returnValue'] ?? $body['ReturnValue'] ?? 0);
     }
 
-    abstract public static function fromResponse(PsrResponseInterface $response): AbstractResponse;
-
-    public function getBody(): array
+    public static function create(): self
     {
-        return $this->body;
+        return new self(
+            TagHandlerFactory::create(),
+        );
     }
 
-    public function successful(): bool
+    public function getTagHandler(int $sourceLang, int $targetLang, Zend_Config $config): TagHandler
     {
-        return $this->statusCode === 200;
-    }
+        $sendWhitespaceAsTag = (bool) $config->runtimeOptions->LanguageResources->t5memory?->sendWhitespaceAsTag;
+        $tagHandler = $this->tagHandlerFactory->createTagHandler(
+            't5memory',
+            [
+                'gTagPairing' => false,
+                TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $sendWhitespaceAsTag,
+            ],
+            $config
+        );
+        $tagHandler->setLanguages($sourceLang, $targetLang);
 
-    public function getErrorMessage(): ?string
-    {
-        return $this->errorMessage;
-    }
-
-    public function getCode(): int
-    {
-        return $this->code;
-    }
-
-    protected static function getContent(PsrResponseInterface $response): string
-    {
-        if ($response->getBody()->isSeekable()) {
-            $response->getBody()->rewind();
-        }
-
-        return $response->getBody()->getContents();
+        return $tagHandler;
     }
 }

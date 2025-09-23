@@ -53,7 +53,7 @@ class ClientFactory
         );
     }
 
-    public function createClient(array $options): ClientInterface
+    public function createClient(array $options): ClientInterface & \GuzzleHttp\ClientInterface
     {
         $stack = HandlerStack::create();
         $stack->unshift($this->createRequestLoggingMiddleware());
@@ -68,7 +68,7 @@ class ClientFactory
         );
     }
 
-    public function createClientForceExceptions(array $options): ClientInterface
+    public function createClientForceExceptions(array $options): ClientInterface & \GuzzleHttp\ClientInterface
     {
         $stack = HandlerStack::create();
         $stack->remove('http_errors');

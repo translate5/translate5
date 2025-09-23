@@ -576,7 +576,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     protected function getMatches(editor_Services_Connector $connector, editor_Models_Segment $segment, $isMtResource)
     {
         if (! $isMtResource) {
-            return $connector->query($segment);
+            // provide the matchrate threshold for pretranslation
+            // it will be used by t5memory only for now
+            // as so - contract of connectors remains unchanged
+            return $connector->query($segment, $this->pretranslateMatchrate); // @phpstan-ignore-line
         }
 
         //the resource is of type mt, so we do not need to query the mt for results, since we will receive always the default MT defined matchrate
