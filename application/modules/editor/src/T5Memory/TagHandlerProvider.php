@@ -36,22 +36,10 @@ use Zend_Config;
 
 class TagHandlerProvider
 {
-    public function __construct(
-        private readonly TagHandlerFactory $tagHandlerFactory,
-    ) {
-    }
-
-    public static function create(): self
-    {
-        return new self(
-            TagHandlerFactory::create(),
-        );
-    }
-
     public function getTagHandler(int $sourceLang, int $targetLang, Zend_Config $config): TagHandler
     {
         $sendWhitespaceAsTag = (bool) $config->runtimeOptions->LanguageResources->t5memory?->sendWhitespaceAsTag;
-        $tagHandler = $this->tagHandlerFactory->createTagHandler(
+        $tagHandler = TagHandlerFactory::createHandler(
             't5memory',
             [
                 'gTagPairing' => false,

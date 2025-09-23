@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tag\TagSequence;
+
 /**
  * Checks the consistency of translations: Segments with an identical target but different sources or with identical sources but different targets
  * This Check can only be done for all segments of a task at once
@@ -64,7 +66,7 @@ class editor_Segment_Whitespace_Check
     public function __construct(editor_Models_Task $task, editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment)
     {
         // Get field text with tags rendered into placeholders
-        $fieldRenderedText = $fieldTags->renderReplaced(editor_TagSequence::MODE_ORIGINAL);
+        $fieldRenderedText = $fieldTags->renderReplaced(TagSequence::MODE_ORIGINAL);
 
         // Detect space at the beginning
         if (str_starts_with($fieldRenderedText, ' ')) {

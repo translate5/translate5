@@ -26,12 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tag\TagSequence;
+
 /**
  * Abstraction for an Internal tag as used in the segment text's
  * This adds serialization/unserialization-capabilities (JSON), cloning capabilities and the general managability of internal tags
  * Generally internal tags must be used with start & end indice relative to the segment texts.
  * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
  * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
+ * @property editor_Segment_Tag[] $children
  * @phpstan-consistent-constructor
  */
 class editor_Segment_Tag extends editor_Tag implements JsonSerializable
@@ -174,27 +177,37 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     public int $endIndex = 0;
 
     /**
-     * This saves the order of the tag as found on creation. This is e.g. crucial for multiple singular tags beside each other or singular tags on the start or end of the covered markup that are directly beside tags with content
+     * This saves the order of the tag as found on creation.
+     * This is e.g. crucial for multiple singular tags beside each other or singular tags on the start or end
+     * of the covered markup that are directly beside tags with content
      */
     public int $order = -1;
 
     /**
-     * This saves the order of the parent tag as found on creation (if there is a parent tag). This is e.g. crucial for singular tags contained in other tags or to specify the nesting if tags have identical start & end indices
+     * This saves the order of the parent tag as found on creation (if there is a parent tag).
+     * This is e.g. crucial for singular tags contained in other tags or
+     * to specify the nesting if tags have identical start & end indices
      */
     public int $parentOrder = -1;
 
     /**
-     * Set by editor_TagSequence to indicate that the Tag spans the complete segment text
+     * Holds the order of a closer of a paired tag in the phase of serialization
+     * Otherwise meanigless
+     */
+    public int $rightOrder = -1;
+
+    /**
+     * Set by TagSequence to indicate that the Tag spans the complete segment text
      */
     public bool $isFullLength = false;
 
     /**
-     * Set by editor_TagSequence to indicate that the Tag was deleted at some time in the segment's history (is in a del-tag)
+     * Set by TagSequence to indicate that the Tag was deleted at some time in the segment's history (is in a del-tag)
      */
     public bool $wasDeleted = false;
 
     /**
-     * Set by editor_TagSequence to indicate that the Tag was inserted at some time in the segment's history (is in an ins-tag)
+     * Set by TagSequence to indicate that the Tag was inserted at some time in the segment's history (is in an ins-tag)
      */
     public bool $wasInserted = false;
 
@@ -656,17 +669,17 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      * CRUCIAL: at this point only editor_Segment_Tag must be added as children !
      * API is used in the rendering process only
      */
-    public function addSegmentText(editor_TagSequence $tags): void
+    public function addSegmentText(TagSequence $tags): void
     {
         if ($this->startIndex < $this->endIndex) {
             if ($this->hasChildren()) {
                 // crucial: we need to sort our children as tags with the same start-position but length 0 must come first
-                usort($this->children, ['editor_TagSequence', 'compareChildren']);
+                usort($this->children, [TagSequence::class, 'compareChildren']);
                 // fill the text-gaps around our children with text-parts of the segments & fill our children with text
                 $chldrn = [];
                 $last = $this->startIndex;
                 foreach ($this->children as $child) {
-                    if (is_a($child, 'editor_Segment_Tag')) {
+                    if (is_a($child, editor_Segment_Tag::class)) {
                         /* @var $child editor_Segment_Tag */
                         if ($last < $child->startIndex) {
                             $chldrn[] = editor_Tag::createText($tags->getTextPart($last, $child->startIndex));
@@ -691,7 +704,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * Adds us and all our children to the segment tags
      */
-    public function sequence(editor_TagSequence $tags, int $parentOrder): void
+    public function sequence(TagSequence $tags, int $parentOrder): void
     {
         $tags->addTag($this, -1, $parentOrder);
         $this->sequenceChildren($tags, $this->order);
@@ -700,11 +713,11 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * Adds all our children to the segment tags
      */
-    public function sequenceChildren(editor_TagSequence $tags, int $parentOrder = -1): void
+    public function sequenceChildren(TagSequence $tags, int $parentOrder = -1): void
     {
         if ($this->hasChildren()) {
             foreach ($this->children as $child) {
-                if (is_a($child, 'editor_Segment_Tag')) {
+                if (is_a($child, editor_Segment_Tag::class)) {
                     /* @var $child editor_Segment_Tag */
                     $child->sequence($tags, $parentOrder);
                 }
@@ -715,7 +728,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * This API finishes the Field Tags generation. It is the final step and finishing work can be made here, e.g. the evaluation of task specific data
      */
-    public function finalize(editor_TagSequence $tags, editor_Models_Task $task): void
+    public function finalize(editor_Segment_FieldTags $tags, editor_Models_Task $task): void
     {
     }
 

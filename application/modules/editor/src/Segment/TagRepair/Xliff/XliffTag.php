@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\TagRepair\Xliff;
 
-class Tag implements TagInterface
+class XliffTag implements TagInterface
 {
     // Tag types
     // TODO: constants should be used in the repair stratigies. A lot of direct deffinitions of the tags.
@@ -125,7 +125,7 @@ class Tag implements TagInterface
         $rid = array_key_exists('rid', $changes) ? $changes['rid'] : $this->rid;
         $position = $changes['position'] ?? $this->position;
 
-        return new Tag($type, $id, $rid, $position, '');
+        return new XliffTag($type, $id, $rid, $position, '');
     }
 
     /**
@@ -151,7 +151,7 @@ class Tag implements TagInterface
             }
 
             if ($id !== null) {
-                return new Tag($type, $id, $rid, $position, $tagString);
+                return new XliffTag($type, $id, $rid, $position, $tagString);
             }
         }
 

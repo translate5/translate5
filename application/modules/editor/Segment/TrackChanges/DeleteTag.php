@@ -38,11 +38,6 @@ final class editor_Segment_TrackChanges_DeleteTag extends editor_Segment_TrackCh
         return true;
     }
 
-    public function isInsertTag(): bool
-    {
-        return false;
-    }
-
     /**
      * Renders the replaced contents
      * what must be an empty string for del-tags (not bring present in textual content)

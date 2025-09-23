@@ -53,7 +53,7 @@ class RegexTagParser implements TagParserInterface
             $fullTag = $match[0][0];
             $position = $match[0][1];
 
-            $tag = Tag::fromString($fullTag, $position);
+            $tag = XliffTag::fromString($fullTag, $position);
             if ($tag !== null) {
                 $tags[] = $tag;
             }

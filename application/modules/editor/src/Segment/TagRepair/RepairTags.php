@@ -30,8 +30,8 @@ namespace MittagQI\Translate5\Segment\TagRepair;
 
 use DOMNodeList;
 use editor_Segment_Internal_Tag;
-use editor_TagSequence;
 use Exception;
+use MittagQI\Translate5\Tag\TagSequence;
 use PHPHtmlParser\Dom\Node\HtmlNode;
 use PHPHtmlParser\DTO\Tag\AttributeDTO;
 use Throwable;
@@ -52,10 +52,10 @@ use ZfExtended_Exception;
  * Logic of restoration:
  * Try to restore from service-result    -> fails     Restore from stripped service-result     -> fails     Return stripped service-result
  *
- * @method Tag unparseHtml(string $html)
- * @property Tag[] $tags
+ * @method RepairTag unparseHtml(string $html)
+ * @property RepairTag[] $tags
  */
-class Tags extends editor_TagSequence
+class RepairTags extends TagSequence
 {
     /**
      * @var bool
@@ -86,13 +86,13 @@ class Tags extends editor_TagSequence
 
     /**
      * Holds any paired tags for the prapare pairing phase
-     * @var Tag[]
+     * @var RepairTag[]
      */
     private array $pairedTags = [];
 
     /**
      * Holds the markup the TagRepair was created with
-     * Not to be confused with ::originalMarkup in editor_TagSequence
+     * Not to be confused with ::originalMarkup in TagSequence
      */
     private string $originalHtml;
 
@@ -107,16 +107,16 @@ class Tags extends editor_TagSequence
     {
         $this->originalHtml = $markup;
         if ($preserveComments) {
-            $markup = Tag::replaceComments($markup);
+            $markup = RepairTag::replaceComments($markup);
         } else {
-            $markup = Tag::stripComments($markup);
+            $markup = RepairTag::stripComments($markup);
         }
         $this->_setMarkup($markup);
         // quirk: when no markup is contained, unparse will not be called and thus requestHtml remains empty
         if (count($this->tags) == 0) {
             $this->requestHtml = $this->text;
         }
-        if (self::DO_DEBUG) {
+        if (self::DO_DEBUG) { // @phpstan-ignore-line
             error_log('CONSTRUCT RepairTags for text [' . strip_tags($markup) . ']' . "\n" . '    Markup is: [' . $markup . ']' . "\n" . '    Request markup is: [' . $this->requestHtml . ']');
         }
     }
@@ -141,11 +141,11 @@ class Tags extends editor_TagSequence
         }
         // when the result has all tags clustered on the start or end and this clusteringis substantially different
         // then in the source
-        if ($this->invalidateDueToClusteredTags(Tag::countImgTagsOnlyStartOrEnd($html))) {
-            if (self::DO_DEBUG) {
+        if ($this->invalidateDueToClusteredTags(RepairTag::countImgTagsOnlyStartOrEnd($html))) {
+            if (self::DO_DEBUG) { // @phpstan-ignore-line
                 error_log('INVALIDATE sent markup due to detected tag-clustering!');
             }
-            $html = Tag::stripImgTags($html);
+            $html = RepairTag::stripImgTags($html);
         }
 
         $this->evaluate();
@@ -159,7 +159,7 @@ class Tags extends editor_TagSequence
             $this->captureErrors = true;
             $rendered = $this->render();
             // reset captured errors
-            if (self::DO_DEBUG && count($this->capturedErrors) > 0) {
+            if (self::DO_DEBUG && count($this->capturedErrors) > 0) { // @phpstan-ignore-line
                 error_log('RENDEREING RepairTags CREATED ERRORS:' . "\n");
                 error_log('VISUALIZED MARKUP: ' . editor_Segment_Internal_Tag::visualizeTags($rendered) . "\n");
                 // TODO FIXME: create an API in ZfExtended_ErrorCodeException for this
@@ -174,7 +174,7 @@ class Tags extends editor_TagSequence
             $this->capturedErrors = [];
             $this->captureErrors = false;
 
-            if (self::DO_DEBUG) {
+            if (self::DO_DEBUG) { // @phpstan-ignore-line
                 error_log('RECREATE RepairTags successful recreation: [' . $rendered . ']' . "\n");
             }
 
@@ -182,10 +182,10 @@ class Tags extends editor_TagSequence
         } catch (Throwable) {
             // reset captured errors
             $this->captureErrors = false;
-            if (self::DO_DEBUG && count($this->capturedErrors) > 0) {
+            if (self::DO_DEBUG && count($this->capturedErrors) > 0) { // @phpstan-ignore-line
                 error_log('RENDEREING RepairTags BY DISMISSING REQUESTED TAGS' . "\n");
                 foreach ($this->capturedErrors as $item) {
-                    error_log("\n" . $item->debug());
+                    error_log("\n" . $item->getMessage());
                 }
             }
             $this->capturedErrors = [];
@@ -220,7 +220,7 @@ class Tags extends editor_TagSequence
     {
         // a single tag on beginning or end is no cluster
         if ($clusterSize > 1 || $clusterSize < -1) {
-            $imgtags = Tag::countImgTagPositions($this->requestHtml);
+            $imgtags = RepairTag::countImgTagPositions($this->requestHtml);
             $isClustered = $imgtags->start === $imgtags->all || $imgtags->end === $imgtags->all;
             // if we do also have clustered tags it must have the same sign, otherwise invalidate
             if ($isClustered) {
@@ -282,9 +282,9 @@ class Tags extends editor_TagSequence
         }
         $text = '';
         $textLength = 0;
-        $parts = preg_split(Tag::REQUEST_TAG_REGEX, $html, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split(RepairTag::REQUEST_TAG_REGEX, $html, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         foreach ($parts as $part) {
-            if (preg_match(Tag::REQUEST_TAG_REGEX, $part) === 1) {
+            if (preg_match(RepairTag::REQUEST_TAG_REGEX, $part) === 1) {
                 // a tag
                 try {
                     // decompose the tag, errors will be catched
@@ -323,7 +323,7 @@ class Tags extends editor_TagSequence
         // first the singular tags (which may refer to the normal tags as their parent)
         for ($i = 0; $i < $numTags; $i++) {
             if ($this->tags[$i]->isSingular()) {
-                $this->tags[$i]->reEvaluateSingularTagPosition($this, $textLength, $wordRatio, $textRatio);
+                $this->tags[$i]->reEvaluateSingularTagPosition($this, $textLength, $wordRatio);
             }
         }
         if (static::DO_DEBUG) {
@@ -463,7 +463,7 @@ class Tags extends editor_TagSequence
 
     /* Tag index API */
 
-    public function findByTagIdx(int $tagIdx): ?Tag
+    public function findByTagIdx(int $tagIdx): ?RepairTag
     {
         foreach ($this->tags as $tag) {
             if ($tag->getRepairIndex() === $tagIdx) {
@@ -474,7 +474,7 @@ class Tags extends editor_TagSequence
         return null;
     }
 
-    public function findByOrder(int $order): ?Tag
+    public function findByOrder(int $order): ?RepairTag
     {
         if ($order > -1) {
             foreach ($this->tags as $tag) {
@@ -580,15 +580,15 @@ class Tags extends editor_TagSequence
         return $this->createRepairTag($classNames, $attributes, $element->nodeName, $startIndex, $children, null);
     }
 
-    private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex, DOMNodeList $domChildren = null, array $htmlChildren = null): Tag
+    private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex, DOMNodeList $domChildren = null, array $htmlChildren = null): RepairTag
     {
         // InternalTag needs special processing to prevent them to be manipulated and to pair the open/close-pairs
         // Since we may deal with user-generated markup here, we not only rely on the class but also inspect the children to avoid quirks
         if (in_array(editor_Segment_Internal_Tag::CSS_CLASS, $classNames) && editor_Segment_Internal_Tag::hasNodeName($nodeName)
                 && (editor_Segment_Internal_Tag::domElementChildrenAreInternalTagChildren($domChildren) || editor_Segment_Internal_Tag::htmlNodeChildrenAreInternalTagChildren($htmlChildren))) {
-            $tag = new InternalTag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
+            $tag = new InternalRepairTag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
         } else {
-            $tag = new Tag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
+            $tag = new RepairTag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
         }
         // we need to prepare any paired tags before consolidation, so we need to know them before sequencing
         if ($tag->canBePaired()) {

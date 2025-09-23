@@ -40,7 +40,7 @@ use editor_Segment_Tag;
  * In the pairing phase, the opener/closing tags will even be joined to a full tag back again to ensure, the repairing creates valid internal tags and thus turn back to full tags but one hierarchy level higher
  * the essential part of the prepare pairing phase is, that paired internal tags need to transfere the repair-index to the closing tag as otherwise they would render a wrong repair-index for the request markup
  */
-final class InternalTag extends Tag
+final class InternalRepairTag extends RepairTag
 {
     protected static ?string $type = editor_Segment_Tag::TYPE_INTERNAL;
 
@@ -58,8 +58,6 @@ final class InternalTag extends Tag
      * The Index of the internal tag.
      */
     private int $tagIndex = -1;
-
-    public int $rightOrder = -1;
 
     /**
      * retrieves the internal tag index
@@ -145,9 +143,9 @@ final class InternalTag extends Tag
     /**
      * This API is called before consolidation and before rendering for request
      */
-    public function prePairWith(Tag $tag): void
+    public function prePairWith(RepairTag $tag): void
     {
-        if (is_a($tag, InternalTag::class) && $this->tagIndex == $tag->getTagIndex()) {
+        if (is_a($tag, InternalRepairTag::class) && $this->tagIndex == $tag->getTagIndex()) {
             // In case we found our pairing counterpart we must set it's tag index to ours to ensure, the request is rendered with proper indexes
             $tag->setRepairIndex($this->repairIdx);
         }
@@ -183,7 +181,7 @@ final class InternalTag extends Tag
      */
     public function pairWith(editor_Segment_Tag $tag): bool
     {
-        if (is_a($tag, InternalTag::class) && $this->tagIndex == $tag->getTagIndex()) {
+        if (is_a($tag, InternalRepairTag::class) && $this->tagIndex == $tag->getTagIndex()) {
             $this->paired = true;
             $this->endIndex = $tag->startIndex;
             $this->rightOrder = $tag->order;

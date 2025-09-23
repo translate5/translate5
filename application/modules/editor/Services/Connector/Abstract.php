@@ -26,14 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
-use editor_Services_Connector_TagHandler_Abstract as TagHandler;
+use editor_Services_Connector_TagHandler_Abstract as AbstractTagHandler;
 use MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing\TagHandlerFactory;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 
@@ -134,13 +127,10 @@ abstract class editor_Services_Connector_Abstract
      */
     protected $resource;
 
-    private TagHandlerFactory $tagHandlerFactory;
-
     /**
      * Tag Handler instance as needed by the concrete Connector
-     * @var editor_Services_Connector_TagHandler_Abstract
      */
-    protected $tagHandler;
+    protected AbstractTagHandler $tagHandler;
 
     /**
      * @var string
@@ -189,7 +179,6 @@ abstract class editor_Services_Connector_Abstract
         //init the default logger, is changed in connectTo
         $this->logger = Zend_Registry::get('logger');
         $this->config = Zend_Registry::get('config');
-        $this->tagHandlerFactory = new TagHandlerFactory($this->config);
         $this->tagHandler = $this->createTagHandler();
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
     }
@@ -237,11 +226,9 @@ abstract class editor_Services_Connector_Abstract
         if (! is_null($config)) {
             $this->config = $config;
         }
-        $this->tagHandlerFactory = new TagHandlerFactory($this->config);
-        $this->tagHandler = $this->createTagHandler([
-            TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $this->isSendingWhitespaceAsTagEnabled(),
-        ]);
-
+        // TODO FIXME: why should a tag-handler be needed before ->connectTo was called ??
+        // Maybe it would be enough to set the remove-handler for instantiation ... better none at all.
+        $this->tagHandler = $this->createTagHandler();
         $this->tagHandler->setLanguages(
             (int) ($sourceLang ?: $languageResource->getSourceLang()),
             (int) ($targetLang ?: $languageResource->getSourceLang())
@@ -603,7 +590,7 @@ abstract class editor_Services_Connector_Abstract
     /**
      * Retrieves the configuerd tag handler
      */
-    public function getTagHandler(): editor_Services_Connector_TagHandler_Abstract
+    public function getTagHandler(): AbstractTagHandler
     {
         return $this->tagHandler;
     }
@@ -653,17 +640,22 @@ abstract class editor_Services_Connector_Abstract
         return $this->getResource()->getName();
     }
 
-    protected function createTagHandler(array $params = []): editor_Services_Connector_TagHandler_Abstract
+    protected function createTagHandler(array $params = []): AbstractTagHandler
     {
-        $params[TagHandler::OPTION_KEEP_WHITESPACE_TAGS] =
-            $params[TagHandler::OPTION_KEEP_WHITESPACE_TAGS] ?? $this->isSendingWhitespaceAsTagEnabled();
+        if (! array_key_exists(AbstractTagHandler::OPTION_KEEP_WHITESPACE_TAGS, $params)) {
+            $params[AbstractTagHandler::OPTION_KEEP_WHITESPACE_TAGS] = $this->isSendingWhitespaceAsTagEnabled();
+        }
 
         // This is for backwards compatibility of the tag handler configuration inside the connector class
-        if (! empty($this->tagHandlerClass)) {
+        if (isset($this->tagHandlerClass)) {
             return ZfExtended_Factory::get($this->tagHandlerClass, [$params]);
         }
 
-        return $this->tagHandlerFactory->createTagHandler(static::TAG_HANDLER_CONFIG_PART, $params);
+        return TagHandlerFactory::createHandler(
+            static::TAG_HANDLER_CONFIG_PART,
+            $params,
+            $this->config
+        );
     }
 
     protected function isSendingWhitespaceAsTagEnabled(): bool

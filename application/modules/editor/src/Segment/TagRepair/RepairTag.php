@@ -30,7 +30,7 @@ namespace MittagQI\Translate5\Segment\TagRepair;
 
 use editor_Segment_Tag;
 use editor_Tag;
-use editor_TagSequence;
+use MittagQI\Translate5\Tag\TagSequence;
 use MittagQI\ZfExtended\Tools\Markup;
 use stdClass;
 
@@ -40,10 +40,10 @@ use stdClass;
  * this information then is used to restore lost or incomplete tags
  * it has capabilities to be rendered as a "request" tag (that will be sent to the service); these request tag render two image-tags instead of an opening & closing tag to increase the chances to be able to restore incomplete tags
  *
- * @property Tag|\editor_TextNode[] $children
+ * @property RepairTag|\editor_TextNode[] $children
  * @phpstan-consistent-constructor
  */
-class Tag extends editor_Segment_Tag
+class RepairTag extends editor_Segment_Tag
 {
     /**
      * @var string
@@ -213,8 +213,13 @@ class Tag extends editor_Segment_Tag
      */
     public bool $isLateral = false;
 
-    public function __construct(int $startIndex, int $endIndex, string $category = '', string $nodeName = 'span', int $repairIdx = 0)
-    {
+    public function __construct(
+        int $startIndex,
+        int $endIndex,
+        string $category = '',
+        string $nodeName = 'span',
+        int $repairIdx = 0,
+    ) {
         $this->startIndex = $startIndex;
         $this->endIndex = $endIndex;
         $this->category = $category;
@@ -280,7 +285,7 @@ class Tag extends editor_Segment_Tag
      * captures the position in words when evaluationg the original
      * also resets the text indices
      */
-    public function capturePosition(Tags $tags, int $textLength)
+    public function capturePosition(RepairTags $tags, int $textLength)
     {
         $this->numWords = 0;
         $this->numWordsBefore = 0;
@@ -304,10 +309,12 @@ class Tag extends editor_Segment_Tag
         if ($parentTag != null) {
             $this->parentTagIdx = $parentTag->getRepairIndex();
             if ($this->startIndex > $parentTag->startIndex) {
-                $this->numWordsBeforeParent = $tags->countWords($tags->getTextPart($parentTag->startIndex, $this->startIndex));
+                $this->numWordsBeforeParent =
+                    $tags->countWords($tags->getTextPart($parentTag->startIndex, $this->startIndex));
             }
             if ($this->endIndex < $parentTag->endIndex) {
-                $this->numWordsAfterParent = $tags->countWords($tags->getTextPart($this->endIndex, $parentTag->endIndex));
+                $this->numWordsAfterParent =
+                    $tags->countWords($tags->getTextPart($this->endIndex, $parentTag->endIndex));
             }
         }
         $this->oldStartIndex = $this->startIndex;
@@ -326,7 +333,7 @@ class Tag extends editor_Segment_Tag
     /**
      * Retrieves the number of words currently covered by the tag
      */
-    public function getNumWords(Tags $tags): int
+    public function getNumWords(RepairTags $tags): int
     {
         if ($this->isSingular()) {
             return 0;
@@ -338,7 +345,7 @@ class Tag extends editor_Segment_Tag
     /**
      * Recreates the tag position for a full, non-singular tag
      */
-    public function reEvaluateTagPosition(Tags $tags, int $textLength, float $wordRatio, float $textRatio): void
+    public function reEvaluateTagPosition(RepairTags $tags, int $textLength, float $wordRatio, float $textRatio): void
     {
         // both positions could be restored
         if ($this->startIndex >= 0 && $this->endIndex >= 0) {
@@ -351,7 +358,8 @@ class Tag extends editor_Segment_Tag
                 if ($this->startIndex >= $textLength) {
                     $this->startIndex = $this->endIndex = $textLength;
                 } else {
-                    // in case the end-position is before the start we invalidate the end as we judge the start-position to be more important. This is purely a matter of taste though
+                    // in case the end-position is before the start we invalidate the end as we judge the
+                    // start-position to be more important. This is purely a matter of taste though
                     $this->endIndex = -1;
                 }
             }
@@ -370,8 +378,9 @@ class Tag extends editor_Segment_Tag
                 if ($parentTag->startIndex >= 0 && $parentTag->endIndex > $parentTag->startIndex) {
                     $parentTagValid = true;
                     $parentNumWords = $parentTag->getNumWords($tags);
-                    $numWords = round(($parentNumWords / ($this->numWords + $this->numWordsBeforeParent + $this->numWordsAfterParent)) * $this->numWords);
-                    $halfNumWords = floor(ceil(($parentNumWords / ($this->numWords + $this->numWordsBeforeParent + $this->numWordsAfterParent)) * $this->numWords) / 2);
+                    $sum = $this->numWords + $this->numWordsBeforeParent + $this->numWordsAfterParent;
+                    $numWords = round(($parentNumWords / $sum) * $this->numWords);
+                    $halfNumWords = floor(ceil(($parentNumWords / $sum) * $this->numWords) / 2);
                 }
             }
         }
@@ -382,17 +391,20 @@ class Tag extends editor_Segment_Tag
                 if ($parentNumWords > 1) {
                     // calculate relative number of words
                     $oldCenter = $this->oldStartIndex + (($this->oldEndIndex - $this->oldStartIndex) / 2);
-                    $oldParentCenter = $parentTag->oldStartIndex + (($parentTag->oldEndIndex - $parentTag->oldStartIndex) / 2);
+                    $oldParentCenter =
+                        $parentTag->oldStartIndex + (($parentTag->oldEndIndex - $parentTag->oldStartIndex) / 2);
                     $parentCenter = $parentTag->startIndex + (($parentTag->endIndex - $parentTag->startIndex) / 2);
-                    $relativeCenter = round($parentCenter + (($oldCenter - $oldParentCenter) * $textRatio));
+                    $relativeCenter = (int) round($parentCenter + (($oldCenter - $oldParentCenter) * $textRatio));
                     $this->startIndex = $tags->getPrevWordsPosition($relativeCenter, $halfNumWords);
                     $this->endIndex = $tags->getNextWordsPosition($relativeCenter, $halfNumWords);
                     if ($this->startIndex < $parentTag->startIndex) {
                         $this->startIndex = $parentTag->startIndex;
-                        $this->endIndex = min($tags->getNextWordsPosition($this->startIndex, $numWords), $parentTag->endIndex);
+                        $this->endIndex =
+                            min($tags->getNextWordsPosition($this->startIndex, $numWords), $parentTag->endIndex);
                     } elseif ($this->endIndex > $parentTag->endIndex) {
                         $this->endIndex = $parentTag->endIndex;
-                        $this->startIndex = max($tags->getPrevWordsPosition($this->endIndex, $numWords), $parentTag->startIndex);
+                        $this->startIndex =
+                            max($tags->getPrevWordsPosition($this->endIndex, $numWords), $parentTag->startIndex);
                     }
                 } else {
                     $this->startIndex = $parentTag->startIndex;
@@ -400,12 +412,12 @@ class Tag extends editor_Segment_Tag
                 }
             } else {
                 // we will restore it from the scaled center, what mostly will be wrong but there is nothing we can do ..
-                $numWords = round($this->numWords * $wordRatio);
+                $numWords = (int) round($this->numWords * $wordRatio);
                 if ($this->oldStartIndex == 0) {
                     $this->startIndex = 0;
                     $this->endIndex = $tags->getNextWordsPosition(0, $numWords);
                 } else {
-                    $this->endIndex = $tags->getClosestWordPosition(round($this->oldEndIndex * $textRatio));
+                    $this->endIndex = $tags->getClosestWordPosition((int) round($this->oldEndIndex * $textRatio));
                     $this->startIndex = $tags->getPrevWordsPosition($this->endIndex, $numWords);
                 }
             }
@@ -415,7 +427,7 @@ class Tag extends editor_Segment_Tag
             if ($parentTagValid) {
                 $this->startIndex = max($tags->getPrevWordsPosition($this->endIndex, $numWords), $parentTag->startIndex);
             } else {
-                $numWords = round(($this->numWords) * $wordRatio);
+                $numWords = (int) round(($this->numWords) * $wordRatio);
                 $this->startIndex = $tags->getPrevWordsPosition($this->endIndex, $numWords);
             }
         }
@@ -424,7 +436,7 @@ class Tag extends editor_Segment_Tag
             if ($parentTagValid) {
                 $this->endIndex = min($tags->getNextWordsPosition($this->startIndex, $numWords), $parentTag->endIndex);
             } else {
-                $numWords = round(($this->numWords) * $wordRatio);
+                $numWords = (int) round(($this->numWords) * $wordRatio);
                 $this->endIndex = $tags->getNextWordsPosition($this->startIndex, $numWords);
             }
         }
@@ -433,7 +445,7 @@ class Tag extends editor_Segment_Tag
     /**
      * Recreates the tag position for a singular tag
      */
-    public function reEvaluateSingularTagPosition(Tags $tags, int $textLength, float $wordRatio, float $textRatio): void
+    public function reEvaluateSingularTagPosition(RepairTags $tags, int $textLength, float $wordRatio): void
     {
         if ($this->startIndex < 0) {
             // our position can not be found
@@ -444,21 +456,23 @@ class Tag extends editor_Segment_Tag
                     if ($parentTag->startIndex == $parentTag->endIndex) {
                         $this->startIndex = $this->endIndex = $parentTag->startIndex;
                     } elseif ($this->numWordsAfterParent > $this->numWordsBeforeParent) {
-                        $numWords = round($this->numWordsAfterParent * $wordRatio);
-                        $this->startIndex = max($tags->getPrevWordsPosition($parentTag->endIndex, $numWords, $this->isBeforeWhitespace), $parentTag->startIndex);
+                        $numWords = (int) round($this->numWordsAfterParent * $wordRatio);
+                        $pos = $tags->getPrevWordsPosition($parentTag->endIndex, $numWords, $this->isBeforeWhitespace);
+                        $this->startIndex = max($pos, $parentTag->startIndex);
                     } else {
-                        $numWords = round($this->numWordsBeforeParent * $wordRatio);
-                        $this->startIndex = min($tags->getNextWordsPosition($parentTag->startIndex, $numWords, ! $this->isBeforeWhitespace), $parentTag->endIndex);
+                        $numWords = (int) round($this->numWordsBeforeParent * $wordRatio);
+                        $pos = $tags->getNextWordsPosition($parentTag->startIndex, $numWords, ! $this->isBeforeWhitespace);
+                        $this->startIndex = min($pos, $parentTag->endIndex);
                     }
                 }
             }
             // if no parentTag was found, we have to evaluate relative to the holder
             if ($this->startIndex < 0) {
                 if ($this->numWordsAfter > $this->numWordsBefore) {
-                    $numWords = round($this->numWordsAfter * $wordRatio);
+                    $numWords = (int) round($this->numWordsAfter * $wordRatio);
                     $this->startIndex = $tags->getPrevWordsPosition($textLength, $numWords, $this->isBeforeWhitespace);
                 } else {
-                    $numWords = round($this->numWordsBefore * $wordRatio);
+                    $numWords = (int) round($this->numWordsBefore * $wordRatio);
                     $this->startIndex = $tags->getNextWordsPosition(0, $numWords, ! $this->isBeforeWhitespace);
                 }
             }
@@ -470,7 +484,7 @@ class Tag extends editor_Segment_Tag
 
     /* sequencing API */
 
-    public function sequence(editor_TagSequence $tags, int $parentOrder): void
+    public function sequence(TagSequence $tags, int $parentOrder): void
     {
         $this->prepareSequencing();
         parent::sequence($tags, $parentOrder);
@@ -548,7 +562,7 @@ class Tag extends editor_Segment_Tag
                 if ($child->isText()) {
                     $html .= $child->render();
                 } else {
-                    /** @var Tag $child */
+                    /** @var RepairTag $child */
                     $html .= $child->renderForRequest();
                 }
             }
@@ -584,7 +598,7 @@ class Tag extends editor_Segment_Tag
     /**
      * This API is called before consolidation and before rendering for request
      */
-    public function prePairWith(Tag $tag): void
+    public function prePairWith(RepairTag $tag): void
     {
     }
 

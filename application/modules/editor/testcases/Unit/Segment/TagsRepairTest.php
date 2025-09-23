@@ -28,8 +28,8 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Unit\Segment;
 
-use MittagQI\Translate5\Segment\TagRepair\Tag;
-use MittagQI\Translate5\Segment\TagRepair\Tags;
+use MittagQI\Translate5\Segment\TagRepair\RepairTag;
+use MittagQI\Translate5\Segment\TagRepair\RepairTags;
 use MittagQI\Translate5\Test\MockedTaskTestAbstract;
 use MittagQI\ZfExtended\Tools\Markup;
 use ZfExtended_Exception;
@@ -416,12 +416,12 @@ class TagsRepairTest extends MockedTaskTestAbstract
 
     public function testStartingEndingTagCount(): void
     {
-        $this->assertEquals(2, Tag::countImgTagsOnlyStartOrEnd('<img src="test"/><img src="test"/>Lorem ipsum sit amet'));
-        $this->assertEquals(-3, Tag::countImgTagsOnlyStartOrEnd('Lorem ipsum sit amet <img src="test"/><img src="test"/><img src="test"/>'));
-        $this->assertEquals(-1, Tag::countImgTagsOnlyStartOrEnd('Lorem ipsum sit amet <img src="test"/>'));
-        $this->assertEquals(0, Tag::countImgTagsOnlyStartOrEnd('<img src="test"/><img src="test"/>Lorem ipsum sit amet<img src="test"/>'));
-        $this->assertEquals(0, Tag::countImgTagsOnlyStartOrEnd('<img src="test"/><img src="test"/>Lorem ipsum <img src="test"/> sit amet'));
-        $this->assertEquals(0, Tag::countImgTagsOnlyStartOrEnd(' <img src="test"/>Lorem ipsum sit amet'));
+        $this->assertEquals(2, RepairTag::countImgTagsOnlyStartOrEnd('<img src="test"/><img src="test"/>Lorem ipsum sit amet'));
+        $this->assertEquals(-3, RepairTag::countImgTagsOnlyStartOrEnd('Lorem ipsum sit amet <img src="test"/><img src="test"/><img src="test"/>'));
+        $this->assertEquals(-1, RepairTag::countImgTagsOnlyStartOrEnd('Lorem ipsum sit amet <img src="test"/>'));
+        $this->assertEquals(0, RepairTag::countImgTagsOnlyStartOrEnd('<img src="test"/><img src="test"/>Lorem ipsum sit amet<img src="test"/>'));
+        $this->assertEquals(0, RepairTag::countImgTagsOnlyStartOrEnd('<img src="test"/><img src="test"/>Lorem ipsum <img src="test"/> sit amet'));
+        $this->assertEquals(0, RepairTag::countImgTagsOnlyStartOrEnd(' <img src="test"/>Lorem ipsum sit amet'));
     }
 
     public function testDetectUntranslated1(): void
@@ -489,7 +489,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
         bool $detectUntranslated = false,
     ): void {
         $markup = $this->replaceHtmlTags($originalMarkup);
-        $tags = new Tags($markup, $preserveComments);
+        $tags = new RepairTags($markup, $preserveComments);
         $expected = (empty($expectedMarkup)) ? $tags->render() : $this->replaceHtmlTags($expectedMarkup);
         $request = $tags->getRequestHtml();
         $translated = $this->replaceRequestTags($translatedMarkup, $originalMarkup, $request);
@@ -538,7 +538,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
         string $translatedMarkup = '',
         string $unreplacedOriginal = '',
     ): void {
-        $tags = new Tags($originalMarkup, true);
+        $tags = new RepairTags($originalMarkup, true);
         $expected = (empty($expectedMarkup)) ? $tags->render() : $expectedMarkup;
         $request = $tags->getRequestHtml();
         if (! empty($translatedMarkup)) {
@@ -579,7 +579,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
     {
         $markup = $this->replaceHtmlTags($originalMarkup);
         $strippedMarkup = $this->replaceHtmlTags(preg_replace('~<(10|11|12)/>~i', '', $originalMarkup));
-        $this->assertEquals($strippedMarkup, Tag::stripComments($markup));
+        $this->assertEquals($strippedMarkup, RepairTag::stripComments($markup));
     }
 
     /**

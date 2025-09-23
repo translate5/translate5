@@ -22,7 +22,6 @@ https://www.gnu.org/licenses/lgpl-3.0.txt
 END LICENSE AND COPYRIGHT
 */
 
-
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\Export\Html;
