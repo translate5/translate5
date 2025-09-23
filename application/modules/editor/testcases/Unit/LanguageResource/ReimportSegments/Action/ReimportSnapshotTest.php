@@ -34,7 +34,6 @@ use DateTimeImmutable;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as Segment;
 use editor_Models_Task as Task;
-use editor_Services_Manager;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\Integration\UpdateSegmentService;
@@ -73,7 +72,6 @@ class ReimportSnapshotTest extends TestCase
     {
         $this->reimportSegmentRepositoryMock = $this->createMock(ReimportSegmentRepositoryInterface::class);
         $this->languageResourceRepositoryMock = $this->createMock(LanguageResourceRepository::class);
-        $this->serviceManagerMock = $this->createMock(editor_Services_Manager::class);
         $this->loggerProviderMock = $this->createMock(ReimportSegmentsLoggerProvider::class);
         $this->segmentRepositoryMock = $this->createMock(SegmentRepository::class);
         $this->tmConversionServiceMock = $this->createMock(TmConversionService::class);

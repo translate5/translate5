@@ -111,8 +111,7 @@ class ResourcesResponseTest extends TestCase
 
     private function getClient(ResponseInterface $response): PoolAsyncClientInterface & ClientInterface
     {
-        $client = new class($response) implements ClientInterface, PoolAsyncClientInterface
-        {
+        $client = new class($response) implements ClientInterface, PoolAsyncClientInterface {
             public function __construct(
                 private ResponseInterface $response
             ) {
