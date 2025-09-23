@@ -39,6 +39,7 @@ use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\Integration\UpdateSegmentService;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\ReimportSnapshot;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLoggerProvider;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
@@ -352,8 +353,8 @@ class ReimportSnapshotTest extends TestCase
         int $segmentId,
         string $sourceText,
         string $targetText
-    ): UpdateSegmentDTO {
-        return new UpdateSegmentDTO(
+    ): ReimportSegmentDTO {
+        return new ReimportSegmentDTO(
             $taskGuid,
             $segmentId,
             $sourceText,

@@ -57,6 +57,7 @@ class Response extends AbstractResponse
             $errorMsg = $body['ErrorMsg'] ?? null;
         }
 
+        // @phpstan-ignore-next-line
         return new static(
             $body,
             $errorMsg,

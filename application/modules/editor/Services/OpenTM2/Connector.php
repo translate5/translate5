@@ -944,24 +944,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return $resultList;
     }
 
-    private function addOverflowLog(Task $task = null): void
-    {
-        $params = [
-            'name' => $this->languageResource->getName(),
-            'apiError' => $this->api->getError(),
-        ];
-
-        if (null !== $task) {
-            $params['task'] = $task;
-        }
-
-        $this->logger->info(
-            'E1603',
-            'Language Resource [{name}] current writable memory is overflown, creating a new one',
-            $params
-        );
-    }
-
     public function export(string $mime): ?string
     {
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);

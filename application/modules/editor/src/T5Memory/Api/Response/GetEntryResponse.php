@@ -33,11 +33,11 @@ namespace MittagQI\Translate5\T5Memory\Api\Response;
 use JsonException;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-class GetEntryResponse extends Response
+class GetEntryResponse extends AbstractResponse
 {
     public static function fromResponse(PsrResponseInterface $response): self
     {
-        $content = self::getContent($response);
+        $content = $response->getBody()->getContents();
         $errorMsg = null;
 
         try {
