@@ -43,7 +43,7 @@ class TranslationTagConverter implements TagConverterInterface
                 // $matches[5]: id for x
 
                 // Check if bx or ex tag matched
-                if (! empty($matches[1]) && isset($matches[2]) && isset($matches[3])) {
+                if (! empty($matches[1]) && isset($matches[2]) && isset($matches[3])) { // @phpstan-ignore-line
                     $tagName = strtolower($matches[1]);
                     $id = $matches[2];
                     $rid = $matches[3];
@@ -52,7 +52,7 @@ class TranslationTagConverter implements TagConverterInterface
 
                     return $tagName === 'bx' ? '<' . $targetTagBase . '>' : '</' . $targetTagBase . '>';
                 } // Check if x tag matched
-                elseif (! empty($matches[4]) && isset($matches[5])) {
+                elseif (! empty($matches[4]) && isset($matches[5])) { // @phpstan-ignore-line
                     $id = $matches[5];
                     // Embed only the ID in the tag name
                     $targetTagBase = self::T5X_TAG_PREFIX . $id;

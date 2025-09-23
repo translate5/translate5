@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Segment\TagRepair\Tags;
+use MittagQI\Translate5\Segment\TagRepair\RepairTags;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Tools\FakeTranslator;
 
@@ -84,7 +84,7 @@ class editor_Plugins_DummyPretranslator_Init extends ZfExtended_Plugin_Abstract
     protected function getDummyContent(string $source): string
     {
         try {
-            $tags = new Tags($source, true);
+            $tags = new RepairTags($source, true);
             $request = $tags->getRequestHtml();
 
             return $tags->recreateTags(FakeTranslator::translateMarkup($request));

@@ -74,7 +74,7 @@ class FuzzySearchService
             QueryStringGuesser::create(),
             T5MemoryApi::create(),
             PersistenceService::create(),
-            TagHandlerProvider::create(),
+            new TagHandlerProvider(),
             SegmentLengthValidator::create(),
         );
     }

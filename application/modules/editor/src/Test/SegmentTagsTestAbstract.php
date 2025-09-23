@@ -30,7 +30,7 @@ namespace MittagQI\Translate5\Test;
 
 use editor_Segment_FieldTags;
 use editor_Segment_Tag;
-use editor_TagSequence;
+use MittagQI\Translate5\Tag\TagSequence;
 
 /**
  * Abstraction layer for performing API tests which involve comparing Segment Texts.
@@ -128,7 +128,7 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         $this->assertEquals($tags->getFieldText(true), $tags->renderReplaced());
         // test the replaced rendering with the labeled whitespace placeholders
         if ($replacedLabeled !== null) {
-            $this->assertEquals($replacedLabeled, $tags->renderReplaced(editor_TagSequence::MODE_LABELED));
+            $this->assertEquals($replacedLabeled, $tags->renderReplaced(TagSequence::MODE_LABELED));
         }
     }
 

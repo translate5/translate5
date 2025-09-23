@@ -85,7 +85,7 @@ class AllTablesEventCodesTest extends UnitTestAbstract
         $notFoundInDocu = array_diff($collectedCodes, $documentedCodes);
 
         if (! empty($unusedInDocu)) {
-            $this->addWarning("\n\nWarning: the following Errorcodes are in the documentation, but not in the PHP code:\n" . join(', ',$unusedInDocu));
+            $this->addWarning("\n\nWarning: the following Errorcodes are in the documentation, but not in the PHP code:\n" . join(', ', $unusedInDocu));
         }
 
         if (! empty($notFoundInDocu)) {

@@ -267,7 +267,7 @@ class editor_Models_LanguageResources_UsageExporter
             $this->excel->writer->close();
 
             // If no zip - just exit, because xlsx file is flushed into php://output by $this->excel->writer
-            if (!$hasChunks) {
+            if (! $hasChunks) {
                 exit;
             }
             $this->worksheetIndex = 0;

@@ -124,7 +124,7 @@ final class editor_Segment_Tags implements JsonSerializable
         if ($serializedData != null) {
             $this->initFromJson($serializedData);
         } elseif ($segment != null) {
-            $this->segmentId = $segment->getId();
+            $this->segmentId = (int) $segment->getId();
             $this->init();
         } else {
             throw new Exception('editor_Segment_Tags needs either a segment-instance with field manager or serialized data for instantiation');

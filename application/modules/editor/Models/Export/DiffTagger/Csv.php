@@ -67,7 +67,7 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
      * @param bool $concatDelim Benutzername des Lektors
      * @return string $edited mit diff-Syntax fertig ausgezeichnet
      */
-    public function diffSegment($target, $edited, $changeTimestamp, $userName, $concatDelim = false) : string
+    public function diffSegment($target, $edited, $changeTimestamp, $userName, $concatDelim = false): string
     {
         $targetArr = $this->tagBreakUp($target);
         $editedArr = $this->tagBreakUp($edited);

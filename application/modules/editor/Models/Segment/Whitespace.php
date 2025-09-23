@@ -396,7 +396,8 @@ class editor_Models_Segment_Whitespace
         return preg_replace_callback($pattern, function ($match) {
             $wholeTag = $match[0];
             $tagName = $match[1];
-            $length = (array_key_exists(5, $match) && strlen($match[5]) > 0) ? $match[5] : '1'; //if length not given defaults to 1
+            //if length not given defaults to 1 @phpstan-ignore-next-line
+            $length = (array_key_exists(5, $match) && strlen($match[5]) > 0) ? $match[5] : '1';
             $renderData = $this->getTagRenderData($tagName, $length, $wholeTag);
             $tagLabel = $renderData['text'];
             if ($tagName == 'char' && mb_strlen($tagLabel) > 1) {
@@ -444,7 +445,7 @@ class editor_Models_Segment_Whitespace
         $content = pack('H*', $content);
         $shortcutKey = 'data-id=' . $id;
 
-        $shortTag  = null;
+        $shortTag = null;
         if (isset($shortcutNumberMap[$shortcutKey])) {
             $shortTag = $shortcutNumberMap[$shortcutKey];
         }

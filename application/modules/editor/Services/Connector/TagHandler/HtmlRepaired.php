@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Segment\TagRepair\Tags;
+use MittagQI\Translate5\Segment\TagRepair\RepairTags;
 
 /**
  * Protects the translate5 internal tags as singular img tags to send them to a request based API
@@ -36,7 +36,7 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
 {
     /**
      * The repair tag processors
-     * @var Tags[]
+     * @var RepairTags[]
      */
     private array $repairTags = [];
 
@@ -68,7 +68,7 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
 
         try {
             // this tries to load the segment's
-            $this->repairTags[$key] = new Tags($queryString);
+            $this->repairTags[$key] = new RepairTags($queryString);
 
             return $this->repairTags[$key]->getRequestHtml();
         } catch (Exception $e) {

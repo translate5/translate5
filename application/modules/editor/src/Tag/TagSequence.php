@@ -26,8 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Tag;
+
+use DOMElement;
+use DOMNodeList;
+use editor_Models_Segment_Exception;
+use editor_Segment_AnyTag;
+use editor_Segment_Tag;
+use editor_Tag;
+use Exception;
+use JsonSerializable;
 use MittagQI\ZfExtended\Tools\Markup;
 use PHPHtmlParser\Dom\Node\HtmlNode;
+use stdClass;
+use Zend_Registry;
+use ZfExtended_Dom;
+use ZfExtended_ErrorCodeException;
+use ZfExtended_Logger;
 
 /**
  * Abstraction to bundle text and tags to an OOP accessible structure
@@ -64,7 +79,7 @@ use PHPHtmlParser\Dom\Node\HtmlNode;
  * - This may creates problems with regex-based tag processing that relies on a fixed order of attributes or css-classes
  * - Generally, RegEx based processing of Markup often fails with nested Markup (especially when the expressions cover the start and end tag) and should be replaced with OOP code
  */
-abstract class editor_TagSequence implements JsonSerializable
+abstract class TagSequence implements JsonSerializable
 {
     /**
      * Can be used to debug and validate the unparsing-process. Use only for Development !!
@@ -181,9 +196,14 @@ abstract class editor_TagSequence implements JsonSerializable
 
     /**
      * Sets the internal tags & the text by markup, acts like a constructor
-     * @throws ZfExtended_Exception
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\CircularException
+     * @throws \PHPHtmlParser\Exceptions\ContentLengthException
+     * @throws \PHPHtmlParser\Exceptions\LogicalException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
+     * @throws \PHPHtmlParser\Exceptions\StrictException
      */
-    protected function _setMarkup(string $text = null)
+    protected function _setMarkup(string $text = null): void
     {
         if (! empty($text) && $text != editor_Segment_Tag::strip($text)) {
             // for better error-tracking, we cache the initial markup to be able to log it
@@ -223,7 +243,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Sets our text. The text-prop always have to be manipulated with this API
      */
-    protected function setText(string $text)
+    protected function setText(string $text): void
     {
         $this->text = $text;
         $this->textLength = mb_strlen($text);
@@ -255,6 +275,7 @@ abstract class editor_TagSequence implements JsonSerializable
 
     /**
      * We expect the passed text to be identical
+     * @throws \ZfExtended_Exception
      */
     public function setTagsByText(string $text): void
     {
@@ -277,7 +298,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Adds a Segment tag. Note, that the nesting has to be reflected with the internal order of tags and the parent (referencing the order of the parent element)
      */
-    public function addTag(editor_Segment_Tag $tag, int $order = -1, int $parentOrder = -1)
+    public function addTag(editor_Segment_Tag $tag, int $order = -1, int $parentOrder = -1): void
     {
         $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= $this->getTextLength());
         $tag->content = $this->getTextPart($tag->startIndex, $tag->endIndex);
@@ -296,7 +317,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Called after the unparsing Phase to finalize adding a single tag
      */
-    protected function finalizeAddTag(editor_Segment_Tag $tag)
+    protected function finalizeAddTag(editor_Segment_Tag $tag): void
     {
     }
 
@@ -387,7 +408,8 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Renders the tag-sequence in replaced mode, what means with markup stripped
      * and some special adjustments depending on the mode
-     * @throws ZfExtended_Exception
+     * @throws \Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
      */
     public function renderReplaced(string $mode = self::MODE_STRIPPED): string
     {
@@ -402,8 +424,8 @@ abstract class editor_TagSequence implements JsonSerializable
     }
 
     /**
-     * @throws Zend_Exception
-     * @throws ZfExtended_ErrorCodeException
+     * @throws \Zend_Exception
+     * @throws editor_Models_Segment_Exception
      */
     private function createRenderingHolder(): editor_Segment_AnyTag
     {
@@ -536,7 +558,12 @@ abstract class editor_TagSequence implements JsonSerializable
 
     /**
      * Unparses Segment markup into FieldTags
-     * @throws Exception
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\CircularException
+     * @throws \PHPHtmlParser\Exceptions\ContentLengthException
+     * @throws \PHPHtmlParser\Exceptions\LogicalException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
+     * @throws \PHPHtmlParser\Exceptions\StrictException
      */
     public function unparse(string $html): void
     {
@@ -582,7 +609,7 @@ abstract class editor_TagSequence implements JsonSerializable
      */
     protected function unparseHtml(string $html): editor_Segment_Tag
     {
-        if (editor_Tag::USE_DOM_DOCUMENT) {
+        if (editor_Tag::USE_DOM_DOCUMENT) { // @phpstan-ignore-line
             // implementation using PHP DOM
             $dom = new ZfExtended_Dom();
             // to make things easier we add a wrapper to hold all tags and only use it's children
@@ -637,9 +664,9 @@ abstract class editor_TagSequence implements JsonSerializable
 
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a HtmlNode structure
-     * @return editor_Segment_Tag
+     * @throws \PHPHtmlParser\Exceptions\CircularException
      */
-    protected function fromHtmlNode(HtmlNode $node, int $startIndex)
+    protected function fromHtmlNode(HtmlNode $node, int $startIndex): editor_Segment_Tag
     {
         $children = $node->hasChildren() ? $node->getChildren() : null;
         $tag = $this->createFromHtmlNode($node, $startIndex, $children);
@@ -669,6 +696,7 @@ abstract class editor_TagSequence implements JsonSerializable
      * Creates a nested structure of Internal tags & text-nodes recursively out of a DOMElement structure
      * This is an alternative implementation using PHP DOM
      * see editor_Tag::USE_DOM_DOCUMENT
+     * @throws Exception
      */
     protected function fromDomElement(DOMElement $element, int $startIndex): editor_Segment_Tag
     {
@@ -678,10 +706,12 @@ abstract class editor_TagSequence implements JsonSerializable
             for ($i = 0; $i < $children->length; $i++) {
                 $child = $children->item($i);
                 if ($child->nodeType == XML_TEXT_NODE) {
+                    /** @var \DOMText $child */
                     if ($tag->addText(Markup::escapeText($child->nodeValue))) {
                         $startIndex += $tag->getLastChildsTextLength();
                     }
                 } elseif ($child->nodeType == XML_ELEMENT_NODE) {
+                    /** @var DOMElement $child */
                     if ($tag->addChild($this->fromDomElement($child, $startIndex))) {
                         $startIndex += $tag->getLastChildsTextLength();
                     }
@@ -883,7 +913,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /* Logging API */
 
     /**
-     * @throws Zend_Exception
+     * @throws \Zend_Exception
      */
     protected function createLogger(): ZfExtended_Logger
     {
@@ -891,7 +921,7 @@ abstract class editor_TagSequence implements JsonSerializable
     }
 
     /**
-     * @throws Zend_Exception
+     * @throws \Zend_Exception
      */
     protected function logError(string $code, string $msg, array $errorData = []): array
     {
