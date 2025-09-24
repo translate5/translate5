@@ -37,24 +37,20 @@ use editor_Services_Connector_TagHandler_Remover;
 use editor_Services_Connector_TagHandler_T5MemoryXliff;
 use editor_Services_Connector_TagHandler_Xliff;
 use Zend_Config;
-use Zend_Registry;
 use ZfExtended_Factory as Factory;
 
 class TagHandlerFactory
 {
-    public static function createHandler(string $resourceAlias, array $params, Zend_Config $config): AbstractTagHandler
+    public static function create(): self
     {
-        $factory = new self();
-
-        return $factory->createTagHandler($resourceAlias, $params, $config);
+        return new self();
     }
 
     public function createTagHandler(
         string $resourceAlias,
+        Zend_Config $config,
         array $params = [],
-        ?Zend_Config $config = null
     ): AbstractTagHandler {
-        $config = $config ?? Zend_Registry::get('config');
         $configuredHandler = $config->runtimeOptions->LanguageResources->{$resourceAlias}?->tagHandler ?? null;
 
         // Using Factory::get here for backwards compatibility as there might be overwritten tag handlers

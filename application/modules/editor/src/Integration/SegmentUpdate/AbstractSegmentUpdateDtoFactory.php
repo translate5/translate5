@@ -101,8 +101,8 @@ abstract class AbstractSegmentUpdateDtoFactory implements SegmentUpdateDtoFactor
     {
         $tagHandler = $this->tagHandlerFactory->createTagHandler(
             $this->getHandlerConfigPart(),
+            $config,
             $this->getHandlerParams($config),
-            $config
         );
         $tagHandler->setLanguages($sourceLang, $targetLang);
 

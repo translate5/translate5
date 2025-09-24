@@ -171,6 +171,8 @@ abstract class editor_Services_Connector_Abstract
 
     private ?int $customerId = null;
 
+    private TagHandlerFactory $tagHandlerFactory;
+
     /**
      * initialises the internal result list
      */
@@ -181,6 +183,7 @@ abstract class editor_Services_Connector_Abstract
         $this->config = Zend_Registry::get('config');
         $this->tagHandler = $this->createTagHandler();
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
+        $this->tagHandlerFactory = TagHandlerFactory::create();
     }
 
     /**
@@ -651,10 +654,10 @@ abstract class editor_Services_Connector_Abstract
             return ZfExtended_Factory::get($this->tagHandlerClass, [$params]);
         }
 
-        return TagHandlerFactory::createHandler(
+        return $this->tagHandlerFactory->createTagHandler(
             static::TAG_HANDLER_CONFIG_PART,
+            $this->config,
             $params,
-            $this->config
         );
     }
 
