@@ -107,7 +107,7 @@ class PluginListCommand extends Translate5AbstractCommand
         $pluginName = $this->input->getArgument('name');
 
         foreach ($plugins as $plugin => $cls) {
-            if ($pluginName !== null && ! str_contains($plugin, $pluginName)) {
+            if ($pluginName !== null && ! str_contains(strtolower($plugin), strtolower($pluginName))) {
                 continue;
             }
             $desc = $cls::getDescription();

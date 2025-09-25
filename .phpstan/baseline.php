@@ -22,11 +22,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/DevelopmentGithookCommand.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Translate5\\\\MaintenanceCli\\\\Command\\\\DevelopmentLocalServicesCommand\\:\\:\\$revertSql is never read, only written\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/DevelopmentLocalServicesCommand.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Translate5\\\\MaintenanceCli\\\\Command\\\\DevelopmentNewModelCommand\\:\\:checkFile\\(\\) should return string but returns true\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/DevelopmentNewModelCommand.php',

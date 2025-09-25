@@ -4,7 +4,7 @@
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics; All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -44,12 +44,14 @@ use ZfExtended_Plugin_Manager;
 
 class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
 {
-    protected const ARGUMENT_HOST = 'host';
+    protected const PROVIDED_URL = 'providedUrl';
 
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'service:autodiscovery';
 
     protected ZfExtended_Plugin_Manager $pluginmanager;
+
+    protected bool $useUnterminatedDomains = false;
 
     /**
      * @var array
@@ -100,7 +102,9 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
         ],
     ];
 
-    protected function configure()
+    private bool $ignorePluginStatus = false;
+
+    protected function configure(): void
     {
         $this
             // the short description shown while running "php bin/console list"
@@ -122,9 +126,10 @@ using the default ports.')
         ');
 
         $this->addArgument(
-            self::ARGUMENT_HOST,
+            self::PROVIDED_URL,
             InputArgument::OPTIONAL,
-            'Custom host for the service. Applicable only when discovering a specific service.'
+            'Custom host for the service. Applicable only when discovering a specific service. '
+            . 'Port can be provided with host:port'
         );
 
         $this->addOption(
@@ -154,6 +159,14 @@ using the default ports.')
             InputOption::VALUE_NONE,
             'Do not use terminated domains, so instead of "http://service.:1234" use "http://service:1234"'
         );
+
+        $this->addOption(
+            'ignore-plugin-status',
+            'p',
+            InputOption::VALUE_NONE,
+            'Do not change plugin config, so do not activate if service found and do not deactivate '
+            . 'if service not working and also set config if plugin disabled.'
+        );
     }
 
     /**
@@ -162,7 +175,7 @@ using the default ports.')
      * @throws Zend_Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
@@ -170,10 +183,11 @@ using the default ports.')
         $this->writeTitle('Translate5 service auto-discovery');
 
         $services = [];
-        $host = null;
-        $doSave = (! $this->input->getOption('auto-set')) ? false : true;
-        $allAvailable = (! $this->input->getOption('all-available')) ? false : true;
-        $useUnterminatedDomains = (! $this->input->getOption('unterminated-domains')) ? false : true;
+        $providedUrl = null;
+        $doSave = (bool) $this->input->getOption('auto-set');
+        $allAvailable = (bool) $this->input->getOption('all-available');
+        $this->useUnterminatedDomains = (bool) $this->input->getOption('unterminated-domains');
+        $this->ignorePluginStatus = (bool) $this->input->getOption('ignore-plugin-status');
 
         // evaluate services to update
         $optionServices = $this->input->getOption('service');
@@ -189,16 +203,16 @@ using the default ports.')
                 $services[$service] = $this->services[$service];
             }
             // a single service can be set to a custom host
-            $host = empty($this->input->getArgument(self::ARGUMENT_HOST)) ? null : $this->input->getArgument(self::ARGUMENT_HOST);
+            $providedUrl = $this->input->getArgument(self::PROVIDED_URL);
         } else {
             $services = $this->services;
 
-            if (! empty($this->input->getArgument(self::ARGUMENT_HOST))) {
+            if (! empty($this->input->getArgument(self::PROVIDED_URL))) {
                 $this->io->warning('The host will be ignored when configuring all services');
             }
         }
 
-        $this->setServices($services, $doSave, $allAvailable, $useUnterminatedDomains, $host);
+        $this->setServices($services, $doSave, $allAvailable, $providedUrl);
 
         return self::SUCCESS;
     }
@@ -211,14 +225,19 @@ using the default ports.')
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Plugin_Exception
      */
-    protected function setServices(array $services, bool $doSave, bool $allAvailableServices = false, bool $useUnterminatedDomains = false, string $host = null)
-    {
-        if ($allAvailableServices) {
+    protected function setServices(
+        array $services,
+        bool $doSave,
+        bool $allAvailableServices = false,
+        ?string $providedUrl = null
+    ): void {
+        $this->pluginmanager = Zend_Registry::get('PluginManager');
+        $this->pluginmanager->bootstrap(); // load all configured plugins
+
+        if ($allAvailableServices || $this->ignorePluginStatus) {
             $allServices = Services::getAllAvailableServices(Zend_Registry::get('config'));
         } else {
-            // get configured services
-            $this->pluginmanager = Zend_Registry::get('PluginManager');
-            $this->pluginmanager->bootstrap(); // load all configured plugins
+            // get only core services and services of enabled plugins
             $allServices = Services::getAllServices(Zend_Registry::get('config'));
         }
 
@@ -227,14 +246,18 @@ using the default ports.')
                 $configuredService = $allServices[$serviceName];
                 if (is_array($service['url'])) {
                     $serviceUrl = $service['url'];
-                    if (! array_key_exists('default', $serviceUrl) || ! array_key_exists('gui', $serviceUrl) || ! array_key_exists('import', $serviceUrl)) {
-                        throw new Zend_Exception('Service "' . $serviceName . '" pooled URLs are not properly defined');
+                    foreach (['default', 'gui', 'import'] as $key) {
+                        if (! array_key_exists($key, $serviceUrl)) {
+                            throw new Zend_Exception('Service "' .
+                                $serviceName . '" pooled URLs are not properly defined');
+                        }
+                        $serviceUrl[$key] = $this->createServiceUrl($serviceUrl[$key], $providedUrl);
+                        if (! is_array($serviceUrl[$key])) {
+                            $serviceUrl[$key] = [$serviceUrl[$key]];
+                        }
                     }
-                    $serviceUrl['default'] = $this->createServiceUrl($serviceUrl['default'], $host, $useUnterminatedDomains, true);
-                    $serviceUrl['gui'] = $this->createServiceUrl($serviceUrl['gui'], $host, $useUnterminatedDomains, true);
-                    $serviceUrl['import'] = $this->createServiceUrl($serviceUrl['import'], $host, $useUnterminatedDomains, true);
                 } else {
-                    $serviceUrl = $this->createServiceUrl($service['url'], $host, $useUnterminatedDomains);
+                    $serviceUrl = $this->createServiceUrl($service['url'], $providedUrl);
                 }
                 $serviceConfig = array_key_exists('config', $service) ? $service['config'] : [];
 
@@ -255,42 +278,49 @@ using the default ports.')
                         }
                     }
                 } else {
-                    $this->io->warning('Service "' . $serviceName . '" is a service that can not be located programmatically.');
+                    $this->io->warning('Service "' . $serviceName
+                        . '" is a service that can not be located programmatically.');
                 }
             } else {
-                $this->io->note('Service "' . $serviceName . '" was not found in the instance\'s configured services probably because the holding plugin is not active.');
+                $this->io->note('Service "' . $serviceName . '" was not found in the instance\'s configured '
+                    . 'services probably because the holding plugin is not active.');
             }
         }
     }
 
     /**
      * Replaces the host if a custom host is given or unterminates the url-host if wanted
-     * @param string|array $url
-     * @return string|array
      */
-    protected function createServiceUrl(mixed $url, string $host = null, bool $unterminateDomains = false, bool $forceArray = false): mixed
-    {
+    protected function createServiceUrl(
+        array|string $url,
+        string $providedUrl = null,
+    ): string|array {
         if (is_array($url)) {
             $newUrls = [];
             foreach ($url as $newUrl) {
-                $newUrls[] = $this->createServiceUrl($newUrl, $host, $unterminateDomains);
+                $newUrls[] = $this->createServiceUrl($newUrl, $providedUrl);
             }
 
             return $newUrls;
         }
-        if (! empty($host) || $unterminateDomains) {
-            $host = ! empty($host) ? $host : parse_url($url, PHP_URL_HOST);
-            if ($unterminateDomains) {
-                $host = trim($host, '.');
-            }
-            $url =
-                parse_url($url, PHP_URL_SCHEME)
-                . '://' . $host . ':'
-                . parse_url($url, PHP_URL_PORT)
-                . (parse_url($url, PHP_URL_PATH) ?? '');
-        }
 
-        return ($forceArray && ! is_array($url)) ? [$url] : $url;
+        $url = $this->parseUrl($url);
+        $providedUrl = $this->parseUrl($providedUrl);
+
+        $url = array_merge($url, $providedUrl);
+
+        if ($this->useUnterminatedDomains) {
+            $url['host'] = rtrim($url['host'] ?? '', '.');
+        }
+        $url = [
+            $url['scheme'] ?? 'http',
+            '://',
+            $url['host'],
+            empty($url['port']) ? '' : ':' . $url['port'],
+            $url['path'] ?? '',
+        ];
+
+        return join('', $url);
     }
 
     /**
@@ -298,14 +328,31 @@ using the default ports.')
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Exception
      */
-    protected function setPluginActive(string $plugin, bool $active = true, bool $doSave = false)
+    protected function setPluginActive(string $plugin, bool $active = true, bool $doSave = false): void
     {
-        if ($doSave) {
+        if ($doSave && ! $this->ignorePluginStatus) {
             $this->pluginmanager->setActive($plugin, $active);
             $this->io->success('Plug-In ' . $plugin . ' ' . ($active ? 'activated.' : 'disabled!'));
         } else {
-            $this->io->note('Would ' . ($active ? 'activate' : 'disable') . ' Plug-In ' . $plugin);
+            $this->io->note('Would ' . ($active ? 'activate' : 'disable') . ' Plug-In ' . $plugin
+                . ' (currently ' . ($this->pluginmanager->isActive($plugin) ? 'enabled' : 'disabled') . '!).');
         }
+    }
+
+    private function parseUrl(?string $url): array
+    {
+        if (! empty($url)) {
+            if (! str_contains($url, '://') && ! str_starts_with($url, '//')) {
+                $url = '//' . $url;
+            }
+            $url = parse_url($url);
+            if ($url === false) {
+                return [];
+            }
+        }
+
+        return $url ?? [];
     }
 }
