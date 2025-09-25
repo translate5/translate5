@@ -86,17 +86,17 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
         ],
     ];
 
-    private string $revertSql = '';
-
-    protected function configure()
+    protected function configure(): void
     {
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('Local Development only: Searches and sets the dockerized services matching the "docker-compose-localdev.yml" docker-compose-file')
+            ->setDescription('Local Development only: Searches and sets the dockerized services '
+                . 'matching the "docker-compose-localdev.yml" docker-compose-file')
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Local Development only: Searches and sets the dockerized services matching the "docker-compose-localdev.yml" docker-compose-file');
+            ->setHelp('Local Development only: Searches and sets the dockerized services matching '
+                . 'the "docker-compose-localdev.yml" docker-compose-file');
 
         $this->addOption(
             'auto-set',
@@ -112,16 +112,14 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
      * @throws Zend_Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
         $this->writeTitle('Local Development: Service auto-discovery');
 
-        $doSave = (! $this->input->getOption('auto-set')) ? false : true;
-
-        $this->setServices($this->services, $doSave);
+        $this->setServices($this->services, (bool) $this->input->getOption('auto-set'));
 
         return self::SUCCESS;
     }

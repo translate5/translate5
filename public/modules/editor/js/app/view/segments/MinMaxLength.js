@@ -241,7 +241,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     /**
      * Render the error-message according to the segment's length status.
      * @param {Array} segmentLengthStatus
-     * @param {Object} meta
      * @returns {String}
      */
     renderErrorMessage: function (segmentLengthStatus) {
@@ -395,10 +394,9 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * Returns the lines (= objects with their text and length) for the given content and meta.
      * @param {String} htmlToCheck
      * @param {Object} meta
-     * @param {integer} fileId
      * @returns {Array<{textInLine: String, lineWidth: integer}>}
      */
-    getLinesAndLength: function (htmlToCheck, meta, fileId) {
+    getLinesAndLength: function (htmlToCheck, meta) {
         const lines = [];
         const dom = RichTextEditor.stringToDom(htmlToCheck);
 
@@ -417,10 +415,18 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         const linebreakNodes = dom.querySelectorAll('.newline');
         let previousLineBreak;
         let lineBreak;
+        const tagsConversion = this.editor.editor.getTagsConversion();
+
         for (let i = 0; i <= linebreakNodes.length; i++) {
             lineBreak = linebreakNodes[i];
 
-            if (lineBreak && this.editor.editor.getTagsConversion().isTrackChangesDelNode(lineBreak.parentNode)) {
+            let parentToCheck = lineBreak?.parentNode;
+
+            if (parentToCheck && tagsConversion.isSpellcheckNode(parentToCheck)) {
+                parentToCheck = parentToCheck.parentNode;
+            }
+
+            if (parentToCheck && tagsConversion.isTrackChangesDelNode(parentToCheck)) {
                 continue;
             }
 
@@ -515,10 +521,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @returns integer|false
      */
     getMaxWidthForSingleLine: function (meta) {
-        if (!this.shouldUseMaxNumberOfLines(meta)) {
-            return Number.MAX_SAFE_INTEGER;
-        }
-
         // don't add messageSizeUnit here, will be used for calculating...
         return meta && meta.maxWidth ? meta.maxWidth : Number.MAX_SAFE_INTEGER;
     },
@@ -550,8 +552,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * and returns true or false if the minmax status strip should be visible.
      */
     updateSegment: function (record, fieldname) {
-        const me = this,
-            fields = Editor.data.task.segmentFields(),
+        const fields = Editor.data.task.segmentFields(),
             field = fields.getAt(fields.findExact('name', fieldname.replace(/Edit$/, ''))),
             minMaxEnabled = field && field.isTarget() && this.shouldUseMinMaxWidth(record.get('metaCache')),
             counterCheckBox = minMaxEnabled ? [] : Ext.ComponentQuery.query('#segmentgrid segmentsToolbar #showHideCharCounter');
@@ -582,8 +583,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
 
     /**
      * @param {String} htmlToCheck
-     * @param {Object} meta
-     * @param {integer} fileId
      * @returns {Array} segmentLengthValid|segmentToShort|segmentToLong|segmentTooManyLines|segmentLinesTooLong|segmentLinesTooShort
      */
     getMinMaxLengthStatus: function (htmlToCheck) {
@@ -770,11 +769,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 }
 
                 if (child.nodeType === Node.ELEMENT_NODE) {
-                    const result = traverseNodes(child);
-
-                    if (result) {
-                        length += result;
-                    }
+                    traverseNodes(child);
                 }
             }
         };

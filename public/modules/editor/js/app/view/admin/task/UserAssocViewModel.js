@@ -105,7 +105,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                             html += ' '+me.strings.canNotBeEditedByUsers + '<br>';
                         }
                         
-                        html += '- ' + workflowsteps[stepname] + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
+                        html += '- ' + workflowsteps[stepname] + ': ' + Ext.String.htmlEncode(missingsegmentranges[i]['missingSegments']) + '<br>';
                         html += '<hr>';
                     } 
                 }

@@ -28,6 +28,7 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -46,6 +47,12 @@ class PluginListCommand extends Translate5AbstractCommand
         // the full command description shown when running the command with
         // the "--help" option
             ->setHelp('Tool to list all installed translate5 plugins.');
+
+        $this->addArgument(
+            'name',
+            InputArgument::OPTIONAL,
+            'Name or part of plugin name to filter the shown list'
+        );
 
         $this->addOption(
             '--as-json',
@@ -97,8 +104,12 @@ class PluginListCommand extends Translate5AbstractCommand
         }
 
         $this->writeTitle('Installed Translate5 Plug-Ins.');
+        $pluginName = $this->input->getArgument('name');
 
         foreach ($plugins as $plugin => $cls) {
+            if ($pluginName !== null && ! str_contains(strtolower($plugin), strtolower($pluginName))) {
+                continue;
+            }
             $desc = $cls::getDescription();
             $type = $cls::getType();
             /* @var \ZfExtended_Plugin_Abstract $cls */
@@ -121,8 +132,15 @@ class PluginListCommand extends Translate5AbstractCommand
                 $rows[] = [$plugin, 'disabled', $enabledByDefault, $type, $desc];
             }
         }
+
+        if ($pluginName !== null && empty($rows)) {
+            $this->io->error('No plugin found matching completely or partly the string ' . $pluginName);
+
+            return self::FAILURE;
+        }
+
         $this->io->table(['Plugin', 'Status', 'Default', 'Type', 'Description'], $rows);
 
-        return 0;
+        return self::SUCCESS;
     }
 }

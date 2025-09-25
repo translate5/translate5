@@ -98,9 +98,6 @@ class editor_SessionController extends ZfExtended_SessionController
 
     public function postAction()
     {
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
-        /* @var $mv editor_Models_Segment_MaterializedView */
-
         if (! parent::postAction()) {
             return;
         }
@@ -109,9 +106,6 @@ class editor_SessionController extends ZfExtended_SessionController
 
         //if there is no taskGuid provided, we don't have to load one
         if (empty($taskGuid)) {
-            //after successfull login we clean up the MVs like in the normal login
-            $mv->cleanUp();
-
             return;
         }
 
@@ -123,7 +117,7 @@ class editor_SessionController extends ZfExtended_SessionController
         } else {
             $task->loadByTaskGuid($taskGuid);
         }
-        $this->view->taskUrlPath = editor_Controllers_Plugins_LoadCurrentTask::makeUrlPath($task->getId());
+        $this->view->taskUrlPath = editor_Controllers_Plugins_LoadCurrentTask::makeUrlPath((int) $task->getId());
     }
 
     /**
@@ -173,10 +167,7 @@ class editor_SessionController extends ZfExtended_SessionController
 
         ZfExtended_Models_LoginLog::addSuccess($auth, 'authhash');
 
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
-        /* @var $mv editor_Models_Segment_MaterializedView */
-        $mv->cleanUp();
-        $this->redirect(editor_Controllers_Plugins_LoadCurrentTask::makeUrlPath($task->getId()), [
+        $this->redirect(editor_Controllers_Plugins_LoadCurrentTask::makeUrlPath((int) $task->getId()), [
             'code' => 307,
         ]);
     }

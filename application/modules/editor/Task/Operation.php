@@ -66,6 +66,12 @@ class editor_Task_Operation
     public const VISUAL_EXCHANGE = 'visualexchange';
 
     /**
+     * For contexts where the operation-type might be unknown
+     * @var string
+     */
+    public const UNKNOWN = 'unknown';
+
+    /**
      * Creates a Task-Operation which is the wrapper for any operation performed for tasks albeit the Import
      */
     public static function create(

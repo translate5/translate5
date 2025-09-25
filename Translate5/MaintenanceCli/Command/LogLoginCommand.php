@@ -113,14 +113,15 @@ class LogLoginCommand extends Translate5AbstractCommand
 
         $log = new LoginLog();
 
-        $userGuids = $this->parseArgumentToUserGuids();
+        $logins = $this->parseArgumentToLogins();
 
         //defining always the --follow loop but break it, if not using following
         while (true) {
             $s = $log->db->select()->order('id DESC');
 
-            if ($userGuids !== null) {
-                $s->where('userGuid IN (?)', $userGuids);
+            if ($logins !== null) {
+                // we have to search for logins, since for failed logins no userGuid is logged, so can't use the guid
+                $s->where('login IN (?)', $logins);
             }
             $this->parseDateToSelect($s);
 
@@ -219,7 +220,7 @@ class LogLoginCommand extends Translate5AbstractCommand
      * @throws Zend_Validate_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    private function parseArgumentToUserGuids(): ?array
+    private function parseArgumentToLogins(): ?array
     {
         $identifier = $this->input->getArgument('userInfo');
         if (! $identifier) {
@@ -233,7 +234,7 @@ class LogLoginCommand extends Translate5AbstractCommand
             $this->writeTitle('Searching one user with ID "' . $identifier . '"');
             $userModel->load($identifier);
 
-            return [$userModel->getUserGuid()];
+            return [$userModel->getLogin()];
         }
 
         $guidToTest = '{' . trim($identifier, '{}') . '}';
@@ -241,12 +242,12 @@ class LogLoginCommand extends Translate5AbstractCommand
             $this->writeTitle('Searching one user with GUID "' . $guidToTest . '"');
             $userModel->loadByGuid($guidToTest);
 
-            return [$userModel->getUserGuid()];
+            return [$userModel->getLogin()];
         }
 
         $this->writeTitle('Searching users with login or e-mail "' . $identifier . '"');
         $users = $userModel->loadAllByLoginPartOrEMail($identifier);
 
-        return array_column($users, 'userGuid');
+        return array_column($users, 'login');
     }
 }

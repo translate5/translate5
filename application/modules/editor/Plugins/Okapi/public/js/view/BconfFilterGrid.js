@@ -97,7 +97,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         if(name.length > 50){
             name = name.substring(0, 47) + ' ...';
         }
-        me.title.text = me.strings.title + ' <i>“'+name+'”</i>';
+        me.title.text = me.strings.title + ' <i>“'+Ext.String.htmlEncode(name)+'”</i>';
         me.callParent();
         me.getStore().getProxy().setBconfId(bconf.id); // for records and backend filter
     },
@@ -209,9 +209,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     dataIndex: 'extensions',
                     width: 175,
                     stateId: 'extensions',
-                    renderer: function(value){
-                        return value.join(', ');
-                    },
+                    renderer: v => Ext.String.htmlEncode(v.join(', ')),
                     text: me.text_cols.extensions,
                     editor: {
                         xtype: 'tagfield',

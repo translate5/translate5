@@ -89,13 +89,6 @@ class LoginController extends ZfExtended_Controllers_Login
 
     protected function initDataAndRedirect()
     {
-        //@todo do this with events
-        if (class_exists('editor_Models_Segment_MaterializedView')) {
-            $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
-            /* @var $mv editor_Models_Segment_MaterializedView */
-            $mv->cleanUp();
-        }
-
         $this->localeSetup();
 
         if (Auth::getInstance()->getUser()->getLogin() == Zfextended_Models_User::SYSTEM_LOGIN) {
@@ -126,11 +119,9 @@ class LoginController extends ZfExtended_Controllers_Login
     private function initDataAndRedirectOpenId(ZfExtended_Models_User $user)
     {
         //init the user session and redirect to the editor
-        $invalidLoginCounter = ZfExtended_Factory::get(
-            ZfExtended_Models_Invalidlogin::class,
-            [$user->getLogin()]
-        );
-        $invalidLoginCounter->resetCounter(); // reset counter - here we are successfully logged in by openID
+        $invalidLoginCounter = ZfExtended_Factory::get(ZfExtended_Models_Invalidlogin::class);
+        // reset counter - here we are successfully logged in by openID
+        $invalidLoginCounter->resetCounter($user->getLogin());
 
         $auth = Auth::getInstance();
         $auth->authenticateUser($user);

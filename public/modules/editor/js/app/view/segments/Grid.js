@@ -221,7 +221,7 @@ Ext.define('Editor.view.segments.Grid', {
             stateId: 'workflowStepColumn',
             renderer: function(v) {
                 var steps = Editor.data.task.getWorkflowMetaData().steps;
-                return steps[v] ? steps[v] : v;
+                return steps[v] ? steps[v] : Ext.String.htmlEncode(v);
             },
             width: 140
         },{
@@ -304,7 +304,7 @@ Ext.define('Editor.view.segments.Grid', {
                     hidden: !userPref.isNonEditableColumnVisible() && rec.isTarget(),
                     isContentColumn: true,//TODO this propertie is missing
                     text: label,
-                    tooltip: label,
+                    tooltip: Ext.String.htmlEncode(label),
                     width: width
                 };
                 columns.push(col2push);
@@ -312,7 +312,7 @@ Ext.define('Editor.view.segments.Grid', {
             
             if(editable){
                 labelWidth = (label.length) * widthFactorHeader + widthOffsetEditable;
-                label = Ext.String.format(me.column_edited_icon, rec.get('label'), Ext.BLANK_IMAGE_URL, me.column_edited, me.column_edited);
+                label = Ext.String.format(me.column_edited_icon, Ext.String.htmlEncode(rec.get('label')), Ext.BLANK_IMAGE_URL, me.column_edited, me.column_edited);
                 //width is only lesser maxWidth for columns where width was calculated < 250px on serverside
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
                 col2push = {
@@ -323,7 +323,7 @@ Ext.define('Editor.view.segments.Grid', {
                     stateId: 'contentColumn_'+name+'_edit',
                     isContentColumn: true,//TODO those properties are missing 
                     isEditableContentColumn: true,//TODO those properties are missing
-                    tooltip: Ext.String.htmlEncode(rec.get('label')),
+                    tooltip: Ext.String.htmlEncode(Ext.String.htmlEncode(rec.get('label'))),
                     text: label,
                     editor: false,
                     width: width

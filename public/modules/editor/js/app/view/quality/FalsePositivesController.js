@@ -257,6 +257,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
         if (qlty !== text) {
             qlty += ' » ' + text;
         }
+        qlty = Ext.String.htmlEncode(qlty);
 
         // Category index shortcut
         var cidx = record.get('categoryIndex');
@@ -304,7 +305,13 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
 
         if (editorController.isEditing) {
             const htmlEditor = editorController.htmlEditor.mainEditor.editor;
-            const dom = RichTextEditor.stringToDom(htmlEditor.getDataT5Format());
+            const data = htmlEditor.getDataT5Format()?.data;
+
+            if (null === data) {
+                return false;
+            }
+
+            const dom = RichTextEditor.stringToDom();
 
             const selector = Editor.util.Util.createSelectorFromProps(
                 null,

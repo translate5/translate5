@@ -264,6 +264,77 @@ Ext.application({
             var msg = document.querySelector('.app-msg');
             if (msg) Ext.get(msg).ghost("t", {remove:true});
         });
+
+        if(Editor.app.isDevelopmentVersion()) {
+            const cookieSet = Ext.util.Cookies.get('use_xss_proxy') === '1',
+                colors = ['#e74c3c', '#27ae60', '#2980b9', '#f39c12', '#8e44ad', '#d35400'],
+                color = colors[Math.floor(Math.random() * colors.length)];
+
+            Ext.create('Ext.button.Button', {
+                text: 'Get XSS Payload',
+                renderTo: Ext.getBody(),
+                tooltip: 'Put XSS Payload in clipboard – use CTRL+V to insert in input fields',
+                style: {
+                    position: 'fixed',
+                    backgroundColor: color,
+                    top: '10px',
+                    left: '300px',
+                    zIndex: 99999
+                },
+                handler: function () {
+                    const payload = '<img src=x onerror=\'alert(1)\' >';
+
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(payload).then(function () {
+                            Ext.toast('Put XSS Payload in clipboard – use CTRL+V to insert in input fields');
+                        }).catch(function (err) {
+                            Ext.toast('Could not copy: ' + err);
+                        });
+                    }
+                }
+            });
+            Ext.create('Ext.button.Button', {
+                text: (cookieSet ? 'Stop' : 'Start') + ' XSS Proxy',
+                renderTo: Ext.getBody(),
+                enableToggle: true,
+                pressed: cookieSet,
+                tooltip: 'Can be used only if Apache is configured properly!',
+                style: {
+                    position: 'fixed',
+                    borderColor: color,
+                    top: '10px',
+                    left: '150px',
+                    zIndex: 99999
+                },
+                toggleHandler: function (btn, pressed) {
+                    if (pressed) {
+                        btn.setText('Stop XSS Proxy');
+                        Ext.util.Cookies.set('use_xss_proxy', '1');
+
+                        Ext.Ajax.request({
+                            url: '/index/monitoring?json=1',
+                            method: 'GET',
+                            success: function (response) {
+                                let proxyActive = response.getResponseHeader('X-XssProxy-Active');
+                                if (proxyActive === '1') {
+                                    Ext.toast('XSS Proxy <b>activated</b>');
+                                } else {
+                                    Ext.toast('XSS Proxy - Apache not properly configured, see: <a href="https://confluence.translate5.net/x/BADIJg" target="_blank">Special Apache config needed</a>');
+                                }
+                            },
+                            failure: function () {
+                                Ext.toast('XSS Proxy activated, but test request failed');
+                            }
+                        });
+
+                    } else {
+                        btn.setText('Start XSS Proxy');
+                        Ext.util.Cookies.clear('use_xss_proxy');
+                        Ext.toast('XSS Proxy disabled');
+                    }
+                }
+            });
+        }
     },
 
     /***

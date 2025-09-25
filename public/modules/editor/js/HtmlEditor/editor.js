@@ -93,6 +93,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node */ "./DataTransform/node.js");
 /* harmony import */ var _TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../TagsTransform/tags-conversion */ "./TagsTransform/tags-conversion.js");
 /* harmony import */ var _TagsTransform_tag_check__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../TagsTransform/tag-check */ "./TagsTransform/tag-check.js");
+/* harmony import */ var _TagsTransform_pixel_mapping__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../TagsTransform/pixel-mapping */ "./TagsTransform/pixel-mapping.js");
+
 
 
 
@@ -102,9 +104,11 @@ const htmlEncode = (__webpack_require__(/*! js-htmlencode */ "./node_modules/js-
 class DataTransformer {
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
+    #font;
 
     /**
      * @param {TagsConversion} tagsConversion
+     * @param {Font} font
      * @param {NodeListOf<HTMLElement>} items
      * @param {NodeListOf<HTMLElement>|Array<HTMLElement>} referenceItems
      * @param {Boolean} userCanModifyWhitespaceTags
@@ -112,12 +116,14 @@ class DataTransformer {
      */
     constructor(
         tagsConversion,
+        font,
         items,
         referenceItems,
         userCanModifyWhitespaceTags,
         userCanInsertWhitespaceTags
     ) {
         this._tagsConversion = tagsConversion;
+        this.#font = font;
         this._referenceTags = {
             [_TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__["default"].TYPE.SINGLE]: {},
             [_TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__["default"].TYPE.OPEN]: {},
@@ -239,9 +245,10 @@ class DataTransformer {
      */
     #transformItems(items, reference = false) {
         let result = [];
+        const pixelMapping = new _TagsTransform_pixel_mapping__WEBPACK_IMPORTED_MODULE_3__["default"](this.#font);
 
         for (const item of items) {
-            const transformed = this._tagsConversion.transform(item);
+            const transformed = this._tagsConversion.transform(item, pixelMapping);
 
             if (! transformed) {
                 continue;
@@ -590,6 +597,16 @@ class EditorWrapper {
             [EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]: [],
         };
 
+        addEventListener('unhandledrejection', (event) => {
+            console.log('Unhandled promise rejection: ');
+            console.log(
+                event.reason?.message,
+                event.promise,
+                event.type,
+                event.target
+            );
+        });
+
         this.registerModifier(
             EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
             (text, actions, position) => this.#removeTagOnCorrespondingDeletion(text, actions, position),
@@ -620,16 +637,19 @@ class EditorWrapper {
         });
     }
 
+    isDataInitialized() {
+        return this.dataTransformer !== undefined && this.dataTransformer !== null;
+    }
+
     /**
      * Returns object containing data in t5 internal format and content
      *
-     * @returns {{data: string, checkResult: CheckResult}}
+     * @returns {{data: string, checkResult: CheckResult}|null}
      */
     getDataT5Format() {
-        // TODO Add length check
-        // this.checkSegmentLength(source || "");
-        // TODO add check for contentEdited
-        // me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
+        if (!this.isDataInitialized()) {
+            return null;
+        }
 
         return this.dataTransformer.reverseTransform(this.#getRawDataNode());
     }
@@ -645,6 +665,7 @@ class EditorWrapper {
         this.#font = font;
         this.dataTransformer = new _DataTransform_data_transformer__WEBPACK_IMPORTED_MODULE_3__["default"](
             this._tagsConversion,
+            this.#font,
             (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(data).childNodes,
             (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(referenceData).childNodes,
             this.#userCanModifyWhitespaceTags,
@@ -2695,6 +2716,11 @@ class TagsConversion {
     };
 
     transform(item, pixelMapping = null) {
+        //some tags are marked as to be ignored in the editor, so we ignore them
+        if (this._isIgnoredNode(item)) {
+            return null;
+        }
+
         if (this.isTextNode(item)) {
             let text = item.cloneNode();
             text.data = item.data;
@@ -2716,7 +2742,10 @@ class TagsConversion {
                     // Keep nodes from TrackChanges, but run replaceTagToImage for them as well
                     result = (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(openingTag + closingTag).childNodes[0];
                     for (const child of item.childNodes) {
-                        result.appendChild(this.transform(child, pixelMapping));
+                        const transformedChild = this.transform(child, pixelMapping);
+                        if (transformedChild) {
+                            result.appendChild(transformedChild);
+                        }
                     }
 
                     break;
@@ -2766,15 +2795,13 @@ class TagsConversion {
             let term = (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(result).childNodes[0];
 
             item.childNodes.forEach((child) => {
-                term.appendChild(this.transform(child, pixelMapping));
+                const transformedChild = this.transform(child, pixelMapping);
+                if (transformedChild) {
+                    term.appendChild(transformedChild);
+                }
             });
 
             return term;
-        }
-
-        //some tags are marked as to be ignored in the editor, so we ignore them
-        if (this._isIgnoredNode(item)) {
-            return null;
         }
 
         //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
@@ -2863,14 +2890,26 @@ class TagsConversion {
     }
 
     isTermNode(item) {
+        if (!this.#isAnElementNode(item)) {
+            return false;
+        }
+
         return /(^|[\s])term([\s]|$)/.test(item.className);
     }
 
     isSpellcheckNode(item) {
+        if (!this.#isAnElementNode(item)) {
+            return false;
+        }
+
         return /(^|[\s])t5spellcheck([\s]|$)/.test(item.className);
     }
 
     isInternalTagNode(item) {
+        if (!this.#isAnElementNode(item)) {
+            return false;
+        }
+
         return /(^|[\s])internal-tag([\s]|$)/.test(item.className);
     }
 
@@ -2879,6 +2918,10 @@ class TagsConversion {
     }
 
     isWhitespaceNode(item) {
+        if (!this.#isAnElementNode(item)) {
+            return false;
+        }
+
         return this._isWhitespaceTag(item.className);
     }
 
@@ -2932,7 +2975,7 @@ class TagsConversion {
         number = shortTagContent.replace(/[^0-9]/g, '');
 
         if (shortTagContent.search(/locked/) !== -1) {
-            number = 'locked' + data.nr;
+            number = 'locked' + number;
         }
 
         return number;
@@ -3305,7 +3348,11 @@ class TagsConversion {
     }
 
     _isIgnoredNode(item) {
-        return /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className);
+        if (!this.#isAnElementNode(item)) {
+            return false;
+        }
+
+        return /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className) || item.tagName === 'TRANSLATE5:ESCAPED';
     }
 
     _isSingleTagNode(item) {
@@ -3344,6 +3391,14 @@ class TagsConversion {
         }
 
         return qmFlagClass.replace('qmflag-', '');
+    }
+
+    #isAnElementNode(item) {
+        if (!item) {
+            return false;
+        }
+
+        return typeof item.nodeType !== 'undefined' && item.nodeType === Node.ELEMENT_NODE;
     }
 }
 

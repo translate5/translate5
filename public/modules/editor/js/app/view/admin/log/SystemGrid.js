@@ -84,7 +84,7 @@ Ext.define('Editor.view.admin.log.SystemGrid', {
                         '<p><b>Trace:</b> <pre>{trace}</pre></p>',
                     '</tpl>',
                     '<tpl if="extra">',
-                        '<p><b>Extra:</b> <pre>{extra}</pre></p>',
+                        '<p><b>Extra:</b> <pre>{[Ext.String.htmlEncode(values.extra)]}</pre></p>',
                     '</tpl>'
                 )
             }],
@@ -140,7 +140,7 @@ Ext.define('Editor.view.admin.log.SystemGrid', {
                     dataIndex: 'message',
                     tdCls: 'message',
                     renderer: function(v) {
-                        return Ext.String.htmlEncode(v).replace(/\n/, "<br>\n");
+                        return v.replace(/\n/, "<br>\n");
                     },
                     text: me.strings.message,
                     variableRowHeight: true,

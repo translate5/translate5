@@ -154,7 +154,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                         '<div style="' +
                                         style +
                                         ' border: 1px solid rgba(0, 0, 0, .2);background: #' +
-                                        record.get('color') +
+                                        Ext.String.htmlEncode(record.get('color')) +
                                         ';"></div>' +
                                         (
                                             record.get('tmConversionState') && 'converted' !== record.get('tmConversionState')
