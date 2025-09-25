@@ -122,7 +122,7 @@ Ext.define('Editor.view.admin.coordinatorGroup.EditCustomersWindow', {
                                     name: 'id',
                                 },
                                 {
-                                    xtype: 'Editor.combobox',
+                                    xtype: 'combobox',
                                     name: 'customer',
                                     itemId: 'customer',
                                     dataIndex: 'customers',

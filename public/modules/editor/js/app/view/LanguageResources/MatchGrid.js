@@ -192,7 +192,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 				  name = Ext.String.htmlEncode(str.get('name'))+' ('+str.get('serviceName')+')';
 	              meta.tdAttr += 'data-qtip="' + Ext.String.htmlEncode(name) + "<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
 				  meta.tdCls  = meta.tdCls  + ' info-icon';
-	              meta.tdAttr += 'bgcolor="' + str.get('color') + '"';
+	              meta.tdAttr += 'bgcolor="' + Ext.String.htmlEncode(str.get('color')) + '"';
                   var value = "<b style='white-space: pre;'>",
                     pg = record.get('penaltyGeneral') || 0,
                     ps = record.get('penaltySublang') || 0,

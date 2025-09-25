@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Cronjob;
 
 use Bootstrap;
+use editor_Models_Segment_MaterializedView;
 use editor_Workflow_Exception;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\Logging\Rotation;
@@ -108,6 +109,9 @@ class Cronjobs
         $this->rotateLogs();
         $this->databaseOptimize();
         $this->logCall(CronEventTrigger::DAILY);
+
+        $mv = new editor_Models_Segment_MaterializedView();
+        $mv->cleanUp();
     }
 
     /**

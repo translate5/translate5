@@ -230,7 +230,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                             items: this.getRoleGroupSets(),
                                         },
                                         {
-                                            xtype: 'Editor.combobox',
+                                            xtype: 'combobox',
                                             itemId: 'coordinatorGroup',
                                             name: 'coordinatorGroup',
                                             allowBlank: true,

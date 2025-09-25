@@ -110,7 +110,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
                         }
                         meta.tdAttr = 'data-qtip="' + tooltip + '"';
                     }
-                    return symbol + text + ' ('+record.get('qcount')+')';
+                    return symbol + Ext.String.htmlEncode(text) + ' ('+record.get('qcount')+')';
                 },
                 sortable: true,
                 flex: 1

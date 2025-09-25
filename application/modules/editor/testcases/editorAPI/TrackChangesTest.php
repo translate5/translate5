@@ -57,7 +57,7 @@ class TrackChangesTest extends ImportTestAbstract
         $segments = static::api()->getSegments();
         $segToEdit = $segments[0];
 
-        //add content with ins del tags, here without attributes for better readability
+        // add content with ins del tags, here without attributes for better readability
         $editedData = 'This <del>was</del><ins>is</ins> the <ins>house</ins><del>castle</del> of St. Nicholas.';
 
         $editedData = $this->addTrackChangesAttributes($editedData);

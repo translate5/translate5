@@ -100,6 +100,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     clearCalculated: function() {
         this.prev = null;
         this.next = null;
+        console.log('prev and next reset to null');
     },
     /**
      * @param {String} type
@@ -191,6 +192,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         me.context = context;
         me.prev = me.calculateRow(-1, editedField);
         me.next = me.calculateRow(1, editedField);
+        console.log('prev and next calculated. ' + (me.next ? 'next is not null' : 'next is null'));
         //fetches missing information from server, if needed.
         me.fetchFromServer(editedField);
         if(!me.isLoading){

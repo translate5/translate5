@@ -131,10 +131,20 @@ class editor_Models_Segment_MaterializedView
     /**
      * created the MV table mutexed, if it already exists return false, if created return true.
      * @return boolean true if table was created, false if it already exists
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
      */
-    protected function createMutexed()
+    protected function createMutexed(): bool
     {
-        $createSql = 'CREATE TABLE `' . $this->viewName . '` LIKE `LEK_segments`; ALTER TABLE `' . $this->viewName . '` ENGINE=MyISAM;';
+        // temporary feature switch
+        $config = Zend_Registry::get('config');
+        $engineInnoDB = (bool) $config->resources->db?->matViewEngineInnoDB;
+
+        $createSql = 'CREATE TABLE `' . $this->viewName . '` LIKE `LEK_segments`;';
+
+        if (! $engineInnoDB) {
+            $createSql .= 'ALTER TABLE `' . $this->viewName . '` ENGINE=MyISAM;';
+        }
         $createSql .= 'ALTER TABLE `' . $this->viewName . '` ADD KEY (`segmentNrInTask`);';
         $db = Zend_Db_Table::getDefaultAdapter();
 
@@ -407,8 +417,9 @@ class editor_Models_Segment_MaterializedView
     /**
      * drops unused materialized views. Unused means LEK_tasks modified field is older as X days,
      * where X can be configured in app.ini (resources.db.matViewLifetime)
+     * @throws Zend_Exception
      */
-    public function cleanUp()
+    public function cleanUp(): void
     {
         $config = Zend_Registry::get('config');
         $lifeTime = (int) $config->resources->db->matViewLifetime;
@@ -417,7 +428,9 @@ class editor_Models_Segment_MaterializedView
         //find all affected views
         //If this is older than lifetime, and mat view was not used, then drop it.
         $viewLike = self::VIEW_PREFIX . '%';
-        $sql = 'select table_name from INFORMATION_SCHEMA.TABLES t where t.TABLE_SCHEMA = database() and t.TABLE_NAME like ? and t.create_time < (CURRENT_TIMESTAMP - INTERVAL ? DAY);';
+        $sql = 'select table_name from INFORMATION_SCHEMA.TABLES t
+                  where t.TABLE_SCHEMA = database() and t.TABLE_NAME like ?
+                    and t.create_time < (CURRENT_TIMESTAMP - INTERVAL ? DAY);';
         $viewToDelete = $db->fetchAll($sql, [$viewLike, $lifeTime], Zend_Db::FETCH_COLUMN);
 
         $sql = 'select t.taskGuid from LEK_task t WHERE modified > (CURRENT_TIMESTAMP - INTERVAL ? DAY);';

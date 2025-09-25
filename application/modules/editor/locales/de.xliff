@@ -10602,6 +10602,14 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>Bleiben</source>
                 <target>Bleiben</target>
             </trans-unit>
+            <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4=">
+                <source>Das Segment konnte nicht gespeichert werden.</source>
+                <target>Das Segment konnte nicht gespeichert werden.</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgdmVyc3VjaGVuIFNpZSwgZGFzIFNlZ21lbnQgZXJuZXV0IHp1IMO2ZmZuZW4gdW5kIGVzIGVybmV1dCB6dSBiZWFyYmVpdGVuLiBXZW5uIGRlciBGZWhsZXIgd2VpdGVyaGluIGJlc3RlaHQsIGFrdHVhbGlzaWVyZW4gU2llIGRpZSBTZWl0ZS4=">
+                <source>Bitte versuchen Sie, das Segment erneut zu öffnen und es erneut zu bearbeiten. Wenn der Fehler weiterhin besteht, aktualisieren Sie die Seite.</source>
+                <target>Bitte versuchen Sie, das Segment erneut zu öffnen und es erneut zu bearbeiten. Wenn der Fehler weiterhin besteht, aktualisieren Sie die Seite.</target>
+            </trans-unit>
             <trans-unit id='VmVyZsO8Z2JhcmUgU3ByYWNocmVzc291cmNlIGbDvHIgRGF0ZWnDvGJlcnNldHp1bmc='>
                 <source>Verfügbare Sprachressource für Dateiübersetzung</source>
                 <target>Verfügbare Sprachressource für Dateiübersetzung</target>

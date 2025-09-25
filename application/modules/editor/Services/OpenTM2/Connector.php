@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_Task as Task;
 use editor_Services_Connector_TagHandler_Abstract as TagHandler;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\FileBasedInterface;

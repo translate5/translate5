@@ -2080,3 +2080,18 @@ Ext.override(Ext.fx.target.Element, {
         }                                                                                                               // +
     }
 });
+
+
+/**
+ * Overridden to pretend XSS in general, for exceptions (render HTML) configure in the TagField / ComboBox:
+ *    listConfig: {
+ *        getInnerTpl: function(displayField) {
+ *            return '{' + displayField + '}';
+ *        }
+ *    }
+ */
+Ext.override(Ext.view.BoundList, {
+    getInnerTpl: function(displayField) {
+        return '{[Ext.String.htmlEncode(values.' + displayField + ')]}';
+    },
+});

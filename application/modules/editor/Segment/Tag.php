@@ -246,7 +246,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      */
     public function __construct(int $startIndex, int $endIndex, string $category = '')
     {
-        if (static::$type == null || static::$nodeName == null) {
+        if (static::$type === null || static::$nodeName === null) {
             throw new Exception('Direct instantiation of editor_Segment_Tag is not appropriate, type and nodeName must not be NULL');
         }
         parent::__construct(static::$nodeName);
@@ -739,13 +739,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      */
     public function debug(): string
     {
-        $debug = '';
         $newline = "\n";
-        $debug .= 'RENDERED: ' . trim($this->render()) . $newline;
-        $debug .= 'START: ' . $this->startIndex . ' | END: ' . $this->endIndex . ' | FULLENGTH: ' . ($this->isFullLength ? 'true' : 'false') . $newline;
-        $debug .= 'DELETED: ' . ($this->wasDeleted ? 'true' : 'false') . ' | INSERTED: ' . ($this->wasInserted ? 'true' : 'false') . $newline;
 
-        return $debug;
+        return 'RENDERED: ' . trim($this->render()) . $newline .
+            'START: ' . $this->startIndex . ' | END: ' . $this->endIndex . ' | FULLENGTH: ' .
+                ($this->isFullLength ? 'true' : 'false') . $newline .
+            'DELETED: ' . ($this->wasDeleted ? 'true' : 'false') . ' | INSERTED: ' .
+                ($this->wasInserted ? 'true' : 'false') . $newline .
+            'ORDER: ' . $this->order . ' | PARENT ORDER: ' . $this->parentOrder . $newline;
     }
 
     public function debugProps(): string

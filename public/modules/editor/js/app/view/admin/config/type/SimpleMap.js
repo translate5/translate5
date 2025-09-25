@@ -144,7 +144,8 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                     bind: {
                         text: '{l10n.configuration.index}'
                     },
-                    dataIndex: 'index'
+                    dataIndex: 'index',
+                    renderer: v => Ext.String.htmlEncode(v)
                 }, {
                     bind: {
                         text: '{l10n.configuration.value}'

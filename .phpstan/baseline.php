@@ -22,11 +22,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/DevelopmentGithookCommand.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Translate5\\\\MaintenanceCli\\\\Command\\\\DevelopmentLocalServicesCommand\\:\\:\\$revertSql is never read, only written\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/DevelopmentLocalServicesCommand.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Translate5\\\\MaintenanceCli\\\\Command\\\\DevelopmentNewModelCommand\\:\\:checkFile\\(\\) should return string but returns true\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/DevelopmentNewModelCommand.php',
@@ -890,11 +885,6 @@ $ignoreErrors[] = [
 	'message' => '#^Variable \\$task in PHPDoc tag @var does not exist\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/CommentnavController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method editor_Models_Config\\:\\:getLevel\\(\\)\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/ConfigController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$customerId on array\\.$#',
@@ -20007,11 +19997,6 @@ $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property ZfExtended_Models_Installer_Modules_Database\\:\\:\\$options\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Installer/Modules/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ZfExtended_Models_Invalidlogin\\:\\:\\$maximum\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Invalidlogin.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$withFromPart of method Zend_Db_Table_Abstract\\:\\:select\\(\\) expects bool, array\\<string, string\\> given\\.$#',

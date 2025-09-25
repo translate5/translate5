@@ -727,11 +727,23 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
      * @returns {Boolean}
      */
     saveMainEditorContent: function (record) {
-        let me = this,
+        const me = this,
             plug = me.editingPlugin,
             // the cleanInvisibleCharacters call removes invisible characters automatically added by the editor,
             // thus preventing the record from being marked as modified when the content has not actually changed
             data = me.mainEditor.editor.getDataT5Format();
+
+        if (null === data) {
+            const msg = Editor.data.l10n.editor.error.segmentNotSaved + '<br />'
+                + Editor.data.l10n.editor.error.reopenSegmentOrRefresh;
+
+            console.log('Failed to save segment', 'record.internalId: ' + record.internalId, 'segmentId: ' + record.get('id'));
+
+            Editor.MessageBox.addError(msg);
+
+            return false;
+        }
+
         // newValue = me.cleanInvisibleCharacters(me.mainEditor.getValueAndUnMarkup()),
         let newValue = data.data;
 
@@ -754,9 +766,9 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
 
         // Remove all TrackChanges Markup
         // var cleanValue = me.cleanForSaveEditorContent(newValue);
-        let cleanValue = newValue;
+        // let cleanValue = newValue;
 
-        if (cleanValue.length === 0 && record.get(me.columnToEdit).length > 0) {
+        if (newValue.length === 0 && record.get(me.columnToEdit).length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
 
             return false;

@@ -113,16 +113,14 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.label}',
                 value: '{customField.label}'
-            },
-            renderer: v => Ext.String.htmlEncode(v)
+            }
         }, {
             itemId: 'tooltip',
             readOnly: true,
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.tooltip}',
                 value: '{customField.tooltip}'
-            },
-            renderer: v => Ext.String.htmlEncode(v)
+            }
         }, {
             xtype: 'combobox',
             forceSelection: true,
@@ -140,8 +138,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 }
             },
             displayField: 'name',
-            valueField: 'value',
-            renderer: v => Ext.String.htmlEncode(v)
+            valueField: 'value'
         }, {
             xtype: 'grid',
             height: 200,
@@ -382,6 +379,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 bind: {
                     text: '{l10n.taskCustomField.meta.regex}'
                 },
+                renderer: v => Ext.String.htmlEncode(v),
                 width: 150
             }, {
                 xtype: 'gridcolumn',

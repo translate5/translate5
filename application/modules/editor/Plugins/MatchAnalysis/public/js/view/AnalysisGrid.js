@@ -154,12 +154,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                         value: Editor.data.plugins.MatchAnalysis.pricing.systemDefaultPresetId,
                         bind: {
                             fieldLabel: '{l10n.MatchAnalysis.pricing.preset.combo}'
-                        },
-                        tpl: Ext.create('Ext.XTemplate',
-                            '<ul class="x-list-plain t5leveledList"><tpl for=".">',
-                            '<li role="option" class="{[values.cid == 0 ? "x-boundlist-item t5level1" : "x-boundlist-item"]}" title="{[Ext.String.htmlEncode(values.description)]}">{[Ext.String.htmlEncode(values.name)]}</li>',
-                            '</tpl></ul>'
-                        )
+                        }
                     }, {
                         xtype: 'image',
                         src: '/modules/editor/images/information.png',
@@ -309,7 +304,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                 } else if (!record.get('resourceColor')) {
                     return value;
                 }
-                return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #' + record.get('resourceColor') + ';"></div>' + Ext.String.htmlEncode(value);
+                return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #' + Ext.String.htmlEncode(record.get('resourceColor')) + ';"></div>' + Ext.String.htmlEncode(value);
             },
             dataIndex: 'resourceName',
             minWidth: 200,

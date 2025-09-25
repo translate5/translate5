@@ -53,6 +53,9 @@ Ext.define('Editor.controller.LanguageResources', {
       ref: 'matchgrid',
       selector: '#matchGrid'
   },{
+      ref: 'searchGrid',
+      selector: '#searchGridPanel'
+  },{
       ref: 'segmentGrid',
       selector:'#segmentgrid'
   },{
@@ -86,7 +89,8 @@ Ext.define('Editor.controller.LanguageResources', {
       },
       controller: {
           '#Editor.$application': {
-              editorViewportOpened: 'afterInitEditor'
+              editorViewportOpened: 'afterInitEditor',
+              beforeLeaveTask: 'onBeforeTaskLeave'
           },
           '#Editor': {
               beforeKeyMapUsage: 'handleEditorKeyMapUsage'
@@ -334,5 +338,9 @@ Ext.define('Editor.controller.LanguageResources', {
 
     onCustomerSelectionChange: function(selectionModel, selectedRecords) {
         this.fireEvent('customerchange', selectedRecords[0]?.id);
+    },
+
+    onBeforeTaskLeave: function() {
+        this.getSearchGrid()?.getController().abortAllRequests();
     }
 });

@@ -62,12 +62,24 @@ class SegmentHistoryCommand extends Translate5AbstractCommand
 The segment is identified by id or by taskGuid + segment number in task.
 The single versions are showing only the values different to the current one! This could be confusing first.');
 
-        $this->addArgument('segment', InputArgument::REQUIRED, 'Either a instance wide unique segment ID, or with -t|--task the segment number in the given task.');
+        $this->addArgument(
+            'segment',
+            InputArgument::REQUIRED,
+            'Either a instance wide unique segment ID, or with -t|--task the segment number in the given task.'
+        );
+
         $this->addOption(
             'task',
             't',
             InputOption::VALUE_REQUIRED,
             'Give a task ID or taskGuid here, then the argument "segment" is interpreted as segment nr in that task instead as a unique segment id.'
+        );
+
+        $this->addOption(
+            'no-trackchanges',
+            'c',
+            InputOption::VALUE_NONE,
+            'With this option no track changes are shown - so final content after applying them is rendered'
         );
     }
 
@@ -175,8 +187,11 @@ The single versions are showing only the values different to the current one! Th
 
     protected function showSegmentContent(array $segment)
     {
-        // TODO track changes: make del red and add green
-        $content = $this->segmentUtilities->internalTag->toExcel($segment['edited']);
+        if ($this->input->getOption('no-trackchanges')) {
+            $content = $this->segmentUtilities->internalTag->toExcel($segment['edited']);
+        } else {
+            $content = $this->segmentUtilities->internalTag->toDebug($segment['edited']);
+        }
         $label = str_pad('<info>' . $segment['name'] . ':</info> ', 30, ' ', STR_PAD_LEFT);
         $this->io->text($label . $content);
     }

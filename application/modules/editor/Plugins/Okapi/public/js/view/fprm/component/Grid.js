@@ -98,6 +98,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.component.Grid', {
             border: 0,
             width: '100%',
             height: 'auto',
+            viewConfig:{
+                markDirty:false
+            },
             store: {
                 type: 'json',
                 data: this.getStoreData(id, config.cols)

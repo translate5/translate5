@@ -130,7 +130,7 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
                 xtype: 'gridcolumn',
                 text: me.strings.name,
                 renderer: function(value, metaData, record) {
-                    return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'
+                    return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+Ext.String.htmlEncode(record.get('color'))+';"></div>'
                         + Ext.String.htmlEncode(value);
                 },
                 dataIndex : 'name',
@@ -142,6 +142,7 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
                 dataIndex : 'serviceName',
                 sortable : true,
                 flex : 25 / 100,
+                renderer: (v) => Ext.String.htmlEncode(v)
             },{
                 xtype : 'gridcolumn',
                 tooltip : me.strings.source,

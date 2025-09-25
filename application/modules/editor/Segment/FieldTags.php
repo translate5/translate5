@@ -230,17 +230,12 @@ class editor_Segment_FieldTags extends SegmentTagSequence
      */
     protected function finalizeUnparse(): void
     {
+        parent::finalizeUnparse();
         $num = count($this->tags);
-        $textLength = $this->getFieldTextLength();
         for ($i = 0; $i < $num; $i++) {
-            $tag = $this->tags[$i];
-            $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= $textLength);
-            $tag->content = $this->getTextPart($tag->startIndex, $tag->endIndex);
-            $tag->field = $this->field;
-            $tag->finalize($this, $this->task);
+            $this->tags[$i]->field = $this->field;
+            $this->tags[$i]->finalize($this, $this->task);
         }
-        // after unserialization, we set the wasDeleted / wasInserted properties of our tags
-        $this->evaluateDeletedInserted();
     }
 
     /* Cloning API */

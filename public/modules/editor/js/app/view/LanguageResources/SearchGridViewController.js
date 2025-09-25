@@ -67,7 +67,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
             '#ViewModes':{
                 viewModeChanged:'viewModeChangeEvent'
             }
-        }
+        },
     },
     refs:[{
         ref: 'resultTab',

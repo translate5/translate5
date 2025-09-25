@@ -208,45 +208,38 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
         function traverseNodes(node) {
             if (node.nodeType === Node.TEXT_NODE) {
                 const isWithinNode = pointer <= position && pointer + node.length >= position;
+
+                if (!isWithinNode) {
+                    pointer += node.length;
+
+                    return false;
+                }
+
                 const isInserting = action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.INSERT;
-                const isDeletingSpellCheck = (
-                    action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.REMOVE
-                    && action.content.length
-                    && tagsConversion.isTermNode(action.content[0].toDom())
-                );
+                const isDeletingTermTag = ! isInserting && _this._isTermNodeAffected(action, tagsConversion);
 
                 if (
-                    isWithinNode
-                    && tagsConversion.isTermNode(node.parentNode)
-                    && (isInserting || isDeletingSpellCheck)
+                    tagsConversion.isTermNode(node.parentNode) &&
+                    (isInserting || isDeletingTermTag)
                 ) {
                     _this._unwrapTermNode(node.parentNode);
 
                     return true;
                 }
 
+                let siblingToUnwrap = _this._resolveSiblingToUnwrap(node, tagsConversion);
+
                 if (
-                    isWithinNode
-                    && node.nextSibling
-                    && tagsConversion.isTermNode(node.nextSibling)
-                    && (
-                        action.type === RichTextEditor.EditorWrapper.ACTION_TYPE.REMOVE
-                        && action.content.length > 1
-                        && tagsConversion.isTermNode(action.content[action.content.length - 1].toDom())
-                    )
+                    siblingToUnwrap &&
+                    !isInserting &&
+                    isDeletingTermTag
                 ) {
-                    _this._unwrapTermNode(node.nextSibling);
+                    _this._unwrapTermNode(siblingToUnwrap);
 
                     return true;
                 }
 
-                if (isWithinNode) {
-                    return true;
-                }
-
-                pointer += node.length;
-
-                return false;
+                return true;
             }
 
             if (tagsConversion.isTag(node)) {
@@ -276,5 +269,62 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
         const insertFragment = document.createRange().createContextualFragment(node.innerHTML);
         node.parentNode.insertBefore(insertFragment, node);
         node.parentNode.removeChild(node);
+    },
+
+    _resolveSiblingToUnwrap: function(node, tagsConversion) {
+        // if we are deleted at the beginning of the spellcheck node with the del or backspace key
+        // and due to calculation of the position of a change current node can be right before the
+        // spellcheck node that we need to unwrap
+        if (node.nextSibling && tagsConversion.isTermNode(node.nextSibling)) {
+            return node.nextSibling;
+        }
+
+        // Edge case when we are deleting at the end of a text node that is followed by
+        // an insertion of a term node
+        if (
+            node.nextSibling &&
+            node.nextSibling.childNodes &&
+            tagsConversion.isTermNode(node.nextSibling.firstChild)
+        ) {
+            return node.nextSibling.firstChild;
+        }
+
+        // sometimes next sibling should be checked on a parent node
+        if (
+            node.parentNode.lastChild === node &&
+            node.parentNode.nextSibling
+        ) {
+            if (tagsConversion.isTermNode(node.parentNode.nextSibling)) {
+                return node.parentNode.nextSibling;
+            }
+
+            if (
+                node.parentNode.nextSibling.firstChild &&
+                tagsConversion.isTermNode(node.parentNode.nextSibling.firstChild)
+            ) {
+                return node.parentNode.nextSibling.firstChild;
+            }
+        }
+
+        return null;
+    },
+
+    _isTermNodeAffected: function (action, tagsConversion) {
+        for (const content of action.content ?? []) {
+            const dom = content.toDom();
+
+            if (
+                dom &&
+                (
+                    tagsConversion.isTermNode(dom) ||
+                    // If one of its children is a term tag node
+                    (dom.nodeType === Node.ELEMENT_NODE && !!dom.querySelectorAll('.term').length)
+                )
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 });

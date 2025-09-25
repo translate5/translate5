@@ -79,9 +79,11 @@ Ext.define('Editor.plugins.MatchAnalysis.model.admin.pricing.PresetPricesModel',
         type: 'int'
     }, {
         name: 'currency',
+        convert: v => Ext.String.htmlEncode(v),
         type: 'string'
     }, {
         name: 'pricesByRangeIds',
+        convert: v => Ext.String.htmlEncode(v),
         type: 'string'
     }, {
         name: 'noMatch',

@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * All available customers assigned to the user
  */
 Ext.define('Editor.view.admin.customer.UserCustomersCombo', {
-    extend: 'Editor.view.form.field.ComboField',
+    extend: 'Ext.form.field.ComboBox',
     alias: 'widget.usercustomerscombo',
     requires: [
         'Editor.store.admin.UserCustomers'

@@ -111,6 +111,7 @@ abstract class TagSequence implements JsonSerializable
      * Helper to sort Internal tags or rendered tags by startIndex
      * This is a central part of the rendering logic
      * Note, that for rendering, tags, that potentially contain other tags, must come first, otherwise this will lead to rendering errors
+     * Note, that the sorting of tags must not reperesent the order-property (!!!)
      * The nesting may be corrected with the ::findHolderByOrder API but for rendering this "longer first" logic must apply
      */
     public static function compare(editor_Segment_Tag $a, editor_Segment_Tag $b): int
@@ -653,6 +654,7 @@ abstract class TagSequence implements JsonSerializable
      */
     protected function finalizeUnparse(): void
     {
+        // setting contents & fulllength props
         $num = count($this->tags);
         $textLength = $this->getTextLength();
         for ($i = 0; $i < $num; $i++) {
@@ -869,20 +871,6 @@ abstract class TagSequence implements JsonSerializable
     }
 
     /**
-     * Helper to set the del/ins properties
-     */
-    protected function setContainedTagsProp(int $start, int $end, int $order, string $propName): void
-    {
-        foreach ($this->tags as $tag) {
-            if ($tag->startIndex >= $start && $tag->endIndex <= $end && $tag->getType() !== editor_Segment_Tag::TYPE_TRACKCHANGES) {
-                if (! ($tag->endIndex === $start || $tag->startIndex === $end) || $tag->parentOrder === $order) {
-                    $tag->$propName = true;
-                }
-            }
-        }
-    }
-
-    /**
      * Removes any parentOrder indices that point to non-existing indices
      */
     protected function fixParentOrders(): void
@@ -957,7 +945,7 @@ abstract class TagSequence implements JsonSerializable
         $newline = "\n";
         $debug = 'TEXT: "' . trim($this->text) . '"' . $newline;
         for ($i = 0; $i < count($this->tags); $i++) {
-            $debug .= 'TAG ' . $i . ':' . $newline . trim($this->tags[$i]->debug()) . $newline;
+            $debug .= 'TAG ' . $i . ':' . $newline . trim($this->tags[$i]->debug()) . $newline . $newline;
         }
 
         return $debug;

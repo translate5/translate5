@@ -49,11 +49,7 @@ class TaskConfig extends UnitTestAbstract
     {
         parent::setUp();
         $this->tmpDir = sys_get_temp_dir();
-        file_put_contents($this->tmpDir . '/task-config.ini', 'runtimeOptions.foo = bar
-runtimeOptions.fou = baz
-fileFilter[] = filter1
-fileFilter[] = filter2
-');
+        file_put_contents($this->tmpDir . '/task-config.ini', '');
     }
 
     public function tearDown(): void
@@ -85,16 +81,52 @@ fileFilter[] = filter2
 
                 return $this->createMock(Zend_Db_Statement_Interface::class);
             });
+
         $taskConfig = new editor_Models_Import_TaskConfig($taskConfigModel);
+
+        //test if configs is taken over properly
+        file_put_contents($this->tmpDir . '/task-config.ini', 'runtimeOptions.import.csv.delimiter = bar
+runtimeOptions.import.csv.enclosure = baz
+fileFilter[] = filter1
+fileFilter[] = filter2
+');
         $taskConfig->loadAndProcessConfigTemplate($task, $importConfig);
+
         $this->assertEquals(
             ['filter1', 'filter2'],
             $importConfig->fileFilters,
             'Task filters from task-config.ini not set as expected'
         );
         $this->assertEquals([
-            'runtimeOptions.foo' => 'bar',
-            'runtimeOptions.fou' => 'baz',
+            'runtimeOptions.import.csv.delimiter' => 'bar',
+            'runtimeOptions.import.csv.enclosure' => 'baz',
         ], $calledParams, 'Updated task config is not as expected');
+
+        //test if only task level configs are allowed
+        file_put_contents(
+            $this->tmpDir . '/task-config.ini',
+            'runtimeOptions.editor.customHtmlContainer = bar'
+        );
+
+        try {
+            $taskConfig->loadAndProcessConfigTemplate($task, $importConfig);
+            $this->fail('Should throw exception ' . \editor_Models_Import_FileParser_Exception::class);
+        } catch (\editor_Models_Import_FileParser_Exception $e) {
+            $this->assertStringContainsString(
+                'which is not setable on task level!',
+                $e->getMessage(),
+                'No proper exception message that a config not on task level requested was found'
+            );
+            $this->assertEquals(
+                'E1743',
+                $e->getErrorCode(),
+                'No Exception with proper ecode that only task level configs are allowed was thrown'
+            );
+            $this->assertEquals(
+                'runtimeOptions.editor.customHtmlContainer',
+                $e->getExtra('name'),
+                'The not allowed configname was not found in the exception'
+            );
+        }
     }
 }

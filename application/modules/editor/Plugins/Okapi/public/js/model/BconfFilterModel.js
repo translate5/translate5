@@ -86,18 +86,22 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         defaultValue: 0 /** @see self.proxy.setBconfId */
     }, {
         name: 'okapiType',
+        convert: v => Ext.String.htmlEncode(v),
         type: 'string',
         critical: true
     }, {
         name: 'okapiId',
+        convert: v => Ext.String.htmlEncode(v),
         type: 'string',
         critical: true
     }, {
         name: 'name',
+        convert: v => Ext.String.htmlEncode(v),
         type: 'string',
         persist: true
     }, {
         name: 'description',
+        convert: v => Ext.String.htmlEncode(v),
         type: 'string',
         persist: true
     }, {
@@ -108,6 +112,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         /* the identifier is unique and is used e.g. to connect the extension-mapping with the store */
         name: 'identifier',
         type: 'string',
+        convert: v => Ext.String.htmlEncode(v),
         critical: true
     }, {
         name: 'editable',
