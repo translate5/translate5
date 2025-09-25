@@ -259,14 +259,8 @@ class SegmentTagSequence extends TagSequence
 
     protected function finalizeUnparse(): void
     {
-        $num = count($this->tags);
-        $textLength = $this->getFieldTextLength();
-        for ($i = 0; $i < $num; $i++) {
-            $tag = $this->tags[$i];
-            $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= $textLength);
-            $tag->content = $this->getTextPart($tag->startIndex, $tag->endIndex);
-        }
-        // after unserialization, we set the wasDeleted / wasInserted properties of our tags
+        parent::finalizeUnparse();
+        // setting the wasDeleted / wasInserted properties of our tags
         $this->evaluateDeletedInserted();
     }
 
@@ -349,8 +343,8 @@ class SegmentTagSequence extends TagSequence
      */
     private function deleteTrackChangesTags(bool $condenseBlanks = true): bool
     {
-        $this->evaluateDeletedInserted(); // ensure this is properly set (normally always the case)
         $this->sort(); // making sure we're in order
+        $this->evaluateDeletedInserted(); // ensure this is properly set (normally always the case)
         foreach ($this->condenseTrackChangesDelTags(true) as $tag) {
             if ($tag->getType() === editor_Segment_Tag::TYPE_TRACKCHANGES) {
                 /** @var editor_Segment_TrackChanges_DeleteTag|editor_Segment_TrackChanges_InsertTag $tag */
@@ -395,7 +389,9 @@ class SegmentTagSequence extends TagSequence
      * Condenses all trackchanges del-tags, that immediately follow on each other.
      * This is crucial to properly calculate whitespace before and after when removing <del>-tags
      * Note, that this will not return tags with no content-length (e.g. trackchanges containing just an internal tag),
-     * those tags will only be flagged for deletion ...
+     * or nested del tags: those tags will only be flagged for deletion ...
+     * This API is just a helper to filter out those <del>-tags, that do not need to be "stamped out"
+     * The returned array contains the "meaningful" <del>-tags and all other types (ncluding <ins>)
      * @return editor_Segment_Tag[]
      */
     private function condenseTrackChangesDelTags(bool $forDeletion = false): array
@@ -403,9 +399,9 @@ class SegmentTagSequence extends TagSequence
         $tags = [];
         $lastTC = null;
         foreach ($this->tags as $tag) {
-            /** @var \editor_Segment_TrackChanges_TrackChangesTag $tag */
+            /** @var \editor_Segment_TrackChanges_DeleteTag $tag */
             if ($tag->getType() === editor_Segment_Tag::TYPE_TRACKCHANGES && $tag->isDeleteTag()) {
-                if ($tag->endIndex === $tag->startIndex) {
+                if ($tag->endIndex === $tag->startIndex || $tag->wasDeleted || $tag->wasInserted) {
                     if ($forDeletion) {
                         $tag->wasDeleted = true;
                     }
@@ -420,7 +416,7 @@ class SegmentTagSequence extends TagSequence
                     }
                 } else {
                     // only when deleting TC tags after using this method, we can (potentially) manipulate them,
-                    // otherwise we need to use clones
+                    // otherwise we need to use clones to not manipulate the existing structure
                     $lastTC = ($forDeletion) ? $tag : $tag->clone(true, true);
                     $tags[] = $lastTC;
                 }
@@ -572,14 +568,76 @@ class SegmentTagSequence extends TagSequence
      * Sets the deleted / inserted properties for all tags inside trackchanges-tags.
      * This is the last step of unparsing the tags and deserialization from JSON
      * It is also crucial for evaluating qualities because only non-deleted tags will count
+     * Mistakenly nested ins/del tags will be corrected here by ignoring them by marking them as "deleted"
+     * NOTE, that this mechanic works just over 2 nesting-levels
+     * and it's absolutely possible to create deeper nested bullshit ...
      */
     protected function evaluateDeletedInserted(): void
     {
+        // first, invalidate deleted/inserted props & find ins/del tags
+        $typeTC = editor_Segment_Tag::TYPE_TRACKCHANGES;
+        $delTags = [];
+        $insTags = [];
         foreach ($this->tags as $tag) {
-            if ($tag->getType() === editor_Segment_Tag::TYPE_TRACKCHANGES) {
+            $tag->wasDeleted = $tag->wasInserted = false;
+            if ($tag->getType() === $typeTC) {
                 /** @var \editor_Segment_TrackChanges_TrackChangesTag $tag */
-                $propName = ($tag->isDeleteTag()) ? 'wasDeleted' : 'wasInserted';
-                $this->setContainedTagsProp($tag->startIndex, $tag->endIndex, $tag->order, $propName);
+                if ($tag->isDeleteTag()) {
+                    $delTags[] = $tag;
+                } else {
+                    $insTags[] = $tag;
+                }
+            }
+        }
+        // first, mark all nested TC tags in top-level DEL as deleted
+        foreach ($delTags as $tag) {
+            if ($tag->parentOrder === -1) {
+                $this->setContainedTagsProp($tag, 'wasDeleted', $typeTC);
+            }
+        }
+        // to cover 2 levels, repeat for inner tags
+        foreach ($insTags as $tag) {
+            if ($tag->wasDeleted) {
+                $this->setContainedTagsProp($tag, 'wasDeleted', $typeTC);
+            }
+        }
+        foreach ($delTags as $tag) {
+            if ($tag->wasDeleted) {
+                $this->setContainedTagsProp($tag, 'wasDeleted', $typeTC);
+            }
+        }
+        // mark all inner inserted tags as such - if the insertion was not deleted
+        foreach ($insTags as $tag) {
+            if (! $tag->wasDeleted) {
+                $this->setContainedTagsProp($tag, 'wasInserted');
+            } elseif ($tag->wasDeleted) {
+                $this->setContainedTagsProp($tag, 'wasDeleted');
+            }
+        }
+        // lastly mark all inner deleted tags as such
+        foreach ($delTags as $tag) {
+            if (! $tag->wasInserted) {
+                $this->setContainedTagsProp($tag, 'wasDeleted');
+            }
+        }
+    }
+
+    /**
+     * Helper to set the del/ins properties
+     */
+    protected function setContainedTagsProp(editor_Segment_Tag $outer, string $propName, string $type = null): void
+    {
+        foreach ($this->tags as $tag) {
+            if ($tag !== $outer &&
+                $tag->startIndex >= $outer->startIndex &&
+                $tag->endIndex <= $outer->endIndex &&
+                ($type === null || $tag->getType() === $type) &&
+                (
+                    ($tag->startIndex > $outer->startIndex && $tag->endIndex < $outer->endIndex) ||
+                    $tag->parentOrder === $outer->order
+                )
+            ) {
+                $tag->$propName = true;
             }
         }
     }
