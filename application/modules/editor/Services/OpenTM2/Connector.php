@@ -38,7 +38,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\QueryCache;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\T5Memory\Api\Response\MutationResponse as MutationApiResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\UpdateResponse as MutationApiResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;

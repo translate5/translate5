@@ -34,7 +34,7 @@ use JsonException;
 use MittagQI\Translate5\T5Memory\Api\Contract\OverflowErrorInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-class MutationResponse extends AbstractResponse implements OverflowErrorInterface
+class UpdateResponse extends AbstractResponse implements OverflowErrorInterface
 {
     use OverflowErrorTrait;
 
