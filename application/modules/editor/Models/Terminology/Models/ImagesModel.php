@@ -144,7 +144,7 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     public function delete()
     {
         // If file exists delete it
-        $src = $this->getImagePath($this->getCollectionId(), $this->getUniqueName());
+        $src = $this->getImagePath((int) $this->getCollectionId(), $this->getUniqueName());
         is_file($src) && unlink($src);
 
         return parent::delete();
@@ -273,11 +273,14 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
      */
     protected function purgeImageTable(int $collectionId)
     {
-        $this->db->getAdapter()->query('DELETE i FROM `terms_images` i
-                LEFT JOIN (
-                    SELECT id, target FROM `terms_attributes` WHERE collectionId = ?
-                ) a ON i.targetId = a.target  
-                WHERE a.id IS NULL AND i.collectionId = ?', [$collectionId, $collectionId]);
+        $this->db->getAdapter()->query(
+            '
+            DELETE i
+            FROM terms_images i
+            LEFT JOIN terms_attributes a ON i.targetId = a.target AND a.collectionId = ?
+            WHERE a.id IS NULL AND i.collectionId = ?',
+            [$collectionId, $collectionId]
+        );
     }
 
     public function getQtyByCollectionId($collectionId)
