@@ -28,8 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\BatchSet\Exception;
+namespace MittagQI\Translate5\Task\BatchOperations\Exception;
 
-class InvalidWorkflowProvidedException extends InvalidValueProvidedException
+class InvalidWorkflowStepProvidedException extends InvalidValueProvidedException
 {
 }

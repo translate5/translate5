@@ -36,8 +36,8 @@ use editor_Models_Task;
 use editor_Models_Task_Remover;
 use MittagQI\Translate5\JobAssignment\UserJob\BatchUpdate\UserJobDeadlineBatchUpdater;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Task\BatchSet\BatchSetTaskGuidsProvider;
-use MittagQI\Translate5\Task\BatchSet\Setter\TaskBatchSetDeadlineDate;
+use MittagQI\Translate5\Task\BatchOperations\BatchSetTaskGuidsProvider;
+use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchSetDeadlineDate;
 use MittagQI\Translate5\Test\Fixtures\CustomerFixtures;
 use MittagQI\Translate5\Test\Fixtures\JobFixtures;
 use MittagQI\Translate5\Test\Fixtures\TaskFixtures;
@@ -247,7 +247,7 @@ class TaskBatchSetDeadlineDateTest extends TestCase
     private static function getRequest(): Request
     {
         $request = new Request();
-        $request->setParam('updateType', 'deadlineDate');
+        $request->setParam('batchType', 'deadlineDate');
         $request->setParam('batchWorkflow', self::workflow);
         $request->setParam('batchWorkflowStep', self::workflowStepName);
         $request->setParam('deadlineDate', self::deadlineDate);

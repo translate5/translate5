@@ -28,43 +28,32 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\BatchSet;
+namespace MittagQI\Translate5\Task\BatchOperations\DTO;
 
-use MittagQI\Translate5\Task\BatchSet\Setter\TaskBatchSetDeadlineDate;
-use REST_Controller_Request_Http;
+use REST_Controller_Request_Http as Request;
 
-class TaskBatchSetter
+class TaskGuidsQueryDto
 {
     /**
-     * @param TaskBatchSetterInterface[] $setters
+     * @param int[] $projectAndTaskIds
      */
     public function __construct(
-        private readonly array $setters,
+        public readonly ?array $projectAndTaskIds,
+        public readonly ?string $filter,
     ) {
     }
 
-    public static function create(): self
+    public static function fromRequest(Request $request): self
     {
-        return new self(
-            [
-                TaskBatchSetDeadlineDate::create(),
-            ],
-        );
-    }
-
-    public function process(REST_Controller_Request_Http $request): void
-    {
-        $this->getSetter($request->getParam('updateType'))?->process($request);
-    }
-
-    private function getSetter(string $updateType): ?TaskBatchSetterInterface
-    {
-        foreach ($this->setters as $setter) {
-            if ($setter->supports($updateType)) {
-                return $setter;
-            }
+        $projectsAndTasks = null;
+        if (! empty($request->getParam('projectsAndTasks'))) {
+            $projectsAndTasks = explode(',', $request->getParam('projectsAndTasks'));
+            $projectsAndTasks = array_map('intval', $projectsAndTasks);
         }
 
-        return null;
+        return new self(
+            $projectsAndTasks,
+            $request->getParam('filter'),
+        );
     }
 }
