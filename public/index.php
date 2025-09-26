@@ -32,4 +32,4 @@ if(file_exists('../client-specific/index_prerun.php')) {
 }
 require_once '../library/ZfExtended/BaseIndex.php';
 $index = ZfExtended_BaseIndex::getInstance();
-$index->startApplication();
+$index->startApplication(fn () => \Editor_Bootstrap::initContainer());
