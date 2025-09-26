@@ -71,7 +71,7 @@ class ReorganizeService
         LanguageResource $languageResource,
         string $tmName,
     ): bool {
-        if (str_contains($response->getErrorMessage(), 'Failed to load tm')) {
+        if (str_contains($response->getErrorMessage() ?: '', 'Failed to load tm')) {
             return false;
         }
 
