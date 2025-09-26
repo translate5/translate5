@@ -522,10 +522,14 @@ Ext.override(Ext.view.Table, {
         // <added block>
         var dom = Ext.fly(div).down(me.getNodeContainerSelector(), true).firstChild;
         if (!dom && updateColumns && jslogger) {
+
             jslogger.addLogEntry({type: 'info', message: 'Undefined element returned'});
+            jslogger.addLogEntry({type: 'info', message: 'Grid: id ' + me.grid?.id + ', xtype ' + me.grid?.xtype});
             jslogger.addLogEntry({type: 'info', message: 'record index: ' + index});
             jslogger.addLogEntry({type: 'info', message: 'record ID index: ' + record.getId()});
-            jslogger.addLogEntry({type: 'info', message: 'updateColumns: ' + JSON.stringify(updateColumns).replaceAll('"', '~')});
+            let info = [];
+            updateColumns.forEach(column => info.push({xtype: column.xtype, dataIndex: column.dataIndex, text: column.text}));
+            jslogger.addLogEntry({type: 'info', message: 'updateColumns: ' + JSON.stringify(info).replaceAll('"', '~')});
             jslogger.addLogEntry({type: 'info', message: 'tplData: ' + JSON.stringify(tplData).replaceAll('"', '~')});
             jslogger.addLogEntry({type: 'info', message: 'me.getNodeContainerSelector(): ' + me.getNodeContainerSelector()});
             jslogger.addLogEntry({type: 'info', message: 'render div: ' + div.outerHTML});
