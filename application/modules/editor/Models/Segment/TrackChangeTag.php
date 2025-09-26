@@ -192,14 +192,102 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * - DEL => avoid multiple space after removing a deleted word with one or more space at both sides
      * - DEL => markup-Tag AND content inbetween is removed
      */
-    public function removeTrackChanges(string $segment)
+    public function removeTrackChanges(string $segment): string
     {
-        $segment = $this->protect($segment);
-        $segment = preg_replace(self::REGEX_INS, '', $segment);
-        $segment = preg_replace('/ +<' . self::PLACEHOLDER_TAG_DEL . '[^>]+> +/', ' ', $segment);
-        $segment = preg_replace('/<' . self::PLACEHOLDER_TAG_DEL . '[^>]+>/', '', $segment);
+        if (! str_contains($segment, '<del') && ! str_contains($segment, '<ins')) {
+            return $segment;
+        }
 
-        return $segment;
+        libxml_use_internal_errors(true);
+
+        // --- 0) Protect &quot; so DOM won’t normalize it in text nodes
+        // Use a very unlikely marker (could randomize if you want)
+        $quotPh = '__PRESERVE_DQ_e1f3b7__';
+        $segment = str_replace('&quot;', $quotPh, $segment);
+
+        // Wrap in a neutral inline container to preserve leading spaces
+        $segment = '<div id="__root__">' . $segment . '</div>';
+        $html = '<?xml encoding="UTF-8">' . $segment;
+
+        $doc = new DOMDocument('1.0', 'UTF-8');
+        $doc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $xpath = new DOMXPath($doc);
+
+        /** 1) Remove all <del> (drop content) */
+        $delNodes = $xpath->query('//del');
+        /** @var DOMNode[] $toRemove */
+        $toRemove = [];
+        foreach ($delNodes as $n) {
+            $toRemove[] = $n;
+        }
+        foreach ($toRemove as $del) {
+            $parent = $del->parentNode;
+            if (! $parent) {
+                continue;
+            }
+
+            // Remember neighbors *before* removal
+            $prev = $del->previousSibling;
+            $next = $del->nextSibling;
+
+            // Normalize boundary whitespace between $prev and $next
+            $leftText = ($prev && $prev->nodeType === XML_TEXT_NODE) ? $prev : null;
+            $rightText = ($next && $next->nodeType === XML_TEXT_NODE) ? $next : null;
+
+            // Remove the <del> node
+            $parent->removeChild($del);
+
+            // Detect if there was whitespace at either side
+            $leftHadWS = $leftText ? (bool) preg_match('/\s$/u', $leftText->nodeValue) : false;
+            $rightHadWS = $rightText ? (bool) preg_match('/^\s/u', $rightText->nodeValue) : false;
+
+            if (! $leftText && ! $rightText) {
+                continue;
+            }
+
+            if (! $leftHadWS && ! $rightHadWS) {
+                continue;
+            }
+
+            // Trim trailing on left, leading on right
+            if ($leftText && $rightHadWS) {
+                $leftText->nodeValue = preg_replace('/\s+$/u', '', $leftText->nodeValue);
+            }
+            if ($rightText) {
+                $rightText->nodeValue = preg_replace('/^\s+/u', ' ', $rightText->nodeValue);
+            }
+        }
+
+        /** 2) Unwrap all <ins> (preserve content) */
+        $insNodes = $xpath->query('//ins');
+        $toUnwrap = [];
+        foreach ($insNodes as $n) {
+            $toUnwrap[] = $n;
+        }
+        foreach ($toUnwrap as $ins) {
+            $parent = $ins->parentNode;
+            if (! $parent) {
+                continue;
+            }
+            while ($ins->firstChild) {
+                $parent->insertBefore($ins->firstChild, $ins);
+            }
+            $parent->removeChild($ins);
+        }
+
+        // Extract innerHTML of our wrapper (preserves leading space)
+        $root = $doc->getElementById('__root__');
+        if (! $root) {
+            // Fallback to whole doc if wrapper somehow missing
+            return $doc->saveHTML();
+        }
+
+        $out = '';
+        foreach ($root->childNodes as $child) {
+            $out .= $doc->saveHTML($child);
+        }
+
+        return str_replace($quotPh, '&quot;', $out);
     }
 
     /**
