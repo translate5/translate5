@@ -181,9 +181,9 @@ abstract class editor_Services_Connector_Abstract
         //init the default logger, is changed in connectTo
         $this->logger = Zend_Registry::get('logger');
         $this->config = Zend_Registry::get('config');
+        $this->tagHandlerFactory = TagHandlerFactory::create();
         $this->tagHandler = $this->createTagHandler();
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
-        $this->tagHandlerFactory = TagHandlerFactory::create();
     }
 
     /**

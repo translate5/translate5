@@ -317,10 +317,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     public function update(editor_Models_Segment $segment, ?UpdateOptions $updateOptions = null): void
     {
         $updateOptions = new UpdateOptions(
-            $updateOptions?->useSegmentTimestamp,
+            (bool) $updateOptions?->useSegmentTimestamp,
             $updateOptions?->saveToDisk && ! $this->isInternalFuzzy(),
-            $updateOptions?->saveDifferentTargetsForSameSource,
-            $updateOptions?->recheckOnUpdate,
+            (bool) $updateOptions?->saveDifferentTargetsForSameSource,
+            (bool) $updateOptions?->recheckOnUpdate,
         );
 
         $this->updateSegmentService->update(

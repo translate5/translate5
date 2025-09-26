@@ -435,7 +435,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
             $saveDifferentTargetsForSameSource,
             $save2disk,
         );
-        $response = $this->sendRequest($request);
+        $response = $this->client->sendRequest($request);
 
         return UpdateResponse::fromResponse($response);
     }
