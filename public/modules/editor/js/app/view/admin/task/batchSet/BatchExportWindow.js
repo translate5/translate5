@@ -56,6 +56,7 @@ Ext.define('Editor.view.admin.task.batchSet.BatchExportWindow', {
     ],
     controller: 'batchExport',
     itemId: 'batchExportWindow',
+    modal: true,
     bodyPadding: 20,
     border: false,
     width: 900,
